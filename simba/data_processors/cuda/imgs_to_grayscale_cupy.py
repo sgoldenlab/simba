@@ -1,4 +1,6 @@
-import time
+__author__ = "Simon Nilsson"
+__email__ = "sronilsson@gmail.com"
+
 from typing import Optional
 import cupy as cp
 import numpy as np

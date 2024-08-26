@@ -1,3 +1,7 @@
+__author__ = "Simon Nilsson"
+__email__ = "sronilsson@gmail.com"
+
+
 from typing import Union, Optional
 import os
 import cv2

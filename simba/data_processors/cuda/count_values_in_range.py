@@ -1,3 +1,7 @@
+__author__ = "Simon Nilsson"
+__email__ = "sronilsson@gmail.com"
+
+
 from numba import cuda
 import numpy as np
 

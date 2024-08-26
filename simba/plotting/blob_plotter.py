@@ -1,3 +1,6 @@
+__author__ = "Simon Nilsson"
+__email__ = "sronilsson@gmail.com"
+
 from typing import List, Tuple
 import os
 from typing import Union, Optional
@@ -19,6 +22,23 @@ from numba import jit
 
 
 class BlobPlotter(PlottingMixin):
+    """
+     Plot the results of animal tracking based on blob.
+
+     :param Union[List[str], str, os.PathLike] data_path: Path(s) to video file(s) or directory containing video files.
+     :param Optional[bool] gpu: Whether to use GPU for processing. Defaults to False.
+     :param Optional[int] batch_size: Number of frames to process in each batch. Defaults to 2000. Increase if your RAM allows.
+     :param Optional[Tuple[int, int, int]] circle_color: Color of the blobs as an RGB tuple. Defaults to pink (255, 105, 180).
+     :param Optional[Union[str, os.PathLike]] save_dir: Directory to save output files. If None, no files will be saved.
+     :param Optional[int] verbose:
+     :param Optional[str] smoothing:
+     :param Optional[int] circle_size:
+     :param Optional[int] core_cnt:
+
+     :example:
+     >>> BlobPlotter(data_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\test\2022-06-20_NOB_DOT_4_downsampled.mp4", smoothing='Savitzky Golay', circle_size=10).run()
+     """
+
     def __init__(self,
                  data_path: Union[List[str], str, os.PathLike],
                  gpu: Optional[bool] = False,
@@ -30,22 +50,7 @@ class BlobPlotter(PlottingMixin):
                  circle_size: Optional[int] = None,
                  core_cnt: Optional[int] = -1):
 
-        """
-        Plot the results of animal tracking based on blob.
 
-        :param Union[List[str], str, os.PathLike] data_path: Path(s) to video file(s) or directory containing video files.
-        :param Optional[bool] gpu: Whether to use GPU for processing. Defaults to False.
-        :param Optional[int] batch_size: Number of frames to process in each batch. Defaults to 2000. Increase if your RAM allows.
-        :param Optional[Tuple[int, int, int]] circle_color: Color of the blobs as an RGB tuple. Defaults to pink (255, 105, 180).
-        :param Optional[Union[str, os.PathLike]] save_dir: Directory to save output files. If None, no files will be saved.
-        :param Optional[int] verbose:
-        :param Optional[str] smoothing:
-        :param Optional[int] circle_size:
-        :param Optional[int] core_cnt:
-
-        :example:
-        >>> BlobPlotter(data_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\test\2022-06-20_NOB_DOT_4_downsampled.mp4", smoothing='Savitzky Golay', circle_size=10).run()
-        """
 
         PlottingMixin.__init__(self)
         if os.path.isdir(data_path):

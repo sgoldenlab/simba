@@ -1,3 +1,6 @@
+__author__ = "Simon Nilsson"
+__email__ = "sronilsson@gmail.com"
+
 import os
 import shap
 import numpy as np

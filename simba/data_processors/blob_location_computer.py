@@ -1,3 +1,6 @@
+__author__ = "Simon Nilsson"
+__email__ = "sronilsson@gmail.com"
+
 import os
 from typing import Union, Optional
 import numpy as np
@@ -18,6 +21,26 @@ from simba.utils.data import savgol_smoother, df_smoother
 import pandas as pd
 
 class BlobLocationComputer(object):
+
+    """
+    Detecting and saving blob locations from video files.
+
+    .. video:: _static/img/BlobLocationComputer.webm
+       :width: 800
+       :autoplay:
+       :loop:
+
+    :param Union[str, os.PathLike] data_path: Path to a video file or a directory containing video files. The videos will be processed for blob detection.
+    :param Optional[bool] verbose:  If True, prints progress and success messages to the console. Default is True.
+    :param Optional[bool] gpu: If True, GPU acceleration will be used for blob detection. Default is True.
+    :param Optional[int] batch_size: The number of frames to process in each batch for blob detection. Default is 2500.
+    :param Optional[Union[str, os.PathLike]] save_dir: Directory where the blob location data will be saved as CSV files. If None, the results will not be saved. Default is None.
+    :param Optional[bool] multiprocessing: If True, video background subtraction will be done using  multiprocessing. Default is False.
+
+    :example:
+    >>> x = BlobLocationComputer(data_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled_bg_subtracted.mp4", multiprocessing=True, gpu=True, batch_size=2000, save_dir=r"C:\troubleshooting\RAT_NOR\project_folder\csv\blob_positions")
+    >>> x.run()
+    """
     def __init__(self,
                  data_path: Union[str, os.PathLike],
                  verbose: Optional[bool] = True,
@@ -26,26 +49,6 @@ class BlobLocationComputer(object):
                  save_dir: Optional[Union[str, os.PathLike]] = None,
                  smoothing: Optional[str] = None,
                  multiprocessing: Optional[bool] = False):
-
-        """
-        Detecting and saving blob locations from video files.
-
-        .. video:: _static/img/BlobLocationComputer.webm
-           :width: 800
-           :autoplay:
-           :loop:
-
-        :param Union[str, os.PathLike] data_path: Path to a video file or a directory containing video files. The videos will be processed for blob detection.
-        :param Optional[bool] verbose:  If True, prints progress and success messages to the console. Default is True.
-        :param Optional[bool] gpu: If True, GPU acceleration will be used for blob detection. Default is True.
-        :param Optional[int] batch_size: The number of frames to process in each batch for blob detection. Default is 2500.
-        :param Optional[Union[str, os.PathLike]] save_dir: Directory where the blob location data will be saved as CSV files. If None, the results will not be saved. Default is None.
-        :param Optional[bool] multiprocessing: If True, video background subtraction will be done using  multiprocessing. Default is False.
-
-        :example:
-        >>> x = BlobLocationComputer(data_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled_bg_subtracted.mp4", multiprocessing=True, gpu=True, batch_size=2000, save_dir=r"C:\troubleshooting\RAT_NOR\project_folder\csv\blob_positions")
-        >>> x.run()
-        """
 
 
         if os.path.isdir(data_path):

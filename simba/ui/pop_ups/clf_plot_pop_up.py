@@ -1,4 +1,5 @@
 __author__ = "Simon Nilsson"
+__email__ = "sronilsson@gmail.com"
 
 import os.path
 from tkinter import *

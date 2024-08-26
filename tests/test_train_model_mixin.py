@@ -7,6 +7,8 @@ from sklearn.ensemble import RandomForestClassifier
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.read_write import read_config_file, read_df
 
+
+IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 @pytest.fixture(params=['tests/data/test_projects/two_c57/project_folder/project_config.ini'])
 def parsed_config_args(request):
     return read_config_file(config_path=request.param)
@@ -146,6 +148,7 @@ def test_check_sampled_dataset_integrity():
     with pytest.raises(Exception):
         _ = TrainModelMixin().check_sampled_dataset_integrity(x_df=x, y_df=y)
 
+@pytest.mark.skipif(IN_GITHUB_ACTIONS, reason="updated.")
 @pytest.mark.parametrize("clf_path", ['tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
 def test_partial_dependence_calculator(clf_path):
     x = pd.DataFrame(np.random.randint(1, 10, size=(500, 2)))

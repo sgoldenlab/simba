@@ -1,3 +1,6 @@
+__author__ = "Simon Nilsson"
+__email__ = "sronilsson@gmail.com"
+
 from numba import cuda
 import numpy as np
 from simba.utils.read_write import read_df
@@ -10,7 +13,6 @@ def _get_3pt_angle_kernel(x_dev, y_dev, z_dev, results):
 
     if i >= x_dev.shape[0]:
         return
-
     if i < x_dev.shape[0]:
         x_x, x_y = x_dev[i][0], x_dev[i][1]
         y_x, y_y = y_dev[i][0], y_dev[i][1]

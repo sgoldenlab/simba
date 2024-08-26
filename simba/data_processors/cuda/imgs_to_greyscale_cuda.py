@@ -1,3 +1,6 @@
+__author__ = "Simon Nilsson"
+__email__ = "sronilsson@gmail.com"
+
 import numpy as np
 from numba import cuda
 from simba.utils.read_write import read_img_batch_from_video_gpu

@@ -36,7 +36,7 @@ class Smoothing(ConfigReader):
     .. note::
        `Smoothing tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-files>`__.
 
-    .. importants::
+    .. important::
         The wmoothened data overwrites the original data on disk. If the original data is required, pass ``copy_originals = True`` to save a copy of the original data.
 
     :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format.

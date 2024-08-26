@@ -1,3 +1,6 @@
+__author__ = "Simon Nilsson"
+__email__ = "sronilsson@gmail.com"
+
 from numba import cuda, njit
 from copy import deepcopy
 import numpy as np
