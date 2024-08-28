@@ -37,8 +37,9 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
                                 check_if_string_value_is_valid_video_timestamp,
-                                check_instance, check_int, check_str,
-                                check_nvidea_gpu_available, check_valid_lst)
+                                check_instance, check_int,
+                                check_nvidea_gpu_available, check_str,
+                                check_valid_lst)
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
 from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 FFMPEGCodecGPUError, FileExistError,
@@ -49,9 +50,9 @@ from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 NoFilesFoundError, NotDirectoryError,
                                 ParametersFileError, PermissionError)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.warnings import (FileExistWarning, InvalidValueWarning,
-                                  NoDataFoundWarning, NoFileFoundWarning,
-                                  ThirdPartyAnnotationsInvalidFileFormatWarning)
+from simba.utils.warnings import (
+    FileExistWarning, InvalidValueWarning, NoDataFoundWarning,
+    NoFileFoundWarning, ThirdPartyAnnotationsInvalidFileFormatWarning)
 
 # from simba.utils.keyboard_listener import KeyboardListener
 

@@ -1,9 +1,11 @@
 from typing import Optional
+
 import cupy as cp
+import numpy as np
 
 from simba.utils.checks import check_float, check_valid_array
-import numpy as np
 from simba.utils.enums import Formats
+
 
 def poly_area(data: np.ndarray,
               pixels_per_mm: Optional[float] = 1.0,
