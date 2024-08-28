@@ -30,7 +30,7 @@ def img_stack_to_grayscale_cupy(imgs: np.ndarray,
     check_if_valid_img(data=imgs[0], source=img_stack_to_grayscale_cupy.__name__)
     if imgs.ndim != 4:
         return imgs
-    results =  cp.zeros((imgs.shape[0], imgs.shape[1], imgs.shape[2]), dtype=np.uint8)
+    results = cp.zeros((imgs.shape[0], imgs.shape[1], imgs.shape[2]), dtype=np.uint8)
     n = int(np.ceil((imgs.shape[0] / batch_size)))
     imgs = np.array_split(imgs, n)
     start = 0

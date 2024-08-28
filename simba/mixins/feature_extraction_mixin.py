@@ -713,17 +713,11 @@ class FeatureExtractionMixin(object):
         angles = np.arctan2(edges[:, 1], edges[:, 0])
         angles = np.abs(np.mod(angles, pi2))
         angles = np.unique(angles)
-        rotations = np.vstack(
-            [np.cos(angles), np.cos(angles - pi2), np.cos(angles + pi2), np.cos(angles)]
-        ).T
+        rotations = np.vstack([np.cos(angles), np.cos(angles - pi2), np.cos(angles + pi2), np.cos(angles)]).T
         rotations = rotations.reshape((-1, 2, 2))
         rot_points = np.dot(rotations, hull_points.T)
-        min_x, max_x = np.nanmin(rot_points[:, 0], axis=1), np.nanmax(
-            rot_points[:, 0], axis=1
-        )
-        min_y, max_y = np.nanmin(rot_points[:, 1], axis=1), np.nanmax(
-            rot_points[:, 1], axis=1
-        )
+        min_x, max_x = np.nanmin(rot_points[:, 0], axis=1), np.nanmax(rot_points[:, 0], axis=1)
+        min_y, max_y = np.nanmin(rot_points[:, 1], axis=1), np.nanmax(rot_points[:, 1], axis=1)
         areas = (max_x - min_x) * (max_y - min_y)
         best_idx = np.argmin(areas)
         x1, x2 = max_x[best_idx], min_x[best_idx]

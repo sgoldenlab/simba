@@ -37,7 +37,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
                                 check_if_string_value_is_valid_video_timestamp,
-                                check_instance, check_int,
+                                check_instance, check_int, check_str,
                                 check_nvidea_gpu_available, check_valid_lst)
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
 from simba.utils.errors import (DataHeaderError, DuplicationError,
@@ -50,7 +50,8 @@ from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 ParametersFileError, PermissionError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.warnings import (FileExistWarning, InvalidValueWarning,
-                                  NoDataFoundWarning, NoFileFoundWarning)
+                                  NoDataFoundWarning, NoFileFoundWarning,
+                                  ThirdPartyAnnotationsInvalidFileFormatWarning)
 
 # from simba.utils.keyboard_listener import KeyboardListener
 
@@ -2091,3 +2092,103 @@ def find_largest_blob_location(imgs: dict, verbose: Optional[bool] = False, vide
             print(e.args)
             results[frm_idx] = np.array([np.nan, np.nan])
     return results
+
+
+
+def bento_file_reader(file_path: Union[str, os.PathLike],
+                      fps: Optional[float] = None,
+                      orient: Optional[Literal['index', 'columns']] = 'index',
+                      save_path: Optional[Union[str, os.PathLike]] = None,
+                      raise_error: Optional[bool] = False,
+                      log_setting: Optional[bool] = False) -> Union[None, Dict[str, pd.DataFrame]]:
+
+    """
+    Reads a BENTO annotation file and processes it into a dictionary of DataFrames, each representing a classified behavior.
+    Optionally, the results can be saved to a specified path.
+
+    The function handles both frame-based and second-based annotations, converting the latter to frame-based
+    annotations if the frames-per-second (FPS) is provided or can be inferred from the file.
+
+    :param Union[str, os.PathLike] file_path: Path to the BENTO annotation file.
+    :param Optional[float] fps: Frames per second (FPS) for converting second-based annotations to frames. If not provided, the function  will attempt to infer FPS from the file. If FPS is required and cannot be inferred, an error is raised.
+    :param Optional[Union[str, os.PathLike]] save_path: Path to save the processed results as a pickle file. If None, results are returned instead of saved.
+    :return: A dictionary where the keys are classifier names and the values are DataFrames with 'START' and 'STOP'  columns representing the start and stop frames of each behavior.
+    :rtype: Dict[str, pd.DataFrame]
+
+    :example:
+    >>> bento_file_reader(file_path=r"C:\troubleshooting\bento_test\bento_files\20240812_crumpling3.annot")
+    """
+
+    def _orient_columns_melt(df: pd.DataFrame) -> pd.DataFrame:
+        df = df[['START', 'STOP']].astype(np.int32).reset_index()
+        df = df.melt(id_vars='index', var_name=None).drop('index', axis=1)
+        df["BEHAVIOR"] = clf_name
+        df.columns = ["EVENT", "FRAME", 'BEHAVIOR']
+        return df.sort_values(by='FRAME', ascending=True)[['BEHAVIOR', "EVENT", "FRAME"]].reset_index(drop=True)
+
+    check_file_exist_and_readable(file_path=file_path)
+    check_str(name=f'{bento_file_reader.__name__} orient', value=orient, options=('index', 'columns'))
+    if fps is not None:
+        check_int(name=f'{bento_file_reader.__name__} fps', value=fps, min_value=1)
+    _, video_name, _ = get_fn_ext(filepath=file_path)
+    try:
+        df = pd.read_csv(file_path, index_col=False, low_memory=False, header=None, encoding='utf-8').astype(str)
+    except:
+        df = pd.read_csv(file_path, index_col=False, low_memory=False, header=None, encoding='ascii').astype(str)
+    idx = df[0].str.contains(pat='>', regex=True)
+    idx = list(idx.index[idx])
+    results = {}
+    if len(idx) == 0:
+        if raise_error:
+            raise NoDataError(f"{file_path} is not a valid BENTO file. See the docs for expected file format.", source=bento_file_reader.__name__)
+        else:
+            ThirdPartyAnnotationsInvalidFileFormatWarning(annotation_app="BENTO", file_path=file_path, source=bento_file_reader.__name__, log_status=log_setting)
+            return results
+    idx.append(len(df))
+    idx_mod = [0] + idx + [max(idx) + 1]
+    clf_dfs = [df.iloc[idx_mod[n]:idx_mod[n + 1]] for n in range(len(idx_mod) - 1)][1:-1]
+    for clf_idx in range(len(clf_dfs)):
+        clf_df = clf_dfs[clf_idx].reset_index(drop=True)
+        clf_name = clf_df.iloc[0, 0][1:]
+        clf_df = clf_df.iloc[2:, 0].reset_index(drop=True)
+        out_clf_df = clf_df.str.split('\t', expand=True)
+        if len(out_clf_df.columns) > 3:
+            if raise_error:
+                raise InvalidFileTypeError(msg=f'SimBA found {len(out_clf_df.columns)} columns for file {file_path} and classifier {clf_name} when trying to split the data by tabs.')
+            else:
+                ThirdPartyAnnotationsInvalidFileFormatWarning(annotation_app="BENTO", file_path=file_path, source=bento_file_reader.__name__, log_status=log_setting)
+                return results
+        numeric_check = list(out_clf_df.apply(lambda s: pd.to_numeric(s, errors='coerce').notnull().all()))
+        if False in numeric_check:
+            if raise_error:
+                raise InvalidInputError(msg=f'SimBA found values in the annotation data for behavior {clf_name} in file {file_path} that could not be interpreted as numeric values (seconds or frame numbers)')
+            else:
+                ThirdPartyAnnotationsInvalidFileFormatWarning(annotation_app="BENTO", file_path=file_path, source=bento_file_reader.__name__, log_status=log_setting)
+                return results
+        out_clf_df.columns = ['START', 'STOP', 'DURATION']
+        out_clf_df = out_clf_df.astype(np.float32)
+        int_check = np.array_equal(out_clf_df, out_clf_df.astype(int))
+        if int_check:
+            if orient == 'index':
+                results[clf_name] = out_clf_df[['START', 'STOP']].astype(np.int32)
+            else:
+                results[clf_name] = _orient_columns_melt(df=out_clf_df)
+
+        else:
+            if fps is None:
+                try:
+                    fps_idx = df[0].str.contains(pat='Annotation framerate', regex=True)
+                    fps_str = df.iloc[list(fps_idx.index[fps_idx])][0].values[0]
+                    fps = float(fps_str.split(':')[1])
+                except:
+                    raise FrameRangeError(f'The annotations are in seconds and FPS was not passed. FPS could also not be read from the BENTO file', source=bento_file_reader.__name__)
+            out_clf_df["START"] = out_clf_df["START"].astype(float) * fps
+            out_clf_df["STOP"] = out_clf_df["STOP"].astype(float) * fps
+            if orient == 'index':
+                results[clf_name] = out_clf_df[['START', 'STOP']].astype(np.int32)
+            else:
+                results[clf_name] = _orient_columns_melt(df=out_clf_df)
+    if save_path is None:
+        return results
+    else:
+        write_pickle(data=results, save_path=save_path)

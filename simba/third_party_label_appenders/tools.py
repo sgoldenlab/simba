@@ -1,14 +1,74 @@
-from typing import Dict, List
+from typing import Dict, List, Union, Optional
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 
 import numpy as np
 import pandas as pd
+import os
 
 from simba.utils.data import detect_bouts
 from simba.utils.enums import Methods
 from simba.utils.errors import ColumnNotFoundError, InvalidFileTypeError
-from simba.utils.read_write import get_fn_ext, read_video_info
+from simba.utils.read_write import get_fn_ext, read_video_info, bento_file_reader, read_video_info_csv, find_files_of_filetypes_in_directory
 from simba.utils.warnings import ThirdPartyAnnotationsInvalidFileFormatWarning
+from simba.utils.checks import (check_valid_lst,
+                                check_valid_dataframe,
+                                check_all_file_names_are_represented_in_video_log,
+                                check_str,
+                                check_valid_boolean,
+                                check_file_exist_and_readable,
+                                check_if_dir_exists)
 
+BENTO = "Bento"
+
+
+def read_bento_files(data_paths: Union[List[str], str, os.PathLike],
+                     video_info_df: Union[str, os.PathLike, pd.DataFrame],
+                     error_setting: Literal[Union[None, Methods.ERROR.value, Methods.WARNING.value]] = None,
+                     log_setting: Optional[bool] = False) -> Dict[str, pd.DataFrame]:
+
+    """
+    Reads multiple BENTO annotation files and processes them into a dictionary of DataFrames, each representing the
+    combined annotations for a corresponding video. The function verifies that all files exist and that the file names
+    match the video information provided.
+
+    :param Union[List[str], str, os.PathLike] data_paths: Paths to BENTO annotation files or a directory containing such files. If a directory is provided, all files with the extension '.annot' will be processed.
+    :param Union[str, os.PathLike, pd.DataFrame] video_info_df: Path to a CSV file containing video information or a preloaded DataFrame with the same data.  This information is used to match BENTO files with their corresponding videos and extract the FPS.
+    :param Literal[Union[None, Methods.ERROR.value, Methods.WARNING.value]] error_setting: Determines the error handling mode. If set to `Methods.ERROR.value`, errors will raise exceptions. If set to `Methods.WARNING.value`, errors will generate warnings instead. If None, no error handling modifications are applied.
+    :param Optional[bool] = False) -> Dict[str, pd.DataFrame] log_setting: If True, logging will be enabled for the process, providing detailed information about the steps being executed.
+    :return: A dictionary where the keys are video names and the values are DataFrames containing the combined annotations for each video.
+    :rtype: Dict[str, pd.DataFrame]
+
+    :example:
+    >>> dfs = read_bento_files(data_paths=r"C:\troubleshooting\bento_test\bento_files", error_setting='WARNING', log_setting=False, video_info_df=r"C:\troubleshooting\bento_test\project_folder\logs\video_info.csv")
+    """
+
+    if error_setting is not None:
+        check_str(name=f'{read_bento_files.__name__} error_setting', value=error_setting, options=(Methods.ERROR.value, Methods.WARNING.value))
+    check_valid_boolean(value=log_setting, source=f'{read_bento_files.__name__} log_setting')
+    raise_error = False
+    if error_setting == Methods.ERROR.value:
+        raise_error = True
+    if isinstance(video_info_df, str):
+        check_file_exist_and_readable(file_path=video_info_df)
+        video_info_df = read_video_info_csv(file_path=video_info_df)
+    if isinstance(data_paths, list):
+        check_valid_lst(data=data_paths, source=f'{read_bento_files.__name__} data_paths', min_len=1, valid_dtypes=(str,))
+    elif isinstance(data_paths, str):
+        check_if_dir_exists(in_dir=data_paths, source=f'{read_bento_files.__name__} data_paths')
+        data_paths = find_files_of_filetypes_in_directory(directory=data_paths, extensions=['.annot'], raise_error=True)
+    check_all_file_names_are_represented_in_video_log(video_info_df=video_info_df, data_paths=data_paths)
+    check_valid_dataframe(df=video_info_df, source=read_bento_files.__name__)
+    dfs = {}
+    for file_cnt, file_path in enumerate(data_paths):
+        _, video_name, ext = get_fn_ext(filepath=file_path)
+        _, _, fps = read_video_info(vid_info_df=video_info_df, video_name=video_name)
+        bento_dict = bento_file_reader(file_path=file_path, fps=fps, orient='columns', save_path=None, raise_error=raise_error, log_setting=log_setting)
+        dfs[video_name] = pd.concat(bento_dict.values(), ignore_index=True)
+
+    return dfs
 
 def observer_timestamp_corrector(timestamps: List[str]) -> List[str]:
     corrected_ts = []
@@ -314,76 +374,6 @@ def read_solomon_files(
 #                          video_info_df=video_info_df)
 
 
-def read_bento_files(
-    data_paths: List[str],
-    error_setting: str,
-    video_info_df: pd.DataFrame,
-    log_setting: bool = False,
-) -> Dict[str, pd.DataFrame]:
-    BENTO = "Bento"
-    CHANNEL = "Ch1----------"
-
-    dfs = {}
-    for file_cnt, file_path in enumerate(data_paths):
-        _, video_name, ext = get_fn_ext(filepath=file_path)
-        _, _, fps = read_video_info(vid_info_df=video_info_df, video_name=video_name)
-        try:
-            data_df = pd.read_csv(
-                file_path, delim_whitespace=True, index_col=False, low_memory=False
-            )
-            start_idx = data_df.index[data_df[BENTO] == CHANNEL].values[0]
-            sliced_annot = data_df.iloc[start_idx + 1 :]
-            clfs = sliced_annot[sliced_annot[BENTO].str.contains(">")]["Bento"].tolist()
-            video_events = []
-            for clf_name in clfs:
-                start_idx = sliced_annot.index[
-                    sliced_annot[BENTO] == f"{clf_name}"
-                ].values[0]
-                clf_df = sliced_annot.loc[start_idx + 2 :, :]
-                end_idx = (
-                    clf_df.isnull()[clf_df.isnull().any(axis=1)].idxmax(axis=1).index
-                )
-                if end_idx.values:
-                    end_idx = end_idx.values[0]
-                else:
-                    end_idx = max(clf_df.index + 1)
-                clf_df = (
-                    clf_df.loc[: end_idx - 1, :]
-                    .reset_index(drop=True)
-                    .drop("file", axis=1)
-                    .astype(float)
-                )
-                clf_df.columns = ["START", "STOP"]
-                clf_df = clf_df * fps
-                for obs in clf_df.values:
-                    video_events.append([clf_name, "START", obs[0]])
-                    video_events.append([clf_name, "STOP", obs[1]])
-            video_df = pd.DataFrame(
-                video_events, columns=["BEHAVIOR", "EVENT", "FRAME"]
-            )
-            video_df["FRAME"] = video_df["FRAME"].astype(int)
-            video_df["BEHAVIOR"] = video_df["BEHAVIOR"].str[1:]
-            dfs[video_name] = video_df
-        except Exception as e:
-            if error_setting == Methods.WARNING.value:
-                ThirdPartyAnnotationsInvalidFileFormatWarning(
-                    annotation_app="BENTO", file_path=file_path, log_status=log_setting
-                )
-            elif error_setting == Methods.ERROR.value:
-                raise InvalidFileTypeError(
-                    msg=f"{file_path} is not a valid BENTO file. See the docs for expected file format."
-                )
-            else:
-                pass
-    return dfs
-
-
-# video_info_df = read_video_info_csv(file_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/logs/video_info.csv')
-#
-# df = read_bento_files(data_paths=['/Users/simon/Desktop/envs/simba_dev/tests/test_data/bento_example/Together_1.annot'],
-#                          error_setting='WARNING',
-#                          log_setting=False,
-#                          video_info_df=video_info_df)
 
 
 def read_deepethogram_files(
