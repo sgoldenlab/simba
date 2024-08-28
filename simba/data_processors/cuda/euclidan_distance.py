@@ -1,11 +1,13 @@
 __author__ = "Simon Nilsson"
 __email__ = "sronilsson@gmail.com"
 
-from numba import cuda
-import numpy as np
-from simba.utils.read_write import read_df
-from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 import math
+
+import numpy as np
+from numba import cuda
+
+from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.utils.read_write import read_df
 
 THREADS_PER_BLOCK = 128
 

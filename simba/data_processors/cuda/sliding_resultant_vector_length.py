@@ -1,9 +1,11 @@
 __author__ = "Simon Nilsson"
 __email__ = "sronilsson@gmail.com"
 
-import numpy as np
-import cupy
 from typing import Optional
+
+import cupy
+import numpy as np
+
 
 def sliding_resultant_vector_length(x: np.ndarray,
                                     time_window: float,
