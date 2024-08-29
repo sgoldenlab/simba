@@ -1,15 +1,18 @@
 import time
 from copy import deepcopy
-from typing import Union, Optional
+from typing import Optional, Union
+
 import numpy as np
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 
-from simba.utils.checks import check_instance, check_if_valid_img
-from simba.utils.read_write import read_img_batch_from_video_gpu
 from numba import cuda
+
+from simba.utils.checks import check_if_valid_img, check_instance
+from simba.utils.read_write import read_img_batch_from_video_gpu
 
 PHOTOMETRIC = 'photometric'
 DIGITAL = 'digital'
