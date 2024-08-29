@@ -69,6 +69,7 @@ def _roi_plotter_mp(frame_range: Tuple[int, np.ndarray],
     group_cnt, frame_range = frame_range[0], frame_range[1]
     start_frm, current_frm, end_frm = frame_range[0], frame_range[0], frame_range[-1]
     save_path = os.path.join(save_temp_directory, f"{group_cnt}.mp4")
+
     writer = cv2.VideoWriter(save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"] * 2, video_meta_data["height"]))
     cap = cv2.VideoCapture(input_video_path)
     cap.set(1, start_frm)
@@ -86,7 +87,7 @@ def _roi_plotter_mp(frame_range: Tuple[int, np.ndarray],
             for animal_cnt, animal_name in enumerate(animal_ids):
                 if style_attr[SHOW_BODY_PARTS] or style_attr[SHOW_ANIMAL_NAMES]:
                     bp_data = data_df.loc[current_frm, body_part_dict[animal_name]].values
-                    if threshold < bp_data[2]:
+                    if threshold <= bp_data[2]:
                         if style_attr[SHOW_BODY_PARTS]:
                             cv2.circle(border_img, (int(bp_data[0]), int(bp_data[1])), circle_size, colors[animal_cnt], -1)
                         if style_attr[SHOW_ANIMAL_NAMES]:
@@ -188,7 +189,7 @@ class ROIPlotMultiprocess(ConfigReader):
         self.__insert_data()
         self.video_path, self.core_cnt, self.threshold, self.body_parts = video_path, core_cnt, threshold, body_parts
         self.cap = cv2.VideoCapture(self.video_path)
-        self.video_meta_data = get_video_meta_data(self.video_path)
+        self.video_meta_data = get_video_meta_data(self.video_path, fps_as_int=False)
         self.temp_folder = os.path.join(self.out_parent_dir, self.video_name, "temp")
         if os.path.exists(self.temp_folder):
             shutil.rmtree(self.temp_folder)

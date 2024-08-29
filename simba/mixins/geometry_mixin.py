@@ -790,7 +790,7 @@ class GeometryMixin(object):
                     bg_img: Optional[np.ndarray] = None,
                     bg_clr: Optional[Tuple[int]] = None,
                     size: Optional[int] = None,
-                    color_palette: Optional[str] = None,
+                    color_palette: Optional[str] = 'Set1',
                     thickness: Optional[int] = 2,
                     pixel_buffer: Optional[int] = 200) -> np.ndarray:
 
@@ -804,7 +804,8 @@ class GeometryMixin(object):
         >>> img = GeometryMixin.view_shapes(shapes=[line_1, polygon_1, multipolygon_1])
         """
 
-        check_valid_lst(data=shapes, source=GeometryMixin.view_shapes.__name__, valid_dtypes=(LineString, Polygon, MultiPolygon, MultiLineString, Point), min_len=1)
+        check_valid_lst(data=shapes, source=GeometryMixin.view_shapes.__name__,
+                        valid_dtypes=(LineString, Polygon, MultiPolygon, MultiLineString, Point), min_len=1)
         check_int(name='pixel_buffer', value=pixel_buffer, min_value=0)
         max_vertices = find_max_vertices_coordinates(shapes=shapes, buffer=pixel_buffer)
         if bg_img is None:
@@ -816,17 +817,24 @@ class GeometryMixin(object):
         else:
             img = bg_img
 
-        check_str(name='color_palette', value=color_palette, options=Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value)
-        colors = create_color_palette(pallete_name=color_palette, increments=len(shapes)+1)
+        if color_palette is not None:
+            check_str(name='color_palette', value=color_palette,
+                      options=Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value)
+
+        colors = create_color_palette(pallete_name=color_palette, increments=len(shapes) + 1)
         for shape_cnt, shape in enumerate(shapes):
             if isinstance(shape, Polygon):
-                cv2.polylines(img, [np.array(shape.exterior.coords).astype(np.int32)], True, (colors[shape_cnt][::-1]), thickness=thickness)
-                interior_coords = [np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2)) for interior in shape.interiors]
+                cv2.polylines(img, [np.array(shape.exterior.coords).astype(np.int32)], True, (colors[shape_cnt][::-1]),
+                              thickness=thickness)
+                interior_coords = [np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2)) for interior in
+                                   shape.interiors]
                 for interior in interior_coords:
-                    cv2.polylines(img, [interior], isClosed=True, color=(colors[shape_cnt][::-1]), thickness=thickness,)
+                    cv2.polylines(img, [interior], isClosed=True, color=(colors[shape_cnt][::-1]),
+                                  thickness=thickness, )
             if isinstance(shape, LineString):
                 if color_palette is None:
-                    cv2.polylines(img, [np.array(shape.coords, dtype=np.int32)], False, (colors[shape_cnt][::-1]), thickness=thickness)
+                    cv2.polylines(img, [np.array(shape.coords, dtype=np.int32)], False, (colors[shape_cnt][::-1]),
+                                  thickness=thickness)
                 else:
                     lines = np.array(shape.coords, dtype=np.int32)
                     palette = create_color_palette(pallete_name=color_palette, increments=lines.shape[0])
@@ -835,24 +843,18 @@ class GeometryMixin(object):
                         cv2.line(img, tuple(p1), tuple(p2), palette[i], thickness)
 
             if isinstance(shape, MultiPolygon):
-                multi_polygon_clrs = create_color_palette(pallete_name=color_palette, increments=len(shape.geoms)+1)
+                multi_polygon_clrs = create_color_palette(pallete_name=color_palette, increments=len(shape.geoms) + 1)
                 for polygon_cnt, polygon in enumerate(shape.geoms):
                     polygon_np = np.array((polygon.convex_hull.exterior.coords), dtype=np.int32)
                     cv2.polylines(img, [polygon_np], True, (multi_polygon_clrs[polygon_cnt][::-1]), thickness=thickness)
             if isinstance(shape, MultiLineString):
                 for line_cnt, line in enumerate(shape.geoms):
-                    cv2.polylines(img, [np.array(shape[line_cnt].coords, dtype=np.int32)], False, (colors[shape_cnt][::-1]), thickness=thickness)
+                    cv2.polylines(img, [np.array(shape[line_cnt].coords, dtype=np.int32)], False,
+                                  (colors[shape_cnt][::-1]), thickness=thickness)
             if isinstance(shape, Point):
-                cv2.circle(
-                    img,
-                    (
-                        int(np.array(shape.centroid)[0]),
-                        int(np.array(shape.centroid)[1]),
-                    ),
-                    0,
-                    colors[shape_cnt][::-1],
-                    thickness,
-                )
+                arr = np.array((shape.coords)).astype(np.int32)
+                x, y = arr[0][0], arr[0][1]
+                cv2.circle(img, (x, y), 3, colors[shape_cnt][::-1], thickness)
         if size:
             return imutils.resize(img, width=size)
         else:
@@ -2136,7 +2138,7 @@ class GeometryMixin(object):
     @staticmethod
     def get_geometry_brightness_intensity(img: Union[np.ndarray, Tuple[cv2.VideoCapture, int]],
                                           geometries: List[Union[np.ndarray, Polygon]],
-                                          ignore_black: Optional[bool] = True) -> np.ndarray:
+                                          ignore_black: Optional[bool] = True) -> List[float]:
         """
         Calculate the average brightness intensity within a geometry region-of-interest of an image.
 
@@ -2177,9 +2179,7 @@ class GeometryMixin(object):
                 accepted_types=(Polygon, np.ndarray),
             )
         sliced_imgs = ImageMixin().slice_shapes_in_img(img=img, geometries=geometries)
-        return ImageMixin().brightness_intensity(
-            imgs=sliced_imgs, ignore_black=ignore_black
-        )
+        return ImageMixin().brightness_intensity(imgs=sliced_imgs, ignore_black=ignore_black)
 
     @staticmethod
     def geometry_histocomparison(

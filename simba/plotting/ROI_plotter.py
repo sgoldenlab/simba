@@ -102,7 +102,7 @@ class ROIPlot(ConfigReader):
         self.__insert_data()
         self.video_path = video_path
         self.cap = cv2.VideoCapture(self.video_path)
-        self.video_meta_data = get_video_meta_data(self.video_path)
+        self.video_meta_data = get_video_meta_data(self.video_path, fps_as_int=False)
         self.threshold, self.body_parts = threshold, body_parts
 
     def __insert_data(self):
@@ -226,8 +226,8 @@ class ROIPlot(ConfigReader):
         video_timer.stop_timer()
         stdout_success(msg=f"Video {self.video_name} created. Video saved at {self.video_save_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
 
-# test = ROIPlot(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini',
-#                video_path="/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4.mp4",
+# test = ROIPlot(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini",
+#                video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4.mp4",
 #                body_parts=['Nose'],
 #                style_attr={'show_body_part': True, 'show_animal_name': False})
 # test.run()

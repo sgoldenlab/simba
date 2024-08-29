@@ -104,7 +104,7 @@ class ROIfeatureVisualizer(ConfigReader):
         self.bp_lk = self.roi_feature_creator.bp_lk
         self.animal_bp_names = [f"{v[0]} {v[1]}" for v in self.bp_lk.values()]
         self.animal_names = [v[0] for v in self.bp_lk.values()]
-        self.video_meta_data = get_video_meta_data(video_path)
+        self.video_meta_data = get_video_meta_data(video_path, fps_as_int=False)
         self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         self.cap = cv2.VideoCapture(video_path)
         check_video_and_data_frm_count_align(video=video_path, data=self.data_path, name=video_path, raise_error=False)

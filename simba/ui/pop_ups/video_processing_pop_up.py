@@ -1065,38 +1065,51 @@ class VideoRotatorPopUp(PopUpMixin):
 
 
 class VideoTemporalJoinPopUp(PopUpMixin):
+
     def __init__(self):
         super().__init__(title="TEMPORAL JOIN VIDEOS")
-        self.settings_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="SETTINGS",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.VIDEO_TOOLS.value,
-        )
-        self.input_dir = FolderSelect( self.settings_frm, "INPUT DIRECTORY:", lblwidth=20)
-        self.file_format = DropDownMenu(self.settings_frm, "INPUT FORMAT:", Options.VIDEO_FORMAT_OPTIONS.value, "20")
+        self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm,
+                                                     header="SETTINGS",
+                                                     icon_name=Keys.DOCUMENTATION.value,
+                                                     icon_link=Links.VIDEO_TOOLS.value)
 
+        FPS_OPTIONS = list(range(2, 102, 2))
+        FPS_OPTIONS.insert(0, 'SAME AS THE FIRST INPUT VIDEO IN INPUT DIRECTORY')
+        FPS_OPTIONS.insert(0, 'KEEP INPUT VIDEO FPS')
+
+        self.input_dir = FolderSelect( self.settings_frm, "INPUT DIRECTORY:", lblwidth=30)
+        self.file_format = DropDownMenu(self.settings_frm, "INPUT VIDEO FORMAT:", Options.VIDEO_FORMAT_OPTIONS.value, "30")
+        self.out_fps = DropDownMenu(self.settings_frm, "OUTPUT FPS:", FPS_OPTIONS, "30")
+        self.out_fps.setChoices('SAME AS INPUT VIDEOS')
         use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=self.settings_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
-
         self.file_format.setChoices(Options.VIDEO_FORMAT_OPTIONS.value[0])
         self.settings_frm.grid(row=0, column=0, sticky=NW)
         self.input_dir.grid(row=0, column=0, sticky=NW)
         self.file_format.grid(row=1, column=0, sticky=NW)
-        use_gpu_cb.grid(row=2, column=0, sticky="NW")
+        self.out_fps.grid(row=2, column=0, sticky=NW)
+        use_gpu_cb.grid(row=3, column=0, sticky="NW")
         self.create_run_frm(run_function=self.run)
+        self.main_frm.mainloop()
 
     def run(self):
         check_if_dir_exists(in_dir=self.input_dir.folder_path)
+        _ = find_files_of_filetypes_in_directory(directory=self.input_dir.folder_path, extensions=[f'.{self.file_format.getChoices()}'], raise_error=True)
+        fps_setting = self.out_fps.getChoices()
+        if fps_setting == 'KEEP INPUT VIDEO FPS':
+            fps = None
+        elif fps_setting == 'SAME AS THE FIRST INPUT VIDEO IN INPUT DIRECTORY':
+            fps = '0'
+        else:
+            fps = int(fps_setting)
+
         print(f"Concatenating videos in {self.input_dir.folder_path} directory...")
         save_path = os.path.join(self.input_dir.folder_path, f"concatenated.mp4")
-        concatenate_videos_in_folder(
-            in_folder=self.input_dir.folder_path,
-            save_path=save_path,
-            remove_splits=False,
-            video_format=self.file_format.getChoices(),
-            gpu=self.use_gpu_var.get(),
-        )
-
+        concatenate_videos_in_folder(in_folder=self.input_dir.folder_path,
+                                     save_path=save_path,
+                                     remove_splits=False,
+                                     fps=fps,
+                                     video_format=self.file_format.getChoices(),
+                                     gpu=self.use_gpu_var.get())
 
 class ImportFrameDirectoryPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):

@@ -688,7 +688,7 @@ class CircularStatisticsMixin(object):
         l = np.int8(360 / len(data))
         Ti[-1] = np.rad2deg(np.pi - np.abs(np.pi - np.abs(np.deg2rad(data[0]) - np.deg2rad(data[-1])))
         )
-        for j in prange(data.shape[0] - 1, -1, -1):
+        for j in range(data.shape[0] - 1, -1, -1):
             Ti[j] = np.rad2deg(
                 np.pi
                 - np.abs(np.pi - np.abs(np.deg2rad(data[j]) - np.deg2rad(data[j - 1])))

@@ -2,7 +2,8 @@ __author__ = "Simon Nilsson"
 
 import warnings
 
-from . import cuRF
+#from . import cuRF
+from sklearn.ensemble import RandomForestClassifier as cuRF
 
 warnings.filterwarnings("ignore")
 import ast
@@ -2145,293 +2146,83 @@ class TrainModelMixin(object):
         if self.rf_max_depth != None:
             check_int(name="RF MAX DEPTH", value=self.rf_max_depth, min_value=1)
 
-    def check_validity_of_meta_files(
-            self, data_df: pd.DataFrame, meta_file_paths: List[Union[str, os.PathLike]]
-    ):
+    def check_validity_of_meta_files(self,
+                                     data_df: pd.DataFrame,
+                                     meta_file_paths: List[Union[str, os.PathLike]]):
+
+
         meta_dicts, errors = {}, []
         for config_cnt, path in enumerate(meta_file_paths):
             _, meta_file_name, _ = get_fn_ext(path)
             meta_dict = read_meta_file(path)
             meta_dict = {k.lower(): v for k, v in meta_dict.items()}
-            errors.append(
-                check_str(
-                    name=meta_dict[MLParamKeys.CLASSIFIER_NAME.value],
-                    value=meta_dict[MLParamKeys.CLASSIFIER_NAME.value],
-                    raise_error=False,
-                )[1]
-            )
-            errors.append(
-                check_str(
-                    name=MLParamKeys.RF_CRITERION.value,
-                    value=meta_dict[MLParamKeys.RF_CRITERION.value],
-                    options=Options.CLF_CRITERION.value,
-                    raise_error=False,
-                )[1]
-            )
-            errors.append(
-                check_str(
-                    name=MLParamKeys.RF_MAX_FEATURES.value,
-                    value=meta_dict[MLParamKeys.RF_MAX_FEATURES.value],
-                    options=Options.CLF_MAX_FEATURES.value,
-                    raise_error=False,
-                )[1]
-            )
-            errors.append(
-                check_str(
-                    MLParamKeys.UNDERSAMPLE_SETTING.value,
-                    meta_dict[MLParamKeys.UNDERSAMPLE_SETTING.value].lower(),
-                    options=[x.lower() for x in Options.UNDERSAMPLE_OPTIONS.value],
-                    raise_error=False,
-                )[1]
-            )
-            errors.append(
-                check_str(
-                    MLParamKeys.OVERSAMPLE_SETTING.value,
-                    meta_dict[MLParamKeys.OVERSAMPLE_SETTING.value].lower(),
-                    options=[x.lower() for x in Options.OVERSAMPLE_OPTIONS.value],
-                    raise_error=False,
-                )[1]
-            )
-            if MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value in meta_dict.keys():
-                errors.append(
-                    check_str(
-                        name=meta_dict[MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value],
-                        value=meta_dict[MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value],
-                        options=Options.TRAIN_TEST_SPLIT.value,
-                        raise_error=False,
-                    )[1]
-                )
+            errors.append(check_str(name=meta_dict[MLParamKeys.CLASSIFIER_NAME.value], value=meta_dict[MLParamKeys.CLASSIFIER_NAME.value], raise_error=False)[1])
+            errors.append(check_str(name=MLParamKeys.RF_CRITERION.value, value=meta_dict[MLParamKeys.RF_CRITERION.value], options=Options.CLF_CRITERION.value, raise_error=False)[1])
+            errors.append(check_str(name=MLParamKeys.RF_MAX_FEATURES.value, value=meta_dict[MLParamKeys.RF_MAX_FEATURES.value],options=Options.CLF_MAX_FEATURES.value, raise_error=False)[1])
 
-            errors.append(
-                check_int(
-                    name=MLParamKeys.RF_ESTIMATORS.value,
-                    value=meta_dict[MLParamKeys.RF_ESTIMATORS.value],
-                    min_value=1,
-                    raise_error=False,
-                )[1]
-            )
-            errors.append(
-                check_int(
-                    name=MLParamKeys.MIN_LEAF.value,
-                    value=meta_dict[MLParamKeys.MIN_LEAF.value],
-                    raise_error=False,
-                )[1]
-            )
-            if (
-                    meta_dict[MLParamKeys.LEARNING_CURVE.value]
-                    in Options.PERFORM_FLAGS.value
-            ):
-                errors.append(
-                    check_int(
-                        name=MLParamKeys.LEARNING_CURVE_K_SPLITS.value,
-                        value=meta_dict[MLParamKeys.LEARNING_CURVE_K_SPLITS.value],
-                        raise_error=False,
-                    )[1]
-                )
-                errors.append(
-                    check_int(
-                        name=MLParamKeys.LEARNING_CURVE_DATA_SPLITS.value,
-                        value=meta_dict[MLParamKeys.LEARNING_CURVE_DATA_SPLITS.value],
-                        raise_error=False,
-                    )[1]
-                )
-            if (
-                    meta_dict[MLParamKeys.IMPORTANCE_BAR_CHART.value]
-                    in Options.PERFORM_FLAGS.value
-            ):
-                errors.append(
-                    check_int(
-                        name=MLParamKeys.N_FEATURE_IMPORTANCE_BARS.value,
-                        value=meta_dict[MLParamKeys.N_FEATURE_IMPORTANCE_BARS.value],
-                        raise_error=False,
-                    )[1]
-                )
+            if not isinstance(meta_dict[MLParamKeys.UNDERSAMPLE_SETTING.value], str): meta_dict[MLParamKeys.UNDERSAMPLE_SETTING.value] = Dtypes.NONE.value
+            if not isinstance(meta_dict[MLParamKeys.OVERSAMPLE_SETTING.value], str): meta_dict[MLParamKeys.OVERSAMPLE_SETTING.value] = Dtypes.NONE.value
+            errors.append(check_str(MLParamKeys.UNDERSAMPLE_SETTING.value, meta_dict[MLParamKeys.UNDERSAMPLE_SETTING.value].lower(), options=[x.lower() for x in Options.UNDERSAMPLE_OPTIONS.value], raise_error=False)[1])
+            errors.append(check_str(MLParamKeys.OVERSAMPLE_SETTING.value, meta_dict[MLParamKeys.OVERSAMPLE_SETTING.value].lower(), options=[x.lower() for x in Options.OVERSAMPLE_OPTIONS.value], raise_error=False)[1])
+            if MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value in meta_dict.keys():
+                errors.append(check_str(name=meta_dict[MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value], value=meta_dict[MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value], options=Options.TRAIN_TEST_SPLIT.value, raise_error=False)[1])
+
+            errors.append(check_int(name=MLParamKeys.RF_ESTIMATORS.value, value=meta_dict[MLParamKeys.RF_ESTIMATORS.value],  min_value=1, raise_error=False)[1])
+            errors.append(check_int(name=MLParamKeys.MIN_LEAF.value, value=meta_dict[MLParamKeys.MIN_LEAF.value], raise_error=False)[1])
+            if (meta_dict[MLParamKeys.LEARNING_CURVE.value] in Options.PERFORM_FLAGS.value):
+                errors.append(check_int(name=MLParamKeys.LEARNING_CURVE_K_SPLITS.value, value=meta_dict[MLParamKeys.LEARNING_CURVE_K_SPLITS.value], raise_error=False)[1])
+                errors.append(check_int(name=MLParamKeys.LEARNING_CURVE_DATA_SPLITS.value, value=meta_dict[MLParamKeys.LEARNING_CURVE_DATA_SPLITS.value],raise_error=False)[1])
+            if (meta_dict[MLParamKeys.IMPORTANCE_BAR_CHART.value] in Options.PERFORM_FLAGS.value):
+                errors.append(check_int(name=MLParamKeys.N_FEATURE_IMPORTANCE_BARS.value, value=meta_dict[MLParamKeys.N_FEATURE_IMPORTANCE_BARS.value], raise_error=False)[1])
             if MLParamKeys.SHAP_SCORES.value in meta_dict.keys():
-                if (
-                        meta_dict[MLParamKeys.SHAP_SCORES.value]
-                        in Options.PERFORM_FLAGS.value
-                ):
-                    errors.append(
-                        check_int(
-                            name=MLParamKeys.SHAP_PRESENT.value,
-                            value=meta_dict[MLParamKeys.SHAP_PRESENT.value],
-                            raise_error=False,
-                        )[1]
-                    )
-                    errors.append(
-                        check_int(
-                            name=MLParamKeys.SHAP_ABSENT.value,
-                            value=meta_dict[MLParamKeys.SHAP_ABSENT.value],
-                            raise_error=False,
-                        )[1]
-                    )
+                if (meta_dict[MLParamKeys.SHAP_SCORES.value] in Options.PERFORM_FLAGS.value):
+                    errors.append(check_int(name=MLParamKeys.SHAP_PRESENT.value, value=meta_dict[MLParamKeys.SHAP_PRESENT.value], raise_error=False)[1])
+                    errors.append(check_int(name=MLParamKeys.SHAP_ABSENT.value, value=meta_dict[MLParamKeys.SHAP_ABSENT.value], raise_error=False)[1])
             if MLParamKeys.RF_MAX_DEPTH.value in meta_dict.keys():
                 if meta_dict[MLParamKeys.RF_MAX_DEPTH.value] != Dtypes.NONE.value:
-                    errors.append(
-                        check_int(
-                            name=MLParamKeys.RF_MAX_DEPTH.value,
-                            value=meta_dict[MLParamKeys.RF_MAX_DEPTH.value],
-                            min_value=1,
-                            raise_error=False,
-                        )[1]
-                    )
+                    errors.append(check_int(name=MLParamKeys.RF_MAX_DEPTH.value, value=meta_dict[MLParamKeys.RF_MAX_DEPTH.value], min_value=1, raise_error=False)[1])
                 else:
                     meta_dict[MLParamKeys.RF_MAX_DEPTH.value] = None
             else:
                 meta_dict[MLParamKeys.RF_MAX_DEPTH.value] = None
 
-            errors.append(
-                check_float(
-                    name=MLParamKeys.TT_SIZE.value,
-                    value=meta_dict[MLParamKeys.TT_SIZE.value],
-                    raise_error=False,
-                )[1]
-            )
-            if (
-                    meta_dict[MLParamKeys.UNDERSAMPLE_SETTING.value].lower()
-                    == Methods.RANDOM_UNDERSAMPLE.value
-            ):
-                errors.append(
-                    check_float(
-                        name=MLParamKeys.UNDERSAMPLE_RATIO.value,
-                        value=meta_dict[MLParamKeys.UNDERSAMPLE_RATIO.value],
-                        raise_error=False,
-                    )[1]
-                )
+            errors.append(check_float(name=MLParamKeys.TT_SIZE.value, value=meta_dict[MLParamKeys.TT_SIZE.value], raise_error=False)[1])
+            if (meta_dict[MLParamKeys.UNDERSAMPLE_SETTING.value].lower() == Methods.RANDOM_UNDERSAMPLE.value):
+                errors.append(check_float(name=MLParamKeys.UNDERSAMPLE_RATIO.value, value=meta_dict[MLParamKeys.UNDERSAMPLE_RATIO.value], raise_error=False)[1])
                 try:
-                    present_len, absent_len = len(
-                        data_df[
-                            data_df[meta_dict[MLParamKeys.CLASSIFIER_NAME.value]] == 1
-                            ]
-                    ), len(
-                        data_df[
-                            data_df[meta_dict[MLParamKeys.CLASSIFIER_NAME.value]] == 0
-                            ]
-                    )
-                    ratio_n = int(
-                        present_len * meta_dict[MLParamKeys.UNDERSAMPLE_RATIO.value]
-                    )
+                    present_len, absent_len = len(data_df[data_df[meta_dict[MLParamKeys.CLASSIFIER_NAME.value]] == 1]), len(data_df[data_df[meta_dict[MLParamKeys.CLASSIFIER_NAME.value]] == 0])
+                    ratio_n = int(present_len * meta_dict[MLParamKeys.UNDERSAMPLE_RATIO.value])
                     if absent_len < ratio_n:
-                        errors.append(
-                            f"The under-sample ratio of {meta_dict[MLParamKeys.UNDERSAMPLE_RATIO.value]} in \n classifier {meta_dict[MLParamKeys.CLASSIFIER_NAME.value]} demands {ratio_n} behavior-absent annotations."
-                        )
+                        errors.append(f"The under-sample ratio of {meta_dict[MLParamKeys.UNDERSAMPLE_RATIO.value]} in \n classifier {meta_dict[MLParamKeys.CLASSIFIER_NAME.value]} demands {ratio_n} behavior-absent annotations.")
                 except:
                     pass
 
-            if (
-                    meta_dict[MLParamKeys.OVERSAMPLE_SETTING.value].lower()
-                    == Methods.SMOTEENN.value.lower()
-            ) or (
-                    meta_dict[MLParamKeys.OVERSAMPLE_SETTING.value].lower()
-                    == Methods.SMOTE.value.lower()
-            ):
-                errors.append(
-                    check_float(
-                        name=MLParamKeys.OVERSAMPLE_RATIO.value,
-                        value=meta_dict[MLParamKeys.OVERSAMPLE_RATIO.value],
-                        raise_error=False,
-                    )[1]
-                )
+            if (meta_dict[MLParamKeys.OVERSAMPLE_SETTING.value].lower() == Methods.SMOTEENN.value.lower()) or (meta_dict[MLParamKeys.OVERSAMPLE_SETTING.value].lower() == Methods.SMOTE.value.lower()):
+                errors.append(check_float(name=MLParamKeys.OVERSAMPLE_RATIO.value, value=meta_dict[MLParamKeys.OVERSAMPLE_RATIO.value], raise_error=False)[1])
 
-            errors.append(
-                check_if_valid_input(
-                    name=MLParamKeys.RF_METADATA.value,
-                    input=meta_dict[MLParamKeys.RF_METADATA.value],
-                    options=Options.RUN_OPTIONS_FLAGS.value,
-                    raise_error=False,
-                )[1]
-            )
-            errors.append(
-                check_if_valid_input(
-                    MLParamKeys.EX_DECISION_TREE.value,
-                    input=meta_dict[MLParamKeys.EX_DECISION_TREE.value],
-                    options=Options.RUN_OPTIONS_FLAGS.value,
-                    raise_error=False,
-                )[1]
-            )
-            errors.append(
-                check_if_valid_input(
-                    MLParamKeys.CLF_REPORT.value,
-                    input=meta_dict[MLParamKeys.CLF_REPORT.value],
-                    options=Options.RUN_OPTIONS_FLAGS.value,
-                    raise_error=False,
-                )[1]
-            )
-            errors.append(
-                check_if_valid_input(
-                    MLParamKeys.IMPORTANCE_LOG.value,
-                    input=meta_dict[MLParamKeys.IMPORTANCE_LOG.value],
-                    options=Options.RUN_OPTIONS_FLAGS.value,
-                    raise_error=False,
-                )[1]
-            )
-            errors.append(
-                check_if_valid_input(
-                    MLParamKeys.IMPORTANCE_BAR_CHART.value,
-                    input=meta_dict[MLParamKeys.IMPORTANCE_BAR_CHART.value],
-                    options=Options.RUN_OPTIONS_FLAGS.value,
-                    raise_error=False,
-                )[1]
-            )
-            errors.append(
-                check_if_valid_input(
-                    MLParamKeys.PERMUTATION_IMPORTANCE.value,
-                    input=meta_dict[MLParamKeys.PERMUTATION_IMPORTANCE.value],
-                    options=Options.RUN_OPTIONS_FLAGS.value,
-                    raise_error=False,
-                )[1]
-            )
-            errors.append(
-                check_if_valid_input(
-                    MLParamKeys.LEARNING_CURVE.value,
-                    input=meta_dict[MLParamKeys.LEARNING_CURVE.value],
-                    options=Options.RUN_OPTIONS_FLAGS.value,
-                    raise_error=False,
-                )[1]
-            )
-            errors.append(
-                check_if_valid_input(
-                    MLParamKeys.PRECISION_RECALL.value,
-                    input=meta_dict[MLParamKeys.PRECISION_RECALL.value],
-                    options=Options.RUN_OPTIONS_FLAGS.value,
-                    raise_error=False,
-                )[1]
-            )
+            errors.append(check_if_valid_input(name=MLParamKeys.RF_METADATA.value, input=meta_dict[MLParamKeys.RF_METADATA.value], options=Options.RUN_OPTIONS_FLAGS.value, raise_error=False)[1])
+            errors.append(check_if_valid_input(MLParamKeys.EX_DECISION_TREE.value, input=meta_dict[MLParamKeys.EX_DECISION_TREE.value], options=Options.RUN_OPTIONS_FLAGS.value, raise_error=False)[1])
+            errors.append(check_if_valid_input(MLParamKeys.CLF_REPORT.value, input=meta_dict[MLParamKeys.CLF_REPORT.value], options=Options.RUN_OPTIONS_FLAGS.value, raise_error=False)[1])
+            errors.append(check_if_valid_input(MLParamKeys.IMPORTANCE_LOG.value, input=meta_dict[MLParamKeys.IMPORTANCE_LOG.value], options=Options.RUN_OPTIONS_FLAGS.value, raise_error=False)[1])
+            errors.append(check_if_valid_input( MLParamKeys.IMPORTANCE_BAR_CHART.value, input=meta_dict[MLParamKeys.IMPORTANCE_BAR_CHART.value], options=Options.RUN_OPTIONS_FLAGS.value, raise_error=False)[1])
+            errors.append(check_if_valid_input(MLParamKeys.PERMUTATION_IMPORTANCE.value, input=meta_dict[MLParamKeys.PERMUTATION_IMPORTANCE.value], options=Options.RUN_OPTIONS_FLAGS.value, raise_error=False)[1])
+            errors.append(check_if_valid_input(MLParamKeys.LEARNING_CURVE.value, input=meta_dict[MLParamKeys.LEARNING_CURVE.value], options=Options.RUN_OPTIONS_FLAGS.value, raise_error=False)[1])
+            errors.append(check_if_valid_input(MLParamKeys.PRECISION_RECALL.value, input=meta_dict[MLParamKeys.PRECISION_RECALL.value], options=Options.RUN_OPTIONS_FLAGS.value, raise_error=False)[1])
+
             if MLParamKeys.PARTIAL_DEPENDENCY.value in meta_dict.keys():
-                errors.append(
-                    check_if_valid_input(
-                        MLParamKeys.PARTIAL_DEPENDENCY.value,
-                        input=meta_dict[MLParamKeys.PARTIAL_DEPENDENCY.value],
-                        options=Options.RUN_OPTIONS_FLAGS.value,
-                        raise_error=False,
-                    )[1]
-                )
+                errors.append(check_if_valid_input(MLParamKeys.PARTIAL_DEPENDENCY.value, input=meta_dict[MLParamKeys.PARTIAL_DEPENDENCY.value], options=Options.RUN_OPTIONS_FLAGS.value, raise_error=False)[1])
             if MLParamKeys.SHAP_MULTIPROCESS.value in meta_dict.keys():
-                errors.append(
-                    check_if_valid_input(
-                        MLParamKeys.SHAP_MULTIPROCESS.value,
-                        input=meta_dict[MLParamKeys.SHAP_MULTIPROCESS.value],
-                        options=Options.RUN_OPTIONS_FLAGS.value,
-                        raise_error=False,
-                    )[1]
-                )
+                errors.append(check_if_valid_input(MLParamKeys.SHAP_MULTIPROCESS.value, input=meta_dict[MLParamKeys.SHAP_MULTIPROCESS.value], options=Options.RUN_OPTIONS_FLAGS.value, raise_error=False)[1])
             if meta_dict[MLParamKeys.RF_MAX_FEATURES.value] == Dtypes.NONE.value:
                 meta_dict[MLParamKeys.RF_MAX_FEATURES.value] = None
             if MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value not in meta_dict.keys():
-                meta_dict[MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value] = (
-                    Methods.SPLIT_TYPE_FRAMES.value
-                )
+                meta_dict[MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value] = (Methods.SPLIT_TYPE_FRAMES.value)
 
             if MLParamKeys.CLASS_WEIGHTS.value in meta_dict.keys():
-                if (
-                        meta_dict[MLParamKeys.CLASS_WEIGHTS.value]
-                        not in Options.CLASS_WEIGHT_OPTIONS.value
-                ):
+                if (meta_dict[MLParamKeys.CLASS_WEIGHTS.value] not in Options.CLASS_WEIGHT_OPTIONS.value):
                     meta_dict[MLParamKeys.CLASS_WEIGHTS.value] = None
                 if meta_dict[MLParamKeys.CLASS_WEIGHTS.value] == "custom":
-                    meta_dict[MLParamKeys.CLASS_WEIGHTS.value] = ast.literal_eval(
-                        meta_dict[MLParamKeys.CLASS_CUSTOM_WEIGHTS.value]
-                    )
+                    meta_dict[MLParamKeys.CLASS_WEIGHTS.value] = ast.literal_eval(meta_dict[MLParamKeys.CLASS_CUSTOM_WEIGHTS.value])
                     for k, v in meta_dict[MLParamKeys.CLASS_WEIGHTS.value].items():
                         meta_dict[MLParamKeys.CLASS_WEIGHTS.value][k] = int(v)
                 if meta_dict[MLParamKeys.CLASS_WEIGHTS.value] == Dtypes.NONE.value:
@@ -2440,9 +2231,7 @@ class TrainModelMixin(object):
                 meta_dict[MLParamKeys.CLASS_WEIGHTS.value] = None
 
             if MLParamKeys.CLASSIFIER_MAP.value in meta_dict.keys():
-                meta_dict[MLParamKeys.CLASSIFIER_MAP.value] = ast.literal_eval(
-                    meta_dict[MLParamKeys.CLASSIFIER_MAP.value]
-                )
+                meta_dict[MLParamKeys.CLASSIFIER_MAP.value] = ast.literal_eval(meta_dict[MLParamKeys.CLASSIFIER_MAP.value])
                 for k, v in meta_dict[MLParamKeys.CLASSIFIER_MAP.value].items():
                     errors.append(check_int(name="MULTICLASS KEYS", value=k, raise_error=False)[1])
                     errors.append(check_str(name="MULTICLASS VALUES", value=v, raise_error=False)[1])
@@ -2451,32 +2240,21 @@ class TrainModelMixin(object):
                 meta_dict[MLParamKeys.CLASSIFIER_MAP.value] = None
 
             if MLParamKeys.SAVE_TRAIN_TEST_FRM_IDX.value in meta_dict.keys():
-                errors.append(
-                    check_if_valid_input(
-                        name="SAVE TRAIN AND TEST FRAME INDEXES",
-                        input=meta_dict[MLParamKeys.SAVE_TRAIN_TEST_FRM_IDX.value],
-                        options=Options.RUN_OPTIONS_FLAGS.value,
-                        raise_error=False,
-                    )[1]
-                )
+                errors.append(check_if_valid_input(name="SAVE TRAIN AND TEST FRAME INDEXES", input=meta_dict[MLParamKeys.SAVE_TRAIN_TEST_FRM_IDX.value], options=Options.RUN_OPTIONS_FLAGS.value, raise_error=False)[1])
             else:
                 meta_dict[MLParamKeys.SAVE_TRAIN_TEST_FRM_IDX.value] = False
 
             errors = [x for x in errors if x != ""]
             if errors:
-                option = TwoOptionQuestionPopUp(
-                    question=f"{errors[0]} \n ({meta_file_name}) \n  Do you want to skip this meta file or terminate training ?",
-                    title="META CONFIG FILE ERROR",
-                    option_one="SKIP",
-                    option_two="TERMINATE",
-                )
+                option = TwoOptionQuestionPopUp(question=f"{errors[0]} \n ({meta_file_name}) \n  Do you want to skip this meta file or terminate training ?",
+                                                title="META CONFIG FILE ERROR",
+                                                option_one="SKIP",
+                                                option_two="TERMINATE")
 
                 if option.selected_option == "SKIP":
                     continue
                 else:
-                    raise InvalidInputError(
-                        msg=errors[0], source=self.__class__.__name__
-                    )
+                    raise InvalidInputError(msg=errors[0], source=self.__class__.__name__)
             else:
                 meta_dicts[config_cnt] = meta_dict
 
@@ -2800,9 +2578,14 @@ class TrainModelMixin(object):
             )
         return low_variance_fields
 
+
+# from simba.utils.read_write import read_simba_meta_files
 # test = TrainModelMixin()
-# test.read_all_files_in_folder(file_paths=['/Users/simon/Desktop/envs/troubleshooting/jake/project_folder/csv/targets_inserted/22-437C_c3_2022-11-01_13-16-23_color.csv', '/Users/simon/Desktop/envs/troubleshooting/jake/project_folder/csv/targets_inserted/22-437D_c4_2022-11-01_13-16-39_color.csv'],
-#                               file_type='csv', classifier_names=['attack', 'non-agresive parallel swimming'])
+# data_df, _ = test.read_all_files_in_folder(file_paths=[r"C:\troubleshooting\two_black_animals_14bp\project_folder\csv\targets_inserted\Together_1.csv"], file_type='csv', classifier_names=['Attack'])
+# meta_file_lst = read_simba_meta_files(folder_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\configs")
+#
+# meta_dicts = test.check_validity_of_meta_files(data_df=data_df, meta_file_paths=meta_file_lst)
+#
 
 
 # test = TrainModelMixin()

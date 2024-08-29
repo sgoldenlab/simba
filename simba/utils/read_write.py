@@ -38,7 +38,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_filepath_list_is_empty,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_instance, check_int, check_str,
-                                check_nvidea_gpu_available, check_valid_lst)
+                                check_nvidea_gpu_available, check_valid_lst, check_valid_dataframe)
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
 from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 FFMPEGCodecGPUError, FileExistError,
@@ -473,7 +473,7 @@ def concatenate_videos_in_folder(in_folder: Union[str, os.PathLike],
                                  substring: Optional[str] = None,
                                  remove_splits: Optional[bool] = True,
                                  gpu: Optional[bool] = False,
-                                 verbose: Optional[bool] = True) -> None:
+                                 fps: Optional[Union[int, str]] = None) -> None:
     """
     Concatenate (temporally) all video files in a folder into a single video.
 
@@ -520,10 +520,30 @@ def concatenate_videos_in_folder(in_folder: Union[str, os.PathLike],
         for file in files:
             f.write("file '" + str(Path(file)) + "'\n")
 
+    out_fps = None
+    if fps is not None:
+        check_int(name='fps', value=fps, min_value=0)
+        int_fps = int(fps)
+        if isinstance(fps, str):
+            if int_fps > len(files):
+                raise InvalidInputError(msg=f'If FPS is a string it represents the video index ({fps}) which is more than the number of videos in the input directory ({len(files)})', source=concatenate_videos_in_folder.__name__)
+            out_fps = float(get_video_meta_data(video_path=files[int_fps])['fps'])
+        elif isinstance(fps, (int, float)):
+            out_fps = fps
+        else:
+            raise InvalidInputError(msg=f'FPS of the output video has to be None, or a string index, or a float, or an integer',source=concatenate_videos_in_folder.__name__)
+
+    print(fps)
     if check_nvidea_gpu_available() and gpu:
-        returned = os.system(f'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -c copy -hide_banner -loglevel info "{save_path}" -y')
+        if fps is None:
+            returned = os.system(f'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -c copy -hide_banner -loglevel info "{save_path}" -y')
+        else:
+            returned = os.system(f'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -r {out_fps} -c:v h264_nvenc -c:a copy -hide_banner -loglevel info "{save_path}" -y')
     else:
-        returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" "{save_path}" -c copy -hide_banner -loglevel info -y')
+        if fps is None:
+            returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" "{save_path}" -c copy -hide_banner -loglevel info -y')
+        else:
+            returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" -r {out_fps} -c:v libx264 -c:a copy -hide_banner -loglevel info "{save_path}" -y')
     while True:
         if returned != 0:
             pass
@@ -2188,6 +2208,129 @@ def bento_file_reader(file_path: Union[str, os.PathLike],
                 results[clf_name] = out_clf_df[['START', 'STOP']].astype(np.int32)
             else:
                 results[clf_name] = _orient_columns_melt(df=out_clf_df)
+    if save_path is None:
+        return results
+    else:
+        write_pickle(data=results, save_path=save_path)
+
+def _is_new_boris_version(pd_df: pd.DataFrame):
+    """
+    Check the format of a boris annotation file.
+
+    In the new version, additional column names are present, while
+    others have slightly different name. Here, we check for the presence
+    of a column name present only in the newer version.
+
+    :return: True if newer version
+    """
+    return "Media file name" in list(pd_df.columns)
+
+def read_boris_file(file_path: Union[str, os.PathLike],
+                    fps: Optional[Union[int, float]] = None,
+                    orient: Optional[Literal['index', 'columns']] = 'index',
+                    save_path: Optional[Union[str, os.PathLike]] = None,
+                    raise_error: Optional[bool] = False,
+                    log_setting: Optional[bool] = False) -> Union[None, Dict[str, pd.DataFrame]]:
+
+    """
+    Reads a BORIS behavioral annotation file, processes the data, and optionally saves the results to a file.
+
+    :param Union[str, os.PathLike] file_path: The path to the BORIS file to be read. The file should be a CSV containing behavioral annotations.
+    :param Optional[Union[int, float]] fps: Frames per second (FPS) to convert time annotations into frame numbers. If not provided, it will be extracted from the BORIS file if available.
+    :param Optional[Literal['index', 'columns']] orient: Determines the orientation of the results. 'index' will organize data with start and stop times as indices, while 'columns' will store data in columns.
+    :param Optional[Union[str, os.PathLike] save_path: The path where the processed results should be saved as a pickle file. If not provided, the results will be returned instead.
+    :param Optional[bool] raise_error: Whether to raise errors if the file format or content is invalid. If False, warnings will be logged instead of raising exceptions.
+    :param Optional[bool] log_setting: Whether to log warnings and errors.  This is relevant when `raise_error` is set to False.
+    :return: If `save_path` is None, returns a dictionary where keys are behaviors and values are dataframes  containing start and stop frames for each behavior. If `save_path` is provided, the results are saved and nothing is returned.
+    """
+
+    MEDIA_FILE_NAME = "Media file name"
+    BEHAVIOR_TYPE = 'Behavior type'
+    OBSERVATION_ID = "Observation id"
+    TIME = "Time"
+    FPS = 'FPS'
+    EVENT = 'EVENT'
+    BEHAVIOR = "Behavior"
+    START = 'START'
+    FRAME = 'FRAME'
+    STOP = 'STOP'
+    STATUS = "Status"
+    MEDIA_FILE_PATH = "Media file path"
+
+    results = {}
+    check_file_exist_and_readable(file_path=file_path)
+    if fps is not None:
+        check_int(name=f'{read_boris_file.__name__} fps', min_value=1, value=fps)
+    check_str(name=f'{read_boris_file.__name__} orient', value=orient, options=('index', 'columns'))
+    if save_path is not None:
+        check_if_dir_exists(in_dir=os.path.dirname(save_path))
+    boris_df = pd.read_csv(file_path)
+    if not _is_new_boris_version(boris_df):
+        expected_headers = [TIME, MEDIA_FILE_PATH, BEHAVIOR, STATUS]
+        if not OBSERVATION_ID in boris_df.columns:
+            if raise_error:
+                raise InvalidFileTypeError(msg=f'{file_path} is not a valid BORIS file', source=read_boris_file.__name__)
+            else:
+                ThirdPartyAnnotationsInvalidFileFormatWarning(annotation_app="BORIS", file_path=file_path, source=read_boris_file.__name__, log_status=log_setting)
+                return results
+        start_idx = boris_df[boris_df[OBSERVATION_ID] == TIME].index.values
+        if len(start_idx) != 1:
+            if raise_error:
+                raise InvalidFileTypeError(msg=f'{file_path} is not a valid BORIS file', source=read_boris_file.__name__)
+            else:
+                ThirdPartyAnnotationsInvalidFileFormatWarning(annotation_app="BORIS", file_path=file_path, source=read_boris_file.__name__, log_status=log_setting)
+                return results
+        df = pd.read_csv(file_path, skiprows=range(0, int(start_idx + 1)))
+    else:
+        MEDIA_FILE_PATH, STATUS = MEDIA_FILE_NAME, BEHAVIOR_TYPE
+        expected_headers = [TIME, MEDIA_FILE_PATH, BEHAVIOR, STATUS]
+        df = pd.read_csv(file_path)
+    check_valid_dataframe(df=df, source=f'{read_boris_file.__name__} {file_path}', required_fields=expected_headers)
+    _, video_base_name, _ = get_fn_ext(df.loc[0, MEDIA_FILE_PATH])
+    numeric_check = pd.to_numeric(df[TIME], errors='coerce').notnull().all()
+    if not numeric_check:
+        if raise_error:
+            raise InvalidInputError(msg=f'SimBA found TIME DATA annotation in file {file_path} that could not be interpreted as numeric values (seconds or frame numbers)')
+        else:
+            ThirdPartyAnnotationsInvalidFileFormatWarning(annotation_app="BORIS", file_path=file_path, source=read_boris_file.__name__, log_status=log_setting)
+            return results
+    df[TIME] = df[TIME].astype(np.float32)
+    fps = None
+    if fps is None:
+        if not FPS in df.columns:
+            if raise_error:
+                raise FrameRangeError(f'The annotations are in seconds and FPS was not passed. FPS could also not be read from the BORIS file', source=bento_file_reader.__name__)
+            else:
+                ThirdPartyAnnotationsInvalidFileFormatWarning(annotation_app="BORIS", file_path=file_path, source=read_boris_file.__name__, log_status=log_setting)
+                return results
+        fps = df[FPS].iloc[0]
+        if not isinstance(fps, (float, int)):
+            if raise_error:
+                raise FrameRangeError(f'The annotations are in seconds and FPS was not passed. FPS could also not be read from the BORIS file', source=bento_file_reader.__name__)
+            else:
+                ThirdPartyAnnotationsInvalidFileFormatWarning(annotation_app="BORIS", file_path=file_path, source=read_boris_file.__name__, log_status=log_setting)
+                return results
+    df = df[expected_headers]
+    df['FRAME'] = (df[TIME] * fps).astype(int)
+    df = df.drop([TIME, MEDIA_FILE_PATH], axis=1)
+    df = df.rename(columns={BEHAVIOR: 'BEHAVIOR', STATUS: EVENT})
+
+    for clf in df['BEHAVIOR'].unique():
+        clf_df = df[df['BEHAVIOR'] == clf].reset_index(drop=True)
+        if orient == 'column':
+            results[clf] = clf_df
+        else:
+            start_clf, stop_clf = clf_df[clf_df[EVENT] == START].reset_index(drop=True), clf_df[clf_df[EVENT] == STOP].reset_index(drop=True)
+            start_clf = start_clf.rename(columns={FRAME: START}).drop([EVENT, 'BEHAVIOR'], axis=1)
+            stop_clf = stop_clf.rename(columns={FRAME: STOP}).drop([EVENT], axis=1)
+            if len(start_clf) != len(stop_clf):
+                if raise_error:
+                    raise FrameRangeError(f'In file {file_path}, the number of start events ({len(start_clf)}) and stop events ({len(stop_clf)}) for behavior {clf} is not equal', source=bento_file_reader.__name__)
+                else:
+                    ThirdPartyAnnotationsInvalidFileFormatWarning(annotation_app="BORIS", file_path=file_path, source=read_boris_file.__name__, log_status=log_setting)
+                    return results
+            clf_df = pd.concat([start_clf, stop_clf], axis=1)[['BEHAVIOR', START, STOP]]
+            results[clf] = clf_df
     if save_path is None:
         return results
     else:

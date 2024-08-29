@@ -211,9 +211,7 @@ class ImageMixin(object):
         )
 
     @staticmethod
-    def slice_shapes_in_img(
-        img: Union[np.ndarray, Tuple[cv2.VideoCapture, int]],
-        geometries: List[Union[Polygon, np.ndarray]],
+    def slice_shapes_in_img(img: Union[np.ndarray, Tuple[cv2.VideoCapture, int]], geometries: List[Union[Polygon, np.ndarray]],
     ) -> List[np.ndarray]:
         """
         Slice regions of interest (ROIs) from an image based on provided shapes.
