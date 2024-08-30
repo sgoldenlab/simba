@@ -676,11 +676,12 @@ class TrainModelMixin(object):
             self.f_importance_save_path = os.path.join(save_dir, f"{clf_name}_{save_file_no}_feature_importance_log.csv")
         else:
             self.f_importance_save_path = os.path.join(save_dir, f"{clf_name}_feature_importance_log.csv")
-        if cuRF is not None and isinstance(rf_clf, cuRF):
+        if cuRF is not None and isinstance(rf_clf, cuRF) and hasattr(rf_clf, 'get_json'):
             cuml_tree_nodes = loads(rf_clf.get_json())
             importances = list(self.cuml_rf_x_importances(nodes=cuml_tree_nodes, n_features=len(x_names)))
             std_importances = [np.nan] * len(importances)
         else:
+            print('s')
             importances_per_tree = np.array([tree.feature_importances_ for tree in rf_clf.estimators_])
             importances = list(np.mean(importances_per_tree, axis=0))
             std_importances = list(np.std(importances_per_tree, axis=0))
