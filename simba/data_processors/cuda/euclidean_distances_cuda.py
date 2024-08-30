@@ -1,8 +1,10 @@
-import numpy as np
-from simba.utils.checks import check_valid_array, check_int
-from simba.utils.enums import Formats
-import cupy as cp
 from typing import Optional
+
+import cupy as cp
+import numpy as np
+
+from simba.utils.checks import check_int, check_valid_array
+from simba.utils.enums import Formats
 
 
 def get_euclidean_distance_cupy(x: np.ndarray,
