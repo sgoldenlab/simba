@@ -20,3 +20,4 @@ SimBA modules
    simba.unsupervised
    simba.utils
    simba.video_processors
+   simba.gpu_helpers

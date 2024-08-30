@@ -21,3 +21,4 @@ API Reference
    simba.utils
    simba.utils.cli
    simba.video_processors
+   simba.gpu_helpers
