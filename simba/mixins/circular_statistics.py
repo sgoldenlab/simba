@@ -885,7 +885,7 @@ class CircularStatisticsMixin(object):
         return np.ceil(np.rad2deg(min(2 * np.pi - circular_range, data[-1] - data[0])))
 
     @staticmethod
-    @njit("(float32[:], float64[:], int64)", parallel=True)
+    @njit("(float32[:], float64[:], int64)")
     def sliding_circular_range(data: np.ndarray, time_windows: np.ndarray, fps: int ) -> np.ndarray:
         """
         Jitted compute of sliding circular range for a time series of circular data. The range is defined as the angular span of the
@@ -911,8 +911,9 @@ class CircularStatisticsMixin(object):
         """
 
         results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
-        for time_window_cnt in prange(time_windows.shape[0]):
+        for time_window_cnt in range(time_windows.shape[0]):
             win_size = int(time_windows[time_window_cnt] * fps)
+            print('s')
             for left, right in zip(range(0, (data.shape[0] - win_size) + 1), range(win_size-1, data.shape[0])):
                 sample = np.sort(np.deg2rad(data[left : right + 1]))
                 angular_diffs = np.diff(sample)
@@ -1163,6 +1164,10 @@ class CircularStatisticsMixin(object):
 
         return results
 
+
+
+# data = np.array([260, 280, 300, 340, 360, 0, 10, 350, 0, 15]).astype(np.float32)
+# CircularStatisticsMixin().sliding_circular_range(data=data, time_windows=np.array([0.5]), fps=10)
 
 # data_sizes = [1, 10, 100, 1000, 10000, 100000, 1000000, 10000000, 100000000]
 # # #

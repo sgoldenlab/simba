@@ -154,8 +154,8 @@ def test_circular_range_2(size):
 
 def test_sliding_circular_range_1():
     data = np.array([260, 280, 300, 340, 360, 0, 10, 350, 0, 15]).astype(np.float32)
-    results = CircularStatisticsMixin().sliding_circular_range(data=data, time_windows=np.array([1.0]), fps=1)
-    expected_results = np.array([[0],[20],[20],[40],[20],[0],[10],[20],[10],[15]])
+    results = CircularStatisticsMixin().sliding_circular_range(data=data, time_windows=np.array([0.5]), fps=10)
+    expected_results = np.array([[0.], [0.], [0.], [0.], [100.], [80.], [70.], [30.], [20.], [25.]])
     assert np.array_equal(expected_results.astype(np.int32), results.astype(np.int32))
 
 @pytest.mark.parametrize('size, time_windows', [(100, (1.5, 2.0)), (1000, (0.5, 10.0)), (10000, (1.0))])
