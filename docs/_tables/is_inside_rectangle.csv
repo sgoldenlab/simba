@@ -1,0 +1,11 @@
+﻿FRAMES,CUDA JIT GPU (S),NUMBA CPU TIME (S)
+2 million,0.0050,0.0220
+4 million,0.0090,0.0310
+8 million,0.0160,0.0970
+16 million,0.0280,0.1990
+32 million,0.0540,0.3990
+64 million,0.1110,0.7690
+128 million,0.3300,1.3000
+256 million,0.6660,2.5310
+512 million,1.1610,7.2730
+1 billion,3.8280,13.3420

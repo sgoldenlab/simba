@@ -22,6 +22,11 @@ def is_inside_rectangle(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     :param np.ndarray x: 2d numeric np.ndarray size (N, 2).
     :param np.ndarray y: 2d numeric np.ndarray size (2, 2) (top left[x, y], bottom right[x, y])
     :return np.ndarray: 2d numeric boolean (N, 1) with 1s representing the point being inside the rectangle and 0 if the point is outside the rectangle.
+
+    .. csv-table:: Function Performance Table with Markup
+       :file: _tables/is_inside_rectangle.csv
+       :widths: 30, 70
+       :header-rows: 1
     """
 
     x = np.ascontiguousarray(x).astype(np.int32)

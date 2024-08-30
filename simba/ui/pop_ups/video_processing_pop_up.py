@@ -3105,13 +3105,12 @@ class ManualTemporalJoinPopUp(PopUpMixin):
         PopUpMixin.__init__(self, title="MANUAL TEMPORAL JOIN VIDEOS")
         video_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="NUMBER OF VIDEOS TO JOIN", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.video_cnt_dropdown = DropDownMenu(video_cnt_frm, "NUMBER OF VIDEOS:", list(range(2, 101, 1)), labelwidth=25)
-        self.select_video_cnt_btn = Button(video_cnt_frm, text="SELECT", font=Formats.FONT_REGULAR.value, command=lambda: self.select())
-        self.quality_dropdown = DropDownMenu(video_cnt_frm, "OUTPUT VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
+        self.select_video_cnt_btn = SimbaButton(parent=video_cnt_frm, txt='SELECT', img='tick', cmd=self.select)
+        self.quality_dropdown = DropDownMenu(video_cnt_frm, "OUTPUT VIDEO QUALITY %:", list(range(10, 110, 10)), labelwidth=25)
         self.quality_dropdown.setChoices(60)
         self.out_format_dropdown = DropDownMenu(video_cnt_frm, "OUTPUT VIDEO FORMAT:", Options.ALL_VIDEO_FORMAT_OPTIONS.value, labelwidth=25)
         self.gpu_dropdown = DropDownMenu(video_cnt_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
         self.gpu_dropdown.setChoices('FALSE')
-
         self.out_format_dropdown.setChoices('.mp4')
         self.video_cnt_dropdown.setChoices(2)
         video_cnt_frm.grid(row=0, column=0, sticky=NW)
@@ -3148,12 +3147,16 @@ class ManualTemporalJoinPopUp(PopUpMixin):
         format = self.out_format_dropdown.getChoices()
         quality = self.quality_dropdown.getChoices()
         gpu = str_2_bool(self.gpu_dropdown.getChoices())
-        if len(unique_fps) > 1: raise ResolutionError(msg=f'The selected videos contain more than one unique FPS: {unique_fps}', source=self.__class__.__name__)
+        if len(unique_fps) > 1: raise FrameRangeError(msg=f'The selected videos contain more than one unique FPS: {unique_fps}', source=self.__class__.__name__)
         if len(unique_res) > 1: raise ResolutionError(msg=f'The selected videos contain more than one unique resolutions: {unique_res}', source=self.__class__.__name__)
         threading.Thread(temporal_concatenation(video_paths=video_file_paths,
                                                 save_format=format[1:],
                                                 quality=quality,
                                                 gpu=gpu)).start()
+
+
+#ManualTemporalJoinPopUp()
+
 
 class CrossfadeVideosPopUp(PopUpMixin):
     def __init__(self):

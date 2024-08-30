@@ -2,7 +2,7 @@ from .angle_3pt import get_3pt_angle
 from .convex_hull import get_convex_hull
 from .count_values_in_range import count_values_in_ranges
 from .create_shap_log import create_shap_log
-from .euclidan_distance import get_euclidean_distance
+from .euclidan_distance_cuda import get_euclidean_distance
 from .is_inside_circle import is_inside_circle
 from .is_inside_polygon import is_inside_polygon
 from .is_inside_rectangle import is_inside_rectangle
