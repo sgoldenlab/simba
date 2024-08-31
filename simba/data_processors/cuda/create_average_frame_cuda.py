@@ -3,14 +3,16 @@ __email__ = "sronilsson@gmail.com"
 
 import os
 from typing import Optional, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 
+from copy import deepcopy
+
 import cupy as cp
 import cv2
-from copy import deepcopy
 import numpy as np
 from numba import cuda
 
@@ -26,16 +28,6 @@ from simba.utils.printing import stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
     get_video_meta_data, read_img_batch_from_video_gpu)
-
-
-
-
-
-
-
-
-
-
 
 
 def average_3d_stack_cupy(image_stack: np.ndarray) -> np.ndarray:

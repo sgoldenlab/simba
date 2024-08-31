@@ -3,6 +3,7 @@ __email__ = "sronilsson@gmail.com"
 
 import math
 from typing import Optional, Tuple
+
 try:
     from typing import Literal
 except:
@@ -10,6 +11,7 @@ except:
 
 import numpy as np
 from numba import cuda, int32
+
 try:
     import cupy as cp
 except:

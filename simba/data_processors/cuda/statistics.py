@@ -2,15 +2,19 @@ __author__ = "Simon Nilsson"
 __email__ = "sronilsson@gmail.com"
 
 
-from typing import Optional
 import math
+from typing import Optional
+
 import numpy as np
 from numba import cuda
+
 from simba.utils.read_write import read_df
+
 try:
     import cupy as cp
 except:
     import numpy as cp
+
 from simba.utils.checks import check_int, check_valid_array
 from simba.utils.enums import Formats
 

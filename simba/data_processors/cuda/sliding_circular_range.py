@@ -12,7 +12,6 @@ import cupy as cp
 import numpy as np
 
 
-
 def sliding_circular_range(x: np.ndarray,
                           time_window: float,
                           sample_rate: float,

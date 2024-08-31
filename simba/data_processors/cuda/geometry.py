@@ -1,13 +1,15 @@
 __author__ = "Simon Nilsson"
 __email__ = "sronilsson@gmail.com"
 
+import math
 from typing import Optional
-from simba.utils.checks import check_float, check_valid_array
-from simba.utils.enums import Formats
 
 import numpy as np
 from numba import cuda, njit
-import math
+
+from simba.utils.checks import check_float, check_valid_array
+from simba.utils.enums import Formats
+
 try:
     import cupy as cp
 except:
