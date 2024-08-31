@@ -30,5 +30,5 @@ simba/sandbox/
 
 #local docs build
 _build/html/
-/docs/_build/html/
+docs/_build
 /docs/_build/
