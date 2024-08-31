@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.utils.warnings &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.utils.warnings</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.utils.warnings</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="kn">from</span> <span class="nn">simba.utils.enums</span> <span class="kn">import</span> <span class="n">TagNames</span>
+<span class="kn">from</span> <span class="nn">simba.utils.printing</span> <span class="kn">import</span> <span class="n">log_event</span><span class="p">,</span> <span class="n">stdout_warning</span>
+
+
+<div class="viewcode-block" id="log_warning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.log_warning">[docs]</a><span class="k">def</span> <span class="nf">log_warning</span><span class="p">(</span><span class="n">func</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">log_event</span><span class="p">(</span>
+            <span class="n">logger_name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="s2">&quot;source&quot;</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s2">&quot;&quot;</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+            <span class="n">log_type</span><span class="o">=</span><span class="n">TagNames</span><span class="o">.</span><span class="n">WARNING</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">msg</span><span class="o">=</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;msg&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">stdout_warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;msg&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">results</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+<div class="viewcode-block" id="ThirdPartyAnnotationsOutsidePoseEstimationDataWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.ThirdPartyAnnotationsOutsidePoseEstimationDataWarning">[docs]</a><span class="k">def</span> <span class="nf">ThirdPartyAnnotationsOutsidePoseEstimationDataWarning</span><span class="p">(</span>
+    <span class="n">video_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">frm_cnt</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">log_status</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">clf_name</span><span class="p">:</span> <span class="nb">str</span> <span class="ow">or</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">annotation_frms</span><span class="p">:</span> <span class="nb">int</span> <span class="ow">or</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">first_error_frm</span><span class="p">:</span> <span class="nb">int</span> <span class="ow">or</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ambiguous_cnt</span><span class="p">:</span> <span class="nb">int</span> <span class="ow">or</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">if</span> <span class="n">clf_name</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;SIMBA THIRD-PARTY ANNOTATION WARNING: SimBA found THIRD-PARTY annotations for behavior </span><span class="si">{</span><span class="n">clf_name</span><span class="si">}</span><span class="s2"> in video &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> that are annotated to occur at times which is not present in the &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;video data you imported into SIMBA. The video you imported to SimBA has </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">frm_cnt</span><span class="p">)</span><span class="si">}</span><span class="s2"> frames. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;However, you have annotated </span><span class="si">{</span><span class="n">clf_name</span><span class="si">}</span><span class="s2"> to happen at frame number </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">first_error_frm</span><span class="p">)</span><span class="si">}</span><span class="s2">. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;These ambiguous annotations occur in </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">ambiguous_cnt</span><span class="p">)</span><span class="si">}</span><span class="s2"> different frames for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> that SimBA will **remove** by default. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Please make sure you imported the same video as you annotated in BORIS into SimBA and the video is registered with the correct frame rate. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;SimBA will only append annotations made to the frames present in the pose estimation data.&quot;</span>
+        <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA THIRD-PARTY ANNOTATION WARNING: The annotations for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> contain data for </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">annotation_frms</span><span class="p">)</span><span class="si">}</span><span class="s2"> frames. The pose-estimation features for the same video contain data for </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">frm_cnt</span><span class="p">)</span><span class="si">}</span><span class="s2"> frames. SimBA will use the annotations for the frames present in the pose-estimation data and discard the rest. If the annotation data is shorter than the pose-estimation data, SimBA will assume the missing annotation frames are all behavior absent.&quot;</span>
+    <span class="k">if</span> <span class="n">log_status</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+    <span class="n">stdout_warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThirdPartyAnnotationsClfMissingWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.ThirdPartyAnnotationsClfMissingWarning">[docs]</a><span class="k">def</span> <span class="nf">ThirdPartyAnnotationsClfMissingWarning</span><span class="p">(</span><span class="n">video_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">clf_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;SIMBA THIRD-PARTY ANNOTATION WARNING: No annotations detected for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> and behavior </span><span class="si">{</span><span class="n">clf_name</span><span class="si">}</span><span class="s2">. &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;SimBA will set all frame annotations as absent.&quot;</span>
+    <span class="p">)</span>
+    <span class="n">stdout_warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThirdPartyAnnotationsAdditionalClfWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.ThirdPartyAnnotationsAdditionalClfWarning">[docs]</a><span class="k">def</span> <span class="nf">ThirdPartyAnnotationsAdditionalClfWarning</span><span class="p">(</span>
+    <span class="n">video_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">clf_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">log_status</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">):</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA THIRD-PARTY ANNOTATION WARNING: Annotations file for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> has annotations for the following behaviors </span><span class="si">{</span><span class="n">clf_names</span><span class="si">}</span><span class="s2"> that are NOT classifiers named in the SimBA project. SimBA will OMIT appending the data for these </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">clf_names</span><span class="p">))</span><span class="si">}</span><span class="s2"> classifiers.&quot;</span>
+    <span class="k">if</span> <span class="n">log_status</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+    <span class="n">stdout_warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThirdPartyAnnotationsInvalidFileFormatWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.ThirdPartyAnnotationsInvalidFileFormatWarning">[docs]</a><span class="k">def</span> <span class="nf">ThirdPartyAnnotationsInvalidFileFormatWarning</span><span class="p">(</span>
+    <span class="n">annotation_app</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">log_status</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">):</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA WARNING: </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2"> is not a valid </span><span class="si">{</span><span class="n">annotation_app</span><span class="si">}</span><span class="s2"> file and is skipped. See the SimBA GitHub repository for expected file format&quot;</span>
+    <span class="k">if</span> <span class="n">log_status</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+    <span class="n">stdout_warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThirdPartyAnnotationsMissingAnnotationsWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.ThirdPartyAnnotationsMissingAnnotationsWarning">[docs]</a><span class="k">def</span> <span class="nf">ThirdPartyAnnotationsMissingAnnotationsWarning</span><span class="p">(</span>
+    <span class="n">video_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">clf_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">log_status</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">):</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA THIRD-PARTY ANNOTATION WARNING: No annotations detected for SimBA classifier(s) named </span><span class="si">{</span><span class="n">clf_names</span><span class="si">}</span><span class="s2"> for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2">. All frame annotations will be set to behavior absent (0).&quot;</span>
+    <span class="k">if</span> <span class="n">log_status</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+    <span class="n">stdout_warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThirdPartyAnnotationsFpsConflictWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.ThirdPartyAnnotationsFpsConflictWarning">[docs]</a><span class="k">def</span> <span class="nf">ThirdPartyAnnotationsFpsConflictWarning</span><span class="p">(</span>
+    <span class="n">video_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">annotation_fps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">video_fps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA THIRD-PARTY ANNOTATION WARNING: The FPS for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> is set to </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">video_fps</span><span class="p">)</span><span class="si">}</span><span class="s2"> in SimBA and </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">annotation_fps</span><span class="p">)</span><span class="si">}</span><span class="s2"> in the annotation file&quot;</span>
+    <span class="n">stdout_warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThirdPartyAnnotationEventCountWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.ThirdPartyAnnotationEventCountWarning">[docs]</a><span class="k">def</span> <span class="nf">ThirdPartyAnnotationEventCountWarning</span><span class="p">(</span>
+    <span class="n">video_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">clf_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">start_event_cnt</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">stop_event_cnt</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="n">log_status</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA THIRD-PARTY ANNOTATION WARNING: The annotations for behavior </span><span class="si">{</span><span class="n">clf_name</span><span class="si">}</span><span class="s2"> in video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> contains </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">start_event_cnt</span><span class="p">)</span><span class="si">}</span><span class="s2"> start events and </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">stop_event_cnt</span><span class="p">)</span><span class="si">}</span><span class="s2"> stop events. SimBA requires the number of stop and start event counts to be equal. SimBA will try to find and delete the odd event stamps.&quot;</span>
+    <span class="k">if</span> <span class="n">log_status</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+    <span class="n">stdout_warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThirdPartyAnnotationOverlapWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.ThirdPartyAnnotationOverlapWarning">[docs]</a><span class="k">def</span> <span class="nf">ThirdPartyAnnotationOverlapWarning</span><span class="p">(</span>
+    <span class="n">video_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">clf_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">log_status</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">):</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA THIRD-PARTY ANNOTATION WARNING: The annotations for behavior </span><span class="si">{</span><span class="n">clf_name</span><span class="si">}</span><span class="s2"> in video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> contains behavior start events that are initiated PRIOR to the PRECEDING behavior event ending. SimBA requires a specific behavior event to end before another behavior event can start. SimBA will try and delete these events.&quot;</span>
+    <span class="k">if</span> <span class="n">log_status</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+    <span class="n">stdout_warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThirdPartyAnnotationFileNotFoundWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.ThirdPartyAnnotationFileNotFoundWarning">[docs]</a><span class="k">def</span> <span class="nf">ThirdPartyAnnotationFileNotFoundWarning</span><span class="p">(</span>
+    <span class="n">video_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">log_status</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="p">):</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA THIRD-PARTY ANNOTATION WARNING: Could not find annotations for video features file </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> in the annotations directory.&quot;</span>
+    <span class="k">if</span> <span class="n">log_status</span><span class="p">:</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span>
+    <span class="n">stdout_warning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BodypartColumnNotFoundWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.BodypartColumnNotFoundWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">BodypartColumnNotFoundWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ShapWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.ShapWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">ShapWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="InValidUserInputWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.InValidUserInputWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">InValidUserInputWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="KleinbergWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.KleinbergWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">KleinbergWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="NoFileFoundWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.NoFileFoundWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">NoFileFoundWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="DataHeaderWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.DataHeaderWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">DataHeaderWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="NoModuleWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.NoModuleWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">NoModuleWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="FileExistWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.FileExistWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">FileExistWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="DuplicateNamesWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.DuplicateNamesWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">DuplicateNamesWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="InvalidValueWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.InvalidValueWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">InvalidValueWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="NoDataFoundWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.NoDataFoundWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">NoDataFoundWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="NotEnoughDataWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.NotEnoughDataWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">NotEnoughDataWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="MissingUserInputWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.MissingUserInputWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">MissingUserInputWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="SameInputAndOutputWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.SameInputAndOutputWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">SameInputAndOutputWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="ROIWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.ROIWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">ROIWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="MultiProcessingFailedWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.MultiProcessingFailedWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">MultiProcessingFailedWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="PythonVersionWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.PythonVersionWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">PythonVersionWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="BorisPointEventsWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.BorisPointEventsWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">BorisPointEventsWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="FFMpegCodecWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.FFMpegCodecWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">FFMpegCodecWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="FFMpegNotFoundWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.FFMpegNotFoundWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">FFMpegNotFoundWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="SkippingFileWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.SkippingFileWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">SkippingFileWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="SkippingRuleWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.SkippingRuleWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">SkippingRuleWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="IdenticalInputWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.IdenticalInputWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">IdenticalInputWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="FrameRangeWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.FrameRangeWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">FrameRangeWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="SamplingWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.SamplingWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">SamplingWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="CropWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.CropWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">CropWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="CorruptedFileWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.CorruptedFileWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">CorruptedFileWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="ResolutionWarning"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.warnings.ResolutionWarning">[docs]</a><span class="nd">@log_warning</span>
+<span class="k">def</span> <span class="nf">ResolutionWarning</span><span class="p">(</span><span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">):</span>
+    <span class="k">pass</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

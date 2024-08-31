@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.utils.errors &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.utils.errors</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.utils.errors</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">from</span> <span class="nn">tkinter</span> <span class="kn">import</span> <span class="n">messagebox</span> <span class="k">as</span> <span class="n">mb</span>
+
+<span class="kn">from</span> <span class="nn">simba.utils.enums</span> <span class="kn">import</span> <span class="n">Defaults</span><span class="p">,</span> <span class="n">TagNames</span>
+<span class="kn">from</span> <span class="nn">simba.utils.printing</span> <span class="kn">import</span> <span class="n">log_event</span>
+
+<span class="n">WINDOW_TITLE</span> <span class="o">=</span> <span class="s2">&quot;SIMBA ERROR&quot;</span>
+
+
+<div class="viewcode-block" id="SimbaError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.SimbaError">[docs]</a><span class="k">class</span> <span class="nc">SimbaError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_window</span> <span class="o">=</span> <span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">show_window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">print_and_log_error</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">msg</span>
+
+<div class="viewcode-block" id="SimbaError.print_and_log_error"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.SimbaError.print_and_log_error">[docs]</a>    <span class="k">def</span> <span class="nf">print_and_log_error</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">log_event</span><span class="p">(</span><span class="n">logger_name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">source</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">log_type</span><span class="o">=</span><span class="n">TagNames</span><span class="o">.</span><span class="n">ERROR</span><span class="o">.</span><span class="n">value</span><span class="p">,</span><span class="n">msg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="si">}{</span><span class="n">Defaults</span><span class="o">.</span><span class="n">STR_SPLIT_DELIMITER</span><span class="o">.</span><span class="n">value</span><span class="si">}{</span><span class="n">TagNames</span><span class="o">.</span><span class="n">ERROR</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">show_window</span><span class="p">:</span>
+            <span class="n">mb</span><span class="o">.</span><span class="n">showerror</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="n">WINDOW_TITLE</span><span class="p">,</span> <span class="n">message</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">msg</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="NoSpecifiedOutputError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.NoSpecifiedOutputError">[docs]</a><span class="k">class</span> <span class="nc">NoSpecifiedOutputError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ROICoordinatesNotFoundError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.ROICoordinatesNotFoundError">[docs]</a><span class="k">class</span> <span class="nc">ROICoordinatesNotFoundError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expected_file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA ROI COORDINATES ERROR: No ROI coordinates found. Please use the [ROI] tab to define ROIs. Expected at location </span><span class="si">{</span><span class="n">expected_file_path</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NoChoosenClassifierError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.NoChoosenClassifierError">[docs]</a><span class="k">class</span> <span class="nc">NoChoosenClassifierError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Select at least one classifier&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NoChoosenROIError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.NoChoosenROIError">[docs]</a><span class="k">class</span> <span class="nc">NoChoosenROIError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Please select at least one ROI.&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NoChoosenMeasurementError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.NoChoosenMeasurementError">[docs]</a><span class="k">class</span> <span class="nc">NoChoosenMeasurementError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;SIMBA NoChoosenMeasurementError ERROR: Please select at least one measurement to calculate descriptive statistics for.&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NoDataError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.NoDataError">[docs]</a><span class="k">class</span> <span class="nc">NoDataError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA NO DATA ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SamplingError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.SamplingError">[docs]</a><span class="k">class</span> <span class="nc">SamplingError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA SAMPLING ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="PermissionError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.PermissionError">[docs]</a><span class="k">class</span> <span class="nc">PermissionError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA PERMISSION ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NoROIDataError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.NoROIDataError">[docs]</a><span class="k">class</span> <span class="nc">NoROIDataError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA NO ROI DATA ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MixedMosaicError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.MixedMosaicError">[docs]</a><span class="k">class</span> <span class="nc">MixedMosaicError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA MixedMosaicError ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ClassifierInferenceError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.ClassifierInferenceError">[docs]</a><span class="k">class</span> <span class="nc">ClassifierInferenceError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA CLASSIFIER INFERENCE ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AnimalNumberError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.AnimalNumberError">[docs]</a><span class="k">class</span> <span class="nc">AnimalNumberError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA ANIMAL NUMBER ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InvalidFilepathError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.InvalidFilepathError">[docs]</a><span class="k">class</span> <span class="nc">InvalidFilepathError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA INVALID FILE PATH ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NoFilesFoundError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.NoFilesFoundError">[docs]</a><span class="k">class</span> <span class="nc">NoFilesFoundError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA NO FILES FOUND ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DataHeaderError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.DataHeaderError">[docs]</a><span class="k">class</span> <span class="nc">DataHeaderError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA DATA HEADER ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NotDirectoryError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.NotDirectoryError">[docs]</a><span class="k">class</span> <span class="nc">NotDirectoryError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA NOT A DIRECTORY ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DirectoryExistError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.DirectoryExistError">[docs]</a><span class="k">class</span> <span class="nc">DirectoryExistError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA DIRECTORY ALREADY EXIST ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FileExistError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.FileExistError">[docs]</a><span class="k">class</span> <span class="nc">FileExistError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA FILE EXIST ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FrameRangeError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.FrameRangeError">[docs]</a><span class="k">class</span> <span class="nc">FrameRangeError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA FRAME RANGE ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AdvancedLabellingError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.AdvancedLabellingError">[docs]</a><span class="k">class</span> <span class="nc">AdvancedLabellingError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">frame</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">lbl_lst</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">unlabel_lst</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;SIMBA ADVANCED LABELLING ERROR: In advanced labelling of multiple behaviors, any annotated frame cannot have some &quot;</span>
+            <span class="s2">&quot;behaviors annotated as present/absent, while other behaviors are un-labelled. All behaviors need &quot;</span>
+            <span class="s2">&quot;labels for a frame with one or more labels. In frame </span><span class="si">{}</span><span class="s2">, behaviors </span><span class="si">{}</span><span class="s2"> are labelled, while behaviors &quot;</span>
+            <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> are un-labelled.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">frame</span><span class="p">),</span> <span class="n">lbl_lst</span><span class="p">,</span> <span class="n">unlabel_lst</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InvalidHyperparametersFileError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.InvalidHyperparametersFileError">[docs]</a><span class="k">class</span> <span class="nc">InvalidHyperparametersFileError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA HYPERPARAMETER FILE ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InvalidVideoFileError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.InvalidVideoFileError">[docs]</a><span class="k">class</span> <span class="nc">InvalidVideoFileError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA VIDEO FILE ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InvalidFileTypeError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.InvalidFileTypeError">[docs]</a><span class="k">class</span> <span class="nc">InvalidFileTypeError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA INVALID FILE TYPE ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FaultyTrainingSetError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.FaultyTrainingSetError">[docs]</a><span class="k">class</span> <span class="nc">FaultyTrainingSetError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA INVALID ML TRAINING SET ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CountError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.CountError">[docs]</a><span class="k">class</span> <span class="nc">CountError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA COUNT ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FeatureNumberMismatchError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.FeatureNumberMismatchError">[docs]</a><span class="k">class</span> <span class="nc">FeatureNumberMismatchError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA FEATURE NUMBER MISMATCH ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DuplicationError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.DuplicationError">[docs]</a><span class="k">class</span> <span class="nc">DuplicationError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA DUPLICATION ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="InvalidInputError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.InvalidInputError">[docs]</a><span class="k">class</span> <span class="nc">InvalidInputError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA VALUE ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="IntegerError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.IntegerError">[docs]</a><span class="k">class</span> <span class="nc">IntegerError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA INTEGER ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StringError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.StringError">[docs]</a><span class="k">class</span> <span class="nc">StringError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA STRING ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FloatError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.FloatError">[docs]</a><span class="k">class</span> <span class="nc">FloatError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA FLOAT ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MissingProjectConfigEntryError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.MissingProjectConfigEntryError">[docs]</a><span class="k">class</span> <span class="nc">MissingProjectConfigEntryError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA MISSING PROJECT CONFIG ENTRY ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MissingColumnsError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.MissingColumnsError">[docs]</a><span class="k">class</span> <span class="nc">MissingColumnsError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA MISSING COLUMN ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="CorruptedFileError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.CorruptedFileError">[docs]</a><span class="k">class</span> <span class="nc">CorruptedFileError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA READ FILE ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ParametersFileError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.ParametersFileError">[docs]</a><span class="k">class</span> <span class="nc">ParametersFileError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA VIDEO PARAMETERS FILE ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ColumnNotFoundError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.ColumnNotFoundError">[docs]</a><span class="k">class</span> <span class="nc">ColumnNotFoundError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">column_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA ERROR: Field name </span><span class="si">{</span><span class="n">column_name</span><span class="si">}</span><span class="s2"> could not be found in file </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BodypartColumnNotFoundError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.BodypartColumnNotFoundError">[docs]</a><span class="k">class</span> <span class="nc">BodypartColumnNotFoundError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA BODY_PART COLUMN NOT FOUND ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="AnnotationFileNotFoundError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.AnnotationFileNotFoundError">[docs]</a><span class="k">class</span> <span class="nc">AnnotationFileNotFoundError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">video_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA THIRD-PARTY ANNOTATION ERROR: NO ANNOTATION DATA FOR VIDEO </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> FOUND&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="DirectoryNotEmptyError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.DirectoryNotEmptyError">[docs]</a><span class="k">class</span> <span class="nc">DirectoryNotEmptyError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA DIRECTORY NOT EMPTY ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<span class="c1">#####</span>
+
+
+<div class="viewcode-block" id="ThirdPartyAnnotationFileNotFoundError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.ThirdPartyAnnotationFileNotFoundError">[docs]</a><span class="k">class</span> <span class="nc">ThirdPartyAnnotationFileNotFoundError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">video_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA ERROR: Could not find file in project_folder/csv/features_extracted directory representing annotations for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThirdPartyAnnotationsFpsConflictError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.ThirdPartyAnnotationsFpsConflictError">[docs]</a><span class="k">class</span> <span class="nc">ThirdPartyAnnotationsFpsConflictError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">video_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">annotation_fps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">video_fps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA THIRD-PARTY ANNOTATION ERROR: The FPS for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> is set to </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">video_fps</span><span class="p">)</span><span class="si">}</span><span class="s2"> in SimBA and </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">annotation_fps</span><span class="p">)</span><span class="si">}</span><span class="s2"> in the annotation file&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThirdPartyAnnotationsMissingAnnotationsError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.ThirdPartyAnnotationsMissingAnnotationsError">[docs]</a><span class="k">class</span> <span class="nc">ThirdPartyAnnotationsMissingAnnotationsError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">video_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">clf_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA THIRD-PARTY ANNOTATION ERROR: No annotations detected for SimBA classifier(s) named </span><span class="si">{</span><span class="n">clf_names</span><span class="si">}</span><span class="s2"> for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThirdPartyAnnotationOverlapError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.ThirdPartyAnnotationOverlapError">[docs]</a><span class="k">class</span> <span class="nc">ThirdPartyAnnotationOverlapError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">video_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">clf_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA THIRD-PARTY ANNOTATION ERROR: The annotations for behavior </span><span class="si">{</span><span class="n">clf_name</span><span class="si">}</span><span class="s2"> in video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> contains behavior start events that are initiated PRIOR to the PRECEDING behavior event ending. SimBA requires a specific behavior event to end before another behavior event can start.&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThirdPartyAnnotationsAdditionalClfError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.ThirdPartyAnnotationsAdditionalClfError">[docs]</a><span class="k">class</span> <span class="nc">ThirdPartyAnnotationsAdditionalClfError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">video_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">clf_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA THIRD-PARTY ANNOTATION ERROR: Annotations file for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> has annotations for the following behaviors </span><span class="si">{</span><span class="n">clf_names</span><span class="si">}</span><span class="s2"> that are NOT classifiers named in the SimBA project.&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThirdPartyAnnotationEventCountError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.ThirdPartyAnnotationEventCountError">[docs]</a><span class="k">class</span> <span class="nc">ThirdPartyAnnotationEventCountError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">video_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">clf_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">start_event_cnt</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">stop_event_cnt</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA THIRD-PARTY ANNOTATION ERROR: The annotations for behavior </span><span class="si">{</span><span class="n">clf_name</span><span class="si">}</span><span class="s2"> in video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> contains </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">start_event_cnt</span><span class="p">)</span><span class="si">}</span><span class="s2"> start events and </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">stop_event_cnt</span><span class="p">)</span><span class="si">}</span><span class="s2"> stop events. SimBA requires the number of stop and start event counts to be equal.&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThirdPartyAnnotationsClfMissingError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.ThirdPartyAnnotationsClfMissingError">[docs]</a><span class="k">class</span> <span class="nc">ThirdPartyAnnotationsClfMissingError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">video_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">clf_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA THIRD-PARTY ANNOTATION WARNING: No annotations detected for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> and behavior </span><span class="si">{</span><span class="n">clf_name</span><span class="si">}</span><span class="s2">.&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ThirdPartyAnnotationsOutsidePoseEstimationDataError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.ThirdPartyAnnotationsOutsidePoseEstimationDataError">[docs]</a><span class="k">class</span> <span class="nc">ThirdPartyAnnotationsOutsidePoseEstimationDataError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">video_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">frm_cnt</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">clf_name</span><span class="p">:</span> <span class="nb">str</span> <span class="ow">or</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">annotation_frms</span><span class="p">:</span> <span class="nb">int</span> <span class="ow">or</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">first_error_frm</span><span class="p">:</span> <span class="nb">int</span> <span class="ow">or</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ambiguous_cnt</span><span class="p">:</span> <span class="nb">int</span> <span class="ow">or</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+
+        <span class="k">if</span> <span class="n">clf_name</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;SIMBA THIRD-PARTY ANNOTATION WARNING: SimBA found THIRD-PARTY annotations for behavior </span><span class="si">{</span><span class="n">clf_name</span><span class="si">}</span><span class="s2"> in video &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> that are annotated to occur at times which is not present in the &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;video data you imported into SIMBA. The video you imported to SimBA has </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">frm_cnt</span><span class="p">)</span><span class="si">}</span><span class="s2"> frames. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;However, in BORIS, you have annotated </span><span class="si">{</span><span class="n">clf_name</span><span class="si">}</span><span class="s2"> to happen at frame number </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">first_error_frm</span><span class="p">)</span><span class="si">}</span><span class="s2">. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;These ambiguous annotations occur in </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">ambiguous_cnt</span><span class="p">)</span><span class="si">}</span><span class="s2"> different frames for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> that SimBA will **remove** by default. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Please make sure you imported the same video as you annotated in BORIS into SimBA and the video is registered with the correct frame rate.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA THIRD-PARTY ANNOTATION WARNING: The annotations for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> contain data for </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">annotation_frms</span><span class="p">)</span><span class="si">}</span><span class="s2"> frames. The pose-estimation features for the same video contain data for </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">frm_cnt</span><span class="p">)</span><span class="si">}</span><span class="s2"> frames.&quot;</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FFMPEGCodecGPUError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.FFMPEGCodecGPUError">[docs]</a><span class="k">class</span> <span class="nc">FFMPEGCodecGPUError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA FFMPEG CODEC ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="FFMPEGNotFoundError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.FFMPEGNotFoundError">[docs]</a><span class="k">class</span> <span class="nc">FFMPEGNotFoundError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA FFMPEG NOT FOUND ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ArrayError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.ArrayError">[docs]</a><span class="k">class</span> <span class="nc">ArrayError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA ARRAY SIZE ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ResolutionError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.ResolutionError">[docs]</a><span class="k">class</span> <span class="nc">ResolutionError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA RESOLUTION ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SimBAModuleNotFoundError"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.errors.SimBAModuleNotFoundError">[docs]</a><span class="k">class</span> <span class="nc">SimBAModuleNotFoundError</span><span class="p">(</span><span class="n">SimbaError</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">show_window</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SIMBA MODULE NOT FOUND ERROR: </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="n">msg</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span> <span class="n">show_window</span><span class="o">=</span><span class="n">show_window</span><span class="p">)</span></div>
+
+
+<span class="c1"># test = NoSpecifiedOutputError(msg=&#39;test&#39;, source=&#39;test.method&#39;)</span>
+<span class="c1"># test = FFMPEGNotFoundError(msg=&#39;323&#39;)</span>
+
+<span class="c1"># class NoSpecifiedOutputError(SimbaError):</span>
+<span class="c1">#     @log_error_decorator()</span>
+<span class="c1">#     def __init__(self, msg: str, source: str = &#39;&#39;, show_window: bool = True):</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.third_party_label_appenders.BENTO_appender &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.third_party_label_appenders.BENTO_appender</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.third_party_label_appenders.BENTO_appender</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">simba.mixins.config_reader</span> <span class="kn">import</span> <span class="n">ConfigReader</span>
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">check_all_file_names_are_represented_in_video_log</span><span class="p">,</span> <span class="n">check_if_dir_exists</span><span class="p">,</span>
+    <span class="n">check_if_filepath_list_is_empty</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.errors</span> <span class="kn">import</span> <span class="n">NoFilesFoundError</span>
+<span class="kn">from</span> <span class="nn">simba.utils.printing</span> <span class="kn">import</span> <span class="n">stdout_success</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="p">(</span><span class="n">bento_file_reader</span><span class="p">,</span>
+                                    <span class="n">find_files_of_filetypes_in_directory</span><span class="p">,</span>
+                                    <span class="n">get_fn_ext</span><span class="p">,</span> <span class="n">read_df</span><span class="p">,</span> <span class="n">write_df</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.warnings</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ThirdPartyAnnotationsClfMissingWarning</span><span class="p">,</span>
+    <span class="n">ThirdPartyAnnotationsOutsidePoseEstimationDataWarning</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="BentoAppender"><a class="viewcode-back" href="../../../simba.third_party_label_appenders.html#simba.third_party_label_appenders.BENTO_appender.BentoAppender">[docs]</a><span class="k">class</span> <span class="nc">BentoAppender</span><span class="p">(</span><span class="n">ConfigReader</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Append BENTO annotation to SimBA featurized datasets.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">       `Example BENTO input file &lt;https://github.com/sgoldenlab/simba/blob/master/misc/bento_example.annot&gt;`_.</span>
+<span class="sd">       &#39;GitHub tutorial &lt;https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md&gt;`_.</span>
+
+<span class="sd">    :param str config_path: path to SimBA project config file in Configparser format</span>
+<span class="sd">    :param str data_dir: Path to folder containing BENTO data.</span>
+
+<span class="sd">    :example:</span>
+<span class="sd">    &gt;&gt;&gt; bento_dir = &#39;tests/test_data/bento_example&#39;</span>
+<span class="sd">    &gt;&gt;&gt; config_path = &#39;tests/test_data/import_tests/project_folder/project_config.ini&#39;</span>
+<span class="sd">    &gt;&gt;&gt; bento_appender = BentoAppender(config_path=config_path, data_dir=bento_dir)</span>
+<span class="sd">    &gt;&gt;&gt; bento_appender.run()</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Segalin et al., eLife, https://doi.org/10.7554/eLife.63720</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">config_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
+                 <span class="n">data_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]):</span>
+
+        <span class="n">ConfigReader</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="n">check_if_dir_exists</span><span class="p">(</span><span class="n">in_dir</span><span class="o">=</span><span class="n">data_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bento_files</span> <span class="o">=</span> <span class="n">find_files_of_filetypes_in_directory</span><span class="p">(</span><span class="n">directory</span><span class="o">=</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">extensions</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;.annot&#39;</span><span class="p">],</span> <span class="n">raise_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">raise_warning</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">check_if_filepath_list_is_empty</span><span class="p">(</span><span class="n">filepaths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_file_paths</span><span class="p">,</span> <span class="n">error_msg</span><span class="o">=</span><span class="s2">&quot;SIMBA ERROR: No feature files found in project_folder/csv/features_extracted. Extract Features BEFORE appending BENTO annotations&quot;</span><span class="p">)</span>
+        <span class="n">check_if_filepath_list_is_empty</span><span class="p">(</span><span class="n">filepaths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bento_files</span><span class="p">,</span> <span class="n">error_msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SIMBA ERROR: No BENTO files with .annot extension found in </span><span class="si">{</span><span class="n">data_dir</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saved_files</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">check_all_file_names_are_represented_in_video_log</span><span class="p">(</span><span class="n">video_info_df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">video_info_df</span><span class="p">,</span> <span class="n">data_paths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bento_files</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">file_cnt</span><span class="p">,</span> <span class="n">bento_file_path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bento_files</span><span class="p">):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">filepath</span><span class="o">=</span><span class="n">bento_file_path</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Appending BENTO annotation to video </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">fps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_video_info</span><span class="p">(</span><span class="n">video_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">)</span>
+            <span class="n">features_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_name</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">features_path</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">NoFilesFoundError</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;No features file for annotation file </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="si">}</span><span class="s1"> file in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">features_dir</span><span class="si">}</span><span class="s1">. SimBA is expecting a file at path </span><span class="si">{</span><span class="n">features_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">targets_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_name</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">feature_df</span> <span class="o">=</span> <span class="n">read_df</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">features_path</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">feature_df</span><span class="p">)</span>
+            <span class="n">bento_dict</span> <span class="o">=</span> <span class="n">bento_file_reader</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">bento_file_path</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">clf_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clf_names</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">clf_name</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">if</span> <span class="n">clf_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">bento_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="n">ThirdPartyAnnotationsClfMissingWarning</span><span class="p">(</span><span class="n">video_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">,</span> <span class="n">clf_name</span><span class="o">=</span><span class="n">clf_name</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">clf_bento_df</span> <span class="o">=</span> <span class="n">bento_dict</span><span class="p">[</span><span class="n">clf_name</span><span class="p">]</span>
+                    <span class="n">annotations_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">clf_bento_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;START&quot;</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;STOP&quot;</span><span class="p">]))),</span> <span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
+                    <span class="n">annotations_idx_outside_video</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">annotations_idx</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">feature_df</span><span class="p">)]</span>
+                    <span class="n">valid_annotation_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">annotations_idx</span> <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">feature_df</span><span class="p">)]</span>
+
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">annotations_idx_outside_video</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">ThirdPartyAnnotationsOutsidePoseEstimationDataWarning</span><span class="p">(</span><span class="n">video_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">,</span>
+                                                                              <span class="n">clf_name</span><span class="o">=</span><span class="n">clf_name</span><span class="p">,</span>
+                                                                              <span class="n">frm_cnt</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">feature_df</span><span class="p">),</span>
+                                                                              <span class="n">first_error_frm</span><span class="o">=</span><span class="n">annotations_idx_outside_video</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                                                              <span class="n">ambiguous_cnt</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">annotations_idx_outside_video</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">valid_annotation_ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Appending </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">valid_annotation_ids</span><span class="p">))</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">clf_name</span><span class="si">}</span><span class="s2"> frame annotations to video </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">valid_annotation_ids</span><span class="p">,</span> <span class="n">clf_name</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__save</span><span class="p">()</span>
+            <span class="n">stdout_success</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Annotations for </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">saved_files</span><span class="p">))</span><span class="si">}</span><span class="s2"> video(s) and saved in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">targets_folder</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">write_df</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">saved_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;BENTO annotations appended to video </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> and saved in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1">#     #</span>
+<span class="c1">#     #</span>
+<span class="c1">#     #         annotation_df = pd.read_csv(</span>
+<span class="c1">#     #             bento_path, delim_whitespace=True, index_col=False, low_memory=False</span>
+<span class="c1">#     #         )</span>
+<span class="c1">#     #         start_idx = annotation_df.index[</span>
+<span class="c1">#     #             annotation_df[&quot;Bento&quot;] == &quot;Ch1----------&quot;</span>
+<span class="c1">#     #         ].values[0]</span>
+<span class="c1">#     #         sliced_annot = annotation_df.iloc[start_idx + 1 :]</span>
+<span class="c1">#     #         annotated_behaviors = sliced_annot[sliced_annot[&quot;Bento&quot;].str.contains(&quot;&gt;&quot;)][</span>
+<span class="c1">#     #             &quot;Bento&quot;</span>
+<span class="c1">#     #         ].tolist()</span>
+<span class="c1">#     #         annotated_behavior_names = [x[1:] for x in annotated_behaviors]</span>
+<span class="c1">#     #         missing_annotation = set(self.clf_names) - set(annotated_behavior_names)</span>
+<span class="c1">#     #         missing_clf = list(set(annotated_behavior_names) - set(self.clf_names))</span>
+<span class="c1">#     #         annotation_intersection = [</span>
+<span class="c1">#     #             x for x in self.clf_names if x in annotated_behavior_names</span>
+<span class="c1">#     #         ]</span>
+<span class="c1">#     #         for missing_clf in missing_annotation:</span>
+<span class="c1">#     #             ThirdPartyAnnotationsClfMissingWarning(</span>
+<span class="c1">#     #                 video_name=self.video_name, clf_name=missing_clf</span>
+<span class="c1">#     #             )</span>
+<span class="c1">#     #             self.results_df[missing_clf] = 0</span>
+<span class="c1">#     #         if missing_clf:</span>
+<span class="c1">#     #             ThirdPartyAnnotationsAdditionalClfWarning(</span>
+<span class="c1">#     #                 video_name=self.video_name, clf_names=missing_clf</span>
+<span class="c1">#     #             )</span>
+<span class="c1">#     #</span>
+<span class="c1">#     #         for clf_name in annotation_intersection:</span>
+<span class="c1">#     #             self.results_df[clf_name] = 0</span>
+<span class="c1">#     #             clf_start_idx = sliced_annot.index[</span>
+<span class="c1">#     #                 sliced_annot[&quot;Bento&quot;] == f&quot;&gt;{clf_name}&quot;</span>
+<span class="c1">#     #             ].values[0]</span>
+<span class="c1">#     #             clf_df = sliced_annot.loc[clf_start_idx + 2 :, :]</span>
+<span class="c1">#     #             end_idx = (</span>
+<span class="c1">#     #                 clf_df.isnull()[clf_df.isnull().any(axis=1)].idxmax(axis=1).index</span>
+<span class="c1">#     #             )</span>
+<span class="c1">#     #             if end_idx.values:</span>
+<span class="c1">#     #                 end_idx = end_idx.values[0]</span>
+<span class="c1">#     #             else:</span>
+<span class="c1">#     #                 end_idx = max(clf_df.index + 1)</span>
+<span class="c1">#     #             clf_df = clf_df.loc[: end_idx - 1, :].reset_index(drop=True)</span>
+<span class="c1">#     #             clf_df.columns = [&quot;start_time&quot;, &quot;stop_time&quot;, &quot;duration&quot;]</span>
+<span class="c1">#     #             clf_df[&quot;start_frm&quot;] = clf_df[&quot;start_time&quot;].astype(float) * fps</span>
+<span class="c1">#     #             clf_df[&quot;end_frm&quot;] = clf_df[&quot;stop_time&quot;].astype(float) * fps</span>
+<span class="c1">#     #             clf_df[&quot;start_frm&quot;] = clf_df[&quot;start_frm&quot;].astype(int)</span>
+<span class="c1">#     #             clf_df[&quot;end_frm&quot;] = clf_df[&quot;end_frm&quot;].astype(int)</span>
+<span class="c1">#     #             annotations_idx = list(</span>
+<span class="c1">#     #                 clf_df.apply(</span>
+<span class="c1">#     #                     lambda x: list(</span>
+<span class="c1">#     #                         range(int(x[&quot;start_frm&quot;]), int(x[&quot;end_frm&quot;]) + 1)</span>
+<span class="c1">#     #                     ),</span>
+<span class="c1">#     #                     1,</span>
+<span class="c1">#     #                 )</span>
+<span class="c1">#     #             )</span>
+<span class="c1">#     #             annotations_idx = [i for s in annotations_idx for i in s]</span>
+<span class="c1">#     #             annotations_idx_outside_video = [</span>
+<span class="c1">#     #                 x for x in annotations_idx if x &gt; video_frm_length</span>
+<span class="c1">#     #             ]</span>
+<span class="c1">#     #             valid_annotation_ids = [</span>
+<span class="c1">#     #                 x for x in annotations_idx if x &lt;= video_frm_length</span>
+<span class="c1">#     #             ]</span>
+<span class="c1">#     #             if len(annotations_idx_outside_video):</span>
+<span class="c1">#     #                 ThirdPartyAnnotationsOutsidePoseEstimationDataWarning(</span>
+<span class="c1">#     #                     video_name=self.video_name,</span>
+<span class="c1">#     #                     clf_name=clf_name,</span>
+<span class="c1">#     #                     frm_cnt=len(feature_df),</span>
+<span class="c1">#     #                     first_error_frm=annotations_idx_outside_video[0],</span>
+<span class="c1">#     #                     ambiguous_cnt=len(annotations_idx_outside_video),</span>
+<span class="c1">#     #                 )</span>
+<span class="c1">#     #             if len(valid_annotation_ids) &gt; 0:</span>
+<span class="c1">#     #                 print(</span>
+<span class="c1">#     #                     f&quot;Appending {str(len(valid_annotation_ids))} {clf_name} frame annotations to video {self.video_name}...&quot;</span>
+<span class="c1">#     #                 )</span>
+<span class="c1">#     #                 self.results_df.loc[valid_annotation_ids, clf_name] = 1</span>
+<span class="c1">#     #         self.__save()</span>
+<span class="c1">#     #     stdout_success(</span>
+<span class="c1">#     #         msg=f&quot;Annotations for {str(len(self.saved_files))} video(s) and saved in project_folder/csv/targets_inserted directory.&quot;</span>
+<span class="c1">#     #     )</span>
+<span class="c1">#     #</span>
+<span class="c1">#     # def __save(self):</span>
+<span class="c1">#     #     write_df(df=self.results_df, file_type=self.file_type, save_path=self.save_path)</span>
+<span class="c1">#     #     self.saved_files.append(self.save_path)</span>
+<span class="c1">#     #     print(</span>
+<span class="c1">#     #         f&quot;BENTO annotations appended to video {self.video_name} and saved in {self.save_path}&quot;</span>
+<span class="c1">#     #     )</span>
+<span class="c1">#     #</span>
+<span class="c1">#</span>
+<span class="c1"># test = BentoAppender(config_path=r&quot;C:\troubleshooting\bento_test\project_folder\project_config.ini&quot;,</span>
+<span class="c1">#                      data_dir=r&quot;C:\troubleshooting\bento_test\bento_files&quot;)</span>
+<span class="c1"># test.run()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

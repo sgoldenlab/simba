@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.mixins.feature_extraction_supplement_mixin &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.mixins.feature_extraction_supplement_mixin</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.mixins.feature_extraction_supplement_mixin</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span><span class="p">,</span> <span class="n">prange</span><span class="p">,</span> <span class="n">typed</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="kn">from</span> <span class="nn">simba.mixins.config_reader</span> <span class="kn">import</span> <span class="n">ConfigReader</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.feature_extraction_mixin</span> <span class="kn">import</span> <span class="n">FeatureExtractionMixin</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.timeseries_features_mixin</span> <span class="kn">import</span> <span class="n">TimeseriesFeatureMixin</span>
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="p">(</span><span class="n">check_float</span><span class="p">,</span> <span class="n">check_if_dir_exists</span><span class="p">,</span>
+                                <span class="n">check_if_filepath_list_is_empty</span><span class="p">,</span>
+                                <span class="n">check_instance</span><span class="p">,</span> <span class="n">check_str</span><span class="p">,</span>
+                                <span class="n">check_that_column_exist</span><span class="p">,</span> <span class="n">check_valid_array</span><span class="p">,</span>
+                                <span class="n">check_valid_dataframe</span><span class="p">,</span> <span class="n">check_valid_lst</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.data</span> <span class="kn">import</span> <span class="n">detect_bouts</span>
+<span class="kn">from</span> <span class="nn">simba.utils.errors</span> <span class="kn">import</span> <span class="n">CountError</span><span class="p">,</span> <span class="n">InvalidInputError</span>
+<span class="kn">from</span> <span class="nn">simba.utils.printing</span> <span class="kn">import</span> <span class="n">SimbaTimer</span><span class="p">,</span> <span class="n">stdout_success</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="n">get_fn_ext</span><span class="p">,</span> <span class="n">read_df</span>
+
+
+<div class="viewcode-block" id="FeatureExtractionSupplemental"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.feature_extraction_supplement_mixin.FeatureExtractionSupplemental">[docs]</a><span class="k">class</span> <span class="nc">FeatureExtractionSupplemental</span><span class="p">(</span><span class="n">FeatureExtractionMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Additional feature extraction method not called by default feature extraction classes from ``simba.feature_extractors``.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">FeatureExtractionMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_helper_euclidean_distance_timeseries_change</span><span class="p">(</span>
+        <span class="n">distances</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">time_windows</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fps</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Private jitted helper called by ``simba.mixins.feature_extraction_supplemental_mixin.FeatureExtractionSupplemental.euclidean_distance_timeseries_change``</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">distances</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time_windows</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">window_cnt</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">time_windows</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">frms</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_windows</span><span class="p">[</span><span class="n">window_cnt</span><span class="p">]</span> <span class="o">*</span> <span class="n">fps</span><span class="p">)</span>
+            <span class="n">shifted_distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span>
+            <span class="n">shifted_distances</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">frms</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+            <span class="n">shifted_distances</span><span class="p">[</span><span class="n">frms</span><span class="p">:]</span> <span class="o">=</span> <span class="n">distances</span><span class="p">[:</span><span class="o">-</span><span class="n">frms</span><span class="p">]</span>
+            <span class="n">shifted_distances</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">shifted_distances</span><span class="p">)]</span> <span class="o">=</span> <span class="n">distances</span><span class="p">[</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">shifted_distances</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="n">results</span><span class="p">[:,</span> <span class="n">window_cnt</span><span class="p">]</span> <span class="o">=</span> <span class="n">distances</span> <span class="o">-</span> <span class="n">shifted_distances</span>
+
+        <span class="k">return</span> <span class="n">results</span>
+
+<div class="viewcode-block" id="FeatureExtractionSupplemental.euclidean_distance_timeseries_change"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.feature_extraction_supplement_mixin.FeatureExtractionSupplemental.euclidean_distance_timeseries_change">[docs]</a>    <span class="k">def</span> <span class="nf">euclidean_distance_timeseries_change</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">location_1</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">location_2</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">fps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">px_per_mm</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">time_windows</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.6</span><span class="p">]),</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the difference in distance between two points in the current frame versus N.N seconds ago. E.g.,</span>
+<span class="sd">        computes if two points are traveling away from each other (positive output values) or towards each other</span>
+<span class="sd">        (negative output values) relative to reference time-point(s)</span>
+
+<span class="sd">        .. image:: _static/img/euclid_distance_change.png</span>
+<span class="sd">           :width: 700</span>
+<span class="sd">           :align: center</span>
+
+<span class="sd">        :parameter ndarray location_1: 2D array of size len(frames) x 2 representing pose-estimated locations of body-part one</span>
+<span class="sd">        :parameter ndarray location_2: 2D array of size len(frames) x 2 representing pose-estimated locations of body-part two</span>
+<span class="sd">        :parameter int fps: Fps of the recorded video.</span>
+<span class="sd">        :parameter float px_per_mm: The pixels per millimeter in the video.</span>
+<span class="sd">        :parameter np.ndarray time_windows: Time windows to compare.</span>
+<span class="sd">        :return np.array: Array of size location_1.shape[0] x time_windows.shape[0]</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; location_1 = np.random.randint(low=0, high=100, size=(2000, 2)).astype(&#39;float32&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; location_2 = np.random.randint(low=0, high=100, size=(2000, 2)).astype(&#39;float32&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; distances = self.euclidean_distance_timeseries_change(location_1=location_1, location_2=location_2, fps=10, px_per_mm=4.33, time_windows=np.array([0.2, 0.4, 0.8, 1.6]))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">distances</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">framewise_euclidean_distance</span><span class="p">(</span>
+            <span class="n">location_1</span><span class="o">=</span><span class="n">location_1</span><span class="p">,</span> <span class="n">location_2</span><span class="o">=</span><span class="n">location_2</span><span class="p">,</span> <span class="n">px_per_mm</span><span class="o">=</span><span class="n">px_per_mm</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_helper_euclidean_distance_timeseries_change</span><span class="p">(</span>
+            <span class="n">distances</span><span class="o">=</span><span class="n">distances</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span> <span class="n">time_windows</span><span class="o">=</span><span class="n">time_windows</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FeatureExtractionSupplemental.peak_ratio"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.feature_extraction_supplement_mixin.FeatureExtractionSupplemental.peak_ratio">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">peak_ratio</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">bin_size_s</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">fps</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the ratio of peak values relative to number of values within each seqential</span>
+<span class="sd">        time-period represented of ``bin_size_s`` seconds. Peak is defined as value is higher than</span>
+<span class="sd">        in the prior observation (i.e., no future data is involved in comparison).</span>
+
+<span class="sd">        .. image:: _static/img/peak_cnt.png</span>
+<span class="sd">           :width: 700</span>
+<span class="sd">           :align: center</span>
+
+<span class="sd">        :parameter ndarray data: 1D array of size len(frames) representing feature values.</span>
+<span class="sd">        :parameter int bin_size_s: The size of the buckets in seconds.</span>
+<span class="sd">        :parameter int fps: Frame-rate of recorded video.</span>
+<span class="sd">        :return np.ndarray: Array of size data.shape[0] with peak counts as ratio of len(frames).</span>
+
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; data = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])</span>
+<span class="sd">        &gt;&gt;&gt; FeatureExtractionSupplemental().peak_ratio(data=data, bin_size_s=1, fps=10)</span>
+<span class="sd">        &gt;&gt;&gt; [0.9 0.9 0.9 0.9 0.9 0.9 0.9 0.9 0.9 0.9]</span>
+<span class="sd">        &gt;&gt;&gt; data = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])</span>
+<span class="sd">        &gt;&gt;&gt; FeatureExtractionSupplemental().peak_ratio(data=data, bin_size_s=1, fps=10)</span>
+<span class="sd">        &gt;&gt;&gt; [0.9 0.9 0.9 0.9 0.9 0.9 0.9 0.9 0.9 0.9 0.  0.  0.  0.  0.  0.  0.  0. 0.  0. ]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">window_size</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">bin_size_s</span> <span class="o">*</span> <span class="n">fps</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">window_size</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">window_size</span><span class="p">)))</span>
+        <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>
+            <span class="n">peak_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">peak_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="o">-</span><span class="mi">2</span><span class="p">]:</span>
+                <span class="n">peak_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">peak_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">peak_ratio</span> <span class="o">=</span> <span class="n">peak_cnt</span> <span class="o">/</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span> <span class="o">=</span> <span class="n">peak_ratio</span>
+            <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]),</span> <span class="n">end</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">results</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">rolling_peak_count_ratio</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">time_windows</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fps</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time_windows</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">time_windows</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">window_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_windows</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">fps</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">window_size</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">window_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="n">window_size</span> <span class="p">:</span> <span class="n">j</span><span class="p">]</span>
+                <span class="n">peak_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">if</span> <span class="n">window_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">window_data</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">peak_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">window_data</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">window_data</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]:</span>
+                    <span class="n">peak_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">window_data</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">window_data</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">window_data</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">peak_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">peak_ratio</span> <span class="o">=</span> <span class="n">peak_cnt</span> <span class="o">/</span> <span class="n">window_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">peak_ratio</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+<div class="viewcode-block" id="FeatureExtractionSupplemental.rolling_categorical_switches_ratio"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.feature_extraction_supplement_mixin.FeatureExtractionSupplemental.rolling_categorical_switches_ratio">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">rolling_categorical_switches_ratio</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">time_windows</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fps</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the ratio of in categorical feature switches within rolling windows.</span>
+
+<span class="sd">        .. attention::</span>
+<span class="sd">           Output for initial frames where [current_frm - window_size] &lt; 0, are populated with ``0``.</span>
+
+<span class="sd">        .. image:: _static/img/feature_switches.png</span>
+<span class="sd">           :width: 700</span>
+<span class="sd">           :align: center</span>
+
+<span class="sd">        :parameter np.ndarray data: 1d array of feature values</span>
+<span class="sd">        :parameter np.ndarray time_windows: Rolling time-windows as floats in seconds. E.g., [0.2, 0.4, 0.6]</span>
+<span class="sd">        :parameter int fps: fps of the recorded video</span>
+<span class="sd">        :returns np.ndarray: Size data.shape[0] x time_windows.shape[0] array</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; data = np.array([0, 1, 1, 1, 4, 5, 6, 7, 8, 9])</span>
+<span class="sd">        &gt;&gt;&gt; FeatureExtractionSupplemental().rolling_categorical_switches_ratio(data=data, time_windows=np.array([1.0]), fps=10)</span>
+<span class="sd">        &gt;&gt;&gt; [[-1][-1][-1][-1][-1][-1][-1][-1][-1][ 0.7]]</span>
+<span class="sd">        &gt;&gt;&gt; data = np.array([&#39;A&#39;, &#39;B&#39;, &#39;B&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;, &#39;E&#39;, &#39;F&#39;, &#39;G&#39;, &#39;H&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; FeatureExtractionSupplemental().rolling_categorical_switches_ratio(data=data, time_windows=np.array([1.0]), fps=10)</span>
+<span class="sd">        &gt;&gt;&gt; [[-1][-1][-1][-1][-1][-1][-1][-1][-1][ 0.7]]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time_windows</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">time_window</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">time_windows</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">jump_frms</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_windows</span><span class="p">[</span><span class="n">time_window</span><span class="p">]</span> <span class="o">*</span> <span class="n">fps</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">current_frm</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">jump_frms</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">time_slice</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">current_frm</span> <span class="o">-</span> <span class="n">jump_frms</span> <span class="p">:</span> <span class="n">current_frm</span><span class="p">]</span>
+                <span class="n">current_value</span><span class="p">,</span> <span class="n">unique_cnt</span> <span class="o">=</span> <span class="n">time_slice</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">time_slice</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                    <span class="k">if</span> <span class="n">time_slice</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">current_value</span><span class="p">:</span>
+                        <span class="n">unique_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">current_value</span> <span class="o">=</span> <span class="n">time_slice</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">unique_cnt</span><span class="p">,</span> <span class="n">time_slice</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">current_frm</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">time_window</span><span class="p">]</span> <span class="o">=</span> <span class="n">unique_cnt</span> <span class="o">/</span> <span class="n">time_slice</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">results</span></div>
+
+<div class="viewcode-block" id="FeatureExtractionSupplemental.consecutive_time_series_categories_count"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.feature_extraction_supplement_mixin.FeatureExtractionSupplemental.consecutive_time_series_categories_count">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">consecutive_time_series_categories_count</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fps</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the count of consecutive milliseconds the feature value has remained static. For example,</span>
+<span class="sd">        compute for how long in milleseconds the animal has remained in the current cardinal direction or the</span>
+<span class="sd">        within an ROI.</span>
+
+<span class="sd">        .. image:: _static/img/categorical_consecitive_time.png</span>
+<span class="sd">           :width: 700</span>
+<span class="sd">           :align: center</span>
+
+<span class="sd">        :parameter np.ndarray data: 1d array of feature values</span>
+<span class="sd">        :parameter int fps: Frame-rate of video.</span>
+<span class="sd">        :returns np.ndarray: Array of size data.shape[0]</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; data = np.array([0, 1, 1, 1, 4, 5, 6, 7, 8, 9])</span>
+<span class="sd">        &gt;&gt;&gt; FeatureExtractionSupplemental().consecutive_time_series_categories_count(data=data, fps=10)</span>
+<span class="sd">        &gt;&gt;&gt; [0.1, 0.1, 0.2, 0.3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]</span>
+<span class="sd">        &gt;&gt;&gt; data = np.array([&#39;A&#39;, &#39;B&#39;, &#39;B&#39;, &#39;B&#39;, &#39;C&#39;, &#39;D&#39;, &#39;E&#39;, &#39;F&#39;, &#39;G&#39;, &#39;H&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; [0.1, 0.1, 0.2, 0.3, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">results</span> <span class="o">/</span> <span class="n">fps</span></div>
+
+<div class="viewcode-block" id="FeatureExtractionSupplemental.rolling_horizontal_vs_vertical_movement"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.feature_extraction_supplement_mixin.FeatureExtractionSupplemental.rolling_horizontal_vs_vertical_movement">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">rolling_horizontal_vs_vertical_movement</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">pixels_per_mm</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">time_windows</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">fps</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the movement along the x-axis relative to the y-axis in rolling time bins.</span>
+
+<span class="sd">        .. attention::</span>
+<span class="sd">           Output for initial frames where [current_frm - window_size] &lt; 0, are populated with ``0``.</span>
+
+<span class="sd">        .. image:: _static/img/x_vs_y_movement.png</span>
+<span class="sd">           :width: 700</span>
+<span class="sd">           :align: center</span>
+
+<span class="sd">        :parameter np.ndarray data: 2d array of size len(frames)x2 with body-part coordinates.</span>
+<span class="sd">        :parameter int fps: FPS of the recorded video</span>
+<span class="sd">        :parameter float pixels_per_mm: Pixels per millimeter of recorded video.</span>
+<span class="sd">        :returns np.ndarray: Size data.shape[0] x time_windows.shape[0] array</span>
+<span class="sd">        :parameter np.ndarray time_windows: Rolling time-windows as floats in seconds. E.g., [0.2, 0.4, 0.6]</span>
+<span class="sd">        :returns np.ndarray: Size data.shape[0] x time_windows.shape[0]. Greater values denote greater movement on x-axis relative to y-axis.</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; data = np.array([[250, 250], [250, 250], [250, 250], [250, 500], [500, 500], 500, 500]]).astype(float)</span>
+<span class="sd">        &gt;&gt;&gt; FeatureExtractionSupplemental().rolling_horizontal_vs_vertical_movement(data=data, time_windows=np.array([1.0]), fps=2, pixels_per_mm=1)</span>
+<span class="sd">        &gt;&gt;&gt; [[  -1.][   0.][   0.][-250.][ 250.][   0.]]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">time_windows</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">time_window</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">time_windows</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">jump_frms</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_windows</span><span class="p">[</span><span class="n">time_window</span><span class="p">]</span> <span class="o">*</span> <span class="n">fps</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">current_frm</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">jump_frms</span><span class="p">,</span> <span class="n">results</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">x_movement</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">ediff1d</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">current_frm</span> <span class="o">-</span> <span class="n">jump_frms</span> <span class="p">:</span> <span class="n">current_frm</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="o">/</span> <span class="n">pixels_per_mm</span>
+                <span class="p">)</span>
+                <span class="n">y_movement</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">ediff1d</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">current_frm</span> <span class="o">-</span> <span class="n">jump_frms</span> <span class="p">:</span> <span class="n">current_frm</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="o">/</span> <span class="n">pixels_per_mm</span>
+                <span class="p">)</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">current_frm</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">time_window</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_movement</span> <span class="o">-</span> <span class="n">y_movement</span>
+
+        <span class="k">return</span> <span class="n">results</span></div>
+
+<div class="viewcode-block" id="FeatureExtractionSupplemental.border_distances"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.feature_extraction_supplement_mixin.FeatureExtractionSupplemental.border_distances">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">border_distances</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">pixels_per_mm</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">img_resolution</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">time_window</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">fps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the mean distance of key-point to the left, right, top, and bottom sides of the image in</span>
+<span class="sd">        rolling time-windows. Uses a straight line.</span>
+
+<span class="sd">        .. image:: _static/img/border_distance.png</span>
+<span class="sd">           :width: 700</span>
+<span class="sd">           :align: center</span>
+
+<span class="sd">        .. attention::</span>
+<span class="sd">           Output for initial frames where [current_frm - window_size] &lt; 0 will be populated with ``-1``.</span>
+
+<span class="sd">        :parameter np.ndarray data: 2d array of size len(frames)x2 with body-part coordinates.</span>
+<span class="sd">        :parameter np.ndarray img_resolution: Resolution of video in WxH format.</span>
+<span class="sd">        :parameter float pixels_per_mm: Pixels per millimeter of recorded video.</span>
+<span class="sd">        :parameter int fps: FPS of the recorded video</span>
+<span class="sd">        :parameter float time_windows: Rolling time-window as floats in seconds. E.g., ``0.2``</span>
+<span class="sd">        :returns np.ndarray: Size data.shape[0] x time_windows.shape[0] array with millimeter distances from LEFT, RIGH, TOP, BOTTOM,</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; data = np.array([[250, 250], [250, 250], [250, 250], [500, 500],[500, 500], [500, 500]]).astype(float)</span>
+<span class="sd">        &gt;&gt;&gt; img_resolution = np.array([500, 500])</span>
+<span class="sd">        &gt;&gt;&gt; FeatureExtractionSupplemental().border_distances(data=data, img_resolution=img_resolution, time_window=1, fps=2, pixels_per_mm=1)</span>
+<span class="sd">        &gt;&gt;&gt; [[-1, -1, -1, -1][250, 250, 250, 250][250, 250, 250, 250][375, 125, 375, 125][500, 0, 500, 0][500, 0, 500, 0]]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">4</span><span class="p">),</span> <span class="o">-</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">window_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_window</span> <span class="o">*</span> <span class="n">fps</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">current_frm</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">window_size</span><span class="p">,</span> <span class="n">results</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">distances</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="mi">4</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+            <span class="n">windowed_locs</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">current_frm</span> <span class="o">-</span> <span class="n">window_size</span> <span class="p">:</span> <span class="n">current_frm</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">bp_cnt</span><span class="p">,</span> <span class="n">bp_loc</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">windowed_locs</span><span class="p">):</span>
+                <span class="n">distances</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">bp_cnt</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">bp_loc</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span> <span class="o">-</span> <span class="n">bp_loc</span>
+                <span class="p">)</span>  <span class="c1"># left</span>
+                <span class="n">distances</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">bp_cnt</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">img_resolution</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bp_loc</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span> <span class="o">-</span> <span class="n">bp_loc</span>
+                <span class="p">)</span>  <span class="c1"># right</span>
+                <span class="n">distances</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="n">bp_cnt</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">bp_loc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="n">bp_loc</span>
+                <span class="p">)</span>  <span class="c1"># top</span>
+                <span class="n">distances</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="n">bp_cnt</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">bp_loc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">img_resolution</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span> <span class="o">-</span> <span class="n">bp_loc</span>
+                <span class="p">)</span>  <span class="c1"># bottpm</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">current_frm</span> <span class="o">-</span> <span class="mi">1</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">distances</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="n">pixels_per_mm</span>
+
+        <span class="k">return</span> <span class="n">results</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FeatureExtractionSupplemental.velocity_aggregator"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.feature_extraction_supplement_mixin.FeatureExtractionSupplemental.velocity_aggregator">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">velocity_aggregator</span><span class="p">(</span>
+        <span class="n">config_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
+        <span class="n">data_dir</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
+        <span class="n">body_part</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">ts_plot</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Aggregate and plot velocity data from multiple pose-estimation files.</span>
+
+<span class="sd">        :param Union[str, os.PathLike] config_path: Path to SimBA configuration file.</span>
+<span class="sd">        :param Union[str, os.PathLike] data_dir: Directory containing data files.</span>
+<span class="sd">        :param str data_dir body_part: Body part to use when calculating velocity.</span>
+<span class="sd">        :param Optional[bool] data_dir ts_plot: Whether to generate a time series plot of velocities for each data file. Defaults to True.</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; config_path = &#39;/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini&#39;</span>
+<span class="sd">        &gt;&gt;&gt; data_dir = &#39;/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location&#39;</span>
+<span class="sd">        &gt;&gt;&gt; body_part = &#39;Nose_1&#39;</span>
+<span class="sd">        &gt;&gt;&gt; FeatureExtractionSupplemental.velocity_aggregator(config_path=config_path, data_dir=data_dir, body_part=body_part)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">timer</span> <span class="o">=</span> <span class="n">SimbaTimer</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">check_if_dir_exists</span><span class="p">(</span><span class="n">in_dir</span><span class="o">=</span><span class="n">data_dir</span><span class="p">)</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigReader</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">,</span> <span class="n">create_logger</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">file_paths</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">data_dir</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;/*.</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">file_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">save_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">logs_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;rolling_velocities_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">datetime</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">save_dir</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_dir</span><span class="p">)</span>
+        <span class="n">check_if_filepath_list_is_empty</span><span class="p">(</span>
+            <span class="n">filepaths</span><span class="o">=</span><span class="n">file_paths</span><span class="p">,</span>
+            <span class="n">error_msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;No data in </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">file_type</span><span class="si">}</span><span class="s2"> format found in </span><span class="si">{</span><span class="n">data_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">bp_cols</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">body_part</span><span class="si">}</span><span class="s2">_x&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">body_part</span><span class="si">}</span><span class="s2">_y&quot;</span><span class="p">]</span>
+        <span class="n">mean_velocities</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">file_cnt</span><span class="p">,</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">file_paths</span><span class="p">):</span>
+            <span class="n">rolling_results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">video_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">filepath</span><span class="o">=</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Analyzing </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+            <span class="n">data_df</span> <span class="o">=</span> <span class="n">read_df</span><span class="p">(</span>
+                <span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">file_type</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="n">bp_cols</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">px_per_mm</span><span class="p">,</span> <span class="n">fps</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">read_video_info</span><span class="p">(</span><span class="n">video_name</span><span class="o">=</span><span class="n">video_name</span><span class="p">)</span>
+            <span class="n">shifted_df</span> <span class="o">=</span> <span class="n">FeatureExtractionMixin</span><span class="o">.</span><span class="n">create_shifted_df</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">data_df</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span>
+                <span class="n">bp_cols</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+            <span class="p">)</span>
+            <span class="n">frm_dist</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">FeatureExtractionMixin</span><span class="p">()</span>
+                <span class="o">.</span><span class="n">framewise_euclidean_distance</span><span class="p">(</span>
+                    <span class="n">location_1</span><span class="o">=</span><span class="n">data_df</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                    <span class="n">location_2</span><span class="o">=</span><span class="n">shifted_df</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                    <span class="n">px_per_mm</span><span class="o">=</span><span class="n">px_per_mm</span><span class="p">,</span>
+                    <span class="n">centimeter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">rolling</span> <span class="o">=</span> <span class="n">TimeseriesFeatureMixin</span><span class="o">.</span><span class="n">sliding_descriptive_statistics</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">frm_dist</span><span class="p">,</span>
+                <span class="n">window_sizes</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">1.0</span><span class="p">]),</span>
+                <span class="n">sample_rate</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">fps</span><span class="p">),</span>
+                <span class="n">statistics</span><span class="o">=</span><span class="n">typed</span><span class="o">.</span><span class="n">List</span><span class="p">([</span><span class="s2">&quot;sum&quot;</span><span class="p">]),</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="n">rolling_results</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Rolling velocity (cm/s) - </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rolling</span>
+            <span class="n">mean_velocities</span><span class="p">[</span><span class="n">video_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">rolling</span><span class="p">)</span>
+            <span class="n">rolling_results</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">ts_plot</span><span class="p">:</span>
+                <span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;whitegrid&quot;</span><span class="p">)</span>  <span class="c1"># Set the style</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>  <span class="c1"># Set the figure size</span>
+                <span class="n">sns</span><span class="o">.</span><span class="n">lineplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">rolling_results</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;tab10&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">2.5</span><span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="n">save_dir</span><span class="p">,</span>
+                        <span class="sa">f</span><span class="s2">&quot;rolling_velocities_</span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">datetime</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)</span>
+        <span class="n">mean_velocities</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+            <span class="n">mean_velocities</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;MEAN VELOCITY (CM/S)&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">mean_velocities</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">logs_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;mean_velocities_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">datetime</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">timer</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">()</span>
+        <span class="n">stdout_success</span><span class="p">(</span>
+            <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Velocity aggregator for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">file_paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> files complete. Data saved in </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">logs_path</span><span class="si">}</span><span class="s2"> directory &quot;</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">velocity_aggregator</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="FeatureExtractionSupplemental.spontaneous_alternations"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.feature_extraction_supplement_mixin.FeatureExtractionSupplemental.spontaneous_alternations">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">spontaneous_alternations</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">arm_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">center_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="nb">int</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Detects spontaneous alternations between a set of user-defined ROIs.</span>
+
+<span class="sd">            .. image:: _static/img/spontaneous_alternations.png</span>
+<span class="sd">               :width: 500</span>
+<span class="sd">               :align: center</span>
+
+<span class="sd">        :param pd.DataFrame data: DataFrame containing shape data where each row represents a frame and each column represents a shape where 0 represents not in ROI and 1 represents inside the ROI</span>
+<span class="sd">        :param List[str] shape_names: List of column names in the DataFrame corresponding to shape names.</span>
+<span class="sd">        :returns Dict[Union[str, Tuple[str], Union[int, float, List[int]]]]: Dict with the following keys and values:</span>
+
+<span class="sd">        Dict with the following keys and values:</span>
+
+<span class="sd">        - &#39;pct_alternation&#39;: Percent alternation computed as `(spontaneous alternation cnt / (total number of arm entries - (number of arms - 1))) × 100`</span>
+<span class="sd">        - &#39;alternation_cnt&#39;: The sliding count of ROI entry sequences of length `len(shape_names)` that are all unique.</span>
+<span class="sd">        - &#39;same_arm_returns_cnt&#39;: Aggregate count of sequential visits to the same ROI.</span>
+<span class="sd">        - &#39;alternate_arm_returns_cnt&#39;: Aggregate count of errors which are not same-arm-return errors.</span>
+<span class="sd">        - &#39;error_cnt&#39;: Aggregate error count (`same_arm_returns_cnt + alternate_arm_returns_cnt`),</span>
+<span class="sd">        - &#39;same_arm_returns_dict&#39;: Dictionary with the keys being the name of the ROI and values are a list of frames when the same-arm-return errors were committed.</span>
+<span class="sd">        - &#39;alternate_arm_returns_cnt&#39;: Dictionary with the keys being the name of the ROI and values are a list of frames when the alternate-arm-return errors were committed.</span>
+<span class="sd">        - &#39;alternations_dict&#39;: Dictionary with the keys being unique ROI name tuple sequences of length `len(shape_names)` and values are a list of frames when the sequence was completed.</span>
+<span class="sd">        - &#39;arm_entry_sequence&#39;: Pandas dataframe with two columns: sequence of arm names entered, the frame the animal entered the arm, the frame that the animal left the arm.</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; data = np.zeros((100, 4), dtype=int)</span>
+<span class="sd">        &gt;&gt;&gt; random_indices = np.random.randint(0, 4, size=100)</span>
+<span class="sd">        &gt;&gt;&gt; for i in range(100): data[i, random_indices[i]] = 1</span>
+<span class="sd">        &gt;&gt;&gt; df = pd.DataFrame(data, columns=[&#39;left&#39;, &#39;top&#39;, &#39;right&#39;, &#39;bottom&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; spontanous_alternations = FeatureExtractionSupplemental.spontaneous_alternations(data=df, shape_names=[&#39;left&#39;, &#39;top&#39;, &#39;right&#39;, &#39;bottom&#39;])</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">get_sliding_alternation</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span>
+            <span class="n">Union</span><span class="p">[</span>
+                <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span>
+            <span class="p">]</span>
+        <span class="p">]:</span>
+            <span class="n">stride</span><span class="p">,</span> <span class="n">same_arm_return_cnt</span><span class="p">,</span> <span class="n">alternate_arm_return_cnt</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">arm_names</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">alternation_cnt</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">alternations</span><span class="p">,</span> <span class="n">same_arm_returns</span><span class="p">,</span> <span class="n">alternate_arm_returns</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{},</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">permutations</span><span class="p">(</span><span class="n">arm_names</span><span class="p">)):</span>
+                <span class="n">alternations</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">arm_names</span><span class="p">:</span>
+                <span class="n">same_arm_returns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">alternate_arm_returns</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">stride</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">current</span><span class="p">,</span> <span class="n">priors</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="p">(</span><span class="n">stride</span><span class="p">)</span> <span class="p">:</span> <span class="n">i</span><span class="p">]</span>
+                <span class="n">sequence</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">priors</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">current</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">sequence</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                    <span class="n">alternations</span><span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">sequence</span><span class="p">)]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">alternation_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">elif</span> <span class="n">sequence</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">sequence</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]:</span>
+                    <span class="n">same_arm_returns</span><span class="p">[</span><span class="n">sequence</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">same_arm_return_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">alternate_arm_returns</span><span class="p">[</span><span class="n">sequence</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">current</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">alternate_arm_return_cnt</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="n">alternate_arm_returns</span><span class="p">,</span>
+                <span class="n">same_arm_returns</span><span class="p">,</span>
+                <span class="n">alternations</span><span class="p">,</span>
+                <span class="n">alternate_arm_return_cnt</span><span class="p">,</span>
+                <span class="n">same_arm_return_cnt</span><span class="p">,</span>
+                <span class="n">alternation_cnt</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">check_instance</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">spontaneous_alternations</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">accepted_types</span><span class="o">=</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,))</span>
+        <span class="n">check_valid_lst</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">arm_names</span><span class="p">,</span><span class="n">source</span><span class="o">=</span><span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">spontaneous_alternations</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span><span class="n">valid_dtypes</span><span class="o">=</span><span class="p">(</span><span class="nb">str</span><span class="p">,),</span><span class="n">valid_values</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="n">check_str</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;center name&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">center_name</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">center_name</span> <span class="ow">in</span> <span class="n">arm_names</span><span class="p">:</span> <span class="n">InvalidInputError</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;One ROI is defined both as an arm ans as the center&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">spontaneous_alternations</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">arm_names</span><span class="p">)))</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arm_names</span><span class="p">):</span> <span class="n">InvalidInputError</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Each arm has to be unique but got </span><span class="si">{</span><span class="n">arm_names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">spontaneous_alternations</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">roi_names</span> <span class="o">=</span> <span class="n">arm_names</span> <span class="o">+</span> <span class="p">[</span><span class="n">center_name</span><span class="p">]</span>
+        <span class="n">data_df</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">roi_names</span><span class="p">]</span>
+        <span class="n">invalid_vals</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">data_df</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span> <span class="o">-</span> <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">})</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">invalid_vals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CountError</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;When computing spontaneous alternation, ROI fields can only be 0 or 1. Found the value(s): </span><span class="si">{</span><span class="n">invalid_vals</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">spontaneous_alternations</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">multiple_rois_frm_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">data_df</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">multiple_rois_frm_idx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CountError</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;When computing spontaneous alternation, animals should only exist in &lt;=1 ROIs in any one frame. In </span><span class="si">{</span><span class="n">multiple_rois_frm_idx</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> frames, the animal exist in more than one ROI.&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">spontaneous_alternations</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">bout_df</span> <span class="o">=</span> <span class="p">(</span><span class="n">detect_bouts</span><span class="p">(</span><span class="n">data_df</span><span class="o">=</span><span class="n">data_df</span><span class="p">,</span> <span class="n">target_lst</span><span class="o">=</span><span class="n">data_df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="mi">1</span><span class="p">)[[</span><span class="s2">&quot;Event&quot;</span><span class="p">,</span> <span class="s2">&quot;Start_frame&quot;</span><span class="p">,</span> <span class="s2">&quot;End_frame&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="n">shifted_</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">bout_df</span><span class="p">,</span> <span class="n">bout_df</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">add_suffix</span><span class="p">(</span><span class="s2">&quot;_shifted&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)[[</span><span class="s2">&quot;Event&quot;</span><span class="p">,</span> <span class="s2">&quot;Event_shifted&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">unique_counts</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">x</span><span class="p">))))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">shifted_</span><span class="p">]</span>
+        <span class="n">drop_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">unique_counts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">bout_df</span> <span class="o">=</span> <span class="n">bout_df</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">drop_idx</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">arm_entry_sequence</span> <span class="o">=</span> <span class="n">bout_df</span><span class="p">[</span><span class="n">bout_df</span><span class="p">[</span><span class="s2">&quot;Event&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">center_name</span><span class="p">]</span>
+
+        <span class="n">alternate_arm_returns</span><span class="p">,</span> <span class="n">same_arm_returns</span><span class="p">,</span> <span class="n">alternations</span><span class="p">,</span> <span class="n">alternate_arm_return_cnt</span><span class="p">,</span> <span class="n">same_arm_return_cnt</span><span class="p">,</span> <span class="n">alternation_cnt</span> <span class="o">=</span> <span class="n">get_sliding_alternation</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">arm_entry_sequence</span><span class="p">[[</span><span class="s2">&quot;Event&quot;</span><span class="p">,</span> <span class="s2">&quot;Start_frame&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+        <span class="n">pct_alternation</span> <span class="o">=</span> <span class="n">alternation_cnt</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">arm_entry_sequence</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">arm_names</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;pct_alternation&quot;</span><span class="p">:</span> <span class="n">pct_alternation</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="s2">&quot;alternation_cnt&quot;</span><span class="p">:</span> <span class="n">alternation_cnt</span><span class="p">,</span>
+            <span class="s2">&quot;error_cnt&quot;</span><span class="p">:</span> <span class="n">same_arm_return_cnt</span> <span class="o">+</span> <span class="n">alternate_arm_return_cnt</span><span class="p">,</span>
+            <span class="s2">&quot;same_arm_returns_cnt&quot;</span><span class="p">:</span> <span class="n">same_arm_return_cnt</span><span class="p">,</span>
+            <span class="s2">&quot;alternate_arm_returns_cnt&quot;</span><span class="p">:</span> <span class="n">alternate_arm_return_cnt</span><span class="p">,</span>
+            <span class="s2">&quot;same_arm_returns_dict&quot;</span><span class="p">:</span> <span class="n">same_arm_returns</span><span class="p">,</span>
+            <span class="s2">&quot;alternate_arm_returns_dict&quot;</span><span class="p">:</span> <span class="n">alternate_arm_returns</span><span class="p">,</span>
+            <span class="s2">&quot;alternations_dict&quot;</span><span class="p">:</span> <span class="n">alternations</span><span class="p">,</span>
+            <span class="s2">&quot;arm_entry_sequence&quot;</span><span class="p">:</span> <span class="n">arm_entry_sequence</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+<div class="viewcode-block" id="FeatureExtractionSupplemental.find_path_loops"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.feature_extraction_supplement_mixin.FeatureExtractionSupplemental.find_path_loops">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">find_path_loops</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the loops detected within a 2-dimensional path.</span>
+
+<span class="sd">        .. image:: _static/img/find_path_loops.png</span>
+<span class="sd">           :width: 700</span>
+<span class="sd">           :align: center</span>
+
+<span class="sd">        :param np.ndarray data: Nx2 2-dimensional array with the x and y coordinated represented on axis 1.</span>
+<span class="sd">        :return: Dictionary with the coordinate tuple(x, y) as keys, and sequential frame numbers as values when animals visited, and re-visited the key coordinate.</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; data = read_df(file_path=&#39;/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/csv/outlier_corrected_movement_location/SI_DAY3_308_CD1_PRESENT.csv&#39;, usecols=[&#39;Center_x&#39;, &#39;Center_y&#39;], file_type=&#39;csv&#39;).values.astype(int)</span>
+<span class="sd">        &gt;&gt;&gt; FeatureExtractionSupplemental.find_path_loops(data=data)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">check_valid_array</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">find_path_loops</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="n">accepted_ndims</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,),</span>
+            <span class="n">accepted_dtypes</span><span class="o">=</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">seen</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">seen</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">seen</span><span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">seen</span><span class="p">[</span><span class="n">value</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">seen_dedup</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">seen</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">seen_dedup</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">x</span> <span class="k">for</span> <span class="n">cnt</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">if</span> <span class="n">cnt</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">v</span><span class="p">[</span><span class="n">cnt</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">v</span><span class="p">[</span><span class="n">cnt</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="p">]</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">seen_dedup</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="FeatureExtractionSupplemental.sequential_lag_analysis"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.feature_extraction_supplement_mixin.FeatureExtractionSupplemental.sequential_lag_analysis">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">sequential_lag_analysis</span><span class="p">(</span>
+        <span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">criterion</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">target</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">time_window</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">fps</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Perform sequential lag analysis to determine the temporal relationship between two events.</span>
+
+<span class="sd">        For every onset of behavior C, count the proportions of behavior T onsets in the time-window preceding the onset</span>
+<span class="sd">        of behavior C vs the proportion of behavior T onsets in the time-window proceeding the onset of behavior C.</span>
+
+<span class="sd">        A value closer to 1.0 indicates that behavior T always precede behavior C. A value closer to 0.0 indicates that behavior T follows behavior C. A value of -1.0 indicates</span>
+<span class="sd">        that behavior T never precede nor proceed behavior C.</span>
+
+
+<span class="sd">        .. seealso::</span>
+<span class="sd">           :class:`simba.data_processorsfsttc_calculator.FSTTCCalculator`</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; df = pd.DataFrame(np.random.randint(0, 2, (100, 2)), columns=[&#39;Attack&#39;, &#39;Sniffing&#39;])</span>
+<span class="sd">        &gt;&gt;&gt; FeatureExtractionSupplemental.sequential_lag_analysis(data=df, criterion=&#39;Attack&#39;, target=&#39;Sniffing&#39;, fps=5, time_window=2.0)</span>
+
+<span class="sd">        References</span>
+<span class="sd">        ----------</span>
+<span class="sd">        .. [1] Casarrubea et al., Structural analyses in the study of behavior: From rodents to non-human primates, `Frontiers in Psychology`,</span>
+<span class="sd">               2022.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">check_str</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">sequential_lag_analysis</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> criterion&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">criterion</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">check_str</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">sequential_lag_analysis</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> target&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">target</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">check_float</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">sequential_lag_analysis</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> fps&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span>
+            <span class="n">min_value</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">check_float</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">sequential_lag_analysis</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> time-window&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">time_window</span><span class="p">,</span>
+            <span class="n">min_value</span><span class="o">=</span><span class="mf">10e-6</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">check_valid_dataframe</span><span class="p">(</span>
+            <span class="n">df</span><span class="o">=</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">sequential_lag_analysis</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> data&quot;</span><span class="p">,</span>
+            <span class="n">valid_dtypes</span><span class="o">=</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+            <span class="n">required_fields</span><span class="o">=</span><span class="p">[</span><span class="n">criterion</span><span class="p">,</span> <span class="n">target</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="n">bouts</span> <span class="o">=</span> <span class="n">detect_bouts</span><span class="p">(</span><span class="n">data_df</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">target_lst</span><span class="o">=</span><span class="p">[</span><span class="n">criterion</span><span class="p">,</span> <span class="n">target</span><span class="p">],</span> <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bouts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CountError</span><span class="p">(</span>
+                <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;No events of behaviors </span><span class="si">{</span><span class="n">criterion</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">target</span><span class="si">}</span><span class="s2"> detected in data.&quot;</span><span class="p">,</span>
+                <span class="n">source</span><span class="o">=</span><span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">sequential_lag_analysis</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">criterion_starts</span> <span class="o">=</span> <span class="n">bouts</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">][</span><span class="n">bouts</span><span class="p">[</span><span class="s2">&quot;Event&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">criterion</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">target_starts</span> <span class="o">=</span> <span class="n">bouts</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">][</span><span class="n">bouts</span><span class="p">[</span><span class="s2">&quot;Event&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">target</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">preceding_cnt</span><span class="p">,</span> <span class="n">proceeding_cnt</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="n">window</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fps</span> <span class="o">*</span> <span class="n">time_window</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">window</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="n">window</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">criterion_start</span> <span class="ow">in</span> <span class="n">criterion_starts</span><span class="p">:</span>
+            <span class="n">preceeding_events</span> <span class="o">=</span> <span class="n">target_starts</span><span class="p">[</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">target_starts</span> <span class="o">&lt;</span> <span class="n">criterion_start</span><span class="p">)</span>
+                    <span class="o">&amp;</span> <span class="p">(</span><span class="n">target_starts</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="n">criterion_start</span> <span class="o">-</span> <span class="n">window</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="n">preceding_cnt</span> <span class="o">+=</span> <span class="n">preceeding_events</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">target_starts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">target_starts</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">preceeding_events</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">proceeding_events</span> <span class="o">=</span> <span class="n">target_starts</span><span class="p">[</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">target_starts</span> <span class="o">&gt;</span> <span class="n">criterion_start</span><span class="p">)</span>
+                    <span class="o">&amp;</span> <span class="p">(</span><span class="n">target_starts</span> <span class="o">&lt;=</span> <span class="p">(</span><span class="n">criterion_start</span> <span class="o">+</span> <span class="n">window</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="n">proceeding_cnt</span> <span class="o">+=</span> <span class="n">proceeding_events</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">target_starts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">target_starts</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">proceeding_events</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">preceding_cnt</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">proceeding_cnt</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mf">1.0</span>
+        <span class="k">elif</span> <span class="n">preceding_cnt</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+        <span class="k">elif</span> <span class="n">proceeding_cnt</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">1.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">preceding_cnt</span> <span class="o">/</span> <span class="p">(</span><span class="n">preceding_cnt</span> <span class="o">+</span> <span class="n">proceeding_cnt</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FeatureExtractionSupplemental.distance_and_velocity"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.feature_extraction_supplement_mixin.FeatureExtractionSupplemental.distance_and_velocity">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">distance_and_velocity</span><span class="p">(</span>
+        <span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+        <span class="n">fps</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">pixels_per_mm</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">centimeters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate total movement and mean velocity from a sequence of position data.</span>
+
+<span class="sd">        :param x: Array containing movement data. For example, created by ``simba.mixins.FeatureExtractionMixin.framewise_euclidean_distance``.</span>
+<span class="sd">        :param fps: Frames per second of the data.</span>
+<span class="sd">        :param pixels_per_mm: Conversion factor from pixels to millimeters.</span>
+<span class="sd">        :param Optional[bool] centimeters: If True, results are returned in centimeters and centimeters per second. Defaults to True.</span>
+<span class="sd">        :return Tuple[float, float]: A tuple containing total movement and mean velocity.</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; x = np.random.randint(0, 100, (100,))</span>
+<span class="sd">        &gt;&gt;&gt; sum_movement, avg_velocity = FeatureExtractionSupplemental.distance_and_velocity(x=x, fps=10, pixels_per_mm=10, centimeters=True)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">check_valid_array</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">distance_and_velocity</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="n">accepted_ndims</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="n">accepted_dtypes</span><span class="o">=</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">check_float</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">distance_and_velocity</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> fps&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span>
+            <span class="n">min_value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">check_float</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">distance_and_velocity</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> pixels_per_mm&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">pixels_per_mm</span><span class="p">,</span>
+            <span class="n">min_value</span><span class="o">=</span><span class="mf">10e-6</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">ndim</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">check_valid_array</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+                <span class="n">source</span><span class="o">=</span><span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">distance_and_velocity</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="n">accepted_axis_1_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,),</span>
+            <span class="p">)</span>
+            <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">t</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">])</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="o">/</span> <span class="n">pixels_per_mm</span>
+        <span class="n">movement</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">pixels_per_mm</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">int</span><span class="p">(</span><span class="n">fps</span><span class="p">)):</span>
+            <span class="n">w</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">fps</span><span class="p">))]</span>
+            <span class="n">v</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="o">/</span> <span class="n">pixels_per_mm</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="nb">int</span><span class="p">(</span><span class="n">fps</span><span class="p">))))</span>
+        <span class="k">if</span> <span class="n">centimeters</span><span class="p">:</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="p">[</span><span class="n">vi</span> <span class="o">/</span> <span class="mi">10</span> <span class="k">for</span> <span class="n">vi</span> <span class="ow">in</span> <span class="n">v</span><span class="p">]</span>
+            <span class="n">movement</span> <span class="o">=</span> <span class="n">movement</span> <span class="o">/</span> <span class="mi">10</span>
+        <span class="k">return</span> <span class="n">movement</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">v</span><span class="p">)</span></div></div>
+
+
+<span class="c1"># x = np.random.randint(0, 100, (100, 2))</span>
+<span class="c1"># FeatureExtractionSupplemental.distance_and_velocity(</span>
+<span class="c1">#     x=x, fps=10, pixels_per_mm=10, centimeters=True</span>
+<span class="c1"># )</span>
+<span class="c1"># # sum_movement, avg_velocity =</span>
+
+
+<span class="c1"># df = read_df(file_path=&#39;/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/targets_inserted/Together_1.csv&#39;, file_type=&#39;csv&#39;)</span>
+<span class="c1">#</span>
+<span class="c1"># df = pd.DataFrame(np.random.randint(0, 2, (100, 2)), columns=[&#39;Attack&#39;, &#39;Sniffing&#39;])</span>
+<span class="c1"># FeatureExtractionSupplemental.sequential_lag_analysis(data=df, criterion=&#39;Attack&#39;, target=&#39;Sniffing&#39;, fps=5, time_window=2.0)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

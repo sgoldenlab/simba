@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Unsupervised analyses in SimBA &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SimBA utilities" href="simba.utils.html" />
+    <link rel="prev" title="SimBA UI pop-ups" href="simba.ui.pop_ups.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SimBA
+              <img src="_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="api.html">API Reference</a></li>
+      <li class="breadcrumb-item active">Unsupervised analyses in SimBA</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/simba.unsupervised.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="unsupervised-analyses-in-simba">
+<h1>Unsupervised analyses in SimBA<a class="headerlink" href="#unsupervised-analyses-in-simba" title="Permalink to this heading"></a></h1>
+<section id="module-simba.unsupervised.bout_aggregator">
+<span id="bout-aggregation-helper"></span><h2>Bout aggregation helper<a class="headerlink" href="#module-simba.unsupervised.bout_aggregator" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="simba.unsupervised.bout_aggregator.bout_aggregator">
+<span class="sig-prename descclassname"><span class="pre">simba.unsupervised.bout_aggregator.</span></span><span class="sig-name descname"><span class="pre">bout_aggregator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">clfs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.12)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.12)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">DataFrame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_bout_length</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">aggregator</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><span class="pre">typing_extensions.Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'MEAN'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'MEDIAN'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'MEAN'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataFrame</span></span></span><a class="reference internal" href="_modules/simba/unsupervised/bout_aggregator.html#bout_aggregator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.unsupervised.bout_aggregator.bout_aggregator" title="Permalink to this definition"></a></dt>
+<dd><p>Helper to aggregate features to bout-level representations for unsupervised analysis.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>pd.DataFrame</em>) – DataFrame with features.</p></li>
+<li><p><strong>clfs</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>]</em>) – Names of classifiers</p></li>
+<li><p><strong>feature_names</strong> – Names of features</p></li>
+<li><p><strong>aggregator</strong> (<em>Optional</em><em>[</em><em>Literal</em><em>[</em><em>'MEAN'</em><em>, </em><em>'MEDIAN'</em><em>]</em><em>]</em>) – Aggregation type, e.g., ‘MEAN’, ‘MEDIAN’. Default ‘MEAN’.</p></li>
+<li><p><strong>min_bout_length</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>) – The length of the shortest allowed bout in milliseconds. Default 0 which means all bouts.</p></li>
+<li><p><strong>video_info</strong> (<em>pd.DataFrame</em>) – Dataframe holding video names, fps, resolution etc typically located at project_folder/logs/video_info.csv of SimBA project.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return pd.DataFrame<span class="colon">:</span></dt>
+<dd class="field-even"><p>Featurized data at aggregate bout level.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-simba.unsupervised.cluster_frequentist_calculator">
+<span id="cluster-frequentist-statistics-calculator"></span><h2>Cluster frequentist statistics calculator<a class="headerlink" href="#module-simba.unsupervised.cluster_frequentist_calculator" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.unsupervised.cluster_frequentist_calculator.ClusterFrequentistCalculator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.unsupervised.cluster_frequentist_calculator.</span></span><span class="sig-name descname"><span class="pre">ClusterFrequentistCalculator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/unsupervised/cluster_frequentist_calculator.html#ClusterFrequentistCalculator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.unsupervised.cluster_frequentist_calculator.ClusterFrequentistCalculator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UnsupervisedMixin</span></code>, <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a></p>
+<p>Class for computing frequentist statitics based on cluster assignment labels for explainability purposes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><em>os.PathLike</em></a><em>]</em>) – path to SimBA configparser.ConfigParser project_config.ini</p></li>
+<li><p><strong>data_path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><em>os.PathLike</em></a><em>]</em>) – path to pickle holding unsupervised results in <code class="docutils literal notranslate"><span class="pre">simba.unsupervised.data_map.yaml</span></code> format.</p></li>
+<li><p><strong>settings</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – Dict holding which statistical tests to use, with test name as keys and booleans as values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Example<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">settings</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;scaled&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;ANOVA&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;tukey_posthoc&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;descriptive_statistics&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calculator</span> <span class="o">=</span> <span class="n">ClusterFrequentistCalculator</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;unsupervised/project_folder/project_config.ini&#39;</span><span class="p">,</span> <span class="n">data_path</span><span class="o">=</span><span class="s1">&#39;unsupervised/cluster_models/quizzical_rhodes.pickle&#39;</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calculator</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-simba.unsupervised.cluster_video_visualizer">
+<span id="cluster-video-visualizer"></span><h2>Cluster video visualizer<a class="headerlink" href="#module-simba.unsupervised.cluster_video_visualizer" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.unsupervised.cluster_video_visualizer.ClusterVideoVisualizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.unsupervised.cluster_video_visualizer.</span></span><span class="sig-name descname"><span class="pre">ClusterVideoVisualizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_videos</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speed</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bg_clr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.12)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">(255,</span> <span class="pre">255,</span> <span class="pre">255)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><span class="pre">typing_extensions.Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'VIDEO'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'HULL'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'SKELETON'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'POINTS'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'SKELETON'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/unsupervised/cluster_video_visualizer.html#ClusterVideoVisualizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.unsupervised.cluster_video_visualizer.ClusterVideoVisualizer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">UnsupervisedMixin</span></code></p>
+<p>Class for creating video examples of cluster assignments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><em>os.PathLike</em></a><em>]</em>) – Path to SimBA project configuration file.</p></li>
+<li><p><strong>data_path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><em>os.PathLike</em></a><em>]</em>) – Path to pickle file containing unsupervised results.</p></li>
+<li><p><strong>max_videos</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><em>None</em><em>]</em><em>]</em>) – Maximum number of videos to create for each cluster. Defaults to None.</p></li>
+<li><p><strong>speed</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>) – Speed of the generated videos. Defaults to 1.0.</p></li>
+<li><p><strong>bg_clr</strong> (<em>Optional</em><em>[</em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em><em>]</em>) – Background color of the videos as RGB tuple. Defaults to white (255, 255, 255).</p></li>
+<li><p><strong>plot_type</strong> (<em>Optional</em><em>[</em><em>Literal</em><em>]</em>) – Type of plot to generate (‘VIDEO’, ‘HULL’, ‘SKELETON’, ‘POINTS’). Defaults to ‘SKELETON’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Example<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">config_path</span> <span class="o">=</span> <span class="s1">&#39;/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data_path</span> <span class="o">=</span> <span class="s1">&#39;/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/cluster_mdls/hopeful_khorana.pickle&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">visualizer</span> <span class="o">=</span> <span class="n">ClusterVideoVisualizer</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">,</span> <span class="n">data_path</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span> <span class="n">bg_clr</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="n">max_videos</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">speed</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">plot_type</span><span class="o">=</span><span class="s1">&#39;POINTS&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">visualizer</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-simba.unsupervised.cluster_xai_calculator">
+<span id="cluster-xai-calculator"></span><h2>Cluster XAI calculator<a class="headerlink" href="#module-simba.unsupervised.cluster_xai_calculator" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.unsupervised.cluster_xai_calculator.ClusterXAICalculator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.unsupervised.cluster_xai_calculator.</span></span><span class="sig-name descname"><span class="pre">ClusterXAICalculator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/unsupervised/cluster_xai_calculator.html#ClusterXAICalculator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.unsupervised.cluster_xai_calculator.ClusterXAICalculator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UnsupervisedMixin</span></code>, <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a></p>
+<p>Class for building RF models on top of cluster assignments, and calculating latent space explainability metrics based on RF models.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><em>os.PathLike</em></a><em>]</em>) – path to SimBA configparser.ConfigParser project_config.ini</p></li>
+<li><p><strong>data_path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><em>os.PathLike</em></a><em>]</em>) – path to pickle holding unsupervised results in <code class="docutils literal notranslate"><span class="pre">data_map.yaml</span></code> format.</p></li>
+<li><p><strong>settings</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>Any</em><em>]</em>) – Dict holding which explainability tests to use.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Example<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">settings</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;gini_importance&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;permutation_importance&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;shap&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;method&#39;</span><span class="p">:</span> <span class="s1">&#39;cluster_paired&#39;</span><span class="p">,</span> <span class="s1">&#39;create&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;sample&#39;</span><span class="p">:</span> <span class="mi">100</span><span class="p">}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calculator</span> <span class="o">=</span> <span class="n">ClusterXAICalculator</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;unsupervised/project_folder/project_config.ini&#39;</span><span class="p">,</span> <span class="n">data_path</span><span class="o">=</span><span class="s1">&#39;unsupervised/cluster_models/quizzical_rhodes.pickle&#39;</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calculator</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-simba.unsupervised.data_extractor">
+<span id="data-extractor"></span><h2>Data extractor<a class="headerlink" href="#module-simba.unsupervised.data_extractor" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.unsupervised.data_extractor.DataExtractor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.unsupervised.data_extractor.</span></span><span class="sig-name descname"><span class="pre">DataExtractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_types</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.12)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/unsupervised/data_extractor.html#DataExtractor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.unsupervised.data_extractor.DataExtractor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UnsupervisedMixin</span></code>, <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a></p>
+<p>Extracts human-readable data from directory of pickles or single pickle file that holds unsupervised analyses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_path</strong> – path to SimBA configparser.ConfigParser project_config.ini</p></li>
+<li><p><strong>data_path</strong> – path to pickle holding unsupervised results in <code class="docutils literal notranslate"><span class="pre">data_map.yaml</span></code> format.</p></li>
+<li><p><strong>data_type</strong> – The type of data to extract. E.g., CLUSTERER_PARAMETERS, DIMENSIONALITY_REDUCTION_PARAMETERS, SCALER, SCALED_DATA, LOW_VARIANCE_FIELDS, FEATURE_NAMES, FRAME_FEATURES, FRAME_POSE, FRAME_TARGET, BOUTS_FEATURES, BOUTS_TARGETS, BOUTS_DIM_CORDS</p></li>
+<li><p><strong>settings</strong> – User-defined parameters for data extraction.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Example<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">extractor</span> <span class="o">=</span> <span class="n">DataExtractor</span><span class="p">(</span><span class="n">data_path</span><span class="o">=</span><span class="s1">&#39;unsupervised/cluster_models/awesome_curran.pickle&#39;</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;BOUTS_TARGETS&#39;</span><span class="p">],</span> <span class="n">settings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;unsupervised/project_folder/project_config.ini&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">extractor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-simba.unsupervised.dataset_creator">
+<span id="data-creator"></span><h2>Data creator<a class="headerlink" href="#module-simba.unsupervised.dataset_creator" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.unsupervised.dataset_creator.DatasetCreator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.unsupervised.dataset_creator.</span></span><span class="sig-name descname"><span class="pre">DatasetCreator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/unsupervised/dataset_creator.html#DatasetCreator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.unsupervised.dataset_creator.DatasetCreator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a>, <code class="xref py py-class docutils literal notranslate"><span class="pre">UnsupervisedMixin</span></code></p>
+<p>Transform raw frame-wise supervised classification data into aggregated
+data for unsupervised analyses. Saves the aggergated data in to logs directory of the SimBa project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><em>os.PathLike</em></a><em>]</em>) – path to SimBA configparser.ConfigParser project_config.ini</p></li>
+<li><p><strong>settings</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>Any</em><em>]</em>) – Attributes for which data should be included and how the data should be aggregated.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Example<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">settings</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;data_slice&#39;</span><span class="p">:</span> <span class="s1">&#39;ALL FEATURES (EXCLUDING POSE)&#39;</span><span class="p">,</span> <span class="s1">&#39;clf_slice&#39;</span><span class="p">:</span> <span class="s1">&#39;Attack&#39;</span><span class="p">,</span> <span class="s1">&#39;bout_aggregation_type&#39;</span><span class="p">:</span> <span class="s1">&#39;MEDIAN&#39;</span><span class="p">,</span> <span class="s1">&#39;min_bout_length&#39;</span><span class="p">:</span> <span class="mi">66</span><span class="p">,</span> <span class="s1">&#39;feature_path&#39;</span><span class="p">:</span> <span class="s1">&#39;/Users/simon/Desktop/envs/simba_dev/simba/assets/unsupervised/features.csv&#39;</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db_creator</span> <span class="o">=</span> <span class="n">DatasetCreator</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini&#39;</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">db_creator</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-simba.unsupervised.dbcv_calculator">
+<span id="density-based-cluster-validation-dbcv"></span><h2>Density-based cluster validation (DBCV)<a class="headerlink" href="#module-simba.unsupervised.dbcv_calculator" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.unsupervised.dbcv_calculator.DBCVCalculator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.unsupervised.dbcv_calculator.</span></span><span class="sig-name descname"><span class="pre">DBCVCalculator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/unsupervised/dbcv_calculator.html#DBCVCalculator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.unsupervised.dbcv_calculator.DBCVCalculator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UnsupervisedMixin</span></code>, <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a></p>
+<p>Density-based Cluster Validation (DBCV).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Jitted version of <a class="reference external" href="https://github.com/christopherjenness/DBCV">DBCSV</a>.
+Faster runtime by replacing meth:<cite>scipy.spatial.distance.cdist</cite> in original DBCSV with LLVM as discussed <a class="reference external" href="https://github.com/numba/numba-scipy/issues/38">HERE</a>.
+A further non-jitted implementaion can be found in the <a class="reference external" href="https://github.com/scikit-learn-contrib/hdbscan/blob/master/hdbscan/validity.py">hdbscan library</a>.
+<a class="reference external" href="https://github.com/awslabs/amazon-denseclus">AWS Denseclus</a> HDBSCAN appears to have DBCV as an attribute of returned object. maybe a faster alternative?</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>embedders_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Directory holding dimensionality reduction models in pickle format.</p></li>
+<li><p><strong>clusterers_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Directory holding cluster models in pickle format.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">References</p>
+<aside class="footnote-list brackets">
+<aside class="footnote brackets" id="id1" role="note">
+<span class="label"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></span>
+<p>Moulavi et al, Density-Based Clustering Validation, <cite>SIAM 2014</cite>, <a class="reference external" href="https://doi.org/10.1137/1.9781611973440.96">https://doi.org/10.1137/1.9781611973440.96</a></p>
+</aside>
+</aside>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dbcv_calculator</span> <span class="o">=</span> <span class="n">DBCVCalculator</span><span class="p">(</span><span class="n">clusterers_path</span><span class="o">=</span><span class="s1">&#39;unsupervised/cluster_models&#39;</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;my_simba_config&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">dbcv_calculator</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.unsupervised.dbcv_calculator.DBCVCalculator.DBCV">
+<span class="sig-name descname"><span class="pre">DBCV</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)"><span class="pre">float</span></a></span></span><a class="reference internal" href="_modules/simba/unsupervised/dbcv_calculator.html#DBCVCalculator.DBCV"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.unsupervised.dbcv_calculator.DBCVCalculator.DBCV" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – 2D array of shape len(observations) x len(dimensionality reduced dimensions)</p></li>
+<li><p><strong>labels</strong> (<em>np.ndarray</em>) – 1D array with cluster labels</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns float<span class="colon">:</span></dt>
+<dd class="field-even"><p>DBCV cluster validity score</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.unsupervised.dbcv_calculator.DBCVCalculator.calculate_dists">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">calculate_dists</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arrays_by_cluster</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.12)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="_modules/simba/unsupervised/dbcv_calculator.html#DBCVCalculator.calculate_dists"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.unsupervised.dbcv_calculator.DBCVCalculator.calculate_dists" title="Permalink to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> (<em>np.ndarray</em>) – 2D array of shape len(observations) x len(dimensionality reduced dimensions)</p></li>
+<li><p><strong>arrays_by_cluster</strong> (<em>numba.types.ListType</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.12)"><em>list</em></a><em>[</em><em>np.ndarray</em><em>]</em><em>]</em>) – Numba typed List of list with 2d arrays.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns Tuple[np.ndarray, bool)<span class="colon">:</span></dt>
+<dd class="field-even"><p>Graph of all pair-wise mutual reachability distances between points of size X.shape[0] x X.shape[0].
+Boolean representing if any issues where detected. Including: If (i) any clusters consist of a single observation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-simba.unsupervised.embedding_correlation_calculator">
+<span id="embedding-correlation-calculator"></span><h2>Embedding correlation calculator<a class="headerlink" href="#module-simba.unsupervised.embedding_correlation_calculator" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.unsupervised.embedding_correlation_calculator.EmbeddingCorrelationCalculator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.unsupervised.embedding_correlation_calculator.</span></span><span class="sig-name descname"><span class="pre">EmbeddingCorrelationCalculator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/unsupervised/embedding_correlation_calculator.html#EmbeddingCorrelationCalculator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.unsupervised.embedding_correlation_calculator.EmbeddingCorrelationCalculator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UnsupervisedMixin</span></code>, <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a></p>
+<p>Class for correlating dimensionality reduction features with original features for explainability purposes.</p>
+<a class="reference internal image-reference" href="_images/EmbeddingCorrelationCalculator.png"><img alt="_images/EmbeddingCorrelationCalculator.png" class="align-center" src="_images/EmbeddingCorrelationCalculator.png" style="width: 800px;" /></a>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – path to SimBA configparser.ConfigParser project_config.ini</p></li>
+<li><p><strong>data_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – path to pickle holding unsupervised results in <code class="docutils literal notranslate"><span class="pre">data_map.yaml</span></code> format.</p></li>
+<li><p><strong>settings</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – dict holding which statistical tests to use and how to create plots.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Example<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">settings</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;correlation_methods&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;pearson&#39;</span><span class="p">,</span> <span class="s1">&#39;kendall&#39;</span><span class="p">,</span> <span class="s1">&#39;spearman&#39;</span><span class="p">],</span> <span class="s1">&#39;plots&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;create&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;correlations&#39;</span><span class="p">:</span> <span class="s1">&#39;pearson&#39;</span><span class="p">,</span> <span class="s1">&#39;palette&#39;</span><span class="p">:</span> <span class="s1">&#39;jet&#39;</span><span class="p">}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calculator</span> <span class="o">=</span> <span class="n">EmbeddingCorrelationCalculator</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;unsupervised/project_folder/project_config.ini&#39;</span><span class="p">,</span> <span class="n">data_path</span><span class="o">=</span><span class="s1">&#39;unsupervised/cluster_models/quizzical_rhodes.pickle&#39;</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">calculator</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-simba.unsupervised.grid_search_visualizers">
+<span id="grid-search-visualizer"></span><h2>Grid-search visualizer<a class="headerlink" href="#module-simba.unsupervised.grid_search_visualizers" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.unsupervised.grid_search_visualizers.GridSearchVisualizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.unsupervised.grid_search_visualizers.</span></span><span class="sig-name descname"><span class="pre">GridSearchVisualizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/unsupervised/grid_search_visualizers.html#GridSearchVisualizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.unsupervised.grid_search_visualizers.GridSearchVisualizer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">UnsupervisedMixin</span></code></p>
+<p>Visualize grid-searched latent spaces in .png format.</p>
+<a class="reference internal image-reference" href="_images/GridSearchVisualizer.png"><img alt="_images/GridSearchVisualizer.png" class="align-center" src="_images/GridSearchVisualizer.png" style="width: 800px;" /></a>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_dir</strong> – path to pickle holding unsupervised results in <code class="docutils literal notranslate"><span class="pre">data_map.yaml</span></code> format.</p></li>
+<li><p><strong>save_dir</strong> – directory holding one or more unsupervised results in pickle <code class="docutils literal notranslate"><span class="pre">data_map.yaml</span></code> format.</p></li>
+<li><p><strong>settings</strong> – User-defined image attributes (e.g., continous and catehorical palettes)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Example<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">settings</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;CATEGORICAL_PALETTE&#39;</span><span class="p">:</span> <span class="s1">&#39;Pastel1&#39;</span><span class="p">,</span> <span class="s1">&#39;CONTINUOUS_PALETTE&#39;</span><span class="p">:</span> <span class="s1">&#39;magma&#39;</span><span class="p">,</span> <span class="s1">&#39;SCATTER_SIZE&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">visualizer</span> <span class="o">=</span> <span class="n">GridSearchVisualizer</span><span class="p">(</span><span class="n">model_dir</span><span class="o">=</span><span class="s1">&#39;/Users/simon/Desktop/envs/troubleshooting/unsupervised/cluster_models_042023&#39;</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="s1">&#39;/Users/simon/Desktop/envs/troubleshooting/unsupervised/images&#39;</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">visualizer</span><span class="o">.</span><span class="n">continuous_visualizer</span><span class="p">(</span><span class="n">continuous_vars</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;START_FRAME&#39;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">visualizer</span><span class="o">.</span><span class="n">categorical_visualizer</span><span class="p">(</span><span class="n">categoricals</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;CLUSTER&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="hdbscan-clusterer">
+<h2>HDBSCAN clusterer<a class="headerlink" href="#hdbscan-clusterer" title="Permalink to this heading"></a></h2>
+</section>
+<section id="umap-embedder">
+<h2>UMAP embedder<a class="headerlink" href="#umap-embedder" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="simba.ui.pop_ups.html" class="btn btn-neutral float-left" title="SimBA UI pop-ups" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="simba.utils.html" class="btn btn-neutral float-right" title="SimBA utilities" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

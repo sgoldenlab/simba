@@ -1,0 +1,12 @@
+﻿FRAMES (MILLION),CUDA JIT GPU (S),NUMBA CPU TIME (S)
+**2 million**,0.005,0.022
+**4 million**,0.009,0.031
+**8 million**,0.016,0.097
+**16 million**,0.028,0.199
+**32 million**,0.054,0.399
+**64 million**,0.111,0.769
+**128 million**,0.33,1.3
+**256 million**,0.666,2.531
+**512 million**,1.161,7.273
+**1 billion**,3.828,13.342
+NVIDIA GeForce RTX 4070,,

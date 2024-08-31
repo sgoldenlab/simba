@@ -4,7 +4,7 @@ __email__ = "sronilsson@gmail.com"
 import math
 
 import numpy as np
-from numba import cuda
+from numba import cuda, int32
 
 THREADS_PER_BLOCK = 1024
 
@@ -15,7 +15,7 @@ def _cuda_direction_from_two_bps(x, y, results):
         return
     else:
         a = math.atan2(x[i][0] - y[i][0], y[i][1] - x[i][1]) * (180 / math.pi)
-        a = numba.int32(a + 360 if a < 0 else a)
+        a = int32(a + 360 if a < 0 else a)
         results[i] = a
 
 

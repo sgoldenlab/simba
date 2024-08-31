@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scenario 2 walkthrough &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Scenario 3 walkthrough" href="scenario_3.html" />
+    <link rel="prev" title="Scenario 1 walkthrough" href="scenario_1.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SimBA
+              <img src="../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../walkthroughs.html">Walkthroughs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="scenario_1.html">Scenario 1 walkthrough</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Scenario 2 walkthrough</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#hypothetical-experiment"><strong>Hypothetical Experiment</strong>:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#scenario-2-using-a-classifier-on-new-experimental-data"><strong>Scenario 2</strong>: Using a classifier on new experimental data…</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-1-clean-up-your-project-or-create-a-new-project">Part 1: ‘Clean up your project’, or create a new project.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-2-load-project-and-process-your-tracking-data">Part 2: Load project and process your tracking data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-3-run-the-classifier-on-new-data">Part 3: Run the classifier on new data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-4-analyze-machine-results">Part 4: Analyze Machine Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-5-visualizing-results">Part 5: VISUALIZING RESULTS</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#visualizing-classifications">VISUALIZING CLASSIFICATIONS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#visualizing-gantt-charts">VISUALIZING GANTT CHARTS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#visualizing-classification-probabilities">VISUALIZING CLASSIFICATION PROBABILITIES</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#visualizing-path-plots">VISUALIZING PATH PLOTS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#visualizing-distance-plots">VISUALIZING DISTANCE PLOTS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#visualizing-classification-heatmaps">VISUALIZING CLASSIFICATION HEATMAPS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#visualizing-data-tables">VISUALIZING DATA TABLES</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#merging-concatenating-videos">MERGING (CONCATENATING VIDEOS)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="scenario_3.html">Scenario 3 walkthrough</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scenario_3.html#hypothetical-experiment"><strong>Hypothetical Experiment</strong>:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scenario_3.html#scenario-3-updating-a-classifier-with-further-annotated-data"><strong>Scenario 3</strong>: Updating a classifier with further annotated data.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scenario_4.html">Scenario 3 walkthrough</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scenario_4.html#hypothetical-experiment"><strong>Hypothetical Experiment</strong>:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scenario_4.html#scenario-4-analyzing-and-adding-new-experimental-data-to-a-previously-started-project"><strong>Scenario 4</strong>: Analyzing and adding new Experimental data to a previously started project.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scenario_4.html#part-6-post-classification-validation-detecting-false-positives">PART 6: Post-classification Validation (detecting false-positives)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../walkthroughs.html">Walkthroughs</a></li>
+      <li class="breadcrumb-item active">Scenario 2 walkthrough</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_rst/scenario_2.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="scenario-2-walkthrough">
+<h1>Scenario 2 walkthrough<a class="headerlink" href="#scenario-2-walkthrough" title="Permalink to this heading"></a></h1>
+<p>To faciliate the initial use of SimBA, we provide several use scenarios.
+We have created these scenarios around a hypothetical experiment that
+take a user from initial use (completely new start) all the way through
+analyzing a complete experiment and then adding additional experimental
+datasets to an initial project.</p>
+<p>All scenarios assume that the videos have been
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md">pre-processed</a>
+and that <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md">DLC behavioral tracking CSV
+dataframes</a>
+have been created.</p>
+<section id="hypothetical-experiment">
+<h2><strong>Hypothetical Experiment</strong>:<a class="headerlink" href="#hypothetical-experiment" title="Permalink to this heading"></a></h2>
+<p>Three days of resident-intruder testing between aggressive CD-1 mice and
+subordinante C57 intruders. Each day of testing has 10 pairs of mice,
+for a total of 30 videos recorded across 3 days. Recordings are 3
+minutes in duration, in color, at 30fps.</p>
+</section>
+<section id="scenario-2-using-a-classifier-on-new-experimental-data">
+<h2><strong>Scenario 2</strong>: Using a classifier on new experimental data…<a class="headerlink" href="#scenario-2-using-a-classifier-on-new-experimental-data" title="Permalink to this heading"></a></h2>
+<p>In this scenario you have either are now ready to do one of two things.</p>
+<ol class="lowerroman simple">
+<li><p>You have generated a classifier yourself which performance you are
+happy with. For example, you have followed <a class="reference external" href="https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md">Scenario
+1</a>,
+and generated the classifier for “Behavior that Will Get a Nature
+Paper (Behavior BtWGaNP)” and its working well.</p></li>
+<li><p>Or, you have received a behavioral classifier generated somewhere
+else, and now you want to use the classifier to score Behavior
+BtWGaNP on your experimental videos. For example, you have
+downloaded the classifier from our <a class="reference external" href="https://osf.io/d69jt/">OSF
+repository</a>.</p></li>
+</ol>
+</section>
+<section id="part-1-clean-up-your-project-or-create-a-new-project">
+<h2>Part 1: ‘Clean up your project’, or create a new project.<a class="headerlink" href="#part-1-clean-up-your-project-or-create-a-new-project" title="Permalink to this heading"></a></h2>
+<p>We will need start with a project directory tree that does not contain
+any other data than the data we want to analyze. If you are coming along
+from <a class="reference external" href="https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md">Scenario
+1</a>,
+you will have a project tree already. However, this project tree
+contains the files used to create the BtWGaNP classifier: if you look in
+the subdirectories of the <code class="docutils literal notranslate"><span class="pre">project_folder/csv/input</span></code> directory, you
+will see the 19 CSV files we used to generate the project. If we
+continue using this project, SimBA will see these CSV files and analyze
+these files in addition to your Experimental data. Thus, one option is
+to manually remove these files from the subdirectories of our project
+(see the legacy tutorial for <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4.md#part-1-clean-up-your-project--or-alternatively-create-a-new-project">Scenario
+4</a>
+where we take this approach), or you could use the
+<code class="docutils literal notranslate"><span class="pre">Archive</span> <span class="pre">Processed</span> <span class="pre">files</span></code> function in the <code class="docutils literal notranslate"><span class="pre">Load</span> <span class="pre">Project</span></code> tab
+described in the new <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4_new.md#part-1-clean-up-your-project--or-alternatively-create-a-new-project">Scenario 4
+tutorial</a>
+and shown in the image below.</p>
+<a class="reference internal image-reference" href="../_images/menu_1.jpg"><img alt="../_images/menu_1.jpg" class="align-center" src="../_images/menu_1.jpg" style="width: 1200px;" /></a>
+<p>Another alternative is to <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project">create a
+new</a>
+project that only contains the data from our Experiment. In this
+Scenario, we will create a <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project">new
+project</a>.</p>
+<p>Go ahead and create a new project with your experimental data, follow
+the instructions for creating a new project in either of these
+tutorials:
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project-1">1</a>,
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config">2</a>.
+Instead of using your pilot data as indicated in the tutorial from
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project-1">Scenario
+1</a>,
+use the data and videos for the experiment you want to analyze.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the final <em>Step 4</em> of the <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project-1">tutorial for creating a new
+project</a>,
+we extract the frames from the imported videos. Having the frames is
+only necessery if you wish to visualize the predictive classifications
+generated in this current Scenario 2. If you do not want to visualize
+the machine predictions you can skip this step. However, we recommend
+that you at least visualize the machine predictions using one or a few
+videos to gauge its performance. How to visualize the machine
+predictions is described in <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions">Part
+5</a>
+of this tutorial.</p>
+</div>
+</section>
+<section id="part-2-load-project-and-process-your-tracking-data">
+<h2>Part 2: Load project and process your tracking data<a class="headerlink" href="#part-2-load-project-and-process-your-tracking-data" title="Permalink to this heading"></a></h2>
+<p>In <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-1-clean-up-your-project-or-create-a-new-project">Part
+1</a>
+above, we created a project that contains your experimental data. To
+continue working with this project, we <strong>must</strong> load it. To load the
+project and process your experimental data, follow the instructions for
+<strong>Step 1 to 5</strong> in either the <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md">Scenario 1
+tutorial</a>
+or <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config%5D">Part I of the generic
+tutorial</a>.</p>
+<p>In this current Scenario 2, you can <strong>ignore Steps 6-7 of the
+tutorials</strong>, which deals with annotating data and creating classifiers.</p>
+<p>However, <strong>Step 1-5</strong> of the <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md">Scenario 1
+tutorial</a>,
+which we need to complete, performs <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf">outlier correction in the
+tracking</a>
+and <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv">extracts
+features</a>,
+which we will need to do before analyzing our experimental data.</p>
+</section>
+<section id="part-3-run-the-classifier-on-new-data">
+<h2>Part 3: Run the classifier on new data<a class="headerlink" href="#part-3-run-the-classifier-on-new-data" title="Permalink to this heading"></a></h2>
+<p>At this point we have Experimental data, which has been corrected for
+outliers and with features extracted, and we want to predict behavior
+BtWGaNP in these videos.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you haven’t generated the predictive classifier yourself,
+and you have instead downloaded the predictive classifier or been
+given the predictive calssifier by someone else, we will also include
+information on how you can use that classifier to predict behaviors
+in your videos.</p>
+</div>
+<ol class="arabic simple">
+<li><p>In the Load Project menu, navigate to the <strong>Run Machine Model</strong> tab
+and you should see the following window.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/menu_24.png"><img alt="../_images/menu_24.png" class="align-center" src="../_images/menu_24.png" style="width: 600px;" /></a>
+<ol class="arabic simple" start="2">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Model</span> <span class="pre">Selection</span></code>. The following window, containing the
+classifier names that were defined when you created the project, will
+pop up. The image below depicts a full suite of behavioral predictive
+classifiers relevant to aggression behavior, but yours should only
+show Behavior BtWGaNP.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/menu_34.png"><img alt="../_images/menu_34.png" class="align-center" src="../_images/menu_34.png" style="width: 600px;" /></a>
+<ol class="arabic simple" start="3">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code> and select the model (<em>.sav</em>) file
+associated with the classifier name. If you are following along from
+<a class="reference external" href="https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md">Scenario
+1</a>,
+the <em>.sav</em> file will be saved in your earlier project, in the
+<code class="docutils literal notranslate"><span class="pre">project_folder\models\generated_models</span></code> directory or the
+<code class="docutils literal notranslate"><span class="pre">project_folder\models\validation\model_files</span></code> directory. You can
+also select an <em>.sav</em> file located in any other directory. For
+example, if you have downloaded a random forest model from <a class="reference external" href="https://osf.io/d69jt/">our OSF
+repository</a>, you can specify the path to
+that file here.</p></li>
+</ol>
+<p>Once the path has been selected, go ahead and modify the discrimination
+<code class="docutils literal notranslate"><span class="pre">Threshold</span></code> and <code class="docutils literal notranslate"><span class="pre">Minimum</span> <span class="pre">Bout</span></code> for each classifier separately. If
+you want to explore the optimal threshold for your classifier, go ahead
+and read <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data">Scenario 1 - Critical validation step before running machine
+model on new
+data</a>
+on how to use the <code class="docutils literal notranslate"><span class="pre">Validate</span> <span class="pre">Model</span> <span class="pre">on</span> <span class="pre">Single</span> <span class="pre">Video</span></code> menu (this
+information is also repeated in brief in Step 4 below). The
+<code class="docutils literal notranslate"><span class="pre">Threshold</span></code> entry box accepts a value between 0 and 1. The
+<code class="docutils literal notranslate"><span class="pre">Minimum</span> <span class="pre">Bout</span></code> is a time value in milliseconds that represents the
+minimum length of a classified behavioral bout. To read more about the
+<code class="docutils literal notranslate"><span class="pre">Minimum</span> <span class="pre">Bout</span></code> - go ahead and read <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data">Scenario 1 - Critical validation
+step before running machine model on new
+data</a>(this
+information is also repeated in brief in Step 4 below).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the real world you may want want to run mutiple
+classifiers on each video, one for each of the behaviors you are
+intrested in. <strong>In such a scenario you have defined mutiple
+predictive calssifier names when you created the project in Step 1</strong>.
+Each one will be displayed in the <code class="docutils literal notranslate"><span class="pre">Model</span> <span class="pre">Selection</span></code>, and you can
+specify a different path to a different <em>.sav</em> file for each of them.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Each random forest expects a specific number of
+features. The number of calculated features is determined by the
+number of body-parts tracked in pose-estimation in DeepLabCut or
+DeepPoseKit. <em>For example</em>: if the input dataset contains the
+coordinates of three body parts, then a fewer number of features can
+be calculated than if 8 body parts were tracked. This means that you
+will get an error if you run a random forest model <em>.sav</em> file that
+has been generated using 8 body parts on a new dataset that contains
+only 3 body parts.</p>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>Fill in the <code class="docutils literal notranslate"><span class="pre">Discrimination</span> <span class="pre">threshold</span></code> and click on <code class="docutils literal notranslate"><span class="pre">Set</span></code> to save
+the settings.</p></li>
+</ol>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Discrimination</span> <span class="pre">threshold</span></code>: This value represents the level of
+probability required to define that the frame belongs to the target
+class and it accepts a float value between 0.0 and 1.0. In other
+words, how certain does the computer have to be that behavior BtWGaNP
+occurs in a frame, in order for the frame to be classified as
+containing behavior BtWGaNP? For example, if the discrimination
+theshold is set to 0.50, then all frames with a probability of
+containing the behavior of 0.5 or above will be classified as
+containing the behavior. For more information on classification
+theshold, click
+<a class="reference external" href="https://www.scikit-yb.org/en/latest/api/classifier/threshold.html">here</a>.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can titrate the discrimination threshold to best fit your
+data. Decreasing the threshold will predict that the classified
+behavior is <em>more</em> frequent, while increasing the threshold will
+predict that the behaviors as <em>less</em> frequent.</p>
+</div>
+<ol class="arabic simple" start="5">
+<li><p>Fill in the <code class="docutils literal notranslate"><span class="pre">Minimum</span> <span class="pre">behavior</span> <span class="pre">bout</span> <span class="pre">length</span></code> and click on <code class="docutils literal notranslate"><span class="pre">Set</span></code> to
+save the settings.</p></li>
+</ol>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Minimum</span> <span class="pre">behavior</span> <span class="pre">bout</span> <span class="pre">length</span> <span class="pre">(ms)</span></code>: This value represents the
+minimum length of a classified behavioral bout. <strong>Example</strong>: The
+random forest makes the following predictions for behavior BtWGaNP
+over 9 consecutive frames in a 50 fps video: 1,1,1,1,0,1,1,1,1. This
+would mean, if we don’t have a minimum bout length, that the animals
+enganged in behavior BtWGaNP for 80ms (4 frames), took a break for
+20ms (1 frame), then again enganged in behavior BtWGaNP for another
+80ms (4 frames). You may want to classify this as a single 180ms
+behavior BtWGaNP bout, rather than two separate 80ms BtWGaNP bouts.
+If the minimum behavior bout length is set to 20, any interruption in
+the behavior that is 20ms or shorter will be removed and the example
+behavioral sequence above will be re-classified as: 1,1,1,1,1,1,1,1,1
+- and instead classified as a single 180ms BtWGaNP bout. If your
+videos in your project are recorded at different frame rates then
+SimBA will account for this when correcting for the
+<code class="docutils literal notranslate"><span class="pre">Minimum</span> <span class="pre">behavior</span> <span class="pre">bout</span> <span class="pre">length</span></code>.</p></li>
+</ul>
+<ol class="arabic simple" start="6">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Run</span> <span class="pre">RF</span> <span class="pre">Model</span></code> to run the machine model on the new
+experimental data. You can follow the progress in the main SimBA
+terminal window. A message will be printed once all the behaviors
+have been predicted in the experimental videos. New CSV files, that
+contain the predictions together with the features and
+pose-estimation data, are saved in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/csv/machine_results</span></code> directory.</p></li>
+</ol>
+</section>
+<section id="part-4-analyze-machine-results">
+<h2>Part 4: Analyze Machine Results<a class="headerlink" href="#part-4-analyze-machine-results" title="Permalink to this heading"></a></h2>
+<p>Once the classifications have been generated, we may want to analyze
+descriptive statistics for the behavioral predictions. For example, we
+might like to know how much time the animals in each video enganged in
+behavior BtWGaNP, how long it took for each animal to start enganging in
+behavior BtWGaNP, how many bouts of behavior BtWGaNP did occur in each
+video, and what where the mean/median interval and bout length for
+behavior BtWGaNP. We may also want some descriptive statistics on the
+movements, distances and velocities of the animals. If applicable, we
+can also generate an index on how ‘severe’ behavior BtWGaNP was, and/or
+split the different classification and movement statistics into
+time-bins. To generate such descriptive statistics summaries, click on
+the <code class="docutils literal notranslate"><span class="pre">Run</span> <span class="pre">machine</span> <span class="pre">model</span></code> tab in the <code class="docutils literal notranslate"><span class="pre">Load</span> <span class="pre">project</span></code> menu. In the
+sub-menu <code class="docutils literal notranslate"><span class="pre">Analyze</span> <span class="pre">machine</span> <span class="pre">results</span></code>, you should see the following
+buttons:</p>
+<a class="reference internal image-reference" href="../_images/data_analysis_1.png"><img alt="../_images/data_analysis_1.png" class="align-center" src="../_images/data_analysis_1.png" style="width: 800px;" /></a>
+<ol class="arabic simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">ANALYZE</span> <span class="pre">MACHINE</span> <span class="pre">PREDICTIONS:</span> <span class="pre">AGGREGATES</span></code>: This button generates
+descriptive statistics for each predictive classifier in the project,
+including the total time, the number of frames, total number of
+‘bouts’, mean and median bout interval, time to first occurrence, and
+mean and median interval between each bout. Clicking the button will
+display a pop up window with tick-boxes for the different metric
+options, and the user ticks the metrics that the output file should
+contain. The pop up window should look like this:</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/data_analysis_2.png"><img alt="../_images/data_analysis_2.png" class="align-center" src="../_images/data_analysis_2.png" style="width: 800px;" /></a>
+<p>Clicking on <code class="docutils literal notranslate"><span class="pre">RUN</span></code> runs the selected desciptive statistics on all the
+files in <code class="docutils literal notranslate"><span class="pre">project_folder/csv/machine_results</span></code> directory. A date-time
+stamped output csv file with the data is saved within the
+<code class="docutils literal notranslate"><span class="pre">/project_folder/log</span></code> folder. Check the main SimBA terminal window for
+the exact output filename and file path.</p>
+<ol class="arabic simple" start="2">
+<li><p><code class="docutils literal notranslate"><span class="pre">ANALYZE</span> <span class="pre">DISTANCES</span> <span class="pre">/</span> <span class="pre">VELOCITY:</span> <span class="pre">AGGREGATES</span></code>: This button generates
+descriptive statistics for distances and velocities. Clicking the
+button will display a pop-up window where the user selects how many
+animal, and which body-parts, the user wants to use to calculate the
+distance and velocity metrics. The pop up window should look like
+this:</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/data_analysis_3.png"><img alt="../_images/data_analysis_3.png" class="align-center" src="../_images/data_analysis_3.png" style="width: 800px;" /></a>
+<p>Clicking the <code class="docutils literal notranslate"><span class="pre">Run</span></code> buttons calculates the descriptive statistics on
+all the CSV files in <code class="docutils literal notranslate"><span class="pre">project_folder/csv/machine_results</span></code> directory. A
+date-time stamped output csv file with the data is saved in the
+<code class="docutils literal notranslate"><span class="pre">/project_folder/log</span></code> folder.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When clicking the <code class="docutils literal notranslate"><span class="pre">Body-part</span></code> dropdown in the
+<code class="docutils literal notranslate"><span class="pre">ANALYZE</span> <span class="pre">DISTANCES</span> <span class="pre">/</span> <span class="pre">VELOCITY:</span> <span class="pre">AGGREGATES</span></code> pop-up menu, you should
+see all the body-parts available in your project. You should also see
+options with the suffix <strong>CENTER OF GRAVITY</strong>, e.g., an option may be
+named <code class="docutils literal notranslate"><span class="pre">Animal</span> <span class="pre">1</span> <span class="pre">CENTER</span> <span class="pre">OF</span> <span class="pre">GRAVITY</span></code>. If you use this option, SimBA
+will estimate the centroid of the choosen animal and compute the
+moved distance and the velocity based on the estimated centroid.</p>
+</div>
+<ol class="arabic simple" start="3">
+<li><p><code class="docutils literal notranslate"><span class="pre">ANALYZE</span> <span class="pre">MACHINE</span> <span class="pre">PREDICTIONS:</span> <span class="pre">TIME</span> <span class="pre">BINS</span></code>: Use this menu to compute
+descriptive statistics of classification within <strong>user-defined
+time-bins</strong>. This menu looks very similar to the menu used for
+aggregate machine classification computations, but has one additional
+entry-box at the bottom. In this bottom entry-box, enter the size of
+your time-bins in <strong>seconds</strong>.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/data_analysis_4.png"><img alt="../_images/data_analysis_4.png" class="align-center" src="../_images/data_analysis_4.png" style="width: 800px;" /></a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>(i) If no behavior was expressed in a certain time bin, then
+the fields representing that time bin is missing. (ii) If there was 1
+behavior event within a time bin, then the
+<code class="docutils literal notranslate"><span class="pre">Mean</span> <span class="pre">event</span> <span class="pre">interval</span> <span class="pre">(s)</span></code> and <code class="docutils literal notranslate"><span class="pre">Median</span> <span class="pre">event</span> <span class="pre">interval</span> <span class="pre">(s)</span></code> fields
+are missing for that time-bin.</p>
+</div>
+<ol class="arabic simple" start="4">
+<li><p><code class="docutils literal notranslate"><span class="pre">ANALYZE</span> <span class="pre">DISTANCES</span> <span class="pre">/</span> <span class="pre">VELOCITY:</span> <span class="pre">TIME-BINS</span></code>: This button generates
+descriptive statistics for movements, velocities, and distances
+between animals in <strong>user-defined time-bins</strong>. Clicking this button
+brings up a pop-up menu very similar to the
+<code class="docutils literal notranslate"><span class="pre">ANALYZE</span> <span class="pre">DISTANCES</span> <span class="pre">/</span> <span class="pre">VELOCITY:</span> <span class="pre">AGGREGATES</span></code>, but has one additional
+entry-box at the bottom. In this bottom entry-box, enter the size of
+your time-bins in <strong>seconds</strong>. It also has a checkbox named
+<code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">plots</span></code>. If the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">plots</span></code> checkbox is ticked, SimBA
+will generate line plots, with one line plot per videos, representing
+the movement of your animals in the defined time-bins.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/data_analysis_5.png"><img alt="../_images/data_analysis_5.png" class="align-center" src="../_images/data_analysis_5.png" style="width: 800px;" /></a>
+<ol class="arabic simple" start="5">
+<li><p><code class="docutils literal notranslate"><span class="pre">ANALYZE</span> <span class="pre">MACHINE</span> <span class="pre">PREDICTIONS:</span> <span class="pre">BY</span> <span class="pre">ROI</span></code>: If you have drawn
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md">user-defined
+ROIs</a>,
+then we can compute how much time, and how many classified behavioral
+bout started and ended in each user-defined ROI. Clicking on the
+<code class="docutils literal notranslate"><span class="pre">Classifications</span> <span class="pre">by</span> <span class="pre">ROI</span></code> brings up the following pop-up:</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/data_analysis_6.png"><img alt="../_images/data_analysis_6.png" class="align-center" src="../_images/data_analysis_6.png" style="width: 800px;" /></a>
+<p>In this pop-up. Tick the checkboxes for which classified behaviors and
+ROIs you wish to analyze. Also tick the buttons for which measurements
+you want aggregate statistics for. In the <code class="docutils literal notranslate"><span class="pre">Select</span> <span class="pre">body-part</span></code> drop-down
+menu, select the body-part you shich to use as a proxy for the location
+of the behavior. Once filled in, click
+<code class="docutils literal notranslate"><span class="pre">Analyze</span> <span class="pre">classifications</span> <span class="pre">in</span> <span class="pre">each</span> <span class="pre">ROI</span></code>. An output data file will be
+saved in the <code class="docutils literal notranslate"><span class="pre">project_folder/logs</span></code> directory of your SimBA project.</p>
+<ol class="arabic simple" start="6">
+<li><p><code class="docutils literal notranslate"><span class="pre">Analyze</span> <span class="pre">machine</span> <span class="pre">predictions:</span> <span class="pre">by</span> <span class="pre">severity</span></code>: This type of analysis
+is only relevant if your behavior can be graded on a scale ranging
+from mild (the behavior occurs in the presence of very little body
+part movements) to severe (the behavior occurs in the presence of a
+lot of body part movements). For instance, attacks could be graded
+this way, with ‘mild’ or ‘moderate’ attacks happening when the
+animals aren’t moving as much as they are in other parts of the
+video, while ‘severe’ attacks occur when both animals are tussling at
+full force. This button and code calculates the ‘severity’ of each
+frame classified as containing the behavior based on a user-defined
+scale. Clicking the severity button brings up the following menu:</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/data_analysis_7.png"><img alt="../_images/data_analysis_7.png" class="align-center" src="../_images/data_analysis_7.png" style="width: 800px;" /></a>
+<ul class="simple">
+<li><p><strong>Classifier</strong> dropdown: Select which classifier you want to
+calculate severity scores for.</p></li>
+<li><p><strong>Brackets</strong> dropdown: Select the size of the severity scale. E.g.,
+select <strong>10</strong> if you want to score your classifications on a 10-point
+scale.</p></li>
+<li><p><strong>Animals</strong> dropdown: Select which animals body-parts you want to use
+to calculate the movement. E.g., select <code class="docutils literal notranslate"><span class="pre">ALL</span> <span class="pre">ANIMALS</span></code> to calculate
+the movement based on all animals and their body-parts.</p></li>
+<li><p><strong>FRAME COUNT</strong> checkbox: Check this box to get the results presented
+as <strong>number of frames</strong> in each severity bracket.</p></li>
+<li><p><strong>SECONDS</strong> checkbox: Check this box to get the results presented as
+<strong>number of seconds</strong> in each severity bracket.</p></li>
+</ul>
+<p>Click on RUN SEVERITY ANALYSIS. You can follow progress in the main
+SimBA terminal. The results are saved in the <code class="docutils literal notranslate"><span class="pre">project_folder/logs/</span></code>
+directory of your SimBA project. You can found an expected output of
+this analysis
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/severity_example_20230301090603.csv">HERE</a></p>
+<p>Congrats! You have now used machine models to classify behaviors in new
+data. To visualize the machine predictions by rendering images and
+videos with the behavioral predictions overlaid, and plots describing
+on-going behaviors and bouts, proceed to <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions">Part
+5</a>
+of the current tutorial.</p>
+</section>
+<section id="part-5-visualizing-results">
+<h2>Part 5: VISUALIZING RESULTS<a class="headerlink" href="#part-5-visualizing-results" title="Permalink to this heading"></a></h2>
+<p>In this part of the tutorial we will create visualizations of machine
+learning classifications and the features which you have generated. This
+includes images and videos of the animals with <em>prediction overlays,
+gantt plots, line plots, paths plots, heat maps and data plot etc.</em>
+These visualizations can help us understand the classifier(s),
+behaviors, and differences between experimental groups.</p>
+<p>To access the visualization functions, click the <code class="docutils literal notranslate"><span class="pre">[Visualizations]</span></code>
+tab.</p>
+<section id="visualizing-classifications">
+<h3>VISUALIZING CLASSIFICATIONS<a class="headerlink" href="#visualizing-classifications" title="Permalink to this heading"></a></h3>
+<p>On the left of the <code class="docutils literal notranslate"><span class="pre">Visualization</span></code> tab menu, there is a sub-menu with
+the heading <code class="docutils literal notranslate"><span class="pre">DATA</span> <span class="pre">VISUALIZATION</span></code> with a button named
+<code class="docutils literal notranslate"><span class="pre">VISUALIZE</span> <span class="pre">CLASSIFICATIONS</span></code>. Use this button to create videos with
+classification visualization overlays, similar to what is presented
+<a class="reference external" href="https://youtu.be/lGzbS7OaVEg">HERE</a>. Clicking this button brings up
+the below pop-up menu allowing customization of the videos and how they
+are created. We will go through each of the settings in the
+visualization options in turn:</p>
+<a class="reference internal image-reference" href="../_images/visualization_1.png"><img alt="../_images/visualization_1.png" class="align-center" src="../_images/visualization_1.png" style="width: 800px;" /></a>
+<ul class="simple">
+<li><p><strong>BODY-PART VISUALIZATION THRESHOLD</strong> (0.0-1.0): In this entry-box,
+enter the <strong>minimum</strong> pose-estimation detection probability threshold
+required for the body-part to be included in the visualization. For
+example, enter <code class="docutils literal notranslate"><span class="pre">0.0</span></code> for <strong>all</strong> body-part predictions to be
+included in teh visualization. Enter <code class="docutils literal notranslate"><span class="pre">1.0</span></code> for only body-parts
+detected with 100% certainty to be visualized.</p></li>
+<li><p><strong>STYLE SETTINGS</strong>: By default, SimBA will <strong>auto-compute</strong> suitable
+visualization (i) font sizes, (ii) spacing between text rows, (iii)
+font thickness, and (iv) pose-estimation body-part location circles
+which depend on the resolution of your videos. If you do <strong>not</strong> want
+SimBA to auto-compute these attributes, go ahead and and <strong>un-tick</strong>
+the `Auto-compute font/key-point sizes checkbox, and fill in these
+values manually in each entry box.</p></li>
+<li><p><strong>VISUALIZATION SETTINGS</strong>:</p>
+<ul>
+<li><p><strong>Create video</strong>: Tick the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">video</span></code> checkbox to generate
+<code class="docutils literal notranslate"><span class="pre">.mp4</span></code> videos with classification result overlays.</p></li>
+<li><p><strong>Create frames</strong>: Tick the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">frames</span></code> checkbox to generate
+<code class="docutils literal notranslate"><span class="pre">.png</span></code> files with classification result overlays (NOTE: this
+will create one png file for each frame in each video. If you are
+concerned about storage, leave this checkbox unchecked).</p></li>
+<li><p><strong>Include timers overlay</strong>: Tick the <code class="docutils literal notranslate"><span class="pre">Include</span> <span class="pre">timers</span> <span class="pre">overlay</span></code>
+checkbox to insert the cumulative time in seconds each classified
+behavior has occured in the top left corner of the video.</p></li>
+<li><p><strong>Rotate video 90°</strong>: Tick the <code class="docutils literal notranslate"><span class="pre">Rotate</span> <span class="pre">video</span> <span class="pre">90°</span></code> checkbox to
+rotate the output video 90 degrees clockwise relative to the input
+video.</p></li>
+<li><p><strong>Multiprocess videos (faster)</strong>: Creating videos can be
+computationally costly, and creating many, long, videos can come
+with unacceptable run-times. We can solve this using
+multiprocessing over multiple cores on your computer. To use
+multi-processing, tick the <code class="docutils literal notranslate"><span class="pre">Multiprocess</span> <span class="pre">videos</span> <span class="pre">(faster)</span></code>
+checkbox. Once ticked, the <code class="docutils literal notranslate"><span class="pre">CPU</span> <span class="pre">cores</span></code> dropdown becomes enabled.
+This dropdown contains values between <code class="docutils literal notranslate"><span class="pre">2</span></code> and the number of
+cores available on your computer with fancier computers having
+higher CPU counts. In this dropdown, select the number of cores
+you want to use to create your visualizations.</p></li>
+</ul>
+</li>
+<li><p><strong>RUN</strong>:</p>
+<ul>
+<li><p><strong>SINGLE VIDEO</strong>: To create classification visualizations for a
+single video, select the video in the <code class="docutils literal notranslate"><span class="pre">Video</span></code> drop-down menu and
+click the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">single</span> <span class="pre">video</span></code> button. You can follow the
+progress in the main SimBA terminal. The results will be stored in
+the <code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/sklearn_results</span></code> directory of
+your SimBA project.</p></li>
+<li><p><strong>MULTIPLE VIDEO</strong>: To create classification visualizations for
+all videos in your project, click the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">multiple</span> <span class="pre">videos</span></code>
+button. You can follow the progress in the main SimBA terminal.
+The results will be stored in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/sklearn_results</span></code> directory of your
+SimBA project.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="visualizing-gantt-charts">
+<h3>VISUALIZING GANTT CHARTS<a class="headerlink" href="#visualizing-gantt-charts" title="Permalink to this heading"></a></h3>
+<p>Clicking the <code class="docutils literal notranslate"><span class="pre">VUSIALIZE</span> <span class="pre">GANTT</span></code> button brings up a pop-up menu allowing
+us to customize gantt charts. Gantt charts are broken horizontal bar
+charts allowing us to insepct when and for how long each of our
+classified behaviors occur as in the gif below.</p>
+<a class="reference internal image-reference" href="../_images/visualization_2.png"><img alt="../_images/visualization_2.png" class="align-center" src="../_images/visualization_2.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/gantt_example_1.gif"><img alt="../_images/gantt_example_1.gif" class="align-center" src="../_images/gantt_example_1.gif" style="width: 800px;" /></a>
+<ul class="simple">
+<li><p><strong>STYLE SETTINGS</strong>: Use this menu to specify the resultion of the
+Gantt plot videos and/or frames. Furthermore, use the <code class="docutils literal notranslate"><span class="pre">Font</span> <span class="pre">size</span></code>
+entry box to specify the size of the y- and x-axis label text sizes.
+Use the <code class="docutils literal notranslate"><span class="pre">Font</span> <span class="pre">rotation</span> <span class="pre">degree</span></code> entry-box to specify the rotation of
+the y-axis classifier names (set to <code class="docutils literal notranslate"><span class="pre">45</span></code> by default which is what
+is visualized in the gif above).</p></li>
+<li><p><strong>VISUALIZATION SETTINGS</strong>:</p>
+<ul>
+<li><p><strong>Create video</strong>: Tick the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">video</span></code> checkbox to generate
+gantt plots <code class="docutils literal notranslate"><span class="pre">.mp4</span></code> videos.</p></li>
+<li><p><strong>Create frames</strong>: Tick the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">frames</span></code> checkbox to generate
+gantt plots <code class="docutils literal notranslate"><span class="pre">.png</span></code> files (NOTE: this will create one png file
+for each frame in each video. If you are concerned about storage,
+leave this checkbox unchecked).</p></li>
+<li><p><strong>Create last frame</strong>: Tick the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">last</span> <span class="pre">frame</span></code> checkbox to
+generate a gantt plots <code class="docutils literal notranslate"><span class="pre">.png</span></code> file representing the entire
+video.</p></li>
+<li><p><strong>Multiprocess videos (faster)</strong>: Creating gantt videos and/or
+images can be computationally costly, and creating many, long,
+videos can come with unacceptable run-times. We can solve this
+using multiprocessing over multiple cores on your computer. To use
+multi-processing, tick the <code class="docutils literal notranslate"><span class="pre">Multiprocess</span> <span class="pre">videos</span> <span class="pre">(faster)</span></code>
+checkbox. Once ticked, the <code class="docutils literal notranslate"><span class="pre">CPU</span> <span class="pre">cores</span></code> dropdown becomes enabled.
+This dropdown contains values between <code class="docutils literal notranslate"><span class="pre">2</span></code> and the number of
+cores available on your computer, with fancier computers having
+higher CPU counts. In this dropdown, select the number of cores
+you want to use to create your gantt charts.</p></li>
+</ul>
+</li>
+<li><p><strong>RUN</strong>:</p>
+<ul>
+<li><p><strong>SINGLE VIDEO</strong>: To create gantt chart visualizations for a
+single video, select the video in the <code class="docutils literal notranslate"><span class="pre">Video</span></code> drop-down menu and
+click the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">single</span> <span class="pre">video</span></code> button. You can follow the
+progress in the main SimBA terminal. The results will be stored in
+the <code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/sklearn_results</span></code> directory of
+your SimBA project.</p></li>
+<li><p><strong>MULTIPLE VIDEO</strong>: To create gantt chart visualizations for all
+videos in your project, click the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">multiple</span> <span class="pre">videos</span></code>
+button. You can follow the progress in the main SimBA terminal.
+The results will be stored in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/sklearn_results</span></code> directory of your
+SimBA project.</p></li>
+</ul>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you’d like to create a gif from the gantt frames, you can
+do so by using the <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md">SimBA tools
+menu</a>
+and the <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs">Generate
+gifs</a>
+tool.</p>
+</div>
+</section>
+<section id="visualizing-classification-probabilities">
+<h3>VISUALIZING CLASSIFICATION PROBABILITIES<a class="headerlink" href="#visualizing-classification-probabilities" title="Permalink to this heading"></a></h3>
+<p>SimBA can create line plots depicting the <em>classification probability</em>
+that a specific behavior is occuring in the current frame across the
+video. On the left of the <code class="docutils literal notranslate"><span class="pre">Visualization</span></code> menu, a button named
+<code class="docutils literal notranslate"><span class="pre">VISUALIZE</span> <span class="pre">PROBABILITIES</span></code>. Clicking this button brings up the below
+sub-menu allowing users to customize the videos and how they are
+created.</p>
+<a class="reference internal image-reference" href="../_images/visualization_3.png"><img alt="../_images/visualization_3.png" class="align-center" src="../_images/visualization_3.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/probability_example.gif"><img alt="../_images/probability_example.gif" class="align-center" src="../_images/probability_example.gif" style="width: 800px;" /></a>
+<ul class="simple">
+<li><p><strong>STYLE SETTINGS</strong>: Use this menu to specify the resultion of the
+probability plot videos and/or frames.</p>
+<ul>
+<li><p><strong>RESOLUTION</strong>: Use this dropdown to select the resolution (size)
+of the output video and/or output frames.</p></li>
+<li><p><strong>LINE COLOR</strong>: Use this dropdown to specify the color of the line
+in the charts.</p></li>
+<li><p><strong>FONT SIZE</strong>: In this entry-box, enter the font size of the y-
+and x-axis labels and tick labels. (e.g., <code class="docutils literal notranslate"><span class="pre">10</span></code>)</p></li>
+<li><p><strong>LINE WIDTH</strong>: In this entry-box, enter the thickness of the line
+in the chart (e.g., <code class="docutils literal notranslate"><span class="pre">6</span></code>).</p></li>
+<li><p><strong>CIRCLE SIZE</strong>: In this entry-box, enter the size of the circle
+representing the current frame probability value (e.g., <code class="docutils literal notranslate"><span class="pre">20</span></code>)</p></li>
+</ul>
+</li>
+<li><p><strong>VISUALIZATION SETTINGS</strong>:</p>
+<ul>
+<li><p><strong>CLASSIFIER</strong>: Use this drop down menu to select the classifier
+you which to create the line plot for.</p></li>
+<li><p><strong>CREATE FRAMES</strong>: Tick the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">frames</span></code> checkbox to create
+probability plots <code class="docutils literal notranslate"><span class="pre">.png</span></code> files (NOTE: this will create one png
+file for each frame in each video. If you are concerned about
+storage, leave this checkbox unchecked).</p></li>
+<li><p><strong>CREATE VIDEOS</strong>: Tick the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">video</span></code> checkbox to create
+probability plots <code class="docutils literal notranslate"><span class="pre">.mp4</span></code> videos.</p></li>
+<li><p><strong>Multiprocess videos (faster)</strong>: Creating probability videos
+and/or images can be computationally costly, and creating many,
+long, videos can come with unacceptable run-times. We can solve
+this using multiprocessing over multiple cores on your computer.
+To use multi-processing, tick the <code class="docutils literal notranslate"><span class="pre">Multiprocess</span> <span class="pre">videos</span> <span class="pre">(faster)</span></code>
+checkbox. Once ticked, the <code class="docutils literal notranslate"><span class="pre">CPU</span> <span class="pre">cores</span></code> dropdown becomes enabled.
+This dropdown contains values between <code class="docutils literal notranslate"><span class="pre">2</span></code> and the number of
+cores available on your computer, with fancier computers having
+higher CPU counts. In this dropdown, select the number of cores
+you want to use to create your probability charts.</p></li>
+</ul>
+</li>
+<li><p><strong>RUN</strong>:</p>
+<ul>
+<li><p><strong>SINGLE VIDEO</strong>: To create probability chart visualizations for a
+single video, select the video in the <code class="docutils literal notranslate"><span class="pre">Video</span></code> drop-down menu and
+click the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">single</span> <span class="pre">video</span></code> button. You can follow the
+progress in the main SimBA terminal. The results will be stored in
+the <code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/probability_plots</span></code> directory
+of your SimBA project.</p></li>
+<li><p><strong>MULTIPLE VIDEO</strong>: To create probability chart visualizations for
+all videos in your project, click the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">multiple</span> <span class="pre">videos</span></code>
+button. You can follow the progress in the main SimBA terminal.
+The results will be stored in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/probability_plots</span></code> directory of
+your SimBA project.</p></li>
+</ul>
+</li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you’d like to create a gif from the probability_plots
+frames, you can do so by using the <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md">SimBA tools
+menu</a>
+and the <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs">Generate
+gifs</a>
+tool.</p>
+</div>
+</section>
+<section id="visualizing-path-plots">
+<h3>VISUALIZING PATH PLOTS<a class="headerlink" href="#visualizing-path-plots" title="Permalink to this heading"></a></h3>
+<p>SimBA can create path plots depicting the location of the animal(s),
+their paths, as well the locations of the classified behaviors. In the
+[Visualizations] tab, click the [VISUALIZE PATHS] button, which brings
+up the below pop-up menu.</p>
+<a class="reference internal image-reference" href="../_images/visualization_4.png"><img alt="../_images/visualization_4.png" class="align-center" src="../_images/visualization_4.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/path_plot_example.gif"><img alt="../_images/path_plot_example.gif" class="align-center" src="../_images/path_plot_example.gif" style="width: 800px;" /></a>
+<ul>
+<li><p><strong>STYLE SETTINGS</strong>:</p>
+<ul class="simple">
+<li><p><strong>AUTO-COMPUTE STYLES</strong>: By default, SimBA will <strong>auto-compute</strong>
+suitable visualization styles which depend on the resolution of
+your videos. If you do <strong>not</strong> want SimBA to auto-compute these
+attributes, go ahead and and <strong>un-tick</strong> the
+<code class="docutils literal notranslate"><span class="pre">Auto-compute</span> <span class="pre">styles</span></code> checkbox, and fill in these values
+manually in each entry box.</p></li>
+<li><p><strong>MAX PRIOR LINES</strong> (int): Number of milliseconds for which the
+movement path is diplayed. E.g., a value of <code class="docutils literal notranslate"><span class="pre">2000</span></code> will display
+the movement path for the most recent 2s.</p></li>
+<li><p><strong>LINE WIDTH</strong> (int): The width of the lines representing the
+movement path. E.g., <code class="docutils literal notranslate"><span class="pre">6</span></code>.</p></li>
+<li><p><strong>CIRCLE SIZE</strong> (int): The size of the circle representing the
+animals current location. E.g., <code class="docutils literal notranslate"><span class="pre">20</span></code>.</p></li>
+<li><p><strong>FONT SIZE</strong>: The size of the font text of the animals name.
+<code class="docutils literal notranslate"><span class="pre">E.g.,</span> <span class="pre">3</span></code>.</p></li>
+<li><p><strong>FONT THICKNESS</strong>: The thickness (boldness) of the font text of
+the animals name. <code class="docutils literal notranslate"><span class="pre">E.g.,</span> <span class="pre">2</span></code>.</p></li>
+<li><p><strong>BACKGROUND COLOR</strong>: The background color of the path plots.
+E.g., <code class="docutils literal notranslate"><span class="pre">White</span></code>.</p></li>
+</ul>
+</li>
+<li><p><strong>CHOOSE CLASSIFICATION VISUALIZATION</strong>: Use this menu to specify if
+and how the location of classified events are printed on the path
+plots.</p>
+<ul class="simple">
+<li><p><strong>INCLUDE CLASSIFICATION LOCATIONS</strong>: Check this box to include
+the location of classified events in the path plot.</p></li>
+<li><p>You should see a row for each classifier, and three drop-down
+menues for each classifier. In the example screengrab above, I
+have two classifiers (Classifier 1: <em>Attack</em>, Classifier 2:
+Sniffing). In the second drop-down, select which <strong>color</strong> the
+circles depicting the location of the classified events should
+have. In the third dropdown, select the <strong>size</strong> the circles
+depicting the location of the classified events should have.</p></li>
+</ul>
+<blockquote>
+<div><p>Note: The classified event location will be inferred to be in the
+first animals body-part location</p>
+</div></blockquote>
+</li>
+<li><p><strong>CHOOSE BODY-PARTS</strong>: Use this menu to specify which body-parts of
+the animals will represent their location.</p>
+<ul class="simple">
+<li><p><strong># ANIMALS</strong>: Use this drop-down to specify how many animals you
+want to visualize paths for.</p></li>
+<li><p>You should see a row for each animal, and two drop-down menues
+per. In the example screengrab above, I have two animals. In the
+first drop-down, select the body-part which you want to represent
+the path. In the second drop-down, select which <strong>color</strong> the
+circles and lines depicting the location of the animal should
+have.</p></li>
+</ul>
+</li>
+<li><p><strong>RUN</strong>:</p>
+<ul class="simple">
+<li><p><strong>SINGLE VIDEO</strong>: Use this menu to create a <em>single</em> path
+visualization video. The <code class="docutils literal notranslate"><span class="pre">Video</span></code> drop-down will contain all the
+videos in your <code class="docutils literal notranslate"><span class="pre">project_folder/machine_results</span></code> directory.
+Choose which video you want to create a path visualization for.
+Once choosen, click the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">single</span> <span class="pre">video</span></code> button. You can
+follow the progress in the main SimBA terminal window. Once
+complete, a new video and/or frames will be saved in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/path_plots</span></code> directory.</p></li>
+<li><p><strong>MULTIPLE VIDEO</strong>: Use this menu to create a path visualization
+video for every video in your project. After clicking the
+<code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">multiple</span> <span class="pre">videos</span></code> button. You can follow the progress in
+the main SimBA terminal window. Once complete, one new video
+and/or frames folder for every input video will be saved in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/path_plots</span></code> directory.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="visualizing-distance-plots">
+<h3>VISUALIZING DISTANCE PLOTS<a class="headerlink" href="#visualizing-distance-plots" title="Permalink to this heading"></a></h3>
+<p>SimBA can create distance plots depicting the distance between different
+body-parts and/or animals across the videos. In the [Visualizations]
+tab, click the [VISUALIZE DISTANCES] button, which brings up the below
+pop-up menu.</p>
+<a class="reference internal image-reference" href="../_images/visualization_5.png"><img alt="../_images/visualization_5.png" class="align-center" src="../_images/visualization_5.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/visualization_5.png"><img alt="../_images/visualization_5.png" class="align-center" src="../_images/visualization_5.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/visualization_8.png"><img alt="../_images/visualization_8.png" class="align-center" src="../_images/visualization_8.png" style="width: 800px;" /></a>
+<ul class="simple">
+<li><p><strong>STYLE SETTINGS</strong>:</p>
+<ul>
+<li><p><strong>RESOLUTION</strong>: Use the drop-down to set the size of the output
+video(s) and/or frames.</p></li>
+<li><p><strong>FONT SIZE</strong> (int): The size of the text representing the y- and
+x-axis labels and graph title.</p></li>
+<li><p><strong>LINE WIDTH</strong> (int): The width of the lines representing the
+animal body-part distances.</p></li>
+</ul>
+</li>
+<li><p><strong>CHOOSE DISTANCES</strong>:</p>
+<ul>
+<li><p><strong># DISTANCES</strong>: Use the drop-down to specify how many distances
+(lines) you want to display in the distance plot. E.g., the two
+gifs above 1 and 4 distances, respectively.</p></li>
+<li><p>Once you have selected a number of lines, the table show be
+populated with as many rows as distances chosen, with <strong>three</strong>
+drop-down menus per row. Use the first two drop-down menus to
+select the two body-parts which distance in-between you want
+depicted in the output video and/or frames. Use the third
+right-most drop-down to select the color of that specific line.</p></li>
+</ul>
+</li>
+<li><p><strong>VISUALIXATION SETTINGS</strong>:</p>
+<ul>
+<li><p><strong>Create video</strong>: Tick the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">video</span></code> checkbox to generate
+<code class="docutils literal notranslate"><span class="pre">.mp4</span></code> videos with distance plots.</p></li>
+<li><p><strong>Create frames</strong>: Tick the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">frames</span></code> checkbox to generate
+<code class="docutils literal notranslate"><span class="pre">.png</span></code> files with distance plots (NOTE: this will create one png
+file for each frame in each video. If you are concerned about
+storage, leave this checkbox unchecked).</p></li>
+<li><p><strong>Create last frame</strong>: Create a single <code class="docutils literal notranslate"><span class="pre">.png</span></code> image representing
+the body-part distances at the end of each video (as in the bottom
+image above).</p></li>
+</ul>
+</li>
+<li><p><strong>RUN</strong>:</p>
+<ul>
+<li><p><strong>SINGLE VIDEO</strong>: Use this menu to create a <em>single</em> distance
+visualization video. The <code class="docutils literal notranslate"><span class="pre">Video</span></code> drop-down will contain all the
+videos in your <code class="docutils literal notranslate"><span class="pre">project_folder/machine_results</span></code> directory.
+Choose which video you want to create a distance visualization
+for. Once choosen, click the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">single</span> <span class="pre">video</span></code> button. You
+can follow the progress in the main SimBA terminal window. Once
+complete, a new video and/or frames will be saved in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/line_plots</span></code> directory.</p></li>
+<li><p><strong>MULTIPLE VIDEO</strong>: Use this menu to create a distance
+visualization video for every video in your project. After
+clicking the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">multiple</span> <span class="pre">videos</span></code> button. You can follow the
+progress in the main SimBA terminal window. Once complete, one new
+video and/or frames folder for every input video will be saved in
+the <code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/line_plots</span></code> directory.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="visualizing-classification-heatmaps">
+<h3>VISUALIZING CLASSIFICATION HEATMAPS<a class="headerlink" href="#visualizing-classification-heatmaps" title="Permalink to this heading"></a></h3>
+<p>SimBA can create heatmap videos and/or images representing the location
+of classified events. For an idea of how classification heatmaps works,
+see <a class="reference external" href="https://youtu.be/O41x96kXUHE">THIS VIDEO</a>.</p>
+<a class="reference internal image-reference" href="../_images/visualization_6.png"><img alt="../_images/visualization_6.png" class="align-center" src="../_images/visualization_6.png" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/visualization_7.png"><img alt="../_images/visualization_7.png" class="align-center" src="../_images/visualization_7.png" style="width: 800px;" /></a>
+<ul class="simple">
+<li><p><strong>STYLE SETTINGS</strong>:</p>
+<ul>
+<li><p><strong>PALETTE</strong>: Pick the heatmap color palette. For examples, <a class="reference external" href="https://matplotlib.org/stable/gallery/color/colormap_reference.html">CLICK
+HERE</a></p></li>
+<li><p><strong>SHADING</strong>: Pick the shading/smoothing. The left image above was
+created using <em>Gouraud</em>, the right using <em>Flat</em> shading.</p></li>
+<li><p><strong>CLASSIFIER</strong>: Pick the classifier to plot in the heatmap.</p></li>
+<li><p><strong>BODY-PART</strong>: Pick the body-part which represents the location
+the classified events.</p></li>
+<li><p><strong>MAX TIME SCALE (S)</strong>: Pick the time, in seconds, which
+represents the maximum color intensity in the heatmap. Choose
+<code class="docutils literal notranslate"><span class="pre">Auto-compute</span></code> to let SimBA find the max in the video.</p></li>
+<li><p><strong>BIN SIZE (MM)</strong>: Pick the size of each location in the image.
+For more information on bin sizes, click
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-5-miscellaneous-roi-tools">HERE</a></p></li>
+</ul>
+</li>
+<li><p><strong>VISUALIXATION SETTINGS</strong>:</p>
+<ul>
+<li><p><strong>Create video</strong>: Tick the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">video</span></code> checkbox to generate
+<code class="docutils literal notranslate"><span class="pre">.mp4</span></code> videos heat maps.</p></li>
+<li><p><strong>Create frames</strong>: Tick the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">frames</span></code> checkbox to generate
+<code class="docutils literal notranslate"><span class="pre">.png</span></code> files with heat map plots (NOTE: this will create one png
+file for each frame in each video. If you are concerned about
+storage, leave this checkbox unchecked).</p></li>
+<li><p><strong>Create last frame</strong>: Create a single <code class="docutils literal notranslate"><span class="pre">.png</span></code> image representing
+the classification heat maps at the end of each video.</p></li>
+<li><p><strong>Multiprocess videos (faster)</strong>: Creating heatmaps is
+computationally costly, and creating many, long, videos can come
+with unacceptable run-times. We can solve this in part by using
+multiprocessing over the multiple cores on your computer. To use
+multi-processing, tick the <code class="docutils literal notranslate"><span class="pre">Multiprocess</span> <span class="pre">videos</span> <span class="pre">(faster)</span></code>
+checkbox. Once ticked, the <code class="docutils literal notranslate"><span class="pre">CPU</span> <span class="pre">cores</span></code> dropdown becomes enabled.
+This dropdown contains values between <code class="docutils literal notranslate"><span class="pre">2</span></code> and the number of
+cores available on your computer with fancier computers having
+higher CPU counts. In this dropdown, select the number of cores
+you want to use to create your visualizations.</p></li>
+</ul>
+</li>
+<li><p><strong>RUN</strong>:</p>
+<ul>
+<li><p><strong>SINGLE VIDEO</strong>: Use this menu to create a <em>single</em> heatmap
+visualization. The <code class="docutils literal notranslate"><span class="pre">Video</span></code> drop-down will contain all the videos
+in your <code class="docutils literal notranslate"><span class="pre">project_folder/machine_results</span></code> directory. Choose which
+video you want to create a distance visualization for. Once
+choosen, click the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">single</span> <span class="pre">video</span></code> button. You can follow
+the progress in the main SimBA terminal window. Once complete, a
+new video and/or frames will be saved in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/heatmaps_classifier_locations</span></code>
+directory.</p></li>
+<li><p><strong>MULTIPLE VIDEO</strong>: Use this menu to create a heatmap
+visualization for every video in your project. After clicking the
+<code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">multiple</span> <span class="pre">videos</span></code> button. You can follow the progress in
+the main SimBA terminal window. Once complete, one new video
+and/or frames folder for every input video will be saved in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/heatmaps_classifier_locations</span></code>
+directory.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="visualizing-data-tables">
+<h3>VISUALIZING DATA TABLES<a class="headerlink" href="#visualizing-data-tables" title="Permalink to this heading"></a></h3>
+<p>In the <code class="docutils literal notranslate"><span class="pre">Visualization</span></code> sub-menu, use the second button named
+<code class="docutils literal notranslate"><span class="pre">VISUALIZE</span> <span class="pre">DATA</span> <span class="pre">PLOTS</span></code> to create a frames that display the velocities
+and movements of animals:</p>
+<a class="reference internal image-reference" href="../_images/data_table_example_1.gif"><img alt="../_images/data_table_example_1.gif" class="align-center" src="../_images/data_table_example_1.gif" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/data_table_example_2.gif"><img alt="../_images/data_table_example_2.gif" class="align-center" src="../_images/data_table_example_2.gif" style="width: 800px;" /></a>
+<ul class="simple">
+<li><p><strong>STYLE SETTINGS</strong>:</p>
+<ul>
+<li><p><strong>RESOLUTION</strong>: The size of the output video and/or frames in
+pixels.</p></li>
+<li><p><strong>DECIMAL ACCURACY</strong>: The number of floating points in the values
+displayed.</p></li>
+<li><p><strong>BACKGROUND COLOR</strong>: The background color of the data tables.</p></li>
+<li><p><strong>HEADER COLOR</strong>: The colors of the headers in the data table.</p></li>
+<li><p><strong>FONT THICKNESS</strong>: The thickness of the font in teh the table.</p></li>
+</ul>
+</li>
+<li><p><strong>CHOOSE BODY-PARTS</strong>:</p></li>
+<li><p><strong>VISUALIXATION SETTINGS</strong>:</p>
+<ul>
+<li><p><strong>Create video</strong>: Tick the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">video</span></code> checkbox to generate
+<code class="docutils literal notranslate"><span class="pre">.mp4</span></code> videos data plots.</p></li>
+<li><p><strong>Create frames</strong>: Tick the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">frames</span></code> checkbox to generate
+<code class="docutils literal notranslate"><span class="pre">.png</span></code> files with data plots (NOTE: this will create one png
+file for each frame in each video. If you are concerned about
+storage, leave this checkbox unchecked).</p></li>
+</ul>
+</li>
+<li><p><strong>RUN</strong>:</p>
+<ul>
+<li><p><strong>SINGLE VIDEO</strong>: Use this menu to create a <em>single</em> data table
+visualization. The <code class="docutils literal notranslate"><span class="pre">Video</span></code> drop-down will contain all the videos
+in your <code class="docutils literal notranslate"><span class="pre">project_folder/machine_results</span></code> directory. Choose which
+video you want to create a distance visualization for. Once
+choosen, click the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">single</span> <span class="pre">video</span></code> button. You can follow
+the progress in the main SimBA terminal window. Once complete, a
+new video and/or frames will be saved in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/live_data_table</span></code> directory.</p></li>
+<li><p><strong>MULTIPLE VIDEO</strong>: Use this menu to create a data table
+visualization for every video in your project. After clicking the
+<code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">multiple</span> <span class="pre">videos</span></code> button. You can follow the progress in
+the main SimBA terminal window. Once complete, one new video
+and/or frames folder for every input video will be saved in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/live_data_table</span></code> directory.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+<section id="merging-concatenating-videos">
+<h3>MERGING (CONCATENATING VIDEOS)<a class="headerlink" href="#merging-concatenating-videos" title="Permalink to this heading"></a></h3>
+<p>Next, we may want to merge (concatenate) several of the videos we have
+created in the prior steps into a single video file. To do this, click
+the <code class="docutils literal notranslate"><span class="pre">MERGE</span> <span class="pre">FRAMES</span></code> button in the [VISUALIZATIONS] tab, and you should
+see this pop up to the left:</p>
+<a class="reference internal image-reference" href="../_images/merge_frames.png"><img alt="../_images/merge_frames.png" class="align-center" src="../_images/merge_frames.png" style="width: 800px;" /></a>
+<p>Begin by selecting how many videos you want to concatenate together in
+the <code class="docutils literal notranslate"><span class="pre">VIDEOS</span> <span class="pre">#</span></code> drop-down menu and click <code class="docutils literal notranslate"><span class="pre">SELECT</span></code>. A table, with one
+row representing each of the videos, will show up titled
+<code class="docutils literal notranslate"><span class="pre">VIDEO</span> <span class="pre">PATHS</span></code>. Here, click the <code class="docutils literal notranslate"><span class="pre">BROWSE</span> <span class="pre">FILE</span></code> button and select the
+videos that you want to merge into a single video.</p>
+<p>Next, in the <code class="docutils literal notranslate"><span class="pre">JOIN</span> <span class="pre">TYPE</span></code> sub-menu, we need to select how to join the
+videos together, and we have 4 options:</p>
+<ul class="simple">
+<li><p>MOSAIC: Creates two rows with half of your choosen videos in each
+row. If you have an unequal number of videos you want to concatenate,
+then the bottom row will get an additional blank space.</p></li>
+<li><p>VERTICAL: Creates a single column concatenation with the selected
+videos.</p></li>
+<li><p>HORIZONTAL: Creates a single row concatenation with the selected
+videos.</p></li>
+<li><p>MIXED MOSAIC: First creates two rows with half of your choosen videos
+in each row. The video selected in the <code class="docutils literal notranslate"><span class="pre">Video</span> <span class="pre">1</span></code> path is
+concatenated to the left of the two rows.</p></li>
+</ul>
+<p>Finally, we need to choose the resolution of the videos in the
+<code class="docutils literal notranslate"><span class="pre">Resolution</span> <span class="pre">width</span></code> and the <code class="docutils literal notranslate"><span class="pre">Resolution</span> <span class="pre">height</span></code> drop-down videos.
+<strong>If choosing the MOSAIC, , VERTICAL, or horizontal join type, this is
+the resolution of each panel video in the output video. If choosing
+MIXED MOSAIC, then this is the resolution of the smaller videos in the
+panel (to the right)</strong>.</p>
+<p>After clicking <code class="docutils literal notranslate"><span class="pre">RUN</span></code>, you can follow the progress in the main SimBA
+terminal and the OS terminal. Once complete, a new output video with a
+date-time stamp in the filename is saved in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/merged</span></code> directory of your SimBA project.</p>
+<p>Go to <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario3.md">Scenario
+3</a>
+to read about how to update a classifier with further annotated data.</p>
+<p>Go to <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4.md">Scenario
+4</a>
+to read about how to analyze new experimental data with a previously
+started project.</p>
+<p>Author <a class="reference external" href="https://github.com/sronilsson">Simon N</a></p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="scenario_1.html" class="btn btn-neutral float-left" title="Scenario 1 walkthrough" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="scenario_3.html" class="btn btn-neutral float-right" title="Scenario 3 walkthrough" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

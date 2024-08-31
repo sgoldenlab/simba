@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Regions of Interest (ROIs) in SimBA &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Calculating forward-spike time tiling coefficents in SimBA" href="FSTTC.html" />
+    <link rel="prev" title="Tutorials" href="../tutorials.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SimBA
+              <img src="../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Regions of Interest (ROIs) in SimBA</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#before-analyzing-rois-in-simba">Before analyzing ROIs in SimBA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-1-defining-rois-in-simba">Part 1. Defining ROIs in SimBA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-2-the-region-of-interest-settings-menu">Part 2: The “Region of Interest Settings” menu</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#video-information">Video Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#change-image">Change image</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#new-shape">New shape</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shape-type">Shape type</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shape-attributes">Shape attributes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shape-name">Shape name</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#draw-shape">Draw shape</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#shape-manipulations">Shape manipulations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#deleting-rois">Deleting ROIs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#duplicating-rois">Duplicating ROIs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changing-roi-locations">Changing ROI locations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changing-the-shape-of-the-roi">Changing the shape of the ROI</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#aligning-rois">Aligning ROIs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#change-roi-attributes">Change ROI attributes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#apply-shapes-from-another-video">Apply shapes from another video</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#show-shape-size-information">Show shape size information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#delete-all-roi-definitions-in-your-simba-project">Delete all ROI definitions in your SimBA project</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#next-steps">Next steps</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="FSTTC.html">Calculating forward-spike time tiling coefficents in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_subsets.html">Feature family sub-sets in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_defined_feature_class.html">User-defined ‘feature extraction’ scripts in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kleinberg_filter.html">Kleinberg behavior classification smoothing in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="anchored_rois.html">Animal-anchored ROIs (bounding-boxes) in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SHAP.html">Model explainability and calculating feature SHAP values in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="directionality_between_animals.html">Who is looking at who: calculate “directionality” between animals in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classifier_validation.html">Post-classification Validation (detecting false-positives)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cue_lights.html">Cue Light Analysis in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi_animal_pose.html">Using multi-animal pose-estimation data in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="process_videos.html">Batch Video Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">SimBA Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_user_defined_pose_config.html">User-defined pose-configurations in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html">Video processing tools in SimBA</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">Regions of Interest (ROIs) in SimBA</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_rst/roi.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="regions-of-interest-rois-in-simba">
+<h1>Regions of Interest (ROIs) in SimBA<a class="headerlink" href="#regions-of-interest-rois-in-simba" title="Permalink to this heading"></a></h1>
+<a class="reference internal image-reference" href="../_images/landing3.png"><img alt="../_images/landing3.png" class="align-center" src="../_images/landing3.png" style="width: 800px;" /></a>
+<p>The SimBA region of interest (ROI) interface allows users to define and
+draw ROIs on videos. ROI data can be used to calculate basic descriptive
+statistics based on animals movements and locations such as:</p>
+<ul class="simple">
+<li><p>How much time the animals have spent in different ROIs.</p></li>
+<li><p>How many times the animals have entered different ROIs.</p></li>
+<li><p>The distance animals have moved in the different ROIs.</p></li>
+<li><p>Calculate how animals have engaged in different classified behaviors
+in each ROI. etc….</p></li>
+</ul>
+<p>Furthermore, the ROI data can be used to build potentially valuable,
+additional, features for random forest predictive classifiers. Such
+features can be used to generate a machine model that classify behaviors
+that depend on the spatial location of body parts in relation to the
+ROIs. <strong>CAUTION</strong>: If spatial locations are irrelevant for the behaviour
+being classified, then such features should <em>not</em> be included in the
+machine model generation as they just only introduce noise.</p>
+<section id="before-analyzing-rois-in-simba">
+<h2>Before analyzing ROIs in SimBA<a class="headerlink" href="#before-analyzing-rois-in-simba" title="Permalink to this heading"></a></h2>
+<p>To analyze ROI data in SimBA (for descriptive statistics, machine
+learning features, or both descriptive statistics and machine learning
+features) the tracking data <strong>first</strong> has to be processed the <strong>up-to
+and including the Outlier correction step described in</strong> <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction">Part 2 - Step
+4 - Correcting
+outliers</a>.
+Thus, before proceeding to calculate ROI based measures, you should have
+one CSV file for each of the videos in your project located within the
+<code class="docutils literal notranslate"><span class="pre">project_folder\csv\outlier_corrected_movement_location</span></code> sub-directory
+of your SimBA project.</p>
+<p>Specifically, for working with ROIs in SimBA, begin by (i) <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-2-import-videos-into-project-folder">Importing
+your videos to your
+project</a>,
+(ii) <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-import-dlc-tracking-data">Import the tracking data and relevant videos to your
+project</a>,
+(iii) <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters">Set the video
+parameters</a>,
+and lastly (iv) <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction">Correct
+outliers</a>
+(or click to indicate that you want to <em>Skip outlier correction</em> as
+detailed in the Correct outliers tutorial)</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>A short explanation on what is meant by “using ROI data as features
+for random forest classifiers”** When ROIs have been drawn in SimBA,
+then we can calculate several metrics that goes beyond the
+coordinates of the different body-parts from pose-estimation. For
+example - for each frame of the video - we can calculate the distance
+between the different body-parts and the different ROIs, or if the
+animal is inside or outside the ROIs. In some instances (depending on
+which body parts are tracked), we can also calculate if the animal is
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data">directing towards the
+ROIs</a>
+(see below for more information). These measures can be used to
+calculate several further features such as the percentage of the
+session, up to and including the any frame, the animal has spent
+within a specific ROI. These and other ROI-based features could be
+useful additions for classifying behaviors in certain scenarios.</p>
+</div>
+</section>
+<section id="part-1-defining-rois-in-simba">
+<h2>Part 1. Defining ROIs in SimBA<a class="headerlink" href="#part-1-defining-rois-in-simba" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>In the main SimBA console window, begin loading your project by
+clicking on <code class="docutils literal notranslate"><span class="pre">File</span></code> and <code class="docutils literal notranslate"><span class="pre">Load</span> <span class="pre">project</span></code>. In the <strong>[Load Project]</strong>
+tab, click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code> and select the <code class="docutils literal notranslate"><span class="pre">project_config.ini</span></code>
+that belongs to your project.</p></li>
+<li><p>Navigate to the <strong>ROI</strong> tab, and click the <code class="docutils literal notranslate"><span class="pre">Define</span> <span class="pre">ROIs</span></code> button, and the following table will pop open.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/table.png"><img alt="../_images/table.png" class="align-center" src="../_images/table.png" style="width: 800px;" /></a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you have ROIs on some or all the videos in your project, and
+want to delete your work and start from scratch, use the
+<code class="docutils literal notranslate"><span class="pre">Delete</span> <span class="pre">all</span> <span class="pre">ROIs</span></code> button. More info at <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#delete-all-roi-definitions-in-your-simba-project">the
+end</a>
+of this tutorial.</p>
+</div>
+<p>This table contain one row for each of the videos in the project. Each
+video in the project has three buttons associated with it: <strong>Draw,
+Reset,</strong> and <strong>Apply to all</strong>. The functions associated with each button
+is described in detail below. In brief:</p>
+<ul class="simple">
+<li><p>The <strong>Draw</strong> button allows you to start to draw ROI shapes on the
+specific video. If drawings already exist for the specific video,
+then the <strong>Draw</strong> buttons opens an interface where you can move,
+re-define, or add ROI shapes on the video.</p></li>
+<li><p>The <strong>Reset</strong> button deletes any ROIs made on the specific video and
+allows you to restart the ROI drawings from scratch by next clicking
+on the <strong>Draw</strong> button.</p></li>
+<li><p>The <strong>Apply to all</strong> buttons copies the ROI drawing made on the
+specific video and replicates it on all other videos in the project.
+If a drawing has been applied to all videos videos in the project by
+clicking on the <strong>Apply to all</strong> button, then the shapes for any
+specific video can be moved or re-defined (and new ROI shapes can be
+added) by clicking on the <strong>Draw</strong> button.</p></li>
+</ul>
+<ol class="arabic simple" start="6">
+<li><p>To begin to draw your ROI shapes, click on the <strong>Draw</strong> button for
+the first video in the table. Once clicked, two windows will pop up
+that look like this:</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/ROI_img_1.png"><img alt="../_images/ROI_img_1.png" class="align-center" src="../_images/ROI_img_1.png" style="width: 800px;" /></a>
+<p>The left window (titled <em>Define shape</em>) will display the first frame of
+the video. The right window (titled <em>Region of Interest Settings</em>) will
+contain information, buttons and entry-boxes for creating and
+manpulating your ROI shapes, and we will go through their function in
+detail below.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The aesthetics of the menus might look slightly different on
+your computer (this tutorial was written using MacOS). The functions
+however are the same regardless of operating system.</p>
+</div>
+</section>
+<section id="part-2-the-region-of-interest-settings-menu">
+<h2>Part 2: The “Region of Interest Settings” menu<a class="headerlink" href="#part-2-the-region-of-interest-settings-menu" title="Permalink to this heading"></a></h2>
+<section id="video-information">
+<h3>Video Information<a class="headerlink" href="#video-information" title="Permalink to this heading"></a></h3>
+<p>The first part of the “Region of Interest Settings” menu is titled
+<em>Video Information</em> and is useful for general troubleshooting. This menu
+displays the name of the current video, the format of the video, its
+frame rate, and the frame number and the timestamp of the frame that is
+being displayed in the left window.</p>
+</section>
+<section id="change-image">
+<h3>Change image<a class="headerlink" href="#change-image" title="Permalink to this heading"></a></h3>
+<p>Occationally, the first frame of the video isn’t suitable for defining
+your ROIs and you’d like to use a different frame while drawing.
+Alternatively, you might want to check how your ROIs look in a different
+frame of the video. To manipulate the frame being displayed, us the
+buttons in the <em>Change image</em> menu (see gif below):</p>
+<ul class="simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">+1s</span></code> to display a frame one second later in the video
+than the frame currently being displayed.</p></li>
+<li><p>Conversely, clicking on <code class="docutils literal notranslate"><span class="pre">-1s</span></code> will display a frame one second
+earlier in the video than the frame currently displayed.</p></li>
+<li><p>If you need move a custom distance forward in the video, then enter
+the number of seconds you want to move forward in the
+<code class="docutils literal notranslate"><span class="pre">Seconds</span> <span class="pre">forward</span></code> entry box, and then click on the <code class="docutils literal notranslate"><span class="pre">Move</span></code> button.</p></li>
+<li><p>If you want to display the first frame of the video, click on the
+<code class="docutils literal notranslate"><span class="pre">Reset</span> <span class="pre">first</span> <span class="pre">frame</span></code> button.</p></li>
+</ul>
+<a class="reference internal image-reference" href="../_images/change_frame.gif"><img alt="../_images/change_frame.gif" class="align-center" src="../_images/change_frame.gif" style="width: 1500px;" /></a>
+</section>
+<section id="new-shape">
+<h3>New shape<a class="headerlink" href="#new-shape" title="Permalink to this heading"></a></h3>
+<p>The next menu is used to create new ROI shapes and contains three
+sub-menus (<code class="docutils literal notranslate"><span class="pre">Shape</span> <span class="pre">type</span></code>, <code class="docutils literal notranslate"><span class="pre">Shape</span> <span class="pre">attributes</span></code>, and <code class="docutils literal notranslate"><span class="pre">Shape</span> <span class="pre">name</span></code>)</p>
+</section>
+<section id="shape-type">
+<h3>Shape type<a class="headerlink" href="#shape-type" title="Permalink to this heading"></a></h3>
+<p>To begin creating a new ROI, start by selecting its type. SimBA supports
+three shape types - rectangles, circles, and polygons. Select the shape
+type you want to draw by clicking the appropriate button.</p>
+</section>
+<section id="shape-attributes">
+<h3>Shape attributes<a class="headerlink" href="#shape-attributes" title="Permalink to this heading"></a></h3>
+<p>Next, once you have selected the <code class="docutils literal notranslate"><span class="pre">Shape</span> <span class="pre">type</span></code>, you can pick a few of
+its attributes (or go ahead with the default values). Users drawing ROIs
+in SimBA are often working in a wide variety of video and monitor
+resolutions and are sometimes drawing relatively complex geometries
+involving many shapes. The options in this menu can help make shapes
+visible, distinguable and aligned while drawing. SimBA allowes the user
+to set three different <em>shape attributes</em> (if you want to change these
+attributes later, after drawing your ROI shape, you can - more info
+below):</p>
+<ul class="simple">
+<li><p><strong>Shape thickness</strong>: This dropdown menu controls the thickness of the
+lines in the ROIs (see the top of the image below). If you select a
+higher value in the <code class="docutils literal notranslate"><span class="pre">Shape</span> <span class="pre">thickness</span></code> dropdown menu, then the lines
+of your ROI will be thicker.</p></li>
+<li><p><strong>Ear tag size</strong>: Each shape that you draw will have <em>ear tags</em> (more
+info below). These tags can be clicked on to move shapes, align
+shapes, or manipulate the dimensions of the shapes. In this dropdown
+menu, select the size that the ear-tags of your ROI should have (see
+the bottom of the image below). If you select a higher value in the
+<code class="docutils literal notranslate"><span class="pre">Ear</span> <span class="pre">tag</span> <span class="pre">size</span></code> dropdown, then the ear-tags of the ROI will be
+bigger.</p></li>
+<li><p><strong>Shape color</strong>: Each shape that you draw will have a color. From the
+dropdown, select the color that your ROI should have.</p></li>
+</ul>
+<a class="reference internal image-reference" href="../_images/roi_attributes.png"><img alt="../_images/roi_attributes.png" class="align-center" src="../_images/roi_attributes.png" style="width: 800px;" /></a>
+</section>
+<section id="shape-name">
+<h3>Shape name<a class="headerlink" href="#shape-name" title="Permalink to this heading"></a></h3>
+<p>Each shape in SimBA has a name. In this menu, enter the name of your
+shape as a string (e.g., <code class="docutils literal notranslate"><span class="pre">bottom</span> <span class="pre">left</span> <span class="pre">corner</span></code>, or <code class="docutils literal notranslate"><span class="pre">center</span></code> etc..).</p>
+</section>
+<section id="draw-shape">
+<h3>Draw shape<a class="headerlink" href="#draw-shape" title="Permalink to this heading"></a></h3>
+<p>Once you have defined your shape attributes, it is time to draw it. The
+methods for drawing the three different shape types (<code class="docutils literal notranslate"><span class="pre">Rectangle</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Circle</span></code> and <code class="docutils literal notranslate"><span class="pre">Polygon</span></code>) is slightly different from each other and
+detailed below. However, regardless of the shape type you are currently
+drawing, begin by clicking on <code class="docutils literal notranslate"><span class="pre">Draw</span></code>.</p>
+<section id="rectangle">
+<h4>Rectangle<a class="headerlink" href="#rectangle" title="Permalink to this heading"></a></h4>
+<p>To draw a rectangle, click and hold the left mouse button at the top
+left corner of your rectangle and drag the mouse to the bottom right
+corner of the rectangle. If you’re unhappy with your rectangle, start to
+draw the rectangle again by holding the left mouse button at the top
+left corner of your, new, revised, rectangle. The previous rectangle
+will be automatically discarded. When you are happy with your rectangle,
+<strong>press the keyboard ``ESC`` button</strong> to save your rectangle.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The rectangle will remain blue <em>while</em> you drawing it. After
+you hit <code class="docutils literal notranslate"><span class="pre">ESC</span></code>, the rectangle will take the color you picked in the
+<em>Shape color attribute</em> dropdown menu above.</p>
+</div>
+<a class="reference internal image-reference" href="../_images/draw_rectangle.gif"><img alt="../_images/draw_rectangle.gif" class="align-center" src="../_images/draw_rectangle.gif" style="width: 1000px;" /></a>
+</section>
+<section id="circle">
+<h4>Circle<a class="headerlink" href="#circle" title="Permalink to this heading"></a></h4>
+<p>Begin by left mouse clicking on the image where you would like the
+center of the circle to be. You should see a small filled circle appear
+where you clicked, with the color selected in the <em>Shape color
+attribute</em> dropdown menu. This circle marks the center location of your
+circle. Next, left click on the image where you would like the outer
+bound of the circle to be. You should now see your entire circle ROI.</p>
+<a class="reference internal image-reference" href="../_images/draw_circle.gif"><img alt="../_images/draw_circle.gif" class="align-center" src="../_images/draw_circle.gif" style="width: 1000px;" /></a>
+</section>
+<section id="polygon">
+<h4>Polygon<a class="headerlink" href="#polygon" title="Permalink to this heading"></a></h4>
+<p>Left mouse click on at least three different locations in the image that
+defines the outer bounds of your polygon. You should see a small filled
+circle appear where you clicked, marking the locations of the polygons
+outer bounds. When you are happy with your polygons outer bounds,
+<strong>press the keyboard ``ESC`` button</strong> to save your polygon. After you
+press keyboard <code class="docutils literal notranslate"><span class="pre">ESC</span></code> button, the polygon with its connecting lines
+should appear.</p>
+<a class="reference internal image-reference" href="../_images/draw_polygon.gif"><img alt="../_images/draw_polygon.gif" class="align-center" src="../_images/draw_polygon.gif" style="width: 1000px;" /></a>
+</section>
+</section>
+</section>
+<section id="shape-manipulations">
+<h2>Shape manipulations<a class="headerlink" href="#shape-manipulations" title="Permalink to this heading"></a></h2>
+<p>SimBA allows several forms of shape manipulations that are described in
+detail below, this includes:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#deleting-rois">Deleting
+ROIs</a>
+- allows you to delete all ROIs, or single user-defined ROIs.</p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#duplicating-rois">Duplicating
+ROIs</a>
+- allows you to duplicate already-drawn ROIs.</p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#changing-roi-locations">Change ROI
+location</a>
+- allows you to move ROIs to different locations.</p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#changing-the-shape-of-the-roi">Change the shape of
+ROIs</a>
+- allows you to change the width and/or hight of a rectangle, radius
+of a circle, or the locations of the outer bounds of a polygon.</p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#aligning-rois">Aligning
+ROIs</a>
+- allows you to move ROIs while ensuring that they are completely
+aligned with other ROIs in the image.</p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#change-roi-attributes">Change ROI
+attributes</a>
+- allows you to change the name, color or other attributes of an
+already created ROI.</p></li>
+</ul>
+</section>
+<section id="deleting-rois">
+<h2>Deleting ROIs<a class="headerlink" href="#deleting-rois" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>To delete all drawn ROIs, click on <code class="docutils literal notranslate"><span class="pre">Delete</span> <span class="pre">ALL</span></code> in the <code class="docutils literal notranslate"><span class="pre">Draw</span></code>
+sub-menu.</p></li>
+</ul>
+<a class="reference internal image-reference" href="../_images/delete_all_shapes.gif"><img alt="../_images/delete_all_shapes.gif" class="align-center" src="../_images/delete_all_shapes.gif" style="width: 1000px;" /></a>
+<ul class="simple">
+<li><p>To delete a specific ROI, first use the <code class="docutils literal notranslate"><span class="pre">Select</span> <span class="pre">ROI</span></code> dropdown menu
+in the <code class="docutils literal notranslate"><span class="pre">Draw</span></code> sub-menu to select the ROI you wish to delete. Next,
+click on the <code class="docutils literal notranslate"><span class="pre">Delete</span> <span class="pre">ROI</span></code> button.</p></li>
+</ul>
+<a class="reference internal image-reference" href="../_images/delete_specific_shape.gif"><img alt="../_images/delete_specific_shape.gif" class="align-center" src="../_images/delete_specific_shape.gif" style="width: 1000px;" /></a>
+</section>
+<section id="duplicating-rois">
+<h2>Duplicating ROIs<a class="headerlink" href="#duplicating-rois" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>To duplicate an already-draw ROI, first use the <code class="docutils literal notranslate"><span class="pre">Select</span> <span class="pre">ROI</span></code>
+dropdown menu in the <code class="docutils literal notranslate"><span class="pre">Draw</span></code> sub-menu to select the ROI you wish to
+duplicate. Next, click on the <code class="docutils literal notranslate"><span class="pre">Duplicate</span> <span class="pre">ROI</span></code> button. A new ROI,
+with the same dimensions and attributes as the ROI selected in the
+<code class="docutils literal notranslate"><span class="pre">Select</span> <span class="pre">ROI</span></code> dropdown menu, should appear in the frame near the
+original ROI.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/duplicate_shape.gif"><img alt="../_images/duplicate_shape.gif" class="align-center" src="../_images/duplicate_shape.gif" style="width: 1000px;" /></a>
+<ol class="arabic simple" start="2">
+<li><p>The first duplicated ROI will inherit the name of the original ROI
+with <code class="docutils literal notranslate"><span class="pre">_copy_1</span></code> appended (… the second duplicated ROI will inherit
+the name of the original ROI with <code class="docutils literal notranslate"><span class="pre">_copy_2</span></code> appended etc. Thus, if
+you look in the <code class="docutils literal notranslate"><span class="pre">Select</span> <span class="pre">ROI</span></code> dropdown menu, you should see a new
+ROI with a name in this format:
+<code class="docutils literal notranslate"><span class="pre">My</span> <span class="pre">selected</span> <span class="pre">shape:</span> <span class="pre">MyShapeName_copy_1</span></code>. To change this name,
+and/or other attribute belonging to this ROI, see the <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#change-roi-attributes">Change ROI
+attributes</a>
+below.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/duplicate_dropdown.png"><img alt="../_images/duplicate_dropdown.png" class="align-center" src="../_images/duplicate_dropdown.png" style="width: 1000px;" /></a>
+</section>
+<section id="changing-roi-locations">
+<h2>Changing ROI locations<a class="headerlink" href="#changing-roi-locations" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>To change the location of an ROI, begin by clicking the
+<code class="docutils literal notranslate"><span class="pre">Move</span> <span class="pre">shape</span></code> button in the <code class="docutils literal notranslate"><span class="pre">Interaction</span></code> sub-menu. Once clicked,
+the <code class="docutils literal notranslate"><span class="pre">ear</span> <span class="pre">tags</span></code> of each shape will be displayed in the left
+<code class="docutils literal notranslate"><span class="pre">Define</span> <span class="pre">shape</span></code> frame window. Rectangles will have 9 ear tags,
+circles have 2 ear-tags, and polygons have as many ear-tags as there
+are user-defined outer bounds (plus a <strong>center</strong> ear tag).</p></li>
+<li><p>Next, left mouse click on the <strong>center</strong> ear tag of the ROI you wish
+to move. You should see the entire ROI shape changing its color to
+<strong>grey</strong> marking that it has been selected.</p></li>
+<li><p>Next, left mouse click at the new location the where you want your
+ROI to be located. Once complete, you should see your ROI being
+displayed in the new location. If you want to move a second ROI
+shape, go ahead and click on <code class="docutils literal notranslate"><span class="pre">Move</span> <span class="pre">shape</span></code> again before clicking on
+the center tag of the second ROI shape.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/move_shapes.gif"><img alt="../_images/move_shapes.gif" class="align-center" src="../_images/move_shapes.gif" style="width: 1000px;" /></a>
+</section>
+<section id="changing-the-shape-of-the-roi">
+<h2>Changing the shape of the ROI<a class="headerlink" href="#changing-the-shape-of-the-roi" title="Permalink to this heading"></a></h2>
+<ol class="arabic">
+<li><p>To change the shape of an ROI, begin by clicking the <code class="docutils literal notranslate"><span class="pre">Move</span> <span class="pre">shape</span></code>
+button in the <code class="docutils literal notranslate"><span class="pre">Interaction</span></code> sub-menu. Once clicked, the
+<code class="docutils literal notranslate"><span class="pre">ear</span> <span class="pre">tags</span></code> of each shape will be displayed in the frame window.
+Again, rectangles will have 9 ear tags, circles have 2 ear-tags, and
+polygons have as many ear-tags as there are user-defined outer bounds
+(plus a center ear tag).</p></li>
+<li><p>Next, left mouse-click on the ear-tag you wish to use to manipulate
+the ROI. Once you left click on the ear-tag, the part of the ROI
+shape you are manipulating should change its color to grey. Different
+ROI ear-tags will help you to manipulate different parts of the ROI.
+For example:</p>
+<p><em>Rectangles</em>:</p>
+<ul class="simple">
+<li><p>Clicking on the left middle ear-tag of a rectangle allows you to
+control the location of the left border or the rectangle.</p></li>
+<li><p>Clicking on the top-left corner ear-tag of a rectangle allows you
+to control the top border and left border of the rectangle.</p></li>
+<li><p>Clicking on the bottom middle ear-tag of a rectangle allows you to
+control the bottom border or the rectangle.</p></li>
+</ul>
+<p>Circles:</p>
+<ul class="simple">
+<li><p>Clicking on the left border ear-tag of a circle allows you to
+control the radius of the circle.</p></li>
+</ul>
+<p>Polygon:</p>
+<ul class="simple">
+<li><p>Clicking on any of the outer bounds of the polygon allows you to
+control the location of the outer bound in the polygon (i.e.,
+control the two lines connected to the clicked-on ear-tag).</p></li>
+</ul>
+</li>
+<li><p>After selecting an ear-tag, left mouse-click at the location where
+you want the parts you are manipulating to be located. Once you have
+clicked on the new location, the new ROI shape should be displayed.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/change_shapes.gif"><img alt="../_images/change_shapes.gif" class="align-center" src="../_images/change_shapes.gif" style="width: 1000px;" /></a>
+</section>
+<section id="aligning-rois">
+<h2>Aligning ROIs<a class="headerlink" href="#aligning-rois" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>To align two ROIs, begin by clicking the <code class="docutils literal notranslate"><span class="pre">Move</span> <span class="pre">shape</span></code> button in the
+<code class="docutils literal notranslate"><span class="pre">Interaction</span></code> sub-menu. Once clicked, the <code class="docutils literal notranslate"><span class="pre">ear</span> <span class="pre">tags</span></code> of each
+shape will be displayed in the frame window. Again, rectangles will
+have 9 ear tags, circles have 2 ear-tags, and polygons have as many
+ear-tags as there are user-defined outer bounds (plus a center ear
+tag).</p></li>
+<li><p>Next, left mouse-click on the ear-tag you wish to move and make
+in-alignment with another ROIs ear-tag. Once you left-click on the
+ear-tag, a successful selection will be highlighted by the ear-tag
+and its connected lines turning grey.</p></li>
+<li><p>Next, left mouse-click on the ear-tag of a second ROI representing
+the line with which you want to align the ROI you selected in
+<code class="docutils literal notranslate"><span class="pre">Step</span> <span class="pre">2</span></code> above.</p></li>
+</ol>
+<blockquote>
+<div><p>Note: If you are aligning a <strong>Rectangle or Circle</strong> with a second
+ROI, then the entire shape will move and the coordinates of the
+ear-tag selected in <code class="docutils literal notranslate"><span class="pre">Step</span> <span class="pre">2</span></code> will inherit the same coordinates as
+the ear-tag selected in <code class="docutils literal notranslate"><span class="pre">Step</span> <span class="pre">3</span></code>. If you are aligning a <strong>Polygon</strong>
+with a second ROI, then only the the ear-tag selected in <code class="docutils literal notranslate"><span class="pre">Step</span> <span class="pre">2</span></code>
+will move and inherit the same coordinates as the ear-tag selected in
+<code class="docutils literal notranslate"><span class="pre">Step</span> <span class="pre">3</span></code>. If you want to align several edges a polygon with edges
+in a second ROI, proceed to repeat <code class="docutils literal notranslate"><span class="pre">Step</span> <span class="pre">2</span></code> and <code class="docutils literal notranslate"><span class="pre">Step</span> <span class="pre">3</span></code> for
+those additional edges.</p>
+</div></blockquote>
+<a class="reference internal image-reference" href="../_images/align_shapes.gif"><img alt="../_images/align_shapes.gif" class="align-center" src="../_images/align_shapes.gif" style="width: 1000px;" /></a>
+</section>
+<section id="change-roi-attributes">
+<h2>Change ROI attributes<a class="headerlink" href="#change-roi-attributes" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>To change the attributes of an already-created ROI, begin by
+selecting the ROI which attributes you want to change in the
+<code class="docutils literal notranslate"><span class="pre">Select</span> <span class="pre">ROI</span></code> drop-down menu. Next, click on <code class="docutils literal notranslate"><span class="pre">Change</span> <span class="pre">ROI</span></code> and a
+new menu window should pop open.</p></li>
+<li><p>To change the ROI name, enter a new name in the <code class="docutils literal notranslate"><span class="pre">Shape</span> <span class="pre">name</span></code> entry
+box. To change the ROI shape thickness, ear-tag size, or shape color,
+use the associated dropdown menus. Once done, click on <code class="docutils literal notranslate"><span class="pre">Save</span></code>. Your
+ROI with new attributes should show in the left frame and the
+<code class="docutils literal notranslate"><span class="pre">Change</span> <span class="pre">ROI</span></code> attributes menu is closed.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/change_shape_attr.gif"><img alt="../_images/change_shape_attr.gif" class="align-center" src="../_images/change_shape_attr.gif" style="width: 1000px;" /></a>
+</section>
+<section id="apply-shapes-from-another-video">
+<h2>Apply shapes from another video<a class="headerlink" href="#apply-shapes-from-another-video" title="Permalink to this heading"></a></h2>
+<p>Sometimes we have created ROIs in one video, saved them, and opened up a
+second video to start drawing new ROIs on this second video. Now we may
+want to replicate the ROIs on the first video on the second video, and
+we can do this with the <code class="docutils literal notranslate"><span class="pre">Apply</span> <span class="pre">shapes</span> <span class="pre">from</span> <span class="pre">another</span> <span class="pre">video</span></code> sub-menu.</p>
+<ol class="arabic simple">
+<li><p>To duplicate the ROI shapes already defined in a different video on
+the current video, navigate to the <code class="docutils literal notranslate"><span class="pre">Select</span> <span class="pre">video</span></code> dropdown menu in
+the <code class="docutils literal notranslate"><span class="pre">Apply</span> <span class="pre">shapes</span> <span class="pre">from</span> <span class="pre">another</span> <span class="pre">video</span></code> menu. This dropdown menu will
+show the videos in your SimBA project that has defined ROIs.</p></li>
+<li><p>In this dropdown menu, select the video which has the ROIs you wish
+to replicate. Once selected, click <code class="docutils literal notranslate"><span class="pre">Apply</span></code>. The ROIs from the video
+in the <code class="docutils literal notranslate"><span class="pre">Select</span> <span class="pre">video</span></code> dropdown menu will appear on the frame.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/apply_shapes_other_video.gif"><img alt="../_images/apply_shapes_other_video.gif" class="align-center" src="../_images/apply_shapes_other_video.gif" style="width: 1000px;" /></a>
+</section>
+<section id="show-shape-size-information">
+<h2>Show shape size information<a class="headerlink" href="#show-shape-size-information" title="Permalink to this heading"></a></h2>
+<p>Sometimes we need some metrics representing the sizes of the ROIs we
+have drawn. We can display this by clicking on the <code class="docutils literal notranslate"><span class="pre">Show</span> <span class="pre">shape</span> <span class="pre">info.</span></code>
+button located to the right in the <code class="docutils literal notranslate"><span class="pre">Shape</span> <span class="pre">interaction</span></code> submenu.</p>
+<ol class="arabic simple">
+<li><p>By clicking the <code class="docutils literal notranslate"><span class="pre">Show</span> <span class="pre">shape</span> <span class="pre">info.</span></code> button, some numbers are
+displayed inside our ROIs:</p></li>
+</ol>
+<p>(i). Three numbers are displayed inside each of your drawn <strong>rectangles,
+representing the length, width and area of the rectangle</strong></p>
+<ol class="lowerroman simple" start="2">
+<li><p>One number is displayed inside each of your drawn <strong>circles,
+representing the area of your circle.</strong></p></li>
+<li><p>One number is displayed inside each of your drawn <strong>polygons,
+representing the area of your polygon.</strong></p></li>
+</ol>
+<ol class="arabic simple" start="2">
+<li><p>When you have clicked the `<code class="docutils literal notranslate"><span class="pre">Show</span> <span class="pre">shape</span> <span class="pre">info.</span></code> button, the text
+of the button toggles to <code class="docutils literal notranslate"><span class="pre">Hide</span> <span class="pre">shape</span> <span class="pre">info.</span></code> Click the button again
+to hide the shape information.</p></li>
+<li><p>The font in which the ROI size information is printed on the image
+might be grainy, too big, or too small, depending on your video
+resolution. If that is the case, navigate to the <code class="docutils literal notranslate"><span class="pre">Preference</span> <span class="pre">menu</span></code>
+and correct the <code class="docutils literal notranslate"><span class="pre">Font</span> <span class="pre">size</span></code> and <code class="docutils literal notranslate"><span class="pre">Font</span> <span class="pre">thickness</span></code> to make the font
+larger or smaller, as in the last half of the gif below.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/shape_info.gif"><img alt="../_images/shape_info.gif" class="align-center" src="../_images/shape_info.gif" style="width: 1000px;" /></a>
+</section>
+<section id="delete-all-roi-definitions-in-your-simba-project">
+<h2>Delete all ROI definitions in your SimBA project<a class="headerlink" href="#delete-all-roi-definitions-in-your-simba-project" title="Permalink to this heading"></a></h2>
+<p>Somtimes we may want to delete all ROI definitions in a SimBA project
+and start from scratch.</p>
+<ol class="arabic simple">
+<li><p>To delete all the ROI definitions in the SimBA projects, click on the
+<code class="docutils literal notranslate"><span class="pre">Delete</span> <span class="pre">all</span> <span class="pre">ROI</span> <span class="pre">definitions</span></code> under the [ROI] tab in the load
+project menu, and the following menu should pop open:</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/delete.png"><img alt="../_images/delete.png" class="align-center" src="../_images/delete.png" style="width: 1000px;" /></a>
+<ol class="arabic simple" start="2">
+<li><p>Click <code class="docutils literal notranslate"><span class="pre">Yes</span></code> to delete all ROI definitions in a SimBA project.</p></li>
+</ol>
+</section>
+<section id="next-steps">
+<h2>Next steps<a class="headerlink" href="#next-steps" title="Permalink to this heading"></a></h2>
+<p>Once your ROI definitions are all defined, close the <code class="docutils literal notranslate"><span class="pre">ROI</span> <span class="pre">table</span></code>,
+<code class="docutils literal notranslate"><span class="pre">Regions</span> <span class="pre">of</span> <span class="pre">Interest</span> <span class="pre">Settings</span></code> and <code class="docutils literal notranslate"><span class="pre">Define</span> <span class="pre">Shape</span></code> windows and head
+back to the [ROI] tab in the load project menu.</p>
+<ul class="simple">
+<li><p>If you want to analyze descriptive statistics of movements in
+relation to your defined ROIs, use the <code class="docutils literal notranslate"><span class="pre">Analyze</span> <span class="pre">ROI</span> <span class="pre">data</span></code> button as
+detailed in <code class="docutils literal notranslate"><span class="pre">Step</span> <span class="pre">2</span></code> in <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-2-analyzing-roi-data">THIS
+TUTORIAL</a>.</p></li>
+<li><p>If you want to create machine learning features using your ROI
+definitions, use the <code class="docutils literal notranslate"><span class="pre">Append</span> <span class="pre">ROI</span> <span class="pre">data</span> <span class="pre">to</span> <span class="pre">features</span></code> in the
+<code class="docutils literal notranslate"><span class="pre">Extract</span> <span class="pre">features</span></code> tab as detailed in <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data">THIS
+TUTORIAL</a></p></li>
+</ul>
+<p>If you have any questions, bug reports or feature requests, please let
+us know by opening a new <a class="reference external" href="https://github.com/sgoldenlab/simba/issues">github
+issue</a> or contact us
+through <a class="reference external" href="https://gitter.im/SimBA-Resource/community">gitter</a>!</p>
+<p>Author <a class="reference external" href="https://github.com/sronilsson">Simon N</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../tutorials.html" class="btn btn-neutral float-left" title="Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="FSTTC.html" class="btn btn-neutral float-right" title="Calculating forward-spike time tiling coefficents in SimBA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.utils.enums &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.utils.enums</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.utils.enums</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pkg_resources</span>
+
+<span class="kn">import</span> <span class="nn">simba</span>
+
+
+<div class="viewcode-block" id="ConfigKey"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.ConfigKey">[docs]</a><span class="k">class</span> <span class="nc">ConfigKey</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">GENERAL_SETTINGS</span> <span class="o">=</span> <span class="s2">&quot;General settings&quot;</span>
+    <span class="n">PROJECT_PATH</span> <span class="o">=</span> <span class="s2">&quot;project_path&quot;</span>
+    <span class="n">SML_SETTINGS</span> <span class="o">=</span> <span class="s2">&quot;SML settings&quot;</span>
+    <span class="n">VIDEO_INFO_CSV</span> <span class="o">=</span> <span class="s2">&quot;video_info.csv&quot;</span>
+    <span class="n">FOLDER_PATH</span> <span class="o">=</span> <span class="s2">&quot;folder_path&quot;</span>
+    <span class="n">FILE_TYPE</span> <span class="o">=</span> <span class="s2">&quot;workflow_file_type&quot;</span>
+    <span class="n">TARGET_CNT</span> <span class="o">=</span> <span class="s2">&quot;no_targets&quot;</span>
+    <span class="n">ANIMAL_CNT</span> <span class="o">=</span> <span class="s2">&quot;animal_no&quot;</span>
+    <span class="n">PROJECT_NAME</span> <span class="o">=</span> <span class="s2">&quot;project_name&quot;</span>
+    <span class="n">OS</span> <span class="o">=</span> <span class="s2">&quot;OS_system&quot;</span>
+    <span class="n">MODEL_DIR</span> <span class="o">=</span> <span class="s2">&quot;model_dir&quot;</span>
+    <span class="n">THRESHOLD_SETTINGS</span> <span class="o">=</span> <span class="s2">&quot;threshold_settings&quot;</span>
+    <span class="n">MIN_BOUT_LENGTH</span> <span class="o">=</span> <span class="s2">&quot;Minimum_bout_lengths&quot;</span>
+    <span class="n">FRAME_SETTINGS</span> <span class="o">=</span> <span class="s2">&quot;Frame settings&quot;</span>
+    <span class="n">LINE_PLOT_SETTINGS</span> <span class="o">=</span> <span class="s2">&quot;Line plot settings&quot;</span>
+    <span class="n">PATH_PLOT_SETTINGS</span> <span class="o">=</span> <span class="s2">&quot;Path plot settings&quot;</span>
+    <span class="n">DISTANCE_PLOT_SETTINGS</span> <span class="o">=</span> <span class="s2">&quot;Distance plot&quot;</span>
+    <span class="n">HEATMAP_SETTINGS</span> <span class="o">=</span> <span class="s2">&quot;Heatmap settings&quot;</span>
+    <span class="n">ROI_SETTINGS</span> <span class="o">=</span> <span class="s2">&quot;ROI settings&quot;</span>
+    <span class="n">DIRECTIONALITY_SETTINGS</span> <span class="o">=</span> <span class="s2">&quot;Directionality settings&quot;</span>
+    <span class="n">BODYPART_DIRECTION_VALUE</span> <span class="o">=</span> <span class="s2">&quot;bodypart_direction&quot;</span>
+    <span class="n">PROBABILITY_THRESHOLD</span> <span class="o">=</span> <span class="s2">&quot;probability_threshold&quot;</span>
+    <span class="n">PROCESS_MOVEMENT_SETTINGS</span> <span class="o">=</span> <span class="s2">&quot;process movements&quot;</span>
+    <span class="n">CREATE_ENSEMBLE_SETTINGS</span> <span class="o">=</span> <span class="s2">&quot;create ensemble settings&quot;</span>
+    <span class="n">VALIDATION_SETTINGS</span> <span class="o">=</span> <span class="s2">&quot;validation/run model&quot;</span>
+    <span class="n">MULTI_ANIMAL_ID_SETTING</span> <span class="o">=</span> <span class="s2">&quot;Multi animal IDs&quot;</span>
+    <span class="n">MULTI_ANIMAL_IDS</span> <span class="o">=</span> <span class="s2">&quot;ID_list&quot;</span>
+    <span class="n">OUTLIER_SETTINGS</span> <span class="o">=</span> <span class="s2">&quot;Outlier settings&quot;</span>
+    <span class="n">POSE_SETTING</span> <span class="o">=</span> <span class="s2">&quot;pose_estimation_body_parts&quot;</span>
+    <span class="n">RF_JOBS</span> <span class="o">=</span> <span class="s2">&quot;RF_n_jobs&quot;</span>
+    <span class="n">VALIDATION_VIDEO</span> <span class="o">=</span> <span class="s2">&quot;generate_validation_video&quot;</span>
+    <span class="n">MOVEMENT_CRITERION</span> <span class="o">=</span> <span class="s2">&quot;movement_criterion&quot;</span>
+    <span class="n">LOCATION_CRITERION</span> <span class="o">=</span> <span class="s2">&quot;location_criterion&quot;</span>
+    <span class="n">ROI_ANIMAL_CNT</span> <span class="o">=</span> <span class="s2">&quot;no_of_animals&quot;</span>
+    <span class="n">DISTANCE_MM</span> <span class="o">=</span> <span class="s2">&quot;distance_mm&quot;</span>
+    <span class="n">SKLEARN_BP_PROB_THRESH</span> <span class="o">=</span> <span class="s2">&quot;bp_threshold_sklearn&quot;</span></div>
+
+
+<div class="viewcode-block" id="Paths"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.Paths">[docs]</a><span class="k">class</span> <span class="nc">Paths</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">INPUT_CSV</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;csv/input_csv/&quot;</span><span class="p">)</span>
+    <span class="n">LINE_PLOT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/line_plot/&quot;</span><span class="p">)</span>
+    <span class="n">VIDEO_INFO</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;logs/video_info.csv&quot;</span><span class="p">)</span>
+    <span class="n">OUTLIER_CORRECTED</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;csv/outlier_corrected_movement_location/&quot;</span><span class="p">)</span>
+    <span class="n">OUTLIER_CORRECTED_MOVEMENT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;csv/outlier_corrected_movement/&quot;</span><span class="p">)</span>
+    <span class="n">MACHINE_RESULTS_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;csv/machine_results/&quot;</span><span class="p">)</span>
+    <span class="n">SKLEARN_RESULTS</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/sklearn_results/&quot;</span><span class="p">)</span>
+    <span class="n">CLUSTER_EXAMPLES</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/cluster_examples/&quot;</span><span class="p">)</span>
+    <span class="n">CLF_VALIDATION_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/classifier_validation/&quot;</span><span class="p">)</span>
+    <span class="n">CLF_DATA_VALIDATION_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;csv/validation/&quot;</span><span class="p">)</span>
+    <span class="n">TEST_PATH</span> <span class="o">=</span> <span class="s2">&quot;/Users/simon/Desktop/envs/simba_dev/simba/&quot;</span>
+    <span class="n">BLOB_POSITION_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;csv/output/blob_positions/&quot;</span><span class="p">)</span>
+    <span class="n">SINGLE_CLF_VALIDATION</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/validation/&quot;</span><span class="p">)</span>
+    <span class="n">INPUT_FRAMES_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/input/&quot;</span><span class="p">)</span>
+    <span class="n">ICON_ASSETS</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;assets/icons/&quot;</span><span class="p">)</span>
+    <span class="n">DATA_TABLE</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/live_data_table/&quot;</span><span class="p">)</span>
+    <span class="n">ROI_FEATURES</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/ROI_features/&quot;</span><span class="p">)</span>
+    <span class="n">ROI_ANALYSIS</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/ROI_analysis/&quot;</span><span class="p">)</span>
+    <span class="n">ANNOTATED_FRAMES_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/annotated_frames/&quot;</span><span class="p">)</span>
+    <span class="n">SPONTANEOUS_ALTERNATION_VIDEOS_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/spontanous_alternation&quot;</span><span class="p">)</span>
+    <span class="n">DIRECTIONALITY_DF_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;logs/directionality_dataframes/&quot;</span><span class="p">)</span>
+    <span class="n">BODY_PART_DIRECTIONALITY_DF_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;logs/body_part_directionality_dataframes/&quot;</span><span class="p">)</span>
+    <span class="n">DIRECTING_ANIMALS_OUTPUT_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/ROI_directionality_visualize/&quot;</span><span class="p">)</span>
+    <span class="n">DIRECTING_BETWEEN_ANIMALS_OUTPUT_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/Directing_animals/&quot;</span><span class="p">)</span>
+    <span class="n">DIRECTING_BETWEEN_ANIMAL_BODY_PART_OUTPUT_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/Body_part_directing_animals/&quot;</span><span class="p">)</span>
+    <span class="n">BP_NAMES</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;logs/measures/pose_configs/bp_names/project_bp_names.csv&quot;</span><span class="p">)</span>
+    <span class="n">SIMBA_BP_CONFIG_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;pose_configurations/bp_names/bp_names.csv&quot;</span><span class="p">)</span>
+    <span class="n">SIMBA_SHAP_CATEGORIES_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
+        <span class="s2">&quot;assets/shap/feature_categories/shap_feature_categories.csv&quot;</span>
+    <span class="p">)</span>
+    <span class="n">SIMBA_FEATURE_EXTRACTION_COL_NAMES_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
+        <span class="s2">&quot;assets/lookups/feature_extraction_headers.csv&quot;</span>
+    <span class="p">)</span>
+    <span class="n">SIMBA_NO_ANIMALS_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;pose_configurations/no_animals/no_animals.csv&quot;</span><span class="p">)</span>
+    <span class="n">SIMBA_SHAP_IMG_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;assets/shap/&quot;</span><span class="p">)</span>
+    <span class="n">SCHEMATICS</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;pose_configurations/schematics/&quot;</span><span class="p">)</span>
+    <span class="n">PROJECT_POSE_CONFIG_NAMES</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
+        <span class="s2">&quot;pose_configurations/configuration_names/pose_config_names.csv&quot;</span>
+    <span class="p">)</span>
+    <span class="n">CONCAT_VIDEOS_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/merged/&quot;</span><span class="p">)</span>
+    <span class="n">GANTT_PLOT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/gantt_plots/&quot;</span><span class="p">)</span>
+    <span class="n">HEATMAP_CLF_LOCATION_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/heatmaps_classifier_locations/&quot;</span><span class="p">)</span>
+    <span class="n">HEATMAP_LOCATION_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/heatmaps_locations/&quot;</span><span class="p">)</span>
+    <span class="n">FRAMES_OUTPUT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/&quot;</span><span class="p">)</span>
+    <span class="n">FEATURES_EXTRACTED_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;csv/features_extracted/&quot;</span><span class="p">)</span>
+    <span class="n">TARGETS_INSERTED_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;csv/targets_inserted/&quot;</span><span class="p">)</span>
+    <span class="n">PATH_PLOT_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/path_plots&quot;</span><span class="p">)</span>
+    <span class="n">ABOUT_ME</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;assets/img/about_me.png&quot;</span><span class="p">)</span>
+    <span class="n">PROBABILITY_PLOTS_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;frames/output/probability_plots/&quot;</span><span class="p">)</span>
+    <span class="n">ROI_DEFINITIONS</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;measures/ROI_definitions.h5&quot;</span><span class="p">)</span>
+    <span class="n">DETAILED_ROI_DATA_DIR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;logs/Detailed_ROI_data/&quot;</span><span class="p">)</span>
+    <span class="n">SHAP_LOGS</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;logs/shap/&quot;</span><span class="p">)</span>
+    <span class="n">SPLASH_PATH_WINDOWS</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;assets/img/splash.png&quot;</span><span class="p">)</span>
+    <span class="n">SPLASH_PATH_LINUX</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;assets/img/splash.PNG&quot;</span><span class="p">)</span>
+    <span class="n">SPLASH_PATH_MOVIE</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;assets/img/splash_2024.mp4&quot;</span><span class="p">)</span>
+    <span class="n">BG_IMG_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;assets/img/bg_2024.png&quot;</span><span class="p">)</span>
+    <span class="n">LOGO_ICON_WINDOWS_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;assets/icons/SimBA_logo_3.ico&quot;</span><span class="p">)</span>
+    <span class="n">LOGO_ICON_DARWIN_PATH</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;assets/icons/SimBA_logo_3.png&quot;</span><span class="p">)</span>
+    <span class="n">UNSUPERVISED_MODEL_NAMES</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;assets/lookups/model_names.parquet&quot;</span><span class="p">)</span>
+    <span class="n">CRITICAL_VALUES</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;simba/assets/lookups/critical_values_05.pickle&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="OS"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.OS">[docs]</a><span class="k">class</span> <span class="nc">OS</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">WINDOWS</span> <span class="o">=</span> <span class="s2">&quot;Windows&quot;</span>
+    <span class="n">LINUX</span> <span class="o">=</span> <span class="s2">&quot;Linux&quot;</span>
+    <span class="n">MAC</span> <span class="o">=</span> <span class="s2">&quot;Darwin&quot;</span>
+    <span class="n">PYTHON_VER</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">major</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">minor</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="FontPaths"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.FontPaths">[docs]</a><span class="k">class</span> <span class="nc">FontPaths</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">POPPINS_REGULAR</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;assets/fonts/Poppins Regular.ttf&quot;</span><span class="p">)</span>
+    <span class="n">POPPINS_BOLD</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;assets/fonts/Poppins Bold.ttf&quot;</span><span class="p">)</span>
+    <span class="n">PLAYWRIGHT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;assets/fonts/Playwrite ES Deco.ttf&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Formats"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.Formats">[docs]</a><span class="k">class</span> <span class="nc">Formats</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">MP4_CODEC</span> <span class="o">=</span> <span class="s2">&quot;mp4v&quot;</span>
+    <span class="n">AVI_CODEC</span> <span class="o">=</span> <span class="s2">&quot;XVID&quot;</span>
+    <span class="n">BATCH_CODEC</span> <span class="o">=</span> <span class="s2">&quot;libx264&quot;</span>
+    <span class="n">NUMERIC_DTYPES</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span>
+    <span class="n">LABELFRAME_HEADER_FORMAT</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Helvetica&quot;</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+    <span class="n">LABELFRAME_HEADER_CLICKABLE_FORMAT</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;Helvetica&quot;</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="s2">&quot;bold&quot;</span><span class="p">,</span> <span class="s2">&quot;underline&quot;</span><span class="p">)</span>
+    <span class="n">LABELFRAME_HEADER_CLICKABLE_COLOR</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;#</span><span class="si">{</span><span class="mi">5</span><span class="si">:</span><span class="s2">02x</span><span class="si">}{</span><span class="mi">99</span><span class="si">:</span><span class="s2">02x</span><span class="si">}{</span><span class="mi">193</span><span class="si">:</span><span class="s2">02x</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">CSV</span> <span class="o">=</span> <span class="s2">&quot;csv&quot;</span>
+    <span class="n">PARQUET</span> <span class="o">=</span> <span class="s2">&quot;parquet&quot;</span>
+    <span class="n">PICKLE</span> <span class="o">=</span> <span class="s2">&quot;pickle&quot;</span>
+    <span class="n">XLXS</span> <span class="o">=</span> <span class="s2">&quot;xlsx&quot;</span>
+    <span class="n">PERIMETER</span> <span class="o">=</span> <span class="s2">&quot;perimeter&quot;</span>
+    <span class="n">AREA</span> <span class="o">=</span> <span class="s2">&quot;area&quot;</span>
+    <span class="n">H5</span> <span class="o">=</span> <span class="s2">&quot;h5&quot;</span>
+    <span class="n">ROOT_WINDOW_SIZE</span> <span class="o">=</span> <span class="s2">&quot;750x750&quot;</span>
+    <span class="n">FONT</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_TRIPLEX</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="n">OS</span><span class="o">.</span><span class="n">MAC</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
+        <span class="n">FONT_REGULAR</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Poppins Regular&#39;</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>
+        <span class="n">FONT_HEADER</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Poppins Regular&#39;</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+        <span class="n">FONT_REGULAR_BOLD</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Poppins Bold&#39;</span><span class="p">,</span> <span class="mi">13</span><span class="p">)</span>
+        <span class="n">FONT_LARGE</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Poppins Regular&#39;</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+        <span class="n">FONT_PLAYWRITE</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Playwrite ES Deco&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="p">(</span><span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="n">OS</span><span class="o">.</span><span class="n">WINDOWS</span><span class="o">.</span><span class="n">value</span><span class="p">):</span>
+        <span class="n">FONT_REGULAR</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Poppins Regular&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="n">FONT_REGULAR_BOLD</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Poppins Bold&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="n">FONT_HEADER</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Poppins Regular&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+        <span class="n">FONT_LARGE</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Poppins Regular&#39;</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+        <span class="n">FONT_PLAYWRITE</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;Playwrite ES Deco&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">FONT_REGULAR</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;DejaVu Sans&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+        <span class="n">FONT_REGULAR_BOLD</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;DejaVu Sans&#39;</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+        <span class="n">FONT_HEADER</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;DejaVu Sans&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+        <span class="n">FONT_LARGE</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;DejaVu Sans&#39;</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="s2">&quot;bold&quot;</span><span class="p">)</span>
+    <span class="n">DLC_NETWORK_FILE_NAMES</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;dlc_resnet50&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dlc_resnet_50&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dlc_dlcrnetms5&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dlc_effnet_b0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dlc_resnet101&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">DLC_FILETYPES</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;skeleton&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;sk.h5&quot;</span><span class="p">,</span> <span class="s2">&quot;sk_filtered.h5&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;box&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;bx.h5&quot;</span><span class="p">,</span> <span class="s2">&quot;bx_filtered.h5&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;ellipse&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;el.h5&quot;</span><span class="p">,</span> <span class="s2">&quot;el_filtered.h5&quot;</span><span class="p">],</span>
+    <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="Options"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.Options">[docs]</a><span class="k">class</span> <span class="nc">Options</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">ROLLING_WINDOW_DIVISORS</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">,</span> <span class="mi">15</span><span class="p">]</span>
+    <span class="n">CLF_MODELS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;RF&quot;</span><span class="p">,</span> <span class="s2">&quot;GBC&quot;</span><span class="p">,</span> <span class="s2">&quot;XGBoost&quot;</span><span class="p">]</span>
+    <span class="n">CLF_MAX_FEATURES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;sqrt&quot;</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="s2">&quot;None&quot;</span><span class="p">]</span>
+    <span class="n">CLF_CRITERION</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;gini&quot;</span><span class="p">,</span> <span class="s2">&quot;entropy&quot;</span><span class="p">]</span>
+    <span class="n">UNDERSAMPLE_OPTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="s2">&quot;random undersample&quot;</span><span class="p">]</span>
+    <span class="n">OVERSAMPLE_OPTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="s2">&quot;SMOTE&quot;</span><span class="p">,</span> <span class="s2">&quot;SMOTEENN&quot;</span><span class="p">]</span>
+    <span class="n">CLASS_WEIGHT_OPTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="s2">&quot;balanced&quot;</span><span class="p">,</span> <span class="s2">&quot;balanced_subsample&quot;</span><span class="p">,</span> <span class="s2">&quot;custom&quot;</span><span class="p">]</span>
+    <span class="n">BUCKET_METHODS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;fd&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;doane&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;scott&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;stone&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;rice&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sturges&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sqrt&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">CLF_TEST_SIZE_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;0.1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;0.2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;0.3&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;0.4&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;0.5&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;0.6&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;0.7&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;0.8&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;0.9&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">PALETTE_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;magma&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;jet&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;inferno&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;plasma&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;gnuplot2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;RdBu&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;winter&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">PALETTE_OPTIONS_CATEGORICAL</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;Pastel1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Pastel2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Paired&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Accent&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Dark2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Set1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Set2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Set3&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tab10&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tab20&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">RESOLUTION_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;320×240&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;640×480&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;720×480&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;800×640&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;960×800&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;1120×960&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;1280×720&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;1980×1080&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">DPI_OPTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">800</span><span class="p">,</span> <span class="mi">1600</span><span class="p">,</span> <span class="mi">3200</span><span class="p">]</span>
+    <span class="n">RESOLUTION_OPTIONS_2</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;AUTO&quot;</span><span class="p">,</span> <span class="mi">240</span><span class="p">,</span> <span class="mi">320</span><span class="p">,</span> <span class="mi">480</span><span class="p">,</span> <span class="mi">640</span><span class="p">,</span> <span class="mi">720</span><span class="p">,</span> <span class="mi">800</span><span class="p">,</span> <span class="mi">960</span><span class="p">,</span> <span class="mi">1120</span><span class="p">,</span> <span class="mi">1080</span><span class="p">,</span> <span class="mi">1980</span><span class="p">]</span>
+    <span class="n">SPEED_OPTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">2.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">))]</span>
+    <span class="n">PERFORM_FLAGS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;True&quot;</span><span class="p">]</span>
+    <span class="n">RUN_OPTIONS_FLAGS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;yes&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;True&quot;</span><span class="p">,</span> <span class="s2">&quot;False&quot;</span><span class="p">,</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">,</span> <span class="s2">&quot;false&quot;</span><span class="p">]</span>
+    <span class="n">SCALER_NAMES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MIN-MAX&quot;</span><span class="p">,</span> <span class="s2">&quot;STANDARD&quot;</span><span class="p">,</span> <span class="s2">&quot;QUANTILE&quot;</span><span class="p">]</span>
+    <span class="n">HEATMAP_SHADING_OPTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;gouraud&quot;</span><span class="p">,</span> <span class="s2">&quot;flat&quot;</span><span class="p">]</span>
+    <span class="n">HEATMAP_BIN_SIZE_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;10×10&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;20×20&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;40×40&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;80×80&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;100×100&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;160×160&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;320×320&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;640×640&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;1280×1280&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">INTERPOLATION_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;Animal(s): Nearest&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Animal(s): Linear&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Animal(s): Quadratic&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Body-parts: Nearest&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Body-parts: Linear&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Body-parts: Quadratic&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">INTERPOLATION_OPTIONS_W_NONE</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;None&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Animal(s): Nearest&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Animal(s): Linear&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Animal(s): Quadratic&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Body-parts: Nearest&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Body-parts: Linear&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Body-parts: Quadratic&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">IMPORT_TYPE_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;CSV (DLC/DeepPoseKit)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;JSON (BENTO)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;H5 (multi-animal DLC)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;SLP (SLEAP)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;CSV (SLEAP)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;H5 (SLEAP)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TRK (multi-animal APT)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;MAT (DANNCE 3D)&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">SMOOTHING_OPTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Gaussian&quot;</span><span class="p">,</span> <span class="s2">&quot;Savitzky Golay&quot;</span><span class="p">]</span>
+    <span class="n">MULTI_DLC_TYPE_IMPORT_OPTION</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;skeleton&quot;</span><span class="p">,</span> <span class="s2">&quot;box&quot;</span><span class="p">,</span> <span class="s2">&quot;ellipse&quot;</span><span class="p">]</span>
+    <span class="n">FEATURE_SUBSET_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;Two-point body-part distances (mm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Within-animal three-point body-part angles (degrees)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Within-animal three-point convex hull perimeters (mm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Within-animal four-point convex hull perimeters (mm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Entire animal convex hull perimeters (mm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Entire animal convex hull area (mm2)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Frame-by-frame body-part movements (mm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Frame-by-frame body-part distances to ROI centers (mm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Frame-by-frame body-parts inside ROIs (Boolean)&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">SMOOTHING_OPTIONS_W_NONE</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;None&quot;</span><span class="p">,</span> <span class="s2">&quot;Gaussian&quot;</span><span class="p">,</span> <span class="s2">&quot;Savitzky Golay&quot;</span><span class="p">]</span>
+    <span class="n">VIDEO_FORMAT_OPTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mp4&quot;</span><span class="p">,</span> <span class="s2">&quot;avi&quot;</span><span class="p">]</span>
+    <span class="n">ALL_VIDEO_FORMAT_OPTIONS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;.avi&quot;</span><span class="p">,</span> <span class="s2">&quot;.mp4&quot;</span><span class="p">,</span> <span class="s2">&quot;.mov&quot;</span><span class="p">,</span> <span class="s2">&quot;.flv&quot;</span><span class="p">,</span> <span class="s2">&quot;.m4v&quot;</span><span class="p">,</span> <span class="s2">&quot;.webm&quot;</span><span class="p">)</span>
+    <span class="n">ALL_IMAGE_FORMAT_OPTIONS</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;.bmp&quot;</span><span class="p">,</span> <span class="s2">&quot;.png&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;.webp&quot;</span><span class="p">)</span>
+    <span class="n">ALL_IMAGE_FORMAT_STR_OPTIONS</span> <span class="o">=</span> <span class="s2">&quot;.bmp .png .jpeg .jpg&quot;</span>
+    <span class="n">ALL_VIDEO_FORMAT_STR_OPTIONS</span> <span class="o">=</span> <span class="s2">&quot;.avi .mp4 .mov .flv .m4v .webm&quot;</span>
+    <span class="n">WORKFLOW_FILE_TYPE_OPTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;parquet&quot;</span><span class="p">]</span>
+    <span class="n">WORKFLOW_FILE_TYPE_STR_OPTIONS</span> <span class="o">=</span> <span class="s2">&quot;.csv .parquet&quot;</span>
+    <span class="n">TRACKING_TYPE_OPTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Classic tracking&quot;</span><span class="p">,</span> <span class="s2">&quot;Multi tracking&quot;</span><span class="p">,</span> <span class="s2">&quot;3D tracking&quot;</span><span class="p">]</span>
+    <span class="n">UNSUPERVISED_FEATURE_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;INCLUDE FEATURE DATA (ORIGINAL)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;INCLUDE FEATURES (SCALED)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;EXCLUDE FEATURE DATA&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">TIMEBINS_MEASURMENT_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;First occurrence (s)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Event count&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Total event duration (s)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Mean event duration (s)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Median event duration (s)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Mean event interval (s)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Median event interval (s)&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">CLF_DESCRIPTIVES_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;Bout count&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Total event duration (s)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Mean event bout duration (s)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Median event bout duration (s)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;First event occurrence (s)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Mean event bout interval duration (s)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Median event bout interval duration (s)&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">CLASSICAL_TRACKING_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;1 animal; 4 body-parts&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;1 animal; 7 body-parts&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;1 animal; 8 body-parts&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;1 animal; 9 body-parts&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;2 animals; 8 body-parts&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;2 animals; 14 body-parts&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;2 animals; 16 body-parts&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;MARS&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">MULTI_ANIMAL_TRACKING_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;Multi-animals; 4 body-parts&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Multi-animals; 7 body-parts&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Multi-animals; 8 body-parts&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;AMBER&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">THREE_DIM_TRACKING_OPTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;3D tracking&quot;</span><span class="p">]</span>
+    <span class="n">TRAIN_TEST_SPLIT</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;FRAMES&quot;</span><span class="p">,</span> <span class="s2">&quot;BOUTS&quot;</span><span class="p">]</span>
+    <span class="n">BOOL_STR_OPTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;TRUE&quot;</span><span class="p">,</span> <span class="s2">&quot;FALSE&quot;</span><span class="p">]</span>
+    <span class="n">GANTT_VALIDATION_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;None&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Gantt chart: final frame only (slightly faster)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Gantt chart: video&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">THIRD_PARTY_ANNOTATION_APPS_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;BORIS&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ETHOVISION&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;OBSERVER&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;SOLOMON&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;DEEPETHOGRAM&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;BENTO&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">THIRD_PARTY_ANNOTATION_ERROR_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;INVALID annotations file data format&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ADDITIONAL third-party behavior detected&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Annotations OVERLAP conflict&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ZERO third-party video behavior annotations found&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Annotations and pose FRAME COUNT conflict&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Annotations EVENT COUNT conflict&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Annotations data file NOT FOUND&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">SCALER_OPTIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;MIN-MAX&quot;</span><span class="p">,</span> <span class="s2">&quot;STANDARD&quot;</span><span class="p">,</span> <span class="s2">&quot;QUANTILE&quot;</span><span class="p">]</span>
+    <span class="n">MIN_MAX_SCALER</span> <span class="o">=</span> <span class="s2">&quot;MIN-MAX&quot;</span>
+    <span class="n">STANDARD_SCALER</span> <span class="o">=</span> <span class="s2">&quot;STANDARD&quot;</span>
+    <span class="n">QUANTILE_SCALER</span> <span class="o">=</span> <span class="s2">&quot;QUANTILE&quot;</span>
+
+    <span class="n">CV2_FONTS</span> <span class="o">=</span> <span class="p">[</span><span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_SIMPLEX</span><span class="p">,</span>
+                 <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_PLAIN</span><span class="p">,</span>
+                 <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_DUPLEX</span><span class="p">,</span>
+                 <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_COMPLEX</span><span class="p">,</span>
+                 <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_TRIPLEX</span><span class="p">,</span>
+                 <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_COMPLEX_SMALL</span><span class="p">,</span>
+                 <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_SCRIPT_SIMPLEX</span><span class="p">,</span>
+                 <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_SCRIPT_COMPLEX</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="TextOptions"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.TextOptions">[docs]</a><span class="k">class</span> <span class="nc">TextOptions</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">FIRST_LINE_SPACING</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="mi">2</span>  <span class="c1"># DISTANCE MULTIPLIER BETWEEN FIRST PRINTED ROW AND THE TOP OF THE IMAGE.</span>
+    <span class="p">)</span>
+    <span class="n">LINE_SPACING</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># DISTANCE MULTIPLIER BETWEEN 2nd AND THIRD, THIRD AND FOURTH ETC. PRINTED ROWS.</span>
+    <span class="n">BORDER_BUFFER_X</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># ADDITIONAL PIXEL BUFFER DISTANCE BETWEEN THE START OF THE IMAGE AND FIRST PRINTED CHARACTER ON X AXIS</span>
+    <span class="n">BORDER_BUFFER_Y</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># ADDITIONAL PIXEL BUFFER DISTANCE BETWEEN THE START OF THE IMAGE AND FIRST PRINTED CHARACTER ON Y AXIS</span>
+    <span class="n">FONT_SCALER</span> <span class="o">=</span> <span class="mf">0.8</span>  <span class="c1"># CONSTANT USED TO SCALE FONT ACCORDING TO RESOLUTION. INCREASING VALUE WILL RESULT IN LARGER TEXT.</span>
+    <span class="n">RESOLUTION_SCALER</span> <span class="o">=</span> <span class="mi">1500</span>  <span class="c1"># CONSTANT USED TO SCALE SPACINGS, FONT, AND RADIUS OF CIRCLES. LARGER NUMBER WILL RESULT IN SMALLER SPACINGS, FONT, AND RADIUS OF CIRCLES.</span>
+    <span class="n">RADIUS_SCALER</span> <span class="o">=</span> <span class="mi">10</span>  <span class="c1"># CONSTANT USED TO SCALE CIRCLES. INCREASING VALUE WILL RESULT IN LARGER CIRCLES.</span>
+    <span class="n">SPACE_SCALER</span> <span class="o">=</span> <span class="mi">25</span>  <span class="c1"># CONSTANT USED TO SCALE SPACE BETWEEN PRINTED ROWS. INCREASING VALUE WILL RESULT IN LARGER PIXEL DISTANCES BETWEEN SEQUENTIAL ROWS.</span>
+    <span class="n">TEXT_THICKNESS</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># THE THICKNESS OR &quot;BOLDNESS&quot; OF THE FONT IN PIXELS.</span>
+    <span class="n">LINE_THICKNESS</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="mi">2</span>  <span class="c1"># THICKNESS OF LINES IN CIRCLES, BOUNDING BOXES AND OTHER GEOMETRIES</span>
+    <span class="p">)</span>
+    <span class="n">COLOR</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="mi">147</span><span class="p">,</span>
+        <span class="mi">20</span><span class="p">,</span>
+        <span class="mi">255</span><span class="p">,</span>
+    <span class="p">)</span>  <span class="c1"># THE COLOR OF THE TEXT IN BGR. (147, 20, 255)  REPRESENT DEEP PINK: TYPICALLY NOT A COLOR IN ANIMAL ARENA.</span>
+    <span class="n">FONT</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_SIMPLEX</span></div>
+
+
+<div class="viewcode-block" id="Defaults"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.Defaults">[docs]</a><span class="k">class</span> <span class="nc">Defaults</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">MAX_TASK_PER_CHILD</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">LARGE_MAX_TASK_PER_CHILD</span> <span class="o">=</span> <span class="mi">1000</span>
+    <span class="n">MAXIMUM_MAX_TASK_PER_CHILD</span> <span class="o">=</span> <span class="mi">8000</span>
+    <span class="n">THREADSAFE_CORE_COUNT</span> <span class="o">=</span> <span class="mi">61</span>
+    <span class="n">CHUNK_SIZE</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">SPLASH_TIME</span> <span class="o">=</span> <span class="mi">2500</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">WELCOME_MSG</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Welcome fellow scientists! </span><span class="se">\n</span><span class="s1"> SimBA v.</span><span class="si">{</span><span class="n">pkg_resources</span><span class="o">.</span><span class="n">get_distribution</span><span class="p">(</span><span class="s2">&quot;simba-uw-tf-dev&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s1"> </span><span class="se">\n</span><span class="s1"> &#39;</span>
+    <span class="k">except</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">DistributionNotFound</span><span class="p">:</span>
+        <span class="n">WELCOME_MSG</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Welcome fellow scientists! </span><span class="se">\n</span><span class="s1"> SimBA v. &quot;dev&quot; </span><span class="se">\n</span><span class="s1"> &#39;</span>
+    <span class="n">BROWSE_FOLDER_BTN_TEXT</span> <span class="o">=</span> <span class="s2">&quot;Browse Folder&quot;</span>
+    <span class="n">BROWSE_FILE_BTN_TEXT</span> <span class="o">=</span> <span class="s2">&quot;Browse File&quot;</span>
+    <span class="n">NO_FILE_SELECTED_TEXT</span> <span class="o">=</span> <span class="s2">&quot;No file selected&quot;</span>
+    <span class="n">STR_SPLIT_DELIMITER</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="TagNames"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.TagNames">[docs]</a><span class="k">class</span> <span class="nc">TagNames</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">GREETING</span> <span class="o">=</span> <span class="s2">&quot;greeting&quot;</span>
+    <span class="n">COMPLETE</span> <span class="o">=</span> <span class="s2">&quot;complete&quot;</span>
+    <span class="n">WARNING</span> <span class="o">=</span> <span class="s2">&quot;warning&quot;</span>
+    <span class="n">ERROR</span> <span class="o">=</span> <span class="s2">&quot;error&quot;</span>
+    <span class="n">TRASH</span> <span class="o">=</span> <span class="s2">&quot;trash&quot;</span>
+    <span class="n">STANDARD</span> <span class="o">=</span> <span class="s2">&quot;standard&quot;</span>
+    <span class="n">CLASS_INIT</span> <span class="o">=</span> <span class="s2">&quot;CLASS_INIT&quot;</span></div>
+
+
+<div class="viewcode-block" id="DirNames"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.DirNames">[docs]</a><span class="k">class</span> <span class="nc">DirNames</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">PROJECT</span> <span class="o">=</span> <span class="s2">&quot;project_folder&quot;</span>
+    <span class="n">MODEL</span> <span class="o">=</span> <span class="s2">&quot;models&quot;</span>
+    <span class="n">CONFIGS</span> <span class="o">=</span> <span class="s2">&quot;configs&quot;</span>
+    <span class="n">CSV</span> <span class="o">=</span> <span class="s2">&quot;csv&quot;</span>
+    <span class="n">FRAMES</span> <span class="o">=</span> <span class="s2">&quot;frames&quot;</span>
+    <span class="n">LOGS</span> <span class="o">=</span> <span class="s2">&quot;logs&quot;</span>
+    <span class="n">MEASURES</span> <span class="o">=</span> <span class="s2">&quot;measures&quot;</span>
+    <span class="n">POSE_CONFIGS</span> <span class="o">=</span> <span class="s2">&quot;pose_configs&quot;</span>
+    <span class="n">BP_NAMES</span> <span class="o">=</span> <span class="s2">&quot;bp_names&quot;</span>
+    <span class="n">VIDEOS</span> <span class="o">=</span> <span class="s2">&quot;videos&quot;</span>
+    <span class="n">FEATURES_EXTRACTED</span> <span class="o">=</span> <span class="s2">&quot;features_extracted&quot;</span>
+    <span class="n">INPUT_CSV</span> <span class="o">=</span> <span class="s2">&quot;input_csv&quot;</span>
+    <span class="n">MACHINE_RESULTS</span> <span class="o">=</span> <span class="s2">&quot;machine_results&quot;</span>
+    <span class="n">OUTLIER_MOVEMENT</span> <span class="o">=</span> <span class="s2">&quot;outlier_corrected_movement&quot;</span>
+    <span class="n">OUTLIER_MOVEMENT_LOCATION</span> <span class="o">=</span> <span class="s2">&quot;outlier_corrected_movement_location&quot;</span>
+    <span class="n">TARGETS_INSERTED</span> <span class="o">=</span> <span class="s2">&quot;targets_inserted&quot;</span>
+    <span class="n">INPUT</span> <span class="o">=</span> <span class="s2">&quot;input&quot;</span>
+    <span class="n">OUTPUT</span> <span class="o">=</span> <span class="s2">&quot;output&quot;</span></div>
+
+
+<div class="viewcode-block" id="Keys"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.Keys">[docs]</a><span class="k">class</span> <span class="nc">Keys</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">ROI_RECTANGLES</span> <span class="o">=</span> <span class="s2">&quot;rectangles&quot;</span>
+    <span class="n">ROI_CIRCLES</span> <span class="o">=</span> <span class="s2">&quot;circleDf&quot;</span>
+    <span class="n">ROI_POLYGONS</span> <span class="o">=</span> <span class="s2">&quot;polygons&quot;</span>
+    <span class="n">DOCUMENTATION</span> <span class="o">=</span> <span class="s2">&quot;documentation&quot;</span>
+    <span class="n">FRAME_COUNT</span> <span class="o">=</span> <span class="s2">&quot;frame_count&quot;</span></div>
+
+
+<div class="viewcode-block" id="UMAPParam"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.UMAPParam">[docs]</a><span class="k">class</span> <span class="nc">UMAPParam</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">N_NEIGHBORS</span> <span class="o">=</span> <span class="s2">&quot;n_neighbors&quot;</span>
+    <span class="n">MIN_DISTANCE</span> <span class="o">=</span> <span class="s2">&quot;min_distance&quot;</span>
+    <span class="n">SPREAD</span> <span class="o">=</span> <span class="s2">&quot;spread&quot;</span>
+    <span class="n">VARIANCE</span> <span class="o">=</span> <span class="s2">&quot;variance&quot;</span>
+    <span class="n">SCALER</span> <span class="o">=</span> <span class="s2">&quot;scaler&quot;</span>
+    <span class="n">HYPERPARAMETERS</span> <span class="o">=</span> <span class="p">[</span><span class="n">N_NEIGHBORS</span><span class="p">,</span> <span class="n">MIN_DISTANCE</span><span class="p">,</span> <span class="n">SPREAD</span><span class="p">,</span> <span class="n">SCALER</span><span class="p">,</span> <span class="n">VARIANCE</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Dtypes"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.Dtypes">[docs]</a><span class="k">class</span> <span class="nc">Dtypes</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">NAN</span> <span class="o">=</span> <span class="s2">&quot;NaN&quot;</span>
+    <span class="n">STR</span> <span class="o">=</span> <span class="s2">&quot;str&quot;</span>
+    <span class="n">INT</span> <span class="o">=</span> <span class="s2">&quot;int&quot;</span>
+    <span class="n">FLOAT</span> <span class="o">=</span> <span class="s2">&quot;float&quot;</span>
+    <span class="n">FOLDER</span> <span class="o">=</span> <span class="s2">&quot;folder_path&quot;</span>
+    <span class="n">NONE</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
+    <span class="n">SQRT</span> <span class="o">=</span> <span class="s2">&quot;sqrt&quot;</span>
+    <span class="n">ENTROPY</span> <span class="o">=</span> <span class="s2">&quot;entropy&quot;</span></div>
+
+
+<div class="viewcode-block" id="Methods"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.Methods">[docs]</a><span class="k">class</span> <span class="nc">Methods</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">USER_DEFINED</span> <span class="o">=</span> <span class="s2">&quot;user_defined&quot;</span>
+    <span class="n">CLASSIC_TRACKING</span> <span class="o">=</span> <span class="s2">&quot;Classic tracking&quot;</span>
+    <span class="n">THREE_D_TRACKING</span> <span class="o">=</span> <span class="s2">&quot;3D tracking&quot;</span>
+    <span class="n">MULTI_TRACKING</span> <span class="o">=</span> <span class="s2">&quot;Multi tracking&quot;</span>
+    <span class="n">CREATE_POSE_CONFIG</span> <span class="o">=</span> <span class="s2">&quot;Create pose config...&quot;</span>
+    <span class="n">RANDOM_UNDERSAMPLE</span> <span class="o">=</span> <span class="s2">&quot;random undersample&quot;</span>
+    <span class="n">SMOTE</span> <span class="o">=</span> <span class="s2">&quot;SMOTE&quot;</span>
+    <span class="n">SMOTEENN</span> <span class="o">=</span> <span class="s2">&quot;SMOTEENN&quot;</span>
+    <span class="n">GAUSSIAN</span> <span class="o">=</span> <span class="s2">&quot;Gaussian&quot;</span>
+    <span class="n">SAVITZKY_GOLAY</span> <span class="o">=</span> <span class="s2">&quot;Savitzky Golay&quot;</span>
+    <span class="n">SPLIT_TYPE_FRAMES</span> <span class="o">=</span> <span class="s2">&quot;FRAMES&quot;</span>
+    <span class="n">SPLIT_TYPE_BOUTS</span> <span class="o">=</span> <span class="s2">&quot;BOUTS&quot;</span>
+    <span class="n">BORIS</span> <span class="o">=</span> <span class="s2">&quot;BORIS&quot;</span>
+    <span class="n">WARNING</span> <span class="o">=</span> <span class="s2">&quot;WARNING&quot;</span>
+    <span class="n">ERROR</span> <span class="o">=</span> <span class="s2">&quot;ERROR&quot;</span>
+    <span class="n">ANOVA</span> <span class="o">=</span> <span class="s2">&quot;ANOVA&quot;</span>
+    <span class="n">INVALID_THIRD_PARTY_APPENDER_FILE</span> <span class="o">=</span> <span class="s2">&quot;INVALID annotations file data format&quot;</span>
+    <span class="n">ADDITIONAL_THIRD_PARTY_CLFS</span> <span class="o">=</span> <span class="s2">&quot;ADDITIONAL third-party behavior detected&quot;</span>
+    <span class="n">ZERO_THIRD_PARTY_VIDEO_ANNOTATIONS</span> <span class="o">=</span> <span class="s2">&quot;ZERO third-party video annotations found&quot;</span>
+    <span class="n">THIRD_PARTY_FPS_CONFLICT</span> <span class="o">=</span> <span class="s2">&quot;Annotations and pose FPS conflict&quot;</span>
+    <span class="n">THIRD_PARTY_EVENT_COUNT_CONFLICT</span> <span class="o">=</span> <span class="s2">&quot;Annotations EVENT COUNT conflict&quot;</span>
+    <span class="n">THIRD_PARTY_EVENT_OVERLAP</span> <span class="o">=</span> <span class="s2">&quot;Annotations OVERLAP inaccuracy&quot;</span>
+    <span class="n">ZERO_THIRD_PARTY_VIDEO_BEHAVIOR_ANNOTATIONS</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;ZERO third-party video behavior annotations found&quot;</span>
+    <span class="p">)</span>
+    <span class="n">THIRD_PARTY_FRAME_COUNT_CONFLICT</span> <span class="o">=</span> <span class="s2">&quot;Annotations and pose FRAME COUNT conflict&quot;</span>
+    <span class="n">THIRD_PARTY_ANNOTATION_FILE_NOT_FOUND</span> <span class="o">=</span> <span class="s2">&quot;Annotations data file NOT FOUND&quot;</span></div>
+
+
+
+
+<div class="viewcode-block" id="Links"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.Links">[docs]</a><span class="k">class</span> <span class="nc">Links</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">FEATURE_SUBSETS</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/feature_subsets.md&quot;</span>
+    <span class="p">)</span>
+    <span class="n">HEATMAP_LOCATION</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#heatmaps&quot;</span>
+    <span class="p">)</span>
+    <span class="n">HEATMAP_CLF</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-classification-heatmaps&quot;</span>
+    <span class="n">DATA_TABLES</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-data-tables&quot;</span>
+    <span class="n">CONCAT_VIDEOS</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#merging-concatenating-videos&quot;</span>
+    <span class="n">DISTANCE_PLOTS</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-distance-plots&quot;</span>
+    <span class="n">PATH_PLOTS</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-path-plots&quot;</span>
+    <span class="n">VISUALIZE_CLF_PROBABILITIES</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-classification-probabilities&quot;</span>
+    <span class="n">GANTT_PLOTS</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-gantt-charts&quot;</span>
+    <span class="n">SKLEARN_PLOTS</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-classifications&quot;</span>
+    <span class="n">ANALYZE_ML_RESULTS</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results&quot;</span>
+    <span class="n">FSTTC</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/FSTTC.md&quot;</span>
+    <span class="n">KLEINBERG</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/kleinberg_filter.md&quot;</span>
+    <span class="p">)</span>
+    <span class="n">DOWNSAMPLE</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#downsample-video&quot;</span>
+    <span class="n">VIDEO_TOOLS</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md&quot;</span>
+    <span class="p">)</span>
+    <span class="n">SET_RUN_ML_PARAMETERS</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data&quot;</span>
+    <span class="n">OULIERS</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf&quot;</span>
+    <span class="p">)</span>
+    <span class="n">REMOVE_CLF</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-2-optional-step--import-more-dlc-tracking-data-or-videos&quot;</span>
+    <span class="n">ROI_FEATURES_PLOT</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-5-visualizing-roi-features&quot;</span>
+    <span class="n">ROI_DATA_PLOT</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-4-visualizing-roi-data&quot;</span>
+    <span class="n">DIRECTING_ANIMALS_PLOTS</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/directionality_between_animals.md&quot;</span>
+    <span class="n">CLF_VALIDATION</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/classifier_validation.md&quot;</span>
+    <span class="p">)</span>
+    <span class="n">BATCH_PREPROCESS</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md&quot;</span>
+    <span class="n">THIRD_PARTY_ANNOTATION_NEW</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot_new.md&quot;</span>
+    <span class="p">)</span>
+    <span class="n">OUT_OF_SAMPLE_VALIDATION</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-8-evaluating-the-model-on-new-out-of-sample-data&quot;</span>
+    <span class="n">ROI</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md&quot;</span>
+    <span class="n">ROI_FEATURES</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data&quot;</span>
+    <span class="n">ROI_DATA_ANALYSIS</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-2-analyzing-roi-data&quot;</span>
+    <span class="n">DATA_ANALYSIS</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results&quot;</span>
+    <span class="n">ANALYZE_ROI</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-2-analyzing-roi-data&quot;</span>
+    <span class="n">EXTRACT_FEATURES</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-5-extract-features&quot;</span>
+    <span class="n">USER_DEFINED_FEATURE_EXTRACTION</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/extractFeatures.md&quot;</span>
+    <span class="p">)</span>
+    <span class="n">APPEND_ROI_FEATURES</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data&quot;</span>
+    <span class="n">LABEL_BEHAVIOR</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/label_behavior.md&quot;</span>
+    <span class="p">)</span>
+    <span class="n">THIRD_PARTY_ANNOTATION</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md&quot;</span>
+    <span class="p">)</span>
+    <span class="n">PSEUDO_LBL</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/pseudoLabel.md&quot;</span>
+    <span class="n">ADVANCED_LBL</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/advanced_labelling.md&quot;</span>
+    <span class="p">)</span>
+    <span class="n">TRAIN_ML_MODEL</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-7-train-machine-model&quot;</span>
+    <span class="n">VISUALIZATION</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-results&quot;</span>
+    <span class="n">PLOTLY</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/plotly_dash.md&quot;</span>
+    <span class="n">VIDEO_PARAMETERS</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters&quot;</span>
+    <span class="n">OUTLIERS_DOC</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction&quot;</span>
+    <span class="n">CREATE_PROJECT</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-1-generate-project-config&quot;</span>
+    <span class="n">LOAD_PROJECT</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-2-load-project-1&quot;</span>
+    <span class="n">SCENARIO_2</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md&quot;</span>
+    <span class="n">BBOXES</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md&quot;</span>
+    <span class="n">CUE_LIGHTS</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md&quot;</span>
+    <span class="p">)</span>
+    <span class="n">ADDITIONAL_IMPORTS</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-2-optional-step--import-more-dlc-tracking-data-or-videos&quot;</span>
+    <span class="n">AGGREGATE_BOOL_STATS</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#compute-aggregate-conditional-statistics-from-boolean-fields&quot;</span>
+    <span class="n">GITHUB_REPO</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba&quot;</span>
+    <span class="n">OSF_REPO</span> <span class="o">=</span> <span class="s2">&quot;https://osf.io/tmu6y/&quot;</span>
+    <span class="n">GITTER</span> <span class="o">=</span> <span class="s2">&quot;https://gitter.im/SimBA-Resource/community&quot;</span>
+    <span class="n">COUNT_ANNOTATIONS_IN_PROJECT</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/label_behavior.md#count-annotations-in-simba-project&quot;</span>
+    <span class="n">COUNT_ANNOTATIONS_OUTSIDE_PROJECT</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-project-annotation-counts&quot;</span>
+    <span class="n">CIRCLE_CROP</span> <span class="o">=</span> <span class="s2">&quot;https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#circle-crop&quot;</span></div>
+
+
+<div class="viewcode-block" id="Labelling"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.Labelling">[docs]</a><span class="k">class</span> <span class="nc">Labelling</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">PADDING</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">MAX_FRM_SIZE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1280</span><span class="p">,</span> <span class="mi">650</span><span class="p">)</span>
+    <span class="n">VIDEO_FRAME_SIZE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">700</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+    <span class="n">PLAY_VIDEO_SCRIPT_PATH</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">simba</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;labelling&quot;</span><span class="p">,</span> <span class="s2">&quot;play_annotation_video.py&quot;</span>
+    <span class="p">)</span>
+    <span class="n">VALID_ANNOTATIONS_ADVANCED</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="GeometryEnum"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.GeometryEnum">[docs]</a><span class="k">class</span> <span class="nc">GeometryEnum</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">CAP_STYLE_MAP</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;round&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;square&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;flat&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+    <span class="n">HISTOGRAM_COMPARISON_MAP</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;correlation&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;chi_square&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;intersection&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+        <span class="s2">&quot;bhattacharyya&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="s2">&quot;hellinger&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="s2">&quot;chi_square_alternative&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">CONTOURS_MODE_MAP</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;exterior&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;all&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;interior&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
+    <span class="n">CONTOURS_RETRIEVAL_MAP</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;simple&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;l1&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;kcos&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}</span>
+    <span class="n">RANKING_METHODS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;area&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;min_distance&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;max_distance&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mean_distance&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;left_to_right&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;top_to_bottom&quot;</span><span class="p">,</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="MLParamKeys"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.MLParamKeys">[docs]</a><span class="k">class</span> <span class="nc">MLParamKeys</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">CLASSIFIER</span> <span class="o">=</span> <span class="s2">&quot;classifier&quot;</span>
+    <span class="n">RF_META_DATA</span> <span class="o">=</span> <span class="s1">&#39;RF_meta_data&#39;</span>
+    <span class="n">CLASSIFIER_NAME</span> <span class="o">=</span> <span class="s2">&quot;classifier_name&quot;</span>
+    <span class="n">RF_ESTIMATORS</span> <span class="o">=</span> <span class="s2">&quot;rf_n_estimators&quot;</span>
+    <span class="n">RF_CRITERION</span> <span class="o">=</span> <span class="s2">&quot;rf_criterion&quot;</span>
+    <span class="n">TT_SIZE</span> <span class="o">=</span> <span class="s2">&quot;train_test_size&quot;</span>
+    <span class="n">MIN_LEAF</span> <span class="o">=</span> <span class="s2">&quot;rf_min_sample_leaf&quot;</span>
+    <span class="n">RF_METADATA</span> <span class="o">=</span> <span class="s2">&quot;generate_rf_model_meta_data_file&quot;</span>
+    <span class="n">EX_DECISION_TREE</span> <span class="o">=</span> <span class="s2">&quot;generate_example_decision_tree&quot;</span>
+    <span class="n">CLF_REPORT</span> <span class="o">=</span> <span class="s2">&quot;generate_classification_report&quot;</span>
+    <span class="n">IMPORTANCE_LOG</span> <span class="o">=</span> <span class="s2">&quot;generate_features_importance_log&quot;</span>
+    <span class="n">IMPORTANCE_BAR_CHART</span> <span class="o">=</span> <span class="s2">&quot;generate_features_importance_bar_graph&quot;</span>
+    <span class="n">PERMUTATION_IMPORTANCE</span> <span class="o">=</span> <span class="s2">&quot;compute_feature_permutation_importance&quot;</span>
+    <span class="n">LEARNING_CURVE</span> <span class="o">=</span> <span class="s2">&quot;generate_sklearn_learning_curves&quot;</span>
+    <span class="n">PRECISION_RECALL</span> <span class="o">=</span> <span class="s2">&quot;generate_precision_recall_curves&quot;</span>
+    <span class="n">RF_MAX_FEATURES</span> <span class="o">=</span> <span class="s2">&quot;rf_max_features&quot;</span>
+    <span class="n">RF_MAX_DEPTH</span> <span class="o">=</span> <span class="s2">&quot;rf_max_depth&quot;</span>
+    <span class="n">LEARNING_CURVE_K_SPLITS</span> <span class="o">=</span> <span class="s2">&quot;learning_curve_k_splits&quot;</span>
+    <span class="n">LEARNING_CURVE_DATA_SPLITS</span> <span class="o">=</span> <span class="s2">&quot;learning_curve_data_splits&quot;</span>
+    <span class="n">N_FEATURE_IMPORTANCE_BARS</span> <span class="o">=</span> <span class="s2">&quot;n_feature_importance_bars&quot;</span>
+    <span class="n">SHAP_SCORES</span> <span class="o">=</span> <span class="s2">&quot;generate_shap_scores&quot;</span>
+    <span class="n">SHAP_PRESENT</span> <span class="o">=</span> <span class="s2">&quot;shap_target_present_no&quot;</span>
+    <span class="n">SHAP_ABSENT</span> <span class="o">=</span> <span class="s2">&quot;shap_target_absent_no&quot;</span>
+    <span class="n">SHAP_SAVE_ITERATION</span> <span class="o">=</span> <span class="s2">&quot;shap_save_iteration&quot;</span>
+    <span class="n">PARTIAL_DEPENDENCY</span> <span class="o">=</span> <span class="s2">&quot;partial_dependency&quot;</span>
+    <span class="n">TRAIN_TEST_SPLIT_TYPE</span> <span class="o">=</span> <span class="s2">&quot;train_test_split_type&quot;</span>
+    <span class="n">UNDERSAMPLE_SETTING</span> <span class="o">=</span> <span class="s2">&quot;under_sample_setting&quot;</span>
+    <span class="n">UNDERSAMPLE_RATIO</span> <span class="o">=</span> <span class="s2">&quot;under_sample_ratio&quot;</span>
+    <span class="n">OVERSAMPLE_SETTING</span> <span class="o">=</span> <span class="s2">&quot;over_sample_setting&quot;</span>
+    <span class="n">OVERSAMPLE_RATIO</span> <span class="o">=</span> <span class="s2">&quot;over_sample_ratio&quot;</span>
+    <span class="n">CLASS_WEIGHTS</span> <span class="o">=</span> <span class="s2">&quot;class_weights&quot;</span>
+    <span class="n">CLASS_CUSTOM_WEIGHTS</span> <span class="o">=</span> <span class="s2">&quot;class_custom_weights&quot;</span>
+    <span class="n">EX_DECISION_TREE_FANCY</span> <span class="o">=</span> <span class="s2">&quot;generate_example_decision_tree_fancy&quot;</span>
+    <span class="n">IMPORTANCE_BARS_N</span> <span class="o">=</span> <span class="s2">&quot;N_feature_importance_bars&quot;</span>
+    <span class="n">LEARNING_DATA_SPLITS</span> <span class="o">=</span> <span class="s2">&quot;LearningCurve_shuffle_data_splits&quot;</span>
+    <span class="n">MODEL_TO_RUN</span> <span class="o">=</span> <span class="s2">&quot;model_to_run&quot;</span>
+    <span class="n">SAVE_TRAIN_TEST_FRM_IDX</span> <span class="o">=</span> <span class="s2">&quot;save_train_test_frm_idx&quot;</span>
+    <span class="n">SHAP_MULTIPROCESS</span> <span class="o">=</span> <span class="s2">&quot;shap_multiprocess&quot;</span>
+    <span class="n">CLASSIFIER_MAP</span> <span class="o">=</span> <span class="s2">&quot;classifier_map&quot;</span></div>
+
+<div class="viewcode-block" id="TestPaths"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.enums.TestPaths">[docs]</a><span class="k">class</span> <span class="nc">TestPaths</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">CRITICAL_VALUES</span> <span class="o">=</span> <span class="s2">&quot;../simba/assets/lookups/critical_values_05.pickle&quot;</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.pose_importers.trk_importer &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.pose_importers.trk_importer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.pose_importers.trk_importer</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">h5py</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">scipy.io</span> <span class="k">as</span> <span class="nn">sio</span>
+
+<span class="kn">from</span> <span class="nn">simba.mixins.config_reader</span> <span class="kn">import</span> <span class="n">ConfigReader</span>
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="p">(</span><span class="n">check_if_dir_exists</span><span class="p">,</span>
+                                <span class="n">check_if_filepath_list_is_empty</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.errors</span> <span class="kn">import</span> <span class="n">CountError</span><span class="p">,</span> <span class="n">NoFilesFoundError</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="p">(</span><span class="n">find_video_of_file</span><span class="p">,</span> <span class="n">get_fn_ext</span><span class="p">,</span>
+                                    <span class="n">get_video_meta_data</span><span class="p">,</span> <span class="n">read_config_entry</span><span class="p">,</span>
+                                    <span class="n">read_config_file</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.warnings</span> <span class="kn">import</span> <span class="n">InvalidValueWarning</span>
+
+
+<div class="viewcode-block" id="TRKImporter"><a class="viewcode-back" href="../../../simba.pose_importers.html#simba.pose_importers.trk_importer.TRKImporter">[docs]</a><span class="k">class</span> <span class="nc">TRKImporter</span><span class="p">(</span><span class="n">ConfigReader</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">config_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">data_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">animal_id_lst</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">interpolation_method</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">smoothing_settings</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">ConfigReader</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="n">check_if_dir_exists</span><span class="p">(</span><span class="n">in_dir</span><span class="o">=</span><span class="n">data_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">id_lst</span> <span class="o">=</span> <span class="n">data_path</span><span class="p">,</span> <span class="n">animal_id_lst</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">interpolation_method</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">smooth_settings</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">interpolation_method</span><span class="p">,</span>
+            <span class="n">smoothing_settings</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">animal_cnt</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">animal_ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Animal_1&quot;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">animal_ids</span> <span class="o">=</span> <span class="n">read_config_entry</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;Multi animal IDs&quot;</span><span class="p">,</span> <span class="s2">&quot;id_list&quot;</span><span class="p">,</span> <span class="s2">&quot;str&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">animal_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">animal_ids</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span> <span class="o">+</span> <span class="s2">&quot;/*.trk&quot;</span><span class="p">)</span>
+        <span class="n">check_if_filepath_list_is_empty</span><span class="p">(</span>
+            <span class="n">filepaths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span><span class="p">,</span>
+            <span class="n">error_msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;No TRK files (with .trk file-ending) found in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">space_scaler</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">radius_scaler</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">resolution_scaler</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">font_scaler</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1500</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frm_number</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">trk_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reading data using scipy.io...&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">trk_dict</span> <span class="o">=</span> <span class="n">sio</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="n">trk_coordinates</span> <span class="o">=</span> <span class="n">trk_dict</span><span class="p">[</span><span class="s2">&quot;pTrk&quot;</span><span class="p">]</span>
+            <span class="n">track_cnt</span> <span class="o">=</span> <span class="n">trk_coordinates</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">animals_tracked_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">trk_coordinates</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">track_cnt</span><span class="p">)]</span>
+
+        <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Failed to read data using scipy.io. Reading data using h5py...&quot;</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">trk_dict</span><span class="p">:</span>
+                <span class="n">trk_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">trk_dict</span><span class="p">[</span><span class="s2">&quot;pTrk&quot;</span><span class="p">])</span>
+                <span class="n">t_second</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">trk_list</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">t_second</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">t_third</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">t_second</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+                    <span class="n">trk_coordinates</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">t_third</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+                    <span class="n">track_cnt</span> <span class="o">=</span> <span class="n">trk_coordinates</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+                    <span class="n">animals_tracked_list</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="n">trk_coordinates</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">track_cnt</span><span class="p">)</span>
+                    <span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">animals_tracked_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">swapaxes</span><span class="p">(</span><span class="n">t_second</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+                    <span class="n">track_cnt</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;Number of animals detected in TRK </span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">track_cnt</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">track_cnt</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">animal_cnt</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CountError</span><span class="p">(</span>
+                <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;There are </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">track_cnt</span><span class="p">)</span><span class="si">}</span><span class="s2"> tracks in the .trk file </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s2">. But your SimBA project expects </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">animal_cnt</span><span class="p">)</span><span class="si">}</span><span class="s2"> tracks.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">animals_tracked_list</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">file_cnt</span><span class="p">,</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span><span class="p">):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">file_ext</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">animal_cnt</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="n">video_path</span> <span class="o">=</span> <span class="n">find_video_of_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_dir</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">video_path</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">NoFilesFoundError</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Could not find a video jj&quot;</span><span class="p">)</span></div>
+
+    <span class="c1">#         video_meta_data = get_video_meta_data(video_path=video_path)</span>
+    <span class="c1">#         animal_tracks = self.trk_read(file_path=file_path)</span>
+    <span class="c1">#</span>
+    <span class="c1">#         if self.animal_cnt != 1:</span>
+    <span class="c1">#             animal_df_lst = []</span>
+    <span class="c1">#             for animal in animal_tracks:</span>
+    <span class="c1">#                 m, n, r = animal.shape</span>
+    <span class="c1">#                 out_arr = np.column_stack((np.repeat(np.arange(m), n), animal.reshape(m * n, -1)))</span>
+    <span class="c1">#                 animal_df_lst.append(pd.DataFrame(out_arr).T.iloc[1:].reset_index(drop=True))</span>
+    <span class="c1">#             self.animal_df = pd.concat(animal_df_lst, axis=1).fillna(0)</span>
+    <span class="c1">#         else:</span>
+    <span class="c1">#             m, n, r = animal_tracks.shape</span>
+    <span class="c1">#             out_arr = np.column_stack((np.repeat(np.arange(m), n), animal_tracks.reshape(m * n, -1)))</span>
+    <span class="c1">#             self.animal_df = pd.DataFrame(out_arr).T.iloc[1:].reset_index(drop=True)</span>
+    <span class="c1">#         p_cols = pd.DataFrame(1, index=self.animal_df.index, columns=self.animal_df.columns[1::2] + .5)</span>
+    <span class="c1">#         self.animal_df = pd.concat([self.animal_df, p_cols], axis=1).sort_index(axis=1)</span>
+    <span class="c1">#         if len(self.bp_headers) != len(self.animal_df.columns):</span>
+    <span class="c1">#             raise CountError(msg=f&#39;SimBA detected {str(len(self.animal_df.columns))} body-parts in the .TRK file {file_path}. Your SimBA project however expects {len(self.bp_headers)} body-parts&#39;)</span>
+    <span class="c1">#         self.animal_df.columns = self.bp_headers</span>
+    <span class="c1">#</span>
+    <span class="c1">#         max_dim = max(video_meta_data[&#39;width&#39;], video_meta_data[&#39;height&#39;])</span>
+    <span class="c1">#         self.circle_scale = int(self.radius_scaler / (self.resolution_scaler / max_dim))</span>
+    <span class="c1">#         self.font_scale = float(self.font_scaler / (self.resolution_scaler / max_dim))</span>
+    <span class="c1">#         self.spacingScale = int(self.space_scaler / (self.resolution_scaler / max_dim))</span>
+    <span class="c1">#         cv2.namedWindow(&#39;Define animal IDs&#39;, cv2.WINDOW_NORMAL)</span>
+    <span class="c1">#         self.cap = cv2.VideoCapture(video_path)</span>
+    <span class="c1">#         self.create_first_interface()</span>
+    <span class="c1">#</span>
+    <span class="c1"># def __insert_all_animal_bps(self, frame=None):</span>
+    <span class="c1">#     for animal, bp_data in self.img_bp_cords_dict.items():</span>
+    <span class="c1">#         for bp_cnt, bp_tuple in enumerate(bp_data):</span>
+    <span class="c1">#             try:</span>
+    <span class="c1">#                 cv2.circle(frame, bp_tuple, self.circle_scale, self.animal_bp_dict[animal][&#39;colors&#39;][bp_cnt], -1, lineType=cv2.LINE_AA)</span>
+    <span class="c1">#             except Exception as err:</span>
+    <span class="c1">#                 if type(err) == OverflowError:</span>
+    <span class="c1">#                     InvalidValueWarning(f&#39;SimBA encountered a pose-estimated body-part located at pixel position {str(bp_tuple)}. This value is too large to be converted to an integer. Please check your pose-estimation data to make sure that it is accurate.&#39;)</span>
+    <span class="c1">#                 print(err.args)</span>
+    <span class="c1">#</span>
+    <span class="c1"># def create_first_interface(self):</span>
+    <span class="c1">#     while True:</span>
+    <span class="c1">#         self.cap.set(1, self.frm_number)</span>
+    <span class="c1">#         _, self.frame = self.cap.read()</span>
+    <span class="c1">#         self.overlay = self.frame.copy()</span>
+    <span class="c1">#         self.img_bp_cords_dict = {}</span>
+    <span class="c1">#         for animal_cnt, (animal_name, animal_bps) in enumerate(self.animal_bp_dict.items()):</span>
+    <span class="c1">#             self.img_bp_cords_dict[animal_name] = []</span>
+    <span class="c1">#             for bp_cnt in range(len(animal_bps[&#39;X_bps&#39;])):</span>
+    <span class="c1">#                 x_cord = int(self.animal_df.loc[self.frm_number, animal_name + &#39;_&#39; + animal_bps[&#39;X_bps&#39;][bp_cnt]])</span>
+    <span class="c1">#                 y_cord = int(self.animal_df.loc[self.frm_number, animal_name + &#39;_&#39; + animal_bps[&#39;Y_bps&#39;][bp_cnt]])</span>
+    <span class="c1">#                 self.img_bp_cords_dict[animal_name].append((x_cord, y_cord))</span>
+    <span class="c1">#         self.__insert_all_animal_bps(frame=self.overlay)</span>
+
+
+<span class="c1"># test = TRKImporter(config_path=&#39;/Users/simon/Desktop/envs/troubleshooting/DLC_2_Black_animals/project_folder/project_config.ini&#39;,</span>
+<span class="c1">#                    data_path=&#39;/Users/simon/Desktop/envs/simba_dev/tests/test_data/import_tests/trk_data&#39;,</span>
+<span class="c1">#                    animal_id_lst=[&#39;Animal_1&#39;, &#39;Animal_2&#39;],</span>
+<span class="c1">#                    interpolation_method=&quot;Body-parts: Nearest&quot;,</span>
+<span class="c1">#                    smoothing_settings = {&#39;Method&#39;: &#39;Savitzky Golay&#39;, &#39;Parameters&#39;: {&#39;Time_window&#39;: &#39;200&#39;}})</span>
+<span class="c1">#</span>
+
+
+<span class="c1"># test = SLEAPImporterCSV(config_path=r&#39;/Users/simon/Desktop/envs/troubleshooting/Hornet/project_folder/project_config.ini&#39;,</span>
+<span class="c1">#                  data_folder=r&#39;/Users/simon/Desktop/envs/troubleshooting/Hornet_single_slp/import&#39;,</span>
+<span class="c1">#                  actor_IDs=[&#39;Hornet&#39;],</span>
+<span class="c1">#                  interpolation_settings=&quot;Body-parts: Nearest&quot;,</span>
+<span class="c1">#                  smoothing_settings = {&#39;Method&#39;: &#39;Savitzky Golay&#39;, &#39;Parameters&#39;: {&#39;Time_window&#39;: &#39;200&#39;}})</span>
+<span class="c1"># test.run()</span>
+
+
+<span class="c1"># def __init__(self,</span>
+<span class="c1">#              config_path: str,</span>
+<span class="c1">#              data_folder: str,</span>
+<span class="c1">#              animal_id_lst: list,</span>
+<span class="c1">#              interpolation_method: str,</span>
+<span class="c1">#              smooth_settings: dict):</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.data_processors.timebins_movement_calculator &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.data_processors.timebins_movement_calculator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.data_processors.timebins_movement_calculator</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">simba.mixins.config_reader</span> <span class="kn">import</span> <span class="n">ConfigReader</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.feature_extraction_mixin</span> <span class="kn">import</span> <span class="n">FeatureExtractionMixin</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.feature_extraction_supplement_mixin</span> <span class="kn">import</span> \
+    <span class="n">FeatureExtractionSupplemental</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.plotting_mixin</span> <span class="kn">import</span> <span class="n">PlottingMixin</span>
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">check_all_file_names_are_represented_in_video_log</span><span class="p">,</span> <span class="n">check_float</span><span class="p">,</span>
+    <span class="n">check_if_filepath_list_is_empty</span><span class="p">,</span> <span class="n">check_int</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.enums</span> <span class="kn">import</span> <span class="n">TagNames</span>
+<span class="kn">from</span> <span class="nn">simba.utils.errors</span> <span class="kn">import</span> <span class="n">FrameRangeError</span>
+<span class="kn">from</span> <span class="nn">simba.utils.printing</span> <span class="kn">import</span> <span class="n">SimbaTimer</span><span class="p">,</span> <span class="n">log_event</span><span class="p">,</span> <span class="n">stdout_success</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="n">get_fn_ext</span><span class="p">,</span> <span class="n">read_df</span>
+
+
+<div class="viewcode-block" id="TimeBinsMovementCalculator"><a class="viewcode-back" href="../../../simba.data_processors.html#simba.data_processors.timebins_movement_calculator.TimeBinsMovementCalculator">[docs]</a><span class="k">class</span> <span class="nc">TimeBinsMovementCalculator</span><span class="p">(</span><span class="n">ConfigReader</span><span class="p">,</span> <span class="n">FeatureExtractionMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes aggregate movement statistics in user-defined time-bins.</span>
+
+<span class="sd">    :parameter str config_path: path to SimBA project config file in Configparser format</span>
+<span class="sd">    :parameter int bin_length: Integer representing the time bin size in seconds.</span>
+<span class="sd">    :parameter bool plots: If True, creates time-bin line plots representing the movement in each time-bin per video. Results are saved in the ``project_folder/logs/`` sub-directory.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        `Tutorial &lt;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results&gt;`__.</span>
+
+<span class="sd">    .. image:: _static/img/TimeBinsMovementCalculator.png</span>
+<span class="sd">       :width: 500</span>
+<span class="sd">       :align: center</span>
+
+<span class="sd">    :example:</span>
+<span class="sd">    &gt;&gt;&gt; calculator = TimeBinsMovementCalculator(config_path=&#39;/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini&#39;, bin_length=0.04,plots=True, body_parts=[&#39;Nose_1&#39;, &#39;Nose_2&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; calculator.run()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">config_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">bin_length</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="n">body_parts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">plots</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+
+        <span class="n">ConfigReader</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="n">log_event</span><span class="p">(</span>
+            <span class="n">logger_name</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">),</span>
+            <span class="n">log_type</span><span class="o">=</span><span class="n">TagNames</span><span class="o">.</span><span class="n">CLASS_INIT</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">msg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">create_log_msg_from_init_args</span><span class="p">(</span><span class="nb">locals</span><span class="o">=</span><span class="nb">locals</span><span class="p">()),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bin_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">plots</span> <span class="o">=</span> <span class="n">bin_length</span><span class="p">,</span> <span class="n">plots</span>
+        <span class="n">check_float</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;TIME BIN&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">bin_length</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mf">10e-6</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">col_headers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bp_dict</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">bp_cnt</span><span class="p">,</span> <span class="n">bp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">body_parts</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">col_headers</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bp</span><span class="si">}</span><span class="s2">_x&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bp</span><span class="si">}</span><span class="s2">_y&quot;</span><span class="p">))</span>
+            <span class="n">animal_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_animal_name_from_body_part_name</span><span class="p">(</span>
+                <span class="n">bp_name</span><span class="o">=</span><span class="n">bp</span><span class="p">,</span> <span class="n">bp_dict</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">animal_bp_dict</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bp_dict</span><span class="p">[</span><span class="n">bp_cnt</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">animal_name</span><span class="p">:</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bp</span><span class="si">}</span><span class="s2">_x&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bp</span><span class="si">}</span><span class="s2">_y&quot;</span><span class="p">]}</span>
+        <span class="n">check_if_filepath_list_is_empty</span><span class="p">(</span>
+            <span class="n">filepaths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_corrected_paths</span><span class="p">,</span>
+            <span class="n">error_msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SIMBA ERROR: Cannot analyze movement in time-bins, data directory </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_corrected_dir</span><span class="si">}</span><span class="s2"> is empty.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">animal_combinations</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">animal_bp_dict</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_corrected_paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> video(s)...&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__create_plots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">timer</span> <span class="o">=</span> <span class="n">SimbaTimer</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating time-bin movement plots...&quot;</span><span class="p">)</span>
+        <span class="n">plots_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span><span class="p">,</span> <span class="s2">&quot;logs&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;time_bin_movement_plots_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">plots_dir</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">plots_dir</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">video_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;VIDEO&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+            <span class="n">video_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;VIDEO&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">video_name</span><span class="p">)</span>
+                <span class="o">&amp;</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;MEASUREMENT&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;Movement (cm)&quot;</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="n">video_df</span><span class="p">[</span><span class="s2">&quot;TIME BIN #&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">video_df</span><span class="p">[</span><span class="s2">&quot;TIME BIN #&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">body_part</span> <span class="ow">in</span> <span class="n">video_df</span><span class="p">[</span><span class="s2">&quot;BODY-PART&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+                <span class="n">body_part_df</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">video_df</span><span class="p">[</span><span class="n">video_df</span><span class="p">[</span><span class="s2">&quot;BODY-PART&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">body_part</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;TIME BIN #&quot;</span><span class="p">])</span>
+                <span class="p">)</span>
+                <span class="n">body_part_df</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Time bin # (bin length </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bin_length</span><span class="si">}</span><span class="s2">s)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">body_part_df</span><span class="p">[</span><span class="s2">&quot;TIME BIN #&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="n">body_part_df</span><span class="p">[</span><span class="s2">&quot;VALUE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">body_part_df</span><span class="p">[</span><span class="s2">&quot;VALUE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+                <span class="n">_</span> <span class="o">=</span> <span class="n">PlottingMixin</span><span class="o">.</span><span class="n">line_plot</span><span class="p">(</span>
+                    <span class="n">df</span><span class="o">=</span><span class="n">body_part_df</span><span class="p">,</span>
+                    <span class="n">x</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Time bin # (bin length </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bin_length</span><span class="si">}</span><span class="s2">s)&quot;</span><span class="p">,</span>
+                    <span class="n">y</span><span class="o">=</span><span class="s2">&quot;VALUE&quot;</span><span class="p">,</span>
+                    <span class="n">y_label</span><span class="o">=</span><span class="s2">&quot;Distance (cm)&quot;</span><span class="p">,</span>
+                    <span class="n">save_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">plots_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">body_part</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">),</span>
+                <span class="p">)</span>
+        <span class="n">timer</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">()</span>
+        <span class="n">stdout_success</span><span class="p">(</span>
+            <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Time bin movement plots saved in </span><span class="si">{</span><span class="n">plots_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">elapsed_time</span><span class="o">=</span><span class="n">timer</span><span class="o">.</span><span class="n">elapsed_time_str</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">video_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_df_lst</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">movement_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span><span class="p">,</span>
+            <span class="s2">&quot;logs&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;Time_bins_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bin_length</span><span class="si">}</span><span class="s2">s_movement_results_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">check_all_file_names_are_represented_in_video_log</span><span class="p">(</span>
+            <span class="n">video_info_df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">video_info_df</span><span class="p">,</span> <span class="n">data_paths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_corrected_paths</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">file_cnt</span><span class="p">,</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_corrected_paths</span><span class="p">):</span>
+            <span class="n">video_timer</span> <span class="o">=</span> <span class="n">SimbaTimer</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">video_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Processing time-bin movements for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">file_cnt</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_corrected_paths</span><span class="p">))</span><span class="si">}</span><span class="s2">)...&quot;</span>
+            <span class="p">)</span>
+            <span class="n">video_dict</span><span class="p">[</span><span class="n">video_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">video_settings</span><span class="p">,</span> <span class="n">px_per_mm</span><span class="p">,</span> <span class="n">fps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_video_info</span><span class="p">(</span><span class="n">video_name</span><span class="o">=</span><span class="n">video_name</span><span class="p">)</span>
+            <span class="n">fps</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">movement_cols</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">velocity_cols</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fps</span><span class="p">),</span> <span class="nb">set</span><span class="p">(),</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="n">bin_length_frames</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fps</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_length</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">bin_length_frames</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">FrameRangeError</span><span class="p">(</span>
+                    <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;The specified time-bin length of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bin_length</span><span class="si">}</span><span class="s2"> is TOO SHORT for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> which has a specified FPS of </span><span class="si">{</span><span class="n">fps</span><span class="si">}</span><span class="s2">. This results in time bins that are LESS THAN a single frame.&quot;</span><span class="p">,</span>
+                    <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span> <span class="o">=</span> <span class="n">read_df</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">,</span> <span class="n">usecols</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">col_headers</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_shifted_df</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">)</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">animal_data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bp_dict</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">name</span><span class="p">,</span> <span class="n">bps</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">animal_data</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">(</span><span class="n">animal_data</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">bp_time_1</span><span class="p">,</span> <span class="n">bp_time_2</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="n">bps</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_shifted&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">bps</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">_shifted&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">movement_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">framewise_euclidean_distance</span><span class="p">(</span>
+                        <span class="n">location_1</span><span class="o">=</span><span class="n">bp_time_1</span><span class="p">,</span>
+                        <span class="n">location_2</span><span class="o">=</span><span class="n">bp_time_2</span><span class="p">,</span>
+                        <span class="n">px_per_mm</span><span class="o">=</span><span class="n">px_per_mm</span><span class="p">,</span>
+                        <span class="n">centimeter</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;VALUE&quot;</span><span class="p">],</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">movement_dict</span><span class="p">[</span><span class="n">video_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">movement_data</span>
+                <span class="n">movement_df_lists</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">movement_data</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">bin_length_frames</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">movement_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bin_length_frames</span><span class="p">)</span>
+                <span class="p">]</span>
+                <span class="k">for</span> <span class="nb">bin</span><span class="p">,</span> <span class="n">movement_df</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">movement_df_lists</span><span class="p">):</span>
+                    <span class="n">movement</span><span class="p">,</span> <span class="n">velocity</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">distance_and_velocity</span><span class="p">(</span>
+                            <span class="n">x</span><span class="o">=</span><span class="n">movement_df</span><span class="p">[</span><span class="s2">&quot;VALUE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                            <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span>
+                            <span class="n">pixels_per_mm</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                            <span class="n">centimeters</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="s2">&quot;VIDEO&quot;</span><span class="p">:</span> <span class="n">video_name</span><span class="p">,</span>
+                            <span class="s2">&quot;TIME BIN #&quot;</span><span class="p">:</span> <span class="nb">bin</span><span class="p">,</span>
+                            <span class="s2">&quot;ANIMAL&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                            <span class="s2">&quot;BODY-PART&quot;</span><span class="p">:</span> <span class="n">bps</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span>
+                            <span class="s2">&quot;MEASUREMENT&quot;</span><span class="p">:</span> <span class="s2">&quot;Movement (cm)&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;VALUE&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">movement</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                        <span class="p">}</span>
+                    <span class="p">)</span>
+                    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="s2">&quot;VIDEO&quot;</span><span class="p">:</span> <span class="n">video_name</span><span class="p">,</span>
+                            <span class="s2">&quot;TIME BIN #&quot;</span><span class="p">:</span> <span class="nb">bin</span><span class="p">,</span>
+                            <span class="s2">&quot;ANIMAL&quot;</span><span class="p">:</span> <span class="n">name</span><span class="p">,</span>
+                            <span class="s2">&quot;BODY-PART&quot;</span><span class="p">:</span> <span class="n">bps</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span>
+                            <span class="s2">&quot;MEASUREMENT&quot;</span><span class="p">:</span> <span class="s2">&quot;Velocity (cm/s)&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;VALUE&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">velocity</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+                        <span class="p">}</span>
+                    <span class="p">)</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_df_lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+            <span class="n">video_timer</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> complete (elapsed time: </span><span class="si">{</span><span class="n">video_timer</span><span class="o">.</span><span class="n">elapsed_time_str</span><span class="si">}</span><span class="s2">s)...&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_df_lst</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+            <span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;VIDEO&quot;</span><span class="p">,</span> <span class="s2">&quot;TIME BIN #&quot;</span><span class="p">,</span> <span class="s2">&quot;MEASUREMENT&quot;</span><span class="p">,</span> <span class="s2">&quot;ANIMAL&quot;</span><span class="p">]</span>
+        <span class="p">)[[</span><span class="s2">&quot;VIDEO&quot;</span><span class="p">,</span> <span class="s2">&quot;TIME BIN #&quot;</span><span class="p">,</span> <span class="s2">&quot;ANIMAL&quot;</span><span class="p">,</span> <span class="s2">&quot;BODY-PART&quot;</span><span class="p">,</span> <span class="s2">&quot;MEASUREMENT&quot;</span><span class="p">,</span> <span class="s2">&quot;VALUE&quot;</span><span class="p">]]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;VIDEO&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">()</span>
+        <span class="n">stdout_success</span><span class="p">(</span>
+            <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Movement time-bins results saved at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">elapsed_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">elapsed_time_str</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plots</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__create_plots</span><span class="p">()</span></div>
+
+
+<span class="c1"># test = TimeBinsMovementCalculator(config_path=r&quot;C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini&quot;,</span>
+<span class="c1">#                                   bin_length=0.1,</span>
+<span class="c1">#                                   plots=True,</span>
+<span class="c1">#                                   body_parts=[&#39;Nose_1&#39;])</span>
+<span class="c1"># test.run()</span>
+<span class="c1"># test.save()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.ui.pop_ups.visualize_pose_in_dir_pop_up &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.ui.pop_ups.visualize_pose_in_dir_pop_up</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.ui.pop_ups.visualize_pose_in_dir_pop_up</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">tkinter</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">tkinter</span> <span class="kn">import</span> <span class="n">font</span>
+
+<span class="kn">from</span> <span class="nn">simba.mixins.pop_up_mixin</span> <span class="kn">import</span> <span class="n">PopUpMixin</span>
+<span class="kn">from</span> <span class="nn">simba.plotting.pose_plotter</span> <span class="kn">import</span> <span class="n">PosePlotter</span>
+<span class="kn">from</span> <span class="nn">simba.plotting.pose_plotter_mp</span> <span class="kn">import</span> <span class="n">PosePlotterMultiProcess</span>
+<span class="kn">from</span> <span class="nn">simba.ui.tkinter_functions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">CreateLabelFrameWithIcon</span><span class="p">,</span> <span class="n">DropDownMenu</span><span class="p">,</span>
+                                        <span class="n">FileSelect</span><span class="p">,</span> <span class="n">FolderSelect</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="p">(</span><span class="n">check_file_exist_and_readable</span><span class="p">,</span>
+                                <span class="n">check_if_dir_exists</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.enums</span> <span class="kn">import</span> <span class="n">Formats</span><span class="p">,</span> <span class="n">Keys</span><span class="p">,</span> <span class="n">Links</span><span class="p">,</span> <span class="n">Options</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="n">find_core_cnt</span>
+
+<span class="n">ENTIRE_VIDEOS</span> <span class="o">=</span> <span class="s2">&quot;ENTIRE VIDEO(S)&quot;</span>
+<span class="n">AUTO</span> <span class="o">=</span> <span class="s1">&#39;AUTO&#39;</span>
+
+
+<div class="viewcode-block" id="VisualizePoseInFolderPopUp"><a class="viewcode-back" href="../../../../simba.ui.pop_ups.html#simba.ui.pop_ups.visualize_pose_in_dir_pop_up.VisualizePoseInFolderPopUp">[docs]</a><span class="k">class</span> <span class="nc">VisualizePoseInFolderPopUp</span><span class="p">(</span><span class="n">PopUpMixin</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    .. image:: _static/img/VisualizePoseInFolderPopUp.webp</span>
+<span class="sd">       :width: 500</span>
+<span class="sd">       :align: center</span>
+
+<span class="sd">    :example:</span>
+<span class="sd">    &gt;&gt;&gt; VisualizePoseInFolderPopUp()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">PopUpMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;VISUALIZE POSE_ESTIMATION DATA&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">800</span><span class="p">,</span> <span class="mi">800</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keypoint_sizes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">101</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keypoint_sizes</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">AUTO</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_lengths</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">210</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_lengths</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ENTIRE_VIDEOS</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color_options</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">Options</span><span class="o">.</span><span class="n">PALETTE_OPTIONS_CATEGORICAL</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">color_options</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">AUTO</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">animal_cnt_frm</span> <span class="o">=</span> <span class="n">CreateLabelFrameWithIcon</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">main_frm</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;NUMBER OF ANIMALS&quot;</span><span class="p">,</span> <span class="n">icon_name</span><span class="o">=</span><span class="n">Keys</span><span class="o">.</span><span class="n">DOCUMENTATION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">icon_link</span><span class="o">=</span><span class="n">Links</span><span class="o">.</span><span class="n">VIDEO_TOOLS</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_animals_dropdown</span> <span class="o">=</span> <span class="n">DropDownMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">animal_cnt_frm</span><span class="p">,</span> <span class="s2">&quot;NUMBER OF ANIMALS:&quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">17</span><span class="p">)),</span> <span class="s2">&quot;20&quot;</span><span class="p">,</span> <span class="n">com</span><span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__populate_menu</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_animals_dropdown</span><span class="o">.</span><span class="n">setChoices</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">animal_cnt_frm</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">number_of_animals_dropdown</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__populate_menu</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1">#self.main_frm.mainloop()</span>
+
+    <span class="k">def</span> <span class="nf">__populate_menu</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;settings_menu&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">settings_menu</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">single_video_frm</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">video_dir_frm</span><span class="o">.</span><span class="n">destroy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings_menu</span> <span class="o">=</span> <span class="n">LabelFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_frm</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;SETTINGS&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="n">Formats</span><span class="o">.</span><span class="n">FONT_HEADER</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">pady</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">padx</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings_menu</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="o">=</span> <span class="n">FolderSelect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings_menu</span><span class="p">,</span> <span class="s2">&quot;SAVE DIRECTORY: &quot;</span><span class="p">,</span>  <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Select a data folder&quot;</span><span class="p">,</span> <span class="n">lblwidth</span><span class="o">=</span><span class="mi">35</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keypoint_size_dropdown</span> <span class="o">=</span> <span class="n">DropDownMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings_menu</span><span class="p">,</span> <span class="s2">&quot;KEYPOINT SIZES:&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">keypoint_sizes</span><span class="p">,</span> <span class="s2">&quot;35&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keypoint_size_dropdown</span><span class="o">.</span><span class="n">setChoices</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keypoint_sizes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_slice_dropdown</span> <span class="o">=</span> <span class="n">DropDownMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings_menu</span><span class="p">,</span> <span class="s2">&quot;VIDEO SECTION (SECONDS):&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_lengths</span><span class="p">,</span> <span class="s2">&quot;35&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_slice_dropdown</span><span class="o">.</span><span class="n">setChoices</span><span class="p">(</span><span class="n">ENTIRE_VIDEOS</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keypoint_size_dropdown</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_slice_dropdown</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="n">dropdown_color_titles</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">&#39;Animal_</span><span class="si">{</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s1"> KEYPOINT PALETTE:&#39;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">number_of_animals_dropdown</span><span class="o">.</span><span class="n">getChoices</span><span class="p">()))]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropdown_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">cnt</span><span class="p">,</span> <span class="n">title</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dropdown_color_titles</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dropdown_dict</span><span class="p">[</span><span class="n">title</span><span class="p">]</span> <span class="o">=</span> <span class="n">DropDownMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings_menu</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">color_options</span><span class="p">,</span> <span class="s2">&quot;35&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dropdown_dict</span><span class="p">[</span><span class="n">title</span><span class="p">]</span><span class="o">.</span><span class="n">setChoices</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">color_options</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dropdown_dict</span><span class="p">[</span><span class="n">title</span><span class="p">]</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="n">cnt</span><span class="o">+</span><span class="mi">3</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiprocess_var</span> <span class="o">=</span> <span class="n">BooleanVar</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">multiprocess_cb</span> <span class="o">=</span> <span class="n">Checkbutton</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings_menu</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Multi-process (faster)&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="n">Formats</span><span class="o">.</span><span class="n">FONT_REGULAR</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">variable</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">multiprocess_var</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_dropdown_from_checkbox</span><span class="p">(</span><span class="n">check_box_var</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">multiprocess_var</span><span class="p">,</span> <span class="n">dropdown_menus</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">multiprocess_dropdown</span><span class="p">]))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiprocess_dropdown</span> <span class="o">=</span> <span class="n">DropDownMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings_menu</span><span class="p">,</span> <span class="s2">&quot;CPU cores:&quot;</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">find_core_cnt</span><span class="p">()[</span><span class="mi">0</span><span class="p">])),</span> <span class="s2">&quot;12&quot;</span><span class="p">)</span>
+        <span class="n">multiprocess_cb</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">frame_children</span><span class="p">(</span><span class="n">frame</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">settings_menu</span><span class="p">),</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiprocess_dropdown</span><span class="o">.</span><span class="n">setChoices</span><span class="p">(</span><span class="n">find_core_cnt</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiprocess_dropdown</span><span class="o">.</span><span class="n">disable</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">multiprocess_dropdown</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">frame_children</span><span class="p">(</span><span class="n">frame</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">settings_menu</span><span class="p">),</span> <span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">single_video_frm</span> <span class="o">=</span> <span class="n">LabelFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_frm</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;VISUALIZE DATA FILE&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="n">Formats</span><span class="o">.</span><span class="n">FONT_HEADER</span>  <span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">pady</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">padx</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_select</span> <span class="o">=</span> <span class="n">FileSelect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">single_video_frm</span><span class="p">,</span> <span class="s2">&quot;SELECT DATA FILE (CSV/PARQUET): &quot;</span><span class="p">,</span>  <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Select a data file&quot;</span><span class="p">,</span> <span class="n">file_types</span><span class="o">=</span><span class="p">[(</span><span class="s2">&quot;CSV or PARQUET&quot;</span><span class="p">,</span> <span class="n">Options</span><span class="o">.</span><span class="n">WORKFLOW_FILE_TYPE_STR_OPTIONS</span><span class="o">.</span><span class="n">value</span><span class="p">)],</span> <span class="n">lblwidth</span><span class="o">=</span><span class="mi">35</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_single_file_btn</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">single_video_frm</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;RUN&quot;</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">fg</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">single_video_frm</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="n">Label</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">single_video_frm</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;SELECT CSV OR PARQUET FILE INSIDE &#39;PROJECT_FOLDER/CSV&#39; SUB-DIRECTORIES </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="n">font</span><span class="o">.</span><span class="n">Font</span><span class="p">(</span><span class="n">family</span><span class="o">=</span><span class="s2">&quot;Helvetica&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">slant</span><span class="o">=</span><span class="s2">&quot;italic&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_select</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_single_file_btn</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_dir_frm</span> <span class="o">=</span> <span class="n">LabelFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_frm</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;VISUALIZE DATA DIRECTORY&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="n">Formats</span><span class="o">.</span><span class="n">FONT_HEADER</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">pady</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">padx</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folder_select</span> <span class="o">=</span> <span class="n">FolderSelect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_dir_frm</span><span class="p">,</span> <span class="s2">&quot;SELECT DATA DIRECTORY (CSV/PARQUET): &quot;</span><span class="p">,</span>  <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Select a data folder&quot;</span><span class="p">,</span> <span class="n">lblwidth</span><span class="o">=</span><span class="mi">35</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_folder_btn</span> <span class="o">=</span> <span class="n">Button</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_dir_frm</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;RUN&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="n">Formats</span><span class="o">.</span><span class="n">FONT_REGULAR</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">fg</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_dir_frm</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="n">Label</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_dir_frm</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;SELECT SUB-DIRECTORY INSIDE &#39;PROJECT_FOLDER/CSV&#39; DIRECTORY </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="n">font</span><span class="o">.</span><span class="n">Font</span><span class="p">(</span><span class="n">family</span><span class="o">=</span><span class="s2">&quot;Helvetica&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">slant</span><span class="o">=</span><span class="s2">&quot;italic&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">folder_select</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_folder_btn</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_frm</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
+
+<div class="viewcode-block" id="VisualizePoseInFolderPopUp.run"><a class="viewcode-back" href="../../../../simba.ui.pop_ups.html#simba.ui.pop_ups.visualize_pose_in_dir_pop_up.VisualizePoseInFolderPopUp.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">dir</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">dir</span><span class="p">:</span>
+            <span class="n">data_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder_select</span><span class="o">.</span><span class="n">folder_path</span>
+            <span class="n">check_if_dir_exists</span><span class="p">(</span><span class="n">in_dir</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_select</span><span class="o">.</span><span class="n">file_path</span>
+            <span class="n">check_file_exist_and_readable</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">data_path</span><span class="p">)</span>
+        <span class="n">save_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="o">.</span><span class="n">folder_path</span>
+        <span class="n">check_if_dir_exists</span><span class="p">(</span><span class="n">in_dir</span><span class="o">=</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">circle_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keypoint_size_dropdown</span><span class="o">.</span><span class="n">getChoices</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">circle_size</span> <span class="o">==</span> <span class="n">AUTO</span><span class="p">:</span> <span class="n">circle_size</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span> <span class="n">circle_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">circle_size</span><span class="p">)</span>
+        <span class="n">palettes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">cnt</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dropdown_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">v</span><span class="o">.</span><span class="n">getChoices</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">v</span><span class="o">.</span><span class="n">getChoices</span><span class="p">()</span> <span class="o">==</span> <span class="n">AUTO</span><span class="p">:</span>
+                <span class="n">palettes</span><span class="p">[</span><span class="n">cnt</span><span class="p">]</span> <span class="o">=</span> <span class="n">Options</span><span class="o">.</span><span class="n">PALETTE_OPTIONS_CATEGORICAL</span><span class="o">.</span><span class="n">value</span><span class="p">[</span><span class="n">cnt</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">palettes</span><span class="p">[</span><span class="n">cnt</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">getChoices</span><span class="p">()</span>
+        <span class="n">sample_time</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_slice_dropdown</span><span class="o">.</span><span class="n">getChoices</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">sample_time</span> <span class="o">==</span> <span class="n">ENTIRE_VIDEOS</span><span class="p">:</span>
+            <span class="n">sample_time</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">sample_time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">sample_time</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">multiprocess_var</span><span class="o">.</span><span class="n">get</span><span class="p">():</span>
+            <span class="n">plotter</span> <span class="o">=</span> <span class="n">PosePlotter</span><span class="p">(</span><span class="n">data_path</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span>
+                                  <span class="n">out_dir</span><span class="o">=</span><span class="n">save_dir</span><span class="p">,</span>
+                                  <span class="n">palettes</span><span class="o">=</span><span class="n">palettes</span><span class="p">,</span>
+                                  <span class="n">circle_size</span><span class="o">=</span><span class="n">circle_size</span><span class="p">,</span>
+                                  <span class="n">sample_time</span><span class="o">=</span><span class="n">sample_time</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">core_cnt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">multiprocess_dropdown</span><span class="o">.</span><span class="n">getChoices</span><span class="p">())</span>
+            <span class="n">plotter</span> <span class="o">=</span> <span class="n">PosePlotterMultiProcess</span><span class="p">(</span><span class="n">data_path</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span>
+                                              <span class="n">out_dir</span><span class="o">=</span><span class="n">save_dir</span><span class="p">,</span>
+                                              <span class="n">palettes</span><span class="o">=</span><span class="n">palettes</span><span class="p">,</span>
+                                              <span class="n">circle_size</span><span class="o">=</span><span class="n">circle_size</span><span class="p">,</span>
+                                              <span class="n">sample_time</span><span class="o">=</span><span class="n">sample_time</span><span class="p">,</span>
+                                              <span class="n">core_cnt</span><span class="o">=</span><span class="n">core_cnt</span><span class="p">)</span>
+
+        <span class="n">plotter</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

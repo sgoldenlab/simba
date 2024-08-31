@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.unsupervised.cluster_video_visualizer &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.unsupervised.cluster_video_visualizer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.unsupervised.cluster_video_visualizer</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">permutations</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">MultiPoint</span>
+
+<span class="kn">from</span> <span class="nn">simba.mixins.config_reader</span> <span class="kn">import</span> <span class="n">ConfigReader</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.geometry_mixin</span> <span class="kn">import</span> <span class="n">GeometryMixin</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.unsupervised_mixin</span> <span class="kn">import</span> <span class="n">UnsupervisedMixin</span>
+<span class="kn">from</span> <span class="nn">simba.unsupervised.enums</span> <span class="kn">import</span> <span class="n">Clustering</span><span class="p">,</span> <span class="n">Unsupervised</span>
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="p">(</span><span class="n">check_file_exist_and_readable</span><span class="p">,</span> <span class="n">check_float</span><span class="p">,</span>
+                                <span class="n">check_if_keys_exist_in_dict</span><span class="p">,</span>
+                                <span class="n">check_if_valid_rgb_tuple</span><span class="p">,</span> <span class="n">check_int</span><span class="p">,</span> <span class="n">check_str</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.data</span> <span class="kn">import</span> <span class="n">sample_df_n_by_unique</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="n">read_pickle</span>
+
+
+<div class="viewcode-block" id="ClusterVideoVisualizer"><a class="viewcode-back" href="../../../simba.unsupervised.html#simba.unsupervised.cluster_video_visualizer.ClusterVideoVisualizer">[docs]</a><span class="k">class</span> <span class="nc">ClusterVideoVisualizer</span><span class="p">(</span><span class="n">ConfigReader</span><span class="p">,</span> <span class="n">UnsupervisedMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for creating video examples of cluster assignments.</span>
+
+<span class="sd">    :param Union[str, os.PathLike] config_path: Path to SimBA project configuration file.</span>
+<span class="sd">    :param Union[str, os.PathLike] data_path: Path to pickle file containing unsupervised results.</span>
+<span class="sd">    :param Optional[Union[int, None]] max_videos: Maximum number of videos to create for each cluster. Defaults to None.</span>
+<span class="sd">    :param Optional[int] speed: Speed of the generated videos. Defaults to 1.0.</span>
+<span class="sd">    :param Optional[Tuple[int, int, int]] bg_clr: Background color of the videos as RGB tuple. Defaults to white (255, 255, 255).</span>
+<span class="sd">    :param Optional[Literal] plot_type: Type of plot to generate (&#39;VIDEO&#39;, &#39;HULL&#39;, &#39;SKELETON&#39;, &#39;POINTS&#39;). Defaults to &#39;SKELETON&#39;.</span>
+
+<span class="sd">    :example:</span>
+<span class="sd">    &gt;&gt;&gt; config_path = &#39;/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/project_config.ini&#39;</span>
+<span class="sd">    &gt;&gt;&gt; data_path = &#39;/Users/simon/Desktop/envs/simba/troubleshooting/NG_Unsupervised/project_folder/cluster_mdls/hopeful_khorana.pickle&#39;</span>
+<span class="sd">    &gt;&gt;&gt; visualizer = ClusterVideoVisualizer(config_path=config_path, data_path=data_path, bg_clr=(0, 0, 255), max_videos=20, speed=0.2, plot_type=&#39;POINTS&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; visualizer.run()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">config_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
+        <span class="n">data_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
+        <span class="n">max_videos</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">speed</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">bg_clr</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+        <span class="n">plot_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+            <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;VIDEO&quot;</span><span class="p">,</span> <span class="s2">&quot;HULL&quot;</span><span class="p">,</span> <span class="s2">&quot;SKELETON&quot;</span><span class="p">,</span> <span class="s2">&quot;POINTS&quot;</span><span class="p">]</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;SKELETON&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+
+        <span class="n">check_file_exist_and_readable</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">data_path</span><span class="p">)</span>
+        <span class="n">check_file_exist_and_readable</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="n">check_if_valid_rgb_tuple</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">bg_clr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">max_videos</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">check_int</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;max_videos&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">max_videos</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">check_float</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;speed&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">speed</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="n">check_str</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;plot_type&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">plot_type</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;VIDEO&quot;</span><span class="p">,</span> <span class="s2">&quot;HULL&quot;</span><span class="p">,</span> <span class="s2">&quot;SKELETON&quot;</span><span class="p">,</span> <span class="s2">&quot;POINTS&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">ConfigReader</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="n">UnsupervisedMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">read_pickle</span><span class="p">(</span><span class="n">data_path</span><span class="o">=</span><span class="n">data_path</span><span class="p">)</span>
+        <span class="n">check_if_keys_exist_in_dict</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+            <span class="n">key</span><span class="o">=</span><span class="p">[</span><span class="n">Clustering</span><span class="o">.</span><span class="n">CLUSTER_MODEL</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">Unsupervised</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">value</span><span class="p">],</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_videos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bg_clr</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">max_videos</span><span class="p">,</span>
+            <span class="n">speed</span><span class="p">,</span>
+            <span class="n">plot_type</span><span class="p">,</span>
+            <span class="n">bg_clr</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cl_mdl_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">Clustering</span><span class="o">.</span><span class="n">CLUSTER_MODEL</span><span class="o">.</span><span class="n">value</span><span class="p">][</span>
+            <span class="n">Unsupervised</span><span class="o">.</span><span class="n">HASHED_NAME</span><span class="o">.</span><span class="n">value</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">animal_bp_cols</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">skeleton_perm</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames_output_dir</span><span class="p">,</span> <span class="s2">&quot;clusters&quot;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">animal_nme</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">animal_bp_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">animal_bp_cols</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">animal_bp_dict</span><span class="p">[</span><span class="n">animal_nme</span><span class="p">][</span><span class="s2">&quot;X_bps&quot;</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">animal_bp_dict</span><span class="p">[</span><span class="n">animal_nme</span><span class="p">][</span><span class="s2">&quot;Y_bps&quot;</span><span class="p">],</span>
+            <span class="p">):</span>
+                <span class="n">animal_bp_cols</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">animal_bp_cols</span><span class="p">[</span><span class="n">animal_nme</span><span class="p">]</span> <span class="o">=</span> <span class="n">animal_bp_cols</span>
+            <span class="n">bp_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">animal_bp_dict</span><span class="p">[</span><span class="n">animal_nme</span><span class="p">][</span><span class="s2">&quot;X_bps&quot;</span><span class="p">]]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">skeleton_perm</span><span class="p">[</span><span class="n">animal_nme</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">permutations</span><span class="p">(</span><span class="n">bp_names</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cluster_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">Unsupervised</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">value</span><span class="p">][</span>
+            <span class="n">Unsupervised</span><span class="o">.</span><span class="n">BOUTS_FEATURES</span><span class="o">.</span><span class="n">value</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">index</span>
+        <span class="n">cluster_lbls</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">Clustering</span><span class="o">.</span><span class="n">CLUSTER_MODEL</span><span class="o">.</span><span class="n">value</span><span class="p">][</span>
+            <span class="n">Unsupervised</span><span class="o">.</span><span class="n">MODEL</span><span class="o">.</span><span class="n">value</span>
+        <span class="p">]</span><span class="o">.</span><span class="n">labels_</span>
+        <span class="n">cluster_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cluster_lbls</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;CLUSTER&quot;</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="n">cluster_idx</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_videos</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">cluster_df</span> <span class="o">=</span> <span class="n">sample_df_n_by_unique</span><span class="p">(</span>
+                <span class="n">df</span><span class="o">=</span><span class="n">cluster_df</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="s2">&quot;CLUSTER&quot;</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_videos</span>
+            <span class="p">)</span>
+            <span class="n">cluster_df</span> <span class="o">=</span> <span class="n">cluster_df</span><span class="p">[</span><span class="o">~</span><span class="n">cluster_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="s2">&quot;first&quot;</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">cluster_id</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cluster_df</span><span class="p">[</span><span class="s2">&quot;CLUSTER&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">()):</span>
+            <span class="n">event_idx</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">cluster_df</span><span class="p">[</span><span class="n">cluster_df</span><span class="p">[</span><span class="s2">&quot;CLUSTER&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">cluster_id</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Creating </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">event_idx</span><span class="p">)</span><span class="si">}</span><span class="s2"> videos for cluster </span><span class="si">{</span><span class="n">cluster_id</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">event_idx</span><span class="p">:</span>
+                <span class="n">video_pose</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">Unsupervised</span><span class="o">.</span><span class="n">DATA</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="n">Unsupervised</span><span class="o">.</span><span class="n">FRAME_POSE</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">event</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">:]</span>
+                    <span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">event_df</span> <span class="o">=</span> <span class="n">video_pose</span><span class="p">[</span>
+                    <span class="p">(</span><span class="n">video_pose</span><span class="p">[</span><span class="s2">&quot;FRAME&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">event</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="o">&amp;</span> <span class="p">(</span><span class="n">video_pose</span><span class="p">[</span><span class="s2">&quot;FRAME&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">event</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+                <span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">event</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">event</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">event</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">cluster_id</span><span class="si">}</span><span class="s2">.mp4&quot;</span>
+                <span class="p">)</span>
+                <span class="n">video_info</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">fps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_video_info</span><span class="p">(</span><span class="n">video_name</span><span class="o">=</span><span class="n">event</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">out_fps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">fps</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">speed</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">out_fps</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">out_fps</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">video_info</span><span class="p">[</span><span class="s2">&quot;Resolution_width&quot;</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span>
+                    <span class="n">video_info</span><span class="p">[</span><span class="s2">&quot;Resolution_height&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">bg_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">bg_clr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+                <span class="n">shapes</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">bps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">animal_bp_cols</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_type</span> <span class="o">==</span> <span class="s2">&quot;HULL&quot;</span><span class="p">:</span>
+                        <span class="n">animal_event_pose_data</span> <span class="o">=</span> <span class="n">event_df</span><span class="p">[</span><span class="n">bps</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+                        <span class="n">animal_event_pose_data</span> <span class="o">=</span> <span class="n">animal_event_pose_data</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                            <span class="nb">len</span><span class="p">(</span><span class="n">animal_event_pose_data</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+                        <span class="p">)</span>
+                        <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="n">GeometryMixin</span><span class="p">()</span><span class="o">.</span><span class="n">multiframe_bodyparts_to_polygon</span><span class="p">(</span>
+                                <span class="n">data</span><span class="o">=</span><span class="n">animal_event_pose_data</span><span class="p">,</span>
+                                <span class="n">pixels_per_mm</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                <span class="n">parallel_offset</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                <span class="n">core_cnt</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_type</span> <span class="o">==</span> <span class="s2">&quot;SKELETON&quot;</span><span class="p">:</span>
+                        <span class="n">animal_skeleton_bps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">skeleton_perm</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+                        <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="n">GeometryMixin</span><span class="p">()</span><span class="o">.</span><span class="n">multiframe_bodyparts_to_multistring_skeleton</span><span class="p">(</span>
+                                <span class="n">data_df</span><span class="o">=</span><span class="n">event_df</span><span class="p">,</span>
+                                <span class="n">skeleton</span><span class="o">=</span><span class="n">animal_skeleton_bps</span><span class="p">,</span>
+                                <span class="n">core_cnt</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+                                <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot_type</span> <span class="o">==</span> <span class="s2">&quot;POINTS&quot;</span><span class="p">:</span>
+                        <span class="n">animal_event_pose_data</span> <span class="o">=</span> <span class="n">event_df</span><span class="p">[</span><span class="n">bps</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+                        <span class="n">animal_event_pose_data</span> <span class="o">=</span> <span class="n">animal_event_pose_data</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                            <span class="nb">len</span><span class="p">(</span><span class="n">animal_event_pose_data</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span>
+                        <span class="p">)</span>
+                        <span class="n">results</span> <span class="o">=</span> <span class="n">GeometryMixin</span><span class="p">()</span><span class="o">.</span><span class="n">multiframe_bodypart_to_point</span><span class="p">(</span>
+                            <span class="n">data</span><span class="o">=</span><span class="n">animal_event_pose_data</span>
+                        <span class="p">)</span>
+                        <span class="n">multi_points</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="k">for</span> <span class="n">frm</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)):</span>
+                            <span class="n">multi_points</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">MultiPoint</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="n">frm</span><span class="p">]))</span>
+                        <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">multi_points</span><span class="p">)</span>
+                <span class="n">_</span> <span class="o">=</span> <span class="n">GeometryMixin</span><span class="o">.</span><span class="n">geometry_video</span><span class="p">(</span>
+                    <span class="n">shapes</span><span class="o">=</span><span class="n">shapes</span><span class="p">,</span>
+                    <span class="n">save_path</span><span class="o">=</span><span class="n">save_path</span><span class="p">,</span>
+                    <span class="n">fps</span><span class="o">=</span><span class="n">out_fps</span><span class="p">,</span>
+                    <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">),</span>
+                    <span class="n">bg_img</span><span class="o">=</span><span class="n">bg_img</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cluster video saved at </span><span class="si">{</span><span class="n">save_path</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1"># config_path = &#39;/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini&#39;</span>
+<span class="c1"># data_path = &#39;/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_clusters/adoring_hoover.pickle&#39;</span>
+<span class="c1"># visualizer = ClusterVideoVisualizer(config_path=config_path,</span>
+<span class="c1">#                                     data_path=data_path,</span>
+<span class="c1">#                                     bg_clr=(0, 0, 255),</span>
+<span class="c1">#                                     max_videos=3,</span>
+<span class="c1">#                                     speed=1.0,</span>
+<span class="c1">#                                     plot_type=&#39;HULL&#39;)</span>
+<span class="c1"># visualizer.run()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Model explainability and calculating feature SHAP values in SimBA &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Who is looking at who: calculate “directionality” between animals in SimBA" href="directionality_between_animals.html" />
+    <link rel="prev" title="Animal-anchored ROIs (bounding-boxes) in SimBA" href="anchored_rois.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SimBA
+              <img src="../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="roi.html">Regions of Interest (ROIs) in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FSTTC.html">Calculating forward-spike time tiling coefficents in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_subsets.html">Feature family sub-sets in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_defined_feature_class.html">User-defined ‘feature extraction’ scripts in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kleinberg_filter.html">Kleinberg behavior classification smoothing in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="anchored_rois.html">Animal-anchored ROIs (bounding-boxes) in SimBA</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Model explainability and calculating feature SHAP values in SimBA</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#part-1-generate-a-dataset">Part 1: Generate a dataset</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-2-compute-shap-scores">Part 2: Compute SHAP scores</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#step-1-define-shap-settings">Step 1: Define SHAP settings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#step-2-train-the-classifier-and-generate-shap-values">Step 2: Train the classifier and generate SHAP values.</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#step-3-interpreting-the-shap-value-ouput-generated-by-simba">Step 3: Interpreting the SHAP value ouput generated by SimBA.</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="directionality_between_animals.html">Who is looking at who: calculate “directionality” between animals in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classifier_validation.html">Post-classification Validation (detecting false-positives)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cue_lights.html">Cue Light Analysis in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi_animal_pose.html">Using multi-animal pose-estimation data in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="process_videos.html">Batch Video Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">SimBA Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_user_defined_pose_config.html">User-defined pose-configurations in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html">Video processing tools in SimBA</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">Model explainability and calculating feature SHAP values in SimBA</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_rst/SHAP.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="model-explainability-and-calculating-feature-shap-values-in-simba">
+<h1>Model explainability and calculating feature SHAP values in SimBA<a class="headerlink" href="#model-explainability-and-calculating-feature-shap-values-in-simba" title="Permalink to this heading"></a></h1>
+<a class="reference internal image-reference" href="../_images/landing1.png"><img alt="../_images/landing1.png" class="align-center" src="../_images/landing1.png" style="width: 1000px;" /></a>
+<p>An understanding of how machine learning models reach their decisions is
+important not only for the scientific method but can also help you gain
+insight into how your classifier works and what makes it different or
+similar to other classifiers. Machine learning explainability metrics,
+such as SHAP, can help you answer questions like:</p>
+<ul class="simple">
+<li><p>Why does my classifier think some specific frames contain my behavior
+of interest, while other frames do not?</p></li>
+<li><p>Why does the classifier generated by annotator X classify events so
+differently (or similarly) to the classifier generated by annotator
+Y?</p></li>
+<li><p>Why does my tracking model think the location of the nose of the
+animal is located in this particlar part of the image?</p></li>
+<li><p>Which, of several classifiers, classify the target events by using
+the same behavioural features that a human observers would use to
+classify the same events?</p></li>
+<li><p>Are there any potential differences in the features that annotator X
+and annotator Y look at when annotating videos for the presence or
+absence of the same target behavior?</p></li>
+</ul>
+<p>Explainability metrics can be very important, as it is possible that the
+classifiers you are using <em>appear</em> to look for the same behavioral
+target behaviours and features as a human observer would, while the
+classifier in fact looks as something very different from the human
+observer. Such weaknesses are typically revealed when analyzing new
+videos in new recording environments, that were not included in the data
+used to train the classifier, and explainability metrics can help you
+avoid such pitfalls. For a discussion of the role of explainability in
+machine learning and behavioural neuroscience, see <a class="reference external" href="https://t.co/cADUus3e5o">Goodwin, Nilsson et
+al., Current Opinion in Neurobiology Volume 73, April
+2022</a> as well as <a class="reference external" href="https://osf.io/f9ws3/">THIS SLIDE
+DECK</a>.</p>
+<p>Here we look at how we can use <a class="reference external" href="https://github.com/slundberg/shap">SHAP (SHapley Additive
+exPlanations)</a> within SimBA to
+calculate how much each feature contributes to the final behavioral
+classification score for each annotated video frame. Through this method
+we will get an verbalizable explanation for the classification
+probability score for each frame, such as:</p>
+<p><em>Frame N in Video X was classified as containing my behavior of
+interest, mainly because of the distance between animal A and B, but
+also because the movements of animal A. In frame N, the larger movements
+of the animals increased the behavior classification probability with
+20%, and the distance between the animals increased the classification
+probability with a further 70%</em>.</p>
+<p>In brief, when using SHAP, each feature is evaluated independently, and
+the final classification probability is distributed among the individual
+features according to their contribution to it. This value is calculated
+after exhaustive permutations within the order of feature-introductions
+into the classification scenario:</p>
+<a class="reference internal image-reference" href="../_images/shap_example_1.png"><img alt="../_images/shap_example_1.png" class="align-center" src="../_images/shap_example_1.png" style="width: 800px;" /></a>
+<p>The <em>base probability</em> in the figure above is the probability of picking
+a frame that contains your behavior by pure chance (e.g., if half of
+your video frames contain you behavior of interest, then the base
+probability will be 50%; more info below!). The values associated with
+each feature describe the features effect on the classification
+probability. To read more about SHAP values, also see the <a class="reference external" href="https://github.com/slundberg/shap">SHAP GitHub
+repository</a> which SimBA wraps, or
+read <a class="reference external" href="https://www.nature.com/articles/s42256-019-0138-9">SHAP paper in Nature Machine Learning
+Intelligence</a>.</p>
+<p>The goal if this analysis may be to produce data and visualisations
+similar to the image below, which compares classifiers for the same
+target behavior (attack behaviour, in this example) but built using
+annotations from different recording environment, annotators and
+institutes. With this type of data at hand, we would be able to conclude
+that most attack classifiers primarily depend on features of intruder
+movement, animal distances, and resident and intruder movements, for
+discriminating attack events from non-attack events (with some notable
+exceptions!).</p>
+<a class="reference internal image-reference" href="../_images/shap_example_2.png"><img alt="../_images/shap_example_2.png" class="align-center" src="../_images/shap_example_2.png" style="width: 800px;" /></a>
+<section id="part-1-generate-a-dataset">
+<h2>Part 1: Generate a dataset<a class="headerlink" href="#part-1-generate-a-dataset" title="Permalink to this heading"></a></h2>
+<p>SimBA calculates SHAP values for the classifier at the same time as the
+model is being trained. Thus, before analysing SHAP scores, we need a
+dataset that contains behavioral annotations. You will need complete the
+steps detailed in the <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md">Scenario 1
+tutorial</a>
+<strong>Part 1 Step 1</strong> up to <strong>Part 2 Step 6</strong>. That is, you will need to
+complete everything from <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project-1">Creating a
+project</a>
+up to, and including <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-6-label-behavior-ie-create-annotations-for-predictive-classifiers">labelling behavioral
+events</a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you already have annotations generated elsewhere (e.g.,
+downloaded from the <a class="reference external" href="https://osf.io/d69jt/">SimBA OSF repository</a>,
+you may not have to go through <strong>Part 1 Step 1</strong> to <strong>Part 2 Step 6</strong>
+as detailed above. When calculating the SHAP values, SimBA will loook
+inside your <code class="docutils literal notranslate"><span class="pre">project_folder/csv/targets_inserted</span></code> subdirectory for
+files containing the annotations (just as SimBA does when generating
+the classifier). So to calculate SHAP values, SimBA needs this folder
+to be populated with files containing behavioral annotations.</p>
+</div>
+</section>
+<section id="part-2-compute-shap-scores">
+<h2>Part 2: Compute SHAP scores<a class="headerlink" href="#part-2-compute-shap-scores" title="Permalink to this heading"></a></h2>
+<section id="step-1-define-shap-settings">
+<h3>Step 1: Define SHAP settings<a class="headerlink" href="#step-1-define-shap-settings" title="Permalink to this heading"></a></h3>
+<p>Navigate to the <code class="docutils literal notranslate"><span class="pre">Train</span> <span class="pre">machine</span> <span class="pre">model</span></code> tab and click on <code class="docutils literal notranslate"><span class="pre">Settings</span></code>.
+In the pop-up window, fill out your model <code class="docutils literal notranslate"><span class="pre">hyperparameter</span></code> settings as
+described [HERE]
+(<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-7-train-machine-model">https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-7-train-machine-model</a>.
+At the bottom of the <code class="docutils literal notranslate"><span class="pre">Settings</span></code> pop-up window, you will see these
+entry boxes. Begin by ticking the <code class="docutils literal notranslate"><span class="pre">Calculate</span> <span class="pre">SHAP</span> <span class="pre">values</span></code> entry box.</p>
+<a class="reference internal image-reference" href="../_images/menu_1.png"><img alt="../_images/menu_1.png" class="align-center" src="../_images/menu_1.png" style="width: 800px;" /></a>
+<p>When this box is ticked, and the entry boxes are filled in, SiMBA will
+also calculate SHAP values while generating your behavioral classifier.
+SimBA will use your annotations in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/csv/targets_inserted</span></code> folder when doing so. SHAP
+calculations are an computationally expensive process, so you most
+likely can’t use <strong>all</strong> of your annotations to calculate them. The time
+it takes to calculate SHAP scores for a single frame will depend on how
+many features you have the the specs of your computer, but in all
+likelihood it will take <strong>several seconds, and possibly tens of
+seconds</strong>, for a single frame. We therefore have to select a random
+sub-set of frames to calculate SHAP scores for.</p>
+<ul class="simple">
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">target</span> <span class="pre">present</span></code> entry box, enter the number of frames
+(integer - e.g., <code class="docutils literal notranslate"><span class="pre">200</span></code>) with the behavioral target <strong>present</strong> to
+calculate SHAP values for.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">target</span> <span class="pre">absent</span></code> entry box, enter the number of frames
+(integer - e.g., <code class="docutils literal notranslate"><span class="pre">200</span></code>) with the behavioral target <strong>absent</strong> to
+calculate SHAP values for.</p></li>
+</ul>
+<p>Once you have filled in the SHAP entry boxes, click on either
+<code class="docutils literal notranslate"><span class="pre">save</span> <span class="pre">settings</span> <span class="pre">into</span> <span class="pre">global</span> <span class="pre">environment</span></code> or
+<code class="docutils literal notranslate"><span class="pre">save</span> <span class="pre">settings</span> <span class="pre">for</span> <span class="pre">specific</span> <span class="pre">model</span></code>, depening on wether you are
+generating one model, or several models at once. For more information on
+generating one vs several models, click
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#train-predictive-classifiers-start-the-machine-training">HERE</a>.</p>
+<p>Click to close the <code class="docutils literal notranslate"><span class="pre">Settings</span></code> pop-up window.</p>
+</section>
+<section id="step-2-train-the-classifier-and-generate-shap-values">
+<h3>Step 2: Train the classifier and generate SHAP values.<a class="headerlink" href="#step-2-train-the-classifier-and-generate-shap-values" title="Permalink to this heading"></a></h3>
+<p>Start the classifier training by clicking on
+<code class="docutils literal notranslate"><span class="pre">Train</span> <span class="pre">single</span> <span class="pre">model</span> <span class="pre">from</span> <span class="pre">global</span> <span class="pre">environment</span></code> or
+<code class="docutils literal notranslate"><span class="pre">Train</span> <span class="pre">multiple</span> <span class="pre">models,</span> <span class="pre">one</span> <span class="pre">for</span> <span class="pre">each</span> <span class="pre">saved</span> <span class="pre">settings</span></code>. You will be able
+to follow the progress in the Terminal window. A new message will be
+printed in the main SimBA terminal for every SHAP score computed. If you
+are calculating the shap scores for 200 frames, you can expect the
+beginning of the calculations to look something like this in the main
+SimBA terminal:</p>
+<a class="reference internal image-reference" href="../_images/printing.png"><img alt="../_images/printing.png" class="align-center" src="../_images/printing.png" style="width: 1000px;" /></a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>As noted above, calculating SHAP scores is computationally
+expensive and depending on the number of frames you entered in the
+<code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">target</span> <span class="pre">present</span></code> and <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">target</span> <span class="pre">absent</span></code>, this could take a
+while. If you are calculating SHAP scores for a lot of frames, it’s
+best to make it an overnighter.</p>
+</div>
+<p>Once complete, you will see the following message:
+<code class="docutils literal notranslate"><span class="pre">All</span> <span class="pre">SHAP</span> <span class="pre">data</span> <span class="pre">saved</span> <span class="pre">in</span> <span class="pre">project_folder/models/evaluations</span></code> directory.
+Navigate to the directory to access your SHAP values. In this directory
+you will see several output files. If you used one of the SimBA
+pre-defined <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-1-generate-project-config">14- or 16-body-part
+configurations</a>,
+and your classifier is called <code class="docutils literal notranslate"><span class="pre">copulation</span></code> you will see 5 new files
+named something like this:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">RAW_SHAP_feature_values_copulation_prediction.csv</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SHAP_values_copulation_prediction.csv</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SHAP_summary_copulation_ABSENT_20210507160801.csv</span></code> (only saved
+when using 14- or 16-body-part configurations)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SHAP_summary_copulation_PRSESENT_20210507160801.csv</span></code> (only saved
+when using 14- or 16-body-part configurations)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SHAP_summary_line_graph_copulation_20210507160801.png</span></code> (only saved
+when using 14- or 16-body-part configurations)</p></li>
+</ul>
+<p>Below we will go through how the data in these two files can be
+interpreted.</p>
+</section>
+<section id="step-3-interpreting-the-shap-value-ouput-generated-by-simba">
+<h3>Step 3: Interpreting the SHAP value ouput generated by SimBA.<a class="headerlink" href="#step-3-interpreting-the-shap-value-ouput-generated-by-simba" title="Permalink to this heading"></a></h3>
+<section id="detailed-shap-values">
+<h4>Detailed SHAP values<a class="headerlink" href="#detailed-shap-values" title="Permalink to this heading"></a></h4>
+<p>The first two SHAP value output files
+(<code class="docutils literal notranslate"><span class="pre">RAW_SHAP_feature_values_copulation_prediction.csv</span></code> &amp;
+<code class="docutils literal notranslate"><span class="pre">SHAP_values_copulation_prediction.csv</span></code>) have an equal number of rows,
+where every row represent one of the frames that we calculated SHAP
+scores for. If you chose to generate SHAP values for 200 frames, each of
+the two files will contain 200 rows, where row <em>N</em> within both files
+represent the data for the <strong>same frame</strong>. The first file
+(<code class="docutils literal notranslate"><span class="pre">SHAP_values_copulation_prediction.csv</span></code>) contains the SHAP
+probability values. The second file
+(<code class="docutils literal notranslate"><span class="pre">RAW_SHAP_feature_values_copulation_prediction.csv</span></code>) contain the
+<strong>raw</strong> feature values for the same frames. The reason for generating
+two files is that it is sometimes necessery to match the SHAP values
+(represented in the <code class="docutils literal notranslate"><span class="pre">SHAP_values_copulation_prediction.csv</span></code>) with an
+actual feature values (represented in the
+<code class="docutils literal notranslate"><span class="pre">RAW_SHAP_feature_values_copulation_prediction.csv</span></code>).</p>
+<a class="reference internal image-reference" href="../_images/output_1.png"><img alt="../_images/output_1.png" class="align-center" src="../_images/output_1.png" style="width: 1000px;" /></a>
+<p>To help understand this, I’ve placed the two CSV files next to each
+other in the image above, with the <code class="docutils literal notranslate"><span class="pre">RAW</span> <span class="pre">feature</span> <span class="pre">values</span></code> file shown on
+the left, and the <code class="docutils literal notranslate"><span class="pre">SHAP</span> <span class="pre">values</span></code> file on the right. The red rectangle
+in the RAW values, on the left, shows that raw feature distance between
+the nose and the tail of animal number 1 (the feature name is in the
+header) was 70.23404 millimeters in frame number 1. Conversely, the SHAP
+values, shown on the right, shows that the distance between the nose and
+the tail of animal number 1 <strong>increased</strong> the copulation probability in
+frame number 1 with 0.317%.</p>
+<p>The last four columns of the <code class="docutils literal notranslate"><span class="pre">SHAP_values_copulation_prediction.csv</span></code>
+file contain some information that might be helpful for interpretating
+the data, and give a sanity check that the calculations were done as
+expected:</p>
+<a class="reference internal image-reference" href="../_images/output_2.png"><img alt="../_images/output_2.png" class="align-center" src="../_images/output_2.png" style="width: 1000px;" /></a>
+<p>The first of these 4 columns (<code class="docutils literal notranslate"><span class="pre">Expected_value</span></code>), contains the baseline
+probability value. That is - in this toy example - if you picked a frame
+at random, there is a 7.693% chance that the frame contains the target
+behavior <code class="docutils literal notranslate"><span class="pre">copulation</span></code>.</p>
+<p>The second column (<code class="docutils literal notranslate"><span class="pre">Sum</span></code>) contains the sum of all of the SHAP values
+for each individual frame. The third column (<code class="docutils literal notranslate"><span class="pre">Prediction_probability</span></code>)
+is the classifiers probability for the presence of the behavior in each
+individual frame. <strong>These two columns are generated as a sanity check,
+because the final prediction probability seen in the
+``Prediction_probability`` column should equal the sum of all the SHAP
+values seen in the ``Sum`` column</strong>. If the values in these two columns
+are <strong>not</strong> identical, then something has gone astray.</p>
+</section>
+<section id="summary-shap-statistics">
+<h4>Summary SHAP statistics<a class="headerlink" href="#summary-shap-statistics" title="Permalink to this heading"></a></h4>
+<p>Three further SHAP output files are generated <strong>if</strong> you are using the
+SimBA pre-defined <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-1-generate-project-config">14- or 16-body-part
+configurations</a>.
+The first two of these files
+(<code class="docutils literal notranslate"><span class="pre">SHAP_summary_copulation_ABSENT_20210507160801.csv</span></code> and
+<code class="docutils literal notranslate"><span class="pre">SHAP_summary_copulation_PRSESENT_20210507160801.csv</span></code>) details the sum
+of SHAP values in several defined feature categories. Here, we collapse
+all the features extracted by SimBA into seven feature categories that
+measure general characteristics of the social interaction (i.e., animal
+distances, resident and intruder movement, intruder movement, resident
+movement, resident shape, intruder shape, and resident and intruder
+shape). We then divided each of the seven feature categories into six
+further sub-categories that represent features within the category with
+different frame sampling frequencies (133ms, 166ms, 200ms, 500ms, 66ms,
+1 frame). If we open the two files
+(<code class="docutils literal notranslate"><span class="pre">SHAP_summary_copulation_ABSENT_20210507160801.csv</span></code> and
+<code class="docutils literal notranslate"><span class="pre">SHAP_summary_copulation_PRSESENT_20210507160801.csv</span></code>) they look
+something like this:</p>
+<a class="reference internal image-reference" href="../_images/output_3.png"><img alt="../_images/output_3.png" class="align-center" src="../_images/output_3.png" style="width: 1000px;" /></a>
+<p>The top screengrab tells you that the most important feature category
+for detecting copulation events was features measuring the combined
+movement of both the animals, and the most important feature
+time-sampling window within this category was 200ms. The bottom
+screengrab tells you that the most important features for detecting
+non-copulation events. To see which features form part of each of the
+sub-categories, check out
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/shap_feature_categories.csv">THIS</a>
+CSV file.</p>
+<p>The final file
+(<code class="docutils literal notranslate"><span class="pre">SHAP_summary_line_graph_copulation_20210507160801.png</span></code>) is an image
+that summarizes the summed SHAP scores for a quick overview of the
+decision processes of your classifier. It is a visual representation of
+the summed SHAP values seen in the
+<code class="docutils literal notranslate"><span class="pre">SHAP_summary_copulation_PRSESENT_20210507160801.csv</span></code> file and look
+something like this:</p>
+<a class="reference internal image-reference" href="../_images/output_4.png"><img alt="../_images/output_4.png" class="align-center" src="../_images/output_4.png" style="width: 1000px;" /></a>
+<p>Check in with us on the <a class="reference external" href="https://gitter.im/SimBA-Resource/community">Gitter chat
+channel</a> or raise a an
+issue and we may be able to help. The fourth column
+(<code class="docutils literal notranslate"><span class="pre">copulation_prediction</span></code>) will read either 0 or 1, and tell you if
+this particular frame was annotated as containing the behavior of
+interest (<code class="docutils literal notranslate"><span class="pre">1</span></code>), or <strong>not</strong> containing the behavior of interest
+(<code class="docutils literal notranslate"><span class="pre">0</span></code>).</p>
+<p>Author <a class="reference external" href="https://github.com/sronilsson">Simon N</a>, <a class="reference external" href="https://github.com/inoejj">JJ
+Choong</a></p>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="anchored_rois.html" class="btn btn-neutral float-left" title="Animal-anchored ROIs (bounding-boxes) in SimBA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="directionality_between_animals.html" class="btn btn-neutral float-right" title="Who is looking at who: calculate “directionality” between animals in SimBA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

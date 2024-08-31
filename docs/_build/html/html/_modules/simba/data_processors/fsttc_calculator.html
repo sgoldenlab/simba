@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.data_processors.fsttc_calculator &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.data_processors.fsttc_calculator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.data_processors.fsttc_calculator</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">simba.mixins.config_reader</span> <span class="kn">import</span> <span class="n">ConfigReader</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.plotting_mixin</span> <span class="kn">import</span> <span class="n">PlottingMixin</span>
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="n">check_if_filepath_list_is_empty</span>
+<span class="kn">from</span> <span class="nn">simba.utils.data</span> <span class="kn">import</span> <span class="n">detect_bouts</span>
+<span class="kn">from</span> <span class="nn">simba.utils.enums</span> <span class="kn">import</span> <span class="n">TagNames</span>
+<span class="kn">from</span> <span class="nn">simba.utils.errors</span> <span class="kn">import</span> <span class="n">CountError</span>
+<span class="kn">from</span> <span class="nn">simba.utils.printing</span> <span class="kn">import</span> <span class="n">log_event</span><span class="p">,</span> <span class="n">stdout_success</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="n">get_fn_ext</span><span class="p">,</span> <span class="n">read_df</span>
+
+
+<div class="viewcode-block" id="FSTTCCalculator"><a class="viewcode-back" href="../../../simba.data_processors.html#simba.data_processors.fsttc_calculator.FSTTCCalculator">[docs]</a><span class="k">class</span> <span class="nc">FSTTCCalculator</span><span class="p">(</span><span class="n">ConfigReader</span><span class="p">,</span> <span class="n">PlottingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute forward spike-time tiling coefficients between pairs of</span>
+<span class="sd">    classified behaviors.</span>
+
+<span class="sd">    :parameter str config_path: path to SimBA project config file in Configparser format.</span>
+<span class="sd">    :parameter: Optional[bool] join_bouts_within_delta: If several bouts onsets (of the same classifier) occurs within a single time-delta, then join the bouts into a single bout.</span>
+<span class="sd">    :parameter: Optional[bool] time_delta_at_onset: If True, time delta is initatiated at bout onset. If False, then initated at bout offset and includes bout duration. Default: False.</span>
+<span class="sd">    :parameter int time_window: FSTTC hyperparameter; Integer representing the time window in seconds.</span>
+<span class="sd">    :parameter List[str] behavior_lst: Behaviors to calculate FSTTC between. FSTTC will be computed for all combinations of behaviors.</span>
+<span class="sd">    :parameter bool create_graphs: If True, created violin plots (as below) representing each FSTTC. Default: False.</span>
+
+<span class="sd">    .. image:: _static/img/fsttc_violin.png</span>
+<span class="sd">       :width: 500</span>
+<span class="sd">       :align: center</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">       `Tutorial &lt;https://github.com/sgoldenlab/simba/blob/master/docs/FSTTC.md&gt;`__.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    -----</span>
+<span class="sd">    &gt;&gt;&gt; fsttc_calculator = FSTTCCalculator(config_path=&#39;MyConfigPath&#39;, time_window=2, behavior_lst=[&#39;Attack&#39;, &#39;Sniffing&#39;], create_graphs=True)</span>
+<span class="sd">    &gt;&gt;&gt; fsttc_calculator.run()</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Lee et al., Temporal microstructure of dyadic social behavior during relationship formation in mice, `PLOS One`,</span>
+<span class="sd">           2019.</span>
+<span class="sd">    .. [2] Cutts et al., Detecting Pairwise Correlations in Spike Trains: An Objective Comparison of Methods and</span>
+<span class="sd">           Application to the Study of Retinal Waves, `J Neurosci`, 2014.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">config_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
+        <span class="n">time_window</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">behavior_lst</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">time_delta_at_onset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">join_bouts_within_delta</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">create_graphs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">ConfigReader</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="n">PlottingMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">log_event</span><span class="p">(</span>
+            <span class="n">logger_name</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">),</span>
+            <span class="n">log_type</span><span class="o">=</span><span class="n">TagNames</span><span class="o">.</span><span class="n">CLASS_INIT</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">msg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">create_log_msg_from_init_args</span><span class="p">(</span><span class="nb">locals</span><span class="o">=</span><span class="nb">locals</span><span class="p">()),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_delta</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time_window</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">behavior_lst</span> <span class="o">=</span> <span class="n">behavior_lst</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior_lst</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">CountError</span><span class="p">(</span>
+                <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;FSTCC requires at least two behaviors&quot;</span><span class="p">,</span>
+                <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph_status</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">join_bouts_within_delta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_delta_at_onset</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">create_graphs</span><span class="p">,</span>
+            <span class="n">join_bouts_within_delta</span><span class="p">,</span>
+            <span class="n">time_delta_at_onset</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">check_if_filepath_list_is_empty</span><span class="p">(</span>
+            <span class="n">filepaths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_results_paths</span><span class="p">,</span>
+            <span class="n">error_msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Cannot calculate FSTTC, no data found in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_results_paths</span><span class="si">}</span><span class="s2"> directory&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clf_permutations</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">permutations</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior_lst</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing FSTTC for </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_results_paths</span><span class="p">))</span><span class="si">}</span><span class="s2"> file(s)...&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__join_bouts</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_delta_at_onset</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span><span class="p">[</span><span class="s2">&quot;DELTA_END&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames_in_window</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span><span class="p">[</span><span class="s2">&quot;DELTA_END&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span><span class="p">[</span><span class="s2">&quot;End_frame&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames_in_window</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">])</span>
+
+        <span class="k">for</span> <span class="n">clf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span><span class="p">[</span><span class="s2">&quot;Event&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+            <span class="n">clf_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span><span class="p">[</span><span class="s2">&quot;Event&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">clf</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">grouped_clf</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="n">clf_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">,</span> <span class="s2">&quot;End_frame&quot;</span><span class="p">,</span> <span class="s2">&quot;DELTA_END&quot;</span><span class="p">])</span>
+                    <span class="o">.</span><span class="n">assign</span><span class="p">(</span>
+                        <span class="n">max_End</span><span class="o">=</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;DELTA_END&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cummax</span><span class="p">(),</span>
+                        <span class="n">group</span><span class="o">=</span><span class="k">lambda</span> <span class="n">d</span><span class="p">:</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]</span>
+                        <span class="o">.</span><span class="n">ge</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;max_End&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shift</span><span class="p">())</span>
+                        <span class="o">.</span><span class="n">cumsum</span><span class="p">(),</span>
+                    <span class="p">)</span>
+                    <span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;group&quot;</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">agg</span><span class="p">({</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">:</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span> <span class="s2">&quot;DELTA_END&quot;</span><span class="p">:</span> <span class="s2">&quot;max&quot;</span><span class="p">})</span>
+                    <span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">Duration</span><span class="o">=</span><span class="k">lambda</span> <span class="n">g</span><span class="p">:</span> <span class="n">g</span><span class="p">[</span><span class="s2">&quot;DELTA_END&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">g</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">])</span>
+                <span class="p">)</span>
+                <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;Duration&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">grouped_clf</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grouped_clf</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+            <span class="n">grouped_clf</span><span class="p">[</span><span class="s2">&quot;End_frame&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grouped_clf</span><span class="p">[</span><span class="s2">&quot;DELTA_END&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+            <span class="n">grouped_clf</span><span class="p">[</span><span class="s2">&quot;Event&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">clf</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">grouped_clf</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Event&quot;</span><span class="p">,</span> <span class="s2">&quot;Start_frame&quot;</span><span class="p">])</span>
+            <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;DELTA_END&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="FSTTCCalculator.find_sequences"><a class="viewcode-back" href="../../../simba.data_processors.html#simba.data_processors.fsttc_calculator.FSTTCCalculator.find_sequences">[docs]</a>    <span class="k">def</span> <span class="nf">find_sequences</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to create list of dataframes holding information on the sequences of behaviors including</span>
+<span class="sd">        inter-temporal distances.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Attribute: list</span>
+<span class="sd">            vide_df_sequence_lst</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_sequences</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">out_columns</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;Video&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;First behaviour&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;First behaviour start frame&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;First behavior end frame&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Second behaviour&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Second behaviour start frame&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Difference: first behavior start to second behavior start&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;Time 2nd behaviour start to time window end&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">file_cnt</span><span class="p">,</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_results_paths</span><span class="p">):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">video_sequences</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Analyzing behavioral sequences: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> (Video </span><span class="si">{</span><span class="n">file_cnt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_results_paths</span><span class="p">)</span><span class="si">}</span><span class="s2">)...&quot;</span>
+            <span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_video_info</span><span class="p">(</span><span class="n">video_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">video_sequences</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">][</span><span class="s2">&quot;fps&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fps</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">frames_in_window</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">fps</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_delta</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span> <span class="o">=</span> <span class="n">read_df</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">)</span>  <span class="c1"># [self.behavior_lst]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">video_sequences</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">][</span><span class="s2">&quot;session_length_frames&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span> <span class="o">=</span> <span class="n">detect_bouts</span><span class="p">(</span>
+                <span class="n">data_df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">,</span> <span class="n">target_lst</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">behavior_lst</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fps</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span><span class="p">[</span><span class="s2">&quot;Start_time&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">fps</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span><span class="p">[[</span><span class="s2">&quot;Event&quot;</span><span class="p">,</span> <span class="s2">&quot;Start_frame&quot;</span><span class="p">,</span> <span class="s2">&quot;End_frame&quot;</span><span class="p">]]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">join_bouts_within_delta</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__join_bouts</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">first_clf</span><span class="p">,</span> <span class="n">second_clf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clf_permutations</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">vide_df_sequence_lst</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">sequence_name</span> <span class="o">=</span> <span class="s2">&quot;FSTTC </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">first_clf</span><span class="p">,</span> <span class="n">second_clf</span><span class="p">)</span>
+                <span class="n">first_clf_df</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span><span class="p">[</span><span class="s2">&quot;Event&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">first_clf</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">])</span>
+                    <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">second_clf_df</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bouts_df</span><span class="p">[</span><span class="s2">&quot;Event&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">second_clf</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">])</span>
+                    <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">first_clf_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_delta_at_onset</span><span class="p">:</span>
+                        <span class="n">frame_crtrn_min</span><span class="p">,</span> <span class="n">frame_crtrn_max</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">row</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                            <span class="n">row</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames_in_window</span><span class="p">,</span>
+                        <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">join_bouts_within_delta</span><span class="p">:</span>
+                            <span class="n">frame_crtrn_min</span><span class="p">,</span> <span class="n">frame_crtrn_max</span> <span class="o">=</span> <span class="p">(</span>
+                                <span class="n">row</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                <span class="n">row</span><span class="p">[</span><span class="s2">&quot;End_frame&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames_in_window</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">frame_crtrn_min</span><span class="p">,</span> <span class="n">frame_crtrn_max</span> <span class="o">=</span> <span class="p">(</span>
+                                <span class="n">row</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                <span class="n">row</span><span class="p">[</span><span class="s2">&quot;End_frame&quot;</span><span class="p">],</span>
+                            <span class="p">)</span>
+
+                    <span class="n">second_clf_df_crtrn</span> <span class="o">=</span> <span class="n">second_clf_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                        <span class="p">(</span><span class="n">second_clf_df</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">frame_crtrn_min</span><span class="p">)</span>
+                        <span class="o">&amp;</span> <span class="p">(</span><span class="n">second_clf_df</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">frame_crtrn_max</span><span class="p">)</span>
+                    <span class="p">]</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">second_clf_df_crtrn</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">second_clf_df_crtrn</span> <span class="o">=</span> <span class="n">second_clf_df_crtrn</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                        <span class="n">frames_between_behaviors</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">second_clf_df_crtrn</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]</span>
+                        <span class="p">)</span><span class="o">.</span><span class="n">values</span>
+                        <span class="n">second_clf_df_crtrn</span><span class="p">[</span><span class="s2">&quot;Frames_between_behaviors&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">second_clf_df_crtrn</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]</span>
+                        <span class="p">)</span>
+                        <span class="k">if</span> <span class="n">frames_between_behaviors</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">frames_between_behaviors</span> <span class="o">=</span> <span class="mi">1</span>
+                        <span class="n">second_clf_df_crtrn</span><span class="p">[</span><span class="s2">&quot;Frames_between_behaviors&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">frames_between_behaviors</span>
+                        <span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_delta_at_onset</span><span class="p">:</span>
+                            <span class="n">second_clf_df_crtrn</span><span class="p">[</span>
+                                <span class="s2">&quot;Frames_between_second_behavior_start_to_time_window_end&quot;</span>
+                            <span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                                <span class="n">row</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames_in_window</span>
+                            <span class="p">)</span> <span class="o">-</span> <span class="n">second_clf_df_crtrn</span><span class="p">[</span>
+                                <span class="s2">&quot;Start_frame&quot;</span>
+                            <span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span>
+                                <span class="mi">0</span>
+                            <span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">second_clf_df_crtrn</span><span class="p">[</span>
+                                <span class="s2">&quot;Frames_between_second_behavior_start_to_time_window_end&quot;</span>
+                            <span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                                <span class="n">row</span><span class="p">[</span><span class="s2">&quot;End_frame&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames_in_window</span>
+                            <span class="p">)</span> <span class="o">-</span> <span class="n">second_clf_df_crtrn</span><span class="p">[</span>
+                                <span class="s2">&quot;Start_frame&quot;</span>
+                            <span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span>
+                                <span class="mi">0</span>
+                            <span class="p">]</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">vide_df_sequence_lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                                <span class="p">[</span>
+                                    <span class="p">[</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">,</span>
+                                        <span class="n">first_clf</span><span class="p">,</span>
+                                        <span class="n">row</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">],</span>
+                                        <span class="n">row</span><span class="p">[</span><span class="s2">&quot;End_frame&quot;</span><span class="p">],</span>
+                                        <span class="n">second_clf</span><span class="p">,</span>
+                                        <span class="n">second_clf_df_crtrn</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                        <span class="n">second_clf_df_crtrn</span><span class="p">[</span>
+                                            <span class="s2">&quot;Frames_between_behaviors&quot;</span>
+                                        <span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                        <span class="n">second_clf_df_crtrn</span><span class="p">[</span>
+                                            <span class="s2">&quot;Frames_between_second_behavior_start_to_time_window_end&quot;</span>
+                                        <span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                    <span class="p">]</span>
+                                <span class="p">],</span>
+                                <span class="n">columns</span><span class="o">=</span><span class="n">out_columns</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">vide_df_sequence_lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                                <span class="p">[</span>
+                                    <span class="p">[</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">,</span>
+                                        <span class="n">first_clf</span><span class="p">,</span>
+                                        <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;Start_frame&quot;</span><span class="p">]),</span>
+                                        <span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;End_frame&quot;</span><span class="p">]),</span>
+                                        <span class="s2">&quot;None&quot;</span><span class="p">,</span>
+                                        <span class="s2">&quot;None&quot;</span><span class="p">,</span>
+                                        <span class="s2">&quot;None&quot;</span><span class="p">,</span>
+                                        <span class="s2">&quot;None&quot;</span><span class="p">,</span>
+                                    <span class="p">]</span>
+                                <span class="p">],</span>
+                                <span class="n">columns</span><span class="o">=</span><span class="n">out_columns</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vide_df_sequence_lst</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">video_sequences</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">vide_df_sequence_lst</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                        <span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span>
+                            <span class="n">subset</span><span class="o">=</span><span class="p">[</span>
+                                <span class="s2">&quot;Video&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;First behaviour&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;First behaviour start frame&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;First behavior end frame&quot;</span><span class="p">,</span>
+                                <span class="s2">&quot;Second behaviour&quot;</span><span class="p">,</span>
+                            <span class="p">],</span>
+                            <span class="n">keep</span><span class="o">=</span><span class="s2">&quot;first&quot;</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time_delta_at_onset</span><span class="p">:</span>
+                        <span class="n">video_sequences</span><span class="p">[</span><span class="s2">&quot;Total_window_frames&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames_in_window</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">video_sequences</span><span class="p">[</span><span class="s2">&quot;Total_window_frames&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">video_sequences</span><span class="p">[</span><span class="s2">&quot;First behavior end frame&quot;</span><span class="p">]</span>
+                            <span class="o">-</span> <span class="n">video_sequences</span><span class="p">[</span><span class="s2">&quot;First behaviour start frame&quot;</span><span class="p">]</span>
+                        <span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">frames_in_window</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">video_sequences</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">][</span>
+                        <span class="n">sequence_name</span>
+                    <span class="p">]</span> <span class="o">=</span> <span class="n">video_sequences</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">video_sequences</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">][</span><span class="n">sequence_name</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="FSTTCCalculator.run"><a class="viewcode-back" href="../../../simba.data_processors.html#simba.data_processors.fsttc_calculator.FSTTCCalculator.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to calculate forward spike-time tiling coefficients (FSTTC) using the data computed in :meth:</span>
+<span class="sd">        :meth:`~simba.FSTTCPerformer.find_sequences`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Attribute: dict</span>
+<span class="sd">            results_dict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">find_sequences</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">video_name</span><span class="p">,</span> <span class="n">video_data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_sequences</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span><span class="p">[</span><span class="n">video_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">fps</span><span class="p">,</span> <span class="n">session_frames</span> <span class="o">=</span> <span class="n">video_data</span><span class="p">[</span><span class="s2">&quot;fps&quot;</span><span class="p">],</span> <span class="n">video_data</span><span class="p">[</span><span class="s2">&quot;session_length_frames&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">first_clf</span><span class="p">,</span> <span class="n">second_clf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clf_permutations</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">first_clf</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span><span class="p">[</span><span class="n">video_name</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span><span class="p">[</span><span class="n">video_name</span><span class="p">][</span><span class="n">first_clf</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span><span class="p">[</span><span class="n">video_name</span><span class="p">][</span><span class="n">first_clf</span><span class="p">][</span><span class="n">second_clf</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">sequence_data</span> <span class="o">=</span> <span class="n">video_data</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;FSTTC </span><span class="si">{</span><span class="n">first_clf</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">second_clf</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">sequence_data</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span><span class="p">[</span><span class="n">video_name</span><span class="p">][</span><span class="n">first_clf</span><span class="p">][</span><span class="n">second_clf</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;No events&quot;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">len_clf_1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
+                        <span class="n">sequence_data</span><span class="p">[</span><span class="n">sequence_data</span><span class="p">[</span><span class="s2">&quot;First behaviour&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">first_clf</span><span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="n">len_clf_1_2</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span>
+                        <span class="n">sequence_data</span><span class="p">[</span>
+                            <span class="p">(</span><span class="n">sequence_data</span><span class="p">[</span><span class="s2">&quot;First behaviour&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">first_clf</span><span class="p">)</span>
+                            <span class="o">&amp;</span> <span class="p">(</span><span class="n">sequence_data</span><span class="p">[</span><span class="s2">&quot;Second behaviour&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">second_clf</span><span class="p">)</span>
+                        <span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="p">(</span><span class="n">len_clf_1</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">len_clf_1_2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span><span class="p">[</span><span class="n">video_name</span><span class="p">][</span><span class="n">first_clf</span><span class="p">][</span><span class="n">second_clf</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">clf_1_2_df</span> <span class="o">=</span> <span class="n">sequence_data</span><span class="p">[</span>
+                            <span class="p">(</span><span class="n">sequence_data</span><span class="p">[</span><span class="s2">&quot;First behaviour&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">first_clf</span><span class="p">)</span>
+                            <span class="o">&amp;</span> <span class="p">(</span><span class="n">sequence_data</span><span class="p">[</span><span class="s2">&quot;Second behaviour&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">second_clf</span><span class="p">)</span>
+                        <span class="p">]</span>
+                        <span class="n">P</span> <span class="o">=</span> <span class="n">len_clf_1_2</span> <span class="o">/</span> <span class="n">len_clf_1</span>
+                        <span class="n">Ta</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">clf_1_2_df</span><span class="p">[</span><span class="s2">&quot;Total_window_frames&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">session_frames</span>
+                        <span class="n">Tb</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="nb">sum</span><span class="p">(</span>
+                                <span class="n">clf_1_2_df</span><span class="p">[</span>
+                                    <span class="s2">&quot;Time 2nd behaviour start to time window end&quot;</span>
+                                <span class="p">]</span>
+                            <span class="p">)</span>
+                            <span class="o">/</span> <span class="n">session_frames</span>
+                        <span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span><span class="p">[</span><span class="n">video_name</span><span class="p">][</span><span class="n">first_clf</span><span class="p">][</span><span class="n">second_clf</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span>
+                            <span class="p">(</span><span class="n">P</span> <span class="o">-</span> <span class="n">Tb</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">P</span> <span class="o">*</span> <span class="n">Tb</span><span class="p">))</span> <span class="o">+</span> <span class="p">((</span><span class="n">P</span> <span class="o">-</span> <span class="n">Ta</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">P</span> <span class="o">*</span> <span class="n">Ta</span><span class="p">)))</span>
+                        <span class="p">)</span>
+                        <span class="c1"># print(self.results_dict[video_name][first_clf][second_clf])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">graph_status</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__plot_FSTTC</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__plot_FSTTC</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Private method to visualize forward spike-time tiling coefficients (FSTTC) as png violin plots. Results are stored on</span>
+<span class="sd">        disk within the `project_folder/logs` directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_df</span><span class="p">[</span><span class="s2">&quot;BEHAVIOR COMBINATION&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_df</span><span class="p">[</span><span class="s2">&quot;FIRST BEHAVIOR&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_df</span><span class="p">[</span><span class="s2">&quot;SECOND BEHAVIOR&quot;</span><span class="p">],</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;-&quot;</span>
+        <span class="p">)</span>
+        <span class="n">data_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">out_df</span><span class="p">[</span><span class="s2">&quot;FSTTC&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;No events&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span>
+            <span class="n">drop</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="n">data_df</span><span class="p">[</span><span class="s2">&quot;FSTTC&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">data_df</span><span class="p">[</span><span class="s2">&quot;FSTTC&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">violin_plot</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">data_df</span><span class="p">,</span>
+            <span class="n">x</span><span class="o">=</span><span class="s2">&quot;BEHAVIOR COMBINATION&quot;</span><span class="p">,</span>
+            <span class="n">y</span><span class="o">=</span><span class="s2">&quot;FSTTC&quot;</span><span class="p">,</span>
+            <span class="n">save_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logs_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;FSTTC_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="FSTTCCalculator.save"><a class="viewcode-back" href="../../../simba.data_processors.html#simba.data_processors.fsttc_calculator.FSTTCCalculator.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to save forward spike-time tiling coefficients (FSTTC) to disk within the `project_folder/logs` directory.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;VIDEO&quot;</span><span class="p">,</span> <span class="s2">&quot;FIRST BEHAVIOR&quot;</span><span class="p">,</span> <span class="s2">&quot;SECOND BEHAVIOR&quot;</span><span class="p">,</span> <span class="s2">&quot;FSTTC&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">video_name</span><span class="p">,</span> <span class="n">video_data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">first_behavior</span><span class="p">,</span> <span class="n">first_behavior_data</span> <span class="ow">in</span> <span class="n">video_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">second_behavior</span><span class="p">,</span> <span class="n">fsttc</span> <span class="ow">in</span> <span class="n">first_behavior_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_df</span><span class="p">)]</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="n">video_name</span><span class="p">,</span>
+                        <span class="n">first_behavior</span><span class="p">,</span>
+                        <span class="n">second_behavior</span><span class="p">,</span>
+                        <span class="n">fsttc</span><span class="p">,</span>
+                    <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logs_path</span><span class="p">,</span> <span class="s2">&quot;FSTTC_</span><span class="si">{}</span><span class="s2">.csv&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_save_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">()</span>
+        <span class="n">stdout_success</span><span class="p">(</span>
+            <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;FSTTC data saved at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">file_save_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">elapsed_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">elapsed_time_str</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+
+
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># test = FSTTCCalculator(config_path=&#39;/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini&#39;,</span>
+<span class="c1">#                        time_window=10000,</span>
+<span class="c1">#                         behavior_lst=[&#39;Attack&#39;, &#39;Sniffing&#39;],</span>
+<span class="c1">#                         create_graphs=True)</span>
+<span class="c1"># test.run()</span>
+<span class="c1">#</span>
+
+
+<span class="c1"># test = FSTTCCalculator(config_path=&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini&#39;,</span>
+<span class="c1">#                        time_window=60000,</span>
+<span class="c1">#                        join_bouts_within_delta=True,</span>
+<span class="c1">#                        time_delta_at_onset=True,</span>
+<span class="c1">#                        behavior_lst=[&#39;licking_grooming&#39;, &#39;active_nursing&#39;, &#39;nest_attendance&#39;], #&#39;passive_nursing&#39;, &#39;nest_attendance&#39;</span>
+<span class="c1">#                        create_graphs=True)</span>
+<span class="c1"># test.run()</span>
+
+
+<span class="c1"># test = FSTTCCalculator(config_path=&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini&#39;,</span>
+<span class="c1">#                      time_window=10000,</span>
+<span class="c1">#                      behavior_lst=[&#39;Attack&#39;, &#39;Sniffing&#39;],</span>
+<span class="c1">#                     create_graphs=False)</span>
+<span class="c1"># test.run()</span>
+
+
+<span class="c1">#</span>
+<span class="c1"># test = FSTTCCalculator(config_path=&#39;/Users/simon/Desktop/envs/troubleshooting/naresh/project_folder/project_config.ini&#39;,</span>
+<span class="c1">#                      time_window=2000,</span>
+<span class="c1">#                      behavior_lst=[&#39;Erratic Turning&#39;, &#39;Bottom&#39;, &#39;Normal Swimming&#39;, &#39;Freezing&#39;, &#39;Wall Bumping&#39;],</span>
+<span class="c1">#                     create_graphs=True)</span>
+<span class="c1"># test.run()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -3,9 +3,14 @@ __email__ = "sronilsson@gmail.com"
 
 import os
 from typing import Optional, Union
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 
 import cupy as cp
 import cv2
+from copy import deepcopy
 import numpy as np
 from numba import cuda
 
@@ -21,6 +26,16 @@ from simba.utils.printing import stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
     get_video_meta_data, read_img_batch_from_video_gpu)
+
+
+
+
+
+
+
+
+
+
 
 
 def average_3d_stack_cupy(image_stack: np.ndarray) -> np.ndarray:
@@ -42,9 +57,9 @@ def _average_3d_stack_cuda(data, results):
             sum_value += data[n, y, x, i]
         results[y, x, i] = sum_value / data.shape[0]
 
-def average_3d_stack_cuda(image_stack: np.ndarray) -> np.ndarray:
-    check_instance(source=average_3d_stack_cuda.__name__, instance=image_stack, accepted_types=(np.ndarray,))
-    check_if_valid_img(data=image_stack[0], source=average_3d_stack_cuda.__name__)
+def _average_3d_stack_cuda(image_stack: np.ndarray) -> np.ndarray:
+    check_instance(source=_average_3d_stack_cuda.__name__, instance=image_stack, accepted_types=(np.ndarray,))
+    check_if_valid_img(data=image_stack[0], source=_average_3d_stack_cuda.__name__)
     if image_stack.ndim != 4:
         return image_stack
     x = np.ascontiguousarray(image_stack)
@@ -61,7 +76,7 @@ def average_3d_stack_cuda(image_stack: np.ndarray) -> np.ndarray:
 
 
 
-def create_average_frm(video_path: Union[str, os.PathLike],
+def create_average_frm_cuda(video_path: Union[str, os.PathLike],
                        start_frm: Optional[int] = None,
                        end_frm: Optional[int] = None,
                        start_time: Optional[str] = None,
@@ -95,17 +110,17 @@ def create_average_frm(video_path: Union[str, os.PathLike],
 
     if not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)",
-                                  source=create_average_frm.__name__)
+                                  source=create_average_frm_cuda.__name__)
 
     if ((start_frm is not None) or (end_frm is not None)) and ((start_time is not None) or (end_time is not None)):
         raise InvalidInputError(msg=f'Pass start_frm and end_frm OR start_time and end_time',
-                                source=create_average_frm.__name__)
+                                source=create_average_frm_cuda.__name__)
     elif type(start_frm) != type(end_frm):
-        raise InvalidInputError(msg=f'Pass start frame and end frame', source=create_average_frm.__name__)
+        raise InvalidInputError(msg=f'Pass start frame and end frame', source=create_average_frm_cuda.__name__)
     elif type(start_time) != type(end_time):
-        raise InvalidInputError(msg=f'Pass start time and end time', source=create_average_frm.__name__)
+        raise InvalidInputError(msg=f'Pass start time and end time', source=create_average_frm_cuda.__name__)
     if save_path is not None:
-        check_if_dir_exists(in_dir=os.path.dirname(save_path), source=create_average_frm.__name_)
+        check_if_dir_exists(in_dir=os.path.dirname(save_path), source=create_average_frm_cuda.__name_)
     check_file_exist_and_readable(file_path=video_path)
     video_meta_data = get_video_meta_data(video_path=video_path)
     video_name = get_fn_ext(filepath=video_path)[1]
@@ -116,13 +131,13 @@ def create_average_frm(video_path: Union[str, os.PathLike],
         check_int(name='end_frm', value=end_frm, min_value=0, max_value=video_meta_data['frame_count'])
         if start_frm > end_frm:
             raise InvalidInputError(msg=f'Start frame ({start_frm}) has to be before end frame ({end_frm}).',
-                                    source=create_average_frm.__name__)
+                                    source=create_average_frm_cuda.__name__)
         frame_ids = list(range(start_frm, end_frm))
     elif (start_time is not None) and (end_time is not None):
-        check_if_string_value_is_valid_video_timestamp(value=start_time, name=create_average_frm.__name__)
-        check_if_string_value_is_valid_video_timestamp(value=end_time, name=create_average_frm.__name__)
+        check_if_string_value_is_valid_video_timestamp(value=start_time, name=create_average_frm_cuda.__name__)
+        check_if_string_value_is_valid_video_timestamp(value=end_time, name=create_average_frm_cuda.__name__)
         check_that_hhmmss_start_is_before_end(start_time=start_time, end_time=end_time,
-                                              name=create_average_frm.__name__)
+                                              name=create_average_frm_cuda.__name__)
         check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=start_time, video_path=video_path)
         frame_ids = find_frame_numbers_from_time_stamp(start_time=start_time, end_time=end_time,
                                                        fps=video_meta_data['fps'])
@@ -135,8 +150,8 @@ def create_average_frm(video_path: Union[str, os.PathLike],
         if start_idx == end_idx:
             continue
         imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=start_idx, end_frm=end_idx, verbose=verbose)
-        avg_imgs.append(average_3d_stack_cuda(image_stack=np.stack(list(imgs.values()), axis=0)))
-    avg_img = average_3d_stack_cuda(image_stack=np.stack(avg_imgs, axis=0))
+        avg_imgs.append(_average_3d_stack_cuda(image_stack=np.stack(list(imgs.values()), axis=0)))
+    avg_img = _average_3d_stack_cuda(image_stack=np.stack(avg_imgs, axis=0))
     if save_path is not None:
         cv2.imwrite(save_path, avg_img)
         if verbose:

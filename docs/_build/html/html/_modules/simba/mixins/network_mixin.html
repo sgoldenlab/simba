@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.mixins.network_mixin &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.mixins.network_mixin</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.mixins.network_mixin</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">typing_extensions</span> <span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span>
+<span class="kn">from</span> <span class="nn">pyvis.network</span> <span class="kn">import</span> <span class="n">Network</span>
+
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="p">(</span><span class="n">check_float</span><span class="p">,</span> <span class="n">check_if_dir_exists</span><span class="p">,</span>
+                                <span class="n">check_instance</span><span class="p">,</span> <span class="n">check_int</span><span class="p">,</span>
+                                <span class="n">check_iterable_length</span><span class="p">,</span> <span class="n">check_str</span><span class="p">,</span>
+                                <span class="n">check_valid_array</span><span class="p">,</span> <span class="n">check_valid_hex_color</span><span class="p">,</span>
+                                <span class="n">check_valid_lst</span><span class="p">,</span> <span class="n">check_valid_tuple</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.data</span> <span class="kn">import</span> <span class="n">create_color_palette</span><span class="p">,</span> <span class="n">find_ranked_colors</span><span class="p">,</span> <span class="n">get_mode</span>
+<span class="kn">from</span> <span class="nn">simba.utils.errors</span> <span class="kn">import</span> <span class="n">CountError</span><span class="p">,</span> <span class="n">InvalidInputError</span>
+
+
+<div class="viewcode-block" id="NetworkMixin"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.network_mixin.NetworkMixin">[docs]</a><span class="k">class</span> <span class="nc">NetworkMixin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Methods to create and analyze time-dependent graphs from pose-estimation data.</span>
+
+<span class="sd">    When working with pose-estimation data for more than two animals - over extended periods - it can be beneficial to</span>
+<span class="sd">    represent the data as a graph where the animals feature as nodes are their relationship strengths are represented as edges.</span>
+
+<span class="sd">    When formatted as a graph, we can compute (i) how the relationships between animal pairs change across time and recordings,</span>
+<span class="sd">    (ii) the relative importance&#39;s and hierarchies of individual animals within the group, or (iii) identify sub-groups with the network.</span>
+
+<span class="sd">    The critical component determining the results is how edge weights are represented. These edge weight values could be the amount of time animal bounding</span>
+<span class="sd">    boxes overlap each other, aggregate distances between the animals, or how much time animals engange in coordinated behaviors. These values can be computed</span>
+<span class="sd">    through other methods within SimBA mixin methods.</span>
+
+<span class="sd">    Very much wip and so far primarily depend on `networkx &lt;https://github.com/networkx/networkx&gt;`_.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    See below references for mature and reliable packages (12/2023):</span>
+
+<span class="sd">    .. [1] `networkx &lt;https://github.com/networkx/networkx&gt;`_</span>
+<span class="sd">    .. [2] `igraph &lt;https://igraph.org/&gt;`_</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="NetworkMixin.create_graph"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.network_mixin.NetworkMixin.create_graph">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create_graph</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">():</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a single undirected graph with single edges from on dictionary.</span>
+
+<span class="sd">        :param Dict[Tuple[str, str], float] data: A dictionary where keys are tuples representing node pairs and values are the corresponding edge weights.</span>
+<span class="sd">        :returns nx.Graph: A networkx graph with nodes and edges defined by the input data.</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; data = {(&#39;Animal_1&#39;, &#39;Animal_2&#39;): 1.0, (&#39;Animal_1&#39;, &#39;Animal_3&#39;): 0.2, (&#39;Animal_2&#39;, &#39;Animal_3&#39;): 0.5}</span>
+<span class="sd">        &gt;&gt;&gt; graph = NetworkMixin.create_graph(data=data)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">check_instance</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">create_graph</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">accepted_types</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">check_instance</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">create_graph</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">k</span><span class="p">,</span><span class="n">accepted_types</span><span class="o">=</span><span class="nb">tuple</span><span class="p">)</span>
+            <span class="n">check_iterable_length</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">create_graph</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">k</span><span class="p">),</span> <span class="n">exact_accepted_length</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">check_instance</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">create_graph</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">v</span><span class="p">,</span> <span class="n">accepted_types</span><span class="o">=</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="nb">int</span><span class="p">))</span>
+
+        <span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">node_names</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">node_names</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">node_names</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">node_names</span><span class="p">,</span> <span class="n">edge_weight</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">node_names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">node_names</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">weight</span><span class="o">=</span><span class="n">edge_weight</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">G</span></div>
+
+<div class="viewcode-block" id="NetworkMixin.create_multigraph"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.network_mixin.NetworkMixin.create_multigraph">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create_multigraph</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a multi-graph from a dictionary of node pairs and associated edge weights.</span>
+
+<span class="sd">        For example, creates a multi-graph where node edges represent animal relationship weights at different</span>
+<span class="sd">        timepoints.</span>
+
+<span class="sd">        :param Dict[Tuple[str, str], List[float]] data: A dictionary where keys are tuples representing node pairs, and values are lists of edge weights associated with each pair.</span>
+<span class="sd">        :returns nx.MultiGraph: A NetworkX multigraph with nodes and edges specified by the input data. Each edge is labeled and weighted based on the provided information.</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; data = {(&#39;Animal_1&#39;, &#39;Animal_2&#39;): [0, 0, 0, 6], (&#39;Animal_1&#39;, &#39;Animal_3&#39;): [0, 0, 0, 0], (&#39;Animal_1&#39;, &#39;Animal_4&#39;): [0, 0, 0, 0], (&#39;Animal_1&#39;, &#39;Animal_5&#39;): [0, 0, 0, 0], (&#39;Animal_2&#39;, &#39;Animal_3&#39;): [0, 0, 0, 0], (&#39;Animal_2&#39;, &#39;Animal_4&#39;): [5, 0, 0, 2], (&#39;Animal_2&#39;, &#39;Animal_5&#39;): [0, 0, 0, 0], (&#39;Animal_3&#39;, &#39;Animal_4&#39;): [0, 0, 0, 0], (&#39;Animal_3&#39;, &#39;Animal_5&#39;): [0, 2, 22, 0], (&#39;Animal_4&#39;, &#39;Animal_5&#39;): [0, 0, 0, 0]}</span>
+<span class="sd">        &gt;&gt;&gt; NetworkMixin().create_multigraph(data=data)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">check_instance</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">create_multigraph</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">data</span><span class="p">,</span> <span class="n">accepted_types</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+        <span class="n">results</span><span class="p">,</span> <span class="n">dict_data</span><span class="p">,</span> <span class="n">G</span> <span class="o">=</span> <span class="p">{},</span> <span class="p">[],</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">check_instance</span><span class="p">(</span>
+                <span class="n">source</span><span class="o">=</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">create_multigraph</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="n">instance</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+                <span class="n">accepted_types</span><span class="o">=</span><span class="nb">tuple</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">check_instance</span><span class="p">(</span>
+                <span class="n">source</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">create_multigraph</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">instance</span><span class="o">=</span><span class="n">v</span><span class="p">,</span>
+                <span class="n">accepted_types</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">dict_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+        <span class="n">check_iterable_length</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">create_multigraph</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> data&quot;</span><span class="p">,</span>
+            <span class="n">val</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dict_data</span><span class="p">]))),</span>
+            <span class="n">exact_accepted_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">node_names</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">node_names</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">G</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">node_names</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">node_names</span><span class="p">,</span> <span class="n">edge_weights</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">edge_cnt</span><span class="p">,</span> <span class="n">edge_weight</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">edge_weights</span><span class="p">):</span>
+                <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span>
+                    <span class="n">node_names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">node_names</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">weight</span><span class="o">=</span><span class="n">edge_weight</span><span class="p">,</span>
+                    <span class="n">label</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;edge_</span><span class="si">{</span><span class="n">edge_cnt</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">G</span></div>
+
+<div class="viewcode-block" id="NetworkMixin.graph_page_rank"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.network_mixin.NetworkMixin.graph_page_rank">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">graph_page_rank</span><span class="p">(</span><span class="n">graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span>
+                            <span class="n">weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;weight&quot;</span><span class="p">,</span>
+                            <span class="n">alpha</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">,</span>
+                            <span class="n">max_iter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the PageRank of nodes in a graph.</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; graph = NetworkMixin.create_graph(data={(&#39;Animal_1&#39;, &#39;Animal_2&#39;): 1.0, (&#39;Animal_1&#39;, &#39;Animal_3&#39;): 0.2, (&#39;Animal_2&#39;, &#39;Animal_3&#39;): 0.5})</span>
+<span class="sd">        &gt;&gt;&gt; NetworkMixin().graph_page_rank(graph=graph)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">check_instance</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">graph_page_rank</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="n">instance</span><span class="o">=</span><span class="n">graph</span><span class="p">,</span>
+            <span class="n">accepted_types</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">check_str</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">graph_page_rank</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> weights&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">weights</span>
+        <span class="p">)</span>
+        <span class="n">check_float</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">graph_page_rank</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> alpha&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+        <span class="n">check_int</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">graph_page_rank</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> max_iter&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span>
+            <span class="n">min_value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">edge_weights</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="nb">set</span><span class="p">(</span>
+                <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span>
+                    <span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">for</span> <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">check_str</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">graph_page_rank</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> weights&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">edge_weights</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">pagerank</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NetworkMixin.graph_katz_centrality"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.network_mixin.NetworkMixin.graph_katz_centrality">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">graph_katz_centrality</span><span class="p">(</span><span class="n">graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">,):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Katz centrality is an algorithm in NetworkX that measures the relative influence of a node in a network.</span>
+
+<span class="sd">        See networkx documentation</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; graph = NetworkMixin.create_graph(data={(&#39;Animal_1&#39;, &#39;Animal_2&#39;): 1.0, (&#39;Animal_1&#39;, &#39;Animal_3&#39;): 0.2, (&#39;Animal_2&#39;, &#39;Animal_3&#39;): 0.5})</span>
+<span class="sd">        &gt;&gt;&gt; NetworkMixin().graph_katz_centrality(graph=graph)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">check_instance</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">graph_katz_centrality</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">graph</span><span class="p">,</span> <span class="n">accepted_types</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,)</span>
+        <span class="n">check_str</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">graph_katz_centrality</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> weights&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
+        <span class="n">check_float</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">graph_katz_centrality</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> alpha&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+        <span class="n">edge_weights</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="nb">set</span><span class="p">(</span>
+                <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span>
+                    <span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">for</span> <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">check_str</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">graph_katz_centrality</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> weights&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">edge_weights</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">katz_centrality_numpy</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NetworkMixin.graph_current_flow_closeness_centrality"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.network_mixin.NetworkMixin.graph_current_flow_closeness_centrality">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">graph_current_flow_closeness_centrality</span><span class="p">(</span><span class="n">graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;weight&quot;</span><span class="p">):</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+
+
+
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; graph = NetworkMixin.create_graph(data={(&#39;Animal_1&#39;, &#39;Animal_2&#39;): 1.0, (&#39;Animal_1&#39;, &#39;Animal_3&#39;): 0.2, (&#39;Animal_2&#39;, &#39;Animal_3&#39;): 0.5})</span>
+<span class="sd">        &gt;&gt;&gt; NetworkMixin().graph_current_flow_closeness_centrality(graph=graph)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">check_instance</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">graph_current_flow_closeness_centrality</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="n">instance</span><span class="o">=</span><span class="n">graph</span><span class="p">,</span>
+            <span class="n">accepted_types</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">check_str</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">graph_current_flow_closeness_centrality</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> weights&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">edge_weights</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
+            <span class="nb">set</span><span class="p">(</span>
+                <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span>
+                    <span class="n">d</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">for</span> <span class="o">*</span><span class="n">_</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">check_str</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">graph_current_flow_closeness_centrality</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> weights&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
+            <span class="n">options</span><span class="o">=</span><span class="n">edge_weights</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">current_flow_closeness_centrality</span><span class="p">(</span>
+            <span class="n">graph</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s2">&quot;full&quot;</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="NetworkMixin.girvan_newman"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.network_mixin.NetworkMixin.girvan_newman">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">girvan_newman</span><span class="p">(</span>
+        <span class="n">graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span>
+        <span class="n">levels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">most_valuable_edge</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">object</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; graph = NetworkMixin.create_graph({ (&#39;Animal_1&#39;, &#39;Animal_2&#39;): 0.0, (&#39;Animal_1&#39;, &#39;Animal_3&#39;): 0.0, (&#39;Animal_1&#39;, &#39;Animal_4&#39;): 0.0, (&#39;Animal_1&#39;, &#39;Animal_5&#39;): 0.0, (&#39;Animal_2&#39;, &#39;Animal_3&#39;): 1.0, (&#39;Animal_2&#39;, &#39;Animal_4&#39;): 1.0, (&#39;Animal_2&#39;, &#39;Animal_5&#39;): 1.0, (&#39;Animal_3&#39;, &#39;Animal_4&#39;): 1.0, (&#39;Animal_3&#39;, &#39;Animal_5&#39;): 1.0, (&#39;Animal_4&#39;, &#39;Animal_5&#39;): 1.0})</span>
+<span class="sd">        &gt;&gt;&gt; NetworkMixin().girvan_newman(graph=graph, levels = 1)</span>
+<span class="sd">        &gt;&gt;&gt; [({&#39;Animal_1&#39;}, {&#39;Animal_2&#39;, &#39;Animal_3&#39;, &#39;Animal_4&#39;, &#39;Animal_5&#39;})]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">check_instance</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">multigraph_page_rank</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="n">instance</span><span class="o">=</span><span class="n">graph</span><span class="p">,</span>
+            <span class="n">accepted_types</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">levels</span> <span class="o">&gt;</span> <span class="n">graph</span><span class="o">.</span><span class="n">number_of_nodes</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">CountError</span><span class="p">(</span>
+                <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Number of nodes (</span><span class="si">{</span><span class="n">G</span><span class="o">.</span><span class="n">number_of_nodes</span><span class="p">()</span><span class="si">}</span><span class="s2">) is less than numer of girvan newman levels (</span><span class="si">{</span><span class="n">levels</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">,</span>
+                <span class="n">source</span><span class="o">=</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">communities</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="n">nx</span><span class="o">.</span><span class="n">algorithms</span><span class="o">.</span><span class="n">community</span><span class="o">.</span><span class="n">girvan_newman</span><span class="p">(</span>
+                <span class="n">graph</span><span class="p">,</span> <span class="n">most_valuable_edge</span><span class="o">=</span><span class="n">most_valuable_edge</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">communities</span><span class="p">[:</span><span class="n">levels</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="NetworkMixin.multigraph_page_rank"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.network_mixin.NetworkMixin.multigraph_page_rank">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">multigraph_page_rank</span><span class="p">(</span>
+        <span class="n">graph</span><span class="p">:</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span>
+        <span class="n">weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;weight&quot;</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">,</span>
+        <span class="n">max_iter</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate multi-graph PageRank scores for each node in a MultiGraph.</span>
+
+<span class="sd">        For example, each node-pair in a graph has N undirected edges representing the weighted relationship between the two nodes atobserved point in time.</span>
+<span class="sd">        Calculates the page rank of each node at each observed time point.</span>
+
+<span class="sd">        :param nx.MultiGraph graph: The input MultiGraph, created by ``NetworkMixin.create_multigraph()``.</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; multigraph = NetworkMixin().create_multigraph(data={(&#39;Animal_1&#39;, &#39;Animal_2&#39;): [0, 0, 0, 6], (&#39;Animal_1&#39;, &#39;Animal_3&#39;): [0, 0, 0, 0], (&#39;Animal_1&#39;, &#39;Animal_4&#39;): [0, 0, 0, 0], (&#39;Animal_1&#39;, &#39;Animal_5&#39;): [0, 0, 0, 0], (&#39;Animal_2&#39;, &#39;Animal_3&#39;): [0, 0, 0, 0], (&#39;Animal_2&#39;, &#39;Animal_4&#39;): [5, 0, 0, 2], (&#39;Animal_2&#39;, &#39;Animal_5&#39;): [0, 0, 0, 0], (&#39;Animal_3&#39;, &#39;Animal_4&#39;): [0, 0, 0, 0], (&#39;Animal_3&#39;, &#39;Animal_5&#39;): [0, 2, 22, 0], (&#39;Animal_4&#39;, &#39;Animal_5&#39;): [0, 0, 0, 0]})</span>
+<span class="sd">        &gt;&gt;&gt; NetworkMixin().multigraph_page_rank(graph=multigraph)</span>
+<span class="sd">        &gt;&gt;&gt; {&#39;Animal_1&#39;: [0.06122524589028524, 0.06122524589028524, 0.06122524589028524, 0.32739635847890775], &#39;Animal_2&#39;: [0.06122524589028524, 0.40816213116457223, 0.06122524589028524, 0.442259400816002], &#39;Animal_3&#39;: [0.40816213116457223, 0.06122524589028524, 0.40816213116457223, 0.04545454545454547], &#39;Animal_4&#39;: [0.06122524589028524, 0.40816213116457223, 0.06122524589028524, 0.13943514979599955], &#39;Animal_5&#39;: [0.40816213116457223, 0.06122524589028524, 0.40816213116457223, 0.04545454545454547]}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">check_instance</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">multigraph_page_rank</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+            <span class="n">instance</span><span class="o">=</span><span class="n">graph</span><span class="p">,</span>
+            <span class="n">accepted_types</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">edge_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+        <span class="n">check_iterable_length</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">multigraph_page_rank</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> edge_labels&quot;</span><span class="p">,</span>
+            <span class="n">val</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">edge_labels</span><span class="p">),</span>
+            <span class="nb">min</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">check_str</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">graph_page_rank</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> weights&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">weights</span>
+        <span class="p">)</span>
+        <span class="n">check_float</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">graph_page_rank</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> alpha&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+        <span class="n">check_int</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">graph_page_rank</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> max_iter&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">max_iter</span><span class="p">,</span>
+            <span class="n">min_value</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">())}</span>
+        <span class="k">for</span> <span class="n">edge_label</span> <span class="ow">in</span> <span class="n">edge_labels</span><span class="p">:</span>
+            <span class="n">filtered_graph</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span>
+                <span class="n">graph</span><span class="o">.</span><span class="n">edge_subgraph</span><span class="p">(</span>
+                    <span class="p">[</span>
+                        <span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+                        <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">edge_label</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">page_ranks</span> <span class="o">=</span> <span class="n">NetworkMixin</span><span class="p">()</span><span class="o">.</span><span class="n">graph_page_rank</span><span class="p">(</span>
+                <span class="n">graph</span><span class="o">=</span><span class="n">filtered_graph</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="n">max_iter</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">page_ranks</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NetworkMixin.visualize"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.network_mixin.NetworkMixin.visualize">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">visualize</span><span class="p">(</span><span class="n">graph</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">,</span> <span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">],</span>
+                  <span class="n">save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                  <span class="n">node_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="mf">25.0</span><span class="p">,</span>
+                  <span class="n">palette</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="s2">&quot;magma&quot;</span><span class="p">,</span>
+                  <span class="n">node_shape</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;dot&#39;</span><span class="p">,</span> <span class="s1">&#39;ellipse&#39;</span><span class="p">,</span> <span class="s1">&#39;circle&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="s1">&#39;dot&#39;</span><span class="p">,</span>
+                  <span class="n">smooth_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;dynamic&#39;</span><span class="p">,</span> <span class="s1">&#39;continuous&#39;</span><span class="p">,</span> <span class="s1">&#39;discrete&#39;</span><span class="p">,</span> <span class="s1">&#39;diagonalCross&#39;</span><span class="p">,</span> <span class="s1">&#39;straightCross&#39;</span><span class="p">,</span> <span class="s1">&#39;horizontal&#39;</span><span class="p">,</span> <span class="s1">&#39;vertical&#39;</span><span class="p">,</span> <span class="s1">&#39;curvedCW&#39;</span><span class="p">,</span> <span class="s1">&#39;curvedCCW&#39;</span><span class="p">,</span> <span class="s1">&#39;cubicBezier&#39;</span><span class="p">]]</span> <span class="o">=</span> <span class="s1">&#39;dynamic&#39;</span><span class="p">,</span>
+                  <span class="n">img_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">500</span><span class="p">,</span> <span class="mi">500</span><span class="p">))</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">Network</span><span class="p">]:</span>
+
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Visualizes a network graph using the vis.js library and saves the result as an HTML file.</span>
+
+<span class="sd">        .. raw:: html</span>
+<span class="sd">           :file: ../docs/_static/img/network_ex.html</span>
+
+<span class="sd">        .. raw:: html</span>
+<span class="sd">	        :file: _static/img/network_ex.html</span>
+
+<span class="sd">        .. note::</span>
+<span class="sd">           Multi-networks created by ``simba.mixins.network_mixin.create_multigraph`` can be a little messy to look at. Instead,</span>
+<span class="sd">           creates seperate objects and files with single edges from each time-point.</span>
+
+<span class="sd">        :param Union[nx.Graph, nx.MultiGraph] graph: The input graph to be visualized.</span>
+<span class="sd">        :param Optional[Union[str, os.PathLike]] save_path: The path to save the HTML file. If multi-graph,  pass a directory path. If None, the graph(s) are returned but not saved.</span>
+<span class="sd">        :param Optional[Union[float, Dict[str, float]]] node_size: The size of nodes. Can be a single float or a dictionary mapping node names to their respective sizes. Default: 25.0.</span>
+<span class="sd">        :param Optional[Union[str, Dict[str, str]]] palette: The color palette for nodes. Can be a single string representing a palette name or a dictionary mapping node names to their respective colors. Default; magma.</span>
+<span class="sd">        :param Optional[Tuple[int, int]] img_size: The size of the resulting image in pixels, represented as (width, height). Default: 500x500.</span>
+<span class="sd">        :param Optional[Literal[&#39;dot&#39;, &#39;ellipse&#39;, &#39;circle&#39;]] node_shape: The shape of the nodes. Default: `dot`.</span>
+<span class="sd">        :param Optional[Literal] smooth_type: The dynamics of the interactive graph.</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; graph = NetworkMixin.create_graph(data={(&#39;Animal_1&#39;, &#39;Animal_2&#39;): 1.0, (&#39;Animal_1&#39;, &#39;Animal_3&#39;): 0.2, (&#39;Animal_2&#39;, &#39;Animal_3&#39;): 0.5})</span>
+<span class="sd">        &gt;&gt;&gt; graph_pg = NetworkMixin.visualize(graph=graph, node_size={&#39;Animal_1&#39;: 10, &#39;Animal_2&#39;: 26, &#39;Animal_3&#39;: 50}, save_path=&#39;/Users/simon/Downloads/graph.html&#39;, node_shape=&#39;box&#39;, palette=&#39;spring&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; multigraph = NetworkMixin().create_multigraph(data={(&#39;Animal_1&#39;, &#39;Animal_2&#39;): [0, 0, 0, 6], (&#39;Animal_1&#39;, &#39;Animal_3&#39;): [0, 0, 0, 0], (&#39;Animal_1&#39;, &#39;Animal_4&#39;): [0, 0, 0, 0], (&#39;Animal_1&#39;, &#39;Animal_5&#39;): [0, 0, 0, 0], (&#39;Animal_2&#39;, &#39;Animal_3&#39;): [0, 0, 0, 0], (&#39;Animal_2&#39;, &#39;Animal_4&#39;): [5, 0, 0, 2], (&#39;Animal_2&#39;, &#39;Animal_5&#39;): [0, 0, 0, 0], (&#39;Animal_3&#39;, &#39;Animal_4&#39;): [0, 0, 0, 0], (&#39;Animal_3&#39;, &#39;Animal_5&#39;): [0, 2, 22, 0], (&#39;Animal_4&#39;, &#39;Animal_5&#39;): [0, 0, 0, 0]})</span>
+<span class="sd">        &gt;&gt;&gt; graph_pg = NetworkMixin.visualize(graph=multigraph, node_size={&#39;Animal_1&#39;: 10, &#39;Animal_2&#39;: 26, &#39;Animal_3&#39;: 50, &#39;Animal_4&#39;: 50, &#39;Animal_5&#39;: 50}, save_path=&#39;/Users/simon/Downloads/graphs&#39;, node_shape=&#39;box&#39;, palette=&#39;spring&#39;, smooth_type=&#39;diagonalCross&#39;)</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">check_instance</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">graph</span><span class="p">,</span> <span class="n">accepted_types</span><span class="o">=</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">MultiGraph</span><span class="p">,</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">))</span>
+        <span class="n">check_instance</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">node_size</span><span class="p">,</span> <span class="n">accepted_types</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">dict</span><span class="p">))</span>
+        <span class="n">multi_graph</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">graph</span><span class="o">.</span><span class="n">is_multigraph</span><span class="p">():</span> <span class="n">multi_graph</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">multi_graph</span><span class="p">:</span>
+            <span class="n">check_if_dir_exists</span><span class="p">(</span><span class="n">in_dir</span><span class="o">=</span><span class="n">save_path</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">check_valid_tuple</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">img_size</span><span class="p">,</span> <span class="n">accepted_lengths</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,),</span> <span class="n">valid_dtypes</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">,))</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node_size</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">node_size</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span>
+                <span class="k">raise</span> <span class="n">InvalidInputError</span><span class="p">(</span>
+                    <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;node_size keys do not match graph node names: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s2"> != </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">node_size</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">node_size</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">check_float</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> node_size&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">check_int</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">visualize</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> node size&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">node_size</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">palette</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">palette</span><span class="o">.</span><span class="n">keys</span><span class="p">())):</span>
+                <span class="k">raise</span> <span class="n">InvalidInputError</span><span class="p">(</span>
+                    <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;palette keys do not match graph node names: </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s2"> != </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">node_size</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">palette</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">check_valid_hex_color</span><span class="p">(</span><span class="n">color_hex</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+            <span class="n">clrs</span> <span class="o">=</span> <span class="n">palette</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">clrs</span> <span class="o">=</span> <span class="n">create_color_palette</span><span class="p">(</span><span class="n">pallete_name</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span> <span class="n">as_hex</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">increments</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">())))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">multi_graph</span><span class="p">:</span>
+            <span class="n">network_graph</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">img_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">img_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">)</span>
+            <span class="n">network_graph</span><span class="o">.</span><span class="n">set_edge_smooth</span><span class="p">(</span><span class="n">smooth_type</span><span class="p">)</span>
+            <span class="n">network_graph</span><span class="o">.</span><span class="n">force_atlas_2based</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">node_cnt</span><span class="p">,</span> <span class="n">node_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">graph</span><span class="p">):</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node_size</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">node_node_size</span> <span class="o">=</span> <span class="n">node_size</span><span class="p">[</span><span class="n">node_name</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">node_node_size</span> <span class="o">=</span> <span class="n">node_size</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">palette</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="n">node_clr</span> <span class="o">=</span> <span class="n">palette</span><span class="p">[</span><span class="n">node_name</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">node_clr</span> <span class="o">=</span> <span class="n">clrs</span><span class="p">[</span><span class="n">node_cnt</span><span class="p">]</span>
+                <span class="n">network_graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">n_id</span><span class="o">=</span><span class="n">node_name</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">node_shape</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">node_clr</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">node_node_size</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">edge_attrs</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                <span class="n">network_graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">edge_attrs</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">save_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">network_graph</span><span class="o">.</span><span class="n">save_graph</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">network_graph</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">edge_labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+            <span class="n">check_valid_lst</span><span class="p">(</span><span class="n">source</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">multigraph_page_rank</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> edge_labels&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">edge_labels</span><span class="p">,</span>
+                            <span class="n">min_len</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">edge_label</span> <span class="ow">in</span> <span class="n">edge_labels</span><span class="p">:</span>
+                <span class="n">network_graph</span> <span class="o">=</span> <span class="n">Network</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">img_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">img_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">px&quot;</span><span class="p">)</span>
+                <span class="n">network_graph</span><span class="o">.</span><span class="n">set_edge_smooth</span><span class="p">(</span><span class="n">smooth_type</span><span class="p">)</span>
+                <span class="n">network_graph</span><span class="o">.</span><span class="n">force_atlas_2based</span><span class="p">()</span>
+                <span class="n">graph_save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">edge_label</span><span class="si">}</span><span class="s2">.html&quot;</span><span class="p">)</span>
+                <span class="n">filtered_graph</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span>
+                    <span class="n">graph</span><span class="o">.</span><span class="n">edge_subgraph</span><span class="p">(</span>
+                        <span class="p">[</span>
+                            <span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">keys</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                            <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="n">edge_label</span>
+                        <span class="p">]</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">node_cnt</span><span class="p">,</span> <span class="n">node_name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">filtered_graph</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node_size</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                        <span class="n">node_node_size</span> <span class="o">=</span> <span class="n">node_size</span><span class="p">[</span><span class="n">node_name</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">node_node_size</span> <span class="o">=</span> <span class="n">node_size</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">palette</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                        <span class="n">node_clr</span> <span class="o">=</span> <span class="n">palette</span><span class="p">[</span><span class="n">node_name</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">node_clr</span> <span class="o">=</span> <span class="n">clrs</span><span class="p">[</span><span class="n">node_cnt</span><span class="p">]</span>
+                    <span class="n">network_graph</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">n_id</span><span class="o">=</span><span class="n">node_name</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="s2">&quot;dot&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">node_clr</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">node_node_size</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">edge_attrs</span> <span class="ow">in</span> <span class="n">filtered_graph</span><span class="o">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+                    <span class="n">network_graph</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">edge_attrs</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">save_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">network_graph</span><span class="o">.</span><span class="n">save_graph</span><span class="p">(</span><span class="n">graph_save_path</span><span class="p">)</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">edge_label</span><span class="p">]</span> <span class="o">=</span> <span class="n">network_graph</span>
+            <span class="k">return</span> <span class="n">results</span></div>
+
+<div class="viewcode-block" id="NetworkMixin.simpson_index"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.network_mixin.NetworkMixin.simpson_index">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">simpson_index</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate Simpson&#39;s diversity index for a given array of values.</span>
+
+<span class="sd">        Simpson&#39;s diversity index is a measure of diversity that takes into account the number of different categories</span>
+<span class="sd">        present in the input data as well as the relative abundance of each category. Answer how homogenous a cluster or community is</span>
+<span class="sd">        for categorical input variable.</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">           D = \frac{\sum(n(n-1))}{N(N-1)}</span>
+
+<span class="sd">        where:</span>
+<span class="sd">        - \( n \) is the number of individuals of a particular category,</span>
+<span class="sd">        - \( N \) is the total number of individuals,</span>
+<span class="sd">        - \( \sum \) represents the sum over all categories.</span>
+
+<span class="sd">        :param np.ndarray x: 1-dimensional numpy array containing the values representing categories for which Simpson&#39;s index is calculated.</span>
+<span class="sd">        :return float: Simpson&#39;s diversity index value for the input array `x`</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">unique_v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">n_unique</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_unique</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">unique_v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">unique_v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">cnt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">squared</span> <span class="o">=</span> <span class="n">cnt</span> <span class="o">*</span> <span class="p">(</span><span class="n">cnt</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">v</span><span class="p">,</span> <span class="n">cnt</span><span class="p">,</span> <span class="n">squared</span><span class="p">])</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">results</span><span class="p">[:,</span> <span class="mi">2</span><span class="p">]))</span> <span class="o">/</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="NetworkMixin.berger_parker"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.network_mixin.NetworkMixin.berger_parker">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">berger_parker</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Berger-Parker index for the given one-dimensional array.</span>
+<span class="sd">        The Berger-Parker index is a measure of category dominance, calculated as the ratio of</span>
+<span class="sd">        the frequency of the most abundant category to the total number of observations. Answer how dominated a cluster or community is</span>
+<span class="sd">        by categorical variable.</span>
+
+<span class="sd">        The Berger-Parker index (BP) is calculated using the formula:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">           BP = \\frac{f_{\max}}{N}</span>
+
+<span class="sd">        where:</span>
+<span class="sd">        - \( f_{\max} \) is the frequency of the most abundant category,</span>
+<span class="sd">        - \( N \) is the total number of observations.</span>
+
+<span class="sd">        :param np.ndarray x: One-dimensional numpy array containing the values for which the Berger-Parker index is calculated.</span>
+<span class="sd">        :return float: Berger-Parker index value for the input array `x`</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; x = np.random.randint(0, 25, (100,)).astype(np.float32)</span>
+<span class="sd">        &gt;&gt;&gt; z = NetworkMixin.berger_parker(x=x)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">check_valid_array</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">berger_parker</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> x&quot;</span><span class="p">,</span>
+            <span class="n">accepted_ndims</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">accepted_dtypes</span><span class="o">=</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">get_mode</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="NetworkMixin.shannon_diversity_index"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.network_mixin.NetworkMixin.shannon_diversity_index">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">shannon_diversity_index</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the Shannon Diversity Index for a given array of categories. The Shannon Diversity Index is a measure of diversity in a</span>
+<span class="sd">        categorical feature, taking into account both the number of different categories (richness)</span>
+<span class="sd">        and their relative abundances (evenness). Answer how homogenous a cluster or community is</span>
+<span class="sd">        for categorical variable. A low value indicates that one or a few categories dominate.</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">           H = -\sum_{i=1}^{n} (p_i \cdot \log(p_i))</span>
+
+<span class="sd">        where:</span>
+<span class="sd">        - \( p_i \) is the proportion of individuals belonging to the i-th category,</span>
+<span class="sd">        - \( n \) is the total number of categories.</span>
+
+<span class="sd">        :param np.ndarray x: One-dimensional numpy array containing the categories for which the Shannon Diversity Index is calculated.</span>
+<span class="sd">        :return float: Shannon Diversity Index value for the input array `x`</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; x = np.random.randint(0, 100, (100, ))</span>
+<span class="sd">        &gt;&gt;&gt; NetworkMixin.shannon_diversity_index(x=x)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">unique_v</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">n_unique</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">n_unique</span><span class="p">,),</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">unique_v</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">unique_v</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">cnt</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">v</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">pi</span> <span class="o">=</span> <span class="n">cnt</span> <span class="o">/</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">results</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">pi</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">pi</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">results</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="NetworkMixin.margalef_diversification_index"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.network_mixin.NetworkMixin.margalef_diversification_index">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">margalef_diversification_index</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the Margalef Diversification Index for a given array of values.</span>
+
+<span class="sd">        The Margalef Diversification Index is a measure of category diversity. It quantifies the richness of a community/cluster</span>
+<span class="sd">        relative to the number of individuals. A high Margalef Diversification Index indicates a high diversity of categories relative to the number of observations.</span>
+<span class="sd">        A low Margalef Diversification Index suggests a lower diversity of categories relative to the number of observations.</span>
+
+<span class="sd">        The Margalef Diversification Index (D) is calculated using the formula:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">           D = \\frac{(S - 1)}{\\log(N)}</span>
+
+<span class="sd">        where:</span>
+<span class="sd">        - \( S \) is the number of unique categories,</span>
+<span class="sd">        - \( N \) is the total number of individuals.</span>
+
+<span class="sd">        :param np.array x: One-dimensional numpy array containing nominal values for which the Margalef Diversification Index is calculated.</span>
+<span class="sd">        :return float: Margalef Diversification Index value for the input array `x`</span>
+
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; x = np.random.randint(0, 100, (100,))</span>
+<span class="sd">        &gt;&gt;&gt; NetworkMixin.margalef_diversification_index(x=x)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">check_valid_array</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">margalef_diversification_index</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> x&quot;</span><span class="p">,</span>
+            <span class="n">accepted_ndims</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">accepted_dtypes</span><span class="o">=</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">),</span>
+            <span class="n">min_axis_0</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">n_unique</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">n_unique</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="NetworkMixin.menhinicks_index"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.network_mixin.NetworkMixin.menhinicks_index">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">menhinicks_index</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate the Menhinick&#39;s Index for a given array of values.</span>
+
+<span class="sd">        Menhinick&#39;s Index is a measure of category richness. It quantifies the number of categories relative to the square root of the total number of observations.</span>
+<span class="sd">        A high Menhinick&#39;s Index suggests a high diversity of categories relative to the number of observations.</span>
+<span class="sd">        A low Menhinick&#39;s Index indicates a lower diversity of categories relative to the number of observations.</span>
+
+<span class="sd">        Menhinick&#39;s Index (D) is calculated using the formula:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">           D = \\frac{S}{\\sqrt{N}}</span>
+
+<span class="sd">        where:</span>
+<span class="sd">        - \( S \) is the number of unique categories,</span>
+<span class="sd">        - \( N \) is the total number of observations.</span>
+
+<span class="sd">         :param np.array x: One-dimensional numpy array containing the integer values representing nominal values for which Menhinick&#39;s Index is calculated.</span>
+<span class="sd">         :return float: Menhinick&#39;s Index value for the input array `x`</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; x = np.random.randint(0, 5, (1000,))</span>
+<span class="sd">        &gt;&gt;&gt; NetworkMixin.menhinicks_index(x=x)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">check_valid_array</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">menhinicks_index</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> x&quot;</span><span class="p">,</span>
+            <span class="n">accepted_ndims</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">accepted_dtypes</span><span class="o">=</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">),</span>
+            <span class="n">min_axis_0</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="NetworkMixin.brillouins_index"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.network_mixin.NetworkMixin.brillouins_index">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">brillouins_index</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate Brillouin&#39;s Diversity Index for a given array of values.</span>
+
+<span class="sd">        Brillouin&#39;s Diversity Index is a measure of cluster/community diversity that accounts for both richness</span>
+<span class="sd">        and evenness of distribution.</span>
+
+<span class="sd">        Brillouin&#39;s Diversity Index (H) is calculated using the formula:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">           H = \\frac{1}{\\log(S)} \\sum_{i=1}^{S} \\frac{N_i(N_i - 1)}{n(n-1)}</span>
+
+<span class="sd">        where:</span>
+<span class="sd">        - \( H \) is Brillouin&#39;s Diversity Index,</span>
+<span class="sd">        - \( S \) is the total number of unique species,</span>
+<span class="sd">        - \( N_i \) is the count of individuals in the i-th species,</span>
+<span class="sd">        - \( n \) is the total number of individuals.</span>
+
+<span class="sd">        :param np.array x: One-dimensional numpy array containing the values for which Brillouin&#39;s Index is calculated.</span>
+<span class="sd">        :return float: Brillouin&#39;s Diversity Index value for the input array `x`</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; x = np.random.randint(0, 10, (100,))</span>
+<span class="sd">        &gt;&gt;&gt; NetworkMixin.brillouins_index(x)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">check_valid_array</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">brillouins_index</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> x&quot;</span><span class="p">,</span>
+            <span class="n">accepted_ndims</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">accepted_dtypes</span><span class="o">=</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">),</span>
+            <span class="n">min_axis_0</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">n_total</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">n_unique</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">return_counts</span><span class="o">=</span><span class="kc">True</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">n_unique</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">1.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">S</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">n_unique</span><span class="p">)</span>
+            <span class="n">h</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">n_unique</span><span class="p">:</span>
+                <span class="n">h</span> <span class="o">+=</span> <span class="n">count</span> <span class="o">*</span> <span class="p">(</span><span class="n">count</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">h</span> <span class="o">/=</span> <span class="n">n_total</span> <span class="o">*</span> <span class="p">(</span><span class="n">n_total</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">h</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">S</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">h</span></div>
+
+<div class="viewcode-block" id="NetworkMixin.sorensen_dice_coefficient"><a class="viewcode-back" href="../../../simba.mixins.html#simba.mixins.network_mixin.NetworkMixin.sorensen_dice_coefficient">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">sorensen_dice_coefficient</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate Sørensen&#39;s Similarity Index between two communities/clusters.</span>
+
+<span class="sd">        The Sørensen similarity index, also known as the overlap index, quantifies the overlap between two populations by comparing the number of shared categories to the total number of categories in both populations. It ranges from zero, indicating no overlap, to one, representing perfect overlap</span>
+
+<span class="sd">        Sørensen&#39;s Similarity Index (S) is calculated using the formula:</span>
+
+<span class="sd">        .. math::</span>
+
+<span class="sd">            S = \\frac{2 \times |X \cap Y|}{|X| + |Y|}</span>
+
+<span class="sd">        where:</span>
+<span class="sd">        - \( S \) is Sørensen&#39;s Similarity Index,</span>
+<span class="sd">        - \( X \) and \( Y \) are the sets representing the categories in the first and second communities, respectively,</span>
+<span class="sd">        - \( |X \cap Y| \) is the number of shared categories between the two communities,</span>
+<span class="sd">        - \( |X| \) and \( |Y| \) are the total number of categories in the first and second communities, respectively.</span>
+
+
+<span class="sd">        :param x: 1D numpy array with nominal values for the first cluster/community.</span>
+<span class="sd">        :param y: 1D numpy array with nominal values for the second cluster/community.</span>
+<span class="sd">        :return: Sørensen&#39;s Similarity Index between x and y.</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; x = np.random.randint(0, 10, (100,))</span>
+<span class="sd">        &gt;&gt;&gt; y = np.random.randint(0, 10, (100,))</span>
+<span class="sd">        &gt;&gt;&gt; NetworkMixin.sorensen_dice_coefficient(x=x, y=y)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">check_valid_array</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">sorensen_dice_coefficient</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> x&quot;</span><span class="p">,</span>
+            <span class="n">accepted_ndims</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">x</span><span class="p">,</span>
+            <span class="n">accepted_dtypes</span><span class="o">=</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+            <span class="n">min_axis_0</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">check_valid_array</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">NetworkMixin</span><span class="o">.</span><span class="n">sorensen_dice_coefficient</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> y&quot;</span><span class="p">,</span>
+            <span class="n">accepted_ndims</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">y</span><span class="p">,</span>
+            <span class="n">accepted_dtypes</span><span class="o">=</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span> <span class="nb">int</span><span class="p">),</span>
+            <span class="n">min_axis_0</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="nb">set</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">))</span></div></div>
+
+
+<span class="c1"># graph = NetworkMixin.create_graph(</span>
+<span class="c1">#     {</span>
+<span class="c1">#         (&quot;Animal_1&quot;, &quot;Animal_2&quot;): 0.0,</span>
+<span class="c1">#         (&quot;Animal_1&quot;, &quot;Animal_3&quot;): 0.0,</span>
+<span class="c1">#         (&quot;Animal_1&quot;, &quot;Animal_4&quot;): 0.0,</span>
+<span class="c1">#         (&quot;Animal_1&quot;, &quot;Animal_5&quot;): 0.1,</span>
+<span class="c1">#         (&quot;Animal_2&quot;, &quot;Animal_3&quot;): 1.0,</span>
+<span class="c1">#         (&quot;Animal_2&quot;, &quot;Animal_4&quot;): 1.0,</span>
+<span class="c1">#         (&quot;Animal_2&quot;, &quot;Animal_5&quot;): 1.5,</span>
+<span class="c1">#         (&quot;Animal_3&quot;, &quot;Animal_4&quot;): 1.0,</span>
+<span class="c1">#         (&quot;Animal_3&quot;, &quot;Animal_5&quot;): 1.0,</span>
+<span class="c1">#         (&quot;Animal_4&quot;, &quot;Animal_5&quot;): 1.0,</span>
+<span class="c1">#     }</span>
+<span class="c1"># )</span>
+<span class="c1">#</span>
+<span class="c1"># G = nx.Graph(graph)</span>
+<span class="c1">#</span>
+<span class="c1"># NetworkMixin().graph_current_flow_closeness_centrality(graph=graph)</span>
+<span class="c1"># #</span>
+<span class="c1">#</span>
+<span class="c1"># communities = list(nx.algorithms.community.(G, weight=&#39;weight&#39;))</span>
+<span class="c1">#</span>
+<span class="c1"># partition = nx.algorithms.community.kernighan_lin_bisection(G, weight=&#39;weight&#39;)</span>
+<span class="c1"># partition = nx.algorithms.community.greedy_modularity_communities(G, weight=&#39;weight&#39;)</span>
+<span class="c1"># partition = list(nx.algorithms.community.girvan_newman(G))</span>
+<span class="c1">#</span>
+<span class="c1"># tuple(sorted(c) for c in next(partition))</span>
+
+<span class="c1"># graph_data = {</span>
+<span class="c1">#     (&#39;Animal_1&#39;, &#39;Animal_2&#39;): 0.0,</span>
+<span class="c1">#     (&#39;Animal_1&#39;, &#39;Animal_3&#39;): 0.0,</span>
+<span class="c1">#     (&#39;Animal_1&#39;, &#39;Animal_4&#39;): 0.0,</span>
+<span class="c1">#     (&#39;Animal_1&#39;, &#39;Animal_5&#39;): 0.0,</span>
+<span class="c1">#     (&#39;Animal_2&#39;, &#39;Animal_3&#39;): 1.5,  # Increase weight</span>
+<span class="c1">#     (&#39;Animal_2&#39;, &#39;Animal_4&#39;): 1.0,  # Increase weight</span>
+<span class="c1">#     (&#39;Animal_2&#39;, &#39;Animal_5&#39;): 1.5,  # Increase weight</span>
+<span class="c1">#     (&#39;Animal_3&#39;, &#39;Animal_4&#39;): 2.9,  # Increase weight</span>
+<span class="c1">#     (&#39;Animal_3&#39;, &#39;Animal_5&#39;): 2.0,  # Increase weight</span>
+<span class="c1">#     (&#39;Animal_4&#39;, &#39;Animal_5&#39;): 1.0   # Decrease weight</span>
+<span class="c1"># }</span>
+
+<span class="c1"># result = list(NetworkMixin().asyn_lpa_communities(graph=graph, weight=&#39;weight&#39;))</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># for i in list(result):</span>
+<span class="c1">#     print(i)</span>
+<span class="c1">#</span>
+
+
+<span class="c1"># graph_pg = NetworkMixin().graph_page_rank(graph=graph)</span>
+<span class="c1"># graph_clrs = find_ranked_colors(data=graph_pg, palette=&#39;jet&#39;, as_hex=True)</span>
+<span class="c1"># NetworkMixin().visualize(graph=graph,</span>
+<span class="c1">#                          save_path=&#39;/Users/simon/Desktop/envs/troubleshooting/ARES_data/Termite Test/project/project_data/network_html/graph_101.html&#39;,</span>
+<span class="c1">#                          palette=graph_clrs)</span>
+
+
+<span class="c1"># multigraph = NetworkMixin().create_multigraph(data={(&#39;Animal_1&#39;, &#39;Animal_2&#39;): [0, 0, 0, 6], (&#39;Animal_1&#39;, &#39;Animal_3&#39;): [0, 0, 0, 0], (&#39;Animal_1&#39;, &#39;Animal_4&#39;): [0, 0, 0, 0], (&#39;Animal_1&#39;, &#39;Animal_5&#39;): [0, 0, 0, 0], (&#39;Animal_2&#39;, &#39;Animal_3&#39;): [0, 0, 0, 0], (&#39;Animal_2&#39;, &#39;Animal_4&#39;): [5, 0, 0, 2], (&#39;Animal_2&#39;, &#39;Animal_5&#39;): [0, 0, 0, 0], (&#39;Animal_3&#39;, &#39;Animal_4&#39;): [0, 0, 0, 0], (&#39;Animal_3&#39;, &#39;Animal_5&#39;): [0, 2, 22, 0], (&#39;Animal_4&#39;, &#39;Animal_5&#39;): [0, 0, 0, 0]})</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># #graph_pg = NetworkMixin().graph_page_rank(graph=graph)</span>
+<span class="c1"># graph_clrs = find_ranked_colors(data=graph_pg, palette=&#39;jet&#39;, as_hex=True)</span>
+<span class="c1">#</span>
+<span class="c1"># NetworkMixin().visualize(graph=graph,</span>
+<span class="c1">#                          save_path=&#39;/Users/simon/Desktop/envs/troubleshooting/ARES_data/Termite Test/project/project_data/network_html.html&#39;,</span>
+<span class="c1">#                          palette=graph_clrs)</span>
+
+
+<span class="c1"># multigraph = NetworkMixin().create_multigraph(data={(&#39;Animal_1&#39;, &#39;Animal_2&#39;): [0, 0, 0, 6], (&#39;Animal_1&#39;, &#39;Animal_3&#39;): [0, 0, 0, 0], (&#39;Animal_1&#39;, &#39;Animal_4&#39;): [0, 0, 0, 0], (&#39;Animal_1&#39;, &#39;Animal_5&#39;): [0, 0, 0, 0], (&#39;Animal_2&#39;, &#39;Animal_3&#39;): [0, 0, 0, 0], (&#39;Animal_2&#39;, &#39;Animal_4&#39;): [5, 0, 0, 2], (&#39;Animal_2&#39;, &#39;Animal_5&#39;): [0, 0, 0, 0], (&#39;Animal_3&#39;, &#39;Animal_4&#39;): [0, 0, 0, 0], (&#39;Animal_3&#39;, &#39;Animal_5&#39;): [0, 2, 22, 0], (&#39;Animal_4&#39;, &#39;Animal_5&#39;): [0, 0, 0, 0]})</span>
+<span class="c1"># NetworkMixin().visualize(graph=multigraph, save_path=&#39;/Users/simon/Desktop/envs/troubleshooting/ARES_data/Termite Test/project/project_data/network_html&#39;)</span>
+
+
+<span class="c1"># graph = NetworkMixin.create_graph(data={(&#39;Animal_1&#39;, &#39;Animal_2&#39;): 1.0, (&#39;Animal_1&#39;, &#39;Animal_3&#39;): 0.2, (&#39;Animal_2&#39;, &#39;Animal_3&#39;): 0.5})</span>
+<span class="c1"># NetworkMixin().graph_page_rank(graph=graph)</span>
+<span class="c1"># multigraph = NetworkMixin().create_multigraph(data=data)</span>
+
+
+<span class="c1"># multigraph = NetworkMixin().create_multigraph(data=data)</span>
+<span class="c1">#</span>
+<span class="c1"># #multigraph.edges.data()</span>
+<span class="c1">#</span>
+<span class="c1"># NetworkMixin().visualize(graph=multigraph, save_dir=&#39;/Users/simon/Desktop/envs/troubleshooting/ARES_data/Termite Test/project/project_data/network_html&#39;)</span>
+
+
+<span class="c1">#</span>
+<span class="c1"># for video_name, G in self.graphs.items():</span>
+<span class="c1">#     if node_colors is not None:</span>
+<span class="c1">#         clrs = create_single_color_lst(pallete_name=&#39;magma&#39;, increments=len(self.animal_names), as_hex=True)</span>
+<span class="c1">#         node_colors = {k: v for k, v in sorted(node_colors.items(), key=lambda item: item[1], reverse=True)}</span>
+<span class="c1">#         for node_cnt, node_name in enumerate(node_colors.keys()):</span>
+<span class="c1">#             node_colors[node_name] = clrs[node_cnt]</span>
+<span class="c1">#</span>
+<span class="c1">#     network_graph = Network(style_attr[&#39;size&#39;][0], style_attr[&#39;size&#39;][1])</span>
+<span class="c1">#     for node_name, node_attrs in G.nodes(data=True):</span>
+<span class="c1">#         network_graph.add_node(node_name, color=node_colors[node_name])</span>
+<span class="c1">#</span>
+<span class="c1">#     for source, target, edge_attrs in G.edges(data=True):</span>
+<span class="c1">#         edge_attrs[&#39;value&#39;] = edge_attrs[&#39;weight&#39;]</span>
+<span class="c1">#         network_graph.add_edge(str(source), str(target), **edge_attrs)</span>
+<span class="c1">#</span>
+<span class="c1">#     network_graph.save_graph(&#39;nx.html&#39;)</span>
+<span class="c1">#</span>
+
+
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># data = {(&#39;Animal_1&#39;, &#39;Animal_2&#39;): 0.0,</span>
+<span class="c1">#         (&#39;Animal_1&#39;, &#39;Animal_3&#39;): 0.2,</span>
+<span class="c1">#         (&#39;Animal_1&#39;, &#39;Animal_4&#39;): 0.3,</span>
+<span class="c1">#         (&#39;Animal_2&#39;, &#39;Animal_3&#39;): 0.9,</span>
+<span class="c1">#         (&#39;Animal_2&#39;, &#39;Animal_4&#39;): 1.0,</span>
+<span class="c1">#         (&#39;Animal_3&#39;, &#39;Animal_4&#39;): 0.4}</span>
+<span class="c1"># graph = NetworkMixin.create_graph(data={(&#39;Animal_1&#39;, &#39;Animal_2&#39;): 1.0, (&#39;Animal_1&#39;, &#39;Animal_3&#39;): 0.2, (&#39;Animal_2&#39;, &#39;Animal_3&#39;): 0.5})</span>
+<span class="c1"># NetworkMixin().graph_current_flow_closeness_centrality(graph=graph)</span>
+<span class="c1">#</span>
+
+
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># data = {(&#39;Animal_1&#39;, &#39;Animal_2&#39;): [0, 0, 0, 6],</span>
+<span class="c1">#         (&#39;Animal_1&#39;, &#39;Animal_3&#39;): [0, 0, 0, 0],</span>
+<span class="c1">#         (&#39;Animal_1&#39;, &#39;Animal_4&#39;): [0, 0, 0, 0],</span>
+<span class="c1">#         (&#39;Animal_1&#39;, &#39;Animal_5&#39;): [0, 0, 0, 0],</span>
+<span class="c1">#         (&#39;Animal_2&#39;, &#39;Animal_3&#39;): [0, 0, 0, 0],</span>
+<span class="c1">#         (&#39;Animal_2&#39;, &#39;Animal_4&#39;): [5, 0, 0, 2],</span>
+<span class="c1">#         (&#39;Animal_2&#39;, &#39;Animal_5&#39;): [0, 0, 0, 0],</span>
+<span class="c1">#         (&#39;Animal_3&#39;, &#39;Animal_4&#39;): [0, 0, 0, 0],</span>
+<span class="c1">#         (&#39;Animal_3&#39;, &#39;Animal_5&#39;): [0, 2, 22, 0],</span>
+<span class="c1">#         (&#39;Animal_4&#39;, &#39;Animal_5&#39;): [0, 0, 0, 0]}</span>
+
+
+<span class="c1"># graph = NetworkMixin.create_graph(data={(&#39;Animal_1&#39;, &#39;Animal_2&#39;): 1.0, (&#39;Animal_1&#39;, &#39;Animal_3&#39;): 0.2, (&#39;Animal_2&#39;, &#39;Animal_3&#39;): 0.5})</span>
+<span class="c1"># #NetworkMixin().graph_page_rank(graph=graph)</span>
+<span class="c1"># multigraph = NetworkMixin().create_multigraph(data=data)</span>
+<span class="c1">#</span>
+<span class="c1"># #multigraph.edges.data()</span>
+<span class="c1">#</span>
+<span class="c1"># NetworkMixin().visualize(graph=multigraph, save_dir=&#39;/Users/simon/Desktop/envs/troubleshooting/ARES_data/Termite Test/project/project_data/network_html&#39;)</span>
+
+
+<span class="c1"># NetworkMixin().multigraph_page_rank(graph=multigraph)</span>
+
+
+<span class="c1"># NetworkMixin.page_rank(graph=graph)</span>
+<span class="c1"># NetworkMixin.katz_centrality(graph=graph)</span>
+<span class="c1"># NetworkMixin.current_flow_closeness_centrality(graph=graph)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

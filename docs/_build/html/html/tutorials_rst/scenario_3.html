@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scenario 3 walkthrough &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Scenario 3 walkthrough" href="scenario_4.html" />
+    <link rel="prev" title="Scenario 2 walkthrough" href="scenario_2.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SimBA
+              <img src="../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../walkthroughs.html">Walkthroughs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="scenario_1.html">Scenario 1 walkthrough</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scenario_2.html">Scenario 2 walkthrough</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Scenario 3 walkthrough</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hypothetical-experiment"><strong>Hypothetical Experiment</strong>:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scenario-3-updating-a-classifier-with-further-annotated-data"><strong>Scenario 3</strong>: Updating a classifier with further annotated data.</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#part-1-previously-annotated-csv-files">Part 1: Previously annotated CSV files.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-2-create-a-project">Part 2: Create a project.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-3-load-project-and-process-your-new-tracking-data">Part 3: Load project and process your new tracking data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-4-add-the-previously-annotated-csv-files-to-your-project-folder-csv-targets-inserted-directory">Part 4: Add the previously annotated CSV files to your <code class="docutils literal notranslate"><span class="pre">project_folder\csv\targets_inserted</span></code> directory.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-5-generate-a-new-predictive-classifier-with-the-new-dataset">Part 5: Generate a new predictive classifier with the new dataset.</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="scenario_4.html">Scenario 3 walkthrough</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scenario_4.html#hypothetical-experiment"><strong>Hypothetical Experiment</strong>:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scenario_4.html#scenario-4-analyzing-and-adding-new-experimental-data-to-a-previously-started-project"><strong>Scenario 4</strong>: Analyzing and adding new Experimental data to a previously started project.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scenario_4.html#part-6-post-classification-validation-detecting-false-positives">PART 6: Post-classification Validation (detecting false-positives)</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../walkthroughs.html">Walkthroughs</a></li>
+      <li class="breadcrumb-item active">Scenario 3 walkthrough</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_rst/scenario_3.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="scenario-3-walkthrough">
+<h1>Scenario 3 walkthrough<a class="headerlink" href="#scenario-3-walkthrough" title="Permalink to this heading"></a></h1>
+<p>To faciliate the initial use of SimBA, we provide several use scenarios.
+We have created these scenarios around a hypothetical experiment that
+take a user from initial use (completely new start) all the way through
+analyzing a complete experiment and then adding additional experimental
+datasets to an initial project.</p>
+<p>All scenarios assume that the videos have been
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md">pre-processed</a>
+and that <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md">DLC behavioral tracking .CSV
+dataframes</a>
+have been created.</p>
+</section>
+<section id="hypothetical-experiment">
+<h1><strong>Hypothetical Experiment</strong>:<a class="headerlink" href="#hypothetical-experiment" title="Permalink to this heading"></a></h1>
+<p>Three days of resident-intruder testing between aggressive CD-1 mice and
+subordinante C57 intruders. Each day of testing has 10 pairs of mice,
+for a total of 30 videos recorded across 3 days. Recordings are 3
+minutes in duration, in color, at 30fps.</p>
+</section>
+<section id="scenario-3-updating-a-classifier-with-further-annotated-data">
+<h1><strong>Scenario 3</strong>: Updating a classifier with further annotated data.<a class="headerlink" href="#scenario-3-updating-a-classifier-with-further-annotated-data" title="Permalink to this heading"></a></h1>
+<p>In this Scenario you have generated a classifier using SimBA, but its
+possible (or, likely) that the classifier could be improved by including
+more training data. We suggest that you iterate between Scenario 1 and
+Scenerio 3 a few times before using a classifier on Experimental data,
+as done in Scenario 2. The goal is that you will only need to create a
+classifier once, so the better it is before experimental use, the less
+work you will have to do in the future!</p>
+<blockquote>
+<div><p><strong>Note 1</strong>: If you have received a classifier from another lab, or
+have notably changed the experimental recording configuration in your
+own lab, you will likely need create a new version of your classifier
+that now includes training examples from your own lab’s behavioral
+setup or from the new recording conditions. While classifiers can
+genreralize well, they will always do better if the training dataset
+includes examples from your own behavioral setup! If your predictions
+are not going well with someone else’s classifier, or after you have
+changed your behavioral equipment, this is a very likely reason and
+and easy fix.</p>
+</div></blockquote>
+<blockquote>
+<div><p><strong>Note 2</strong>: For the above reason, it is very important that you
+create clear operational definitions of annotated behaviors. Please
+see these examples for
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/Operational_definitions_mouse_resident_intruder.pdf">mouse</a>
+and
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/Operational_definitions_rat_resident_intruder.pdf">rat</a>
+predictive classifiers for aggressive behaviors in resident-intruder
+protocols.</p>
+<p><strong>Note 3</strong>: If you plan to share a predictive classifier with other
+users, you will need to share the operationalized definitions, the
+<code class="docutils literal notranslate"><span class="pre">project_folder/csv/targets_inserted</span></code> CSV files for <strong>all</strong> the
+videos used in the initial training set, and the <em>video_info.csv</em>
+file generated by SimBA which is located in the
+<code class="docutils literal notranslate"><span class="pre">project_folder\logs</span></code> directory (further detailed below in <em>Part
+1</em>).</p>
+</div></blockquote>
+<p><em>HINT</em>: SimBA inlcudes several model evaluation tools that cant be
+selected by the user when generating the predictive classfiers. Among
+other things, this includes learning curves, which indicates how the
+predictive classifier performs with increasing amounts of data. For more
+information on how to use SimBa to generate learning curves for your
+predictive classifier, click
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-7-train-machine-model">here</a>.
+For more general information on learning curves in machine learning and
+their potential for informing on the benefit of additional data, click
+<a class="reference external" href="https://scikit-learn.org/stable/auto_examples/model_selection/plot_learning_curve.html">here</a>.</p>
+<p>In this tutorial, we will use SimBA to add further annotations to the
+predictive classifier generated in <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md">Scenario
+1</a>,
+and create an new classifier that now includes the training data from
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md">Scenario
+1</a>
+as well as the new additional data.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In practice, what we are doing in this Scenario is to
+generate a brand new classifier that contains previously annotated
+data as well as new annotated data, rather than building on an
+already generated classifier.</p>
+</div>
+<section id="part-1-previously-annotated-csv-files">
+<h2>Part 1: Previously annotated CSV files.<a class="headerlink" href="#part-1-previously-annotated-csv-files" title="Permalink to this heading"></a></h2>
+<p><strong>1. Locate the previously annotated CSV files</strong>. We will need to start
+with a project directory tree that does not contain any other data than
+the data we want to use to create the new predictive classifier. If you
+are coming along from <a class="reference external" href="https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md">Scenario
+1</a>
+or <a class="reference external" href="https://github.com/sgoldenlab/simba/edit/master/docs/Scenario2.md">Scenario
+2</a>
+you will have one or more project directory trees already. The project
+tree from <a class="reference external" href="https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md">Scenario
+1</a>
+will contain critical files that we want to use when creating the new
+predictive classifier in this current Scenario 3. The critical files are
+located in the <code class="docutils literal notranslate"><span class="pre">project_folder/csv/targets_inserted</span></code> directory of the
+<a class="reference external" href="https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md">Scenario
+1</a>
+project. In this folder, there is one CSV file for each video, and each
+CSV file represents a video. Each CSV file contains the (i)
+pose-estimation data, (ii) the extracted features, and (iii) annotated
+behaviours that were created using the <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-6-label-behavior-ie-create-annotations-for-predictive-classifiers">SimBA behavioral annotation
+GUI</a>.
+Copy these CSV files to a safe memorable place, or alternatively, just
+be aware of their location. We will use them in later in this Scenario
+3.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If a predictive classifier has been generated by someone
+else, and you want to add further data to this classifer in order to
+generate a new classifier with more training data, you will need
+three things:</p>
+</div>
+<ul class="simple">
+<li><p>You will need the operational definitions of the behaviors, so that
+you can score the behaviors identically.</p></li>
+<li><p>You will need the files from the <em>targets_inserted</em> folder from the
+project where the classifier was generated.</p></li>
+<li><p>You will also need information on the resolution, pixels per mm, and
+fps from the videos used to create the original predictive
+classifier. This infomation is stored in the <em>video_info.csv</em> file
+generated by SimBA which is located in the <code class="docutils literal notranslate"><span class="pre">project_folder\logs</span></code>
+directory.</p></li>
+<li><p>You <strong>do not</strong> have to have the frames, or the video files, for the
+videos that <em>were used to generate the original classifier</em>.</p></li>
+</ul>
+</section>
+<section id="part-2-create-a-project">
+<h2>Part 2: Create a project.<a class="headerlink" href="#part-2-create-a-project" title="Permalink to this heading"></a></h2>
+<p>To create a new project, follow the instructions for creating a new
+project in either of these tutorials:
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project-1">1</a>,
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config">2</a>.
+Instead of importing the ‘pilot’ data as indicated in the tutorial from
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project-1">Scenario
+1</a>,
+import the pose estimation data and videos you want to ‘add’ to the
+predictive classifier.</p>
+<p><strong>Important I</strong>: In the final portion of the tutorials for creating a
+new project (<em>Step 4</em>), we extract the frames from the videos we have
+imported into the project. Having the frames is necessery in this
+current Scenario 3, as we will render them for annotating behaviors in
+the <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-6-label-behavior-ie-create-annotations-for-predictive-classifiers">SimBA behavioral annotation
+GUI</a>.
+However, you <strong>do not</strong> have to have the frames for the videos that
+<em>were used to generate the original classifier</em>.</p>
+<p><strong>Important II</strong>: Make sure the file names of the new videos, and new
+DeepLabCut pose estimation data, are not identical to the file names of
+the previously annotated videos.</p>
+<p><strong>Important III</strong>: Make sure the the classifier name(s), which is
+defined when <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-1-generate-project-config">creating the
+project</a>
+in the SML Settings menu, is <strong>the same</strong> as the classifier name used to
+create the previous classifier.</p>
+</section>
+<section id="part-3-load-project-and-process-your-new-tracking-data">
+<h2>Part 3: Load project and process your new tracking data<a class="headerlink" href="#part-3-load-project-and-process-your-new-tracking-data" title="Permalink to this heading"></a></h2>
+<p>In Part 2 above, we created a project that contains the data you wish to
+add to the predictive classifier. To continue working with this project,
+we <strong>must</strong> load it. To load the project and process your new data,
+follow the instructions for <strong>Step 1-6</strong> in either of these tutorials:
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-1-create-a-new-project-1">1</a>,
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config">2</a>.</p>
+<p>When you have completed <strong>Step 1-6</strong>, you will have (i) corrected the
+outliers present in your new data, (ii) extracted features from your new
+data, (iii) and annotated behaviours in your new data. For example, if
+you annotated an additional, new, dataset contain 5 videos, you should
+now see 5 CSV files in the <code class="docutils literal notranslate"><span class="pre">project_folder\csv\targets_inserted</span></code>
+directory.</p>
+</section>
+<section id="part-4-add-the-previously-annotated-csv-files-to-your-project-folder-csv-targets-inserted-directory">
+<h2>Part 4: Add the previously annotated CSV files to your <code class="docutils literal notranslate"><span class="pre">project_folder\csv\targets_inserted</span></code> directory.<a class="headerlink" href="#part-4-add-the-previously-annotated-csv-files-to-your-project-folder-csv-targets-inserted-directory" title="Permalink to this heading"></a></h2>
+<p>We have now created a new project and have annotated data in this
+project, and we now want to import the annotations used to create the
+previous classifier into this project. <strong>We will do this manually</strong>.</p>
+<p><strong>1. Navigate</strong> to the folder that stores the previously annotated CSV
+files (see <strong>Part 1</strong>). Copy and paste them into your current current
+project into the <code class="docutils literal notranslate"><span class="pre">project_folder\csv\targets_inserted</span></code> directory.</p>
+<p>You now have all the annotated files that will be used to create your
+predictive classifier in one place.</p>
+<p><strong>2. Create a new, updated, video_info.csv file</strong>. In the the current
+project directory, the <em>video_info.csv</em> file generated by SimBA, which
+is located in the <code class="docutils literal notranslate"><span class="pre">project_folder\logs</span></code> directory, will so far only
+include the information from the new videos that you wish to <em>add</em> to
+the classifier. It does not contain the information from the videos that
+were used to create the previous predictive classifier. To update the
+<em>video_info.csv</em> file so that it contains both the new and the older
+video information, first open the <em>video_info.csv</em> file from the
+<strong>earlier project</strong> (see <strong>Step 1</strong>) and copy its content. Next, open
+the <em>video_info.csv</em> file for the <strong>current project</strong> and paste the
+content into the file. You should now have a <em>video_info.csv</em> that
+contains a row of information for each of the CSV files represented in
+the <code class="docutils literal notranslate"><span class="pre">project_folder\csv\targets_inserted</span></code> directory. The content of
+the file may look similar to this:</p>
+<a class="reference internal image-reference" href="tutorials_rst/img/scenario_3/video_info.jpg"><img alt="tutorials_rst/img/scenario_3/video_info.jpg" class="align-center" src="tutorials_rst/img/scenario_3/video_info.jpg" style="width: 1000px;" /></a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the example screenshoot above the videos have the same
+resolution, pixels per millimeter, and fps. However, they can be in
+any different combination of values across different videos.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Make sure that the column <em>Video</em> (the first column on the
+left), has the names of the video files in the
+<code class="docutils literal notranslate"><span class="pre">project_folder\csv\targets_inserted</span></code> directory (excluding the file
+format, .csv).</p>
+</div>
+</section>
+<section id="part-5-generate-a-new-predictive-classifier-with-the-new-dataset">
+<h2>Part 5: Generate a new predictive classifier with the new dataset.<a class="headerlink" href="#part-5-generate-a-new-predictive-classifier-with-the-new-dataset" title="Permalink to this heading"></a></h2>
+<p>You now have all the necessery data organised and you are ready to
+generate a new predictive classifier that includes the data used to
+generate the original classfier, plus the data from new annotated
+videos. To generate a new predictive classifier with these data, see
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-7-train-machine-model">Step
+7</a>
+and onwards in the <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md">Scenario
+1</a>
+tutorial.</p>
+<p>Once you have completed <strong>Part 5</strong> of the current Scenario 3, you may
+want to proceed to either:</p>
+<ul class="simple">
+<li><p>Visualize and validate the new classifier on a video not used during
+training of the classifier. For validating a classifier on a new
+video, see Scenario 1 - <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data">Critical validation step before running
+machine model on new
+data</a>.</p></li>
+<li><p>Run the new classifier on new data. To run the classifier on new
+data, see Scenario 2 - <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#scenario-2-using-a-classifier-on-new-experimental-data">Using a classifier on new experimental
+data</a>.</p></li>
+<li><p>Visualize machine predictions on one or several videos. To create
+visualizations, see Scenario 2 - <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions">Visualizing machine
+predictions</a>.
+<em>Note</em>: You can only visualize the predictions on videos for which
+you have extracted the frames and have feature data for. For more
+information on extracting frames - click
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-4-extract-frames-into-project-folder">here</a>.</p></li>
+</ul>
+<p><strong>Congratulations! You now have a new classifier of your behavior that
+is better than the original, or that has been updated from another lab’s
+behavioral setup to work with your own! If you are following the
+Scenarios, you also now are ready to add the next two days of
+Experimental data to your project. Please see</strong> <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4.md">Scenario
+4</a>
+<strong>for instructions.</strong></p>
+<p>Author <a class="reference external" href="https://github.com/sronilsson">Simon N</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="scenario_2.html" class="btn btn-neutral float-left" title="Scenario 2 walkthrough" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="scenario_4.html" class="btn btn-neutral float-right" title="Scenario 3 walkthrough" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

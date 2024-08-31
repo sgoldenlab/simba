@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Animal-anchored ROIs (bounding-boxes) in SimBA &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Model explainability and calculating feature SHAP values in SimBA" href="SHAP.html" />
+    <link rel="prev" title="Kleinberg behavior classification smoothing in SimBA" href="kleinberg_filter.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SimBA
+              <img src="../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="roi.html">Regions of Interest (ROIs) in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FSTTC.html">Calculating forward-spike time tiling coefficents in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_subsets.html">Feature family sub-sets in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_defined_feature_class.html">User-defined ‘feature extraction’ scripts in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kleinberg_filter.html">Kleinberg behavior classification smoothing in SimBA</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Animal-anchored ROIs (bounding-boxes) in SimBA</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#before-analyzing-animal-anchored-rois-in-simba">BEFORE ANALYZING ANIMAL-ANCHORED ROIs in SIMBA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#animal-anchored-rois-in-simba-animal-bounding-boxes">Animal anchored ROIs in SimBA (animal bounding boxes)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#finding-animal-anchored-rois">Finding animal-anchored ROIs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#entire-animal-based-bounding-boxes">Entire animal based bounding boxes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#body-part-based-bounding-boxes">Body-part based bounding boxes.</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#visualizing-animal-anchored-rois">Visualizing animal-anchored ROIs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#computing-statistics">Computing statistics</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#computing-aggregate-statistics">Computing aggregate statistics</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="SHAP.html">Model explainability and calculating feature SHAP values in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="directionality_between_animals.html">Who is looking at who: calculate “directionality” between animals in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classifier_validation.html">Post-classification Validation (detecting false-positives)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cue_lights.html">Cue Light Analysis in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi_animal_pose.html">Using multi-animal pose-estimation data in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="process_videos.html">Batch Video Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">SimBA Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_user_defined_pose_config.html">User-defined pose-configurations in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html">Video processing tools in SimBA</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">Animal-anchored ROIs (bounding-boxes) in SimBA</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_rst/anchored_rois.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="animal-anchored-rois-bounding-boxes-in-simba">
+<h1>Animal-anchored ROIs (bounding-boxes) in SimBA<a class="headerlink" href="#animal-anchored-rois-bounding-boxes-in-simba" title="Permalink to this heading"></a></h1>
+<p>The animal-anchored region-of-interest (ROI) interface allows users to
+define bounding boxes (or circles) around one or more pose-estimated
+animal key-points. Once defined, the bounding boxes can be used to
+calulate how often and when different bounding boxes and key-points
+intersect which each other to get proxy measurement for how different
+animals interact with each other. These measurements can also be used as
+features for any downstream machine learning algorithm.</p>
+<p>The code can be found in
+<a class="reference external" href="https://github.com/sgoldenlab/simba/tree/master/simba/bounding_box_tools">simba.bounding_box_tools</a>.</p>
+<section id="before-analyzing-animal-anchored-rois-in-simba">
+<h2>BEFORE ANALYZING ANIMAL-ANCHORED ROIs in SIMBA<a class="headerlink" href="#before-analyzing-animal-anchored-rois-in-simba" title="Permalink to this heading"></a></h2>
+<p>To analyze anchored-roi data in SimBA (for descriptive statistics,
+machine learning features, or both descriptive statistics and machine
+learning features), the pose-estimated tracking data <strong>first</strong> has to be
+processed <strong>up-to and including the Outlier correction step described
+in</strong> <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction">Part 2 - Step 4 - Correcting
+outliers</a>.
+Thus, before proceeding to calculate animal-anchored ROI based metrics,
+you should have one file for each of the videos in your project located
+within the <code class="docutils literal notranslate"><span class="pre">project_folder\csv\outlier_corrected_movement_location</span></code>
+sub-directory of your SimBA project.</p>
+<p>Specifically, for working with anchored-ROIs in SimBA, begin by (i)
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-2-import-videos-into-project-folder">Importing your videos to your
+project</a>,
+(ii) <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-import-dlc-tracking-data">Importing the tracking data and relevant videos to your
+project</a>,
+(iii) <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters">Setting the video
+parameters</a>,
+and lastly (iv) <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction">Correctting
+outliers</a>
+(or click to indicate that you want to <em>Skip outlier correction</em> as
+detailed in the Correct outliers tutorial)</p>
+</section>
+<section id="animal-anchored-rois-in-simba-animal-bounding-boxes">
+<h2>Animal anchored ROIs in SimBA (animal bounding boxes)<a class="headerlink" href="#animal-anchored-rois-in-simba-animal-bounding-boxes" title="Permalink to this heading"></a></h2>
+<section id="finding-animal-anchored-rois">
+<h3>Finding animal-anchored ROIs<a class="headerlink" href="#finding-animal-anchored-rois" title="Permalink to this heading"></a></h3>
+<a class="reference internal image-reference" href="../_images/menu_13.png"><img alt="../_images/menu_13.png" class="align-center" src="../_images/menu_13.png" style="width: 800px;" /></a>
+<p>Before analyzing animal-anchored ROI data in SimBA, we need to define
+the shape of - and find - the bounding boxes that define each animal in
+each frame of your videos. To do this, click on the right-most [Add-ons]
+tab after loading your SimBA project. Next, click on the
+<code class="docutils literal notranslate"><span class="pre">Animal-anchored</span> <span class="pre">ROI</span> <span class="pre">analysis</span></code> button to launch a pop-up giving access
+to the animal-anchored ROI methods. Begin by clickin on the
+<code class="docutils literal notranslate"><span class="pre">Find</span> <span class="pre">animal</span> <span class="pre">boundaries</span></code> button in the <code class="docutils literal notranslate"><span class="pre">SIMBA</span> <span class="pre">ANCHORED</span> <span class="pre">ROI</span></code> pop-up
+window displayed in the screengrab above.</p>
+<p>This brings up a further pop-up window named <code class="docutils literal notranslate"><span class="pre">FIND</span> <span class="pre">ANIMAL</span> <span class="pre">BOUNDARIES</span></code>
+with a single drop-down menu named <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">SHAPE</span> <span class="pre">TYPE</span></code>. The dropdown
+menu has <strong>three</strong> options, (i) <em>Entire animal</em>, (ii) <em>Single body-part
+square</em>, and (iii) <em>Single body-part circle</em>. More information on each
+option follows below, but in brief:</p>
+<ul class="simple">
+<li><p>When choosing <em>Entire animal</em>, all of the animal body-parts will be
+placed inside the animal-anchored ROI.</p></li>
+<li><p>When choosing <em>Single body-part square</em>, a single user-defined
+body-part will be placed inside a square animal-anchored ROI.</p></li>
+<li><p>When choosing <em>Single body-part circle</em>, a single user-defined
+body-part will be placed inside a circular animal-anchored ROI.</p></li>
+</ul>
+<a class="reference internal image-reference" href="../_images/menu_2.png"><img alt="../_images/menu_2.png" class="align-center" src="../_images/menu_2.png" style="width: 800px;" /></a>
+<p>If choosing <strong>Entire animal</strong> in the <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">SHAPE</span> <span class="pre">TYPE</span></code> dropdown, the
+settings menu on the <strong>left</strong> in the screen-grab below will be show up.
+If choosing <strong>Single body-part circle</strong> or <strong>Single body-part square</strong>
+in the <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">SHAPE</span> <span class="pre">TYPE</span></code> dropdown, the settings menu on the
+<strong>right</strong> in the screen-grab below will be show up. We will first go
+through the settings for <strong>Entire animal</strong> based bounding boxes,
+followed by body-part anchored bounding boxes.</p>
+</section>
+<section id="entire-animal-based-bounding-boxes">
+<h3>Entire animal based bounding boxes<a class="headerlink" href="#entire-animal-based-bounding-boxes" title="Permalink to this heading"></a></h3>
+<a class="reference internal image-reference" href="../_images/bbox_example_termite.png"><img alt="../_images/bbox_example_termite.png" class="align-center" src="../_images/bbox_example_termite.png" style="width: 800px;" /></a>
+<p>CLICK
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/images/bounding_boxes_example_1.png">HERE</a>
+FOR A SIMILAR SHAPE-TYPE REFERENCE TABLE DESCRIBING EXPECTED BOUNDING
+BOXES OUTPUT FOR SHAPE SHIFTING ANIMALS (I.E., MICE)</p>
+<p>If selecting <code class="docutils literal notranslate"><span class="pre">Entire</span> <span class="pre">animal</span></code> based bounding boxes, then users have two
+user-defined parameters:</p>
+<ul class="simple">
+<li><ol class="arabic simple">
+<li><p>FORCE RECTANGLE: Rather then defining each animals ROI through
+polygons, we can force the polygon to its <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/f07bc8e2e2c845e7913c05bf6e0cbbc96cc1a19d/simba/bounding_box_tools/find_bounderies.py#L47">minimim bounding
+rectangle</a>.
+If you want your whole animal-anchored ROI to be rectangles,
+rather than a polygons, then tick the <code class="docutils literal notranslate"><span class="pre">FORCE</span> <span class="pre">RECTANGLE</span></code>
+checkbox. If you want the animals-anchored ROIs to be polygons,
+then leave the <code class="docutils literal notranslate"><span class="pre">FORCE</span> <span class="pre">RECTANGLE</span></code> checkbox un-checked.</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="2">
+<li><p>PARALLEL OFFSET: Sometimes we may <strong>not</strong> want to draw our
+animal-anchored ROIs exacactly by the outer-bounds of the animal
+hull body-part key-points. Instead, we may want to introduce a
+little extra wriggle room that defines the animals personal space.
+If you want to introduce a little extra room inside the
+animal-anchored ROIs, then enter the size of that space in the
+<code class="docutils literal notranslate"><span class="pre">PARALLEL</span> <span class="pre">OFFSET</span></code> entry box in millimeter.</p></li>
+</ol>
+</li>
+</ul>
+</section>
+<section id="body-part-based-bounding-boxes">
+<h3>Body-part based bounding boxes.<a class="headerlink" href="#body-part-based-bounding-boxes" title="Permalink to this heading"></a></h3>
+<p>Single body-part based bounding also has two user-defined parameters:</p>
+<ul class="simple">
+<li><ol class="arabic simple">
+<li><p>BODY-PARTS: As opposed to <code class="docutils literal notranslate"><span class="pre">ENTIRE</span> <span class="pre">ANIMAL</span></code> based bounding boxes -
+for single body-part based bounding boxes, we need to define which
+body-part the ROI should be anchored to. When selecting <strong>Single
+body-part circle</strong> or <strong>Single body-part square</strong> in the
+<code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">SHAPE</span> <span class="pre">TYPE</span></code> dropdown, you should see a row representing
+each animal in your SimBA project. Each row has a drop-down menu
+named <code class="docutils literal notranslate"><span class="pre">BODY-PART</span></code>. For each animal, select the body-part you
+wish to anchor the animals’ ROI to.</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="2">
+<li><p>PARALLEL OFFSET: Just as when working with <em>Entire animal</em> based
+ROIs, there is a parallel offset entry box when working with
+single body-part based ROIs. This entry box defines the size of
+the ROI from the animal body-part (see the example reference image
+above). As opposed to when working with <em>Entire animal</em> based
+ROIs, this entry box <strong>cannot be zero or empty</strong> when working with
+single body-part based ROIs.</p></li>
+</ol>
+</li>
+</ul>
+<hr class="docutils" />
+<p>Once you have filled in the parameters for your animal-anchored ROIs,
+click the <code class="docutils literal notranslate"><span class="pre">RUN</span></code> button. You should be able to follow the progress in
+the main SimBA main terminal window and the OS terminal.</p>
+<p>Once complete, SimBA saves the information of all the anchored ROIs for
+all the animals in all frames and videos in a <em>pickled dictionary of
+shapely shapes values</em> with the <code class="docutils literal notranslate"><span class="pre">project_folder/log</span></code> directory. You
+should see a file named <code class="docutils literal notranslate"><span class="pre">project_folder/logs/anchored_rois.pickle</span></code>. I
+know - a <em>pickled dictionary with shapely shapes</em> will be nonsense to
+many and difficult to work with. However, this file containes all the
+information we need to compute all the statistics we need. The reason
+for saving the data in this nonsense format as we need to <strong>compress</strong>
+it as much as we possibly can, because it contains a potentially very
+large about of data (depending on the number of videos, individuals, and
+frame rate of your videos).</p>
+</section>
+</section>
+<section id="visualizing-animal-anchored-rois">
+<h2>Visualizing animal-anchored ROIs<a class="headerlink" href="#visualizing-animal-anchored-rois" title="Permalink to this heading"></a></h2>
+<p>Next, when the animal anchored-ROIs have been computed and we have the
+<code class="docutils literal notranslate"><span class="pre">anchored_rois.pickle</span></code> file, we may want to visualize the information
+in this file to confirm the ROIs look as expected. To visualize the
+animal-anchored ROI boundaries, click on the <code class="docutils literal notranslate"><span class="pre">VISUALIZE</span> <span class="pre">BOUNDARIES</span></code>
+button which should bring up the following pop-up window allowing a few
+user-defined video settings:</p>
+<a class="reference internal image-reference" href="../_images/menu_3.png"><img alt="../_images/menu_3.png" class="align-center" src="../_images/menu_3.png" style="width: 800px;" /></a>
+<ul class="simple">
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">VIDEO</span></code> drop-down menu, select the video you wish to
+visualize the animal-anchored boundaries in.</p></li>
+<li><p>Tick the <code class="docutils literal notranslate"><span class="pre">INCLUDE</span> <span class="pre">KEY-POINTS</span></code> checkbox <strong>if</strong> you want to visualize
+the body-part pose-estimated key-points <strong>in addition</strong> to the
+animal-anchored ROIs.</p></li>
+<li><p>Occationally, the animal-anchored ROIs (and key-points) are more
+visable when rest of the image is in greyscale. To create greyscale
+images (and colored ROIs/key-points), then tick the <code class="docutils literal notranslate"><span class="pre">GREYSCALE</span></code>
+checkbox.</p></li>
+<li><p>We may want to make the the intersections that SimBA finds more
+<strong>salient</strong> (i.e., highlight intersecting animal-anchored ROIs in in
+bright red) to make sure that the statistics presented are accurate.
+To do this, tick the <code class="docutils literal notranslate"><span class="pre">HIGHLIGHT</span> <span class="pre">INTERSECTIONS</span></code> checkbox. NOTE: In
+order for this to work, you <strong>must</strong> <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md#calculating-boundary-statistics">calculate boundary
+statistics</a>
+before visualizing the data.</p></li>
+<li><p>We may want to specify the the attributes of each ROI manually rather
+than SimBA automatically assigning ROI and key-point colors and
+sizes. To do this, tick the <code class="docutils literal notranslate"><span class="pre">ENABLE</span> <span class="pre">USER-DEFINED</span> <span class="pre">ROI</span> <span class="pre">ATTRIBUTES</span></code>
+and the the table to assign different ROI attributes for different
+animals becomes available:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">ROI</span> <span class="pre">COLOR</span></code>: The color of the animal bounding-box (and
+key-points).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">ROI</span> <span class="pre">THICKNESS</span></code>: The thickness of the animal bounding-box. For
+more information on thickness, see the upper panel of <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/images/roi_new_2.png">THIS
+IMAGE</a>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">KEY-POINT</span> <span class="pre">SIZE</span></code>: The size of the circles denoting the location
+of the pose-estimated body-parts.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">HIGHLIGHT</span> <span class="pre">COLOR</span></code>: The color of the animal bounding-box <strong>IF</strong>
+it insersects with another animal bounding box or another animal
+body-part.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">HIGHLIGHT</span> <span class="pre">THICKNESS</span></code>: The thickness of the animal bounding-box
+<strong>IF</strong> it insersects with another animal bounding box or another
+animal body-part.</p></li>
+</ul>
+</li>
+</ul>
+<p>Next, to create the animal-anchored boundary videos, click the <code class="docutils literal notranslate"><span class="pre">RUN</span></code>
+button. You can follow the progress in the main SimBA terminal window
+and the OS terminal. Once complete, a new file representing the video
+selected in the <code class="docutils literal notranslate"><span class="pre">SELECT</span> <span class="pre">VIDEO</span></code> drop-down is created in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/anchored_rois</span></code> directory of your SimBA
+project. You should expect the videos to look something like these
+examples, dependning in your chosen shape-type:</p>
+<a class="reference internal image-reference" href="../_images/bbox_example_termite.gif"><img alt="../_images/bbox_example_termite.gif" class="align-center" src="../_images/bbox_example_termite.gif" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/bbox_example_termite_head.gif"><img alt="../_images/bbox_example_termite_head.gif" class="align-center" src="../_images/bbox_example_termite_head.gif" style="width: 800px;" /></a>
+<a class="reference internal image-reference" href="../_images/bbox_example_termite_overlap.gif"><img alt="../_images/bbox_example_termite_overlap.gif" class="align-center" src="../_images/bbox_example_termite_overlap.gif" style="width: 800px;" /></a>
+</section>
+<section id="computing-statistics">
+<h2>Computing statistics<a class="headerlink" href="#computing-statistics" title="Permalink to this heading"></a></h2>
+<p>Next, we want to calculate statistics based on on each animal-anchored
+ROI. For each frame and each animal-anchored ROI, we may want to know:</p>
+<ul class="simple">
+<li><p>Which other animal-anchored ROIs the ROI intersects with, and</p></li>
+<li><p>Which pose-estimated key-points belonging to other animals intersects
+with the animal-anchored ROI</p></li>
+</ul>
+<p>Thus, an animal-anchored ROI can intersect with (i) other
+animal-anchored ROIs, and (ii) other animal body-part key-points, as in
+the example image below.</p>
+<a class="reference internal image-reference" href="../_images/termite_intersecting_examples.png"><img alt="../_images/termite_intersecting_examples.png" class="align-center" src="../_images/termite_intersecting_examples.png" style="width: 800px;" /></a>
+<p>To calculate these data, click on <code class="docutils literal notranslate"><span class="pre">CALCULATE</span> <span class="pre">BOUNDARY</span> <span class="pre">STATISTICS</span></code>
+button which brings up the following pop-up settings window:</p>
+<a class="reference internal image-reference" href="../_images/menu_4.png"><img alt="../_images/menu_4.png" class="align-center" src="../_images/menu_4.png" style="width: 800px;" /></a>
+<p>To calculate ROI-ROI intersection data (as in the left termite image
+above), tick the <code class="docutils literal notranslate"><span class="pre">ROI-ROI</span> <span class="pre">INTERSECTIONS</span></code> checkbox. To calculate
+ROI-keypoints intersection data (as in the right termite image above),
+then tick the <code class="docutils literal notranslate"><span class="pre">ROI-KEYPOINT</span> <span class="pre">INTERSECTIONS</span></code> checkbox.</p>
+<p>Next, we want to choose the output file-format on how to store our data.
+If your data is relatively small (e.g., &lt;100k-ish frames per video, &lt;5
+animals per video, &lt;15 ish videos, and you have a good amount of storage
+space), consider ticking the <code class="docutils literal notranslate"><span class="pre">.csv</span></code> radio-button in the
+<code class="docutils literal notranslate"><span class="pre">OUTPUT</span> <span class="pre">FILE</span> <span class="pre">TYPE</span></code> sub-menu. This is the easiest file-type to work
+with for many of us (You can open and play with these it in any
+spreadsheet-viewer) but comes at the cost of the files being very large
+and time-consuming to read and write. If you have longer videos and less
+storage available, then you may be forced to tick either the <code class="docutils literal notranslate"><span class="pre">.pickle</span></code>
+or <code class="docutils literal notranslate"><span class="pre">.parquet</span></code> radio-buttons.</p>
+<p>Once you’ve made your selections, click the <code class="docutils literal notranslate"><span class="pre">RUN</span></code> button. You can
+follow the progress in the main SimBA terminal window. Once complete,
+one data-file in your chosen file-format for each of your videos will be
+created within the <code class="docutils literal notranslate"><span class="pre">project_folder/csv/anchored_roi_data</span></code> directory of
+your SimBA project. These files are <em>truth tables</em> (containing only 0
+and 1s) with rows representing frames, and columns representing the
+different possible interactions/intersections between animal-anchored
+ROIs and pose-estimated body-part key-points.</p>
+<p>From these truth tables we can calculate all necessery aggregate
+statistics representing animal interactions (e.g., interaction latencies
+and interaction event counts). But, to enable flexibility and
+user-defined custom metrics, we will go through the structure of the
+file in a little more details.</p>
+<a class="reference internal image-reference" href="../_images/data_format_example.png"><img alt="../_images/data_format_example.png" class="align-center" src="../_images/data_format_example.png" style="width: 1000px;" /></a>
+<p>There are two possible types of columns in this file; representing (i)
+ROI-ROI intersections, and (ii) ROI-keypoint intersections. The ROI-ROI
+intersections are represented by the column headers to the <strong>left</strong> in
+the image above. These column headers contain three strings separated by
+a single <strong>:</strong> character <strong>where the final string reads ROI_ONLY</strong>.
+Further, the ROI-keypoint intersections are represented by the column
+headers to the <strong>right</strong> in the image above. These column headers also
+contain three different strings separated by <strong>:</strong> characters <strong>where
+the final string reads the name of the 2nd animals body-part
+key-point</strong>.</p>
+<p>If you saved the data in CSV file format, and open the file in a
+spreadsheet viewer, you might see something like this when viewing the
+first two columns and first 30 frames:</p>
+<a class="reference internal image-reference" href="../_images/data_format_example_1.png"><img alt="../_images/data_format_example_1.png" class="align-center" src="../_images/data_format_example_1.png" style="width: 1000px;" /></a>
+<p>The first column (in blue) is named <code class="docutils literal notranslate"><span class="pre">Animal_1:Animal_2:ROI_ONLY</span></code>. This
+column contains data reprsenenting intersections of the <strong>Animal 1
+anchored ROI</strong> and the <strong>Animal 2 anchored ROI</strong>. The <code class="docutils literal notranslate"><span class="pre">1</span></code> with the
+rows 0-13 shows that the Animal 1 anchored ROI and the Animal 2 anchored
+ROI where <strong>overlapping</strong> in those frames. The value <code class="docutils literal notranslate"><span class="pre">0</span></code> in the cells
+representing frames 14-30 shows that the Animal 1 anchored ROI and
+Animal 2 anchored ROI where <strong>not overlapping</strong> in those frames.</p>
+<p>The second column (in yellow) is named <code class="docutils literal notranslate"><span class="pre">Animal</span> <span class="pre">1:Animal</span> <span class="pre">5:Head</span></code>. This
+column contains data for the intersections of the <strong>Animal 1 anchored
+ROI</strong> and the <strong>Animal 2 head body-part</strong>. The <code class="docutils literal notranslate"><span class="pre">1</span></code> in rows 14-30 shows
+that the Animal 1 anchored ROI and Animal 5 head body-part where
+<strong>overlapping</strong> in those frames. The value <code class="docutils literal notranslate"><span class="pre">0</span></code> in the cells
+representing frames 0-13 shows that the Animal 1 anchored ROI and Animal
+5 head body-part where <strong>not overlapping</strong> in those frames.</p>
+</section>
+<section id="computing-aggregate-statistics">
+<h2>Computing aggregate statistics<a class="headerlink" href="#computing-aggregate-statistics" title="Permalink to this heading"></a></h2>
+<p>Next, with this information at hand, we can now compute aggregate
+statistics proxying how much each animal interact with each other in
+each video. To compute aggregate statistics, we click the
+<code class="docutils literal notranslate"><span class="pre">CALCULATE</span> <span class="pre">AGGREGATE</span> <span class="pre">BOUNDARY</span> <span class="pre">STATISTICS</span></code> button which brings up the
+following pop-up window:</p>
+<a class="reference internal image-reference" href="../_images/menu_5.png"><img alt="../_images/menu_5.png" class="align-center" src="../_images/menu_5.png" style="width: 1000px;" /></a>
+<p>The first sub-menu in this pop-up window is titled <code class="docutils literal notranslate"><span class="pre">SETTINGS</span></code>. Here,
+we define the types of aggregate statistics we want to compute:</p>
+<ul class="simple">
+<li><p>INTERACTION TIME (s): How much time (in seconds) each ROI intersect
+with other ROI and/or body-part key-points.</p></li>
+<li><p>INTERACTION BOUT COUNT: The number of interaction events (defined as
+an uninterrupted sequence of frames where ROI and/or body-part
+key-points intersect) between each two aniamls in the video.</p></li>
+<li><p>INTERACTION BOUT TIME MEAN (s): The mean length of each interaction
+event between each two aniamls in the video.</p></li>
+<li><p>INTERACTION BOUT TIME MEDIAN (s): The median length of each
+interaction event between each two aniamls in the video.</p></li>
+<li><p>DETAILED INTERACTIONS TABLE: A table showiing all found interactions
+and their start and end times. For an example, <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/detailed_aggregate_statistics_anchored_rois_20221121204633.csv">CLICK
+HERE</a></p></li>
+<li><p>MINIMUM BOUT LENGTH (MS): The shortest allowed length of an
+interaction bout. You can read more about <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data">minimum bout length
+here</a>.
+In brief, if you enter <code class="docutils literal notranslate"><span class="pre">500</span></code> in the <code class="docutils literal notranslate"><span class="pre">MINIMUM</span> <span class="pre">BOUT</span> <span class="pre">LENGTH</span></code>
+entry-box, then any interaction shorter than 500ms will be
+<strong>ignored</strong> when computing aggregate statistics.</p></li>
+</ul>
+<p>Next, click on <code class="docutils literal notranslate"><span class="pre">CALCULATE</span> <span class="pre">AGGREGATE</span> <span class="pre">STATISTICS</span></code>. You can follow the
+progress in the main SimBA terminal window. Once complete, a
+datetime-stamped CSV file containing the user-defined aggregate
+statistics is saved in the <code class="docutils literal notranslate"><span class="pre">project_folder/logs</span></code> directory of the
+SimBA project, with a file-name akin to
+<code class="docutils literal notranslate"><span class="pre">aggregate_statistics_anchored_rois_20221113153859.csv</span></code>. Click
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/aggregate_statistics_anchored_rois_20221113154903.csv">HERE</a>
+for an example the SimBA output with expected aggregate statistics after
+ticking all available metrics. When opening this file in a spreadsheet
+viewer, the top few cells look something like this:</p>
+<a class="reference internal image-reference" href="../_images/data_format_example_2.png"><img alt="../_images/data_format_example_2.png" class="align-center" src="../_images/data_format_example_2.png" style="width: 1000px;" /></a>
+<p>Here, the first column named ‘Video’ tells you which video the data
+comes from (in my cace <code class="docutils literal notranslate"><span class="pre">termites_test.mp4</span></code>). The second column tells
+you the Animal anchored ROI. Th third column tells you the second Animal
+anchored ROI. If analyzing ROI-keypoint intersections, then the fourth
+column tell you the key-point body-part of the second animal. If
+analyzing ROI-ROI intersections, then the fourth column will read
+<code class="docutils literal notranslate"><span class="pre">None</span></code>. The fifth and sixth column gives you the measurement and its
+value. Thus, the first row in the screengrab above tells me <code class="docutils literal notranslate"><span class="pre">Animal</span> <span class="pre">3</span></code>
+and <code class="docutils literal notranslate"><span class="pre">Animal</span> <span class="pre">4</span></code> have 11 event bout interaction events, while the second
+row tells me they have lasted for a total 10.83s. Moreover, the sixth
+row tells me <code class="docutils literal notranslate"><span class="pre">Thorax</span></code> body-part of <code class="docutils literal notranslate"><span class="pre">Animal</span> <span class="pre">5</span></code> has intersected with
+the animal-anchored ROI of <code class="docutils literal notranslate"><span class="pre">Animal</span> <span class="pre">2</span></code> for 5 event bouts.</p>
+<blockquote>
+<div><p>Note: if you need to calculate aggregate statistics that is not
+available in the <code class="docutils literal notranslate"><span class="pre">CALCULATE</span> <span class="pre">AGGREGATE</span> <span class="pre">BOUNDARY</span> <span class="pre">STATISTICS</span></code> menu,
+please reach out to us on
+<a class="reference external" href="https://gitter.im/SimBA-Resource/community">Gitter</a> or open an
+<a class="reference external" href="https://github.com/sgoldenlab/simba/issues">issue on GitHub</a> and
+we can work together to make the measurement you need available!</p>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="kleinberg_filter.html" class="btn btn-neutral float-left" title="Kleinberg behavior classification smoothing in SimBA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="SHAP.html" class="btn btn-neutral float-right" title="Model explainability and calculating feature SHAP values in SimBA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

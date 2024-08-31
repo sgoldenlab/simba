@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Using multi-animal pose-estimation data in SimBA &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Batch Video Processing" href="process_videos.html" />
+    <link rel="prev" title="Cue Light Analysis in SimBA" href="cue_lights.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SimBA
+              <img src="../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="roi.html">Regions of Interest (ROIs) in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FSTTC.html">Calculating forward-spike time tiling coefficents in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_subsets.html">Feature family sub-sets in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_defined_feature_class.html">User-defined ‘feature extraction’ scripts in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kleinberg_filter.html">Kleinberg behavior classification smoothing in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="anchored_rois.html">Animal-anchored ROIs (bounding-boxes) in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SHAP.html">Model explainability and calculating feature SHAP values in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="directionality_between_animals.html">Who is looking at who: calculate “directionality” between animals in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classifier_validation.html">Post-classification Validation (detecting false-positives)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cue_lights.html">Cue Light Analysis in SimBA</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Using multi-animal pose-estimation data in SimBA</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#step-1-generate-project-config">Step 1: Generate Project Config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-2-define-your-type-of-tracking">Step 2: Define your Type of Tracking</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-3-import-your-videos">Step 3: Import your videos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-4-import-your-tracking-data">Step 4: Import your tracking data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-5-assigning-tracks-the-correct-identities">Step 5: Assigning tracks the correct identities.</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="process_videos.html">Batch Video Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">SimBA Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_user_defined_pose_config.html">User-defined pose-configurations in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html">Video processing tools in SimBA</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">Using multi-animal pose-estimation data in SimBA</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_rst/multi_animal_pose.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="using-multi-animal-pose-estimation-data-in-simba">
+<h1>Using multi-animal pose-estimation data in SimBA<a class="headerlink" href="#using-multi-animal-pose-estimation-data-in-simba" title="Permalink to this heading"></a></h1>
+<p>New developments in pose-estimation packages such as <a class="reference external" href="https://github.com/DeepLabCut/DeepLabCut/releases/tag/v2.2b5">maDeepLabCut
+(version
+&gt;=2.2b5)</a>
+and <a class="reference external" href="https://sleap.ai/">SLEAP</a> allow users to track similar looking
+animals, for example multiple littermates of the same coat-color. In
+prior versions of these pose-estimation tools, tracking several similar
+looking animals could be difficult as a single body-part (i.e., the
+“Snout” or the “Tail-base”) was intermittently attributed to either
+animal.</p>
+<p>In this tutorial we will import multi-animal tracking data from
+DeepLabCut into SimBA from videos of two black-coated C57BL/6J mice.
+SimBA is capable of working with more than two subjects, but has been
+optimized for two-subject pairings. Multiple animals can also be tracked
+with <a class="reference external" href="http://kristinbranson.github.io/APT/index.html">Animal Part Tracker
+(APT)</a> and such data
+(.trk files) can also be imported into SimBA.</p>
+<p><strong>IMPORTANT NOTE:</strong> Both maDLC and SLEAP present significant advances in
+pose-estimation. However, behaviors that contain elements where
+experimental subjects are fully occluded, by either environmental
+factors (such as enrichment igloos) or by other experimental subjects
+(such as during aggression or mating behaviors), may present tracking
+difficulties. The accuracy of predictive classifiers depends on
+tracking, so it is critical to troubleshoot any similar multiple animal
+pose-estimation issues prior to importing tracking data into SimBA.</p>
+<section id="step-1-generate-project-config">
+<h2>Step 1: Generate Project Config<a class="headerlink" href="#step-1-generate-project-config" title="Permalink to this heading"></a></h2>
+<p>If you are coming along from <a class="reference external" href="https://github.com/sgoldenlab/simba/edit/SimBA_no_TF/docs/Scenario_1_new.md">Scenario 1 - Creating a classifier from
+scratch</a>,
+then you have already completed <em>Step 1</em> of the current tutorial and you
+can skip this part and continue to Step 2.</p>
+<p>In this Step we will create the main project folder, which will then
+auto-populate with all the required sub-directories.</p>
+<ol class="arabic simple">
+<li><p>In the main SimBA window, click on <code class="docutils literal notranslate"><span class="pre">File</span></code> and and
+<code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">a</span> <span class="pre">new</span> <span class="pre">project</span></code>. The following windows will pop up.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/menu_17.png"><img alt="../_images/menu_17.png" class="align-center" src="../_images/menu_17.png" style="width: 1000px;" /></a>
+<ol class="arabic simple" start="2">
+<li><p>Navigate to the <code class="docutils literal notranslate"><span class="pre">[</span> <span class="pre">Generate</span> <span class="pre">project</span> <span class="pre">config</span> <span class="pre">]</span></code> tab. Under <strong>General
+Settings</strong>, specify a <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">Path</span></code> which is the directory that
+will contain your main project folder.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">Name</span></code> is the name of your project. *Keep in mind that the
+project name cannot contain spaces. We suggest to instead use
+underscore “_“*</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">SML</span> <span class="pre">Settings</span></code> sub-menu, put in the number of predictive
+classifiers that you wish to create. For an example, in Scenario 1 we
+would like to create a single classifier. We will enter the number 1.
+Note that in the real world you would probably want to create
+multiple classifiers concurrently as this would decrease the number
+of times a video would need to be manually annotated. For simplicity,
+we will here create a single classifier.</p></li>
+<li><p>Click a single time, and it creates a row as shown in the following
+image. In each entry box, fill in the name of the behavior (BtWGaNP)
+that you want to classify. If you click too many times, as long as
+you leave the extra boxes empty, all is well.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/menu_22.png"><img alt="../_images/menu_22.png" class="align-center" src="../_images/menu_22.png" style="width: 1000px;" /></a>
+</section>
+<section id="step-2-define-your-type-of-tracking">
+<h2>Step 2: Define your Type of Tracking<a class="headerlink" href="#step-2-define-your-type-of-tracking" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>In this current Scenario we are using multi-animal tracking. Click on
+the <code class="docutils literal notranslate"><span class="pre">Type</span> <span class="pre">of</span> <span class="pre">Tracking</span></code> drop-down menu in the <code class="docutils literal notranslate"><span class="pre">Animal</span> <span class="pre">Settings</span></code>
+sub-menu and chose <code class="docutils literal notranslate"><span class="pre">Multi</span> <span class="pre">tracking</span></code>.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/menu_32.png"><img alt="../_images/menu_32.png" class="align-center" src="../_images/menu_32.png" style="width: 1000px;" /></a>
+<ol class="arabic simple" start="2">
+<li><p>Next, click on the <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">config</span></code> drop-down menu to specify the
+pose-estimation body-parts configuration you used to track your
+animals. If the body-parts you tracked on your animals are not
+listed, then chose the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">pose</span> <span class="pre">config...</span></code> option and head to
+the tutorial on <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Pose_config.md">how to use user-defined pose-configurations in
+SimBA</a>
+for intructions on how to import your data into SimBA.</p></li>
+</ol>
+<a class="reference internal image-reference" href="tutorials_rst/img/multi_animal_import/menu_4.png"><img alt="tutorials_rst/img/multi_animal_import/menu_4.png" class="align-center" src="tutorials_rst/img/multi_animal_import/menu_4.png" style="width: 1000px;" /></a>
+<p><strong>IMPORTANT</strong>. The images of the animals in the menu above shows two
+black mice. However, this is for illustrative purposes only and is used
+for hightlighting the expected body-parts and their order of how the
+body-parts were labeled in DeepLabCut or SLEAP (the numbers 1-8). If
+your data contains any other number of animals (e.g., you have 3 animals
+rather than 2), and your animals look different (e.g., you have several
+white coat-coated animals rather than several black-coated animals), but
+your data contains the pose-estimation tracks of the 8 body-parts in the
+image, then go ahead and select this <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">config</span></code> setting. In other
+words, select the <code class="docutils literal notranslate"><span class="pre">Multi-tracking</span> <span class="pre">#</span> <span class="pre">config</span></code> setting based solely on
+the expected body-parts and their order of labelling and <strong>NOT</strong> the
+species / number of animals shown in the image.</p>
+<p>In this current scenario we will import the tracking data for 8
+body-parts on each of the two black-coated mice (16 body-parts in
+total). In the <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">config</span></code> drop-down menu we select
+<code class="docutils literal notranslate"><span class="pre">Multi-animals,</span> <span class="pre">8bps</span></code>. Once selected, we click on
+<code class="docutils literal notranslate"><span class="pre">Generate</span> <span class="pre">Project</span> <span class="pre">Config</span></code>.</p>
+</section>
+<section id="step-3-import-your-videos">
+<h2>Step 3: Import your videos<a class="headerlink" href="#step-3-import-your-videos" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Next, click on the <code class="docutils literal notranslate"><span class="pre">[Import</span> <span class="pre">videos</span> <span class="pre">into</span> <span class="pre">project</span> <span class="pre">folder]</span></code> tab in the
+<code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">configuration</span></code> window. If you have multiple videos, use
+the <code class="docutils literal notranslate"><span class="pre">Import</span> <span class="pre">multiple</span> <span class="pre">videos</span></code> sub-menu to select a folder containing
+the <em>raw</em> MP4 or AVI video files you have analyzed in DeepLabCut. If
+you have a single video, use the <code class="docutils literal notranslate"><span class="pre">Import</span> <span class="pre">single</span> <span class="pre">video</span></code> sub-menu to
+select a single MP4 or AVI file to import into the project. For more
+details on importing video files into SimBA projects, see the
+following tutorial documentation:
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/SimBA_no_TF/docs/Scenario1.md#step-2-import-videos-into-project-folder">1</a><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-2-import-videos-into-project-folder">2</a>.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When importing multi-animal pose-estimation data into SimBA
+you <strong>must</strong> import your videos prior to importing your tracking
+data. The videos will be used to interactively re-organise your
+pose-estimation data to ensure that the pose-estimation data for each
+specific individual falls in the same column, and same column order,
+in all your tracked files (more information on this follows below).</p>
+</div>
+</section>
+<section id="step-4-import-your-tracking-data">
+<h2>Step 4: Import your tracking data<a class="headerlink" href="#step-4-import-your-tracking-data" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>After importing your video files, click on the
+<code class="docutils literal notranslate"><span class="pre">[Import</span> <span class="pre">tracking</span> <span class="pre">data]</span></code> tab in the <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">configuration</span></code>
+window. In the <code class="docutils literal notranslate"><span class="pre">Import</span> <span class="pre">tracking</span> <span class="pre">data</span></code> sub-menu, click on the
+<code class="docutils literal notranslate"><span class="pre">File</span> <span class="pre">type</span></code> drop-down menu to select your pose-estimation tracking
+data file type.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/menu_52.png"><img alt="../_images/menu_52.png" class="align-center" src="../_images/menu_52.png" style="width: 1000px;" /></a>
+<p>In this tutorial we have multi-animal tracking data in .H5 file format
+from DeepLabCut, and we select the <code class="docutils literal notranslate"><span class="pre">H5</span> <span class="pre">(multi-animal</span> <span class="pre">DLC)</span></code> option. For
+more information on the generating .H5 multi-animal tracking files in
+DeepLabCut, consult the <a class="reference external" href="https://www.youtube.com/channel/UC2HEbWpC_1v6i9RnDMy-dfA">DeepLabCut tutorials on
+YouTube</a>,
+the <a class="reference external" href="https://github.com/DeepLabCut/DeepLabCut/releases/tag/v2.2b5">DeepLabCut GitHub
+documentation</a>,
+or the <a class="reference external" href="https://gitter.im/DeepLabCut/community">DeepLabCut Gitter
+channel</a>. SimBA will convert
+these files during the processes descibed below into organised and more
+readable CSV files that can be opened with, for example, Microsoft Excel
+or OpenOffice Calc.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you have generated multi-animal tracking data using
+<a class="reference external" href="https://sleap.ai/">SLEAP</a> you should select the <code class="docutils literal notranslate"><span class="pre">SLP</span> <span class="pre">(SLEAP)</span></code>
+option from the <code class="docutils literal notranslate"><span class="pre">File</span> <span class="pre">type</span></code> menu. This difference in <code class="docutils literal notranslate"><span class="pre">File</span> <span class="pre">type</span></code>
+selection is the <strong>only user difference</strong> between processing SLEAP
+and DLC data in SimBA. In fact, despite the different file type names
+(H5 vs. SLP) they are both H5 dataframes that will be converted into
+readily readable and organised CSV file formats in SimBA which are
+more accessable to neuroscientst unfamiliar with dataframe container
+file formats.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you have generated multi-animal tracking data using
+<a class="reference external" href="http://kristinbranson.github.io/APT/index.html">Animal Part Tracker
+(APT)</a> and have
+.TRK tracking files, you should select the <code class="docutils literal notranslate"><span class="pre">TRK</span> <span class="pre">(multi-animal</span> <span class="pre">APT)</span></code>
+option from the <code class="docutils literal notranslate"><span class="pre">File</span> <span class="pre">type</span></code> menu.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>SimBA focus on use of CSV file formats due to its greater
+accessability, and SimBA converts alterative pose-estimation tracking
+formats (e.g., H5, JSON, SLP) behind-the-hood to CSV to enable a
+greater number of researchers to take advantage of SimBA. If you are
+tracking a large number of body-parts (e.g., more than 8 body-parts),
+on a larger number of animals (e.g., more than 3 animals), in longer
+videos (e.g., more than 20min / 30 fps) then CSV files may be
+non-optimal to work with due to their relatively slow read/write
+speed and less-than-ideal compression form (they can become gigabytes
+after calculating <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features">feature
+sets</a>).
+Although working with CSV files is fine, we are currently working on
+a tick-box option in SimBA that would allow users to save their data
+in file formats with better compression ratio and read-write speed.
+This may be preferred for more advanced users.</p>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>Below the <code class="docutils literal notranslate"><span class="pre">File</span> <span class="pre">type</span></code> drop-down menu, there are two option menus
+that can help correct and improve the incoming pose-estimation data
+(<em>interpolation</em>, and <em>smoothing</em>). Both of these menus default to
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, meaning no corrections will be performed on the incoming
+data. If you are intrested in removing missing values
+(interpolation), and/or correcting “jitter” (smoothing), please see
+sections <code class="docutils literal notranslate"><span class="pre">2</span></code> and <code class="docutils literal notranslate"><span class="pre">3</span></code> in <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-files">TUTORIAL SCENARIO 1: IMPORT TRACKING
+DATA</a>
+which details these functions, including video examples of expected
+results.</p></li>
+<li><p>After selecting the File type, enter the number of animals you are
+tracking in the <code class="docutils literal notranslate"><span class="pre">No</span> <span class="pre">of</span> <span class="pre">animals</span></code> entry box. In the current scenario
+we are tracking two animals and enter the number <code class="docutils literal notranslate"><span class="pre">2</span></code>. After
+entering the number 2, two further rows will appear asking you to
+name your two animals. In this tutorial, we will name Animal 1
+<em>Resident</em> and Animal 2 <em>Intruder</em>.</p></li>
+</ol>
+<a class="reference internal image-reference" href="tutorials_rst/img/multi_animal_import/menu_6.png"><img alt="tutorials_rst/img/multi_animal_import/menu_6.png" class="align-center" src="tutorials_rst/img/multi_animal_import/menu_6.png" style="width: 1000px;" /></a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Avoid spaces and commas <code class="docutils literal notranslate"><span class="pre">,</span></code> in your animal names. If you
+had planned to use spaces in your animal names, we recommend
+replacing them with underscore <code class="docutils literal notranslate"><span class="pre">_</span></code>.</p>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>Multi animal DLC (DLC verson &gt;=2.2b5) offers two tracking methods
+(skeleton vs. box). In the <code class="docutils literal notranslate"><span class="pre">Tracking</span> <span class="pre">type</span></code> dropdown, select the
+option you used to generate your tracking pose-estimation (this
+drop-down menu is only relevant for importing deepLabCut H5 files,
+and ths drop-down is not shown if importing SLEAP SLP data).</p></li>
+<li><p>Next to <code class="docutils literal notranslate"><span class="pre">Path</span> <span class="pre">to</span> <span class="pre">h5</span> <span class="pre">files</span></code>, click on <code class="docutils literal notranslate"><span class="pre">Browse</span></code> to select the
+folder that contain you H5 files. The selected folder should contain
+one H5 file for all the videos imported into the project during <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/SimBA_no_TF/docs/Multi_animal_pose.md#step-3-import-your-videos">Step
+3 of the current
+tutorial</a>.
+Once you have selected a folder containing your H5 files, click on
+<code class="docutils literal notranslate"><span class="pre">Import</span> <span class="pre">h5</span></code>.</p></li>
+</ol>
+</section>
+<section id="step-5-assigning-tracks-the-correct-identities">
+<h2>Step 5: Assigning tracks the correct identities.<a class="headerlink" href="#step-5-assigning-tracks-the-correct-identities" title="Permalink to this heading"></a></h2>
+<p>When SLEAP and multi-animal DLC predicts the location of body-parts for
+multiple animals, the animals are assigned <em>tracks</em> or <em>tracklets</em> (for
+more information, see the SLEAP and maDLC documentation), with one track
+for each animal. In the current scenario, this means that DeepLabCut may
+have assigned <em>track 1</em> to be the Resident, and <em>track 2</em> to be the
+Intruder. It could also be the reverse, and <em>track 1</em> is the Intruder
+and <em>track 2</em> is the Resident. Further - if you have multiple videos,
+then the identity of the animal representing <em>track 1</em> and <em>track 2</em>
+will most likely shift across the different videos in your project. We
+need to organise the pose-estimation data such as <em>track 1</em> is Animal 1
+(Resident) and <em>track 2</em> is Animal 2 (Intruder) <strong>in all of our tracking
+files</strong> and SimBA does this through an interactive interface.</p>
+<blockquote>
+<div><p>Note: If you used SLEAP to track only <strong>one</strong> animal, then SimBA will
+automatically skip over over this step.</p>
+</div></blockquote>
+<ol class="arabic simple">
+<li><p>When you click on <code class="docutils literal notranslate"><span class="pre">Import</span> <span class="pre">h5</span></code>, you will see the following window
+pop open.</p></li>
+</ol>
+<a class="reference internal image-reference" href="tutorials_rst/img/multi_animal_import/interface_1.png"><img alt="tutorials_rst/img/multi_animal_import/interface_1.png" class="align-center" src="tutorials_rst/img/multi_animal_import/interface_1.png" style="width: 1000px;" /></a>
+<p>This represents the first frame of your video, with the pose-estimation
+body-part locations plotted on top of the animals. If you <strong>can</strong> tell
+which animal is the Resident and which animal is the Intruder in the
+diplayed frame, then proceed to press <code class="docutils literal notranslate"><span class="pre">c</span></code> on your keyboard. If you
+<strong>cannot</strong> tell which animal is the Resident and which animal is the
+Intruder, press <code class="docutils literal notranslate"><span class="pre">x</span></code> on your keyboard.</p>
+<p>If you press <code class="docutils literal notranslate"><span class="pre">x</span></code> on your keyboard, then a new random frame will be
+shown and you will be asked again if you can tell which animal is the
+Resident, and which animal is the Intruder. Continoue to press <code class="docutils literal notranslate"><span class="pre">x</span></code> on
+your keyboard until SimBA displays a frame where you can tell which
+animal is which.</p>
+<p>When you press <code class="docutils literal notranslate"><span class="pre">c</span></code>, SimBA will shown this new message below asking you
+to double left mouse click on the Resident (Animal 1). After you double
+left mouse click on the Resident (Animal 1), SimBA will ask you to
+double left mouse click on the Intruder (Animal 2).</p>
+<a class="reference internal image-reference" href="tutorials_rst/img/multi_animal_import/interface_2.png"><img alt="tutorials_rst/img/multi_animal_import/interface_2.png" class="align-center" src="tutorials_rst/img/multi_animal_import/interface_2.png" style="width: 1000px;" /></a>
+<p>Once you have clicked on all the animals in your project, you will be
+asked if you are happy with your assigned identities. If you are not
+happy with your assigned identities, press <code class="docutils literal notranslate"><span class="pre">x</span></code> on your keyboard to
+re-assign the animal identities. If you are happy with your assigned
+identities, press <code class="docutils literal notranslate"><span class="pre">c</span></code> on your keyboard to save an organised (according
+to the animal identities) CSV pose-estimation file. SimBA will loop over
+all the videos and H5 files in your project asking you to assign the
+identities of the animals in each file.</p>
+<a class="reference internal image-reference" href="tutorials_rst/img/multi_animal_import/interface_3.png"><img alt="tutorials_rst/img/multi_animal_import/interface_3.png" class="align-center" src="tutorials_rst/img/multi_animal_import/interface_3.png" style="width: 1000px;" /></a>
+<p>The process for each video should look like in the following gif:</p>
+<a class="reference internal image-reference" href="tutorials_rst/img/multi_animal_import/interface_4.png"><img alt="tutorials_rst/img/multi_animal_import/interface_4.png" class="align-center" src="tutorials_rst/img/multi_animal_import/interface_4.png" style="width: 1000px;" /></a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>What happens behind-the-hood is that SimBA looks for the
+body-part closest to your left-mouse click and assigns the track that
+encompasses that body-part to the current Animal ID (e.g., the
+Resident). Thus, we recommend that your left-mouse click is at the
+centroid of the animal you wish to assign the current identity to
+prevent several tracks being assigned to the same identity.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The back-end process of converting and organising SLEAP H5
+tracks into CSV is a little more time-consuming for SimBA than
+converting DLC tracks, so if you are shifting from DeepLabCut to
+SLEAP pose-estimation, and the process takes a little longer than
+what you are used to, then don’t be alarmed - you can follow the
+progress through messages printed in the main SimBA terminal window.</p>
+</div>
+<ol class="arabic simple" start="2">
+<li><p>When you have attributed the animal IDs for all of the videos of your
+project, you can navigate to your project folder to check that all
+CSV files have been generated as expected. Navigate to your
+<code class="docutils literal notranslate"><span class="pre">project_folder/csv/input_csv</span></code> and you should see one CSV file for
+each of the videos in your project.</p></li>
+</ol>
+<p>Congratulation! You have now successfully imported your multi-animal
+pose-estimation tracking into SimBA and you are now ready to use this
+data to create predictive classifiers, analyze using already generated
+predictive classifiers, and/or analyze descriptive statistics.</p>
+<p>Go to <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-2-load-project-1">Scenario 1 - Creating a classifier from
+scratch</a>
+for tutorials on how to use the imported data to create predictive
+classifiers.</p>
+<p>Go to <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md">Scenario 2 - Using a classifier on new experimental
+data</a>
+for tutorials on how to analyze the imported data using previously
+generated classifiers.</p>
+<p>Go to <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md">Scenario 3 - Updating a classifier with further annotated
+data</a>
+for tutorials on how to use the imported data to update previously
+created classifiers.</p>
+<p>Author <a class="reference external" href="https://github.com/sronilsson">Simon N</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="cue_lights.html" class="btn btn-neutral float-left" title="Cue Light Analysis in SimBA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="process_videos.html" class="btn btn-neutral float-right" title="Batch Video Processing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

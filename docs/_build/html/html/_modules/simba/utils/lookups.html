@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.utils.lookups &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.utils.lookups</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.utils.lookups</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">Lock</span><span class="p">,</span> <span class="n">Value</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.font_manager</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">pyglet</span>
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">cm</span>
+
+<span class="kn">import</span> <span class="nn">simba</span>
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="p">(</span><span class="n">check_file_exist_and_readable</span><span class="p">,</span>
+                                <span class="n">check_if_dir_exists</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.enums</span> <span class="kn">import</span> <span class="n">OS</span><span class="p">,</span> <span class="n">FontPaths</span><span class="p">,</span> <span class="n">Methods</span><span class="p">,</span> <span class="n">Paths</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="n">get_fn_ext</span>
+<span class="kn">from</span> <span class="nn">simba.utils.warnings</span> <span class="kn">import</span> <span class="n">NoDataFoundWarning</span>
+
+<span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="n">OS</span><span class="o">.</span><span class="n">WINDOWS</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">pyglet.libs.win32</span> <span class="kn">import</span> <span class="n">constants</span>
+    <span class="n">constants</span><span class="o">.</span><span class="n">COINIT_MULTITHREADED</span> <span class="o">=</span> <span class="mh">0x2</span>  <span class="c1"># 0x2 = COINIT_APARTMENTTHREADED</span>
+
+
+<div class="viewcode-block" id="SharedCounter"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.SharedCounter">[docs]</a><span class="k">class</span> <span class="nc">SharedCounter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Counter that can be shared across processes on different cores&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initval</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">val</span> <span class="o">=</span> <span class="n">Value</span><span class="p">(</span><span class="s2">&quot;i&quot;</span><span class="p">,</span> <span class="n">initval</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lock</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SharedCounter.increment"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.SharedCounter.increment">[docs]</a>    <span class="k">def</span> <span class="nf">increment</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="SharedCounter.value"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.SharedCounter.value">[docs]</a>    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">lock</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">val</span><span class="o">.</span><span class="n">value</span></div></div>
+
+
+<div class="viewcode-block" id="get_body_part_configurations"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.get_body_part_configurations">[docs]</a><span class="k">def</span> <span class="nf">get_body_part_configurations</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return dict with named body-part schematics of pose-estimation schemas in SimBA installation as keys,</span>
+<span class="sd">    and paths to the images representing those body-part schematics as values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">lookup</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">simba_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">simba</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
+    <span class="n">img_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">simba_dir</span><span class="p">,</span> <span class="n">Paths</span><span class="o">.</span><span class="n">SCHEMATICS</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="n">names_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">simba_dir</span><span class="p">,</span> <span class="n">Paths</span><span class="o">.</span><span class="n">PROJECT_POSE_CONFIG_NAMES</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="n">check_file_exist_and_readable</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">names_path</span><span class="p">)</span>
+    <span class="n">check_if_dir_exists</span><span class="p">(</span><span class="n">in_dir</span><span class="o">=</span><span class="n">img_dir</span><span class="p">)</span>
+    <span class="n">names_lst</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">names_path</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">img_paths</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">img_dir</span> <span class="o">+</span> <span class="s2">&quot;/*.png&quot;</span><span class="p">)</span>
+    <span class="n">img_paths</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span>
+        <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="p">[</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="k">else</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[^0-9]|[0-9]+&quot;</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">img_path</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">names_lst</span><span class="p">,</span> <span class="n">img_paths</span><span class="p">):</span>
+        <span class="n">lookup</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">lookup</span><span class="p">[</span><span class="n">name</span><span class="p">][</span><span class="s2">&quot;img_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">img_path</span>
+    <span class="k">return</span> <span class="n">lookup</span></div>
+
+
+<div class="viewcode-block" id="get_bp_config_codes"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.get_bp_config_codes">[docs]</a><span class="k">def</span> <span class="nf">get_bp_config_codes</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper to match SimBA project_config.ini [create ensemble settings][pose_estimation_body_parts] to string names.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;1 animal; 4 body-parts&quot;</span><span class="p">:</span> <span class="s2">&quot;4&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;1 animal; 7 body-parts&quot;</span><span class="p">:</span> <span class="s2">&quot;7&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;1 animal; 8 body-parts&quot;</span><span class="p">:</span> <span class="s2">&quot;8&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;1 animal; 9 body-parts&quot;</span><span class="p">:</span> <span class="s2">&quot;9&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;2 animals; 8 body-parts&quot;</span><span class="p">:</span> <span class="s2">&quot;8&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;2 animals; 14 body-parts&quot;</span><span class="p">:</span> <span class="s2">&quot;14&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;2 animals; 16 body-parts&quot;</span><span class="p">:</span> <span class="s2">&quot;16&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;MARS&quot;</span><span class="p">:</span> <span class="n">Methods</span><span class="o">.</span><span class="n">USER_DEFINED</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+        <span class="s2">&quot;Multi-animals; 4 body-parts&quot;</span><span class="p">:</span> <span class="s2">&quot;8&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Multi-animals; 7 body-parts&quot;</span><span class="p">:</span> <span class="s2">&quot;14&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Multi-animals; 8 body-parts&quot;</span><span class="p">:</span> <span class="s2">&quot;16&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;3D tracking&quot;</span><span class="p">:</span> <span class="s2">&quot;3D_user_defined&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;AMBER&quot;</span><span class="p">:</span> <span class="s2">&quot;AMBER&quot;</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="get_bp_config_code_class_pairs"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.get_bp_config_code_class_pairs">[docs]</a><span class="k">def</span> <span class="nf">get_bp_config_code_class_pairs</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper to match SimBA project_config.ini [create ensemble settings][pose_estimation_body_parts] setting to feature extraction module class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">simba.feature_extractors.amber_feature_extractor</span> <span class="kn">import</span> \
+        <span class="n">AmberFeatureExtractor</span>
+    <span class="kn">from</span> <span class="nn">simba.feature_extractors.feature_extractor_4bp</span> <span class="kn">import</span> \
+        <span class="n">ExtractFeaturesFrom4bps</span>
+    <span class="kn">from</span> <span class="nn">simba.feature_extractors.feature_extractor_7bp</span> <span class="kn">import</span> \
+        <span class="n">ExtractFeaturesFrom7bps</span>
+    <span class="kn">from</span> <span class="nn">simba.feature_extractors.feature_extractor_8bp</span> <span class="kn">import</span> \
+        <span class="n">ExtractFeaturesFrom8bps</span>
+    <span class="kn">from</span> <span class="nn">simba.feature_extractors.feature_extractor_8bps_2_animals</span> <span class="kn">import</span> \
+        <span class="n">ExtractFeaturesFrom8bps2Animals</span>
+    <span class="kn">from</span> <span class="nn">simba.feature_extractors.feature_extractor_9bp</span> <span class="kn">import</span> \
+        <span class="n">ExtractFeaturesFrom9bps</span>
+    <span class="kn">from</span> <span class="nn">simba.feature_extractors.feature_extractor_14bp</span> <span class="kn">import</span> \
+        <span class="n">ExtractFeaturesFrom14bps</span>
+    <span class="kn">from</span> <span class="nn">simba.feature_extractors.feature_extractor_16bp</span> <span class="kn">import</span> \
+        <span class="n">ExtractFeaturesFrom16bps</span>
+    <span class="kn">from</span> <span class="nn">simba.feature_extractors.feature_extractor_user_defined</span> <span class="kn">import</span> \
+        <span class="n">UserDefinedFeatureExtractor</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;16&quot;</span><span class="p">:</span> <span class="n">ExtractFeaturesFrom16bps</span><span class="p">,</span>
+        <span class="s2">&quot;14&quot;</span><span class="p">:</span> <span class="n">ExtractFeaturesFrom14bps</span><span class="p">,</span>
+        <span class="s2">&quot;9&quot;</span><span class="p">:</span> <span class="n">ExtractFeaturesFrom9bps</span><span class="p">,</span>
+        <span class="s2">&quot;8&quot;</span><span class="p">:</span> <span class="p">{</span><span class="mi">1</span><span class="p">:</span> <span class="n">ExtractFeaturesFrom8bps</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="n">ExtractFeaturesFrom8bps2Animals</span><span class="p">},</span>
+        <span class="s2">&quot;7&quot;</span><span class="p">:</span> <span class="n">ExtractFeaturesFrom7bps</span><span class="p">,</span>
+        <span class="s2">&quot;4&quot;</span><span class="p">:</span> <span class="n">ExtractFeaturesFrom4bps</span><span class="p">,</span>
+        <span class="s2">&quot;user_defined&quot;</span><span class="p">:</span> <span class="n">UserDefinedFeatureExtractor</span><span class="p">,</span>
+        <span class="s2">&quot;AMBER&quot;</span><span class="p">:</span> <span class="n">AmberFeatureExtractor</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="get_icons_paths"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.get_icons_paths">[docs]</a><span class="k">def</span> <span class="nf">get_icons_paths</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper to get dictionary with icons with the icon names as keys (grabbed from file-name) and their</span>
+<span class="sd">    file paths as values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">simba_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">simba</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
+    <span class="n">icons_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">simba_dir</span><span class="p">,</span> <span class="n">Paths</span><span class="o">.</span><span class="n">ICON_ASSETS</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+    <span class="n">icon_paths</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">icons_dir</span> <span class="o">+</span> <span class="s2">&quot;/*.png&quot;</span><span class="p">)</span>
+    <span class="n">icons</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">icon_path</span> <span class="ow">in</span> <span class="n">icon_paths</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">icon_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">icon_path</span><span class="p">)</span>
+        <span class="n">icons</span><span class="p">[</span><span class="n">icon_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">icons</span><span class="p">[</span><span class="n">icon_name</span><span class="p">][</span><span class="s2">&quot;icon_path&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">icon_path</span>
+    <span class="k">return</span> <span class="n">icons</span></div>
+
+<div class="viewcode-block" id="load_simba_fonts"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.load_simba_fonts">[docs]</a><span class="k">def</span> <span class="nf">load_simba_fonts</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Load fonts defined in simba.utils.enums.FontPaths into memory&quot;&quot;&quot;</span>
+    <span class="n">simba_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">simba</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
+    <span class="n">font_enum</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">i</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">FontPaths</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">font_enum</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">pyglet</span><span class="o">.</span><span class="n">font</span><span class="o">.</span><span class="n">add_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">simba_dir</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="get_third_party_appender_file_formats"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.get_third_party_appender_file_formats">[docs]</a><span class="k">def</span> <span class="nf">get_third_party_appender_file_formats</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper to get dictionary that maps different third-party annotation tools with different file formats.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;BORIS&quot;</span><span class="p">:</span> <span class="s2">&quot;csv&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ETHOVISION&quot;</span><span class="p">:</span> <span class="s2">&quot;xlsx&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;OBSERVER&quot;</span><span class="p">:</span> <span class="s2">&quot;xlsx&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;SOLOMON&quot;</span><span class="p">:</span> <span class="s2">&quot;csv&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;DEEPETHOGRAM&quot;</span><span class="p">:</span> <span class="s2">&quot;csv&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;BENTO&quot;</span><span class="p">:</span> <span class="s2">&quot;annot&quot;</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="get_emojis"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.get_emojis">[docs]</a><span class="k">def</span> <span class="nf">get_emojis</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper to get dictionary of emojis with names as keys and emojis as values. Note, the same emojis are</span>
+<span class="sd">    represented differently in different python versions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">python_version</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">major</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="o">.</span><span class="n">minor</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">python_version</span> <span class="o">==</span> <span class="s2">&quot;3.6&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;thank_you&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="nb">chr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&gt;2H&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\U0001f64f</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-16be&quot;</span><span class="p">))</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;relaxed&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="nb">chr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&gt;2H&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\U0001F600</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-16be&quot;</span><span class="p">))</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="nb">chr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&gt;2H&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\U0001F6A8</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-16be&quot;</span><span class="p">))</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;complete&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="nb">chr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&gt;2H&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\U0001F680</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-16be&quot;</span><span class="p">))</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;warning&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="nb">chr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&gt;2H&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\u2757\uFE0F</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-16be&quot;</span><span class="p">))</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;trash&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="nb">chr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="s2">&quot;&gt;2H&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\U0001F5D1</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-16be&quot;</span><span class="p">))</span>
+            <span class="p">),</span>
+        <span class="p">}</span>
+
+    <span class="k">elif</span> <span class="n">python_version</span> <span class="o">==</span> <span class="s2">&quot;3.10&quot;</span> <span class="ow">or</span> <span class="n">python_version</span> <span class="o">==</span> <span class="s2">&quot;3.9&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;thank_you&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\U0001f64f</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="s2">&quot;replace&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span>
+            <span class="s2">&quot;relaxed&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\U0001F600</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="s2">&quot;replace&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span>
+            <span class="s2">&quot;warning&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\u2757\uFE0F</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="s2">&quot;replace&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span>
+            <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\U0001F6A8</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="s2">&quot;replace&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span>
+            <span class="s2">&quot;complete&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\U0001F680</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="s2">&quot;replace&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span>
+            <span class="s2">&quot;trash&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\U0001F5D1</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="s2">&quot;replace&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(),</span>
+        <span class="p">}</span>
+
+    <span class="k">elif</span> <span class="n">python_version</span> <span class="o">==</span> <span class="s2">&quot;3.7&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;thank_you&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\U0001f64f</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf16&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;surrogatepass&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                <span class="s2">&quot;utf16&quot;</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;relaxed&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\U0001F600</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf16&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;surrogatepass&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                <span class="s2">&quot;utf16&quot;</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\U0001F6A8</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf16&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;surrogatepass&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                <span class="s2">&quot;utf16&quot;</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;complete&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\U0001F680</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf16&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;surrogatepass&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                <span class="s2">&quot;utf16&quot;</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;warning&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\u2757\uFE0F</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf16&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;surrogatepass&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                <span class="s2">&quot;utf16&quot;</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;trash&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\U0001F5D1</span><span class="s2">F&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf16&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;surrogatepass&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span>
+                <span class="s2">&quot;utf16&quot;</span>
+            <span class="p">),</span>
+        <span class="p">}</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;thank_you&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\U0001f64f</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;relaxed&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\U0001F600</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\U0001F6A8</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;complete&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\U0001F680</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;trash&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\U0001F5D1</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="get_meta_data_file_headers"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.get_meta_data_file_headers">[docs]</a><span class="k">def</span> <span class="nf">get_meta_data_file_headers</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get List of headers for SimBA classifier metadata output.</span>
+
+<span class="sd">    :return List[str]:</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="s2">&quot;Classifier_name&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;RF_criterion&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;RF_max_features&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;RF_min_sample_leaf&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;RF_n_estimators&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;compute_feature_permutation_importance&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;generate_classification_report&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;generate_example_decision_tree&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;generate_features_importance_bar_graph&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;generate_features_importance_log&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;generate_precision_recall_curves&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;generate_rf_model_meta_data_file&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;generate_sklearn_learning_curves&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;learning_curve_data_splits&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;learning_curve_k_splits&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;n_feature_importance_bars&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;over_sample_ratio&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;over_sample_setting&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;train_test_size&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;train_test_split_type&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;under_sample_ratio&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;under_sample_setting&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;class_weight&quot;</span><span class="p">,</span>
+        <span class="s1">&#39;rf_max_depth&#39;</span><span class="p">,</span>
+    <span class="p">]</span></div>
+
+<div class="viewcode-block" id="get_cmaps"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.get_cmaps">[docs]</a><span class="k">def</span> <span class="nf">get_cmaps</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get list of named matplotlib color palettes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="s2">&quot;spring&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;summer&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;autumn&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cool&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Wistia&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Pastel1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Set1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;winter&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;afmhot&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;gist_heat&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;copper&quot;</span><span class="p">,</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="get_categorical_palettes"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.get_categorical_palettes">[docs]</a><span class="k">def</span> <span class="nf">get_categorical_palettes</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="s2">&quot;Pastel1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Pastel2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Paired&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Accent&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Dark2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Set1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Set2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Set3&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tab10&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tab20&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tab20b&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tab20c&quot;</span><span class="p">,</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="get_color_dict"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.get_color_dict">[docs]</a><span class="k">def</span> <span class="nf">get_color_dict</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get dict of color names as keys and RGB tuples as values</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;Grey&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">220</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">200</span><span class="p">),</span>
+        <span class="s2">&quot;Red&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+        <span class="s2">&quot;Dark-red&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">139</span><span class="p">),</span>
+        <span class="s2">&quot;Maroon&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">128</span><span class="p">),</span>
+        <span class="s2">&quot;Orange&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">165</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+        <span class="s2">&quot;Dark-orange&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">140</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+        <span class="s2">&quot;Coral&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">127</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+        <span class="s2">&quot;Chocolate&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">105</span><span class="p">,</span> <span class="mi">210</span><span class="p">),</span>
+        <span class="s2">&quot;Yellow&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+        <span class="s2">&quot;Green&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="s2">&quot;Dark-grey&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">105</span><span class="p">,</span> <span class="mi">105</span><span class="p">,</span> <span class="mi">105</span><span class="p">),</span>
+        <span class="s2">&quot;Light-grey&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">192</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">192</span><span class="p">),</span>
+        <span class="s2">&quot;Pink&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">178</span><span class="p">,</span> <span class="mi">102</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+        <span class="s2">&quot;Lime&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">204</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">229</span><span class="p">),</span>
+        <span class="s2">&quot;Purple&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">51</span><span class="p">,</span> <span class="mi">153</span><span class="p">),</span>
+        <span class="s2">&quot;Cyan&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">102</span><span class="p">),</span>
+        <span class="s2">&quot;White&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+        <span class="s2">&quot;Black&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="s2">&quot;Darkgoldenrod&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">184</span><span class="p">,</span> <span class="mi">134</span><span class="p">,</span> <span class="mi">11</span><span class="p">),</span>
+        <span class="s2">&quot;Olive&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">109</span><span class="p">,</span> <span class="mi">113</span><span class="p">,</span> <span class="mi">46</span><span class="p">),</span>
+        <span class="s2">&quot;Seagreen&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">46</span><span class="p">,</span> <span class="mi">139</span><span class="p">,</span> <span class="mi">87</span><span class="p">),</span>
+        <span class="s2">&quot;Dodgerblue&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">30</span><span class="p">,</span> <span class="mi">144</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
+        <span class="s2">&quot;Springgreen&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">127</span><span class="p">),</span>
+        <span class="s2">&quot;Firebrick&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">178</span><span class="p">,</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">34</span><span class="p">),</span>
+        <span class="s2">&quot;Indigo&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">63</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">183</span><span class="p">),</span>
+    <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="get_named_colors"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.get_named_colors">[docs]</a><span class="k">def</span> <span class="nf">get_named_colors</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get list of named matplotlib colors.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="s2">&quot;red&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pink&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lime&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;gold&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;coral&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lavender&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;sienna&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tomato&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;grey&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;azure&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;crimson&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;lightgrey&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;aqua&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;plum&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;blue&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;teal&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;maroon&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;green&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;black&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;deeppink&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;darkgoldenrod&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;purple&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;olive&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;seagreen&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dodgerblue&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;springgreen&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;firebrick&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;indigo&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;white&quot;</span><span class="p">,</span>
+    <span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="create_color_palettes"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.create_color_palettes">[docs]</a><span class="k">def</span> <span class="nf">create_color_palettes</span><span class="p">(</span><span class="n">no_animals</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">map_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create list of lists of bgr colors, one for each animal. Each list is pulled from a different palette</span>
+<span class="sd">    matplotlib color map.</span>
+
+<span class="sd">    :param int no_animals: Number of different palette lists</span>
+<span class="sd">    :param int map_size: Number of colors in each created palette.</span>
+<span class="sd">    :return List[List[int]]:  BGR colors</span>
+
+<span class="sd">    :example:</span>
+<span class="sd">    &gt;&gt;&gt; create_color_palettes(no_animals=2, map_size=2)</span>
+<span class="sd">    &gt;&gt;&gt; [[[255.0, 0.0, 255.0], [0.0, 255.0, 255.0]], [[102.0, 127.5, 0.0], [102.0, 255.0, 255.0]]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">colorListofList</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">cmaps</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;spring&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;summer&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;autumn&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cool&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Wistia&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Pastel1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Set1&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;winter&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;afmhot&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;gist_heat&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;copper&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;viridis&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Set3&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Set2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Paired&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;seismic&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;prism&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ocean&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">colormap</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">no_animals</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">cm</span><span class="p">,</span> <span class="s2">&quot;cmap_d&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">colormap</span> <span class="ow">in</span> <span class="n">cm</span><span class="o">.</span><span class="n">cmap_d</span><span class="p">:</span>
+            <span class="n">currColorMap</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="n">cmaps</span><span class="p">[</span><span class="n">colormap</span><span class="p">],</span> <span class="n">map_size</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">currColorMap</span> <span class="o">=</span> <span class="n">cm</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s2">&quot;spring&quot;</span><span class="p">,</span> <span class="n">map_size</span><span class="p">)</span>
+        <span class="n">currColorList</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">currColorMap</span><span class="o">.</span><span class="n">N</span><span class="p">):</span>
+            <span class="n">rgb</span> <span class="o">=</span> <span class="nb">list</span><span class="p">((</span><span class="n">currColorMap</span><span class="p">(</span><span class="n">i</span><span class="p">)[:</span><span class="mi">3</span><span class="p">]))</span>
+            <span class="n">rgb</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="mi">255</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">rgb</span><span class="p">]</span>
+            <span class="n">rgb</span><span class="o">.</span><span class="n">reverse</span><span class="p">()</span>
+            <span class="n">currColorList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rgb</span><span class="p">)</span>
+        <span class="n">colorListofList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">currColorList</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">colorListofList</span></div>
+
+
+<div class="viewcode-block" id="cardinality_to_integer_lookup"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.cardinality_to_integer_lookup">[docs]</a><span class="k">def</span> <span class="nf">cardinality_to_integer_lookup</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create dictionary that maps cardinal compass directions to integers.</span>
+
+<span class="sd">    :example:</span>
+<span class="sd">    &gt;&gt;&gt; data = [&quot;N&quot;, &quot;NE&quot;, &quot;E&quot;, &quot;SE&quot;, &quot;S&quot;, &quot;SW&quot;, &quot;W&quot;, &quot;NW&quot;]</span>
+<span class="sd">    &gt;&gt;&gt; [cardinality_to_integer_lookup()[d] for d in data]</span>
+<span class="sd">    &gt;&gt;&gt; [0, 1, 2, 3, 4, 5, 6, 7]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;N&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;NE&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;E&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;SE&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;S&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s2">&quot;SW&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;W&quot;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span> <span class="s2">&quot;NW&quot;</span><span class="p">:</span> <span class="mi">7</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="integer_to_cardinality_lookup"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.integer_to_cardinality_lookup">[docs]</a><span class="k">def</span> <span class="nf">integer_to_cardinality_lookup</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create dictionary that maps integers to cardinal compass directions.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;N&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;NE&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;E&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s2">&quot;SE&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s2">&quot;S&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="s2">&quot;SW&quot;</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="s2">&quot;W&quot;</span><span class="p">,</span> <span class="mi">7</span><span class="p">:</span> <span class="s2">&quot;NW&quot;</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="percent_to_crf_lookup"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.percent_to_crf_lookup">[docs]</a><span class="k">def</span> <span class="nf">percent_to_crf_lookup</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create dictionary that matches human-readable percent values to FFmpeg Constant Rate Factor (CRF)</span>
+<span class="sd">    values that regulates video quality in CPU codecs. Higher CRF values translates to lower video quality and reduced</span>
+<span class="sd">    file sizes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;10&quot;</span><span class="p">:</span> <span class="mi">37</span><span class="p">,</span>
+        <span class="s2">&quot;20&quot;</span><span class="p">:</span> <span class="mi">34</span><span class="p">,</span>
+        <span class="s2">&quot;30&quot;</span><span class="p">:</span> <span class="mi">31</span><span class="p">,</span>
+        <span class="s2">&quot;40&quot;</span><span class="p">:</span> <span class="mi">28</span><span class="p">,</span>
+        <span class="s2">&quot;50&quot;</span><span class="p">:</span> <span class="mi">25</span><span class="p">,</span>
+        <span class="s2">&quot;60&quot;</span><span class="p">:</span> <span class="mi">22</span><span class="p">,</span>
+        <span class="s2">&quot;70&quot;</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span>
+        <span class="s2">&quot;80&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="s2">&quot;90&quot;</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span>
+        <span class="s2">&quot;100&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+    <span class="p">}</span></div>
+
+<div class="viewcode-block" id="percent_to_qv_lk"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.percent_to_qv_lk">[docs]</a><span class="k">def</span> <span class="nf">percent_to_qv_lk</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create dictionary that matches human-readable percent values to FFmpeg regulates video quality in CPU codecs.</span>
+<span class="sd">    Higher FFmpeg quality scores maps to smaller, lower quality videos. Used in some AVI codecs such as &#39;divx&#39; and &#39;mjpeg&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span><span class="mi">100</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span>
+            <span class="mi">90</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+            <span class="mi">80</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span>
+            <span class="mi">70</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span>
+            <span class="mi">60</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span>
+            <span class="mi">50</span><span class="p">:</span> <span class="mi">13</span><span class="p">,</span>
+            <span class="mi">40</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+            <span class="mi">30</span><span class="p">:</span> <span class="mi">17</span><span class="p">,</span>
+            <span class="mi">20</span><span class="p">:</span> <span class="mi">19</span><span class="p">,</span>
+            <span class="mi">10</span><span class="p">:</span> <span class="mi">21</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="get_ffmpeg_crossfade_methods"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.get_ffmpeg_crossfade_methods">[docs]</a><span class="k">def</span> <span class="nf">get_ffmpeg_crossfade_methods</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;fade&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;fadeblack&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;fadewhite&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;distance&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;wipeleft&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;wiperight&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;wipeup&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;wipedown&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;sideleft&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;sideright&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;sideup&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;sidedown&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;smoothleft&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;smoothright&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;smoothup&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;smoothdown&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;circlecrop&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;rectcrop&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;circleclose&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;circleopen&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;horzclose&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;horzopen&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;vertclose&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;vertopen&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;diagbl&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;diagbr&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;diagtl&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;diagtr&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;hlslice&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;hrslice&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;vuslice&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;vdslice&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;dissolve&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;pixelize&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;radial&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;hblur&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;wipetl&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;wipetr&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;wipebl&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;wipebr&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;fadegrays&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;squeezev&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;squeezeh&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;zoomin&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;hlwind&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;hrwind&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;vuwind&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;vdwind&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;coverleft&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;coverright&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;cobverup&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;coverdown&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;revealleft&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;revealright&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;revealup&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;revealdown&#39;</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="video_quality_to_preset_lookup"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.video_quality_to_preset_lookup">[docs]</a><span class="k">def</span> <span class="nf">video_quality_to_preset_lookup</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create dictionary that matches human-readable video quality settings to FFmpeg presets for GPU codecs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;Low&quot;</span><span class="p">:</span> <span class="s2">&quot;fast&quot;</span><span class="p">,</span> <span class="s2">&quot;Medium&quot;</span><span class="p">:</span> <span class="s2">&quot;medium&quot;</span><span class="p">,</span> <span class="s2">&quot;High&quot;</span><span class="p">:</span> <span class="s2">&quot;slow&quot;</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="get_labelling_img_kbd_bindings"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.get_labelling_img_kbd_bindings">[docs]</a><span class="k">def</span> <span class="nf">get_labelling_img_kbd_bindings</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns dictionary of tkinter keyboard bindings.</span>
+<span class="sd">    .. note::</span>
+<span class="sd">        Change ``kbd`` values to change keyboard shortcuts. For example:</span>
+
+<span class="sd">        Some possible examples:</span>
+<span class="sd">            &lt;Key&gt;, &lt;KeyPress&gt;, &lt;KeyRelease&gt;: Binds to any key press or release.</span>
+<span class="sd">            &lt;KeyPress-A&gt;, &lt;Key-a&gt;: Binds to the &#39;a&#39; key press (case sensitive).</span>
+<span class="sd">            &lt;Up&gt;, &lt;Down&gt;, &lt;Left&gt;, &lt;Right&gt;: Binds to the arrow keys.</span>
+<span class="sd">            &lt;Control-KeyPress-A&gt;, &lt;Control-a&gt;: Binds to Ctrl + A or Ctrl + a</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> \
+        <span class="p">{</span><span class="s1">&#39;frame+1&#39;</span><span class="p">:</span> <span class="c1"># MOVE FORWARD 1 FRAME</span>
+             <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;Right Arrow = +1 frame&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;kbd&#39;</span><span class="p">:</span> <span class="s2">&quot;&lt;Right&gt;&quot;</span><span class="p">},</span>
+         <span class="s1">&#39;frame-1&#39;</span><span class="p">:</span> <span class="c1"># MOVE BACK 1 FRAME</span>
+             <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;Left Arrow = -1 frame&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;kbd&#39;</span><span class="p">:</span> <span class="s2">&quot;&lt;Left&gt;&quot;</span><span class="p">},</span>
+         <span class="s1">&#39;save&#39;</span><span class="p">:</span> <span class="c1"># SAVE CURRENT ANNOTATIONS STATS TO DISK</span>
+             <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;Ctrl + s = Save annotations file&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;kbd&#39;</span><span class="p">:</span> <span class="s2">&quot;&lt;Control-s&gt;&quot;</span><span class="p">},</span>
+         <span class="s1">&#39;frame+1_keep_choices&#39;</span><span class="p">:</span> <span class="c1"># MOVE FORWARD 1 FRAME AND KEEP ANNOTATION SELECTIONS OF THE CURRENT FRAME</span>
+             <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;Ctrl + a = +1 frame and keep choices&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;kbd&#39;</span><span class="p">:</span> <span class="s2">&quot;&lt;Control-a&gt;&quot;</span><span class="p">},</span>
+         <span class="s1">&#39;print_annotation_statistic&#39;</span><span class="p">:</span> <span class="c1"># PRINT ANNOTATION STATISTICS</span>
+             <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;Ctrl + p = Show annotation statistics&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;kbd&#39;</span><span class="p">:</span> <span class="s2">&quot;&lt;Control-p&gt;&quot;</span><span class="p">},</span>
+         <span class="s1">&#39;last_frame&#39;</span><span class="p">:</span>  <span class="c1"># SHOW LAST FRAME</span>
+             <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;Ctrl + l = Last frame&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;kbd&#39;</span><span class="p">:</span> <span class="s2">&quot;&lt;Control-l&gt;&quot;</span><span class="p">},</span>
+         <span class="s1">&#39;first_frame&#39;</span><span class="p">:</span>  <span class="c1"># SHOW FIRT FRAME</span>
+             <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;Ctrl + o = First frame&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;kbd&#39;</span><span class="p">:</span> <span class="s2">&quot;&lt;Control-o&gt;&quot;</span><span class="p">}</span>
+         <span class="p">}</span></div>
+
+<div class="viewcode-block" id="get_labelling_video_kbd_bindings"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.get_labelling_video_kbd_bindings">[docs]</a><span class="k">def</span> <span class="nf">get_labelling_video_kbd_bindings</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns dictionary of OpenCV keyboard bindings.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        Change ``kbd`` values to change keyboard shortcuts. Note that OpenCV keyboard bindings are different from tkinter</span>
+<span class="sd">        keyboard bindings as used in ``get_labelling_img_kbd_bindings``.</span>
+
+<span class="sd">        Use either letters as below, or integer ASCII code for non-letters. For example:</span>
+<span class="sd">            - Space bar: 32</span>
+<span class="sd">            - Left arrow: 81</span>
+<span class="sd">            - Right arrow: 83</span>
+
+<span class="sd">        e.g., {&#39;Pause/Play&#39;: {&#39;label&#39;: &#39;p = Pause/Play&#39;, &#39;kbd&#39;: 32} would remap the space-bar to pause.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+
+    <span class="k">return</span> \
+        <span class="p">{</span><span class="s1">&#39;Pause/Play&#39;</span><span class="p">:</span> <span class="c1">#</span>
+             <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;p = Pause/Play&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;kbd&#39;</span><span class="p">:</span> <span class="s1">&#39;p&#39;</span><span class="p">},</span>
+         <span class="s1">&#39;forward_two_frames&#39;</span><span class="p">:</span>  <span class="c1">#</span>
+             <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;o = +2 frames&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;kbd&#39;</span><span class="p">:</span> <span class="s2">&quot;o&quot;</span><span class="p">},</span>
+         <span class="s1">&#39;forward_ten_frames&#39;</span><span class="p">:</span>  <span class="c1">#</span>
+             <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;e = +10 frames&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;kbd&#39;</span><span class="p">:</span> <span class="s2">&quot;e&quot;</span><span class="p">},</span>
+         <span class="s1">&#39;forward_one_second&#39;</span><span class="p">:</span>  <span class="c1">#</span>
+             <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;w = +1 second&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;kbd&#39;</span><span class="p">:</span> <span class="s2">&quot;w&quot;</span><span class="p">},</span>
+         <span class="s1">&#39;backwards_two_frames&#39;</span><span class="p">:</span>  <span class="c1">#</span>
+             <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;t = -2 frames&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;kbd&#39;</span><span class="p">:</span> <span class="s2">&quot;t&quot;</span><span class="p">},</span>
+         <span class="s1">&#39;backwards_ten_frames&#39;</span><span class="p">:</span>  <span class="c1">#</span>
+             <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;s = -10 frames&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;kbd&#39;</span><span class="p">:</span> <span class="s2">&quot;s&quot;</span><span class="p">},</span>
+         <span class="s1">&#39;backwards_one_second&#39;</span><span class="p">:</span>  <span class="c1">#</span>
+             <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;x = -1 second&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;kbd&#39;</span><span class="p">:</span> <span class="s2">&quot;x&quot;</span><span class="p">},</span>
+         <span class="s1">&#39;close_window&#39;</span><span class="p">:</span>  <span class="c1">#</span>
+             <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;q = Close video window&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;kbd&#39;</span><span class="p">:</span> <span class="s2">&quot;q&quot;</span><span class="p">},</span>
+         <span class="p">}</span></div>
+
+
+
+<div class="viewcode-block" id="get_fonts"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.get_fonts">[docs]</a><span class="k">def</span> <span class="nf">get_fonts</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; Returns a dictionary with all fonts available in OS, with the font name as key and font path as value&quot;&quot;&quot;</span>
+    <span class="n">font_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">f</span><span class="o">.</span><span class="n">fname</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">font_manager</span><span class="o">.</span><span class="n">fontManager</span><span class="o">.</span><span class="n">ttflist</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)}</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">font_dict</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">NoDataFoundWarning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s1">&#39;No fonts found on disk using matplotlib.font_manager&#39;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">get_fonts</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">platform</span><span class="o">.</span><span class="n">system</span><span class="p">()</span> <span class="o">==</span> <span class="n">OS</span><span class="o">.</span><span class="n">WINDOWS</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+        <span class="n">font_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;C:&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">as_posix</span><span class="p">())</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">font_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="k">return</span> <span class="n">font_dict</span></div>
+
+<div class="viewcode-block" id="get_log_config"><a class="viewcode-back" href="../../../simba.utils.html#simba.utils.lookups.get_log_config">[docs]</a><span class="k">def</span> <span class="nf">get_log_config</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="s2">&quot;disable_existing_loggers&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;formatters&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2">|</span><span class="si">%(name)s</span><span class="s2">||</span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;datefmt&quot;</span><span class="p">:</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">T%H:%M:%SZ&quot;</span><span class="p">,</span>
+                <span class="c1"># &quot;class&quot;: &quot;pythonjsonlogger.jsonlogger.JsonFormatter&quot;,</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;file_handler&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;class&quot;</span><span class="p">:</span> <span class="s2">&quot;logging.handlers.RotatingFileHandler&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;formatter&quot;</span><span class="p">:</span> <span class="s2">&quot;default&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;a&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;backupCount&quot;</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span>
+                <span class="s2">&quot;maxBytes&quot;</span><span class="p">:</span> <span class="mi">5000000</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;loggers&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="s2">&quot;INFO&quot;</span><span class="p">,</span> <span class="s2">&quot;handlers&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;file_handler&quot;</span><span class="p">]}},</span>
+    <span class="p">}</span></div>
+
+
+<span class="c1">#</span>
+<span class="c1"># def rao_spacing_critical_values():</span>
+<span class="c1">#     {4.0: 186.45,</span>
+<span class="c1">#      5.0: 183.44,</span>
+<span class="c1">#      6.0: 180.65,</span>
+<span class="c1">#      7.0: 177.83,</span>
+<span class="c1">#      8.0: 175.68,</span>
+<span class="c1">#      9.0: 173.68,</span>
+<span class="c1">#      10.0: 171.98,</span>
+<span class="c1">#      11.0: 170.45,</span>
+<span class="c1">#      12.0: 169.09,</span>
+<span class="c1">#      13.0: 167.87,</span>
+<span class="c1">#      14.0: 166.76,</span>
+<span class="c1">#      15.0: 165.75,</span>
+<span class="c1">#      16.0: 164.83,</span>
+<span class="c1">#      17.0: 163.98,</span>
+<span class="c1">#      18.0: 163.2,</span>
+<span class="c1">#      19.0: 162.47,</span>
+<span class="c1">#      20.0: 161.79,</span>
+<span class="c1">#      21.0: 161.16,</span>
+<span class="c1">#      22.0: 160.56,</span>
+<span class="c1">#      23.0: 160.01,</span>
+<span class="c1">#      24.0: 159.48,</span>
+<span class="c1">#      25.0: 158.99,</span>
+<span class="c1">#      26.0: 158.52,</span>
+<span class="c1">#      27.0: 158.07,</span>
+<span class="c1">#      28.0: 157.65,</span>
+<span class="c1">#      29.0: 157.25,</span>
+<span class="c1">#      30.0: 156.87,</span>
+<span class="c1">#      35.0: 155.19,</span>
+<span class="c1">#      40.0: 153.82,</span>
+<span class="c1">#      45.0: 152.68,</span>
+<span class="c1">#      50.0: 151.7,</span>
+<span class="c1">#      75.0: 148.34,</span>
+<span class="c1">#      100.0: 146.29,</span>
+<span class="c1">#      150.0: 143.83,</span>
+<span class="c1">#      200.0: 142.35,</span>
+<span class="c1">#      300.0: 140.57,</span>
+<span class="c1">#      400.0: 139.5,</span>
+<span class="c1">#      500.0: 138.77,</span>
+<span class="c1">#      600.0: 138.23,</span>
+<span class="c1">#      700.0: 137.8,</span>
+<span class="c1">#      800.0: 137.46,</span>
+<span class="c1">#      900.0: 137.18,</span>
+<span class="c1">#      1000.0: 136.94}</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

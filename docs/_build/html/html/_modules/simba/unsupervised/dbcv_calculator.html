@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.unsupervised.dbcv_calculator &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.unsupervised.dbcv_calculator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.unsupervised.dbcv_calculator</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span><span class="p">,</span> <span class="n">njit</span><span class="p">,</span> <span class="n">prange</span><span class="p">,</span> <span class="n">types</span>
+<span class="kn">from</span> <span class="nn">numba.typed</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="kn">import</span> <span class="n">csgraph</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.csgraph</span> <span class="kn">import</span> <span class="n">minimum_spanning_tree</span>
+
+<span class="kn">from</span> <span class="nn">simba.mixins.config_reader</span> <span class="kn">import</span> <span class="n">ConfigReader</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.unsupervised_mixin</span> <span class="kn">import</span> <span class="n">UnsupervisedMixin</span>
+<span class="kn">from</span> <span class="nn">simba.unsupervised.enums</span> <span class="kn">import</span> <span class="n">Clustering</span><span class="p">,</span> <span class="n">Unsupervised</span>
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="p">(</span><span class="n">check_file_exist_and_readable</span><span class="p">,</span>
+                                <span class="n">check_if_dir_exists</span><span class="p">,</span> <span class="n">check_valid_extension</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.enums</span> <span class="kn">import</span> <span class="n">Formats</span>
+<span class="kn">from</span> <span class="nn">simba.utils.printing</span> <span class="kn">import</span> <span class="n">SimbaTimer</span><span class="p">,</span> <span class="n">stdout_success</span><span class="p">,</span> <span class="n">stdout_warning</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="p">(</span><span class="n">find_files_of_filetypes_in_directory</span><span class="p">,</span>
+                                    <span class="n">get_unique_values_in_iterable</span><span class="p">,</span> <span class="n">read_pickle</span><span class="p">)</span>
+
+<span class="n">CLUSTERER_NAME</span> <span class="o">=</span> <span class="s2">&quot;CLUSTERER_NAME&quot;</span>
+<span class="n">CLUSTER_COUNT</span> <span class="o">=</span> <span class="s2">&quot;CLUSTER_COUNT&quot;</span>
+<span class="n">EMBEDDER_NAME</span> <span class="o">=</span> <span class="s2">&quot;EMBEDDER_NAME&quot;</span>
+<span class="n">DBCV</span> <span class="o">=</span> <span class="s2">&quot;DBCV&quot;</span>
+
+
+<div class="viewcode-block" id="DBCVCalculator"><a class="viewcode-back" href="../../../simba.unsupervised.html#simba.unsupervised.dbcv_calculator.DBCVCalculator">[docs]</a><span class="k">class</span> <span class="nc">DBCVCalculator</span><span class="p">(</span><span class="n">UnsupervisedMixin</span><span class="p">,</span> <span class="n">ConfigReader</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Density-based Cluster Validation (DBCV).</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">       Jitted version of `DBCSV &lt;https://github.com/christopherjenness/DBCV&gt;`__.</span>
+<span class="sd">       Faster runtime by replacing meth:`scipy.spatial.distance.cdist` in original DBCSV with LLVM as discussed `HERE &lt;https://github.com/numba/numba-scipy/issues/38&gt;`__.</span>
+<span class="sd">       A further non-jitted implementaion can be found in the `hdbscan library  &lt;https://github.com/scikit-learn-contrib/hdbscan/blob/master/hdbscan/validity.py&gt;`__.</span>
+<span class="sd">       `AWS Denseclus &lt;https://github.com/awslabs/amazon-denseclus&gt;`_ HDBSCAN appears to have DBCV as an attribute of returned object. maybe a faster alternative?</span>
+
+<span class="sd">    :param str embedders_path: Directory holding dimensionality reduction models in pickle format.</span>
+<span class="sd">    :param str clusterers_path: Directory holding cluster models in pickle format.</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Moulavi et al, Density-Based Clustering Validation, `SIAM 2014`, https://doi.org/10.1137/1.9781611973440.96</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    -----</span>
+<span class="sd">    &gt;&gt;&gt; dbcv_calculator = DBCVCalculator(clusterers_path=&#39;unsupervised/cluster_models&#39;, config_path=&#39;my_simba_config&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; results = dbcv_calculator.run()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span> <span class="n">data_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]</span>
+    <span class="p">):</span>
+        <span class="n">check_file_exist_and_readable</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="n">ConfigReader</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="n">UnsupervisedMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">data_path</span><span class="p">):</span>
+            <span class="n">check_if_dir_exists</span><span class="p">(</span><span class="n">in_dir</span><span class="o">=</span><span class="n">data_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span> <span class="o">=</span> <span class="n">find_files_of_filetypes_in_directory</span><span class="p">(</span>
+                <span class="n">directory</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span>
+                <span class="n">extensions</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">Formats</span><span class="o">.</span><span class="n">PICKLE</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span>
+                <span class="n">raise_error</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">check_valid_extension</span><span class="p">(</span>
+                <span class="n">path</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span> <span class="n">accepted_extensions</span><span class="o">=</span><span class="n">Formats</span><span class="o">.</span><span class="n">PICKLE</span><span class="o">.</span><span class="n">value</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">data_path</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logs_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;DBCV_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="si">}</span><span class="s2">.xlsx&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelWriter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>
+            <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Analyzing DBCV for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> clusterers...&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">file_cnt</span><span class="p">,</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span><span class="p">):</span>
+            <span class="n">model_timer</span> <span class="o">=</span> <span class="n">SimbaTimer</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">v</span> <span class="o">=</span> <span class="n">read_pickle</span><span class="p">(</span><span class="n">data_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">file_cnt</span><span class="p">],</span> <span class="n">dbcv_results</span><span class="p">,</span> <span class="n">warning</span> <span class="o">=</span> <span class="p">{},</span> <span class="s2">&quot;nan&quot;</span><span class="p">,</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">file_cnt</span><span class="p">][</span><span class="n">CLUSTERER_NAME</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">Clustering</span><span class="o">.</span><span class="n">CLUSTER_MODEL</span><span class="o">.</span><span class="n">value</span><span class="p">][</span>
+                <span class="n">Unsupervised</span><span class="o">.</span><span class="n">HASHED_NAME</span><span class="o">.</span><span class="n">value</span>
+            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">file_cnt</span><span class="p">][</span><span class="n">EMBEDDER_NAME</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">Unsupervised</span><span class="o">.</span><span class="n">DR_MODEL</span><span class="o">.</span><span class="n">value</span><span class="p">][</span>
+                <span class="n">Unsupervised</span><span class="o">.</span><span class="n">HASHED_NAME</span><span class="o">.</span><span class="n">value</span>
+            <span class="p">]</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Performing DBCV for cluster model </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">file_cnt</span><span class="p">][</span><span class="n">CLUSTERER_NAME</span><span class="p">]</span><span class="si">}</span><span class="s2">...&quot;</span>
+            <span class="p">)</span>
+            <span class="n">cluster_lbls</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">Clustering</span><span class="o">.</span><span class="n">CLUSTER_MODEL</span><span class="o">.</span><span class="n">value</span><span class="p">][</span>
+                <span class="n">Unsupervised</span><span class="o">.</span><span class="n">MODEL</span><span class="o">.</span><span class="n">value</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">labels_</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">v</span><span class="p">[</span><span class="n">Unsupervised</span><span class="o">.</span><span class="n">DR_MODEL</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="n">Unsupervised</span><span class="o">.</span><span class="n">MODEL</span><span class="o">.</span><span class="n">value</span><span class="p">]</span><span class="o">.</span><span class="n">embedding_</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">file_cnt</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">file_cnt</span><span class="p">],</span>
+                <span class="o">**</span><span class="n">v</span><span class="p">[</span><span class="n">Clustering</span><span class="o">.</span><span class="n">CLUSTER_MODEL</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="n">Unsupervised</span><span class="o">.</span><span class="n">PARAMETERS</span><span class="o">.</span><span class="n">value</span><span class="p">],</span>
+                <span class="o">**</span><span class="n">v</span><span class="p">[</span><span class="n">Unsupervised</span><span class="o">.</span><span class="n">DR_MODEL</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="n">Unsupervised</span><span class="o">.</span><span class="n">PARAMETERS</span><span class="o">.</span><span class="n">value</span><span class="p">],</span>
+            <span class="p">}</span>
+            <span class="n">cluster_cnt</span> <span class="o">=</span> <span class="n">get_unique_values_in_iterable</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">cluster_lbls</span><span class="p">,</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">v</span><span class="p">[</span><span class="n">Clustering</span><span class="o">.</span><span class="n">CLUSTER_MODEL</span><span class="o">.</span><span class="n">value</span><span class="p">][</span><span class="n">Unsupervised</span><span class="o">.</span><span class="n">HASHED_NAME</span><span class="o">.</span><span class="n">value</span><span class="p">],</span>
+                <span class="nb">min</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">cluster_cnt</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">dbcv_results</span><span class="p">,</span> <span class="n">warning</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DBCV</span><span class="p">(</span>
+                    <span class="n">x</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span> <span class="n">cluster_lbls</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">file_cnt</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">file_cnt</span><span class="p">],</span>
+                <span class="o">**</span><span class="p">{</span><span class="n">DBCV</span><span class="p">:</span> <span class="n">dbcv_results</span><span class="p">},</span>
+                <span class="o">**</span><span class="p">{</span><span class="n">CLUSTER_COUNT</span><span class="p">:</span> <span class="n">cluster_cnt</span><span class="p">},</span>
+                <span class="o">**</span><span class="p">{</span><span class="s2">&quot;WARNING (POTENTIALLY INACCURATE)&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">warning</span><span class="p">)},</span>
+            <span class="p">}</span>
+            <span class="n">model_timer</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">()</span>
+            <span class="n">stdout_success</span><span class="p">(</span>
+                <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;DBCV complete for model </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">file_cnt</span><span class="p">][</span><span class="n">CLUSTERER_NAME</span><span class="p">]</span><span class="si">}</span><span class="s2"> ...&quot;</span><span class="p">,</span>
+                <span class="n">elapsed_time</span><span class="o">=</span><span class="n">model_timer</span><span class="o">.</span><span class="n">elapsed_time_str</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__save_results</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">()</span>
+        <span class="n">stdout_success</span><span class="p">(</span>
+            <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;ALL DBCV calculations complete and saved in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">elapsed_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">elapsed_time_str</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__save_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">orient</span><span class="o">=</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;VALUE&quot;</span><span class="p">])</span>
+            <span class="k">with</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelWriter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_path</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="n">v</span><span class="p">[</span><span class="n">CLUSTERER_NAME</span><span class="p">],</span> <span class="n">index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<div class="viewcode-block" id="DBCVCalculator.DBCV"><a class="viewcode-back" href="../../../simba.unsupervised.html#simba.unsupervised.dbcv_calculator.DBCVCalculator.DBCV">[docs]</a>    <span class="k">def</span> <span class="nf">DBCV</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param np.ndarray X: 2D array of shape len(observations) x len(dimensionality reduced dimensions)</span>
+<span class="sd">        :param np.ndarray labels: 1D array with cluster labels</span>
+<span class="sd">        :returns float: DBCV cluster validity score</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Computing mutual reach distance ... (Step  1/4)&quot;</span><span class="p">)</span>
+        <span class="n">arrays_by_cluster</span><span class="p">,</span> <span class="n">ordered_labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mutual_reach_dist_graph</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Computing pairwise distances ... (Step  2/4)&quot;</span><span class="p">)</span>
+        <span class="n">graph</span><span class="p">,</span> <span class="n">warning</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_dists</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">arrays_by_cluster</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Computing minimum spanning tree ... (Step  3/4)&quot;</span><span class="p">)</span>
+        <span class="n">mst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mutual_reach_dist_MST</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Computing cluster validity index ... (Step  4/4)&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clustering_validity_index</span><span class="p">(</span><span class="n">mst</span><span class="p">,</span> <span class="n">ordered_labels</span><span class="p">),</span> <span class="n">warning</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@njit</span><span class="p">(</span><span class="s2">&quot;(float32[:,:], int64[:])&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_mutual_reach_dist_graph</span><span class="p">(</span><span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param np.ndarray X: 2D array of shape len(observations) x len(dimensionality reduced dimensions)</span>
+<span class="sd">        :param np.ndarray labels: 1D array with cluster labels</span>
+<span class="sd">        :returns ListType arrays_by_cluster: 3D array in numba ListType, of shape len(number of clusters) x len(cluster_members) x len(dimensionality reduced dimensions)</span>
+<span class="sd">        :returns v arrays_by_cluster: numba ListType of labels in the order of arrays_by_cluster</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">unique_cluster_labels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+        <span class="n">arrays_by_cluster</span> <span class="o">=</span> <span class="n">List</span><span class="p">()</span>
+        <span class="n">ordered_labels</span> <span class="o">=</span> <span class="n">List</span><span class="p">()</span>
+
+        <span class="k">def</span> <span class="nf">_get_label_members</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">cluster_label</span><span class="p">):</span>
+            <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">labels</span> <span class="o">==</span> <span class="n">cluster_label</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">members</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">members</span>
+
+        <span class="k">for</span> <span class="n">cluster_label_idx</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">unique_cluster_labels</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">cluster_label</span> <span class="o">=</span> <span class="n">unique_cluster_labels</span><span class="p">[</span><span class="n">cluster_label_idx</span><span class="p">]</span>
+            <span class="n">members</span> <span class="o">=</span> <span class="n">_get_label_members</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">cluster_label</span><span class="p">)</span>
+            <span class="n">ordered_labels</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">cluster_label</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">members</span><span class="p">))</span>
+            <span class="n">arrays_by_cluster</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">members</span><span class="p">])</span>
+
+        <span class="n">ordered_labels</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">ordered_labels</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">arrays_by_cluster</span><span class="p">,</span> <span class="n">ordered_labels</span>
+
+<div class="viewcode-block" id="DBCVCalculator.calculate_dists"><a class="viewcode-back" href="../../../simba.unsupervised.html#simba.unsupervised.dbcv_calculator.DBCVCalculator.calculate_dists">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fastmath</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">calculate_dists</span><span class="p">(</span>
+        <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">arrays_by_cluster</span><span class="p">:</span> <span class="n">types</span><span class="o">.</span><span class="n">List</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param np.ndarray X: 2D array of shape len(observations) x len(dimensionality reduced dimensions)</span>
+<span class="sd">        :param numba.types.ListType[list[np.ndarray]] arrays_by_cluster: Numba typed List of list with 2d arrays.</span>
+<span class="sd">        :returns Tuple[np.ndarray, bool): Graph of all pair-wise mutual reachability distances between points of size X.shape[0] x X.shape[0].</span>
+<span class="sd">                                          Boolean representing if any issues where detected. Including: If (i) any clusters consist of a single observation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">cluster_n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">arrays_by_cluster</span><span class="p">)</span>
+        <span class="n">graph</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">X</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="n">graph_row_counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">warning_flag</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">for</span> <span class="n">cluster_a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cluster_n</span><span class="p">):</span>
+            <span class="n">A</span> <span class="o">=</span> <span class="n">arrays_by_cluster</span><span class="p">[</span><span class="n">cluster_a</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">Ci</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">A</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                <span class="n">init_val_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                <span class="n">init_val</span> <span class="o">=</span> <span class="n">init_val_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                    <span class="n">acc</span> <span class="o">=</span> <span class="n">init_val</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                        <span class="n">acc</span> <span class="o">+=</span> <span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">a</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">A</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+                    <span class="n">Ci</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">acc</span><span class="p">)</span>
+
+                <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Ci</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+                <span class="n">Ci</span> <span class="o">=</span> <span class="n">Ci</span><span class="p">[</span><span class="n">indices</span><span class="p">]</span>
+                <span class="n">numerator</span> <span class="o">=</span> <span class="p">((</span><span class="mi">1</span> <span class="o">/</span> <span class="n">Ci</span><span class="p">)</span> <span class="o">**</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="n">warning_flag</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">denominator_axis_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]]))</span>
+
+                <span class="n">core_dist_i</span> <span class="o">=</span> <span class="p">(</span><span class="n">numerator</span> <span class="o">/</span> <span class="p">(</span><span class="n">denominator_axis_0</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">**</span> <span class="p">(</span>
+                    <span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="n">A</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="n">graph_row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">0</span><span class="p">))</span>
+
+                <span class="k">for</span> <span class="n">array_cnt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">arrays_by_cluster</span><span class="p">)):</span>
+                    <span class="n">B</span> <span class="o">=</span> <span class="n">arrays_by_cluster</span><span class="p">[</span><span class="n">array_cnt</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                        <span class="n">Cii</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">B</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                        <span class="n">init_val_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">B</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                        <span class="n">init_val</span> <span class="o">=</span> <span class="n">init_val_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                            <span class="n">acc</span> <span class="o">=</span> <span class="n">init_val</span>
+                            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                                <span class="n">acc</span> <span class="o">+=</span> <span class="p">(</span><span class="n">B</span><span class="p">[</span><span class="n">b</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span> <span class="o">-</span> <span class="n">B</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+                            <span class="n">Cii</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">acc</span><span class="p">)</span>
+                        <span class="n">indices_ii</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">Cii</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span>
+                        <span class="n">Cii</span> <span class="o">=</span> <span class="n">Cii</span><span class="p">[</span><span class="n">indices_ii</span><span class="p">]</span>
+                        <span class="n">numerator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="p">((</span><span class="mi">1</span> <span class="o">/</span> <span class="n">Cii</span><span class="p">)</span> <span class="o">**</span> <span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">sum</span><span class="p">()])</span>
+                        <span class="p">)</span>
+                        <span class="n">denominator_axis_0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(([</span><span class="mi">2</span><span class="p">,</span> <span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]])))</span>
+                        <span class="n">core_dist_j</span> <span class="o">=</span> <span class="p">(</span><span class="n">numerator</span> <span class="o">/</span> <span class="p">(</span><span class="n">denominator_axis_0</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">**</span> <span class="p">(</span>
+                            <span class="o">-</span><span class="mi">1</span> <span class="o">/</span> <span class="n">B</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="p">)</span>
+                        <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">a</span><span class="p">]</span> <span class="o">-</span> <span class="n">B</span><span class="p">[</span><span class="n">b</span><span class="p">])</span>
+                        <span class="n">mutual_reachability</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">core_dist_i</span><span class="p">,</span> <span class="n">core_dist_j</span><span class="p">,</span> <span class="n">dist</span><span class="p">])</span>
+                        <span class="p">)</span>
+                        <span class="n">graph_row</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">graph_row</span><span class="p">,</span> <span class="n">mutual_reachability</span><span class="p">)</span>
+
+                <span class="n">graph</span><span class="p">[</span><span class="n">graph_row_counter</span><span class="p">]</span> <span class="o">=</span> <span class="n">graph_row</span>
+                <span class="n">graph_row_counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">graph</span><span class="p">,</span> <span class="n">warning_flag</span></div>
+
+    <span class="k">def</span> <span class="nf">_mutual_reach_dist_MST</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param np.ndarray graph: array of dimensions len(observations) x len(observations). Can be computed by ``calculate_dists``.</span>
+<span class="sd">        :return np.ndarray minimum_spanning_tree: array of dimensions len(observations) x len(observations, minimum spanning tree of all pair-wise mutual reachability distances between points.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mst</span> <span class="o">=</span> <span class="n">minimum_spanning_tree</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span><span class="o">.</span><span class="n">toarray</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">transpose_np</span><span class="p">(</span><span class="n">mst</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">))</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@njit</span><span class="p">(</span><span class="s2">&quot;(float32[:,:]),&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">transpose_np</span><span class="p">(</span><span class="n">mst</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">mst</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">mst</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_clustering_validity_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mst</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param np.ndarray graph: minimum spanning tree of all pair-wise mutual reachability distances between points.</span>
+<span class="sd">        :param np.ndarray labels: 1D array with cluster labels</span>
+<span class="sd">        :returns validity_index: float score in range -1 to 1 indicating validity of clustering assignments</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">n_samples</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+        <span class="n">validity_index</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+            <span class="n">fraction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">labels</span> <span class="o">==</span> <span class="n">label</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">n_samples</span><span class="p">)</span>
+            <span class="n">cluster_validity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_validity_index</span><span class="p">(</span><span class="n">mst</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+            <span class="n">validity_index</span> <span class="o">+=</span> <span class="n">fraction</span> <span class="o">*</span> <span class="n">cluster_validity</span>
+
+        <span class="k">return</span> <span class="n">validity_index</span>
+
+    <span class="k">def</span> <span class="nf">_cluster_validity_index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MST</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">cluster</span><span class="p">):</span>
+        <span class="n">min_density_separation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+        <span class="k">for</span> <span class="n">cluster_j</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">labels</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">cluster_j</span> <span class="o">!=</span> <span class="n">cluster</span><span class="p">:</span>
+                <span class="n">cluster_density_separation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_density_separation</span><span class="p">(</span>
+                    <span class="n">MST</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">cluster</span><span class="p">,</span> <span class="n">cluster_j</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">cluster_density_separation</span> <span class="o">&lt;</span> <span class="n">min_density_separation</span><span class="p">:</span>
+                    <span class="n">min_density_separation</span> <span class="o">=</span> <span class="n">cluster_density_separation</span>
+
+        <span class="n">cluster_density_sparseness</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cluster_density_sparseness</span><span class="p">(</span>
+            <span class="n">MST</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">labels</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">cluster</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">numerator</span> <span class="o">=</span> <span class="n">min_density_separation</span> <span class="o">-</span> <span class="n">cluster_density_sparseness</span>
+        <span class="n">denominator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">min_density_separation</span><span class="p">,</span> <span class="n">cluster_density_sparseness</span><span class="p">])</span>
+        <span class="n">cluster_validity</span> <span class="o">=</span> <span class="n">numerator</span> <span class="o">/</span> <span class="n">denominator</span>
+        <span class="k">return</span> <span class="n">cluster_validity</span>
+
+    <span class="k">def</span> <span class="nf">_cluster_density_separation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">MST</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">cluster_i</span><span class="p">,</span> <span class="n">cluster_j</span><span class="p">):</span>
+        <span class="n">indices_i</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">labels</span> <span class="o">==</span> <span class="n">cluster_i</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">indices_j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">labels</span> <span class="o">==</span> <span class="n">cluster_j</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">shortest_paths</span> <span class="o">=</span> <span class="n">csgraph</span><span class="o">.</span><span class="n">dijkstra</span><span class="p">(</span><span class="n">MST</span><span class="p">,</span> <span class="n">indices</span><span class="o">=</span><span class="n">indices_i</span><span class="p">)</span>
+        <span class="n">relevant_paths</span> <span class="o">=</span> <span class="n">shortest_paths</span><span class="p">[:,</span> <span class="n">indices_j</span><span class="p">]</span>
+        <span class="n">density_separation</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">relevant_paths</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">density_separation</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_cluster_density_sparseness</span><span class="p">(</span><span class="n">MST</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">cluster</span><span class="p">):</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">labels</span> <span class="o">==</span> <span class="n">cluster</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">cluster_MST</span> <span class="o">=</span> <span class="n">MST</span><span class="p">[</span><span class="n">indices</span><span class="p">][:,</span> <span class="n">indices</span><span class="p">]</span>
+        <span class="n">cluster_density_sparseness</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">cluster_MST</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cluster_density_sparseness</span></div>
+
+
+<span class="c1"># test = DBCVCalculator(data_path=&#39;/Users/simon/Desktop/envs/troubleshooting/unsupervised/cluster_models&#39;,</span>
+<span class="c1">#                       config_path=&#39;/Users/simon/Desktop/envs/troubleshooting/unsupervised/project_folder/project_config.ini&#39;)</span>
+<span class="c1"># test.run()</span>
+
+<span class="c1"># test = DBCVCalculator(config_path=&#39;/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini&#39;,</span>
+<span class="c1">#                       data_path=&#39;/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_clusters&#39;)</span>
+<span class="c1"># test.run()</span>
+
+<span class="c1">#</span>
+<span class="c1"># test = DBCVCalculator(config_path=&#39;/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini&#39;,</span>
+<span class="c1">#                       data_path=&#39;/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/error_mdl/ecstatic_darwin.pickle&#39;)</span>
+<span class="c1"># test.run()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

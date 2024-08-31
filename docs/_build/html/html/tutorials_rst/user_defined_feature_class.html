@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User-defined ‘feature extraction’ scripts in SimBA &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Kleinberg behavior classification smoothing in SimBA" href="kleinberg_filter.html" />
+    <link rel="prev" title="Feature family sub-sets in SimBA" href="feature_subsets.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SimBA
+              <img src="../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="roi.html">Regions of Interest (ROIs) in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FSTTC.html">Calculating forward-spike time tiling coefficents in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_subsets.html">Feature family sub-sets in SimBA</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">User-defined ‘feature extraction’ scripts in SimBA</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#step-1-use-a-user-defined-feature-extraction-script-in-simba">Step 1: Use a user-defined feature extraction script in SimBA</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="kleinberg_filter.html">Kleinberg behavior classification smoothing in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="anchored_rois.html">Animal-anchored ROIs (bounding-boxes) in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SHAP.html">Model explainability and calculating feature SHAP values in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="directionality_between_animals.html">Who is looking at who: calculate “directionality” between animals in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classifier_validation.html">Post-classification Validation (detecting false-positives)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cue_lights.html">Cue Light Analysis in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi_animal_pose.html">Using multi-animal pose-estimation data in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="process_videos.html">Batch Video Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">SimBA Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_user_defined_pose_config.html">User-defined pose-configurations in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html">Video processing tools in SimBA</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">User-defined ‘feature extraction’ scripts in SimBA</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_rst/user_defined_feature_class.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="user-defined-feature-extraction-scripts-in-simba">
+<h1>User-defined ‘feature extraction’ scripts in SimBA<a class="headerlink" href="#user-defined-feature-extraction-scripts-in-simba" title="Permalink to this heading"></a></h1>
+<p>SimBA extracts <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features">‘features’ from pose-estimation
+data</a>,
+and use these features together with <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-6-label-behavior">behavior
+annotations</a>
+to <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model">build predictive
+classifiers</a>
+of the behavior. In SimBA (when using pre-defined pose-estimation
+body-part configurations), these features compose of curated metrics
+such as the distances between particular animal body-parts, and certain
+movements that may be particluarly relevant for studying social
+behaviours. The exact features, and the number of features, is
+hard-coded in SimBA and is determined by the number of body-part
+key-points tracked during pose-estimation. For examples of the features
+calculated by SimBA when using pose-estimation from 2 animals and
+16-body-parts, see <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv">this
+file</a>.</p>
+<p>In some scenarios, however, employing these built-in feature-extraction
+scripts is not suitable, and the user may want to extract other features
+that are of particuar relevance to their behavior of interest and
+experimental protocol. We address this with the
+<code class="docutils literal notranslate"><span class="pre">user-defined</span> <span class="pre">feature</span> <span class="pre">extraction</span></code> function in SimBA. The
+<code class="docutils literal notranslate"><span class="pre">user-defined</span> <span class="pre">'feature</span> <span class="pre">extraction</span></code> function in SimBA gives users
+significant flexibility, e.g.:</p>
+<p><em>1. Advanced users can write their own, brand-new, feature extraction
+scripts and use them within the SimBA GUI environment. These can be
+shared independently of the SimBA program, and may improve classifier
+accuracy and computational time in experimental settings for which SimBA
+was not originally targeted (i.e., non-social behavior).</em></p>
+<p><em>2. As SimBA is developing - the default hard-coded feature extraction
+files could, at times, be updated (i) with further, additional, features
+that we have found powerful for classifying particular social behaviors,
+or (ii) originaly calculated features, that we have found to lack
+predictive power in social settings, may be removed to speed up
+computational time. The ability to deploy user-defined ‘feature
+extraction’ scrips make newer versions of SimBA back-compatible, and
+users can specify to use feature extraction scripts that came with any
+prior version of SimBA within the latest SimBA GUI environment.</em></p>
+<p><em>3. By default, when using user-defined pose-estimation body-part
+configurations in SimBA, a generic feature battery of features is
+calculated in SimBA which encompass the distance between all body-parts
+and their velocities in rolling windows. This may not be optimal - as
+this generic feature set could include many features that are not
+relevant for the behavior of interest, while also missing some key
+features that could increase predictive accuracy if they were included.
+If the user is tracking a large number of body-parts using a
+user-defined pose-estimation configuration, the generaically defined
+feature set can also turn very large. The ability to deplay
+user-generated feature extraction scripts in SimBA overcomes these
+hurdles.</em></p>
+<p><em>4. Many features that SimBA calculates (e.g., distances between
+individual body-parts within animals, or the size of the animal
+represented as a convex hull) are only really relevant for classifying
+behaviors if the animals show variability in these features across
+sequential frames. Shape-shifting animals like, like rodents, do show
+variability in these features, while non-shape-shifting animals, like
+fish, do</em> <strong>not</strong> <em>show variability in these features. If we are working
+with non-shape shifting animals like fish we may therefore want to
+calculate alternative features; like angular features, dispersion
+time-series decomposition, rotation etc to build more accurate
+classifiers instead.</em></p>
+<section id="step-1-use-a-user-defined-feature-extraction-script-in-simba">
+<h2>Step 1: Use a user-defined feature extraction script in SimBA<a class="headerlink" href="#step-1-use-a-user-defined-feature-extraction-script-in-simba" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Before using a user-defined a feature extraction script in SimBA,
+load your project, import the pose-estimation tracking files and
+correct outliers. For instructions on how to load your project,
+importing pose-estimation tracking files, and correcting outliers,
+read the walk-through tutorial for <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md">Scenario
+1</a>
+and/or <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config%5D">Part
+I</a>
+or the generic SimBA tutorial.</p></li>
+<li><p>Navigate to the <code class="docutils literal notranslate"><span class="pre">Extract</span> <span class="pre">features</span></code> tab in SimBA. and you should see
+the following window with the “User-defined feature extraction” menu
+marked in red in the image.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/12.png"><img alt="../_images/12.png" class="align-center" src="../_images/12.png" style="width: 800px;" /></a>
+<ol class="arabic simple" start="3">
+<li><p>Tick the <code class="docutils literal notranslate"><span class="pre">Apply</span> <span class="pre">user</span> <span class="pre">defined</span> <span class="pre">feature</span> <span class="pre">extraction</span> <span class="pre">script</span></code> box, and
+click the <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code> button next to the <code class="docutils literal notranslate"><span class="pre">Script</span> <span class="pre">path</span></code>
+entry-box. Go ahead and select the path to your feature extraction
+script.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Your feature extraction script needs to be a <code class="docutils literal notranslate"><span class="pre">.py</span></code> file with
+a <strong>single</strong> python class. If there are more then one class in your
+feature extraction script, then SimBA will use the first class.</p>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>After selecting the feature extraction script you would like to use
+in you project, click on <code class="docutils literal notranslate"><span class="pre">Extract</span> <span class="pre">Features</span></code> in the
+<code class="docutils literal notranslate"><span class="pre">Extract</span> <span class="pre">Features</span></code> sub-menu.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>For example outlines of SimBA feature extraction files, for
+either designing your own feature extraction script within SimBA, or
+modifying existing feature extraction scripts, please see the
+<a class="reference external" href="https://github.com/sgoldenlab/simba/tree/master/simba/features_scripts">hard-coded feature extraction scripts in
+SimBA</a>
+orthe SimBA <a class="reference external" href="https://osf.io/emxyw/">OSF repository</a>. For an
+example user-defined feature extraction script used to score behavior
+in zebrafish, see <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/simba/features_scripts/misc/fish_feature_extractor.py">THIS
+FILE</a>.</p>
+</div>
+<p>Author <a class="reference external" href="https://github.com/sronilsson">Simon N</a>, <a class="reference external" href="https://github.com/inoejj">JJ
+Choong</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="feature_subsets.html" class="btn btn-neutral float-left" title="Feature family sub-sets in SimBA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="kleinberg_filter.html" class="btn btn-neutral float-right" title="Kleinberg behavior classification smoothing in SimBA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

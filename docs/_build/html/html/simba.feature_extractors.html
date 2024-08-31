@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Feature extractors &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Labelling" href="simba.labelling.html" />
+    <link rel="prev" title="Cue light tools" href="simba.cue_light_tools.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SimBA
+              <img src="_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="api.html">API Reference</a></li>
+      <li class="breadcrumb-item active">Feature extractors</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/simba.feature_extractors.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="feature-extractors">
+<h1>Feature extractors<a class="headerlink" href="#feature-extractors" title="Permalink to this heading"></a></h1>
+<section id="module-simba.feature_extractors.feature_extractor_14bp">
+<span id="default-feature-extractor-for-1-animals-and-14-body-parts"></span><h2>Default feature extractor for 1 animals and 14 body-parts<a class="headerlink" href="#module-simba.feature_extractors.feature_extractor_14bp" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.feature_extractors.feature_extractor_14bp.ExtractFeaturesFrom14bps">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.feature_extractors.feature_extractor_14bp.</span></span><span class="sig-name descname"><span class="pre">ExtractFeaturesFrom14bps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/feature_extractors/feature_extractor_14bp.html#ExtractFeaturesFrom14bps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.feature_extractors.feature_extractor_14bp.ExtractFeaturesFrom14bps" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a>, <a class="reference internal" href="simba.mixins.html#simba.mixins.feature_extraction_mixin.FeatureExtractionMixin" title="simba.mixins.feature_extraction_mixin.FeatureExtractionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureExtractionMixin</span></code></a></p>
+<p>Extracts hard-coded set of features from pose-estimation data from two animals with 7 tracked body-parts each.
+Results are stored in the <cite>project_folder/csv/features_extracted</cite> directory of the SimBA project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – path to SimBA project config file in Configparser format</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features">Feature extraction tutorial</a>.
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/6.png">Expected pose configuration</a></p>
+<a class="reference internal image-reference" href="_images/6.png"><img alt="_images/6.png" class="align-center" src="_images/6.png" style="width: 150px;" /></a>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">feature_extractor</span> <span class="o">=</span> <span class="n">ExtractFeaturesFrom14bps</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;MyProjectConfig&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.feature_extractors.feature_extractor_14bp.ExtractFeaturesFrom14bps.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/feature_extractors/feature_extractor_14bp.html#ExtractFeaturesFrom14bps.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.feature_extractors.feature_extractor_14bp.ExtractFeaturesFrom14bps.run" title="Permalink to this definition"></a></dt>
+<dd><p>Method to compute and save features to disk. Results are saved in the <cite>project_folder/csv/features_extracted</cite>
+directory of the SimBA project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-simba.feature_extractors.feature_extractor_16bp">
+<span id="default-feature-extractor-for-1-animals-and-16-body-parts"></span><h2>Default feature extractor for 1 animals and 16 body-parts<a class="headerlink" href="#module-simba.feature_extractors.feature_extractor_16bp" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.feature_extractors.feature_extractor_16bp.ExtractFeaturesFrom16bps">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.feature_extractors.feature_extractor_16bp.</span></span><span class="sig-name descname"><span class="pre">ExtractFeaturesFrom16bps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/feature_extractors/feature_extractor_16bp.html#ExtractFeaturesFrom16bps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.feature_extractors.feature_extractor_16bp.ExtractFeaturesFrom16bps" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a>, <a class="reference internal" href="simba.mixins.html#simba.mixins.feature_extraction_mixin.FeatureExtractionMixin" title="simba.mixins.feature_extraction_mixin.FeatureExtractionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureExtractionMixin</span></code></a></p>
+<p>Extracts hard-coded set of features from pose-estimation data from two animals with 8 tracked body-parts each.
+Results are stored in the <cite>project_folder/csv/features_extracted</cite> directory of the SimBA project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – path to SimBA project config file in Configparser format</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features">Feature extraction tutorial</a>.
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/7.png">Expected pose configuration</a></p>
+<a class="reference internal image-reference" href="_images/7.png"><img alt="_images/7.png" class="align-center" src="_images/7.png" style="width: 150px;" /></a>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">feature_extractor</span> <span class="o">=</span> <span class="n">ExtractFeaturesFrom16bps</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;MyProjectConfig&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.feature_extractors.feature_extractor_16bp.ExtractFeaturesFrom16bps.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/feature_extractors/feature_extractor_16bp.html#ExtractFeaturesFrom16bps.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.feature_extractors.feature_extractor_16bp.ExtractFeaturesFrom16bps.run" title="Permalink to this definition"></a></dt>
+<dd><p>Method to compute and save feature battery to disk. Results are saved in the <cite>project_folder/csv/features_extracted</cite>
+directory of the SimBA project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-simba.feature_extractors.feature_extractor_4bp">
+<span id="default-feature-extractor-for-1-animals-and-4-body-parts"></span><h2>Default feature extractor for 1 animals and 4 body-parts<a class="headerlink" href="#module-simba.feature_extractors.feature_extractor_4bp" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.feature_extractors.feature_extractor_4bp.ExtractFeaturesFrom4bps">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.feature_extractors.feature_extractor_4bp.</span></span><span class="sig-name descname"><span class="pre">ExtractFeaturesFrom4bps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/feature_extractors/feature_extractor_4bp.html#ExtractFeaturesFrom4bps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.feature_extractors.feature_extractor_4bp.ExtractFeaturesFrom4bps" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a>, <a class="reference internal" href="simba.mixins.html#simba.mixins.feature_extraction_mixin.FeatureExtractionMixin" title="simba.mixins.feature_extraction_mixin.FeatureExtractionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureExtractionMixin</span></code></a></p>
+<p>Extracts hard-coded set of features from pose-estimation data with one animal and 4 tracked body-parts.
+Results are stored in the <code class="docutils literal notranslate"><span class="pre">project_folder/csv/features_extracted</span></code> directory of the SimBA project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – path to SimBA project config file in Configparser format</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features">Feature extraction tutorial</a>.</p>
+<dl>
+<dt><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/1.png">Expected pose configuration</a></dt><dd><a class="reference internal image-reference" href="_images/1.png"><img alt="_images/1.png" class="align-center" src="_images/1.png" style="width: 150px;" /></a>
+</dd>
+</dl>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">feature_extractor</span> <span class="o">=</span> <span class="n">ExtractFeaturesFrom4bps</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;MyProjectConfig&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.feature_extractors.feature_extractor_4bp.ExtractFeaturesFrom4bps.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/feature_extractors/feature_extractor_4bp.html#ExtractFeaturesFrom4bps.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.feature_extractors.feature_extractor_4bp.ExtractFeaturesFrom4bps.run" title="Permalink to this definition"></a></dt>
+<dd><p>Method to compute and save features to disk. Results are saved in the <cite>project_folder/csv/features_extracted</cite>
+directory of the SimBA project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-simba.feature_extractors.feature_extractor_7bp">
+<span id="default-feature-extractor-for-1-animals-and-7-body-parts"></span><h2>Default feature extractor for 1 animals and 7 body-parts<a class="headerlink" href="#module-simba.feature_extractors.feature_extractor_7bp" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.feature_extractors.feature_extractor_7bp.ExtractFeaturesFrom7bps">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.feature_extractors.feature_extractor_7bp.</span></span><span class="sig-name descname"><span class="pre">ExtractFeaturesFrom7bps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/feature_extractors/feature_extractor_7bp.html#ExtractFeaturesFrom7bps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.feature_extractors.feature_extractor_7bp.ExtractFeaturesFrom7bps" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a>, <a class="reference internal" href="simba.mixins.html#simba.mixins.feature_extraction_mixin.FeatureExtractionMixin" title="simba.mixins.feature_extraction_mixin.FeatureExtractionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureExtractionMixin</span></code></a></p>
+<p>Extracts hard-coded set of features from pose-estimation data from single animals with 7 tracked body-parts.
+Results are stored in the <cite>project_folder/csv/features_extracted</cite> directory of the SimBA project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – path to SimBA project config file in Configparser format</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features">Feature extraction tutorial</a>.
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/2.png">Expected pose configuration</a></p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/2.png"><img alt="_images/2.png" class="align-center" src="_images/2.png" style="width: 150px;" /></a>
+</div></blockquote>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">feature_extractor</span> <span class="o">=</span> <span class="n">ExtractFeaturesFrom7bps</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;MyProjectConfig&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.feature_extractors.feature_extractor_7bp.ExtractFeaturesFrom7bps.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/feature_extractors/feature_extractor_7bp.html#ExtractFeaturesFrom7bps.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.feature_extractors.feature_extractor_7bp.ExtractFeaturesFrom7bps.run" title="Permalink to this definition"></a></dt>
+<dd><p>Method to compute and save features to disk. Results are saved in the <cite>project_folder/csv/features_extracted</cite>
+directory of the SimBA project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-simba.feature_extractors.feature_extractor_8bp">
+<span id="default-feature-extractor-for-1-animals-and-8-body-parts"></span><h2>Default feature extractor for 1 animals and 8 body-parts<a class="headerlink" href="#module-simba.feature_extractors.feature_extractor_8bp" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.feature_extractors.feature_extractor_8bp.ExtractFeaturesFrom8bps">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.feature_extractors.feature_extractor_8bp.</span></span><span class="sig-name descname"><span class="pre">ExtractFeaturesFrom8bps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/feature_extractors/feature_extractor_8bp.html#ExtractFeaturesFrom8bps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.feature_extractors.feature_extractor_8bp.ExtractFeaturesFrom8bps" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a>, <a class="reference internal" href="simba.mixins.html#simba.mixins.feature_extraction_mixin.FeatureExtractionMixin" title="simba.mixins.feature_extraction_mixin.FeatureExtractionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureExtractionMixin</span></code></a></p>
+<p>Extracts hard-coded set of features from pose-estimation data from single animals with 8 tracked body-parts.
+Results are stored in the <cite>project_folder/csv/features_extracted</cite> directory of the SimBA project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – path to SimBA project config file in Configparser format</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features">Feature extraction tutorial</a>.
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/3.png">Expected pose configuration</a></p>
+<blockquote>
+<div><a class="reference internal image-reference" href="_images/3.png"><img alt="_images/3.png" class="align-center" src="_images/3.png" style="width: 150px;" /></a>
+</div></blockquote>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">feature_extractor</span> <span class="o">=</span> <span class="n">ExtractFeaturesFrom8bps</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;MyProjectConfig&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.feature_extractors.feature_extractor_8bp.ExtractFeaturesFrom8bps.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/feature_extractors/feature_extractor_8bp.html#ExtractFeaturesFrom8bps.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.feature_extractors.feature_extractor_8bp.ExtractFeaturesFrom8bps.run" title="Permalink to this definition"></a></dt>
+<dd><p>Method to compute and save features to disk. Results are saved in the <cite>project_folder/csv/features_extracted</cite>
+directory of the SimBA project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-simba.feature_extractors.feature_extractor_8bps_2_animals">
+<span id="default-feature-extractor-for-2-animals-and-16-body-parts"></span><h2>Default feature extractor for 2 animals and 16 body-parts<a class="headerlink" href="#module-simba.feature_extractors.feature_extractor_8bps_2_animals" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.feature_extractors.feature_extractor_8bps_2_animals.ExtractFeaturesFrom8bps2Animals">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.feature_extractors.feature_extractor_8bps_2_animals.</span></span><span class="sig-name descname"><span class="pre">ExtractFeaturesFrom8bps2Animals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/feature_extractors/feature_extractor_8bps_2_animals.html#ExtractFeaturesFrom8bps2Animals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.feature_extractors.feature_extractor_8bps_2_animals.ExtractFeaturesFrom8bps2Animals" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a>, <a class="reference internal" href="simba.mixins.html#simba.mixins.feature_extraction_mixin.FeatureExtractionMixin" title="simba.mixins.feature_extraction_mixin.FeatureExtractionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureExtractionMixin</span></code></a></p>
+<p>Extracts hard-coded set of features from pose-estimation data from two animals with 4 tracked body-parts each.
+Results are stored in the <cite>project_folder/csv/features_extracted</cite> directory of the SimBA project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – path to SimBA project config file in Configparser format</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features">Feature extraction tutorial</a>.
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/5.png">Expected pose configuration</a></p>
+<a class="reference internal image-reference" href="_images/5.png"><img alt="_images/5.png" class="align-center" src="_images/5.png" style="width: 150px;" /></a>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">feature_extractor</span> <span class="o">=</span> <span class="n">ExtractFeaturesFrom8bps2Animals</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;MyProjectConfig&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.feature_extractors.feature_extractor_8bps_2_animals.ExtractFeaturesFrom8bps2Animals.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/feature_extractors/feature_extractor_8bps_2_animals.html#ExtractFeaturesFrom8bps2Animals.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.feature_extractors.feature_extractor_8bps_2_animals.ExtractFeaturesFrom8bps2Animals.run" title="Permalink to this definition"></a></dt>
+<dd><p>Method to compute and save feature battery to disk. Results are saved in the <cite>project_folder/csv/features_extracted</cite>
+directory of the SimBA project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-simba.feature_extractors.feature_extractor_9bp">
+<span id="default-feature-extractor-for-1-animals-and-9-body-parts"></span><h2>Default feature extractor for 1 animals and 9 body-parts<a class="headerlink" href="#module-simba.feature_extractors.feature_extractor_9bp" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.feature_extractors.feature_extractor_9bp.ExtractFeaturesFrom9bps">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.feature_extractors.feature_extractor_9bp.</span></span><span class="sig-name descname"><span class="pre">ExtractFeaturesFrom9bps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/feature_extractors/feature_extractor_9bp.html#ExtractFeaturesFrom9bps"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.feature_extractors.feature_extractor_9bp.ExtractFeaturesFrom9bps" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a>, <a class="reference internal" href="simba.mixins.html#simba.mixins.feature_extraction_mixin.FeatureExtractionMixin" title="simba.mixins.feature_extraction_mixin.FeatureExtractionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureExtractionMixin</span></code></a></p>
+<p>Extracts hard-coded set of features from pose-estimation data from single animals with 9 tracked body-parts.
+Results are stored in the <cite>project_folder/csv/features_extracted</cite> directory of the SimBA project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – path to SimBA project config file in Configparser format</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features">Feature extraction tutorial</a>.
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/4.png">Expected pose configuration</a></p>
+<a class="reference internal image-reference" href="_images/4.png"><img alt="_images/4.png" class="align-center" src="_images/4.png" style="width: 150px;" /></a>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">feature_extractor</span> <span class="o">=</span> <span class="n">ExtractFeaturesFrom9bps</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;MyProjectConfig&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-simba.feature_extractors.feature_extractor_user_defined">
+<span id="default-feature-extractor-for-user-defined-body-parts"></span><h2>Default feature extractor for user-defined body-parts<a class="headerlink" href="#module-simba.feature_extractors.feature_extractor_user_defined" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.feature_extractors.feature_extractor_user_defined.UserDefinedFeatureExtractor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.feature_extractors.feature_extractor_user_defined.</span></span><span class="sig-name descname"><span class="pre">UserDefinedFeatureExtractor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/feature_extractors/feature_extractor_user_defined.html#UserDefinedFeatureExtractor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.feature_extractors.feature_extractor_user_defined.UserDefinedFeatureExtractor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a>, <a class="reference internal" href="simba.mixins.html#simba.mixins.feature_extraction_mixin.FeatureExtractionMixin" title="simba.mixins.feature_extraction_mixin.FeatureExtractionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureExtractionMixin</span></code></a></p>
+<p>Generic featurizer of data within SimBA project using user-defined body-parts in the pose-estimation data.
+Results are stored in the <cite>project_folder/csv/features_extracted</cite> directory of the SimBA project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – path to SimBA project config file in Configparser format</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features">Feature extraction tutorial</a>.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">feature_extractor</span> <span class="o">=</span> <span class="n">UserDefinedFeatureExtractor</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;MyProjectConfig&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">feature_extractor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.feature_extractors.feature_extractor_user_defined.UserDefinedFeatureExtractor.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/feature_extractors/feature_extractor_user_defined.html#UserDefinedFeatureExtractor.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.feature_extractors.feature_extractor_user_defined.UserDefinedFeatureExtractor.run" title="Permalink to this definition"></a></dt>
+<dd><p>Method to compute and save features to disk. Results are saved in the <cite>project_folder/csv/features_extracted</cite>
+directory of the SimBA project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-simba.feature_extractors.feature_subsets">
+<span id="feature-extractor-for-feature-subset-family"></span><h2>Feature extractor for feature subset family<a class="headerlink" href="#module-simba.feature_extractors.feature_subsets" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.feature_extractors.feature_subsets.FeatureSubsetsCalculator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.feature_extractors.feature_subsets.</span></span><span class="sig-name descname"><span class="pre">FeatureSubsetsCalculator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_families</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.12)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_file_checks</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">append_to_features_extracted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">append_to_targets_inserted</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/feature_extractors/feature_subsets.html#FeatureSubsetsCalculator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.feature_extractors.feature_subsets.FeatureSubsetsCalculator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a>, <a class="reference internal" href="simba.mixins.html#simba.mixins.feature_extraction_mixin.FeatureExtractionMixin" title="simba.mixins.feature_extraction_mixin.FeatureExtractionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureExtractionMixin</span></code></a>, <a class="reference internal" href="simba.mixins.html#simba.mixins.train_model_mixin.TrainModelMixin" title="simba.mixins.train_model_mixin.TrainModelMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrainModelMixin</span></code></a></p>
+<p>Computes a subset of features from pose for non-ML downstream purposes.
+E.g., returns the size of animal convex hull in each frame.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – path to SimBA project config file in Configparser format</p></li>
+<li><p><strong>save_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – directory where to store results.</p></li>
+<li><p><strong>feature_family</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Feature subtype to calculate. E.g., “Two-point body-part distances (mm)”.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><cite>Tutorial &lt;https://github.com/sgoldenlab/simba/blob/master/docs/feature_subsets.md&gt;_</cite></p>
+</div>
+<a class="reference internal image-reference" href="_images/feature_subsets.png"><img alt="_images/feature_subsets.png" class="align-center" src="_images/feature_subsets.png" style="width: 400px;" /></a>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">FeatureSubsetsCalculator</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;project_folder/project_config.ini&#39;</span><span class="p">,</span> <span class="n">feature_family</span><span class="o">=</span><span class="s1">&#39;Frame-by-frame body-parts inside ROIs (Boolean)&#39;</span><span class="p">,</span> <span class="n">save_dir</span><span class="o">=</span><span class="s1">&#39;data&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="jitted-methods-for-convex-hull-related-calculations">
+<h2>Jitted methods for convex-hull related calculations<a class="headerlink" href="#jitted-methods-for-convex-hull-related-calculations" title="Permalink to this heading"></a></h2>
+<span class="target" id="module-simba.feature_extractors.perimeter_jit"></span><dl class="py function">
+<dt class="sig sig-object py" id="simba.feature_extractors.perimeter_jit.jitted_centroid">
+<span class="sig-prename descclassname"><span class="pre">simba.feature_extractors.perimeter_jit.</span></span><span class="sig-name descname"><span class="pre">jitted_centroid</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/simba/feature_extractors/perimeter_jit.html#jitted_centroid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.feature_extractors.perimeter_jit.jitted_centroid" title="Permalink to this definition"></a></dt>
+<dd><p>Compute the centroid of polygons.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>points</strong> (<em>array</em>) – 3d array FRAMESxBODY-PARTxCOORDINATE</p></li>
+<li><p><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Options [perimeter, area]</p></li>
+</ul>
+</dd>
+</dl>
+<p>:return 1d np.array</p>
+<dl class="field-list simple">
+<dt class="field-odd">Example<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">jitted_centroid</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simba.feature_extractors.perimeter_jit.jitted_hull">
+<span class="sig-prename descclassname"><span class="pre">simba.feature_extractors.perimeter_jit.</span></span><span class="sig-name descname"><span class="pre">jitted_hull</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'perimeter'</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="reference internal" href="_modules/simba/feature_extractors/perimeter_jit.html#jitted_hull"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.feature_extractors.perimeter_jit.jitted_hull" title="Permalink to this definition"></a></dt>
+<dd><p>Compute attributes (e.g., perimeter or area) of a polygon.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>points</strong> (<em>array</em>) – 3d array FRAMESxBODY-PARTxCOORDINATE</p></li>
+<li><p><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Options [perimeter, area, hull]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>1d np.array representing perimeter length or area of polygon on each frame</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Modified from <a class="reference external" href="https://stackoverflow.com/questions/74812556/computing-quick-convex-hull-using-numba/74817179#74817179">Jérôme Richard</a></p>
+</div>
+<a class="reference internal image-reference" href="_images/jitted_hull.png"><img alt="_images/jitted_hull.png" class="align-center" src="_images/jitted_hull.png" style="width: 400px;" /></a>
+<dl class="field-list simple">
+<dt class="field-odd">Example<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">points</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">jitted_hull</span><span class="p">(</span><span class="n">points</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s1">&#39;area&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="simba.cue_light_tools.html" class="btn btn-neutral float-left" title="Cue light tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="simba.labelling.html" class="btn btn-neutral float-right" title="Labelling" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

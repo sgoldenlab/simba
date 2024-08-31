@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User-defined pose-configurations in SimBA &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Video processing tools in SimBA" href="tools.html" />
+    <link rel="prev" title="SimBA Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SimBA
+              <img src="../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="roi.html">Regions of Interest (ROIs) in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FSTTC.html">Calculating forward-spike time tiling coefficents in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_subsets.html">Feature family sub-sets in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_defined_feature_class.html">User-defined ‘feature extraction’ scripts in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kleinberg_filter.html">Kleinberg behavior classification smoothing in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="anchored_rois.html">Animal-anchored ROIs (bounding-boxes) in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SHAP.html">Model explainability and calculating feature SHAP values in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="directionality_between_animals.html">Who is looking at who: calculate “directionality” between animals in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classifier_validation.html">Post-classification Validation (detecting false-positives)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cue_lights.html">Cue Light Analysis in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi_animal_pose.html">Using multi-animal pose-estimation data in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="process_videos.html">Batch Video Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">SimBA Installation</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">User-defined pose-configurations in SimBA</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#create-a-new-user-defined-pose-configuration">Create a new user-defined pose-configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#removing-archiving-user-defined-pose-configurations-in-simba">Removing / archiving user-defined pose-configurations in SimBA</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#optional-creating-deeplabcut-projects-using-user-defined-pose-configurations-in-simba">Optional: Creating DeepLabCut projects using user-defined pose-configurations in SimBA</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html">Video processing tools in SimBA</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">User-defined pose-configurations in SimBA</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_rst/create_user_defined_pose_config.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="user-defined-pose-configurations-in-simba">
+<h1>User-defined pose-configurations in SimBA<a class="headerlink" href="#user-defined-pose-configurations-in-simba" title="Permalink to this heading"></a></h1>
+<p>SimBA comes pre-packaged with the ability to import tracking data based
+on <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling">8 different body-part pose-estimation tracking
+combinations</a>.
+Where possible, we strongly recommend using SimBA and pose-estimation
+packages (like DeepLabCut or DeepPoseKit) with a <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling">16-body-part, 2
+animal, pose-configuration
+setting</a>.</p>
+<p>However, SimBA can handle <em>any</em> combination of tracked body-parts, as
+long as users create their own pose configuration setting in SimBA. In
+this tutorial we describe how users define their own body part
+configurations in SimBA.</p>
+<div class="admonition important">
+<p class="admonition-title">Important</p>
+<p>When users create projects with user-defined body part
+configurations, SimBA calculates fewer and less precise features for the
+machine models and this may negatively affect the prediction
+performance. Thus - <em>if users have the option</em> - we strongly encourage
+that the <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling">16-body-part, 2 animal, pose-configuration
+setting</a>
+is used. Click
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/features_user_defined_pose_config.csv">HERE</a>
+for a rough list of the features that SimBA calculates based on
+user-defined pose configurations. For comparison, click
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv">HERE</a>
+for the list of features that SimBA calculates based on the
+16-body-part, 2 animal, pose-configuration setting.</p>
+</div>
+<section id="create-a-new-user-defined-pose-configuration">
+<h2>Create a new user-defined pose-configuration<a class="headerlink" href="#create-a-new-user-defined-pose-configuration" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>In the main SimBA console window, click on <code class="docutils literal notranslate"><span class="pre">File</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">a</span> <span class="pre">new</span> <span class="pre">project</span></code>. The window that pops open is descibed
+in-depth the <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-1-generate-project-config">Scenario 1 - Create
+Project</a>
+tutorial. If you are creating a new user-defined pose-configuration
+setting, <strong>do not</strong> begin by specifying a project path, project name,
+or any SML settings. Instead, skip these menus, leave these entry
+boxes blank, and click on the button in the <code class="docutils literal notranslate"><span class="pre">Animal</span> <span class="pre">Settings</span></code> menu
+next to the text <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">config</span></code>. You should see the following default
+menu pop open:</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/menu_15.png"><img alt="../_images/menu_15.png" class="align-center" src="../_images/menu_15.png" style="width: 800px;" /></a>
+<p>Click on <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">pose</span> <span class="pre">config</span></code> to begin to define a new user-defined
+pose configuration.</p>
+<ol class="arabic simple" start="2">
+<li><p>After clicking on <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">pose</span> <span class="pre">config</span></code>, the following menu pops
+open:</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/menu_21.png"><img alt="../_images/menu_21.png" class="align-center" src="../_images/menu_21.png" style="width: 800px;" /></a>
+<p>In the <em>first</em> entry box, give your pose-configuration a name. In this
+tutorial we will call our user-defined pose configuration
+<em>BtWGaNP_pose</em>. Please avoid spaces in the pose config name. In the
+<em>second</em> entry box, enter the number of animals you wish to track. This
+could be 1 or 2 or mote. In the <em>third</em> entry box, enter the number of
+body-parts your tracking data will contain. For example, if the dataset
+contains 8 tracked body-parts on two different animals, I will enter the
+integer <strong>16</strong>.</p>
+<p>Next, select an image that is representative of your tracking
+environment and contains a clear view of all the tracked bodyparts by
+clicking on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code>. This image will be used to create a
+reference image of your pose configuration settings. After you have
+selected an image, click on <code class="docutils literal notranslate"><span class="pre">Confirm</span></code>.</p>
+<ol class="arabic simple" start="3">
+<li><p>After clicking confirm a table should pop open. The table contains
+one row for each body-part specified in the <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">of</span> <span class="pre">Bodyparts</span></code> entry
+box. If the user has entered <code class="docutils literal notranslate"><span class="pre">1</span></code> in the <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">of</span> <span class="pre">Animals</span></code> entry box,
+this table will contain a single columns (as in the left image
+below). If the user has entered a number greater than 1 in the
+<code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">of</span> <span class="pre">Animals</span></code> entry box, then this table will contain two columns
+(as in the right image below).</p></li>
+</ol>
+<p>Please name the bodyparts in the left-most column (titled <em>Bodyparts’
+name</em>) by filling in their names. <strong>Do not use spaces in the bodypart
+names</strong>.</p>
+<p>If you have two or more animals, you will need to fill in the second
+column (titled <em>Animal ID number</em>) with an integer which tells SimBA
+which animal each of the individual body-part belong too. In this
+example image above, we are creating a body-part pose-configuration with
+7 bodyparts for 2 different animals, and I have entered <code class="docutils literal notranslate"><span class="pre">1</span></code> and <code class="docutils literal notranslate"><span class="pre">2</span></code>
+in the <em>Animal ID number</em> column to specify which animal the different
+body-parts belong too. When done, click on <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">Pose</span> <span class="pre">Configs</span></code> to
+proceed.</p>
+<ol class="arabic simple" start="3">
+<li><p>After clicking on <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">Pose</span> <span class="pre">Configs</span></code>, a window named
+<code class="docutils literal notranslate"><span class="pre">Define</span> <span class="pre">pose</span></code> pops open that shows the frame that was chosen in the
+<code class="docutils literal notranslate"><span class="pre">Image</span> <span class="pre">Path</span></code> entry box. This image also displays some instructions
+at the top - like the image here below to the left. Follow the
+instructions at the top of the window to label all of your defined
+body parts, like the gif below:</p></li>
+</ol>
+<a class="reference internal image-reference" href="tutorials_rst/img/create_user_defined_pose_configuration/interface_1.gif"><img alt="tutorials_rst/img/create_user_defined_pose_configuration/interface_1.gif" class="align-center" src="tutorials_rst/img/create_user_defined_pose_configuration/interface_1.gif" style="width: 1000px;" /></a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>DOUBLE LEFT MOUSE CLICK TO PLACE BODY PART. PRESS ESC TO ADVANCE
+TO THE NEXT BODY PART</p>
+</div>
+<p>The window will close once all the body-parts have been marked. Double
+left mouse-click to assign a body-part location. Press <code class="docutils literal notranslate"><span class="pre">Esc</span></code> to move
+to the next body-part after a body-part as been assigned.</p>
+<ol class="arabic simple" start="4">
+<li><p>Your newly created body part configuration should now be accessable
+though the <code class="docutils literal notranslate"><span class="pre">Animal</span> <span class="pre">Settings</span></code> menu next to the text <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">config</span></code>:</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/menu_31.png"><img alt="../_images/menu_31.png" class="align-center" src="../_images/menu_31.png" style="width: 800px;" /></a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When a project has been created in SimBA, the
+pose-configuration selected when creating the project is stored
+within a CSV file within the project folder, and this file is
+referenced to at various stages of the workflow. You can check this
+file out by navigating to the
+<code class="docutils literal notranslate"><span class="pre">project_folder\logs\measures\pose_configs\bp_names\project_bp_names.csv</span></code>
+file.</p>
+</div>
+</section>
+<section id="removing-archiving-user-defined-pose-configurations-in-simba">
+<h2>Removing / archiving user-defined pose-configurations in SimBA<a class="headerlink" href="#removing-archiving-user-defined-pose-configurations-in-simba" title="Permalink to this heading"></a></h2>
+<p>The user may want to remove user-defined body-part configurations from
+the <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">config</span></code> list. To do this, locate the
+<code class="docutils literal notranslate"><span class="pre">Reset</span> <span class="pre">user-defined</span> <span class="pre">pose</span> <span class="pre">configs</span></code> button in the
+<code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">configuration</span></code> tab:</p>
+<a class="reference internal image-reference" href="../_images/menu_41.png"><img alt="../_images/menu_41.png" class="align-center" src="../_images/menu_41.png" style="width: 800px;" /></a>
+<ol class="arabic simple">
+<li><p>When clicked on, a warning message will pop open, asking if you are
+sure if you want to reset your pose-configurations. Click on <code class="docutils literal notranslate"><span class="pre">Yes</span></code>
+to proceed.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/warning.png"><img alt="../_images/warning.png" class="align-center" src="../_images/warning.png" style="width: 800px;" /></a>
+<ol class="arabic simple" start="2">
+<li><p>The next time you open the <code class="docutils literal notranslate"><span class="pre">Project</span> <span class="pre">configuration</span></code> tab, your
+user-defined pose-configurations will no longer be visable in the
+<code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">config</span></code> list.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The user defined configs are never deleted even though they
+are removed from the <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">config</span></code> list. The user-defined
+pose-configurations are archived in the they can be retrieved. Once
+removed , they are stored in the
+<code class="docutils literal notranslate"><span class="pre">SimBA\pose_configurations_archive</span></code> folder.</p>
+</div>
+<section id="optional-creating-deeplabcut-projects-using-user-defined-pose-configurations-in-simba">
+<h3>Optional: Creating DeepLabCut projects using user-defined pose-configurations in SimBA<a class="headerlink" href="#optional-creating-deeplabcut-projects-using-user-defined-pose-configurations-in-simba" title="Permalink to this heading"></a></h3>
+<p>Once a project with a specific pose-configuration has been created in
+SimBA, you may also want to use this pose-configuration and body part
+naming convention in your DeepLabCut projects created through SimBA.</p>
+<ol class="arabic simple">
+<li><p>You newly created pose-configuration setting in a new DeepLabCut
+project through SimBA, click the following box next to the text
+<code class="docutils literal notranslate"><span class="pre">Bp</span> <span class="pre">config</span> <span class="pre">file</span></code> in the <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">DLC</span> <span class="pre">model</span></code> menu. For more
+information on how to use DeepLabCut in SimBA, click
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/Tutorial_DLC.md">HERE</a>.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/menu_51.png"><img alt="../_images/menu_51.png" class="align-center" src="../_images/menu_51.png" style="width: 800px;" /></a>
+<p>Once clicked on, first navigate to your SimBA project. Your SimBA
+body-part configuration is saved in a csv file within your SimBA
+project. Go ahead and navigate to
+<code class="docutils literal notranslate"><span class="pre">project_folder/logs/measures/pose_configs/bp_names\project_bp_names.csv</span></code>
+and select this file.</p>
+<p>When you click on <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">project</span></code> in the DeepLabCut
+<code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">Project</span></code> menu, your DeepLabCut project and DeepLabCut project
+<em>yaml</em> file will now be based on your SimBA-configured body-parts.</p>
+<p>Author <a class="reference external" href="https://github.com/sronilsson">Simon N</a></p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="installation.html" class="btn btn-neutral float-left" title="SimBA Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tools.html" class="btn btn-neutral float-right" title="Video processing tools in SimBA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

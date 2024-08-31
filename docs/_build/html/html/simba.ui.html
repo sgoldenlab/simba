@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SimBA UI &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="SimBA UI pop-ups" href="simba.ui.pop_ups.html" />
+    <link rel="prev" title="Third-party behavior labels (annotation) appenders" href="simba.third_party_label_appenders.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SimBA
+              <img src="_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="api.html">API Reference</a></li>
+      <li class="breadcrumb-item active">SimBA UI</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/simba.ui.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="simba-ui">
+<h1>SimBA UI<a class="headerlink" href="#simba-ui" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="simba.ui.pop_ups.html">SimBA UI pop-ups</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.about_simba_pop_up">simba.ui.pop_ups.about_simba_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.about_simba_pop_up.AboutSimBAPopUp"><code class="docutils literal notranslate"><span class="pre">AboutSimBAPopUp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.append_roi_features_animals_pop_up">simba.ui.pop_ups.append_roi_features_animals_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.append_roi_features_animals_pop_up.AppendROIFeaturesByAnimalPopUp"><code class="docutils literal notranslate"><span class="pre">AppendROIFeaturesByAnimalPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.append_roi_features_animals_pop_up.AppendROIFeaturesByAnimalPopUp.create_settings_frm"><code class="docutils literal notranslate"><span class="pre">AppendROIFeaturesByAnimalPopUp.create_settings_frm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.append_roi_features_animals_pop_up.AppendROIFeaturesByAnimalPopUp.run"><code class="docutils literal notranslate"><span class="pre">AppendROIFeaturesByAnimalPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.append_roi_features_bodypart_pop_up">simba.ui.pop_ups.append_roi_features_bodypart_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.append_roi_features_bodypart_pop_up.AppendROIFeaturesByBodyPartPopUp"><code class="docutils literal notranslate"><span class="pre">AppendROIFeaturesByBodyPartPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.append_roi_features_bodypart_pop_up.AppendROIFeaturesByBodyPartPopUp.run"><code class="docutils literal notranslate"><span class="pre">AppendROIFeaturesByBodyPartPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.archive_files_pop_up">simba.ui.pop_ups.archive_files_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.archive_files_pop_up.ArchiveProcessedFilesPopUp"><code class="docutils literal notranslate"><span class="pre">ArchiveProcessedFilesPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.archive_files_pop_up.ArchiveProcessedFilesPopUp.run"><code class="docutils literal notranslate"><span class="pre">ArchiveProcessedFilesPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.batch_preprocess_pop_up">simba.ui.pop_ups.batch_preprocess_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.batch_preprocess_pop_up.BatchPreProcessPopUp"><code class="docutils literal notranslate"><span class="pre">BatchPreProcessPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.batch_preprocess_pop_up.BatchPreProcessPopUp.run"><code class="docutils literal notranslate"><span class="pre">BatchPreProcessPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.clf_add_remove_print_pop_up">simba.ui.pop_ups.clf_add_remove_print_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.clf_add_remove_print_pop_up.AddClfPopUp"><code class="docutils literal notranslate"><span class="pre">AddClfPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.clf_add_remove_print_pop_up.AddClfPopUp.run"><code class="docutils literal notranslate"><span class="pre">AddClfPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.clf_add_remove_print_pop_up.PoseResetterPopUp"><code class="docutils literal notranslate"><span class="pre">PoseResetterPopUp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.clf_add_remove_print_pop_up.PrintModelInfoPopUp"><code class="docutils literal notranslate"><span class="pre">PrintModelInfoPopUp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.clf_add_remove_print_pop_up.RemoveAClassifierPopUp"><code class="docutils literal notranslate"><span class="pre">RemoveAClassifierPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.clf_add_remove_print_pop_up.RemoveAClassifierPopUp.run"><code class="docutils literal notranslate"><span class="pre">RemoveAClassifierPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.clf_by_roi_pop_up">simba.ui.pop_ups.clf_by_roi_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.clf_by_roi_pop_up.ClfByROIPopUp"><code class="docutils literal notranslate"><span class="pre">ClfByROIPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.clf_by_roi_pop_up.ClfByROIPopUp.run_clf_by_ROI_analysis"><code class="docutils literal notranslate"><span class="pre">ClfByROIPopUp.run_clf_by_ROI_analysis()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.clf_by_timebins_pop_up">simba.ui.pop_ups.clf_by_timebins_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.clf_by_timebins_pop_up.TimeBinsClfPopUp"><code class="docutils literal notranslate"><span class="pre">TimeBinsClfPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.clf_by_timebins_pop_up.TimeBinsClfPopUp.run_time_bins_clf"><code class="docutils literal notranslate"><span class="pre">TimeBinsClfPopUp.run_time_bins_clf()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.clf_descriptive_statistics_pop_up">simba.ui.pop_ups.clf_descriptive_statistics_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.clf_descriptive_statistics_pop_up.ClfDescriptiveStatsPopUp"><code class="docutils literal notranslate"><span class="pre">ClfDescriptiveStatsPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.clf_descriptive_statistics_pop_up.ClfDescriptiveStatsPopUp.run_descriptive_analysis"><code class="docutils literal notranslate"><span class="pre">ClfDescriptiveStatsPopUp.run_descriptive_analysis()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.clf_plot_pop_up">simba.ui.pop_ups.clf_plot_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.clf_plot_pop_up.SklearnVisualizationPopUp"><code class="docutils literal notranslate"><span class="pre">SklearnVisualizationPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.clf_plot_pop_up.SklearnVisualizationPopUp.get_bp_probability_threshold"><code class="docutils literal notranslate"><span class="pre">SklearnVisualizationPopUp.get_bp_probability_threshold()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.clf_probability_plot_pop_up">simba.ui.pop_ups.clf_probability_plot_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.clf_probability_plot_pop_up.VisualizeClassificationProbabilityPopUp"><code class="docutils literal notranslate"><span class="pre">VisualizeClassificationProbabilityPopUp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.clf_validation_plot_pop_up">simba.ui.pop_ups.clf_validation_plot_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.clf_validation_plot_pop_up.ClassifierValidationPopUp"><code class="docutils literal notranslate"><span class="pre">ClassifierValidationPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.clf_validation_plot_pop_up.ClassifierValidationPopUp.run"><code class="docutils literal notranslate"><span class="pre">ClassifierValidationPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up">simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up.CreateUserDefinedPoseConfigurationPopUp"><code class="docutils literal notranslate"><span class="pre">CreateUserDefinedPoseConfigurationPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up.CreateUserDefinedPoseConfigurationPopUp.create_bodypart_table"><code class="docutils literal notranslate"><span class="pre">CreateUserDefinedPoseConfigurationPopUp.create_bodypart_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up.CreateUserDefinedPoseConfigurationPopUp.save_pose_config"><code class="docutils literal notranslate"><span class="pre">CreateUserDefinedPoseConfigurationPopUp.save_pose_config()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up.CreateUserDefinedPoseConfigurationPopUp.validate_unique_entries"><code class="docutils literal notranslate"><span class="pre">CreateUserDefinedPoseConfigurationPopUp.validate_unique_entries()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.csv_2_parquet_pop_up">simba.ui.pop_ups.csv_2_parquet_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.csv_2_parquet_pop_up.Csv2ParquetPopUp"><code class="docutils literal notranslate"><span class="pre">Csv2ParquetPopUp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.csv_2_parquet_pop_up.Parquet2CsvPopUp"><code class="docutils literal notranslate"><span class="pre">Parquet2CsvPopUp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.data_plot_pop_up">simba.ui.pop_ups.data_plot_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.data_plot_pop_up.DataPlotterPopUp"><code class="docutils literal notranslate"><span class="pre">DataPlotterPopUp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.directing_other_animals_plot_pop_up">simba.ui.pop_ups.directing_other_animals_plot_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.directing_other_animals_plot_pop_up.DirectingOtherAnimalsVisualizerPopUp"><code class="docutils literal notranslate"><span class="pre">DirectingOtherAnimalsVisualizerPopUp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.distance_plot_pop_up">simba.ui.pop_ups.distance_plot_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.distance_plot_pop_up.DistancePlotterPopUp"><code class="docutils literal notranslate"><span class="pre">DistancePlotterPopUp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.fsttc_pop_up">simba.ui.pop_ups.fsttc_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.fsttc_pop_up.FSTTCPopUp"><code class="docutils literal notranslate"><span class="pre">FSTTCPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.fsttc_pop_up.FSTTCPopUp.run"><code class="docutils literal notranslate"><span class="pre">FSTTCPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.gantt_pop_up">simba.ui.pop_ups.gantt_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.gantt_pop_up.GanttPlotPopUp"><code class="docutils literal notranslate"><span class="pre">GanttPlotPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.gantt_pop_up.GanttPlotPopUp.enable_text_settings"><code class="docutils literal notranslate"><span class="pre">GanttPlotPopUp.enable_text_settings()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.heatmap_clf_pop_up">simba.ui.pop_ups.heatmap_clf_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.heatmap_clf_pop_up.HeatmapClfPopUp"><code class="docutils literal notranslate"><span class="pre">HeatmapClfPopUp</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.heatmap_location_pop_up">simba.ui.pop_ups.heatmap_location_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.heatmap_location_pop_up.HeatmapLocationPopup"><code class="docutils literal notranslate"><span class="pre">HeatmapLocationPopup</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.kleinberg_pop_up">simba.ui.pop_ups.kleinberg_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.kleinberg_pop_up.KleinbergPopUp"><code class="docutils literal notranslate"><span class="pre">KleinbergPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.kleinberg_pop_up.KleinbergPopUp.run_kleinberg"><code class="docutils literal notranslate"><span class="pre">KleinbergPopUp.run_kleinberg()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.make_path_plot_pop_up">simba.ui.pop_ups.make_path_plot_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.make_path_plot_pop_up.MakePathPlotPopUp"><code class="docutils literal notranslate"><span class="pre">MakePathPlotPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.make_path_plot_pop_up.MakePathPlotPopUp.run"><code class="docutils literal notranslate"><span class="pre">MakePathPlotPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.movement_analysis_pop_up">simba.ui.pop_ups.movement_analysis_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.movement_analysis_pop_up.MovementAnalysisPopUp"><code class="docutils literal notranslate"><span class="pre">MovementAnalysisPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.movement_analysis_pop_up.MovementAnalysisPopUp.create_settings_frm"><code class="docutils literal notranslate"><span class="pre">MovementAnalysisPopUp.create_settings_frm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.movement_analysis_pop_up.MovementAnalysisPopUp.run"><code class="docutils literal notranslate"><span class="pre">MovementAnalysisPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.movement_analysis_time_bins_pop_up">simba.ui.pop_ups.movement_analysis_time_bins_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.movement_analysis_time_bins_pop_up.MovementAnalysisTimeBinsPopUp"><code class="docutils literal notranslate"><span class="pre">MovementAnalysisTimeBinsPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.movement_analysis_time_bins_pop_up.MovementAnalysisTimeBinsPopUp.create_settings_frm"><code class="docutils literal notranslate"><span class="pre">MovementAnalysisTimeBinsPopUp.create_settings_frm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.movement_analysis_time_bins_pop_up.MovementAnalysisTimeBinsPopUp.run"><code class="docutils literal notranslate"><span class="pre">MovementAnalysisTimeBinsPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.outlier_settings_pop_up">simba.ui.pop_ups.outlier_settings_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.outlier_settings_pop_up.OutlierSettingsPopUp"><code class="docutils literal notranslate"><span class="pre">OutlierSettingsPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.outlier_settings_pop_up.OutlierSettingsPopUp.run"><code class="docutils literal notranslate"><span class="pre">OutlierSettingsPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.path_plot_pop_up">simba.ui.pop_ups.path_plot_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.path_plot_pop_up.PathPlotPopUp"><code class="docutils literal notranslate"><span class="pre">PathPlotPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.path_plot_pop_up.PathPlotPopUp.enable_clf_location_settings"><code class="docutils literal notranslate"><span class="pre">PathPlotPopUp.enable_clf_location_settings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.path_plot_pop_up.PathPlotPopUp.enable_entrybox_from_dropdown"><code class="docutils literal notranslate"><span class="pre">PathPlotPopUp.enable_entrybox_from_dropdown()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.path_plot_pop_up.PathPlotPopUp.enable_style_settings"><code class="docutils literal notranslate"><span class="pre">PathPlotPopUp.enable_style_settings()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.path_plot_pop_up.PathPlotPopUp.populate_body_parts_menu"><code class="docutils literal notranslate"><span class="pre">PathPlotPopUp.populate_body_parts_menu()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.path_plot_pop_up.PathPlotPopUp.populate_clf_location_data"><code class="docutils literal notranslate"><span class="pre">PathPlotPopUp.populate_clf_location_data()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.pose_bp_drop_pop_up">simba.ui.pop_ups.pose_bp_drop_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.pose_bp_drop_pop_up.DropTrackingDataPopUp"><code class="docutils literal notranslate"><span class="pre">DropTrackingDataPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.pose_bp_drop_pop_up.DropTrackingDataPopUp.confirm"><code class="docutils literal notranslate"><span class="pre">DropTrackingDataPopUp.confirm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.pose_bp_drop_pop_up.DropTrackingDataPopUp.run"><code class="docutils literal notranslate"><span class="pre">DropTrackingDataPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.pose_reorganizer_pop_up">simba.ui.pop_ups.pose_reorganizer_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.pose_reorganizer_pop_up.PoseReorganizerPopUp"><code class="docutils literal notranslate"><span class="pre">PoseReorganizerPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.pose_reorganizer_pop_up.PoseReorganizerPopUp.confirm"><code class="docutils literal notranslate"><span class="pre">PoseReorganizerPopUp.confirm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.pose_reorganizer_pop_up.PoseReorganizerPopUp.run_reorganization"><code class="docutils literal notranslate"><span class="pre">PoseReorganizerPopUp.run_reorganization()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.pup_retrieval_pop_up">simba.ui.pop_ups.pup_retrieval_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.pup_retrieval_pop_up.PupRetrievalPopUp"><code class="docutils literal notranslate"><span class="pre">PupRetrievalPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.pup_retrieval_pop_up.PupRetrievalPopUp.run"><code class="docutils literal notranslate"><span class="pre">PupRetrievalPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.quick_path_plot_pop_up">simba.ui.pop_ups.quick_path_plot_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.quick_path_plot_pop_up.QuickLineplotPopup"><code class="docutils literal notranslate"><span class="pre">QuickLineplotPopup</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.quick_path_plot_pop_up.QuickLineplotPopup.run"><code class="docutils literal notranslate"><span class="pre">QuickLineplotPopup.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.roi_analysis_pop_up">simba.ui.pop_ups.roi_analysis_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.roi_analysis_pop_up.ROIAnalysisPopUp"><code class="docutils literal notranslate"><span class="pre">ROIAnalysisPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.roi_analysis_pop_up.ROIAnalysisPopUp.create_settings_frm"><code class="docutils literal notranslate"><span class="pre">ROIAnalysisPopUp.create_settings_frm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.roi_analysis_pop_up.ROIAnalysisPopUp.run"><code class="docutils literal notranslate"><span class="pre">ROIAnalysisPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.roi_analysis_time_bins_pop_up">simba.ui.pop_ups.roi_analysis_time_bins_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.roi_analysis_time_bins_pop_up.ROIAnalysisTimeBinsPopUp"><code class="docutils literal notranslate"><span class="pre">ROIAnalysisTimeBinsPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.roi_analysis_time_bins_pop_up.ROIAnalysisTimeBinsPopUp.create_settings_frm"><code class="docutils literal notranslate"><span class="pre">ROIAnalysisTimeBinsPopUp.create_settings_frm()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.roi_analysis_time_bins_pop_up.ROIAnalysisTimeBinsPopUp.run"><code class="docutils literal notranslate"><span class="pre">ROIAnalysisTimeBinsPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.roi_features_plot_pop_up">simba.ui.pop_ups.roi_features_plot_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.roi_features_plot_pop_up.VisualizeROIFeaturesPopUp"><code class="docutils literal notranslate"><span class="pre">VisualizeROIFeaturesPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.roi_features_plot_pop_up.VisualizeROIFeaturesPopUp.run"><code class="docutils literal notranslate"><span class="pre">VisualizeROIFeaturesPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.roi_tracking_plot_pop_up">simba.ui.pop_ups.roi_tracking_plot_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.roi_tracking_plot_pop_up.VisualizeROITrackingPopUp"><code class="docutils literal notranslate"><span class="pre">VisualizeROITrackingPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.roi_tracking_plot_pop_up.VisualizeROITrackingPopUp.run"><code class="docutils literal notranslate"><span class="pre">VisualizeROITrackingPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.set_machine_model_parameters_pop_up">simba.ui.pop_ups.set_machine_model_parameters_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.set_machine_model_parameters_pop_up.SetMachineModelParameters"><code class="docutils literal notranslate"><span class="pre">SetMachineModelParameters</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.set_machine_model_parameters_pop_up.SetMachineModelParameters.set"><code class="docutils literal notranslate"><span class="pre">SetMachineModelParameters.set()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.severity_analysis_pop_up">simba.ui.pop_ups.severity_analysis_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.severity_analysis_pop_up.AnalyzeSeverityPopUp"><code class="docutils literal notranslate"><span class="pre">AnalyzeSeverityPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.severity_analysis_pop_up.AnalyzeSeverityPopUp.enable_visualization_options"><code class="docutils literal notranslate"><span class="pre">AnalyzeSeverityPopUp.enable_visualization_options()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.severity_analysis_pop_up.AnalyzeSeverityPopUp.run"><code class="docutils literal notranslate"><span class="pre">AnalyzeSeverityPopUp.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.severity_analysis_pop_up.AnalyzeSeverityPopUp.show_settings"><code class="docutils literal notranslate"><span class="pre">AnalyzeSeverityPopUp.show_settings()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#simba-ui-pop-ups-smoothing-interpolation-pop-up-module">simba.ui.pop_ups.smoothing_interpolation_pop_up module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.subset_feature_extractor_pop_up">simba.ui.pop_ups.subset_feature_extractor_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.subset_feature_extractor_pop_up.FeatureSubsetExtractorPopUp"><code class="docutils literal notranslate"><span class="pre">FeatureSubsetExtractorPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.subset_feature_extractor_pop_up.FeatureSubsetExtractorPopUp.run"><code class="docutils literal notranslate"><span class="pre">FeatureSubsetExtractorPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.third_party_annotator_appender_pop_up">simba.ui.pop_ups.third_party_annotator_appender_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.third_party_annotator_appender_pop_up.ThirdPartyAnnotatorAppenderPopUp"><code class="docutils literal notranslate"><span class="pre">ThirdPartyAnnotatorAppenderPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.third_party_annotator_appender_pop_up.ThirdPartyAnnotatorAppenderPopUp.run"><code class="docutils literal notranslate"><span class="pre">ThirdPartyAnnotatorAppenderPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.validation_plot_pop_up">simba.ui.pop_ups.validation_plot_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.validation_plot_pop_up.ValidationVideoPopUp"><code class="docutils literal notranslate"><span class="pre">ValidationVideoPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.validation_plot_pop_up.ValidationVideoPopUp.run"><code class="docutils literal notranslate"><span class="pre">ValidationVideoPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.video_processing_pop_up">simba.ui.pop_ups.video_processing_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.BackgroundRemoverPopUp"><code class="docutils literal notranslate"><span class="pre">BackgroundRemoverPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.BackgroundRemoverPopUp.run"><code class="docutils literal notranslate"><span class="pre">BackgroundRemoverPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.BoxBlurPopUp"><code class="docutils literal notranslate"><span class="pre">BoxBlurPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.BoxBlurPopUp.run"><code class="docutils literal notranslate"><span class="pre">BoxBlurPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.BrightnessContrastPopUp"><code class="docutils literal notranslate"><span class="pre">BrightnessContrastPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.BrightnessContrastPopUp.apply"><code class="docutils literal notranslate"><span class="pre">BrightnessContrastPopUp.apply()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.BrightnessContrastPopUp.run_directory"><code class="docutils literal notranslate"><span class="pre">BrightnessContrastPopUp.run_directory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.BrightnessContrastPopUp.run_video"><code class="docutils literal notranslate"><span class="pre">BrightnessContrastPopUp.run_video()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.CLAHEPopUp"><code class="docutils literal notranslate"><span class="pre">CLAHEPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.CLAHEPopUp.run_directory"><code class="docutils literal notranslate"><span class="pre">CLAHEPopUp.run_directory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.CLAHEPopUp.run_single_video"><code class="docutils literal notranslate"><span class="pre">CLAHEPopUp.run_single_video()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.CalculatePixelsPerMMInVideoPopUp"><code class="docutils literal notranslate"><span class="pre">CalculatePixelsPerMMInVideoPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.CalculatePixelsPerMMInVideoPopUp.run"><code class="docutils literal notranslate"><span class="pre">CalculatePixelsPerMMInVideoPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ChangeFpsMultipleVideosPopUp"><code class="docutils literal notranslate"><span class="pre">ChangeFpsMultipleVideosPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ChangeFpsMultipleVideosPopUp.run"><code class="docutils literal notranslate"><span class="pre">ChangeFpsMultipleVideosPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ChangeFpsSingleVideoPopUp"><code class="docutils literal notranslate"><span class="pre">ChangeFpsSingleVideoPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ChangeFpsSingleVideoPopUp.run"><code class="docutils literal notranslate"><span class="pre">ChangeFpsSingleVideoPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ChangeImageFormatPopUp"><code class="docutils literal notranslate"><span class="pre">ChangeImageFormatPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ChangeImageFormatPopUp.run_img_conversion"><code class="docutils literal notranslate"><span class="pre">ChangeImageFormatPopUp.run_img_conversion()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ClipMultipleVideosByFrameNumbersPopUp"><code class="docutils literal notranslate"><span class="pre">ClipMultipleVideosByFrameNumbersPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ClipMultipleVideosByFrameNumbersPopUp.run"><code class="docutils literal notranslate"><span class="pre">ClipMultipleVideosByFrameNumbersPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ClipMultipleVideosByTimestamps"><code class="docutils literal notranslate"><span class="pre">ClipMultipleVideosByTimestamps</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ClipMultipleVideosByTimestamps.run"><code class="docutils literal notranslate"><span class="pre">ClipMultipleVideosByTimestamps.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ClipSingleVideoByFrameNumbers"><code class="docutils literal notranslate"><span class="pre">ClipSingleVideoByFrameNumbers</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ClipSingleVideoByFrameNumbers.run"><code class="docutils literal notranslate"><span class="pre">ClipSingleVideoByFrameNumbers.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ClipVideoPopUp"><code class="docutils literal notranslate"><span class="pre">ClipVideoPopUp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ConcatenatingVideosPopUp"><code class="docutils literal notranslate"><span class="pre">ConcatenatingVideosPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ConcatenatingVideosPopUp.run"><code class="docutils literal notranslate"><span class="pre">ConcatenatingVideosPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ConcatenatorPopUp"><code class="docutils literal notranslate"><span class="pre">ConcatenatorPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ConcatenatorPopUp.populate_table"><code class="docutils literal notranslate"><span class="pre">ConcatenatorPopUp.populate_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ConcatenatorPopUp.run"><code class="docutils literal notranslate"><span class="pre">ConcatenatorPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2AVIPopUp"><code class="docutils literal notranslate"><span class="pre">Convert2AVIPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2AVIPopUp.run"><code class="docutils literal notranslate"><span class="pre">Convert2AVIPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2BlackWhitePopUp"><code class="docutils literal notranslate"><span class="pre">Convert2BlackWhitePopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2BlackWhitePopUp.run"><code class="docutils literal notranslate"><span class="pre">Convert2BlackWhitePopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2MOVPopUp"><code class="docutils literal notranslate"><span class="pre">Convert2MOVPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2MOVPopUp.run"><code class="docutils literal notranslate"><span class="pre">Convert2MOVPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2MP4PopUp"><code class="docutils literal notranslate"><span class="pre">Convert2MP4PopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2MP4PopUp.run"><code class="docutils literal notranslate"><span class="pre">Convert2MP4PopUp.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2MP4PopUp.update_quality_dropdown"><code class="docutils literal notranslate"><span class="pre">Convert2MP4PopUp.update_quality_dropdown()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2PNGPopUp"><code class="docutils literal notranslate"><span class="pre">Convert2PNGPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2PNGPopUp.run_dir"><code class="docutils literal notranslate"><span class="pre">Convert2PNGPopUp.run_dir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2PNGPopUp.run_img"><code class="docutils literal notranslate"><span class="pre">Convert2PNGPopUp.run_img()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2TIFFPopUp"><code class="docutils literal notranslate"><span class="pre">Convert2TIFFPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2TIFFPopUp.run"><code class="docutils literal notranslate"><span class="pre">Convert2TIFFPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2WEBMPopUp"><code class="docutils literal notranslate"><span class="pre">Convert2WEBMPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2WEBMPopUp.run"><code class="docutils literal notranslate"><span class="pre">Convert2WEBMPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2WEBPPopUp"><code class="docutils literal notranslate"><span class="pre">Convert2WEBPPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2WEBPPopUp.run_dir"><code class="docutils literal notranslate"><span class="pre">Convert2WEBPPopUp.run_dir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2WEBPPopUp.run_img"><code class="docutils literal notranslate"><span class="pre">Convert2WEBPPopUp.run_img()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2bmpPopUp"><code class="docutils literal notranslate"><span class="pre">Convert2bmpPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2bmpPopUp.run_dir"><code class="docutils literal notranslate"><span class="pre">Convert2bmpPopUp.run_dir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2bmpPopUp.run_img"><code class="docutils literal notranslate"><span class="pre">Convert2bmpPopUp.run_img()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2jpegPopUp"><code class="docutils literal notranslate"><span class="pre">Convert2jpegPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2jpegPopUp.run_dir"><code class="docutils literal notranslate"><span class="pre">Convert2jpegPopUp.run_dir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.Convert2jpegPopUp.run_img"><code class="docutils literal notranslate"><span class="pre">Convert2jpegPopUp.run_img()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ConvertROIDefinitionsPopUp"><code class="docutils literal notranslate"><span class="pre">ConvertROIDefinitionsPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ConvertROIDefinitionsPopUp.run"><code class="docutils literal notranslate"><span class="pre">ConvertROIDefinitionsPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ConvertVideoPopUp"><code class="docutils literal notranslate"><span class="pre">ConvertVideoPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ConvertVideoPopUp.convert_single"><code class="docutils literal notranslate"><span class="pre">ConvertVideoPopUp.convert_single()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.CreateAverageFramePopUp"><code class="docutils literal notranslate"><span class="pre">CreateAverageFramePopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.CreateAverageFramePopUp.run"><code class="docutils literal notranslate"><span class="pre">CreateAverageFramePopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.CreateGIFPopUP"><code class="docutils literal notranslate"><span class="pre">CreateGIFPopUP</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.CreateGIFPopUP.run"><code class="docutils literal notranslate"><span class="pre">CreateGIFPopUP.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.CropVideoCirclesPopUp"><code class="docutils literal notranslate"><span class="pre">CropVideoCirclesPopUp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.CropVideoPolygonsPopUp"><code class="docutils literal notranslate"><span class="pre">CropVideoPolygonsPopUp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.CropVideoPopUp"><code class="docutils literal notranslate"><span class="pre">CropVideoPopUp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.CrossfadeVideosPopUp"><code class="docutils literal notranslate"><span class="pre">CrossfadeVideosPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.CrossfadeVideosPopUp.run"><code class="docutils literal notranslate"><span class="pre">CrossfadeVideosPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.DownsampleMultipleVideosPopUp"><code class="docutils literal notranslate"><span class="pre">DownsampleMultipleVideosPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.DownsampleMultipleVideosPopUp.downsample_custom"><code class="docutils literal notranslate"><span class="pre">DownsampleMultipleVideosPopUp.downsample_custom()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.DownsampleMultipleVideosPopUp.downsample_default"><code class="docutils literal notranslate"><span class="pre">DownsampleMultipleVideosPopUp.downsample_default()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.DownsampleSingleVideoPopUp"><code class="docutils literal notranslate"><span class="pre">DownsampleSingleVideoPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.DownsampleSingleVideoPopUp.downsample_custom"><code class="docutils literal notranslate"><span class="pre">DownsampleSingleVideoPopUp.downsample_custom()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.DownsampleSingleVideoPopUp.downsample_default"><code class="docutils literal notranslate"><span class="pre">DownsampleSingleVideoPopUp.downsample_default()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.DownsampleVideoPopUp"><code class="docutils literal notranslate"><span class="pre">DownsampleVideoPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.DownsampleVideoPopUp.custom_downsample"><code class="docutils literal notranslate"><span class="pre">DownsampleVideoPopUp.custom_downsample()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.DownsampleVideoPopUp.default_downsample"><code class="docutils literal notranslate"><span class="pre">DownsampleVideoPopUp.default_downsample()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ExtractAllFramesPopUp"><code class="docutils literal notranslate"><span class="pre">ExtractAllFramesPopUp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ExtractAnnotationFramesPopUp"><code class="docutils literal notranslate"><span class="pre">ExtractAnnotationFramesPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ExtractAnnotationFramesPopUp.run"><code class="docutils literal notranslate"><span class="pre">ExtractAnnotationFramesPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ExtractSEQFramesPopUp"><code class="docutils literal notranslate"><span class="pre">ExtractSEQFramesPopUp</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ExtractSpecificFramesPopUp"><code class="docutils literal notranslate"><span class="pre">ExtractSpecificFramesPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ExtractSpecificFramesPopUp.start_frm_extraction"><code class="docutils literal notranslate"><span class="pre">ExtractSpecificFramesPopUp.start_frm_extraction()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.FlipVideosPopUp"><code class="docutils literal notranslate"><span class="pre">FlipVideosPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.FlipVideosPopUp.run"><code class="docutils literal notranslate"><span class="pre">FlipVideosPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.GreyscaleSingleVideoPopUp"><code class="docutils literal notranslate"><span class="pre">GreyscaleSingleVideoPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.GreyscaleSingleVideoPopUp.run_dir"><code class="docutils literal notranslate"><span class="pre">GreyscaleSingleVideoPopUp.run_dir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.GreyscaleSingleVideoPopUp.run_video"><code class="docutils literal notranslate"><span class="pre">GreyscaleSingleVideoPopUp.run_video()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ImportFrameDirectoryPopUp"><code class="docutils literal notranslate"><span class="pre">ImportFrameDirectoryPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ImportFrameDirectoryPopUp.run"><code class="docutils literal notranslate"><span class="pre">ImportFrameDirectoryPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.InitiateClipMultipleVideosByFrameNumbersPopUp"><code class="docutils literal notranslate"><span class="pre">InitiateClipMultipleVideosByFrameNumbersPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.InitiateClipMultipleVideosByFrameNumbersPopUp.run"><code class="docutils literal notranslate"><span class="pre">InitiateClipMultipleVideosByFrameNumbersPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.InitiateClipMultipleVideosByTimestampsPopUp"><code class="docutils literal notranslate"><span class="pre">InitiateClipMultipleVideosByTimestampsPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.InitiateClipMultipleVideosByTimestampsPopUp.run"><code class="docutils literal notranslate"><span class="pre">InitiateClipMultipleVideosByTimestampsPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.InteractiveClahePopUp"><code class="docutils literal notranslate"><span class="pre">InteractiveClahePopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.InteractiveClahePopUp.apply"><code class="docutils literal notranslate"><span class="pre">InteractiveClahePopUp.apply()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.InteractiveClahePopUp.run_directory"><code class="docutils literal notranslate"><span class="pre">InteractiveClahePopUp.run_directory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.InteractiveClahePopUp.run_video"><code class="docutils literal notranslate"><span class="pre">InteractiveClahePopUp.run_video()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ManualTemporalJoinPopUp"><code class="docutils literal notranslate"><span class="pre">ManualTemporalJoinPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ManualTemporalJoinPopUp.run"><code class="docutils literal notranslate"><span class="pre">ManualTemporalJoinPopUp.run()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ManualTemporalJoinPopUp.select"><code class="docutils literal notranslate"><span class="pre">ManualTemporalJoinPopUp.select()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.MergeFrames2VideoPopUp"><code class="docutils literal notranslate"><span class="pre">MergeFrames2VideoPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.MergeFrames2VideoPopUp.run"><code class="docutils literal notranslate"><span class="pre">MergeFrames2VideoPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.MultiCropPopUp"><code class="docutils literal notranslate"><span class="pre">MultiCropPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.MultiCropPopUp.run"><code class="docutils literal notranslate"><span class="pre">MultiCropPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.MultiShortenPopUp"><code class="docutils literal notranslate"><span class="pre">MultiShortenPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.MultiShortenPopUp.batch_change"><code class="docutils literal notranslate"><span class="pre">MultiShortenPopUp.batch_change()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.MultiShortenPopUp.run_clipping"><code class="docutils literal notranslate"><span class="pre">MultiShortenPopUp.run_clipping()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.MultiShortenPopUp.show_start_stop"><code class="docutils literal notranslate"><span class="pre">MultiShortenPopUp.show_start_stop()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ReverseVideoPopUp"><code class="docutils literal notranslate"><span class="pre">ReverseVideoPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.ReverseVideoPopUp.run"><code class="docutils literal notranslate"><span class="pre">ReverseVideoPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.RotateVideoSetDegreesPopUp"><code class="docutils literal notranslate"><span class="pre">RotateVideoSetDegreesPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.RotateVideoSetDegreesPopUp.run"><code class="docutils literal notranslate"><span class="pre">RotateVideoSetDegreesPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.SuperImposeFrameCountPopUp"><code class="docutils literal notranslate"><span class="pre">SuperImposeFrameCountPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.SuperImposeFrameCountPopUp.apply"><code class="docutils literal notranslate"><span class="pre">SuperImposeFrameCountPopUp.apply()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.SuperImposeFrameCountPopUp.run_multiple_videos"><code class="docutils literal notranslate"><span class="pre">SuperImposeFrameCountPopUp.run_multiple_videos()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.SuperImposeFrameCountPopUp.run_single_video"><code class="docutils literal notranslate"><span class="pre">SuperImposeFrameCountPopUp.run_single_video()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.SuperimposeProgressBarPopUp"><code class="docutils literal notranslate"><span class="pre">SuperimposeProgressBarPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.SuperimposeProgressBarPopUp.run"><code class="docutils literal notranslate"><span class="pre">SuperimposeProgressBarPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.SuperimposeTextPopUp"><code class="docutils literal notranslate"><span class="pre">SuperimposeTextPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.SuperimposeTextPopUp.run"><code class="docutils literal notranslate"><span class="pre">SuperimposeTextPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.SuperimposeTimerPopUp"><code class="docutils literal notranslate"><span class="pre">SuperimposeTimerPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.SuperimposeTimerPopUp.run"><code class="docutils literal notranslate"><span class="pre">SuperimposeTimerPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.SuperimposeVideoNamesPopUp"><code class="docutils literal notranslate"><span class="pre">SuperimposeVideoNamesPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.SuperimposeVideoNamesPopUp.run"><code class="docutils literal notranslate"><span class="pre">SuperimposeVideoNamesPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.SuperimposeVideoPopUp"><code class="docutils literal notranslate"><span class="pre">SuperimposeVideoPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.SuperimposeVideoPopUp.run"><code class="docutils literal notranslate"><span class="pre">SuperimposeVideoPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.SuperimposeWatermarkPopUp"><code class="docutils literal notranslate"><span class="pre">SuperimposeWatermarkPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.SuperimposeWatermarkPopUp.run"><code class="docutils literal notranslate"><span class="pre">SuperimposeWatermarkPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.UpsampleVideosPopUp"><code class="docutils literal notranslate"><span class="pre">UpsampleVideosPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.UpsampleVideosPopUp.run"><code class="docutils literal notranslate"><span class="pre">UpsampleVideosPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.VideoRotatorPopUp"><code class="docutils literal notranslate"><span class="pre">VideoRotatorPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.VideoRotatorPopUp.run"><code class="docutils literal notranslate"><span class="pre">VideoRotatorPopUp.run()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.VideoTemporalJoinPopUp"><code class="docutils literal notranslate"><span class="pre">VideoTemporalJoinPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.video_processing_pop_up.VideoTemporalJoinPopUp.run"><code class="docutils literal notranslate"><span class="pre">VideoTemporalJoinPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="simba.ui.pop_ups.html#module-simba.ui.pop_ups.visualize_pose_in_dir_pop_up">simba.ui.pop_ups.visualize_pose_in_dir_pop_up module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.visualize_pose_in_dir_pop_up.VisualizePoseInFolderPopUp"><code class="docutils literal notranslate"><span class="pre">VisualizePoseInFolderPopUp</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simba.ui.pop_ups.html#simba.ui.pop_ups.visualize_pose_in_dir_pop_up.VisualizePoseInFolderPopUp.run"><code class="docutils literal notranslate"><span class="pre">VisualizePoseInFolderPopUp.run()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<section id="module-simba.ui.create_project_ui">
+<span id="simba-ui-create-project-ui-module"></span><h2>simba.ui.create_project_ui module<a class="headerlink" href="#module-simba.ui.create_project_ui" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.ui.create_project_ui.ProjectCreatorPopUp">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.ui.create_project_ui.</span></span><span class="sig-name descname"><span class="pre">ProjectCreatorPopUp</span></span><a class="reference internal" href="_modules/simba/ui/create_project_ui.html#ProjectCreatorPopUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.create_project_ui.ProjectCreatorPopUp" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.pop_up_mixin.PopUpMixin" title="simba.mixins.pop_up_mixin.PopUpMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PopUpMixin</span></code></a></p>
+<p>Mixin for GUI pop-up windows that accept user-inputs for creating a SimBA project.</p>
+<a class="reference internal image-reference" href="_images/ProjectCreatorPopUp.webp"><img alt="_images/ProjectCreatorPopUp.webp" class="align-center" src="_images/ProjectCreatorPopUp.webp" style="width: 800px;" /></a>
+<dl class="field-list simple">
+<dt class="field-odd">Example<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">ProjectCreatorPopUp</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.create_project_ui.ProjectCreatorPopUp.extract_frames">
+<span class="sig-name descname"><span class="pre">extract_frames</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/create_project_ui.html#ProjectCreatorPopUp.extract_frames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.create_project_ui.ProjectCreatorPopUp.extract_frames" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.create_project_ui.ProjectCreatorPopUp.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/create_project_ui.html#ProjectCreatorPopUp.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.create_project_ui.ProjectCreatorPopUp.run" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.create_project_ui.ProjectCreatorPopUp.update_body_part_dropdown">
+<span class="sig-name descname"><span class="pre">update_body_part_dropdown</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selected_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/create_project_ui.html#ProjectCreatorPopUp.update_body_part_dropdown"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.create_project_ui.ProjectCreatorPopUp.update_body_part_dropdown" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.create_project_ui.ProjectCreatorPopUp.update_img">
+<span class="sig-name descname"><span class="pre">update_img</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selected_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/create_project_ui.html#ProjectCreatorPopUp.update_img"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.create_project_ui.ProjectCreatorPopUp.update_img" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-simba.ui.machine_model_settings_ui">
+<span id="simba-ui-machine-model-settings-ui-module"></span><h2>simba.ui.machine_model_settings_ui module<a class="headerlink" href="#module-simba.ui.machine_model_settings_ui" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.ui.machine_model_settings_ui.</span></span><span class="sig-name descname"><span class="pre">MachineModelSettingsPopUp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/machine_model_settings_ui.html#MachineModelSettingsPopUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.pop_up_mixin.PopUpMixin" title="simba.mixins.pop_up_mixin.PopUpMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PopUpMixin</span></code></a>, <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a></p>
+<p>GUI window for specifying ML model training parameters.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.change_shap_cadence_options">
+<span class="sig-name descname"><span class="pre">change_shap_cadence_options</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/machine_model_settings_ui.html#MachineModelSettingsPopUp.change_shap_cadence_options"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.change_shap_cadence_options" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.check_meta_data_integrity">
+<span class="sig-name descname"><span class="pre">check_meta_data_integrity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/machine_model_settings_ui.html#MachineModelSettingsPopUp.check_meta_data_integrity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.check_meta_data_integrity" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.clear_cache">
+<span class="sig-name descname"><span class="pre">clear_cache</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/machine_model_settings_ui.html#MachineModelSettingsPopUp.clear_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.clear_cache" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.create_class_weight_table">
+<span class="sig-name descname"><span class="pre">create_class_weight_table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/machine_model_settings_ui.html#MachineModelSettingsPopUp.create_class_weight_table"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.create_class_weight_table" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.dropdown_switch_entry_box_state">
+<span class="sig-name descname"><span class="pre">dropdown_switch_entry_box_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">box</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropdown</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/machine_model_settings_ui.html#MachineModelSettingsPopUp.dropdown_switch_entry_box_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.dropdown_switch_entry_box_state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.find_meta_file_cnt">
+<span class="sig-name descname"><span class="pre">find_meta_file_cnt</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/machine_model_settings_ui.html#MachineModelSettingsPopUp.find_meta_file_cnt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.find_meta_file_cnt" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.get_expected_meta_dict_entry_keys">
+<span class="sig-name descname"><span class="pre">get_expected_meta_dict_entry_keys</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/machine_model_settings_ui.html#MachineModelSettingsPopUp.get_expected_meta_dict_entry_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.get_expected_meta_dict_entry_keys" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.load_config">
+<span class="sig-name descname"><span class="pre">load_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/machine_model_settings_ui.html#MachineModelSettingsPopUp.load_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.load_config" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.save_config">
+<span class="sig-name descname"><span class="pre">save_config</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/machine_model_settings_ui.html#MachineModelSettingsPopUp.save_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.save_config" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.save_global">
+<span class="sig-name descname"><span class="pre">save_global</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/machine_model_settings_ui.html#MachineModelSettingsPopUp.save_global"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.machine_model_settings_ui.MachineModelSettingsPopUp.save_global" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-simba.ui.tkinter_functions">
+<span id="simba-ui-tkinter-functions-module"></span><h2>simba.ui.tkinter_functions module<a class="headerlink" href="#module-simba.ui.tkinter_functions" title="Permalink to this heading"></a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.CreateLabelFrameWithIcon">
+<span class="sig-prename descclassname"><span class="pre">simba.ui.tkinter_functions.</span></span><span class="sig-name descname"><span class="pre">CreateLabelFrameWithIcon</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Toplevel</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">LabelFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Canvas</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Frame</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">header</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">icon_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">icon_link</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#CreateLabelFrameWithIcon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.CreateLabelFrameWithIcon" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.CreateToolTip">
+<span class="sig-prename descclassname"><span class="pre">simba.ui.tkinter_functions.</span></span><span class="sig-name descname"><span class="pre">CreateToolTip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">widget</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#CreateToolTip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.CreateToolTip" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.DropDownMenu">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.ui.tkinter_functions.</span></span><span class="sig-name descname"><span class="pre">DropDownMenu</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropdownLabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">choice_dict</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labelwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">com</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#DropDownMenu"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.DropDownMenu" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Frame</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.DropDownMenu.disable">
+<span class="sig-name descname"><span class="pre">disable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#DropDownMenu.disable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.DropDownMenu.disable" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.DropDownMenu.enable">
+<span class="sig-name descname"><span class="pre">enable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#DropDownMenu.enable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.DropDownMenu.enable" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.DropDownMenu.getChoices">
+<span class="sig-name descname"><span class="pre">getChoices</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#DropDownMenu.getChoices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.DropDownMenu.getChoices" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.DropDownMenu.setChoices">
+<span class="sig-name descname"><span class="pre">setChoices</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">choice</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#DropDownMenu.setChoices"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.DropDownMenu.setChoices" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.Entry_Box">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.ui.tkinter_functions.</span></span><span class="sig-name descname"><span class="pre">Entry_Box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileDescription</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labelwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">status</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entry_box_width</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#Entry_Box"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.Entry_Box" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Frame</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.Entry_Box.destroy">
+<span class="sig-name descname"><span class="pre">destroy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#Entry_Box.destroy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.Entry_Box.destroy" title="Permalink to this definition"></a></dt>
+<dd><p>Destroy this and all descendants widgets.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.Entry_Box.entry_get">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">entry_get</span></span><a class="headerlink" href="#simba.ui.tkinter_functions.Entry_Box.entry_get" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.Entry_Box.entry_set">
+<span class="sig-name descname"><span class="pre">entry_set</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">val</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#Entry_Box.entry_set"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.Entry_Box.entry_set" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.Entry_Box.set_state">
+<span class="sig-name descname"><span class="pre">set_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">setstatus</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#Entry_Box.set_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.Entry_Box.set_state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.FileSelect">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.ui.tkinter_functions.</span></span><span class="sig-name descname"><span class="pre">FileSelect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fileDescription</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lblwidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropdown</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#simba.ui.tkinter_functions.DropDownMenu" title="simba.ui.tkinter_functions.DropDownMenu"><span class="pre">DropDownMenu</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#FileSelect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.FileSelect" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Frame</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.FileSelect.file_path">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">file_path</span></span><a class="headerlink" href="#simba.ui.tkinter_functions.FileSelect.file_path" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.FileSelect.setFilePath">
+<span class="sig-name descname"><span class="pre">setFilePath</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#FileSelect.setFilePath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.FileSelect.setFilePath" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.FileSelect.set_state">
+<span class="sig-name descname"><span class="pre">set_state</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">setstatus</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#FileSelect.set_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.FileSelect.set_state" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.FolderSelect">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.ui.tkinter_functions.</span></span><span class="sig-name descname"><span class="pre">FolderSelect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Frame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">LabelFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Canvas</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Toplevel</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">folderDescription</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lblwidth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initialdir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kw</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#FolderSelect"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.FolderSelect" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Frame</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.FolderSelect.folder_path">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">folder_path</span></span><a class="headerlink" href="#simba.ui.tkinter_functions.FolderSelect.folder_path" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.FolderSelect.setFolderPath">
+<span class="sig-name descname"><span class="pre">setFolderPath</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#FolderSelect.setFolderPath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.FolderSelect.setFolderPath" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.SimbaButton">
+<span class="sig-prename descclassname"><span class="pre">simba.ui.tkinter_functions.</span></span><span class="sig-name descname"><span class="pre">SimbaButton</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Frame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Canvas</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">LabelFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Toplevel</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">txt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">txt_clr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bg_clr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.12)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('Poppins</span> <span class="pre">Regular',</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compound</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'left'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><span class="pre">PhotoImage</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.12)"><span class="pre">Callable</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd_kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enabled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thread</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Button</span></span></span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#SimbaButton"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.SimbaButton" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.SimbaCheckbox">
+<span class="sig-prename descclassname"><span class="pre">simba.ui.tkinter_functions.</span></span><span class="sig-name descname"><span class="pre">SimbaCheckbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><span class="pre">Frame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Toplevel</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">LabelFrame</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Canvas</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">txt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">txt_clr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'black'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">txt_img</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">txt_img_location</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'left'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'right'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'top'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'bottom'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'right'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">font</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.12)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">('Poppins</span> <span class="pre">Regular',</span> <span class="pre">8)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">state</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'disabled'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'normal'</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'normal'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.12)"><span class="pre">Callable</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#SimbaCheckbox"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.SimbaCheckbox" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.ToolTip">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.ui.tkinter_functions.</span></span><span class="sig-name descname"><span class="pre">ToolTip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">widget</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#ToolTip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.ToolTip" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.ToolTip.hidetip">
+<span class="sig-name descname"><span class="pre">hidetip</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#ToolTip.hidetip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.ToolTip.hidetip" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.ToolTip.showtip">
+<span class="sig-name descname"><span class="pre">showtip</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#ToolTip.showtip"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.ToolTip.showtip" title="Permalink to this definition"></a></dt>
+<dd><p>Display text in tooltip window</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.TwoOptionQuestionPopUp">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.ui.tkinter_functions.</span></span><span class="sig-name descname"><span class="pre">TwoOptionQuestionPopUp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">question</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">option_one</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">option_two</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">link</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#TwoOptionQuestionPopUp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.TwoOptionQuestionPopUp" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Helpe to create a two-option question tkinter pop up window (e.g., YES/NO).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>question</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Question to present to the user. E.g., <code class="docutils literal notranslate"><span class="pre">DO</span> <span class="pre">YOU</span> <span class="pre">WANT</span> <span class="pre">TO</span> <span class="pre">PROCEED?</span></code>.</p></li>
+<li><p><strong>option_one</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The first user option. E.g., <code class="docutils literal notranslate"><span class="pre">YES</span></code>.</p></li>
+<li><p><strong>option_one</strong> – The second user option. E.g., <code class="docutils literal notranslate"><span class="pre">NO</span></code>.</p></li>
+<li><p><strong>title</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – The window titel in the top banner of the pop-up. E.g., <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">QUESTION</span> <span class="pre">FOR</span> <span class="pre">YOU!</span></code>.</p></li>
+<li><p><strong>link</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>]</em>) – If not None, then a link to documentation presenting background info about the user choices.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.TwoOptionQuestionPopUp.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">selected_option</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#TwoOptionQuestionPopUp.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.TwoOptionQuestionPopUp.run" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.bindToMousewheel">
+<span class="sig-prename descclassname"><span class="pre">simba.ui.tkinter_functions.</span></span><span class="sig-name descname"><span class="pre">bindToMousewheel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">canvas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#bindToMousewheel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.bindToMousewheel" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.callback">
+<span class="sig-prename descclassname"><span class="pre">simba.ui.tkinter_functions.</span></span><span class="sig-name descname"><span class="pre">callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.callback" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.create_scalebar">
+<span class="sig-prename descclassname"><span class="pre">simba.ui.tkinter_functions.</span></span><span class="sig-name descname"><span class="pre">create_scalebar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parent</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Frame</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">min</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">max</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">cmd</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><span class="pre">object</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#create_scalebar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.create_scalebar" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.form_validator_is_numeric">
+<span class="sig-prename descclassname"><span class="pre">simba.ui.tkinter_functions.</span></span><span class="sig-name descname"><span class="pre">form_validator_is_numeric</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inStr</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acttyp</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#form_validator_is_numeric"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.form_validator_is_numeric" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.hxtScrollbar">
+<span class="sig-prename descclassname"><span class="pre">simba.ui.tkinter_functions.</span></span><span class="sig-name descname"><span class="pre">hxtScrollbar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">master</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#hxtScrollbar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.hxtScrollbar" title="Permalink to this definition"></a></dt>
+<dd><p>Create canvas.
+Create a frame and put it in the canvas.
+Create two scrollbar and insert command of canvas x and y view
+Use canvas to create a window, where window = frame
+Bind the frame to the canvas</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.onFrameConfigure">
+<span class="sig-prename descclassname"><span class="pre">simba.ui.tkinter_functions.</span></span><span class="sig-name descname"><span class="pre">onFrameConfigure</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">canvas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#onFrameConfigure"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.onFrameConfigure" title="Permalink to this definition"></a></dt>
+<dd><p>Reset the scroll region to encompass the inner frame</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.onMousewheel">
+<span class="sig-prename descclassname"><span class="pre">simba.ui.tkinter_functions.</span></span><span class="sig-name descname"><span class="pre">onMousewheel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">canvas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#onMousewheel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.onMousewheel" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="simba.ui.tkinter_functions.unbindToMousewheel">
+<span class="sig-prename descclassname"><span class="pre">simba.ui.tkinter_functions.</span></span><span class="sig-name descname"><span class="pre">unbindToMousewheel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">canvas</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/tkinter_functions.html#unbindToMousewheel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.tkinter_functions.unbindToMousewheel" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-simba.ui.user_defined_pose_creator">
+<span id="simba-ui-user-defined-pose-creator-module"></span><h2>simba.ui.user_defined_pose_creator module<a class="headerlink" href="#module-simba.ui.user_defined_pose_creator" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.ui.user_defined_pose_creator.PoseConfigCreator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.ui.user_defined_pose_creator.</span></span><span class="sig-name descname"><span class="pre">PoseConfigCreator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pose_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_animals</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">img_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bp_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.12)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">animal_id_int_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.12)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/user_defined_pose_creator.html#PoseConfigCreator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.user_defined_pose_creator.PoseConfigCreator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.plotting_mixin.PlottingMixin" title="simba.mixins.plotting_mixin.PlottingMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlottingMixin</span></code></a></p>
+<p>Class for creating user-defined pose-estimation pipeline in SimBA through a GUI interface.</p>
+<dl class="simple">
+<dt>..seealso::</dt><dd><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Pose_config.md">GitHub tutorial/documentation</a>.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pose_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Name of the user-defined pose-estimation setting.</p></li>
+<li><p><strong>no_animals</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Number of animals in the user-defined pose-estimation setting.</p></li>
+<li><p><strong>img_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Path to image representation of user-defined pose-estimation setting</p></li>
+<li><p><strong>bp_list</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>]</em>) – Body-parts in the user-defined pose-estimation setting.</p></li>
+<li><p><strong>animal_id_int_list</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>) – Integers representing the animal ID which the body-parts belong to.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Examples<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pose_config_creator</span> <span class="o">=</span> <span class="n">PoseConfigCreator</span><span class="p">(</span><span class="n">pose_name</span><span class="o">=</span><span class="s2">&quot;My_test_config&quot;</span><span class="p">,</span> <span class="n">no_animals</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">img_path</span><span class="o">=</span><span class="s1">&#39;simba/splash_050122.png&#39;</span><span class="p">,</span> <span class="n">bp_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Ear&#39;</span><span class="p">,</span> <span class="s1">&#39;Nose&#39;</span><span class="p">,</span> <span class="s1">&#39;Left_ear&#39;</span><span class="p">,</span> <span class="s1">&#39;Ear&#39;</span><span class="p">,</span> <span class="s1">&#39;Nose&#39;</span><span class="p">,</span> <span class="s1">&#39;Left_ear&#39;</span><span class="p">],</span> <span class="n">animal_id_int_list</span><span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pose_config_creator</span><span class="o">.</span><span class="n">launch</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.user_defined_pose_creator.PoseConfigCreator.launch">
+<span class="sig-name descname"><span class="pre">launch</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/user_defined_pose_creator.html#PoseConfigCreator.launch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.user_defined_pose_creator.PoseConfigCreator.launch" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.user_defined_pose_creator.PoseConfigCreator.save">
+<span class="sig-name descname"><span class="pre">save</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/user_defined_pose_creator.html#PoseConfigCreator.save"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.user_defined_pose_creator.PoseConfigCreator.save" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-simba.ui.video_info_ui">
+<span id="simba-ui-video-info-ui-module"></span><h2>simba.ui.video_info_ui module<a class="headerlink" href="#module-simba.ui.video_info_ui" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.ui.video_info_ui.VideoInfoTable">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.ui.video_info_ui.</span></span><span class="sig-name descname"><span class="pre">VideoInfoTable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/video_info_ui.html#VideoInfoTable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.video_info_ui.VideoInfoTable" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a>, <a class="reference internal" href="simba.mixins.html#simba.mixins.pop_up_mixin.PopUpMixin" title="simba.mixins.pop_up_mixin.PopUpMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PopUpMixin</span></code></a></p>
+<p>Create GUI that allows users to modify resolutions, fps, and pixels-per-mm
+interactively of videos within the SimBA project. Data is stored within the project_folder/logs/video_info.csv
+file in the SimBA project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_file_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – path to SimBA project config file in Configparser format</p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>..seealso::</dt><dd><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters">Tutorial</a>.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Example<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">video_info_gui</span> <span class="o">=</span> <span class="n">VideoInfoTable</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;MyProjectConfig&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">video_info_gui</span><span class="o">.</span><span class="n">create_window</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">video_info_gui</span><span class="o">.</span><span class="n">main_frm</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.ui.video_info_ui.VideoInfoTable.create_window">
+<span class="sig-name descname"><span class="pre">create_window</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/ui/video_info_ui.html#VideoInfoTable.create_window"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.ui.video_info_ui.VideoInfoTable.create_window" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-simba.ui">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-simba.ui" title="Permalink to this heading"></a></h2>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="simba.third_party_label_appenders.html" class="btn btn-neutral float-left" title="Third-party behavior labels (annotation) appenders" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="simba.ui.pop_ups.html" class="btn btn-neutral float-right" title="SimBA UI pop-ups" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

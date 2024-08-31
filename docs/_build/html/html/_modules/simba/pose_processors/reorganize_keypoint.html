@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.pose_processors.reorganize_keypoint &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.pose_processors.reorganize_keypoint</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.pose_processors.reorganize_keypoint</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="p">(</span><span class="n">check_if_dir_exists</span><span class="p">,</span>
+                                <span class="n">check_if_filepath_list_is_empty</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.enums</span> <span class="kn">import</span> <span class="n">Formats</span>
+<span class="kn">from</span> <span class="nn">simba.utils.printing</span> <span class="kn">import</span> <span class="n">stdout_success</span>
+
+
+<div class="viewcode-block" id="KeypointReorganizer"><a class="viewcode-back" href="../../../simba.pose_processors.html#simba.pose_processors.reorganize_keypoint.KeypointReorganizer">[docs]</a><span class="k">class</span> <span class="nc">KeypointReorganizer</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Re-organizing the order of pose-estimated keypoints in directory containing</span>
+<span class="sd">    CSV or H5 format files.</span>
+
+<span class="sd">    :param str data_folder: Path to directory containing pose-estiation CSV or H5 data</span>
+<span class="sd">    :param str pose_tool: Tool used to perform pose-estimation. E.g., &#39;DLC&#39; or &#39;maDLC&#39;.</span>
+<span class="sd">    :param str file_format: File type of pose-estimation data.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">       `GitHub tutorial/documentation &lt;https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#re-organize-tracking-data&gt;`__.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    ----------</span>
+<span class="sd">    &gt;&gt;&gt; keypoint_reorganizer = KeypointReorganizer(data_folder=&quot;test_data/misc_test_files&quot;, pose_tool=&#39;maDLC&#39;, file_format=&#39;h5&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; keypoint_reorganizer.run(animal_list=[&#39;UM&#39;, &#39;LM&#39;, &#39;LM&#39;, &#39;UM&#39;, &#39;LM&#39;, &#39;UM&#39;, &#39;LM&#39;, &#39;LM&#39;, &#39;UM&#39;, &#39;LM&#39;, &#39;UM&#39;, &#39;UM&#39;, &#39;UM&#39;, &#39;UM&#39;, &#39;LM&#39;, &#39;LM&#39;], bp_lst=[&#39;Lateral_left&#39;, &#39;Nose&#39;, &#39;Tail_base&#39;, &#39;Lateral_right&#39;, &#39;Ear_right&#39;, &#39;Center&#39;, &#39;Nose&#39;, &#39;Ear_left&#39;, &#39;Ear_right&#39;, &#39;Center&#39;, &#39;Tail_end&#39;, &#39;Ear_left&#39;, &#39;Tail_base&#39;, &#39;Lateral_left&#39;, &#39;Tail_end&#39;, &#39;Lateral_right&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; keypoint_reorganizer = KeypointReorganizer(data_folder=&quot;test_data/misc_test_files&quot;, pose_tool=&#39;DLC&#39;, file_format=&#39;csv&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; keypoint_reorganizer.run(bp_lst=[&#39;Ear_left_1&#39;, &#39;Ear_right_1&#39;, &#39;Nose_1&#39;, &#39;Center_1&#39;, &#39;Lateral_left_1&#39;, &#39;Lateral_right_1&#39;, &#39;Tail_base_1&#39;, &#39;Ear_left_2&#39;, &#39;Ear_right_2&#39;, &#39;Nose_2&#39;, &#39;Center_2&#39;, &#39;Lateral_left_2&#39;, &#39;Lateral_right_2&#39;, &#39;Tail_base_2&#39;], animal_list=None)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">data_folder</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">pose_tool</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="n">check_if_dir_exists</span><span class="p">(</span><span class="n">in_dir</span><span class="o">=</span><span class="n">data_folder</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pose_tool</span> <span class="o">=</span> <span class="n">data_folder</span><span class="p">,</span> <span class="n">pose_tool</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_format</span> <span class="o">=</span> <span class="n">file_format</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files_found</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_folder</span> <span class="o">+</span> <span class="s2">&quot;/*.&quot;</span> <span class="o">+</span> <span class="n">file_format</span><span class="p">)</span>
+        <span class="n">check_if_filepath_list_is_empty</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">files_found</span><span class="p">,</span>
+            <span class="n">error_msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SIMBA ERROR: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_folder</span><span class="si">}</span><span class="s2"> directory contains no </span><span class="si">{</span><span class="n">file_format</span><span class="si">}</span><span class="s2"> files.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datetime</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m</span><span class="si">%d</span><span class="s2">%H%M%S&quot;</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">file_format</span> <span class="o">==</span> <span class="n">Formats</span><span class="o">.</span><span class="n">H5</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">pose_tool</span> <span class="o">==</span> <span class="s2">&quot;DLC&quot;</span> <span class="ow">or</span> <span class="s2">&quot;maDLC&quot;</span><span class="p">):</span>
+            <span class="n">first_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">header_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">first_df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+            <span class="n">animal_bp_tuple_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">header_val</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">header_list</span><span class="p">:</span>
+                <span class="n">new_value</span> <span class="o">=</span> <span class="p">(</span><span class="n">header_val</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">header_val</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">new_value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">animal_bp_tuple_list</span><span class="p">:</span>
+                    <span class="n">animal_bp_tuple_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_value</span><span class="p">)</span>
+            <span class="n">animal_bp_tuple_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">animal_bp_tuple_list</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">animal_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">animal_bp_tuple_list</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bp_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">animal_bp_tuple_list</span><span class="p">]</span>
+
+        <span class="k">elif</span> <span class="p">(</span><span class="n">file_format</span> <span class="o">==</span> <span class="n">Formats</span><span class="o">.</span><span class="n">CSV</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">pose_tool</span> <span class="o">==</span> <span class="s2">&quot;DLC&quot;</span> <span class="ow">or</span> <span class="s2">&quot;maDLC&quot;</span><span class="p">):</span>
+            <span class="n">first_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">first_df</span><span class="o">.</span><span class="n">scorer</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;coords&quot;</span><span class="p">:</span>
+                <span class="n">scorer</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">first_df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+                <span class="n">scorer</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;scorer&quot;</span><span class="p">)</span>
+                <span class="n">individuals</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">first_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:])</span>
+                <span class="n">individuals</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;individuals&quot;</span><span class="p">)</span>
+                <span class="n">bodyparts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">first_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
+                <span class="n">bodyparts</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;bodyparts&quot;</span><span class="p">)</span>
+                <span class="n">coords</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">first_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:])</span>
+                <span class="n">coords</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;coords&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">header_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">scorer</span><span class="p">,</span> <span class="n">individuals</span><span class="p">,</span> <span class="n">bodyparts</span><span class="p">,</span> <span class="n">coords</span><span class="p">))</span>
+                <span class="n">animallist</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">individuals</span><span class="p">,</span> <span class="n">bodyparts</span><span class="p">))</span>
+                <span class="n">animal_bp_tuple_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span><span class="n">animallist</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">animal_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">animal_bp_tuple_list</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bp_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">animal_bp_tuple_list</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">animal_list</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">scorer</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">first_df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+                <span class="n">scorer</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;scorer&quot;</span><span class="p">)</span>
+                <span class="n">bodyparts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">first_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:])</span>
+                <span class="n">bodyparts</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;bodyparts&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bp_list</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">bp</span> <span class="ow">in</span> <span class="n">bodyparts</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">bp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bp_list</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">bp_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bp</span><span class="p">)</span>
+                <span class="n">coords</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">first_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:])</span>
+                <span class="n">coords</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;coords&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">header_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">scorer</span><span class="p">,</span> <span class="n">bodyparts</span><span class="p">,</span> <span class="n">coords</span><span class="p">))</span>
+
+        <span class="k">elif</span> <span class="p">(</span><span class="n">file_format</span> <span class="o">==</span> <span class="n">Formats</span><span class="o">.</span><span class="n">CSV</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">pose_tool</span> <span class="o">==</span> <span class="s2">&quot;SLEAP&quot;</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;s&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bp_lst</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">animal_list</span><span class="p">:</span> <span class="nb">list</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="n">save_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_folder</span><span class="p">,</span> <span class="s2">&quot;Reorganized_bp_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">save_directory</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_directory</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;Saving </span><span class="si">{}</span><span class="s2"> new pose-estimation files in </span><span class="si">{}</span><span class="s2"> directory...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found</span><span class="p">)),</span> <span class="n">save_directory</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">header_tuples</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pose_tool</span> <span class="o">==</span> <span class="s2">&quot;maDLC&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">animal_name</span><span class="p">,</span> <span class="n">animal_bp</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">animal_list</span><span class="p">,</span> <span class="n">bp_lst</span><span class="p">):</span>
+                <span class="n">header_tuples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">animal_name</span><span class="p">,</span> <span class="n">animal_bp</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">header_tuples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">animal_name</span><span class="p">,</span> <span class="n">animal_bp</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">header_tuples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">header_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">animal_name</span><span class="p">,</span> <span class="n">animal_bp</span><span class="p">,</span> <span class="s2">&quot;likelihood&quot;</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="n">new_df_ordered_cols</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_tuples</span><span class="p">(</span>
+                <span class="n">header_tuples</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;scorer&quot;</span><span class="p">,</span> <span class="s2">&quot;individuals&quot;</span><span class="p">,</span> <span class="s2">&quot;bodyparts&quot;</span><span class="p">,</span> <span class="s2">&quot;coords&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pose_tool</span> <span class="o">==</span> <span class="s2">&quot;DLC&quot;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">animal_bp</span> <span class="ow">in</span> <span class="n">bp_lst</span><span class="p">:</span>
+                <span class="n">header_tuples</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">header_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">animal_bp</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">))</span>
+                <span class="n">header_tuples</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">header_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">animal_bp</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">))</span>
+                <span class="n">header_tuples</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">header_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">animal_bp</span><span class="p">,</span> <span class="s2">&quot;likelihood&quot;</span><span class="p">))</span>
+            <span class="n">new_df_ordered_cols</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_tuples</span><span class="p">(</span>
+                <span class="n">header_tuples</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;scorer&quot;</span><span class="p">,</span> <span class="s2">&quot;bodyparts&quot;</span><span class="p">,</span> <span class="s2">&quot;coords&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">file_cnt</span><span class="p">,</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found</span><span class="p">):</span>
+            <span class="n">df_save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_directory</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_format</span> <span class="o">==</span> <span class="s2">&quot;h5&quot;</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_hdf</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+                <span class="n">df_reorganized</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">new_df_ordered_cols</span><span class="p">)</span>
+                <span class="n">df_reorganized</span><span class="o">.</span><span class="n">to_hdf</span><span class="p">(</span>
+                    <span class="n">df_save_path</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s2">&quot;re-organized&quot;</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;table&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_format</span> <span class="o">==</span> <span class="s2">&quot;csv&quot;</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+                <span class="n">df_reorganized</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">new_df_ordered_cols</span><span class="p">)</span>
+                <span class="n">df_reorganized</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">df_save_path</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Saved </span><span class="si">{}</span><span class="s2">, Video </span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file_path</span><span class="p">),</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">file_cnt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found</span><span class="p">)),</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="n">stdout_success</span><span class="p">(</span>
+            <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found</span><span class="p">))</span><span class="si">}</span><span class="s2"> new data files with reorganized body-parts saved in </span><span class="si">{</span><span class="n">save_directory</span><span class="si">}</span><span class="s2"> directory&quot;</span>
+        <span class="p">)</span></div>
+
+
+<span class="c1"># keypoint_reorganizer = KeypointReorganizer(data_folder=&quot;/Users/simon/Desktop/envs/troubleshooting/Termites_5/import_h5&quot;, pose_tool=&#39;SLEAP&#39;, file_format=&#39;csv&#39;)</span>
+<span class="c1"># keypoint_reorganizer = KeypointReorganizer(data_folder=&quot;/Users/simon/Desktop/envs/troubleshooting/Termites_5/import_h5&quot;, pose_tool=&#39;SLEAP&#39;, file_format=&#39;SLEAP H5&#39;)</span>
+<span class="c1"># keypoint_reorganizer = KeypointReorganizer(data_folder=&quot;/Users/simon/Desktop/troubleshooting/B1-MS_US/el_import&quot;, pose_tool=&#39;maDLC&#39;, file_format=&#39;h5&#39;)</span>
+<span class="c1"># keypoint_reorganizer.run(animal_list=[&#39;UM&#39;, &#39;LM&#39;, &#39;LM&#39;, &#39;UM&#39;, &#39;LM&#39;, &#39;UM&#39;, &#39;LM&#39;, &#39;LM&#39;, &#39;UM&#39;, &#39;LM&#39;, &#39;UM&#39;, &#39;UM&#39;, &#39;UM&#39;, &#39;UM&#39;, &#39;LM&#39;, &#39;LM&#39;], bp_lst=[&#39;Nose&#39;, &#39;Tail_base&#39;, &#39;Tail_base&#39;, &#39;Lateral_right&#39;, &#39;Ear_right&#39;, &#39;Center&#39;, &#39;Nose&#39;, &#39;Ear_left&#39;, &#39;Ear_right&#39;, &#39;Center&#39;, &#39;Tail_end&#39;, &#39;Ear_left&#39;, &#39;Tail_base&#39;, &#39;Lateral_left&#39;, &#39;Tail_end&#39;, &#39;Lateral_right&#39;])</span>
+
+<span class="c1"># keypoint_reorganizer = KeypointReorganizer(data_folder=&quot;//Users/simon/Desktop/simbapypi_dev/tests/test_data/misc_test_files&quot;, pose_tool=&#39;DLC&#39;, file_format=&#39;csv&#39;)</span>
+<span class="c1"># keypoint_reorganizer.run(bp_lst=[&#39;Ear_left_1&#39;, &#39;Ear_right_1&#39;, &#39;Nose_1&#39;, &#39;Center_1&#39;, &#39;Lateral_left_1&#39;, &#39;Lateral_right_1&#39;, &#39;Tail_base_1&#39;, &#39;Ear_left_2&#39;, &#39;Ear_right_2&#39;, &#39;Nose_2&#39;, &#39;Center_2&#39;, &#39;Lateral_left_2&#39;, &#39;Lateral_right_2&#39;, &#39;Tail_base_2&#39;], animal_list=None)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

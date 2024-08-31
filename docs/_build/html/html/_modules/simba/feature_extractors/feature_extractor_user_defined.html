@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.feature_extractors.feature_extractor_user_defined &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.feature_extractors.feature_extractor_user_defined</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.feature_extractors.feature_extractor_user_defined</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">product</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">simba.mixins.config_reader</span> <span class="kn">import</span> <span class="n">ConfigReader</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.feature_extraction_mixin</span> <span class="kn">import</span> <span class="n">FeatureExtractionMixin</span>
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="n">check_str</span>
+<span class="kn">from</span> <span class="nn">simba.utils.printing</span> <span class="kn">import</span> <span class="n">SimbaTimer</span><span class="p">,</span> <span class="n">stdout_success</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="n">get_fn_ext</span><span class="p">,</span> <span class="n">read_df</span><span class="p">,</span> <span class="n">write_df</span>
+
+
+<div class="viewcode-block" id="UserDefinedFeatureExtractor"><a class="viewcode-back" href="../../../simba.feature_extractors.html#simba.feature_extractors.feature_extractor_user_defined.UserDefinedFeatureExtractor">[docs]</a><span class="k">class</span> <span class="nc">UserDefinedFeatureExtractor</span><span class="p">(</span><span class="n">ConfigReader</span><span class="p">,</span> <span class="n">FeatureExtractionMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generic featurizer of data within SimBA project using user-defined body-parts in the pose-estimation data.</span>
+<span class="sd">    Results are stored in the `project_folder/csv/features_extracted` directory of the SimBA project.</span>
+
+<span class="sd">    :parameter str config_path: path to SimBA project config file in Configparser format</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">       `Feature extraction tutorial &lt;https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features&gt;`__.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    ----------</span>
+<span class="sd">    &gt;&gt;&gt; feature_extractor = UserDefinedFeatureExtractor(config_path=&#39;MyProjectConfig&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; feature_extractor.run()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">FeatureExtractionMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="n">ConfigReader</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;Extracting features from </span><span class="si">{}</span><span class="s2"> file(s)...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found</span><span class="p">)))</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__euclid_dist_between_bps_of_other_animals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating euclidean distances...&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">distance_col_names</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">animal_name</span><span class="p">,</span> <span class="n">animal_data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">animal_bp_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">current_animal_bp_xs</span><span class="p">,</span> <span class="n">current_animal_bp_ys</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">animal_data</span><span class="p">[</span><span class="s2">&quot;X_bps&quot;</span><span class="p">],</span>
+                <span class="n">animal_data</span><span class="p">[</span><span class="s2">&quot;Y_bps&quot;</span><span class="p">],</span>
+            <span class="p">)</span>
+            <span class="n">other_animals</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">i</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">animal_bp_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">animal_bp_dict</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="n">animal_name</span>
+            <span class="p">}</span>
+            <span class="k">for</span> <span class="n">current_animal_bp_x</span><span class="p">,</span> <span class="n">current_animal_bp_y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="n">current_animal_bp_xs</span><span class="p">,</span> <span class="n">current_animal_bp_ys</span>
+            <span class="p">):</span>
+                <span class="k">for</span> <span class="n">other_animal_name</span><span class="p">,</span> <span class="n">other_animal_data</span> <span class="ow">in</span> <span class="n">other_animals</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">other_animal_bp_xs</span><span class="p">,</span> <span class="n">other_animal_bp_ys</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">other_animal_data</span><span class="p">[</span><span class="s2">&quot;X_bps&quot;</span><span class="p">],</span>
+                        <span class="n">other_animal_data</span><span class="p">[</span><span class="s2">&quot;Y_bps&quot;</span><span class="p">],</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">other_animal_bp_x</span><span class="p">,</span> <span class="n">other_animal_bp_y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                        <span class="n">other_animal_bp_xs</span><span class="p">,</span> <span class="n">other_animal_bp_ys</span>
+                    <span class="p">):</span>
+                        <span class="n">current_bp_name</span><span class="p">,</span> <span class="n">other_bp_name</span> <span class="o">=</span> <span class="n">current_animal_bp_x</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span>
+                            <span class="s2">&quot;_x&quot;</span>
+                        <span class="p">),</span> <span class="n">other_animal_bp_x</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;_x&quot;</span><span class="p">)</span>
+                        <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Euclidean_distance_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">current_bp_name</span><span class="p">,</span> <span class="n">other_bp_name</span>
+                        <span class="p">)</span>
+                        <span class="n">reverse_col_name</span> <span class="o">=</span> <span class="s2">&quot;Euclidean_distance_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">other_bp_name</span><span class="p">,</span> <span class="n">current_bp_name</span>
+                        <span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">reverse_col_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                                <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+                                    <span class="p">(</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="n">current_animal_bp_x</span><span class="p">]</span>
+                                        <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="n">other_animal_bp_x</span><span class="p">]</span>
+                                    <span class="p">)</span>
+                                    <span class="o">**</span> <span class="mi">2</span>
+                                    <span class="o">+</span> <span class="p">(</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="n">current_animal_bp_y</span><span class="p">]</span>
+                                        <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="n">other_animal_bp_y</span><span class="p">]</span>
+                                    <span class="p">)</span>
+                                    <span class="o">**</span> <span class="mi">2</span>
+                                <span class="p">)</span>
+                            <span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">distance_col_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col_name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__movement_of_all_bps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating movements of all body-parts...&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mean_movement_cols</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sum_movement_cols</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">animal_name</span><span class="p">,</span> <span class="n">animal_data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">animal_bp_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">animal_cols</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">current_animal_bp_xs</span><span class="p">,</span> <span class="n">current_animal_bp_ys</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">animal_data</span><span class="p">[</span><span class="s2">&quot;X_bps&quot;</span><span class="p">],</span>
+                <span class="n">animal_data</span><span class="p">[</span><span class="s2">&quot;Y_bps&quot;</span><span class="p">],</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">bp_x</span><span class="p">,</span> <span class="n">bp_y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">current_animal_bp_xs</span><span class="p">,</span> <span class="n">current_animal_bp_ys</span><span class="p">):</span>
+                <span class="n">shifted_bp_x</span><span class="p">,</span> <span class="n">shifted_bp_y</span> <span class="o">=</span> <span class="n">bp_x</span> <span class="o">+</span> <span class="s2">&quot;_shifted&quot;</span><span class="p">,</span> <span class="n">bp_y</span> <span class="o">+</span> <span class="s2">&quot;_shifted&quot;</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Movement_&quot;</span> <span class="o">+</span> <span class="n">bp_x</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;_x&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+                        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_df_comb</span><span class="p">[</span><span class="n">bp_x</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df_comb</span><span class="p">[</span><span class="n">shifted_bp_x</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+                        <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_df_comb</span><span class="p">[</span><span class="n">bp_y</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df_comb</span><span class="p">[</span><span class="n">shifted_bp_y</span><span class="p">])</span>
+                        <span class="o">**</span> <span class="mi">2</span>
+                    <span class="p">)</span>
+                <span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span>
+                <span class="n">animal_cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="s2">&quot;All_bp_movements_&quot;</span> <span class="o">+</span> <span class="n">animal_name</span> <span class="o">+</span> <span class="s2">&quot;_sum&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span>
+                <span class="n">animal_cols</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="s2">&quot;All_bp_movements_&quot;</span> <span class="o">+</span> <span class="n">animal_name</span> <span class="o">+</span> <span class="s2">&quot;_mean&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span>
+                <span class="n">animal_cols</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="s2">&quot;All_bp_movements_&quot;</span> <span class="o">+</span> <span class="n">animal_name</span> <span class="o">+</span> <span class="s2">&quot;_min&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span>
+                <span class="n">animal_cols</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="s2">&quot;All_bp_movements_&quot;</span> <span class="o">+</span> <span class="n">animal_name</span> <span class="o">+</span> <span class="s2">&quot;_max&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span>
+                <span class="n">animal_cols</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mean_movement_cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;All_bp_movements_&quot;</span> <span class="o">+</span> <span class="n">animal_name</span> <span class="o">+</span> <span class="s2">&quot;_mean&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sum_movement_cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;All_bp_movements_&quot;</span> <span class="o">+</span> <span class="n">animal_name</span> <span class="o">+</span> <span class="s2">&quot;_sum&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__rolling_windows_bp_distances</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating rolling windows data: distances between body-parts...&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">distance_col_names</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="s2">&quot;Mean_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="s2">&quot;Sum_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__rolling_windows_movement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating rolling windows data: animal movements...&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">product</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mean_movement_cols</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="s2">&quot;Mean_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="s2">&quot;Sum_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">])]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__pose_probability_filters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">p_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p_cols</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="s2">&quot;Sum_probabilities&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_df</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="s2">&quot;Mean_probabilities&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">p_df</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">count_values_in_range</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p_cols</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="n">ranges</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">]]),</span>
+            <span class="p">),</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;Low_prob_detections_0.1&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Low_prob_detections_0.5&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Low_prob_detections_0.75&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">,</span> <span class="n">results</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<div class="viewcode-block" id="UserDefinedFeatureExtractor.run"><a class="viewcode-back" href="../../../simba.feature_extractors.html#simba.feature_extractors.feature_extractor_user_defined.UserDefinedFeatureExtractor.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to compute and save features to disk. Results are saved in the `project_folder/csv/features_extracted`</span>
+<span class="sd">        directory of the SimBA project.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">for</span> <span class="n">file_cnt</span><span class="p">,</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found</span><span class="p">):</span>
+            <span class="n">video_timer</span> <span class="o">=</span> <span class="n">SimbaTimer</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Extracting features for video </span><span class="si">{}</span><span class="s2">/</span><span class="si">{}</span><span class="s2">...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">file_cnt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="n">check_str</span><span class="p">(</span><span class="s2">&quot;file name&quot;</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+            <span class="n">video_settings</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span> <span class="n">fps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_video_info</span><span class="p">(</span>
+                <span class="n">video_name</span><span class="o">=</span><span class="n">file_name</span>
+            <span class="p">)</span>
+            <span class="n">roll_windows</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">)):</span>
+                <span class="n">roll_windows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">fps</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span> <span class="o">=</span> <span class="n">read_df</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">col_headers</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df_shifted</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="n">periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df_shifted</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">col_headers_shifted</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df_comb</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df_shifted</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">join</span><span class="o">=</span><span class="s2">&quot;inner&quot;</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__euclid_dist_between_bps_of_other_animals</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__movement_of_all_bps</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__rolling_windows_bp_distances</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__rolling_windows_movement</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__pose_probability_filters</span><span class="p">()</span>
+            <span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">write_df</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="n">save_path</span><span class="p">)</span>
+            <span class="n">video_timer</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Feature extraction complete for video </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2"> (elapsed time: </span><span class="si">{</span><span class="n">video_timer</span><span class="o">.</span><span class="n">elapsed_time_str</span><span class="si">}</span><span class="s2">s)&quot;</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">()</span>
+        <span class="n">stdout_success</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Feature extraction complete for </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found</span><span class="p">))</span><span class="si">}</span><span class="s2"> video(s). Results are saved inside the project_folder/csv/features_extracted directory&quot;</span><span class="p">,</span>
+            <span class="n">elapsed_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">elapsed_time_str</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+
+
+<span class="c1"># test = UserDefinedFeatureExtractor(config_path=&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini&#39;)</span>
+<span class="c1"># test.run()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

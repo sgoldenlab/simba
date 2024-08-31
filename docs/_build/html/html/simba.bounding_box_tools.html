@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SimBA bounding-box tools (animal-anchoired ROIs) &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Cue light tools" href="simba.cue_light_tools.html" />
+    <link rel="prev" title="Mixins" href="simba.mixins.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SimBA
+              <img src="_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="api.html">API Reference</a></li>
+      <li class="breadcrumb-item active">SimBA bounding-box tools (animal-anchoired ROIs)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/simba.bounding_box_tools.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="simba-bounding-box-tools-animal-anchoired-rois">
+<h1>SimBA bounding-box tools (animal-anchoired ROIs)<a class="headerlink" href="#simba-bounding-box-tools-animal-anchoired-rois" title="Permalink to this heading"></a></h1>
+<p>Methods for analyzing animal interactions through <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md">overlapping bounding boxes</a>.</p>
+<section id="module-simba.bounding_box_tools.agg_boundary_stats">
+<span id="aggregate-statistics"></span><h2>Aggregate Statistics<a class="headerlink" href="#module-simba.bounding_box_tools.agg_boundary_stats" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.bounding_box_tools.agg_boundary_stats.AggBoundaryStatisticsCalculator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.bounding_box_tools.agg_boundary_stats.</span></span><span class="sig-name descname"><span class="pre">AggBoundaryStatisticsCalculator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">measures</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.12)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><span class="pre">typing_extensions.Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'INTERACTION</span> <span class="pre">TIME</span> <span class="pre">(s)'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'INTERACTION</span> <span class="pre">BOUT</span> <span class="pre">COUNT'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'INTERACTION</span> <span class="pre">BOUT</span> <span class="pre">MEAN</span> <span class="pre">(s)'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'INTERACTION</span> <span class="pre">BOUT</span> <span class="pre">MEDIAN</span> <span class="pre">(s)'</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shortest_allowed_interaction</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/bounding_box_tools/agg_boundary_stats.html#AggBoundaryStatisticsCalculator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.bounding_box_tools.agg_boundary_stats.AggBoundaryStatisticsCalculator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a></p>
+<p>Compute aggregate boundary statistics</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – SimBA project config file in Configparser format</p></li>
+<li><p><strong>measures</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>]</em>) – Aggregate statistics measurements. OPTIONS: ‘DETAILED INTERACTIONS TABLE’, ‘INTERACTION TIME (s)’, ‘INTERACTION BOUT COUNT’, ‘INTERACTION BOUT MEAN (s)’, ‘INTERACTION BOUT MEDIAN (s)’</p></li>
+<li><p><strong>shortest_allowed_interaction</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – The shortest allowed animal-anchored ROI intersection in millisecond.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md">Tutorial</a>.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">boundary_stats_calculator</span> <span class="o">=</span> <span class="n">AggBoundaryStatisticsCalculator</span><span class="p">(</span><span class="s1">&#39;MyProjectConfig&#39;</span><span class="p">,</span> <span class="n">measures</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;INTERACTION TIME (s)&#39;</span><span class="p">],</span> <span class="n">shortest_allowed_interaction</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">boundary_stats_calculator</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">boundary_stats_calculator</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-simba.bounding_box_tools.boundary_menus">
+<span id="gui-tool"></span><h2>GUI Tool<a class="headerlink" href="#module-simba.bounding_box_tools.boundary_menus" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.bounding_box_tools.boundary_menus.BoundaryMenus">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.bounding_box_tools.boundary_menus.</span></span><span class="sig-name descname"><span class="pre">BoundaryMenus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/bounding_box_tools/boundary_menus.html#BoundaryMenus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.bounding_box_tools.boundary_menus.BoundaryMenus" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a>, <a class="reference internal" href="simba.mixins.html#simba.mixins.pop_up_mixin.PopUpMixin" title="simba.mixins.pop_up_mixin.PopUpMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PopUpMixin</span></code></a></p>
+<p>Launch GUI interface for extrapolating bounding boxes from pose-estimation data, and calculating
+statstics on bounding boxes and pose-estimated key-point intersections.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – str path to SimBA project config file in Configparser format</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md">Tutorial</a>.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">BoundaryMenus</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-simba.bounding_box_tools.boundary_statistics">
+<span id="statistics"></span><h2>Statistics<a class="headerlink" href="#module-simba.bounding_box_tools.boundary_statistics" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.bounding_box_tools.boundary_statistics.BoundaryStatisticsCalculator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.bounding_box_tools.boundary_statistics.</span></span><span class="sig-name descname"><span class="pre">BoundaryStatisticsCalculator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi_intersections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi_keypoint_intersections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">save_format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/bounding_box_tools/boundary_statistics.html#BoundaryStatisticsCalculator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.bounding_box_tools.boundary_statistics.BoundaryStatisticsCalculator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a></p>
+<p>Compute boundary intersection statistics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Path to SimBA project config file in Configparser format.</p></li>
+<li><p><strong>roi_intersections</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – If True, calculates intersection of animal-anchored ROIs</p></li>
+<li><p><strong>roi_keypoint_intersections</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – If True, calculates intersection of animal-anchored ROIs and pose-estimated animal key-points.</p></li>
+<li><p><strong>save_format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Output data format. OPTIONS: CSV, PARQUET, PICKLE.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md">Bounding boxes tutorial</a>.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">boundary_stats_calculator</span> <span class="o">=</span> <span class="n">BoundaryStatisticsCalculator</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;MyConfigFile&#39;</span><span class="p">,</span><span class="n">roi_intersections</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">roi_keypoint_intersections</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">save_format</span><span class="o">=</span><span class="s1">&#39;CSV&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">boundary_stats_calculator</span><span class="o">.</span><span class="n">save_results</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-simba.bounding_box_tools.find_boundaries">
+<span id="find-boundaries"></span><h2>Find Boundaries<a class="headerlink" href="#module-simba.bounding_box_tools.find_boundaries" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.bounding_box_tools.find_boundaries.AnimalBoundaryFinder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.bounding_box_tools.find_boundaries.</span></span><span class="sig-name descname"><span class="pre">AnimalBoundaryFinder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_rectangle</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">body_parts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parallel_offset</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(in Python v3.12)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/bounding_box_tools/find_boundaries.html#AnimalBoundaryFinder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.bounding_box_tools.find_boundaries.AnimalBoundaryFinder" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a>, <a class="reference internal" href="simba.mixins.html#simba.mixins.feature_extraction_mixin.FeatureExtractionMixin" title="simba.mixins.feature_extraction_mixin.FeatureExtractionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureExtractionMixin</span></code></a></p>
+<p>Compute boundaries (animal-anchored) ROIs for animals in each frame. Result is saved
+as a pickle in the <code class="docutils literal notranslate"><span class="pre">project_folder/logs</span></code> directory of the SimBA project.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – path to SimBA project config file in Configparser format</p></li>
+<li><p><strong>roi_type</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – <p>shape type of ROI. OPTIONS: “ENTIRE ANIMAL”, “SINGLE BODY-PART SQUARE”, “SINGLE BODY-PART CIRCLE”. For
+more information/examples, see <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md/">Tutorial</a>.</p>
+</p></li>
+<li><p><strong>force_rectangle</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – If True, forces roi shape into minimum bounding rectangle. If False, then polygon.</p></li>
+<li><p><strong>body_parts</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a><em>] or </em><em>None</em>) – If roi_type is ‘SINGLE BODY-PART CIRCLE’ or ‘SINGLE BODY-PART SQUARE’, then body-parts to anchor the ROI to
+with keys as animal names and values as body-parts. E.g., body_parts={‘Animal_1’: ‘Head_1’, ‘Animal_2’: ‘Head_2’}.</p></li>
+<li><p><strong>parallel_offset</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a><em>]</em>) – Offset of ROI from the animal outer bounds in millimeter. If None, then no offset.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">animal_boundary_finder</span> <span class="o">=</span> <span class="n">AnimalBoundaryFinder</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;project_folder/project_config.ini&#39;</span><span class="p">,</span> <span class="n">roi_type</span><span class="o">=</span><span class="s1">&#39;SINGLE BODY-PART CIRCLE&#39;</span><span class="p">,</span><span class="n">body_parts</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Animal_1&#39;</span><span class="p">:</span> <span class="s1">&#39;Head_1&#39;</span><span class="p">,</span> <span class="s1">&#39;Animal_2&#39;</span><span class="p">:</span> <span class="s1">&#39;Head_2&#39;</span><span class="p">},</span> <span class="n">force_rectangle</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">parallel_offset</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">animal_boundary_finder</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-simba.bounding_box_tools.visualize_boundaries">
+<span id="visualize"></span><h2>Visualize<a class="headerlink" href="#module-simba.bounding_box_tools.visualize_boundaries" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.bounding_box_tools.visualize_boundaries.BoundaryVisualizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.bounding_box_tools.visualize_boundaries.</span></span><span class="sig-name descname"><span class="pre">BoundaryVisualizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">video_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_key_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">greyscale</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_intersections</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><span class="pre">bool</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">roi_attributes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/bounding_box_tools/visualize_boundaries.html#BoundaryVisualizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.bounding_box_tools.visualize_boundaries.BoundaryVisualizer" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a>, <a class="reference internal" href="simba.mixins.html#simba.mixins.plotting_mixin.PlottingMixin" title="simba.mixins.plotting_mixin.PlottingMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">PlottingMixin</span></code></a></p>
+<p>Visualisation of user-specified animal-anchored ROI boundaries. Results are stored in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/anchored_rois</span></code> directory of the SimBA project</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Path to SimBA project config file in Configparser format</p></li>
+<li><p><strong>video_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Name of the video in the SimBA project to create bounding box video for</p></li>
+<li><p><strong>include_key_points</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – If True, includes pose-estimated body-parts in the video.</p></li>
+<li><p><strong>greyscale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – If True, converts the video (but not the shapes/keypoints) to greyscale.</p></li>
+<li><p><strong>show_intersections</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – If True, then produce highlight boundaries/keypoints to signify present intersections.
+See <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/images/termites_video_3.gif">this example for highlighted intersections</a></p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md">Bounding boxes tutorial</a>.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">boundary_visualizer</span> <span class="o">=</span> <span class="n">BoundaryVisualizer</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;MySimBAConfig&#39;</span><span class="p">,</span> <span class="n">video_name</span><span class="o">=</span><span class="s1">&#39;MyVideoName&#39;</span><span class="p">,</span> <span class="n">include_key_points</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">greyscale</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">boundary_visualizer</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="simba.mixins.html" class="btn btn-neutral float-left" title="Mixins" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="simba.cue_light_tools.html" class="btn btn-neutral float-right" title="Cue light tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cue Light Analysis in SimBA &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Using multi-animal pose-estimation data in SimBA" href="multi_animal_pose.html" />
+    <link rel="prev" title="Post-classification Validation (detecting false-positives)" href="classifier_validation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SimBA
+              <img src="../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="roi.html">Regions of Interest (ROIs) in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FSTTC.html">Calculating forward-spike time tiling coefficents in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_subsets.html">Feature family sub-sets in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_defined_feature_class.html">User-defined ‘feature extraction’ scripts in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kleinberg_filter.html">Kleinberg behavior classification smoothing in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="anchored_rois.html">Animal-anchored ROIs (bounding-boxes) in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SHAP.html">Model explainability and calculating feature SHAP values in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="directionality_between_animals.html">Who is looking at who: calculate “directionality” between animals in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classifier_validation.html">Post-classification Validation (detecting false-positives)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Cue Light Analysis in SimBA</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#before-analyzing-cue-light-data-in-simba">Before analyzing cue light data in SimBA</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-1-defining-cue-light-rois-in-simba">Part 1. Defining cue light ROIs in SimBA.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-2-analyzing-cue-light-s-states">Part 2. Analyzing cue light(s) states.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-3-visualizing-cue-light-states">Part 3. Visualizing cue light states.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-4-analyzing-movement-at-cue-light-states">Part 4. Analyzing movement at cue light states.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-5-analyzing-classifications-at-cue-light-states">Part 5. Analyzing classifications at cue light states.</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="multi_animal_pose.html">Using multi-animal pose-estimation data in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="process_videos.html">Batch Video Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">SimBA Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_user_defined_pose_config.html">User-defined pose-configurations in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html">Video processing tools in SimBA</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">Cue Light Analysis in SimBA</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_rst/cue_lights.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="cue-light-analysis-in-simba">
+<h1>Cue Light Analysis in SimBA<a class="headerlink" href="#cue-light-analysis-in-simba" title="Permalink to this heading"></a></h1>
+<a class="reference internal image-reference" href="tutorials_rst/img/feature_subsets/landing.png"><img alt="tutorials_rst/img/feature_subsets/landing.png" class="align-center" src="tutorials_rst/img/feature_subsets/landing.png" style="width: 1000px;" /></a>
+<p>Behavioral experiments can involve conditioned stimuli (such as cue
+lights) where experimenters assess behaviors around the time periods of
+such conditioned stimuli.</p>
+<p>For example, we may want to know:</p>
+<ul class="simple">
+<li><p>How many times, and for how long, is behavior X expressed during the
+cue light (and in user-specified time-windows preceding and proceding
+the cue light)?</p></li>
+<li><p>How much does the animal move during the cue light (and in
+user-specified time-windows preceding and proceding the cue light)?</p></li>
+<li><p>Where in the environment does the animal spend time during the cue
+light (and in user-specified time-windows preceding and proceding the
+cue light)?</p></li>
+</ul>
+<p>In this tutorial we will use SimBA to infer when the cue light is on,
+and analyze movement, velocities, and behavioral classifications in
+relationship with the cue light status. This tutorial involves a
+scenario with a single video, single classifier, single animal and
+single cue light. However, note that SimBA methods supports several cue
+lights, multiple animals and classifiers, and different cue lights in
+different locations across multiple videos.</p>
+<section id="before-analyzing-cue-light-data-in-simba">
+<h2>Before analyzing cue light data in SimBA<a class="headerlink" href="#before-analyzing-cue-light-data-in-simba" title="Permalink to this heading"></a></h2>
+<p>To analyze cue light data in SimBA, the tracking data <strong>first</strong> has to
+be processed the <strong>up-to and including the Outlier correction step
+described in</strong> <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction">Part 2 - Step 4 - Correcting
+outliers</a>.
+Thus, before proceeding to analyze cue light based measures, you should
+have one file for each of the videos in your project located within the
+<code class="docutils literal notranslate"><span class="pre">project_folder\csv\outlier_corrected_movement_location</span></code> sub-directory
+of your SimBA project.</p>
+<p>Specifically, when working cue lights in SimBA, begin by (i) <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-2-import-videos-into-project-folder">Importing
+your videos to your
+project</a>,
+(ii) <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-import-dlc-tracking-data">Import the tracking data and relevant videos to your
+project</a>,
+(iii) <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters">Set the video
+parameters</a>,
+and lastly (iv) <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction">Correct
+outliers</a>.</p>
+</section>
+<section id="part-1-defining-cue-light-rois-in-simba">
+<h2>Part 1. Defining cue light ROIs in SimBA.<a class="headerlink" href="#part-1-defining-cue-light-rois-in-simba" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>SimBA uses ROIs to locate your cue light(s) in the image and to
+compute their states. To define the locations of the cue lights,
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-2-load-project-1">load your
+project</a>
+and head to the [ROI] tab. Next, click on <code class="docutils literal notranslate"><span class="pre">Define</span> <span class="pre">ROIs</span></code>. A pop up
+will be displayed listing all the videos in your project. In this
+tutorial, I am working with a SimBA project which contains a single
+video. I click on <code class="docutils literal notranslate"><span class="pre">Draw</span></code> next to the video to define my ROIs:</p></li>
+</ol>
+<a class="reference internal image-reference" href="tutorials_rst/img/feature_subsets/menu_1.png"><img alt="tutorials_rst/img/feature_subsets/menu_1.png" class="align-center" src="tutorials_rst/img/feature_subsets/menu_1.png" style="width: 1000px;" /></a>
+<ol class="arabic simple" start="2">
+<li><p>A new window pops up that allows you to define your regions of
+interest. In my video, I have a single cue light (an operant
+house-light) . I am also intrested in where in the environment my
+animal spends time in relation the the cue light state. I therefore
+draw <strong>three</strong> rectangular regions using the SimBA ROI interface,
+representing (i) the left side of the box, (ii) the right side of the
+box, and (iii) the houselight. To learn how to use the SimBA ROI
+interface, click
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md">HERE</a>.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>There are no restrictions for which shape an ROI region
+(including the cue lights) can have. I choosed three rectangles, but
+they can also be defined as circles or polygons.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Note II: There are no restrictions for how many cue lights you have.
+Define an ROI for each cue light of interest.</p>
+</div>
+<a class="reference internal image-reference" href="tutorials_rst/img/feature_subsets/interface_1.png"><img alt="tutorials_rst/img/feature_subsets/interface_1.png" class="align-center" src="tutorials_rst/img/feature_subsets/interface_1.png" style="width: 1000px;" /></a>
+</section>
+<section id="part-2-analyzing-cue-light-s-states">
+<h2>Part 2. Analyzing cue light(s) states.<a class="headerlink" href="#part-2-analyzing-cue-light-s-states" title="Permalink to this heading"></a></h2>
+<p>To begin analyzing your cue light data, head to the right-most tab in
+the SimBA interface called [Add-ons] and click on
+<code class="docutils literal notranslate"><span class="pre">Cue-light</span> <span class="pre">analysis</span></code>.</p>
+<p>To begin analysing</p>
+<a class="reference internal image-reference" href="tutorials_rst/img/feature_subsets/menu_2.png"><img alt="tutorials_rst/img/feature_subsets/menu_2.png" class="align-center" src="tutorials_rst/img/feature_subsets/menu_2.png" style="width: 1000px;" /></a>
+<p>Once clicked, a window will pop open looking something like the below
+gif. Using this interface, we will tell SimBA which of our ROIs are cue
+lights, and analyse animal movements and classifications around cue
+lights onsets and offsets. We will also visualize the cue light data to
+validate and a sanity check that the onsets and offsets of the cue
+light(s) are accurately captured by SimBA.</p>
+<p>To begin, we use the <code class="docutils literal notranslate"><span class="pre">Define</span> <span class="pre">cue</span> <span class="pre">lights</span></code> menu and select <code class="docutils literal notranslate"><span class="pre">1</span></code> in the
+<code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">Cue</span> <span class="pre">lights</span></code> drop-down to indicate that we have one cue light in our
+video(s). Once done, a single dropdown menu will appear asking us for
+the name of the single cue light. I use this dropdown menu to say that
+the cue light is names <code class="docutils literal notranslate"><span class="pre">Cue</span> <span class="pre">light</span></code>.</p>
+<a class="reference internal image-reference" href="tutorials_rst/img/feature_subsets/menu_3.gif"><img alt="tutorials_rst/img/feature_subsets/menu_3.gif" class="align-center" src="tutorials_rst/img/feature_subsets/menu_3.gif" style="width: 1000px;" /></a>
+<p>Next, I go ahead and click the <code class="docutils literal notranslate"><span class="pre">Analyze</span> <span class="pre">cue</span> <span class="pre">light</span> <span class="pre">data</span></code> button, which
+will start the analysis and extract the times when the cue light(s) are
+on and off in all frames of all videos in the project. You can follow
+the progress in the SimBA main terminal window. Once complete, a new
+file is creates inside the <code class="docutils literal notranslate"><span class="pre">project_folder/csv/cue_lights</span></code> directory
+within your SimBA project. If you open up one of these files, you will
+see columns named after your cue lights right towards the end of the
+file, filled with ones and zeros. Each row represents a frame of your
+data, a <code class="docutils literal notranslate"><span class="pre">1</span></code> indicated that the cue light is ON, and a <code class="docutils literal notranslate"><span class="pre">0</span></code> indicated
+that the cue light is OFF.</p>
+<blockquote>
+<div><p>Note: To analyze the cue-light states on standard computers at
+acceptable runtimes, SimBA uses
+<a class="reference external" href="https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html">kmeans</a>
+and python
+<a class="reference external" href="https://docs.python.org/3/library/multiprocessing.html">multi-processing</a>.
+Should you happen to see any <code class="docutils literal notranslate"><span class="pre">MemoryErrors</span></code>, or analyses that are
+<em>not</em> completed in an acceptable time, please reach out to us by
+opening a <a class="reference external" href="https://github.com/sgoldenlab/simba/issues">GitHib
+issue</a> or chat to us
+on <a class="reference external" href="https://gitter.im/SimBA-Resource/community">Gitter</a>.</p>
+</div></blockquote>
+</section>
+<section id="part-3-visualizing-cue-light-states">
+<h2>Part 3. Visualizing cue light states.<a class="headerlink" href="#part-3-visualizing-cue-light-states" title="Permalink to this heading"></a></h2>
+<p>As a further sanity check before analysing larger video batches, we’d
+want to visualize the results of the preceding step to confirm that
+SimBA has accurately captured the onsets and offsets of the cue lights.
+We have to option to generate compressed video files or individual
+images. I choose to generate a compressed video, and click
+<code class="docutils literal notranslate"><span class="pre">Visualize</span> <span class="pre">cue</span> <span class="pre">light</span> <span class="pre">data</span></code>. Once clicked, you can follow the progress
+in the main SimBA terminal.</p>
+<a class="reference internal image-reference" href="tutorials_rst/img/feature_subsets/menu_4.gif"><img alt="tutorials_rst/img/feature_subsets/menu_4.gif" class="align-center" src="tutorials_rst/img/feature_subsets/menu_4.gif" style="width: 1000px;" /></a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Reading and writing images and videos to disc is
+computationally costly on standard computers. I recommend generating
+video confirmations on a sub-set of videos to gauge accuracy and
+troubleshooting.</p>
+</div>
+<p>Once complete, one video file for each of your input data files will be
+saved inside the <code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/cue_lighs</span></code> directory of
+your SimBA project. In the videos, the numbers to the right of the video
+will tell you (i) the current status of each hoselight (ON vs OFF), (ii)
+the onset count, (iii) the total ON time in seconds, and the total OFF
+time in seconds, as in the gif example below:</p>
+<a class="reference internal image-reference" href="tutorials_rst/img/feature_subsets/example_1.gif"><img alt="tutorials_rst/img/feature_subsets/example_1.gif" class="align-center" src="tutorials_rst/img/feature_subsets/example_1.gif" style="width: 1000px;" /></a>
+</section>
+<section id="part-4-analyzing-movement-at-cue-light-states">
+<h2>Part 4. Analyzing movement at cue light states.<a class="headerlink" href="#part-4-analyzing-movement-at-cue-light-states" title="Permalink to this heading"></a></h2>
+<p>Next, we want to analyze movements (distances moved, velocities, and
+time spend in different parts of the environment) in and around the
+times the cue light(s) are on. To do this we click on
+<code class="docutils literal notranslate"><span class="pre">Analyze</span> <span class="pre">cue</span> <span class="pre">light</span> <span class="pre">movements</span></code> which will bring up a up pop-up menu
+looking like the window to the right (indicated with a red rectangle)
+accepting different user-defined settings:</p>
+<a class="reference internal image-reference" href="tutorials_rst/img/feature_subsets/menu_5.png"><img alt="tutorials_rst/img/feature_subsets/menu_5.png" class="align-center" src="tutorials_rst/img/feature_subsets/menu_5.png" style="width: 1000px;" /></a>
+<p><strong>(1)</strong> Begin by selecting how many animals you want to compute
+movements for in the <code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">Animals</span></code> dropdown menu. In my SimBA project I
+only have one animal, so I use the drop-down to select <code class="docutils literal notranslate"><span class="pre">1</span></code> (which is
+the only option available, as the project only has data for 1 animal).</p>
+<p><strong>(2)</strong> Select which body-part you want to use to determine the location
+of each animal in the <code class="docutils literal notranslate"><span class="pre">Animal</span> <span class="pre">1</span> <span class="pre">bp</span></code> dropdown menu. If you have more
+than one animal, there will be a dropdown shown for each animal chosen
+in step (1) above.</p>
+<p><strong>(3)</strong> Select a pre-cue window size (in milliseconds) in the
+<code class="docutils literal notranslate"><span class="pre">Pre-cue</span> <span class="pre">window</span> <span class="pre">(ms)</span></code> entry box. This is the time period <strong>before</strong>
+the onset of each each cue light which we want to compute movement
+statistics for. In the screengrab above, I have typed <code class="docutils literal notranslate"><span class="pre">15000</span></code>, and
+SimBA will therefore calculate movement statistics in the 15s preceeding
+each cue light onset.</p>
+<p><strong>(4)</strong> Select a post-cue window size (in milliseconds) in the
+<code class="docutils literal notranslate"><span class="pre">Post-cue</span> <span class="pre">window</span> <span class="pre">(ms)</span></code> entry box. This is the time period <strong>after</strong>
+the onset of each each cue light which we want to compute movement
+statistics for. In the screengrab above, I have typed <code class="docutils literal notranslate"><span class="pre">15000</span></code>, and
+SimBA will therefore calculate movement statistics in the 15s proceding
+each cue light onset.</p>
+<p><strong>(5)</strong> Select a body-part threshold value in the
+<code class="docutils literal notranslate"><span class="pre">Threshold</span> <span class="pre">(0.00</span> <span class="pre">-</span> <span class="pre">1.00)</span></code> entry box. This is the minimum
+pose-estimation confidence probability value for the present of the
+body-part SimBA should use. For example, if you want SimBA to calculate
+movements when the confidence is high, set this value to close to
+<code class="docutils literal notranslate"><span class="pre">1.00</span></code>. If you want SimBA to use all pose-estimation body-part
+locations to calculate movement statistics, set this value to <code class="docutils literal notranslate"><span class="pre">0.00</span></code>.</p>
+<p><strong>(6)</strong> If you have additional ROIs defined in SimBA (i.e., more ROIs
+than there are cue lights), we may want to calculate how much time the
+animal(s) are spending in these ROIs when the cue light is on, as well
+as the <code class="docutils literal notranslate"><span class="pre">pre-cue</span></code> and <code class="docutils literal notranslate"><span class="pre">post-cue</span></code> periods. If we want to perform these
+calculations, we go ahead and tick the <code class="docutils literal notranslate"><span class="pre">Analyze</span> <span class="pre">ROI</span> <span class="pre">data</span></code> checkbox.</p>
+<p><strong>(7)</strong> Once all the fields have been filled in, we click the
+<code class="docutils literal notranslate"><span class="pre">Analyze</span> <span class="pre">movement</span> <span class="pre">data</span></code> button. You can follow the progress in the
+main SimBA terminal window. Once complete, navigate to the
+<code class="docutils literal notranslate"><span class="pre">project_folder/logs</span></code> directory in your SimBA project. You should see
+a datetimed CSV file named something like this:
+<code class="docutils literal notranslate"><span class="pre">Cue_lights_movement_statistics_20220909103957.csv</span></code>. Opening this file
+you should see the different movement statistics for the different
+animals within the different cue lights periods, e.g., somthing akin to
+this:</p>
+<a class="reference internal image-reference" href="tutorials_rst/img/feature_subsets/output_1.png"><img alt="tutorials_rst/img/feature_subsets/output_1.png" class="align-center" src="tutorials_rst/img/feature_subsets/output_1.png" style="width: 1000px;" /></a>
+<p>As we ticked the checkbox during step <strong>(6)</strong>, SimBA will also generate
+a second output file inside the <code class="docutils literal notranslate"><span class="pre">project_folder/logs</span></code> directory named
+something like <code class="docutils literal notranslate"><span class="pre">Cue_lights_roi_statistics_20220911112453.csv</span></code>. This
+file contains statistics on where in relation to the non-cue light ROIs
+the animals spent time during the different cue lights period:</p>
+<a class="reference internal image-reference" href="tutorials_rst/img/feature_subsets/output_2.png"><img alt="tutorials_rst/img/feature_subsets/output_2.png" class="align-center" src="tutorials_rst/img/feature_subsets/output_2.png" style="width: 1000px;" /></a>
+</section>
+<section id="part-5-analyzing-classifications-at-cue-light-states">
+<h2>Part 5. Analyzing classifications at cue light states.<a class="headerlink" href="#part-5-analyzing-classifications-at-cue-light-states" title="Permalink to this heading"></a></h2>
+<p>Next, we want to analyze behavioral classifications in and around the
+times the cue light(s) are on. To do this we click on
+<code class="docutils literal notranslate"><span class="pre">Analyze</span> <span class="pre">cue</span> <span class="pre">light</span> <span class="pre">classifications</span></code>. Which will bring up a up pop-up
+menu looking like the window to the right (indicated with a red
+rectangle) accepting different user-defined settings:</p>
+<blockquote>
+<div><p>Note: To analyze classifications at cue light states, we need to have
+analyzed our videos using the classifiers of interest. That means
+that <strong>before</strong> we analyze classifications at cue light states, we
+need a file representing each video of interest in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/csv/machine_results</span></code> directory. Click
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model">HERE</a>
+for documentation on how to analyze videos using previously created
+classifiers.</p>
+</div></blockquote>
+<a class="reference internal image-reference" href="tutorials_rst/img/feature_subsets/menu_6.png"><img alt="tutorials_rst/img/feature_subsets/menu_6.png" class="align-center" src="tutorials_rst/img/feature_subsets/menu_6.png" style="width: 1000px;" /></a>
+<p><strong>(1)</strong> Begin by selecting shich behavior you want statistics for in
+relation to the onsets and offsets of the cue lights(s). In this
+example, I only have one classifier named <code class="docutils literal notranslate"><span class="pre">Freezing</span></code>. I go ahead and
+tick the checkbox next to <code class="docutils literal notranslate"><span class="pre">Freezing</span></code>.</p>
+<p><strong>(2)</strong> Select a pre-cue window size (in milliseconds) in the
+<code class="docutils literal notranslate"><span class="pre">Pre-cue</span> <span class="pre">window</span> <span class="pre">(ms)</span></code> entry box. This is the time period <strong>before</strong>
+the onset of each each cue light which we want to compute behavior
+statistics for. In the screengrab above, I have typed <code class="docutils literal notranslate"><span class="pre">1500</span></code>, and
+SimBA will therefore calculate movement statistics in the 1.5s preceding
+each cue light onset.</p>
+<p><strong>(3)</strong> Select a post-cue window size (in milliseconds) in the
+<code class="docutils literal notranslate"><span class="pre">Post-cue</span> <span class="pre">window</span> <span class="pre">(ms)</span></code> entry box. This is the time period <strong>after</strong>
+the onset of each each cue light which we want to compute behavior
+statistics for. In the screengrab above, I have typed <code class="docutils literal notranslate"><span class="pre">1500</span></code>, and
+SimBA will therefore calculate movement statistics in the 1.5s proceding
+each cue light onset.</p>
+<p><strong>(7)</strong> Once all the fields have been filled in, we click the
+<code class="docutils literal notranslate"><span class="pre">Analyze</span> <span class="pre">classifier</span> <span class="pre">data</span></code> button. You can follow the progress in the
+main SimBA terminal window. Once complete, navigate to the
+<code class="docutils literal notranslate"><span class="pre">project_folder/logs</span></code> directory in your SimBA project. You should see
+a datetimed CSV file named something like this:
+<code class="docutils literal notranslate"><span class="pre">Cue_lights_clf_statistics_20220911120047.csv</span></code>. Opening this file you
+should see the different statistics for the different classifications
+within the different cue lights periods, e.g., something like the
+screengrab below. The last row for each classifier will tell you how
+much the animals engaged in the classified behavior outside the cue
+light time periods.</p>
+<a class="reference internal image-reference" href="tutorials_rst/img/feature_subsets/output_3.png"><img alt="tutorials_rst/img/feature_subsets/output_3.png" class="align-center" src="tutorials_rst/img/feature_subsets/output_3.png" style="width: 1000px;" /></a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Light analyses involve new and un-tested functions in SimBA. Should
+you encounter errors that are difficult to interpret, please reach out
+to us by opening a <a class="reference external" href="https://github.com/sgoldenlab/simba/issues">GitHub
+issue</a> or write to us on
+<a class="reference external" href="https://gitter.im/SimBA-Resource/community">Gitter</a>.</p>
+</div>
+<p>Author <a class="reference external" href="https://github.com/sronilsson">Simon N</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="classifier_validation.html" class="btn btn-neutral float-left" title="Post-classification Validation (detecting false-positives)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="multi_animal_pose.html" class="btn btn-neutral float-right" title="Using multi-animal pose-estimation data in SimBA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

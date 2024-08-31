@@ -10,7 +10,7 @@ import sys
 sys.path.insert(0, os.path.abspath('../'))
 
 project = 'SimBA'
-copyright = '2023, sronilsson'
+copyright = '2024, sronilsson'
 author = 'sronilsson'
 release = '0.0.1'
 
@@ -58,4 +58,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
-html_style = 'css/simba_theme.css'
+html_css_files = [
+    'css/simba_theme.css',  # Include your existing CSS file
+    'custom.css',  # Include your additional CSS file
+]

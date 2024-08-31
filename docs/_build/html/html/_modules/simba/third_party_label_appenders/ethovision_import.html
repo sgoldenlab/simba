@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.third_party_label_appenders.ethovision_import &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.third_party_label_appenders.ethovision_import</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.third_party_label_appenders.ethovision_import</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">simba.mixins.config_reader</span> <span class="kn">import</span> <span class="n">ConfigReader</span>
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="p">(</span><span class="n">check_if_filepath_list_is_empty</span><span class="p">,</span>
+                                <span class="n">check_that_column_exist</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.printing</span> <span class="kn">import</span> <span class="n">stdout_success</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="p">(</span><span class="n">get_fn_ext</span><span class="p">,</span> <span class="n">read_config_file</span><span class="p">,</span> <span class="n">read_df</span><span class="p">,</span>
+                                    <span class="n">write_df</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ImportEthovision"><a class="viewcode-back" href="../../../simba.third_party_label_appenders.html#simba.third_party_label_appenders.ethovision_import.ImportEthovision">[docs]</a><span class="k">class</span> <span class="nc">ImportEthovision</span><span class="p">(</span><span class="n">ConfigReader</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Append ETHOVISION human annotations onto featurized pose-estimation data.</span>
+<span class="sd">    Results are saved within the project_folder/csv/targets_inserted directory of</span>
+<span class="sd">    the SimBA project (as parquets&#39; or CSVs).</span>
+
+<span class="sd">    :param str config_path: path to SimBA project config file in Configparser format</span>
+<span class="sd">    :param str data_dir: path to folder holding ETHOVISION data files is XLSX or XLS format</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">       `Third-party import GitHub tutorial &lt;https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md&gt;`__.</span>
+<span class="sd">       `Example of expected ETHOVISION file &lt;https://github.com/sgoldenlab/simba/blob/master/misc/ethovision_example.xlsx&gt;`__.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    -----</span>
+<span class="sd">    &gt;&gt;&gt; ethovision_importer = ImportEthovision(config_path=&quot;MyConfigPath&quot;, data_dir=&quot;MyEthovisionFolderPath&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; ethovision_importer.run()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Appending ETHOVISION annotations...&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">read_config_file</span><span class="p">(</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files_found</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">data_dir</span> <span class="o">+</span> <span class="s2">&quot;/*.xlsx&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span>
+            <span class="n">data_dir</span> <span class="o">+</span> <span class="s2">&quot;/*.xls&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files_found</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files_found</span> <span class="k">if</span> <span class="s2">&quot;~$&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span><span class="p">]</span>
+        <span class="n">check_if_filepath_list_is_empty</span><span class="p">(</span>
+            <span class="n">filepaths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found</span><span class="p">,</span>
+            <span class="n">error_msg</span><span class="o">=</span><span class="s2">&quot;SIMBA ERROR: No ETHOVISION xlsx or xls files found in </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">data_dir</span><span class="p">)</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__read_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files_found</span><span class="p">:</span>
+            <span class="n">ethovision_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">manual_scoring_sheet_name</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ethovision_df</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">ethovision_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_excel</span><span class="p">(</span>
+                <span class="n">file_path</span><span class="p">,</span>
+                <span class="n">sheet_name</span><span class="o">=</span><span class="n">manual_scoring_sheet_name</span><span class="p">,</span>
+                <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                <span class="n">header</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">video_path</span> <span class="o">=</span> <span class="n">ethovision_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">&quot;Video file&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s1">&#39;SIMBA ERROR: &quot;Video file&quot; row does not exist in the sheet named </span><span class="si">{}</span><span class="s1"> in file </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">manual_scoring_sheet_name</span><span class="p">,</span> <span class="n">file_path</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;SIMBA ERROR: &quot;Video file&quot; does not exist in the sheet named </span><span class="si">{</span><span class="n">manual_scoring_sheet_name</span><span class="si">}</span><span class="s1"> in file </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">video_path</span><span class="p">):</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="s1">&#39;SIMBA ERROR: &quot;Video file&quot; row does not have a value in the sheet named </span><span class="si">{}</span><span class="s1"> in file </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">manual_scoring_sheet_name</span><span class="p">,</span> <span class="n">file_path</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s1">&#39;SIMBA ERROR: &quot;Video file&quot; row does not have a value in the sheet named </span><span class="si">{</span><span class="n">manual_scoring_sheet_name</span><span class="si">}</span><span class="s1"> in file </span><span class="si">{</span><span class="n">file_path</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+            <span class="n">dir_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">video_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">processed_videos</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">video_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">features_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">features_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_name</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Processing annotations for video &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">fps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_video_info</span><span class="p">(</span><span class="n">video_name</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">))</span>
+            <span class="n">header_lines_n</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">ethovision_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s2">&quot;Number of header lines:&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="mi">2</span>
+            <span class="p">)</span>
+            <span class="n">ethovision_df</span> <span class="o">=</span> <span class="n">ethovision_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">header_lines_n</span><span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">ethovision_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ethovision_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">ethovision_df</span> <span class="o">=</span> <span class="n">ethovision_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clf_dict</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">check_that_column_exist</span><span class="p">(</span>
+                <span class="n">df</span><span class="o">=</span><span class="n">ethovision_df</span><span class="p">,</span> <span class="n">column_name</span><span class="o">=</span><span class="s2">&quot;Behavior&quot;</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="n">file_path</span>
+            <span class="p">)</span>
+            <span class="n">check_that_column_exist</span><span class="p">(</span>
+                <span class="n">df</span><span class="o">=</span><span class="n">ethovision_df</span><span class="p">,</span> <span class="n">column_name</span><span class="o">=</span><span class="s2">&quot;Recording time&quot;</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="n">file_path</span>
+            <span class="p">)</span>
+            <span class="n">check_that_column_exist</span><span class="p">(</span>
+                <span class="n">df</span><span class="o">=</span><span class="n">ethovision_df</span><span class="p">,</span> <span class="n">column_name</span><span class="o">=</span><span class="s2">&quot;Event&quot;</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="n">file_path</span>
+            <span class="p">)</span>
+            <span class="n">non_clf_behaviors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="nb">set</span><span class="p">(</span><span class="n">ethovision_df</span><span class="p">[</span><span class="s2">&quot;Behavior&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clf_names</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">non_clf_behaviors</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">non_clf_behaviors</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">!=</span> <span class="s2">&quot;start&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_clf_behaviors</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;SIMBA WARNING: The ETHOVISION annotation file for video </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> contains annotations for </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">non_clf_behaviors</span><span class="p">))</span><span class="si">}</span><span class="s2"> behaviors&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; which is NOT defined in the SimBA project: </span><span class="si">{</span><span class="n">non_clf_behaviors</span><span class="si">}</span><span class="s2"> and will be SKIPPED.&quot;</span>
+                <span class="p">)</span>
+            <span class="k">for</span> <span class="n">clf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clf_names</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">clf_dict</span><span class="p">[</span><span class="n">clf</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">clf_data</span> <span class="o">=</span> <span class="n">ethovision_df</span><span class="p">[</span><span class="n">ethovision_df</span><span class="p">[</span><span class="s2">&quot;Behavior&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">clf</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">clf_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;SIMBA WARNING: ZERO ETHOVISION annotations detected for SimBA classifier named </span><span class="si">{</span><span class="n">clf</span><span class="si">}</span><span class="s2"> for video </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="si">}</span><span class="s2">. &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;SimBA will label that the behavior as ABSENT in the entire </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> video.&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">starts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                    <span class="n">clf_data</span><span class="p">[</span><span class="s2">&quot;Recording time&quot;</span><span class="p">][</span><span class="n">clf_data</span><span class="p">[</span><span class="s2">&quot;Event&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;state start&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="n">ends</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                    <span class="n">clf_data</span><span class="p">[</span><span class="s2">&quot;Recording time&quot;</span><span class="p">][</span><span class="n">clf_data</span><span class="p">[</span><span class="s2">&quot;Event&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;state stop&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">clf_dict</span><span class="p">[</span><span class="n">clf</span><span class="p">][</span><span class="s2">&quot;start_frames&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">fps</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">starts</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">clf_dict</span><span class="p">[</span><span class="n">clf</span><span class="p">][</span><span class="s2">&quot;end_frames&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">fps</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ends</span><span class="p">]</span>
+                <span class="n">frame_list</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">cnt</span><span class="p">,</span> <span class="n">start</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clf_dict</span><span class="p">[</span><span class="n">clf</span><span class="p">][</span><span class="s2">&quot;start_frames&quot;</span><span class="p">]):</span>
+                    <span class="n">frame_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                        <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">clf_dict</span><span class="p">[</span><span class="n">clf</span><span class="p">][</span><span class="s2">&quot;end_frames&quot;</span><span class="p">][</span><span class="n">cnt</span><span class="p">]))</span>
+                    <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">clf_dict</span><span class="p">[</span><span class="n">clf</span><span class="p">][</span><span class="s2">&quot;frames&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame_list</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__insert_annotations</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__insert_annotations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">features_df</span> <span class="o">=</span> <span class="n">read_df</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_file_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">clf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clf_names</span><span class="p">:</span>
+            <span class="n">annotation_mismatch</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clf_dict</span><span class="p">[</span><span class="n">clf</span><span class="p">][</span><span class="s2">&quot;frames&quot;</span><span class="p">])</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_df</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">annotation_mismatch</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;SIMBA ETHOVISION WARNING: SimBA found ETHOVISION annotations for behavior </span><span class="si">{</span><span class="n">clf</span><span class="si">}</span><span class="s2"> in video &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> that are annotated to occur at times which is not present in the &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;video data you imported into SIMBA. The video you imported to SimBA has </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_df</span><span class="o">.</span><span class="n">index</span><span class="p">))</span><span class="si">}</span><span class="s2"> frames. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;However, in ETHOVISION, you have annotated </span><span class="si">{</span><span class="n">clf</span><span class="si">}</span><span class="s2"> to happen at frame number </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">annotation_mismatch</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;These ambiguous annotations occur in </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">annotation_mismatch</span><span class="p">))</span><span class="si">}</span><span class="s2"> different frames for video </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> that SimBA will **remove** by default. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Please make sure you imported the same video as you annotated in ETHOVISION into SimBA and the video is registered with the correct frame rate.&quot;</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">features_df</span><span class="p">[</span><span class="n">clf</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">features_df</span><span class="p">[</span><span class="n">clf</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">features_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clf_dict</span><span class="p">[</span><span class="n">clf</span><span class="p">][</span><span class="s2">&quot;frames&quot;</span><span class="p">]),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__save_data</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__save_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">save_file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">targets_folder</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_name</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span>
+        <span class="p">)</span>
+        <span class="n">write_df</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">,</span> <span class="n">save_file_name</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Added Ethovision annotations for video </span><span class="si">{}</span><span class="s2"> ... &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processed_videos</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__read_files</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">()</span>
+        <span class="n">stdout_success</span><span class="p">(</span>
+            <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;All Ethovision annotations added. Files with annotation are located in the project_folder/csv/targets_inserted directory&quot;</span><span class="p">,</span>
+            <span class="n">elapsed_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">elapsed_time_str</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<span class="c1"># test = ImportEthovision(config_path= r&quot;/Users/simon/Desktop/envs/simba_dev/tests/test_data/import_tests/project_folder/project_config.ini&quot;, data_dir=r&#39;/Users/simon/Desktop/envs/simba_dev/tests/test_data/import_tests/ethovision_data&#39;)</span>
+<span class="c1"># test = ImportEthovision(config_path= r&quot;/Users/simon/Desktop/envs/simba_dev/test/data/test_projects/two_c57/project_folder/project_config.ini&quot;, data_dir=&#39;/Users/simon/Desktop/envs/simba_dev/test/data/test_projects/two_c57/ethovision_annotations&#39;)</span>
+<span class="c1"># test.run()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

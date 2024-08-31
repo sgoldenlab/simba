@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Outlier correction tools &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Plotting / visualization" href="simba.plotting.html" />
+    <link rel="prev" title="Labelling" href="simba.labelling.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SimBA
+              <img src="_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="api.html">API Reference</a></li>
+      <li class="breadcrumb-item active">Outlier correction tools</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/simba.outlier_tools.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="outlier-correction-tools">
+<h1>Outlier correction tools<a class="headerlink" href="#outlier-correction-tools" title="Permalink to this heading"></a></h1>
+<section id="module-simba.outlier_tools.outlier_corrector_location">
+<span id="location-outlier-methods"></span><h2>Location outlier methods<a class="headerlink" href="#module-simba.outlier_tools.outlier_corrector_location" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.outlier_tools.outlier_corrector_location.OutlierCorrecterLocation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.outlier_tools.outlier_corrector_location.</span></span><span class="sig-name descname"><span class="pre">OutlierCorrecterLocation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/outlier_tools/outlier_corrector_location.html#OutlierCorrecterLocation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.outlier_tools.outlier_corrector_location.OutlierCorrecterLocation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a></p>
+<p>Detect and amend outliers in pose-estimation data based in the location of the body-parts
+in the current frame relative to the location of the body-part in the preceding frame using heuristic rules.</p>
+<p>Uses heuristic rules critera is grabbed from the SimBA project project_config.ini under the [Outlier settings] header.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf">Documentation</a>.</p>
+</div>
+<a class="reference internal image-reference" href="_images/location_outlier.png"><img alt="_images/location_outlier.png" class="align-center" src="_images/location_outlier.png" style="width: 500px;" /></a>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><em>os.PathLike</em></a><em>]</em>) – path to SimBA project config file in Configparser format</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">OutlierCorrecterLocation</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;MyProjectConfig&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.outlier_tools.outlier_corrector_location.OutlierCorrecterLocation.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/outlier_tools/outlier_corrector_location.html#OutlierCorrecterLocation.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.outlier_tools.outlier_corrector_location.OutlierCorrecterLocation.run" title="Permalink to this definition"></a></dt>
+<dd><p>Runs outlier detection and correction. Results are stored in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/csv/outlier_corrected_movement_location</span></code> directory of the SimBA project.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-simba.outlier_tools.outlier_corrector_movement">
+<span id="movement-outlier-methods"></span><h2>Movement outlier methods<a class="headerlink" href="#module-simba.outlier_tools.outlier_corrector_movement" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.outlier_tools.outlier_corrector_movement.OutlierCorrecterMovement">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.outlier_tools.outlier_corrector_movement.</span></span><span class="sig-name descname"><span class="pre">OutlierCorrecterMovement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/outlier_tools/outlier_corrector_movement.html#OutlierCorrecterMovement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.outlier_tools.outlier_corrector_movement.OutlierCorrecterMovement" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a>, <a class="reference internal" href="simba.mixins.html#simba.mixins.feature_extraction_mixin.FeatureExtractionMixin" title="simba.mixins.feature_extraction_mixin.FeatureExtractionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureExtractionMixin</span></code></a></p>
+<p>Detect and ammend outliers in pose-estimation data based on movement lenghth (Euclidean) of the body-parts
+in the current frame from preceeding frame. Uses critera stored in the SimBA project project_config.ini
+under the [Outlier settings] header.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – path to SimBA project config file in Configparser format</p>
+</dd>
+</dl>
+<a class="reference internal image-reference" href="_images/movement_outlier.png"><img alt="_images/movement_outlier.png" class="align-center" src="_images/movement_outlier.png" style="width: 500px;" /></a>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf">Outlier correction documentation</a>.</p>
+</div>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">outlier_correcter_movement</span> <span class="o">=</span> <span class="n">OutlierCorrecterMovement</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;MyProjectConfig&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">outlier_correcter_movement</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.outlier_tools.outlier_corrector_movement.OutlierCorrecterMovement.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/outlier_tools/outlier_corrector_movement.html#OutlierCorrecterMovement.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.outlier_tools.outlier_corrector_movement.OutlierCorrecterMovement.run" title="Permalink to this definition"></a></dt>
+<dd><p>Runs outlier detection and correction. Results are stored in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/csv/outlier_corrected_movement</span></code> directory of the SimBA project.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-simba.outlier_tools.outlier_corrector_movement_advanced">
+<span id="advanced-movement-outlier-correction"></span><h2>Advanced movement outlier correction<a class="headerlink" href="#module-simba.outlier_tools.outlier_corrector_movement_advanced" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.outlier_tools.outlier_corrector_movement_advanced.OutlierCorrecterMovementAdvanced">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.outlier_tools.outlier_corrector_movement_advanced.</span></span><span class="sig-name descname"><span class="pre">OutlierCorrecterMovementAdvanced</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">criterion_body_parts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'animal'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'body-part'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">typing_extensions.Literal</span><span class="p"><span class="pre">[</span></span><span class="s"><span class="pre">'mean'</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="s"><span class="pre">'median'</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/outlier_tools/outlier_corrector_movement_advanced.html#OutlierCorrecterMovementAdvanced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.outlier_tools.outlier_corrector_movement_advanced.OutlierCorrecterMovementAdvanced" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a>, <a class="reference internal" href="simba.mixins.html#simba.mixins.feature_extraction_mixin.FeatureExtractionMixin" title="simba.mixins.feature_extraction_mixin.FeatureExtractionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureExtractionMixin</span></code></a></p>
+<p>Performs outlier correction that allows different heuristic outlier criteria for different animals or body-parts.
+For example, correct some outlier body-parts with a movement heuristic criteria of 2x above the mean movement,
+and other body-parts with a heuristic critera of 1.5x above the mean movement.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See <a class="reference external" href="https://simba-uw-tf-dev.readthedocs.io/en/latest/nb/advanced_outlier_correction.html">notebook</a>. for example use-case.</p>
+</div>
+<a class="reference internal image-reference" href="_images/movement_outlier.png"><img alt="_images/movement_outlier.png" class="align-center" src="_images/movement_outlier.png" style="width: 400px;" /></a>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – path to SimBA project config file in Configparser format.</p></li>
+<li><p><strong>input_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Directory containing input files. E.g., <cite>project_folder/csv/input_csv</cite> directory.</p></li>
+<li><p><strong>type</strong> (<em>Literal</em><em>[</em><em>'animal'</em><em>, </em><em>'body-part'</em><em>]</em>) – If the rules are defined on animal or body-part level. E.g., If one heuristic rule per animal then <cite>animal</cite>. If one heurstic rule prr body-part then <cite>body-parts</cite></p></li>
+<li><p><strong>agg_method</strong> (<em>Literal</em><em>[</em><em>'mean'</em><em>, </em><em>'median'</em><em>]</em>) – If to use the mean or median to compute criterion.</p></li>
+<li><p><strong>criterion_body_parts</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – The body-parts used to calculate the size of the animals.</p></li>
+<li><p><strong>settings</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – The heuristic multiplier rules to use for each body part or animal.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Example<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">settings</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Simon&#39;</span><span class="p">:</span> <span class="mf">1.1</span><span class="p">,</span> <span class="s1">&#39;JJ&#39;</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">criterion_body_parts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Simon&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Nose_1&#39;</span><span class="p">,</span> <span class="s1">&#39;Tail_base_1&#39;</span><span class="p">],</span> <span class="s1">&#39;JJ&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Nose_2&#39;</span><span class="p">,</span> <span class="s1">&#39;Tail_base_2&#39;</span><span class="p">]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">outlier_corrector</span> <span class="o">=</span> <span class="n">OutlierCorrecterMovementAdvanced</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini&#39;</span><span class="p">,</span> <span class="n">input_dir</span><span class="o">=</span><span class="s1">&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/input_csv&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;animal&#39;</span><span class="p">,</span> <span class="n">agg_method</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">criterion_body_parts</span><span class="o">=</span><span class="n">criterion_body_parts</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">outlier_corrector</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">settings</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Simon&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Ear_left_1&#39;</span><span class="p">:</span> <span class="mf">1.1</span><span class="p">,</span> <span class="s1">&#39;Ear_right_1&#39;</span><span class="p">:</span> <span class="mf">5.1</span><span class="p">,</span> <span class="s1">&#39;Nose_1&#39;</span><span class="p">:</span> <span class="mf">2.1</span><span class="p">,</span> <span class="s1">&#39;Center_1&#39;</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="s1">&#39;Lat_left_1&#39;</span><span class="p">:</span> <span class="mf">3.1</span><span class="p">,</span> <span class="s1">&#39;Lat_right_1&#39;</span><span class="p">:</span> <span class="mf">1.9</span><span class="p">,</span> <span class="s1">&#39;Tail_base_1&#39;</span><span class="p">:</span> <span class="mf">2.3</span><span class="p">,</span> <span class="s1">&#39;Tail_end_1&#39;</span><span class="p">:</span> <span class="mf">1.4</span><span class="p">},</span> <span class="s1">&#39;JJ&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Ear_left_2&#39;</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">,</span> <span class="s1">&#39;Ear_right_2&#39;</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">,</span> <span class="s1">&#39;Nose_2&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Center_2&#39;</span><span class="p">:</span> <span class="mf">4.1</span><span class="p">,</span> <span class="s1">&#39;Lat_left_2&#39;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s1">&#39;Lat_right_2&#39;</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">,</span> <span class="s1">&#39;Tail_base_2&#39;</span><span class="p">:</span> <span class="mf">1.6</span><span class="p">,</span> <span class="s1">&#39;Tail_end_2&#39;</span><span class="p">:</span> <span class="mf">2.2</span><span class="p">}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">outlier_corrector</span> <span class="o">=</span> <span class="n">OutlierCorrecterMovementAdvanced</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini&#39;</span><span class="p">,</span> <span class="n">input_dir</span><span class="o">=</span><span class="s1">&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/input_csv&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;body-part&#39;</span><span class="p">,</span> <span class="n">agg_method</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">criterion_body_parts</span><span class="o">=</span><span class="n">criterion_body_parts</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-simba.outlier_tools.outlier_corrector_location_advanced">
+<span id="advanced-location-outlier-correction"></span><h2>Advanced location outlier correction<a class="headerlink" href="#module-simba.outlier_tools.outlier_corrector_location_advanced" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.outlier_tools.outlier_corrector_location_advanced.OutlierCorrecterLocationAdvanced">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.outlier_tools.outlier_corrector_location_advanced.</span></span><span class="sig-name descname"><span class="pre">OutlierCorrecterLocationAdvanced</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">agg_method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">criterion_body_parts</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">settings</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/outlier_tools/outlier_corrector_location_advanced.html#OutlierCorrecterLocationAdvanced"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.outlier_tools.outlier_corrector_location_advanced.OutlierCorrecterLocationAdvanced" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a>, <a class="reference internal" href="simba.mixins.html#simba.mixins.feature_extraction_mixin.FeatureExtractionMixin" title="simba.mixins.feature_extraction_mixin.FeatureExtractionMixin"><code class="xref py py-class docutils literal notranslate"><span class="pre">FeatureExtractionMixin</span></code></a></p>
+<p>Performs location outlier correction that allows different heuristic outlier criteria for different animals or body-parts.
+For example, correct some outlier body-parts with a location heuristic criteria of 4x above the mean movement,
+and other body-parts with a heuristic critera of 2x above the mean movement.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>See <a class="reference external" href="https://simba-uw-tf-dev.readthedocs.io/en/latest/nb/advanced_outlier_correction.html">notebook</a>. for example use-case.</p>
+</div>
+<a class="reference internal image-reference" href="_images/location_outlier.png"><img alt="_images/location_outlier.png" class="align-center" src="_images/location_outlier.png" style="width: 400px;" /></a>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – path to SimBA project config file in Configparser format.</p></li>
+<li><p><strong>input_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a>) – Directory containing input files. E.g., <cite>project_folder/csv/input_csv</cite> directory.</p></li>
+<li><p><strong>type</strong> (<em>Literal</em><em>[</em><em>'animal'</em><em>, </em><em>'body-part'</em><em>]</em>) – If the rules are defined on animal or body-part level. E.g., If one heuristic rule per animal then <cite>animal</cite>. If one heurstic rule prr body-part then <cite>body-parts</cite></p></li>
+<li><p><strong>agg_method</strong> (<em>Literal</em><em>[</em><em>'mean'</em><em>, </em><em>'median'</em><em>]</em>) – If to use the mean or median to compute criterion.</p></li>
+<li><p><strong>criterion_body_parts</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – The body-parts used to calculate the size of the animals.</p></li>
+<li><p><strong>settings</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><em>dict</em></a>) – The heuristic multiplier rules to use for each body part or animal.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Example<span class="colon">:</span></dt>
+<dd class="field-even"><p></p></dd>
+</dl>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">settings</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Simon&#39;</span><span class="p">:</span> <span class="mf">1.1</span><span class="p">,</span> <span class="s1">&#39;JJ&#39;</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">criterion_body_parts</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Simon&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Nose_1&#39;</span><span class="p">,</span> <span class="s1">&#39;Tail_base_1&#39;</span><span class="p">],</span> <span class="s1">&#39;JJ&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Nose_2&#39;</span><span class="p">,</span> <span class="s1">&#39;Tail_base_2&#39;</span><span class="p">]}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">outlier_corrector</span> <span class="o">=</span> <span class="n">OutlierCorrecterLocationAdvanced</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini&#39;</span><span class="p">,</span> <span class="n">input_dir</span><span class="o">=</span><span class="s1">&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/input_csv&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;animal&#39;</span><span class="p">,</span> <span class="n">agg_method</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">criterion_body_parts</span><span class="o">=</span><span class="n">criterion_body_parts</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">outlier_corrector</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">settings</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Simon&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Ear_left_1&#39;</span><span class="p">:</span> <span class="mf">1.1</span><span class="p">,</span> <span class="s1">&#39;Ear_right_1&#39;</span><span class="p">:</span> <span class="mf">5.1</span><span class="p">,</span> <span class="s1">&#39;Nose_1&#39;</span><span class="p">:</span> <span class="mf">2.1</span><span class="p">,</span> <span class="s1">&#39;Center_1&#39;</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span> <span class="s1">&#39;Lat_left_1&#39;</span><span class="p">:</span> <span class="mf">3.1</span><span class="p">,</span> <span class="s1">&#39;Lat_right_1&#39;</span><span class="p">:</span> <span class="mf">1.9</span><span class="p">,</span> <span class="s1">&#39;Tail_base_1&#39;</span><span class="p">:</span> <span class="mf">2.3</span><span class="p">,</span> <span class="s1">&#39;Tail_end_1&#39;</span><span class="p">:</span> <span class="mf">1.4</span><span class="p">},</span> <span class="s1">&#39;JJ&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;Ear_left_2&#39;</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">,</span> <span class="s1">&#39;Ear_right_2&#39;</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">,</span> <span class="s1">&#39;Nose_2&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Center_2&#39;</span><span class="p">:</span> <span class="mf">4.1</span><span class="p">,</span> <span class="s1">&#39;Lat_left_2&#39;</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s1">&#39;Lat_right_2&#39;</span><span class="p">:</span> <span class="mf">1.2</span><span class="p">,</span> <span class="s1">&#39;Tail_base_2&#39;</span><span class="p">:</span> <span class="mf">1.6</span><span class="p">,</span> <span class="s1">&#39;Tail_end_2&#39;</span><span class="p">:</span> <span class="mf">2.2</span><span class="p">}}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">outlier_corrector</span> <span class="o">=</span> <span class="n">OutlierCorrecterLocationAdvanced</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini&#39;</span><span class="p">,</span> <span class="n">input_dir</span><span class="o">=</span><span class="s1">&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/input_csv&#39;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">&#39;body-part&#39;</span><span class="p">,</span> <span class="n">agg_method</span><span class="o">=</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">criterion_body_parts</span><span class="o">=</span><span class="n">criterion_body_parts</span><span class="p">,</span> <span class="n">settings</span><span class="o">=</span><span class="n">settings</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</section>
+<section id="module-simba.outlier_tools.skip_outlier_correction">
+<span id="skipping-outlier-correction"></span><h2>Skipping outlier correction<a class="headerlink" href="#module-simba.outlier_tools.skip_outlier_correction" title="Permalink to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="simba.outlier_tools.skip_outlier_correction.OutlierCorrectionSkipper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">simba.outlier_tools.skip_outlier_correction.</span></span><span class="sig-name descname"><span class="pre">OutlierCorrectionSkipper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(in Python v3.12)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><span class="pre">PathLike</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/outlier_tools/skip_outlier_correction.html#OutlierCorrectionSkipper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.outlier_tools.skip_outlier_correction.OutlierCorrectionSkipper" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="simba.mixins.html#simba.mixins.config_reader.ConfigReader" title="simba.mixins.config_reader.ConfigReader"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConfigReader</span></code></a></p>
+<p>Skip outlier correction in SimBA projects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config_path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.12)"><em>os.PathLike</em></a><em>]</em>) – path to SimBA project config file in Configparser format</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">_</span> <span class="o">=</span> <span class="n">OutlierCorrectionSkipper</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s1">&#39;MyProjectConfig&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="simba.outlier_tools.skip_outlier_correction.OutlierCorrectionSkipper.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/simba/outlier_tools/skip_outlier_correction.html#OutlierCorrectionSkipper.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#simba.outlier_tools.skip_outlier_correction.OutlierCorrectionSkipper.run" title="Permalink to this definition"></a></dt>
+<dd><p>Standardizes pose-estimation data (i.e., headers) from different pose-estimation packages.
+Results are stored in the project_folder/csv/outlier_corrected_movement_location` directory of
+the SimBA project.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="simba.labelling.html" class="btn btn-neutral float-left" title="Labelling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="simba.plotting.html" class="btn btn-neutral float-right" title="Plotting / visualization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

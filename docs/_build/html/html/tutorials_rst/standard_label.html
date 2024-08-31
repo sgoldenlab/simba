@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SimBA Behavioral Annotator GUI &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="SimBA behavioral Annotator GUI (ADVANCED LABELLING)" href="advanced_label.html" />
+    <link rel="prev" title="Labelling" href="../labelling.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SimBA
+              <img src="../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../labelling.html">Labelling</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">SimBA Behavioral Annotator GUI</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#step-1-loading-project-config-file">Step 1. Loading project_config file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-2-opening-the-labelling-behavior-interface">Step 2. Opening the labelling behavior interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-3-using-the-labelling-behavior-interface">Step 3. Using the labelling behavior interface</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#continouing-previously-started-annotations">CONTINOUING PREVIOUSLY STARTED ANNOTATIONS</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#notes-on-the-different-forms-of-behavior-labelling-advanced-vs-psudo-vs-standard-labelling">NOTES ON THE DIFFERENT FORMS OF BEHAVIOR LABELLING (ADVANCED vs. PSUDO vs. ‘STANDARD’ LABELLING)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#standard-labelling">‘STANDARD’ LABELLING</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#psudo-labelling">‘PSUDO’ LABELLING</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#advanced-labelling">‘ADVANCED’ LABELLING</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#miscellaneous-labelling-tools-in-simba">MISCELLANEOUS LABELLING TOOLS IN SIMBA</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_label.html">SimBA behavioral Annotator GUI (ADVANCED LABELLING)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boris.html">Exporting BORIS annotations for SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="third_party_annotations.html">Third-part annotations in SimBA</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../labelling.html">Labelling</a></li>
+      <li class="breadcrumb-item active">SimBA Behavioral Annotator GUI</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_rst/standard_label.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="simba-behavioral-annotator-gui">
+<h1>SimBA Behavioral Annotator GUI<a class="headerlink" href="#simba-behavioral-annotator-gui" title="Permalink to this heading"></a></h1>
+<p>The SimBA behavioural annotator GUI is used to label (annotate) frames
+in videos that contain behaviors of interest. SimBA appends the
+behavioral annotations directly to the pose-estimation tracking data to
+build supervised machine learning predictive classifiers of behaviors of
+interest. Specifically, this GUI integrates two additional consoles with
+the main SimBA console: (1) a video player and (2) a frame viewer. The
+video player and frame viewer are synced, such that pausing or starting
+the video will advance the frame viewer to the identical frame that the
+video was paused or started at. The frame viewer is then used to
+annotate when behaviors of interest are present or absent within the
+given frame. Such annotations can be flexibily annotated from single to
+numerous frames using the annotation interface. Please see below for
+details for how to best use the annotator in your specific use case.</p>
+<p>Note that SimBA performs similar functions such as the open-source
+<a class="reference external" href="http://www.jwatcher.ucla.edu/">JWatcher</a> or commercial <a class="reference external" href="https://www.noldus.com/human-behavior-research/products/the-observer-xt">Noldus
+Observer</a>
+systems, with the exception that SimBA automates the backend integration
+of behavioral annotation with creating predictive classifiers. If you
+already have such annotations stored in alterantive file formats, like
+<a class="reference external" href="http://www.jwatcher.ucla.edu/">JWatcher</a> or <a class="reference external" href="https://www.noldus.com/human-behavior-research/products/the-observer-xt">Noldus
+Observer</a>,
+they can be appended directly to the tracking data and no behavioral
+annotations needs to be done in SimBA. To append annotations created in
+alternative third-party software, check out <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md">THIS
+TUTORIAL</a>.
+The <a class="reference external" href="http://www.vision.caltech.edu/Video_Datasets/CRIM13/CRIM13/Main.html">Crim13
+dataset</a>
+was annotated using <a class="reference external" href="https://github.com/pdollar/toolbox">Piotr’s Matlab
+Toolbox</a> and we appended the
+annotations to the tracking data using a version of <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/Caltech_2_DLC.py">this
+script</a>.</p>
+<p>If you already have annotated videos created with these alternative
+tools, or any other behavioral annotator, and would like to use them to
+create predictive classifiers, please let us know as we would like to
+write scripts that could process these data for SimBA. If you have
+created such scripts yourself, please consider contributing them to the
+community! If you have any issues using the SimBA annotation interface,
+please open a <a class="reference external" href="https://github.com/sgoldenlab/simba/issues">GitHub
+issue</a> or reach out to us
+on our <a class="reference external" href="https://gitter.im/SimBA-Resource/community">Gitter</a> support
+channel. <strong>We will provide support in either scenario</strong>.</p>
+<section id="step-1-loading-project-config-file">
+<h2>Step 1. Loading project_config file<a class="headerlink" href="#step-1-loading-project-config-file" title="Permalink to this heading"></a></h2>
+<p>In the main SimBA menu, click on
+<code class="docutils literal notranslate"><span class="pre">File</span> <span class="pre">&gt;</span> <span class="pre">Load</span> <span class="pre">Project</span> <span class="pre">&gt;</span> <span class="pre">Load</span> <span class="pre">Project.ini</span> <span class="pre">&gt;</span> <span class="pre">Browse</span> <span class="pre">File</span></code> and select the
+config file (project_config.ini) representing your SimBA project. This
+step <strong>must</strong> be done before proceeding to the next step.</p>
+</section>
+<section id="step-2-opening-the-labelling-behavior-interface">
+<h2>Step 2. Opening the labelling behavior interface<a class="headerlink" href="#step-2-opening-the-labelling-behavior-interface" title="Permalink to this heading"></a></h2>
+<p>Once your project is loaded, click on the [Label Behavior] tab and you
+should see the below four sub-menus (Note: I’m writing this document on
+a Mac, if you’re running SimBA on a PC or Linux, the aestetics might be
+slightly different):</p>
+<a class="reference internal image-reference" href="../_images/menu_11.png"><img alt="../_images/menu_11.png" class="align-center" src="../_images/menu_11.png" style="width: 1000px;" /></a>
+<p>These four different sub-menus represent four different ways of getting
+human annotations appended to your videos. The differences between the
+different menus, and when to use them, are detailed below. In brief, the
+main difference between the methods is how <strong>non</strong> user-annoated frames
+are going to be treated.</p>
+<ul class="simple">
+<li><ol class="arabic simple">
+<li><p><strong>LABEL BEHAVIOR</strong>: When selecting a new video to annotate, SimBA
+assumes that the behavior is absent in any given frame unless
+indicated by the user. In other words, the default annotation is
+that the behavior(s) are <strong>not</strong> present in the frame.</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="2">
+<li><p><strong>PSEUDO-LABELLING</strong>: When selecting a new video to annotate,
+SimBA uses prior machine classifications as the default
+annotation. Thus, any frame with a classification probability
+<em>above</em> the user-specified threshold will have <strong>behavior
+present</strong> as the default value. Conversely, any frame with a
+classification probability <em>below</em> or at the user-specified
+threshold will have <strong>behavior absent</strong> as the default value.
+Pseudo-labelling requires you to <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data">first analyze the video using
+behavioral
+classifiers</a>.</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="3">
+<li><p><strong>ADVANCED LABEL BEHAVIOR</strong>. When selecting a new video to
+annotate using advanced labelling, SimBA <strong>has no default
+annotatation for any frame</strong>. In other words, the user is
+required annotate each frame as either behavior-absent or
+behavior-present. Only frames with behavior labelled as either
+present or absent will be used when creating the machine learning
+model(s). You can read more about advanced labelling
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/advanced_labelling.md">HERE</a>.</p></li>
+</ol>
+</li>
+<li><ol class="arabic simple" start="4">
+<li><p><strong>IMPORT THIRD-PARTY BEHAVIOR ANNOTATIONS</strong>. Use these menus to
+import annotations created in other software tools (without
+performing any annotation work in SimBA. Click
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md">HERE</a>
+to learn more about how to import annotations from third-party
+software.</p></li>
+</ol>
+</li>
+</ul>
+<p>Regardless of which method you choose (standard <code class="docutils literal notranslate"><span class="pre">LABEL</span> <span class="pre">BEHAVIOR</span></code>,
+<code class="docutils literal notranslate"><span class="pre">PSEUDO-LABELLING</span></code>, or <code class="docutils literal notranslate"><span class="pre">ADVANCED</span> <span class="pre">LABEL</span> <span class="pre">BEHAVIOR</span></code>), the SimBA
+behavior annotation interface, its buttons and functions, are very
+similar. The procedure <strong>is</strong> identical when using standard
+<code class="docutils literal notranslate"><span class="pre">LABEL</span> <span class="pre">BEHAVIOR</span></code>, <code class="docutils literal notranslate"><span class="pre">PSEUDO-LABELLING</span></code>, while differing slighly when
+using the <code class="docutils literal notranslate"><span class="pre">ADVANCED</span> <span class="pre">LABEL</span> <span class="pre">BEHAVIOR</span></code> interface. If you are intrested in
+the using the <code class="docutils literal notranslate"><span class="pre">ADVANCED</span> <span class="pre">LABEL</span> <span class="pre">BEHAVIOR</span></code> tool, I advice to first get
+familiar with the standard <code class="docutils literal notranslate"><span class="pre">LABEL</span> <span class="pre">BEHAVIOR</span></code> interface, before
+proceeding to the <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/advanced_labelling.md">ADVANCED LABEL BEHAVIOR
+tutorial</a>.</p>
+<p>In this tutorial, we will click on
+<code class="docutils literal notranslate"><span class="pre">Select</span> <span class="pre">video</span> <span class="pre">(create</span> <span class="pre">new</span> <span class="pre">video</span> <span class="pre">annotation)</span></code> in the <code class="docutils literal notranslate"><span class="pre">LABEL</span> <span class="pre">BEHAVIOR</span></code>
+sub-menu. This will bring up a file selection dialog menu. We navigate
+to the <code class="docutils literal notranslate"><span class="pre">project_folder/videos</span></code> directory and select a video we wich we
+want to annotate. In this tutorial, I am selecting <code class="docutils literal notranslate"><span class="pre">BtWGANP.mp4</span></code> and
+click <code class="docutils literal notranslate"><span class="pre">Open</span></code>:</p>
+<a class="reference internal image-reference" href="../_images/annotator_11.png"><img alt="../_images/annotator_11.png" class="align-center" src="../_images/annotator_11.png" style="width: 1000px;" /></a>
+</section>
+<section id="step-3-using-the-labelling-behavior-interface">
+<h2>Step 3. Using the labelling behavior interface<a class="headerlink" href="#step-3-using-the-labelling-behavior-interface" title="Permalink to this heading"></a></h2>
+<p>Once I’ve selected my video file, the annotation interface will pop
+open, looking something like this:</p>
+<a class="reference internal image-reference" href="../_images/annotator_2.gif"><img alt="../_images/annotator_2.gif" class="align-center" src="../_images/annotator_2.gif" style="width: 1000px;" /></a>
+<p>In this image I have marked 9 different parts of the window with boxes,
+which will we can use to scan and accurately label the frames of the
+video as containing (or not containing) your behavior(s) of interest:</p>
+<p><strong>(1)</strong> In the title header of the window, it will state which type of
+annotations you are currently doing (of the ones listed above). I opened
+the annotation interface through the <strong>LABEL BEHAVIOR</strong> setting and the
+<code class="docutils literal notranslate"><span class="pre">Select</span> <span class="pre">video</span> <span class="pre">(create</span> <span class="pre">new</span> <span class="pre">video</span> <span class="pre">annotation)</span></code> button, hence it reads
+<strong>ANNOTATING FROM SCRATCH</strong>. If you are using <strong>PSEUDO-LABELLING</strong>, it
+will read <strong>PSEUDO-LABELLING</strong>, and if you opened <strong>ADVANCED LABEL
+BEHAVIOR</strong>, it will read <strong>ADVANCED ANNOTATION</strong>.</p>
+<p><strong>(2)</strong> In box 2, there are buttons to navigate between different frames
+of your video. The middle entry box is telling you the <code class="docutils literal notranslate"><span class="pre">frame</span> <span class="pre">number</span></code>
+within the video that is currently beeing displayed. Clicking the inner
+buttons <code class="docutils literal notranslate"><span class="pre">&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;</span></code> will show you the proceeding and preceding
+frame, respectively. Clicking the outer buttons <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&lt;&lt;</span></code> will
+show you the last and first frame of the video, respectively.</p>
+<p><strong>Navigating to a different frame than the one being viwerd (i.e., a
+preceding or a proceeding frame) will save your annotation selections
+for the previously-viewed frame into SimBA memory (more information
+below).</strong></p>
+<a class="reference internal image-reference" href="../_images/annotator_31.gif"><img alt="../_images/annotator_31.gif" class="align-center" src="../_images/annotator_31.gif" style="width: 1000px;" /></a>
+<p>If you want to navigate to a specific frame number, change the value in
+the frame number entry box and click on the <code class="docutils literal notranslate"><span class="pre">Jump</span> <span class="pre">to</span> <span class="pre">selected</span> <span class="pre">frame</span></code>
+button. To jump a user-specified number of frames forwards (or
+backwards), drag the <code class="docutils literal notranslate"><span class="pre">Jump</span> <span class="pre">Size</span></code> bar to set the number of frames you
+wish to jump forwards or backwards. Then click the <code class="docutils literal notranslate"><span class="pre">&lt;&lt;</span></code> and <code class="docutils literal notranslate"><span class="pre">&gt;&gt;</span></code>
+buttons next to the <code class="docutils literal notranslate"><span class="pre">Jump</span> <span class="pre">size</span></code> bar to jump the selected number of
+frames in the video:</p>
+<a class="reference internal image-reference" href="../_images/annotator_41.gif"><img alt="../_images/annotator_41.gif" class="align-center" src="../_images/annotator_41.gif" style="width: 1000px;" /></a>
+<p><strong>(3)</strong> If you are using standard <em>LABEL BEHAVIOR</em>, or
+<em>PSEUDO-LABELLING</em>, this part of the window contains one check box for
+each classifier in your SimBA project. In my project, I only have one
+behavior - <code class="docutils literal notranslate"><span class="pre">Attack</span></code>. Furthermore, this is the first time I view this
+frame in the SimBA annotator GUI - and because I started the annotator
+GUI through the <em>LABEL BEHAVIOR</em> button - it’s by default unchecked
+(behavior is not present). If the behavior of interest (Attack) is
+occuring in the frame I am viewing, then I go ahead and check the
+<code class="docutils literal notranslate"><span class="pre">Attack</span></code> checkbox. If I then navigate back or forwards several frames,
+and back to the frame where I checked the <code class="docutils literal notranslate"><span class="pre">Attack</span></code> checkbox, you can
+see that it remains checked for that particular frame. My choice that
+<code class="docutils literal notranslate"><span class="pre">Attack</span></code> is occuring in frame <code class="docutils literal notranslate"><span class="pre">57</span></code> has been recorded, and is being
+held in SimBA memory.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you are using <strong>ADVANCED LABEL BEHAVIOR</strong> in SimBA, every
+classifier in your SimBA project will have <strong>two</strong> check-boxes
+(rather than one) in the SimBA annotator GUI - one checkbox to
+indicate that the behavior is present, and one check-box to indicate
+that the behavior is absent. For a further tutorial documenting how
+to use the advanced behavior annotator in SimBA, click
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/advanced_labelling.md">HERE</a>.</p>
+</div>
+<a class="reference internal image-reference" href="../_images/annotator_51.gif"><img alt="../_images/annotator_51.gif" class="align-center" src="../_images/annotator_51.gif" style="width: 1000px;" /></a>
+<p><strong>(4)</strong> There are times where we may want to batch label a range of
+images as either containing, or not containing, our behavior(s) of
+interest and for that we will use the functions in sub-menu number
+<code class="docutils literal notranslate"><span class="pre">4</span></code>. In the gif below, I tick the <code class="docutils literal notranslate"><span class="pre">Frame</span> <span class="pre">range</span></code> checkbox. I then
+fill in a start frame number (57) and an end frame number (257). I next
+tick the checkboxes for the behavior(s) that is present in these frames.
+Finally, I click <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">Range</span></code> to store my selections in SimBA memory.
+The viewed frame will jump to the last frame in the selected range when
+I click <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">Range</span></code>.</p>
+<a class="reference internal image-reference" href="../_images/annotator_51.gif"><img alt="../_images/annotator_51.gif" class="align-center" src="../_images/annotator_51.gif" style="width: 1000px;" /></a>
+<p><strong>(5)</strong> At times, it may be difficult to see what is going on when
+viewing a still frame, and we will need to look at a sequence of frames
+in order to judge if the animal is doing the behaviors of interest or
+not. To view the video, click the <code class="docutils literal notranslate"><span class="pre">Open</span> <span class="pre">video</span></code> button at the top right
+corner and another window showing the video will pop open. At the bottom
+right of the new video window that pops open, the current time and
+current frame number is printed in yellow font.</p>
+<a class="reference internal image-reference" href="../_images/annotator_6.gif"><img alt="../_images/annotator_6.gif" class="align-center" src="../_images/annotator_6.gif" style="width: 1000px;" /></a>
+<p><strong>(6)</strong> If you highlight this video window (i.e., click on it), you can
+use keybord shortcuts to study it frame-by-frame. Once the video is
+highlighted, press <code class="docutils literal notranslate"><span class="pre">p</span></code> on your keyboard to pause the video. Use the
+keyboard shortcuts printed in the main frame of the annotation GUI to
+navigate between frames. After you have pressed <code class="docutils literal notranslate"><span class="pre">p</span></code> for pause, you can
+also close the video by clicking the window close button at the top
+left.</p>
+<a class="reference internal image-reference" href="../_images/annotator_8.png"><img alt="../_images/annotator_8.png" class="align-center" src="../_images/annotator_8.png" style="width: 1000px;" /></a>
+<p><strong>(7)</strong> When you’re viewing the video, you may see a frame in the main
+SimBA annotator GIO and label, or change labels, for that partuclar
+frame or range of frames. To do this. First highlight the video (by
+clicking on the frame) and press the <code class="docutils literal notranslate"><span class="pre">p</span></code> button on your keyboard to
+pause the video. Next, click the <code class="docutils literal notranslate"><span class="pre">Show</span> <span class="pre">current</span> <span class="pre">video</span> <span class="pre">frame</span></code> button.
+This will diplay whatever frame is shown in the video player in the main
+SimBA annotator GUI frame-viewer.</p>
+<a class="reference internal image-reference" href="../_images/annotator_7.gif"><img alt="../_images/annotator_7.gif" class="align-center" src="../_images/annotator_7.gif" style="width: 1000px;" /></a>
+<p><strong>(8)</strong> There are keyboard-shortcuts that will allow you to navigate the
+frame displayed in the main SimBA annotator GUI. These keyboard
+shortcuts allows you to perform some of the same functions as performed
+with the buttons documented in part <strong>(1)</strong> in this document. They also
+allow you to save your annotations into your SimBA project (see below),
+which you are <strong>required to do</strong> in order to use your annotations for
+creating machine learning models.</p>
+<a class="reference internal image-reference" href="../_images/annotator_shortcuts.png"><img alt="../_images/annotator_shortcuts.png" class="align-center" src="../_images/annotator_shortcuts.png" style="width: 1000px;" /></a>
+<p>Two of these shortcuts needs further description:</p>
+<blockquote>
+<div><p>Control-a: Hold down the <code class="docutils literal notranslate"><span class="pre">ctrl</span></code> keyboard button and press <code class="docutils literal notranslate"><span class="pre">a</span></code> to
+move to the next frame as well as keeping the classifier checkboxes
+the same as however they where checked in the prior frame. Good for
+quickly labelling successive frames with the same annotations.
+Control-p: Hold down the <code class="docutils literal notranslate"><span class="pre">ctrl</span></code> keyboard button and press <code class="docutils literal notranslate"><span class="pre">p</span></code> to
+print a table telling you how many frames you have annotated so far
+and how you have anntated them, as in the image below.</p>
+</div></blockquote>
+<a class="reference internal image-reference" href="../_images/annotator_9.png"><img alt="../_images/annotator_9.png" class="align-center" src="../_images/annotator_9.png" style="width: 1000px;" /></a>
+<p><strong>(8)</strong> The last button in the SimBA annotator interface is labelled
+<code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">Annotations</span></code> and it is a <strong>very important</strong> button. This buttons
+saves your annotations into your SimBA project which you are required to
+do in order to use the annotation for creating mchine learning models.
+Clicking this buttons saves a data file inside your
+<code class="docutils literal notranslate"><span class="pre">project_folder/csv/targets_inserted</span></code> directory. This file will
+contain all of the body-part coordinates and features in seperate
+columns, plus a few additional columns at the end of the file (one for
+each behavior that you are annotating) with the headers that represent
+the behavior names. Hence, clicking this button in this tutoral, will
+generate a file inside the <code class="docutils literal notranslate"><span class="pre">project_folder/csv/targets_inserted</span></code>
+directory called <code class="docutils literal notranslate"><span class="pre">BtWGANP</span></code> where the last column is named <code class="docutils literal notranslate"><span class="pre">Attack</span></code>.
+This column will be filled with <code class="docutils literal notranslate"><span class="pre">1</span></code>s and <code class="docutils literal notranslate"><span class="pre">0</span></code>s - a <code class="docutils literal notranslate"><span class="pre">1</span></code> for
+every frame where I noted the behavior to be present, and a <code class="docutils literal notranslate"><span class="pre">0</span></code> for
+every frame where I note the behavior to be absent.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>I used the standard <em>LABEL BEHAVIOR</em> method in SimBA in this
+tutorial. This means that any frame that I did <strong>not</strong> view in the
+SimBA annotator GUI frame viewer will be saved as <strong>behavior
+absent</strong>. Hence, if I open the BtWGANP file inside the
+<code class="docutils literal notranslate"><span class="pre">project_folder/csv/targets_inserted</span></code> directory, there will be a
+<code class="docutils literal notranslate"><span class="pre">0</span></code> for every frame that I did not view in the SimBA annotator GUI
+frame viewer.</p>
+</div>
+<a class="reference internal image-reference" href="../_images/annotator_10.png"><img alt="../_images/annotator_10.png" class="align-center" src="../_images/annotator_10.png" style="width: 1000px;" /></a>
+</section>
+<section id="continouing-previously-started-annotations">
+<h2>CONTINOUING PREVIOUSLY STARTED ANNOTATIONS<a class="headerlink" href="#continouing-previously-started-annotations" title="Permalink to this heading"></a></h2>
+<p>After clicking <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">Annotations</span></code> and closing the SimBA annotation
+GUI, you may want to come back and continue annotating the same video.
+To do this, click the
+<code class="docutils literal notranslate"><span class="pre">Select</span> <span class="pre">video</span> <span class="pre">(continue</span> <span class="pre">existing</span> <span class="pre">video</span> <span class="pre">annotation)</span></code> button:</p>
+<a class="reference internal image-reference" href="../_images/annotator_111.png"><img alt="../_images/annotator_111.png" class="align-center" src="../_images/annotator_111.png" style="width: 1000px;" /></a>
+<p>When clicked, this brings up a file selection dialog menu. We navigate
+to the <code class="docutils literal notranslate"><span class="pre">project_folder/videos</span></code> directory and select a video we wich to
+continue annotating. SimBA will read the file name for the video you
+select e.g., (BtWGANP.mp4), and scan the
+<code class="docutils literal notranslate"><span class="pre">project_folder/csv/targets_inserted</span></code> directory within your SimBA
+project to find the file that represents your previously stored
+annotations for this video. You can then preceed to annotate video
+frames as documented above. When continuing to annotate a previously
+started video, SimBA opens the GUI annotator interface at the frame
+number of the latest saved frame.</p>
+</section>
+<section id="notes-on-the-different-forms-of-behavior-labelling-advanced-vs-psudo-vs-standard-labelling">
+<h2>NOTES ON THE DIFFERENT FORMS OF BEHAVIOR LABELLING (ADVANCED vs. PSUDO vs. ‘STANDARD’ LABELLING)<a class="headerlink" href="#notes-on-the-different-forms-of-behavior-labelling-advanced-vs-psudo-vs-standard-labelling" title="Permalink to this heading"></a></h2>
+<section id="standard-labelling">
+<h3>‘STANDARD’ LABELLING<a class="headerlink" href="#standard-labelling" title="Permalink to this heading"></a></h3>
+<p>If you use standard labelling (as in the tutorial above) all frames are
+by default labelled as <strong>behavior absent</strong>. Thus, if I open a video of
+3k frames, and <strong>immediately</strong> click <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">Annotations</span></code>, a file will
+be saved inside the <code class="docutils literal notranslate"><span class="pre">project_folder/csv/targets_inserted</span></code> directory
+with 3k rows, where the final columns representing my annotations
+<strong>all</strong> are filled with <code class="docutils literal notranslate"><span class="pre">0</span></code>. Using the standard <code class="docutils literal notranslate"><span class="pre">LABEL</span> <span class="pre">BEHAVIOR</span></code>
+method, it is not <em>required</em> to view all frames, it is only necessery to
+label all the frames where you know that the behavior is present.</p>
+<p>It is very important to not feed your classifier errorous information.
+An assumption that behavior is absent in unviewed frames, where the
+behavior is actually present, can lead to classifiers that perform
+terribly. If you are working with infrequent behaviors, and have a good
+understanding of when they are occuring, then this option can
+nevertheless save you a lot of time.</p>
+</section>
+<section id="psudo-labelling">
+<h3>‘PSUDO’ LABELLING<a class="headerlink" href="#psudo-labelling" title="Permalink to this heading"></a></h3>
+<p>If you use pseudo labelling all frames are, by default, labelled
+according to what your latest machine learning inference on that video
+(and your input threshold) said was occuring in that frame. Therefore,
+in order to perform psudo-labelling, the video has to have been scored
+with a classifier prior to starting the annotation of that video. That
+means that the video has to have been analyzed through the [Run machine
+model] header, and a file representing the video has to be present
+within the <code class="docutils literal notranslate"><span class="pre">project_folder/csv/machine_results</span></code> directory. To read
+more about the benefits and motives behind pseudo-labelling, and how to
+use it, check out <a class="reference external" href="https://github.com/sgoldenlab/simba/edit/master/docs/pseudoLabel.md">THIS
+TUTORIAL</a>.</p>
+<p>When closing the SimBA annotation GUI after annotating a video using the
+psedu-annotator in SimBA, you may want to come back and continue
+annotating the same video. To do this, click the
+<code class="docutils literal notranslate"><span class="pre">Select</span> <span class="pre">video</span> <span class="pre">(continue</span> <span class="pre">existing</span> <span class="pre">video</span> <span class="pre">annotation)</span></code> button in the
+standard <code class="docutils literal notranslate"><span class="pre">LABEL</span> <span class="pre">BEHAVIOR</span></code> sub-menu in the [Label behavior] tab.</p>
+</section>
+<section id="advanced-labelling">
+<h3>‘ADVANCED’ LABELLING<a class="headerlink" href="#advanced-labelling" title="Permalink to this heading"></a></h3>
+<p>If you use ADVANCED labelling, all frames are, by default, labelled as
+<code class="docutils literal notranslate"><span class="pre">None</span></code>. That means that if you have not looked at a frame in the SimBA
+annotation GUI, and indicated what behaviors the frame contains (i.e.,
+if the behvaior is present or absent), then the information for that
+specific frame <strong>will not</strong> be saved when clicking the
+<code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">Annotations</span></code>. That means that the specific frame won’t be used
+in any downstream machine learning classifier creation tasks. For
+example, if you (i) open a video containing 3k frames, (ii) look at, and
+annotate, the first N frames, (iii) click <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">Annotations</span></code>, and
+navigate to the <code class="docutils literal notranslate"><span class="pre">project_folder/csv/machine_results</span></code> directory and
+open the file representing the video you just annotated. When you open
+this file, you should see that it only contains N rows representing the
+N rows you labelled in the SimBA annotator GUI.</p>
+<p>This method (<code class="docutils literal notranslate"><span class="pre">ADVANCED</span> <span class="pre">LABELLING</span></code>) allows you the greatest control
+over the data that is used by the machine learning models to build
+predictive classifiers. This is the only method that allows you to
+control which frames of the specific video that goes into training and
+testing the classifiers. While ‘PSUDO’ and standard labelling use all of
+the frames of a specific video, <code class="docutils literal notranslate"><span class="pre">ADVANCED</span> <span class="pre">LABELLING</span></code> allows you to
+pick a specific subset of frames from a a specific video for creating
+machine learning models. To read more about how to use the
+<code class="docutils literal notranslate"><span class="pre">ADVANCED</span> <span class="pre">LABELLING</span></code> method in SimBA, click
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/advanced_labelling.md">HERE</a>.</p>
+</section>
+</section>
+<section id="miscellaneous-labelling-tools-in-simba">
+<h2>MISCELLANEOUS LABELLING TOOLS IN SIMBA<a class="headerlink" href="#miscellaneous-labelling-tools-in-simba" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>After we have created (or
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md">imported</a>)
+our annotations into SimBA, we may want to view them so confirm that
+they are accurate. For this, click on <code class="docutils literal notranslate"><span class="pre">Visualize</span> <span class="pre">annotations</span></code> in
+the <code class="docutils literal notranslate"><span class="pre">LABELLING</span> <span class="pre">TOOLS</span></code> submenu in the [Label behavior] tab and you
+should see the follwoing pop-up:</p></li>
+</ul>
+<a class="reference internal image-reference" href="../_images/annotator_12.png"><img alt="../_images/annotator_12.png" class="align-center" src="../_images/annotator_12.png" style="width: 1000px;" /></a>
+<p>Select which classifier annotatated frames you wish to extract by
+ticking the appropriate tick-boxes. If you need to down-sample your
+images, use the <code class="docutils literal notranslate"><span class="pre">Down-sample</span> <span class="pre">images</span></code> dropdown to select how many times
+the images should be reduced from the original. Once completed, click
+the <code class="docutils literal notranslate"><span class="pre">RUN</span></code> button. You can follow the prohres sin the main SimBA
+terminal.</p>
+<p>Once complete, the images annotated as <strong>behavior present</strong> will be
+stored within sub-directories of the
+<code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/annotated_frames</span></code> folder in the
+hierarchy of <code class="docutils literal notranslate"><span class="pre">video</span> <span class="pre">name</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">classifier</span> <span class="pre">behavior</span> <span class="pre">name</span></code>. The file
+names of the frames are the frame number of the annotated behaviour.
+E.g., a file at the path
+<code class="docutils literal notranslate"><span class="pre">project_folder/frames/output/annotated_frames/My_video/Attack/28.png</span></code>
+represents an <strong>behavior-present</strong> annotation for the behavior
+<code class="docutils literal notranslate"><span class="pre">Attack</span></code> at the 28th frame of video <code class="docutils literal notranslate"><span class="pre">My_video</span></code>.</p>
+<p>Author <a class="reference external" href="https://github.com/sronilsson">Simon N</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../labelling.html" class="btn btn-neutral float-left" title="Labelling" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="advanced_label.html" class="btn btn-neutral float-right" title="SimBA behavioral Annotator GUI (ADVANCED LABELLING)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

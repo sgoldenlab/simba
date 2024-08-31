@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.plotting.heat_mapper_location &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.plotting.heat_mapper_location</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.plotting.heat_mapper_location</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">numba</span> <span class="kn">import</span> <span class="n">jit</span><span class="p">,</span> <span class="n">prange</span>
+
+<span class="kn">from</span> <span class="nn">simba.mixins.config_reader</span> <span class="kn">import</span> <span class="n">ConfigReader</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.geometry_mixin</span> <span class="kn">import</span> <span class="n">GeometryMixin</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.plotting_mixin</span> <span class="kn">import</span> <span class="n">PlottingMixin</span>
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">check_all_file_names_are_represented_in_video_log</span><span class="p">,</span>
+    <span class="n">check_file_exist_and_readable</span><span class="p">,</span> <span class="n">check_float</span><span class="p">,</span> <span class="n">check_if_keys_exist_in_dict</span><span class="p">,</span>
+    <span class="n">check_int</span><span class="p">,</span> <span class="n">check_that_column_exist</span><span class="p">,</span> <span class="n">check_valid_lst</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.enums</span> <span class="kn">import</span> <span class="n">Formats</span><span class="p">,</span> <span class="n">TagNames</span>
+<span class="kn">from</span> <span class="nn">simba.utils.errors</span> <span class="kn">import</span> <span class="n">NoSpecifiedOutputError</span>
+<span class="kn">from</span> <span class="nn">simba.utils.printing</span> <span class="kn">import</span> <span class="n">SimbaTimer</span><span class="p">,</span> <span class="n">log_event</span><span class="p">,</span> <span class="n">stdout_success</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="n">get_fn_ext</span><span class="p">,</span> <span class="n">read_df</span>
+
+<span class="n">STYLE_PALETTE</span> <span class="o">=</span> <span class="s1">&#39;palette&#39;</span>
+<span class="n">STYLE_SHADING</span> <span class="o">=</span> <span class="s1">&#39;shading&#39;</span>
+<span class="n">STYLE_BIN_SIZE</span> <span class="o">=</span> <span class="s1">&#39;bin_size&#39;</span>
+<span class="n">STYLE_MAX_SCALE</span> <span class="o">=</span> <span class="s1">&#39;max_scale&#39;</span>
+
+<span class="n">STYLE_ATTR</span> <span class="o">=</span> <span class="p">[</span><span class="n">STYLE_PALETTE</span><span class="p">,</span> <span class="n">STYLE_SHADING</span><span class="p">,</span> <span class="n">STYLE_BIN_SIZE</span><span class="p">,</span> <span class="n">STYLE_MAX_SCALE</span><span class="p">]</span>
+
+<div class="viewcode-block" id="HeatmapperLocationSingleCore"><a class="viewcode-back" href="../../../simba.plotting.html#simba.plotting.heat_mapper_location.HeatmapperLocationSingleCore">[docs]</a><span class="k">class</span> <span class="nc">HeatmapperLocationSingleCore</span><span class="p">(</span><span class="n">ConfigReader</span><span class="p">,</span> <span class="n">PlottingMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create heatmaps representing the location where animals spend time.</span>
+<span class="sd">    For improved run-time, see :meth:`simba.heat_mapper_location_mp.HeatMapperLocationMultiprocess` for multiprocess class.</span>
+
+<span class="sd">    ..note::</span>
+<span class="sd">       `GitHub visualizations tutorial &lt;https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-11-visualizations&gt;`__.</span>
+<span class="sd">        For improved run-time of videos, see :meth:`simba.heat_mapper_location_mp.HeatMapperLocationMultiprocess` for multiprocess class.</span>
+
+<span class="sd">    .. image:: _static/img/heatmap_location.gif</span>
+<span class="sd">       :width: 1000</span>
+<span class="sd">       :align: center</span>
+
+<span class="sd">    :param str config_path: path to SimBA project config file in Configparser format</span>
+<span class="sd">    :param str bodypart: The name of the body-part used to infer the location of the animal.</span>
+<span class="sd">    :param int bin_size: The rectangular size of each heatmap location in millimeters. For example, `50` will divide the video frames into 5 centimeter rectangular spatial bins.</span>
+<span class="sd">    :param str palette:  Heatmap pallette. Eg. &#39;jet&#39;, &#39;magma&#39;, &#39;inferno&#39;,&#39;plasma&#39;, &#39;viridis&#39;, &#39;gnuplot2&#39;</span>
+<span class="sd">    :param int or &#39;auto&#39; max_scale: The max value in the heatmap in seconds. E.g., with a value of `10`, if the classified behavior has occured &gt;= 10s within a rectangular bins, it will be filled with the same color.</span>
+<span class="sd">    :param bool final_img_setting: If True, create a single image representing the last frame of the input video</span>
+<span class="sd">    :param bool video_setting: If True, then create a video of heatmaps.</span>
+<span class="sd">    :param bool frame_setting: If True, then create individual heatmap frames.</span>
+
+<span class="sd">    :example:</span>
+<span class="sd">    &gt;&gt;&gt; style_attr = {&#39;palette&#39;: &#39;jet&#39;, &#39;shading&#39;: &#39;gouraud&#39;, &#39;bin_size&#39;: 100, &#39;max_scale&#39;: &#39;auto&#39;}</span>
+<span class="sd">    &gt;&gt;&gt; heatmapper = HeatmapperLocationSingleCore(config_path=&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini&#39;, style_attr = style_attr, final_img_setting=True, video_setting=True, frame_setting=False, bodypart=&#39;Nose_1&#39;, files_found=[&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/machine_results/Together_1.csv&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; heatmapper.run()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">config_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
+                 <span class="n">data_paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]],</span>
+                 <span class="n">bodypart</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">style_attr</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+                 <span class="n">final_img_setting</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">video_setting</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">frame_setting</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+
+
+        <span class="n">log_event</span><span class="p">(</span><span class="n">logger_name</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">),</span> <span class="n">log_type</span><span class="o">=</span><span class="n">TagNames</span><span class="o">.</span><span class="n">CLASS_INIT</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">create_log_msg_from_init_args</span><span class="p">(</span><span class="nb">locals</span><span class="o">=</span><span class="nb">locals</span><span class="p">()))</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="n">frame_setting</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">video_setting</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="n">final_img_setting</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">NoSpecifiedOutputError</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Please choose to select either heatmap videos, frames, and/or final image.&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+        <span class="n">check_file_exist_and_readable</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="n">check_valid_lst</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">data_paths</span><span class="p">,</span> <span class="n">valid_dtypes</span><span class="o">=</span><span class="p">(</span><span class="nb">str</span><span class="p">,),</span> <span class="n">min_len</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">check_if_keys_exist_in_dict</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">style_attr</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">STYLE_ATTR</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> style_attr&#39;</span><span class="p">)</span>
+        <span class="n">ConfigReader</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="n">PlottingMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">frame_setting</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_setting</span> <span class="o">=</span> <span class="n">frame_setting</span><span class="p">,</span> <span class="n">video_setting</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_img_setting</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bp</span> <span class="o">=</span> <span class="n">final_img_setting</span><span class="p">,</span> <span class="n">bodypart</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">style_attr</span> <span class="o">=</span> <span class="n">style_attr</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">heatmap_location_dir</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">heatmap_location_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span> <span class="o">=</span> <span class="n">data_paths</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fourcc</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter_fourcc</span><span class="p">(</span><span class="o">*</span><span class="n">Formats</span><span class="o">.</span><span class="n">MP4_CODEC</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bp_lst</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bp</span><span class="si">}</span><span class="s2">_x&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bp</span><span class="si">}</span><span class="s2">_y&quot;</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing heatmaps for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> video(s)...&quot;</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__calculate_cum_array_final_img</span><span class="p">(</span><span class="n">loc_array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">):</span>
+        <span class="n">final_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">loc_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">loc_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">frm</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">loc_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">loc_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">loc_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+                    <span class="n">final_img</span><span class="p">[</span><span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="o">+=</span> <span class="n">loc_array</span><span class="p">[</span><span class="n">frm</span><span class="p">,</span> <span class="n">row</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">final_img</span>
+
+    <span class="k">def</span> <span class="nf">__calculate_bin_attr</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">data_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+        <span class="n">bp_lst</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="n">px_per_mm</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">img_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">img_height</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">bin_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">fps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="p">):</span>
+
+        <span class="n">bin_size_px</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">px_per_mm</span><span class="p">)</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">bin_size</span><span class="p">))</span>
+        <span class="n">horizontal_bin_cnt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">img_width</span> <span class="o">/</span> <span class="n">bin_size_px</span><span class="p">)</span>
+        <span class="n">vertical_bin_cnt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">img_height</span> <span class="o">/</span> <span class="n">bin_size_px</span><span class="p">)</span>
+        <span class="n">aspect_ratio</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">vertical_bin_cnt</span> <span class="o">/</span> <span class="n">horizontal_bin_cnt</span><span class="p">),</span> <span class="mi">3</span><span class="p">)</span>
+
+        <span class="n">bp_data</span> <span class="o">=</span> <span class="n">data_df</span><span class="p">[</span><span class="n">bp_lst</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+        <span class="n">bin_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">x_location</span><span class="p">,</span> <span class="n">y_location</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">hbin</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">horizontal_bin_cnt</span><span class="p">):</span>
+            <span class="n">bin_dict</span><span class="p">[</span><span class="n">hbin</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">vbin</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">vertical_bin_cnt</span><span class="p">):</span>
+                <span class="n">bin_dict</span><span class="p">[</span><span class="n">hbin</span><span class="p">][</span><span class="n">vbin</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;top_left_x&quot;</span><span class="p">:</span> <span class="n">x_location</span><span class="p">,</span>
+                    <span class="s2">&quot;top_left_y&quot;</span><span class="p">:</span> <span class="n">y_location</span><span class="p">,</span>
+                    <span class="s2">&quot;bottom_right_x&quot;</span><span class="p">:</span> <span class="n">x_location</span> <span class="o">+</span> <span class="n">bin_size_px</span><span class="p">,</span>
+                    <span class="s2">&quot;bottom_right_y&quot;</span><span class="p">:</span> <span class="n">y_location</span> <span class="o">+</span> <span class="n">bin_size_px</span><span class="p">,</span>
+                <span class="p">}</span>
+                <span class="n">y_location</span> <span class="o">+=</span> <span class="n">bin_size_px</span>
+            <span class="n">y_location</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">x_location</span> <span class="o">+=</span> <span class="n">bin_size_px</span>
+
+        <span class="n">location_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">bp_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">vertical_bin_cnt</span><span class="p">,</span> <span class="n">horizontal_bin_cnt</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">frm_cnt</span><span class="p">,</span> <span class="n">frame</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">bp_data</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">h_bin_name</span><span class="p">,</span> <span class="n">v_dict</span> <span class="ow">in</span> <span class="n">bin_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">v_bin_name</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">v_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">frame</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;bottom_right_x&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="n">frame</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;top_left_x&quot;</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="p">(</span>
+                            <span class="n">frame</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;bottom_right_y&quot;</span><span class="p">]</span>
+                            <span class="ow">and</span> <span class="n">frame</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">c</span><span class="p">[</span><span class="s2">&quot;top_left_y&quot;</span><span class="p">]</span>
+                        <span class="p">):</span>
+                            <span class="n">location_array</span><span class="p">[</span><span class="n">frm_cnt</span><span class="p">][</span><span class="n">v_bin_name</span><span class="p">][</span><span class="n">h_bin_name</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+        <span class="n">location_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__calculate_cum_array</span><span class="p">(</span><span class="n">clf_array</span><span class="o">=</span><span class="n">location_array</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">location_array</span><span class="p">,</span> <span class="n">aspect_ratio</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@jit</span><span class="p">(</span><span class="n">nopython</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__calculate_cum_array</span><span class="p">(</span><span class="n">clf_array</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span> <span class="n">fps</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">cum_sum_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">clf_array</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">frm_idx</span> <span class="ow">in</span> <span class="n">prange</span><span class="p">(</span><span class="n">clf_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">frame_cum_sum</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">((</span><span class="n">clf_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">clf_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span> <span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">sliced_arr</span> <span class="o">=</span> <span class="n">clf_array</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">frm_idx</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sliced_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sliced_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+                    <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sliced_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]):</span>
+                        <span class="n">frame_cum_sum</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">+=</span> <span class="n">sliced_arr</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">]</span>
+            <span class="n">cum_sum_arr</span><span class="p">[</span><span class="n">frm_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">frame_cum_sum</span>
+
+        <span class="k">return</span> <span class="n">cum_sum_arr</span> <span class="o">/</span> <span class="n">fps</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">check_all_file_names_are_represented_in_video_log</span><span class="p">(</span><span class="n">video_info_df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">video_info_df</span><span class="p">,</span> <span class="n">data_paths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">file_cnt</span><span class="p">,</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span><span class="p">):</span>
+            <span class="n">video_timer</span> <span class="o">=</span> <span class="n">SimbaTimer</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">video_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_video_info</span><span class="p">(</span><span class="n">video_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_info</span><span class="p">[</span><span class="s2">&quot;Resolution_width&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_info</span><span class="p">[</span><span class="s2">&quot;Resolution_height&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_setting</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">video_save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">heatmap_location_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="si">}</span><span class="s2">.mp4&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">writer</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">VideoWriter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_save_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fourcc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fps</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">),)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_setting</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_img_setting</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save_video_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">heatmap_location_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_video_folder</span><span class="p">):</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_video_folder</span><span class="p">)</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_video_folder</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span> <span class="o">=</span> <span class="n">read_df</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">)</span>
+            <span class="n">check_that_column_exist</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">,</span> <span class="n">column_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">bp_lst</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bp_lst</span><span class="p">]</span>
+            <span class="n">squares</span><span class="p">,</span> <span class="n">aspect_ratio</span> <span class="o">=</span> <span class="n">GeometryMixin</span><span class="p">()</span><span class="o">.</span><span class="n">bucket_img_into_grid_square</span><span class="p">(</span><span class="n">bucket_grid_size_mm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style_attr</span><span class="p">[</span><span class="n">STYLE_BIN_SIZE</span><span class="p">],</span> <span class="n">img_size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">),</span> <span class="n">px_per_mm</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">)</span>
+            <span class="n">location_array</span> <span class="o">=</span> <span class="n">GeometryMixin</span><span class="p">()</span><span class="o">.</span><span class="n">cumsum_coord_geometries</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">fps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fps</span><span class="p">,</span> <span class="n">geometries</span><span class="o">=</span><span class="n">squares</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">style_attr</span><span class="p">[</span><span class="n">STYLE_MAX_SCALE</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;auto&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_scale</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">location_array</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)),</span> <span class="mi">3</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_scale</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_scale</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">check_float</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> style max scale&#39;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style_attr</span><span class="p">[</span><span class="n">STYLE_MAX_SCALE</span><span class="p">],</span> <span class="n">min_value</span><span class="o">=</span><span class="mf">10e-6</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">max_scale</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">style_attr</span><span class="p">[</span><span class="n">STYLE_MAX_SCALE</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_img_setting</span><span class="p">:</span>
+                <span class="n">final_img_save_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">heatmap_location_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="si">}</span><span class="s2">_final_frm.png&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">make_location_heatmap_plot</span><span class="p">(</span><span class="n">frm_data</span><span class="o">=</span><span class="n">location_array</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:,</span> <span class="p">:][</span><span class="mi">0</span><span class="p">],</span>
+                                                <span class="n">max_scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_scale</span><span class="p">,</span>
+                                                <span class="n">palette</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style_attr</span><span class="p">[</span><span class="n">STYLE_PALETTE</span><span class="p">],</span>
+                                                <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">aspect_ratio</span><span class="p">,</span>
+                                                <span class="n">file_name</span><span class="o">=</span><span class="n">final_img_save_name</span><span class="p">,</span>
+                                                <span class="n">shading</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style_attr</span><span class="p">[</span><span class="n">STYLE_SHADING</span><span class="p">],</span>
+                                                <span class="n">img_size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">))</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Final heatmap image saved at </span><span class="si">{</span><span class="n">final_img_save_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">frame_setting</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_setting</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">frm_cnt</span><span class="p">,</span> <span class="n">cumulative_frm</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">location_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])):</span>
+                    <span class="n">img</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_location_heatmap_plot</span><span class="p">(</span><span class="n">frm_data</span><span class="o">=</span><span class="n">location_array</span><span class="p">[</span><span class="n">cumulative_frm</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:],</span>
+                                                          <span class="n">max_scale</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">max_scale</span><span class="p">,</span>
+                                                          <span class="n">palette</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style_attr</span><span class="p">[</span><span class="s2">&quot;palette&quot;</span><span class="p">],</span>
+                                                          <span class="n">aspect_ratio</span><span class="o">=</span><span class="n">aspect_ratio</span><span class="p">,</span>
+                                                          <span class="n">file_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                                          <span class="n">shading</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">style_attr</span><span class="p">[</span><span class="s2">&quot;shading&quot;</span><span class="p">],</span>
+                                                          <span class="n">img_size</span><span class="o">=</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">height</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_setting</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">img</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:</span><span class="mi">3</span><span class="p">])</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">frame_setting</span><span class="p">:</span>
+                        <span class="n">frame_save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">save_video_folder</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">frm_cnt</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+                        <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="n">frame_save_path</span><span class="p">,</span> <span class="n">img</span><span class="p">)</span>
+
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Heatmap frame: </span><span class="si">{</span><span class="n">frm_cnt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">)</span><span class="si">}</span><span class="s2">. Video: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">file_cnt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_setting</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+            <span class="n">video_timer</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Heatmap plot for video </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> saved (elapsed time: </span><span class="si">{</span><span class="n">video_timer</span><span class="o">.</span><span class="n">elapsed_time_str</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">()</span>
+        <span class="n">stdout_success</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Created heatmaps for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> videos&quot;</span><span class="p">,</span> <span class="n">elapsed_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">elapsed_time_str</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,)</span></div>
+
+
+<span class="c1"># test = HeatmapperLocationSingleCore(config_path=&#39;/Users/simon/Desktop/envs/simba/troubleshooting/platea/project_folder/project_config.ini&#39;,</span>
+<span class="c1">#                                       style_attr = {&#39;palette&#39;: &#39;jet&#39;, &#39;shading&#39;: &#39;flat&#39;, &#39;bin_size&#39;: 30, &#39;max_scale&#39;: 2},</span>
+<span class="c1">#                                       final_img_setting=True,</span>
+<span class="c1">#                                       video_setting=True,</span>
+<span class="c1">#                                       frame_setting=False,</span>
+<span class="c1">#                                       bodypart=&#39;CENTER&#39;,</span>
+<span class="c1">#                                       data_paths=[&#39;/Users/simon/Desktop/envs/simba/troubleshooting/platea/project_folder/csv/outlier_corrected_movement_location/Video_1.csv&#39;])</span>
+<span class="c1"># test.run()</span>
+
+
+
+
+
+
+<span class="c1"># test = HeatmapperLocationSingleCore(config_path=&#39;/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/project_config.ini&#39;,</span>
+<span class="c1">#                                       style_attr = {&#39;palette&#39;: &#39;jet&#39;, &#39;shading&#39;: &#39;gouraud&#39;, &#39;bin_size&#39;: 100, &#39;max_scale&#39;: 10},</span>
+<span class="c1">#                                       final_img_setting=True,</span>
+<span class="c1">#                                       video_setting=True,</span>
+<span class="c1">#                                       frame_setting=False,</span>
+<span class="c1">#                                       bodypart=&#39;Snout&#39;,</span>
+<span class="c1">#                                       data_paths=[&#39;/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/csv/outlier_corrected_movement_location/raw_clip1.csv&#39;])</span>
+<span class="c1"># test.run()</span>
+
+
+
+
+<span class="c1">#</span>
+<span class="c1"># test = HeatmapperLocationSingleCore(config_path=&#39;/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini&#39;,</span>
+<span class="c1">#                                       style_attr = {&#39;palette&#39;: &#39;jet&#39;, &#39;shading&#39;: &#39;gouraud&#39;, &#39;bin_size&#39;: 100, &#39;max_scale&#39;: &#39;auto&#39;},</span>
+<span class="c1">#                                       final_img_setting=True,</span>
+<span class="c1">#                                       video_setting=True,</span>
+<span class="c1">#                                       frame_setting=False,</span>
+<span class="c1">#                                       bodypart=&#39;Nose_1&#39;,</span>
+<span class="c1">#                                       files_found=[&#39;/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Together_1.csv&#39;])</span>
+<span class="c1"># test.run()</span>
+
+
+<span class="c1"># test = HeatmapperLocationSingleCore(config_path=&#39;/Users/simon/Desktop/envs/troubleshooting/locomotion/project_folder/project_config.ini&#39;,</span>
+<span class="c1">#                                       style_attr = {&#39;palette&#39;: &#39;jet&#39;, &#39;shading&#39;: &#39;gouraud&#39;, &#39;bin_size&#39;: 50, &#39;max_scale&#39;: &#39;auto&#39;},</span>
+<span class="c1">#                                       final_img_setting=False,</span>
+<span class="c1">#                                       video_setting=True,</span>
+<span class="c1">#                                       frame_setting=False,</span>
+<span class="c1">#                                       bodypart=&#39;Nose&#39;,</span>
+<span class="c1">#                                       files_found=[&#39;/Users/simon/Desktop/envs/troubleshooting/locomotion/project_folder/csv/outlier_corrected_movement_location/PD1406_2022-05-24_RVDG_GCaMP8s-Gi_Video_Day_22_Baseline.csv&#39;])</span>
+<span class="c1"># test.create_heatmaps()</span>
+
+
+<span class="c1"># test = HeatmapperLocation(config_path=&#39;/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini&#39;,</span>
+<span class="c1">#                           bodypart=&#39;Nose_1&#39;,</span>
+<span class="c1">#                           bin_size=50,</span>
+<span class="c1">#                           palette=&#39;jet&#39;,</span>
+<span class="c1">#                           max_scale=&#39;auto&#39;,</span>
+<span class="c1">#                           final_img_setting=True,</span>
+<span class="c1">#                           video_setting=False,</span>
+<span class="c1">#                           frame_setting=False)</span>
+<span class="c1"># test.create_heatmaps()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Video processing tools in SimBA &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Walkthroughs" href="../walkthroughs.html" />
+    <link rel="prev" title="User-defined pose-configurations in SimBA" href="create_user_defined_pose_config.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SimBA
+              <img src="../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="roi.html">Regions of Interest (ROIs) in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="FSTTC.html">Calculating forward-spike time tiling coefficents in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature_subsets.html">Feature family sub-sets in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_defined_feature_class.html">User-defined ‘feature extraction’ scripts in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kleinberg_filter.html">Kleinberg behavior classification smoothing in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="anchored_rois.html">Animal-anchored ROIs (bounding-boxes) in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SHAP.html">Model explainability and calculating feature SHAP values in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="directionality_between_animals.html">Who is looking at who: calculate “directionality” between animals in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classifier_validation.html">Post-classification Validation (detecting false-positives)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cue_lights.html">Cue Light Analysis in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi_animal_pose.html">Using multi-animal pose-estimation data in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="process_videos.html">Batch Video Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">SimBA Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_user_defined_pose_config.html">User-defined pose-configurations in SimBA</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Video processing tools in SimBA</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#shorten-videos">Shorten Videos</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#method-1">Method 1</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#method-2">Method 2</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#clip-video-into-multiple-videos">Clip video into multiple videos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#crop-video">Crop Video</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fixed-crop-videos">Fixed Crop Videos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#multi-crop-videos">Multi-crop videos</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#downsample-video">Downsample video</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#customize-resolution">Customize Resolution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#default-resolution">Default resolution</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#get-coordinates-calibrate-distance">Get Coordinates (calibrate distance)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#change-formats">Change formats</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#change-image-formats">Change image formats</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#change-video-format">Change video format</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#clahe-enhance-video">CLAHE enhance video</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#superimpose-frame-numbers-on-video">Superimpose frame numbers on video</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#convert-to-grayscale">Convert to grayscale</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#change-fps-frame-rate-of-videos">Change FPS (frame-rate) of videos</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#change-fps-of-a-single-video">Change FPS of a single video</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#change-fps-of-multiple-videos">Change FPS of multiple videos</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#create-path-plots">Create path plots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#merge-images-to-video">Merge images to video</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#generate-gifs">Generate gifs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#extract-frames">Extract Frames</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#extract-defined-frames">Extract defined Frames</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#extract-frames-1">Extract frames</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#extract-frames-from-seq-files">Extract frames from seq files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#convert-seq-files-to-mp4-files">Convert . seq files to .mp4 files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#re-organize-tracking-data">Re-organize tracking data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#remove-body-parts-from-tracking-data">Remove body-parts from tracking data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#visualize-pose-estimation-in-folder">Visualize pose estimation in folder</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#temporal-join-videos">Temporal join videos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rotate-videos">Rotate videos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#concatenate-two-videos">Concatenate two videos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#concatenate-multiple-videos">Concatenate multiple videos</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#print-mode-info">Print mode info</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">Video processing tools in SimBA</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_rst/tools.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="video-processing-tools-in-simba">
+<h1>Video processing tools in SimBA<a class="headerlink" href="#video-processing-tools-in-simba" title="Permalink to this heading"></a></h1>
+<p>We have developed video and image processing tools and incorporated them
+into the overall SimBA pipeline. However, many of the tools are useful
+on their own or in “one-off” situations. To make these easily
+accessible, the tools have been incorporated into their own space within
+the GUI, and are described below.</p>
+<a class="reference internal image-reference" href="../_images/menu_110.png"><img alt="../_images/menu_110.png" class="align-center" src="../_images/menu_110.png" style="width: 1000px;" /></a>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#shorten-videos">Clip
+videos</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#clip-video-into-multiple-videos">Clip video into multiple
+videos</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#crop-video">Crop
+videos</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#fixed-crop-videos">Fixed Crop
+Videos</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#multi-crop-videos">Multi-crop
+videos</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#downsample-video">Downsample
+videos</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#get-coordinates">Get
+mm/ppx</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#change-formats">Change
+formats</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#change-fps-frame-rate-of-videos">Change
+fps</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#create-path-plots">Create path
+plots</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#clahe">CLAHE enhance
+video</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#add-frame-numbers">Superimpose frame numbers on
+video</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#convert-to-grayscale">Convert to
+greyscale</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#merge-images-to-video">Merge frames to
+video</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#generate-gifs">Generate
+gifs</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-frames">Extract
+frames</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#print-mode-info">Print model
+info</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/simba_JJ_branch/docs/Tutorial_tools.md#convert--seq-files-to-mp4-files">Convert .seq to
+.mp4</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#re-organize-tracking-data">Re-order pose-estimation tracking
+data</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#re-organize-tracking-data">Remove body-parts from tracking
+data</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#visualize-pose-estimation-in-folder">Visualize pose estimation in
+folder</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#concatenate-two-videos">Concatenate two
+videos</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#concatenate-multiple-videos">Concatenate multiple
+videos</a></p></li>
+</ul>
+<section id="shorten-videos">
+<h2>Shorten Videos<a class="headerlink" href="#shorten-videos" title="Permalink to this heading"></a></h2>
+<p>This is a tool used to trim video lengths. The tool contains two
+different methods: <strong>Method 1</strong> and <strong>Method 2</strong>.</p>
+<section id="method-1">
+<h3>Method 1<a class="headerlink" href="#method-1" title="Permalink to this heading"></a></h3>
+<p>Use Method 1 to trim both the beginning and the end of the video.</p>
+<p>Let’s say we have a 2 minute long video and we want to get rid of the
+first 10 seconds, and the last 5 seconds. We would start our video on at
+<code class="docutils literal notranslate"><span class="pre">00:00:10</span></code>, and end the video at <code class="docutils literal notranslate"><span class="pre">00:01:55</span></code>.</p>
+<ol class="arabic simple">
+<li><p>First, click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code> to select the video to trim.</p></li>
+<li><p>Enter the start time in the <code class="docutils literal notranslate"><span class="pre">Start</span> <span class="pre">at:</span></code> entry box, in this case it
+will be <em>00:00:10</em></p></li>
+<li><p>Enter the end time in <code class="docutils literal notranslate"><span class="pre">End</span> <span class="pre">at:</span></code> entry box, in this case it will be
+<em>00:01:55</em>. The settings should look like the image below.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/shorten_videos_1.png"><img alt="../_images/shorten_videos_1.png" class="align-center" src="../_images/shorten_videos_1.png" style="width: 1000px;" /></a>
+<ol class="arabic simple" start="4">
+<li><p>Click <code class="docutils literal notranslate"><span class="pre">Cut</span> <span class="pre">Video</span></code> to trim the video and a new shorter video will be
+generated. The new shorter video will have a name of <em>Name of
+original video</em> + *_shorten* and will be located in the same folder
+as the original video.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/shorten_videos_2.png"><img alt="../_images/shorten_videos_2.png" class="align-center" src="../_images/shorten_videos_2.png" style="width: 1000px;" /></a>
+</section>
+<section id="method-2">
+<h3>Method 2<a class="headerlink" href="#method-2" title="Permalink to this heading"></a></h3>
+<p>Method 2 cuts of the beginning of the video.</p>
+<p>Let’s say we have a 2 minute long video and we want to get rid of the
+first 20 seconds from the start of the video.</p>
+<ol class="arabic simple">
+<li><p>Enter the amount of time that needs to be trimmed from the start of
+the video in <code class="docutils literal notranslate"><span class="pre">Seconds:</span></code>, in this case it will be <em>20</em></p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/shorten_videos_3.png"><img alt="../_images/shorten_videos_3.png" class="align-center" src="../_images/shorten_videos_3.png" style="width: 1000px;" /></a>
+<ol class="arabic simple" start="2">
+<li><p>Click <code class="docutils literal notranslate"><span class="pre">Cut</span> <span class="pre">Video</span></code> to trim video and a new shorten video will be
+generated, the new video will have a name of <em>Name of original video</em>
++ *_shorten* and will be located in the same folder as the original
+video.</p></li>
+</ol>
+</section>
+</section>
+<section id="clip-video-into-multiple-videos">
+<h2>Clip video into multiple videos<a class="headerlink" href="#clip-video-into-multiple-videos" title="Permalink to this heading"></a></h2>
+<p>This tool can help users to cut the videos into multiple clips/section.</p>
+<ol class="arabic simple">
+<li><p>Click on the <code class="docutils literal notranslate"><span class="pre">Clip</span> <span class="pre">video</span> <span class="pre">into</span> <span class="pre">multiple</span> <span class="pre">videos</span></code> from the <code class="docutils literal notranslate"><span class="pre">Tools</span></code>
+section.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/multi_clip_1.png"><img alt="../_images/multi_clip_1.png" class="align-center" src="../_images/multi_clip_1.png" style="width: 1000px;" /></a>
+<ol class="arabic simple" start="2">
+<li><p>Select the video that you want to split/clip by clicking
+<code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code></p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/multi_clip_2.png"><img alt="../_images/multi_clip_2.png" class="align-center" src="../_images/multi_clip_2.png" style="width: 1000px;" /></a>
+<ol class="arabic simple" start="3">
+<li><p>Put in the number of output clips/sections that you want in
+<code class="docutils literal notranslate"><span class="pre">#</span> <span class="pre">of</span> <span class="pre">clips</span></code>, and click <code class="docutils literal notranslate"><span class="pre">Confirm</span></code>. Please note that if you put in
+the wrong number the first time, you can re-enter the number and
+click <code class="docutils literal notranslate"><span class="pre">Confirm</span></code> to change the table.</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/multi_clip_3.png"><img alt="../_images/multi_clip_3.png" class="align-center" src="../_images/multi_clip_3.png" style="width: 1000px;" /></a>
+<ol class="arabic simple" start="4">
+<li><p>Then enter the <code class="docutils literal notranslate"><span class="pre">Start</span> <span class="pre">Time</span></code> and <code class="docutils literal notranslate"><span class="pre">Stop</span> <span class="pre">Time</span></code> in the following
+format HH:MM:SS. For example, for a minute and 20 seconds it will be
+00:01:20.</p></li>
+<li><p>Once the table has been filled, click <code class="docutils literal notranslate"><span class="pre">Clip</span> <span class="pre">video</span></code> and the video
+will be output on the same folder path/ directory of your original
+video.</p></li>
+</ol>
+</section>
+<section id="crop-video">
+<h2>Crop Video<a class="headerlink" href="#crop-video" title="Permalink to this heading"></a></h2>
+<p>This is a tool to crop videos.</p>
+<ol class="arabic simple">
+<li><p>First, click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code> to select a video to crop.</p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Crop</span> <span class="pre">Video</span></code> and the following window <code class="docutils literal notranslate"><span class="pre">Select</span> <span class="pre">ROI</span></code> will
+pop up.</p></li>
+<li><p>Use your mouse to <em>Left Click</em> on the video and drag the rectangle
+bounding box to contain the area of the video you wish to keep. <em>You
+can always left click and drag on the video to recrop your video</em></p></li>
+<li><p>Hit <code class="docutils literal notranslate"><span class="pre">Enter</span></code> <strong>twice</strong> and SimBA will crop the video. The new video
+will have a name of <em>Name of original video</em> + *_cropped* and will
+be located in the same folder as the original video.</p></li>
+</ol>
+</section>
+<section id="fixed-crop-videos">
+<h2>Fixed Crop Videos<a class="headerlink" href="#fixed-crop-videos" title="Permalink to this heading"></a></h2>
+<p>This tool allows the user to crop once and apply the same dimension to
+the rest of the videos in the folder.</p>
+<a class="reference internal image-reference" href="../_images/crop_1.png"><img alt="../_images/crop_1.png" class="align-center" src="../_images/crop_1.png" style="width: 1000px;" /></a>
+<ol class="arabic simple">
+<li><p>Under <code class="docutils literal notranslate"><span class="pre">Video</span> <span class="pre">directory</span></code>, select the input video folder by clicking
+<code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">Folder</span></code>.</p></li>
+<li><p>Then, select an output folder.</p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Confirm</span></code> and an image will pop up, use your mouse to
+<em>Left Click</em> on the video and drag the rectangle bounding box to
+contain the area of the video you wish to keep. <em>You can always left
+click and drag on the video to recrop your video</em></p></li>
+<li><p>Hit <code class="docutils literal notranslate"><span class="pre">Enter</span></code> <strong>twice</strong> and SimBA will crop all the videos in the
+folder with the same coordinate. The new videos will have a name of
+<em>Name of original video</em> + *_cropped* and will be located in the
+output folder.</p></li>
+</ol>
+</section>
+<section id="multi-crop-videos">
+<h2>Multi-crop videos<a class="headerlink" href="#multi-crop-videos" title="Permalink to this heading"></a></h2>
+<p>This is a tool to used to multi-crop videos. For example, if you
+recorded four different environments with a single camera, you can use
+this tool to split single recordings into 4 different videos. This tool
+operates on all videos in a folder that is defined by the user. The user
+is required to draw the number of defined rectangles on <strong>each</strong> of the
+videos in the specified folder.</p>
+<ol class="arabic simple">
+<li><p>First, click on Multi-crop and the following menu will pop-open:</p></li>
+</ol>
+<a class="reference internal image-reference" href="../_images/multi_crop_1.jpg"><img alt="../_images/multi_crop_1.jpg" class="align-center" src="../_images/multi_crop_1.jpg" style="width: 1000px;" /></a>
+<ol class="arabic simple" start="2">
+<li><p>Next to <em>Video Folder</em>, click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">Folder</span></code> and select a
+folder containing the videos you which to multi-crop.</p></li>
+<li><p>Next to <em>Output folder</em>, click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">Folder</span></code> and select a
+folder that should house the cropped output videos.</p></li>
+<li><p>Next to <em>Video type</em>, type the file format of yout input videos
+(e.g., mp4, avi etc).</p></li>
+<li><p>Next to <em># of crop</em>, type in the number of cropped videos you wich to
+generate from each single input video (e.g., 4). Click on <strong>Crop</strong> to
+proceed. When you click on <strong>Crop</strong>, the first frame of the first
+video in the specified folder will be displayed, and the name of the
+video and rectangle number is printed overlaid:</p></li>
+</ol>
+<p><a href="#id2"><span class="problematic" id="id3">|alt-text-1|</span></a> 6. Left click the mouse and drag from the top left corner
+to the bottom right corner of the first video you wish to generate. When
+finished with the first video, press <code class="docutils literal notranslate"><span class="pre">Enter</span></code>. Repeat this step for the
+next videos you wish to generate from Video 1. Once Video1 is complete,
+repeat these steps for all the videos in the user-specified <em>Video
+Folder</em>.</p>
+<ol class="arabic simple" start="7">
+<li><p>The cropped output videos will be located in the user-defined <em>Output
+folder</em> as defined in Step 3.</p></li>
+</ol>
+</section>
+<section id="downsample-video">
+<h2>Downsample video<a class="headerlink" href="#downsample-video" title="Permalink to this heading"></a></h2>
+<p>This is a tool to downsample a video into smaller size and reduce the
+resolution of the video.</p>
+<p>The downsample video tool has two options: <strong>Customize Resolution</strong> and
+<strong>Default Resolution</strong>.</p>
+<section id="customize-resolution">
+<h3>Customize Resolution<a class="headerlink" href="#customize-resolution" title="Permalink to this heading"></a></h3>
+<p>Use this tool to downsample video into any height and width.</p>
+<ol class="arabic simple">
+<li><p>First, click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code> to select a video to downsample.</p></li>
+<li><p>Then, enter any values in the <code class="docutils literal notranslate"><span class="pre">Height</span></code> and <code class="docutils literal notranslate"><span class="pre">Width</span></code> entry boxes.</p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Downsample</span> <span class="pre">to</span> <span class="pre">custom</span> <span class="pre">resolution</span></code> to downsample the video.
+The new video will have a name of <em>Name of original video</em> +
+*_downsampled* and will be located in the same folder as the
+original video.</p></li>
+</ol>
+</section>
+<section id="default-resolution">
+<h3>Default resolution<a class="headerlink" href="#default-resolution" title="Permalink to this heading"></a></h3>
+<p>This tool allows the user to downsample a video quickly.</p>
+<ol class="arabic simple">
+<li><p>First, click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code> to select a video to downsample.</p></li>
+<li><p>Tick on one of the resoltion options.</p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Downsample</span> <span class="pre">to</span> <span class="pre">default</span> <span class="pre">resolution</span></code> and the video will
+downsample into the selected resolution. The video will be located in
+the same folder as the original video.</p></li>
+</ol>
+</section>
+</section>
+<section id="get-coordinates-calibrate-distance">
+<h2>Get Coordinates (calibrate distance)<a class="headerlink" href="#get-coordinates-calibrate-distance" title="Permalink to this heading"></a></h2>
+<p>This tool is to get the length (millimeter) per pixel of a video.</p>
+<p>Let’s say we want to find out the metric length per pixel of a video of
+a mouse in a cage, and we know the width of cage is 130 millimeters
+(it’s a tight one).</p>
+<ol class="arabic simple">
+<li><p>First, click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code> to select a video.</p></li>
+<li><p>Enter <em>130</em> in the <code class="docutils literal notranslate"><span class="pre">Known</span> <span class="pre">length</span> <span class="pre">in</span> <span class="pre">real</span> <span class="pre">life(mm)</span></code> entry box.</p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Get</span> <span class="pre">Distance</span></code>, and the following window will pop up.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>When the frame is displayed, it may not be shown at the
+correct aspect ratio. To fix this, drag the window corner to the
+correct aspect ratio.</p>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>Use your mouse to double <em>Left click</em> at the left side of the cage
+and double <em>Left click</em> again on the right side of the cage. These
+are the known distance of 130 mm.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can double click any point again to change the location
+of the point.</p>
+</div>
+<ol class="arabic simple" start="5">
+<li><p>Once two points are selected, hit <code class="docutils literal notranslate"><span class="pre">Esc</span></code> button. The millimeter per
+pixel value is printed in the main SimBA interface.</p></li>
+</ol>
+</section>
+<section id="change-formats">
+<h2>Change formats<a class="headerlink" href="#change-formats" title="Permalink to this heading"></a></h2>
+<p>This menu includes <strong>Change image formats</strong> and <strong>Change video formats</strong></p>
+<section id="change-image-formats">
+<h3>Change image formats<a class="headerlink" href="#change-image-formats" title="Permalink to this heading"></a></h3>
+<p>This tool allows the user to select a folder containing multiple images
+and convert the formats.</p>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">Folder</span></code> to select a folder that contains multiple
+images.</p></li>
+<li><p>Choose the original format of the images in the selected folder.</p></li>
+<li><p>Choose the desired output image format.</p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Convert</span> <span class="pre">image</span> <span class="pre">file</span> <span class="pre">format</span></code>.</p></li>
+</ol>
+</section>
+<section id="change-video-format">
+<h3>Change video format<a class="headerlink" href="#change-video-format" title="Permalink to this heading"></a></h3>
+<p>This tool allows the user to convert the file format of a single or
+multiple videos.</p>
+<section id="convert-multiple-video-file-formats">
+<h4>Convert multiple video file formats<a class="headerlink" href="#convert-multiple-video-file-formats" title="Permalink to this heading"></a></h4>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">Folder</span></code> to select the directory that contains the
+videos that you want to convert.</p></li>
+<li><p>Enter the original file format (eg: mp4, flv, avi etc.) in the
+<code class="docutils literal notranslate"><span class="pre">Input</span> <span class="pre">format</span></code> entry box. <strong>Note: do not put dots (‘.’) in the file
+format name (eg: mp4 or flv, etc)</strong>.</p></li>
+<li><p>Enter the desired output format in the <code class="docutils literal notranslate"><span class="pre">Output</span> <span class="pre">format</span></code> entry box .</p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Convert</span> <span class="pre">multiple</span> <span class="pre">videos</span></code>.</p></li>
+</ol>
+</section>
+<section id="convert-single-video-file-format">
+<h4>Convert single video file format<a class="headerlink" href="#convert-single-video-file-format" title="Permalink to this heading"></a></h4>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code> to select a video to convert.</p></li>
+<li><p>Choose one of the following <code class="docutils literal notranslate"><span class="pre">Convert</span> <span class="pre">.avi</span> <span class="pre">to</span> <span class="pre">.mp4</span></code> or
+<code class="docutils literal notranslate"><span class="pre">Convert</span> <span class="pre">mp4</span> <span class="pre">into</span> <span class="pre">Powerpoint</span> <span class="pre">supported</span> <span class="pre">format</span></code></p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Convert</span> <span class="pre">video</span> <span class="pre">format</span></code>.</p></li>
+</ol>
+</section>
+</section>
+</section>
+<section id="clahe-enhance-video">
+<h2><a class="reference external" href="https://docs.opencv.org/3.4/d5/daf/tutorial_py_histogram_equalization.html">CLAHE enhance video</a><a class="headerlink" href="#clahe-enhance-video" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code> and select a video file.</p></li>
+<li><p>Click <code class="docutils literal notranslate"><span class="pre">Apply</span> <span class="pre">CLAHE</span></code>. The new video will have a name of <em>CLAHE_</em>
+<em>Name of original video</em>. The new file will be in a <strong>.avi</strong> format
+will be located in the same folder as the original video.</p></li>
+</ol>
+</section>
+<section id="superimpose-frame-numbers-on-video">
+<h2>Superimpose frame numbers on video<a class="headerlink" href="#superimpose-frame-numbers-on-video" title="Permalink to this heading"></a></h2>
+<p>This tool creates a video with the frame numbers printed on top of the
+video.</p>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Superimpose</span> <span class="pre">frame</span> <span class="pre">numbers</span> <span class="pre">on</span> <span class="pre">video</span></code> and a new window will
+pop up.</p></li>
+<li><p>Select a video and click on <code class="docutils literal notranslate"><span class="pre">Open</span></code>.</p></li>
+<li><p>The new version of the video will be created with the name <em>Name of
+original video</em> + *_frame_no* and will be located in the same
+folder as the original video.</p></li>
+</ol>
+</section>
+<section id="convert-to-grayscale">
+<h2>Convert to grayscale<a class="headerlink" href="#convert-to-grayscale" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Convert</span> <span class="pre">to</span> <span class="pre">grayscale</span></code> and a new window will pop up.</p></li>
+<li><p>Select video and click <code class="docutils literal notranslate"><span class="pre">Open</span></code>.</p></li>
+<li><p>The new greyscale version of the video will be created and have the
+name <em>Name of original video</em> + *_grayscale*. The new video will be
+located in the same folder as the original video.</p></li>
+</ol>
+</section>
+<section id="change-fps-frame-rate-of-videos">
+<h2>Change FPS (frame-rate) of videos<a class="headerlink" href="#change-fps-frame-rate-of-videos" title="Permalink to this heading"></a></h2>
+<section id="change-fps-of-a-single-video">
+<h3>Change FPS of a single video<a class="headerlink" href="#change-fps-of-a-single-video" title="Permalink to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Tools</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Change</span> <span class="pre">fps</span></code> -&gt;
+<code class="docutils literal notranslate"><span class="pre">Change</span> <span class="pre">fps</span> <span class="pre">for</span> <span class="pre">single</span> <span class="pre">video</span></code> and a new pop up window is displayed.</p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code> and select the video you want to change the
+FPS for.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">Output</span> <span class="pre">FPS</span></code> entry-box, enter the FPS of the new video as a
+number (e.g., <code class="docutils literal notranslate"><span class="pre">15</span></code>).</p></li>
+<li><p>Click the <code class="docutils literal notranslate"><span class="pre">Convert</span></code> button. A new video is saved in the directory
+of the input video with the <code class="docutils literal notranslate"><span class="pre">fps_15</span></code> filename suffix.</p></li>
+</ol>
+</section>
+<section id="change-fps-of-multiple-videos">
+<h3>Change FPS of multiple videos<a class="headerlink" href="#change-fps-of-multiple-videos" title="Permalink to this heading"></a></h3>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Tools</span></code> -&gt; <code class="docutils literal notranslate"><span class="pre">Change</span> <span class="pre">fps</span></code> -&gt;
+<code class="docutils literal notranslate"><span class="pre">Change</span> <span class="pre">fps</span> <span class="pre">for</span> <span class="pre">multiple</span> <span class="pre">videos</span></code> and a new pop up window is
+displayed.</p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">Folder</span></code> and select the directory containing the
+videos you want to change the FPS for.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">Output</span> <span class="pre">FPS</span></code> entry-box, enter the FPS of the new videos as a
+number (e.g., <code class="docutils literal notranslate"><span class="pre">15</span></code>).</p></li>
+<li><p>Click the <code class="docutils literal notranslate"><span class="pre">Convert</span></code> button. New videos are saved in the directory
+of the input videos with the <code class="docutils literal notranslate"><span class="pre">fps_15</span></code> filename suffix.</p></li>
+</ol>
+</section>
+</section>
+<section id="create-path-plots">
+<h2>Create path plots<a class="headerlink" href="#create-path-plots" title="Permalink to this heading"></a></h2>
+<p>Use this tool to create a path plot videos from raw pose-estimation data
+files.</p>
+<a class="reference internal image-reference" href="tutorials_rst/img/third_party_annotations/line_plot_1.png"><img alt="tutorials_rst/img/third_party_annotations/line_plot_1.png" class="align-center" src="tutorials_rst/img/third_party_annotations/line_plot_1.png" style="width: 1000px;" /></a>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code> next to <code class="docutils literal notranslate"><span class="pre">VIDEO</span> <span class="pre">PATH</span></code> and select the video
+file used to create the pose-estimation data (this is needed get and
+apply the correct fps and resolution of the output video).</p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code> next to <code class="docutils literal notranslate"><span class="pre">DATA</span> <span class="pre">PATH</span></code> and select the raw
+output pose-estimation data from the video file (e.g., a
+DLC-generated H5 or CSV file).</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">BODY-PART</span></code> entry-box, enter the body-part (e.g., Nose) you
+which to represent the location of the animal in the path plot video.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">BACKGROUND</span> <span class="pre">COLOR</span></code> drop-down, select the color you which to
+represent the background in the path plot video.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">LINE</span> <span class="pre">COLOR</span></code> drop-down, select the color you which to
+represent the path of your animal in the path plot video (NOTE: make
+sure background and line colors are not identical).</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">LINE</span> <span class="pre">THICKNESS</span></code> drop-down, select the thickness of the
+lines you which to represent the path of your animal in the path plot
+video.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">CIRCLE</span> <span class="pre">SIZE</span></code> drop-down, select the size of the circle which
+represent the current location of the animal in the path plot video.</p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">PATH</span> <span class="pre">PLOT</span> <span class="pre">VIDEO</span></code>. A new path plot video is created
+in the same directory as the input video with the <code class="docutils literal notranslate"><span class="pre">line_plot</span></code> file
+name suffix.</p></li>
+</ol>
+<a class="reference internal image-reference" href="tutorials_rst/img/third_party_annotations/line_plot_2.png"><img alt="tutorials_rst/img/third_party_annotations/line_plot_2.png" class="align-center" src="tutorials_rst/img/third_party_annotations/line_plot_2.png" style="width: 1000px;" /></a>
+</section>
+<section id="merge-images-to-video">
+<h2>Merge images to video<a class="headerlink" href="#merge-images-to-video" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">Folder</span></code> to select a folder containing multiple
+frames.</p></li>
+<li><p>Enter the input image format of the frames. Eg: if the image name is
+<em>Image001.PNG</em>, enter <em>PNG</em> in the <code class="docutils literal notranslate"><span class="pre">Image</span> <span class="pre">format</span></code> entry box.</p></li>
+<li><p>Enter the desire output video format. Eg: if the video should be in
+<em>.mp4</em> file format, enter <em>mp4</em> in the <code class="docutils literal notranslate"><span class="pre">Video</span> <span class="pre">format</span></code> entry box.</p></li>
+<li><p>Enter the desire frames per second in the <code class="docutils literal notranslate"><span class="pre">fps</span></code> entry box.</p></li>
+<li><p>Enter the desired
+<a class="reference external" href="https://help.encoding.com/knowledge-base/article/understanding-bitrates-in-video-files/">bitrate</a>
+for the video in the <code class="docutils literal notranslate"><span class="pre">Bitrate</span></code> entry box.</p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Merge</span> <span class="pre">Images</span></code> to create the video.</p></li>
+</ol>
+</section>
+<section id="generate-gifs">
+<h2>Generate gifs<a class="headerlink" href="#generate-gifs" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code> and select a video to convert to a GIF.</p></li>
+<li><p>Enter the starting time of the GIF from the video in the
+<code class="docutils literal notranslate"><span class="pre">Start</span> <span class="pre">times(s)</span></code> entry box.</p></li>
+<li><p>Enter the duration of the GIF in the <code class="docutils literal notranslate"><span class="pre">Duration(s)</span></code> entry box.</p></li>
+<li><p>Enter the size of the GIF in the <code class="docutils literal notranslate"><span class="pre">Width</span></code> entry box. The output GIF
+will be scale automatically.</p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Generate</span> <span class="pre">gif</span></code> to create the gif.</p></li>
+</ol>
+</section>
+<section id="extract-frames">
+<h2>Extract Frames<a class="headerlink" href="#extract-frames" title="Permalink to this heading"></a></h2>
+<p>The Extract frames menu has two options: <strong>Extract defined frames</strong>,
+<strong>Extract frames</strong>, and <strong>Extract frames from seq files</strong>.</p>
+<section id="extract-defined-frames">
+<h3>Extract defined Frames<a class="headerlink" href="#extract-defined-frames" title="Permalink to this heading"></a></h3>
+<p>This tool allows users to extract frames from a video by inputting
+specific start- and end-frame numbers. This is useful if you want to
+extract a subset of frames from a larger video, without first needing to
+generate a new video of the desired length.</p>
+<ol class="arabic simple">
+<li><p>Click <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code> to select a video.</p></li>
+<li><p>Enter the starting frame number in the <code class="docutils literal notranslate"><span class="pre">Start</span> <span class="pre">Frame</span></code> entry box.</p></li>
+<li><p>Enter the ending frame number in the <code class="docutils literal notranslate"><span class="pre">End</span> <span class="pre">Frame</span></code> entry box.</p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Extract</span> <span class="pre">Frames</span></code> to extract the frames from the
+<code class="docutils literal notranslate"><span class="pre">Start</span> <span class="pre">Frame</span></code> to the <code class="docutils literal notranslate"><span class="pre">End</span> <span class="pre">Frame</span></code>.</p></li>
+<li><p>A folder with the video name will be generated and the all the
+extracted frames will be located in the folder. The frames will be in
+<em>.png</em> file format.</p></li>
+</ol>
+</section>
+<section id="extract-frames-1">
+<span id="id1"></span><h3>Extract frames<a class="headerlink" href="#extract-frames-1" title="Permalink to this heading"></a></h3>
+<p>Use this tool to extract every frame from a single video or multiple
+videos.</p>
+<section id="single-video">
+<h4>Single video<a class="headerlink" href="#single-video" title="Permalink to this heading"></a></h4>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code> to select a video file.</p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Extract</span> <span class="pre">Frames(Single</span> <span class="pre">video)</span></code> to extract every frame from
+the video.</p></li>
+<li><p>A folder with the video name will be generated and the all the
+extracted frames will be located in the folder. The frames will be in
+<em>.png</em> file format.</p></li>
+</ol>
+</section>
+<section id="multiple-videos">
+<h4>Multiple videos<a class="headerlink" href="#multiple-videos" title="Permalink to this heading"></a></h4>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">Folder</span></code> to select the folder with videos.</p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Extract</span> <span class="pre">Frames(Multiple</span> <span class="pre">videos)</span></code> to extract every frame
+from the video.</p></li>
+<li><p>Folders with the video name will be generated and the all the
+extracted frames will be located in the folders. The frames will be
+in <em>.png</em> file format.</p></li>
+</ol>
+</section>
+</section>
+<section id="extract-frames-from-seq-files">
+<h3>Extract frames from seq files<a class="headerlink" href="#extract-frames-from-seq-files" title="Permalink to this heading"></a></h3>
+<p>Use this tool to extract all the frames from a video in <strong>seq</strong> file
+format.</p>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">File</span></code> to select a video.</p></li>
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Extract</span> <span class="pre">All</span> <span class="pre">Frames</span></code> to extract all the frames from the
+video.</p></li>
+<li><p>A folder with the video name will be generated and the all the
+extracted frames will be located in the folder. The frames will be in
+<em>.png</em> file format.</p></li>
+</ol>
+</section>
+<section id="convert-seq-files-to-mp4-files">
+<h3>Convert . seq files to .mp4 files<a class="headerlink" href="#convert-seq-files-to-mp4-files" title="Permalink to this heading"></a></h3>
+<p>Use this tool to convert .seq files to .mp4 files.</p>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Tools</span></code>, then <code class="docutils literal notranslate"><span class="pre">Change</span> <span class="pre">formats</span></code>, and click on
+<code class="docutils literal notranslate"><span class="pre">Change</span> <span class="pre">.seq</span> <span class="pre">to</span> <span class="pre">.mp4</span></code>.</p></li>
+<li><p>A window will pop up and you can then navigate and select the video
+folder that contains the mp4’s.</p></li>
+<li><p>The conversion progress can be followed through the progress bar
+printed in the terminal window.</p></li>
+</ol>
+</section>
+<section id="re-organize-tracking-data">
+<h3>Re-organize tracking data<a class="headerlink" href="#re-organize-tracking-data" title="Permalink to this heading"></a></h3>
+<p>Use this tool to re-order the pose-estimation tracking data of multiple
+files in a folder. For example, you may have some pose-estimation
+body-part tracking files where the <code class="docutils literal notranslate"><span class="pre">Animal_1_nose</span></code> is body-part number
+1, and some other pose-estimation body-part tracking files where
+<code class="docutils literal notranslate"><span class="pre">Animal_1_tail_base</span></code> is body-part number 1. Now you want to re-order
+the data so that all files contains the same order of tracked
+body-parts.</p>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Tools</span></code>, then <code class="docutils literal notranslate"><span class="pre">Re-organize</span> <span class="pre">Tracking</span> <span class="pre">Data</span></code>.</p></li>
+<li><p>In the entry box <code class="docutils literal notranslate"><span class="pre">Data</span> <span class="pre">Folder</span></code>, select the directory containing
+your pose-estimation tracking files.</p></li>
+<li><p>Select your pose-estimation tool in the <code class="docutils literal notranslate"><span class="pre">Tracking</span> <span class="pre">Tool</span></code> drop-down
+menu.</p></li>
+<li><p>Select the file-format of your tracking data in the <code class="docutils literal notranslate"><span class="pre">File</span> <span class="pre">Type</span></code>
+drop-down menu.</p></li>
+<li><p>Click <code class="docutils literal notranslate"><span class="pre">Confirm</span></code> and the following menu below will pop open. If you
+have one animal in your tracking data, the menu on the left will
+show. If you have multiple animals in your tracking data, the menu on
+the right will show. The image on the right contains an extra column
+compared to the image on the left, representing the Animal name.</p></li>
+</ol>
+<a class="reference internal image-reference" href="tutorials_rst/img/third_party_annotations/reorganize_keypoints_1.png"><img alt="tutorials_rst/img/third_party_annotations/reorganize_keypoints_1.png" class="align-center" src="tutorials_rst/img/third_party_annotations/reorganize_keypoints_1.png" style="width: 1000px;" /></a>
+<ol class="arabic simple" start="6">
+<li><p>The <code class="docutils literal notranslate"><span class="pre">Current</span> <span class="pre">Order</span></code> sub-menu on represents the column order of the
+input files. The <code class="docutils literal notranslate"><span class="pre">New</span> <span class="pre">Order</span></code> sub-menu on represents the order which
+the body-parts should be re-ordered to. Use the drop-down menus to
+select the new order of the body-parts, then click on
+<code class="docutils literal notranslate"><span class="pre">Run</span> <span class="pre">re-organization</span></code>.</p></li>
+<li><p>Your new, re-organized files will be saved in a date-time stamped
+folder inside the <code class="docutils literal notranslate"><span class="pre">Data</span> <span class="pre">Folder</span></code> selected in Step 2. The new folder
+will be named something like <code class="docutils literal notranslate"><span class="pre">Reorganized_bp_20210726111127</span></code>.</p></li>
+</ol>
+</section>
+<section id="remove-body-parts-from-tracking-data">
+<h3>Remove body-parts from tracking data<a class="headerlink" href="#remove-body-parts-from-tracking-data" title="Permalink to this heading"></a></h3>
+<p>Use this tool to delete user-specified body-parts from pose-estimation
+tracking data for all files in a folder. For example, you may have
+pose-estimation body-part tracking files for 16 body-parts, but now you
+want to get rid of the data for 2 body-parts and keep the other 14.</p>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Tools</span></code>, then <code class="docutils literal notranslate"><span class="pre">Remove</span> <span class="pre">body-parts</span> <span class="pre">from</span> <span class="pre">tracking</span> <span class="pre">data</span></code>.</p></li>
+<li><p>In the entry box <code class="docutils literal notranslate"><span class="pre">Data</span> <span class="pre">Folder</span></code>, select the directory containing
+your pose-estimation tracking files.</p></li>
+<li><p>Select your pose-estimation tool in the <code class="docutils literal notranslate"><span class="pre">Tracking</span> <span class="pre">Tool</span></code> drop-down
+menu.</p></li>
+<li><p>Select the file-format of your tracking data in the <code class="docutils literal notranslate"><span class="pre">File</span> <span class="pre">Type</span></code>
+drop-down menu.</p></li>
+<li><p>Select how many body-parts you like to remove from the
+pose-estimation tracking data files.</p></li>
+<li><p>Click <code class="docutils literal notranslate"><span class="pre">Confirm</span></code> and the following menu below will pop open (Note:
+if you have multiple animals in your pose-estimation files, you will
+also see a dropdown menu named <code class="docutils literal notranslate"><span class="pre">Animal</span></code>.) Select the body-parts you
+would like to remove, and click <code class="docutils literal notranslate"><span class="pre">Run</span> <span class="pre">Removal</span></code>.</p></li>
+</ol>
+<a class="reference internal image-reference" href="tutorials_rst/img/third_party_annotations/remove_keypoints.png"><img alt="tutorials_rst/img/third_party_annotations/remove_keypoints.png" class="align-center" src="tutorials_rst/img/third_party_annotations/remove_keypoints.png" style="width: 1000px;" /></a>
+<ol class="arabic simple" start="7">
+<li><p>Your new files (with the removed body-parts) will be saved in a
+date-time stamped folder inside the <code class="docutils literal notranslate"><span class="pre">Data</span> <span class="pre">Folder</span></code> selected in Step
+2. The new folder will be named something like
+<code class="docutils literal notranslate"><span class="pre">Reorganized_bp_20210726111127</span></code>. You can now go ahead and import
+the files into your SimBA project.</p></li>
+</ol>
+</section>
+<section id="visualize-pose-estimation-in-folder">
+<h3>Visualize pose estimation in folder<a class="headerlink" href="#visualize-pose-estimation-in-folder" title="Permalink to this heading"></a></h3>
+<p>Use this tool to visualize the pose-estimation of all the files inside a
+SimBA project directory. This tool can be useful when you have
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-import-dlc-tracking-data">interpolated and/or
+smoothened</a>
+your pose-estimation data at import, and now you want to visualize the
+results of that interpolation and smoothing.</p>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Tools</span></code>, then <code class="docutils literal notranslate"><span class="pre">Visualize</span> <span class="pre">pose-estimation</span> <span class="pre">in</span> <span class="pre">folder...</span></code>.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">Input</span> <span class="pre">directory</span> <span class="pre">(with</span> <span class="pre">csv/parquet</span> <span class="pre">files)</span></code> menu, click bowse
+and select a folder that contain CSV or parquet files (e.g., the
+<code class="docutils literal notranslate"><span class="pre">project_folder/csv/input_csv</span></code> directory of your SimBA project)</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">Output</span> <span class="pre">directory</span> <span class="pre">(where</span> <span class="pre">your</span> <span class="pre">videos</span> <span class="pre">will</span> <span class="pre">be</span> <span class="pre">saved)</span></code> menu,
+click bowse and select a folder where your videos should be saved (I
+recommend to choose an empty folder or create a new folder).</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">Circle</span> <span class="pre">size</span></code> entry box, choose the size of the circles
+denoting the location of your body-parts (e.g., <code class="docutils literal notranslate"><span class="pre">5</span></code>)</p></li>
+<li><p><strong>OPTIONAL</strong>: If you want to manually set the colors for each of the
+animals, click on <code class="docutils literal notranslate"><span class="pre">OPEN</span> <span class="pre">ADVANCED</span> <span class="pre">SETTINGS</span></code> and choose the number of
+animals in your data file. Then use the dropdown menus to set the
+color of each animal. If you <strong>do not</strong> set the animal colors using
+the <code class="docutils literal notranslate"><span class="pre">ADVANCED</span> <span class="pre">SETTINGS</span></code> menu, SimBA will automatically assign
+colors to each of the body-parts.</p></li>
+<li><p>Click on the <code class="docutils literal notranslate"><span class="pre">VISUALIZE</span></code>. You can follow the progress in the main
+SimBA terminal window.</p></li>
+</ol>
+<a class="reference internal image-reference" href="tutorials_rst/img/third_party_annotations/visualize_pose.png"><img alt="tutorials_rst/img/third_party_annotations/visualize_pose.png" class="align-center" src="tutorials_rst/img/third_party_annotations/visualize_pose.png" style="width: 1000px;" /></a>
+</section>
+<section id="temporal-join-videos">
+<h3>Temporal join videos<a class="headerlink" href="#temporal-join-videos" title="Permalink to this heading"></a></h3>
+<p>Use this tool to join a single recording represented by multiple video
+files into a video file.</p>
+<ol class="arabic simple">
+<li><p>Click on <code class="docutils literal notranslate"><span class="pre">Tools</span></code>, then <code class="docutils literal notranslate"><span class="pre">Temporal</span> <span class="pre">join</span> <span class="pre">videos</span></code>.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">INPUT</span> <span class="pre">DIRECTORY</span></code>, click browse and select the directory
+holding your videos. &gt;NOTE: The video files in the directory have to
+be sequantuall and numerically named in order for SimBA to know the
+order. E.g., <code class="docutils literal notranslate"><span class="pre">1.mp4</span></code>, <code class="docutils literal notranslate"><span class="pre">2.mp4</span></code>…</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">INPUT</span> <span class="pre">FORMAT</span></code> dropdown, select the file format of the input
+videos.</p></li>
+<li><p>Click run. A new video file will be created inside the directory
+selected in Step 2 called <code class="docutils literal notranslate"><span class="pre">concatenated.mp4</span></code>.</p></li>
+</ol>
+</section>
+<section id="rotate-videos">
+<h3>Rotate videos<a class="headerlink" href="#rotate-videos" title="Permalink to this heading"></a></h3>
+<p>At times, the camera made have been tilted during a recording which
+prevents accurate bounding-box cropping and/or messes with our
+classifiers and now we want to fix this.</p>
+<ol class="arabic simple">
+<li><p>To rotate videos, click <code class="docutils literal notranslate"><span class="pre">Tools</span></code>, then <code class="docutils literal notranslate"><span class="pre">Rotate</span> <span class="pre">videos</span></code>.</p></li>
+<li><p>In <code class="docutils literal notranslate"><span class="pre">Save</span> <span class="pre">directory</span></code>, select the directory where you want to store
+your rotated videos.</p></li>
+<li><p>To rotate several videos, select the directory where the videos live
+in <code class="docutils literal notranslate"><span class="pre">Rotate</span> <span class="pre">videos</span> <span class="pre">in</span> <span class="pre">directory</span></code>. Alternatively, to rotate a single
+video, select the path to the video file in <code class="docutils literal notranslate"><span class="pre">Video</span> <span class="pre">path</span></code>.</p></li>
+<li><p>Once selected, click the <code class="docutils literal notranslate"><span class="pre">Run</span></code> button and the interface in the
+video below pops up. Use the left and right keyboard buttons to
+rotate the video to the left and right. Once happy, use the <code class="docutils literal notranslate"><span class="pre">ESC</span></code>
+button to rotate and save the video in the directory chosen in Step
+2.</p></li>
+</ol>
+<p><a class="reference external" href="https://user-images.githubusercontent.com/34761092/234957017-6b3de496-f485-47ce-b66c-00b3d841d7ab.mp4">https://user-images.githubusercontent.com/34761092/234957017-6b3de496-f485-47ce-b66c-00b3d841d7ab.mp4</a></p>
+</section>
+<section id="concatenate-two-videos">
+<h3>Concatenate two videos<a class="headerlink" href="#concatenate-two-videos" title="Permalink to this heading"></a></h3>
+<p>Use this tool to concatenate two videos into a single video.</p>
+<a class="reference internal image-reference" href="tutorials_rst/img/third_party_annotations/concatenate_videos_1.png"><img alt="tutorials_rst/img/third_party_annotations/concatenate_videos_1.png" class="align-center" src="tutorials_rst/img/third_party_annotations/concatenate_videos_1.png" style="width: 1000px;" /></a>
+<ol class="arabic simple">
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">First</span> <span class="pre">video</span> <span class="pre">path</span></code>, click on <code class="docutils literal notranslate"><span class="pre">Browse</span></code> and select the first
+video.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">Second</span> <span class="pre">video</span> <span class="pre">path</span></code>, click on <code class="docutils literal notranslate"><span class="pre">Browse</span></code> and select the
+second video.</p></li>
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">Resolution</span></code> drop-down menu, select the resolution of the
+output video. &gt; Note 1: Select <code class="docutils literal notranslate"><span class="pre">Video</span> <span class="pre">1</span></code> in the <code class="docutils literal notranslate"><span class="pre">Resolution</span></code>
+drop-down menu to use the resolution of Video 1 as the resolution of
+the output video. &gt; Note 2: Select <code class="docutils literal notranslate"><span class="pre">Video</span> <span class="pre">2</span></code> in the <code class="docutils literal notranslate"><span class="pre">Resolution</span></code>
+drop-down menu to use the resolution of Video 2 as the resolution of
+the output video.</p></li>
+<li><p>To vertically concatenate the videos, click the
+<code class="docutils literal notranslate"><span class="pre">Vertical</span> <span class="pre">concatenation</span></code> radio-button. To horizontally concatenate
+the videos, click the <code class="docutils literal notranslate"><span class="pre">Horizontal</span> <span class="pre">concatenation</span></code> radio-button. The
+resolution choosen in Step 3 refers to the height or width depending
+on which type of concatenation (vertical vs horizontal).</p></li>
+<li><p>Click <code class="docutils literal notranslate"><span class="pre">Run</span></code> to perform the concatenation. The file-path of the
+output video will be printed in the main SimBA terminal window (the
+file will be located in the same directory as the
+<code class="docutils literal notranslate"><span class="pre">First</span> <span class="pre">video</span> <span class="pre">path</span></code> with the <code class="docutils literal notranslate"><span class="pre">_concat.mp4</span></code> suffix.</p></li>
+</ol>
+</section>
+<section id="concatenate-multiple-videos">
+<h3>Concatenate multiple videos<a class="headerlink" href="#concatenate-multiple-videos" title="Permalink to this heading"></a></h3>
+<p>Use this tool to concatenate a user-defined number of videos into a
+single video mosaic of videos.</p>
+<a class="reference internal image-reference" href="../_images/menu_25.png"><img alt="../_images/menu_25.png" class="align-center" src="../_images/menu_25.png" style="width: 1000px;" /></a>
+<p>Begin by selecting how many videos you want to concatenate together in
+the <code class="docutils literal notranslate"><span class="pre">VIDEOS</span> <span class="pre">#</span></code> drop-down menu and click <code class="docutils literal notranslate"><span class="pre">SELECT</span></code>. A table, with one
+row representing each of the videos, will show up titled
+<code class="docutils literal notranslate"><span class="pre">VIDEO</span> <span class="pre">PATHS</span></code>. Here, click the <code class="docutils literal notranslate"><span class="pre">BROWSE</span> <span class="pre">FILE</span></code> button and select the
+videos that you want to merge into a single video.</p>
+<p>Next, in the <code class="docutils literal notranslate"><span class="pre">JOIN</span> <span class="pre">TYPE</span></code> sub-menu, we need to select how to join the
+videos together, and we have 4 options:</p>
+<ul class="simple">
+<li><p>MOSAIC: Creates two rows with half of your choosen videos in each
+row. If you have an unequal number of videos you want to concatenate,
+then the bottom row will get an additional blank space.</p></li>
+<li><p>VERTICAL: Creates a single column concatenation with the selected
+videos.</p></li>
+<li><p>HORIZONTAL: Creates a single row concatenation with the selected
+videos.</p></li>
+<li><p>MIXED MOSAIC: First creates two rows with half of your choosen videos
+in each row. The video selected in the <code class="docutils literal notranslate"><span class="pre">Video</span> <span class="pre">1</span></code> path is
+concatenated to the left of the two rows.</p></li>
+</ul>
+<p>Finally, we need to choose the resolution of the videos in the
+<code class="docutils literal notranslate"><span class="pre">Resolution</span> <span class="pre">width</span></code> and the <code class="docutils literal notranslate"><span class="pre">Resolution</span> <span class="pre">height</span></code> drop-down videos.
+<strong>If choosing the MOSAIC, , VERTICAL, or horizontal join type, this is
+the resolution of each panel video in the output video. If choosing
+MIXED MOSAIC, then this is the resolution of the smaller videos in the
+panel (to the right)</strong>.</p>
+<p>After clicking <code class="docutils literal notranslate"><span class="pre">RUN</span></code>, you can follow the progress in the main SimBA
+terminal and the OS terminal. Once complete, a new output video with a
+date-time stamp in the filename is saved in the the same directory as
+the directory of the video selected as <code class="docutils literal notranslate"><span class="pre">Video</span> <span class="pre">1</span></code>.</p>
+</section>
+<section id="print-mode-info">
+<h3>Print mode info<a class="headerlink" href="#print-mode-info" title="Permalink to this heading"></a></h3>
+<p>Use this tool to get the model information (e.g., number of features,
+number of trees used to create a model) from a model <code class="docutils literal notranslate"><span class="pre">.sav</span></code> file in
+SimBA.</p>
+<a class="reference internal image-reference" href="tutorials_rst/img/third_party_annotations/print_model_info_1.png"><img alt="tutorials_rst/img/third_party_annotations/print_model_info_1.png" class="align-center" src="tutorials_rst/img/third_party_annotations/print_model_info_1.png" style="width: 600px;" /></a>
+<ol class="arabic simple">
+<li><p>Next to the <code class="docutils literal notranslate"><span class="pre">Model</span> <span class="pre">path</span></code> entry box, click <code class="docutils literal notranslate"><span class="pre">Browse</span></code> and navigate
+to a model classifier that you have created in SimBA (e.g., select
+the <code class="docutils literal notranslate"><span class="pre">MyClassifier.sav</span></code> file.</p></li>
+<li><p>Next, click <code class="docutils literal notranslate"><span class="pre">PRINT</span> <span class="pre">MODEL</span> <span class="pre">INFO</span></code> and you should see the following
+information printed in the main SimBA terminal.</p></li>
+</ol>
+<a class="reference internal image-reference" href="tutorials_rst/img/third_party_annotations/print_model_info_2.png"><img alt="tutorials_rst/img/third_party_annotations/print_model_info_2.png" class="align-center" src="tutorials_rst/img/third_party_annotations/print_model_info_2.png" style="width: 1000px;" /></a>
+<p>This information tells you how many trees the classifier uses, how many
+features the classifier expects, further model hyperparameter settings,
+and when the file was created etc.</p>
+<p>Author <a class="reference external" href="https://github.com/sronilsson">Simon N</a>, <a class="reference external" href="https://github.com/inoejj">JJ
+Choong</a></p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="create_user_defined_pose_config.html" class="btn btn-neutral float-left" title="User-defined pose-configurations in SimBA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../walkthroughs.html" class="btn btn-neutral float-right" title="Walkthroughs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

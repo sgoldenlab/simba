@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.data_processors.spontaneous_alternation_calculator &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.data_processors.spontaneous_alternation_calculator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.data_processors.spontaneous_alternation_calculator</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">platform</span>
+
+<span class="kn">from</span> <span class="nn">simba.mixins.config_reader</span> <span class="kn">import</span> <span class="n">ConfigReader</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.feature_extraction_supplement_mixin</span> <span class="kn">import</span> \
+    <span class="n">FeatureExtractionSupplemental</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.geometry_mixin</span> <span class="kn">import</span> <span class="n">GeometryMixin</span>
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">check_all_file_names_are_represented_in_video_log</span><span class="p">,</span> <span class="n">check_float</span><span class="p">,</span> <span class="n">check_int</span><span class="p">,</span>
+    <span class="n">check_str</span><span class="p">,</span> <span class="n">check_valid_lst</span><span class="p">,</span> <span class="n">check_video_has_rois</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.errors</span> <span class="kn">import</span> <span class="p">(</span><span class="n">AnimalNumberError</span><span class="p">,</span> <span class="n">InvalidInputError</span><span class="p">,</span>
+                                <span class="n">NoFilesFoundError</span><span class="p">,</span> <span class="n">ROICoordinatesNotFoundError</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.printing</span> <span class="kn">import</span> <span class="n">stdout_success</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="n">get_fn_ext</span><span class="p">,</span> <span class="n">read_data_paths</span><span class="p">,</span> <span class="n">read_df</span>
+<span class="kn">from</span> <span class="nn">simba.utils.warnings</span> <span class="kn">import</span> <span class="n">NoFileFoundWarning</span>
+
+<span class="n">TAIL_END</span> <span class="o">=</span> <span class="s2">&quot;tail_end&quot;</span>
+
+
+<div class="viewcode-block" id="SpontaneousAlternationCalculator"><a class="viewcode-back" href="../../../simba.data_processors.html#simba.data_processors.spontaneous_alternation_calculator.SpontaneousAlternationCalculator">[docs]</a><span class="k">class</span> <span class="nc">SpontaneousAlternationCalculator</span><span class="p">(</span><span class="n">ConfigReader</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute spontaneous alternations based on specified ROIs and animal detection parameters.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">       This method computes spontaneous alternation by fitting the smallest viable geometry (a.k.a. shape, polygon) that</span>
+<span class="sd">       encompasses the animal key-points (but see buffer parameter below). It then checks the percent overlap between the</span>
+<span class="sd">       animal geometry and the defined arm and center geometries in each frame. If the percent overlap is more or equal to the</span>
+<span class="sd">       specified threshold, then the animal considered to visiting the relevant arm. The animal is considered exiting an arm</span>
+<span class="sd">       when the percent overlap with a different ROI is above the threshold.</span>
+
+<span class="sd">    .. attention::</span>
+<span class="sd">       Requires SimBA project with (i) only one tracked animal, (ii) at least three pose-estmated body-parts, and (iii) defined</span>
+<span class="sd">       ROIs representing the arms and the center of the maze.</span>
+
+<span class="sd">    :param Union[str, os.PathLike] config_path: Path to SimBA project config file.</span>
+<span class="sd">    :param List[str] arm_names: List of ROI names representing the arms.</span>
+<span class="sd">    :param str center_name: Name of the ROI representing the center of the maze</span>
+<span class="sd">    :param Optional[int] animal_area: Value between 51 and 100, representing the percent of the animal body that has to be situated in a ROI for it to be considered an entry.</span>
+<span class="sd">    :param Optional[float] threshold: Value between 0.0 and 1.0. Body-parts with detection probabilities below this value will be (if possible) filtered when constructing the animal geometry.</span>
+<span class="sd">    :param Optional[int] buffer: Millimeters area for which the animal geometry should be increased in size. Useful if the animal geometry does not fully cover the animal.</span>
+<span class="sd">    :param Optional[bool] detailed_data: If True, saves an additional CSV for each analyzed video with detailed data pertaining each error type and alternation sequence.</span>
+<span class="sd">    :param Optional[Union[str, os.PathLike]] data_path: Directory of path to the file to be analyzed. If None, then ``project_folder/outlier_corrected_movement_location`` directory.</span>
+
+<span class="sd">    :example:</span>
+<span class="sd">    &gt;&gt;&gt; x = SpontaneousAlternationCalculator(config_path=&#39;/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini&#39;, arm_names=[&#39;A&#39;, &#39;B&#39;, &#39;C&#39;], center_name=&#39;Center&#39;, threshold=0.0, animal_area=100, buffer=2, detailed_data=True)</span>
+<span class="sd">    &gt;&gt;&gt; x.run()</span>
+<span class="sd">    &gt;&gt;&gt; x.save()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">config_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
+                 <span class="n">arm_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                 <span class="n">center_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">animal_area</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">80</span><span class="p">,</span>
+                 <span class="n">threshold</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span><span class="p">,</span>
+                 <span class="n">buffer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+                 <span class="n">verbose</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">detailed_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">data_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">ConfigReader</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">animal_cnt</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">AnimalNumberError</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Spontaneous alternation can only be calculated in 1 animal projects. Your project has </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">animal_cnt</span><span class="si">}</span><span class="s2"> animals.&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">body_parts_lst</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidInputError</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Spontaneous alternation can only be calculated in projects with 3 or more tracked body-parts. Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">body_parts_lst</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roi_coordinates_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">ROICoordinatesNotFoundError</span><span class="p">(</span><span class="n">expected_file_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">roi_coordinates_path</span><span class="p">)</span>
+        <span class="n">check_valid_lst</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">arm_names</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="n">SpontaneousAlternationCalculator</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">valid_dtypes</span><span class="o">=</span><span class="p">(</span><span class="nb">str</span><span class="p">,),</span> <span class="n">min_len</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">check_str</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;CENTER NAME&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">center_name</span><span class="p">)</span>
+        <span class="n">check_int</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;ANIMAL AREA&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">animal_area</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">51</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+        <span class="n">check_float</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;THRESHOLD&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">max_value</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">check_int</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;BUFFER&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">buffer</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">data_paths</span> <span class="o">=</span> <span class="n">read_data_paths</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_corrected_paths</span><span class="p">,</span> <span class="n">default_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_corrected_dir</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">)</span>
+        <span class="n">file_paths</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="n">data_paths</span><span class="p">:</span> <span class="n">file_paths</span><span class="p">[</span><span class="n">get_fn_ext</span><span class="p">(</span><span class="n">file_path</span><span class="p">)[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">file_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_roi_data</span><span class="p">()</span>
+        <span class="n">files_w_missing_rois</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">file_paths</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_names_w_rois</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files_w_rois</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">file_paths</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_names_w_rois</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_w_rois</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NoFilesFoundError</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;No ROI definitions found for any of the data fat </span><span class="si">{</span><span class="n">arm_names</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files_w_missing_rois</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">NoFileFoundWarning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">files_w_missing_rois</span><span class="p">)</span><span class="si">}</span><span class="s2"> file(s) at </span><span class="si">{</span><span class="n">data_path</span><span class="si">}</span><span class="s2"> are missing ROI definitions and will be skipped when performing spontaneous alternation calculations: </span><span class="si">{</span><span class="n">files_w_missing_rois</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">check_video_has_rois</span><span class="p">(</span><span class="n">roi_dict</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">roi_dict</span><span class="p">,</span> <span class="n">video_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">files_w_rois</span><span class="p">,</span> <span class="n">roi_names</span><span class="o">=</span><span class="n">arm_names</span> <span class="o">+</span> <span class="p">[</span><span class="n">center_name</span><span class="p">],)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_paths</span> <span class="o">=</span> <span class="nb">list</span><span class="p">({</span><span class="n">file_paths</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files_w_rois</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">file_paths</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">animal_area</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">detailed_data</span> <span class="o">=</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">buffer</span><span class="p">,</span> <span class="n">animal_area</span><span class="p">,</span> <span class="n">detailed_data</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">center_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">arm_names</span> <span class="o">=</span> <span class="n">verbose</span><span class="p">,</span> <span class="n">center_name</span><span class="p">,</span> <span class="n">arm_names</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">roi_geos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_clrs</span> <span class="o">=</span> <span class="n">GeometryMixin</span><span class="o">.</span><span class="n">simba_roi_to_geometries</span><span class="p">(</span><span class="n">rectangles_df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rectangles_df</span><span class="p">,</span> <span class="n">circles_df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">circles_df</span><span class="p">,</span> <span class="n">polygons_df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">polygon_df</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_geos</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">roi_geos</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">files_w_rois</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">check_all_file_names_are_represented_in_video_log</span><span class="p">(</span><span class="n">video_info_df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">video_info_df</span><span class="p">,</span> <span class="n">data_paths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">file_paths</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fps_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_paths</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">filepath</span><span class="o">=</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">px_per_mm</span><span class="p">,</span> <span class="n">fps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_video_info</span><span class="p">(</span><span class="n">video_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fps_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">fps</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span> <span class="o">=</span> <span class="n">read_df</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">)</span>
+            <span class="n">bp_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bp_headers</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_p&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">TAIL_END</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()]]</span>
+            <span class="n">p_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bp_headers</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_p&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">TAIL_END</span> <span class="ow">in</span> <span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()]]</span>
+            <span class="n">bp_arr</span> <span class="o">=</span> <span class="n">bp_df</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bp_df</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">bp_df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
+            <span class="n">p_arr</span> <span class="o">=</span> <span class="n">p_df</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p_df</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">p_df</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">threshold</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="n">bp_arr</span> <span class="o">=</span> <span class="n">GeometryMixin</span><span class="o">.</span><span class="n">filter_low_p_bps_for_shapes</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">bp_arr</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">p_arr</span><span class="p">,</span> <span class="n">threshold</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">threshold</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">bp_arr</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">animal_polygons</span> <span class="o">=</span> <span class="n">GeometryMixin</span><span class="p">()</span><span class="o">.</span><span class="n">multiframe_bodyparts_to_polygon</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">bp_arr</span><span class="p">,</span>
+                                                                                   <span class="n">parallel_offset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">buffer</span><span class="p">,</span>
+                                                                                   <span class="n">pixels_per_mm</span><span class="o">=</span><span class="n">px_per_mm</span><span class="p">,</span>
+                                                                                   <span class="n">video_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">,</span>
+                                                                                   <span class="n">animal_name</span><span class="o">=</span><span class="s2">&quot;Animal&quot;</span><span class="p">,</span>
+                                                                                   <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">roi_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">geo_name</span><span class="p">,</span> <span class="n">geo</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_geos</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">roi_geo</span> <span class="o">=</span> <span class="p">[</span><span class="n">geo</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">animal_polygons</span><span class="p">))]</span>
+                <span class="n">pct_overlap</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">GeometryMixin</span><span class="p">()</span><span class="o">.</span><span class="n">multiframe_compute_pct_shape_overlap</span><span class="p">(</span><span class="n">shape_1</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">animal_polygons</span><span class="p">,</span>
+                                                                                            <span class="n">shape_2</span><span class="o">=</span><span class="n">roi_geo</span><span class="p">,</span>
+                                                                                            <span class="n">denominator</span><span class="o">=</span><span class="s2">&quot;shape_1&quot;</span><span class="p">,</span>
+                                                                                            <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">,</span>
+                                                                                            <span class="n">animal_names</span><span class="o">=</span><span class="n">geo_name</span><span class="p">,</span>
+                                                                                            <span class="n">video_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">))</span>
+                <span class="n">frames_in_roi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">pct_overlap</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                <span class="n">frames_in_roi</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argwhere</span><span class="p">(</span><span class="n">pct_overlap</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">animal_area</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">roi_df</span><span class="p">[</span><span class="n">geo_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">frames_in_roi</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">video_results</span> <span class="o">=</span> <span class="n">FeatureExtractionSupplemental</span><span class="o">.</span><span class="n">spontaneous_alternations</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">roi_df</span><span class="p">,</span> <span class="n">arm_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">arm_names</span><span class="p">,</span> <span class="n">center_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">center_name</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_results</span>
+
+    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running alternation analysis...&quot;</span><span class="p">)</span>
+        <span class="n">results_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;VIDEO NAME&quot;</span><span class="p">,</span><span class="s2">&quot;ALTERNATION RATE&quot;</span><span class="p">,</span><span class="s2">&quot;ALTERNATION COUNT&quot;</span><span class="p">,</span><span class="s2">&quot;ERROR COUNT&quot;</span><span class="p">,</span><span class="s2">&quot;SAME ARM RETURN ERRORS&quot;</span><span class="p">,</span><span class="s2">&quot;ALTERNATE ARM RETURN ERRORS&quot;</span><span class="p">])</span>
+        <span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logs_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;spontaneous_alternation_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">video_name</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">results_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">results_df</span><span class="p">)]</span> <span class="o">=</span> <span class="p">[</span><span class="n">video_name</span><span class="p">,</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;pct_alternation&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;alternation_cnt&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;error_cnt&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;same_arm_returns_cnt&quot;</span><span class="p">],</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;alternate_arm_returns_cnt&quot;</span><span class="p">]]</span>
+        <span class="n">results_df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;VIDEO NAME&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+        <span class="n">stdout_success</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Spontaneous alternation data for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span><span class="si">}</span><span class="s2"> video(s) saved at </span><span class="si">{</span><span class="n">save_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">detailed_data</span><span class="p">:</span>
+            <span class="n">save_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logs_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;detailed_spontaneous_alternation_data_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">sliced_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;same_arm_returns_dict&quot;</span><span class="p">,</span><span class="s2">&quot;alternate_arm_returns_dict&quot;</span><span class="p">,</span><span class="s2">&quot;alternations_dict&quot;</span><span class="p">]</span>
+            <span class="n">replace_keys</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;same_arm_returns_dict&quot;</span><span class="p">:</span> <span class="s2">&quot;same arm return&quot;</span><span class="p">,</span><span class="s2">&quot;alternate_arm_returns_dict&quot;</span><span class="p">:</span> <span class="s2">&quot;alternate arm return&quot;</span><span class="p">,</span><span class="s2">&quot;alternations_dict&quot;</span><span class="p">:</span> <span class="s2">&quot;alternations&quot;</span><span class="p">,}</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_dir</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">video_name</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">details_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2">_details.csv&quot;</span><span class="p">)</span>
+                <span class="n">arm_entry_sequence_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2">_arm_entry_sequence.csv&quot;</span><span class="p">)</span>
+                <span class="n">sliced_data</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">sliced_keys</span><span class="p">}</span>
+                <span class="n">sliced_data</span> <span class="o">=</span> <span class="p">{</span><span class="n">replace_keys</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">sliced_data</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+                <span class="n">row_idx</span> <span class="o">=</span> <span class="p">[(</span><span class="n">o</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">o</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sliced_data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sliced_data</span><span class="o">.</span><span class="n">values</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sublist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">sublist</span><span class="p">))]</span> <span class="k">for</span> <span class="n">sublist</span> <span class="ow">in</span> <span class="n">values</span><span class="p">]</span>
+                <span class="n">multi_index</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_tuples</span><span class="p">(</span><span class="n">row_idx</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Behavior&quot;</span><span class="p">,</span> <span class="s2">&quot;Arm&quot;</span><span class="p">])</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">multi_index</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Frames&quot;</span><span class="p">])</span>
+                <span class="n">d</span><span class="p">[</span><span class="s1">&#39;arm_entry_sequence&#39;</span><span class="p">][</span><span class="s1">&#39;ENTER TIME (s)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;arm_entry_sequence&#39;</span><span class="p">][</span><span class="s1">&#39;Start_frame&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fps_dict</span><span class="p">[</span><span class="n">video_name</span><span class="p">]</span>
+                <span class="n">d</span><span class="p">[</span><span class="s1">&#39;arm_entry_sequence&#39;</span><span class="p">][</span><span class="s1">&#39;EXIT TIME (s)&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;arm_entry_sequence&#39;</span><span class="p">][</span><span class="s1">&#39;End_frame&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fps_dict</span><span class="p">[</span><span class="n">video_name</span><span class="p">]</span>
+                <span class="n">arm_entry_sequence_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;arm_entry_sequence&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;ARM_ENTRY_SEQUENCE&#39;</span><span class="p">,</span> <span class="s1">&#39;ENTRY FRAME&#39;</span><span class="p">,</span> <span class="s1">&#39;EXIT FRAME&#39;</span><span class="p">,</span> <span class="s1">&#39;ENTER TIME (s)&#39;</span><span class="p">,</span> <span class="s1">&#39;EXIT TIME (s)&#39;</span><span class="p">])</span>
+                <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">details_path</span><span class="p">)</span>
+                <span class="n">arm_entry_sequence_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">arm_entry_sequence_path</span><span class="p">)</span>
+
+            <span class="n">stdout_success</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Detailed spontaneous alternation data for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span><span class="si">}</span><span class="s2"> video(s) saved at </span><span class="si">{</span><span class="n">save_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<span class="c1"># config_path = &#39;/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini&#39;</span>
+<span class="c1"># arm_names = [&#39;A&#39;, &#39;B&#39;, &#39;C&#39;]</span>
+<span class="c1"># center_name = &#39;Center&#39;</span>
+<span class="c1"># threshold = 0.0</span>
+<span class="c1"># animal_area = 60</span>
+<span class="c1"># buffer = 2</span>
+<span class="c1"># verbose = True</span>
+<span class="c1">#</span>
+<span class="c1"># x = SpontaneousAlternationCalculator(config_path=config_path,</span>
+<span class="c1">#                                      arm_names=arm_names,</span>
+<span class="c1">#                                      center_name=center_name,</span>
+<span class="c1">#                                      threshold=threshold,</span>
+<span class="c1">#                                      detailed_data=True,</span>
+<span class="c1">#                                      animal_area=animal_area,</span>
+<span class="c1">#                                      buffer=buffer,</span>
+<span class="c1">#                                      verbose=verbose)</span>
+<span class="c1"># x.run()</span>
+<span class="c1"># x.save()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

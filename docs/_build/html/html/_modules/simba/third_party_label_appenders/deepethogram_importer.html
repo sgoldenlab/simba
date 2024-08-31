@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.third_party_label_appenders.deepethogram_importer &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.third_party_label_appenders.deepethogram_importer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.third_party_label_appenders.deepethogram_importer</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">simba.mixins.config_reader</span> <span class="kn">import</span> <span class="n">ConfigReader</span>
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="p">(</span><span class="n">check_if_dir_exists</span><span class="p">,</span>
+                                <span class="n">check_if_filepath_list_is_empty</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.printing</span> <span class="kn">import</span> <span class="n">stdout_success</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="n">get_fn_ext</span><span class="p">,</span> <span class="n">read_df</span><span class="p">,</span> <span class="n">write_df</span>
+
+
+<div class="viewcode-block" id="DeepEthogramImporter"><a class="viewcode-back" href="../../../simba.third_party_label_appenders.html#simba.third_party_label_appenders.deepethogram_importer.DeepEthogramImporter">[docs]</a><span class="k">class</span> <span class="nc">DeepEthogramImporter</span><span class="p">(</span><span class="n">ConfigReader</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Append DeepEthogram optical flow annotations onto featurized pose-estimation data.</span>
+
+<span class="sd">    :param str config_path: path to SimBA project config file in Configparser format</span>
+<span class="sd">    :param str data_dir: path to folder holding DeepEthogram data files is CSV format</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">       `Third-party import tutorials &lt;https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md&gt;`__.</span>
+<span class="sd">       `Example expected input &lt;https://github.com/sgoldenlab/simba/blob/master/misc/deep_ethogram_labels.csv&gt;`__.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    ----------</span>
+<span class="sd">    &gt;&gt;&gt; deepethogram_importer = DeepEthogramImporter(config_path=r&#39;MySimBAConfigPath&#39;, data_dir=r&#39;MyDeepEthogramDir&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; deepethogram_importer.run()</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    .. [1] `DeepEthogram repo &lt;https://github.com/jbohnslav/deepethogram&gt;`__.</span>
+<span class="sd">    .. [2] `Example DeepEthogram input file &lt;https://github.com/sgoldenlab/simba/blob/master/misc/deep_ethogram_labels.csv&gt;`__.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">config_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">data_dir</span>
+        <span class="n">check_if_dir_exists</span><span class="p">(</span><span class="n">in_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deepethogram_files_found</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">+</span> <span class="s2">&quot;/*.csv&quot;</span><span class="p">)</span>
+        <span class="n">check_if_filepath_list_is_empty</span><span class="p">(</span><span class="n">filepaths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">deepethogram_files_found</span><span class="p">,</span>
+            <span class="n">error_msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SIMBA ERROR: ZERO DeepEthogram CSV files found in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="si">}</span><span class="s2"> directory&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">check_if_filepath_list_is_empty</span><span class="p">(</span>
+            <span class="n">filepaths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_file_paths</span><span class="p">,</span>
+            <span class="n">error_msg</span><span class="o">=</span><span class="s2">&quot;SIMBA ERROR: ZERO files found in the project_folder/csv/features_extracted directory&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">feature_file_names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches_dict</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">feature_file_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">feature_file_paths</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">feature_file_path</span><span class="p">)</span>
+            <span class="n">feature_file_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">deepethogram_files_found</span><span class="p">:</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">file_name</span> <span class="ow">in</span> <span class="n">feature_file_names</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">matches_dict</span><span class="p">[</span><span class="n">file_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">features_dir</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">+</span> <span class="n">ext</span>
+                <span class="p">)</span>
+                <span class="k">pass</span>
+            <span class="k">elif</span> <span class="n">file_name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_labels&quot;</span><span class="p">):</span>
+                <span class="n">short_file_name</span> <span class="o">=</span> <span class="n">file_name</span><span class="p">[:</span><span class="o">-</span><span class="mi">7</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">short_file_name</span> <span class="ow">in</span> <span class="n">feature_file_names</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">matches_dict</span><span class="p">[</span><span class="n">file_path</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">features_dir</span><span class="p">,</span> <span class="n">short_file_name</span> <span class="o">+</span> <span class="n">ext</span>
+                    <span class="p">)</span>
+                    <span class="k">pass</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;SIMBA ERROR: Could not find file in project_folder/csv/features_extracted directory representing </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">file_name</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">cnt</span><span class="p">,</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matches_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">video_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">filepath</span><span class="o">=</span><span class="n">v</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">annotations_df</span> <span class="o">=</span> <span class="n">read_df</span><span class="p">(</span>
+                <span class="n">file_path</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">file_type</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">features_df</span> <span class="o">=</span> <span class="n">read_df</span><span class="p">(</span>
+                <span class="n">file_path</span><span class="o">=</span><span class="n">v</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">file_type</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_video_info</span><span class="p">(</span><span class="n">video_name</span><span class="o">=</span><span class="n">video_name</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">clf_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clf_names</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">clf_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotations_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="s2">&quot;SIMBA ERROR: No annotations for behavior </span><span class="si">{}</span><span class="s2"> found in DeepEthogram annotation file for video </span><span class="si">{}</span><span class="s2">&quot;</span>
+                        <span class="s2">&quot;Exclude </span><span class="si">{}</span><span class="s2"> from your SimBA project or add DeepEthogram annotations for </span><span class="si">{}</span><span class="s2"> for video </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">clf_name</span><span class="p">,</span> <span class="n">video_name</span><span class="p">,</span> <span class="n">clf_name</span><span class="p">,</span> <span class="n">clf_name</span><span class="p">,</span> <span class="n">video_name</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annotations_df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_df</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;SIMBA WARNING: The DEEPETHOGRAM annotations for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> contain data for </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annotations_df</span><span class="p">))</span><span class="si">}</span><span class="s2"> frames. The pose-estimation features for the same video contain data for </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_df</span><span class="p">))</span><span class="si">}</span><span class="s2"> frames. &quot;</span>
+                    <span class="s2">&quot;SimBA will use the annotations for the frames present in the pose-estimation data and discard the rest.&quot;</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">annotations_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotations_df</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_df</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annotations_df</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_df</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;SIMBA WARNING: The DEEPETHOGRAM annotations for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> contain data for </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annotations_df</span><span class="p">))</span><span class="si">}</span><span class="s2"> frames. The pose-estimation features for the same video contain data for </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_df</span><span class="p">))</span><span class="si">}</span><span class="s2"> frames. &quot;</span>
+                    <span class="s2">&quot;SimBA expects the annotations and pose-estimation data to contain an equal number of frames. SimBA will assume that &quot;</span>
+                    <span class="s2">&quot;the un-annotated frames have no behaviors present.&quot;</span>
+                <span class="p">)</span>
+                <span class="n">padding</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                    <span class="p">[[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_df</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">annotations_df</span><span class="p">))],</span>
+                    <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">annotations_df</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">annotations_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotations_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">padding</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">features_df</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">clf_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clf_names</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">clf_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">annotations_df</span><span class="p">[</span><span class="n">clf_name</span><span class="p">]</span>
+
+            <span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">targets_folder</span><span class="p">,</span> <span class="n">video_name</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span>
+            <span class="p">)</span>
+            <span class="n">write_df</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="n">save_path</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DeepEthogram annotation for video </span><span class="si">{}</span><span class="s2"> saved...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">video_name</span><span class="p">))</span>
+
+        <span class="n">stdout_success</span><span class="p">(</span>
+            <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Annotations for </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clf_names</span><span class="p">)))</span><span class="si">}</span><span class="s2"> behaviors added to </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">matches_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2"> videos and saved in the project_folder/csv/targets_inserted directory.&quot;</span>
+        <span class="p">)</span></div>
+
+
+<span class="c1"># test = DeepEthogramImporter(deep_ethogram_dir=&#39;/Users/simon/Desktop/troubleshooting/deepethnogram/deepethnogram&#39;,</span>
+<span class="c1">#                             config_path=&#39;/Users/simon/Desktop/troubleshooting/deepethnogram/project_folder/project_config.ini&#39;)</span>
+<span class="c1"># test.run()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

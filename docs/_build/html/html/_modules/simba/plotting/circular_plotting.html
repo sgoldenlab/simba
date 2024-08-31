@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.plotting.circular_plotting &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.plotting.circular_plotting</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.plotting.circular_plotting</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="n">cm</span><span class="p">,</span> <span class="n">figure</span>
+
+<span class="kn">from</span> <span class="nn">simba.mixins.plotting_mixin</span> <span class="kn">import</span> <span class="n">PlottingMixin</span>
+<span class="kn">from</span> <span class="nn">simba.utils.printing</span> <span class="kn">import</span> <span class="n">stdout_success</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="n">read_df</span>
+
+
+<div class="viewcode-block" id="CircularPlotting"><a class="viewcode-back" href="../../../simba.plotting.html#simba.plotting.circular_plotting.CircularPlotting">[docs]</a><span class="k">class</span> <span class="nc">CircularPlotting</span><span class="p">(</span><span class="n">PlottingMixin</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">PlottingMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="CircularPlotting.diffusion_plot"><a class="viewcode-back" href="../../../simba.plotting.html#simba.plotting.circular_plotting.CircularPlotting.diffusion_plot">[docs]</a>    <span class="k">def</span> <span class="nf">diffusion_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                       <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                       <span class="n">fps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                       <span class="n">degree_width</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+                       <span class="n">palette</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;jet&#39;</span><span class="p">,</span>
+                       <span class="n">title</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                       <span class="n">save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create polar plot representing the within a video.</span>
+
+<span class="sd">        .. image:: _static/img/circular_plotter.png</span>
+<span class="sd">          :width: 450</span>
+<span class="sd">          :align: center</span>
+
+<span class="sd">        :param np.ndarray data: 1D np.ndarray with angle in degrees with one entry per frame.</span>
+<span class="sd">        :param int fps: Framerate the video was recorded in.</span>
+<span class="sd">        :param int degree_width: The width of the bars in the plot.</span>
+<span class="sd">        :param str palette: The polar plot palette.</span>
+<span class="sd">        :param str title: Title of the plot</span>
+<span class="sd">        :param Optional[Union[str, os.PathLike]] save_path: Plot save location on disk. If None, then return plt.figure polar plot.</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; data = np.random.normal(loc=180, scale=99, size=5000)</span>
+<span class="sd">        &gt;&gt;&gt; _ = CircularPlotting().diffusion_plot(data=data, title=&#39;Mean 180 degree plot&#39;, fps=30, degree_width=5, palette=&#39;jet&#39;, save_path=&#39;/Users/simon/Desktop/envs/troubleshooting/circular_features_zebrafish/project_folder/frames/output/dispersion/20200730_AB_7dpf_850nm_0004.png&#39;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">matplotlib</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s2">&quot;font.size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="n">max_seconds</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">fps</span><span class="p">)</span>
+        <span class="n">second_bin</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_seconds</span> <span class="o">/</span> <span class="mi">5</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">second_bin</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">second_bin</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">data_rad</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">360</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]</span>
+        <span class="n">angle_bin_starts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">degree_width</span> <span class="o">/</span> <span class="mi">360</span><span class="p">))</span>
+        <span class="n">n_length_bins</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">max_seconds</span> <span class="o">/</span> <span class="n">second_bin</span><span class="p">)</span>
+        <span class="n">bin_width</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="p">(</span><span class="n">degree_width</span> <span class="o">/</span> <span class="mi">360</span><span class="p">)</span>
+        <span class="n">counts</span><span class="p">,</span> <span class="n">bin_edges</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">histogram</span><span class="p">(</span><span class="n">data_rad</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">angle_bin_starts</span><span class="p">)</span>
+        <span class="n">colors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_single_color_lst</span><span class="p">(</span><span class="n">pallete_name</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span> <span class="n">increments</span><span class="o">=</span><span class="n">bin_edges</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">as_rgb_ratio</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">norm_counts</span> <span class="o">=</span> <span class="n">counts</span> <span class="o">/</span> <span class="p">(</span><span class="n">fps</span> <span class="o">*</span> <span class="n">second_bin</span><span class="p">)</span>
+        <span class="n">bin_numbers</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">norm_counts</span> <span class="o">*</span> <span class="n">n_length_bins</span> <span class="o">/</span> <span class="n">max_seconds</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+        <span class="n">bin_lengths</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="o">/</span> <span class="n">degree_width</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">bin_numbers</span><span class="p">]</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_axes</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">],</span> <span class="n">polar</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">bars</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">angle_bin_starts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">bin_lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">width</span><span class="o">=</span><span class="n">bin_width</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_theta_zero_location</span><span class="p">(</span><span class="s2">&quot;N&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_theta_direction</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">cnt</span><span class="p">,</span> <span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">bar</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">bin_lengths</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bars</span><span class="p">)):</span>
+            <span class="n">bar</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="n">colors</span><span class="p">[</span><span class="n">cnt</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">title</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">save_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+            <span class="n">stdout_success</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Diffusion plot </span><span class="si">{</span><span class="n">save_path</span><span class="si">}</span><span class="s2"> created!&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ax</span></div>
+
+<div class="viewcode-block" id="CircularPlotting.diffusion_time_bin_plot"><a class="viewcode-back" href="../../../simba.plotting.html#simba.plotting.circular_plotting.CircularPlotting.diffusion_time_bin_plot">[docs]</a>    <span class="k">def</span> <span class="nf">diffusion_time_bin_plot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                <span class="n">data</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+                                <span class="n">fps</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                                <span class="n">time_bin</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                                <span class="n">degree_width</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                                <span class="n">palette</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                                <span class="n">save_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create polar plots representing angular diffusion within each N second time-bin of the video.</span>
+
+<span class="sd">        .. image:: _static/img/cicular_time_bins.png</span>
+<span class="sd">          :width: 600</span>
+<span class="sd">          :align: center</span>
+
+<span class="sd">        :param np.ndarray data: 1D np.ndarray with angle in degrees with one entry per frame.</span>
+<span class="sd">        :param int fps: Framerate the video was recorded in.</span>
+<span class="sd">        :param int time_bin: The length of each time bin (one plot will be created per time bin).</span>
+<span class="sd">        :param int degree_width: The width of the bars in the plot.</span>
+<span class="sd">        :param str palette: The polar plot palette.</span>
+<span class="sd">        :param Optional[Union[str, os.PathLike]] save_path: Plot save location on disk. If None, then return plt.figure polar plot.</span>
+
+<span class="sd">        :example:</span>
+<span class="sd">        &gt;&gt;&gt; data = np.random.normal(loc=180, scale=99, size=5000)</span>
+<span class="sd">        &gt;&gt;&gt; _ = CircularPlotting().diffusion_time_bin_plot(data=data, fps=30, degree_width=40, palette=&#39;jet&#39;, save_path=&#39;/Users/simon/Desktop/envs/troubleshooting/circular_features_zebrafish/project_folder/frames/output/dispertion_time_series/20200730_AB_7dpf_850nm_0004&#39;, time_bin=10)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">time_bin_frame_size</span> <span class="o">=</span> <span class="n">time_bin</span> <span class="o">*</span> <span class="n">fps</span>
+        <span class="n">split_data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="n">time_bin_frame_size</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">save_path</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">save_path</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">bin_cnt</span><span class="p">,</span> <span class="n">time_bin_data</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">split_data</span><span class="p">):</span>
+            <span class="n">time_plot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diffusion_plot</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">time_bin_data</span><span class="p">,</span>
+                <span class="n">fps</span><span class="o">=</span><span class="n">fps</span><span class="p">,</span>
+                <span class="n">degree_width</span><span class="o">=</span><span class="n">degree_width</span><span class="p">,</span>
+                <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span>
+                <span class="n">title</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Time bin </span><span class="si">{</span><span class="n">bin_cnt</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">fig_save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Time_bin_</span><span class="si">{</span><span class="n">bin_cnt</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">)</span>
+            <span class="n">time_plot</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">fig_save_path</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
+            <span class="n">stdout_success</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Diffusion plot </span><span class="si">{</span><span class="n">save_path</span><span class="si">}</span><span class="s2"> created!&quot;</span><span class="p">)</span></div></div>
+
+
+
+
+<span class="c1"># data = read_df(&#39;/Users/simon/Desktop/envs/simba/troubleshooting/zebrafish/project_folder/csv/features_extracted/test.csv&#39;, file_type=&#39;csv&#39;, usecols=[f&#39;Fish_clockwise_angle_degrees&#39;]).values.flatten()</span>
+<span class="c1"># CircularPlotting().diffusion_plot(data=data, title=&#39;Mean 180 degree plot&#39;, fps=30, degree_width=15, palette=&#39;jet&#39;, save_path=&#39;/Users/simon/Desktop/envs/simba/troubleshooting/zebrafish/project_folder/csv/features_extracted/test.png&#39;)</span>
+<span class="c1">#</span>
+<span class="c1"># #</span>
+<span class="c1">#</span>
+<span class="c1">#         #data = np.split(data, data.shape[0])</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># data = np.random.normal(loc=90, scale=99, size=5000)</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># _ = CircularPlotting().diffusion_plot(data=data, title=&#39;test&#39;, fps=30, degree_width=20, palette=&#39;jet&#39;, save_path=&#39;/Users/simon/Desktop/envs/troubleshooting/circular_features_zebrafish/project_folder/frames/output/dispersion/20200730_AB_7dpf_850nm_0004.png&#39;)</span>
+<span class="c1">#</span>
+<span class="c1"># #_ = CircularPlotting().diffusion_time_bin_plot(data=data, fps=30, degree_width=40, palette=&#39;jet&#39;, save_path=&#39;/Users/simon/Desktop/envs/troubleshooting/circular_features_zebrafish/project_folder/frames/output/dispertion_time_series/20200730_AB_7dpf_850nm_0004&#39;, time_bin=10)</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># print(np.rad2deg(circstd(np.deg2rad(data))))</span>
+<span class="c1"># print(np.rad2deg(circmean(np.deg2rad(data))))</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># config_path=&#39;/Users/simon/Desktop/envs/troubleshooting/circular_features_zebrafish/project_folder/project_config.ini&#39;</span>
+<span class="c1"># save_path=&#39;/Users/simon/Desktop/envs/troubleshooting/circular_features_zebrafish/project_folder/frames/output/20200730_AB_7dpf_850nm_0002.png&#39;</span>
+<span class="c1"># DW = 20</span>
+<span class="c1"># MAX_SECONDS = 10</span>
+<span class="c1"># SECOND_BIN = 1</span>
+<span class="c1"># LAST_BIN = 2*np.pi</span>
+<span class="c1">#</span>
+<span class="c1"># length_raw = np.arange(0,MAX_SECONDS+SECOND_BIN, SECOND_BIN)</span>
+<span class="c1"># length_dict = {x: x/MAX_SECONDS for x in length_raw}</span>
+<span class="c1"># data_rad = [x*2*np.pi/360 for x in data]</span>
+<span class="c1"># angle_bin_starts = np.arange(0.0, 2*np.pi, 2*np.pi * (DW/360))</span>
+<span class="c1"># n_length_bins = int(MAX_SECONDS/SECOND_BIN)</span>
+<span class="c1"># bin_width = 2*np.pi * (DW/360)</span>
+<span class="c1">#</span>
+<span class="c1"># # for bin_start in angle_bin_starts:</span>
+<span class="c1"># counts, bin_edges = np.histogram(data_rad, bins=angle_bin_starts)</span>
+<span class="c1"># colors = PlottingMixin().create_single_color_lst(pallete_name=&#39;jet&#39;, increments=bin_edges.shape[0], as_rgb_ratio=True)</span>
+<span class="c1"># norm_counts = counts/(30*SECOND_BIN)</span>
+<span class="c1"># bin_numbers = [np.round(norm_counts * n_length_bins/MAX_SECONDS, 0)]</span>
+<span class="c1"># bin_lengths = [x/5 for x in bin_numbers]</span>
+<span class="c1"># bin_widths = [bin_width for idx in range(0, 72)]</span>
+<span class="c1"># fig = figure(figsize=(8,8))</span>
+<span class="c1"># ax = fig.add_axes([0.1, 0.1, 0.8, 0.8], polar=True)</span>
+<span class="c1"># #ax.set_yticklabels([list(range(1, MAX_SECONDS))])</span>
+<span class="c1"># bars = ax.bar(angle_bin_starts[:-1], bin_lengths[0], width=bin_width, bottom=0.0)</span>
+<span class="c1"># ax.set_theta_zero_location(&#39;N&#39;)</span>
+<span class="c1"># ax.set_theta_direction(-1)</span>
+<span class="c1"># ax.set_yticklabels([])</span>
+<span class="c1"># #labels = [str(int(x)) + &#39;s&#39; for x in np.linspace(0, MAX_SECONDS, 4)]</span>
+<span class="c1"># #labels_cnt = np.linspace(0, 1, 4)</span>
+<span class="c1">#</span>
+<span class="c1"># #ax.set_rgrids(labels_cnt, labels, fontsize=16)</span>
+<span class="c1"># #lines, labels = ax.set_rgrids(labels_cnt, labels, fontsize=16)</span>
+<span class="c1"># for cnt, (r, bar) in enumerate(zip(bin_lengths[0], bars)):</span>
+<span class="c1">#     bar.set_facecolor(colors[cnt])</span>
+<span class="c1">#     #bar.set_facecolor([cm.Reds(r)])</span>
+<span class="c1"># #</span>
+<span class="c1"># #</span>
+<span class="c1"># #</span>
+<span class="c1">#</span>
+<span class="c1"># # #plt.clf()</span>
+<span class="c1"># # compass_plot = plt.subplot(1, 1, 1, projection=&#39;polar&#39;)</span>
+<span class="c1"># # compass_plot.set_theta_zero_location(&#39;N&#39;)</span>
+<span class="c1"># # bars = compass_plot.bar(data, 0.01, width=0.01, bottom=0.0)</span>
+<span class="c1"># #</span>
+<span class="c1"># # # N = 20</span>
+<span class="c1"># # theta = np.arange(0.0, 2*np.pi, 2*np.pi/N)</span>
+<span class="c1"># # radii = 10*np.random.rand(N)</span>
+<span class="c1"># # width = np.pi/4*np.random.rand(N)</span>
+<span class="c1"># # bars = ax.bar(theta, radii, width=width, bottom=0.0)</span>
+<span class="c1"># # for r,bar in zip(radii, bars):</span>
+<span class="c1"># #     bar.set_facecolor( cm.jet(r/10.))</span>
+<span class="c1"># #     bar.set_alpha(0.5)</span>
+<span class="c1"># #</span>
+<span class="c1"># # show()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

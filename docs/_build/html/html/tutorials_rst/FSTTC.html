@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculating forward-spike time tiling coefficents in SimBA &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Feature family sub-sets in SimBA" href="feature_subsets.html" />
+    <link rel="prev" title="Regions of Interest (ROIs) in SimBA" href="roi.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SimBA
+              <img src="../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">Tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="roi.html">Regions of Interest (ROIs) in SimBA</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Calculating forward-spike time tiling coefficents in SimBA</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#step-1-generate-a-dataset">Step 1: Generate a dataset.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-2-perform-fsttc-analysis">Step 2: Perform FSTTC analysis.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#step-3-interpreting-the-fsttc-results-output">Step 3: Interpreting the FSTTC results output.</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="feature_subsets.html">Feature family sub-sets in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user_defined_feature_class.html">User-defined ‘feature extraction’ scripts in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kleinberg_filter.html">Kleinberg behavior classification smoothing in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="anchored_rois.html">Animal-anchored ROIs (bounding-boxes) in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SHAP.html">Model explainability and calculating feature SHAP values in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="directionality_between_animals.html">Who is looking at who: calculate “directionality” between animals in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="classifier_validation.html">Post-classification Validation (detecting false-positives)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cue_lights.html">Cue Light Analysis in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="multi_animal_pose.html">Using multi-animal pose-estimation data in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="process_videos.html">Batch Video Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">SimBA Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="create_user_defined_pose_config.html">User-defined pose-configurations in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tools.html">Video processing tools in SimBA</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../tutorials.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">Calculating forward-spike time tiling coefficents in SimBA</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_rst/FSTTC.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="calculating-forward-spike-time-tiling-coefficents-in-simba">
+<h1>Calculating forward-spike time tiling coefficents in SimBA<a class="headerlink" href="#calculating-forward-spike-time-tiling-coefficents-in-simba" title="Permalink to this heading"></a></h1>
+<a class="reference internal image-reference" href="../_images/landing.png"><img alt="FSTTC landing" class="align-center" src="../_images/landing.png" style="width: 600px;" /></a>
+<p>When classifying mutiple behaviors in SimBA, we may be interested in
+causal sequences. For example, does behavior A cause the expression of
+behavior B, or does behavior B cause the expression of behavior A (… and
+so one for all the different pairwise behavior combinations of
+interest).</p>
+<p>Several statistical solutions to get to such answers have been presented
+(e.g., <a class="reference external" href="https://www.tandfonline.com/doi/abs/10.1080/00949658808811102">Haccou et
+al. 1988</a>),
+and <a class="reference external" href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220596">Lee et
+al. (2019)</a>
+proposed the Forward Spike Time Tiling Coefficient (FSTTC), an
+adaptation of the Spike Time Tiling Coefficient (<a class="reference external" href="https://www.jneurosci.org/content/34/43/14288.short">Cutts and Eglen,
+2014</a>), to
+detect how behaviors initiated by one animal can trigger behavioral
+responses of a second animal during dyadic encounters. We urge users
+interested in these metrics to check out the excellent <a class="reference external" href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220596">Lee et
+al. (2019)</a>.</p>
+<p>In short, FSTTC may be helpful to answer questions such as:</p>
+<ul class="simple">
+<li><p>Does resident attack behavior predominantly cause intruder defensive
+behavior or intruder escape behavior?</p></li>
+<li><p>Does attack behavior cause defensive behavior or does defensive
+behavior cause attack behavior?</p></li>
+<li><p>Does attack behavior typically follow defensive behavior or escape
+behavior?</p></li>
+<li><p>Does rearing events typically follow sniffing events or freezing
+events?</p></li>
+</ul>
+<p>… etc etc.</p>
+<p>Note that SimBA will calculate the FSTTC for all the behaviors selected
+by the user, and SimBA does <strong>not</strong> require there to be two, or more,
+tracked animals.</p>
+<p>The FSTTC is calculated as:</p>
+<a class="reference internal image-reference" href="../_images/equation.png"><img alt="FSTTC equation" class="align-center" src="../_images/equation.png" style="width: 400px;" /></a>
+<p>Where the Δt hyper-parameter is a time-window (e.g 2000ms - Lee et
+al. 2019). P is the proportion of behavior B onsets that fall inside Δt
+following the onset of behavior A. TA is the proportion of the total
+session time that falls inside Δt following behavior A onset. TB is the
+proportion of the total session time that falls inside Δt following
+behavior B onset.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Although  transitional relationships of behavioral events often are evaluated and visualized using Markov decision processes, such techniques may require mutually exclusive states and this introduces statistical challenges for multi-individual environments. We recognise that the more sophisticated approach to explore casuse and effect in multi-individual environments would be [multi-agent reinforcement learning](<a class="reference external" href="https://medium.com/swlh/the-gist-multi-agent-reinforcement-learning-767b367b395f">https://medium.com/swlh/the-gist-multi-agent-reinforcement-learning-767b367b395f</a>) techniques but.. yeah.. this works and RL have to wait.. :)
+–&gt;</p>
+</div>
+<section id="step-1-generate-a-dataset">
+<h2>Step 1: Generate a dataset.<a class="headerlink" href="#step-1-generate-a-dataset" title="Permalink to this heading"></a></h2>
+<p>First, SimBA needs classified data to calculate the FSTTC. SimBA will
+look in the <code class="docutils literal notranslate"><span class="pre">project_folder/csv/machine_results</span></code> directory for files,
+and calculate the FSTTC scores for all the files in this folder. Thus,
+before calculating the FSTTC, make sure that you have run your
+classifiers on your data as documented
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model">HERE</a>.
+In other words, make sure you have processed your data as documented in
+the <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md">Scenario 1
+Tutorial</a>,
+up to and including <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-8-run-machine-model">Step
+8</a>.</p>
+</section>
+<section id="step-2-perform-fsttc-analysis">
+<h2>Step 2: Perform FSTTC analysis.<a class="headerlink" href="#step-2-perform-fsttc-analysis" title="Permalink to this heading"></a></h2>
+<p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-load-project-config">Load you SimBA
+project</a>,
+and click on the <code class="docutils literal notranslate"><span class="pre">[Run</span> <span class="pre">machine</span> <span class="pre">model]</span></code> tab. In the <em>Run Machine Model</em>
+submenu, you should see a button named <code class="docutils literal notranslate"><span class="pre">FSTTC</span></code>.</p>
+<a class="reference internal image-reference" href="../_images/button.png"><img alt="button" class="align-center" src="../_images/button.png" style="width: 200px;" /></a>
+<p>Go ahead and click on it, and you should see the following menu pop up:</p>
+<a class="reference internal image-reference" href="../_images/pop_up.png"><img alt="pop_up" class="align-center" src="../_images/pop_up.png" style="width: 200px;" /></a>
+<p>In this menu, we need to insert some settings telling SimBA how to
+perform the FSTTC:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">graph</span></code>: If you tick this box, SimBA will create and save a
+violin plot of the FSTTC representating all the videos in you
+project. This can be helpful to get a quick overview of the data. The
+graph will be saved as a time-stamped <code class="docutils literal notranslate"><span class="pre">.png</span></code> file in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/logs</span></code> directory, and be named something like
+<code class="docutils literal notranslate"><span class="pre">FSTTC_20210307071243.png</span></code>. It will look something like this image
+below (click on the image to enlarge), with the FSTTC is on the
+y-axis, and the dyadic pairwise behaviors on the x-axis. On the
+x-axis, the first behavior name is behavior A, and the second
+behavior name is behavior B. Thus, in the image below, the first
+violin represents the FSTTC for <strong>Lateral threat</strong> behavior followed
+by <strong>Attack</strong> behavior.</p></li>
+</ul>
+<a class="reference internal image-reference" href="../_images/violin.png"><img alt="violin" class="align-center" src="../_images/violin.png" style="width: 400px;" /></a>
+<ul class="simple">
+<li><p>Time Delta: The FSTTC needs a single hyperparameter - time delta -
+which should be expressed in milliseconds. This represents the length
+of the time-window following behavior A onset. If the expression of
+behavior B happens within time-delta, then we will consider behavior
+B as produced by behavior A. If unsure, start with a time-delta of
+2000ms <a class="reference external" href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0220596">Lee et al,
+2019</a>.</p></li>
+<li><p>Behaviors: Go ahead and tick the behaviors in your project that you
+want to calculate FSTTC’s for. SimBA will calculate FSTTC’s for all
+possible pairwise combinations of the behaviors you tick.</p></li>
+</ul>
+<p>Once done, go ahead and click on <code class="docutils literal notranslate"><span class="pre">Caluclate</span> <span class="pre">FSTTC</span></code>. You can follow the
+progress in the main SimBA terminal window.</p>
+</section>
+<section id="step-3-interpreting-the-fsttc-results-output">
+<h2>Step 3: Interpreting the FSTTC results output.<a class="headerlink" href="#step-3-interpreting-the-fsttc-results-output" title="Permalink to this heading"></a></h2>
+<p>Once done, inside your <code class="docutils literal notranslate"><span class="pre">project_folder/logs</span></code> directory, you will have
+a time-stamped CSV file - which is named something like
+<code class="docutils literal notranslate"><span class="pre">FSTTC_20210307071243.csv</span></code> - and contains the results for each of the
+videos in your project. If you open it up, it will look like this (click
+on the image to enlarge):</p>
+<a class="reference internal image-reference" href="../_images/results.png"><img alt="results" class="align-center" src="../_images/results.png" style="width: 400px;" /></a>
+<p>This file contains one row for every video in your project, and one
+column for every pairwise behavior combination of the behaviors you
+selected in <strong>Step 2</strong> above. So, for example, if you want the FSTTC for
+video <code class="docutils literal notranslate"><span class="pre">CSDS01110</span></code> and <code class="docutils literal notranslate"><span class="pre">Lateral</span> <span class="pre">threat</span> <span class="pre">-&gt;</span> <span class="pre">Attack</span></code>, look in cell C2.</p>
+<ul class="simple">
+<li><p>If the video contained no expression of behavior B, but expression of behavior A, then the
+FSTTC cell value will read <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p>If the video contained no expression of behavior A, and no expression
+of behavior B, then the FSTTC cell value will read <code class="docutils literal notranslate"><span class="pre">No</span> <span class="pre">events</span></code>.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If you ticked the box for <code class="docutils literal notranslate"><span class="pre">Create</span> <span class="pre">graph</span></code> in <strong>Step 2</strong> above,
+you will also have a violin plot in <code class="docutils literal notranslate"><span class="pre">project_folder/logs</span></code>
+directory. In this violin plot, videos that has neither expression of
+behavior A nor expression of behavior B have been omitted from the
+graph calculation.</p>
+</div>
+<p>If you bump into any issues using the FSTTC, let on know by opening an
+<a class="reference external" href="https://github.com/sgoldenlab/simba/issues">issue</a> or reach out to
+us on <a class="reference external" href="https://gitter.im/SimBA-Resource/community">Gitter</a>.</p>
+<p>Author <a class="reference external" href="https://github.com/sronilsson">Simon N</a>, <a class="reference external" href="https://github.com/inoejj">JJ
+Choong</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="roi.html" class="btn btn-neutral float-left" title="Regions of Interest (ROIs) in SimBA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="feature_subsets.html" class="btn btn-neutral float-right" title="Feature family sub-sets in SimBA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.feature_extractors.feature_extractor_7bp &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.feature_extractors.feature_extractor_7bp</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.feature_extractors.feature_extractor_7bp</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">scipy</span>
+<span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">ConvexHull</span>
+
+<span class="kn">from</span> <span class="nn">simba.feature_extractors.perimeter_jit</span> <span class="kn">import</span> <span class="n">jitted_hull</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.config_reader</span> <span class="kn">import</span> <span class="n">ConfigReader</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.feature_extraction_mixin</span> <span class="kn">import</span> <span class="n">FeatureExtractionMixin</span>
+<span class="kn">from</span> <span class="nn">simba.utils.printing</span> <span class="kn">import</span> <span class="n">stdout_success</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="n">get_fn_ext</span><span class="p">,</span> <span class="n">read_df</span><span class="p">,</span> <span class="n">write_df</span>
+
+
+<div class="viewcode-block" id="ExtractFeaturesFrom7bps"><a class="viewcode-back" href="../../../simba.feature_extractors.html#simba.feature_extractors.feature_extractor_7bp.ExtractFeaturesFrom7bps">[docs]</a><span class="k">class</span> <span class="nc">ExtractFeaturesFrom7bps</span><span class="p">(</span><span class="n">ConfigReader</span><span class="p">,</span> <span class="n">FeatureExtractionMixin</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extracts hard-coded set of features from pose-estimation data from single animals with 7 tracked body-parts.</span>
+<span class="sd">    Results are stored in the `project_folder/csv/features_extracted` directory of the SimBA project.</span>
+
+<span class="sd">    :parameter str config_path: path to SimBA project config file in Configparser format</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">      `Feature extraction tutorial &lt;https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features&gt;`_.</span>
+<span class="sd">      `Expected pose configuration &lt;https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/2.png&gt;`_</span>
+<span class="sd">       .. image:: _static/img/pose_configurations/2.png</span>
+<span class="sd">          :width: 150</span>
+<span class="sd">          :align: center</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    ----------</span>
+<span class="sd">    &gt;&gt;&gt; feature_extractor = ExtractFeaturesFrom7bps(config_path=&#39;MyProjectConfig&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; feature_extractor.run()</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]):</span>
+        <span class="n">FeatureExtractionMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="n">ConfigReader</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_feature_extraction_headers</span><span class="p">(</span>
+            <span class="n">pose</span><span class="o">=</span><span class="s2">&quot;1 animal 7 body-parts&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mouse_p_headers</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_headers</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">==</span> <span class="s2">&quot;_p&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mouse_headers</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_headers</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:]</span> <span class="o">!=</span> <span class="s2">&quot;_p&quot;</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;Extracting features from </span><span class="si">{}</span><span class="s2"> file(s)...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found</span><span class="p">)))</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="ExtractFeaturesFrom7bps.run"><a class="viewcode-back" href="../../../simba.feature_extractors.html#simba.feature_extractors.feature_extractor_7bp.ExtractFeaturesFrom7bps.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to compute and save features to disk. Results are saved in the `project_folder/csv/features_extracted`</span>
+<span class="sd">        directory of the SimBA project.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">file_cnt</span><span class="p">,</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found</span><span class="p">):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="n">video_settings</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span> <span class="n">fps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_video_info</span><span class="p">(</span>
+                <span class="n">video_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span>
+            <span class="p">)</span>
+            <span class="n">roll_windows</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">:</span>
+                <span class="n">roll_windows</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">fps</span> <span class="o">/</span> <span class="n">window</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">read_df</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">to_numeric</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="s2">&quot;Processing </span><span class="si">{}</span><span class="s2"> (</span><span class="si">{}</span><span class="s2"> frames)...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">))</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">insert_default_headers_for_feature_extraction</span><span class="p">(</span>
+                <span class="n">df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">,</span>
+                <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">in_headers</span><span class="p">,</span>
+                <span class="n">pose_config</span><span class="o">=</span><span class="s2">&quot;7 body-parts&quot;</span><span class="p">,</span>
+                <span class="n">filename</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">)</span>
+            <span class="n">mouse_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mouse_headers</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_data</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_poly_area&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">jitted_hull</span><span class="p">(</span><span class="n">points</span><span class="o">=</span><span class="n">mouse_array</span><span class="p">,</span> <span class="n">target</span><span class="o">=</span><span class="s2">&quot;perimeter&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">create_shifted_df</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_nose_to_tail&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">euclidean_distance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Nose_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Tail_base_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Nose_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Tail_base_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_width&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">euclidean_distance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_left_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_right_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_left_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_right_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_Ear_distance&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">euclidean_distance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Ear_left_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Ear_right_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Ear_left_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Ear_right_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_Nose_to_centroid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">euclidean_distance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Nose_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Center_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Nose_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Center_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_Nose_to_lateral_left&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">euclidean_distance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Nose_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_left_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Nose_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_left_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_Nose_to_lateral_right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">euclidean_distance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Nose_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_right_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Nose_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_right_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_Centroid_to_lateral_left&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">euclidean_distance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Center_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_left_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Center_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_left_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_Centroid_to_lateral_right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">euclidean_distance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Center_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_right_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Center_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_right_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_centroid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">euclidean_distance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Center_x_shifted&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Center_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Center_y_shifted&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Center_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_nose&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">euclidean_distance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Nose_x_shifted&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Nose_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Nose_y_shifted&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Nose_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_tail_base&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">euclidean_distance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Tail_base_x_shifted&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Tail_base_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Tail_base_y_shifted&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Tail_base_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_left_ear&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">euclidean_distance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Ear_left_x_shifted&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Ear_left_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Ear_left_y_shifted&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Ear_left_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_right_ear&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">euclidean_distance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Ear_right_x_shifted&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Ear_right_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Ear_right_y_shifted&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Ear_right_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_lateral_left&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">euclidean_distance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_left_x_shifted&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_left_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_left_y_shifted&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_left_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_lateral_right&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">euclidean_distance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_right_x_shifted&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_right_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_right_y_shifted&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Lat_right_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_polygon_size_change&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Mouse_poly_area_shifted&quot;</span><span class="p">]</span>
+                <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="s2">&quot;Mouse_poly_area&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating hull variables...&quot;</span><span class="p">)</span>
+            <span class="n">mouse_array</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_data</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mouse_headers</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">hull_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">cnt</span><span class="p">,</span> <span class="n">animal_frm</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mouse_array</span><span class="p">):</span>
+                <span class="n">animal_frm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">animal_frm</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+                <span class="n">animal_dists</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">spatial</span><span class="o">.</span><span class="n">distance</span><span class="o">.</span><span class="n">cdist</span><span class="p">(</span>
+                    <span class="n">animal_frm</span><span class="p">,</span> <span class="n">animal_frm</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span>
+                <span class="p">)</span>
+                <span class="n">animal_dists</span> <span class="o">=</span> <span class="n">animal_dists</span><span class="p">[</span><span class="n">animal_dists</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hull_dict</span><span class="p">[</span><span class="s2">&quot;M1_largest_euclidean_distance_hull&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="n">animal_dists</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hull_dict</span><span class="p">[</span><span class="s2">&quot;M1_smallest_euclidean_distance_hull&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">amin</span><span class="p">(</span>
+                        <span class="n">animal_dists</span><span class="p">,</span>
+                        <span class="n">initial</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hull_dict</span><span class="p">[</span><span class="s2">&quot;M1_largest_euclidean_distance_hull&quot;</span><span class="p">][</span>
+                            <span class="o">-</span><span class="mi">1</span>
+                        <span class="p">],</span>
+                    <span class="p">)</span>
+                    <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hull_dict</span><span class="p">[</span><span class="s2">&quot;M1_mean_euclidean_distance_hull&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">animal_dists</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hull_dict</span><span class="p">[</span><span class="s2">&quot;M1_sum_euclidean_distance_hull&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">animal_dists</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span>
+                <span class="p">)</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">hull_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Total_movement_all_bodyparts_M1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span>
+                <span class="p">[</span>
+                    <span class="s2">&quot;Movement_mouse_centroid&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Movement_mouse_nose&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Movement_mouse_left_ear&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Movement_mouse_right_ear&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Movement_mouse_lateral_left&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Movement_mouse_lateral_right&quot;</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating rolling windows: medians, medians, and sums...&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">:</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Mouse1_width_median_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_width&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">median</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Mouse1_width_mean_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_width&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Mouse1_width_sum_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_width&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">:</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Mouse1_mean_euclid_distances_median_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;M1_mean_euclidean_distance_hull&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">median</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Mouse1_mean_euclid_distances_mean_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;M1_mean_euclidean_distance_hull&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Mouse1_mean_euclid_distances_sum_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;M1_mean_euclidean_distance_hull&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">:</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Mouse1_smallest_euclid_distances_median_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;M1_smallest_euclidean_distance_hull&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">median</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Mouse1_smallest_euclid_distances_mean_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;M1_smallest_euclidean_distance_hull&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Mouse1_smallest_euclid_distances_sum_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;M1_smallest_euclidean_distance_hull&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">:</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Mouse1_largest_euclid_distances_median_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;M1_largest_euclidean_distance_hull&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">median</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Mouse1_largest_euclid_distances_mean_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;M1_largest_euclidean_distance_hull&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Mouse1_largest_euclid_distances_sum_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;M1_largest_euclidean_distance_hull&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">:</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Tail_base_movement_M1_median_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_tail_base&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">median</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Tail_base_movement_M1_mean_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_tail_base&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Tail_base_movement_M1_sum_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_tail_base&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">:</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Centroid_movement_M1_median_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_centroid&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">median</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Centroid_movement_M1_mean_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_centroid&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Centroid_movement_M1_sum_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_centroid&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">:</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Nose_movement_M1_median_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_nose&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">median</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Nose_movement_M1_mean_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_nose&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Nose_movement_M1_sum_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_nose&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">:</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Total_movement_M1_median_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Total_movement_all_bodyparts_M1&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">median</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Total_movement_M1_mean_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Total_movement_all_bodyparts_M1&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="p">)</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Total_movement_M1_sum_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Total_movement_all_bodyparts_M1&quot;</span><span class="p">]</span>
+                    <span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                    <span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+                <span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating angles...&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_angle&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angle3pt_serialized</span><span class="p">(</span>
+                <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span>
+                    <span class="p">[</span>
+                        <span class="s2">&quot;Nose_x&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Nose_y&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Center_x&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Center_y&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Tail_base_x&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Tail_base_y&quot;</span><span class="p">,</span>
+                    <span class="p">]</span>
+                <span class="p">]</span><span class="o">.</span><span class="n">values</span>
+            <span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating deviations...&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Total_movement_all_bodyparts_deviation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Total_movement_all_bodyparts_M1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Total_movement_all_bodyparts_M1&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;M1_smallest_euclid_distances_hull_deviation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;M1_smallest_euclidean_distance_hull&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;M1_smallest_euclidean_distance_hull&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;M1_largest_euclid_distances_hull_deviation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;M1_largest_euclidean_distance_hull&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;M1_largest_euclidean_distance_hull&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;M1_mean_euclid_distances_hull_deviation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;M1_mean_euclidean_distance_hull&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;M1_mean_euclidean_distance_hull&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Total_angle_deviation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_angle&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_angle&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_deviation_centroid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_centroid&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_centroid&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_polygon_deviation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_poly_area&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Mouse_poly_area&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">:</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Mouse1_smallest_euclid_distances_mean_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">deviation_col_name</span> <span class="o">=</span> <span class="n">col_name</span> <span class="o">+</span> <span class="s2">&quot;_deviation&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">deviation_col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">:</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Mouse1_largest_euclid_distances_mean_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="n">deviation_col_name</span> <span class="o">=</span> <span class="n">col_name</span> <span class="o">+</span> <span class="s2">&quot;_deviation&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">deviation_col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">:</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Mouse1_mean_euclid_distances_mean_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="n">deviation_col_name</span> <span class="o">=</span> <span class="n">col_name</span> <span class="o">+</span> <span class="s2">&quot;_deviation&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">deviation_col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span>
+                <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_percentile_rank&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span>
+                <span class="s2">&quot;Movement_mouse_centroid&quot;</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">pct</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Movement_mouse_deviation_percentile_rank&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span>
+                <span class="s2">&quot;Movement_mouse_deviation_centroid&quot;</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">pct</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">:</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Total_movement_M1_mean_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="n">deviation_col_name</span> <span class="o">=</span> <span class="n">col_name</span> <span class="o">+</span> <span class="s2">&quot;_percentile_rank&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">deviation_col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">:</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Mouse1_mean_euclid_distances_mean_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="n">deviation_col_name</span> <span class="o">=</span> <span class="n">col_name</span> <span class="o">+</span> <span class="s2">&quot;_percentile_rank&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">deviation_col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">:</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Mouse1_smallest_euclid_distances_mean_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">deviation_col_name</span> <span class="o">=</span> <span class="n">col_name</span> <span class="o">+</span> <span class="s2">&quot;_percentile_rank&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">deviation_col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span>
+                <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">:</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Mouse1_largest_euclid_distances_mean_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="n">deviation_col_name</span> <span class="o">=</span> <span class="n">col_name</span> <span class="o">+</span> <span class="s2">&quot;_percentile_rank&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">deviation_col_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span>
+                <span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating path tortuosities...&quot;</span><span class="p">)</span>
+            <span class="n">as_strided</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">stride_tricks</span><span class="o">.</span><span class="n">as_strided</span>
+            <span class="n">win_size</span> <span class="o">=</span> <span class="mi">3</span>
+            <span class="n">centroid_lst_mouse_x</span> <span class="o">=</span> <span class="n">as_strided</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Center_x&quot;</span><span class="p">],</span>
+                <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">win_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">win_size</span><span class="p">),</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Center_x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">strides</span> <span class="o">*</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">)</span>
+            <span class="n">centroid_lst_mouse_y</span> <span class="o">=</span> <span class="n">as_strided</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Center_y&quot;</span><span class="p">],</span>
+                <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">win_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">win_size</span><span class="p">),</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Center_y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">strides</span> <span class="o">*</span> <span class="mi">2</span><span class="p">),</span>
+            <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roll_windows_values</span><span class="p">:</span>
+                <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span> <span class="o">+</span> <span class="nb">int</span><span class="p">(</span><span class="n">window</span><span class="p">)</span>
+                <span class="n">tortuosities_results</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">frame</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">)):</span>
+                    <span class="n">tortuosities_dict</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+                    <span class="n">c_centroid_lst_mouse_x</span><span class="p">,</span> <span class="n">c_centroid_lst_mouse_y</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">centroid_lst_mouse_x</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">],</span>
+                        <span class="n">centroid_lst_mouse_y</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">],</span>
+                    <span class="p">)</span>
+                    <span class="k">for</span> <span class="n">frame_in_window</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">c_centroid_lst_mouse_x</span><span class="p">)):</span>
+                        <span class="n">move_angle_mouse_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angle3pt</span><span class="p">(</span>
+                            <span class="n">c_centroid_lst_mouse_x</span><span class="p">[</span><span class="n">frame_in_window</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                            <span class="n">c_centroid_lst_mouse_y</span><span class="p">[</span><span class="n">frame_in_window</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                            <span class="n">c_centroid_lst_mouse_x</span><span class="p">[</span><span class="n">frame_in_window</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                            <span class="n">c_centroid_lst_mouse_y</span><span class="p">[</span><span class="n">frame_in_window</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                            <span class="n">c_centroid_lst_mouse_x</span><span class="p">[</span><span class="n">frame_in_window</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                            <span class="n">c_centroid_lst_mouse_y</span><span class="p">[</span><span class="n">frame_in_window</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                        <span class="p">)</span>
+                        <span class="n">tortuosities_dict</span><span class="p">[</span><span class="s2">&quot;Animal_1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">move_angle_mouse_</span><span class="p">)</span>
+                    <span class="n">tortuosities_results</span><span class="p">[</span><span class="s2">&quot;Animal_1&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="nb">sum</span><span class="p">(</span><span class="n">tortuosities_dict</span><span class="p">[</span><span class="s2">&quot;Animal_1&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="n">start</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">end</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">col_name</span> <span class="o">=</span> <span class="s2">&quot;Tortuosity_Mouse1_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">window</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">tortuosities_results</span><span class="p">[</span><span class="s2">&quot;Animal_1&quot;</span><span class="p">]</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Calculating pose probability scores...&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Sum_probabilities&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Ear_left_p&quot;</span><span class="p">]</span>
+                <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Ear_right_p&quot;</span><span class="p">]</span>
+                <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Nose_p&quot;</span><span class="p">]</span>
+                <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Tail_base_p&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Sum_probabilities_deviation&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Sum_probabilities&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Sum_probabilities&quot;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Sum_probabilities_deviation_percentile_rank&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Sum_probabilities_deviation&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">pct</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span><span class="s2">&quot;Sum_probabilities_percentile_rank&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">[</span>
+                <span class="s2">&quot;Sum_probabilities_deviation_percentile_rank&quot;</span>
+            <span class="p">]</span><span class="o">.</span><span class="n">rank</span><span class="p">(</span><span class="n">pct</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">count_values_in_range</span><span class="p">(</span>
+                    <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mouse_p_headers</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">,</span>
+                    <span class="n">ranges</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">]]),</span>
+                <span class="p">),</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+                    <span class="s2">&quot;Low_prob_detections_0.1&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Low_prob_detections_0.5&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Low_prob_detections_0.75&quot;</span><span class="p">,</span>
+                <span class="p">],</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">,</span> <span class="n">results</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">save_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_name</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span>
+            <span class="p">)</span>
+            <span class="n">write_df</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">,</span> <span class="n">save_path</span><span class="o">=</span><span class="n">save_path</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Feature extraction complete for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">file_cnt</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found</span><span class="p">)</span><span class="si">}</span><span class="s2">)...&quot;</span>
+            <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">()</span>
+        <span class="n">stdout_success</span><span class="p">(</span>
+            <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;All features extracted. Results are stored in the project_folder/csv/features_extracted directory&quot;</span><span class="p">,</span>
+            <span class="n">elapsed_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">elapsed_time_str</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+
+
+<span class="c1"># test = ExtractFeaturesFrom7bps(config_path=&#39;/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/project_config.ini&#39;)</span>
+<span class="c1"># test.run()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

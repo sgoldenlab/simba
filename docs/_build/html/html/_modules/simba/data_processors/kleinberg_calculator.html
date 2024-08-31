@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.data_processors.kleinberg_calculator &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.data_processors.kleinberg_calculator</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.data_processors.kleinberg_calculator</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">simba.data_processors.pybursts_calculator</span> <span class="kn">import</span> <span class="n">kleinberg_burst_detection</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.config_reader</span> <span class="kn">import</span> <span class="n">ConfigReader</span>
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="p">(</span><span class="n">check_float</span><span class="p">,</span> <span class="n">check_if_dir_exists</span><span class="p">,</span>
+                                <span class="n">check_if_filepath_list_is_empty</span><span class="p">,</span> <span class="n">check_int</span><span class="p">,</span>
+                                <span class="n">check_that_column_exist</span><span class="p">,</span> <span class="n">check_valid_lst</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.enums</span> <span class="kn">import</span> <span class="n">Paths</span><span class="p">,</span> <span class="n">TagNames</span>
+<span class="kn">from</span> <span class="nn">simba.utils.printing</span> <span class="kn">import</span> <span class="n">SimbaTimer</span><span class="p">,</span> <span class="n">log_event</span><span class="p">,</span> <span class="n">stdout_success</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="n">get_fn_ext</span><span class="p">,</span> <span class="n">read_df</span><span class="p">,</span> <span class="n">write_df</span>
+<span class="kn">from</span> <span class="nn">simba.utils.warnings</span> <span class="kn">import</span> <span class="n">KleinbergWarning</span>
+
+
+<div class="viewcode-block" id="KleinbergCalculator"><a class="viewcode-back" href="../../../simba.data_processors.html#simba.data_processors.kleinberg_calculator.KleinbergCalculator">[docs]</a><span class="k">class</span> <span class="nc">KleinbergCalculator</span><span class="p">(</span><span class="n">ConfigReader</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Smooth classification data using the Kleinberg burst detection algorithm.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">       `Tutorial &lt;https://github.com/sgoldenlab/simba/blob/master/docs/kleinberg_filter.md&gt;`__.</span>
+
+<span class="sd">    .. image:: _static/img/kleinberg.png</span>
+<span class="sd">       :width: 400</span>
+<span class="sd">       :align: center</span>
+
+<span class="sd">    :param str config_path: path to SimBA project config file in Configparser format</span>
+<span class="sd">    :param List[str] classifier_names: Classifier names to apply Kleinberg smoothing to.</span>
+<span class="sd">    :param float sigma: Burst detection sigma value. Higher sigma values and fewer, longer, behavioural bursts will be recognised. Default: 2.</span>
+<span class="sd">    :param float gamma: Burst detection gamma value. Higher gamma values and fewer behavioural bursts will be recognised. Default: 0.3.</span>
+<span class="sd">    :param int hierarchy: Burst detection hierarchy level. Higher hierarchy values and fewer behavioural bursts will to be recognised. Default: 1.</span>
+<span class="sd">    :param bool hierarchical_search: See `Tutorial &lt;https://github.com/sgoldenlab/simba/blob/master/docs/kleinberg_filter.md#hierarchical-search-example&gt;`_ Default: False.</span>
+<span class="sd">    :param Optional[Union[str, os.PathLike]] input_dir: The directory with files to perform kleinberg smoothing on. If None, defaults to `project_folder/csv/machine_results`</span>
+<span class="sd">    :param Optional[Union[str, os.PathLike]] output_dir: Location to save smoothened data in. If None, defaults to `project_folder/csv/machine_results`</span>
+
+<span class="sd">    :example I:</span>
+<span class="sd">    &gt;&gt;&gt; kleinberg_calculator = KleinbergCalculator(config_path=&#39;MySimBAConfigPath&#39;, classifier_names=[&#39;Attack&#39;], sigma=2, gamma=0.3, hierarchy=2, hierarchical_search=False)</span>
+<span class="sd">    &gt;&gt;&gt; kleinberg_calculator.run()</span>
+
+<span class="sd">    :example 2:</span>
+<span class="sd">    &gt;&gt;&gt; output_dir = r&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/kleinberg_gridsearch_test&#39;</span>
+<span class="sd">    &gt;&gt;&gt; input_dir = r&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/kleinberg_gridsearch_test&#39;</span>
+<span class="sd">    &gt;&gt;&gt; kleinberg_calculator = KleinbergCalculator(config_path=r&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini&#39;, classifier_names=[&#39;Attack&#39;, &#39;Sniffing&#39;, &#39;Rear&#39;], sigma=2, gamma=0.3, hierarchy=3, hierarchical_search=False, input_dir=input_dir, output_dir=output_dir)</span>
+
+<span class="sd">    References</span>
+<span class="sd">    ----------</span>
+<span class="sd">    .. [1] Kleinberg, Bursty and Hierarchical Structure in Streams, `Data Mining and Knowledge Discovery`,</span>
+<span class="sd">           vol. 7, pp. 373–397, 2003.</span>
+<span class="sd">    .. [2] Lee et al., Temporal microstructure of dyadic social behavior during relationship formation in mice, `PLOS One`,</span>
+<span class="sd">           2019.</span>
+<span class="sd">    .. [3] Bordes et al., Automatically annotated motion tracking identifies a distinct social behavioral profile</span>
+<span class="sd">           following chronic social defeat stress, `bioRxiv`, 2022.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">config_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
+                 <span class="n">classifier_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                 <span class="n">sigma</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+                 <span class="n">gamma</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
+                 <span class="n">hierarchy</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+                 <span class="n">hierarchical_search</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+                 <span class="n">input_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">output_dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">ConfigReader</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="n">log_event</span><span class="p">(</span><span class="n">logger_name</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">),</span> <span class="n">log_type</span><span class="o">=</span><span class="n">TagNames</span><span class="o">.</span><span class="n">CLASS_INIT</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">msg</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">create_log_msg_from_init_args</span><span class="p">(</span><span class="nb">locals</span><span class="o">=</span><span class="nb">locals</span><span class="p">()))</span>
+        <span class="n">check_float</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">sigma</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> sigma&#39;</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mf">1.01</span><span class="p">)</span>
+        <span class="n">check_float</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">gamma</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> gamma&#39;</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">check_int</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="n">hierarchy</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> hierarchy&#39;</span><span class="p">,</span> <span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">check_valid_lst</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">classifier_names</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1"> classifier_names&#39;</span><span class="p">,</span> <span class="n">valid_dtypes</span><span class="o">=</span><span class="p">(</span><span class="nb">str</span><span class="p">,),</span> <span class="n">min_len</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hierarchical_search</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">gamma</span><span class="p">,</span> <span class="n">hierarchy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="p">(</span><span class="n">hierarchical_search</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">sigma</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">gamma</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">hierarchy</span><span class="p">),</span> <span class="n">output_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gamma</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">hierarchy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">clfs</span> <span class="o">=</span> <span class="p">(</span> <span class="nb">float</span><span class="p">(</span><span class="n">sigma</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">gamma</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">hierarchy</span><span class="p">),</span> <span class="n">classifier_names</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">input_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_results_paths</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_results_dir</span>
+            <span class="n">check_if_filepath_list_is_empty</span><span class="p">(</span><span class="n">filepaths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_results_paths</span><span class="p">,</span> <span class="n">error_msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SIMBA ERROR: No data files found in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_results_dir</span><span class="si">}</span><span class="s2">. Cannot perform Kleinberg smoothing&quot;</span><span class="p">)</span>
+            <span class="n">original_data_files_folder</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_path</span><span class="p">,</span> <span class="n">Paths</span><span class="o">.</span><span class="n">MACHINE_RESULTS_DIR</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Pre_Kleinberg_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">original_data_files_folder</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">original_data_files_folder</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">machine_results_paths</span><span class="p">:</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">original_data_files_folder</span><span class="p">,</span> <span class="n">file_name</span> <span class="o">+</span> <span class="n">ext</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">check_if_dir_exists</span><span class="p">(</span><span class="n">in_dir</span><span class="o">=</span><span class="n">input_dir</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">input_dir</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;/*.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">check_if_filepath_list_is_empty</span><span class="p">(</span><span class="n">filepaths</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span><span class="p">,</span> <span class="n">error_msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SIMBA ERROR: No data files found in </span><span class="si">{</span><span class="n">input_dir</span><span class="si">}</span><span class="s2">. Cannot perform Kleinberg smoothing&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">output_dir</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processing Kleinberg burst detection for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span><span class="p">)</span><span class="si">}</span><span class="s2"> file(s) and </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">classifier_names</span><span class="p">)</span><span class="si">}</span><span class="s2"> classifier(s)...&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">hierarchical_searcher</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kleinberg_bouts</span><span class="p">[</span><span class="s2">&quot;Hierarchy&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kleinberg_bouts</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Hierarchy&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">clf_bouts_in_hierarchy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kleinberg_bouts</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">kleinberg_df</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kleinberg_bouts</span><span class="p">)</span>
+            <span class="n">kleinberg_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">kleinberg_df</span><span class="p">[</span><span class="s2">&quot;Hierarchy&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Hierarchy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
+            <span class="n">kleinberg_df</span><span class="p">[</span><span class="s2">&quot;prior_hierarchy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kleinberg_df</span><span class="p">[</span><span class="s2">&quot;Hierarchy&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">kleinberg_df</span><span class="p">[</span><span class="s2">&quot;hierarchy_difference&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">kleinberg_df</span><span class="p">[</span><span class="s2">&quot;Hierarchy&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">kleinberg_df</span><span class="p">[</span><span class="s2">&quot;prior_hierarchy&quot;</span><span class="p">])</span>
+            <span class="n">start_idx</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">kleinberg_df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">kleinberg_df</span><span class="p">[</span><span class="s2">&quot;hierarchy_difference&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">])</span>
+            <span class="n">end_idx</span> <span class="o">=</span> <span class="nb">list</span><span class="p">([</span><span class="n">x</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">start_idx</span><span class="p">][</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="n">end_idx_2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">kleinberg_df</span><span class="o">.</span><span class="n">index</span><span class="p">[(</span><span class="n">kleinberg_df</span><span class="p">[</span><span class="s2">&quot;hierarchy_difference&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">kleinberg_df</span><span class="p">[</span><span class="s2">&quot;hierarchy_difference&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">)])</span>
+            <span class="n">end_idx</span><span class="o">.</span><span class="n">extend</span><span class="p">((</span><span class="n">end_idx_2</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">start_idx</span><span class="p">,</span> <span class="n">end_idx</span><span class="p">):</span>
+                <span class="n">hierarchies_in_bout</span> <span class="o">=</span> <span class="n">kleinberg_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+                <span class="n">target_hierarchy_in_hierarchies_bout</span> <span class="o">=</span> <span class="n">hierarchies_in_bout</span><span class="p">[</span><span class="n">hierarchies_in_bout</span><span class="p">[</span><span class="s2">&quot;Hierarchy&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">hierarchy</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_hierarchy_in_hierarchies_bout</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">lower_hierarchy</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hierarchy</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)):</span>
+                        <span class="n">lower_hierarchy_in_hierarchies_bout</span> <span class="o">=</span> <span class="n">hierarchies_in_bout</span><span class="p">[</span><span class="n">hierarchies_in_bout</span><span class="p">[</span><span class="s2">&quot;Hierarchy&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">lower_hierarchy</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lower_hierarchy_in_hierarchies_bout</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">target_hierarchy_in_hierarchies_bout</span> <span class="o">=</span> <span class="p">(</span><span class="n">lower_hierarchy_in_hierarchies_bout</span><span class="p">)</span>
+                            <span class="k">break</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">target_hierarchy_in_hierarchies_bout</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">target_hierarchy_in_hierarchies_bout</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">clf_bouts_in_hierarchy</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;prior_hierarchy&quot;</span><span class="p">,</span> <span class="s2">&quot;hierarchy_difference&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">clf_bouts_in_hierarchy</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Video&quot;</span><span class="p">,</span> <span class="s2">&quot;Classifier&quot;</span><span class="p">,</span> <span class="s2">&quot;Hierarchy&quot;</span><span class="p">,</span> <span class="s2">&quot;Start&quot;</span><span class="p">,</span> <span class="s2">&quot;Stop&quot;</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">detailed_df_lst</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">file_cnt</span><span class="p">,</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span><span class="p">):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">video_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="n">video_timer</span> <span class="o">=</span> <span class="n">SimbaTimer</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Performing Kleinberg burst detection for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2">  (Video </span><span class="si">{</span><span class="n">file_cnt</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_paths</span><span class="p">)</span><span class="si">}</span><span class="s2">)...&quot;</span><span class="p">)</span>
+            <span class="n">data_df</span> <span class="o">=</span> <span class="n">read_df</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">video_out_df</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">data_df</span><span class="p">)</span>
+            <span class="n">check_that_column_exist</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">data_df</span><span class="p">,</span> <span class="n">column_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">clfs</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="n">video_name</span><span class="p">)</span>
+            <span class="n">save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">clf</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clfs</span><span class="p">:</span>
+                <span class="n">clf_offsets</span> <span class="o">=</span> <span class="n">data_df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">data_df</span><span class="p">[</span><span class="n">clf</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">clf_offsets</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">video_out_df</span><span class="p">[</span><span class="n">clf</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">kleinberg_bouts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">kleinberg_burst_detection</span><span class="p">(</span><span class="n">offsets</span><span class="o">=</span><span class="n">clf_offsets</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sigma</span><span class="p">,</span> <span class="n">gamma</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gamma</span><span class="p">),</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Hierarchy&quot;</span><span class="p">,</span> <span class="s2">&quot;Start&quot;</span><span class="p">,</span> <span class="s2">&quot;Stop&quot;</span><span class="p">])</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">kleinberg_bouts</span><span class="p">[</span><span class="s2">&quot;Stop&quot;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">kleinberg_bouts</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;Classifier&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">clf</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">kleinberg_bouts</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="s2">&quot;Video&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">video_name</span><span class="p">)</span>
+                    <span class="n">detailed_df_lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kleinberg_bouts</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hierarchical_search</span><span class="p">:</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Applying hierarchical search for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">hierarchical_searcher</span><span class="p">()</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">clf_bouts_in_hierarchy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kleinberg_bouts</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">kleinberg_bouts</span><span class="p">[</span><span class="s2">&quot;Hierarchy&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">hierarchy</span><span class="p">]</span>
+                    <span class="n">hierarchy_idx</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clf_bouts_in_hierarchy</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;Start&quot;</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;Stop&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)),</span> <span class="mi">1</span><span class="p">))</span>
+                    <span class="n">hierarchy_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">xs</span> <span class="ow">in</span> <span class="n">hierarchy_idx</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">]</span>
+                    <span class="n">hierarchy_idx</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">hierarchy_idx</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">data_df</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span>
+                    <span class="n">video_out_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">hierarchy_idx</span><span class="p">,</span> <span class="n">clf</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">write_df</span><span class="p">(</span><span class="n">video_out_df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">,</span> <span class="n">save_path</span><span class="p">)</span>
+            <span class="n">video_timer</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">()</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Kleinberg analysis complete for video </span><span class="si">{</span><span class="n">video_name</span><span class="si">}</span><span class="s1"> (saved at </span><span class="si">{</span><span class="n">save_path</span><span class="si">}</span><span class="s1">), elapsed time: </span><span class="si">{</span><span class="n">video_timer</span><span class="o">.</span><span class="n">elapsed_time_str</span><span class="si">}</span><span class="s1">s.&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">detailed_df_lst</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detailed_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">detailed_df_lst</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">detailed_save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logs_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Kleinberg_detailed_log_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detailed_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">detailed_save_path</span><span class="p">)</span>
+            <span class="n">stdout_success</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Kleinberg analysis complete. See </span><span class="si">{</span><span class="n">detailed_save_path</span><span class="si">}</span><span class="s2"> for details of detected bouts of all classifiers in all hierarchies&quot;</span><span class="p">,</span> <span class="n">elapsed_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">timer</span><span class="o">.</span><span class="n">elapsed_time_str</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Kleinberg analysis complete.&quot;</span><span class="p">)</span>
+            <span class="n">KleinbergWarning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;All behavior bouts removed following kleinberg smoothing&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span></div>
+
+
+<span class="c1"># test = KleinbergCalculator(config_path=&#39;/Users/simon/Desktop/envs/simba/troubleshooting/levi/project_folder/project_config.ini&#39;,</span>
+<span class="c1">#                            classifier_names=[&#39;No_Seizure_(0)&#39;],</span>
+<span class="c1">#                            sigma=1.1,</span>
+<span class="c1">#                            gamma=0.1,</span>
+<span class="c1">#                            hierarchy=1,</span>
+<span class="c1">#                            hierarchical_search=False)</span>
+<span class="c1">#</span>
+<span class="c1"># test.run()</span>
+<span class="c1">#</span>
+<span class="c1"># test.perform_kleinberg()</span>
+<span class="c1"># #data = run_kleinberg(r&#39;Z:\DeepLabCut\DLC_extract\Troubleshooting\DLC_two_mice\project_folder\project_config.ini&#39;, [&#39;int&#39;], sigma=2, gamma=0.3, hierarchy=1)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

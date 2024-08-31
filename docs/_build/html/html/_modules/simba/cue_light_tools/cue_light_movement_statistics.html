@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.cue_light_tools.cue_light_movement_statistics &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.cue_light_tools.cue_light_movement_statistics</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.cue_light_tools.cue_light_movement_statistics</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">statistics</span> <span class="kn">import</span> <span class="n">mean</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">simba.cue_light_tools.cue_light_tools</span> <span class="kn">import</span> <span class="n">find_frames_when_cue_light_on</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.config_reader</span> <span class="kn">import</span> <span class="n">ConfigReader</span>
+<span class="kn">from</span> <span class="nn">simba.roi_tools.ROI_analyzer</span> <span class="kn">import</span> <span class="n">ROIAnalyzer</span>
+<span class="kn">from</span> <span class="nn">simba.utils.printing</span> <span class="kn">import</span> <span class="n">stdout_success</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="n">get_fn_ext</span><span class="p">,</span> <span class="n">read_df</span>
+
+
+<div class="viewcode-block" id="CueLightMovementAnalyzer"><a class="viewcode-back" href="../../../simba.cue_light_tools.html#simba.cue_light_tools.cue_light_movement_statistics.CueLightMovementAnalyzer">[docs]</a><span class="k">class</span> <span class="nc">CueLightMovementAnalyzer</span><span class="p">(</span><span class="n">ConfigReader</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute aggregate statistics of animal movement in relation to the cue light</span>
+<span class="sd">    ON and OFF states.</span>
+
+<span class="sd">    :parameter str config_path: path to SimBA project config file in Configparser format</span>
+<span class="sd">    :parameter int pre_window: Time period (in millisecond) before the onset of each cue light to compute aggregate classification</span>
+<span class="sd">        statistics within.</span>
+<span class="sd">    :parameter int post_window: Time period (in millisecond) after the offset of each cue light to compute aggregate classification</span>
+<span class="sd">        statistics within.</span>
+<span class="sd">    :parameter List[str] cue_light_names: Names of cue lights, as defined in the SimBA ROI interface.</span>
+<span class="sd">    :parameter float threshold: The body-part post-estimation probability threshold. SimBA omits movement calculations for frames where the</span>
+<span class="sd">        body-part probability threshold is lower than the user-specified threshold.</span>
+<span class="sd">    :parameter bool roi_setting: If True, SimBA calculates movement statistics within non-light cue ROIs.</span>
+
+<span class="sd">    .. note:</span>
+<span class="sd">       `Cue light tutorials &lt;https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md&gt;`__.</span>
+
+
+<span class="sd">    Examples</span>
+<span class="sd">    ----------</span>
+<span class="sd">    &gt;&gt;&gt; cue_light_movement_analyzer = CueLightMovementAnalyzer(config_path=&#39;MyProjectConfig&#39;, cue_light_names=[&#39;Cue_light&#39;], pre_window=1000, post_window=1000, threshold=0.0, roi_setting=True)</span>
+<span class="sd">    &gt;&gt;&gt; cue_light_movement_analyzer.calculate_whole_session_movement()</span>
+<span class="sd">    &gt;&gt;&gt; cue_light_movement_analyzer.organize_results()</span>
+<span class="sd">    &gt;&gt;&gt; cue_light_movement_analyzer.save_results()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">config_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
+        <span class="n">pre_window</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">post_window</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">cue_light_names</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">roi_setting</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">ConfigReader</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cue_light_names</span> <span class="o">=</span> <span class="n">cue_light_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">roi_setting</span> <span class="o">=</span> <span class="n">roi_setting</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_threshold</span> <span class="o">=</span> <span class="n">threshold</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pre_window</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_window</span> <span class="o">=</span> <span class="n">pre_window</span><span class="p">,</span> <span class="n">post_window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">in_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_path</span><span class="p">,</span> <span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;cue_lights&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files_found</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">in_dir</span> <span class="o">+</span> <span class="s2">&quot;/*.&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bp_dict</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">bp_columns</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">),</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">cnt</span><span class="p">,</span> <span class="n">animal</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">multi_animal_id_list</span><span class="p">):</span>
+            <span class="n">bp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ROI settings&quot;</span><span class="p">,</span> <span class="s2">&quot;animal_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">cnt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_bp&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">bp_name</span> <span class="o">==</span> <span class="s2">&quot;None&quot;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;SIMBA ERROR: Please analyze ROI data and set body-parts first.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span>
+            <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;_x&quot;</span><span class="p">,</span> <span class="s2">&quot;_y&quot;</span><span class="p">,</span> <span class="s2">&quot;_p&quot;</span><span class="p">]:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bp_dict</span><span class="p">[</span><span class="n">animal</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bp_name</span> <span class="o">+</span> <span class="n">c</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bp_columns</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bp_name</span> <span class="o">+</span> <span class="n">c</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Analyzing </span><span class="si">{}</span><span class="s2"> files...&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found</span><span class="p">))))</span>
+
+        <span class="k">if</span> <span class="n">roi_setting</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">roi_analyzer</span> <span class="o">=</span> <span class="n">ROIAnalyzer</span><span class="p">(</span>
+                <span class="n">config_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config_path</span><span class="p">,</span>
+                <span class="n">data_path</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span><span class="p">,</span> <span class="s2">&quot;csv&quot;</span><span class="p">,</span> <span class="s2">&quot;outlier_corrected_movement_location&quot;</span>
+                <span class="p">),</span>
+                <span class="n">calculate_distances</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">roi_analyzer</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+            <span class="c1"># self.entries_exits_df = pd.DataFrame.from_dict(self.roi_analyzer.detailed_df, orient=&#39;index&#39;)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">roi_analyzer</span><span class="o">.</span><span class="n">detailed_df</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">entries_exits_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_analyzer</span><span class="o">.</span><span class="n">detailed_df</span><span class="p">[</span>
+                <span class="o">~</span><span class="bp">self</span><span class="o">.</span><span class="n">roi_analyzer</span><span class="o">.</span><span class="n">detailed_df</span><span class="p">[</span><span class="s2">&quot;SHAPE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cue_light_names</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">entries_exits_df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">entries_exits_df</span><span class="p">[</span><span class="s2">&quot;inside_lst&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries_exits_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span>
+                        <span class="nb">range</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;ENTRY FRAMES&quot;</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;EXIT FRAMES&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+                    <span class="p">),</span>
+                    <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__euclidean_distance</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">bp_1_x_vals</span><span class="p">,</span> <span class="n">bp_2_x_vals</span><span class="p">,</span> <span class="n">bp_1_y_vals</span><span class="p">,</span> <span class="n">bp_2_y_vals</span><span class="p">,</span> <span class="n">px_per_mm</span>
+    <span class="p">):</span>
+        <span class="n">series</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">bp_1_x_vals</span> <span class="o">-</span> <span class="n">bp_2_x_vals</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">bp_1_y_vals</span> <span class="o">-</span> <span class="n">bp_2_y_vals</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span> <span class="o">/</span> <span class="n">px_per_mm</span>
+        <span class="k">return</span> <span class="n">series</span>
+
+<div class="viewcode-block" id="CueLightMovementAnalyzer.calculate_whole_session_movement"><a class="viewcode-back" href="../../../simba.cue_light_tools.html#simba.cue_light_tools.cue_light_movement_statistics.CueLightMovementAnalyzer.calculate_whole_session_movement">[docs]</a>    <span class="k">def</span> <span class="nf">calculate_whole_session_movement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to calculate movement in relation to cue-light(s) onsets.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Attribute: dict</span>
+<span class="sd">            roi_results</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_setting</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">roi_results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">file_cnt</span><span class="p">,</span> <span class="n">file_path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found</span><span class="p">):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span> <span class="o">=</span> <span class="n">read_df</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">video_info_settings</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_video_info</span><span class="p">(</span>
+                <span class="n">video_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prior_window_frames_cnt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_window</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1000</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fps</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">post_window_frames_cnt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">post_window</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1000</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fps</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">light_on_dict</span> <span class="o">=</span> <span class="n">find_frames_when_cue_light_on</span><span class="p">(</span>
+                <span class="n">data_df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">,</span>
+                <span class="n">cue_light_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cue_light_names</span><span class="p">,</span>
+                <span class="n">fps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fps</span><span class="p">,</span>
+                <span class="n">prior_window_frames_cnt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">prior_window_frames_cnt</span><span class="p">,</span>
+                <span class="n">post_window_frames_cnt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">post_window_frames_cnt</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">animal_name</span><span class="p">,</span> <span class="n">animal_bps</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">bp_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">][</span><span class="n">animal_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">animal_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[</span><span class="n">animal_bps</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_threshold</span> <span class="o">&gt;</span> <span class="mf">0.00</span><span class="p">:</span>
+                    <span class="n">animal_df</span> <span class="o">=</span> <span class="n">animal_df</span><span class="p">[</span><span class="n">animal_df</span><span class="p">[</span><span class="n">animal_bps</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">p_threshold</span><span class="p">]</span>
+                <span class="n">animal_df</span> <span class="o">=</span> <span class="n">animal_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">df_shifted</span> <span class="o">=</span> <span class="n">animal_df</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">df_shifted</span> <span class="o">=</span> <span class="n">df_shifted</span><span class="o">.</span><span class="n">combine_first</span><span class="p">(</span><span class="n">animal_df</span><span class="p">)</span><span class="o">.</span><span class="n">add_suffix</span><span class="p">(</span><span class="s2">&quot;_shifted&quot;</span><span class="p">)</span>
+                <span class="n">animal_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">animal_df</span><span class="p">,</span> <span class="n">df_shifted</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">movement</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__euclidean_distance</span><span class="p">(</span>
+                        <span class="n">animal_df</span><span class="p">[</span><span class="n">animal_bps</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span>
+                        <span class="n">animal_df</span><span class="p">[</span><span class="n">animal_bps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_shifted&quot;</span><span class="p">],</span>
+                        <span class="n">animal_df</span><span class="p">[</span><span class="n">animal_bps</span><span class="p">[</span><span class="mi">1</span><span class="p">]],</span>
+                        <span class="n">animal_df</span><span class="p">[</span><span class="n">animal_bps</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;_shifted&quot;</span><span class="p">],</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">px_per_mm</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="o">/</span> <span class="mi">10</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">light_movement</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="k">for</span> <span class="n">cue_light</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cue_light_names</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">light_movement</span><span class="p">[</span><span class="n">cue_light</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">light_movement</span><span class="p">[</span><span class="n">cue_light</span><span class="p">][</span><span class="s2">&quot;pre_window_movement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">movement</span><span class="p">[</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">movement</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">light_on_dict</span><span class="p">[</span><span class="n">cue_light</span><span class="p">][</span><span class="s2">&quot;pre_window_frames&quot;</span><span class="p">]</span>
+                            <span class="p">)</span>
+                        <span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">light_movement</span><span class="p">[</span><span class="n">cue_light</span><span class="p">][</span><span class="s2">&quot;light_movement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">movement</span><span class="p">[</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">movement</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">light_on_dict</span><span class="p">[</span><span class="n">cue_light</span><span class="p">][</span><span class="s2">&quot;light_on_frames&quot;</span><span class="p">]</span>
+                        <span class="p">)</span>
+                    <span class="p">]</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">light_movement</span><span class="p">[</span><span class="n">cue_light</span><span class="p">][</span><span class="s2">&quot;post_window_movement&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">movement</span><span class="p">[</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">movement</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">light_on_dict</span><span class="p">[</span><span class="n">cue_light</span><span class="p">][</span><span class="s2">&quot;post_window_frames&quot;</span><span class="p">]</span>
+                            <span class="p">)</span>
+                        <span class="p">]</span>
+                    <span class="p">)</span>
+                <span class="k">for</span> <span class="n">cue_light</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cue_light_names</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">][</span><span class="n">animal_name</span><span class="p">][</span><span class="n">cue_light</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">state_name</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                        <span class="p">[</span><span class="s2">&quot;pre-cue&quot;</span><span class="p">,</span> <span class="s2">&quot;cue&quot;</span><span class="p">,</span> <span class="s2">&quot;post-cue&quot;</span><span class="p">],</span>
+                        <span class="p">[</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">light_movement</span><span class="p">[</span><span class="n">cue_light</span><span class="p">][</span><span class="s2">&quot;pre_window_movement&quot;</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">light_movement</span><span class="p">[</span><span class="n">cue_light</span><span class="p">][</span><span class="s2">&quot;light_movement&quot;</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">light_movement</span><span class="p">[</span><span class="n">cue_light</span><span class="p">][</span><span class="s2">&quot;post_window_movement&quot;</span><span class="p">],</span>
+                        <span class="p">],</span>
+                    <span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">][</span><span class="n">animal_name</span><span class="p">][</span><span class="n">cue_light</span><span class="p">][</span>
+                            <span class="n">state_name</span>
+                        <span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">][</span><span class="n">animal_name</span><span class="p">][</span><span class="n">cue_light</span><span class="p">][</span>
+                            <span class="n">state_name</span>
+                        <span class="p">][</span><span class="s2">&quot;Distance (cm)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">df</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span> <span class="o">/</span> <span class="mi">10</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+                        <span class="n">velocity_lst</span> <span class="o">=</span> <span class="p">[]</span>
+                        <span class="k">for</span> <span class="n">sliced_df</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">array_split</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fps</span><span class="p">):</span>
+                            <span class="n">velocity_lst</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sliced_df</span><span class="o">.</span><span class="n">sum</span><span class="p">())</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">][</span><span class="n">animal_name</span><span class="p">][</span><span class="n">cue_light</span><span class="p">][</span>
+                            <span class="n">state_name</span>
+                        <span class="p">][</span><span class="s2">&quot;Velocity (cm/s)&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">mean</span><span class="p">(</span><span class="n">velocity_lst</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_setting</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">roi_results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">roi_results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">][</span><span class="n">animal_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">roi_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries_exits_df</span><span class="p">[</span><span class="s2">&quot;SHAPE&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">():</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">roi_results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">][</span><span class="n">animal_name</span><span class="p">][</span><span class="n">roi_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                        <span class="n">inside_roi_frms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entries_exits_df</span><span class="p">[</span><span class="s2">&quot;inside_lst&quot;</span><span class="p">][</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">entries_exits_df</span><span class="p">[</span><span class="s2">&quot;SHAPE&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">roi_name</span>
+                        <span class="p">]</span>
+                        <span class="n">inside_roi_frms</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">inside_roi_frms</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
+                        <span class="k">for</span> <span class="n">cue_light</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cue_light_names</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">roi_results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">][</span><span class="n">animal_name</span><span class="p">][</span><span class="n">roi_name</span><span class="p">][</span>
+                                <span class="n">cue_light</span>
+                            <span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">overlap_light</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                                <span class="nb">set</span><span class="p">(</span><span class="n">inside_roi_frms</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">light_on_dict</span><span class="p">[</span><span class="n">cue_light</span><span class="p">][</span><span class="s2">&quot;light_on_frames&quot;</span><span class="p">]</span>
+                                <span class="p">)</span>
+                            <span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">overlap_pre_window_frames</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                                <span class="nb">set</span><span class="p">(</span><span class="n">inside_roi_frms</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">light_on_dict</span><span class="p">[</span><span class="n">cue_light</span><span class="p">][</span><span class="s2">&quot;pre_window_frames&quot;</span><span class="p">]</span>
+                                <span class="p">)</span>
+                            <span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">overlap_post_window_frames</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                                <span class="nb">set</span><span class="p">(</span><span class="n">inside_roi_frms</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">light_on_dict</span><span class="p">[</span><span class="n">cue_light</span><span class="p">][</span><span class="s2">&quot;post_window_frames&quot;</span><span class="p">]</span>
+                                <span class="p">)</span>
+                            <span class="p">)</span>
+                            <span class="k">for</span> <span class="n">state_name</span><span class="p">,</span> <span class="n">lst</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                                <span class="p">[</span><span class="s2">&quot;pre-cue&quot;</span><span class="p">,</span> <span class="s2">&quot;cue&quot;</span><span class="p">,</span> <span class="s2">&quot;post-cue&quot;</span><span class="p">],</span>
+                                <span class="p">[</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">overlap_pre_window_frames</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">overlap_light</span><span class="p">,</span>
+                                    <span class="bp">self</span><span class="o">.</span><span class="n">overlap_post_window_frames</span><span class="p">,</span>
+                                <span class="p">],</span>
+                            <span class="p">):</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">roi_results</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">video_name</span><span class="p">][</span><span class="n">animal_name</span><span class="p">][</span>
+                                    <span class="n">roi_name</span>
+                                <span class="p">][</span><span class="n">cue_light</span><span class="p">][</span><span class="n">state_name</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span>
+                                    <span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1000</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fps</span><span class="p">))</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">),</span> <span class="mi">4</span>
+                                <span class="p">)</span></div>
+
+<div class="viewcode-block" id="CueLightMovementAnalyzer.organize_results"><a class="viewcode-back" href="../../../simba.cue_light_tools.html#simba.cue_light_tools.cue_light_movement_statistics.CueLightMovementAnalyzer.organize_results">[docs]</a>    <span class="k">def</span> <span class="nf">organize_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to organize movement results into dataframe</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Attribute: pd.DataFrame</span>
+<span class="sd">            results_roi_df</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">results_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Video&quot;</span><span class="p">,</span> <span class="s2">&quot;Animal&quot;</span><span class="p">,</span> <span class="s2">&quot;Cue light&quot;</span><span class="p">,</span> <span class="s2">&quot;Time period&quot;</span><span class="p">,</span> <span class="s2">&quot;Measure&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">video_name</span><span class="p">,</span> <span class="n">video_data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">animal_name</span><span class="p">,</span> <span class="n">animal_data</span> <span class="ow">in</span> <span class="n">video_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">light_name</span><span class="p">,</span> <span class="n">light_data</span> <span class="ow">in</span> <span class="n">animal_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">for</span> <span class="n">period_name</span><span class="p">,</span> <span class="n">period_data</span> <span class="ow">in</span> <span class="n">light_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">for</span> <span class="n">measure_name</span><span class="p">,</span> <span class="n">measure_data</span> <span class="ow">in</span> <span class="n">period_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">results_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results_df</span><span class="p">)]</span> <span class="o">=</span> <span class="p">[</span>
+                                <span class="n">video_name</span><span class="p">,</span>
+                                <span class="n">animal_name</span><span class="p">,</span>
+                                <span class="n">light_name</span><span class="p">,</span>
+                                <span class="n">period_name</span><span class="p">,</span>
+                                <span class="n">measure_name</span><span class="p">,</span>
+                                <span class="n">measure_data</span><span class="p">,</span>
+                            <span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_setting</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results_roi_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="n">columns</span><span class="o">=</span><span class="p">[</span>
+                    <span class="s2">&quot;Video&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Animal&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;ROI Name&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Cue light&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Time period&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Time in ROI (s)&quot;</span><span class="p">,</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">video_name</span><span class="p">,</span> <span class="n">video_data</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">animal_name</span><span class="p">,</span> <span class="n">animal_data</span> <span class="ow">in</span> <span class="n">video_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">for</span> <span class="n">roi_name</span><span class="p">,</span> <span class="n">roi_data</span> <span class="ow">in</span> <span class="n">animal_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">for</span> <span class="n">light_name</span><span class="p">,</span> <span class="n">light_data</span> <span class="ow">in</span> <span class="n">roi_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                            <span class="k">for</span> <span class="n">period_name</span><span class="p">,</span> <span class="n">period_data</span> <span class="ow">in</span> <span class="n">light_data</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">results_roi_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results_roi_df</span><span class="p">)]</span> <span class="o">=</span> <span class="p">[</span>
+                                    <span class="n">video_name</span><span class="p">,</span>
+                                    <span class="n">animal_name</span><span class="p">,</span>
+                                    <span class="n">roi_name</span><span class="p">,</span>
+                                    <span class="n">light_name</span><span class="p">,</span>
+                                    <span class="n">period_name</span><span class="p">,</span>
+                                    <span class="n">period_data</span><span class="p">,</span>
+                                <span class="p">]</span></div>
+
+<div class="viewcode-block" id="CueLightMovementAnalyzer.save_results"><a class="viewcode-back" href="../../../simba.cue_light_tools.html#simba.cue_light_tools.cue_light_movement_statistics.CueLightMovementAnalyzer.save_results">[docs]</a>    <span class="k">def</span> <span class="nf">save_results</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method to save movement cue light results into the SimBA project folder.</span>
+<span class="sd">        Results are stored in the `project_folder/logs` directory of the SimBA project.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">save_results_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logs_path</span><span class="p">,</span>
+            <span class="s2">&quot;Cue_lights_movement_statistics_</span><span class="si">{}</span><span class="s2">.csv&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;Video&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">save_results_path</span><span class="p">)</span>
+        <span class="n">stdout_success</span><span class="p">(</span>
+            <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Cue light movement statistics saved in project_folder/logs directory.&quot;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">roi_setting</span><span class="p">:</span>
+            <span class="n">save_roi_results_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logs_path</span><span class="p">,</span> <span class="s2">&quot;Cue_lights_roi_statistics_</span><span class="si">{}</span><span class="s2">.csv&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results_roi_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results_roi_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;Video&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span>
+                <span class="n">drop</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results_roi_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">save_roi_results_path</span><span class="p">)</span>
+            <span class="n">stdout_success</span><span class="p">(</span>
+                <span class="n">msg</span><span class="o">=</span><span class="s2">&quot;Cue light ROI statistics saved in project_folder/logs directory.&quot;</span>
+            <span class="p">)</span></div></div>
+
+
+<span class="c1"># test = CueLightMovementAnalyzer(config_path=r&#39;/Users/simon/Desktop/envs/troubleshooting/naresh/project_folder/project_config.ini&#39;,</span>
+<span class="c1">#                                 pre_window=100, post_window=100, cue_light_names=[&#39;Rectangl_1&#39;], threshold=0.0, roi_setting=True)</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># def __init__(self,</span>
+<span class="c1">#              config_path: str,</span>
+<span class="c1">#              pre_window: int,</span>
+<span class="c1">#              post_window: int,</span>
+<span class="c1">#              cue_light_names: list,</span>
+<span class="c1">#              threshold: float,</span>
+<span class="c1">#              roi_setting: bool):</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

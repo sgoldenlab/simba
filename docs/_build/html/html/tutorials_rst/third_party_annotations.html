@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Third-part annotations in SimBA &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Friendly Asked Questions (FAQ)" href="FAQ.html" />
+    <link rel="prev" title="Exporting BORIS annotations for SimBA" href="boris.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SimBA
+              <img src="../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../labelling.html">Labelling</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="standard_label.html">SimBA Behavioral Annotator GUI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="advanced_label.html">SimBA behavioral Annotator GUI (ADVANCED LABELLING)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boris.html">Exporting BORIS annotations for SimBA</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Third-part annotations in SimBA</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#before-importing-third-party-annotations-into-simba-project">Before importing third-party annotations into SimBA project</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tutorial">Tutorial</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#troubleshooting-and-common-errors">Troubleshooting and common errors</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../labelling.html">Labelling</a></li>
+      <li class="breadcrumb-item active">Third-part annotations in SimBA</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_rst/third_party_annotations.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="third-part-annotations-in-simba">
+<h1>Third-part annotations in SimBA<a class="headerlink" href="#third-part-annotations-in-simba" title="Permalink to this heading"></a></h1>
+<a class="reference internal image-reference" href="../_images/landing4.png"><img alt="../_images/landing4.png" class="align-center" src="../_images/landing4.png" style="width: 1000px;" /></a>
+<p>SimBA has an <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/labelling_aggression_tutorial.md">in-built behavior annotation
+interface</a>
+that allow users to append experimenter-made labels to the <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features">features
+extracted</a>
+from pose-estimation data. Accurate human labelling of images can be the
+most time-consuming part of creating reliable supervised machine
+learning models. However, often experimenters have previously
+hand-labelled videos using manual software annotation tools and these
+labels can be appended to the pose-estimation datasets in SimBA. Some
+users may also prefer to use other dedicated behavior annotation tools
+rather than using the <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/labelling_aggression_tutorial.md">annotation tool built into
+SimBA</a>.</p>
+<p>SimBA currently supports the import of annotations created in:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://solomon.andraspeter.com/">SOLOMON CODER</a></p></li>
+<li><p><a class="reference external" href="https://www.boris.unito.it/">BORIS</a></p></li>
+<li><p><a class="reference external" href="https://github.com/neuroethology/bentoMAT">BENTO</a></p></li>
+<li><p><a class="reference external" href="https://www.noldus.com/ethovision-xt">NOLDUS ETHOVISION</a></p></li>
+<li><p><a class="reference external" href="https://github.com/jbohnslav/deepethogram">DeepEthogram</a></p></li>
+<li><p><a class="reference external" href="https://www.noldus.com/observer-xt">NOLDUS OBSERVER</a></p></li>
+</ul>
+<p>If you have annotation created in any other software tool and would like
+to append them to your data in SimBA, please reach out to us on
+<a class="reference external" href="https://gitter.im/SimBA-Resource/community">Gitter</a> or
+<a class="reference external" href="https://github.com/sgoldenlab/simba">GitHub</a> and we can work
+together to make the option available in the SimBA GUI.</p>
+<section id="before-importing-third-party-annotations-into-simba-project">
+<h2>Before importing third-party annotations into SimBA project<a class="headerlink" href="#before-importing-third-party-annotations-into-simba-project" title="Permalink to this heading"></a></h2>
+<p>In brief, before we can import the third-party annotations, we need to
+(i) create a SimBA project, (ii) import our pose-estimation data into
+this project, (iii) correct any outliers (or indicate to skip outlier
+correction), and (iv) extract features for our data set, thus:</p>
+<ol class="arabic simple">
+<li><p>Once you have created a project, click on <code class="docutils literal notranslate"><span class="pre">File</span></code> –&gt;
+<code class="docutils literal notranslate"><span class="pre">Load</span> <span class="pre">project</span></code> to load your project. For more information on
+creating a project, click
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#part-1-create-a-new-project-1">HERE</a>.</p></li>
+<li><p>Make sure you have extracted the features from your tracking data and
+there are files, one file representing each video in your project,
+located inside the <code class="docutils literal notranslate"><span class="pre">project_folder/csv/features_extracted</span></code>
+directory of your project. For more information on extracting
+features, click
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features">HERE</a>.</p></li>
+</ol>
+<section id="tutorial">
+<h3>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this heading"></a></h3>
+<p><strong>1.</strong> After loading your project, click on the <code class="docutils literal notranslate"><span class="pre">[LABEL</span> <span class="pre">BEHAVIOR]</span></code>
+tab, and the <code class="docutils literal notranslate"><span class="pre">Append</span> <span class="pre">third-party</span> <span class="pre">annotations</span></code> button inside the
+<code class="docutils literal notranslate"><span class="pre">LABELLING</span> <span class="pre">TOOLS</span></code> sub-frame and you should see the following pop-up:</p>
+<a class="reference internal image-reference" href="../_images/menu_19.png"><img alt="../_images/menu_19.png" class="align-center" src="../_images/menu_19.png" style="width: 1000px;" /></a>
+<p><strong>2.</strong> In the first drop-down menu named ’THIRD-PARTY APPLICATION`,
+select the application which your annotations were created in:</p>
+<a class="reference internal image-reference" href="../_images/menu_25.png"><img alt="../_images/menu_25.png" class="align-center" src="../_images/menu_25.png" style="width: 1000px;" /></a>
+<p><strong>3.</strong> Next, where it says <code class="docutils literal notranslate"><span class="pre">DATA</span> <span class="pre">DIRECTORY</span></code>, click <code class="docutils literal notranslate"><span class="pre">Browse</span> <span class="pre">Folder</span></code>
+and select the directory where your third-party annotations are stored.</p>
+<p><strong>4.</strong> Next, we need to tell SimBA how to deal with inconsistancies in
+the annotation data and conflicts with the pose-estimation data (if they
+exist). While developing these tools in SimBA, we have been shared a lot
+of annotation files from a lot of users. We have noticed that the
+annotation files sometimes have oddities; e.g., behaviors that are
+annotated to end before they start or that start more times then they
+end etc etc.. We need to deal with these inconsistancies and conflicts
+when appeding the labels, and these settings gives the users some powers
+in how we do this.</p>
+<p>Each of the <code class="docutils literal notranslate"><span class="pre">WARNINGS</span> <span class="pre">AND</span> <span class="pre">ERRORS</span></code> dropdowns have two options:
+<code class="docutils literal notranslate"><span class="pre">WARNING</span></code>, and <code class="docutils literal notranslate"><span class="pre">ERROR</span></code>:</p>
+<a class="reference internal image-reference" href="../_images/menu_35.png"><img alt="../_images/menu_35.png" class="align-center" src="../_images/menu_35.png" style="width: 1000px;" /></a>
+<p>If <code class="docutils literal notranslate"><span class="pre">WARNING</span></code> is selected, then SimBA will warn you with printed text
+that an inconsistancy has been found, where it was found, and try to
+remedy the issue. If <code class="docutils literal notranslate"><span class="pre">ERROR</span></code> is selected, then SimBA will shut down
+the appending process and print a text saying an inconsistancy has been
+found and where it was found, so that the user can look into and fix the
+issue. Below we will go through the potential inconsistancies and
+conflicts that SimBA will look for:</p>
+<ol class="lowerroman simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">INVALID</span> <span class="pre">ANNOTATION</span> <span class="pre">DATA</span> <span class="pre">FILE</span> <span class="pre">FORMAT</span></code>: SimBA expects the
+annotation files to look a certain way depending on the third-party
+application. SimBA needs to make assumptions on - for example -
+where to find the time-stamps, the behaviors, and the video names
+etc. within your files, and when these assumptions are wrong, SimBA
+will show and <em>INVALID ANNOTATION DATA FILE FORMAT</em> error or
+warning. If this dropdown is set to <strong>WARNING</strong>, then SimBA will
+skip to read in the invalid file. If this dropdown is set to
+<strong>ERROR</strong>, then SimBA will halt the reading of your annotation files
+and show you en error. See below links for the file formats expected
+by SimBA from the differet annotation tools.</p></li>
+</ol>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/bento_example.annot">BENTO</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/boris_example.csv">BORIS</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/deep_ethogram_labels.csv">DEEPETHOGRAM</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/ethovision_example.xlsx">ETHOVISION</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/Observer_example_1.xlsx">OBSERVER</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/Observer_example_2.xlsx">OBSERVER</a></p></li>
+<li><p><a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/solomon_example.csv">SOLOMON</a></p></li>
+</ul>
+<ol class="lowerroman simple" start="2">
+<li><p><code class="docutils literal notranslate"><span class="pre">ADDITIONAL</span> <span class="pre">THIRD</span> <span class="pre">PARTY</span> <span class="pre">BEHAVIOR</span> <span class="pre">DETECTED</span></code>: At times, the
+annotation files contain annotations for behaviors that you have
+<strong>not</strong> defined in your SimBA project.</p></li>
+</ol>
+<p>Example 1: You have defined two classifiers/behaviors in your SimBA
+project called: <code class="docutils literal notranslate"><span class="pre">Attack</span></code> and <code class="docutils literal notranslate"><span class="pre">Sniffing</span></code>. In your annotation files,
+SimBA finds annotations for <code class="docutils literal notranslate"><span class="pre">Attack</span></code>, <code class="docutils literal notranslate"><span class="pre">Sniffing</span></code>, and <code class="docutils literal notranslate"><span class="pre">Grooming</span></code>.
+As <code class="docutils literal notranslate"><span class="pre">Grooming</span></code> is not defined in your SimBA project we are not sure
+what to do with those annotations.</p>
+<p>Example 2: You have defined two classifiers/behaviors in your SimBA
+project called: <code class="docutils literal notranslate"><span class="pre">Attack</span></code> and <code class="docutils literal notranslate"><span class="pre">Sniffing</span></code>. In your annotation files,
+SimBA finds annotations for <code class="docutils literal notranslate"><span class="pre">attack</span></code>, <code class="docutils literal notranslate"><span class="pre">sniffing</span></code>. As <code class="docutils literal notranslate"><span class="pre">attack</span></code> and
+<code class="docutils literal notranslate"><span class="pre">sniffing</span></code> is not defined in your SimBA project we are not sure what
+to do with those annotations.</p>
+<p>If this dropdown is set to <strong>WARNING</strong>, then SimBA will show you a
+warning and <strong>discard</strong> the behaviors not defined in your SimBA project.
+If this dropdown is set to <strong>ERROR</strong>, then SimBA will stop appending the
+annotations and show you an error about the additional
+classifiers/annotations found and where SImBA found them.</p>
+<ol class="lowerroman simple" start="2">
+<li><p><code class="docutils literal notranslate"><span class="pre">ANNOTATION</span> <span class="pre">OVERLAP</span> <span class="pre">CONFLICT</span></code>: Many third-party annotation
+softwares give you a <code class="docutils literal notranslate"><span class="pre">BEHAVIOR</span></code> and <code class="docutils literal notranslate"><span class="pre">EVENT</span></code> columns (e.g.,
+Noldus tools). For example, a specific log in a file can be a
+behavior of <code class="docutils literal notranslate"><span class="pre">Grooming</span></code> and the event is <code class="docutils literal notranslate"><span class="pre">START</span></code>, and the next
+row log the behavior is <code class="docutils literal notranslate"><span class="pre">Grooming</span></code> and the event is <code class="docutils literal notranslate"><span class="pre">STOP</span></code>. But
+what happens when a behavior is recorded as <code class="docutils literal notranslate"><span class="pre">STOP</span></code> before any
+record of an associated <code class="docutils literal notranslate"><span class="pre">START</span></code>? This would happen if you have
+sequantial logs of <code class="docutils literal notranslate"><span class="pre">Grooming</span></code> as
+<code class="docutils literal notranslate"><span class="pre">START</span></code>-&gt;<code class="docutils literal notranslate"><span class="pre">STOP</span></code>-&gt;<code class="docutils literal notranslate"><span class="pre">STOP</span></code>-&gt;<code class="docutils literal notranslate"><span class="pre">START</span></code> or
+<code class="docutils literal notranslate"><span class="pre">STOP</span></code>-&gt;<code class="docutils literal notranslate"><span class="pre">START</span></code>-&gt;<code class="docutils literal notranslate"><span class="pre">START</span></code>-&gt;<code class="docutils literal notranslate"><span class="pre">STOP</span></code> etc. Make sure your
+START and STOP events are intertwined.</p></li>
+</ol>
+<p>If this dropdown is set to <strong>WARNING</strong>, then SimBA will show you a
+warning and try to find the innaccurate start-&gt;stop annotations and
+discard them. If this dropdown is set to <strong>ERROR</strong>, then SimBA will stop
+appending the annotations and show you an error about which behavior and
+video the overlap was found.</p>
+<ol class="lowerroman simple" start="3">
+<li><p><code class="docutils literal notranslate"><span class="pre">ZERO</span> <span class="pre">THIRD-PARTY</span> <span class="pre">VIDEO</span> <span class="pre">BEHAVIOR</span> <span class="pre">ANNOTATIONS</span> <span class="pre">FOUND</span></code>: At times, a
+specific video contains zero third-party annotations for a
+specific behavior.</p></li>
+</ol>
+<p>If this dropdown is set to <strong>WARNING</strong>, then SimBA will show you a
+warning and set all frames in your data to annotated as <strong>behavior
+absent</strong>. If this dropdown is set to <strong>ERROR</strong>, then SimBA will stop
+appending the annotations and show you an error about which behavior and
+video contains zero annotations as behavior present.</p>
+<ol class="lowerroman simple" start="4">
+<li><p><code class="docutils literal notranslate"><span class="pre">ANNOTATION</span> <span class="pre">AND</span> <span class="pre">POSE</span> <span class="pre">FRAME</span> <span class="pre">COUNT</span> <span class="pre">FONFLICT</span></code>: It happens that the
+video annotated in your annotation tool and the pose-estimation
+data imported to SimBA has different number of frames. For example,
+the annotation data for a specific video may contains annotations
+for 2k frames, <strong>but</strong> the imported pose-estimation data for the
+same video is 1.5k frames long. More, if the annotation file
+indicates that your behavior is present between frame 1750 and
+frame 1800, then SimBA does not know what to do with those
+annotations as the pose-estimation data only has 1500 entries.</p></li>
+</ol>
+<p>If this dropdown is set to <strong>WARNING</strong>, then SimBA will show you a
+warning and <strong>discard</strong> any annotations made after the last frame in the
+pose-estimation data. If this dropdown is set to <strong>ERROR</strong>, then SimBA
+will stop appending your labels when this conflict occurs, and give you
+information about where the conflict was found (which video, which
+behavior, which frames, and how many frames).</p>
+<ol class="loweralpha simple" start="22">
+<li><p><code class="docutils literal notranslate"><span class="pre">ANNOTATION</span> <span class="pre">EVENT</span> <span class="pre">COUNT</span> <span class="pre">CONFLICT</span></code>: Many third-party annotation
+softwares give you a <code class="docutils literal notranslate"><span class="pre">BEHAVIOR</span></code> and <code class="docutils literal notranslate"><span class="pre">EVENT</span></code> columns (e.g.,
+Noldus tools). For example, a specific log in a file can be a
+behavior of <code class="docutils literal notranslate"><span class="pre">Grooming</span></code> and the event is <code class="docutils literal notranslate"><span class="pre">START</span></code>, and the next
+row log the behavior is <code class="docutils literal notranslate"><span class="pre">Grooming</span></code> and the event is <code class="docutils literal notranslate"><span class="pre">STOP</span></code>. But
+what happens when a behavior is recorded as have started N times and
+stopped N-1 or N+1 times? This would happen if you have sequantial
+logs of <code class="docutils literal notranslate"><span class="pre">Grooming</span></code> as
+<code class="docutils literal notranslate"><span class="pre">START</span></code>-&gt;<code class="docutils literal notranslate"><span class="pre">STOP</span></code>-&gt;<code class="docutils literal notranslate"><span class="pre">START</span></code>-&gt;<code class="docutils literal notranslate"><span class="pre">STOP</span></code>-&gt;‘START’ or
+<code class="docutils literal notranslate"><span class="pre">START</span></code>-&gt;<code class="docutils literal notranslate"><span class="pre">STOP</span></code>-&gt;<code class="docutils literal notranslate"><span class="pre">STOP</span></code> etc. Then we have an extra event
+with no counter-event which SimBA doesn’t know how to deal with.</p></li>
+</ol>
+<p>If this dropdown is set to <strong>WARNING</strong>, then SimBA will show you a
+warning and try to find the innaccurate start/stop annotations and
+discard them. If this dropdown is set to <strong>ERROR</strong>, then SimBA will stop
+appending the annotations and show you an error about which behavior and
+video the count conflict was found in.</p>
+<ol class="lowerroman simple" start="6">
+<li><p><code class="docutils literal notranslate"><span class="pre">ANNOTATION</span> <span class="pre">DATA</span> <span class="pre">FILE</span> <span class="pre">NOT</span> <span class="pre">FOUND</span></code>: Say we have two video data
+files representing our pose-estimation in our SimBA project -
+<code class="docutils literal notranslate"><span class="pre">Video_1</span></code> and <code class="docutils literal notranslate"><span class="pre">Video_2</span></code> - that we want to append third-party
+annotations to. We import our third-party annotations for two
+videos <code class="docutils literal notranslate"><span class="pre">Video_1</span></code> and <code class="docutils literal notranslate"><span class="pre">Video_3</span></code>. When SimBA gets to <code class="docutils literal notranslate"><span class="pre">Video_2</span></code>
+and looks for the third-party annotations, it doesn’t find any.</p></li>
+</ol>
+<p>If this dropdown is set to <strong>WARNING</strong>, then SimBA will show you a
+warning and skip appending annotations to the video that lack annotation
+data. If this dropdown is set to <strong>ERROR</strong>, then SimBA will stop
+appending the annotations and show you an error about which video is
+lacking annotation data.</p>
+<p><strong>5.</strong> We may want to create a log file recording all of the
+<strong>WARNINGS</strong> displayed during the append process. If you want a log,
+tick the <code class="docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">IMPORT</span> <span class="pre">LOG</span></code> checkbox. The log will be saved in the
+<code class="docutils literal notranslate"><span class="pre">project_folder/logs</span></code> directory of your SimBA project and named
+something like <code class="docutils literal notranslate"><span class="pre">BORIS_append_20230328095919.log</span></code>.</p>
+</section>
+</section>
+<section id="troubleshooting-and-common-errors">
+<h2>Troubleshooting and common errors<a class="headerlink" href="#troubleshooting-and-common-errors" title="Permalink to this heading"></a></h2>
+<ul class="simple">
+<li><p>Please make sure that the FPS of the imported video <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters">registered in
+the video_info.csv
+file</a>
+and the video annotated in the third-party tool are identical -
+otherwise SimBA may get the frame numbers jumbled up.</p></li>
+<li><p>The imported annotations into SimBA <strong>has to have START and STOP</strong>
+demarcations. This means that behaviors coded BORIS or NOLDUS tools
+as <code class="docutils literal notranslate"><span class="pre">POINT</span></code> events will be discarded by SimBA during importation. We
+discard these as we cannot build classifiers around events that are
+only present for a single frame, as is the case with <code class="docutils literal notranslate"><span class="pre">POINT</span></code>
+events.</p></li>
+<li><p>To pair the video names as recorded in SimBA with the video names as
+recorded in the annotation tools, SimBA will look at different places
+depending on the annotation tool:</p></li>
+<li><p>BORIS: The file-name (excluding the file-path) in the
+<code class="docutils literal notranslate"><span class="pre">Media</span> <span class="pre">file</span> <span class="pre">path</span></code> column.</p></li>
+<li><p>DEEPETHOGRAM: The annotation file filename.</p></li>
+<li><p>NOLDUS ETHOVISION: The file-name (excluding the file-path) in the
+<code class="docutils literal notranslate"><span class="pre">Video</span> <span class="pre">file:</span></code> entry.</p></li>
+<li><p>NOLDUS OBSERVER: The entry in the <code class="docutils literal notranslate"><span class="pre">Observation</span></code> column.</p></li>
+<li><p>BENTO: The annotation file filename.</p></li>
+<li><p>SOLOMON CODER: The annotation file filename.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="boris.html" class="btn btn-neutral float-left" title="Exporting BORIS annotations for SimBA" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="FAQ.html" class="btn btn-neutral float-right" title="Friendly Asked Questions (FAQ)" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

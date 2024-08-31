@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.plotting.interactive_probability_grapher &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.plotting.interactive_probability_grapher</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.plotting.interactive_probability_grapher</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="kn">from</span> <span class="nn">simba.mixins.config_reader</span> <span class="kn">import</span> <span class="n">ConfigReader</span>
+<span class="kn">from</span> <span class="nn">simba.plotting.tools.tkinter_tools</span> <span class="kn">import</span> <span class="n">InteractiveVideoPlotterWindow</span>
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="n">check_file_exist_and_readable</span>
+<span class="kn">from</span> <span class="nn">simba.utils.enums</span> <span class="kn">import</span> <span class="n">Paths</span>
+<span class="kn">from</span> <span class="nn">simba.utils.errors</span> <span class="kn">import</span> <span class="n">ColumnNotFoundError</span><span class="p">,</span> <span class="n">InvalidInputError</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="n">get_fn_ext</span><span class="p">,</span> <span class="n">read_df</span>
+
+
+<div class="viewcode-block" id="InteractiveProbabilityGrapher"><a class="viewcode-back" href="../../../simba.plotting.html#simba.plotting.interactive_probability_grapher.InteractiveProbabilityGrapher">[docs]</a><span class="k">class</span> <span class="nc">InteractiveProbabilityGrapher</span><span class="p">(</span><span class="n">ConfigReader</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Launch interactive GUI for classifier probability inspection.</span>
+
+<span class="sd">    :param str config_path: path to SimBA project config file in Configparser format</span>
+<span class="sd">    :param str file_path: Data with classification probability field.</span>
+<span class="sd">    :param str model_path: Path to classifier used to create probability field.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">       `Validation tutorial &lt;https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data&gt;`__.</span>
+<span class="sd">        .. image:: _static/img/interactive_probability_plot.png</span>
+<span class="sd">           :width: 450</span>
+<span class="sd">           :align: center</span>
+
+
+<span class="sd">    Examples</span>
+<span class="sd">    ----------</span>
+<span class="sd">    &gt;&gt;&gt; interactive_plotter = InteractiveProbabilityGrapher(config_path=r&#39;MyConfigPath&#39;, file_path=&#39;MyFeatureFilepath&#39;, model_path=&#39;MyPickledClassifier.sav&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; interactive_plotter.run()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">model_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="n">check_file_exist_and_readable</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="n">check_file_exist_and_readable</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">model_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_path</span> <span class="o">=</span> <span class="n">file_path</span><span class="p">,</span> <span class="n">model_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">click_counter</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">_</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">clf_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">filepath</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">clf_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clf_names</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidInputError</span><span class="p">(</span>
+                <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;The classifier </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">clf_name</span><span class="si">}</span><span class="s2"> is not a classifier in the SimBA project: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">clf_names</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">project_path</span><span class="p">,</span>
+            <span class="n">Paths</span><span class="o">.</span><span class="n">CLF_DATA_VALIDATION_DIR</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file_path</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">check_file_exist_and_readable</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">video_name</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_fn_ext</span><span class="p">(</span><span class="n">filepath</span><span class="o">=</span><span class="n">file_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span> <span class="o">=</span> <span class="n">read_df</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="sa">f</span><span class="s2">&quot;Probability_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">clf_name</span><span class="si">}</span><span class="s2">&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ColumnNotFoundError</span><span class="p">(</span>
+                <span class="n">column_name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Probability_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">clf_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data_path</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">p_arr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_df</span><span class="p">[[</span><span class="s2">&quot;Probability_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clf_name</span><span class="p">)]]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+        <span class="n">current_video_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_video_of_file</span><span class="p">(</span>
+            <span class="n">video_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">video_dir</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">video_name</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_frm</span> <span class="o">=</span> <span class="n">InteractiveVideoPlotterWindow</span><span class="p">(</span>
+            <span class="n">video_path</span><span class="o">=</span><span class="n">current_video_file_path</span><span class="p">,</span> <span class="n">p_arr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">p_arr</span>
+        <span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__click_event</span><span class="p">(</span><span class="n">event</span><span class="p">):</span>
+        <span class="k">global</span> <span class="n">current_x_cord</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">dblclick</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">button</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">xdata</span><span class="p">)</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="n">current_x_cord</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">xdata</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">matplotlib</span>
+
+        <span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;TkAgg&quot;</span><span class="p">)</span>
+        <span class="k">global</span> <span class="n">current_x_cord</span>
+        <span class="n">probability_txt</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Selected frame: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">clf_name</span><span class="si">}</span><span class="s2"> probability: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">p_arr</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+        <span class="n">plt_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Click on the points of the graph to display the corresponding video frame. </span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">probability_txt</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">current_x_cord</span><span class="p">,</span> <span class="n">prior_x_cord</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p_arr</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;frame #&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">clf_name</span><span class="si">}</span><span class="s2"> probability&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">plt_title</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">flush_events</span><span class="p">()</span>
+
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">mpl_connect</span><span class="p">(</span>
+                <span class="s2">&quot;button_press_event&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">event</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__click_event</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">current_x_cord</span> <span class="o">!=</span> <span class="n">prior_x_cord</span><span class="p">:</span>
+                <span class="n">prior_x_cord</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="n">current_x_cord</span><span class="p">)</span>
+                <span class="n">probability_txt</span> <span class="o">=</span> <span class="s2">&quot;Selected frame: </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> probability: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="n">current_x_cord</span><span class="p">),</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">clf_name</span><span class="p">,</span>
+                    <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">p_arr</span><span class="p">[</span><span class="n">current_x_cord</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="p">)</span>
+                <span class="n">plt_title</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Click on the points of the graph to display the corresponding video frame. </span><span class="se">\n</span><span class="s2"> </span><span class="si">{</span><span class="n">probability_txt</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">video_frm</span><span class="o">.</span><span class="n">load_new_frame</span><span class="p">(</span><span class="n">frm_cnt</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">current_x_cord</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">line</span> <span class="o">!=</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">line</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">plt_title</span><span class="p">)</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">current_x_cord</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">)</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">flush_events</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">ion</span><span class="p">()</span>
+            <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">())</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">pause</span><span class="p">(</span><span class="mf">0.0001</span><span class="p">)</span></div>
+
+
+<span class="c1"># test = InteractiveProbabilityGrapher(config_path=r&#39;/Users/simon/Desktop/envs/troubleshooting/naresh/project_folder/project_config.ini&#39;,</span>
+<span class="c1">#                                      file_path=&#39;/Users/simon/Desktop/envs/troubleshooting/naresh/project_folder/csv/features_extracted/SF2.csv&#39;,</span>
+<span class="c1">#                                      model_path=&#39;/Users/simon/Desktop/envs/troubleshooting/naresh/models/generated_models/Top.sav&#39;)</span>
+<span class="c1"># test.create_plots()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tutorials &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Regions of Interest (ROIs) in SimBA" href="tutorials_rst/roi.html" />
+    <link rel="prev" title="Multi-class classifiers" href="nb/multiclass.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            SimBA
+              <img src="_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/roi.html">Regions of Interest (ROIs) in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/FSTTC.html">Calculating forward-spike time tiling coefficents in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/feature_subsets.html">Feature family sub-sets in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/user_defined_feature_class.html">User-defined ‘feature extraction’ scripts in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/kleinberg_filter.html">Kleinberg behavior classification smoothing in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/anchored_rois.html">Animal-anchored ROIs (bounding-boxes) in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/SHAP.html">Model explainability and calculating feature SHAP values in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/directionality_between_animals.html">Who is looking at who: calculate “directionality” between animals in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/classifier_validation.html">Post-classification Validation (detecting false-positives)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/cue_lights.html">Cue Light Analysis in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/multi_animal_pose.html">Using multi-animal pose-estimation data in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/process_videos.html">Batch Video Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/installation.html">SimBA Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/create_user_defined_pose_config.html">User-defined pose-configurations in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/tools.html">Video processing tools in SimBA</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Tutorials</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/tutorials.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="tutorials">
+<h1>Tutorials<a class="headerlink" href="#tutorials" title="Permalink to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/roi.html">Regions of Interest (ROIs) in SimBA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/roi.html#before-analyzing-rois-in-simba">Before analyzing ROIs in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/roi.html#part-1-defining-rois-in-simba">Part 1. Defining ROIs in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/roi.html#part-2-the-region-of-interest-settings-menu">Part 2: The “Region of Interest Settings” menu</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/roi.html#shape-manipulations">Shape manipulations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/roi.html#deleting-rois">Deleting ROIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/roi.html#duplicating-rois">Duplicating ROIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/roi.html#changing-roi-locations">Changing ROI locations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/roi.html#changing-the-shape-of-the-roi">Changing the shape of the ROI</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/roi.html#aligning-rois">Aligning ROIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/roi.html#change-roi-attributes">Change ROI attributes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/roi.html#apply-shapes-from-another-video">Apply shapes from another video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/roi.html#show-shape-size-information">Show shape size information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/roi.html#delete-all-roi-definitions-in-your-simba-project">Delete all ROI definitions in your SimBA project</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/roi.html#next-steps">Next steps</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/FSTTC.html">Calculating forward-spike time tiling coefficents in SimBA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/FSTTC.html#step-1-generate-a-dataset">Step 1: Generate a dataset.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/FSTTC.html#step-2-perform-fsttc-analysis">Step 2: Perform FSTTC analysis.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/FSTTC.html#step-3-interpreting-the-fsttc-results-output">Step 3: Interpreting the FSTTC results output.</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/feature_subsets.html">Feature family sub-sets in SimBA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/feature_subsets.html#instructions">INSTRUCTIONS</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/user_defined_feature_class.html">User-defined ‘feature extraction’ scripts in SimBA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/user_defined_feature_class.html#step-1-use-a-user-defined-feature-extraction-script-in-simba">Step 1: Use a user-defined feature extraction script in SimBA</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/kleinberg_filter.html">Kleinberg behavior classification smoothing in SimBA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/kleinberg_filter.html#how-to-use-kleinberg-filter-in-simba">How to use Kleinberg Filter in SimBA</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/anchored_rois.html">Animal-anchored ROIs (bounding-boxes) in SimBA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/anchored_rois.html#before-analyzing-animal-anchored-rois-in-simba">BEFORE ANALYZING ANIMAL-ANCHORED ROIs in SIMBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/anchored_rois.html#animal-anchored-rois-in-simba-animal-bounding-boxes">Animal anchored ROIs in SimBA (animal bounding boxes)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/anchored_rois.html#visualizing-animal-anchored-rois">Visualizing animal-anchored ROIs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/anchored_rois.html#computing-statistics">Computing statistics</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/anchored_rois.html#computing-aggregate-statistics">Computing aggregate statistics</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/SHAP.html">Model explainability and calculating feature SHAP values in SimBA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/SHAP.html#part-1-generate-a-dataset">Part 1: Generate a dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/SHAP.html#part-2-compute-shap-scores">Part 2: Compute SHAP scores</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/directionality_between_animals.html">Who is looking at who: calculate “directionality” between animals in SimBA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/directionality_between_animals.html#before-analyzing-directionality-in-simba">Before analyzing directionality in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/directionality_between_animals.html#calculate-what-other-body-parts-and-what-other-animals-are-in-the-line-of-sight-for-specific-animal">Calculate what other body-parts and what other animals, are in the line of sight for specific animal.</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/classifier_validation.html">Post-classification Validation (detecting false-positives)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/classifier_validation.html#how-to-use-it">How to use it</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/cue_lights.html">Cue Light Analysis in SimBA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/cue_lights.html#before-analyzing-cue-light-data-in-simba">Before analyzing cue light data in SimBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/cue_lights.html#part-1-defining-cue-light-rois-in-simba">Part 1. Defining cue light ROIs in SimBA.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/cue_lights.html#part-2-analyzing-cue-light-s-states">Part 2. Analyzing cue light(s) states.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/cue_lights.html#part-3-visualizing-cue-light-states">Part 3. Visualizing cue light states.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/cue_lights.html#part-4-analyzing-movement-at-cue-light-states">Part 4. Analyzing movement at cue light states.</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/cue_lights.html#part-5-analyzing-classifications-at-cue-light-states">Part 5. Analyzing classifications at cue light states.</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/multi_animal_pose.html">Using multi-animal pose-estimation data in SimBA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/multi_animal_pose.html#step-1-generate-project-config">Step 1: Generate Project Config</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/multi_animal_pose.html#step-2-define-your-type-of-tracking">Step 2: Define your Type of Tracking</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/multi_animal_pose.html#step-3-import-your-videos">Step 3: Import your videos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/multi_animal_pose.html#step-4-import-your-tracking-data">Step 4: Import your tracking data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/multi_animal_pose.html#step-5-assigning-tracks-the-correct-identities">Step 5: Assigning tracks the correct identities.</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/process_videos.html">Batch Video Processing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/process_videos.html#pipeline">Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/process_videos.html#step-1-folder-selection">Step 1: Folder Selection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/process_videos.html#step-2-the-batch-processing-interface">Step 2: The batch processing interface.</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/installation.html">SimBA Installation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/installation.html#requirements">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/installation.html#installing-simba-option-1">Installing SimBA Option 1</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/installation.html#how-to-launch-simba-installed-using-pip-install-simba-uw-tf-dev">How to launch SimBA ( installed using pip install simba-uw-tf-dev)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/installation.html#installing-simba-using-anaconda">Installing SimBA using Anaconda</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/installation.html#installing-on-macos">Installing on MacOS</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/create_user_defined_pose_config.html">User-defined pose-configurations in SimBA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/create_user_defined_pose_config.html#create-a-new-user-defined-pose-configuration">Create a new user-defined pose-configuration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/create_user_defined_pose_config.html#removing-archiving-user-defined-pose-configurations-in-simba">Removing / archiving user-defined pose-configurations in SimBA</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials_rst/tools.html">Video processing tools in SimBA</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/tools.html#shorten-videos">Shorten Videos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/tools.html#clip-video-into-multiple-videos">Clip video into multiple videos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/tools.html#crop-video">Crop Video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/tools.html#fixed-crop-videos">Fixed Crop Videos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/tools.html#multi-crop-videos">Multi-crop videos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/tools.html#downsample-video">Downsample video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/tools.html#get-coordinates-calibrate-distance">Get Coordinates (calibrate distance)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/tools.html#change-formats">Change formats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/tools.html#clahe-enhance-video">CLAHE enhance video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/tools.html#superimpose-frame-numbers-on-video">Superimpose frame numbers on video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/tools.html#convert-to-grayscale">Convert to grayscale</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/tools.html#change-fps-frame-rate-of-videos">Change FPS (frame-rate) of videos</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/tools.html#create-path-plots">Create path plots</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/tools.html#merge-images-to-video">Merge images to video</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/tools.html#generate-gifs">Generate gifs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorials_rst/tools.html#extract-frames">Extract Frames</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="nb/multiclass.html" class="btn btn-neutral float-left" title="Multi-class classifiers" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tutorials_rst/roi.html" class="btn btn-neutral float-right" title="Regions of Interest (ROIs) in SimBA" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

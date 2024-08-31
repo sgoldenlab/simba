@@ -18,7 +18,7 @@ def _euclidean_distance_kernel(x_dev, y_dev, results):
         p = (math.sqrt((x_dev[i][0] - y_dev[i][0]) ** 2 + (x_dev[i][1] - y_dev[i][1]) ** 2))
         results[i] = p
 
-def get_euclidean_distance(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+def get_euclidean_distance_cuda(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     """
     Computes the Euclidean distance between two sets of points using CUDA for GPU acceleration.
 
@@ -37,7 +37,7 @@ def get_euclidean_distance(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     >>> shifted_df = FeatureExtractionMixin.create_shifted_df(df=df, periods=1)
     >>> x = shifted_df[['Center_x', 'Center_y']].values
     >>> y = shifted_df[['Center_x_shifted', 'Center_y_shifted']].values
-    >>> get_euclidean_distance(x=x, y=y)
+    >>> get_euclidean_distance_cuda(x=x, y=y)
     """
 
     x = np.ascontiguousarray(x).astype(np.int32)

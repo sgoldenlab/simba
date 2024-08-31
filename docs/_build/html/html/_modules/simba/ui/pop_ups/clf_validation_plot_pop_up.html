@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.ui.pop_ups.clf_validation_plot_pop_up &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.ui.pop_ups.clf_validation_plot_pop_up</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.ui.pop_ups.clf_validation_plot_pop_up</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">threading</span>
+<span class="kn">from</span> <span class="nn">tkinter</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">simba.mixins.config_reader</span> <span class="kn">import</span> <span class="n">ConfigReader</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.pop_up_mixin</span> <span class="kn">import</span> <span class="n">PopUpMixin</span>
+<span class="kn">from</span> <span class="nn">simba.plotting.clf_validator</span> <span class="kn">import</span> <span class="n">ClassifierValidationClips</span>
+<span class="kn">from</span> <span class="nn">simba.ui.tkinter_functions</span> <span class="kn">import</span> <span class="p">(</span><span class="n">CreateLabelFrameWithIcon</span><span class="p">,</span> <span class="n">DropDownMenu</span><span class="p">,</span>
+                                        <span class="n">Entry_Box</span><span class="p">,</span> <span class="n">SimbaButton</span><span class="p">,</span> <span class="n">SimbaCheckbox</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="n">check_int</span>
+<span class="kn">from</span> <span class="nn">simba.utils.enums</span> <span class="kn">import</span> <span class="n">Formats</span><span class="p">,</span> <span class="n">Keys</span><span class="p">,</span> <span class="n">Links</span><span class="p">,</span> <span class="n">Options</span>
+<span class="kn">from</span> <span class="nn">simba.utils.errors</span> <span class="kn">import</span> <span class="n">NoDataError</span>
+<span class="kn">from</span> <span class="nn">simba.utils.read_write</span> <span class="kn">import</span> <span class="n">get_file_name_info_in_directory</span>
+
+
+<div class="viewcode-block" id="ClassifierValidationPopUp"><a class="viewcode-back" href="../../../../simba.ui.pop_ups.html#simba.ui.pop_ups.clf_validation_plot_pop_up.ClassifierValidationPopUp">[docs]</a><span class="k">class</span> <span class="nc">ClassifierValidationPopUp</span><span class="p">(</span><span class="n">PopUpMixin</span><span class="p">,</span> <span class="n">ConfigReader</span><span class="p">):</span>
+
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    :example:</span>
+<span class="sd">    &gt;&gt;&gt; _ = ClassifierValidationPopUp(config_path=r&#39;C:\troubleshooting\RAT_NOR\project_folder\project_config.ini&#39;)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]):</span>
+        <span class="n">ConfigReader</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">,</span> <span class="n">read_video_info</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files_found_dict</span> <span class="o">=</span> <span class="n">get_file_name_info_in_directory</span><span class="p">(</span><span class="n">directory</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_results_dir</span><span class="p">,</span> <span class="n">file_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">file_type</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NoDataError</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;No data found in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_results_dir</span><span class="si">}</span><span class="s1"> directory. This is required for creating validation clips.&#39;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">PopUpMixin</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s2">&quot;SIMBA CLASSIFIER VALIDATION CLIPS&quot;</span><span class="p">)</span>
+        <span class="n">color_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">colors_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings_frm</span> <span class="o">=</span> <span class="n">CreateLabelFrameWithIcon</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">main_frm</span><span class="p">,</span><span class="n">header</span><span class="o">=</span><span class="s2">&quot;SETTINGS&quot;</span><span class="p">,</span><span class="n">icon_name</span><span class="o">=</span><span class="n">Keys</span><span class="o">.</span><span class="n">DOCUMENTATION</span><span class="o">.</span><span class="n">value</span><span class="p">,</span><span class="n">icon_link</span><span class="o">=</span><span class="n">Links</span><span class="o">.</span><span class="n">CLF_VALIDATION</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seconds_entry</span> <span class="o">=</span> <span class="n">Entry_Box</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings_frm</span><span class="p">,</span> <span class="s2">&quot;SECONDS PADDING: &quot;</span><span class="p">,</span> <span class="s2">&quot;20&quot;</span><span class="p">,</span> <span class="n">validation</span><span class="o">=</span><span class="s2">&quot;numeric&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clf_dropdown</span> <span class="o">=</span> <span class="n">DropDownMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings_frm</span><span class="p">,</span> <span class="s2">&quot;CLASSIFIER: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">clf_names</span><span class="p">,</span> <span class="s2">&quot;20&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clr_dropdown</span> <span class="o">=</span> <span class="n">DropDownMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings_frm</span><span class="p">,</span> <span class="s2">&quot;TEXT COLOR: &quot;</span><span class="p">,</span> <span class="n">color_names</span><span class="p">,</span> <span class="s2">&quot;20&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highlight_clr_dropdown</span> <span class="o">=</span> <span class="n">DropDownMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings_frm</span><span class="p">,</span> <span class="s2">&quot;HIGHLIGHT TEXT COLOR: &quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;None&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">color_names</span><span class="p">,</span> <span class="s2">&quot;20&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_speed_dropdown</span> <span class="o">=</span> <span class="n">DropDownMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">settings_frm</span><span class="p">,</span> <span class="s2">&quot;VIDEO SPEED: &quot;</span><span class="p">,</span> <span class="n">Options</span><span class="o">.</span><span class="n">SPEED_OPTIONS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="s2">&quot;20&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clf_dropdown</span><span class="o">.</span><span class="n">setChoices</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clf_names</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clr_dropdown</span><span class="o">.</span><span class="n">setChoices</span><span class="p">(</span><span class="s2">&quot;Cyan&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seconds_entry</span><span class="o">.</span><span class="n">entry_set</span><span class="p">(</span><span class="n">val</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highlight_clr_dropdown</span><span class="o">.</span><span class="n">setChoices</span><span class="p">(</span><span class="s2">&quot;None&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_speed_dropdown</span><span class="o">.</span><span class="n">setChoices</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">individual_bout_clips_cb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">one_vid_per_bout_var</span> <span class="o">=</span> <span class="n">SimbaCheckbox</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">settings_frm</span><span class="p">,</span> <span class="n">txt</span><span class="o">=</span><span class="s2">&quot;CREATE ONE CLIP PER BOUT&quot;</span><span class="p">,</span> <span class="n">txt_img</span><span class="o">=</span><span class="s1">&#39;segment&#39;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">individual_clip_per_video_cb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">one_vid_per_video_var</span> <span class="o">=</span> <span class="n">SimbaCheckbox</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">settings_frm</span><span class="p">,</span> <span class="n">txt</span><span class="o">=</span><span class="s2">&quot;CREATE ONE CLIP PER BOUT&quot;</span><span class="p">,</span> <span class="n">txt_img</span><span class="o">=</span><span class="s1">&#39;video&#39;</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_frm</span> <span class="o">=</span> <span class="n">LabelFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main_frm</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;RUN&quot;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="n">Formats</span><span class="o">.</span><span class="n">FONT_HEADER</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">pady</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">padx</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">fg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_single_video_frm</span> <span class="o">=</span> <span class="n">LabelFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run_frm</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;SINGLE VIDEO&quot;</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">Formats</span><span class="o">.</span><span class="n">FONT_HEADER</span><span class="o">.</span><span class="n">value</span><span class="p">,</span><span class="n">pady</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">padx</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">fg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_single_video_btn</span> <span class="o">=</span> <span class="n">SimbaButton</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_single_video_frm</span><span class="p">,</span> <span class="n">txt</span><span class="o">=</span><span class="s2">&quot;Create single video&quot;</span><span class="p">,</span> <span class="n">img</span><span class="o">=</span><span class="s1">&#39;rocket&#39;</span><span class="p">,</span> <span class="n">txt_clr</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="n">Formats</span><span class="o">.</span><span class="n">FONT_REGULAR</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">cmd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">cmd_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;multiple_videos&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">})</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">single_video_dropdown</span> <span class="o">=</span> <span class="n">DropDownMenu</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run_single_video_frm</span><span class="p">,</span><span class="s2">&quot;Video:&quot;</span><span class="p">,</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span><span class="s2">&quot;12&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">single_video_dropdown</span><span class="o">.</span><span class="n">setChoices</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_multiple_videos</span> <span class="o">=</span> <span class="n">LabelFrame</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run_frm</span><span class="p">,</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;MULTIPLE VIDEO&quot;</span><span class="p">,</span><span class="n">font</span><span class="o">=</span><span class="n">Formats</span><span class="o">.</span><span class="n">FONT_HEADER</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">pady</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">padx</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">fg</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_multiple_video_btn</span> <span class="o">=</span> <span class="n">SimbaButton</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run_multiple_videos</span><span class="p">,</span> <span class="n">txt</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Create multiple videos (</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span><span class="si">}</span><span class="s2"> video(s) found)&quot;</span><span class="p">,</span> <span class="n">img</span><span class="o">=</span><span class="s1">&#39;rocket&#39;</span><span class="p">,</span> <span class="n">txt_clr</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">,</span> <span class="n">font</span><span class="o">=</span><span class="n">Formats</span><span class="o">.</span><span class="n">FONT_REGULAR</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">cmd</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">,</span> <span class="n">cmd_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;multiple_videos&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">settings_frm</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">seconds_entry</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clf_dropdown</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clr_dropdown</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">highlight_clr_dropdown</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">video_speed_dropdown</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">individual_bout_clips_cb</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">individual_clip_per_video_cb</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_frm</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_single_video_frm</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_single_video_btn</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">single_video_dropdown</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_multiple_videos</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">run_multiple_video_btn</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="n">row</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">sticky</span><span class="o">=</span><span class="n">NW</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">main_frm</span><span class="o">.</span><span class="n">mainloop</span><span class="p">()</span>
+
+<div class="viewcode-block" id="ClassifierValidationPopUp.run"><a class="viewcode-back" href="../../../../simba.ui.pop_ups.html#simba.ui.pop_ups.clf_validation_plot_pop_up.ClassifierValidationPopUp.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multiple_videos</span><span class="p">:</span> <span class="nb">bool</span><span class="p">):</span>
+        <span class="n">check_int</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;CLIP SECONDS&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">seconds_entry</span><span class="o">.</span><span class="n">entry_get</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">highlight_clr_dropdown</span><span class="o">.</span><span class="n">getChoices</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;None&quot;</span><span class="p">:</span>
+            <span class="n">highlight_clr</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">highlight_clr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">colors_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">highlight_clr_dropdown</span><span class="o">.</span><span class="n">getChoices</span><span class="p">()]</span>
+        <span class="k">if</span> <span class="n">multiple_videos</span><span class="p">:</span>
+            <span class="n">data_paths</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data_paths</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">files_found_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">single_video_dropdown</span><span class="o">.</span><span class="n">getChoices</span><span class="p">()]]</span>
+
+        <span class="n">clf_validator</span> <span class="o">=</span> <span class="n">ClassifierValidationClips</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config_path</span><span class="p">,</span>
+                                                  <span class="n">window</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">seconds_entry</span><span class="o">.</span><span class="n">entry_get</span><span class="p">),</span>
+                                                  <span class="n">clf_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">clf_dropdown</span><span class="o">.</span><span class="n">getChoices</span><span class="p">(),</span>
+                                                  <span class="n">clips</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">one_vid_per_bout_var</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                                                  <span class="n">text_clr</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">colors_dict</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">clr_dropdown</span><span class="o">.</span><span class="n">getChoices</span><span class="p">()],</span>
+                                                  <span class="n">highlight_clr</span><span class="o">=</span><span class="n">highlight_clr</span><span class="p">,</span>
+                                                  <span class="n">video_speed</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">video_speed_dropdown</span><span class="o">.</span><span class="n">getChoices</span><span class="p">()),</span>
+                                                  <span class="n">concat_video</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">one_vid_per_video_var</span><span class="o">.</span><span class="n">get</span><span class="p">(),</span>
+                                                  <span class="n">data_paths</span><span class="o">=</span><span class="n">data_paths</span><span class="p">)</span>
+
+        <span class="n">threading</span><span class="o">.</span><span class="n">Thread</span><span class="p">(</span><span class="n">target</span><span class="o">=</span><span class="n">clf_validator</span><span class="o">.</span><span class="n">run</span><span class="p">())</span><span class="o">.</span><span class="n">start</span><span class="p">()</span></div></div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scenario 3 walkthrough &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/togglebutton.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../_static/custom.css" />
+
+  
+    <link rel="shortcut icon" href="../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Labelling" href="../labelling.html" />
+    <link rel="prev" title="Scenario 3 walkthrough" href="scenario_3.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SimBA
+              <img src="../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../walkthroughs.html">Walkthroughs</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="scenario_1.html">Scenario 1 walkthrough</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scenario_2.html">Scenario 2 walkthrough</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scenario_3.html">Scenario 3 walkthrough</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scenario_3.html#hypothetical-experiment"><strong>Hypothetical Experiment</strong>:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="scenario_3.html#scenario-3-updating-a-classifier-with-further-annotated-data"><strong>Scenario 3</strong>: Updating a classifier with further annotated data.</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Scenario 3 walkthrough</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#hypothetical-experiment"><strong>Hypothetical Experiment</strong>:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scenario-4-analyzing-and-adding-new-experimental-data-to-a-previously-started-project"><strong>Scenario 4</strong>: Analyzing and adding new Experimental data to a previously started project.</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#part-1-clean-up-your-previous-project-or-alternatively-create-a-new-project">Part 1: ‘Clean up your previous project’ (.. or alternatively create a new project).</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-2-load-the-project-and-import-your-new-data">Part 2: Load the project and import your new data.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-3-process-the-data-for-day-2-3-of-the-experiment">Part 3: Process the data for Day 2-3 of the experiment.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-4-run-the-predictive-classifier-on-the-data-for-day-2-3">Part 4: Run the predictive classifier on the data for Day 2-3.</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-4-analyze-machine-results">Part 4: Analyze Machine Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#part-5-visualizing-machine-predictions">Part 5: Visualizing machine predictions</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#part-6-post-classification-validation-detecting-false-positives">PART 6: Post-classification Validation (detecting false-positives)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#how-to-use-post-classification-validation">How to use <em>post-classification Validation</em></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../walkthroughs.html">Walkthroughs</a></li>
+      <li class="breadcrumb-item active">Scenario 3 walkthrough</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials_rst/scenario_4.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast.container,
+.nboutput.nblast.container {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast.container + .nbinput.container {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<section id="scenario-3-walkthrough">
+<h1>Scenario 3 walkthrough<a class="headerlink" href="#scenario-3-walkthrough" title="Permalink to this heading"></a></h1>
+<p>To faciliate the initial use of SimBA, we provide several use scenarios.
+We have created these scenarios around a hypothetical experiment that
+take a user from initial use (completely new start) all the way through
+analyzing a complete experiment and then adding additional experimental
+datasets to an initial project.</p>
+<p>All scenarios assume that the videos have been
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md">pre-processed</a>
+and that <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md">DLC behavioral tracking CSV
+files</a>
+have been created.</p>
+</section>
+<section id="hypothetical-experiment">
+<h1><strong>Hypothetical Experiment</strong>:<a class="headerlink" href="#hypothetical-experiment" title="Permalink to this heading"></a></h1>
+<p>Three days of resident-intruder testing between aggressive CD-1 mice and
+subordinante C57 intruders. Each day of testing has 10 pairs of mice,
+for a total of 30 videos recorded across 3 days. Recordings are 3
+minutes in duration, in color, at 30fps.</p>
+<p>Also, so that we do not overfit the predictive classifiers to the
+experimental data, a different set of pilot videos have been recorded of
+resident-inturder pairings using identical video acquisition parameters.
+A total of 20 pilot videos were recorded.</p>
+</section>
+<section id="scenario-4-analyzing-and-adding-new-experimental-data-to-a-previously-started-project">
+<h1><strong>Scenario 4</strong>: Analyzing and adding new Experimental data to a previously started project.<a class="headerlink" href="#scenario-4-analyzing-and-adding-new-experimental-data-to-a-previously-started-project" title="Permalink to this heading"></a></h1>
+<p>In this current Scenario, you have already generated a predictive
+classifier for “Behavior that Will Get a Nature Paper (Behavior
+BtWGaNP)” (see <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md">Scenario
+1</a>),
+and you have used the classifier to analyze Day 1 of your Experimental
+data (see <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md">Scenario
+2</a>).
+You may have also updated your classifier to make it better in <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario3.md">Scenario
+3</a>.
+You now wish to use the BtWGaNP classifier to analyse Days 2 and 3 of
+your Experimental data.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This Scenario is very similar to <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md">Scenario
+2</a>,
+however, we will take a slightly different approach to analyzing
+additional data in SimBA (see <em>Part 1</em> below).</p>
+</div>
+<section id="part-1-clean-up-your-previous-project-or-alternatively-create-a-new-project">
+<h2>Part 1: ‘Clean up your previous project’ (.. or alternatively create a new project).<a class="headerlink" href="#part-1-clean-up-your-previous-project-or-alternatively-create-a-new-project" title="Permalink to this heading"></a></h2>
+<p>We will need start with a project directory tree that does not contain
+any other CSV data than the data we want to analyze. If you are coming
+along from <a class="reference external" href="https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md">Scenario
+1</a>
+or <a class="reference external" href="https://github.com/sgoldenlab/simba/edit/master/docs/Scenario2.md">Scenario
+2</a>,
+you will have one or several project trees already. However, the project
+trees may contain the files used to create the BtWGaNP classifier
+(<a class="reference external" href="https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md">Scenario
+1</a>),
+or data from Day 1 of the experiments (<a class="reference external" href="https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md">Scenario
+2</a>).
+If you look in the different sub-directories of the
+<code class="docutils literal notranslate"><span class="pre">project_folder/csv</span></code> folder in your previous projects, you will see
+the CSV files we used to generate the project and/or have analyzed
+previously. If we continue using one of these project as is, SimBA will
+see these CSV files and analyze these files in addition to your new as
+yet un-analyzed experimental data from Day 2 and 3 of the experiment.</p>
+<p>As these files have been analyzed before, we shouldn’t have to analyze
+them again. In <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md">Scenario
+2</a>,
+we created a new project to avoid mixing the files that were used to
+create the predictive classifier for behavior BtWGaNP with the new
+experimental files we were to analyze.</p>
+<p>Another option is to “remove” these files from the immediate
+sub-directories of our <code class="docutils literal notranslate"><span class="pre">project_folder/csv</span></code> folder. This way SimBA
+cannot see them, and won’t analyze the already analyzed files again. In
+this current Scenario, we will hide the already analyzed files from the
+project created in <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md">Scenario
+2</a>.
+In previous versions of SimBA (and <strong>not</strong> required in the current SimBA
+version), users had to manually put the CSV files in a different
+directory to hide the files from SimBA and prevent them from being
+analyzed again.</p>
+<ol class="arabic simple">
+<li><p>In the current version of SimBA (as of 05-04-2020), instead, begin by
+loading loading your <code class="docutils literal notranslate"><span class="pre">project_config.ini</span></code> through the
+<code class="docutils literal notranslate"><span class="pre">File-&gt;Load</span> <span class="pre">Project</span></code> button in the main SimBA terminal window.</p></li>
+<li><p>Navigate to the `[Further imports (data/video/frames]’ tab. On the
+button right side of the window, you should see the following entry
+box and button, under the title <em>Archive processed files</em>:</p></li>
+</ol>
+<a class="reference internal image-reference" href="tutorials_rst/img/scenario_2/archive_1.jpg"><img alt="tutorials_rst/img/scenario_2/archive_1.jpg" class="align-center" src="tutorials_rst/img/scenario_2/archive_1.jpg" style="width: 1200px;" /></a>
+<ol class="arabic simple" start="3">
+<li><p>In the <code class="docutils literal notranslate"><span class="pre">Archive</span> <span class="pre">folder</span> <span class="pre">name</span></code> entry box, enter a folder name that
+best represents the data you have processed and now want to hide from
+SimBA and prevent from being included in further analyses. This may
+be, for example, the session or the day of the protocol (e.g.,
+<strong>Day1</strong> or <strong>Session1</strong>)</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You don’t have to avoid spaces in the <code class="docutils literal notranslate"><span class="pre">Archive</span> <span class="pre">folder</span> <span class="pre">name</span></code>
+entry box, but, it’s always good practise to do so.</p>
+</div>
+<ol class="arabic simple" start="4">
+<li><p>Before clicking on the <code class="docutils literal notranslate"><span class="pre">Archive</span></code> button, the contents of the
+<code class="docutils literal notranslate"><span class="pre">project_folder/csv</span></code> sub-directories may look like this image below
+on the left, if you have previosly processed 20 videos.</p></li>
+</ol>
+<a class="reference internal image-reference" href="tutorials_rst/img/scenario_4/archive_2.jpg"><img alt="tutorials_rst/img/scenario_4/archive_2.jpg" class="align-center" src="tutorials_rst/img/scenario_4/archive_2.jpg" style="width: 1200px;" /></a>
+<ol class="arabic simple" start="5">
+<li><p>I then enter <code class="docutils literal notranslate"><span class="pre">Day1</span></code> into the <code class="docutils literal notranslate"><span class="pre">Archive</span> <span class="pre">folder</span> <span class="pre">name</span></code> entry box and
+click on <code class="docutils literal notranslate"><span class="pre">Archive</span></code>. The contents of all directories, which is all
+analysed files, will be moved to newly created subdirectories within
+each project_folder/csv folders. Like in the image above on the
+right. SimBA can no longer see these files and will not process them
+again.</p></li>
+</ol>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In <a class="reference external" href="https://github.com/sgoldenlab/simba/edit/master/docs/Scenario1.md">Scenario
+1</a>,
+the data analysis also generated additional <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction">CSV files indicating how
+many outliers were
+corrected</a>,
+and further <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results">CSV files containing descriptive statistics of the
+classified
+behaviors</a>.
+These files are stored in the <code class="docutils literal notranslate"><span class="pre">project_folder/csv/logs</span></code> folder and
+you may want to <strong>manually</strong> cut/paste them to a new sub-directory
+(named Day1) to have better control over the outputted data. Also
+note that the sub-directory containing the <em>Day1</em> analysis files does
+not have to be in the <code class="docutils literal notranslate"><span class="pre">project_folder</span></code>, but can be <em>anywhere</em>
+except directly within the <code class="docutils literal notranslate"><span class="pre">project_folder/csv</span></code> sub-directories,
+and users can move or <strong>manually</strong> cut and paste them if prefered.</p>
+</div>
+</section>
+<section id="part-2-load-the-project-and-import-your-new-data">
+<h2>Part 2: Load the project and import your new data.<a class="headerlink" href="#part-2-load-the-project-and-import-your-new-data" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>After cleaning your project folders, it is time to load your project
+in SimBA. Follow the instructions in Scenario 1 - <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-1-load-project-config">Step 1: Load
+Project
+Config</a>
+to load your project.</p></li>
+<li><p>Once the project is loaded, follow the instructions in Scenario 1 -
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-2-optional-step--import-more-dlc-tracking-data-or-videos">Step 2 (Optional step) : Import more DLC Tracking Data or
+videos</a>
+to import further DLC tracking data, and further videos, into your
+project using the following menu:</p></li>
+</ol>
+<a class="reference internal image-reference" href="tutorials_rst/img/scenario_4/import.jpg"><img alt="tutorials_rst/img/scenario_4/import.jpg" class="align-center" src="tutorials_rst/img/scenario_4/import.jpg" style="width: 1200px;" /></a>
+<p>Once the data is imported, you should see the new imported data for Day
+2 in the <code class="docutils literal notranslate"><span class="pre">project_folder/csv/input</span></code> directory:</p>
+<a class="reference internal image-reference" href="tutorials_rst/img/scenario_4/archive_2.jpg"><img alt="tutorials_rst/img/scenario_4/archive_2.jpg" class="align-center" src="tutorials_rst/img/scenario_4/archive_2.jpg" style="width: 1200px;" /></a>
+</section>
+<section id="part-3-process-the-data-for-day-2-3-of-the-experiment">
+<h2>Part 3: Process the data for Day 2-3 of the experiment.<a class="headerlink" href="#part-3-process-the-data-for-day-2-3-of-the-experiment" title="Permalink to this heading"></a></h2>
+<p>Next, we will need to process the data for Day 2-3 of the experiment.
+This process includes (i) <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf">correcting outliers in the
+tracking</a>,
+and (ii) <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv">extracting
+features</a>.
+To process the newly added data imported during <strong>Part 2</strong> of this
+current Scenario, follow the instructions for <strong>Step 3 to 5</strong> in <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters">Part 2
+of Scenario
+1</a>.</p>
+</section>
+<section id="part-4-run-the-predictive-classifier-on-the-data-for-day-2-3">
+<h2>Part 4: Run the predictive classifier on the data for Day 2-3.<a class="headerlink" href="#part-4-run-the-predictive-classifier-on-the-data-for-day-2-3" title="Permalink to this heading"></a></h2>
+<p>At this point we have the Day 2-3 data within the project, and the data
+has been corrected for outliers and the features have been extracted. We
+now want to predict behavior BtWGaNP in these videos - just like we did
+in <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md">Scenario
+2</a>.
+The process to do this is documented in <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data">Part 3 of tutorial for Scenario
+2</a>,
+and is repeated here below.</p>
+<ol class="arabic simple">
+<li><p>In the Load Project menu, navigate to the <strong>Run Machine Model</strong> tab
+and you should see the following window.</p></li>
+<li><p><strong>The ``Model Selection`` window</strong> .If you click on
+<code class="docutils literal notranslate"><span class="pre">Model</span> <span class="pre">Selection</span></code>. The following window, containing the classifier
+names that were defined when you created the project, will pop up.</p></li>
+</ol>
+<p>Once the data is imported, you should see the new imported data for Day
+2 in the <code class="docutils literal notranslate"><span class="pre">project_folder/csv/input</span></code> directory:</p>
+<ol class="arabic simple" start="3">
+<li><p><strong>Fill in the ``Discrimination threshold`` and the
+``Minimum behavior bout length`` entry boxes.</strong> For a reminder of the
+functions of these entry boxes, click
+<a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data">here</a>.</p></li>
+</ol>
+<p>Click on Run RF Model to run the machine model on the data for Day 2 of
+the experiment.</p>
+</section>
+<section id="part-4-analyze-machine-results">
+<h2>Part 4: Analyze Machine Results<a class="headerlink" href="#part-4-analyze-machine-results" title="Permalink to this heading"></a></h2>
+<p>See <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results">Scenario 2 - Part 4: Analyze Machine
+Results</a>
+for how to generate descriptive statistics for the behavioral
+classification for Day 2 of the experiment.</p>
+</section>
+<section id="part-5-visualizing-machine-predictions">
+<h2>Part 5: Visualizing machine predictions<a class="headerlink" href="#part-5-visualizing-machine-predictions" title="Permalink to this heading"></a></h2>
+<p>See <a class="reference external" href="https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-5--visualizing-machine-predictions">Scenario 2 - Part 5 - Visualizing machine
+predictions</a>
+for how to generate visualizations of the features and machine learning
+classification results for Day 2 of the experiment.</p>
+</section>
+</section>
+<section id="part-6-post-classification-validation-detecting-false-positives">
+<h1>PART 6: Post-classification Validation (detecting false-positives)<a class="headerlink" href="#part-6-post-classification-validation-detecting-false-positives" title="Permalink to this heading"></a></h1>
+<p>Now, when you likely have generated a large number of predictions, you
+may want to visualize them in videos that only display the classified
+events. This <em>post-classification</em> validation step generates a video for
+each .CSV in the project that contains the concatenated clips of all the
+events of the target behavior that the predictive classifier identifies.</p>
+<a class="reference internal image-reference" href="tutorials_rst/img/scenario_4/menu_1.jpg"><img alt="tutorials_rst/img/scenario_4/menu_1.jpg" class="align-center" src="tutorials_rst/img/scenario_4/menu_1.jpg" style="width: 1200px;" /></a>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">Seconds</span></code> is the duration to add in seconds to the start of an
+event and to the end of the event. Let’s say there was a event of <strong>2
+seconds of an attack</strong>, entering 1 in the <strong>Seconds</strong> entry box will
+add 1 second before the 2 second attack and 1 second after.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Target</span></code> is the target behavior to implement into this step.</p></li>
+</ul>
+<section id="how-to-use-post-classification-validation">
+<h2>How to use <em>post-classification Validation</em><a class="headerlink" href="#how-to-use-post-classification-validation" title="Permalink to this heading"></a></h2>
+<ol class="arabic simple">
+<li><p>Enter 1 or 2 in the <code class="docutils literal notranslate"><span class="pre">Seconds</span></code> entry box. *Note: the larger the
+seconds, the longer the duration of the video.**</p></li>
+<li><p>Select the target behavior from the <code class="docutils literal notranslate"><span class="pre">Target</span></code> dropdown box.</p></li>
+<li><p>Click <code class="docutils literal notranslate"><span class="pre">Validate</span></code> button and the videos will be generated in
+<code class="docutils literal notranslate"><span class="pre">/project_folder/frames/output/classifier_validation</span></code>. The name of
+the video will be formated in the following manner: <strong>videoname</strong> +
+<strong>target behavior</strong> + <strong>number of bouts</strong> + .mp4</p></li>
+</ol>
+<a class="reference internal image-reference" href="tutorials_rst/img/classifier_validation/classifiervalidation.gif"><img alt="tutorials_rst/img/classifier_validation/classifiervalidation.gif" class="align-center" src="tutorials_rst/img/classifier_validation/classifiervalidation.gif" style="width: 1200px;" /></a>
+<p><strong>PLEASE HELP BY REPORTING BUGS VIA GITHUB, OR JOIN THE SIMBA</strong>
+<a class="reference external" href="https://gitter.im/SimBA-Resource/community">GITTER</a> <strong>FOR
+DISCUSSION</strong></p>
+<p>Author <a class="reference external" href="https://github.com/sronilsson">Simon N</a></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="scenario_3.html" class="btn btn-neutral float-left" title="Scenario 3 walkthrough" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../labelling.html" class="btn btn-neutral float-right" title="Labelling" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

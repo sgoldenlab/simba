@@ -19,24 +19,17 @@ def is_inside_rectangle(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     """
     Determines whether points in array `x` are inside the rectangle defined by the top left and bottom right vertices in array `y`.
 
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/is_inside_rectangle.csv
+       :widths: 10, 45, 45
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
     :param np.ndarray x: 2d numeric np.ndarray size (N, 2).
     :param np.ndarray y: 2d numeric np.ndarray size (2, 2) (top left[x, y], bottom right[x, y])
     :return np.ndarray: 2d numeric boolean (N, 1) with 1s representing the point being inside the rectangle and 0 if the point is outside the rectangle.
-
-    .. csv-table:: Function Performance Table with Markup
-       :file: ../../_tables/is_inside_rectangle.csv
-       :widths: 30, 70
-       :header-rows: 1
-
-    .. csv-table:: Function Performance Table with Markup
-       :file: ../../../_tables/is_inside_rectangle.csv
-       :widths: 30, 70
-       :header-rows: 1
-
-    .. csv-table:: Function Performance Table with Markup
-       :file: /_tables/is_inside_rectangle.csv
-       :widths: 30, 70
-       :header-rows: 1
 
     """
 

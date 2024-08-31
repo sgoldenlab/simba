@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>simba.plotting.shap_agg_stats_visualizer &mdash; SimBA 0.0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/simba_theme.css" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/togglebutton.css" />
+
+  
+    <link rel="shortcut icon" href="../../../_static/readthedocs_logo.png"/>
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script>let toggleHintShow = 'Click to show';</script>
+        <script>let toggleHintHide = 'Click to hide';</script>
+        <script>let toggleOpenOnPrint = 'true';</script>
+        <script src="../../../_static/togglebutton.js"></script>
+        <script>var togglebuttonSelector = '.toggle, .admonition.dropdown';</script>
+        <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SimBA
+              <img src="../../../_static/readthedocs_logo.png" class="logo" alt="Logo"/>
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API REFERENCE:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API Reference</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">NOTEBOOKS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../notebooks.html">Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">USER GUIDE / TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">WALKTHROUGHS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../walkthroughs.html">Walkthroughs</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">LABELLING TUTORIALS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../labelling.html">Labelling</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">FAQ:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials_rst/FAQ.html">Friendly Asked Questions (FAQ)</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">DOCS:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../docs/workflow.html">SimBA basic workflow</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">ABOUT:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../credits.html#who-writes-this-stuff">Who writes this stuff??</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../links.html">Links</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SimBA</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">simba.plotting.shap_agg_stats_visualizer</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for simba.plotting.shap_agg_stats_visualizer</h1><div class="highlight"><pre>
+<span></span><span class="n">__author__</span> <span class="o">=</span> <span class="s2">&quot;Simon Nilsson&quot;</span>
+
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">cv2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">simba</span>
+<span class="kn">from</span> <span class="nn">simba.mixins.config_reader</span> <span class="kn">import</span> <span class="n">ConfigReader</span>
+<span class="kn">from</span> <span class="nn">simba.utils.checks</span> <span class="kn">import</span> <span class="p">(</span><span class="n">check_file_exist_and_readable</span><span class="p">,</span>
+                                <span class="n">check_if_df_field_is_boolean</span><span class="p">,</span>
+                                <span class="n">check_if_dir_exists</span><span class="p">,</span> <span class="n">check_instance</span><span class="p">,</span> <span class="n">check_int</span><span class="p">,</span>
+                                <span class="n">check_str</span><span class="p">,</span> <span class="n">check_that_column_exist</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">simba.utils.enums</span> <span class="kn">import</span> <span class="n">Paths</span>
+<span class="kn">from</span> <span class="nn">simba.utils.printing</span> <span class="kn">import</span> <span class="n">SimbaTimer</span><span class="p">,</span> <span class="n">stdout_success</span>
+<span class="kn">from</span> <span class="nn">simba.utils.warnings</span> <span class="kn">import</span> <span class="n">ShapWarning</span>
+
+<span class="n">SIMBA_DIR</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">simba</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ShapAggregateStatisticsVisualizer"><a class="viewcode-back" href="../../../simba.plotting.html#simba.plotting.shap_agg_stats_visualizer.ShapAggregateStatisticsVisualizer">[docs]</a><span class="k">class</span> <span class="nc">ShapAggregateStatisticsVisualizer</span><span class="p">(</span><span class="n">ConfigReader</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate aggregate (binned) SHAP value statistics where individual bins represent reaulated features.</span>
+<span class="sd">    and create line chart visualizations reprsenting aggregations of behavior-present SHAP values.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">       `Tutorial &lt;https://github.com/sgoldenlab/simba/blob/master/docs/SHAP.md#step-3-interpreting-the-shap-value-ouput-generated-by-simba&gt;`__.</span>
+<span class="sd">       `Example output &lt;https://github.com/sgoldenlab/simba/blob/master/images/example_shap_graph.png&gt;`__.</span>
+
+<span class="sd">    .. image:: _static/img/shap.png</span>
+<span class="sd">       :width: 600</span>
+<span class="sd">       :align: center</span>
+
+
+<span class="sd">    :parameter str config_path: Path to SimBA project config file in Configparser format</span>
+<span class="sd">    :param str classifier_name: Name of classifier (e.g., Attack).</span>
+<span class="sd">    :param pd.DataFrame shap_df: Dataframe with non-aggregated SHAP values where rows represent frames and columns represent features.</span>
+<span class="sd">    :param float shap_baseline_value: SHAP expected value (computed by ``simba.train_model_functions.create_shap_log``).</span>
+<span class="sd">    :param str save_path: Directory where to store the results</span>
+
+<span class="sd">    :example:</span>
+<span class="sd">    &gt;&gt;&gt; _ = ShapAggregateStatisticsVisualizer(config_path=&#39;SimBAConfigFilePath&#39;, classifier_name=&#39;Attack&#39;, shap_df=&#39;tests/test_data/test_shap/data/test_shap.csv&#39;, shap_baseline_value=4, save_path=&#39;SaveDirectory&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">config_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
+                 <span class="n">shap_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+                 <span class="n">classifier_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">shap_baseline_value</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+                 <span class="n">visualization</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+                 <span class="n">save_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+
+        <span class="n">check_file_exist_and_readable</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="n">check_instance</span><span class="p">(</span>
+            <span class="n">source</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> shap_df&quot;</span><span class="p">,</span>
+            <span class="n">instance</span><span class="o">=</span><span class="n">shap_df</span><span class="p">,</span>
+            <span class="n">accepted_types</span><span class="o">=</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,),</span>
+        <span class="p">)</span>
+        <span class="n">check_str</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> classifier_name&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">classifier_name</span>
+        <span class="p">)</span>
+        <span class="n">check_that_column_exist</span><span class="p">(</span>
+            <span class="n">df</span><span class="o">=</span><span class="n">shap_df</span><span class="p">,</span> <span class="n">column_name</span><span class="o">=</span><span class="n">classifier_name</span><span class="p">,</span> <span class="n">file_name</span><span class="o">=</span><span class="s2">&quot;shap dataframe&quot;</span>
+        <span class="p">)</span>
+        <span class="n">check_if_df_field_is_boolean</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">shap_df</span><span class="p">,</span> <span class="n">field</span><span class="o">=</span><span class="n">classifier_name</span><span class="p">)</span>
+        <span class="n">check_int</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> shap_baseline_value&quot;</span><span class="p">,</span>
+            <span class="n">value</span><span class="o">=</span><span class="n">shap_baseline_value</span><span class="p">,</span>
+            <span class="n">max_value</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+            <span class="n">min_value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">ConfigReader</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pose_setting</span> <span class="o">!=</span> <span class="s2">&quot;14&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pose_setting</span> <span class="o">!=</span> <span class="s2">&quot;16&quot;</span><span class="p">):</span>
+            <span class="n">ShapWarning</span><span class="p">(</span><span class="n">msg</span><span class="o">=</span><span class="s2">&quot;SHAP visualizations/aggregate stats skipped (only viable for projects with two animals and default 7 or 8 body-parts per animal) ...&quot;</span><span class="p">,</span> <span class="n">source</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">classifier_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shap_df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">shap_baseline_value</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">classifier_name</span><span class="p">,</span>
+                <span class="n">shap_df</span><span class="p">,</span>
+                <span class="n">shap_baseline_value</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shap_logs_path</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shap_logs_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">img_save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">shap_logs_path</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;SHAP_summary_line_graph_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">classifier_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="si">}</span><span class="s2">.png&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">feature_categories_csv_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="n">SIMBA_DIR</span><span class="p">,</span> <span class="n">Paths</span><span class="o">.</span><span class="n">SIMBA_SHAP_CATEGORIES_PATH</span><span class="o">.</span><span class="n">value</span>
+            <span class="p">)</span>
+            <span class="n">check_file_exist_and_readable</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">feature_categories_csv_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">feature_categories_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+                <span class="n">feature_categories_csv_path</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unique_feature_category_names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unique_time_bin_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+                <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_categories_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="p">),</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">feature_categories_df</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">levels</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__run</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">visualization</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__create_base_shap_img</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__insert_data_in_img</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__save_aggregate_scores</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Private helper to convert results in dict format to CSV file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+            <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]],</span>
+            <span class="n">index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">row_name</span><span class="p">,</span> <span class="n">time_bins</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">column_name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">time_bins</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">results</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">row_name</span><span class="p">,</span> <span class="n">column_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">reindex</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_save_path</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agg_stats_timer</span> <span class="o">=</span> <span class="n">SimbaTimer</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">clf_state</span><span class="p">,</span> <span class="n">clf_state_name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="p">[</span><span class="s2">&quot;ABSENT&quot;</span><span class="p">,</span> <span class="s2">&quot;PRESENT&quot;</span><span class="p">]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">df_save_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">shap_logs_path</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;SHAP_summary_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">classifier_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">clf_state_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">shap_clf_sliced</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shap_df</span><span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">shap_df</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">classifier_name</span><span class="p">]</span> <span class="o">==</span> <span class="n">clf_state</span>
+            <span class="p">]</span>
+
+            <span class="k">for</span> <span class="n">feature_category</span><span class="p">,</span> <span class="n">feature_time_bin</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">unique_feature_category_names</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unique_time_bin_names</span>
+            <span class="p">):</span>
+                <span class="k">if</span> <span class="n">feature_category</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">feature_category</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">feature_names_sliced</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">feature_categories_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                        <span class="p">:,</span> <span class="p">(</span><span class="n">feature_category</span><span class="p">,</span> <span class="n">feature_time_bin</span><span class="p">)</span>
+                    <span class="p">]</span>
+                <span class="p">)</span>
+                <span class="n">feature_names_sliced</span> <span class="o">=</span> <span class="p">[</span>
+                    <span class="n">x</span>
+                    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">feature_names_sliced</span>
+                    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;nan&quot;</span> <span class="ow">and</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">shap_clf_sliced</span>
+                <span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">feature_category</span><span class="p">][</span><span class="n">feature_time_bin</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span>
+                    <span class="n">shap_clf_sliced</span><span class="p">[</span><span class="n">feature_names_sliced</span><span class="p">]</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">6</span>
+                <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__save_aggregate_scores</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">agg_stats_timer</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visualization_timer</span> <span class="o">=</span> <span class="n">SimbaTimer</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">stdout_success</span><span class="p">(</span>
+            <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Aggregate SHAP statistics saved in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">shap_logs_path</span><span class="si">}</span><span class="s2"> directory&quot;</span><span class="p">,</span>
+            <span class="n">elapsed_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">agg_stats_timer</span><span class="o">.</span><span class="n">elapsed_time_str</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__create_base_shap_img</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Private helper to create the base (axes, icons ticks etc.) of the aggregate shap value visualization.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">shap_img_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">SIMBA_DIR</span><span class="p">,</span> <span class="n">Paths</span><span class="o">.</span><span class="n">SIMBA_SHAP_IMG_PATH</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">check_if_dir_exists</span><span class="p">(</span><span class="n">in_dir</span><span class="o">=</span><span class="n">shap_img_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale_img_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;baseline_scale&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">shap_img_path</span><span class="p">,</span> <span class="s2">&quot;baseline_scale.jpg&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;small_arrow&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">shap_img_path</span><span class="p">,</span> <span class="s2">&quot;down_arrow.jpg&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;side_scale&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">shap_img_path</span><span class="p">,</span> <span class="s2">&quot;side_scale.jpg&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;color_bar&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">shap_img_path</span><span class="p">,</span> <span class="s2">&quot;color_bar.jpg&quot;</span><span class="p">),</span>
+        <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">category_img_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;Animal distances&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;icon&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">shap_img_path</span><span class="p">,</span> <span class="s2">&quot;animal_distances.jpg&quot;</span><span class="p">)</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;Intruder movement&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;icon&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">shap_img_path</span><span class="p">,</span> <span class="s2">&quot;intruder_movement.jpg&quot;</span><span class="p">)</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;Resident+intruder movement&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;icon&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">shap_img_path</span><span class="p">,</span> <span class="s2">&quot;resident_intruder_movement.jpg&quot;</span><span class="p">)</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;Resident movement&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;icon&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">shap_img_path</span><span class="p">,</span> <span class="s2">&quot;resident_movement.jpg&quot;</span><span class="p">)</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;Intruder shape&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;icon&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">shap_img_path</span><span class="p">,</span> <span class="s2">&quot;intruder_shape.jpg&quot;</span><span class="p">)</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;Resident+intruder shape&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;icon&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">shap_img_path</span><span class="p">,</span> <span class="s2">&quot;resident_intruder_shape.jpg&quot;</span><span class="p">)</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;Resident shape&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;icon&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">shap_img_path</span><span class="p">,</span> <span class="s2">&quot;resident_shape.jpg&quot;</span><span class="p">)</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scale_img_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">check_file_exist_and_readable</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">v</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">category_img_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">check_file_exist_and_readable</span><span class="p">(</span><span class="n">file_path</span><span class="o">=</span><span class="n">v</span><span class="p">[</span><span class="s2">&quot;icon&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">positive_arrow_colors</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="mi">253</span><span class="p">,</span> <span class="mi">141</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">252</span><span class="p">,</span> <span class="mi">78</span><span class="p">,</span> <span class="mi">42</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">227</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">28</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">189</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">38</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">38</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">negative_arrow_colors</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="mi">65</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">196</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">29</span><span class="p">,</span> <span class="mi">145</span><span class="p">,</span> <span class="mi">192</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">34</span><span class="p">,</span> <span class="mi">94</span><span class="p">,</span> <span class="mi">168</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">37</span><span class="p">,</span> <span class="mi">52</span><span class="p">,</span> <span class="mi">148</span><span class="p">),</span>
+            <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">29</span><span class="p">,</span> <span class="mi">88</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ranges_lst</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">)),</span>
+            <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">40</span><span class="p">)),</span>
+            <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">60</span><span class="p">)),</span>
+            <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">80</span><span class="p">)),</span>
+            <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">80</span><span class="p">,</span> <span class="mi">101</span><span class="p">)),</span>
+        <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img</span> <span class="o">=</span> <span class="mi">255</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">([</span><span class="mi">1680</span><span class="p">,</span> <span class="mi">1680</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseline_scale_img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_img_dict</span><span class="p">[</span><span class="s2">&quot;baseline_scale&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">baseline_scale_top_left</span> <span class="o">=</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">800</span><span class="p">)</span>
+        <span class="n">baseline_scale_bottom_right</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">baseline_scale_top_left</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_scale_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">baseline_scale_top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_scale_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">baseline_scale_middle</span> <span class="o">=</span> <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="mi">700</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_scale_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)),</span> <span class="mi">85</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">baseline_scale_top_left</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">:</span> <span class="n">baseline_scale_bottom_right</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">baseline_scale_top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">:</span> <span class="n">baseline_scale_bottom_right</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_scale_img</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span>
+            <span class="s2">&quot;BASELINE SHAP&quot;</span><span class="p">,</span>
+            <span class="n">baseline_scale_middle</span><span class="p">,</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_COMPLEX</span><span class="p">,</span>
+            <span class="mi">1</span><span class="p">,</span>
+            <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">small_arrow_img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_img_dict</span><span class="p">[</span><span class="s2">&quot;small_arrow&quot;</span><span class="p">])</span>
+        <span class="n">small_arrow_top_left</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">baseline_scale_bottom_right</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="nb">int</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">baseline_scale_top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">baseline_scale_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shap_baseline_value</span><span class="p">)</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">small_arrow_bottom_right</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">small_arrow_top_left</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">small_arrow_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">small_arrow_top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">small_arrow_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">[</span>
+            <span class="n">small_arrow_top_left</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">:</span> <span class="n">small_arrow_bottom_right</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">small_arrow_top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">:</span> <span class="n">small_arrow_bottom_right</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">small_arrow_img</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">color_bar_img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_img_dict</span><span class="p">[</span><span class="s2">&quot;color_bar&quot;</span><span class="p">])</span>
+
+        <span class="n">side_scale_img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scale_img_dict</span><span class="p">[</span><span class="s2">&quot;side_scale&quot;</span><span class="p">])</span>
+        <span class="n">side_scale_top_left</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">small_arrow_bottom_right</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">50</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">baseline_scale_top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">50</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">side_scale_y_tick_cords</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">side_scale_top_left</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">side_scale_top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">75</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">side_scale_y_tick_cords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">side_scale_top_left</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="n">side_scale_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">4</span><span class="p">)</span> <span class="o">*</span> <span class="n">i</span><span class="p">),</span>
+                    <span class="nb">int</span><span class="p">(</span><span class="n">side_scale_top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">75</span><span class="p">),</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">arrow_start</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">small_arrow_top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">small_arrow_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)),</span>
+            <span class="n">side_scale_top_left</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">img_cnt</span><span class="p">,</span> <span class="p">(</span><span class="n">img_name</span><span class="p">,</span> <span class="n">img_data</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">category_img_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+            <span class="n">icon_img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">img_data</span><span class="p">[</span><span class="s2">&quot;icon&quot;</span><span class="p">]),</span>
+                <span class="kc">None</span><span class="p">,</span>
+                <span class="n">fx</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+                <span class="n">fy</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
+                <span class="n">interpolation</span><span class="o">=</span><span class="n">cv2</span><span class="o">.</span><span class="n">INTER_CUBIC</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">icon_top_left</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">side_scale_y_tick_cords</span><span class="p">[</span><span class="n">img_cnt</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">icon_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">side_scale_y_tick_cords</span><span class="p">[</span><span class="n">img_cnt</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">icon_bottom_right</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">icon_top_left</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">icon_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">side_scale_y_tick_cords</span><span class="p">[</span><span class="n">img_cnt</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">icon_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">100</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">text_location</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">int</span><span class="p">(</span>
+                    <span class="n">icon_bottom_right</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="o">-</span> <span class="p">(</span><span class="n">icon_bottom_right</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">icon_top_left</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="o">+</span> <span class="mi">100</span>
+                <span class="p">),</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">icon_bottom_right</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">icon_bottom_right</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">icon_top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="o">-</span> <span class="mi">380</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">img_name</span><span class="p">),</span>
+                <span class="p">(</span><span class="n">text_location</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">text_location</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_COMPLEX</span><span class="p">,</span>
+                <span class="mf">0.75</span><span class="p">,</span>
+                <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                <span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">[</span>
+                <span class="n">icon_top_left</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">:</span> <span class="n">icon_bottom_right</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">icon_top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">:</span> <span class="n">icon_bottom_right</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+            <span class="p">]</span> <span class="o">=</span> <span class="n">icon_img</span>
+
+    <span class="k">def</span> <span class="nf">__insert_data_in_img</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Private helper to insert the data (i.e., colored arrows, text etc.) into the aggregate shap value visualization</span>
+<span class="sd">        and save the results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">shap_logs_path</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;SHAP_summary_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">classifier_name</span><span class="si">}</span><span class="s2">_PRESENT_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">datetime</span><span class="si">}</span><span class="s2">.csv&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">feature_category</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">unique_feature_category_names</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">category_img_dict</span><span class="p">[</span><span class="n">feature_category</span><span class="p">][</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                <span class="n">data_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">feature_category</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+            <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">row_cnt</span><span class="p">,</span> <span class="p">(</span><span class="n">feature_category_name</span><span class="p">,</span> <span class="n">feature_data</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">category_img_dict</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">):</span>
+            <span class="n">arrow_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">baseline_scale_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="nb">abs</span><span class="p">(</span><span class="n">feature_data</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">feature_data</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">arrow_end</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arrow_start</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">arrow_width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">arrow_start</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">arrow_middle</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                    <span class="p">((</span><span class="n">arrow_end</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">arrow_start</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">arrow_start</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">7</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">bracket_no</span><span class="p">,</span> <span class="n">bracket</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ranges_lst</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">feature_data</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])</span> <span class="ow">in</span> <span class="n">bracket</span><span class="p">:</span>
+                        <span class="n">color</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">positive_arrow_colors</span><span class="p">[</span><span class="n">bracket_no</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">positive_arrow_colors</span><span class="p">[</span><span class="n">bracket_no</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">positive_arrow_colors</span><span class="p">[</span><span class="n">bracket_no</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                        <span class="p">)</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">arrowedLine</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">arrow_start</span><span class="p">,</span> <span class="n">arrow_end</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">tipLength</span><span class="o">=</span><span class="mf">0.1</span>
+                <span class="p">)</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span>
+                    <span class="s2">&quot;+&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">feature_data</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]))</span> <span class="o">+</span> <span class="s2">&quot;%&quot;</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">arrow_end</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">7</span><span class="p">,</span> <span class="n">arrow_middle</span> <span class="o">-</span> <span class="mi">15</span><span class="p">),</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_COMPLEX</span><span class="p">,</span>
+                    <span class="mi">1</span><span class="p">,</span>
+                    <span class="n">color</span><span class="p">,</span>
+                    <span class="mi">2</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">arrow_end</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">arrow_start</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">arrow_width</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">arrow_start</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="n">arrow_middle</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                    <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">arrow_start</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">arrow_end</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">arrow_end</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">7</span>
+                <span class="p">)</span>
+                <span class="k">for</span> <span class="n">bracket_no</span><span class="p">,</span> <span class="n">bracket</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ranges_lst</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">feature_data</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">])</span> <span class="ow">in</span> <span class="n">bracket</span><span class="p">:</span>
+                        <span class="n">color</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">negative_arrow_colors</span><span class="p">[</span><span class="n">bracket_no</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">negative_arrow_colors</span><span class="p">[</span><span class="n">bracket_no</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">negative_arrow_colors</span><span class="p">[</span><span class="n">bracket_no</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                        <span class="p">)</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">arrowedLine</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">arrow_start</span><span class="p">,</span> <span class="n">arrow_end</span><span class="p">,</span> <span class="n">color</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="n">tipLength</span><span class="o">=</span><span class="mf">0.1</span>
+                <span class="p">)</span>
+                <span class="n">cv2</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span>
+                    <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">feature_data</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]))</span> <span class="o">+</span> <span class="s2">&quot;%&quot;</span><span class="p">,</span>
+                    <span class="p">(</span><span class="n">arrow_end</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">7</span><span class="p">,</span> <span class="n">arrow_middle</span> <span class="o">-</span> <span class="mi">15</span><span class="p">),</span>
+                    <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_COMPLEX</span><span class="p">,</span>
+                    <span class="mi">1</span><span class="p">,</span>
+                    <span class="n">color</span><span class="p">,</span>
+                    <span class="mi">2</span><span class="p">,</span>
+                <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">row_cnt</span> <span class="o">!=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">category_img_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">arrow_start</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">arrow_end</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">side_scale_y_tick_cords</span><span class="p">[</span><span class="n">row_cnt</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                <span class="p">)</span>
+
+        <span class="n">small_arrow_top_left</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">arrow_end</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="mi">20</span><span class="p">,</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">arrow_end</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">small_arrow_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="n">small_arrow_bottom_right</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">small_arrow_top_left</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">small_arrow_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">small_arrow_top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">small_arrow_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">[</span>
+            <span class="n">small_arrow_top_left</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">:</span> <span class="n">small_arrow_bottom_right</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">small_arrow_top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">:</span> <span class="n">small_arrow_bottom_right</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">small_arrow_img</span>
+        <span class="n">color_bar_top_left</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">arrow_end</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">small_arrow_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">25</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">baseline_scale_top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">color_bar_bottom_right</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">color_bar_top_left</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">color_bar_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">color_bar_top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">color_bar_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">[</span>
+            <span class="n">color_bar_top_left</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">:</span> <span class="n">color_bar_bottom_right</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+            <span class="n">color_bar_top_left</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">:</span> <span class="n">color_bar_bottom_right</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">color_bar_img</span>
+
+        <span class="n">color_bar_middle</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="mi">580</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">baseline_scale_img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)),</span>
+            <span class="n">color_bar_bottom_right</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="mi">50</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">putText</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">,</span>
+            <span class="s2">&quot;CLASSIFICATION PROBABILITY&quot;</span><span class="p">,</span>
+            <span class="n">color_bar_middle</span><span class="p">,</span>
+            <span class="n">cv2</span><span class="o">.</span><span class="n">FONT_HERSHEY_COMPLEX</span><span class="p">,</span>
+            <span class="mi">1</span><span class="p">,</span>
+            <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">cv2</span><span class="o">.</span><span class="n">imwrite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">img_save_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">img</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visualization_timer</span><span class="o">.</span><span class="n">stop_timer</span><span class="p">()</span>
+        <span class="n">stdout_success</span><span class="p">(</span>
+            <span class="n">msg</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;SHAP summary graph saved at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">img_save_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">elapsed_time</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">visualization_timer</span><span class="o">.</span><span class="n">elapsed_time_str</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<span class="c1"># shap_df = pd.read_csv(&#39;/Users/simon/Desktop/envs/simba_dev/tests/test_data/test_shap/data/test_shap.csv&#39;, index_col=0)</span>
+<span class="c1"># test = ShapAggregateStatisticsVisualizer(config_path=&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini&#39;,</span>
+<span class="c1">#                                          classifier_name=&#39;Attack&#39;,</span>
+<span class="c1">#                                          shap_df=shap_df,</span>
+<span class="c1">#                                          shap_baseline_value=40,</span>
+<span class="c1">#                                          save_path=&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/logs/shap&#39;)</span>
+
+<span class="c1"># shap_df = pd.read_csv(&#39;/Users/simon/Desktop/envs/simba/simba/tests/data/sample_data/shap_test.csv&#39;, index_col=0)</span>
+<span class="c1"># test = ShapAggregateStatisticsVisualizer(config_path=&#39;/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini&#39;,</span>
+<span class="c1">#                                          classifier_name=&#39;target&#39;,</span>
+<span class="c1">#                                          shap_df=shap_df,</span>
+<span class="c1">#                                          shap_baseline_value=40,</span>
+<span class="c1">#                                          save_path=&#39;/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/logs/shap&#39;)</span>
+<span class="c1">#</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, sronilsson.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
