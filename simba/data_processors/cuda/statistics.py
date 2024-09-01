@@ -41,9 +41,16 @@ def get_3pt_angle(x: np.ndarray, y: np.ndarray, z: np.ndarray) -> np.ndarray:
     GPU. The points x, y, and z represent the coordinates of three points in space, and the angle is calculated
     at point `y` between the line segments `xy` and `yz`.
 
-    .. image:: _static/img/get_3pt_angle_cuda.png
-       :width: 500
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_resultant_vector_length.csv
+       :widths: 10, 90
        :align: center
+       :header-rows: 1
+
+    .. seealso::
+       For CPU function see :func:`~simba.mixins.FeatureExtractionMixin.angle3pt` and
+       For CPU function see :func:`~simba.mixins.FeatureExtractionMixin.angle3pt_serialized`.
 
     :param x:  A numpy array of shape (n, 2) representing the first point (e.g., nose) coordinates.
     :param y: A numpy array of shape (n, 2) representing the second point (e.g., center) coordinates, where the angle is computed.
@@ -94,9 +101,16 @@ def count_values_in_ranges(x: np.ndarray, r: np.ndarray) -> np.ndarray:
     """
     Counts the number of values in each feature within specified ranges for each row in a 2D array using CUDA.
 
-    .. image:: _static/img/get_euclidean_distance_cuda.png
-       :width: 500
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/count_values_in_ranges.csv
+       :widths: 10, 90
        :align: center
+       :header-rows: 1
+
+    .. seealso::
+       For CPU function see :func:`~simba.mixins.FeatureExtractionMixin.count_values_in_range`.
 
     :param np.ndarray x: 2d array with feature values.
     :param np.ndarray r: 2d array with lower and upper boundaries.
@@ -131,9 +145,17 @@ def get_euclidean_distance_cuda(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     """
     Computes the Euclidean distance between two sets of points using CUDA for GPU acceleration.
 
-    .. image:: _static/img/get_euclidean_distance_cuda.png
-       :width: 500
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/get_euclidean_distance_cuda.csv
+       :widths: 10, 90
        :align: center
+       :header-rows: 1
+
+    .. seealso::
+       For CPU function see :func:`~simba.mixins.FeatureExtractionMixin.framewise_euclidean_distance`.
+       For CuPY function see :func:`~simba.data_processors.cuda.statistics.get_euclidean_distance_cupy`.
+
 
     :param np.ndarray x: A 2D array of shape (n, m) representing n points in m-dimensional space. Each row corresponds to a point.
     :param np.ndarray y: A 2D array of shape (n, m) representing n points in m-dimensional space. Each row corresponds to a point.
@@ -168,6 +190,11 @@ def get_euclidean_distance_cupy(x: np.ndarray,
     Computes the Euclidean distance between corresponding pairs of points in two 2D arrays
     using CuPy for GPU acceleration. The computation is performed in batches to handle large
     datasets efficiently.
+
+
+    .. seealso::
+       For CPU function see :func:`~simba.mixins.FeatureExtractionMixin.framewise_euclidean_distance`.
+       For CUDA JIT function see :func:`~simba.data_processors.cuda.statistics.get_euclidean_distance_cuda`.
 
     :param np.ndarray x: A 2D NumPy array with shape (n, 2), where each row represents a point in a 2D space.
     :param np.ndarray y: A 2D NumPy array with shape (n, 2), where each row represents a point in a 2D space. The shape of `y` must match the shape of `x`.
@@ -212,14 +239,18 @@ def sliding_mean(x: np.ndarray, time_window: float, sample_rate: int) -> np.ndar
     """
     Computes the mean of values within a sliding window over a 1D numpy array `x` using CUDA for acceleration.
 
-    .. image:: _static/img/sliding_mean_cuda.png
-       :width: 500
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_mean.csv
+       :widths: 10, 90
        :align: center
+       :header-rows: 1
 
     :param np.ndarray x: The input 1D numpy array of floats. The array over which the sliding window sum is computed.
-    :param float time_window:The size of the sliding window in seconds. This window slides over the array `x` to compute the sum.
+    :param float time_window: The size of the sliding window in seconds. This window slides over the array `x` to compute the sum.
     :param int sample_rate: The number of samples per second in the array `x`. This is used to convert the time-based window size into the number of samples.
-    :return np.ndarray: A numpy array containing the sum of values within each position of the sliding window.
+    :return: A numpy array containing the sum of values within each position of the sliding window.
+    :rtype: np.ndarray
 
     :example:
     >>> x = np.random.randint(1, 11, (100, )).astype(np.float32)
@@ -259,14 +290,18 @@ def sliding_min(x: np.ndarray, time_window: float, sample_rate: int) -> np.ndarr
     """
     Computes the minimum value within a sliding window over a 1D numpy array `x` using CUDA for acceleration.
 
-    .. image:: _static/img/sliding_min_cuda.png
-       :width: 500
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_min.csv
+       :widths: 10, 90
        :align: center
+       :header-rows: 1
 
     :param np.ndarray x: Input 1D numpy array of floats. The array over which the sliding window minimum is computed.
     :param float time_window: The size of the sliding window in seconds.
-    :param intsample_rate: The sampling rate of the data, which determines the number of samples per second.
+    :param int sample_rate: The sampling rate of the data, which determines the number of samples per second.
     :return: A numpy array containing the minimum value for each position of the sliding window.
+    :rtype: np.ndarray
 
     :example:
     >>> x = np.arange(0, 10000000)
@@ -296,15 +331,14 @@ def sliding_spearmans_rank(x: np.ndarray,
     over sliding windows of size `time_window * sample_rate`. The computation is performed
     in batches to optimize memory usage, leveraging GPU acceleration with CuPy.
 
-    .. math::
-       \rho = 1 - \frac{6 \sum d_i^2}{n_w(n_w^2 - 1)}
+    .. seealso::
 
-    .. math::
-        The function uses CuPy to perform GPU-accelerated calculations. Ensure that your environment
-        supports GPU computation with CuPy installed.
+       For CPU function see :func:`~simba.mixins.statistics.StatisticsMixin.sliding_spearman_rank_correlation`.
+
+    :math:`\\rho = 1 - \\frac{6 \\sum d_i^2}{n_w(n_w^2 - 1)}`
 
     Where:
-    - \( \rho \) is the Spearman's rank correlation coefficient.
+    - \( \\rho \) is the Spearman's rank correlation coefficient.
     - \( d_i \) is the difference between the ranks of corresponding elements in the sliding window.
     - \( n_w \) is the size of the sliding window.
 
@@ -321,7 +355,6 @@ def sliding_spearmans_rank(x: np.ndarray,
     >>> y = np.array([11, 12, 15, 19, 21, 26, 19, 20, 22, 19])
     >>> sliding_spearmans_rank(x, y, time_window=0.5, sample_rate=2)
     """
-
 
     window_size = int(np.ceil(time_window * sample_rate))
     n = x.shape[0]
@@ -378,9 +411,10 @@ def sliding_std(x: np.ndarray, time_window: float, sample_rate: int) -> np.ndarr
     """
 
     :param np.ndarray x: The input 1D numpy array of floats. The array over which the sliding window sum is computed.
-    :param float time_window:The size of the sliding window in seconds. This window slides over the array `x` to compute the sum.
+    :param float time_window: The size of the sliding window in seconds. This window slides over the array `x` to compute the sum.
     :param int sample_rate: The number of samples per second in the array `x`. This is used to convert the time-based window size into the number of samples.
-    :return np.ndarray: A numpy array containing the sum of values within each position of the sliding window.
+    :return: A numpy array containing the sum of values within each position of the sliding window.
+    :rtype: np.ndarray
 
     :example:
     >>> x = np.random.randint(1, 11, (100, )).astype(np.float32)
@@ -418,9 +452,10 @@ def sliding_sum(x: np.ndarray, time_window: float, sample_rate: int) -> np.ndarr
     Computes the sum of values within a sliding window over a 1D numpy array `x` using CUDA for acceleration.
 
     :param np.ndarray x: The input 1D numpy array of floats. The array over which the sliding window sum is computed.
-    :param float time_window:The size of the sliding window in seconds. This window slides over the array `x` to compute the sum.
+    :param float time_window: The size of the sliding window in seconds. This window slides over the array `x` to compute the sum.
     :param int sample_rate: The number of samples per second in the array `x`. This is used to convert the time-based window size into the number of samples.
-    :return np.ndarray: A numpy array containing the sum of values within each position of the sliding window.
+    :return: A numpy array containing the sum of values within each position of the sliding window.
+    :rtype: np.ndarray
 
     :example:
     >>> x = np.random.randint(1, 11, (100, )).astype(np.float32)

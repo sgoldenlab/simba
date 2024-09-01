@@ -36,14 +36,20 @@ def direction_from_two_bps(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     Compute the directionality in degrees from two body-parts. E.g., ``nape`` and ``nose``,
     or ``swim_bladder`` and ``tail`` with GPU acceleration.
 
-    .. image:: _static/img/direction_from_two_bps_cuda.png
-       :width: 1200
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/direction_from_two_bps.csv
+       :widths: 10, 90
        :align: center
+       :header-rows: 1
 
+    .. seealso::
+       For CPU function see :func:`~simba.mixins.circular_statistics.CircularStatisticsMixin.direction_two_bps`.
 
     :parameter np.ndarray x: Size len(frames) x 2 representing x and y coordinates for first body-part.
     :parameter np.ndarray y: Size len(frames) x 2 representing x and y coordinates for second body-part.
-    :return np.ndarray: Frame-wise directionality in degrees.
+    :return: Frame-wise directionality in degrees.
+    :rtype: np.ndarray.
 
     """
     x = np.ascontiguousarray(x).astype(np.int32)
@@ -68,6 +74,17 @@ def sliding_circular_hotspots(x: np.ndarray,
     This function processes time series data representing angles (in degrees) and calculates the proportion of data
     points within specified angular bins over a sliding window. The calculations are performed in batches to
     accommodate large datasets efficiently.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_circular_hotspots.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+    .. seealso::
+       For CPU function see :func:`~simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_circular_hotspots`.
+
 
     :param np.ndarray x: The input time series data in degrees. Should be a 1D numpy array.
     :param float time_window: The size of the sliding window in seconds.
@@ -127,6 +144,16 @@ def sliding_circular_mean(x: np.ndarray,
     - :math:`N` is the number of samples in the window
 
 
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_circular_mean.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+    .. seealso::
+       For CPU function see :func:`~simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_circular_mean`.
+
     :param np.ndarray x: Input array containing angle values in degrees. The array should be 1-dimensional.
     :param float time_window: Time duration for the sliding window, in seconds. This determines the number of samples in each window  based on the `sample_rate`.
     :param int sample_rate: The number of samples per second (i.e., FPS). This is used to calculate the window size in terms of array indices.
@@ -176,6 +203,16 @@ def sliding_circular_range(x: np.ndarray,
 
     - :math:`\\Delta \\theta` is the difference between angles within the window,
     - :math:`360` accounts for the circular nature of the data (i.e., wrap-around at 360 degrees).
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_circular_range.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+    .. seealso::
+       For CPU function see :func:`~simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_circular_range`.
 
     :param np.ndarray x: The input time series data in degrees. Should be a 1D numpy array.
     :param float time_window: The size of the sliding window in seconds.
@@ -227,6 +264,16 @@ def sliding_circular_std(x: np.ndarray,
 
     where :math:`x_{\text{batch}}` is the data within the current sliding window, and :math:`\text{mean}` and
     :math:`\log` are computed in the circular (complex plane) domain.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_circular_std.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+    .. seealso::
+       For CPU function see :func:`~simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_circular_std`.
 
     :param np.ndarray x: The input time series data in degrees. Should be a 1D numpy array.
     :param float time_window: The size of the sliding window in seconds.
@@ -285,6 +332,18 @@ def sliding_rayleigh_z(x: np.ndarray,
     where:
     - :math:`\theta_i` are the angles in the window.
     - :math:`n` is the number of angles in the window.
+
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_rayleigh_z.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+    .. seealso::
+       For CPU function see :func:`~simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_rayleigh_z`.
+
 
     :param np.ndarray x: Input array of angles in degrees. Should be a 1D numpy array.
     :param float time_window: The size of the sliding window in time units (e.g., seconds).
@@ -347,12 +406,21 @@ def sliding_resultant_vector_length(x: np.ndarray,
     with CuPy for efficiency, especially on large datasets.
 
 
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_resultant_vector_length.csv
+       :widths: 10, 10, 80
+       :align: center
+       :header-rows: 1
+
+    .. seealso::
+       For CPU function see :func:`~simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_resultant_vector_length`.
+
     :param np.ndarray x: Input array containing angle values in degrees. The array should be 1-dimensional.
     :param float time_window: Time duration for the sliding window, in seconds. This determines the number of samples in each window  based on the `sample_rate`.
     :param int sample_rate: The number of samples per second (i.e., FPS). This is used to calculate the window size in terms of array indices.
     :param Optional[int] batch_size: The maximum number of elements to process in each batch. This is used to handle large arrays by processing them in chunks to avoid memory overflow. Defaults to 3e+7 (30 million elements).
     :return np.ndarray: A 1D numpy array of the same length as `x`, containing the resultant vector length for each sliding window. Values before the window is fully populated will be set to -1.
-
 
     :example:
     >>> x = np.random.randint(0, 361, (5000, )).astype(np.int32)

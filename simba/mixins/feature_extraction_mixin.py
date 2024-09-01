@@ -155,9 +155,14 @@ class FeatureExtractionMixin(object):
         """
         Calculate single frame convex hull perimeter length in millimeters.
 
+        .. note::
+           For acceptable run-time, call using parallel processing.
+
         .. seealso::
-            For acceptable run-time, call using ``parallel.delayed``.
-            For large data, use :meth:`simba.feature_extractors.perimeter_jit.jitted_hull` which returns perimiter length OR area.
+
+           For large data, consider :func:`~simba.feature_extractors.perimeter_jit.jitted_hull`,
+           :func:`~simba.data_processors.cuda.geometry.get_convex_hull`,
+           :func:`~ simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_polygon`.
 
         .. image:: _static/img/framewise_perim_length.png
            :width: 300
@@ -196,9 +201,13 @@ class FeatureExtractionMixin(object):
            :width: 300
            :align: center
 
+        .. seealso::
+           :func:`simba.data_processors.cuda.statistics.count_values_in_ranges`
+
         :parameter np.ndarray data: 2D numpy array with frames on X.
         :parameter np.ndarray ranges: 2D numpy array representing the brackets. E.g., [[0, 0.1], [0.1, 0.5]]
-        :return np.ndarray: 2D numpy array of size data.shape[0], ranges.shape[1]
+        :return: 2D numpy array of size data.shape[0], ranges.shape[1]
+        :rtype: np.ndarray
 
         :example:
         >>> FeatureExtractionMixin.count_values_in_range(data=np.random.random((3,10)), ranges=np.array([[0.0, 0.25], [0.25, 0.5]]))
@@ -255,15 +264,16 @@ class FeatureExtractionMixin(object):
 
     @staticmethod
     @jit(nopython=True)
-    def framewise_inside_rectangle_roi(
-        bp_location: np.ndarray, roi_coords: np.ndarray
-    ) -> np.ndarray:
+    def framewise_inside_rectangle_roi(bp_location: np.ndarray, roi_coords: np.ndarray) -> np.ndarray:
         """
         Jitted helper for frame-wise analysis if animal is inside static rectangular ROI.
 
         .. image:: _static/img/inside_rectangle.png
            :width: 300
            :align: center
+
+        .. seealso::
+           :func:`simba.data_processors.cuda.geometry.is_inside_rectangle`
 
         :parameter np.ndarray bp_location:  2d numeric np.ndarray size len(frames) x 2
         :parameter np.ndarray roi_coords: 2d numeric np.ndarray size 2x2 (top left[x, y], bottom right[x, y])
@@ -302,6 +312,9 @@ class FeatureExtractionMixin(object):
         .. image:: _static/img/inside_polygon.png
            :width: 300
            :align: center
+
+        .. seealso::
+           :func:`simba.data_processors.cuda.geometry.is_inside_polygon`
 
 
         :parameter np.ndarray bp_location:  2d numeric np.ndarray size len(frames) x 2
@@ -743,12 +756,17 @@ class FeatureExtractionMixin(object):
            :width: 300
            :align: center
 
+        .. seealso::
+           :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cupy`,
+           :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cuda`
+
+
         :parameter ndarray location_1: 2D array of size len(frames) x 2.
         :parameter ndarray location_1: 2D array of size len(frames) x 2.
         :parameter float px_per_mm: The pixels per millimeter in the video.
         :parameter bool centimeter: If true, the value in centimeters is returned. Else the value in millimeters.
-
-        :return np.ndarray: 1D array of size location_1.shape[0]
+        :return: 1D array of size location_1.shape[0]
+        :rtype: np.ndarray.
 
         :example:
         >>> loc_1 = np.random.randint(1, 200, size=(6, 2)).astype(np.float32)
@@ -756,8 +774,7 @@ class FeatureExtractionMixin(object):
         >>> FeatureExtractionMixin.framewise_euclidean_distance(location_1=loc_1, location_2=loc_2, px_per_mm=4.56, centimeter=False)
         >>> [49.80098657, 46.54963644, 49.60650394, 70.35919993, 37.91069901, 71.95422524]
         """
-        # if not px_per_mm and centimeter:
-        #     raise InvalidInputError(msg='To calculate centimeters, provide a pixel per millimeter value')
+
         results = np.full((location_1.shape[0]), np.nan)
         for i in prange(location_1.shape[0]):
             results[i] = np.linalg.norm(location_1[i] - location_2[i]) / px_per_mm

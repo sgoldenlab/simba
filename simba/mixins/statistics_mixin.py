@@ -14,8 +14,7 @@ except:
     from typing_extensions import Literal
 
 import numpy as np
-from numba import (bool_, float32, float64, int8, jit, njit, objmode, optional,
-                   prange, typed, types)
+from numba import (bool_, float32, float64, int8, jit, njit, prange, typed, types)
 from scipy import stats
 from scipy.stats.distributions import chi2
 from sklearn.covariance import EllipticEnvelope
@@ -1363,6 +1362,10 @@ class Statistics(FeatureExtractionMixin):
         # where:
         # - \( d_i \) is the difference between the ranks of corresponding elements in sample_1 and sample_2.
         # - \( n \) is the number of observations.
+
+        .. seealso::
+           :func:`simba.data_processors.cuda.statistics.sliding_spearman_rank_correlation`,
+           :func:`simba.mixins.statistics.StatisticsMixin.sliding_spearman_rank_correlation`
 
         :param np.ndarray sample_1: First 1D array containing feature values.
         :param np.ndarray sample_2: Second 1D array containing feature values.

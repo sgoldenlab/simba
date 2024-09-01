@@ -30,6 +30,7 @@ def _cuda_is_inside_rectangle(x, y, r):
 def is_inside_rectangle(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     """
     Determines whether points in array `x` are inside the rectangle defined by the top left and bottom right vertices in array `y`.
+    |:heart_eyes:|
 
     .. csv-table::
        :header: EXPECTED RUNTIMES
@@ -39,12 +40,13 @@ def is_inside_rectangle(x: np.ndarray, y: np.ndarray) -> np.ndarray:
        :class: simba-table
        :header-rows: 1
 
+    .. seealso::
+       For numba CPU function see :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_inside_rectangle_roi`
+
     :param np.ndarray x: 2d numeric np.ndarray size (N, 2).
     :param np.ndarray y: 2d numeric np.ndarray size (2, 2) (top left[x, y], bottom right[x, y])
     :return np.ndarray: 2d numeric boolean (N, 1) with 1s representing the point being inside the rectangle and 0 if the point is outside the rectangle.
-
     """
-
 
     x = np.ascontiguousarray(x).astype(np.int32)
     y = np.ascontiguousarray(y).astype(np.int32)
@@ -67,11 +69,21 @@ def _cuda_is_inside_circle(x, y, r, results):
             results[i] = 1
 def is_inside_circle(x: np.ndarray, y: np.ndarray, r: float) -> np.ndarray:
     """
-    Determines whether points in array `x` are inside the rectangle defined by the top left and bottom right vertices in array `y`.
+    Determines whether points in array `x` are inside the circle with center ``y`` and radius ``r``
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/is_inside_circle.csv
+       :widths: 10, 90
+       :align: center
+       :class: simba-table
+       :header-rows: 1
 
     :param np.ndarray x: 2d numeric np.ndarray size (N, 2).
-    :param np.ndarray y: 2d numeric np.ndarray size (2, 2) (top left[x, y], bottom right[x, y])
-    :return np.ndarray: 2d numeric boolean (N, 1) with 1s representing the point being inside the rectangle and 0 if the point is outside the rectangle.
+    :param np.ndarray y: 2d numeric np.ndarray size (1, 2) representing the center of the circle.
+    :param float r: The radius of the circle.
+    :return: 2d numeric boolean (N, 1) with 1s representing the point being inside the circle and 0 if the point is outside the rectangle.
+    :rtype: 1d np.ndarray vector.
     """
 
     x = np.ascontiguousarray(x).astype(np.int32)
@@ -121,13 +133,21 @@ def is_inside_polygon(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     the polygon defined by the vertices in `y`. The result is an array where each element indicates whether
     the corresponding point is inside the polygon.
 
-    .. image:: _static/img/is_inside_polygon_cuda.webp
-       :width: 500
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/is_inside_polygon.csv
+       :widths: 10, 45, 45
        :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       For numba CPU function see :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_inside_polygon_roi`
 
     :param np.ndarray x: An array of shape (N, 2) where each row represents a point in 2D space. The points are checked against the polygon.
     :param np.ndarray y: An array of shape (M, 2) where each row represents a vertex of the polygon in 2D space.
-    :return np.ndarray: An array of shape (N,) where each element is 1 if the corresponding point in `x` is inside the polygon defined by `y`, and 0 otherwise.
+    :return: An array of shape (N,) where each element is 1 if the corresponding point in `x` is inside the polygon defined by `y`, and 0 otherwise.
+    :rtype: np.ndarray
 
     :example:
     >>> x = np.random.randint(0, 200, (i, 2)).astype(np.int8)
@@ -229,6 +249,9 @@ def get_convex_hull(pts: np.ndarray) -> np.ndarray:
     .. note::
        `Modified from Jacob Hultman <https://github.com/jhultman/rotating-calipers>`_
 
+    .. seealso::
+       :func:`~simba.feature_extractors.perimeter_jit.jitted_hull`.
+       :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.convex_hull_calculator_mp`.
 
     :param pts: A 3D numpy array of shape (M, N, 2) where: - M is the number of frames. - N is the number of points (body-parts) in each frame. - The last dimension (2) represents the x and y coordinates of each point.
     :return: An upated 3D numpy array of shape (M, N, 2) consisting of the points in the hull.
@@ -266,6 +289,9 @@ def poly_area(data: np.ndarray,
     to a point in the polygon and each column representing the x and y coordinates.
 
     The computation is done in batches to handle large datasets efficiently.
+
+    .. seealso::
+       :func:`~simba.feature_extractors.perimeter_jit.jitted_hull`.
 
     :param data: A 3D numpy array of shape (N, M, 2), where N is the number of polygons, M is the number of points per polygon, and 2 represents the x and y coordinates.
     :param pixels_per_mm: Optional scaling factor to convert the area from pixels squared  to square millimeters. Default is 1.0.
