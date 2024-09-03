@@ -17,9 +17,8 @@ try:
 except:
     import numpy as cp
 
+from simba.utils.checks import check_int, check_valid_array
 from simba.utils.enums import Formats
-from simba.utils.checks import check_valid_array, check_int
-
 
 THREADS_PER_BLOCK = 1024
 
