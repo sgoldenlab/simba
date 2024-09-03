@@ -3,6 +3,7 @@ __email__ = "sronilsson@gmail.com"
 
 import math
 from typing import Optional, Tuple
+
 try:
     from typing import Literal
 except:
@@ -10,10 +11,14 @@ except:
 
 import numpy as np
 from numba import cuda, int32
+
 try:
     import cupy as cp
 except:
     import numpy as cp
+
+from simba.utils.enums import Formats
+from simba.utils.checks import check_valid_array, check_int
 
 
 THREADS_PER_BLOCK = 1024
@@ -34,14 +39,20 @@ def direction_from_two_bps(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     Compute the directionality in degrees from two body-parts. E.g., ``nape`` and ``nose``,
     or ``swim_bladder`` and ``tail`` with GPU acceleration.
 
-    .. image:: _static/img/direction_from_two_bps_cuda.png
-       :width: 1200
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/direction_two_bps.csv
+       :widths: 10, 90
        :align: center
+       :header-rows: 1
 
+    .. seealso::
+       For CPU function see :func:`~simba.mixins.circular_statistics.CircularStatisticsMixin.direction_two_bps`.
 
     :parameter np.ndarray x: Size len(frames) x 2 representing x and y coordinates for first body-part.
     :parameter np.ndarray y: Size len(frames) x 2 representing x and y coordinates for second body-part.
-    :return np.ndarray: Frame-wise directionality in degrees.
+    :return: Frame-wise directionality in degrees.
+    :rtype: np.ndarray.
 
     """
     x = np.ascontiguousarray(x).astype(np.int32)
@@ -66,6 +77,17 @@ def sliding_circular_hotspots(x: np.ndarray,
     This function processes time series data representing angles (in degrees) and calculates the proportion of data
     points within specified angular bins over a sliding window. The calculations are performed in batches to
     accommodate large datasets efficiently.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_circular_hotspots.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+    .. seealso::
+       For CPU function see :func:`~simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_circular_hotspots`.
+
 
     :param np.ndarray x: The input time series data in degrees. Should be a 1D numpy array.
     :param float time_window: The size of the sliding window in seconds.
@@ -125,6 +147,16 @@ def sliding_circular_mean(x: np.ndarray,
     - :math:`N` is the number of samples in the window
 
 
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_circular_mean.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+    .. seealso::
+       For CPU function see :func:`~simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_circular_mean`.
+
     :param np.ndarray x: Input array containing angle values in degrees. The array should be 1-dimensional.
     :param float time_window: Time duration for the sliding window, in seconds. This determines the number of samples in each window  based on the `sample_rate`.
     :param int sample_rate: The number of samples per second (i.e., FPS). This is used to calculate the window size in terms of array indices.
@@ -174,6 +206,16 @@ def sliding_circular_range(x: np.ndarray,
 
     - :math:`\\Delta \\theta` is the difference between angles within the window,
     - :math:`360` accounts for the circular nature of the data (i.e., wrap-around at 360 degrees).
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_circular_range.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+    .. seealso::
+       For CPU function see :func:`~simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_circular_range`.
 
     :param np.ndarray x: The input time series data in degrees. Should be a 1D numpy array.
     :param float time_window: The size of the sliding window in seconds.
@@ -225,6 +267,16 @@ def sliding_circular_std(x: np.ndarray,
 
     where :math:`x_{\text{batch}}` is the data within the current sliding window, and :math:`\text{mean}` and
     :math:`\log` are computed in the circular (complex plane) domain.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_circular_std.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+    .. seealso::
+       For CPU function see :func:`~simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_circular_std`.
 
     :param np.ndarray x: The input time series data in degrees. Should be a 1D numpy array.
     :param float time_window: The size of the sliding window in seconds.
@@ -283,6 +335,18 @@ def sliding_rayleigh_z(x: np.ndarray,
     where:
     - :math:`\theta_i` are the angles in the window.
     - :math:`n` is the number of angles in the window.
+
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_rayleigh_z.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+    .. seealso::
+       For CPU function see :func:`~simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_rayleigh_z`.
+
 
     :param np.ndarray x: Input array of angles in degrees. Should be a 1D numpy array.
     :param float time_window: The size of the sliding window in time units (e.g., seconds).
@@ -345,12 +409,21 @@ def sliding_resultant_vector_length(x: np.ndarray,
     with CuPy for efficiency, especially on large datasets.
 
 
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_resultant_vector_length.csv
+       :widths: 10, 10, 80
+       :align: center
+       :header-rows: 1
+
+    .. seealso::
+       For CPU function see :func:`~simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_resultant_vector_length`.
+
     :param np.ndarray x: Input array containing angle values in degrees. The array should be 1-dimensional.
     :param float time_window: Time duration for the sliding window, in seconds. This determines the number of samples in each window  based on the `sample_rate`.
     :param int sample_rate: The number of samples per second (i.e., FPS). This is used to calculate the window size in terms of array indices.
     :param Optional[int] batch_size: The maximum number of elements to process in each batch. This is used to handle large arrays by processing them in chunks to avoid memory overflow. Defaults to 3e+7 (30 million elements).
     :return np.ndarray: A 1D numpy array of the same length as `x`, containing the resultant vector length for each sliding window. Values before the window is fully populated will be set to -1.
-
 
     :example:
     >>> x = np.random.randint(0, 361, (5000, )).astype(np.int32)
@@ -371,5 +444,48 @@ def sliding_resultant_vector_length(x: np.ndarray,
         cos_sum, sin_sum = cp.sum(cos, axis=1), cp.sum(sin, axis=1)
         r = np.sqrt(cos_sum ** 2 + sin_sum ** 2) / window_size
         results[left+window_size-1:right] = r
+    return results.get()
+
+
+def direction_from_three_bps(x: np.ndarray,
+                             y: np.ndarray,
+                             z: np.ndarray,
+                             batch_size: Optional[int] = int(1.5e+7)) -> np.ndarray:
+
+    """
+    Calculate the direction angle based on the coordinates of three body points using GPU acceleration.
+
+    This function computes the mean direction angle (in degrees) for a batch of coordinates
+    provided in the form of NumPy arrays. The calculation is based on the arctangent of the
+    difference in x and y coordinates between pairs of points. The result is a value in
+    the range [0, 360) degrees.
+
+    .. seealso::
+       :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.direction_three_bps`
+
+    :param np.ndarray x: A 2D array of shape (N, 2) containing the x-coordinates of the first body part  (nose)
+    :param np.ndarray y: A 2D array of shape (N, 2) containing the coordinates of the second body part (left ear).
+    :param np.ndarray z: A 2D array of shape (N, 2) containing the coordinates of the second body part (right ear).
+    :param Optional[int] batch_size: The size of the batch to be processed in each iteration. Default is 15 million.
+    :return: An array of shape (N,) containing the computed direction angles in degrees.
+    :rtype np.ndarray:
+    """
+
+    check_valid_array(data=x, source=direction_from_three_bps.__name__, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=y, source=direction_from_three_bps.__name__, accepted_shapes=(x.shape,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=z, source=direction_from_three_bps.__name__, accepted_shapes=(x.shape,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_int(value=batch_size, name=direction_from_three_bps.__name__, min_value=1)
+    results = cp.full((x.shape[0]), fill_value=-1, dtype=np.int16)
+
+    for l in range(0, x.shape[0], batch_size):
+        r = l + batch_size
+        x_batch = cp.array(x[l:r])
+        y_batch = cp.array(y[l:r])
+        z_batch = cp.array(z[l:r])
+        left_ear_to_nose = cp.arctan2(x_batch[:, 0] - y_batch[:, 0], y_batch[:, 1] - x_batch[:,1])
+        right_ear_nose = cp.arctan2(x_batch[:, 0] - z_batch[:, 0], z_batch[:, 1] - x_batch[:, 1])
+        mean_angle_rad = cp.arctan2(cp.sin(left_ear_to_nose) + cp.sin(right_ear_nose), cp.cos(left_ear_to_nose) + cp.cos(right_ear_nose))
+        results[l:r] = (cp.degrees(mean_angle_rad) + 360) % 360
+
     return results.get()
 

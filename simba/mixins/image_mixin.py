@@ -64,9 +64,13 @@ class ImageMixin(object):
 
         For example, (i) create a list of images containing a light cue ROI, (ii) compute brightness in each image, (iii) perform kmeans on brightness, and get the frames when the light cue is on vs off.
 
+        .. seealso::
+           :func:`simba.data_processors.cuda.image.img_stack_brightness`.
+
         :param List[np.ndarray] imgs: List of images as arrays to calculate average brightness intensity within.
         :param Optional[bool] ignore_black: If True, ignores black pixels. If the images are sliced non-rectangular geometric shapes created by ``slice_shapes_in_img``, then pixels that don't belong to the shape has been masked in black.
-        :returns List[float]: List of floats of size len(imgs) with brightness intensities.
+        :returns: List of floats of size len(imgs) with brightness intensities.
+        :rtype: List[float]
 
         :example:
         >>> img = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/khan/project_folder/videos/stitched_frames/0.png').astype(np.uint8)
@@ -347,13 +351,15 @@ class ImageMixin(object):
             return cv2.HuMoments(cv2.moments(img))
 
     @staticmethod
-    def find_contours(
-        img: np.ndarray,
-        mode: Optional[Literal["all", "exterior"]] = "all",
-        method: Optional[Literal["simple", "none", "l1", "kcos"]] = "simple",
-    ) -> np.ndarray:
+    def find_contours(img: np.ndarray,
+                      mode: Optional[Literal["all", "exterior"]] = "all",
+                      method: Optional[Literal["simple", "none", "l1", "kcos"]] = "simple",
+                      ) -> np.ndarray:
         """
         Find contours in the input image.
+
+        .. seealso::
+           :func:`simba.mixins.image_mixin.ImageMixin.get_contourmatch`
 
         :param np.ndarray img: Input image as a NumPy array.
         :param Optional[Literal['all', 'exterior']] img: Contour retrieval mode. E.g., which contours should be kept. Default is 'all'.
@@ -552,9 +558,7 @@ class ImageMixin(object):
 
     @staticmethod
     @jit(nopython=True)
-    def img_stack_to_bw(
-        imgs: np.ndarray, lower_thresh: int, upper_thresh: int, invert: bool
-    ):
+    def img_stack_to_bw(imgs: np.ndarray, lower_thresh: int, upper_thresh: int, invert: bool):
         """
         Convert a stack of color images into black and white format.
 
@@ -607,6 +611,10 @@ class ImageMixin(object):
            :width: 800
            :align: center
 
+        .. seealso::
+           :func:`simba.mixins.image_mixin.ImageMixin.segment_img_stack_horizontal`
+           :func:`simba.mixins.image_mixin.ImageMixin.segment_img_vertical`
+
         :param np.ndarray img: Input image as a NumPy array.
         :param int pct: Percentage of the image to be segmented. If `lower` is True, it represents the lower part; if False, it represents the upper part.
         :param Optional[bool] lower: Flag indicating whether to segment the lower part (True) or upper part (False) of the image. Default is True.
@@ -640,6 +648,9 @@ class ImageMixin(object):
     def segment_img_stack_horizontal(imgs: np.ndarray, pct: int, lower: bool, both: bool) -> np.ndarray:
         """
         Segment a horizontal part of all images in stack.
+
+        .. seealso::
+           :func:`simba.mixins.image_mixin.ImageMixin.segment_img_horizontal`
 
         :example:
         >>> imgs = ImageMixin.read_img_batch_from_video(video_path='/Users/simon/Downloads/3A_Mouse_5-choice_MouseTouchBasic_a1.mp4', start_frm=0, end_frm=400)
@@ -766,6 +777,7 @@ class ImageMixin(object):
         Helper to read in all images within a directory using multiprocessing.
         Returns a dictionary with the image name as key and the images in array format as values.
 
+
         :example:
         >>> imgs = ImageMixin().read_all_img_in_dir(dir='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/Together_4_cropped_frames')
         """
@@ -805,6 +817,10 @@ class ImageMixin(object):
            Also see ``img_sliding_mse``.
 
 
+        .. seealso::
+           :func:`simba.data_processors.cuda.image.stack_sliding_mse`
+           :func:`simba.mixins.image_mixin.ImageMixin.img_sliding_mse`
+
         :param np.ndarray imgs_1: First three (non-color) or four (color) dimensional stack of images in array format.
         :param np.ndarray imgs_1: Second three (non-color) or four (color) dimensional stack of images in array format.
         :return np.ndarray: Array of size len(imgs_1) comparing ``imgs_1`` and ``imgs_2`` at each index using mean squared errors at each pixel location.
@@ -837,6 +853,10 @@ class ImageMixin(object):
         This function performs pairwise comparisons of images using mean squared errors (MSE).
         It slides a window of the specified size over the sequence of images and computes the MSE
         between each image and the image that is `slide_size` positions before it.
+
+        .. seealso::
+           :func:`simba.data_processors.cuda.image.stack_sliding_mse`
+           :func:`simba.mixins.image_mixin.ImageMixin.img_stack_mse`
 
 
         .. image:: _static/img/img_sliding_mse.webp
@@ -886,12 +906,17 @@ class ImageMixin(object):
         """
         Read a batch of frames from a video file. This method reads frames from a specified range of frames within a video file using multiprocessing.
 
+
+        .. seealso::
+           :func:`simba.utils.read_write.read_img_batch_from_video_gpu`
+
         :param Union[str, os.PathLike] video_path: Path to the video file.
         :param int start_frm: Starting frame index.
         :param int end_frm: Ending frame index.
         :param Optionalint] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, indicating using all available cores.
         :param Optional[bool] greyscale: If True, reads the images as greyscale. If False, then as original color scale. Default: True.
-        :returns Dict[int, np.ndarray]: A dictionary containing frame indices as keys and corresponding frame arrays as values.
+        :returns: A dictionary containing frame indices as keys and corresponding frame arrays as values.
+        :rtype: Dict[int, np.ndarray]
 
         :example:
         >>> ImageMixin().read_img_batch_from_video(video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Together_1.avi', start_frm=0, end_frm=50)
@@ -1030,6 +1055,12 @@ class ImageMixin(object):
            :width: 600
            :align: center
 
+        .. seealso::
+           :func:`simba.data_processors.cuda.image.stack_sliding_mse`
+           :func:`simba.mixins.image_mixin.ImageMixin.img_sliding_mse`
+           :func:`simba.mixins.image_mixin.ImageMixin.img_stack_mse`
+
+
         :param np.ndarray imgs: A stack of images represented as a numpy array.
         :return np.ndarray: The MSE matrix table.
 
@@ -1054,6 +1085,11 @@ class ImageMixin(object):
         The function takes an RGB image and converts it to a greyscale image using a weighted sum approach.
         If the input image is already in greyscale (2D array), it is returned as is.
 
+        .. seealso::
+           :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cupy`
+           :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cuda`
+           :func:`simba.mixins.image_mixin.ImageMixin.img_stack_to_greyscale`
+
         :param np.ndarray img: Input image represented as a NumPy array. For a color image, the array should have three channels (RGB).
         :return np.ndarray: The greyscale image as a 2D NumPy array.
         """
@@ -1073,8 +1109,14 @@ class ImageMixin(object):
            :width: 600
            :align: center
 
-        :parameter np.ndarray imgs: A 4D array representing color images. It should have the shape (num_images, height, width, 3) where the last dimension represents the color channels (R, G, B).
-        :returns np.ndarray: A 3D array containing the grayscale versions of the input images. The shape of the output array is (num_images, height, width).
+        .. seealso::
+           :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cupy`
+           :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cuda`
+           :func:`simba.mixins.image_mixin.ImageMixin.img_to_greyscale`
+
+        :param np.ndarray imgs: A 4D array representing color images. It should have the shape (num_images, height, width, 3) where the last dimension represents the color channels (R, G, B).
+        :returns: A 3D array containing the grayscale versions of the input images. The shape of the output array is (num_images, height, width).
+        :rtype: np.ndarray
 
         :example:
         >>> imgs = ImageMixin().read_img_batch_from_video( video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Together_1.avi', start_frm=0, end_frm=100)

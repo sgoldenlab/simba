@@ -14,8 +14,8 @@ except:
     from typing_extensions import Literal
 
 import numpy as np
-from numba import (bool_, float32, float64, int8, jit, njit, objmode, optional,
-                   prange, typed, types)
+from numba import (bool_, float32, float64, int8, jit, njit, prange, typed,
+                   types)
 from scipy import stats
 from scipy.stats.distributions import chi2
 from sklearn.covariance import EllipticEnvelope
@@ -91,9 +91,10 @@ class Statistics(FeatureExtractionMixin):
         E.g., compute t-test statistics when comparing ``Feature N`` in the current 1s
         time-window, versus ``Feature N`` in the previous 1s time-window.
 
-        :parameter ndarray data: 1D array of size len(frames) representing feature values.
-        :parameter int group_size_s: The size of the buckets in seconds.
-        :parameter int fps: Frame-rate of recorded video.
+        :param ndarray data: 1D array of size len(frames) representing feature values.
+        :param int group_size_s: The size of the buckets in seconds.
+        :param fps: Frame-rate of recorded video.
+        :rtype: int
 
         .. image:: _static/img/independent_t_tests.png
            :width: 700
@@ -101,6 +102,9 @@ class Statistics(FeatureExtractionMixin):
 
         .. attention::
            Each window is compared to the prior window. Output for the windows without a prior window (the first window) is ``-1``.
+
+        .. seealso::
+           :func:`simba.mixins.statistics_mixin.Statistics.independent_samples_t`
 
         :example:
         >>> data_1, data_2 = np.random.normal(loc=10, scale=2, size=10), np.random.normal(loc=20, scale=2, size=10)
@@ -158,9 +162,12 @@ class Statistics(FeatureExtractionMixin):
             - \\(s_p\\) is the pooled standard deviation,
             - \\(n_1\\) and \\(n_2\\) are the sample sizes of sample_1 and sample_2 respectively.
 
-        :parameter ndarray sample_1: First 1d array representing feature values.
-        :parameter ndarray sample_2: Second 1d array representing feature values.
-        :parameter ndarray critical_values: 2d array where the first column represents degrees of freedom and second column represents critical values.
+        .. seealso::
+           :func:`simba.mixins.statistics_mixin.Statistics.rolling_independent_sample_t`
+
+        :param ndarray sample_1: First 1d array representing feature values.
+        :param ndarray sample_2: Second 1d array representing feature values.
+        :param ndarray critical_values: 2d array where the first column represents degrees of freedom and second column represents critical values.
         :returns (float Union[None, bool]) t_statistic, p_value: Representing t-statistic and associated probability value. p_value is ``None`` if critical_values is None. Else True or False with True representing significant.
 
         :example:
@@ -214,9 +221,10 @@ class Statistics(FeatureExtractionMixin):
             - \\(\\bar{x}_1\\) and \\(\\bar{x}_2\\) are the means of sample_1 and sample_2 respectively,
             - \\(s_1\\) and \\(s_2\\) are the standard deviations of sample_1 and sample_2 respectively.
 
-        :parameter ndarray sample_1: First 1d array representing feature values.
-        :parameter ndarray sample_2: Second 1d array representing feature values.
-        :returns float: Cohens D statistic.
+        :param ndarray sample_1: First 1d array representing feature values.
+        :param ndarray sample_2: Second 1d array representing feature values.
+        :returns: Cohens D statistic.
+        :rtype: float
 
         :example:
         >>> sample_1 = [2, 4, 7, 3, 7, 35, 8, 9]
@@ -238,7 +246,8 @@ class Statistics(FeatureExtractionMixin):
         :parameter ndarray data: 1D array of size len(frames) representing feature values.
         :parameter np.ndarray[ints] time_window: Time windows to compute ANOVAs for in seconds.
         :parameter int fps: Frame-rate of recorded video.
-        :returns np.ndarray: Array of size data.shape[0] x window_sizes.shape[1] with Cohens D.
+        :returns: Array of size data.shape[0] x window_sizes.shape[1] with Cohens D.
+        :rtype: np.ndarray
 
         :example:
         >>> sample_1, sample_2 = np.random.normal(loc=10, scale=1, size=4), np.random.normal(loc=11, scale=2, size=4)
@@ -275,7 +284,8 @@ class Statistics(FeatureExtractionMixin):
         :parameter ndarray data: 1D array of size len(frames) representing feature values.
         :parameter float time_window: The size of the buckets in seconds.
         :parameter int fps: Frame-rate of recorded video.
-        :return np.ndarray: Array of size data.shape[0] with KS statistics
+        :return: Array of size data.shape[0] with KS statistics
+        :rtype: np.ndarray
 
         :example:
         >>> data = np.random.randint(low=0, high=100, size=(200)).astype('float32')
@@ -1106,7 +1116,7 @@ class Statistics(FeatureExtractionMixin):
         :returns float: The Mann-Whitney U statistic.
 
         :references:
-        `Modified from James Webber gist on GitHub <https://gist.github.com/jamestwebber/38ab26d281f97feb8196b3d93edeeb7b>`__.
+           `Modified from James Webber gist on GitHub <https://gist.github.com/jamestwebber/38ab26d281f97feb8196b3d93edeeb7b>`__.
 
         :example:
         >>> sample_1 = np.array([1, 1, 3, 4, 5])
@@ -1364,6 +1374,10 @@ class Statistics(FeatureExtractionMixin):
         # - \( d_i \) is the difference between the ranks of corresponding elements in sample_1 and sample_2.
         # - \( n \) is the number of observations.
 
+        .. seealso::
+           :func:`simba.data_processors.cuda.statistics.sliding_spearman_rank_correlation`,
+           :func:`simba.mixins.statistics.StatisticsMixin.sliding_spearman_rank_correlation`
+
         :param np.ndarray sample_1: First 1D array containing feature values.
         :param np.ndarray sample_2: Second 1D array containing feature values.
         :return float: Spearman's rank correlation coefficient.
@@ -1399,7 +1413,8 @@ class Statistics(FeatureExtractionMixin):
         :parameter ndarray sample_1: Second 1D array with feature values.
         :parameter float time_windows: The length of the sliding window in seconds.
         :parameter int fps: The fps of the recorded video.
-        :returns np.ndarray: 2d array of Pearsons R of size len(sample_1) x len(time_windows). Note, if sliding window is 10 frames, the first 9 entries will be filled with 0.
+        :returns: 2d array of Pearsons R of size len(sample_1) x len(time_windows). Note, if sliding window is 10 frames, the first 9 entries will be filled with 0.
+        :rtype: np.ndarray
 
         :example:
         >>> sample_1 = np.random.randint(0, 50, (10)).astype(np.float32)
@@ -1920,7 +1935,8 @@ class Statistics(FeatureExtractionMixin):
         :param Optional[float] contamination: Small pseudonumber to avoid DivisionByZero error.
         :param Optional[bool] normalize: Whether to normalize the distances between 0 and 1. Defaults to False.
         :param Optional[int] groupby_idx: If int, then the index 1 of ``data`` for which to group the data and compute LOF on each segment. E.g., can be field holding a cluster identifier.
-        :returns np.ndarray: Array of size data.shape[0] with local outlier scores.
+        :returns: Array of size data.shape[0] with local outlier scores.
+        :rtype: np.ndarray
 
         :example:
         >>> data, lbls = make_blobs(n_samples=2000, n_features=2, centers=10, random_state=42)
@@ -2113,7 +2129,7 @@ class Statistics(FeatureExtractionMixin):
         :param Union[int, float] estimators: Number of splits. If the value is a float, then interpreted as the ratio of x shape.
         :param Optional[int] groupby_idx: If int, then the index 1 of ``data`` for which to group the data and compute LOF on each segment. E.g., can be field holding a cluster identifier.
         :param Optional[bool] normalize: Whether to normalize the outlier score between 0 and 1. Defaults to False.
-        :return:
+        :return: np.ndarray
 
         :example:
         >>> x, lbls = make_blobs(n_samples=10000, n_features=2, centers=10, random_state=42)
@@ -2282,7 +2298,8 @@ class Statistics(FeatureExtractionMixin):
         :parameter ndarray data: 1D array of size len(frames) representing feature values.
         :parameter int time_window: The size of the buckets in seconds.
         :parameter int fps: Frame-rate of recorded video.
-        :return np.ndarray: Array of size data.shape[0] with Shapiro-Wilks normality statistics
+        :return: Array of size data.shape[0] with Shapiro-Wilks normality statistics
+        :rtype: np.ndarray
 
         :example:
         >>> data = np.random.randint(low=0, high=100, size=(200)).astype('float32')
@@ -2325,7 +2342,8 @@ class Statistics(FeatureExtractionMixin):
         :parameter ndarray data: 1D NumPy array containing the time-series data.
         :parameter ndarray time_windows: 1D NumPy array specifying the time windows in seconds over which to calculate the Z-scores.
         :parameter int time_windows: Frames per second, used to convert time windows from seconds to the corresponding number of data points.
-        :returns np.ndarray: A 2D NumPy array containing the calculated Z-scores. Each row corresponds to the Z-scores calculated for a specific time window. The time windows are represented by the columns.
+        :returns: A 2D NumPy array containing the calculated Z-scores. Each row corresponds to the Z-scores calculated for a specific time window. The time windows are represented by the columns.
+        :rtype: np.ndarray
 
         :example:
         >>> data = np.random.randint(0, 100, (1000,)).astype(np.float32)
@@ -2365,7 +2383,8 @@ class Statistics(FeatureExtractionMixin):
             - R1, R2: Counts of occurrences where the truth is 1 and 0, respectively.
 
         :param np.ndarray data: A NumPy array containing binary data organized in two columns. Each row represents a pair of binary values for two variables. Columns represent two features or two binary classification results.
-        :param float: The calculated phi coefficient, a value between 0 and 1. A value of 0 indicates no association between the variables, while 1 indicates a perfect association.
+        :returns: The calculated phi coefficient, a value between 0 and 1. A value of 0 indicates no association between the variables, while 1 indicates a perfect association.
+        :rtype: float
 
         :example:
         >>> data = np.array([[0, 1], [1, 0], [1, 0], [1, 1]]).astype(np.int64)
@@ -2417,7 +2436,8 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray x: 1D array containing the dependent variable data.
         :param np.ndarray y: 1d array containing the grouping variable (categorical) data of same size as ``x``.
-        :return float: The eta-squared value representing the proportion of variance in the dependent variable that is attributable to the grouping variable.
+        :return: The eta-squared value representing the proportion of variance in the dependent variable that is attributable to the grouping variable.
+        :rtype: float
         """
 
         check_valid_array(data=x, source=f'{Statistics.eta_squared.__name__} x', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
@@ -2848,6 +2868,8 @@ class Statistics(FeatureExtractionMixin):
         :parameter np.ndarray x: First binary vector.
         :parameter np.ndarray x: Second binary vector.
         :parameter Optional[np.ndarray] w: Optional weights for each element. Can be classification probabilities. If not provided, equal weights are assumed.
+        :returns: sokal sneath coefficient
+        :rtype: float
 
         :example:
         >>> x = np.array([0, 1, 0, 0, 1]).astype(np.int8)
@@ -2889,7 +2911,8 @@ class Statistics(FeatureExtractionMixin):
 
         :parameter np.ndarray x: 2d array with likely normalized feature values.
         :parameter Optional[np.ndarray] w: Optional 2d array with weights of same size as x. Default None and all observations will have the same weight.
-        :returns np.ndarray: 2d array with same size as x representing dissimilarity values. 0 and the observations are identical and at 1 the observations are completly disimilar.
+        :returns: 2d array with same size as x representing dissimilarity values. 0 and the observations are identical and at 1 the observations are completly disimilar.
+        :rtype: np.ndarray
 
         :example:
         >>> x = np.array([[1, 1, 1, 1, 1], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [1, 1, 1, 1, 1]]).astype(np.float32)
@@ -3086,6 +3109,11 @@ class Statistics(FeatureExtractionMixin):
             - \( D_{ij} \) are the observed frequencies,
             - \( E_{ij} \) are the expected frequencies.
 
+        :param np.ndarray sample_1: The first binary sample, a 1D NumPy array of integers.
+        :param np.ndarray sample_2: The second binary sample, a 1D NumPy array of integers.
+        :return: Cohen's Kappa coefficient between the two samples.
+        :rtype: float
+
         :example:
         >>> sample_1 = np.random.randint(0, 2, size=(10000,))
         >>> sample_2 = np.random.randint(0, 2, size=(10000,))
@@ -3120,6 +3148,15 @@ class Statistics(FeatureExtractionMixin):
 
         D-prime (d') is a measure of signal detection performance, indicating the ability to discriminate between signal and noise.
         It is computed as the difference between the inverse cumulative distribution function (CDF) of the hit rate and the false alarm rate.
+
+        .. math::
+
+           d' = \\Phi^{-1}(hit\\_rate) - \\Phi^{-1}(false\\_alarm\\_rate)
+
+        where:
+            - \( \\Phi^{-1} \) is the inverse of the cumulative distribution function (CDF) of the normal distribution,
+            - \( hit\\_rate \) is the proportion of true positives correctly identified,
+            - \( false\\_alarm\\_rate \) is the proportion of false positives incorrectly identified.
 
         :param np.ndarray x: Boolean 1D array of response values, where 1 represents presence, and 0 representing absence.
         :param np.ndarray y: Boolean 1D array of ground truth, where 1 represents presence, and 0 representing absence.
@@ -3189,6 +3226,8 @@ class Statistics(FeatureExtractionMixin):
         :param np.ndarray y: 1-dimensional Boolean array with predictions of the second model.
         :param np.ndarray ground_truth: 1-dimensional Boolean array with ground truth labels.
         :param Optional[bool] continuity_corrected : Whether to apply continuity correction. Default is True.
+        :returns: McNemar score are significance level.
+        :rtype: Tuple[float, float]
 
         :example:
         >>> x = np.random.randint(0, 2, (100000, ))

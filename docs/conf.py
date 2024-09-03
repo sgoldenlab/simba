@@ -22,14 +22,21 @@ myst_url_schemes = ["http", "https"]
 extensions = ['sphinx.ext.napoleon',
               'sphinx.ext.imgmath',
               'sphinx.ext.mathjax',
+              'sphinx-mathjax-offline',
               'sphinx.ext.autodoc',
               'sphinx.ext.todo',
               'sphinx.ext.viewcode',
+              'sphinxemoji.sphinxemoji',
               #'sphinx_autodoc_typehints',
               'sphinx_togglebutton',
               'nbsphinx',
               'sphinx.ext.intersphinx',
               'sphinxcontrib.video']
+
+#mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+
+
+
 intersphinx_mapping = {
   'python': ('https://docs.python.org/3', None),
   }

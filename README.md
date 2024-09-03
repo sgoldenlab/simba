@@ -13,7 +13,7 @@
 [![Downloads](https://pepy.tech/badge/simba-uw-tf-dev/month)](https://pepy.tech/project/simba-uw-tf-dev)
 [![Downloads](https://pepy.tech/badge/simba-uw-tf-dev)](https://pepy.tech/project/simba-uw-tf-dev)
 
-
+**Manuscript: [Simple Behavioral Analysis (SimBA) as a platform for explainable machine learning in behavioral neuroscience](https://www.nature.com/articles/s41593-024-01649-9)**
 **Pre-print: [Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)**
 
 <p align="center">

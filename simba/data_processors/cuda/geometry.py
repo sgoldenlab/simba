@@ -1,16 +1,19 @@
 __author__ = "Simon Nilsson"
 __email__ = "sronilsson@gmail.com"
 
+import math
 from typing import Optional
-from simba.utils.checks import check_float, check_valid_array
-from simba.utils.enums import Formats
 
 import numpy as np
 from numba import cuda, njit
-import math
+
+from simba.utils.checks import check_float, check_valid_array, check_int
+from simba.utils.enums import Formats
+
 try:
     import cupy as cp
-except:
+
+except ModuleNotFoundError:
     import numpy as cp
 
 THREADS_PER_BLOCK = 1024
@@ -28,6 +31,7 @@ def _cuda_is_inside_rectangle(x, y, r):
 def is_inside_rectangle(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     """
     Determines whether points in array `x` are inside the rectangle defined by the top left and bottom right vertices in array `y`.
+    |:heart_eyes:|
 
     .. csv-table::
        :header: EXPECTED RUNTIMES
@@ -37,12 +41,13 @@ def is_inside_rectangle(x: np.ndarray, y: np.ndarray) -> np.ndarray:
        :class: simba-table
        :header-rows: 1
 
+    .. seealso::
+       For numba CPU function see :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_inside_rectangle_roi`
+
     :param np.ndarray x: 2d numeric np.ndarray size (N, 2).
     :param np.ndarray y: 2d numeric np.ndarray size (2, 2) (top left[x, y], bottom right[x, y])
     :return np.ndarray: 2d numeric boolean (N, 1) with 1s representing the point being inside the rectangle and 0 if the point is outside the rectangle.
-
     """
-
 
     x = np.ascontiguousarray(x).astype(np.int32)
     y = np.ascontiguousarray(y).astype(np.int32)
@@ -65,11 +70,21 @@ def _cuda_is_inside_circle(x, y, r, results):
             results[i] = 1
 def is_inside_circle(x: np.ndarray, y: np.ndarray, r: float) -> np.ndarray:
     """
-    Determines whether points in array `x` are inside the rectangle defined by the top left and bottom right vertices in array `y`.
+    Determines whether points in array `x` are inside the circle with center ``y`` and radius ``r``
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/is_inside_circle.csv
+       :widths: 10, 90
+       :align: center
+       :class: simba-table
+       :header-rows: 1
 
     :param np.ndarray x: 2d numeric np.ndarray size (N, 2).
-    :param np.ndarray y: 2d numeric np.ndarray size (2, 2) (top left[x, y], bottom right[x, y])
-    :return np.ndarray: 2d numeric boolean (N, 1) with 1s representing the point being inside the rectangle and 0 if the point is outside the rectangle.
+    :param np.ndarray y: 2d numeric np.ndarray size (1, 2) representing the center of the circle.
+    :param float r: The radius of the circle.
+    :return: 2d numeric boolean (N, 1) with 1s representing the point being inside the circle and 0 if the point is outside the rectangle.
+    :rtype: 1d np.ndarray vector.
     """
 
     x = np.ascontiguousarray(x).astype(np.int32)
@@ -119,13 +134,21 @@ def is_inside_polygon(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     the polygon defined by the vertices in `y`. The result is an array where each element indicates whether
     the corresponding point is inside the polygon.
 
-    .. image:: _static/img/is_inside_polygon_cuda.webp
-       :width: 500
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/is_inside_polygon.csv
+       :widths: 10, 45, 45
        :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. seealso::
+       For numba CPU function see :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_inside_polygon_roi`
 
     :param np.ndarray x: An array of shape (N, 2) where each row represents a point in 2D space. The points are checked against the polygon.
     :param np.ndarray y: An array of shape (M, 2) where each row represents a vertex of the polygon in 2D space.
-    :return np.ndarray: An array of shape (N,) where each element is 1 if the corresponding point in `x` is inside the polygon defined by `y`, and 0 otherwise.
+    :return: An array of shape (N,) where each element is 1 if the corresponding point in `x` is inside the polygon defined by `y`, and 0 otherwise.
+    :rtype: np.ndarray
 
     :example:
     >>> x = np.random.randint(0, 200, (i, 2)).astype(np.int8)
@@ -227,6 +250,9 @@ def get_convex_hull(pts: np.ndarray) -> np.ndarray:
     .. note::
        `Modified from Jacob Hultman <https://github.com/jhultman/rotating-calipers>`_
 
+    .. seealso::
+       :func:`~simba.feature_extractors.perimeter_jit.jitted_hull`.
+       :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.convex_hull_calculator_mp`.
 
     :param pts: A 3D numpy array of shape (M, N, 2) where: - M is the number of frames. - N is the number of points (body-parts) in each frame. - The last dimension (2) represents the x and y coordinates of each point.
     :return: An upated 3D numpy array of shape (M, N, 2) consisting of the points in the hull.
@@ -265,6 +291,9 @@ def poly_area(data: np.ndarray,
 
     The computation is done in batches to handle large datasets efficiently.
 
+    .. seealso::
+       :func:`~simba.feature_extractors.perimeter_jit.jitted_hull`.
+
     :param data: A 3D numpy array of shape (N, M, 2), where N is the number of polygons, M is the number of points per polygon, and 2 represents the x and y coordinates.
     :param pixels_per_mm: Optional scaling factor to convert the area from pixels squared  to square millimeters. Default is 1.0.
     :param batch_size: Optional batch size for processing the data in chunks to fit in memory. Default is 0.5e+7.
@@ -282,9 +311,77 @@ def poly_area(data: np.ndarray,
         y_r = cp.roll(y, shift=1, axis=1)
         dot_xy_roll_y = cp.sum(x * y_r, axis=1)
         dot_y_roll_x = cp.sum(y * x_r, axis=1)
-        results[l:r]  = (0.5 * cp.abs(dot_xy_roll_y - dot_y_roll_x)) / pixels_per_mm
+        results[l:r] = (0.5 * cp.abs(dot_xy_roll_y - dot_y_roll_x)) / pixels_per_mm
 
     return results.get()
+
+def find_midpoints(x: np.ndarray,
+                   y: np.ndarray,
+                   percentile: Optional[float] = 0.5,
+                   batch_size: Optional[int] = int(1.5e+7)) -> np.ndarray:
+
+    """
+    Calculate the midpoints between corresponding points in arrays `x` and `y`
+    based on a given percentile using GPU acceleration.
+
+    For example, calculate the midpoint between the animal ears (to get presumed ``nape``) or lateral sides (to get presumed center of mass),
+    or nose and left ear (to get left eye) etc.
+
+    This function computes the midpoints between each pair of points (x[i], y[i])
+    from the input arrays `x` and `y`. The midpoint is calculated by taking a
+    weighted sum of the differences along each axis, where the weight is determined
+    by the specified percentile. The computation is performed in batches to handle
+    large datasets efficiently.
+
+    .. seealso:
+       For CPU function see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.find_midpoints`.
+
+    .. image:: _static/img/find_midpoints.webp
+       :width: 600
+       :align: center
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/find_midpoints.csv
+       :widths: 10, 90
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    :param np.ndarray x: An array of shape (n, 2) representing the x-coordinates of n points.
+    :param np.ndarray y: An array of shape (n, 2) representing the y-coordinates of n points.
+    :param percentile: A float value between 0 and 1 indicating the percentile to use when calculating the midpoints. The default value is 0.5, which corresponds to the middle.
+    :param Optional[int] batch_size: An integer specifying the batch size for processing the input arrays. Larger batch sizes will use more memory but may be faster. The default value is 15 million (1.5e+7).
+    :return: An array of shape (n, 2) containing the calculated midpoints for each pair of corresponding points in `x` and `y`.
+    :rtype: np.ndarray
+
+    :example:
+    >>> x = np.random.randint(0, 100, (100, 2)).astype(np.int8)
+    >>> y = np.random.randint(0, 100, (100, 2)).astype(np.int8)
+    >>> p = find_midpoints(x=x, y=y)
+    """
+
+    n = x.shape[0]
+    x = cp.asarray(x)
+    y = cp.asarray(y)
+    results = cp.full((n, 2), -1, dtype=cp.int32)
+    for left in range(0, n, batch_size):
+        right = int(min(left + batch_size, n))
+        x_batch = x[left:right]
+        y_batch = y[left:right]
+        axis_0_diff = cp.abs(x_batch[:, 0] - y_batch[:, 0])
+        axis_1_diff = cp.abs(x_batch[:, 1] - y_batch[:, 1])
+        x_dist_percentile = (axis_0_diff * percentile).astype(cp.int32)
+        y_dist_percentile = (axis_1_diff * percentile).astype(cp.int32)
+        new_x = cp.minimum(x_batch[:, 0], y_batch[:, 0]) + x_dist_percentile
+        new_y = cp.minimum(x_batch[:, 1], y_batch[:, 1]) + y_dist_percentile
+        results[left:right, 0] = new_x
+        results[left:right, 1] = new_y
+
+    return results
+
+
+
 
 
 

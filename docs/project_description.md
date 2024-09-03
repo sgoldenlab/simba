@@ -10,8 +10,9 @@ See below for raison d'être, detailed API, tutorials, data, documentation, supp
 - Documentation readthedocs: [https://simba-uw-tf-dev.readthedocs.io/en/latest/](https://simba-uw-tf-dev.readthedocs.io/en/latest/)
 - API: [https://simba-uw-tf-dev.readthedocs.io/en/latest/api.html](https://simba-uw-tf-dev.readthedocs.io/en/latest/api.html)
 - Gitter Chat: [https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im](https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im)
-- biorxiv preprint: [https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)
-- OSF: [https://osf.io/tmu6y/](https://osf.io/tmu6y/)
+- bioRxiv preprint: [https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)
+- Nature Neuroscience paper: [https://www.nature.com/articles/s41593-024-01649-9](https://www.nature.com/articles/s41593-024-01649-9)
+- Open Science Framework (OSF) data buckets: [https://osf.io/tmu6y/](https://osf.io/tmu6y/)
 
 ### Installation
 To install SimBA, use the following command:

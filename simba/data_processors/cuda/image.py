@@ -4,6 +4,7 @@ __email__ = "sronilsson@gmail.com"
 
 import os
 from typing import Optional, Union
+
 try:
     from typing import Literal
 except:
@@ -12,23 +13,26 @@ try:
     import cupy as cp
 except:
     import numpy as cp
+
+from copy import deepcopy
+
 import cv2
 import numpy as np
 from numba import cuda
-from copy import deepcopy
 
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists,
                                 check_if_string_value_is_valid_video_timestamp,
-                                check_int, check_nvidea_gpu_available,
-                                check_if_valid_img,
+                                check_if_valid_img, check_instance, check_int,
+                                check_nvidea_gpu_available,
                                 check_that_hhmmss_start_is_before_end,
-                                check_instance, check_valid_array)
+                                check_valid_array)
 from simba.utils.data import find_frame_numbers_from_time_stamp
 from simba.utils.errors import FFMPEGCodecGPUError, InvalidInputError
 from simba.utils.printing import stdout_success
-from simba.utils.read_write import (check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext, get_video_meta_data, read_img_batch_from_video_gpu)
-
+from simba.utils.read_write import (
+    check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
+    get_video_meta_data, read_img_batch_from_video_gpu)
 
 PHOTOMETRIC = 'photometric'
 DIGITAL = 'digital'
@@ -50,6 +54,9 @@ def create_average_frm_cupy(video_path: Union[str, os.PathLike],
     to a specified file. If `save_path` is provided, the average frame is saved as an image file;
     otherwise, the average frame is returned as a NumPy array.
 
+    .. seealso::
+       For CPU function see :func:`~simba.video_processors.video_processing.create_average_frm`.
+       For CUDA function see :func:`~simba.data_processors.cuda.image.create_average_frm_cuda`
 
     :param Union[str, os.PathLike] video_path:  The path to the video file from which to extract frames.
     :param Optional[int] start_frm: The starting frame number (inclusive). Either `start_frm`/`end_frm` or `start_time`/`end_time` must be provided, but not both.
@@ -72,17 +79,17 @@ def create_average_frm_cupy(video_path: Union[str, os.PathLike],
         return img.get()
 
     if not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)", source=create_average_frm.__name__)
+        raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)", source=create_average_frm_cupy.__name__)
 
 
     if ((start_frm is not None) or (end_frm is not None)) and ((start_time is not None) or (end_time is not None)):
-        raise InvalidInputError(msg=f'Pass start_frm and end_frm OR start_time and end_time', source=create_average_frm.__name__)
+        raise InvalidInputError(msg=f'Pass start_frm and end_frm OR start_time and end_time', source=create_average_frm_cupy.__name__)
     elif type(start_frm) != type(end_frm):
-        raise InvalidInputError(msg=f'Pass start frame and end frame', source=create_average_frm.__name__)
+        raise InvalidInputError(msg=f'Pass start frame and end frame', source=create_average_frm_cupy.__name__)
     elif type(start_time) != type(end_time):
-        raise InvalidInputError(msg=f'Pass start time and end time', source=create_average_frm.__name__)
+        raise InvalidInputError(msg=f'Pass start time and end time', source=create_average_frm_cupy.__name__)
     if save_path is not None:
-        check_if_dir_exists(in_dir=os.path.dirname(save_path), source=create_average_frm.__name_)
+        check_if_dir_exists(in_dir=os.path.dirname(save_path), source=create_average_frm_cupy.__name__)
     check_file_exist_and_readable(file_path=video_path)
     video_meta_data = get_video_meta_data(video_path=video_path)
     video_name = get_fn_ext(filepath=video_path)[1]
@@ -92,12 +99,12 @@ def create_average_frm_cupy(video_path: Union[str, os.PathLike],
         check_int(name='start_frm', value=start_frm, min_value=0, max_value=video_meta_data['frame_count'])
         check_int(name='end_frm', value=end_frm, min_value=0, max_value=video_meta_data['frame_count'])
         if start_frm > end_frm:
-            raise InvalidInputError(msg=f'Start frame ({start_frm}) has to be before end frame ({end_frm}).', source=create_average_frm.__name__)
+            raise InvalidInputError(msg=f'Start frame ({start_frm}) has to be before end frame ({end_frm}).', source=create_average_frm_cupy.__name__)
         frame_ids = list(range(start_frm, end_frm))
     elif (start_time is not None) and (end_time is not None):
-        check_if_string_value_is_valid_video_timestamp(value=start_time, name=create_average_frm.__name__)
-        check_if_string_value_is_valid_video_timestamp(value=end_time, name=create_average_frm.__name__)
-        check_that_hhmmss_start_is_before_end(start_time=start_time, end_time=end_time, name=create_average_frm.__name__)
+        check_if_string_value_is_valid_video_timestamp(value=start_time, name=create_average_frm_cupy.__name__)
+        check_if_string_value_is_valid_video_timestamp(value=end_time, name=create_average_frm_cupy.__name__)
+        check_that_hhmmss_start_is_before_end(start_time=start_time, end_time=end_time, name=create_average_frm_cupy.__name__)
         check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=start_time, video_path=video_path)
         frame_ids = find_frame_numbers_from_time_stamp(start_time=start_time, end_time=end_time, fps=video_meta_data['fps'])
     else:
@@ -114,7 +121,7 @@ def create_average_frm_cupy(video_path: Union[str, os.PathLike],
     if save_path is not None:
         cv2.imwrite(save_path, avg_img)
         if verbose:
-            stdout_success(msg=f'Saved average frame at {save_path}', source=create_average_frm.__name__)
+            stdout_success(msg=f'Saved average frame at {save_path}', source=create_average_frm_cupy.__name__)
     else:
         return avg_img
 
@@ -173,6 +180,9 @@ def create_average_frm_cuda(video_path: Union[str, os.PathLike],
     to a specified file. If `save_path` is provided, the average frame is saved as an image file;
     otherwise, the average frame is returned as a NumPy array.
 
+    .. selalso::
+       For CuPy function see :func:`~simba.data_processors.cuda.image.create_average_frm_cupy`.
+       For CPU function see :func:`~simba.video_processors.video_processing.create_average_frm`.
 
     :param Union[str, os.PathLike] video_path:  The path to the video file from which to extract frames.
     :param Optional[int] start_frm: The starting frame number (inclusive). Either `start_frm`/`end_frm` or `start_time`/`end_time` must be provided, but not both.
@@ -185,7 +195,7 @@ def create_average_frm_cuda(video_path: Union[str, os.PathLike],
     :return: Returns `None` if the result is saved to `save_path`. Otherwise, returns the average frame as a NumPy array.
 
     :example:
-    >>> create_average_frm(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled.mp4", verbose=True, start_frm=0, end_frm=9000)
+    >>> create_average_frm_cuda(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled.mp4", verbose=True, start_frm=0, end_frm=9000)
     """
 
     if not check_nvidea_gpu_available():
@@ -280,6 +290,8 @@ def img_stack_brightness(x: np.ndarray,
     .. math::
        \text{brightness} = 0.299 \cdot R + 0.587 \cdot G + 0.114 \cdot B
 
+    .. selalso::
+       For CPU function see :func:`~simba.mixins.image_mixin.ImageMixin.brightness_intensity`.
 
     :param np.ndarray x: A 4D array of images with dimensions (N, H, W, C), where N is the number of images, H and W are the height and width, and C is the number of channels (RGB).
     :param Optional[Literal['photometric', 'digital']] method:  The method to use for calculating brightness. It can be 'photometric' for  the standard luminance calculation or 'digital' for an alternative set of coefficients. Default is 'digital'.
@@ -375,6 +387,11 @@ def stack_sliding_mse(x: np.ndarray,
     where the reference image is determined by a sliding window approach with a specified stride.
     The function is optimized for large image stacks by processing them in batches.
 
+    .. seelalso::
+       For CPU function see :func:`~simba.mixins.image_mixin.ImageMixin.img_stack_mse` and
+       :func:`~simba.mixins.image_mixin.ImageMixin.img_sliding_mse`.
+
+
     :param np.ndarray x: Input array of images, where the first dimension corresponds to the stack of images. The array should be either 3D (height, width, channels) or 4D (batch, height, width, channels).
     :param Optional[int] stride: The stride or step size for the sliding window that determines the reference image. Defaults to 1, meaning the previous image in the stack is used as the reference.
     :param Optional[int] batch_size: The number of images to process in a single batch. Larger batch sizes may improve performance but require more GPU memory.  Defaults to 1000.
@@ -424,6 +441,19 @@ def img_stack_to_grayscale_cupy(imgs: np.ndarray,
     """
     Converts a stack of color images to grayscale using GPU acceleration with CuPy.
 
+    .. seelalso::
+       For CPU function single images :func:`~simba.mixins.image_mixin.ImageMixin.img_to_greyscale` and
+       :func:`~simba.mixins.image_mixin.ImageMixin.img_stack_to_greyscale` for stack. For CUDA JIT, see
+       :func:`~simba.data_processors.cuda.image.img_stack_to_grayscale_cuda`.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/img_stack_to_grayscale_cupy.csv
+       :widths: 10, 90
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
     :param np.ndarray imgs: A 4D NumPy array representing a stack of images with shape (num_images, height, width, channels). The images are expected to have 3 channels (RGB).
     :param Optional[int] batch_size: The number of images to process in each batch. Defaults to 250. Adjust this parameter to fit your GPU's memory capacity.
     :return np.ndarray: m A 3D NumPy array of shape (num_images, height, width) containing the grayscale images. If the input array is not 4D, the function returns the input as is.
@@ -471,6 +501,19 @@ def _img_stack_to_grayscale(data, results):
 def img_stack_to_grayscale_cuda(x: np.ndarray) -> np.ndarray:
     """
     Convert image stack to grayscale using CUDA.
+
+    .. seelalso::
+       For CPU function single images :func:`~simba.mixins.image_mixin.ImageMixin.img_to_greyscale` and
+       :func:`~simba.mixins.image_mixin.ImageMixin.img_stack_to_greyscale` for stack. For CuPy, see
+       :func:`~simba.data_processors.cuda.image.img_stack_to_grayscale_cupy`.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/img_stack_to_grayscale_cuda.csv
+       :widths: 10, 45, 45
+       :align: center
+       :class: simba-table
+       :header-rows: 1
 
     :param np.ndarray x: 4d array of color images in numpy format.
     :return np.ndarray: 3D array of greyscaled images.
