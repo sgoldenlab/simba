@@ -681,7 +681,6 @@ class TrainModelMixin(object):
             importances = list(self.cuml_rf_x_importances(nodes=cuml_tree_nodes, n_features=len(x_names)))
             std_importances = [np.nan] * len(importances)
         else:
-            print('s')
             importances_per_tree = np.array([tree.feature_importances_ for tree in rf_clf.estimators_])
             importances = list(np.mean(importances_per_tree, axis=0))
             std_importances = list(np.std(importances_per_tree, axis=0))
