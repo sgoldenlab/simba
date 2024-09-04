@@ -26,9 +26,10 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_valid_img, check_instance, check_int,
                                 check_nvidea_gpu_available,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_array)
+                                check_valid_array, check_valid_boolean, check_float)
 from simba.utils.data import find_frame_numbers_from_time_stamp
 from simba.utils.errors import FFMPEGCodecGPUError, InvalidInputError
+from simba.utils.enums import Formats
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
@@ -538,3 +539,135 @@ def img_stack_to_grayscale_cuda(x: np.ndarray) -> np.ndarray:
     _img_stack_to_grayscale[blocks_per_grid, threads_per_block](x_dev, results)
     results = results.copy_to_host()
     return results
+
+
+def img_stack_to_bw(imgs: np.ndarray,
+                    lower_thresh: Optional[int] = 100,
+                    upper_thresh: Optional[int] = 100,
+                    invert: Optional[bool] = True,
+                    batch_size: Optional[int] = 1000) -> np.ndarray:
+    """
+
+    Converts a stack of RGB images to binary (black and white) images based on given threshold values using GPU acceleration.
+
+    This function processes a 4D stack of images, converting each RGB image to a binary image using
+    specified lower and upper threshold values. The conversion can be inverted if desired, and the
+    processing is done in batches for efficiency.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/img_stack_to_bw.csv
+       :widths: 10, 90
+       :align: center
+       :header-rows: 1
+
+    .. seealso::
+       :func:`simba.mixins.image_mixin.ImageMixin.img_to_bw`
+       :func:`simba.mixins.image_mixin.ImageMixin.img_stack_to_bw`
+
+    :param np.ndarray imgs:  A 4D NumPy array representing a stack of RGB images, with shape (N, H, W, C).
+    :param Optional[int]  lower_thresh: The lower threshold value. Pixel values below this threshold are set to 0 (or 1 if `invert` is True). Default is 100.
+    :param Optional[int]  upper_thresh: The upper threshold value. Pixel values above this threshold are set to 1 (or 0 if `invert` is True). Default is 100.
+    :param Optional[bool] invert: If True, the binary conversion is inverted, meaning that values below `lower_thresh` become 1, and values above `upper_thresh` become 0. Default is True.
+    :param Optional[int]  batch_size: The number of images to process in a single batch. This helps manage memory usage for large stacks of images. Default is 1000.
+    :return: A 3D NumPy array of shape (N, H, W), where each image has been converted to a binary format with pixel values of either 0 or 1.
+    :rtype: np.ndarray
+    """
+
+    check_valid_array(data=imgs, source=img_stack_to_bw.__name__, accepted_ndims=(4,))
+    check_int(name='lower_thresh', value=lower_thresh, max_value=255, min_value=0)
+    check_int(name='upper_thresh', value=upper_thresh, max_value=255, min_value=0)
+    check_int(name='batch_size', value=batch_size, min_value=1)
+    results = cp.full((imgs.shape[0], imgs.shape[1], imgs.shape[2]), fill_value=cp.nan, dtype=cp.uint8)
+
+    for l in range(0, imgs.shape[0], batch_size):
+        r = l + batch_size
+        batch_imgs = cp.array(imgs[l:r]).astype(cp.uint8)
+        img_mean = cp.sum(batch_imgs, axis=3) / 3
+        if not invert:
+            batch_imgs = cp.where(img_mean < lower_thresh, 0, img_mean)
+            batch_imgs = cp.where(batch_imgs > upper_thresh, 1, batch_imgs).astype(cp.uint8)
+        else:
+            batch_imgs = cp.where(img_mean < lower_thresh, 1, img_mean)
+            batch_imgs = cp.where(batch_imgs > upper_thresh, 0, batch_imgs).astype(cp.uint8)
+
+        results[l:r] = batch_imgs
+
+    return results.get()
+
+def segment_img_stack_vertical(imgs: np.ndarray,
+                               pct: float,
+                               left: bool,
+                               right: bool) -> np.ndarray:
+    """
+    Segment a stack of images vertically based on a given percentage using GPU acceleration. For example, return the left half, right half, or senter half of each image in the stack.
+
+    .. note::
+       If both left and right are true, the center portion is returned.
+
+    .. seealso::
+       :func:`simba.mixins.image_mixin.ImageMixin.segment_img_vertical`
+
+    :param np.ndarray imgs: A 3D or 4D NumPy array representing a stack of images. The array should have shape (N, H, W) for grayscale images or (N, H, W, C) for color images.
+    :param float pct: The percentage of the image width to be used for segmentation.  This value should be between a small positive value (e.g., 10e-6) and 0.99.
+    :param bool left: If True, the left side of the image stack will be segmented.
+    :param bool right: If True, the right side of the image stack will be segmented.
+    :return: A NumPy array containing the segmented images, with the same number of dimensions as the input.
+    :rtype: np.ndarray
+    """
+
+    check_valid_boolean(value=[left, right], source=segment_img_stack_vertical.__name__)
+    check_float(name=f'{segment_img_stack_vertical.__name__} pct', value=pct, min_value=10e-6, max_value=0.99)
+    check_valid_array(data=imgs, source=f'{segment_img_stack_vertical.__name__} imgs', accepted_ndims=(3, 4,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    if not left and not right:
+        raise InvalidInputError(msg='left are right argument are both False. Set one or both to True.', source=segment_img_stack_vertical.__name__)
+    imgs = cp.array(imgs).astype(cp.uint8)
+    h, w = imgs[0].shape[0], imgs[0].shape[1]
+    px_crop = int(w * pct)
+    if left and not right:
+        imgs = imgs[:, :, :px_crop]
+    elif right and not left:
+        imgs = imgs[:, :, imgs.shape[2] - px_crop:]
+    else:
+        imgs = imgs[:, :, int(px_crop/2):int(imgs.shape[2] - (px_crop/2))]
+    return imgs.get()
+
+
+def segment_img_stack_horizontal(imgs: np.ndarray,
+                                 pct: float,
+                                 upper: Optional[bool] = False,
+                                 lower: Optional[bool] = False) -> np.ndarray:
+
+    """
+    Segment a stack of images horizontally based on a given percentage using GPU acceleration. For example, return the top half, bottom half, or center half of each image in the stack.
+
+    .. note::
+       If both top and bottom are true, the center portion is returned.
+
+    .. seealso::
+       :func:`simba.mixins.image_mixin.ImageMixin.segment_img_stack_horizontal`
+
+    :param np.ndarray imgs: A 3D or 4D NumPy array representing a stack of images. The array should have shape (N, H, W) for grayscale images or (N, H, W, C) for color images.
+    :param float pct: The percentage of the image width to be used for segmentation.  This value should be between a small positive value (e.g., 10e-6) and 0.99.
+    :param bool upper: If True, the top part of the image stack will be segmented.
+    :param bool lower: If True, the bottom part of the image stack will be segmented.
+    :return: A NumPy array containing the segmented images, with the same number of dimensions as the input.
+    :rtype: np.ndarray
+    """
+
+    check_valid_boolean(value=[upper, lower], source=segment_img_stack_horizontal.__name__)
+    check_float(name=f'{segment_img_stack_horizontal.__name__} pct', value=pct, min_value=10e-6, max_value=0.99)
+    check_valid_array(data=imgs, source=f'{segment_img_stack_vertical.__name__} imgs', accepted_ndims=(3, 4,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    if not upper and not lower:
+        raise InvalidInputError(msg='upper and lower argument are both False. Set one or both to True.', source=segment_img_stack_horizontal.__name__)
+    imgs = cp.array(imgs).astype(cp.uint8)
+    h, w = imgs[0].shape[0], imgs[0].shape[1]
+    px_crop = int(h * pct)
+    if upper and not lower:
+        imgs = imgs[: , :px_crop, :]
+    elif not upper and lower:
+        imgs = imgs[:, imgs.shape[0] - px_crop :, :]
+    else:
+        imgs = imgs[:, int(px_crop/2):int((imgs.shape[0] - px_crop) / 2), :]
+
+    return imgs.get()

@@ -291,6 +291,10 @@ class CircularStatisticsMixin(object):
            :width: 600
            :align: center
 
+        .. seealso::
+           :func:`simba.data_processors.cuda.circular_statistics.instantaneous_angular_velocity`
+
+
         :parameter ndarray data: 1D array of size len(frames) representing degrees.
         :parameter int bin_size: The number of frames prior to compare the current angular velocity against.
         :returns: 1D array with instantanous angular velocities according to bin size.
@@ -359,6 +363,9 @@ class CircularStatisticsMixin(object):
            :width: 600
            :align: center
 
+        .. seealso::
+           :func:`simba.data_processors.cuda.circular_statistics.sliding_bearing`
+
         :param np.ndarray x: An array of shape (n, 2) representing the time-series sequence of 2D points.
         :param float lag: The lag time (in seconds) used for calculating the sliding bearing. E.g., if 1, then bearing will be calculated using coordinates in the current frame vs the frame 1s previously.
         :param float fps: The sample rate (frames per second) of the sequence.
@@ -376,8 +383,8 @@ class CircularStatisticsMixin(object):
         for i in range(lag, x.shape[0]):
             x1, y1 = x[i - lag, 0], x[i - lag, 1]
             x2, y2 = x[i, 1], x[i, 1]
-            degree = 90 - np.degrees(np.arctan2(y1 - y2, x2 - x1))
-            results[i] = degree + 360 if degree < 0 else degree
+            bearing = np.degrees(np.arctan2(x2 - x1, y2 - y1))
+            results[i] = (bearing + 360) % 360
         return results
 
     @staticmethod

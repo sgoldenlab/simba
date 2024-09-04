@@ -17,7 +17,7 @@ try:
 except:
     import numpy as cp
 
-from simba.utils.checks import check_int, check_valid_array
+from simba.utils.checks import check_int, check_valid_array, check_float
 from simba.utils.enums import Formats
 
 THREADS_PER_BLOCK = 1024
@@ -487,4 +487,194 @@ def direction_from_three_bps(x: np.ndarray,
         results[l:r] = (cp.degrees(mean_angle_rad) + 360) % 360
 
     return results.get()
+
+
+@cuda.jit()
+def _instantaneous_angular_velocity(x, stride, results):
+    r = cuda.grid(1)
+    l = np.int32(r - (stride[0]))
+    if (r > results.shape[0]) or (l < 0):
+        results[r] = -1
+    else:
+        d = math.pi - (abs(math.pi - abs(x[l] - x[r])))
+        results[r] = d * (180 / math.pi)
+
+
+def instantaneous_angular_velocity(x: np.ndarray, stride: Optional[int] = 1) -> np.ndarray:
+    """
+    Calculate the instantaneous angular velocity between angles in a given array.
+
+    This function uses CUDA to perform parallel computations on the GPU.
+
+    The angular velocity is computed using the difference in angles between
+    the current and previous values (with a specified stride) in the array.
+    The result is returned in degrees per unit time.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/instantaneous_angular_velocity.csv
+       :widths: 10, 90
+       :align: center
+       :header-rows: 1
+
+    .. math::
+       \omega = \frac{{\Delta \theta}}{{\Delta t}} = \frac{{180}}{{\pi}} \times \left( \pi - \left| \pi - \left| \theta_r - \theta_l \right| \right| \right)
+
+    where:
+    - \( \theta_r \) is the current angle.
+    - \( \theta_l \) is the angle at the specified stride before the current angle.
+    - \( \Delta t \) is the time difference between the two angles.
+
+
+    .. seealso::
+       :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.instantaneous_angular_velocity`
+
+    :param np.ndarray x: Array of angles in degrees, for which the instantaneous angular velocity will be calculated.
+    :param Optional[int] stride: The stride or lag (in frames) to use when calculating the difference in angles. Defaults to 1.
+    :return: Array of instantaneous angular velocities corresponding to the input angles. Velocities are in degrees per unit time.
+    :rtype: np.ndarray
+    """
+
+    x = np.deg2rad(x).astype(np.int16)
+    stride = np.array([stride]).astype(np.int64)
+    bpg = (x.shape[0] + (THREADS_PER_BLOCK - 1)) // THREADS_PER_BLOCK
+    x_dev = cuda.to_device(x)
+    stride_dev = cuda.to_device(stride)
+    results = cuda.device_array(x.shape[0], dtype=np.float32)
+    _instantaneous_angular_velocity[bpg, THREADS_PER_BLOCK](x_dev, stride_dev, results)
+    return results.copy_to_host()
+
+
+@cuda.jit(device=True)
+def _rad2deg(x):
+    return x * (180/math.pi)
+
+
+@cuda.jit()
+def _sliding_bearing(x, stride, results):
+    r = cuda.grid(1)
+    l = np.int32(r - (stride[0]))
+    if (r > results.shape[0]-1) or (l < 0):
+        results[r] = -1
+    else:
+        x1, y1 = x[l, 0], x[l, 1]
+        x2, y2 = x[r, 0], x[r, 1]
+        bearing = _rad2deg(math.atan2(x2 - x1, y2 - y1))
+        results[r] = (bearing + 360) % 360
+
+
+def sliding_bearing(x: np.ndarray,
+                    stride: Optional[float] = 1,
+                    sample_rate: Optional[float] = 1) -> np.ndarray:
+    """
+    Compute the bearing between consecutive points in a 2D coordinate array using a sliding window approach using GPU acceleration.
+
+    This function calculates the angle (bearing) in degrees between each point and a point a certain number of
+    steps ahead (defined by `stride`) in the 2D coordinate array `x`. The bearing is calculated using the
+    arctangent of the difference in coordinates, converted from radians to degrees.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_bearing.csv
+       :widths: 10, 90
+       :align: center
+       :header-rows: 1
+
+    .. seealso::
+       :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_bearing`
+
+    :param np.ndarray x: A 2D array of shape `(n, 2)` where each row represents a point with `x` and `y` coordinates. The array must be numeric.
+    :param Optional[float] stride: The time (multiplied by `sample_rate`) to look ahead when computing the bearing in seconds. Defaults to 1.
+    :param Optional[float] sample_rate: A multiplier applied to the `stride` value to determine the actual step size for calculating the bearing. E.g., frames per second. Defaults to 1. If the resulting stride is less than 1, it is automatically set to 1.
+    :return:A 1D array of shape `(n,)` containing the calculated bearings in degrees. Values outside the valid range (i.e., where the stride exceeds array bounds) are set to -1.
+    :rtype: np.ndarray
+    """
+
+    check_valid_array(data=x, source=f'{sliding_bearing.__name__} x', accepted_ndims=(2,), accepted_axis_1_shape=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{sliding_bearing.__name__} stride', value=stride, min_value=10e-6, max_value=x.shape[0]-1)
+    check_float(name=f'{sliding_bearing.__name__} sample_rate', value=sample_rate, min_value=10e-6, max_value=x.shape[0]-1)
+    stride = int(stride * sample_rate)
+    if stride < 1:
+        stride = 1
+    stride = np.array([stride]).astype(np.int64)
+    bpg = (x.shape[0] + (THREADS_PER_BLOCK - 1)) // THREADS_PER_BLOCK
+    x_dev = cuda.to_device(x)
+    stride_dev = cuda.to_device(stride)
+    results = cuda.device_array(x.shape[0], dtype=np.float32)
+    _sliding_bearing[bpg, THREADS_PER_BLOCK](x_dev, stride_dev, results)
+    return results.copy_to_host()
+
+
+@cuda.jit(device=True)
+def _rad2deg(x):
+    return x * (180 / math.pi)
+
+
+@cuda.jit()
+def _sliding_angular_diff(data, strides, results):
+    x, y = cuda.grid(2)
+    if (x > data.shape[0] - 1) or (y > strides.shape[0] - 1):
+        return
+    else:
+        stride = int(strides[y])
+        if x - stride < 0:
+            return
+        a_2 = data[x]
+        a_1 = data[x - stride]
+        distance = math.pi - abs(math.pi - abs(a_1 - a_2))
+        distance = abs(int(_rad2deg(distance)) + 1)
+        results[x][y] = distance
+
+
+def sliding_angular_diff(x: np.ndarray,
+                         time_windows: np.ndarray,
+                         fps: float) -> np.ndarray:
+    """
+    Calculate the sliding angular differences for a given time window using GPU acceleration.
+
+
+    This function computes the angular differences between each angle in `x`
+    and the corresponding angle located at a distance determined by the time window
+    and frame rate (fps). The results are returned as a 2D array where each row corresponds
+    to a position in `x`, and each column corresponds to a different time window.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_angular_diff.csv
+       :widths: 10, 90
+       :align: center
+       :header-rows: 1
+
+
+    .. seealso::
+       :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_angular_diff`
+
+    .. math::
+       \text{difference} = \pi - |\pi - |a_1 - a_2||
+
+    Where:
+    - \( a_1 \) is the angle at position `x`.
+    - \( a_2 \) is the angle at position `x - \text{stride}`.
+
+    :param np.ndarray x: 1D array of angles in degrees.
+    :param np.ndarray time_windows: 1D array of time windows in seconds to determine the stride (distance in frames) between angles.
+    :param float fps: Frame rate (frames per second) used to convert time windows to strides.
+    :return: 2D array of angular differences. Each row corresponds to an angle in `x`, and each column corresponds to a time window.
+    :rtype: np.ndarray
+    """
+
+    x = np.deg2rad(x)
+    strides = np.zeros(time_windows.shape[0])
+    for i in range(time_windows.shape[0]):
+        strides[i] = np.ceil(time_windows[i] * fps).astype(np.int32)
+    x_dev = cuda.to_device(x)
+    stride_dev = cuda.to_device(strides)
+    results = cuda.device_array((x.shape[0], time_windows.shape[0]))
+    grid_x = (x.shape[0] + THREADS_PER_BLOCK - 1) // THREADS_PER_BLOCK
+    grid_y = (strides.shape[0] + THREADS_PER_BLOCK - 1)
+    blocks_per_grid = (grid_x, grid_y)
+    _sliding_angular_diff[blocks_per_grid, THREADS_PER_BLOCK](x_dev, stride_dev, results)
+    results = results.copy_to_host().astype(np.int32)
+    return results
+
 

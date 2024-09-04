@@ -651,6 +651,7 @@ class ImageMixin(object):
 
         .. seealso::
            :func:`simba.mixins.image_mixin.ImageMixin.segment_img_horizontal`
+           :func:`simba.data_processors.cuda.image.segment_img_stack_horizontal`
 
         :example:
         >>> imgs = ImageMixin.read_img_batch_from_video(video_path='/Users/simon/Downloads/3A_Mouse_5-choice_MouseTouchBasic_a1.mp4', start_frm=0, end_frm=400)
@@ -690,6 +691,10 @@ class ImageMixin(object):
         .. image:: _static/img/segment_img_vertical.png
            :width: 800
            :align: center
+
+        .. seealso::
+           :func:`simba.data_processors.cuda.image.segment_img_stack_vertical`
+           :func:`simba.data_processors.cuda.image.segment_img_stack_horizontal`
 
         :param np.ndarray img: Input image as a NumPy array.
         :param int pct: Percentage of the image to be segmented. If `lower` is True, it represents the lower part; if False, it represents the upper part.
