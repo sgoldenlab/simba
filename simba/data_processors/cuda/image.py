@@ -20,16 +20,16 @@ import cv2
 import numpy as np
 from numba import cuda
 
-from simba.utils.checks import (check_file_exist_and_readable,
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_if_valid_img, check_instance, check_int,
                                 check_nvidea_gpu_available,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_array, check_valid_boolean, check_float)
+                                check_valid_array, check_valid_boolean)
 from simba.utils.data import find_frame_numbers_from_time_stamp
-from simba.utils.errors import FFMPEGCodecGPUError, InvalidInputError
 from simba.utils.enums import Formats
+from simba.utils.errors import FFMPEGCodecGPUError, InvalidInputError
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
