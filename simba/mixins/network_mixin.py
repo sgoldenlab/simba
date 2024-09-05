@@ -335,10 +335,15 @@ class NetworkMixin(object):
         Visualizes a network graph using the vis.js library and saves the result as an HTML file.
 
         .. raw:: html
-           :file: ../docs/_static/img/network_ex.html
+           :file: ../../docs/_static/img/network_ex.html
+
 
         .. raw:: html
-	        :file: _static/img/network_ex.html
+
+           <iframe src="../../docs/_static/img/network_ex.html" width="100%" height="600px" frameborder="0"></iframe>
+
+
+
 
         .. note::
            Multi-networks created by ``simba.mixins.network_mixin.create_multigraph`` can be a little messy to look at. Instead,
