@@ -39,7 +39,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_instance, check_int,
                                 check_nvidea_gpu_available, check_str,
-                                check_valid_dataframe, check_valid_lst)
+                                check_valid_dataframe, check_valid_lst,
+                                check_valid_array, check_valid_boolean)
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
 from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 FFMPEGCodecGPUError, FileExistError,
@@ -2336,3 +2337,69 @@ def read_boris_file(file_path: Union[str, os.PathLike],
         return results
     else:
         write_pickle(data=results, save_path=save_path)
+
+
+def img_stack_to_video(x: np.ndarray,
+                       save_path: Union[str, os.PathLike],
+                       fps: float,
+                       gpu: Optional[bool] = False,
+                       bitrate: Optional[int] = 5000) -> None:
+
+    """
+    Converts a NumPy image stack to a video file, with optional GPU acceleration and configurable bitrate.
+
+    :param np.ndarray x: A NumPy array representing the image stack. The array should have shape (N, H, W) for greyscale or (N, H, W, 3) for RGB images, where N is the number of frames, H is the height, and W is the width.
+    :param Union[str, os.PathLike] save_path: Path to the output video file where the video will be saved.
+    :param float fps: Frames per second for the output video. Should be a positive floating-point number.
+    :param Optional[bool] gpu: Whether to use GPU acceleration for encoding. If True, the video encoding will use NVIDIA's NVENC encoder. Defaults to False.
+    :param Optional[int] bitrate: Bitrate for the video encoding in kilobits per second (kbps). Should be an integer between 1000 and 35000. Defaults to 5000.
+    :return: None
+    """
+
+    check_if_dir_exists(in_dir=os.path.dirname(save_path), source=img_stack_to_video.__name__)
+    check_valid_array(data=x, source=img_stack_to_video.__name__, accepted_ndims=(3, 4))
+    check_float(name=f'{img_stack_to_video.__name__} fps', value=fps, min_value=10e-6)
+    check_valid_boolean(value=gpu, source=img_stack_to_video.__name__)
+    check_int(name=f'{img_stack_to_video.__name__} bitrate', value=bitrate, min_value=1000, max_value=35000)
+    if gpu and not check_nvidea_gpu_available():
+        raise FFMPEGCodecGPUError('No GPU found but GPU flag is True')
+    is_color = (x.ndim == 4 and x.shape[3] == 3)
+    N, H, W = x.shape[:3]
+    pix_fmt = 'gray' if not is_color else 'rgb24'
+    timer = SimbaTimer(start=True)
+    vcodec = 'mpeg4'
+    if gpu:
+        vcodec = 'h264_nvenc'
+
+    cmd = [
+        'ffmpeg',
+        '-loglevel', 'error',
+        '-stats',
+        '-hide_banner',
+        '-y',
+        '-f', 'rawvideo',
+        '-vcodec', 'rawvideo',
+        '-s', f'{W}x{H}',
+        '-pix_fmt', pix_fmt,
+        '-r', str(fps),
+        '-i', '-',
+        '-an',
+        '-vcodec', f'{vcodec}',
+        '-b:v', f'{bitrate}k',
+        save_path
+    ]
+
+    process = subprocess.Popen(cmd, stdin=subprocess.PIPE)
+    for frame in x:
+        if frame.dtype != np.uint8:
+            frame = (255 * np.clip(frame, 0, 1)).astype(np.uint8)
+        process.stdin.write(frame.tobytes())
+
+    process.stdin.close()
+    process.wait()
+    timer.stop_timer()
+    stdout_success(msg=f'Video complete. Saved at {save_path}', elapsed_time=timer.elapsed_time_str)
+
+
+
+

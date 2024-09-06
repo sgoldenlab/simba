@@ -1,7 +1,6 @@
 import itertools
 import os
 import re
-import threading
 from copy import deepcopy
 
 import cv2
@@ -14,6 +13,7 @@ from simba.utils.data import add_missing_ROI_cols
 from simba.utils.enums import ConfigKey, Keys, Paths
 from simba.utils.errors import InvalidInputError
 from simba.utils.read_write import get_fn_ext, read_config_file
+from simba.mixins.plotting_mixin import PlottingMixin
 
 
 class ROI_image_class:
@@ -601,78 +601,20 @@ class ROI_image_class:
             if show_size_info is True:
                 area_cm = self.rectangle_size_dict["Rectangles"][e["Name"]]["area_cm"]
                 width_cm = self.rectangle_size_dict["Rectangles"][e["Name"]]["width_cm"]
-                height_cm = self.rectangle_size_dict["Rectangles"][e["Name"]][
-                    "height_cm"
-                ]
-                cv2.putText(
-                    self.working_frame,
-                    str(height_cm),
-                    (
-                        int(e["Tags"]["Left tag"][0] + e["Thickness"]),
-                        e["Tags"]["Left tag"][1],
-                    ),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    self.text_size / 10,
-                    self.colors[e["Color name"]],
-                    self.text_thickness,
-                    lineType=self.line_type,
-                )
-                cv2.putText(
-                    self.working_frame,
-                    str(width_cm),
-                    (
-                        e["Tags"]["Bottom tag"][0],
-                        int(e["Tags"]["Bottom tag"][1] - e["Thickness"]),
-                    ),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    self.text_size / 10,
-                    self.colors[e["Color name"]],
-                    self.text_thickness,
-                    lineType=self.line_type,
-                )
-                cv2.putText(
-                    self.working_frame,
-                    str(area_cm),
-                    (e["Tags"]["Center tag"][0], e["Tags"]["Center tag"][1]),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    self.text_size / 10,
-                    self.colors[e["Color name"]],
-                    self.text_thickness,
-                    lineType=self.line_type,
-                )
+                height_cm = self.rectangle_size_dict["Rectangles"][e["Name"]]["height_cm"]
+                self.working_frame = PlottingMixin().put_text(img=self.working_frame, text=f'AREA: {str(area_cm)}, HEIGHT: {str(height_cm)}, WIDTH: {str(width_cm)}', pos=(int(e["Tags"]["Left tag"][0] + e["Thickness"]), e["Tags"]["Left tag"][1]), font_size=self.text_size, font_thickness=self.text_thickness, font=cv2.FONT_HERSHEY_SIMPLEX, text_color=self.colors[e["Color name"]])
+                print(f'{e["Name"]} area: {area_cm}')
 
         for c in self.out_circles:
             self.no_shapes += 1
-            cv2.circle(
-                self.working_frame,
-                (c["centerX"], c["centerY"]),
-                c["radius"],
-                c["Color BGR"],
-                int(c["Thickness"]),
-                lineType=self.line_type,
-            )
+            cv2.circle( self.working_frame, (c["centerX"], c["centerY"]), c["radius"], c["Color BGR"], int(c["Thickness"]), lineType=self.line_type)
             if ROI_ear_tags is True:
                 for t in c["Tags"]:
-                    cv2.circle(
-                        self.working_frame,
-                        c["Tags"][t],
-                        c["Ear_tag_size"],
-                        self.colors[c["Color name"]],
-                        -1,
-                    )
+                    cv2.circle( self.working_frame, c["Tags"][t], c["Ear_tag_size"], self.colors[c["Color name"]], -1)
             if show_size_info is True:
                 area_cm = self.circle_size_dict["Circles"][c["Name"]]["area_cm"]
-                cv2.putText(
-                    self.working_frame,
-                    str(area_cm),
-                    (c["Tags"]["Center tag"][0], c["Tags"]["Center tag"][1]),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    self.text_size / 10,
-                    self.colors[c["Color name"]],
-                    self.text_thickness,
-                    lineType=self.line_type,
-                )
-
+                self.working_frame = PlottingMixin().put_text(img=self.working_frame, text=f'AREA: {str(area_cm)}', pos=(c["Tags"]["Center tag"][0], c["Tags"]["Center tag"][1]), font_size=self.text_size, font_thickness=self.text_thickness, font=cv2.FONT_HERSHEY_SIMPLEX, text_color=self.colors[c["Color name"]])
+                print(f'{c["Name"]} area: {area_cm}')
         for pg in self.out_polygon:
             self.no_shapes += 1
             pts = np.array(pg["vertices"]).reshape((-1, 1, 2))
@@ -715,17 +657,8 @@ class ROI_image_class:
                         )
             if show_size_info is True:
                 area_cm = self.polygon_size_dict["Polygons"][pg["Name"]]["area_cm"]
-                cv2.putText(
-                    self.working_frame,
-                    str(area_cm),
-                    (pg["Center_X"], pg["Center_Y"]),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    self.text_size / 10,
-                    self.colors[pg["Color name"]],
-                    self.text_thickness,
-                    lineType=self.line_type,
-                )
-
+                self.working_frame = PlottingMixin().put_text(img=self.working_frame, text=f'AREA: {str(area_cm)}', pos=(pg["Center_X"], pg["Center_Y"]), font_size=self.text_size, font_thickness=self.text_thickness, font=cv2.FONT_HERSHEY_SIMPLEX, text_color=self.colors[pg["Color name"]])
+                print(f'{pg["Name"]} area: {area_cm}')
         cv2.namedWindow("Define shape", cv2.WINDOW_NORMAL)
         cv2.imshow("Define shape", self.working_frame)
         cv2.waitKey(100)

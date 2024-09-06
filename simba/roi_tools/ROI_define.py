@@ -11,9 +11,8 @@ from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.ROI_image import ROI_image_class
 from simba.roi_tools.ROI_move_shape import move_edge, update_all_tags
 from simba.roi_tools.ROI_multiply import create_emty_df
-from simba.roi_tools.ROI_size_calculations import (circle_size_calc,
-                                                   polygon_size_calc,
-                                                   rectangle_size_calc)
+from simba.roi_tools.ROI_size_calculations import (circle_size_calc, polygon_size_calc, rectangle_size_calc)
+from simba.mixins.plotting_mixin import PlottingMixin
 from simba.ui.tkinter_functions import SimbaButton, hxtScrollbar
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.enums import Formats, TagNames
@@ -83,8 +82,8 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         self.img_no = 1
         self.duplicate_jump_size = 20
         self.click_sens = 10
-        self.text_size = 5
-        self.text_thickness = 3
+        self.text_size, _, _ = PlottingMixin().get_optimal_font_scales(text='TEN DIGITS', accepted_px_width=int(self.video_info['Resolution_width']/10), accepted_px_height=int(self.video_info['Resolution_height']/10), text_thickness=2, font=cv2.FONT_HERSHEY_SIMPLEX)
+        self.text_thickness = 2
         self.line_type = -1
         self.named_shape_colors = get_color_dict()
         self.window_menus()
@@ -318,7 +317,7 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         self.zoom_pct.insert(0, 10)
 
         self.pan = Button(self.interact_frame, text="Pan", fg=self.non_select_color, state=DISABLED, command=lambda: self.set_interact_state("pan"))
-        self.shape_info_btn = SimbaButton(parent=self.interact_frame, txt="SHOW SHAPE INFO", img='info', txt_clr=self.non_select_color, enabled=False, cmd=self.show_shape_information)
+        self.shape_info_btn = SimbaButton(parent=self.interact_frame, txt="SHOW SHAPE INFO", img='info', txt_clr=self.non_select_color, enabled=True, cmd=self.show_shape_information)
 
 
         self.interact_frame.grid(row=6, sticky=W)
@@ -377,27 +376,21 @@ class ROI_definitions(ConfigReader, PopUpMixin):
                 self.rectangle_size_dict = {}
                 self.rectangle_size_dict["Rectangles"] = {}
                 for rectangle in self.image_data.out_rectangles:
-                    self.rectangle_size_dict["Rectangles"][rectangle["Name"]] = (
-                        rectangle_size_calc(rectangle, self.curr_px_mm)
-                    )
+                    self.rectangle_size_dict["Rectangles"][rectangle["Name"]] = (rectangle_size_calc(rectangle, self.curr_px_mm))
                 self.image_data.rectangle_size_dict = self.rectangle_size_dict
 
             if len(self.image_data.out_circles) > 0:
                 self.circle_size_dict = {}
                 self.circle_size_dict["Circles"] = {}
                 for circle in self.image_data.out_circles:
-                    self.circle_size_dict["Circles"][circle["Name"]] = circle_size_calc(
-                        circle, self.curr_px_mm
-                    )
+                    self.circle_size_dict["Circles"][circle["Name"]] = circle_size_calc(circle, self.curr_px_mm)
                 self.image_data.circle_size_dict = self.circle_size_dict
 
             if len(self.image_data.out_polygon) > 0:
                 self.polygon_size_dict = {}
                 self.polygon_size_dict["Polygons"] = {}
                 for polygon in self.image_data.out_polygon:
-                    self.polygon_size_dict["Polygons"][polygon["Name"]] = (
-                        polygon_size_calc(polygon, self.curr_px_mm)
-                    )
+                    self.polygon_size_dict["Polygons"][polygon["Name"]] = (polygon_size_calc(polygon, self.curr_px_mm))
                 self.image_data.polygon_size_dict = self.polygon_size_dict
 
             self.image_data.insert_all_ROIs_into_image(show_size_info=True)

@@ -3548,12 +3548,34 @@ class GeometryMixin(object):
                     results[i][j] = new_val
         return results
 
+    @staticmethod
+    def get_shape_lengths_widths(shapes: Union[List[Polygon], Polygon]) -> Dict[str, Any]:
+        """
+        Calculate the lengths and widths of the minimum bounding rectangles of polygons.
 
-
-
-
-
-
+        :param Union[List[Polygon], Polygon] shapes: A single Polygon or a list of Polygons for which the MBR dimensions are calculated. Each polygon is assumed to be a valid shapely Polygon object. If a single Polygon is provided, it is internally converted to a list
+        :return: A dictionary containing:
+                 - 'lengths': A list of the lengths of the MBR for each polygon.
+                 - 'widths': A list of the widths of the MBR for each polygon.
+                 - 'max_length': The maximum length found among all polygons.
+                 - 'min_length': The minimum length found among all polygons.
+                 - 'max_width': The maximum width found among all polygons.
+                 - 'min_width': The minimum width found among all polygons.
+        :rtype: Dict[str, Any]
+        """
+        widths, lengths, max_length, max_width, min_length, min_width = [], [], -np.inf, -np.inf, np.inf, np.inf
+        if isinstance(shapes, Polygon):
+            shapes = [shapes]
+        for shape in shapes:
+            shape_cords = list(zip(*shape.exterior.coords.xy))
+            mbr_lengths = [LineString((shape_cords[i], shape_cords[i + 1])).length for i in range(len(shape_cords) - 1)]
+            width, length = min(mbr_lengths), max(mbr_lengths)
+            min_length, max_length = min(min_length, length), max(max_length, length)
+            min_width, max_width = min(min_width, width), max(max_width, width)
+            lengths.append(length);
+            widths.append(width)
+        return {'lengths': lengths, 'widths': widths, 'max_length': max_length, 'min_length': min_length,
+                'min_width': min_width, 'max_width': max_width}
 
 # data = np.array([[[364, 308], [383, 323], [403, 335], [423, 351]],
 #                  [[356, 307], [376, 319], [396, 331], [419, 347]],

@@ -4,7 +4,7 @@ __email__ = "sronilsson@gmail.com"
 
 import os
 from typing import Optional, Union
-
+import math
 try:
     from typing import Literal
 except:
@@ -30,10 +30,9 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.data import find_frame_numbers_from_time_stamp
 from simba.utils.enums import Formats
 from simba.utils.errors import FFMPEGCodecGPUError, InvalidInputError
-from simba.utils.printing import stdout_success
-from simba.utils.read_write import (
-    check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
-    get_video_meta_data, read_img_batch_from_video_gpu)
+from simba.utils.printing import stdout_success, SimbaTimer
+from simba.utils.read_write import (check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext, get_video_meta_data, read_img_batch_from_video_gpu)
+from simba.mixins.image_mixin import ImageMixin
 
 PHOTOMETRIC = 'photometric'
 DIGITAL = 'digital'
@@ -671,3 +670,169 @@ def segment_img_stack_horizontal(imgs: np.ndarray,
         imgs = imgs[:, int(px_crop/2):int((imgs.shape[0] - px_crop) / 2), :]
 
     return imgs.get()
+
+
+
+@cuda.jit(device=True)
+def _cuda_is_inside_polygon(x, y, polygon_vertices):
+    """
+    Checks if the pixel location is inside the polygon.
+
+    :param int x: Pixel x location.
+    :param int y: Pixel y location.
+    :param np.ndarray polygon_vertices: 2-dimentional array representing the x and y coordinates of the polygon vertices.
+    :return: Boolean representing if the x and y are located in the polygon.
+    """
+
+    n = len(polygon_vertices)
+    p2x, p2y, xints, inside = 0.0, 0.0, 0.0, False
+    p1x, p1y = polygon_vertices[0]
+    for j in range(n + 1):
+        p2x, p2y = polygon_vertices[j % n]
+        if (
+                (y > min(p1y, p2y))
+                and (y <= max(p1y, p2y))
+                and (x <= max(p1x, p2x))
+        ):
+            if p1y != p2y:
+                xints = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
+            if p1x == p2x or x <= xints:
+                inside = not inside
+        p1x, p1y = p2x, p2y
+    return inside
+
+
+
+@cuda.jit(device=True)
+def _cuda_is_inside_circle(x, y, circle_x, circle_y, circle_r):
+    """
+    Device func to check if the pixel location is inside a circle.
+
+    :param int x: Pixel x location.
+    :param int y: Pixel y location.
+    :param int circle_x: Center of circle x coordinate.
+    :param int circle_y: Center of circle y coordinate.
+    :param int y: Circle radius.
+    :return: Boolean representing if the x and y are located in the circle.
+    """
+
+    p = (math.sqrt((x - circle_x) ** 2 + (y - circle_y) ** 2))
+    if p <= circle_r:
+        return True
+    else:
+        return False
+
+@cuda.jit()
+def _cuda_create_rectangle_masks(shapes, imgs):
+    x, y, n = cuda.grid(3)
+    if n < 0 or n > (imgs.shape[0] -1):
+        return
+    if y < 0 or y > (imgs.shape[1] -1):
+        return
+    if x < 0 or x > (imgs.shape[2] -1):
+        return
+    else:
+        polygon = shapes[n]
+        inside = _cuda_is_inside_polygon(x, y, polygon)
+        if not inside:
+            imgs[n, y, x] = 0
+
+@cuda.jit()
+def _cuda_create_circle_masks(shapes, imgs):
+    x, y, n = cuda.grid(3)
+    if n < 0 or n > (imgs.shape[0] -1):
+        return
+    if y < 0 or y > (imgs.shape[1] -1):
+        return
+    if x < 0 or x > (imgs.shape[2] -1):
+        return
+    else:
+        circle_x, circle_y, circle_r = shapes[n][0], shapes[n][1], shapes[n][2]
+        inside = _cuda_is_inside_circle(x, y, circle_x, circle_y, circle_r)
+        if not inside:
+            imgs[n, y, x] = 0
+
+def slice_imgs(video_path: Union[str, os.PathLike],
+               shapes: np.ndarray,
+               batch_size: Optional[int] = 1000,
+               verbose: Optional[bool] = True):
+
+    """
+    Slice frames from a video based on given shape coordinates (rectangles or circles) and return the cropped regions using GPU acceleration.
+
+
+    .. video:: _static/img/slice_imgs_gpu.webm
+       :width: 800
+       :autoplay:
+       :loop:
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/slice_imgs.csv
+       :widths: 10, 90
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    :param Union[str, os.PathLike] video_path: Path to the video file.
+    :param np.ndarray shapes: A NumPy array of shape `(n, m, 2)` where `n` is the number of frames. Each frame contains 4 (x, y) or one points representing the bounding shapes (e.g., rectangles edges) or centroid and radius (if circles) to slice from each frame.
+    :param Optional[int] batch_size: Optional; default is 500. The number of frames to process in each batch for memory efficiency. Larger batches are faster but use more memory.
+    :param Optional[bool] verbose: If True, prints progress during the slicing process.
+    :return: A NumPy array of sliced images with shape `(n, h, w, 3)` if the video is in color, or `(n, h, w)` if the video is grayscale.  Here, `n` is the number of frames, and `h`, `w` are the height and width of the frames, respectively.
+    :rtype: np.ndarray
+
+    :example I rectangles:
+    >>> data_path = r"/mnt/c/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/FRR_gq_Saline_0624.csv" # PATH TO A DATA FILE
+    >>> video_path = r'/mnt/c/troubleshooting/mitra/project_folder/videos/FRR_gq_Saline_0624.mp4' # PATH TO AN ASSOCIATED VIDEO FILE
+    >>> nose_arr = read_df(file_path=data_path, file_type='csv', usecols=['Nose_x', 'Nose_y', 'Tail_base_x', 'Tail_base_y', 'Left_side_x', 'Left_side_y', 'Right_side_x', 'Right_side_y']).values.reshape(-1, 4, 2)[0:1000] ## READ THE BODY-PART THAT DEFINES THE HULL AND CONVERT TO ARRAY
+    >>> polygons = GeometryMixin().multiframe_bodyparts_to_polygon(data=nose_arr, parallel_offset=60) ## CONVERT THE BODY-PART TO POLYGONS WITH A LITTLE BUFFER
+    >>> polygons = GeometryMixin().multiframe_minimum_rotated_rectangle(shapes=polygons) # CONVERT THE POLYGONS TO RECTANGLES (I.E., WITH 4 UNIQUE POINTS).
+    >>> polygon_lst = [] # GET THE POINTS OF THE RECTANGLES
+    >>> for i in polygons: polygon_lst.append(np.array(i.exterior.coords))
+    >>> polygons = np.stack(polygon_lst, axis=0)
+    >>> sliced_imgs = slice_imgs(video_path=video_path, shapes=polygons) #SLICE THE RECTANGLES IN THE VIDEO.
+
+
+    :example II circles:
+    >>> data_path = r"/mnt/c/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/FRR_gq_Saline_0624.csv" # PATH TO A DATA FILE
+    >>> video_path = r'/mnt/c/troubleshooting/mitra/project_folder/videos/FRR_gq_Saline_0624.mp4' # PATH TO AN ASSOCIATED VIDEO FILE
+    >>> nose_arr = read_df(file_path=data_path, file_type='csv', usecols=['Nose_x', 'Nose_y']).values[0:6000] ## READ THE BODY-PART THAT DEFINES THE CENTER OF CIRCLE
+    >>> nose_arr = np.hstack((nose_arr, np.full((nose_arr.shape[0], 1), fill_value=50))).astype(np.int32) ## APPEND THE RADIUS OF THE CIRCLE TO THE DATA
+    >>> sliced_imgs = slice_imgs(video_path=video_path, shapes=nose_arr) #SLICE THE CIRCLE IN THE VIDEO.
+    """
+    THREADS_PER_BLOCK = (32, 32, 1)
+
+    video_meta_data = get_video_meta_data(video_path=video_path)
+    video_meta_data['frame_count'] = shapes.shape[0]
+    n, w, h = video_meta_data['frame_count'], video_meta_data['width'], video_meta_data['height']
+    is_color = ImageMixin.is_video_color(video=video_path)
+    timer = SimbaTimer(start=True)
+    if is_color:
+        results = np.zeros((n, h, w, 3), dtype=np.uint8)
+    else:
+        results = np.zeros((n, h, w), dtype=np.uint8)
+    for start_img_idx in range(0, n, batch_size):
+        end_img_idx = start_img_idx + batch_size
+        if end_img_idx > video_meta_data['frame_count']:
+            end_img_idx = video_meta_data['frame_count']
+        if verbose:
+            print(f'Processing images {start_img_idx} to {end_img_idx} (of {n})...')
+        batch_n = end_img_idx - start_img_idx
+        batch_imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=start_img_idx, end_frm=end_img_idx)
+        batch_imgs = np.stack(list(batch_imgs.values()), axis=0)
+        batch_shapes = shapes[start_img_idx:end_img_idx].astype(np.int32)
+        x_dev = cuda.to_device(batch_shapes)
+        batch_img_dev = cuda.to_device(batch_imgs)
+        grid_x = math.ceil(w / THREADS_PER_BLOCK[0])
+        grid_y = math.ceil(h / THREADS_PER_BLOCK[1])
+        grid_z = math.ceil(batch_n / THREADS_PER_BLOCK[2])
+        bpg = (grid_x, grid_y, grid_z)
+        if batch_shapes.shape[1] == 3:
+            _cuda_create_circle_masks[bpg, THREADS_PER_BLOCK](x_dev, batch_img_dev)
+        else:
+            _cuda_create_rectangle_masks[bpg, THREADS_PER_BLOCK](x_dev, batch_img_dev)
+        results[start_img_idx: end_img_idx] = batch_img_dev.copy_to_host()
+    timer.stop_timer()
+    if verbose:
+        stdout_success(msg='Shapes sliced in video.', elapsed_time=timer.elapsed_time_str)
+    return results

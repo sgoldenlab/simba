@@ -1689,6 +1689,25 @@ class ImageMixin(object):
             stdout_success(f'Video {video_meta["video_name"]} blob detection complete', elapsed_time=timer.elapsed_time_str)
             return results.astype(np.int32)
 
+    @staticmethod
+    def is_video_color(video: Union[str, os.PathLike, cv2.VideoCapture]):
+        """
+        Determines whether a video is in color or greyscale.
+
+        :param Union[str, os.PathLike, cv2.VideoCapture] video: The video source, either a cv2.VideoCapture object or a path to a file on disk.
+        :return: Returns `True` if the video is in color (has more than one channel), and `False` if the video is greyscale (single channel).
+        :rtype: bool
+        """
+
+        frm = ImageMixin.find_first_non_uniform_clr_frm(video_path=video)
+        if frm.ndim > 2:
+            if frm.shape[2] != 1:
+                return True
+            else:
+                return False
+        else:
+            return False
+
 
 #x = ImageMixin.get_blob_locations(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled_bg_subtracted.mp4", gpu=True)
 # imgs = ImageMixin().read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples')

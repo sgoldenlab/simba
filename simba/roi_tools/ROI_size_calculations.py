@@ -1,6 +1,7 @@
 import math
-
 import numpy as np
+from shapely.geometry import Polygon
+from scipy.spatial import ConvexHull
 
 
 def rectangle_size_calc(rectangle_dict: dict, px_mm: float) -> dict:
@@ -18,9 +19,7 @@ def rectangle_size_calc(rectangle_dict: dict, px_mm: float) -> dict:
 
     rectangle_dict["height_cm"] = round((rectangle_dict["height"] / px_mm) / 10, 2)
     rectangle_dict["width_cm"] = round((rectangle_dict["width"] / px_mm) / 10, 2)
-    rectangle_dict["area_cm"] = round(
-        rectangle_dict["width_cm"] * rectangle_dict["height_cm"], 2
-    )
+    rectangle_dict["area_cm"] = round(rectangle_dict["width_cm"] * rectangle_dict["height_cm"], 2)
     return rectangle_dict
 
 
@@ -53,18 +52,14 @@ def polygon_size_calc(polygon_dict, px_mm) -> dict:
     >>> polygon_size_calc(polygon_dict={'vertices': np.array([[0, 2], [200, 98], [100, 876], [10, 702]])}, px_mm=5)
     >>> {'vertices': [[  0,   2], [200,  98], [100, 876], [ 10, 702]], 'area_cm': 45.29}
     """
-
-    y_vals = polygon_dict["vertices"][:, 0]
-    x_vals = polygon_dict["vertices"][:, 1]
-    poly_area_px = 0.5 * np.abs(
-        np.dot(x_vals, np.roll(y_vals, 1)) - np.dot(y_vals, np.roll(x_vals, 1))
-    )
-    polygon_dict["area_cm"] = round((poly_area_px / px_mm) / 500, 2)
+    polygon = polygon_dict["vertices"]
+    area = round((ConvexHull(polygon).area / px_mm) / 10, 2)
+    polygon_dict["area_cm"] = area
 
     return polygon_dict
 
 
-polygon_size_calc(
-    polygon_dict={"vertices": np.array([[0, 2], [200, 98], [100, 876], [10, 702]])},
-    px_mm=5,
-)
+# polygon_size_calc(
+#     polygon_dict={"vertices": np.array([[0, 2], [200, 98], [100, 876], [10, 702]])},
+#     px_mm=5,
+# )
