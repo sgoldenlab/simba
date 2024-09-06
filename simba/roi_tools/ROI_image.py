@@ -7,13 +7,13 @@ import cv2
 import numpy as np
 import pandas as pd
 
+from simba.mixins.plotting_mixin import PlottingMixin
 from simba.roi_tools.ROI_move_shape import move_edge, move_edge_align
 from simba.roi_tools.ROI_zoom import zoom_in
 from simba.utils.data import add_missing_ROI_cols
 from simba.utils.enums import ConfigKey, Keys, Paths
 from simba.utils.errors import InvalidInputError
 from simba.utils.read_write import get_fn_ext, read_config_file
-from simba.mixins.plotting_mixin import PlottingMixin
 
 
 class ROI_image_class:

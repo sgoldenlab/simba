@@ -2,9 +2,10 @@ __author__ = "Simon Nilsson"
 __email__ = "sronilsson@gmail.com"
 
 
+import math
 import os
 from typing import Optional, Union
-import math
+
 try:
     from typing import Literal
 except:
@@ -20,6 +21,7 @@ import cv2
 import numpy as np
 from numba import cuda
 
+from simba.mixins.image_mixin import ImageMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_string_value_is_valid_video_timestamp,
@@ -30,9 +32,10 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.data import find_frame_numbers_from_time_stamp
 from simba.utils.enums import Formats
 from simba.utils.errors import FFMPEGCodecGPUError, InvalidInputError
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.read_write import (check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext, get_video_meta_data, read_img_batch_from_video_gpu)
-from simba.mixins.image_mixin import ImageMixin
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (
+    check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
+    get_video_meta_data, read_img_batch_from_video_gpu)
 
 PHOTOMETRIC = 'photometric'
 DIGITAL = 'digital'

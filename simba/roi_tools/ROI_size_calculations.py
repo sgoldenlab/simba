@@ -1,7 +1,8 @@
 import math
+
 import numpy as np
-from shapely.geometry import Polygon
 from scipy.spatial import ConvexHull
+from shapely.geometry import Polygon
 
 
 def rectangle_size_calc(rectangle_dict: dict, px_mm: float) -> dict:
