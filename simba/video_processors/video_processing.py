@@ -34,7 +34,7 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_instance, check_int,
                                 check_nvidea_gpu_available, check_str,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_lst, check_valid_tuple)
+                                check_valid_lst, check_valid_tuple, check_valid_boolean)
 from simba.utils.data import find_frame_numbers_from_time_stamp
 from simba.utils.enums import OS, ConfigKey, Formats, Options, Paths
 from simba.utils.errors import (CountError, DirectoryExistError,
@@ -2801,17 +2801,23 @@ def mixed_mosaic_concatenator(
         )
 
 
-def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]], frm_ids: List[List[int]], save_dir: Optional[Union[str, os.PathLike]] = None):
+def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]],
+                             frm_ids: List[List[int]],
+                             save_dir: Optional[Union[str, os.PathLike]] = None,
+                             gpu: Optional[bool] = False):
+
     """
     Clip videos specified by frame IDs (numbers).
 
     :param List[Union[str, os.PathLike]] file_paths: List of paths to input video files.
     :param List[List[int]] frm_ids: List of lists containing start and end frame IDs for each video.
     :param Optional[Union[str, os.PathLike]] save_dir:  Directory to save the clipped videos. If None, videos will be saved in the same directory as the input videos with frame numbers as suffix.
+    :param Optional[bool] gpu: If True, uses FFMpeg GPU acceleration.
     :return: None.
 
     :example:
-    >>> file_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/path_plots/Trial    10.mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/path_plots/Trial    10_1.mp4']
+    >>> file_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/path_plots/Trial    10.mp4',
+    >>>               '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/path_plots/Trial    10_1.mp4']
     >>> frm_ids = [[0, 20], [20, 40]]
     >>> clip_videos_by_frame_ids(file_paths=file_paths, frm_ids=frm_ids, save_dir='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/path_plots/trial_cnt')
     """
@@ -2819,6 +2825,9 @@ def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]], frm_ids:
     timer = SimbaTimer(start=True)
     check_valid_lst(data=file_paths,source=clip_videos_by_frame_ids.__name__,valid_dtypes=(str,),min_len=1)
     check_valid_lst(data=frm_ids,source=clip_videos_by_frame_ids.__name__,valid_dtypes=(list,), exact_len=len(file_paths))
+    check_valid_boolean(value=gpu, source=f'{clip_videos_by_frame_ids} gpu')
+    if gpu and not check_nvidea_gpu_available():
+        raise FFMPEGCodecGPUError('GPU is passed but no GPU was found on the machine.', source=clip_videos_by_frame_ids.__name__)
     for cnt, i in enumerate(frm_ids):
         check_valid_lst(data=i, source=f"clip_videos_by_frame_count.__name_ frm_ids {cnt}", valid_dtypes=(int,), exact_len=2)
         if i[0] >= i[1]:
@@ -2840,7 +2849,10 @@ def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]], frm_ids:
             out_path = os.path.join(save_dir, os.path.basename(file_path))
         else:
             out_path = os.path.join(dir, f"{video_name}_{s_f}_{e_f}{ext}")
-        cmd = f'ffmpeg -i "{file_path}" -vf trim=start_frame={s_f}:end_frame={e_f} -an "{out_path}" -loglevel error -stats -y'
+        if not gpu:
+            cmd = f'ffmpeg -i "{file_path}" -vf trim=start_frame={s_f}:end_frame={e_f} -an "{out_path}" -loglevel error -stats -y'
+        else:
+            cmd = f'ffmpeg -hwaccel auto -i "{file_path}" -vf trim=start_frame={s_f}:end_frame={e_f} -c:v h264_nvenc -an "{out_path}" -loglevel error -stats -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         video_timer.stop_timer()
         print(f"Video {video_name} complete (elapsed time {video_timer.elapsed_time_str}s)")
@@ -2849,7 +2861,6 @@ def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]], frm_ids:
         stdout_success(msg=f"{len(file_paths)} video(s) clipped by frame", elapsed_time=timer.elapsed_time_str)
     else:
         stdout_success(msg=f"{len(file_paths)} video(s) clipped by frame and saved in {save_dir}", elapsed_time=timer.elapsed_time_str)
-
 
 def convert_to_mp4(path: Union[str, os.PathLike],
                    codec: Literal['libx265', 'libx264', 'vp9', 'h264_cuvid', 'powerpoint'] = 'libx265',

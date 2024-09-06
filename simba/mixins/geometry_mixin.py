@@ -5,7 +5,7 @@ import multiprocessing
 import os
 import platform
 from copy import deepcopy
-from typing import Dict, Iterable, List, Optional, Tuple, Union
+from typing import Dict, Iterable, List, Optional, Tuple, Union, Any
 
 import cv2
 import imutils

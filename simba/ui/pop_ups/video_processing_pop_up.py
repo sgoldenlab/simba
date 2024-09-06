@@ -35,7 +35,8 @@ from simba.utils.enums import Dtypes, Formats, Keys, Links, Options, Paths
 from simba.utils.errors import (CountError, DuplicationError, FrameRangeError,
                                 InvalidInputError, MixedMosaicError,
                                 NoChoosenClassifierError, NoFilesFoundError,
-                                NotDirectoryError, ResolutionError)
+                                NotDirectoryError, ResolutionError,
+                                FFMPEGCodecGPUError)
 from simba.utils.lookups import (get_color_dict, get_ffmpeg_crossfade_methods,
                                  get_fonts)
 from simba.utils.printing import SimbaTimer, stdout_success
@@ -1380,11 +1381,12 @@ class ClipSingleVideoByFrameNumbers(PopUpMixin):
         self.selected_video = FileSelect(settings_frm, "VIDEO PATH: ", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=15)
         self.start_frm_eb = Entry_Box(settings_frm, "START FRAME: ", "15", validation="numeric")
         self.end_frm_eb = Entry_Box(settings_frm, "END FRAME: ", "15", validation="numeric")
-
+        gpu_cb, self.gpu_var = SimbaCheckbox(parent=settings_frm, txt='USE GPU', txt_img='gpu_2')
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.selected_video.grid(row=0, column=0, sticky=NW)
         self.start_frm_eb.grid(row=1, column=0, sticky=NW)
         self.end_frm_eb.grid(row=2, column=0, sticky=NW)
+        gpu_cb.grid(row=3, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
 
     def run(self):
@@ -1414,10 +1416,11 @@ class ClipSingleVideoByFrameNumbers(PopUpMixin):
                 msg=f'The video  has {video_meta_data["frame_count"]} frames, which is less than the end frame: {end_frame}',
                 source=__class__.__name__,
             )
+        if self.gpu_var.get() and not check_nvidea_gpu_available():
+            raise FFMPEGCodecGPUError('No GPU found on machine. Try unchecking the GPU checkbox', source=self.__class__.__name__)
+
         frm_ids = [[start_frame, end_frame]]
-        _ = clip_videos_by_frame_ids(
-            file_paths=[self.selected_video.file_path], frm_ids=frm_ids, save_dir=None
-        )
+        _ = clip_videos_by_frame_ids(file_paths=[self.selected_video.file_path], frm_ids=frm_ids, save_dir=None, gpu=self.gpu_var.get())
 
 
 #ClipSingleVideoByFrameNumbers()
@@ -1451,20 +1454,17 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
         self.entry_boxes = {}
         for cnt, video_name in enumerate(self.video_paths.keys()):
             self.entry_boxes[video_name] = {}
-            Label(data_frm, text=video_name, width=max_video_name_len, font=Formats.FONT_REGULAR.value).grid(
-                row=cnt + 1, column=0, sticky=NW
-            )
-            Label(
-                data_frm, text=self.video_meta_data[cnt], width=max_video_name_len
-            ).grid(row=cnt + 1, column=1, sticky=NW)
-            self.entry_boxes[video_name]["start"] = Entry_Box(
-                data_frm, "", 5, validation="numeric"
-            )
-            self.entry_boxes[video_name]["end"] = Entry_Box(
-                data_frm, "", 5, validation="numeric"
-            )
+            Label(data_frm, text=video_name, width=max_video_name_len, font=Formats.FONT_REGULAR.value).grid(row=cnt + 1, column=0, sticky=NW)
+            Label(data_frm, text=self.video_meta_data[cnt], width=max_video_name_len).grid(row=cnt + 1, column=1, sticky=NW)
+            self.entry_boxes[video_name]["start"] = Entry_Box(data_frm, "", 5, validation="numeric")
+            self.entry_boxes[video_name]["end"] = Entry_Box(data_frm, "", 5, validation="numeric")
             self.entry_boxes[video_name]["start"].grid(row=cnt + 1, column=2, sticky=NW)
             self.entry_boxes[video_name]["end"].grid(row=cnt + 1, column=3, sticky=NW)
+
+        settings_frm = LabelFrame(self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value, fg="black", padx=5, pady=5)
+        gpu_cb, self.gpu_var = SimbaCheckbox(parent=settings_frm, txt='USE GPU (REDUCED RUNTIME)', txt_img='gpu_2')
+        settings_frm.grid(row=1, column=0, sticky=NW)
+        gpu_cb.grid(row=0, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run, btn_txt_clr="blue")
 
     def run(self):
@@ -1499,9 +1499,9 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
                 )
             frame_ids.append([start, end])
 
-        _ = clip_videos_by_frame_ids(
-            file_paths=video_paths, frm_ids=frame_ids, save_dir=self.save_dir
-        )
+        if self.gpu_var.get() and not check_nvidea_gpu_available():
+            raise FFMPEGCodecGPUError('No GPU detected on machine. Try unchecking the GPU checkbox', source=self.__class__.__name__)
+        _ = clip_videos_by_frame_ids(file_paths=video_paths, frm_ids=frame_ids, save_dir=self.save_dir, gpu=self.gpu_var.get())
 
 
 class InitiateClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
