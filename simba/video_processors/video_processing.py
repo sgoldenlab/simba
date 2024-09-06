@@ -34,7 +34,8 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_instance, check_int,
                                 check_nvidea_gpu_available, check_str,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_lst, check_valid_tuple, check_valid_boolean)
+                                check_valid_boolean, check_valid_lst,
+                                check_valid_tuple)
 from simba.utils.data import find_frame_numbers_from_time_stamp
 from simba.utils.enums import OS, ConfigKey, Formats, Options, Paths
 from simba.utils.errors import (CountError, DirectoryExistError,

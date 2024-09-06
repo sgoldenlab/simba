@@ -32,11 +32,11 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_that_hhmmss_start_is_before_end)
 from simba.utils.data import convert_roi_definitions
 from simba.utils.enums import Dtypes, Formats, Keys, Links, Options, Paths
-from simba.utils.errors import (CountError, DuplicationError, FrameRangeError,
+from simba.utils.errors import (CountError, DuplicationError,
+                                FFMPEGCodecGPUError, FrameRangeError,
                                 InvalidInputError, MixedMosaicError,
                                 NoChoosenClassifierError, NoFilesFoundError,
-                                NotDirectoryError, ResolutionError,
-                                FFMPEGCodecGPUError)
+                                NotDirectoryError, ResolutionError)
 from simba.utils.lookups import (get_color_dict, get_ffmpeg_crossfade_methods,
                                  get_fonts)
 from simba.utils.printing import SimbaTimer, stdout_success
