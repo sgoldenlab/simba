@@ -7,12 +7,14 @@ import cv2
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
+from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.ROI_image import ROI_image_class
 from simba.roi_tools.ROI_move_shape import move_edge, update_all_tags
 from simba.roi_tools.ROI_multiply import create_emty_df
-from simba.roi_tools.ROI_size_calculations import (circle_size_calc, polygon_size_calc, rectangle_size_calc)
-from simba.mixins.plotting_mixin import PlottingMixin
+from simba.roi_tools.ROI_size_calculations import (circle_size_calc,
+                                                   polygon_size_calc,
+                                                   rectangle_size_calc)
 from simba.ui.tkinter_functions import SimbaButton, hxtScrollbar
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.enums import Formats, TagNames
