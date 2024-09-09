@@ -1,11 +1,11 @@
 import copy
 import os
 from tkinter import *
-from PIL import ImageTk
-import PIL.Image
 
 import cv2
 import pandas as pd
+import PIL.Image
+from PIL import ImageTk
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
@@ -16,16 +16,15 @@ from simba.roi_tools.ROI_multiply import create_emty_df
 from simba.roi_tools.ROI_size_calculations import (circle_size_calc,
                                                    polygon_size_calc,
                                                    rectangle_size_calc)
+from simba.ui.pop_ups.roi_fixed_size_pop_up import DrawFixedROIPopUp
 from simba.ui.tkinter_functions import SimbaButton, hxtScrollbar
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.enums import Formats, TagNames
 from simba.utils.errors import NoROIDataError
-from simba.utils.lookups import get_color_dict
+from simba.utils.lookups import get_color_dict, get_icons_paths
 from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import find_all_videos_in_directory, get_fn_ext
 from simba.utils.warnings import NoDataFoundWarning
-from simba.utils.lookups import get_icons_paths
-from simba.ui.pop_ups.roi_fixed_size_pop_up import DrawFixedROIPopUp
 
 WINDOW_SIZE = (800, 750)
 

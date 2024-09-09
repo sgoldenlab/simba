@@ -1,14 +1,15 @@
-from typing import Tuple, Dict, Optional
+from tkinter import NW, Label, LabelFrame
+from typing import Dict, Optional, Tuple
+
 import numpy as np
 
 from simba.mixins.pop_up_mixin import PopUpMixin
-from tkinter import LabelFrame, NW, Label
-from simba.ui.tkinter_functions import Entry_Box, DropDownMenu, SimbaButton
-from simba.utils.enums import Formats
-from simba.utils.lookups import get_color_dict
-from simba.utils.checks import check_str, check_int, check_valid_tuple
 from simba.roi_tools.ROI_image import ROI_image_class
+from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, SimbaButton
+from simba.utils.checks import check_int, check_str, check_valid_tuple
+from simba.utils.enums import Formats
 from simba.utils.errors import InvalidInputError
+from simba.utils.lookups import get_color_dict
 from simba.utils.printing import stdout_success
 
 THICKNESS_OPTIONS = list(range(1, 26, 1))
