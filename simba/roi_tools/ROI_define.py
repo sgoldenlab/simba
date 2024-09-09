@@ -1,7 +1,8 @@
 import copy
-import glob
 import os
 from tkinter import *
+from PIL import ImageTk
+import PIL.Image
 
 import cv2
 import pandas as pd
@@ -23,9 +24,10 @@ from simba.utils.lookups import get_color_dict
 from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import find_all_videos_in_directory, get_fn_ext
 from simba.utils.warnings import NoDataFoundWarning
+from simba.utils.lookups import get_icons_paths
+from simba.ui.pop_ups.roi_fixed_size_pop_up import DrawFixedROIPopUp
 
 WINDOW_SIZE = (800, 750)
-
 
 class ROI_definitions(ConfigReader, PopUpMixin):
     """
@@ -63,6 +65,11 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         for video in self.other_video_paths:
             self.other_video_file_names.append(os.path.basename(video))
         self.video_info, self.curr_px_mm, self.curr_fps = self.read_video_info(video_name=self.file_name)
+
+        self.menu_icons = get_icons_paths()
+
+        for k in self.menu_icons.keys():
+            self.menu_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname(__file__), self.menu_icons[k]["icon_path"])))
 
         self.roi_root = Toplevel()
         self.roi_root.minsize(WINDOW_SIZE[0], WINDOW_SIZE[1])
@@ -224,9 +231,7 @@ class ROI_definitions(ConfigReader, PopUpMixin):
                 for shape_type in ["rectangles", "circleDf", "polygons"]:
                     c_df = pd.read_hdf(self.roi_coordinates_path, key=shape_type)
                     if len(c_df) > 0:
-                        c_df = c_df[c_df["Video"] == target_video].reset_index(
-                            drop=True
-                        )
+                        c_df = c_df[c_df["Video"] == target_video].reset_index(drop=True)
                         c_df["Video"] = self.file_name
                         c_df = c_df.to_dict("records")
                         if shape_type == "rectangles":
@@ -848,9 +853,9 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         menu = Menu(self.roi_root)
         file_menu = Menu(menu)
         menu.add_cascade(label="File (ROI)", menu=file_menu)
-        file_menu.add_command(
-            label="Preferences...", command=lambda: PreferenceMenu(self.image_data)
-        )
+
+        file_menu.add_command(label="Preferences...", compound="left", image=self.menu_icons["settings"]["img"], command=lambda: PreferenceMenu(self.image_data))
+        file_menu.add_command(label="Draw ROIs of pre-defined sizes...", compound="left", image=self.menu_icons["size_black"]["img"], command=lambda: DrawFixedROIPopUp(roi_image=self.image_data))
         file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self.Exit)
         self.roi_root.config(menu=menu)
@@ -893,9 +898,7 @@ class PreferenceMenu:
         line_type_dropdown = OptionMenu(pref_lbl_frame, self.line_type, *line_type_list)
         text_thickness_dropdown = OptionMenu(pref_lbl_frame, self.text_thickness, *text_thickness_list)
         text_size_dropdown = OptionMenu(pref_lbl_frame, self.text_size, *text_size_list)
-        click_sens_dropdown = OptionMenu(
-            pref_lbl_frame, self.click_sens, *click_sensitivity_list
-        )
+        click_sens_dropdown = OptionMenu(pref_lbl_frame, self.click_sens, *click_sensitivity_list)
         duplicate_jump_size_lbl = Label(pref_lbl_frame, text="DUPLICATE SHAPE JUMP: ", font=Formats.FONT_REGULAR.value)
         duplicate_jump_size_list = list(range(1, 100, 5))
         self.duplicate_jump_size = IntVar()

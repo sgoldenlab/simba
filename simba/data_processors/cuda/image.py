@@ -763,7 +763,6 @@ def slice_imgs(video_path: Union[str, os.PathLike],
     """
     Slice frames from a video based on given shape coordinates (rectangles or circles) and return the cropped regions using GPU acceleration.
 
-
     .. video:: _static/img/slice_imgs_gpu.webm
        :width: 800
        :autoplay:

@@ -25,9 +25,7 @@ class ROI_image_class:
 
         config = read_config_file(config_path=config_path)
         self.roi_define = ROI_define_instance
-        self.project_path = config.get(
-            ConfigKey.GENERAL_SETTINGS.value, ConfigKey.PROJECT_PATH.value
-        )
+        self.project_path = config.get(ConfigKey.GENERAL_SETTINGS.value, ConfigKey.PROJECT_PATH.value)
         _, self.curr_vid_name, ext = get_fn_ext(video_path)
         (
             self.duplicate_jump_size,
@@ -48,10 +46,7 @@ class ROI_image_class:
         self.colors = self.roi_define.named_shape_colors
         self.select_color = (128, 128, 128)
         _, self.orig_frame = self.cap.read()
-        self.frame_width, self.frame_height = (
-            self.orig_frame.shape[0],
-            self.orig_frame.shape[1],
-        )
+        self.frame_width, self.frame_height = (self.orig_frame.shape[0], self.orig_frame.shape[1])
         self.frame_default_loc = (
             int(self.roi_define.default_top_left_x - self.frame_width),
             0,
@@ -539,19 +534,13 @@ class ROI_image_class:
     def remove_ROI(self, roi_to_delete):
         if roi_to_delete.startswith("Rectangle"):
             rectangle_name = roi_to_delete.split("Rectangle: ")[1]
-            self.out_rectangles[:] = [
-                d for d in self.out_rectangles if d.get("Name") != rectangle_name
-            ]
+            self.out_rectangles[:] = [d for d in self.out_rectangles if d.get("Name") != rectangle_name]
         if roi_to_delete.startswith("Circle"):
             circle_name = roi_to_delete.split("Circle: ")[1]
-            self.out_circles[:] = [
-                d for d in self.out_circles if d.get("Name") != circle_name
-            ]
+            self.out_circles[:] = [d for d in self.out_circles if d.get("Name") != circle_name]
         if roi_to_delete.startswith("Polygon"):
             polygon_name = roi_to_delete.split("Polygon: ")[1]
-            self.out_polygon[:] = [
-                d for d in self.out_polygon if d.get("Name") != polygon_name
-            ]
+            self.out_polygon[:] = [d for d in self.out_polygon if d.get("Name") != polygon_name]
         self.insert_all_ROIs_into_image()
 
     def insert_all_ROIs_into_image(

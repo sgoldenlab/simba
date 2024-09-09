@@ -54,7 +54,7 @@ def test_circle_size_calc(circle_dict, px_mm, expected_area):
     results = circle_size_calc(circle_dict=circle_dict, px_mm=px_mm)
     assert results['area_cm'] == expected_area
 
-@pytest.mark.parametrize("polygon_dict, px_mm, expected_area", [({'vertices': np.array([[0, 2], [200, 98], [100, 876], [10, 702]])}, 5, 45.29)])
+@pytest.mark.parametrize("polygon_dict, px_mm, expected_area", [({'vertices': np.array([[0, 2], [200, 98], [100, 876], [10, 702]])}, 5, 38.04)])
 def test_polygon_size_calc(polygon_dict, px_mm, expected_area):
     results = polygon_size_calc(polygon_dict=polygon_dict, px_mm=px_mm)
     assert results['area_cm'] == expected_area

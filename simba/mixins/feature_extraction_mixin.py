@@ -82,7 +82,8 @@ class FeatureExtractionMixin(object):
 
         .. seealso::
            Use :meth:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance`
-           for imporved run-times.
+           for imporved run-times. Use :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cuda`
+           or :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cupy` for GPU acceleration.
 
         :param np.ndarray bp_1_x: 2D array of size len(frames) x 1 with bodypart 1 x-coordinates.
         :param np.ndarray bp_2_x: 2D array of size len(frames) x 1 with bodypart 2 x-coordinates.
@@ -111,6 +112,11 @@ class FeatureExtractionMixin(object):
         .. image:: _static/img/three_point_angle.png
            :width: 300
            :align: center
+
+        .. seealso::
+           :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt_serialized`,
+           :func:
+
 
         :example:
         >>> FeatureExtractionMixin.angle3pt(ax=122.0, ay=198.0, bx=237.0, by=138.0, cx=191.0, cy=109)
@@ -743,12 +749,10 @@ class FeatureExtractionMixin(object):
 
     @staticmethod
     @jit(nopython=True)
-    def framewise_euclidean_distance(
-        location_1: np.ndarray,
-        location_2: np.ndarray,
-        px_per_mm: float,
-        centimeter: bool = False,
-    ) -> np.ndarray:
+    def framewise_euclidean_distance(location_1: np.ndarray,
+                                     location_2: np.ndarray,
+                                     px_per_mm: float,
+                                     centimeter: bool = False) -> np.ndarray:
         """
         Jitted helper finding frame-wise distances between two moving locations in millimeter or centimeter.
 

@@ -46,7 +46,8 @@ def is_inside_rectangle(x: np.ndarray, y: np.ndarray) -> np.ndarray:
 
     :param np.ndarray x: 2d numeric np.ndarray size (N, 2).
     :param np.ndarray y: 2d numeric np.ndarray size (2, 2) (top left[x, y], bottom right[x, y])
-    :return np.ndarray: 2d numeric boolean (N, 1) with 1s representing the point being inside the rectangle and 0 if the point is outside the rectangle.
+    :return: 2d numeric boolean (N, 1) with 1s representing the point being inside the rectangle and 0 if the point is outside the rectangle.
+    :rtype: np.ndarray
     """
 
     x = np.ascontiguousarray(x).astype(np.int32)
@@ -298,6 +299,7 @@ def poly_area(data: np.ndarray,
     :param pixels_per_mm: Optional scaling factor to convert the area from pixels squared  to square millimeters. Default is 1.0.
     :param batch_size: Optional batch size for processing the data in chunks to fit in memory. Default is 0.5e+7.
     :return: A 1D numpy array of shape (N,) containing the computed area of each polygon in square millimeters.
+    :rtype: np.ndarray
     """
 
     check_valid_array(data=data, source=f'{poly_area} data', accepted_ndims=(3,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)

@@ -710,16 +710,13 @@ class ConfigReader(object):
                     source=self.__class__.__name__,
                 )
 
-    def read_video_info_csv(self, file_path: str) -> pd.DataFrame:
+    def read_video_info_csv(self, file_path: Union[str, os.PathLike]) -> pd.DataFrame:
         """
         Helper to read the project_folder/logs/video_info.csv of the SimBA project in as a pd.DataFrame
-        Parameters
-        ----------
-        file_path: str
 
-        Returns
-        -------
-        pd.DataFrame
+        :param Union[str, os.PathLike] file_path: Path to the project_folder/logs/video_info.csv file.
+        :return: Dataframe representation of the file.
+        :rtype: pd.DataFrame
         """
 
         if not os.path.isfile(file_path):
@@ -764,8 +761,7 @@ class ConfigReader(object):
         return info_df
 
     def read_video_info(
-        self, video_name: str, raise_error: Optional[bool] = True
-    ) -> (pd.DataFrame, float, float):
+        self, video_name: str, raise_error: Optional[bool] = True) -> Tuple[pd.DataFrame, float, float]:
         """
         Helper to read the meta-data (pixels per mm, resolution, fps) from the video_info.csv for a single input file.
 
@@ -773,7 +769,8 @@ class ConfigReader(object):
         :param Optional[bool] raise_error: If True, raise error if video info for the video name cannot be found. Default: True.
         :raise ParametersFileError: If ``raise_error`` and video metadata info is not found
         :raise DuplicationError: If file contains multiple entries for the same video.
-        :return (pd.DataFrame, float, float) representing all video info, pixels per mm, and fps
+        :returns: Tuple representing all video info, pixels per mm, and fps
+        :rtype: Tuple[pd.DataFrame, float, float]
         """
 
         video_settings = self.video_info_df.loc[

@@ -49,13 +49,14 @@ def get_3pt_angle(x: np.ndarray, y: np.ndarray, z: np.ndarray) -> np.ndarray:
        :header-rows: 1
 
     .. seealso::
-       For CPU function see :func:`~simba.mixins.FeatureExtractionMixin.angle3pt` and
-       For CPU function see :func:`~simba.mixins.FeatureExtractionMixin.angle3pt_serialized`.
+       For CPU function see :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt` and
+       For CPU function see :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt_serialized`.
 
     :param x:  A numpy array of shape (n, 2) representing the first point (e.g., nose) coordinates.
     :param y: A numpy array of shape (n, 2) representing the second point (e.g., center) coordinates, where the angle is computed.
     :param z: A numpy array of shape (n, 2) representing the second point (e.g., center) coordinates, where the angle is computed.
     :return: A numpy array of shape (n, 1) containing the calculated angles (in degrees) for each row.
+    :rtype: np.ndarray
 
     :example:
     >>> video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0514.mp4"
@@ -110,11 +111,12 @@ def count_values_in_ranges(x: np.ndarray, r: np.ndarray) -> np.ndarray:
        :header-rows: 1
 
     .. seealso::
-       For CPU function see :func:`~simba.mixins.FeatureExtractionMixin.count_values_in_range`.
+       For CPU function see :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.count_values_in_range`.
 
     :param np.ndarray x: 2d array with feature values.
     :param np.ndarray r: 2d array with lower and upper boundaries.
-    :return np.ndarray: 2d array of size len(x) x len(r) with the counts of values in each feature range (inclusive).
+    :return: 2d array of size len(x) x len(r) with the counts of values in each feature range (inclusive).
+    :rtype: np.ndarray
 
     :example:
     >>> x = np.random.randint(1, 11, (10, 10)).astype(np.int8)
@@ -153,7 +155,7 @@ def get_euclidean_distance_cuda(x: np.ndarray, y: np.ndarray) -> np.ndarray:
        :header-rows: 1
 
     .. seealso::
-       For CPU function see :func:`~simba.mixins.FeatureExtractionMixin.framewise_euclidean_distance`.
+       For CPU function see :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance`.
        For CuPY function see :func:`~simba.data_processors.cuda.statistics.get_euclidean_distance_cupy`.
 
 
@@ -193,7 +195,7 @@ def get_euclidean_distance_cupy(x: np.ndarray,
 
 
     .. seealso::
-       For CPU function see :func:`~simba.mixins.FeatureExtractionMixin.framewise_euclidean_distance`.
+       For CPU function see :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance`.
        For CUDA JIT function see :func:`~simba.data_processors.cuda.statistics.get_euclidean_distance_cuda`.
 
     :param np.ndarray x: A 2D NumPy array with shape (n, 2), where each row represents a point in a 2D space.

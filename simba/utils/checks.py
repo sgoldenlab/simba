@@ -104,13 +104,13 @@ def check_int(
     return True, msg
 
 
-def check_str(
-    name: str,
-    value: Any,
-    options: Optional[Tuple[Any]] = (),
-    allow_blank: bool = False,
-    raise_error: bool = True,
-) -> (bool, str):
+def check_str(name: str,
+              value: Any,
+              options: Optional[Tuple[Any]] = (),
+              allow_blank: bool = False,
+              invalid_options: Optional[List[str]] = None,
+              raise_error: bool = True) -> (bool, str):
+
     """
     Check if variable is a valid string.
 
@@ -119,6 +119,7 @@ def check_str(
     :param Optional[Tuple[Any]] options: Tuple of allowed strings. If empty tuple, then any string allowed. Default: ().
     :param Optional[bool] allow_blank: If True, allow empty string. Default: False.
     :param Optional[bool] raise_error: If True, then raise error if invalid string. Default: True.
+    :param Optional[List[str]] invalid_options: If not None, then a list of strings that are invalid.
 
     :return bool: False if invalid. True if valid.
     :return str: If invalid, then error msg. Else empty str.
@@ -138,7 +139,18 @@ def check_str(
             return False, msg
     if len(options) > 0:
         if value not in options:
-            msg = f"{name} is set to {str(value)} in SimBA, but this is not a valid option: {options}"
+            msg = f"{name} is set to {value} in SimBA, but this is not a valid option: {options}"
+            if raise_error:
+                raise StringError(msg=msg, source=check_str.__name__)
+            else:
+                return False, msg
+        else:
+            return True, msg
+
+    if invalid_options is not None:
+        check_valid_lst(data=invalid_options, valid_dtypes=(str,), min_len=1)
+        if value in invalid_options:
+            msg = f"{name} is set to {value} in SimBA, but this is among invalid options: {invalid_options}"
             if raise_error:
                 raise StringError(msg=msg, source=check_str.__name__)
             else:
@@ -147,7 +159,6 @@ def check_str(
             return True, msg
     else:
         return True, msg
-
 
 def check_float(
     name: str,
