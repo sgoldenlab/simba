@@ -1,6 +1,8 @@
+import math
+
 import numpy as np
 from numba import cuda
-import math
+
 
 @cuda.jit(device=True)
 def _cuda_sum(x: np.ndarray):

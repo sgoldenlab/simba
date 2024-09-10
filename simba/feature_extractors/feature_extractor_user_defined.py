@@ -10,7 +10,7 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.utils.checks import check_str, check_float
+from simba.utils.checks import check_float, check_str
 from simba.utils.errors import MissingColumnsError, ParametersFileError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df, write_df
