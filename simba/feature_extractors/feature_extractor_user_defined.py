@@ -11,9 +11,9 @@ import pandas as pd
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.utils.checks import check_str
+from simba.utils.errors import MissingColumnsError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df, write_df
-from simba.utils.errors import MissingColumnsError
 
 
 class UserDefinedFeatureExtractor(ConfigReader, FeatureExtractionMixin):

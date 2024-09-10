@@ -6,17 +6,21 @@ __email__ = "sronilsson@gmail.com"
 
 from tkinter import NW, Label, LabelFrame
 from typing import Dict, Optional, Tuple
+
 import numpy as np
 
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.ROI_image import ROI_image_class
+from simba.roi_tools.ROI_size_calculations import (get_ear_tags_for_rectangle,
+                                                   get_half_circle_vertices,
+                                                   get_triangle_vertices,
+                                                   get_vertices_hexagon)
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, SimbaButton
 from simba.utils.checks import check_int, check_str, check_valid_tuple
 from simba.utils.enums import Formats
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import get_color_dict
 from simba.utils.printing import stdout_success
-from simba.roi_tools.ROI_size_calculations import get_vertices_hexagon, get_half_circle_vertices, get_ear_tags_for_rectangle, get_triangle_vertices
 
 THICKNESS_OPTIONS = list(range(1, 26, 1))
 EAR_TAG_SIZE_OPTIONS = list(range(1, 26, 1))
