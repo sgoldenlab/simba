@@ -4,17 +4,13 @@ __email__ = "sronilsson@gmail.com"
 
 import math
 from typing import Optional
-
 import numpy as np
 from numba import cuda
-
 from simba.utils.read_write import read_df
-
 try:
     import cupy as cp
 except:
     import numpy as cp
-
 from simba.utils.checks import check_int, check_valid_array
 from simba.utils.enums import Formats
 
@@ -55,7 +51,6 @@ def get_3pt_angle(x: np.ndarray, y: np.ndarray, z: np.ndarray) -> np.ndarray:
     .. seealso::
        For CPU function see :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt` and
        For CPU function see :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt_serialized`.
-
 
 
     :param x:  A numpy array of shape (n, 2) representing the first point (e.g., nose) coordinates.

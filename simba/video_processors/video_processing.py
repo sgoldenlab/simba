@@ -365,11 +365,10 @@ def convert_to_webp(path: Union[str, os.PathLike],
     timer.stop_timer()
     stdout_success(msg=f"SIMBA COMPLETE: {len(file_paths)} image file(s) in {directory} directory converted to WEBP and stored in {save_dir} directory", source=convert_to_webp.__name__, elapsed_time=timer.elapsed_time_str)
 
-def clahe_enhance_video(
-    file_path: Union[str, os.PathLike],
-    clip_limit: Optional[int] = 2,
-    tile_grid_size: Optional[Tuple[int]] = (16, 16),
-    out_path: Optional[Union[str, os.PathLike]] = None) -> None:
+def clahe_enhance_video(file_path: Union[str, os.PathLike],
+                         clip_limit: Optional[int] = 2,
+                         tile_grid_size: Optional[Tuple[int]] = (16, 16),
+                         out_path: Optional[Union[str, os.PathLike]] = None) -> None:
 
     """
     Convert a single video file to clahe-enhanced greyscale .avi file. The result is saved with prefix
@@ -655,6 +654,10 @@ def video_to_greyscale(file_path: Union[str, os.PathLike], gpu: Optional[bool] =
        :width: 700
        :align: center
 
+    .. seealso::
+       :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cupy`, :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cuda`,
+       :func:`simba.mixins.image_mixin.ImageMixin.img_stack_to_greyscale`, :func:`simba.video_processors.video_processing.batch_video_to_greyscale`
+
     :parameter Union[str, os.PathLike] file_path: Path to video file.
     :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :raise FFMPEGCodecGPUError: If no GPU is found and ``gpu == True``.
@@ -702,6 +705,10 @@ def batch_video_to_greyscale(path: Union[str, os.PathLike, List[Union[str, os.Pa
     .. image:: _static/img/to_greyscale.gif
        :width: 700
        :align: center
+
+    .. seealso::
+       :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cupy`, :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cuda`,
+       :func:`simba.mixins.image_mixin.ImageMixin.img_stack_to_greyscale`, :func:`simba.video_processors.video_processing.video_to_greyscale`
 
     :param Union[str, os.PathLike] path: Path to directory holding video files in color, or a list of file paths to videos in color.
     :param Optional[bool] save_dir: If not None, then the directory where to store converted videos. If None, then stores the new videos in the same directory as the input video with the ``_grayscale`` suffix.
@@ -1305,6 +1312,9 @@ def crop_single_video(file_path: Union[str, os.PathLike], gpu: Optional[bool] = 
        :width: 700
        :align: center
 
+    .. seealso::
+       :func:`simba.video_processors.video_processing.crop_multiple_videos`
+
     :parameter str file_path: Path to video file.
     :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
 
@@ -1366,9 +1376,15 @@ def crop_multiple_videos(
     """
     Crop multiple videos in a folder according to crop-coordinates defined in the **first** video.
 
+    .. seealso::
+       :func:`simba.video_processors.video_processing.crop_single_video`
+
+
     :parameter str directory_path: Directory containing input videos.
     :parameter str output_path: Directory where to save the cropped videos.
     :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+
+
 
     :example:
     >>> _ = crop_multiple_videos(directory_path='project_folder/videos', output_path='project_folder/videos/my_new_folder')
@@ -1615,9 +1631,6 @@ class VideoRotator(ConfigReader):
     :parameter str output_dir: Directory where to save the rotated video.
     :parameter Optional[bool] gpu: If True, use FFMPEG NVIDEA GPU codecs. Else CPU codecs.
     :parameter Optional[bool] gpu: If True, use FFPMPEG. Else, OpenCV.
-
-
-
 
     :example:
     >>> VideoRotator(input_path='project_folder/videos/Video_1.mp4', output_dir='project_folder/videos')
@@ -2004,6 +2017,10 @@ def crop_multiple_videos_circles(in_dir: Union[str, os.PathLike], out_dir: Union
        using the first video and saves the videos in the ``out_dir`` with the same filenames as the original videos..
 
 
+    .. seealso::
+       :func:`simba.video_processors.video_processing.crop_single_video_circle`
+
+
 
     :param  Union[str, os.PathLike] in_dir: The directory containing input video files.
     :param  Union[str, os.PathLike] out_dir: The directory to save the cropped video files.
@@ -2370,6 +2387,9 @@ def horizontal_video_concatenator(
        :width: 1000
        :align: center
 
+    .. seealso::
+       :func:`simba.video_processors.video_processing.vertical_video_concatenator`
+
     :param List[Union[str, os.PathLike]] video_paths: List of input video file paths.
     :param Union[str, os.PathLike] save_path: File path to save the concatenated video.
     :param Optional[int] height_px: Height of the output video in pixels.
@@ -2452,6 +2472,10 @@ def vertical_video_concatenator(
     .. image:: _static/img/vertical_video_concatenator.png
        :width: 300
        :align: center
+
+
+    .. seealso::
+       :func:`simba.video_processors.video_processing.horizontal_video_concatenator`
 
     :param List[Union[str, os.PathLike]] video_paths: List of input video file paths.
     :param Union[str, os.PathLike] save_path: File path to save the concatenated video.
@@ -3610,6 +3634,10 @@ def video_to_bw(video_path: Union[str, os.PathLike],
        :autoplay:
        :loop:
 
+    .. seealso::
+       :func:`simba.mixins.image_mixin.ImageMixin.img_to_bw`, :func:`simba.mixins.image_mixin.ImageMixin.img_stack_to_bw`,
+       :func:`simba.data_processors.cuda.image.img_stack_to_bw`
+
     :param Union[str, os.PathLike] video_path: Path to the video
     :param Optional[float] threshold: Value between 0 and 1. Lower values gives more white and vice versa.
     :param Optional[bool] gpu: If True, uses GPU codecs with potentially faster runtimes. Default: False.
@@ -3690,6 +3718,9 @@ def create_average_frm(video_path: Union[str, os.PathLike],
        Useful helper for e.g., video background subtraction ``simba.video_processors.video_processing.video_bg_substraction()``
        Either pass ``start_frm`` and ``end_frm`` OR ``start_time`` and ``end_time`` OR pass all four arguments as None.
        If all are None, then the entire video will be used to create the average frame.
+
+    .. seealso:
+       :func:`simba.data_processors.cuda.image.create_average_frm_cupy`, :func:`simba.data_processors.cuda.image.create_average_frm_cuda`
 
     :param Union[str, os.PathLike] video_path: The path to the video to create the average frame from. Default: None.
     :param Optional[int] start_frm: The first frame in the segment to create the average frame from. Default: None.

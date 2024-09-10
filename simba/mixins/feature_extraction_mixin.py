@@ -165,10 +165,9 @@ class FeatureExtractionMixin(object):
            For acceptable run-time, call using parallel processing.
 
         .. seealso::
-
            For large data, consider :func:`~simba.feature_extractors.perimeter_jit.jitted_hull`,
            :func:`~simba.data_processors.cuda.geometry.get_convex_hull`,
-           :func:`~ simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_polygon`.
+           :func:`~simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_polygon`.
 
         .. image:: _static/img/framewise_perim_length.png
            :width: 300
