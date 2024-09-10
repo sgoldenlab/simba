@@ -1,3 +1,8 @@
+__author__ = "Simon Nilsson"
+__email__ = "sronilsson@gmail.com"
+
+
+
 import math
 from typing import Tuple, Dict, Optional, Union
 
@@ -160,3 +165,28 @@ def get_ear_tags_for_rectangle(center: Tuple[int, int], width: int, height: int)
     tags['left_tag'] = (int(center[1] - (width / 2)), int(center[0]))
     tags['bottom_tag'] = (int(center[1]), int(center[0] + (height / 2)))
     return tags
+
+
+def get_triangle_vertices(center: Tuple[int, int], side_length: int, direction: int) -> Tuple[np.ndarray, Dict[str, Tuple[int, int]]]:
+    """
+    Find equilateral triangle vertices knowing the center, direction and length side.
+
+    :param Tuple[int, int] center: A tuple (x, y) representing the center coordinates of the hexagon. Must contain exactly two numeric values.
+    :param int side_length: The length of each of the three sides in pixels.
+    :param int direction: The direction to point the vertices.
+    :return: 2-part tuple containing vertices as array and dict.
+    :rtype: Tuple[np.ndarray, Dict[str, Tuple[int, int]]]
+    """
+    check_valid_tuple(x=center, source=get_vertices_hexagon.__name__, accepted_lengths=(2,), valid_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_int(name='side_length', value=side_length, min_value=1)
+    check_int(name='direction', value=direction, min_value=0, max_value=360)
+
+    direction_radians = np.radians(direction)
+    radius = side_length / np.sqrt(3)
+
+    top_vertex = (center[0] + radius * np.cos(direction_radians), center[1] + radius * np.sin(direction_radians))
+    vertex2 = (center[0] + radius * np.cos(direction_radians + np.radians(120)), center[1] + radius * np.sin(direction_radians + np.radians(120)))
+    vertex3 = (center[0] + radius * np.cos(direction_radians + np.radians(-120)), center[1] + radius * np.sin(direction_radians + np.radians(-120)))
+    vertices = np.array([top_vertex, vertex2, vertex3, top_vertex]).astype(np.int32)
+    vertices_dict = {"Center_tag": (int(center[0]), int(center[1])), 'Tag_0':  (int(top_vertex[0]), int(top_vertex[1])), 'Tag_1': (int(vertex2[0]), int(vertex2[1])), 'Tag_2': (int(vertex3[0]), int(vertex3[1]))}
+    return (vertices, vertices_dict)

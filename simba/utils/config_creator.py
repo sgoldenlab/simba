@@ -16,6 +16,9 @@ class ProjectConfigCreator(object):
     """
     Create SimBA project directory tree and associated project_config.ini config file.
 
+    .. note::
+       `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#part-1-create-a-new-project-1>`__.
+
     :parameter str project_path: path to directory where to save the SimBA project directory tree
     :parameter str project_name: Name of the SimBA project
     :parameter List[str] target_list: Classifier names in the SimBA project
@@ -25,9 +28,6 @@ class ProjectConfigCreator(object):
                                          your pose-estimated body-parts in `this file <https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/bp_names/bp_names.csv>`_.
     :parameter int animal_cnt: Number of animals tracked in the input pose-estimation data.
     :parameter str file_type: The SimBA project file type. OPTIONS: ``csv`` or ``parquet``.
-
-    .. note::
-       `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#part-1-create-a-new-project-1>`__.
 
     Examples
     ----------

@@ -2,6 +2,7 @@ import itertools
 import os
 import re
 from copy import deepcopy
+from typing import Union
 
 import cv2
 import numpy as np
@@ -19,8 +20,8 @@ from simba.utils.read_write import get_fn_ext, read_config_file
 class ROI_image_class:
 
     def __init__(self,
-                 config_path: str,
-                 video_path: str,
+                 config_path: Union[str, os.PathLike],
+                 video_path: Union[str, os.PathLike],
                  ROI_define_instance: object):
 
         config = read_config_file(config_path=config_path)

@@ -33,7 +33,7 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
     :param Optional[bool] calculate_distances: If True, then calculate movements aggregate statistics (distances and velocities) inside ROIs. Results are saved in ``project_folder/logs/`` directory. Default: False.
     :param Optional[bool] detailed_bout_data: If True, saves a file with a row for every entry into each ROI for each animal in each video. Results are saved in ``project_folder/logs/`` directory. Default: False.
     :param Optional[float] threshold: Float between 0 and 1. Body-part locations detected below this confidence threshold are filtered. Default: 0.0.
-    :param Optional[float] threshold: List of body-parts to perform ROI analysis on.
+    :param Optional[List[str]] body_parts: List of body-parts to perform ROI analysis on.
 
     .. note::
        `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
@@ -66,16 +66,9 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                                           file_type=self.file_type)
 
         check_float(name="Body-part probability threshold", value=threshold, min_value=0.0, max_value=1.0)
-        check_valid_lst(
-            data=body_parts,
-            source=f"{self.__class__.__name__} body-parts",
-            valid_dtypes=(str,),
-        )
+        check_valid_lst(data=body_parts, source=f"{self.__class__.__name__} body-parts", valid_dtypes=(str,))
         if len(set(body_parts)) != len(body_parts):
-            raise CountError(
-                msg=f"All body-part entries have to be unique. Got {body_parts}",
-                source=self.__class__.__name__,
-            )
+            raise CountError(msg=f"All body-part entries have to be unique. Got {body_parts}", source=self.__class__.__name__)
         self.bp_dict, self.bp_lk = {}, {}
         for bp in body_parts:
             animal = self.find_animal_name_from_body_part_name(

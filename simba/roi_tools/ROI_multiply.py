@@ -1,3 +1,8 @@
+__author__ = "Simon Nilsson"
+__email__ = "sronilsson@gmail.com"
+
+
+
 import glob
 import os
 

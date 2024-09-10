@@ -1,22 +1,28 @@
+__author__ = "Simon Nilsson"
+__email__ = "sronilsson@gmail.com"
+
+
+
+
 from tkinter import NW, Label, LabelFrame
 from typing import Dict, Optional, Tuple
-
 import numpy as np
 
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.ROI_image import ROI_image_class
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, SimbaButton
-from simba.utils.checks import check_int, check_str
+from simba.utils.checks import check_int, check_str, check_valid_tuple
 from simba.utils.enums import Formats
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import get_color_dict
 from simba.utils.printing import stdout_success
-from simba.roi_tools.ROI_size_calculations import get_vertices_hexagon, get_half_circle_vertices, get_ear_tags_for_rectangle
+from simba.roi_tools.ROI_size_calculations import get_vertices_hexagon, get_half_circle_vertices, get_ear_tags_for_rectangle, get_triangle_vertices
 
 THICKNESS_OPTIONS = list(range(1, 26, 1))
 EAR_TAG_SIZE_OPTIONS = list(range(1, 26, 1))
 THICKNESS_OPTIONS.insert(0, 'THICKNESS')
 EAR_TAG_SIZE_OPTIONS.insert(0, 'EAR TAG SIZE')
+
 
 class DrawFixedROIPopUp(PopUpMixin):
 
@@ -92,10 +98,22 @@ class DrawFixedROIPopUp(PopUpMixin):
         self.half_circle_direction_drpdwn.grid(row=0, column=1, sticky=NW)
         add_half_circle_btn.grid(row=0, column=2, sticky=NW)
 
-        self.info_txt = Label(self.main_frm, text='', font=Formats.FONT_REGULAR.value)
-        self.info_txt.grid(row=5, column=0, sticky=NW)
-        self.main_frm.mainloop()
+        self.triangle_frm = LabelFrame(self.main_frm, text="ADD EQUILATERAL TRIANGLE", pady=10, font=Formats.FONT_HEADER.value, fg="black")
+        self.triangle_side_length_eb = Entry_Box(self.triangle_frm, '', 0, None, validation='numeric', entry_box_width='15')
+        self.triangle_side_length_eb.entry_set('SIDE LENGTH (MM)')
+        self.triangle_direction_drpdwn = DropDownMenu(self.triangle_frm, 'DIRECTION DEGREES:', list(range(1, 361)), 18)
+        self.triangle_direction_drpdwn.setChoices('90')
+        add_triangle_btn = SimbaButton(parent=self.triangle_frm, txt='ADD TRIANGLE', img='triangle_black', cmd=self.add_triangle, txt_clr='blue')
 
+        self.triangle_frm.grid(row=5, column=0, sticky=NW)
+        self.triangle_side_length_eb.grid(row=0, column=0, sticky=NW)
+        self.triangle_direction_drpdwn.grid(row=0, column=1, sticky=NW)
+        add_triangle_btn.grid(row=0, column=2, sticky=NW)
+
+
+        self.info_txt = Label(self.main_frm, text='', font=Formats.FONT_REGULAR.value)
+        self.info_txt.grid(row=6, column=0, sticky=NW)
+        self.main_frm.mainloop()
 
     def _checks(self):
         name = self.name_eb.entry_get.strip()
@@ -249,7 +267,40 @@ class DrawFixedROIPopUp(PopUpMixin):
         self.roi_define.get_all_ROI_names()
         self.roi_define.update_delete_ROI_menu()
         self.roi_image.insert_all_ROIs_into_image()
-        txt = f'New HEXAGON {self.name} (MM radius: {mm_radius}, PIXELS radius: {radius}) inserted using pixel per millimeter {self.px_per_mm} conversion factor.)'
+        txt = f'New HALF CIRCLE {self.name} (MM radius: {mm_radius}, PIXELS radius: {radius}) inserted using pixel per millimeter {self.px_per_mm} conversion factor.)'
         self.info_txt['text'] = txt
         stdout_success(msg=txt)
         self.shape_cnt += 1
+
+
+    def add_triangle(self):
+        self._checks()
+        valid, error_msg = check_int(name='TRIANGLE SIDE LENGTH', value=self.triangle_side_length_eb.entry_get, min_value=1)
+        if not valid: self.info_txt['text'] = error_msg; raise InvalidInputError(msg=error_msg, source=self.__class__.__name__)
+        side_length_mm = int(self.triangle_side_length_eb.entry_get)
+        side_length = int(int(self.triangle_side_length_eb.entry_get) * float(self.px_per_mm))
+        shape_center = (int(self.img_center[0]) + (self.jump_size*self.shape_cnt), int(self.img_center[1] + (self.jump_size*self.shape_cnt)))
+        direction = int(self.triangle_direction_drpdwn.getChoices())
+        vertices, vertices_dict = get_triangle_vertices(center=shape_center, side_length=side_length, direction=direction)
+
+        results = {"Video": self.roi_define.file_name,
+                   "Shape_type": "Polygon",
+                   "Name": self.name,
+                   "Color name": self.clr_name,
+                   "Color BGR": self.clrs_dict[self.clr_name],
+                   "Thickness": self.thickness,
+                    "Center_X": shape_center[0],
+                    "Center_Y": shape_center[1],
+                    "vertices": vertices,
+                    "Tags": vertices_dict,
+                    "Ear_tag_size": self.ear_tag_size}
+
+        self.roi_image.out_polygon.append(results)
+        self.roi_define.get_all_ROI_names()
+        self.roi_define.update_delete_ROI_menu()
+        self.roi_image.insert_all_ROIs_into_image()
+        txt = f'New EQUILATERAL TRIANGLE {self.name} (MM radius: {side_length_mm}, PIXELS radius: {side_length}) inserted using pixel per millimeter {self.px_per_mm} conversion factor.)'
+        self.info_txt['text'] = txt
+        stdout_success(msg=txt)
+        self.shape_cnt += 1
+

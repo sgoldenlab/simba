@@ -3,6 +3,7 @@ __author__ = "Simon Nilsson"
 
 import os
 from itertools import product
+from typing import Union
 
 import numpy as np
 import pandas as pd
@@ -12,6 +13,7 @@ from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.utils.checks import check_str
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df, write_df
+from simba.utils.errors import MissingColumnsError
 
 
 class UserDefinedFeatureExtractor(ConfigReader, FeatureExtractionMixin):
@@ -30,12 +32,10 @@ class UserDefinedFeatureExtractor(ConfigReader, FeatureExtractionMixin):
     >>> feature_extractor.run()
     """
 
-    def __init__(self, config_path: str):
+    def __init__(self, config_path: Union[str, os.PathLike]):
         FeatureExtractionMixin.__init__(self, config_path=config_path)
         ConfigReader.__init__(self, config_path=config_path)
-        print(
-            "Extracting features from {} file(s)...".format(str(len(self.files_found)))
-        )
+        print(f"Extracting features from {len(self.files_found)} file(s)...")
 
     def __euclid_dist_between_bps_of_other_animals(self):
         print("Calculating euclidean distances...")
@@ -160,40 +160,23 @@ class UserDefinedFeatureExtractor(ConfigReader, FeatureExtractionMixin):
         self.data_df = pd.concat([self.data_df, results], axis=1)
 
     def run(self):
-        """
-        Method to compute and save features to disk. Results are saved in the `project_folder/csv/features_extracted`
-        directory of the SimBA project.
-
-        Returns
-        -------
-        None
-        """
-
         for file_cnt, file_path in enumerate(self.files_found):
             video_timer = SimbaTimer(start=True)
-            print(
-                "Extracting features for video {}/{}...".format(
-                    str(file_cnt + 1), str(len(self.files_found))
-                )
-            )
             _, file_name, _ = get_fn_ext(file_path)
+            print(f"Extracting features for video {file_name} ({file_cnt + 1}/{len(self.files_found)})...")
             check_str("file name", file_name)
-            video_settings, self.px_per_mm, fps = self.read_video_info(
-                video_name=file_name
-            )
+            video_settings, self.px_per_mm, fps = self.read_video_info(video_name=file_name)
             roll_windows = []
             for i in range(len(self.roll_windows_values)):
                 roll_windows.append(int(fps / self.roll_windows_values[i]))
             self.data_df = read_df(file_path, self.file_type)
+            if len(self.data_df.columns) != len(self.col_headers):
+                raise MissingColumnsError(msg=f'There is a mismatch in the number headers in file {file_name} ({len(self.data_df.columns)}) and the number of columns expected in the SImBA project ({len(self.col_headers)}) as determined by the SimBA file at {self.body_parts_path}')
             self.data_df.columns = self.col_headers
             self.data_df = self.data_df.fillna(0).apply(pd.to_numeric)
             self.data_df_shifted = self.data_df.shift(periods=1)
             self.data_df_shifted.columns = self.col_headers_shifted
-            self.data_df_comb = (
-                pd.concat([self.data_df, self.data_df_shifted], axis=1, join="inner")
-                .fillna(0)
-                .reset_index(drop=True)
-            )
+            self.data_df_comb = (pd.concat([self.data_df, self.data_df_shifted], axis=1, join="inner").fillna(0).reset_index(drop=True))
             self.__euclid_dist_between_bps_of_other_animals()
             self.__movement_of_all_bps()
             self.__rolling_windows_bp_distances()
@@ -203,16 +186,11 @@ class UserDefinedFeatureExtractor(ConfigReader, FeatureExtractionMixin):
             self.data_df = self.data_df.reset_index(drop=True).fillna(0)
             write_df(df=self.data_df, file_type=self.file_type, save_path=save_path)
             video_timer.stop_timer()
-            print(
-                f"Feature extraction complete for video {file_name} (elapsed time: {video_timer.elapsed_time_str}s)"
-            )
+            print(f"Feature extraction complete for video {file_name} (elapsed time: {video_timer.elapsed_time_str}s)")
 
         self.timer.stop_timer()
-        stdout_success(
-            f"Feature extraction complete for {str(len(self.files_found))} video(s). Results are saved inside the project_folder/csv/features_extracted directory",
-            elapsed_time=self.timer.elapsed_time_str,
-        )
+        stdout_success(f"Feature extraction complete for {str(len(self.files_found))} video(s). Results are saved inside the {self.features_dir} directory", elapsed_time=self.timer.elapsed_time_str,)
 
 
-# test = UserDefinedFeatureExtractor(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+# test = UserDefinedFeatureExtractor(config_path=r"C:\troubleshooting\open_field_below\project_folder\project_config.ini")
 # test.run()

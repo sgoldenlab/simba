@@ -29,7 +29,8 @@ class GetPixelsPerMillimeterInterface():
 
     :param Union[str, os.PathLike] video_path: Path to a video file on disk.
     :param float known_metric_mm: Known millimeter distance to get the pixels conversion factor for.
-    :returns float: The number of pixels per metric millimeter.
+    :returns: The number of pixels per metric millimeter.
+    :rtype: float
 
     :example:
     >>> runner = GetPixelsPerMillimeterInterface(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi', known_metric_mm=140)
