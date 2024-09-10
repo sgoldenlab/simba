@@ -27,22 +27,30 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_all_videos_in_directory,
                                     find_core_cnt, get_fn_ext,
-                                    get_video_meta_data, remove_files)
+                                    get_video_meta_data)
 
 
 class BlobPlotter(PlottingMixin):
     """
      Plot the results of animal tracking based on blob.
 
+     .. seealso::
+        :func:`simba.mixins.plotting_mixin.PlottingMixin._plot_blobs`, :func:`simba.mixins.image_mixin.ImageMixin.get_blob_locations`
+
+     .. video:: _static/img/BlobLocationComputer.webm
+        :width: 800
+        :autoplay:
+        :loop:
+
      :param Union[List[str], str, os.PathLike] data_path: Path(s) to video file(s) or directory containing video files.
      :param Optional[bool] gpu: Whether to use GPU for processing. Defaults to False.
      :param Optional[int] batch_size: Number of frames to process in each batch. Defaults to 2000. Increase if your RAM allows.
      :param Optional[Tuple[int, int, int]] circle_color: Color of the blobs as an RGB tuple. Defaults to pink (255, 105, 180).
      :param Optional[Union[str, os.PathLike]] save_dir: Directory to save output files. If None, no files will be saved.
-     :param Optional[int] verbose:
-     :param Optional[str] smoothing:
-     :param Optional[int] circle_size:
-     :param Optional[int] core_cnt:
+     :param Optional[int] verbose: If True, then prints msgs informing on progress.
+     :param Optional[str] smoothing: Savitzky Golay, Gaussian, or None. Smooths body-part coordinate data for more accurate blob representation. Default None.
+     :param Optional[int] circle_size: The circle defining the x, y location of the animal in the data. Defaults to None and SimBA will try and retrieve the optimal circle size based in the video resolution.
+     :param Optional[int] core_cnt: The number of cores to use for multiprocessing. Deafults to -1 which means all available cores.
 
      :example:
      >>> BlobPlotter(data_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\test\2022-06-20_NOB_DOT_4_downsampled.mp4", smoothing='Savitzky Golay', circle_size=10).run()

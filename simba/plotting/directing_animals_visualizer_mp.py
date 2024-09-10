@@ -146,16 +146,16 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
     .. note::
         Example of expected output https://www.youtube.com/watch?v=d6pAatreb1E&list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl&index=22
 
-        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-data-tables`>_.
+       `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-data-tables`>__.
 
     .. image:: _static/img/directing_other_animals.png
        :width: 450
        :align: center
 
-    :parameter Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
-    :parameter Union[str, os.PathLike] video_path: Path to video for to visualize directionality.
-    :parameter dict style_attr: Video style attribitions (colors and sizes etc.)
-    :parameter Optional[int] core_cnt: How many cores to use to create the video. Deafult -1 which is all the cores.
+    :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
+    :param Union[str, os.PathLike] video_path: Path to video for to visualize directionality.
+    :param Dict[str, Any] style_attr: Video style attribitions (colors and sizes etc.)
+    :param Optional[int] core_cnt: How many cores to use to create the video. Deafult -1 which is all the cores.
 
     :examples:
     >>> style_attr = {'show_pose': True, 'animal_names': False, 'circle_size': 3, 'directionality_color': [(255, 0, 0), (0, 0, 255)], 'direction_thickness': 10, 'highlight_endpoints': True}

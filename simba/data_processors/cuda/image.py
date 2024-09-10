@@ -390,10 +390,9 @@ def stack_sliding_mse(x: np.ndarray,
     where the reference image is determined by a sliding window approach with a specified stride.
     The function is optimized for large image stacks by processing them in batches.
 
-    .. seelalso::
+    .. seealso::
        For CPU function see :func:`~simba.mixins.image_mixin.ImageMixin.img_stack_mse` and
        :func:`~simba.mixins.image_mixin.ImageMixin.img_sliding_mse`.
-
 
     :param np.ndarray x: Input array of images, where the first dimension corresponds to the stack of images. The array should be either 3D (height, width, channels) or 4D (batch, height, width, channels).
     :param Optional[int] stride: The stride or step size for the sliding window that determines the reference image. Defaults to 1, meaning the previous image in the stack is used as the reference.

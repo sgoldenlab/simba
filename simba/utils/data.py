@@ -48,9 +48,7 @@ from simba.utils.read_write import (find_video_of_file, get_fn_ext,
                                     read_roi_data, write_df)
 
 
-def detect_bouts(
-    data_df: pd.DataFrame, target_lst: List[str], fps: int
-) -> pd.DataFrame:
+def detect_bouts(data_df: pd.DataFrame, target_lst: List[str], fps: int) -> pd.DataFrame:
     """
     Detect behavior "bouts" (e.g., continous sequence of classified behavior-present frames) for specified classifiers.
 
@@ -60,7 +58,8 @@ def detect_bouts(
     :param pd.DataFrame data_df: Dataframe with fields representing classifications in boolean type.
     :param List[str] target_lst: Classifier names. E.g., ['Attack', 'Sniffing', 'Grooming'] or ROIs
     :param int fps: The fps of the input video.
-    :return pd.DataFrame: Dataframe where bouts are represented by rows and fields are represented by 'Event type ', 'Start time', 'End time', 'Start frame', 'End frame', 'Bout time'
+    :return: Dataframe where bouts are represented by rows and fields are represented by 'Event type ', 'Start time', 'End time', 'Start frame', 'End frame', 'Bout time'
+    :rtype: pd.DataFrame
 
     :example:
     >>> data_df = read_df(file_path='tests/data/test_projects/two_c57/project_folder/csv/machine_results/Together_1.csv', file_type='csv')
@@ -124,9 +123,7 @@ def detect_bouts(
     )
 
 
-def detect_bouts_multiclass(
-    data: pd.DataFrame, target: str, fps: int = 1, classifier_map: Dict[int, str] = None
-) -> pd.DataFrame:
+def detect_bouts_multiclass(data: pd.DataFrame, target: str, fps: int = 1, classifier_map: Dict[int, str] = None) -> pd.DataFrame:
     """
     Detect bouts in a multiclass time series dataset and return the bout event types, their start times, end times and duration.
 
@@ -134,6 +131,8 @@ def detect_bouts_multiclass(
     :param str target: Name of the target column in ``data``.
     :param int fps: Frames per second of the video used to collect ``data``. Default is 1.
     :param Dict[int, str] classifier_map: A dictionary mapping class labels to their names. Used to replace numeric labels with descriptive names. If None, then numeric event labels are kept.
+    :return: Dataframe where bouts are represented by rows and fields are represented by 'Event type ', 'Start time', 'End time', 'Start frame', 'End frame', 'Bout time'
+    :rtype: pd.DataFrame
 
     :example:
     >>> df = pd.DataFrame({'value': [0, 0, 0, 2, 2, 1, 1, 1, 3, 3]})
@@ -196,16 +195,17 @@ def plug_holes_shortest_bout(data_df: pd.DataFrame,
     Removes behavior "bouts" that are shorter than the minimum user-specified length within a dataframe.
 
     .. note::
-      In the initial step the function looks for behavior "interuptions" that are the length of the ``shortest_bout`` or shorter.
-      I.e., these are ``0`` sequences that are the length of the ``shortest_bout`` or shorter with trailing **and** leading `1`s.
-      These interuptions are filled with `1`s. Next, the behavioral bouts shorter than the `shortest_bout` are removed. This operations are perfomed as it helps in preserving longer sequences of the desired behavior,
-      ensuring they aren't fragmented by brief interruptions.
+       In the initial step the function looks for behavior "interuptions" that are the length of the ``shortest_bout`` or shorter.
+       I.e., these are ``0`` sequences that are the length of the ``shortest_bout`` or shorter with trailing **and** leading `1`s.
+       These interuptions are filled with `1`s. Next, the behavioral bouts shorter than the `shortest_bout` are removed. This operations are perfomed as it helps in preserving longer sequences of the desired behavior,
+       ensuring they aren't fragmented by brief interruptions.
 
     :param pd.DataFrame data_df: Pandas Dataframe with classifier prediction data.
     :param str clf_name: Name of the classifier field of list of names of classifier fields
     :param int fps: The fps of the input video.
     :param int shortest_bout: The shortest valid behavior boat in milliseconds.
-    :return pd.DataFrame data_df: Dataframe where behavior bouts with invalid lengths have been removed (< shortest_bout)
+    :return: Dataframe where behavior bouts with invalid lengths have been removed (< shortest_bout)
+    :rtype: pd.DataFrame
 
     :example:
     >>>  data_df = pd.DataFrame(data=[1, 0, 1, 1, 1], columns=['target'])
@@ -251,16 +251,15 @@ def plug_holes_shortest_bout(data_df: pd.DataFrame,
 
     return data_df
 
-def create_color_palettes(
-    no_animals: int, map_size: int, cmaps: Optional[List[str]] = None
-) -> List[List[int]]:
+def create_color_palettes(no_animals: int, map_size: int, cmaps: Optional[List[str]] = None) -> List[List[int]]:
     """
     Create list of lists of bgr colors, one for each animal. Each list is pulled from a different palette
     matplotlib color map.
 
     :param int no_animals: Number of different palette lists
     :param int map_size: Number of colors in each created palette.
-    :return List[List[int]]:  BGR colors
+    :return: BGR colors
+    :rtype: List[List[int]]
 
     :example:
     >>> create_color_palettes(no_animals=2, map_size=2)
@@ -322,7 +321,8 @@ def create_color_palette(pallete_name: str,
     .. note::
        If **both** as_rgb_ratio and as_hex, HEX values will be returned.
 
-    :return list: Color palette values.
+    :return: Color palette values.
+    :rtype: List[Union[str, float]]
 
     :example:
     >>> create_color_palette(pallete_name='jet', increments=3)
@@ -351,7 +351,7 @@ def create_color_palette(pallete_name: str,
 
 def interpolate_color_palette(start_color: Tuple[int, int, int],
                               end_color: Tuple[int, int, int],
-                              n: Optional[int] = 10):
+                              n: Optional[int] = 10) -> List[Tuple[int, int, int]]:
     """
     Generate a list of colors interpolated between two passed RGB colors.
 
@@ -359,6 +359,7 @@ def interpolate_color_palette(start_color: Tuple[int, int, int],
     :param end_color: Tuple of RGB values for the end color.
     :param n: Number of colors to generate.
     :return: List of interpolated RGB colors.
+    :rtype: List[Tuple[int, int, int]]
 
     :example:
     >>> red, black = (255, 0, 0), (0, 0, 0)
@@ -574,9 +575,7 @@ def find_bins(
     return video_bins_info
 
 
-def find_frame_numbers_from_time_stamp(
-    start_time: str, end_time: str, fps: int
-) -> List[int]:
+def find_frame_numbers_from_time_stamp(start_time: str, end_time: str, fps: int) -> List[int]:
     """
     Given start and end timestamps in HH:MM:SS formats and the fps, return the frame numbers representing
     the time period.
@@ -584,7 +583,8 @@ def find_frame_numbers_from_time_stamp(
     :param str start_time: Period start time in HH:MM:SS format.
     :param str end_time: Period end time in HH:MM:SS format.
     :param int fps: Framerate of the video.
-    :returns List[int]: Frame numbers within the period.
+    :returns: Frame numbers within the period.
+    :rtype: List[int]
 
     :example:
     >>> find_frame_numbers_from_time_stamp(start_time='00:00:00', end_time='00:00:01', fps=10)
@@ -592,9 +592,7 @@ def find_frame_numbers_from_time_stamp(
     """
     check_if_string_value_is_valid_video_timestamp(value=start_time, name="Start time")
     check_if_string_value_is_valid_video_timestamp(value=start_time, name="End time")
-    check_that_hhmmss_start_is_before_end(
-        start_time=start_time, end_time=end_time, name="Time period"
-    )
+    check_that_hhmmss_start_is_before_end(start_time=start_time, end_time=end_time, name="Time period")
     start_h, start_m, start_s = start_time.split(":")
     end_h, end_m, end_s = end_time.split(":")
     start_in_s = int(start_h) * 3600 + int(start_m) * 60 + float(start_s)
@@ -668,7 +666,7 @@ def convert_roi_definitions(
     roi_definitions_path: Union[str, os.PathLike], save_dir: Union[str, os.PathLike]
 ) -> None:
     """
-    Helper to convert SimBA `ROI_definitions.h5` file into human-readable format.
+    Helper to convert SimBA `ROI_definitions.h5` file into human-readable CSV format.
 
     :param Union[str, os.PathLike] roi_definitions_path: Path to SimBA `ROI_definitions.h5` on disk.
     :param Union[str, os.PathLike] save_dir: Directory location where the output data should be stored
@@ -694,6 +692,11 @@ def slice_roi_dict_for_video(data: Dict[str, pd.DataFrame], video_name: str) -> 
     """
     Given a dictionary of dataframes representing different ROIs (created by ``simba.mixins.config_reader.ConfigReader.read_roi_data``),
     retain only the ROIs belonging to the specified video.
+
+    :param Dict[str, pd.DataFrame] data: Dictionary with ``Circle`, ``Polygon`` and ``Rectangle`` keys and dataframe values.
+    :param str video_name: Name of the vidio which ROIs should be sliced out.
+    :return: Tuple with (i) a dictionary of the same shape as input data, and a list of the roi names for the sliced video.
+    :rtype: Tuple[Dict[str, pd.DataFrame], List[str]]
     """
     check_if_keys_exist_in_dict(
         data=data,
@@ -723,12 +726,16 @@ def slice_roi_dict_for_video(data: Dict[str, pd.DataFrame], video_name: str) -> 
     return new_data, shape_names
 
 
-def freedman_diaconis(data: np.array) -> (float, int):
+def freedman_diaconis(data: np.ndarray) -> Tuple[float, int]:
     """
     Use Freedman-Diaconis rule to compute optimal count of histogram bins and their width.
 
     .. note::
        Can also use ``simba.utils.data.bucket_data`` passing method ``fd``.
+
+    :param np.ndarray data: 1d array with values to compute optimal bins for.
+    :returns: Tuple representing the optimal count of histogram bins and their width.
+    :rtype: Tuple[float, int]
 
     :references:
        .. [2] `Reference freedman_diaconis <http://www.jtrive.com/determining-histogram-bin-width-using-the-freedman-diaconis-rule.html>`_.
@@ -755,10 +762,13 @@ def hist_1d_mp(data: np.ndarray, bin_counts: np.ndarray, bin_widths: np.ndarray,
 
        For computing a single 1D histogram from 1d data, use : func: `hist_1d_`
 
-    :parameter np.ndarray data: 1d array containing feature values.
-    :parameter int bin_count: The number of bins.
-    :parameter: np.ndarray range: 1d array with two values representing minimum and maximum value to bin.
-    :parameter: Optional[bool] normalize: If True, then the counts are returned as a ratio of all values. If False, then the raw counts. Pass normalize as True if the datasets are unequal counts. Default: True.
+    :param np.ndarray data: 2d array containing feature values. The data in each row will be binned seperately.
+    :param int bin_count: The number of bins.
+    :param np.ndarray range: 1d array with two values representing minimum and maximum value to bin.
+    :param Optional[bool] normalize: If True, then the counts are returned as a ratio of all values. If False, then the raw counts. Pass normalize as True if the datasets are unequal counts. Default: True.
+    :returns: A numba list of list of same size as data.shape[0]
+    :rtype: typed.List
+
 
     :example:
     >>> data = np.random.randint(0, 100, (900, 300))
@@ -780,18 +790,18 @@ def hist_1d_mp(data: np.ndarray, bin_counts: np.ndarray, bin_widths: np.ndarray,
     return results
 
 
-def bucket_data(
-    data: np.ndarray,
-    method: Literal[
-        "fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"
-    ] = "auto",
-) -> Tuple[float, int]:
+def bucket_data(data: np.ndarray, method: Literal["fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"] = "auto",) -> Tuple[float, int]:
     """
     Computes the optimal bin count and bin width non-heuristically using specified method.
 
+    .. seealso::
+       :func:`simba.utils.data.freedman_diaconis`
+       :func:`simba.utils.data.bucket_data`
+
     :param np.ndarray data: 1D array of numerical data.
     :param np.ndarray method: The method to compute optimal bin count and bin width. These methods differ in how they estimate the optimal bin count and width. Defaults to 'auto', which represents the maximum of the Sturges and Freedman-Diaconis estimators. Available methods are 'fd', 'doane', 'auto', 'scott', 'stone', 'rice', 'sturges', 'sqrt'.
-    :returns Tuple[float, int]: A tuple containing the optimal bin width and bin count.
+    :returns: A tuple containing the optimal bin width and bin count.
+    :rtype: Tuple[float, int]
 
     :example:
     >>> data = np.random.randint(low=1, high=1000, size=(1, 100))
@@ -819,6 +829,10 @@ def bucket_data_mp(data: np.ndarray,
     """
     Compute histogram bin edges for many inputs in parallel using CPU with Joblib.
 
+    .. seealso::
+       :func:`simba.utils.data.freedman_diaconis`
+       :func:`simba.utils.data.bucket_data_mp`
+
     :param data: 2D input arrays for which to calculate histogram bin edges.
     :param np.ndarray method: The method to compute optimal bin count and bin width. These methods differ in how they estimate the optimal bin count and width. Defaults to 'auto', which represents the maximum of the Sturges and Freedman-Diaconis estimators. Available methods are 'fd', 'doane', 'auto', 'scott', 'stone', 'rice', 'sturges', 'sqrt'.
     :param n_jobs: Number of CPU cores to use for parallelism (-1 uses all available cores).
@@ -837,12 +851,17 @@ def bucket_data_mp(data: np.ndarray,
 
 
 @jit(nopython=True)
-def fast_minimum_rank(data: np.ndarray, descending: bool = True):
+def fast_minimum_rank(data: np.ndarray, descending: Optional[bool] = True) -> np.ndarray:
     """
     Jitted helper to rank values in 1D array using ``minimum`` method.
 
+    .. seealso::
+       :func:`simba.utils.data.fast_mean_rank`
+
     :param np.ndarray data: 1D array of feature values.
     :param bool descending: If True, ranks returned where low values get a high rank. If False, low values get a low rank. Default: True.
+    :return: 1D array with the ``data`` values ranked indices.
+    :rtype: np.ndarray
 
     :references:
         `Jérôme Richard on StackOverflow <https://stackoverflow.com/a/69869255>`__.
@@ -873,12 +892,17 @@ def fast_minimum_rank(data: np.ndarray, descending: bool = True):
 
 
 @jit(nopython=True)
-def fast_mean_rank(data: np.ndarray, descending: bool = True):
+def fast_mean_rank(data: np.ndarray, descending: Optional[bool] = True) -> np.ndarray:
     """
     Jitted helper to rank values in 1D array using ``mean`` method.
 
+    .. seealso::
+       :func:`simba.utils.data.fast_minimum_rank`
+
     :param np.ndarray data: 1D array of feature values.
     :param bool descending: If True, ranks returned where low values get a high rank. If False, low values get a low rank. Default: True.
+    :return: 1D array with the ``data`` values ranked indices.
+    :rtype: np.ndarray
 
     :references:
         `Modified from James Webber gist on GitHub <https://gist.github.com/jamestwebber/38ab26d281f97feb8196b3d93edeeb7b>`__.
@@ -1012,9 +1036,7 @@ def slp_to_df_convert(
     return data_df
 
 
-def find_ranked_colors(
-    data: Dict[str, float], palette: str, as_hex: Optional[bool] = False
-) -> Dict[str, Union[Tuple[int], str]]:
+def find_ranked_colors(data: Dict[str, float], palette: str, as_hex: Optional[bool] = False) -> Dict[str, Union[Tuple[int], str]]:
     """
     Find ranked colors for a given data dictionary values based on a specified color palette.
 
@@ -1025,6 +1047,7 @@ def find_ranked_colors(
     :param palette: A string representing the name of the color palette to use (e.g., 'magma').
     :param as_hex: If True, return colors in hexadecimal format; if False, return as RGB tuples. Default is False.
     :return: A dictionary where keys are labels and values are corresponding colors based on ranking.
+    :rtype: Dict[str, Union[Tuple[int], str]]
 
     :examples:
     >>> data = {'Animal_1': 0.34786870380536705, 'Animal_2': 0.4307923198152757, 'Animal_3': 0.221338976379357}
@@ -1066,7 +1089,8 @@ def sample_df_n_by_unique(df: pd.DataFrame, field: str, n: int) -> pd.DataFrame:
     :param pd.DataFramedf: The dataframe to sample from.
     :param str field: The column name in the DataFrame to use for sampling based on unique values.
     :param int n: The maximum number of rows to sample for each unique value in the specified column.
-    :return pd.DataFrame: A dataframe containing randomly sampled rows.
+    :return A dataframe containing randomly sampled rows.
+    :rtype: pd.DataFrame
     """
 
     check_instance(
@@ -1093,11 +1117,17 @@ def sample_df_n_by_unique(df: pd.DataFrame, field: str, n: int) -> pd.DataFrame:
 
 
 def get_mode(x: np.ndarray) -> Union[float, int]:
-    """Get the mode (most frequent value) within an array"""
+    """
+    Get the mode (most frequent value) within an array
+
+    :param np.ndarray x: 1d array of numerics.
+    :return: The mode of `x`.
+    :rtype Union[float, int]:
+    """
     check_valid_array(
         source=f"{get_mode.__name__} x",
         data=x,
-        accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, np.int8),
+        accepted_dtypes=Formats.NUMERIC_DTYPES.value,
     )
     values, counts = np.unique(x, return_counts=True)
     return counts.argmax()
@@ -1374,6 +1404,7 @@ def df_smoother(data: pd.DataFrame,
 
 def get_library_version(library_name: str) -> str:
     """
+    Get the version installed package in python environment.
 
     :param str library_name: Name of library.
     :return str: Library version name, if installed

@@ -6,86 +6,17 @@ import numpy as np
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.ROI_image import ROI_image_class
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, SimbaButton
-from simba.utils.checks import check_int, check_str, check_valid_tuple
+from simba.utils.checks import check_int, check_str
 from simba.utils.enums import Formats
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import get_color_dict
 from simba.utils.printing import stdout_success
+from simba.roi_tools.ROI_size_calculations import get_vertices_hexagon, get_half_circle_vertices, get_ear_tags_for_rectangle
 
 THICKNESS_OPTIONS = list(range(1, 26, 1))
 EAR_TAG_SIZE_OPTIONS = list(range(1, 26, 1))
 THICKNESS_OPTIONS.insert(0, 'THICKNESS')
 EAR_TAG_SIZE_OPTIONS.insert(0, 'EAR TAG SIZE')
-
-
-def get_half_circle_vertices(center: Tuple[int, int],
-                             radius: int,
-                             direction: str,
-                             n_points: Optional[int] = 50) -> Tuple[np.ndarray, Dict[str, Tuple[int, int]]]:
-
-    check_valid_tuple(x=center, source=get_vertices_hexagon.__name__, accepted_lengths=(2,), valid_dtypes=Formats.NUMERIC_DTYPES.value)
-    check_int(name='radius', value=radius, min_value=1)
-    check_str(name='direction', options=['NORTH', 'SOUTH', 'WEST', 'EAST'], value=direction)
-    x_c, y_c = center
-    if direction == "WEST":
-        a = np.linspace(np.pi / 2, 3 * np.pi / 2, n_points)
-    elif direction == "EAST":
-        a = np.linspace(-np.pi / 2, np.pi / 2, n_points)
-    elif direction == "SOUTH":
-        a = np.linspace(0, np.pi, n_points)
-    else:
-        a = np.linspace(np.pi, 2 * np.pi, n_points)
-    x, y = x_c + radius * np.cos(a), y_c + radius * np.sin(a)
-    vertices = np.column_stack((x, y)).astype(np.int32)
-    vertices_dict = {"Center_tag": (center[0], center[1])}
-    for tag_id in range(vertices.shape[0]):
-        vertices_dict[f"Tag_{tag_id}"] = (vertices[tag_id][0], vertices[tag_id][1])
-    return (np.array(vertices).astype("int32"), vertices_dict)
-
-
-def get_vertices_hexagon(center: Tuple[int, int],
-                         radius: int) -> Tuple[np.ndarray, Dict[str, Tuple[int, int]]]:
-
-
-    check_valid_tuple(x=center, source=get_vertices_hexagon.__name__, accepted_lengths=(2,), valid_dtypes=Formats.NUMERIC_DTYPES.value)
-    check_int(name='radius', value=radius, min_value=1)
-    vertices = []
-    x_c, y_c = center
-    for i in range(6):
-        angle_rad = np.deg2rad(60 * i)
-        x_i = x_c + radius * np.cos(angle_rad)
-        y_i = y_c + radius * np.sin(angle_rad)
-        vertices.append((x_i, y_i))
-
-    vertices_dict = {"Center_tag": (center[0], center[1])}
-    for tag_id, tag in enumerate(vertices):
-        vertices_dict[f"Tag_{tag_id}"] = (int(tag[0]), int(tag[1]))
-    return (np.array(vertices).astype("int32"), vertices_dict)
-
-def get_ear_tags_for_rectangle(center: Tuple[int, int], width: int, height: int) -> Dict[str, int]:
-    """
-    Knowing the center, width, and height of rectangle, return its vertices.
-
-    :param Tuple[int, int] center: The center x and y coordinates of the rectangle
-    :param int width: The width of the rectangle in pixels.
-    :param Tuple[int, int] width: The width of the rectangle in pixels.
-    """
-
-    check_valid_tuple(x=center, source=get_ear_tags_for_rectangle.__name__, accepted_lengths=(2,), valid_dtypes=Formats.NUMERIC_DTYPES.value)
-    check_int(name='width', value=width, min_value=1)
-    check_int(name='height', value=height, min_value=1)
-    tags = {}
-    tags['top_left_x'] = int((center[1] - (width/2)))
-    tags['top_left_y'] = int(center[0] - (height/2))
-    tags['bottom_right_x'] = int(center[1] + (width/2))
-    tags['bottom_right_y'] = int(center[0] + (height/2))
-    tags['top_right_tag'] = (int(center[1] + (width/2)), int(center[0] - (height/2)))
-    tags['bottom_left_tag'] = (int(center[1] - (width / 2)), int(center[0] + (height / 2)))
-    tags['top_tag'] = (int(center[1]), int(center[0] - (height / 2)))
-    tags['right_tag'] = (int(center[1] + (width / 2)), int(center[0]))
-    tags['left_tag'] = (int(center[1] - (width / 2)), int(center[0]))
-    tags['bottom_tag'] = (int(center[1]), int(center[0] + (height / 2)))
-    return tags
 
 class DrawFixedROIPopUp(PopUpMixin):
 
@@ -122,44 +53,44 @@ class DrawFixedROIPopUp(PopUpMixin):
         self.eartag_size_drpdwn.grid(row=0, column=3, sticky=NW)
 
         self.rectangle_frm = LabelFrame(self.main_frm, text="ADD RECTANGLE", pady=10, font=Formats.FONT_HEADER.value, fg="black")
-        self.rectangle_width_eb = Entry_Box(self.rectangle_frm, '', 0, None, validation='numeric', entry_box_width='9')
+        self.rectangle_width_eb = Entry_Box(self.rectangle_frm, '', 0, None, validation='numeric', entry_box_width='11')
         self.rectangle_width_eb.entry_set('WIDTH (MM)')
-        self.rectangle_height_eb = Entry_Box(self.rectangle_frm, '', 0, None, validation='numeric', entry_box_width='9')
+        self.rectangle_height_eb = Entry_Box(self.rectangle_frm, '', 0, None, validation='numeric', entry_box_width='11')
         self.rectangle_height_eb.entry_set('HEIGHT (MM)')
         add_rect_btn = SimbaButton(parent=self.rectangle_frm, txt='ADD RECTANGLE', img='square_black', cmd=self.add_rect, txt_clr='blue')
         self.rectangle_frm.grid(row=1, column=0, sticky=NW)
         self.rectangle_width_eb.grid(row=0, column=0, sticky=NW)
         self.rectangle_height_eb.grid(row=0, column=1, sticky=NW)
-        add_rect_btn.grid(row=1, column=0, sticky=NW)
+        add_rect_btn.grid(row=0, column=2, sticky=NW)
 
         self.circle_frm = LabelFrame(self.main_frm, text="ADD CIRCLE", pady=10, font=Formats.FONT_HEADER.value, fg="black")
-        self.circle_radius_eb = Entry_Box(self.circle_frm, '', 0, None, validation='numeric', entry_box_width='9')
+        self.circle_radius_eb = Entry_Box(self.circle_frm, '', 0, None, validation='numeric', entry_box_width='11')
         self.circle_radius_eb.entry_set('RADIUS (MM)')
         add_circle_btn = SimbaButton(parent=self.circle_frm, txt='ADD CIRCLE', img='circle_2', cmd=self.add_circle, txt_clr='blue')
         self.circle_frm.grid(row=2, column=0, sticky=NW)
         self.circle_radius_eb.grid(row=0, column=0, sticky=NW)
-        add_circle_btn.grid(row=1, column=0, sticky=NW)
+        add_circle_btn.grid(row=0, column=1, sticky=NW)
 
         self.hexagon_frm = LabelFrame(self.main_frm, text="ADD HEXAGON", pady=10, font=Formats.FONT_HEADER.value, fg="black")
-        self.hexagon_radius_eb = Entry_Box(self.hexagon_frm, '', 0, None, validation='numeric', entry_box_width='9')
+        self.hexagon_radius_eb = Entry_Box(self.hexagon_frm, '', 0, None, validation='numeric', entry_box_width='11')
         self.hexagon_radius_eb.entry_set('RADIUS (MM)')
         add_hex_btn = SimbaButton(parent=self.hexagon_frm, txt='ADD HEXAGON', img='hexagon', cmd=self.add_hex, txt_clr='blue')
 
         self.hexagon_frm.grid(row=3, column=0, sticky=NW)
         self.hexagon_radius_eb.grid(row=0, column=0, sticky=NW)
-        add_hex_btn.grid(row=1, column=0, sticky=NW)
+        add_hex_btn.grid(row=0, column=1, sticky=NW)
 
         self.half_circle_frm = LabelFrame(self.main_frm, text="ADD HALF CIRCLE", pady=10, font=Formats.FONT_HEADER.value, fg="black")
-        self.half_circle_radius_eb = Entry_Box(self.half_circle_frm, '', 0, None, validation='numeric', entry_box_width='9')
+        self.half_circle_radius_eb = Entry_Box(self.half_circle_frm, '', 0, None, validation='numeric', entry_box_width='11')
         self.half_circle_radius_eb.entry_set('RADIUS (MM)')
-        self.half_circle_direction_drpdwn = DropDownMenu(self.half_circle_frm, 'DIRECTION:', ['NORTH', 'SOUTH', 'WEST', 'EAST'], 10)
+        self.half_circle_direction_drpdwn = DropDownMenu(self.half_circle_frm, 'DIRECTION:', ['NORTH', 'SOUTH', 'WEST', 'EAST' 'NORTH-EAST', 'NORTH-WEST', 'SOUTH-EAST', 'SOUTH-WEST'], 10)
         self.half_circle_direction_drpdwn.setChoices('NORTH')
         add_half_circle_btn = SimbaButton(parent=self.half_circle_frm, txt='ADD HALF CIRCLE', img='half_circle', cmd=self.add_half_circle, txt_clr='blue')
 
         self.half_circle_frm.grid(row=4, column=0, sticky=NW)
         self.half_circle_radius_eb.grid(row=0, column=0, sticky=NW)
         self.half_circle_direction_drpdwn.grid(row=0, column=1, sticky=NW)
-        add_half_circle_btn.grid(row=1, column=0, sticky=NW)
+        add_half_circle_btn.grid(row=0, column=2, sticky=NW)
 
         self.info_txt = Label(self.main_frm, text='', font=Formats.FONT_REGULAR.value)
         self.info_txt.grid(row=5, column=0, sticky=NW)

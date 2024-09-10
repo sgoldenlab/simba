@@ -106,7 +106,8 @@ class CircularStatisticsMixin(object):
         :parameter np.ndarray data: 1D array of size len(data) representing degrees.
         :parameter np.ndarray time_window: Rolling time-window as float in seconds.
         :parameter int fps: fps of the recorded video
-        :returns np.ndarray: Size len(data) x len(time_windows) representing resultant vector length in the prior ``time_window``.
+        :returns: Size len(data) x len(time_windows) representing resultant vector length in the prior ``time_window``.
+        :rtype: np.ndarray
 
         :example:
         >>> data_1, data_2 = np.random.normal(loc=45, scale=1, size=100), np.random.normal(loc=90, scale=45, size=100)
@@ -163,12 +164,6 @@ class CircularStatisticsMixin(object):
         """
         Compute the circular mean in degrees within sliding temporal windows.
 
-        :parameter np.ndarray data: 1d array with feature values in degrees.
-        :parameter np.ndarray time_windows: Rolling time-windows as floats in seconds. E.g., [0.2, 0.4, 0.6]
-        :parameter int fps: fps of the recorded video
-        :returns: Size data.shape[0] x time_windows.shape[0] array
-        :rtype: np.ndarray
-
         .. image:: _static/img/mean_rolling_timeseries_angle.png
            :width: 600
            :align: center
@@ -181,6 +176,12 @@ class CircularStatisticsMixin(object):
            :func:`simba.data_processors.cuda.circular_statistics.sliding_circular_mean`,
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.circular_mean`
 
+
+        :parameter np.ndarray data: 1d array with feature values in degrees.
+        :parameter np.ndarray time_windows: Rolling time-windows as floats in seconds. E.g., [0.2, 0.4, 0.6]
+        :parameter int fps: fps of the recorded video
+        :returns: Size data.shape[0] x time_windows.shape[0] array
+        :rtype: np.ndarray
 
         :example:
         >>> data = np.random.normal(loc=45, scale=1, size=20).astype(np.float32)
@@ -204,10 +205,6 @@ class CircularStatisticsMixin(object):
         """
         Jitted compute of the circular standard deviation from a single distribution of angles in degrees.
 
-        :parameter ndarray data: 1D array of size len(frames) with angles in degrees
-        :returns: The standard deviation of the data sample in degrees.
-        :rtype: float
-
         .. image:: _static/img/circular_std.png
            :width: 600
            :align: center
@@ -221,6 +218,11 @@ class CircularStatisticsMixin(object):
            \\sigma_{\\text{circular}} = \\text{rad2deg}\\left(\\sqrt{-2 \\cdot \\log\\left(|\text{mean}(\\exp(j \\cdot \\theta))|\\right)}\\right)
 
         where \\(\\theta\\) represents the angles in radians
+
+
+        :parameter ndarray data: 1D array of size len(frames) with angles in degrees
+        :returns: The standard deviation of the data sample in degrees.
+        :rtype: float
 
         :example:
         >>> data = np.array([180, 221, 32, 42, 212, 101, 139, 41, 69, 171, 149, 200]).astype(np.float32)

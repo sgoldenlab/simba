@@ -95,18 +95,39 @@ class ImageMixin(object):
         return results
 
     @staticmethod
-    def gaussian_blur(img: np.ndarray, kernel_size: Optional[Tuple] = (9, 9)):
+    def gaussian_blur(img: np.ndarray, kernel_size: Optional[Tuple] = (9, 9)) -> np.ndarray:
+        """
+        Applies a Gaussian blur to an input image using the specified kernel size.
+
+        Gaussian blurring is used to reduce image noise and detail by smoothing the image. It applies a weighted average
+        where more importance is given to the central pixels, creating a soft blur effect.
+
+        :param np.ndarray img: Input image as a NumPy array. The image should be a valid 2D (grayscale) or 3D (color) array.
+        :param Optional[Tuple] kernel_size: A tuple (height, width) representing the size of the Gaussian kernel. The values must be positive odd integers. Default is (9, 9).
+        :return: A NumPy array representing the blurred image with the same dimensions as the input image.
+        :rtype: np.ndarray
+
+        """
         check_if_valid_img(data=img, source=ImageMixin.gaussian_blur.__name__)
         check_instance(source=ImageMixin.gaussian_blur.__name__, instance=kernel_size, accepted_types=(tuple,))
         check_valid_lst(data=list(kernel_size), source=ImageMixin.gaussian_blur.__name__, valid_dtypes=(int,), exact_len=2,)
         return cv2.GaussianBlur(img, kernel_size, 0)
 
     @staticmethod
-    def erode(
-        img: np.ndarray,
-        kernel_size: Optional[Tuple] = (3, 3),
-        iterations: Optional[int] = 3,
-    ):
+    def erode( img: np.ndarray,
+              kernel_size: Optional[Tuple[int, int]] = (3, 3),
+              iterations: Optional[int] = 3) -> np.ndarray:
+        """
+        Applies morphological erosion to the input image using the specified kernel size and number of iterations.
+
+        :param np.ndarray img: A 2D or 3D NumPy array representing the input image on which erosion will be applied. It should be in the form of a binary or greyscale image.
+        :param Optional[Tuple[int, int]] kernel_size: A tuple (width, height) specifying the size of the kernel to be used for erosion. The default kernel size is (3, 3).
+        :param Optional[int] iterations: The number of times the erosion operation is applied. The default value is 3.
+        :return: A NumPy array of the same shape as the input `img` representing the eroded image.
+        :rtype: np.ndarray
+
+        """
+
         check_if_valid_img(data=img, source=ImageMixin.gaussian_blur.__name__)
         check_instance(
             source=ImageMixin.gaussian_blur.__name__,
@@ -181,7 +202,8 @@ class ImageMixin(object):
         :param np.ndarray img_1: First input image (numpy array).
         :param np.ndarray img_2: Second input image (numpy array).
         :param Optional[Literal['all', 'exterior']] method: Method for contour extraction. Options: 'all' (all contours) or 'exterior' (only exterior contours). Defaults to 'all'.
-        :return float: Contour similarity score between the two images. Lower values indicate greater similarity, and higher values indicate greater dissimilarity.
+        :return: Contour similarity score between the two images. Lower values indicate greater similarity, and higher values indicate greater dissimilarity.
+        :rtype: float
 
         :example:
         >>> img_1 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/khan/project_folder/videos/stitched_frames/0.png').astype(np.uint8)
@@ -215,8 +237,7 @@ class ImageMixin(object):
         )
 
     @staticmethod
-    def slice_shapes_in_img(img: Union[np.ndarray, Tuple[cv2.VideoCapture, int]], geometries: List[Union[Polygon, np.ndarray]],
-    ) -> List[np.ndarray]:
+    def slice_shapes_in_img(img: Union[np.ndarray, Tuple[cv2.VideoCapture, int]], geometries: List[Union[Polygon, np.ndarray]]) -> List[np.ndarray]:
         """
         Slice regions of interest (ROIs) from an image based on provided shapes.
 
@@ -225,9 +246,19 @@ class ImageMixin(object):
            and shifting geometries across images, consider ``simba.mixins.image_mixin.ImageMixin.slice_shapes_in_imgs``
            which uses CPU multiprocessing.
 
+        .. seealso::
+           :func:`simba.data_processors.cuda.image.slice_imgs`
+           :func:`simba.mixins.image_mixin.ImageMixin.slice_shapes_in_imgs`
+
+        .. video:: _static/img/slice_imgs_gpu.webm
+           :width: 800
+           :autoplay:
+           :loop:
+
         :param Union[np.ndarray, Tuple[cv2.VideoCapture, int]] img: Either an image in numpy array format OR a tuple with cv2.VideoCapture object and the frame index.
         :param List[Union[Polygon, np.ndarray]] img: A list of shapes either as vertices in a numpy array, or as shapely Polygons.
-        :returns List[np.ndarray]: List of sliced ROIs from the input image.
+        :returns: List of sliced ROIs from the input image.
+        :rtype: List[np.ndarray]
 
         >>> img = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/img_comparisons_4/1.png')
         >>> img_video = cv2.VideoCapture('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/Example_1.mp4')
@@ -292,16 +323,26 @@ class ImageMixin(object):
         return result
 
     @staticmethod
-    def canny_edge_detection(
-        img: np.ndarray,
-        threshold_1: int = 30,
-        threshold_2: int = 200,
-        aperture_size: int = 3,
-        l2_gradient: bool = False,
-    ) -> np.ndarray:
+    def canny_edge_detection(img: np.ndarray,
+                             threshold_1: Optional[int] = 30,
+                             threshold_2: Optional[int] = 200,
+                             aperture_size: Optional[int] = 3,
+                             l2_gradient: Optional[bool] = False) -> np.ndarray:
         """
-        Apply Canny edge detection to the input image.
+        Applies Canny edge detection to the input image using specified thresholds, aperture size, and L2 gradient option.
+
+        Canny edge detection is an edge detection algorithm that uses gradient values to identify sharp changes in intensity
+        in an image, which correspond to edges.
+
+        :param np.ndarray img: A 2D or 3D NumPy array representing the input image. If the image has 3 channels (RGB or BGR), it will be converted to grayscale.
+        :param Optional[int] threshold_1: The lower threshold value for the Canny edge detection. Default is 30.
+        :param Optional[int] threshold_2: The upper threshold value for the Canny edge detection. Default is 200.
+        :param Optional[int] aperture_size: The aperture size for the Sobel operator used during edge detection. It must be an odd number between 3 and 7. Default is 3.
+        :param Optional[bool] l2_gradient:  If set to True, the L2 norm is used to calculate the gradient magnitude. If False, the L1 norm is used. Default is False.
+        :return: A NumPy array representing the detected edges in the image.
+        :rtype: np.ndarray
         """
+
         check_if_valid_img(source=f"{ImageMixin.canny_edge_detection.__name__}", data=img)
         check_int(
             name=f"{ImageMixin.canny_edge_detection.__name__} threshold_1",
@@ -330,12 +371,20 @@ class ImageMixin(object):
 
     @staticmethod
     def img_moments(img: np.ndarray, hu_moments: Optional[bool] = False) -> np.ndarray:
-        """
-        Compute image moments.
 
-        :param np.ndarray img: The input image.
-        :param  Optional[bool] img: If True, returns the 7 Hu moments. Else, returns the moments.
-        :returns np.ndarray: A 24x1 2d-array if hu_moments is False, 7x1 2d-array if hu_moments is True.
+        """
+        Compute image moments or Hu moments from the given image.
+
+        Image moments are statistical properties of an image that provide information about its shape and structure.
+        Hu moments are a set of seven invariant moments used for image pattern recognition, which are invariant to
+        image transformations such as scaling, translation, and rotation.
+
+        See https://en.wikipedia.org/wiki/Image_moment#Hu_invariant_moments
+
+        :param np.ndarray img: The input image as a 2D or 3D NumPy array. If the image has multiple channels (e.g., RGB or BGR), it will be converted to grayscale.
+        :param  Optional[bool] hu_moments: If set to True, the function computes and returns the 7 Hu moments.  If False, it returns the standard moments of the image. Default is False.
+        :returns: A 24x1 2D-array if `hu_moments` is False (representing standard moments), or a 7x1 2D-array if `hu_moments` is True (representing Hu moments).
+        :rtype: np.ndarray
 
         :example:
         >>> img_1 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/khan/project_folder/videos/stitched_frames/0.png').astype(np.uint8)
@@ -364,6 +413,7 @@ class ImageMixin(object):
         :param np.ndarray img: Input image as a NumPy array.
         :param Optional[Literal['all', 'exterior']] img: Contour retrieval mode. E.g., which contours should be kept. Default is 'all'.
         :param Optional[Literal['simple', 'none', 'l1', 'kcos']]: Contour approximation method. Default is 'simple'.
+        :rtype: np.ndarray
         """
 
         check_if_valid_img(source=f"{ImageMixin.find_contours.__name__} img", data=img)
@@ -448,9 +498,10 @@ class ImageMixin(object):
         :param np.ndarray img: Template image for matching. E.g., a cropped image from ``video_path``.
         :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default is -1 (max available cores).
         :param Optional[bool] return_img: Whether to return the annotated best match image with rectangle around matched template area. Default is False.
-        :returns Tuple[ int, dict, Union[None, np.ndarray]]: A tuple containing: (i) int: frame index of the frame with the best match.
+        :returns: A tuple containing: (i) int: frame index of the frame with the best match.
                  (ii) dict: Dictionary containing results (probability and match location) for each frame.
                  (iii) Union[None, np.ndarray]: Annotated image with rectangles around matches (if return_img is True), otherwise None.
+        :rtype: Tuple[ int, dict, Union[None, np.ndarray]]
 
         :example:
         >>> img = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Screenshot 2024-01-17 at 12.45.55 PM.png')
@@ -526,15 +577,16 @@ class ImageMixin(object):
            :width: 600
            :align: center
 
-        .. note::
-           If converting multiple images from colour to black and white, consider ``simba.mixins.image_mixin.ImageMixin.img_stack_to_bw()``
-
+        .. seelalso::
+           If converting multiple images from colour to black and white, consider :func:`simba.mixins.image_mixin.ImageMixin.img_stack_to_bw()` or
+           :func:`simba.data_processors.cuda.image.img_stack_to_bw`
 
         :param np.ndarray img: Input image as a NumPy array.
         :param Optional[int] lower_thresh: Lower threshold value for binary conversion. Pixels below this value become black. Default is 20.
         :param Optional[int] upper_thresh: Upper threshold value for binary conversion. Pixels above this value become white. Default is 250.
         :param Optional[bool] invert: Flag indicating whether to invert the binary image (black becomes white and vice versa). Default is True.
-        :return np.ndarray: Binary black and white image.
+        :return: Binary black and white image.
+        :rtype: np.ndarray
         """
         check_if_valid_img(data=img, source=ImageMixin().img_to_bw.__name__)
         check_int(
@@ -563,7 +615,8 @@ class ImageMixin(object):
         Convert a stack of color images into black and white format.
 
         .. note::
-           If converting a single image, consider ``simba.mixins.image_mixin.ImageMixin.img_to_bw()``
+           If converting a single image, consider ``simba.mixins.image_mixin.ImageMixin.img_to_bw()``. For GPU acceleration,
+           see :func:`simba.data_processors.cuda.image.img_stack_to_bw`.
 
         :param np.ndarray img: 4-dimensional array of color images.
         :param Optional[int] lower_thresh: Lower threshold value for binary conversion. Pixels below this value become black. Default is 20.
@@ -612,14 +665,15 @@ class ImageMixin(object):
            :align: center
 
         .. seealso::
-           :func:`simba.mixins.image_mixin.ImageMixin.segment_img_stack_horizontal`
-           :func:`simba.mixins.image_mixin.ImageMixin.segment_img_vertical`
+           :func:`simba.mixins.image_mixin.ImageMixin.segment_img_stack_horizontal`, :func:`simba.mixins.image_mixin.ImageMixin.segment_img_vertical`,
+           :func:`simba.data_processors.cuda.image.segment_img_stack_horizontal`, :func:`simba.data_processors.cuda.image.segment_img_stack_vertical`
 
         :param np.ndarray img: Input image as a NumPy array.
         :param int pct: Percentage of the image to be segmented. If `lower` is True, it represents the lower part; if False, it represents the upper part.
         :param Optional[bool] lower: Flag indicating whether to segment the lower part (True) or upper part (False) of the image. Default is True.
         :param Optional[bool] both: If True, **removes** both the upper pct and lower pct and keeps middle part.
-        :return np.array: Segmented part of the image.
+        :return: Segmented part of the image.
+        :rtype: np.ndarray
 
         :example:
         >>> img = cv2.imread('/Users/simon/Desktop/test.png')
@@ -651,7 +705,7 @@ class ImageMixin(object):
 
         .. seealso::
            :func:`simba.mixins.image_mixin.ImageMixin.segment_img_horizontal`
-           :func:`simba.data_processors.cuda.image.segment_img_stack_horizontal`
+           :func:`simba.data_processors.cuda.image.segment_img_stack_horizontal`,
 
         :example:
         >>> imgs = ImageMixin.read_img_batch_from_video(video_path='/Users/simon/Downloads/3A_Mouse_5-choice_MouseTouchBasic_a1.mp4', start_frm=0, end_frm=400)
@@ -700,7 +754,8 @@ class ImageMixin(object):
         :param int pct: Percentage of the image to be segmented. If `lower` is True, it represents the lower part; if False, it represents the upper part.
         :param Optional[bool] lower: Flag indicating whether to segment the lower part (True) or upper part (False) of the image. Default is True.
         :param Optional[bool] both: If True, **removes** both the left pct and right pct and keeps middle part.
-        :return np.array: Segmented part of the image.
+        :return: Segmented part of the image.
+        :rtype: np.ndarray
         """
 
         check_if_valid_img(data=img, source=ImageMixin().segment_img_vertical.__name__)
@@ -780,8 +835,11 @@ class ImageMixin(object):
     def read_all_img_in_dir(dir: Union[str, os.PathLike], core_cnt: Optional[int] = -1) -> Dict[str, np.ndarray]:
         """
         Helper to read in all images within a directory using multiprocessing.
-        Returns a dictionary with the image name as key and the images in array format as values.
 
+        :param Union[str, os.PathLike] dir: Diretory holding the input images.
+        :param Optional[int] core_cnt: Number of CPU cores to use to read in images. Default to ``-1`` denoting all available cores.
+        :returns: Returns a dictionary with the image name as key and the images in array format as values.
+        :rtype: Dict[str, np.ndarray]
 
         :example:
         >>> imgs = ImageMixin().read_all_img_in_dir(dir='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/Together_4_cropped_frames')
@@ -815,12 +873,11 @@ class ImageMixin(object):
     @njit([(uint8[:, :, :, :], uint8[:, :, :, :]), (uint8[:, :, :], uint8[:, :, :])])
     def img_stack_mse(imgs_1: np.ndarray, imgs_2: np.ndarray) -> np.ndarray:
         """
-        Pairwise comparison of images in two stacks of equal length using mean squared errors.
+        Jitted pairwise comparison of images in two stacks of equal length using mean squared errors.
 
         .. note::
            Useful for noting subtle changes, each imgs_2 equals imgs_1 with images shifted by 1. Images has to be in uint8 format.
            Also see ``img_sliding_mse``.
-
 
         .. seealso::
            :func:`simba.data_processors.cuda.image.stack_sliding_mse`
@@ -828,7 +885,8 @@ class ImageMixin(object):
 
         :param np.ndarray imgs_1: First three (non-color) or four (color) dimensional stack of images in array format.
         :param np.ndarray imgs_1: Second three (non-color) or four (color) dimensional stack of images in array format.
-        :return np.ndarray: Array of size len(imgs_1) comparing ``imgs_1`` and ``imgs_2`` at each index using mean squared errors at each pixel location.
+        :return: Array of size len(imgs_1) comparing ``imgs_1`` and ``imgs_2`` at each index using mean squared errors at each pixel location.
+        :rtype: np.ndarray
 
         :example:
         >>> img_1 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/khan/project_folder/videos/stitched_frames/0.png').astype(np.uint8)
@@ -853,7 +911,7 @@ class ImageMixin(object):
     @njit([(uint8[:, :, :, :], int64), (uint8[:, :, :], int64)])
     def img_sliding_mse(imgs: np.ndarray, slide_size: int = 1) -> np.ndarray:
         """
-        Calculate the mean squared error (MSE) between pairs of images in a sliding window manner.
+        Jitted compute the mean squared error (MSE) between pairs of images in a sliding window manner.
 
         This function performs pairwise comparisons of images using mean squared errors (MSE).
         It slides a window of the specified size over the sequence of images and computes the MSE
@@ -871,6 +929,7 @@ class ImageMixin(object):
         :param imgs: 3d or 4d A numpy array of images.
         :param slide_size: The size of the sliding window (default is 1).
         :return: A numpy array of MSE values for each pair of images in the sliding window.
+        :rtype: np.ndarray
 
 
         :example:
@@ -910,7 +969,6 @@ class ImageMixin(object):
     ) -> Dict[int, np.ndarray]:
         """
         Read a batch of frames from a video file. This method reads frames from a specified range of frames within a video file using multiprocessing.
-
 
         .. seealso::
            :func:`simba.utils.read_write.read_img_batch_from_video_gpu`
@@ -972,6 +1030,12 @@ class ImageMixin(object):
         """
         Compute Wasserstein distance between two images represented as numpy arrays.
 
+        .. math::
+           EMD(P, Q) = \inf_{\gamma \in \Gamma(P, Q)} \int |x - y| d\gamma(x, y)
+
+        where :math:`P` and :math:`Q` are the distributions (image histograms), and :math:`\Gamma(P, Q)` represents the set of all possible joint distributions between :math:`P` and :math:`Q`. The goal is to minimize the cost of transforming :math:`P` into :math:`Q`.
+
+
         .. note::
            Long runtime for larger images. Consider down-sampling videos / images before caluclating wasserstein / earth mover distances.
 
@@ -979,6 +1043,13 @@ class ImageMixin(object):
            :width: 600
            :align: center
 
+        :param List[np.ndarray] imgs: A list containing two images as NumPy arrays. Alternatively, you can pass `img_1` and `img_2` directly.
+        :param Optional[np.ndarray] img_1: The first image (optional if `imgs` is provided).
+        :param Optional[np.ndarray] img_2:  The second image (optional if `imgs` is provided).
+        :param Optional[float] lower_bound: Lower bound on the EMD computation. Default is 0.5.
+        :param Optional[bool] verbose: If True, prints additional information such as elapsed time.
+        :return: The Earth Mover's Distance (Wasserstein distance) between the two images.
+        :rtype: float
 
         :example:
         >>> img_1 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/Example_1_frames/24.png', 0).astype(np.float32)
@@ -1026,7 +1097,8 @@ class ImageMixin(object):
         :param Tuple[int, int] size: A tuple of two integers representing the width and height of the image.
         :param Tuple[int, int, int] color: A tuple of three integers representing the RGB color (e.g., (255, 0, 0) for red).
         :param Optional[Union[str, os.PathLike]] save_path: a string representing the file path to save the image.  If not provided, the function returns the image as a numpy array.
-        :return Union[None, np.ndarray]: If save_path is provided, the function saves the image to the specified path and returns None. f save_path is not provided, the function returns the image as a numpy ndarray.
+        :return: If save_path is provided, the function saves the image to the specified path and returns None. f save_path is not provided, the function returns the image as a numpy ndarray.
+        :rtype: Union[None, np.ndarray]
 
         :example:
         >>> from simba.utils.data import create_color_palette
@@ -1067,7 +1139,8 @@ class ImageMixin(object):
 
 
         :param np.ndarray imgs: A stack of images represented as a numpy array.
-        :return np.ndarray: The MSE matrix table.
+        :return: The MSE matrix table.
+        :rtype: np.ndarray
 
         :example:
         >>> imgs = ImageMixin().read_img_batch_from_video(video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Together_1.avi', start_frm=0, end_frm=50)
@@ -1096,7 +1169,8 @@ class ImageMixin(object):
            :func:`simba.mixins.image_mixin.ImageMixin.img_stack_to_greyscale`
 
         :param np.ndarray img: Input image represented as a NumPy array. For a color image, the array should have three channels (RGB).
-        :return np.ndarray: The greyscale image as a 2D NumPy array.
+        :return: The greyscale image as a 2D NumPy array.
+        :rtype: np.ndarray
         """
         check_if_valid_img(data=img, source=ImageMixin.img_to_greyscale.__name__)
         if len(img.shape) != 2:
@@ -1165,7 +1239,8 @@ class ImageMixin(object):
 
         :param Dict[int, np.ndarray] image_dict: A dictionary mapping integer keys to numpy arrays representing images.
         :param Optional[int] pad_value: The value (between 0-255) used for padding. Defaults to 0 (black)
-        :return Dict[int, np.ndarray]: A dictionary mapping integer keys to numpy arrays representing padded images.
+        :return: A dictionary mapping integer keys to numpy arrays representing padded images.
+        :rtype: Dict[int, np.ndarray]
         """
 
         check_instance(source=ImageMixin.pad_img_stack.__name__, instance=image_dict,accepted_types=(dict,))
@@ -1184,12 +1259,15 @@ class ImageMixin(object):
     def img_stack_to_video(imgs: Dict[int, np.ndarray],
                            fps: int,
                            save_path: Union[str, os.PathLike],
-                           verbose: Optional[bool] = True):
+                           verbose: Optional[bool] = True) -> None:
         """
         Convert a dictionary of images into a video file.
 
         .. note::
            The input dictionary ``imgs`` can be created with ``simba.mixins.ImageMixin.slice_shapes_in_imgs``.
+
+        .. seealso::
+           :func:`simba.utils.read_write.img_stack_to_video` for GPU acceleration options.
 
         :param Dict[int, np.ndarray] imgs: A dictionary containing frames of the video, where the keys represent frame indices and the values are numpy arrays representing the images.
         :param Union[str, os.PathLike] save_path: The path to save the output video file.
@@ -1250,6 +1328,10 @@ class ImageMixin(object):
 
         For example, given a stack of N images, and N*X geometries representing the region around the animal body-part(s),
         slice out the X geometries from each of the N images and return the sliced areas.
+
+        .. seealso::
+           :func:`simba.data_processors.cuda.image.slice_imgs`
+           :func:`simba.mixins.image_mixin.ImageMixin.slice_shapes_in_img`
 
         .. image:: _static/img/slice_shapes_in_imgs_4.gif
            :width: 400
@@ -1344,7 +1426,8 @@ class ImageMixin(object):
 
         :param np.ndarray img_1: The first input image represented as a NumPy array.
         :param np.ndarray img_2: The second input image represented as a NumPy array.
-        :return float: The SSI value representing the similarity between the two images.
+        :returns: The SSI value representing the similarity between the two images.
+        :rtype: float
         """
         check_if_valid_img(data=img_1, source=f'{ImageMixin.structural_similarity_index.__name__} img_1')
         check_if_valid_img(data=img_2, source=f'{ImageMixin.structural_similarity_index.__name__} img_2')
@@ -1377,7 +1460,8 @@ class ImageMixin(object):
         :param np.ndarray imgs: A list of images. Each element in the list is expected to be a numpy array representing an image.
         :param Optional[int] stride: The number of images to skip between comparisons. Default is 1.
         :param Optional[bool] verbose: If True, prints progress messages. Default is False.
-        :return np.ndarray: A numpy array containing the SSI values for each pair of images.
+        :return: A numpy array containing the SSI values for each pair of images.
+        :rtype: np.ndarray
 
         :example:
         >>> imgs = ImageMixin.read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples/test')
@@ -1404,7 +1488,7 @@ class ImageMixin(object):
         return results
 
     @staticmethod
-    def structural_similarity_matrix(imgs: List[np.array], verbose: Optional[bool] = False) -> np.array:
+    def structural_similarity_matrix(imgs: List[np.array], verbose: Optional[bool] = False) -> np.ndarray:
         """
         Computes a matrix of Structural Similarity Index (SSI) values for a list of images.
 
@@ -1417,7 +1501,8 @@ class ImageMixin(object):
 
         :param List[np.array] imgs: A list of images represented as numpy arrays. If not all images are greyscale or color, they are converted and processed as greyscale.
         :param Optional[bool] verbose: If True, prints progress messages showing which SSI values have been computed.  Default is False.
-        :return np.array: A square numpy array where the element at [i, j] represents the SSI between imgs[i] and imgs[j].
+        :return: A square numpy array where the element at [i, j] represents the SSI between imgs[i] and imgs[j].
+        :rtype: np.ndarray
 
         :example:
         >>> imgs = ImageMixin.read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples/test')
@@ -1456,7 +1541,8 @@ class ImageMixin(object):
 
         :param np.ndarray img_1: The first input image. It can be a 2D grayscale image or a 3D color image.
         :param np.ndarray img_2:  The second input image. It must have the same dimensions as img_1.
-        :return float: The NCC value representing the similarity between the two images. Returns 0.0 if the denominator is zero, indicating no similarity.
+        :return: The NCC value representing the similarity between the two images. Returns 0.0 if the denominator is zero, indicating no similarity.
+        :rtype: float
 
         :example:
         >>> img_1 = cv2.imread('/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples/a.png').astype(np.uint8)
@@ -1491,7 +1577,8 @@ class ImageMixin(object):
 
         :param np.ndarray imgs: A 3D array (for grayscale images) or a 4D array (for color images) containing the sequence of images.  Each image should have the same size.
         :param int stride: The stride length for comparing images. Determines how many steps back in the sequence each image is compared to.
-        :return np.ndarray: A 1D array of NCC values representing the similarity between each image and the image `stride` positions before it. The length of the array is the same as the number of images.
+        :return: A 1D array of NCC values representing the similarity between each image and the image `stride` positions before it. The length of the array is the same as the number of images.
+        :rtype: np.ndarray
 
         :example:
         >>> imgs = ImageMixin.read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/08102021_DOT_Rat11_12_frames')
@@ -1514,7 +1601,7 @@ class ImageMixin(object):
     @staticmethod
     @njit(["(uint8[:, :, :],)",
            "(uint8[:, :, :, :],)"])
-    def cross_correlation_matrix(imgs: np.array) -> np.array:
+    def cross_correlation_matrix(imgs: np.array) -> np.ndarray:
         """
         Computes the cross-correlation matrix for a given array of images.
 
@@ -1538,8 +1625,9 @@ class ImageMixin(object):
                               - For grayscale images: shape should be (n_images, height, width)
                               - For color images: shape should be (n_images, height, width, channels)
 
-        :return np.array: A 2D numpy array representing the cross-correlation matrix, where the element at [i, j]
+        :return: A 2D numpy array representing the cross-correlation matrix, where the element at [i, j]
                           contains the cross-correlation coefficient between the i-th and j-th images.
+        :rtype: np.array
 
         :example:
         >>> imgs = ImageMixin.read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples/test')
@@ -1581,6 +1669,8 @@ class ImageMixin(object):
         :param Union[str, os.PathLike, cv2.VideoCapture] video_path: The path to a video file on disk, or a cv2.VideoCapture object.
         :param Optional[int] start_idx: The first frame (where to start searching for the non-uniform color image). Default: 0 which equals the first frame. None also equals start searching at the first frame.
         :param Optional[int] end_idx: The last frame (where to end searching for the non-uniform color image). Default: None, which equals 1s into the video.
+        :returns: The first non-uniform color image in the video as np.ndarray.
+        :rtype: np.ndarray
         """
 
         check_instance(source='find_first_non_uniform_clr_frm', instance=video_path, accepted_types=(str, cv2.VideoCapture))
@@ -1626,6 +1716,10 @@ class ImageMixin(object):
         Detects the location of the largest blob in each frame of a video. Processes frames in batches and
         optionally uses GPU for acceleration. Results can be saved to a specified path or returned as a NumPy array.
 
+        .. seealso::
+           :func:`simba.plotting.blob_plotter.BlobPlotter`, :func:`simba.mixins.plotting_mixin.PlottingMixin._plot_blobs`
+
+
         :param Union[str, os.PathLike] video_path: Path to the video file from which to extract frames.
         :param Optional[int] batch_size: Number of frames to process in each batch. Default is 2000.
         :param Optional[bool] gpu: Whether to use GPU acceleration for processing. Default is False.
@@ -1634,6 +1728,7 @@ class ImageMixin(object):
 
         :return: A NumPy array of shape (N, 2) where N is the number of frames, containing the X and Y coordinates
                  of the centroid of the largest blob in each frame. If `save_path` is provided, returns None.
+        :rtype: Union[None, np.ndarray]
         :example:
         >>> x = ImageMixin.get_blob_locations(video_path=r"/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4_downsampled_bg_subtracted.mp4", gpu=True)
         >>> x = ImageMixin.get_blob_locations(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_IOT_1_bg_subtracted.mp4", gpu=True)

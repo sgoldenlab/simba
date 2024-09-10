@@ -48,9 +48,9 @@ class DirectingOtherAnimalsVisualizer(ConfigReader, PlottingMixin):
        For better runtime, use :meth:`simba.plotting.Directing_animals_visualizer.DirectingOtherAnimalsVisualizerMultiprocess`.
 
     .. note::
-       `Example of expected output <https://www.youtube.com/watch?v=d6pAatreb1E&list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl&index=22`_.
+       `Example expected output <https://www.youtube.com/watch?v=d6pAatreb1E&list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl&index=22`_.
 
-        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-data-tables`>_.
+       `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-data-tables`>__.
 
     .. image:: _static/img/directing_other_animals.png
        :width: 500
@@ -60,9 +60,9 @@ class DirectingOtherAnimalsVisualizer(ConfigReader, PlottingMixin):
        :width: 500
        :align: center
 
-    :parameter Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
-    :parameter Union[str, os.PathLike] video_path: Path to video for to visualize directionality.
-    :parameter Dict[str, Any] style_attr: Video style attributes (colors and sizes etc.)
+    :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
+    :param Union[str, os.PathLike] video_path: Path to video for to visualize directionality.
+    :param Dict[str, Any] style_attr: Video style attributes (colors and sizes etc.)
 
     :example:
     >>> style_attr = {'show_pose': True, 'animal_names': True, 'circle_size': 3, 'directionality_color': [(255, 0, 0), (0, 0, 255)], 'direction_thickness': 10, 'highlight_endpoints': True}

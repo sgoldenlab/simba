@@ -71,8 +71,12 @@ class GeometryMixin(object):
 
 
         """
-        .. note::
-           To convert multiple frame body-part coordinates to polygon, use ``simba.mixins.geometry_mixin.GeometryMixin.multiframe_bodyparts_to_polygon``
+        Converts the body-part points into polygoinal representations.
+
+
+        .. seealso::
+           :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_bodyparts_to_polygon`,
+           :func:`simba.data_processors.cuda.geometry.get_convex_hull`
 
         .. image:: _static/img/bodyparts_to_polygon.png
            :width: 400
@@ -150,16 +154,19 @@ class GeometryMixin(object):
         """
         Convert body-parts coordinate to Point geometries.
 
-        :param np.ndarray data: 2D array with body-part coordinates where rows are frames and columns are x and y coordinates.
-        :param Optional[int] buffer: If not None, then the area of the Point. Thus, if not None, then returns Polygons representing the Points.
-        :param Optional[int] px_per_mm: Pixels to millimeter convertion factor. Required if buffer is not None.
-
         .. note:
            If buffer and px_per_mm is not None, then the points will be *buffered* and a 2D share polygon created with the specified buffered area.
            If buffer is provided, then also provide px_per_mm for accurate convesion factor between pixels and millimeters.
 
-           If having a large number of body-parts, consider using ``simba.mixins.geometry_mixin.GeometryMixin.multiframe_bodypart_to_point``
+        .. seealso::
+           If having a large number of body-parts, consider using :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_bodypart_to_point`
            which uses CPU multiprocessing.
+
+        :param np.ndarray data: 2D array with body-part coordinates where rows are frames and columns are x and y coordinates.
+        :param Optional[int] buffer: If not None, then the area of the Point. Thus, if not None, then returns Polygons representing the Points.
+        :param Optional[int] px_per_mm: Pixels to millimeter convertion factor. Required if buffer is not None.
+        :returns: List of shapely Points (or polygons if buffer is not None).
+        :rtype: List[Union[Point, Polygon]]
 
         :example:
         >>> data = np.random.randint(0, 100, (1, 2))
@@ -198,12 +205,14 @@ class GeometryMixin(object):
         """
         Convert a 2D array of x and y coordinates to a shapely linestring.
 
-        Linestrings are useful for representing an animal path, and to answer questions like (i)
-        "How far along the animals paths was the animal most proximal to geometry X"?
-        "How far had the animal travelled at time T?"
-        "When does the animal path intersect geometry X?"
+        .. note::
+           Linestrings are useful for representing an animal path, and to answer questions like (i)
+           "How far along the animals paths was the animal most proximal to geometry X"?
+           "How far had the animal travelled at time T?"
+           "When does the animal path intersect geometry X?"
 
         :param np.ndarray data: 2D array with floats or ints of size Nx2 representing body-part coordinates.
+        :rtype: LineString
 
         :example:
         >>> data = np.load('/Users/simon/Desktop/envs/simba/simba/simba/sandbox/data.npy')
@@ -238,7 +247,8 @@ class GeometryMixin(object):
         :param np.ndarray data: The body-part coordinate xy as a 1d array. E.g., np.array([364, 308])
         :param float parallel_offset: The radius of the resultant circle in millimeters.
         :param int pixels_per_mm: The pixels per millimeter of the video. If not passed, 1 will be used meaning revert to radius in pixels rather than millimeters.
-        :returns Polygon: Shapely Polygon of curcular shape.
+        :returns: Shapely Polygon of circular shape.
+        :rtype: Union[Polygon, List[Polygon]]
 
         :example:
         >>> data = np.array([364, 308])
@@ -306,7 +316,8 @@ class GeometryMixin(object):
         :param int size_mm: The size of the buffer in millimeters. Use a negative value for an inward buffer.
         :param float pixels_per_mm: The conversion factor from millimeters to pixels.
         :param Literal['round', 'square', 'flat'] cap_style: The cap style for the buffer. Valid values are 'round', 'square', or 'flat'. Defaults to 'round'.
-        :return Polygon: The buffered shape.
+        :return: The buffered shape.
+        :rtype: Polygon
 
         :example:
         >>> polygon = GeometryMixin().bodyparts_to_polygon(np.array([[100, 110],[100, 100],[110, 100],[110, 110]]))
@@ -324,7 +335,6 @@ class GeometryMixin(object):
 
     @staticmethod
     def compute_pct_shape_overlap(shapes: np.ndarray, denominator: Optional[Literal["difference", "shape_1", "shape_2"]] = "difference") -> int:
-
         """
         Compute the percentage of overlap between two shapes.
 
@@ -332,9 +342,14 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
+        .. seealso::
+           :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_compute_pct_shape_overlap` with parallel CPU acceleration. See
+           :func:`simba.mixins.geometry_mixin.GeometryMixin.compute_shape_overlap` to compute boolean if shapes overlap.
+
         :param List[Union[LineString, Polygon]] shapes: A 2D array, where each sub-array has two Polygon or LineString shapes.
         :param Optional[Literal['union', 'shape_1', 'shape_2']] denominator: If ``difference``, then percent overlap is calculated using non-intersection area as denominator. If ``shape_1``, percent overlap is calculated using the area of the first shape as denominator. If ``shape_2``, percent overlap is calculated using the area of the second shape as denominator. Default: ``difference``.
-        :return float: The percentage of overlap between the two shapes as integer.
+        :return: The percentage of overlap between the two shapes (0 - 100) as integer.
+        :rtype: int
 
         :example:
         >>> polygon_1 = GeometryMixin().bodyparts_to_polygon(np.array([[364, 308],[383, 323],[403, 335],[423, 351]]))
@@ -397,7 +412,7 @@ class GeometryMixin(object):
            :align: center
 
         :param List[Union[LineString, Polygon]] shapes: A list of two input Polygon or LineString shapes.
-        :return float: Returns 1 if the two shapes overlap, otherwise returns 0.
+        :return int: Returns 1 if the two shapes overlap, otherwise returns 0.
         """
 
         for shape in shapes:
@@ -426,7 +441,8 @@ class GeometryMixin(object):
            :align: center
 
         :param List[LineString] shapes: A list containing two LineString objects.
-        :return bool: True if the LineStrings cross each other, False otherwise.
+        :return: True if the LineStrings cross each other, False otherwise.
+        :rtype: bool
 
         :example:
         >>> line_1 = GeometryMixin().bodyparts_to_line(np.array([[10, 10],[20, 10],[30, 10],[40, 10]]))
@@ -458,7 +474,8 @@ class GeometryMixin(object):
            :align: center
 
         :param Union[LineString, Polygon, MultiPolygon, MultiPoint] shapes: List of 2 geometries, checks if the second geometry fully covers the first geometry.
-        :return bool: True if the second geometry fully covers the first geometry, otherwise False.
+        :return: True if the second geometry fully covers the first geometry, otherwise False.
+        :rtype: bool
 
         >>> polygon_1 = GeometryMixin().bodyparts_to_polygon(np.array([[10, 10], [10, 100], [100, 10], [100, 100]]))
         >>> polygon_2 = GeometryMixin().bodyparts_to_polygon(np.array([[25, 25], [25, 75], [90, 25], [90, 75]]))
@@ -480,7 +497,8 @@ class GeometryMixin(object):
         Calculate the area of a geometry in square millimeters.
 
         .. note::
-           If certain that the input data is a valid Polygon, consider using :func:`simba.feature_extractors.perimeter_jit.jitted_hull`
+           If certain that the input data is a valid Polygon, consider using :func:`simba.feature_extractors.perimeter_jit.jitted_hull` or
+           :func:`simba.data_processors.cuda.geometry.poly_area`.
 
         :param Union[MultiPolygon, Polygon] shape: The geometry (MultiPolygon or Polygon) for which to calculate the area.
         :param float pixels_per_mm: The pixel-to-millimeter conversion factor.
@@ -509,7 +527,8 @@ class GeometryMixin(object):
         :param List[Union[LineString, Polygon]] shapes: A list containing two LineString or Polygon geometries.
         :param float pixels_per_mm: The conversion factor from pixels to millimeters.
         :param Literal['mm', 'cm', 'dm', 'm'] unit: The desired unit for the distance calculation. Options: 'mm', 'cm', 'dm', 'm'. Defaults to 'mm'.
-        :return float: The distance between the two geometries in the specified unit.
+        :return: The distance between the two geometries in the specified unit.
+        :rtype: float
 
         .. image:: _static/img/shape_distance.png
            :width: 400
@@ -597,7 +616,6 @@ class GeometryMixin(object):
         """
         Get the center coordinate of a shape or a list of shapes.
 
-
         .. image:: _static/img/get_center.png
            :width: 500
            :align: center
@@ -636,7 +654,8 @@ class GeometryMixin(object):
            Different from GeometryMixin().crosses: Touches requires a common boundary, and does not require the sharing of interior space.
 
         :param List[Union[LineString, Polygon]] shapes: A list containing two LineString or Polygon geometries.
-        :return bool: True if the geometries touch each other, False otherwise.
+        :return: True if the geometries touch each other, False otherwise.
+        :rtype: bool
 
         :example:
         >>> rectangle_1 = Polygon(np.array([[0, 0], [10, 10], [0, 10], [10, 0]]))
@@ -697,6 +716,7 @@ class GeometryMixin(object):
 
         :param List[Union[LineString, Polygon, MultiPolygon]] shapes: A list of geometries.
         :return: The first geometry in ``shapes`` is returned where all parts that overlap with the other geometries in ``shapes have been removed.
+        :rtype: Polygon
 
         :example:
         >>> polygon_1 = GeometryMixin().bodyparts_to_polygon(np.array([[10, 10], [10, 100], [100, 10], [100, 100]]))
@@ -736,7 +756,8 @@ class GeometryMixin(object):
            :align: center
 
         :param List[Union[LineString, Polygon, MultiPolygon]] shapes: A list of LineString, Polygon, or MultiPolygon geometries to be unioned.
-        :return Union[MultiPolygon, Polygon]: The resulting geometry after performing the union operation.
+        :return: The resulting geometry after performing the union operation.
+        :rtype: Union[MultiPolygon, Polygon]
 
         :example:
         >>> polygon_1 = GeometryMixin().bodyparts_to_polygon(np.array([[10, 10], [10, 100], [100, 10], [100, 100]]))
@@ -767,7 +788,8 @@ class GeometryMixin(object):
            :align: center
 
         :param List[Union[LineString, Polygon, MultiPolygon]] shapes: A list of LineString, Polygon, or MultiPolygon geometries to find the symmetric difference.
-        :return List[Union[Polygon, MultiPolygon]]: A list containing the resulting geometries after performing symmetric difference operations.
+        :return: A list containing the resulting geometries after performing symmetric difference operations.
+        :rtype: List[Union[Polygon, MultiPolygon]]
 
         :example:
         >>> polygon_1 = GeometryMixin().bodyparts_to_polygon(np.array([[10, 10], [10, 100], [100, 10], [100, 100]]))
@@ -788,14 +810,31 @@ class GeometryMixin(object):
     @staticmethod
     def view_shapes(shapes: List[Union[LineString, Polygon, MultiPolygon, MultiLineString]],
                     bg_img: Optional[np.ndarray] = None,
-                    bg_clr: Optional[Tuple[int]] = None,
+                    bg_clr: Optional[Tuple[int, int, int]] = None,
                     size: Optional[int] = None,
                     color_palette: Optional[str] = 'Set1',
                     thickness: Optional[int] = 2,
                     pixel_buffer: Optional[int] = 200) -> np.ndarray:
 
         """
-        Helper function to draw shapes on white canvas or specified background image. Useful for quick troubleshooting.
+        Draws geometrical shapes (such as LineString, Polygon, MultiPolygon, and MultiLineString)
+        on a white canvas or a specified background image.
+
+        This function is useful for quick visual troubleshooting by allowing the inspection of geometrical shapes.
+
+        .. seealso::
+           See :func:`simba.mixins.geometry_mixin.GeometryMixin.geometry_video` or :func:`simba.plotting.geometry_plotter.GeometryPlotter` for videos.
+
+
+        :param List[Union[LineString, Polygon, MultiPolygon, MultiLineString]] shapes: A list of geometrical shapes to be drawn. The shapes can be of type LineString, Polygon, MultiPolygon, or MultiLineString.
+        :param Optional[np.ndarray] bg_img: Optional. An image array (in np.ndarray format) to use as the background. If not provided, a blank canvas will be created.
+        :param Optional[Tuple[int, int, int]] bg_clr: A tuple representing the RGB color of the background (e.g., (255, 255, 255) for white). This is ignored if bg_img is provided. If None the background is white.
+        :param Optional[int] size: Optional. An integer to specify the size of the canvas (width and height). Only applicable if bg_img is not provided.
+        :param Optional[str] color_palette: Optional. A string specifying the color palette to be used for the shapes. Default is 'Set1', which uses distinct colors.
+        :param Optional[int] thickness: Optional. An integer specifying the thickness of the lines when rendering LineString or Polygon borders. Default is 2.
+        :param Optional[int] pixel_buffer: Optional. An integer specifying the number of pixels to add around the bounding box of the shapes for padding. Default is 200.
+        :return: An image (np.ndarray) with the rendered shapes.
+        :rtype: np.ndarray
 
         :example:
         >>> multipolygon_1 = MultiPolygon([Polygon([[200, 110],[200, 100],[200, 100],[200, 110]]), Polygon([[70, 70],[70, 60],[10, 50],[1, 70]])])
@@ -872,7 +911,7 @@ class GeometryMixin(object):
         """
         Helper to create a geometry video from a list of shapes.
 
-        .. note::
+        .. seealso::
            If more aesthetic videos are needed, overlaid on video, then use ``simba.plotting.geometry_plotter.GeometryPlotter``
            If single images of geometries are needed, then use ``simba.mixins.geometry_mixin.view_shapes``
 
@@ -960,8 +999,12 @@ class GeometryMixin(object):
            :width: 500
            :align: center
 
+        .. seealso::
+           :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_minimum_rotated_rectangle`
+
         :param Polygon shape: The Polygon for which the minimum rotated rectangle is to be calculated.
-        :return Polygon: The minimum rotated rectangle geometry that bounds the input polygon.
+        :return: The minimum rotated rectangle geometry that bounds the input polygon.
+        :rtype: Polygon
 
         :example:
         >>> polygon = GeometryMixin().bodyparts_to_polygon(np.array([[364, 308],[383, 323],[403, 335],[423, 351]]))
@@ -990,9 +1033,13 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
+        .. seealso::
+            :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_bodyparts_to_line`, :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_length`
+
         :param LineString shape: The LineString geometry for which the length is to be calculated.
         :param Literal['mm', 'cm', 'dm', 'm'] unit: The desired unit for the length measurement ('mm', 'cm', 'dm', 'm').
-        :return float: The length of the LineString geometry in the specified unit.
+        :return: The length of the LineString geometry in the specified unit.
+        :rtype: float
 
         :example:
         >>> line_1 = GeometryMixin().bodyparts_to_line(np.array([[10, 70],[20, 60],[30, 50],[40, 70]]))
@@ -1027,12 +1074,14 @@ class GeometryMixin(object):
         Convert multidimensional NumPy array representing body part coordinates to a list of Polygons.
 
         .. note::
-           To convert single frame animal body-part coordinates to polygon, use ``simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_polygon``
+           To convert single frame animal body-part coordinates to polygon, use :func:`simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_polygon`
 
         :param np.ndarray data: NumPy array of body part coordinates. Each subarray represents the coordinates of a body part.
         :param Literal['round', 'square', 'flat'] cap_style: Style of line cap for parallel offset. Options: 'round', 'square', 'flat'.
         :param int parallel_offset: Offset distance for parallel lines. Default is 1.
         :param float simplify_tolerance: Tolerance parameter for simplifying geometries. Default is 2.
+        :returns: A list of polygons with length data.shape[0]
+        :rtype: List[Polygon]
 
         :example:
         >>> data = np.array([[[364, 308], [383, 323], [403, 335], [423, 351]],[[356, 307], [376, 319], [396, 331], [419, 347]]])
@@ -1109,8 +1158,10 @@ class GeometryMixin(object):
         """
         Process multiple frames of body part data in parallel and convert them to shapely Points.
 
-        This function takes a multi-frame body part data represented as an array and
-        converts it into points. It utilizes multiprocessing for parallel processing.
+        This function takes a multi-frame body part data represented as an array and converts it into points. It utilizes multiprocessing for parallel processing.
+
+        .. seealso::
+           For non-parallized call, use :func:`simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_points`
 
         :param np.ndarray data: 2D or 3D array with body-part coordinates where rows are frames and columns are x and y coordinates.
         :param Optional[int] core_cnt: The number of cores to use. If -1, then all available cores.
@@ -1161,21 +1212,23 @@ class GeometryMixin(object):
         else:
             return results
 
-    def multiframe_bodyparts_to_circle(
-        self,
-        data: np.ndarray,
-        parallel_offset: int = 1,
-        core_cnt: int = -1,
-        pixels_per_mm: Optional[int] = 1,
-    ) -> List[Polygon]:
+    def multiframe_bodyparts_to_circle(self,
+                                       data: np.ndarray,
+                                       parallel_offset: int = 1,
+                                       core_cnt: int = -1,
+                                       pixels_per_mm: Optional[int] = 1) -> List[Polygon]:
         """
         Convert a set of pose-estimated key-points to circles with specified radius using multiprocessing.
+
+        .. seealso::
+           For non-parallized call, use :func:`simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_circle`
 
         :param np.ndarray data: The body-part coordinates xy as a 2d array where rows are frames and columns represent x and y coordinates . E.g., np.array([[364, 308], [369, 309]])
         :param int data: The radius of the resultant circle in millimeters.
         :param int core_cnt: Number of CPU cores to use. Defaults to -1 meaning all available cores will be used.
         :param int pixels_per_mm: The pixels per millimeter of the video. If not passed, 1 will be used meaning revert to radius in pixels rather than millimeters.
-        :returns Polygon: List of shapely Polygons of circular shape of size data.shape[0].
+        :returns: List of shapely Polygons of circular shape of size data.shape[0].
+        :rtype: Polygon
 
         :example:
         >>> data = np.random.randint(0, 100, (100, 2))

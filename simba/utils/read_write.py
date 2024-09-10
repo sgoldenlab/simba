@@ -85,7 +85,8 @@ def read_df(
     :parameter Optional[List[str]] usecols: If not None, then keep columns in list.
     :parameter bool check_multiindex: check file is multi-index headers. Default: False.
     :parameter int multi_index_headers_to_keep: If reading multi-index file, and we want to keep one of the dropped multi-index levels as the header in the output file, specify the index of the multiindex hader as int.
-    :return pd.DataFrame
+    :return: Table data in pd.DataFrame format.
+    :rtype: pd.DataFrame
 
     :example:
     >>> read_df(file_path='project_folder/csv/input_csv/Video_1.csv', file_type='csv', check_multiindex=True)
@@ -175,12 +176,10 @@ def read_df(
     return df
 
 
-def write_df(
-    df: pd.DataFrame,
-    file_type: str,
-    save_path: Union[str, os.PathLike],
-    multi_idx_header: bool = False,
-) -> None:
+def write_df(df: pd.DataFrame,
+             file_type: str,
+             save_path: Union[str, os.PathLike],
+             multi_idx_header: bool = False) -> None:
     """
     Write single tabular data file.
 
@@ -229,14 +228,13 @@ def write_df(
         )
 
 
-def get_fn_ext(filepath: Union[os.PathLike, str]) -> (str, str, str):
+def get_fn_ext(filepath: Union[os.PathLike, str]) -> Tuple[str, str, str]:
     """
     Split file path into three components: (i) directory, (ii) file name, and (iii) file extension.
 
     :parameter str filepath: Path to file.
-    :return str: File directory name
-    :return str: File name
-    :return str: File extension
+    :returns: 3-part tuple with file directory name, file name (w/o extension), and file extension.
+    :rtype: Tuple[str, str, str]
 
     :example:
     >>> get_fn_ext(filepath='C:/My_videos/MyVideo.mp4')
@@ -251,14 +249,12 @@ def get_fn_ext(filepath: Union[os.PathLike, str]) -> (str, str, str):
     return dir_name, file_name, file_extension
 
 
-def read_config_entry(
-    config: configparser.ConfigParser,
-    section: str,
-    option: str,
-    data_type: str,
-    default_value: Optional[Any] = None,
-    options: Optional[List] = None,
-) -> Union[float, int, str]:
+def read_config_entry(config: configparser.ConfigParser,
+                      section: str,
+                      option: str,
+                      data_type: str,
+                      default_value: Optional[Any] = None,
+                      options: Optional[List] = None) -> Union[float, int, str]:
     """
     Helper to read entry in SimBA project_config.ini parsed by configparser.ConfigParser.
 
@@ -317,13 +313,13 @@ def read_config_entry(
             )
 
 
-def read_project_path_and_file_type(config: configparser.ConfigParser) -> (str, str):
+def read_project_path_and_file_type(config: configparser.ConfigParser) -> Tuple[str, str]:
     """
     Helper to read the path and file type of the SimBA project from the project_config.ini.
 
     :param configparser.ConfigParser config: parsed SimBA config in configparser.ConfigParser format
-    :return str: The path of the project ``project_folder``.
-    :return str: The set file type of the project (i.e., ``csv`` or ``parquet``).
+    :returns: The path of the project ``project_folder`` and  the set file type of the project (i.e., ``csv`` or ``parquet``) as two-part tuple.
+    :rtype: Tuple[str, str]
     """
 
     project_path = read_config_entry(
@@ -352,8 +348,9 @@ def read_video_info_csv(file_path: Union[str, os.PathLike]) -> pd.DataFrame:
     """
     Read the project_folder/logs/video_info.csv of the SimBA project as a pd.DataFrame
 
-    :parameter str file_path: Path to the SimBA project ``project_folder/logs/video_info.csv`` file
-    :return pd.DataFrame
+    :paramstr file_path: Path to the SimBA project ``project_folder/logs/video_info.csv`` file
+    :return: The ``project_folder/logs/video_info.csv`` file in pd.DataFrame format.
+    :rtype: pd.DataFrame
     :raise ParametersFileError: Invalid format of ``project_folder/logs/video_info.csv``.
     :raise InvalidValueWarning: Some videos are registered with FPS >= 1.
 
@@ -403,8 +400,9 @@ def read_config_file(config_path: Union[str, os.PathLike]) -> configparser.Confi
     """
     Helper to parse SimBA project project_config.ini file
 
-    :parameter str config_path: Path to project_config.ini file
-    :return configparser.ConfigParser: parsed project_config.ini file
+    :parameter Union[str, os.PathLike] config_path: Path to project_config.ini file
+    :return: parsed project_config.ini file
+    :rtype: configparser.ConfigParser
     :raise MissingProjectConfigEntryError: Invalid file format.
 
     :example:
@@ -429,7 +427,8 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture], f
 
     :parameter str video_path: Path to a video file.
     :parameter bool fps_as_int: If True, force video fps to int through floor rounding, else float. Default = True.
-    :return dict: Video file meta data.
+    :return: The video metadata in dict format with parameter (e.g., ``fps``)  as keys.
+    :rtype: Dict[str, Any].
 
     :example:
     >>> get_video_meta_data('test_data/video_tests/Video_1.avi')
@@ -465,6 +464,7 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture], f
 
 def remove_a_folder(folder_dir: Union[str, os.PathLike]) -> None:
     """Helper to remove a directory"""
+    check_if_dir_exists(in_dir=folder_dir, source=remove_a_folder.__name__)
     shutil.rmtree(folder_dir, ignore_errors=True)
 
 
@@ -485,13 +485,13 @@ def concatenate_videos_in_folder(in_folder: Union[str, os.PathLike],
     .. note::
        If substring and file_paths are both not None, then file_paths with be sliced and only file paths with substring will be retained.
 
-    :parameter Union[str, os.PathLike] in_folder: Path to folder holding un-concatenated video files.
-    :parameter Union[str, os.PathLike] save_path: Path to the saved the output file. Note: If the path exist, it will be overwritten
-    :parameter Optional[List[Union[str, os.PathLike]]] file_paths: If not None, then the files that should be joined. If None, then all files. Default None.
-    :parameter Optional[str] video_format: The format of the video clips that should be concatenated. Default: mp4.
-    :parameter Optional[str] substring: If a string, then only videos in in_folder with a filename that contains substring will be joined. If None, then all are joined. Default: None.
-    :parameter Optional[str] video_format: Format of the input video files in ``in_folder``. Default: ``mp4``.
-    :parameter Optional[bool] remove_splits: If true, the input splits in the ``in_folder`` will be removed following concatenation. Default: True.
+    :param Union[str, os.PathLike] in_folder: Path to folder holding un-concatenated video files.
+    :param Union[str, os.PathLike] save_path: Path to the saved the output file. Note: If the path exist, it will be overwritten
+    :param Optional[List[Union[str, os.PathLike]]] file_paths: If not None, then the files that should be joined. If None, then all files. Default None.
+    :param Optional[str] video_format: The format of the video clips that should be concatenated. Default: mp4.
+    :param Optional[str] substring: If a string, then only videos in in_folder with a filename that contains substring will be joined. If None, then all are joined. Default: None.
+    :param Optional[str] video_format: Format of the input video files in ``in_folder``. Default: ``mp4``.
+    :param Optional[bool] remove_splits: If true, the input splits in the ``in_folder`` will be removed following concatenation. Default: True.
     """
 
     if not check_nvidea_gpu_available() and gpu:
@@ -566,7 +566,8 @@ def get_bp_headers(body_parts_lst: List[str]) -> list:
     Helper to create ordered list of all column header fields from body-part names for SimBA project dataframes.
 
     :parameter List[str] body_parts_lst: Body-part names in the SimBA prject
-    :return List[str]: Body-part headers
+    :return: Body-part headers
+    :rtype: List[str]
 
     :examaple:
     >>> get_bp_headers(body_parts_lst=['Nose'])
@@ -589,7 +590,8 @@ def read_video_info(vid_info_df: pd.DataFrame,
     :parameter pd.DataFrame vid_info_df: Parsed ``project_folder/logs/video_info.csv`` file. This file can be parsed by :meth:`simba.utils.read_write.read_video_info_csv`.
     :parameter str video_name: Name of the video as represented in the ``Video`` column of the ``project_folder/logs/video_info.csv`` file.
     :parameter Optional[bool] raise_error: If True, raises error if the video cannot be found in the ``vid_info_df`` file. If False, returns None if the video cannot be found.
-    :returns Tuple[pd.DataFrame, float, float]: One row DataFrame representing the video in the ``project_folder/logs/video_info.csv`` file, the frame rate of the video, and the the pixels per millimeter of the video
+    :returns: 3-part tuple: One row DataFrame representing the video in the ``project_folder/logs/video_info.csv`` file, the frame rate of the video, and the the pixels per millimeter of the video
+    :rtype: Tuple[pd.DataFrame, float, float]
 
     :example:
     >>> video_info_df = read_video_info_csv(file_path='project_folder/logs/video_info.csv')
@@ -613,20 +615,20 @@ def read_video_info(vid_info_df: pd.DataFrame,
             raise ParametersFileError(msg=f"Make sure the videos that are going to be analyzed are represented with APPROPRIATE VALUES inside the project_folder/logs/video_info.csv file in your SimBA project. Could not interpret the fps, pixels per millimeter and/or fps as numerical values for video {video_name}", source=read_video_info.__name__)
 
 
-def find_all_videos_in_directory(
-    directory: Union[str, os.PathLike],
-    as_dict: Optional[bool] = False,
-    raise_error: bool = False,
-    video_formats: Optional[Tuple[str]] = (".avi", ".mp4", ".mov", ".flv", ".m4v", '.webm'),
-) -> Union[dict, list]:
+def find_all_videos_in_directory(directory: Union[str, os.PathLike],
+                                 as_dict: Optional[bool] = False,
+                                 raise_error: bool = False,
+                                 video_formats: Optional[Tuple[str]] = (".avi", ".mp4", ".mov", ".flv", ".m4v", '.webm'),) -> Union[dict, list]:
     """
-    Get all video file paths within a directory
+    Get all video file paths within a provided directory
 
     :param str directory: Directory to search for video files.
     :param bool as_dict: If True, returns dictionary with the video name as key and file path as value.
     :param bool raise_error: If True, raise error if no videos are found. Else, NoFileFoundWarning.
     :param Tuple[str] video_formats: Acceptable video formats. Default: '.avi', '.mp4', '.mov', '.flv', '.m4v'.
-    :return List[str] or Dict[str, str]
+    :return Either a list or dictionary of all available video files in the ``directory``.
+    :rtype: Union[dict, list]
+
     :raises NoFilesFoundError: If ``raise_error`` and ``directory`` has no files in formats ``video_formats``.
 
     :examples:
@@ -676,7 +678,8 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
     :param Optional[Tuple[int, int]] size: If tuple, resizes the image to size. Else, returns original image size.
     :param Optional[bool] greyscale: If true, returns the greyscale image. Default False.
     :param Optional[bool] clahe: If true, returns clahe enhanced image. Default False.
-    :return np.ndarray: Image as numpy array.
+    :return: Image as numpy array.
+    :rtype: np.ndarray
 
     :example:
     >>> img = read_frm_of_video(video_path='/Users/simon/Desktop/envs/platea_featurizer/data/video/3D_Mouse_5-choice_MouseTouchBasic_s9_a4_grayscale.mp4', clahe=True)
@@ -748,7 +751,8 @@ def find_video_of_file(video_dir: Union[str, os.PathLike],
     :param str filename: Data file name, e.g., ``Video_1``.
     :param Optional[bool] raise_error: If True, raise error if no file can be found. If False, returns None if no file can be found. Default: False
     :param Optional[bool] warning: If True, print warning if no file can be found. If False, no warning is printed if file cannot be found. Default: False
-    :return str: Video path.
+    :return: Video file path.
+    :rtype: Union[str, os.PathLike]
 
     :examples:
     >>> find_video_of_file(video_dir='project_folder/videos', filename='Together_1')
@@ -778,8 +782,8 @@ def find_video_of_file(video_dir: Union[str, os.PathLike],
     return return_path
 
 
-def find_files_of_filetypes_in_directory(directory: str,
-                                         extensions: list,
+def find_files_of_filetypes_in_directory(directory: Union[str, os.PathLike],
+                                         extensions: List[str],
                                          raise_warning: Optional[bool] = True,
                                          raise_error: Optional[bool] = False) -> List[str]:
     """
@@ -788,8 +792,8 @@ def find_files_of_filetypes_in_directory(directory: str,
     :param str directory: Directory holding files.
     :param List[str] extensions: Accepted file extensions.
     :param bool raise_warning: If True, raise error if no files are found.
-
-    :return List[str]: All files in ``directory`` with extensions.
+    :return: All files in ``directory`` with the specified extension(s).
+    :rtype: List[str]
 
     :example:
     >>> find_files_of_filetypes_in_directory(directory='project_folder/videos', extensions=['mp4', 'avi', 'png'], raise_warning=False)
@@ -1022,6 +1026,7 @@ def str_2_bool(input_str: str) -> bool:
     >>> str_2_bool(input_str='yes')
     >>> True
     """
+    check_str(name='input_str', value=input_str)
     return input_str.lower() in ("yes", "true", "1")
 
 
@@ -1104,7 +1109,8 @@ def get_all_clf_names(config: configparser.ConfigParser, target_cnt: int) -> Lis
 
     :param configparser.ConfigParser config: Parsed SimBA project_config.ini
     :param int target_cnt: Count of models in SimBA project
-    :return List[str]: Classifier model names
+    :return: Classifier model names
+    :rtype: List[str]
 
     :example:
     >>> get_all_clf_names(config=config, target_cnt=2)
@@ -1139,7 +1145,8 @@ def read_simba_meta_files(folder_path: str, raise_error: bool = False) -> List[s
 
     :param str folder_path: directory with SimBA model config meta files
     :param bool raise_error: If True, raise error if no files are found with ``meta`` suffix. Else, print warning. Default: False.
-    :return List[str]: List of paths to  SimBA model config meta files.
+    :return: List of paths to SimBA model config meta files.
+    :rtype: List[str]
 
     :example:
     >>> read_simba_meta_files(folder_path='/project_folder/configs')
@@ -1213,7 +1220,8 @@ def get_memory_usage_of_df(df: pd.DataFrame) -> Dict[str, float]:
     Get the RAM memory usage of a dataframe.
 
     :param pd.DataFrame df: Parsed dataframe
-    :return dict: The memory usage of the dataframe in bytes, mb, and gb.
+    :return: Dict holding the memory usage of the dataframe in bytes, mb, and gb.
+    :rtype: Dict[str, float]
 
     :example:
     >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
@@ -1425,6 +1433,10 @@ def check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp: str, video_path:
 def timestamp_to_seconds(timestamp: str) -> int:
     """
     Returns the number of seconds into the video given a timestamp in HH:MM:SS format.
+
+    :param str timestamp: Timestamp in HH:MM:SS format
+    :returns: The timestamps as seconds.
+    :rtype: int
     :raises FrameRangeError: If timestamp is not a valid format.
 
     :example:
@@ -1439,9 +1451,7 @@ def timestamp_to_seconds(timestamp: str) -> int:
 
 
 
-def find_time_stamp_from_frame_numbers(
-    start_frame: int, end_frame: int, fps: float
-) -> List[str]:
+def find_time_stamp_from_frame_numbers(start_frame: int, end_frame: int, fps: float) -> List[str]:
     """
     Given start and end frame numbers and frames per second (fps), return a list of formatted time stamps
     corresponding to the frame range start and end time.
@@ -1449,7 +1459,8 @@ def find_time_stamp_from_frame_numbers(
     :param int start_frame: The starting frame index.
     :param int end_frame: The ending frame index.
     :param float fps: Frames per second.
-    :return List[str]: A list of time stamps in the format 'HH:MM:SS:MS'.
+    :return: A list of time stamps in the format 'HH:MM:SS:MS'.
+    :rtype: List[str]
 
     :example:
     >>> find_time_stamp_from_frame_numbers(start_frame=11, end_frame=20, fps=3.4)
@@ -1479,11 +1490,13 @@ def find_time_stamp_from_frame_numbers(
     return [get_time(start_frame, fps), get_time(end_frame, fps)]
 
 
-def read_roi_data(
-    roi_path: Union[str, os.PathLike]
-) -> (pd.DataFrame, pd.DataFrame, pd.DataFrame):
+def read_roi_data(roi_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
-    Method to read in ROI definitions from SimBA project
+    Method to read in ROI definitions from SimBA project.
+
+    :param Union[str, os.PathLike] roi_path: path to `ROI_definitions.h5` on disk.
+    :return: 3-part Tuple of dataframes representing circles, polygons, and rectangles.
+    :rtype: Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]
     """
     check_file_exist_and_readable(file_path=roi_path)
     try:
@@ -1511,18 +1524,16 @@ def create_directory(path: Union[str, os.PathLike]):
         pass
 
 
-def find_max_vertices_coordinates(
-    shapes: List[Union[Polygon, LineString, MultiPolygon, Point]],
-    buffer: Optional[int] = None,
-) -> Tuple[int, int]:
+def find_max_vertices_coordinates(shapes: List[Union[Polygon, LineString, MultiPolygon, Point]], buffer: Optional[int] = None) -> Tuple[int, int]:
     """
-    Find the maximum x and y coordinates among the vertices of a list of Shapely geometries.
+    Find the maximum x and y coordinates among the vertices of a list of geometries.
 
     Can be useful for plotting puposes, to dtermine the rquired size of the canvas to fit all geometries.
 
     :param List[Union[Polygon, LineString, MultiPolygon, Point]] shapes: A list of Shapely geometries including Polygons, LineStrings, MultiPolygons, and Points.
     :param Optional[int] buffer: If int, adds to maximum x and y.
-    :returns Tuple[int, int]: A tuple containing the maximum x and y coordinates found among the vertices.
+    :returns: A two-part tuple containing the maximum x and y coordinates found among the vertices.
+    :rtype: Tuple[int, int]
 
     :example:
     >>> polygon = Polygon([(0, 0), (1, 0), (1, 1), (0, 1)])
@@ -1632,12 +1643,10 @@ def clean_sleap_filenames_in_directory(dir: Union[str, os.PathLike]) -> None:
             pass
 
 
-def copy_files_in_directory(
-    in_dir: Union[str, os.PathLike],
-    out_dir: Union[str, os.PathLike],
-    raise_error: bool = True,
-    filetype: Optional[str] = None,
-) -> None:
+def copy_files_in_directory(in_dir: Union[str, os.PathLike],
+                            out_dir: Union[str, os.PathLike],
+                            raise_error: bool = True,
+                            filetype: Optional[str] = None) -> None:
     """
     Copy files from the specified input directory to the output directory.
 
@@ -1751,15 +1760,15 @@ def write_pickle(data: Dict[str, Any], save_path: Union[str, os.PathLike]) -> No
 
 
 def read_pickle(
-    data_path: Union[str, os.PathLike], verbose: Optional[bool] = False
-) -> dict:
+    data_path: Union[str, os.PathLike], verbose: Optional[bool] = False) -> Dict[Any, Any]:
     """
     Read a single or directory of pickled objects. If directory, returns dict with numerical sequential integer keys for
     each object.
 
     :param str data_path: Pickled file path, or directory of pickled files.
     :param Optional[bool] verbose: If True, prints progress. Default False.
-    :returns dict
+    :returns: Dictionary representation of the pickle.
+    :rtype: Dict[Any, Any]
 
     :example:
     >>> data = read_pickle(data_path='/test/unsupervised/cluster_models')
@@ -1809,9 +1818,7 @@ def read_pickle(
     return data
 
 
-def drop_df_fields(
-    data: pd.DataFrame, fields: List[str], raise_error: Optional[bool] = False
-) -> pd.DataFrame:
+def drop_df_fields(data: pd.DataFrame, fields: List[str], raise_error: Optional[bool] = False) -> pd.DataFrame:
     """
     Drops specified fields in dataframe.
 
@@ -2093,9 +2100,6 @@ def read_img_batch_from_video_gpu(video_path: Union[str, os.PathLike],
 
 
 def find_largest_blob_location(imgs: dict, verbose: Optional[bool] = False, video_name: Optional[str] = None):
-
-
-
     results = {}
     for frm_idx, img in imgs.items():
         if verbose:
