@@ -4,11 +4,12 @@ __email__ = "sronilsson@gmail.com"
 
 
 import math
-from typing import Tuple, Dict, Optional, Union
+from typing import Dict, Optional, Tuple, Union
 
 import numpy as np
 from scipy.spatial import ConvexHull
-from simba.utils.checks import check_valid_tuple, check_int, check_str
+
+from simba.utils.checks import check_int, check_str, check_valid_tuple
 from simba.utils.enums import Formats
 
 
