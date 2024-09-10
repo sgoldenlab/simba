@@ -48,9 +48,15 @@ def get_3pt_angle(x: np.ndarray, y: np.ndarray, z: np.ndarray) -> np.ndarray:
        :align: center
        :header-rows: 1
 
+    .. image:: _static/img/get_3pt_angle.webp
+       :width: 300
+       :align: center
+
     .. seealso::
        For CPU function see :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt` and
        For CPU function see :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt_serialized`.
+
+
 
     :param x:  A numpy array of shape (n, 2) representing the first point (e.g., nose) coordinates.
     :param y: A numpy array of shape (n, 2) representing the second point (e.g., center) coordinates, where the angle is computed.

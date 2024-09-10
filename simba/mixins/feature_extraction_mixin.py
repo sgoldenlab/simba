@@ -109,7 +109,7 @@ class FeatureExtractionMixin(object):
            For 3-point angles across multiple frames and improved runtime, see
            :meth:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt_serialized`.
 
-        .. image:: _static/img/three_point_angle.png
+        .. image:: _static/img/get_3pt_angle.webp
            :width: 300
            :align: center
 
@@ -131,7 +131,7 @@ class FeatureExtractionMixin(object):
         """
         Jitted helper for frame-wise 3-point angles.
 
-        .. image:: _static/img/three_point_angle.png
+        .. image:: _static/img/get_3pt_angle.webp
            :width: 300
            :align: center
 
