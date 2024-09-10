@@ -27,3 +27,9 @@ Image
 .. automodule:: simba.data_processors.cuda.image
    :members:
    :show-inheritance:
+
+Time-series statistics
+---------------------
+.. automodule:: simba.data_processors.cuda.timeseries
+   :members:
+   :show-inheritance:

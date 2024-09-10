@@ -388,9 +388,7 @@ class TimeseriesFeatureMixin(object):
 
     @staticmethod
     @njit("(float64[:], float64, float64[:], int64,)", cache=True, fastmath=True)
-    def sliding_percent_beyond_n_std(
-        data: np.ndarray, n: float, window_sizes: np.ndarray, sample_rate: int
-    ) -> np.ndarray:
+    def sliding_percent_beyond_n_std(data: np.ndarray, n: float, window_sizes: np.ndarray, sample_rate: int) -> np.ndarray:
         """
         Computed the percentage of data points that exceed 'n' standard deviations from the mean for each position in
         the time series using various window sizes. It returns a 2D array where each row corresponds to a position in the time series,

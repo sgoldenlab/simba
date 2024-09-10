@@ -5,6 +5,7 @@ import itertools
 import json
 import logging
 import logging.config
+import math
 import os
 import shutil
 from ast import literal_eval
@@ -760,8 +761,7 @@ class ConfigReader(object):
             )
         return info_df
 
-    def read_video_info(
-        self, video_name: str, raise_error: Optional[bool] = True) -> Tuple[pd.DataFrame, float, float]:
+    def read_video_info(self, video_name: str, raise_error: Optional[bool] = True) -> Tuple[pd.DataFrame, float, float]:
         """
         Helper to read the meta-data (pixels per mm, resolution, fps) from the video_info.csv for a single input file.
 
@@ -778,13 +778,13 @@ class ConfigReader(object):
         ]
         if len(video_settings) > 1:
             raise DuplicationError(
-                msg=f"SimBA found multiple rows in the project_folder/logs/video_info.csv named {str(video_name)}. Please make sure that each video name is represented ONCE in the video_info.csv",
+                msg=f"SimBA found multiple rows in the project_folder/logs/video_info.csv named {video_name}. Please make sure that each video name is represented ONCE in the {self.video_info_path} file",
                 source=self.__class__.__name__,
             )
         elif len(video_settings) < 1:
             if raise_error:
                 raise ParametersFileError(
-                    msg=f"SimBA could not find {str(video_name)} in the video_info.csv file. Make sure all videos analyzed are represented in the project_folder/logs/video_info.csv file.",
+                    msg=f"SimBA could not find {str(video_name)} in the video_info.csv file. Make sure all videos analyzed are represented in the {self.video_info_path} file.",
                     source=self.__class__.__name__,
                 )
             else:
@@ -793,6 +793,10 @@ class ConfigReader(object):
             try:
                 px_per_mm = float(video_settings["pixels/mm"])
                 fps = float(video_settings["fps"])
+                if math.isnan(px_per_mm):
+                    raise ParametersFileError(msg=f'Pixels per millimeter for video {video_name} in the {self.video_info_path} file is not a valid number.')
+                if math.isnan(fps):
+                    raise ParametersFileError(msg=f'The FPS for video {video_name} in the {self.video_info_path} file is not a valid number.')
                 return video_settings, px_per_mm, fps
             except TypeError:
                 raise ParametersFileError(

@@ -10,8 +10,8 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.utils.checks import check_str
-from simba.utils.errors import MissingColumnsError
+from simba.utils.checks import check_str, check_float
+from simba.utils.errors import MissingColumnsError, ParametersFileError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df, write_df
 
@@ -192,5 +192,5 @@ class UserDefinedFeatureExtractor(ConfigReader, FeatureExtractionMixin):
         stdout_success(f"Feature extraction complete for {str(len(self.files_found))} video(s). Results are saved inside the {self.features_dir} directory", elapsed_time=self.timer.elapsed_time_str,)
 
 
-# test = UserDefinedFeatureExtractor(config_path=r"C:\troubleshooting\open_field_below\project_folder\project_config.ini")
+# test = UserDefinedFeatureExtractor(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
 # test.run()
