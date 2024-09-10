@@ -20,8 +20,7 @@ except:
     from typing_extensions import Literal
 
 import typing
-from typing import get_type_hints
-from typing import Tuple, Optional
+from typing import Optional, Tuple, get_type_hints
 
 from simba.utils.checks import (check_float, check_instance, check_int,
                                 check_str, check_that_column_exist,
