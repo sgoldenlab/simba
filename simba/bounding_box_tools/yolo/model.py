@@ -1,13 +1,17 @@
+import functools
+import multiprocessing
 import os
+from typing import Optional, Tuple, Union
+
 import numpy as np
+import pandas as pd
 import torch
 from ultralytics import YOLO
-from typing import Union, Optional, Tuple
-import multiprocessing
-import pandas as pd
-import functools
+
 from simba.utils.enums import Defaults
-from simba.utils.read_write import get_video_meta_data, read_img_batch_from_video_gpu, find_core_cnt
+from simba.utils.read_write import (find_core_cnt, get_video_meta_data,
+                                    read_img_batch_from_video_gpu)
+
 
 def fit_yolo(initial_weights: Union[str, os.PathLike],
              data: Union[str, os.PathLike],

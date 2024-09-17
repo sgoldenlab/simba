@@ -52,8 +52,9 @@ from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 ParametersFileError, PermissionError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.warnings import (
-    FileExistWarning, InvalidValueWarning, NoDataFoundWarning,
-    NoFileFoundWarning, ThirdPartyAnnotationsInvalidFileFormatWarning, FrameRangeWarning)
+    FileExistWarning, FrameRangeWarning, InvalidValueWarning,
+    NoDataFoundWarning, NoFileFoundWarning,
+    ThirdPartyAnnotationsInvalidFileFormatWarning)
 
 # from simba.utils.keyboard_listener import KeyboardListener
 

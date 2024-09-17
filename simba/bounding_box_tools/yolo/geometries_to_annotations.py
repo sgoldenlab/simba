@@ -1,17 +1,20 @@
+import json
 import os
-from typing import Optional, Union, Dict, Tuple
-from pycocotools import mask
+from datetime import datetime
+from typing import Dict, Optional, Tuple, Union
 
 import cv2
-import json
-from simba.utils.read_write import read_df, get_video_meta_data, read_frm_of_video
 import numpy as np
-from simba.mixins.geometry_mixin import GeometryMixin
+from pycocotools import mask
 from shapely.geometry import Polygon
-from datetime import datetime
-from simba.utils.checks import check_int, check_instance, check_valid_array
-from simba.utils.enums import Formats
 from skimage.draw import polygon
+
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.utils.checks import check_instance, check_int, check_valid_array
+from simba.utils.enums import Formats
+from simba.utils.read_write import (get_video_meta_data, read_df,
+                                    read_frm_of_video)
+
 
 def geometry_to_rle(geometry: Union[np.ndarray, Polygon], img_size: Tuple[int, int]):
     """
