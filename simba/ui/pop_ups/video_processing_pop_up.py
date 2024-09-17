@@ -597,7 +597,7 @@ class ExtractAllFramesPopUp(PopUpMixin):
         PopUpMixin.__init__(self, title="EXTRACT ALL FRAMES")
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm,header="SINGLE VIDEO",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.VIDEO_TOOLS.value)
         video_path = FileSelect( single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
-        single_video_btn = SimbaButton(parent=single_video_frm, txt="Extract Frames (Single video)", img='rocket', font=Formats.FONT_REGULAR.value, cmd=extract_frames_single_video, cmd_kwargs={'file_path': lambda:video_path.file_path})
+        single_video_btn = SimbaButton(parent=single_video_frm, txt="Extract Frames (Single video)", img='rocket', font=Formats.FONT_REGULAR.value, cmd=extract_frames_single_video, cmd_kwargs={'file_path': lambda:video_path.file_path, 'save_dir': None})
         multiple_videos_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="MULTIPLE VIDEOS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
 
         folder_path = FolderSelect(multiple_videos_frm, "DIRECTORY PATH:", title=" Select video folder")

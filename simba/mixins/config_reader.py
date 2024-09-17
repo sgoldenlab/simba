@@ -58,6 +58,7 @@ class ConfigReader(object):
         self.config_path = config_path
         self.config = read_config_file(config_path=config_path)
         self.datetime = datetime.now().strftime("%Y%m%d%H%M%S")
+
         self.project_path, self.file_type = read_project_path_and_file_type(
             config=self.config
         )

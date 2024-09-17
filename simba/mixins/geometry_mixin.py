@@ -3602,7 +3602,7 @@ class GeometryMixin(object):
         return results
 
     @staticmethod
-    def get_shape_lengths_widths(shapes: Union[List[Polygon], Polygon]) -> Dict[str, Any]:
+    def get_shape_statistics(shapes: Union[List[Polygon], Polygon]) -> Dict[str, Any]:
         """
         Calculate the lengths and widths of the minimum bounding rectangles of polygons.
 
@@ -3616,19 +3616,87 @@ class GeometryMixin(object):
                  - 'min_width': The minimum width found among all polygons.
         :rtype: Dict[str, Any]
         """
-        widths, lengths, max_length, max_width, min_length, min_width = [], [], -np.inf, -np.inf, np.inf, np.inf
+        widths, lengths, areas, centers, max_length, max_width, max_area, min_length, min_width, min_area = [], [], [], [], -np.inf, -np.inf, -np.inf, np.inf, np.inf, np.inf
         if isinstance(shapes, Polygon):
             shapes = [shapes]
         for shape in shapes:
             shape_cords = list(zip(*shape.exterior.coords.xy))
             mbr_lengths = [LineString((shape_cords[i], shape_cords[i + 1])).length for i in range(len(shape_cords) - 1)]
             width, length = min(mbr_lengths), max(mbr_lengths)
+            area = width * length
             min_length, max_length = min(min_length, length), max(max_length, length)
             min_width, max_width = min(min_width, width), max(max_width, width)
-            lengths.append(length);
+            min_area, max_area = min(min_area, area), max(max_area, area)
+            lengths.append(length)
             widths.append(width)
-        return {'lengths': lengths, 'widths': widths, 'max_length': max_length, 'min_length': min_length,
-                'min_width': min_width, 'max_width': max_width}
+            areas.append(area)
+            centers.append(list(np.array(shape.centroid).astype(np.int32)))
+
+        return {'lengths': lengths, 'widths': widths, 'areas': areas, 'centers': centers, 'max_length': max_length, 'min_length': min_length, 'min_width': min_width, 'max_width': max_width, 'min_area': min_area, 'max_area': max_area}
+
+    @staticmethod
+    def _geometries_to_exterior_keypoints_helper(geometries):
+        results = []
+        for geo in geometries:
+            results.append(np.array(geo.exterior.coords))
+        return results
+
+    @staticmethod
+    def geometries_to_exterior_keypoints(geometries: List[Polygon], core_cnt: Optional[int] = -1) -> np.ndarray:
+        """
+        Extract exterior keypoints from a list of Polygon geometries in parallel, with optional core count specification for multiprocessing.
+
+        :param List[Polygon] geometries: A list of Shapely `Polygon` objects representing geometries whose exterior keypoints will be extracted.
+        :param Optional[int] core_cnt: The number of CPU cores to use for multiprocessing. If -1, it uses the maximum number of available cores.
+        :return: A numpy array of exterior keypoints extracted from the input geometries.
+        :rtype: np.ndarray
+
+        :example:
+        >>> data_path = r"C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\FRR_gq_Saline_0624.csv"
+        >>> animal_data = read_df(file_path=data_path, file_type='csv', usecols=['Nose_x', 'Nose_y', 'Tail_base_x', 'Tail_base_y', 'Left_side_x', 'Left_side_y', 'Right_side_x', 'Right_side_y']).values.reshape(-1, 4, 2)[0:20].astype(np.int32)
+        >>> animal_polygons = GeometryMixin().bodyparts_to_polygon(data=animal_data)
+        >>> geometries_to_exterior_keypoints(geometries=animal_polygons)
+        """
+        check_int(name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
+        if core_cnt == -1: core_cnt = find_core_cnt()[0]
+        check_valid_lst(data=geometries, source=GeometryMixin.geometries_to_exterior_keypoints.__name__, valid_dtypes=(Polygon,), min_len=1)
+        results = []
+        geometries = np.array_split(geometries, 3)
+        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
+            for cnt, mp_return in enumerate(
+                pool.imap(GeometryMixin._geometries_to_exterior_keypoints_helper, geometries, chunksize=1)):
+                results.append(mp_return)
+        results = [i for xs in results for i in xs]
+        return np.array(results).astype(np.int32)
+
+    @staticmethod
+    @njit("(int32[:, :, :],)", parallel=True)
+    def keypoints_to_axis_aligned_bounding_box(keypoints: np.ndarray) -> np.ndarray:
+        """
+        Computes the axis-aligned bounding box for each set of keypoints.
+
+        Each set of keypoints consists of a 2D array of coordinates representing points. The function calculates
+        the minimum and maximum x and y values from the keypoints to form a rectangle (bounding box) aligned with
+        the x and y axes.
+
+        :param np.ndarray keypoints: A 3D array of shape (N, M, 2) where N is the number of observations, and each observation contains M points in 2D space (x, y).
+        :return: A 3D array of shape (N, 4, 2), where each entry represents the four corners of the axis-aligned  bounding box corresponding to each set of keypoints.
+        :rtype: np.ndarray
+
+        :example:
+        >>> data = np.random.randint(0, 360, (30000, 7, 2))
+        >>> results = keypoints_to_axis_aligned_bounding_box(keypoints=data)
+        """
+        results = np.full((keypoints.shape[0], 4, 2), np.nan, dtype=np.int32)
+        for i in prange(keypoints.shape[0]):
+            obs = keypoints[i]
+            min_x, min_y = np.min(obs[:, 0].flatten()), np.min(obs[:, 1].flatten())
+            max_x, max_y = np.max(obs[:, 0].flatten()), np.max(obs[:, 1].flatten())
+            results[i] = np.array([[min_x, min_y], [max_x, min_y], [max_x, max_y], [min_x, max_y]])
+        return results
+
+
+
 
 # data = np.array([[[364, 308], [383, 323], [403, 335], [423, 351]],
 #                  [[356, 307], [376, 319], [396, 331], [419, 347]],

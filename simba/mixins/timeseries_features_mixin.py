@@ -1698,9 +1698,7 @@ class TimeseriesFeatureMixin(object):
 
     @staticmethod
     @njit("(int32[:,:], float64[:], float64, float64)")
-    def sliding_displacement(
-        x: np.ndarray, time_windows: np.ndarray, fps: float, px_per_mm: float
-    ) -> np.ndarray:
+    def sliding_displacement(x: np.ndarray, time_windows: np.ndarray, fps: float, px_per_mm: float) -> np.ndarray:
         """
         Calculate sliding Euclidean displacement of a body-part point over time windows.
 

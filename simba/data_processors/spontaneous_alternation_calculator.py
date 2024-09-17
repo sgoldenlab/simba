@@ -26,7 +26,6 @@ from simba.utils.warnings import NoFileFoundWarning
 
 TAIL_END = "tail_end"
 
-
 class SpontaneousAlternationCalculator(ConfigReader):
     """
     Compute spontaneous alternations based on specified ROIs and animal detection parameters.

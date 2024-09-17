@@ -1136,19 +1136,25 @@ class CircularStatisticsMixin(object):
         """
         Jitted compute of frame-by-frame rotational direction within a 1D timeseries array of angular data.
 
-        :parameter ndarray data: 1D array of size len(frames) representing degrees.
-        :return numpy.ndarray: An array of directional indicators.
-           - 0 indicates no rotational change relative to prior frame.
-           - 1 indicates a clockwise rotational change relative to prior frame.
-           - 2 indicates a counter-clockwise rotational change relative to prior frame.
-
         .. note::
            * For the first frame, no rotation is possible so is populated with -1.
            * Frame-by-frame rotations of 180° degrees are denoted as clockwise rotations.
 
+        .. seealso::
+           See :func:`~simba.data_processors.cuda.circular_statistics.rotational_direction` for GPU acceleration.
+
         .. image:: _static/img/rotational_direction.png
            :width: 600
            :align: center
+
+        The result array contains values:
+        - `0` where there is no change between points.
+        - `1` where the angle has increased in the positive direction.
+        - `2` where the angle has decreased in the negative direction.
+
+        :param np.ndarray data: 1D array of size len(frames) representing degrees.
+        :return: An array of directional indicators.
+        :rtype: numpy.ndarray
 
         :example:
         >>> data = np.array([45, 50, 35, 50, 80, 350, 350, 0 , 180]).astype(np.float32)

@@ -3,22 +3,18 @@ __author__ = "Simon Nilsson / Florian Duclot"
 import glob
 import os
 from copy import deepcopy
-
 import pandas as pd
+from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
-from simba.third_party_label_appenders.tools import is_new_boris_version
-from simba.utils.checks import (check_if_dir_exists,
-                                check_if_filepath_list_is_empty)
-from simba.utils.errors import (ThirdPartyAnnotationEventCountError,
-                                ThirdPartyAnnotationOverlapError)
-from simba.utils.printing import stdout_success
-from simba.utils.read_write import get_fn_ext, read_df, write_df
-from simba.utils.warnings import (
-    ThirdPartyAnnotationsInvalidFileFormatWarning,
-    ThirdPartyAnnotationsOutsidePoseEstimationDataWarning)
+from simba.third_party_label_appenders.tools import is_new_boris_version, read_boris_annotation_files
+from simba.utils.checks import (check_if_dir_exists, check_if_filepath_list_is_empty)
+from simba.utils.errors import (ThirdPartyAnnotationEventCountError, ThirdPartyAnnotationOverlapError, NoDataError)
+from simba.utils.printing import stdout_success, SimbaTimer
+from simba.utils.read_write import get_fn_ext, read_df, write_df, find_files_of_filetypes_in_directory
+from simba.utils.warnings import (ThirdPartyAnnotationsInvalidFileFormatWarning, ThirdPartyAnnotationsOutsidePoseEstimationDataWarning)
 
-
+BEHAVIOR = 'BEHAVIOR'
 class BorisAppender(ConfigReader):
     """
     Append BORIS human annotations onto featurized pose-estimation data.
@@ -35,11 +31,9 @@ class BorisAppender(ConfigReader):
        :width: 200
        :align: center
 
-    Examples
-    ----------
-    >>> boris_appender = BorisAppender(config_path='MyProjectConfigPath', data_dir=r'BorisDataFolder')
-    >>> boris_appender.create_boris_master_file()
-    >>> boris_appender.run()
+    :example:
+    >>> test = BorisAppender(config_path=r"C:\troubleshooting\boris_test\project_folder\project_config.ini", data_dir=r"C:\troubleshooting\boris_test\project_folder\boris_files")
+    >>> test.run()
 
     References
     ----------
@@ -47,203 +41,67 @@ class BorisAppender(ConfigReader):
     .. [1] `Behavioral Observation Research Interactive Software (BORIS) user guide <https://boris.readthedocs.io/en/latest/#>`__.
     """
 
-    def __init__(self, config_path: str, data_dir: str):
+    def __init__(self, config_path: Union[str, os.PathLike], data_dir: Union[str, os.PathLike]):
         super().__init__(config_path=config_path)
-        self.boris_dir = data_dir
-        self.boris_files_found = glob.glob(self.boris_dir + "/*.csv")
         check_if_dir_exists(data_dir)
-        check_if_filepath_list_is_empty(
-            filepaths=self.boris_files_found,
-            error_msg=f"SIMBA ERROR: 0 BORIS CSV files found in {data_dir} directory",
-        )
-        print(f"Processing BORIS for {str(len(self.feature_file_paths))} file(s)...")
+        self.boris_dir = data_dir
+        self.boris_files_found = find_files_of_filetypes_in_directory(directory=self.boris_dir, extensions=['.csv'], raise_error=True)
+        print(f"Processing {len(self.boris_files_found)} BORIS annotation file(s) in {data_dir} directory...")
+        if len(self.feature_file_paths) == 0:
+            raise NoDataError(f'No data files found in the {self.features_dir} directory.', source=self.__class__.__name__)
 
-    def create_boris_master_file(self):
-        """
-        Method to create concatenated dataframe of BORIS annotations.
 
-        Returns
-        -------
-        Attribute: pd.Dataframe
-            master_boris_df
-        """
-        self.master_boris_df_list = []
-        for file_cnt, file_path in enumerate(self.boris_files_found):
-            try:
-                _, video_name, _ = get_fn_ext(file_path)
-                boris_df = pd.read_csv(file_path)
-                if not is_new_boris_version(boris_df):
-                    index = boris_df[boris_df["Observation id"] == "Time"].index.values
-                    boris_df = pd.read_csv(file_path, skiprows=range(0, int(index + 1)))
-                    boris_df = boris_df.loc[
-                        :, ~boris_df.columns.str.contains("^Unnamed")
-                    ]
-                    boris_df.drop(
-                        ["Behavioral category", "Comment", "Subject"],
-                        axis=1,
-                        inplace=True,
-                    )
-                else:
-                    target_cols = [
-                        "Time",
-                        "Media file path",
-                        "Total length",
-                        "FPS",
-                        "Behavior",
-                        "Status",
-                    ]
-                    boris_df.rename(
-                        columns={
-                            "Media file name": "Media file path",
-                            "Media duration (s)": "Total length",
-                            "Behavior type": "Status",
-                        },
-                        inplace=True,
-                    )
-                    boris_df = boris_df.reindex(columns=target_cols)
-                _, video_base_name, _ = get_fn_ext(boris_df.loc[0, "Media file path"])
-                boris_df["Media file path"] = video_base_name
-                self.master_boris_df_list.append(boris_df)
-            except Exception as e:
-                print(e.args)
-                ThirdPartyAnnotationsInvalidFileFormatWarning(
-                    annotation_app="BORIS", file_path=file_path
-                )
-        self.master_boris_df = pd.concat(self.master_boris_df_list, axis=0).reset_index(
-            drop=True
-        )
-        print(
-            "Found {} annotated behaviors in {} files with {} directory".format(
-                str(len(self.master_boris_df["Behavior"].unique())),
-                len(self.boris_files_found),
-                self.boris_dir,
-            )
-        )
-        print(
-            "The following behavior annotations where detected in the boris directory:"
-        )
-        for behavior in self.master_boris_df["Behavior"].unique():
-            print(behavior)
-
-    def __check_non_overlapping_annotations(self):
-        shifted_annotations = deepcopy(self.clf_annotations)
-        shifted_annotations["START"] = self.clf_annotations["START"].shift(-1)
+    def __check_non_overlapping_annotations(self, annotation_df):
+        shifted_annotations = deepcopy(annotation_df)
+        shifted_annotations["START"] = annotation_df["START"].shift(-1)
         shifted_annotations = shifted_annotations.head(-1)
-        return shifted_annotations.query("START < STOP")
+        error_rows = shifted_annotations.query("START < STOP")
+        if len(error_rows) > 0:
+            raise ThirdPartyAnnotationOverlapError(video_name=self.video_name, clf_name=self.clf)
+
 
     def run(self):
-        """
-        Method to append BORIS annotations created in :meth:`~simba.BorisAppender.create_boris_master_file` to the
-        featurized pose-estimation data in the SimBA project. Results (parquets' or CSVs) are saved within the the
-        project_folder/csv/targets_inserted directory of the SimBA project.
-        """
+        boris_annotation_dict = read_boris_annotation_files(data_paths=self.boris_files_found, video_info_df=self.video_info_df, orient='index')
         for file_cnt, file_path in enumerate(self.feature_file_paths):
-            _, self.video_name, _ = get_fn_ext(file_path)
-            print("Appending BORIS annotations to {} ...".format(self.video_name))
+            self.file_name = get_fn_ext(filepath=file_path)[1]
+            self.video_timer = SimbaTimer(start=True)
+            print(f'Processing BORIS annotations for feature file {self.file_name}...')
+            if self.file_name not in boris_annotation_dict.keys():
+                raise NoDataError(msg=f'Your SimBA project has a feature file named {self.file_name}, however no annotations exist for this file in the {self.boris_dir} directory.')
+            else:
+                video_annot = boris_annotation_dict[self.file_name]
             data_df = read_df(file_path, self.file_type)
-            self.out_df = deepcopy(data_df)
-            vid_annotations = self.master_boris_df.loc[
-                self.master_boris_df["Media file path"] == self.video_name
-            ]
-            vid_annotation_starts = vid_annotations[(vid_annotations.Status == "START")]
-            vid_annotation_stops = vid_annotations[(vid_annotations.Status == "STOP")]
-            vid_annotations = (
-                pd.concat(
-                    [vid_annotation_starts, vid_annotation_stops],
-                    axis=0,
-                    join="inner",
-                    copy=True,
-                )
-                .sort_index()
-                .reset_index(drop=True)
-            )
-            vid_annotations = vid_annotations[
-                vid_annotations["Behavior"].isin(self.clf_names)
-            ]
-            if len(vid_annotations) == 0:
-                print(
-                    "SIMBA WARNING: No BORIS annotations detected for SimBA classifier(s) named {} for video {}".format(
-                        str(self.clf_names), self.video_name
-                    )
-                )
-                continue
-            video_fps = vid_annotations["FPS"].values[0]
-            for clf in self.clf_names:
-                self.clf = clf
-                clf_annotations = vid_annotations[(vid_annotations["Behavior"] == clf)]
-                clf_annotations_start = clf_annotations[
-                    clf_annotations["Status"] == "START"
-                ].reset_index(drop=True)
-                clf_annotations_stop = clf_annotations[
-                    clf_annotations["Status"] == "STOP"
-                ].reset_index(drop=True)
-                if len(clf_annotations_start) != len(clf_annotations_stop):
-                    raise ThirdPartyAnnotationEventCountError(
-                        video_name=self.video_name,
-                        clf_name=self.clf,
-                        start_event_cnt=len(clf_annotations_start),
-                        stop_event_cnt=len(clf_annotations_stop),
-                    )
-                self.clf_annotations = (
-                    clf_annotations_start["Time"]
-                    .to_frame()
-                    .rename(columns={"Time": "START"})
-                )
-                self.clf_annotations["STOP"] = clf_annotations_stop["Time"]
-                self.clf_annotations = self.clf_annotations.apply(pd.to_numeric)
-                results = self.__check_non_overlapping_annotations()
-                if len(results) > 0:
-                    raise ThirdPartyAnnotationOverlapError(
-                        video_name=self.video_name, clf_name=self.clf
-                    )
-                self.clf_annotations["START_FRAME"] = (
-                    self.clf_annotations["START"] * video_fps
-                ).astype(int)
-                self.clf_annotations["END_FRAME"] = (
-                    self.clf_annotations["STOP"] * video_fps
-                ).astype(int)
-                if len(self.clf_annotations) == 0:
-                    self.out_df[clf] = 0
-                    print(
-                        f"SIMBA WARNING: No BORIS annotation detected for video {self.video_name} and behavior {clf}. SimBA will set all frame annotations as absent."
-                    )
+            for clf_name in self.clf_names:
+                data_df[clf_name] = 0
+                if clf_name not in video_annot[BEHAVIOR].unique():
+                    print(f"SIMBA WARNING: No BORIS annotation detected for video {self.file_name} and behavior {clf_name}. SimBA will set all frame annotations as absent.")
                     continue
-                annotations_idx = list(
-                    self.clf_annotations.apply(
-                        lambda x: list(
-                            range(int(x["START_FRAME"]), int(x["END_FRAME"]) + 1)
-                        ),
-                        1,
-                    )
-                )
+                video_clf_annot = video_annot[video_annot[BEHAVIOR] == clf_name].reset_index(drop=True)
+                self.__check_non_overlapping_annotations(video_clf_annot)
+                annotations_idx = list(video_clf_annot.apply(lambda x: list(range(int(x["START"]), int(x["STOP"]) + 1)), 1))
                 annotations_idx = [x for xs in annotations_idx for x in xs]
-                idx_difference = list(set(annotations_idx) - set(self.out_df.index))
+                idx_difference = list(set(annotations_idx) - set(data_df.index))
                 if len(idx_difference) > 0:
-                    ThirdPartyAnnotationsOutsidePoseEstimationDataWarning(
-                        video_name=self.video_name,
-                        clf_name=clf,
-                        frm_cnt=self.out_df.index[-1],
-                        first_error_frm=idx_difference[0],
-                        ambiguous_cnt=len(idx_difference),
-                    )
-                    annotations_idx = [
-                        x for x in annotations_idx if x not in idx_difference
-                    ]
-                self.out_df[clf] = 0
-                self.out_df.loc[annotations_idx, clf] = 1
-            self.__save_boris_annotations()
+                    ThirdPartyAnnotationsOutsidePoseEstimationDataWarning(video_name=self.file_name, clf_name=clf_name, frm_cnt=data_df.index[-1], first_error_frm=idx_difference[0], ambiguous_cnt=len(idx_difference))
+                    annotations_idx = [x for x in annotations_idx if x not in idx_difference]
+                data_df.loc[annotations_idx, clf_name] = 1
+                print(f'Appended {len(annotations_idx)} BORIS behavior {clf_name} annotations for video {self.file_name}...')
+            self.__save_boris_annotations(df=data_df)
         self.timer.stop_timer()
-        stdout_success(
-            msg="BORIS annotations appended to dataset and saved in project_folder/csv/targets_inserted directory",
-            elapsed_time=self.timer.elapsed_time_str,
-        )
+        stdout_success(msg=f"BORIS annotations appended to {len(self.feature_file_paths)} data file(s) and saved in {self.targets_folder}", elapsed_time=self.timer.elapsed_time_str)
 
-    def __save_boris_annotations(self):
-        self.save_path = os.path.join(
-            self.targets_folder, self.video_name + "." + self.file_type
-        )
-        write_df(self.out_df, self.file_type, self.save_path)
-        print("Saved BORIS annotations for video {}...".format(self.video_name))
+    def __save_boris_annotations(self, df):
+        self.save_path = os.path.join(self.targets_folder, f"{self.file_name}.{self.file_type}")
+        write_df(df, self.file_type, self.save_path)
+        self.video_timer.stop_timer()
+        print(f"Saved BORIS annotations for video {self.file_name}... (elapsed time: {self.video_timer.elapsed_time_str})")
+
+# test = BorisAppender(config_path=r"C:\troubleshooting\boris_test\project_folder\project_config.ini",
+#                      data_dir=r"C:\troubleshooting\boris_test\project_folder\boris_files")
+# #test.create_boris_master_file()
+# test.run()
+
+
 
 
 # test = BorisAppender(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',

@@ -624,7 +624,6 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
     def importBoris(self):
         ann_folder = askdirectory()
         boris_appender = BorisAppender(config_path=self.config_path, data_dir=ann_folder)
-        boris_appender.create_boris_master_file()
         threading.Thread(target=boris_appender.run).start()
 
     def importSolomon(self):

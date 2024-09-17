@@ -3,7 +3,7 @@ __email__ = "sronilsson@gmail.com"
 
 
 import math
-from typing import Optional
+from typing import Optional, Tuple
 
 import numpy as np
 from numba import cuda
@@ -12,10 +12,11 @@ from simba.utils.read_write import read_df
 
 try:
     import cupy as cp
+    from cupyx.scipy.spatial.distance import cdist
 except:
     import numpy as cp
 
-from simba.utils.checks import check_int, check_valid_array
+from simba.utils.checks import check_int, check_valid_array, check_valid_tuple
 from simba.utils.enums import Formats
 
 THREADS_PER_BLOCK = 256
@@ -111,7 +112,7 @@ def count_values_in_ranges(x: np.ndarray, r: np.ndarray) -> np.ndarray:
     .. csv-table::
        :header: EXPECTED RUNTIMES
        :file: ../../../docs/tables/count_values_in_ranges.csv
-       :widths: 10, 90
+       :widths: 10, 45, 45
        :align: center
        :header-rows: 1
 
@@ -479,3 +480,33 @@ def sliding_sum(x: np.ndarray, time_window: float, sample_rate: int) -> np.ndarr
     _cuda_sliding_sum[bpg, THREADS_PER_BLOCK](x_dev, delta_dev, results)
     results = results.copy_to_host()
     return results
+
+
+def euclidean_distance_to_static_point(data: np.ndarray,
+                                       point: Tuple[int, int],
+                                       pixels_per_millimeter: Optional[int] = 1,
+                                       centimeter: Optional[bool] = False,
+                                       batch_size: Optional[int] = int(6.5e+7)) -> np.ndarray:
+    """
+    Computes the Euclidean distance between each point in a given 2D array `data` and a static point using GPU acceleration.
+
+    :param data: A 2D array of shape (N, 2), where N is the number of points, and each point is represented by its (x, y) coordinates. The array can represent pixel coordinates.
+    :param point: A tuple of two integers representing the static point (x, y) in the same space as `data`.
+    :param pixels_per_millimeter: A scaling factor that indicates how many pixels correspond to one millimeter. Defaults to 1 if no scaling is necessary.
+    :param centimeter:  A flag to indicate whether the output distances should be converted from millimeters to centimeters. If True, the result is divided by 10. Defaults to False (millimeters).
+    :param batch_size: The number of points to process in each batch to avoid memory overflow on the GPU. The default  batch size is set to 65 million points (6.5e+7). Adjust this parameter based on GPU memory capacity.
+    :return: A 1D array of distances between each point in `data` and the static `point`, either in millimeters or centimeters depending on the `centimeter` flag.
+    :rtype: np.ndarray
+    """
+    check_valid_array(data=data, source=euclidean_distance_to_static_point.__name__, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_1_shape=[2,])
+    check_valid_tuple(x=point, source=euclidean_distance_to_static_point.__name__, accepted_lengths=(2,), valid_dtypes=Formats.NUMERIC_DTYPES.value)
+    n = data.shape[0]
+    results = cp.full((data.shape[0], 1),-1, dtype=np.float32)
+    point = cp.array(point).reshape(1, 2)
+    for cnt, l in enumerate(range(0, int(n), int(batch_size))):
+        r = np.int32(min(l + batch_size, n))
+        batch_data = cp.array(data[l:r])
+        results[l:r]  = cdist(batch_data, point).astype(np.float32) / pixels_per_millimeter
+    if centimeter:
+        results = results / 10
+    return results.get

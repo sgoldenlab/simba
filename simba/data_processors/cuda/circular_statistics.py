@@ -573,7 +573,7 @@ def sliding_bearing(x: np.ndarray,
     .. csv-table::
        :header: EXPECTED RUNTIMES
        :file: ../../../docs/tables/sliding_bearing.csv
-       :widths: 10, 90
+       :widths: 10, 45, 45
        :align: center
        :header-rows: 1
 
@@ -638,7 +638,7 @@ def sliding_angular_diff(x: np.ndarray,
     .. csv-table::
        :header: EXPECTED RUNTIMES
        :file: ../../../docs/tables/sliding_angular_diff.csv
-       :widths: 10, 90
+       :widths: 10, 45, 45
        :align: center
        :header-rows: 1
 
@@ -673,5 +673,61 @@ def sliding_angular_diff(x: np.ndarray,
     _sliding_angular_diff[blocks_per_grid, THREADS_PER_BLOCK](x_dev, stride_dev, results)
     results = results.copy_to_host().astype(np.int32)
     return results
+
+@cuda.jit()
+def _rotational_direction(data, stride, results):
+    r = cuda.grid(1)
+    l = int(r - stride[0])
+    if (r < 0) or (r > data.shape[0] - 1):
+        return
+    elif (l < 0):
+        return
+    else:
+        l_val, r_val = data[l], data[r]
+        angle_diff = r_val - l_val
+        if angle_diff > np.pi:
+            angle_diff -= 2 * np.pi
+        elif angle_diff < -np.pi:
+            angle_diff += 2 * np.pi
+        if angle_diff == 0:
+            results[r] = 0
+        elif angle_diff > 0:
+            results[r] = 1
+        else:
+            results[r] = 2
+
+def rotational_direction(data: np.ndarray, stride: Optional[int] = 1) -> np.ndarray:
+    """
+    Computes the rotational direction between consecutive data points in a circular space, where the angles wrap
+    around at 360 degrees. The function uses GPU acceleration via CUDA to process the data in parallel.
+
+    The result array contains values:
+
+    * `0` where there is no change between points.
+    * `1` where the angle has increased in the positive direction.
+    * `2` where the angle has decreased in the negative direction.
+
+    .. seealso::
+       :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.rotational_direction` for jitted CPU method.
+
+    :param np.ndarray data: 1D array of angular data (in degrees) to analyze. The data will be internally converted to radians and wrapped between [0, 360) degrees before processing.
+    :param Optional[int] stride: The stride or gap between data points for which the rotational direction is calculated. Default is 1.
+    :return: A 1D array of integers of the same length as `data`, where each element indicates the rotational direction between the current and previous point based on the stride. The first `stride` elements in the result will  be initialized to -1 since they cannot be compared.
+    :rtype: np.ndarray
+
+    :example:
+    >>> data = np.random.randint(0, 365, (100))
+    >>> p = rotational_direction(data=data)
+    """
+    data = np.deg2rad(data % 360)
+    results = np.full((data.shape[0]), fill_value=-1, dtype=np.int16)
+    results_dev = cuda.to_device(results)
+    stride = np.array([stride])
+    stride_dev = cuda.to_device(stride)
+    data_dev = cuda.to_device(data)
+    bpg = (data.shape[0] + (THREADS_PER_BLOCK - 1)) // THREADS_PER_BLOCK
+    _rotational_direction[bpg, THREADS_PER_BLOCK](data_dev, stride_dev, results_dev)
+    return results_dev.copy_to_host()
+
 
 

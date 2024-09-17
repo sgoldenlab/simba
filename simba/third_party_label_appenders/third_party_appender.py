@@ -191,6 +191,8 @@ class ThirdPartyLabelAppender(ConfigReader):
         self.timer.stop_timer()
         stdout_success(msg=f"{self.annotation_app} annotations appended to dataset and saved in {self.targets_folder} directory", elapsed_time=self.timer.elapsed_time_str)
 
+
+
 # log = True
 # file_format = 'xlsx'
 # error_settings = {'INVALID annotations file data format': 'WARNING',
@@ -200,9 +202,29 @@ class ThirdPartyLabelAppender(ConfigReader):
 #                   'ZERO third-party video behavior annotations found': 'WARNING',
 #                   'Annotations and pose FRAME COUNT conflict': 'WARNING',
 #                   'Annotations data file NOT FOUND': 'WARNING'}
+#
+# test = ThirdPartyLabelAppender(config_path=r"C:\troubleshooting\boris_test\project_folder\project_config.ini",
+#                                data_dir=r"C:\troubleshooting\boris_test\project_folder\boris_files",
+#                                app='BORIS',
+#                                file_format='.csv',
+#                                error_settings=error_settings,
+#                                log=log)
+# test.run()
+#
 
-# test = ThirdPartyLabelAppender(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
-#                                data_dir='/Users/simon/Desktop/envs/simba/troubleshooting/BORIS_EXAMPLE',
+#
+# log = True
+# file_format = 'xlsx'
+# error_settings = {'INVALID annotations file data format': 'WARNING',
+#                   'ADDITIONAL third-party behavior detected': 'NONE',
+#                   'Annotations EVENT COUNT conflict': 'WARNING',
+#                   'Annotations OVERLAP inaccuracy': 'WARNING',
+#                   'ZERO third-party video behavior annotations found': 'WARNING',
+#                   'Annotations and pose FRAME COUNT conflict': 'WARNING',
+#                   'Annotations data file NOT FOUND': 'WARNING'}
+#
+# test = ThirdPartyLabelAppender(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini",
+#                                data_dir=r"C:\troubleshooting\two_black_animals_14bp\BORIS",
 #                                app='BORIS',
 #                                file_format='.csv',
 #                                error_settings=error_settings,

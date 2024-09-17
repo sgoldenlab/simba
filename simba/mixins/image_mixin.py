@@ -577,8 +577,8 @@ class ImageMixin(object):
            :width: 600
            :align: center
 
-        .. seelalso::
-           If converting multiple images from colour to black and white, consider :func:`simba.mixins.image_mixin.ImageMixin.img_stack_to_bw()` or
+        .. seealso::
+           If converting multiple images from colour to black and white, consider :func:`simba.mixins.image_mixin.ImageMixin.img_stack_to_bw` or
            :func:`simba.data_processors.cuda.image.img_stack_to_bw`
 
         :param np.ndarray img: Input image as a NumPy array.

@@ -114,8 +114,7 @@ class FeatureExtractionMixin(object):
            :align: center
 
         .. seealso::
-           :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt_serialized`,
-           :func:
+           :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt_serialized`
 
 
         :example:

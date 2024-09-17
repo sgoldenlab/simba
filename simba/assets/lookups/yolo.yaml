@@ -1,0 +1,7 @@
+path: C:\troubleshooting\coco_data # dataset root dir
+train: ../images/501_MA142_Gi_CNO_0514 # train images (relative to 'path') 128 images
+val: ../images/F0_gq_CNO_0621 # val images (relative to 'path') 128 images
+test: ../images/FL_gq_CNO_0625_78
+
+names:
+    0: animal_1

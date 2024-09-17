@@ -29,16 +29,16 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_nvidea_gpu_available,
                                 check_that_hhmmss_start_is_before_end,
                                 check_valid_array, check_valid_boolean)
+from simba.data_processors.cuda.utils import _cuda_mse
 from simba.utils.data import find_frame_numbers_from_time_stamp
 from simba.utils.enums import Formats
 from simba.utils.errors import FFMPEGCodecGPUError, InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (
-    check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
-    get_video_meta_data, read_img_batch_from_video_gpu)
+from simba.utils.read_write import (check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext, get_video_meta_data, read_img_batch_from_video_gpu)
 
 PHOTOMETRIC = 'photometric'
 DIGITAL = 'digital'
+THREADS_PER_BLOCK = 20124
 
 def create_average_frm_cupy(video_path: Union[str, os.PathLike],
                        start_frm: Optional[int] = None,
@@ -73,6 +73,7 @@ def create_average_frm_cupy(video_path: Union[str, os.PathLike],
 
     :example:
     >>> create_average_frm_cupy(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled.mp4", verbose=True, start_frm=0, end_frm=9000)
+
     """
 
     def average_3d_stack(image_stack: np.ndarray) -> np.ndarray:
@@ -443,7 +444,7 @@ def img_stack_to_grayscale_cupy(imgs: np.ndarray,
     """
     Converts a stack of color images to grayscale using GPU acceleration with CuPy.
 
-    .. seelalso::
+    .. seealso::
        For CPU function single images :func:`~simba.mixins.image_mixin.ImageMixin.img_to_greyscale` and
        :func:`~simba.mixins.image_mixin.ImageMixin.img_stack_to_greyscale` for stack. For CUDA JIT, see
        :func:`~simba.data_processors.cuda.image.img_stack_to_grayscale_cuda`.
@@ -504,7 +505,7 @@ def img_stack_to_grayscale_cuda(x: np.ndarray) -> np.ndarray:
     """
     Convert image stack to grayscale using CUDA.
 
-    .. seelalso::
+    .. seealso::
        For CPU function single images :func:`~simba.mixins.image_mixin.ImageMixin.img_to_greyscale` and
        :func:`~simba.mixins.image_mixin.ImageMixin.img_stack_to_greyscale` for stack. For CuPy, see
        :func:`~simba.data_processors.cuda.image.img_stack_to_grayscale_cupy`.
@@ -837,3 +838,68 @@ def slice_imgs(video_path: Union[str, os.PathLike],
     if verbose:
         stdout_success(msg='Shapes sliced in video.', elapsed_time=timer.elapsed_time_str)
     return results
+
+
+@cuda.jit()
+def _sliding_psnr(data, stride, results):
+    r = cuda.grid(1)
+    l = int(r - stride[0])
+    if (r < 0) or (r > data.shape[0] -1):
+        return
+    if l < 0:
+        return
+    else:
+        img_1, img_2 = data[r], data[l]
+        mse = _cuda_mse(img_1, img_2)
+        if mse == 0:
+            results[r] = 0.0
+        else:
+            results[r] = 20 * math.log10(255 / math.sqrt(mse))
+
+def sliding_psnr(data: np.ndarray,
+                 stride_s: int,
+                 sample_rate: float) -> np.ndarray:
+    """
+    Computes the Peak Signal-to-Noise Ratio (PSNR) between pairs of images in a stack using a sliding window approach.
+
+    This function calculates PSNR for each image in a stack compared to another image in the stack that is separated by a specified stride.
+    The sliding window approach allows for the comparison of image quality over a sequence of images.
+
+    .. note::
+       - PSNR values are measured in decibels (dB).
+       - Higher PSNR values indicate better quality with minimal differences from the reference image.
+       - Lower PSNR values indicate higher distortion or noise.
+
+    .. math::
+
+       \text{PSNR} = 20 \cdot \log_{10} \left( \frac{\text{MAX}}{\sqrt{\text{MSE}}} \right)
+
+    where:
+    - :math:`\text{MAX}` is the maximum possible pixel value (255 for 8-bit images).
+    - :math:`\text{MSE}` is the Mean Squared Error between the two images.
+
+    :param data:  A 4D NumPy array of shape (N, H, W, C) representing a stack of images, where N is the number of images, H is the height, W is the width, and C is the number of color channels.
+    :param stride_s: The base stride length in terms of the number of images between the images being compared. Determines the separation between images for comparison in the stack.
+    :param sample_rate: The sample rate to scale the stride length. This allows for adjusting the stride dynamically based on the sample rate.
+    :return: A 1D NumPy array of PSNR values, where each element represents the PSNR between the image at index `r` and the  image at index `l = r - stride`, for all valid indices `r`.
+    :rtype: np.ndarray
+
+    :example:
+    >>> data = ImageMixin().read_img_batch_from_video(video_path =r"/mnt/c/troubleshooting/mitra/project_folder/videos/clipped/501_MA142_Gi_CNO_0514_clipped.mp4", start_frm=0, end_frm=299)
+    >>> data = np.stack(list(data.values()), axis=0).astype(np.uint8)
+    >>> data = ImageMixin.img_stack_to_greyscale(imgs=data)
+    >>> p = sliding_psnr(data=data, stride_s=1, sample_rate=1)
+    """
+
+    results = np.full(data.shape[0], fill_value=255.0, dtype=np.float32)
+    stride = np.array([stride_s * sample_rate], dtype=np.int32)
+    if stride[0] < 1: stride[0] = 1
+    stride_dev = cuda.to_device(stride)
+    results_dev = cuda.to_device(results)
+    data_dev = cuda.to_device(data)
+    bpg = (data.shape[0] + (THREADS_PER_BLOCK - 1)) // THREADS_PER_BLOCK
+    _sliding_psnr[bpg, THREADS_PER_BLOCK](data_dev, stride_dev, results_dev)
+    return results_dev.copy_to_host()
+
+
+

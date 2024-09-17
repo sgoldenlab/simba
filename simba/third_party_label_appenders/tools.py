@@ -100,11 +100,10 @@ def is_new_boris_version(pd_df: pd.DataFrame):
 def read_boris_annotation_files(data_paths: Union[List[str], str, os.PathLike],
                                 video_info_df: Union[str, os.PathLike, pd.DataFrame],
                                 error_setting: Literal[Union[None, Methods.ERROR.value, Methods.WARNING.value]] = None,
+                                orient: Literal['index', 'columns'] = 'columns',
                                 log_setting: Optional[bool] = False) -> Dict[str, pd.DataFrame]:
     """
     Reads multiple BORIS behavioral annotation files and compiles the data into a dictionary of dataframes.
-
-    TEST!
 
     :param Union[List[str], str, os.PathLike] data_paths: Paths to the BORIS annotation files. This can be a list of file paths, a single directory containing the files, or a single file path.
     :param Union[str, os.PathLike, pd.DataFrame] video_info_df: The path to a CSV file, an existing dataframe, or a file-like object containing video information  (e.g., FPS, video name). This data is used to align the annotation files with their respective videos.
@@ -113,7 +112,7 @@ def read_boris_annotation_files(data_paths: Union[List[str], str, os.PathLike],
     :return: A dictionary where each key is a video name, and each value is a dataframe containing the compiled behavioral annotations from the corresponding BORIS file.
 
     :example:
-    >>>data = read_boris_annotation_files(data_paths=[r"C:\troubleshooting\boris_test\project_folder\boris_files\c_oxt23_190816_132617_s_trimmcropped.csv"], error_setting='WARNING', log_setting=False, video_info_df=r"C:\troubleshooting\boris_test\project_folder\logs\video_info.csv")
+    >>> data = read_boris_annotation_files(data_paths=[r"C:\troubleshooting\boris_test\project_folder\boris_files\c_oxt23_190816_132617_s_trimmcropped.csv"], error_setting='WARNING', log_setting=False, video_info_df=r"C:\troubleshooting\boris_test\project_folder\logs\video_info.csv")
     """
 
 
@@ -131,14 +130,13 @@ def read_boris_annotation_files(data_paths: Union[List[str], str, os.PathLike],
     elif isinstance(data_paths, str):
         check_if_dir_exists(in_dir=data_paths, source=f'{read_boris_annotation_files.__name__} data_paths')
         data_paths = find_files_of_filetypes_in_directory(directory=data_paths, extensions=['.csv'], raise_error=True)
-    check_all_file_names_are_represented_in_video_log(video_info_df=video_info_df, data_paths=data_paths)
     check_valid_dataframe(df=video_info_df, source=read_boris_annotation_files.__name__)
     dfs = {}
     for file_cnt, file_path in enumerate(data_paths):
         _, video_name, _ = get_fn_ext(file_path)
-        _, _, fps = read_video_info(vid_info_df=video_info_df, video_name=video_name)
-        boris_dict = read_boris_file(file_path=file_path, fps=fps, orient='columns', raise_error=raise_error, log_setting=log_setting)
-        dfs[video_name] = pd.concat(boris_dict.values(), ignore_index=True)
+        boris_dict = read_boris_file(file_path=file_path, fps=None, orient=orient, raise_error=raise_error, log_setting=log_setting)
+        for video_name, video_data in boris_dict.items():
+            dfs[video_name] = pd.concat(video_data, ignore_index=True)
     return dfs
 
 

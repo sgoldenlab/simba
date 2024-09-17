@@ -14,7 +14,6 @@ from simba.third_party_label_appenders.deepethogram_importer import DeepEthogram
 def test_boris_import_use_case(config_path, boris_path):
     boris_appender = BorisAppender(config_path=config_path,
                                    data_dir=boris_path)
-    boris_appender.create_boris_master_file()
     boris_appender.run()
     #assert len(boris_appender.out_df) == 1738
     #for f in glob.glob(boris_appender.targets_folder + '/*.csv'): os.remove(f)

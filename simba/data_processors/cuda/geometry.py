@@ -345,7 +345,7 @@ def find_midpoints(x: np.ndarray,
     .. csv-table::
        :header: EXPECTED RUNTIMES
        :file: ../../../docs/tables/find_midpoints.csv
-       :widths: 10, 90
+       :widths: 10, 45, 45
        :align: center
        :class: simba-table
        :header-rows: 1
@@ -381,6 +381,9 @@ def find_midpoints(x: np.ndarray,
         results[left:right, 1] = new_y
 
     return results
+
+
+
 
 
 
