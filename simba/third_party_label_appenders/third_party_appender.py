@@ -212,7 +212,7 @@ class ThirdPartyLabelAppender(ConfigReader):
 # test.run()
 #
 
-#
+
 # log = True
 # file_format = 'xlsx'
 # error_settings = {'INVALID annotations file data format': 'WARNING',

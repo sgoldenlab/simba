@@ -71,6 +71,8 @@ class BorisAppender(ConfigReader):
             else:
                 video_annot = boris_annotation_dict[self.file_name]
             data_df = read_df(file_path, self.file_type)
+            video_annot = video_annot.fillna(len(data_df))
+            print(video_annot)
             for clf_name in self.clf_names:
                 data_df[clf_name] = 0
                 if clf_name not in video_annot[BEHAVIOR].unique():
@@ -101,23 +103,7 @@ class BorisAppender(ConfigReader):
 # #test.create_boris_master_file()
 # test.run()
 
-
-
-
-# test = BorisAppender(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
-#                      data_dir='/Users/simon/Downloads/FIXED')
-# test.create_boris_master_file()
+#
+# test = BorisAppender(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini",
+#                      data_dir=r"C:\troubleshooting\two_black_animals_14bp\BORIS")
 # test.run()
-
-# test = BorisAppender(config_path='/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini', boris_folder=r'/Users/simon/Desktop/troubleshooting/train_model_project/boris_import')
-# test.create_boris_master_file()
-# test.append_boris()
-
-# test = BorisAppender(config_path='/Users/simon/Desktop/envs/marcel_boris/project_folder/project_config.ini', boris_folder=r'/Users/simon/Desktop/envs/marcel_boris/BORIS_data')
-# test.create_boris_master_file()
-# test.append_boris()
-
-# test = BorisAppender(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
-#                      boris_folder='/Users/simon/Downloads/FIXED')
-# test.create_boris_master_file()
-# test.append_boris()
