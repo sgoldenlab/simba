@@ -21,6 +21,7 @@ import cv2
 import numpy as np
 from numba import cuda
 
+from simba.data_processors.cuda.utils import _cuda_mse
 from simba.mixins.image_mixin import ImageMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
@@ -29,12 +30,13 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_nvidea_gpu_available,
                                 check_that_hhmmss_start_is_before_end,
                                 check_valid_array, check_valid_boolean)
-from simba.data_processors.cuda.utils import _cuda_mse
 from simba.utils.data import find_frame_numbers_from_time_stamp
 from simba.utils.enums import Formats
 from simba.utils.errors import FFMPEGCodecGPUError, InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext, get_video_meta_data, read_img_batch_from_video_gpu)
+from simba.utils.read_write import (
+    check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
+    get_video_meta_data, read_img_batch_from_video_gpu)
 
 PHOTOMETRIC = 'photometric'
 DIGITAL = 'digital'
