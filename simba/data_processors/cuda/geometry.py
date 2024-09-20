@@ -135,6 +135,10 @@ def is_inside_polygon(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     the polygon defined by the vertices in `y`. The result is an array where each element indicates whether
     the corresponding point is inside the polygon.
 
+    .. image:: _static/img/simba.data_processors.cuda.geometry.is_inside_polygon.webp
+       :width: 450
+       :align: center
+
     .. csv-table::
        :header: EXPECTED RUNTIMES
        :file: ../../../docs/tables/is_inside_polygon.csv
@@ -144,7 +148,7 @@ def is_inside_polygon(x: np.ndarray, y: np.ndarray) -> np.ndarray:
        :header-rows: 1
 
     .. seealso::
-       For numba CPU function see :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_inside_polygon_roi`
+       For jitted CPU function see :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_inside_polygon_roi`
 
     :param np.ndarray x: An array of shape (N, 2) where each row represents a point in 2D space. The points are checked against the polygon.
     :param np.ndarray y: An array of shape (M, 2) where each row represents a vertex of the polygon in 2D space.

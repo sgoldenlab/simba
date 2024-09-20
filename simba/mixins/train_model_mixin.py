@@ -1492,19 +1492,9 @@ class TrainModelMixin(object):
         if clf_names != None:
             for clf_name in clf_names:
                 if not clf_name in df.columns:
-                    raise ColumnNotFoundError(
-                        column_name=clf_name,
-                        file_name=file_path,
-                        source=TrainModelMixin._read_data_file_helper.__name__,
-                    )
-                elif (
-                        len(set(df[clf_name].unique()) - {0, 1}) > 0
-                        and raise_bool_clf_error
-                ):
-                    raise InvalidInputError(
-                        msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file_path} the {clf_name} field contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}.",
-                        source=TrainModelMixin._read_data_file_helper.__name__,
-                    )
+                    raise MissingColumnsError(msg=f'The SimBA project specifies a classifier named "{clf_name}" that could not be found in your dataset for file {file_path}. Make sure that your project_config.ini is created correctly.', source=TrainModelMixin._read_data_file_helper.__name__)
+                elif (len(set(df[clf_name].unique()) - {0, 1}) > 0 and raise_bool_clf_error):
+                    raise InvalidInputError(msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file_path} the {clf_name} field column contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}.", source=TrainModelMixin._read_data_file_helper.__name__)
         timer.stop_timer()
         print(f"Reading complete {vid_name} (elapsed time: {timer.elapsed_time_str}s)...")
 
@@ -1599,14 +1589,9 @@ class TrainModelMixin(object):
         if clf_names != None:
             for clf_name in clf_names:
                 if not clf_name in df.columns:
-                    raise ColumnNotFoundError(column_name=clf_name, file_name=file_path)
-                elif (
-                        len(set(df[clf_name].unique()) - {0, 1}) > 0
-                        and raise_bool_clf_error
-                ):
-                    raise InvalidInputError(
-                        msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file_path} the {clf_name} field contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}."
-                    )
+                    raise MissingColumnsError(msg=f'The SimBA project specifies a classifier named "{clf_name}" that could not be found in your dataset for file {file_path}. Make sure that your project_config.ini is created correctly.')
+                elif (len(set(df[clf_name].unique()) - {0, 1}) > 0 and raise_bool_clf_error):
+                    raise InvalidInputError(msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file_path} the {clf_name} field contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}.")
         timer.stop_timer()
         return df, vid_name, timer.elapsed_time_str, frm_numbers
 
