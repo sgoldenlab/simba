@@ -11,7 +11,7 @@ import cv2
 import imutils
 import numpy as np
 import pandas as pd
-from numba import njit, prange
+from numba import njit, prange, jit, types, typed
 from shapely.geometry import (GeometryCollection, LineString, MultiLineString,
                               MultiPoint, MultiPolygon, Point, Polygon)
 from shapely.ops import linemerge, split, triangulate, unary_union
@@ -22,6 +22,9 @@ except:
     from typing import Literal
 
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+InsidePolygon = FeatureExtractionMixin.framewise_inside_polygon_roi
+
+
 from simba.mixins.image_mixin import ImageMixin
 from simba.utils.checks import (check_float,
                                 check_if_2d_array_has_min_unique_values,
@@ -814,7 +817,8 @@ class GeometryMixin(object):
                     size: Optional[int] = None,
                     color_palette: Optional[str] = 'Set1',
                     thickness: Optional[int] = 2,
-                    pixel_buffer: Optional[int] = 200) -> np.ndarray:
+                    pixel_buffer: Optional[int] = 200,
+                    circle_size: Optional[int] = 2) -> np.ndarray:
 
         """
         Draws geometrical shapes (such as LineString, Polygon, MultiPolygon, and MultiLineString)
@@ -843,9 +847,9 @@ class GeometryMixin(object):
         >>> img = GeometryMixin.view_shapes(shapes=[line_1, polygon_1, multipolygon_1])
         """
 
-        check_valid_lst(data=shapes, source=GeometryMixin.view_shapes.__name__,
-                        valid_dtypes=(LineString, Polygon, MultiPolygon, MultiLineString, Point), min_len=1)
+        check_valid_lst(data=shapes, source=GeometryMixin.view_shapes.__name__, valid_dtypes=(LineString, Polygon, MultiPolygon, MultiLineString, Point), min_len=1)
         check_int(name='pixel_buffer', value=pixel_buffer, min_value=0)
+        check_int(name='circle_size', value=circle_size, min_value=1)
         max_vertices = find_max_vertices_coordinates(shapes=shapes, buffer=pixel_buffer)
         if bg_img is None:
             if bg_clr is None:
@@ -893,7 +897,7 @@ class GeometryMixin(object):
             if isinstance(shape, Point):
                 arr = np.array((shape.coords)).astype(np.int32)
                 x, y = arr[0][0], arr[0][1]
-                cv2.circle(img, (x, y), 3, colors[shape_cnt][::-1], thickness)
+                cv2.circle(img, (x, y), circle_size, colors[shape_cnt][::-1], -1)
         if size:
             return imutils.resize(img, width=size)
         else:
@@ -3694,6 +3698,53 @@ class GeometryMixin(object):
             max_x, max_y = np.max(obs[:, 0].flatten()), np.max(obs[:, 1].flatten())
             results[i] = np.array([[min_x, min_y], [max_x, min_y], [max_x, max_y], [min_x, max_y]])
         return results
+
+    @staticmethod
+    @jit(nopython=True, parallel=True)
+    def points_in_polygon(x: typed.List) -> types.List:
+        """
+        Finds the points that fall inside the respective polygons.
+
+        .. image:: _static/img/simba.mixins.geometry_mixin.GeometryMixin.points_in_polygon.webp
+           :width: 400
+           :align: center
+
+        :param numba.typed.List x:  List of numpy arrays of size Nx2 representing polygon vertices.
+        :return: List of size len(x) of numpy arrays with coordinates representing points inside the polygons.
+        :rtype: numba.typed.List[numba.types.Array]
+
+        :example:
+        >>> data_path = r"/mnt/c/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Together_1.csv" # PATH TO A DATA FILE
+        >>> array_1 = read_df(file_path=data_path, file_type='csv', usecols=['Nose_1_x', 'Nose_1_y', 'Tail_base_1_x', 'Tail_base_1_y', 'Lat_left_1_x', 'Lat_left_1_y', 'Lat_right_1_x', 'Lat_right_1_y', 'Ear_left_1_x', 'Ear_left_1_y', 'Ear_right_1_x', 'Ear_right_1_y']).values.reshape(-1, 6, 2)[0:150]## READ THE BODY-PART THAT DEFINES THE HULL AND CONVERT TO ARRAY
+        >>> polygons = GeometryMixin().multiframe_bodyparts_to_polygon(data=array_1, parallel_offset=50, simplify_tolerance=2, preserve_topology=True)
+        >>> polygons_lst = typed.List()
+        >>> for i in polygons: polygons_lst.append(np.array(i.exterior.coords).astype(np.int32))
+        >>> results = points_in_polygon(polygons_lst)
+         """
+
+        results = typed.List()
+        for i in range(len(x)):
+            L = np.arange(np.min(x[i][:, 0]), np.max(x[i][:, 0]))
+            H = np.arange(np.min(x[i][:, 1]), np.max(x[i][:, 1]))
+            grid = np.full(shape=(int(L.shape[0] * H.shape[0]), 2), fill_value=np.nan, dtype=np.int32)
+
+            idx = 0
+            for j in range(L.shape[0]):
+                for k in range(H.shape[0]):
+                    grid[idx] = np.array([L[j], H[k]])
+                    idx += 1
+            p = InsidePolygon(bp_location=grid, roi_coords=x[i]).astype(types.bool_)
+            results.append(grid[p])
+        return results
+
+
+# if __name__ == "__main__":
+#     data_path = r"C:\troubleshooting\two_black_animals_14bp\project_folder\csv\outlier_corrected_movement_location\Together_1.csv" # PATH TO A DATA FILE
+#     array_1 = read_df(file_path=data_path, file_type='csv', usecols=['Nose_1_x', 'Nose_1_y', 'Tail_base_1_x', 'Tail_base_1_y', 'Lat_left_1_x', 'Lat_left_1_y', 'Lat_right_1_x', 'Lat_right_1_y', 'Ear_left_1_x', 'Ear_left_1_y', 'Ear_right_1_x', 'Ear_right_1_y']).values.reshape(-1, 6, 2)[0:150]## READ THE BODY-PART THAT DEFINES THE HULL AND CONVERT TO ARRAY
+#     polygons = GeometryMixin().multiframe_bodyparts_to_polygon(data=array_1, parallel_offset=50, simplify_tolerance=2, preserve_topology=True)
+#     polygons_lst = typed.List()
+#     for i in polygons: polygons_lst.append(np.array(i.exterior.coords).astype(np.int32))
+#     results = GeometryMixin.points_in_polygon(polygons_lst)
 
 
 

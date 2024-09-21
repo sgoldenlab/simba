@@ -33,6 +33,10 @@ def is_inside_rectangle(x: np.ndarray, y: np.ndarray) -> np.ndarray:
     Determines whether points in array `x` are inside the rectangle defined by the top left and bottom right vertices in array `y`.
     |:heart_eyes:|
 
+    .. image:: _static/img/simba.data_processors.cuda.geometry.is_inside_rectangle.webp
+       :width: 450
+       :align: center
+
     .. csv-table::
        :header: EXPECTED RUNTIMES
        :file: ../../../docs/tables/is_inside_rectangle.csv

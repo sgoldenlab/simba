@@ -689,7 +689,7 @@ def _cuda_is_inside_polygon(x, y, polygon_vertices):
 
     :param int x: Pixel x location.
     :param int y: Pixel y location.
-    :param np.ndarray polygon_vertices: 2-dimentional array representing the x and y coordinates of the polygon vertices.
+    :param np.ndarray polygon_vertices: 2-dimensional array representing the x and y coordinates of the polygon vertices.
     :return: Boolean representing if the x and y are located in the polygon.
     """
 
