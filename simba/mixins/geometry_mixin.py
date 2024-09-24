@@ -11,7 +11,7 @@ import cv2
 import imutils
 import numpy as np
 import pandas as pd
-from numba import njit, prange, jit, types, typed
+from numba import jit, njit, prange, typed, types
 from shapely.geometry import (GeometryCollection, LineString, MultiLineString,
                               MultiPoint, MultiPolygon, Point, Polygon)
 from shapely.ops import linemerge, split, triangulate, unary_union
@@ -22,6 +22,7 @@ except:
     from typing import Literal
 
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+
 InsidePolygon = FeatureExtractionMixin.framewise_inside_polygon_roi
 
 
