@@ -158,9 +158,9 @@ class Statistics(FeatureExtractionMixin):
            t = \frac{\bar{x}_1 - \bar{x}_2}{s_p \sqrt{\frac{1}{n_1} + \frac{1}{n_2}}}
 
         where:
-            - \\(\bar{x}_1\\) and \\(\bar{x}_2\\) are the means of sample_1 and sample_2 respectively,
-            - \\(s_p\\) is the pooled standard deviation,
-            - \\(n_1\\) and \\(n_2\\) are the sample sizes of sample_1 and sample_2 respectively.
+        - :math:`\bar{x}_1` and :math:`\bar{x}_2` are the means of the two samples,
+        - :math:`s_p` is the pooled standard deviation,
+        - :math:`n_1` and :math:`n_2` are the sizes of the two samples.
 
         .. seealso::
            :func:`simba.mixins.statistics_mixin.Statistics.rolling_independent_sample_t`
@@ -218,8 +218,8 @@ class Statistics(FeatureExtractionMixin):
            d = \\frac{{\\bar{x}_1 - \\bar{x}_2}}{{\\sqrt{{\\frac{{s_1^2 + s_2^2}}{2}}}}}
 
         where:
-            - \\(\\bar{x}_1\\) and \\(\\bar{x}_2\\) are the means of sample_1 and sample_2 respectively,
-            - \\(s_1\\) and \\(s_2\\) are the standard deviations of sample_1 and sample_2 respectively.
+           - :math:`\bar{x}_1` and :math:`\bar{x}_2` are the means of sample_1 and sample_2 respectively,
+           - :math:`s_1` and :math:`s_2` are the standard deviations of sample_1 and sample_2 respectively.
 
         :param ndarray sample_1: First 1d array representing feature values.
         :param ndarray sample_2: Second 1d array representing feature values.
@@ -612,7 +612,7 @@ class Statistics(FeatureExtractionMixin):
            JSD = 1: Indicates that the two distributions are maximally dissimilar.
 
         .. math::
-           JSD = \frac{{KL(P_1 || M) + KL(P_2 || M)}}{2}
+           JSD = \frac{KL(P_1 || M) + KL(P_2 || M)}{2}
 
         :parameter ndarray sample_1: First 1d array representing feature values.
         :parameter ndarray sample_2: Second 1d array representing feature values.
@@ -1033,20 +1033,19 @@ class Statistics(FeatureExtractionMixin):
         The Kruskal-Wallis test is a non-parametric method for testing whether samples originate from the same distribution.
         It ranks all the values from the combined samples, then calculates the H statistic based on the ranks.
 
-
         .. math::
 
            H = \\frac{{12}}{{n(n + 1)}} \\left(\\frac{{(\\sum R_{\text{sample1}})^2}}{{n_1}} + \\frac{{(\\sum R_{\text{sample2}})^2}}{{n_2}}\\right) - 3(n + 1)
 
         where:
-            - \( n \) is the total number of observations,
-            - \( n_1 \) and \( n_2 \) are the number of observations in sample 1 and sample 2 respectively,
-            - \( R_{\text{sample1}} \) and \( R_{\text{sample2}} \) are the sums of ranks for sample 1 and sample 2 respectively.
+        - :math:`n` is the total number of observations,
+        - :math:`n_1` and :math:`n_2` are the number of observations in sample 1 and sample 2 respectively,
+        - :math:`R_{\text{sample1}}` and :math:`R_{\text{sample2}}` are the sums of ranks for sample 1 and sample 2 respectively.
 
-
-        :parameter ndarray sample_1: First 1d array representing feature values.
-        :parameter ndarray sample_2: Second 1d array representing feature values.
-        :returns float: Kruskal-Wallis H statistic.
+        :param ndarray sample_1: First 1d array representing feature values.
+        :param ndarray sample_2: Second 1d array representing feature values.
+        :returns: Kruskal-Wallis H statistic.
+        :rtype: float
 
         :example:
         >>> sample_1 = np.array([1, 1, 3, 4, 5]).astype(np.float64)
@@ -1256,14 +1255,14 @@ class Statistics(FeatureExtractionMixin):
            W = -\\frac{{n_x \\cdot n_y \\cdot (\\bar{R}_y - \\bar{R}_x)}}{{(n_x + n_y) \\cdot \\sqrt{{n_x \\cdot S_x + n_y \\cdot S_y}}}}
 
         where:
-            - \( n_x \) and \( n_y \) are the sizes of sample_1 and sample_2 respectively,
-            - \( \bar{R}_x \) and \( \bar{R}_y \) are the mean ranks of sample_1 and sample_2 respectively,
-            - \( S_x \) and \( S_y \) are the dispersion statistics of sample_1 and sample_2 respectively.
+           - :math:`n_x` and :math:`n_y` are the sizes of sample_1 and sample_2 respectively,
+           - :math:`\bar{R}_x` and :math:`\bar{R}_y` are the mean ranks of sample_1 and sample_2 respectively,
+           - :math:`S_x` and :math:`S_y` are the dispersion statistics of sample_1 and sample_2 respectively.
 
         :parameter ndarray sample_1: First 1d array representing feature values.
         :parameter ndarray sample_2: Second 1d array representing feature values.
-        :returns float: Brunner-Munzel W.
-
+        :returns: Brunner-Munzel W.
+        :rtype: float
 
         :example:
         >>> sample_1, sample_2 = np.random.normal(loc=10, scale=2, size=10), np.random.normal(loc=20, scale=2, size=10)
@@ -1626,11 +1625,31 @@ class Statistics(FeatureExtractionMixin):
     @njit("(int64[:, :]), bool_")
     def concordance_ratio(x: np.ndarray, invert: bool) -> float:
         """
-        Calculate the concordance ratio of a 2D numpy array.
+        Calculate the concordance ratio of a 2D numpy array. The concordance ratio is a measure of agreement in a dataset. It is calculated as the ratio of the number of
+        rows that contain only one unique value to the total number of rows.
+
+        The equation for the concordance ratio :math:`C` is given by:
+
+        .. math::
+           C = \frac{N_c}{N_t}
+
+        where:
+           - :math:`N_c` is the count of rows with only one unique value,
+           - :math:`N_t` is the total number of rows in the array.
+
+        If the `invert` parameter is set to `True`, the function will return the disconcordance ratio instead, defined as:
+
+        .. math::
+            D = \frac{N_d}{N_t}
+
+        where:
+
+           - :math:`N_d` is the count of rows with more than one unique value.
 
         :param np.ndarray x: A 2D numpy array with ordinals represented as integers.
         :param bool invert: If True, the concordance ratio is inverted, and disconcordance ratio is returned
-        :return float: The concordance ratio, representing the count of rows with only one unique value divided by the total number of rows in the array.
+        :return: The concordance ratio, representing the count of rows with only one unique value divided by the total number of rows in the array.
+        :rtype: float
 
         :example:
         >>> x = np.random.randint(0, 2, (5000, 4))
@@ -2427,12 +2446,11 @@ class Statistics(FeatureExtractionMixin):
         Eta-squared (\(\eta^2\)) is calculated as the ratio of the sum of squares between groups to the total sum of squares. Range from 0 to 1, where larger values indicate
         a stronger effect size.
 
-        .. math::
-           \eta^2 = \frac{SS_{between}}{SS_{between} + SS_{within}}
+        The equation for eta squared is defined as: :math:`\eta^2 = \frac{SS_{between}}{SS_{between} + SS_{within}}`
 
         where:
-        - \( SS_{between} \) is the sum of squares between groups.
-        - \( SS_{within} \) is the sum of squares within groups.
+           - :math:`SS_{between}` is the sum of squares between groups,
+           - :math:`SS_{within}` is the sum of squares within groups.
 
         :param np.ndarray x: 1D array containing the dependent variable data.
         :param np.ndarray y: 1d array containing the grouping variable (categorical) data of same size as ``x``.
@@ -2463,7 +2481,8 @@ class Statistics(FeatureExtractionMixin):
         :param np.ndarray y: The array containing the grouping variable (categorical) data.
         :param np.ndarray window_sizes: 1D array of window sizes in seconds.
         :param int sample_rate: The sampling rate of the data in frames per second.
-        :return np.ndarray: Array of size  x.shape[0] x window_sizes.shape[0] with sliding eta squared values.
+        :return: Array of size  x.shape[0] x window_sizes.shape[0] with sliding eta squared values.
+        :rtype: np.ndarray
 
         :example:
         >>> x = np.random.randint(0, 10, (10000,))
@@ -2617,7 +2636,7 @@ class Statistics(FeatureExtractionMixin):
 
            \\text{Cohen's h} = 2 \\arcsin\\left(\\sqrt{\\frac{\\sum\\text{sample\_1}}{N\_1}}\\right) - 2 \\arcsin\\left(\\sqrt{\\frac{\\sum\\text{sample\_2}}{N\_2}}\\right)
 
-        Where N_1 and N_2 are the sample sizes of sample_1 and sample_2, respectively.
+        Where :math:`N_1` and :math:`N_2` are the sample sizes of sample_1 and sample_2, respectively.
 
         :param np.ndarray sample_1: 1D array with binary [0, 1] values (e.g., first classifier inference values).
         :param np.ndarray sample_2: 1D array with binary [0, 1] values (e.g., second classifier inference values).
@@ -2774,13 +2793,15 @@ class Statistics(FeatureExtractionMixin):
            \\text{Hamming distance}(x, y) = \\frac{{\\sum_{i=1}^{n} w_i}}{{n}}
 
         where:
-           - \( n \) is the length of the vectors,
-           - \( w_i \) is the weight associated with the \( i \)th element of the vectors.
+           - :math:`n` is the length of the vectors,
+           - :math:`w_i` is the weight associated with the math:`i`th element of the vectors.
 
         :parameter np.ndarray x: First binary vector.
         :parameter np.ndarray x: Second binary vector.
         :parameter Optional[np.ndarray] w: Optional weights for each element. Can be classification probabilities. If not provided, equal weights are assumed.
         :parameter Optional[bool] sort: If True, sorts x and y prior to hamming distance calculation. Default, False.
+        :return: Hamming similarity
+        :rtype: float
 
         :example:
         >>> x, y = np.random.randint(0, 2, (10,)).astype(np.int8), np.random.randint(0, 2, (10,)).astype(np.int8)
@@ -2963,12 +2984,16 @@ class Statistics(FeatureExtractionMixin):
 
            H(P, Q) = \frac{1}{\sqrt{2}} \sqrt{ \sum_{i=1}^{n} (\sqrt{P(i)} - \sqrt{Q(i)})^2 }
 
-        where \( n \) is the number of bins in the histogram representation of the distributions.
+        where:
+        - :math:`P(i)` is the probability of the :math:`i`-th event in distribution :math:`P`,
+        - :math:`Q(i)` is the probability of the :math:`i`-th event in distribution :math:`Q`,
+        - :math:`n` is the number of events.
 
         :param np.ndarray x: First 1D array representing a probability distribution.
         :param np.ndarray y: Second 1D array representing a probability distribution.
         :param Optional[Literal['fd', 'doane', 'auto', 'scott', 'stone', 'rice', 'sturges', 'sqrt']] bucket_method: Method for computing histogram bins. Default is 'auto'.
-        :returns float: Hellinger distance between the two input probability distributions.
+        :returns: Hellinger distance between the two input probability distributions.
+        :rtype: float
 
         :example:
         >>> x = np.random.randint(0, 9000, (500000,))
@@ -2993,7 +3018,8 @@ class Statistics(FeatureExtractionMixin):
 
         :param sample_1: The first binary array.
         :param sample_2: The second binary array.
-        :return float: Youden's J statistic.
+        :return: Youden's J statistic.
+        :rtype: float
         """
 
         check_valid_array(data=sample_1, source=f'{Statistics.youden_j.__name__} sample_1', accepted_ndims=(1,), accepted_values=[0, 1])
@@ -3104,10 +3130,10 @@ class Statistics(FeatureExtractionMixin):
            \\kappa = 1 - \\frac{\sum{w_{ij} \\cdot D_{ij}}}{\\sum{w_{ij} \\cdot E_{ij}}}
 
         where:
-            - \( \kappa \) is Cohen's Kappa coefficient,
-            - \( w_{ij} \) are the weights,
-            - \( D_{ij} \) are the observed frequencies,
-            - \( E_{ij} \) are the expected frequencies.
+           - :math:`\kappa` is Cohen's Kappa coefficient,
+           - :math:`w_{ij}` are the weights,
+           - :math:`D_{ij}` are the observed frequencies,
+           - :math:`E_{ij}` are the expected frequencies.
 
         :param np.ndarray sample_1: The first binary sample, a 1D NumPy array of integers.
         :param np.ndarray sample_2: The second binary sample, a 1D NumPy array of integers.
@@ -3154,15 +3180,16 @@ class Statistics(FeatureExtractionMixin):
            d' = \\Phi^{-1}(hit\\_rate) - \\Phi^{-1}(false\\_alarm\\_rate)
 
         where:
-            - \( \\Phi^{-1} \) is the inverse of the cumulative distribution function (CDF) of the normal distribution,
-            - \( hit\\_rate \) is the proportion of true positives correctly identified,
-            - \( false\\_alarm\\_rate \) is the proportion of false positives incorrectly identified.
+        - :math:`\\Phi^{-1}` is the inverse of the cumulative distribution function (CDF) of the normal distribution,
+        - :math:`hit\\_rate` is the proportion of true positives correctly identified,
+        - :math:`false\\_alarm\\_rate` is the proportion of false positives incorrectly identified.
 
         :param np.ndarray x: Boolean 1D array of response values, where 1 represents presence, and 0 representing absence.
         :param np.ndarray y: Boolean 1D array of ground truth, where 1 represents presence, and 0 representing absence.
         :param Optional[float] lower_limit: Lower limit to bound hit and false alarm rates. Defaults to 0.0001.
         :param Optional[float] upper_limit: Upper limit to bound hit and false alarm rates. Defaults to 0.9999.
-        :return float: The calculated d' (d-prime) value.
+        :return: The calculated d' (d-prime) value.
+        :rtype: float
 
         :example:
         >>> x = np.random.randint(0, 2, (1000,))
@@ -3293,12 +3320,25 @@ class Statistics(FeatureExtractionMixin):
         It can be used to evaluate if the performance of multiple (>=2) classifiers on the same data is the same or significantly different.
 
         .. note::
-           If two classifiers, consider ``simba.mixins.statistics.Statistics.mcnemar``.
+           If two classifiers, consider :func:`simba.mixins.statistics.Statistics.mcnemar`.
 
            Useful background: https://psych.unl.edu/psycrs/handcomp/hccochran.PDF
 
-        :param np.ndarray data: Two dimensional array of boolean values where axis 1 represents classifiers or features and rows represent frames.
-        :return Tuple[float, float]: Cochran's Q statistic signidicance value.
+        .. math::
+           Q = \frac{(k - 1) \left( kG^2 - \left( \sum_{j=1}^{k} C_j \right)^2 \right)}{kR - S}
+
+        where:
+
+        - :math:`k` is the number of classifiers,
+        - :math:`G = \sum_{j=1}^{k} C_j^2` (the sum of the squares of the column sums),
+        - :math:`C_j` is the sum of the :math:`j`-th column (number of successes for the :math:`j`-th classifier),
+        - :math:`R = \sum_{i=1}^{n} R_i` (the total number of successes across all classifiers),
+        - :math:`S = \sum_{i=1}^{n} R_i^2` (the sum of the squares of the row sums),
+        - :math:`R_i` is the sum of the :math:`i`-th row (number of successes for the :math:`i`-th observation).
+
+        :param np.ndarray data: Two-dimensional array of boolean values where axis 1 represents classifiers or features and rows represent frames.
+        :return: Cochran's Q statistic signidicance value.
+        :rtype: Tuple[float, float]
 
         :example:
         >>> data = np.random.randint(0, 2, (100000, 4))
@@ -3336,15 +3376,16 @@ class Statistics(FeatureExtractionMixin):
         Values close to one represent closer to equal variance.
 
         .. math::
-
-           \text{Hartley's Fmax} = \frac{\max(\text{Var}(x), \text{Var}(y))}{\min(\text{Var}(x), \text{Var}(y))}
+            \text{Hartley's } F_{max} = \frac{\max(\text{Var}(x), \text{Var}(y))}{\min(\text{Var}(x), \text{Var}(y))}
 
         where:
-            - Var(x) is the variance of sample x,
-            - Var(y) is the variance of sample y.
+        - :math:`\text{Var}(x)` is the variance of sample :math:`x`,
+        - :math:`\text{Var}(y)` is the variance of sample :math:`y`.
 
         :param np.ndarray x: 1D array representing numeric data of the first group/feature.
         :param np.ndarray x: 1D array representing numeric data of the second group/feature.
+        :return: Hartley's Fmax statistic.
+        :rtype: float
 
         :example:
         >>> x = np.random.random((100,))
@@ -3379,17 +3420,17 @@ class Statistics(FeatureExtractionMixin):
         extreme value (either the minimum or maximum) and the sample mean, divided by the sample standard deviation.
 
         .. math::
-
            \text{Grubbs' Test Statistic} = \frac{|\bar{x} - x_{\text{min/max}}|}{s}
 
         where:
-            - \( \bar{x} \) is the sample mean,
-            - \( x_{\text{min/max}} \) is the minimum or maximum value of the sample (depending on the tail being tested),
-            - \( s \) is the sample standard deviation.
+           - :math:`\bar{x}` is the sample mean,
+           - :math:`x_{\text{min/max}}` is the minimum or maximum value of the sample (depending on the tail being tested),
+           - :math:`s` is the sample standard deviation.
 
         :param np.ndarray x: 1D array representing numeric data.
         :param Optional[bool] left_tail: If True, the test calculates the Grubbs' test statistic for the left tail (minimum value). If False (default), it calculates the statistic for the right tail (maximum value).
-        :return float: The computed Grubbs' test statistic.
+        :return: The computed Grubbs' test statistic.
+        :rtype: float
 
         :example:
         >>> x = np.random.random((100,))
@@ -3550,7 +3591,7 @@ class Statistics(FeatureExtractionMixin):
         The Dunn Index is given by:
 
         .. math::
-        D = \frac{\min_{i \neq j} \{ \delta(C_i, C_j) \}}{\max_k \{ \Delta(C_k) \}}
+           D = \frac{\min_{i \neq j} \{ \delta(C_i, C_j) \}}{\max_k \{ \Delta(C_k) \}}
 
         where :math:`\delta(C_i, C_j)` is the distance between clusters :math:`C_i` and :math:`C_j`, and
         :math:`\Delta(C_k)` is the diameter of cluster :math:`C_k`.
@@ -3679,13 +3720,14 @@ class Statistics(FeatureExtractionMixin):
             The Calinski-Harabasz score (CH) is calculated as:
 
         .. math::
-            CH = \frac{B}{W} \times \frac{N - k}{k - 1}
+
+            CH = \\frac{B}{W} \\times \\frac{N - k}{k - 1}
 
         where:
-        - B is the sum of squared distances between cluster centroids,
-        - W is the sum of squared distances from each point to its assigned cluster centroid,
-        - N is the total number of data points,
-        - k is the number of clusters.
+        - :math:`B` is the sum of squared distances between cluster centroids,
+        - :math:`W` is the sum of squared distances from each point to its assigned cluster centroid,
+        - :math:`N` is the total number of data points,
+        - :math:`k` is the number of clusters.
 
         :param x: 2D array representing the data points. Shape (n_samples, n_features/n_dimension).
         :param y: 2D array representing cluster labels for each data point. Shape (n_samples,).
@@ -3781,9 +3823,9 @@ class Statistics(FeatureExtractionMixin):
            FMI = \\sqrt{\\frac{TP}{TP + FP} \\times \\frac{TP}{TP + FN}}
 
         where:
-        - TP (True Positive) is the number of pairs of elements that are in the same cluster in both x and y,
-        - FP (False Positive) is the number of pairs of elements that are in the same cluster in y but not in x,
-        - FN (False Negative) is the number of pairs of elements that are in the same cluster in x but not in y.
+        - :math:`TP` (True Positive) is the number of pairs of elements that are in the same cluster in both x and y,
+        - :math:`FP` (False Positive) is the number of pairs of elements that are in the same cluster in y but not in x,
+        - :math:`FN` (False Negative) is the number of pairs of elements that are in the same cluster in x but not in y.
 
         .. note::
            Modified from `scikit-learn <https://github.com/scikit-learn/scikit-learn/blob/8721245511de2f225ff5f9aa5f5fadce663cd4a3/sklearn/metrics/cluster/_supervised.py#L1184>`_
@@ -3824,13 +3866,15 @@ class Statistics(FeatureExtractionMixin):
            \text{AMI}(x, y) = \frac{\text{MI}(x, y) - E(\text{MI}(x, y))}{\max(H(x), H(y)) - E(\text{MI}(x, y))}
 
         where:
-            - \text{MI}(x, y) \text{ is the mutual information between } x \text{ and } y.
-            - E(\text{MI}(x, y)) \text{ is the expected mutual information.}
-            - H(x) \text{ and } H(y) \text{ are the entropies of } x \text{ and } y, \text{ respectively.}
+            - :math:`\text{MI}(x, y)` is the mutual information between :math:`x` and :math:`y`.
+            - :math:`E(\text{MI}(x, y))` is the expected mutual information.
+            - :math:`H(x)` and :math:`H(y)` are the entropies of :math:`x` and :math:`y`, respectively.
+
 
         :param np.ndarray x: 1D array representing the labels of the first model.
         :param np.ndarray y: 1D array representing the labels of the second model.
-        :return float: Score between 0 and 1, where 1 indicates perfect clustering agreement.
+        :return: Score between 0 and 1, where 1 indicates perfect clustering agreement.
+        :rtype: float
 
         """
         check_valid_array(
@@ -3861,8 +3905,10 @@ class Statistics(FeatureExtractionMixin):
         .. note::
            Normalize arrays sample_1 and sample_2 before passing it to ensure accurate results.
 
-        .. math::
-            D_\infty(p, q) = \max_i \left| p_i - q_i \right|
+        The equation for the Czebyshev distance is given by: :math:`D_\infty(p, q) = \max_i \left| p_i - q_i \right|`.
+
+        .. seealso:
+           :func:`simba.mixins.statistics_mixin.Statistics.sliding_czebyshev_distance`
 
         :param np.ndarray sample_1: The first sample, an N-dimensional NumPy array.
         :param np.ndarray sample_2: The second sample, an N-dimensional NumPy array.
@@ -3891,6 +3937,9 @@ class Statistics(FeatureExtractionMixin):
 
         .. note::
            Normalize array x before passing it to ensure accurate results.
+
+        .. seealso:
+           :func:`simba.mixins.statistics_mixin.Statistics.czebyshev_distance`
 
         :param np.ndarray x: Input signal, a 2D array with shape (n_samples, n_features).
         :param np.ndarray window_sizes: Array containing window sizes for sliding computation.

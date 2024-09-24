@@ -56,7 +56,7 @@ class CircularStatisticsMixin(object):
         data points towards a central direction on the circle with a range between 0 and 1.
 
         .. image:: _static/img/mean_resultant_vector.png
-           :width: 600
+           :width: 400
            :align: center
 
         .. math::
@@ -71,7 +71,8 @@ class CircularStatisticsMixin(object):
 
 
         :parameter np.ndarray data: 1D array of size len(frames) representing angles in degrees.
-        :returns float: The mean resultant vector of the angles. 1 represents tendency towards a single point. 0 represents no central point.
+        :returns: The mean resultant vector of the angles. 1 represents tendency towards a single point. 0 represents no central point.
+        :rtype: float
 
         :example:
         >>> data = np.array([50, 90, 70, 60, 20, 90]).astype(np.float32)
@@ -132,6 +133,14 @@ class CircularStatisticsMixin(object):
     def circular_mean(data: np.ndarray) -> float:
         """
         Jitted compute of the circular mean of single sample.
+
+        .. math::
+            \mu = \text{atan2}\left(\frac{1}{N} \sum_{i=1}^{N} \sin(\theta_i), \frac{1}{N} \sum_{i=1}^{N} \cos(\theta_i)\right)
+
+        Where:
+        - :math:`\mu` is the circular mean in degrees.
+        - :math:`\theta_i` are the individual angles in degrees.
+        - :math:`N` is the number of samples.
 
         :param np.ndarray data: 1D array of size len(frames) representing angles in degrees.
         :returns: The circular mean of the angles in degrees.
@@ -327,8 +336,8 @@ class CircularStatisticsMixin(object):
         Convert degree angles to cardinal direction bucket e.g., 0 -> "N", 180 -> "S"
 
         .. note::
-           To convert cardinal literals to integers, map using ``simba.utils.enums.lookups.cardinality_to_integer_lookup``.
-           To convert integers to cardinal literals, map using ``simba.utils.enums.lookups.integer_to_cardinality_lookup``.
+           To convert cardinal literals to integers, map using :func:`simba.utils.enums.lookups.cardinality_to_integer_lookup`.
+           To convert integers to cardinal literals, map using :func:`simba.utils.enums.lookups.integer_to_cardinality_lookup`.
 
         .. image:: _static/img/degrees_to_cardinal.png
            :width: 600
@@ -480,10 +489,11 @@ class CircularStatisticsMixin(object):
         """
         Jitted compute of Rayleigh Z (test of non-uniformity) of single sample of circular data in degrees.
 
-        .. note:
+        .. note::
            Adapted from ``pingouin.circular.circ_rayleigh`` and ``pycircstat.tests.rayleigh``.
 
-                The Rayleigh Z score is calculated as follows:
+
+        The Rayleigh Z score is calculated as follows:
 
         .. math::
            Z = nR^2
@@ -603,13 +613,21 @@ class CircularStatisticsMixin(object):
         .. note::
            Values prior to the ending of the first time window will be filles with ``0``.
 
+        .. math::
+            r = \frac{\sum \sin(\theta_1 - \bar{\theta_1}) \cdot \sin(\theta_2 - \bar{\theta_2})}{\sqrt{\sum \sin^2(\theta_1 - \bar{\theta_1}) \cdot \sum \sin^2(\theta_2 - \bar{\theta_2})}}
+
+        Where:
+        - :math:`r` is the circular correlation coefficient.
+        - :math:`\theta_1` and :math:`\theta_2` are the angular data points from the two samples.
+        - :math:`\bar{\theta_1}` and :math:`\bar{\theta_2}` are the mean angles of the two samples.
+
         .. seealso:
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.circular_correlation`
 
-        :parameter np.ndarray sample_1: Angular data for e.g., Animal 1
-        :parameter np.ndarray sample_1: Angular data for e.g., Animal 2
-        :parameter float time_windows: Size of sliding time window in seconds. E.g., two windows of 0.5s and 1s would be represented as np.array([0.5, 1.0])
-        :parameter int fps: Frame-rate of recorded video.
+        :param np.ndarray sample_1: Angular data for e.g., Animal 1
+        :param np.ndarray sample_1: Angular data for e.g., Animal 2
+        :param float time_windows: Size of sliding time window in seconds. E.g., two windows of 0.5s and 1s would be represented as np.array([0.5, 1.0])
+        :param int fps: Frame-rate of recorded video.
         :return: Array of size len(sample_1) x len(time_window) with correlation coefficients.
         :rtype: np.ndarray
 
@@ -626,12 +644,8 @@ class CircularStatisticsMixin(object):
             for j in prange(win_size, sample_1.shape[0] + 1):
                 data_1_window = sample_1[j - win_size : j]
                 data_2_window = sample_2[j - win_size : j]
-                m1 = np.arctan2(
-                    np.mean(np.sin(data_1_window)), np.mean(np.cos(data_1_window))
-                )
-                m2 = np.arctan2(
-                    np.mean(np.sin(data_2_window)), np.mean(np.cos(data_2_window))
-                )
+                m1 = np.arctan2(np.mean(np.sin(data_1_window)), np.mean(np.cos(data_1_window)))
+                m2 = np.arctan2(np.mean(np.sin(data_2_window)), np.mean(np.cos(data_2_window)))
                 sin_1, sin_2 = np.sin(data_1_window - m1), np.sin(data_2_window - m2)
                 denominator = np.sqrt(np.sum(sin_1 * sin_1) * np.sum(sin_2 * sin_2))
                 numerator = np.sum(sin_1 * sin_2)
@@ -743,6 +757,15 @@ class CircularStatisticsMixin(object):
         Computes the uniformity of a circular dataset in degrees. Low output values represent concentrated angularity,
         while high values represent dispersed angularity.
 
+        The Rao's Spacing (:math:`U`) is calculated as follows:
+
+        .. math::
+
+           U = \\frac{1}{2} \\sum_{i=1}^{N} |l - T_i|
+
+        where :math:`N` is the number of data points in the sliding window, :math:`T_i` is the spacing between adjacent data points, and :math:`l` is the equal angular spacing.
+
+
         :parameter ndarray data: 1D array of size len(frames) with data in degrees.
         :return: Rao's spacing measure, indicating the dispersion or concentration of angular data points.
         :rtype: int
@@ -836,11 +859,23 @@ class CircularStatisticsMixin(object):
 
         Kuiper's two-sample test is a non-parametric test used to determine if two samples are drawn from the same circular distribution. It is particularly useful for circular data, such as angles or directions.
 
+        The Kuiper test statistic is calculated as the sum of the maximum positive and negative deviations between the cumulative distribution functions of the two samples:
+
+        .. math::
+
+           V = \max(F_1(\theta) - F_2(\theta)) + \max(F_2(\theta) - F_1(\theta))
+
+        Where:
+
+        - :math:`F_1(\theta)` and :math:`F_2(\theta)` are the empirical cumulative distribution functions (CDFs) of the two circular samples.
+        - :math:`\theta` are the sorted angles in the two samples.
+
         .. note::
            Adapted from `Kuiper <https://github.com/aarchiba/kuiper/tree/master>`__ by `Anne Archibald <https://github.com/aarchiba>`_.
 
         .. seealso::
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_kuipers_two_sample_test`
+
 
         :param ndarray data: The first circular sample array in degrees.
         :param ndarray data: The second circular sample array in degrees.
@@ -904,9 +939,7 @@ class CircularStatisticsMixin(object):
         return results
 
     @staticmethod
-    def sliding_hodges_ajne(
-        data: np.ndarray, time_window: float, fps: int
-    ) -> np.ndarray:
+    def sliding_hodges_ajne(data: np.ndarray, time_window: float, fps: int) -> np.ndarray:
 
         data = np.deg2rad(data)
         results, window_size = np.full((data.shape[0]), -1.0), int(time_window * fps)
@@ -1214,7 +1247,8 @@ class CircularStatisticsMixin(object):
 
         :parameter np.ndarray data: A 3D NumPy array with shape (N, M, 2). N represent frames, M represents the number of body-parts, and 2 represents x and y coordinates.
         :parameter int max_iterations: The maximum number of iterations for fitting the circle.
-        :returns np.ndarray: Array with shape (N, 3) with N representing frame and 3 representing (i) X-coordinate of the circle center, (ii) Y-coordinate of the circle center, and (iii) Radius of the circle
+        :return: Array with shape (N, 3) with N representing frame and 3 representing (i) X-coordinate of the circle center, (ii) Y-coordinate of the circle center, and (iii) Radius of the circle
+        :rtype: np.ndarray
 
         :example:
         >>> data = np.array([[[5, 10], [10, 5], [15, 10], [10, 15]]])
