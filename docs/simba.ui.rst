@@ -1,13 +1,4 @@
-SimBA UI
-================
-
-.. toctree::
-   :maxdepth: 4
-
-   simba.ui.pop_ups
-
-
-simba.ui.create\_project\_ui module
+Create project UI
 -----------------------------------
 
 .. automodule:: simba.ui.create_project_ui
@@ -15,7 +6,7 @@ simba.ui.create\_project\_ui module
    :undoc-members:
    :show-inheritance:
 
-simba.ui.machine\_model\_settings\_ui module
+Set machine learning hyperparameters UI
 --------------------------------------------
 
 .. automodule:: simba.ui.machine_model_settings_ui
@@ -23,7 +14,7 @@ simba.ui.machine\_model\_settings\_ui module
    :undoc-members:
    :show-inheritance:
 
-simba.ui.tkinter\_functions module
+SimBA tkinter methods
 ----------------------------------
 
 .. automodule:: simba.ui.tkinter_functions
@@ -31,7 +22,7 @@ simba.ui.tkinter\_functions module
    :undoc-members:
    :show-inheritance:
 
-simba.ui.user\_defined\_pose\_creator module
+SimBA create user-defined pose config UI
 --------------------------------------------
 
 .. automodule:: simba.ui.user_defined_pose_creator
@@ -39,7 +30,7 @@ simba.ui.user\_defined\_pose\_creator module
    :undoc-members:
    :show-inheritance:
 
-simba.ui.video\_info\_ui module
+SimBA set video info UI
 -------------------------------
 
 .. automodule:: simba.ui.video_info_ui
@@ -47,10 +38,26 @@ simba.ui.video\_info\_ui module
    :undoc-members:
    :show-inheritance:
 
-Module contents
----------------
 
-.. automodule:: simba.ui
+SimBA get pixels per millimeter converstion UI
+-------------------------------
+
+.. autoclass:: simba.ui.px_to_mm_ui.GetPixelsPerMillimeterInterface
    :members:
    :undoc-members:
+   :show-inheritance:
+
+SimBA pop-up UIs
+-------------------------------
+
+.. automodule:: simba.ui.pop_ups
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SimBA pop-up mixin
+----------------------------------
+
+.. automodule:: simba.mixins.pop_up_mixin
+   :members:
    :show-inheritance:

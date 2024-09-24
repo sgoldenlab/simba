@@ -1,14 +1,9 @@
-Data processors
-==============================
-
-Methods for manipulating animal detection and transforming classification and pose-estimation data
-
 Aggregate classifier statistics calculator
 --------------------------------------------------
 
-.. automodule:: simba.data_processors.agg_clf_calculator
+.. autoclass:: simba.data_processors.agg_clf_calculator.AggregateClfCalculator
    :members:
-   :show-inheritance:
+   :undoc-members:
 
 
 Interpolate pose-estimation data
@@ -16,36 +11,42 @@ Interpolate pose-estimation data
 
 .. automodule:: simba.data_processors.interpolate
    :members:
-   :show-inheritance:
-
+   :undoc-members:
 
 Advanced pose-estimation interpolation
 --------------------------------------------------
 
 .. automodule:: simba.data_processors.advanced_interpolator
    :members:
-   :show-inheritance:
+   :undoc-members:
 
 Smooth pose-estimation data
 --------------------------------------------------
 
 .. automodule:: simba.data_processors.smoothing
    :members:
-   :show-inheritance:
+   :undoc-members:
 
 Advanced smooth pose-estimation data
 --------------------------------------------------
 
 .. automodule:: simba.data_processors.advanced_smoothing
    :members:
-   :show-inheritance:
+   :undoc-members:
 
 Directing-other-animals calculator
 -------------------------------------------------------------------
 
 .. automodule:: simba.data_processors.directing_other_animals_calculator
    :members:
-   :show-inheritance:
+   :undoc-members:
+
+Directing-other-animals body-parts calculator
+-------------------------------------------------------------------
+
+.. automodule:: simba.data_processors.directing_other_animals_calculator
+   :members:
+   :undoc-members:
 
 Forward-spike-time-tiling coefficient calculator
 -----------------------------------------------
@@ -53,70 +54,69 @@ Forward-spike-time-tiling coefficient calculator
 .. automodule:: simba.data_processors.fsttc_calculator
    :members:
    :undoc-members:
-   :show-inheritance:
 
 Pose interpolator calculator
 -----------------------------------------------
 
 .. automodule:: simba.data_processors.interpolate_pose
    :members:
-   :show-inheritance:
+   :undoc-members:
 
 Pose interpolator and smoothing calculators
 ------------------------------------------------------
 
 .. automodule:: simba.data_processors.interpolation_smoothing
    :members:
-   :show-inheritance:
+   :undoc-members:
 
 Kleinberg calculator
 ---------------------------------------------------
 
 .. automodule:: simba.data_processors.kleinberg_calculator
    :members:
-   :show-inheritance:
+   :undoc-members:
 
 Movement calculator
 --------------------------------------------------
 
 .. automodule:: simba.data_processors.movement_calculator
    :members:
-   :show-inheritance:
+   :undoc-members:
 
 Pup-retrieval calculator
 --------------------------------------------------------
 
 .. automodule:: simba.data_processors.pup_retrieval_calculator
    :members:
-   :show-inheritance:
+   :undoc-members:
 
 SimBA pyburst calculator
 --------------------------------------------------
 
 .. automodule:: simba.data_processors.pybursts_calculator
    :members:
-   :show-inheritance:
+   :undoc-members:
 
 Severity calculator
 --------------------------------------------------
 
 .. automodule:: simba.data_processors.severity_calculator
    :members:
-   :show-inheritance:
+   :undoc-members:
 
 Classifier time-bins calculator
 -------------------------------------------------------
 
 .. automodule:: simba.data_processors.timebins_clf_calculator
    :members:
-   :show-inheritance:
+   :undoc-members:
 
 Movement time-bins calculator
 ------------------------------------------------------------
 
 .. automodule:: simba.data_processors.timebins_movement_calculator
    :members:
-   :show-inheritance:
+   :undoc-members:
 
 
 Mutual exclusivity refactorer
@@ -124,7 +124,7 @@ Mutual exclusivity refactorer
 
 .. automodule:: simba.data_processors.mutual_exclusivity_corrector
    :members:
-   :show-inheritance:
+   :undoc-members:
 
 
 Boolean conditional calculator
@@ -132,7 +132,7 @@ Boolean conditional calculator
 
 .. automodule:: simba.data_processors.boolean_conditional_calculator
    :members:
-   :show-inheritance:
+   :undoc-members:
 
 
 Gibbs sampling
@@ -140,14 +140,14 @@ Gibbs sampling
 
 .. automodule:: simba.data_processors.gibbs_sampler
    :members:
-   :show-inheritance:
+   :undoc-members:
 
 Spontaneous alternation calculator
 ------------------------------------------------------------
 
 .. automodule:: simba.data_processors.spontaneous_alternation_calculator
    :members:
-   :show-inheritance:
+   :undoc-members:
 
 
 "Blob" location detector
@@ -155,4 +155,4 @@ Spontaneous alternation calculator
 
 .. automodule:: simba.data_processors.blob_location_computer
    :members:
-   :show-inheritance:
+   :undoc-members:

@@ -1,6 +1,3 @@
-Pose estimation importers
-=============================
-
 Import single DLC CSV file
 -----------------------------------------------
 
@@ -63,3 +60,40 @@ Import DLC H5 files
 .. automodule:: simba.pose_importers.madlc_importer
    :members:
    :show-inheritance:
+
+
+Reset pose
+-----------------------------------------
+
+.. automodule:: simba.pose_processors.pose_reset
+   :members:
+   :show-inheritance:
+
+Remove key-points
+-----------------------------------------------
+
+.. automodule:: simba.pose_processors.remove_keypoints
+   :members:
+   :show-inheritance:
+
+Re-organize key-points
+--------------------------------------------------
+
+.. automodule:: simba.pose_processors.reorganize_keypoint
+   :members:
+   :show-inheritance:
+
+Reverse pose
+-------------------------------------------
+
+.. automodule:: simba.pose_processors.reverse_pose
+   :members:
+   :show-inheritance:
+
+Pose import mixins
+-----------------------------------------
+
+.. automodule:: simba.mixins.pose_importer_mixin
+   :members:
+   :show-inheritance:
+

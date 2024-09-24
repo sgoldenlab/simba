@@ -147,8 +147,8 @@ class SLEAPImporterSLP(ConfigReader, PoseImporterMixin):
             self.analysis_dict["animals_in_each_frame"] = [x[4] - x[3] for x in frames_lst]
             self.__create_tracks()
             if self.animal_cnt > 1:
-                self.multianimal_identification()
                 self.initialize_multi_animal_ui(animal_bp_dict=self.animal_bp_dict, video_info=self.video_info, data_df=self.data_df, video_path=video_data["VIDEO"])
+                self.multianimal_identification()
             else:
                 self.out_df = self.insert_multi_idx_columns(df=self.data_df.fillna(0))
             self.save_path = os.path.join(os.path.join(self.input_csv_dir, f"{self.video_name}.{self.file_type}"))
@@ -215,6 +215,16 @@ class SLEAPImporterSLP(ConfigReader, PoseImporterMixin):
         self.__fill_missing_indexes()
         self.data_df.sort_index(inplace=True)
         self.data_df = self.insert_column_headers_for_outlier_correction(data_df=self.data_df, new_headers=self.bp_headers, filepath=self.video_name)
+
+
+# test = SLEAPImporterSLP(project_path=r"C:\troubleshooting\sleap_two_animals_open_field\project_folder\project_config.ini",
+#                         data_folder=r"C:\troubleshooting\sleap_two_animals_open_field\slp_import",
+#                         id_lst=['Jarryd', 'Nilsson'],
+#                         interpolation_settings=None,
+#                         smoothing_settings = None) #Savitzky Golay
+# test.run()
+
+
 
 
 

@@ -1,9 +1,3 @@
-SimBA bounding-box tools (animal-anchoired ROIs)
-==================================
-
-Methods for analyzing animal interactions through `overlapping bounding boxes
-<https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`_.
-
 Aggregate Statistics
 ------------------------------------------------------
 

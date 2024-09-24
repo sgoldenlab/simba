@@ -263,6 +263,11 @@ def get_convex_hull(pts: np.ndarray) -> np.ndarray:
        :func:`~simba.feature_extractors.perimeter_jit.jitted_hull`.
        :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.convex_hull_calculator_mp`.
 
+    .. video:: _static/img/get_convex_hull_cuda.mp4
+       :width: 800
+       :autoplay:
+       :loop:
+
     :param pts: A 3D numpy array of shape (M, N, 2) where: - M is the number of frames. - N is the number of points (body-parts) in each frame. - The last dimension (2) represents the x and y coordinates of each point.
     :return: An upated 3D numpy array of shape (M, N, 2) consisting of the points in the hull.
     :rtype: np.ndarray

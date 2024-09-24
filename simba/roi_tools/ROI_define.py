@@ -26,7 +26,7 @@ from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import find_all_videos_in_directory, get_fn_ext
 from simba.utils.warnings import NoDataFoundWarning
 
-WINDOW_SIZE = (800, 750)
+WINDOW_SIZE = (825, 825) #800
 
 class ROI_definitions(ConfigReader, PopUpMixin):
     """

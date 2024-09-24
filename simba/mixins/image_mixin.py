@@ -40,7 +40,7 @@ from simba.utils.read_write import (find_core_cnt,
 
 class ImageMixin(object):
     """
-    Methods to slice and compute attributes of images and comparing those attributes across sequential images.
+    Methods to slice and compute attributes of images from tracking data and comparing those image attributes across sequential images.
 
     This can be helpful when the behaviors studied are very subtle and the signal is very low in relation to the
     noise within the pose-estimated data. In these use-cases, we cannot use pose-estimated data directly, and we instead

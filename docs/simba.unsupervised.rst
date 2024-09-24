@@ -1,6 +1,3 @@
-Unsupervised analyses in SimBA
-==========================
-
 Bout aggregation helper
 ------------------------------------------
 
@@ -74,5 +71,13 @@ HDBSCAN clusterer
 UMAP embedder
 ----------------------------------------
 .. automodule:: simba.unsupervised.umap_embedder
+   :members:
+   :show-inheritance:
+
+
+Unsupervised mixins
+---------------------------------------
+
+.. automodule:: simba.mixins.unsupervised_mixin
    :members:
    :show-inheritance:

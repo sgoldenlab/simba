@@ -31,7 +31,7 @@ from simba.utils.errors import CountError, InvalidInputError
 
 class Statistics(FeatureExtractionMixin):
     """
-    Primarily frequentist statistics methods used for feature extraction or drift assessment.
+    Statistics methods used for feature extraction, drift assessment, distance computations, distribution comparisons in sliding and static windows.
 
     .. note::
 

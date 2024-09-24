@@ -500,12 +500,15 @@ class GeometryMixin(object):
         Calculate the area of a geometry in square millimeters.
 
         .. note::
-           If certain that the input data is a valid Polygon, consider using :func:`simba.feature_extractors.perimeter_jit.jitted_hull` or
-           :func:`simba.data_processors.cuda.geometry.poly_area`.
+           If certain that the input data is a valid Polygon, consider using :func:`simba.feature_extractors.perimeter_jit.jitted_hull` or :func:`simba.data_processors.cuda.geometry.poly_area`.
+
+        .. seealso:
+           For multiprocessing, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_area`
 
         :param Union[MultiPolygon, Polygon] shape: The geometry (MultiPolygon or Polygon) for which to calculate the area.
         :param float pixels_per_mm: The pixel-to-millimeter conversion factor.
-        :return float: The area of the geometry in square millimeters.
+        :return: The area of the geometry in square millimeters.
+        :rtype: float
 
         :example:
         >>> polygon = GeometryMixin().bodyparts_to_polygon(np.array([[10, 10], [10, 100], [100, 10], [100, 100]]))
@@ -527,11 +530,16 @@ class GeometryMixin(object):
         """
         Calculate the distance between two geometries in specified units.
 
+        The distance method will compute the shortest distance between the boundaries of the two shapes. If the shapes overlap, the distance will be zero.
+
         :param List[Union[LineString, Polygon]] shapes: A list containing two LineString or Polygon geometries.
         :param float pixels_per_mm: The conversion factor from pixels to millimeters.
         :param Literal['mm', 'cm', 'dm', 'm'] unit: The desired unit for the distance calculation. Options: 'mm', 'cm', 'dm', 'm'. Defaults to 'mm'.
         :return: The distance between the two geometries in the specified unit.
         :rtype: float
+
+        .. seealso:
+           For multiprocessing, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_shape_distance`
 
         .. image:: _static/img/shape_distance.png
            :width: 400
@@ -566,11 +574,10 @@ class GeometryMixin(object):
         return D
 
     @staticmethod
-    def bodyparts_to_line(
-        data: np.ndarray,
-        buffer: Optional[int] = None,
-        px_per_mm: Optional[float] = None,
-    ) -> Union[Polygon, LineString]:
+    def bodyparts_to_line( data: np.ndarray,
+                          buffer: Optional[int] = None,
+                          px_per_mm: Optional[float] = None) -> Union[Polygon, LineString]:
+
         """
         Convert body-part coordinates to a Linestring.
 
@@ -581,6 +588,9 @@ class GeometryMixin(object):
         .. image:: _static/img/bodyparts_to_line.png
            :width: 400
            :align: center
+
+        .. seealso:
+           For multiprocessing, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_bodyparts_to_line`
 
         :example:
         >>> data = np.array([[364, 308],[383, 323], [403, 335],[423, 351]])
@@ -640,9 +650,6 @@ class GeometryMixin(object):
                 results[i] = np.array(shape[i].centroid)
             return results
 
-
-
-        return
 
     @staticmethod
     def is_touching(shapes=List[Union[LineString, Polygon]]) -> bool:
@@ -717,6 +724,10 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
+
+        .. seealso:
+           For multicore solution, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_difference`
+
         :param List[Union[LineString, Polygon, MultiPolygon]] shapes: A list of geometries.
         :return: The first geometry in ``shapes`` is returned where all parts that overlap with the other geometries in ``shapes have been removed.
         :rtype: Polygon
@@ -758,6 +769,9 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
+        .. seealso:
+           For multicore solution, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_union`
+
         :param List[Union[LineString, Polygon, MultiPolygon]] shapes: A list of LineString, Polygon, or MultiPolygon geometries to be unioned.
         :return: The resulting geometry after performing the union operation.
         :rtype: Union[MultiPolygon, Polygon]
@@ -789,6 +803,10 @@ class GeometryMixin(object):
         .. image:: _static/img/symmetric_difference.png
            :width: 400
            :align: center
+
+        .. seealso:
+           For multicore call, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_symmetric_difference`.
+
 
         :param List[Union[LineString, Polygon, MultiPolygon]] shapes: A list of LineString, Polygon, or MultiPolygon geometries to find the symmetric difference.
         :return: A list containing the resulting geometries after performing symmetric difference operations.
@@ -828,7 +846,6 @@ class GeometryMixin(object):
 
         .. seealso::
            See :func:`simba.mixins.geometry_mixin.GeometryMixin.geometry_video` or :func:`simba.plotting.geometry_plotter.GeometryPlotter` for videos.
-
 
         :param List[Union[LineString, Polygon, MultiPolygon, MultiLineString]] shapes: A list of geometrical shapes to be drawn. The shapes can be of type LineString, Polygon, MultiPolygon, or MultiLineString.
         :param Optional[np.ndarray] bg_img: Optional. An image array (in np.ndarray format) to use as the background. If not provided, a blank canvas will be created.
@@ -916,8 +933,8 @@ class GeometryMixin(object):
         Helper to create a geometry video from a list of shapes.
 
         .. seealso::
-           If more aesthetic videos are needed, overlaid on video, then use ``simba.plotting.geometry_plotter.GeometryPlotter``
-           If single images of geometries are needed, then use ``simba.mixins.geometry_mixin.view_shapes``
+           If more aesthetic videos are needed, overlaid on video, then use func:`simba.plotting.geometry_plotter.GeometryPlotter`
+           If single images of geometries are needed, then use :func:`simba.mixins.geometry_mixin.view_shapes`
 
         .. image:: _static/img/geometry_video.gif
            :width: 500
@@ -1004,7 +1021,7 @@ class GeometryMixin(object):
            :align: center
 
         .. seealso::
-           :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_minimum_rotated_rectangle`
+           For multicore call, use :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_minimum_rotated_rectangle`
 
         :param Polygon shape: The Polygon for which the minimum rotated rectangle is to be calculated.
         :return: The minimum rotated rectangle geometry that bounds the input polygon.

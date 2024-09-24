@@ -1,6 +1,3 @@
-Labelling
-=======================
-
 Extracting labelled images
 ------------------------------------------------
 
@@ -34,5 +31,13 @@ Playing videos in the annotation interface
 ----------------------------------------------
 
 .. automodule:: simba.labelling.play_annotation_video
+   :members:
+   :show-inheritance:
+
+
+Annotation GUI mixins
+---------------------------------------
+
+.. automodule:: simba.mixins.annotator_mixin
    :members:
    :show-inheritance:

@@ -102,7 +102,6 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
         else: circle_size = int(circle_size)
         palettes = {}
         for cnt, (k, v) in enumerate(self.dropdown_dict.items()):
-            print(k, v, v.getChoices())
             if v.getChoices() == AUTO:
                 palettes[cnt] = Options.PALETTE_OPTIONS_CATEGORICAL.value[cnt]
             else:

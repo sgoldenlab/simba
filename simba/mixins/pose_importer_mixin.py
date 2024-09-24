@@ -35,7 +35,7 @@ class PoseImporterMixin(object):
                                    animal_bp_dict: dict,
                                    video_info: dict,
                                    data_df: pd.DataFrame,
-                                   video_path: str):
+                                   video_path: Union[str, os.PathLike]):
 
         self.video_info, self.data_df, self.frame_no, self.add_spacer = (video_info, data_df, 0, 2)
         self.animal_bp_dict, self.cap = animal_bp_dict, cv2.VideoCapture(video_path)
@@ -47,8 +47,6 @@ class PoseImporterMixin(object):
         w, h = int(video_info["width"]), int(video_info["height"])
         self.scalers["circle"] = PlottingMixin().get_optimal_circle_size(frame_size=(w, h), circle_frame_ratio=100)
         self.scalers["font"], _, self.scalers["space"] = PlottingMixin().get_optimal_font_scales(text="Press 'c' to continue to start assigning identities using this frame", accepted_px_width=w, accepted_px_height=int(h/6))
-        print(self.scalers["font"], self.scalers["space"])
-
 
     def find_data_files(self, dir: Union[str, os.PathLike], extensions: List[str]) -> List[str]:
         """

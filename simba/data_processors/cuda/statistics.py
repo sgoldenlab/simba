@@ -44,7 +44,7 @@ def get_3pt_angle(x: np.ndarray, y: np.ndarray, z: np.ndarray) -> np.ndarray:
 
     .. csv-table::
        :header: EXPECTED RUNTIMES
-       :file: ../../../docs/tables/sliding_resultant_vector_length.csv
+       :file: ../../../docs/tables/get_3pt_angle.csv
        :widths: 10, 90
        :align: center
        :header-rows: 1
@@ -112,7 +112,7 @@ def count_values_in_ranges(x: np.ndarray, r: np.ndarray) -> np.ndarray:
     .. csv-table::
        :header: EXPECTED RUNTIMES
        :file: ../../../docs/tables/count_values_in_ranges.csv
-       :widths: 10, 45, 45
+       :widths: 10, 90
        :align: center
        :header-rows: 1
 

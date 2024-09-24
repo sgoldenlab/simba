@@ -102,7 +102,6 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
 
             csv_rows = []
             n_frames, n_nodes, _, n_tracks = tracks.shape
-            print(tracks)
             for frame_ind in range(n_frames):
                 csv_row = []
                 for track_ind in range(n_tracks):
@@ -146,6 +145,15 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
         stdout_success(msg="All SLEAP H5 data files imported", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
 
+
+# test = SLEAPImporterH5(config_path=r"C:\troubleshooting\sleap_two_animals_open_field\project_folder\project_config.ini",
+#                         data_folder=r"C:\troubleshooting\sleap_two_animals_open_field\h5",
+#                         id_lst=['Jarryd', 'Nilsson'],
+#                         interpolation_settings=None,
+#                         smoothing_settings = None)
+# test.run()
+#
+#
 
 #
 #

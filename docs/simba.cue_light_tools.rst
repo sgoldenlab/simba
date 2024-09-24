@@ -1,8 +1,3 @@
-Cue light tools
-===============================
-
-Methods for analyzing animal behaviours associated with `cue-light states through <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`_.
-
 Analyze
 ---------------------------------------------------
 

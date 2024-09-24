@@ -61,11 +61,14 @@ class BorisAppender(ConfigReader):
 
     def __check_non_overlapping_annotations(self, annotation_df):
         shifted_annotations = deepcopy(annotation_df)
+        print(shifted_annotations)
         shifted_annotations["START"] = annotation_df["START"].shift(-1)
         shifted_annotations = shifted_annotations.head(-1)
+        print(shifted_annotations)
         error_rows = shifted_annotations.query("START < STOP")
+
         if len(error_rows) > 0:
-            raise ThirdPartyAnnotationOverlapError(video_name=self.video_name, clf_name=self.clf)
+            raise ThirdPartyAnnotationOverlapError(video_name=self.file_name, clf_name=self.clf_name)
 
 
     def run(self):
@@ -80,8 +83,8 @@ class BorisAppender(ConfigReader):
                 video_annot = boris_annotation_dict[self.file_name]
             data_df = read_df(file_path, self.file_type)
             video_annot = video_annot.fillna(len(data_df))
-            print(video_annot)
             for clf_name in self.clf_names:
+                self.clf_name = clf_name
                 data_df[clf_name] = 0
                 if clf_name not in video_annot[BEHAVIOR].unique():
                     print(f"SIMBA WARNING: No BORIS annotation detected for video {self.file_name} and behavior {clf_name}. SimBA will set all frame annotations as absent.")
@@ -105,6 +108,13 @@ class BorisAppender(ConfigReader):
         write_df(df, self.file_type, self.save_path)
         self.video_timer.stop_timer()
         print(f"Saved BORIS annotations for video {self.file_name}... (elapsed time: {self.video_timer.elapsed_time_str})")
+
+
+
+# test = BorisAppender(config_path=r"C:\troubleshooting\boris_test_2\project_folder\project_config.ini",
+#                      data_dir=r"C:\troubleshooting\boris_test_2\project_folder\boris_files")
+# test.run()
+#
 
 # test = BorisAppender(config_path=r"C:\troubleshooting\boris_test\project_folder\project_config.ini",
 #                      data_dir=r"C:\troubleshooting\boris_test\project_folder\boris_files")

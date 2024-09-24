@@ -3,8 +3,9 @@ Welcome to SimBA's documentation!
 =================================
 
 .. image:: tutorials_rst/img/index/landing_1.gif
-   :width: 900
+   :width: 1000
    :align: center
+
 
 
 

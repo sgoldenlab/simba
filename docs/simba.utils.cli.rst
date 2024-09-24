@@ -1,6 +1,3 @@
-simba.utils.cli package
-=======================
-
 SimBA CLI tools
 ---------------------------------
 

@@ -186,7 +186,7 @@ def create_average_frm_cuda(video_path: Union[str, os.PathLike],
     to a specified file. If `save_path` is provided, the average frame is saved as an image file;
     otherwise, the average frame is returned as a NumPy array.
 
-    .. selalso::
+    .. seealso::
        For CuPy function see :func:`~simba.data_processors.cuda.image.create_average_frm_cupy`.
        For CPU function see :func:`~simba.video_processors.video_processing.create_average_frm`.
 
@@ -202,6 +202,7 @@ def create_average_frm_cuda(video_path: Union[str, os.PathLike],
 
     :example:
     >>> create_average_frm_cuda(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled.mp4", verbose=True, start_frm=0, end_frm=9000)
+
     """
 
     if not check_nvidea_gpu_available():

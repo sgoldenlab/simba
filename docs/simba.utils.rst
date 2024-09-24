@@ -1,13 +1,9 @@
-SimBA utilities
-===================
-
-Variable checks
+SimBA argument checks
 -------------------------
 
 .. automodule:: simba.utils.checks
    :members:
    :undoc-members:
-   :show-inheritance:
 
 SimBA project config creator
 ----------------------------------
@@ -15,7 +11,6 @@ SimBA project config creator
 .. automodule:: simba.utils.config_creator
    :members:
    :undoc-members:
-   :show-inheritance:
 
 Data utilities
 -----------------------
@@ -25,7 +20,7 @@ Data utilities
    :undoc-members:
    :show-inheritance:
 
-Enums
+SimBA Enumerals
 ------------------------
 
 .. automodule:: simba.utils.enums
@@ -33,7 +28,7 @@ Enums
    :undoc-members:
    :show-inheritance:
 
-Errors
+SimBA Errors
 -------------------------
 
 .. automodule:: simba.utils.errors
@@ -49,7 +44,7 @@ Lookups
    :undoc-members:
    :show-inheritance:
 
-Printing
+SimBA Printing
 ---------------------------
 
 .. automodule:: simba.utils.printing
@@ -65,10 +60,18 @@ Reading and writing
    :undoc-members:
    :show-inheritance:
 
-Warnings
+SimBA Warnings
 ---------------------------
 
 .. automodule:: simba.utils.warnings
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+SimBA CLI tools
+---------------------------
+
+.. automodule:: simba.utils.cli.cli_tools
    :members:
    :undoc-members:
    :show-inheritance:

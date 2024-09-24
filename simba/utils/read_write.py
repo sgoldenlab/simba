@@ -2,12 +2,17 @@ __author__ = "Simon Nilsson"
 
 import configparser
 import glob
+import json
 import multiprocessing
 import os
 import pickle
+import itertools
+import base64
 import platform
 import re
+import io
 import shutil
+from PIL import Image
 import subprocess
 import webbrowser
 from configparser import ConfigParser
@@ -30,8 +35,7 @@ import pkg_resources
 import pyarrow as pa
 from numba import njit, prange
 from pyarrow import csv
-from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point,
-                              Polygon)
+from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point, Polygon)
 
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
@@ -40,7 +44,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_instance, check_int,
                                 check_nvidea_gpu_available, check_str,
                                 check_valid_array, check_valid_boolean,
-                                check_valid_dataframe, check_valid_lst)
+                                check_valid_dataframe, check_valid_lst, check_if_keys_exist_in_dict)
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
 from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 FFMPEGCodecGPUError, FileExistError,
@@ -2315,7 +2319,7 @@ def read_boris_file(file_path: Union[str, os.PathLike],
     df[TIME] = df[TIME].astype(np.float32)
     media_file_names_in_file = df[MEDIA_FILE_PATH].unique()
     FRAME_INDEX = _find_cap_insensitive_name(target=FRAME_INDEX, values=list(df.columns))
-    if fps is None:
+    if fps is None and FRAME_INDEX is None:
         FPS = _find_cap_insensitive_name(target=FPS, values=list(df.columns))
         if not FPS in df.columns:
             if raise_error:
@@ -2345,10 +2349,9 @@ def read_boris_file(file_path: Union[str, os.PathLike],
     for video_cnt, video_file_name in enumerate(media_file_names_in_file):
         video_name = get_fn_ext(filepath=video_file_name)[1]
         results[video_name] = {}
-        video_fps = fps[video_cnt]
         video_df = df[df[MEDIA_FILE_PATH] == video_file_name].reset_index(drop=True)
         if FRAME_INDEX is None:
-            video_df['FRAME'] = (video_df[TIME] * video_fps).astype(int)
+            video_df['FRAME'] = (video_df[TIME] * fps[video_cnt]).astype(int)
         else:
             video_df['FRAME'] = video_df[FRAME_INDEX]
         video_df = video_df.drop([TIME, MEDIA_FILE_PATH], axis=1)
@@ -2441,5 +2444,70 @@ def img_stack_to_video(x: np.ndarray,
     stdout_success(msg=f'Video complete. Saved at {save_path}', elapsed_time=timer.elapsed_time_str)
 
 
+def _b64_to_arr(img_b64) -> np.ndarray:
+    """
+    Helper to convert byte string (e.g., from labelme, to image in numpy format
+    """
+    f = io.BytesIO()
+    f.write(base64.b64decode(img_b64))
+    img_arr = np.array(Image.open(f))
+    return img_arr
 
 
+def labelme_to_dlc(labelme_dir: Union[str, os.PathLike],
+                   scorer: Optional[str] = 'SN',
+                   save_dir: Optional[Union[str, os.PathLike]] = None) -> None:
+    """
+    Convert labels from labelme format to DLC format.
+
+    :param Union[str, os.PathLike] labelme_dir: Directory with labelme json files.
+    :param Optional[str] scorer: Name of the scorer (anticipated by DLC as header)
+    :param Optional[Union[str, os.PathLike]] save_dir: Directory where to save the DLC annotations. If None, then same directory as labelme_dir with `_dlc_annotations` suffix.
+    :return: None
+
+    :example:
+    >>> labelme_dir = r'D:\ts_annotations'
+    >>> labelme_to_dlc(labelme_dir=labelme_dir)
+    """
+
+    check_if_dir_exists(in_dir=labelme_dir)
+    annotation_paths = find_files_of_filetypes_in_directory(directory=labelme_dir, extensions=['.json'],
+                                                            raise_error=True)
+    results_dict = {}
+    images = {}
+    for annot_path in annotation_paths:
+        with open(annot_path) as f:
+            annot_data = json.load(f)
+        check_if_keys_exist_in_dict(data=annot_data, key=['shapes', 'imageData', 'imagePath'], name=annot_path)
+        img_name = os.path.basename(annot_data['imagePath'])
+        images[img_name] = _b64_to_arr(annot_data['imageData'])
+        for bp_data in annot_data['shapes']:
+            check_if_keys_exist_in_dict(data=bp_data, key=['label', 'points'], name=annot_path)
+            point_x, point_y = bp_data['points'][0][0], bp_data['points'][0][1]
+            lbl = bp_data['label']
+            id = os.path.join('labeled-data', os.path.basename(labelme_dir), img_name)
+            if id not in results_dict.keys():
+                results_dict[id] = {f'{lbl}': {'x': point_x, 'y': point_y}}
+            else:
+                results_dict[id].update({f'{lbl}': {'x': point_x, 'y': point_y}})
+
+    if save_dir is None:
+        save_dir = os.path.join(os.path.dirname(labelme_dir), os.path.basename(labelme_dir) + '_dlc_annotations')
+        if not os.path.isdir(save_dir): os.makedirs(save_dir)
+
+    bp_names = set()
+    for img, bp in results_dict.items(): bp_names.update(set(bp.keys()))
+    col_names = list(itertools.product(*[[scorer], bp_names, ['x', 'y']]))
+    columns = pd.MultiIndex.from_tuples(col_names)
+    results = pd.DataFrame(columns=columns)
+    results.columns.names = ['scorer', 'bodyparts', 'coords']
+    for img, bp_data in results_dict.items():
+        for bp_name, bp_cords in bp_data.items():
+            results.at[img, (scorer, bp_name, 'x')] = bp_cords['x']
+            results.at[img, (scorer, bp_name, 'y')] = bp_cords['y']
+
+    for img_name, img in images.items():
+        img_save_path = os.path.join(save_dir, img_name)
+        cv2.imwrite(img_save_path, img)
+    save_path = os.path.join(save_dir, f'CollectedData_{scorer}.csv')
+    results.to_csv(save_path)
