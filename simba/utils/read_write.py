@@ -1,18 +1,17 @@
 __author__ = "Simon Nilsson"
 
+import base64
 import configparser
 import glob
+import io
+import itertools
 import json
 import multiprocessing
 import os
 import pickle
-import itertools
-import base64
 import platform
 import re
-import io
 import shutil
-from PIL import Image
 import subprocess
 import webbrowser
 from configparser import ConfigParser
@@ -20,6 +19,8 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+
+from PIL import Image
 
 try:
     from typing import Literal
@@ -35,16 +36,18 @@ import pkg_resources
 import pyarrow as pa
 from numba import njit, prange
 from pyarrow import csv
-from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point, Polygon)
+from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point,
+                              Polygon)
 
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
+                                check_if_keys_exist_in_dict,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_instance, check_int,
                                 check_nvidea_gpu_available, check_str,
                                 check_valid_array, check_valid_boolean,
-                                check_valid_dataframe, check_valid_lst, check_if_keys_exist_in_dict)
+                                check_valid_dataframe, check_valid_lst)
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
 from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 FFMPEGCodecGPUError, FileExistError,
