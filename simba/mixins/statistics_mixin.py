@@ -86,7 +86,8 @@ class Statistics(FeatureExtractionMixin):
     @staticmethod
     @njit("(float32[:], float64, float64)", cache=True)
     def rolling_independent_sample_t(data: np.ndarray, time_window: float, fps: float) -> np.ndarray:
-        """
+
+        r"""
         Jitted compute independent-sample t-statistics for sequentially binned values in a time-series.
         E.g., compute t-test statistics when comparing ``Feature N`` in the current 1s
         time-window, versus ``Feature N`` in the previous 1s time-window.
@@ -468,7 +469,8 @@ class Statistics(FeatureExtractionMixin):
             "fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"
         ] = "auto",
     ) -> float:
-        """
+
+        r"""
         Compute Kullback-Leibler divergence between two distributions.
 
         .. note::
@@ -603,7 +605,8 @@ class Statistics(FeatureExtractionMixin):
             "fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"
         ] = "auto",
     ) -> float:
-        """
+
+        r"""
         Compute Jensen-Shannon divergence between two distributions. Useful for (i) measure drift in datasets, and (ii) featurization of distribution shifts across
         sequential time-bins.
 
@@ -909,7 +912,8 @@ class Statistics(FeatureExtractionMixin):
             Literal["fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"]
         ] = "auto",
     ) -> float:
-        """
+
+        r"""
         Compute Population Stability Index (PSI) comparing two distributions.
 
         The Population Stability Index (PSI) is a measure of the difference in distribution
@@ -928,11 +932,12 @@ class Statistics(FeatureExtractionMixin):
         where:
             - \( p_1 \) and \( p_2 \) are the proportions of observations in the bins for sample 1 and sample 2 respectively.
 
-        :parameter ndarray sample_1: First 1d array representing feature values.
-        :parameter ndarray sample_2: Second 1d array representing feature values.
-        :parameter Optional[int] fill_value: Empty bins (0 observations in bin) in is replaced with ``fill_value``. Default 1.
-        :parameter Literal bucket_method: Estimator determining optimal bucket count and bucket width. Default: The maximum of the Sturges and Freedman-Diaconis estimators
-        :returns float: PSI distance between ``sample_1`` and ``sample_2``
+        :param ndarray sample_1: First 1d array representing feature values.
+        :param ndarray sample_2: Second 1d array representing feature values.
+        :param Optional[int] fill_value: Empty bins (0 observations in bin) in is replaced with ``fill_value``. Default 1.
+        :param Literal bucket_method: Estimator determining optimal bucket count and bucket width. Default: The maximum of the Sturges and Freedman-Diaconis estimators
+        :returns: PSI distance between ``sample_1`` and ``sample_2``
+        :rtype: float
 
         :example:
         >>> sample_1, sample_2 = np.random.randint(0, 100, (100,)), np.random.randint(0, 10, (100,))
@@ -1107,9 +1112,9 @@ class Statistics(FeatureExtractionMixin):
            U = \\min(U_1, U_2)
 
         Where:
-              - U is the Mann-Whitney U statistic,
-              - U_1 is the sum of ranks for sample 1,
-              - U_2 is the sum of ranks for sample 2.
+              - :math:`U` is the Mann-Whitney U statistic,
+              - :math:`U_1` is the sum of ranks for sample 1,
+              - :math:`U_2` is the sum of ranks for sample 2.
 
         :parameter ndarray sample_1: First 1d array representing feature values.
         :parameter ndarray sample_2: Second 1d array representing feature values.
@@ -1322,7 +1327,8 @@ class Statistics(FeatureExtractionMixin):
     @staticmethod
     @njit("(float32[:], float32[:])")
     def pearsons_r(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
-        """
+
+        r"""
         Calculate the Pearson correlation coefficient (Pearson's r) between two numeric samples.
 
         Pearson's r is a measure of the linear correlation between two sets of data points. It quantifies the strength and
@@ -1332,17 +1338,18 @@ class Statistics(FeatureExtractionMixin):
 
         Pearson's r is calculated using the formula:
 
-        # .. math::
-        #
-        #    r = \frac{\sum{(x_i - \bar{x})(y_i - \bar{y})}}{\sqrt{\sum{(x_i - \bar{x})^2}\sum{(y_i - \bar{y})^2}}}
-        #
-        # where:
-        #    - \( x_i \) and \( y_i \) are individual data points in sample_1 and sample_2, respectively.
-        #    - \( \bar{x} \) and \( \bar{y} \) are the means of sample_1 and sample_2, respectively.
+        .. math::
+
+           r = \frac{\sum{(x_i - \bar{x})(y_i - \bar{y})}}{\sqrt{\sum{(x_i - \bar{x})^2}\sum{(y_i - \bar{y})^2}}}
+
+        where:
+           - \( x_i \) and \( y_i \) are individual data points in sample_1 and sample_2, respectively.
+           - \( \bar{x} \) and \( \bar{y} \) are the means of sample_1 and sample_2, respectively.
 
         :param np.ndarray sample_1: First numeric sample.
         :param np.ndarray sample_2: Second numeric sample.
-        :return float: Pearson's correlation coefficient between the two samples.
+        :return: Pearson's correlation coefficient between the two samples.
+        :rtype: float
 
         :example:
         >>> sample_1 = np.array([7, 2, 9, 4, 5, 6, 7, 8, 9]).astype(np.float32)
@@ -2391,10 +2398,10 @@ class Statistics(FeatureExtractionMixin):
            \\phi = \\frac{{(BC - AD)}}{{\sqrt{{(C\_1 + C\_2)(R\_1 + R\_2)(C\_1 + R\_1)(C\_2 + R\_2)}}}}
 
         where:
-            - BC: Hit rate (reponse and truth is both 1)
-            - AD: Correct rejections (response and truth are both 0)
-            - C1, C2: Counts of occurrences where the response is 1 and 0, respectively.
-            - R1, R2: Counts of occurrences where the truth is 1 and 0, respectively.
+            - :math:`BC`: Hit rate (reponse and truth is both 1)
+            - :math:`AD`: Correct rejections (response and truth are both 0)
+            - :math:`C1, C2`: Counts of occurrences where the response is 1 and 0, respectively.
+            - :math`R1, R2`: Counts of occurrences where the truth is 1 and 0, respectively.
 
         :param np.ndarray data: A NumPy array containing binary data organized in two columns. Each row represents a pair of binary values for two variables. Columns represent two features or two binary classification results.
         :returns: The calculated phi coefficient, a value between 0 and 1. A value of 0 indicates no association between the variables, while 1 indicates a perfect association.
@@ -2435,7 +2442,8 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     def eta_squared(x: np.ndarray, y: np.ndarray) -> float:
-        """
+
+        r"""
         Calculate eta-squared, a measure of between-subjects effect size.
 
         Eta-squared (\(\eta^2\)) is calculated as the ratio of the sum of squares between groups to the total sum of squares. Range from 0 to 1, where larger values indicate
@@ -2969,7 +2977,8 @@ class Statistics(FeatureExtractionMixin):
             return np.sqrt(1 - result / np.sqrt(norm_x * norm_y))
 
     def hellinger_distance(self, x: np.ndarray, y: np.ndarray, bucket_method: Optional[Literal["fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"]] = "auto") -> float:
-        """
+
+        r"""
         Compute the Hellinger distance between two vector distributions.
 
         .. note::
@@ -3247,7 +3256,7 @@ class Statistics(FeatureExtractionMixin):
         :param np.ndarray x: 1-dimensional Boolean array with predictions of the first model.
         :param np.ndarray y: 1-dimensional Boolean array with predictions of the second model.
         :param np.ndarray ground_truth: 1-dimensional Boolean array with ground truth labels.
-        :param Optional[bool] continuity_corrected : Whether to apply continuity correction. Default is True.
+        :param Optional[bool] continuity_corrected: Whether to apply continuity correction. Default is True.
         :returns: McNemar score are significance level.
         :rtype: Tuple[float, float]
 
@@ -3364,7 +3373,8 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     def hartley_fmax(x: np.ndarray, y: np.ndarray) -> float:
-        """
+
+        r"""
         Compute Hartley's Fmax statistic to test for equality of variances between two features or groups.
 
         Hartley's Fmax statistic is used to test whether two samples have equal variances.
@@ -3408,7 +3418,8 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     def grubbs_test(x: np.ndarray, left_tail: Optional[bool] = False) -> float:
-        """
+
+        r"""
         Perform Grubbs' test to detect outliers if the minimum or maximum value in a feature series is an outlier.
 
         Grubbs' test is a statistical test used to detect outliers in a univariate data set.
@@ -3571,7 +3582,8 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     def dunn_index(x: np.ndarray, y: np.ndarray, sample: Optional[float] = None) -> float:
-        """
+
+        r"""
         Calculate the Dunn index to evaluate the quality of clustered labels.
 
         This function calculates the Dunn Index, which is a measure of clustering quality.
@@ -3965,7 +3977,8 @@ class Statistics(FeatureExtractionMixin):
     @njit(["(int64[:], int64[:], float64[:])", "(int64[:], int64[:], types.misc.Omitted(None))",
            "(int64[:, :], int64[:, :], float64[:])", "(int64[:, :], int64[:, :], types.misc.Omitted(None))"])
     def sokal_michener(x: np.ndarray, y: np.ndarray, w: Optional[np.ndarray] = None) -> float:
-        """
+
+        r"""
         Jitted compute of the Sokal-Michener dissimilarity between two binary vectors or matrices.
 
         Higher values indicate more dissimilar vectors or matrices, while lower values indicate more similar vectors or matrices.
