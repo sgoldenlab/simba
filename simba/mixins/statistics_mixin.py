@@ -1252,7 +1252,7 @@ class Statistics(FeatureExtractionMixin):
 
         .. math::
 
-           W = -\\frac{{n_x \\cdot n_y \\cdot (\bar{R}_y - \bar{R}_x)}}{{(n_x + n_y) \\cdot \\sqrt{{n_x \\cdot S_x + n_y \\cdot S_y}}}}
+           W = -\frac{{n_x \\cdot n_y \\cdot (\bar{R}_y - \bar{R}_x)}}{{(n_x + n_y) \\cdot \\sqrt{{n_x \\cdot S_x + n_y \\cdot S_y}}}}
 
         where:
            - :math:`n_x` and :math:`n_y` are the sizes of sample_1 and sample_2 respectively,
@@ -3318,6 +3318,8 @@ class Statistics(FeatureExtractionMixin):
            Useful background: https://psych.unl.edu/psycrs/handcomp/hccochran.PDF
 
         :math:`Q = \frac{(k - 1) \left( kG^2 - \left( \sum_{j=1}^{k} C_j \right)^2 \right)}{kR - S}`
+        :math:`Q = \frac{(k - 1) \left( kG^2 - \left( \sum_{j=1}^{k} C_j \right)^2 \right)}{kR - S}`
+
 
         where:
 
@@ -3709,7 +3711,7 @@ class Statistics(FeatureExtractionMixin):
         .. note::
            Modified from `scikit-learn <https://github.com/scikit-learn/scikit-learn/blob/8721245511de2f225ff5f9aa5f5fadce663cd4a3/sklearn/metrics/cluster/_unsupervised.py#L326>`_
 
-            The Calinski-Harabasz score (CH) is calculated as:
+        The Calinski-Harabasz score (CH) is calculated as:
 
         .. math::
 
