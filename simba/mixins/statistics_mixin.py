@@ -218,7 +218,7 @@ class Statistics(FeatureExtractionMixin):
            d = \\frac{{\\bar{x}_1 - \\bar{x}_2}}{{\\sqrt{{\\frac{{s_1^2 + s_2^2}}{2}}}}}
 
         where:
-           - :math:`\bar{x}_1` and :math:`\bar{x}_2` are the means of sample_1 and sample_2 respectively,
+           - :math:`\\bar{x}_1` and :math:`\\bar{x}_2` are the means of sample_1 and sample_2 respectively,
            - :math:`s_1` and :math:`s_2` are the standard deviations of sample_1 and sample_2 respectively.
 
         :param ndarray sample_1: First 1d array representing feature values.
@@ -1256,7 +1256,7 @@ class Statistics(FeatureExtractionMixin):
 
         where:
            - :math:`n_x` and :math:`n_y` are the sizes of sample_1 and sample_2 respectively,
-           - :math:`\bar{R}_x` and :math:`\bar{R}_y` are the mean ranks of sample_1 and sample_2 respectively,
+           - :math:`\\bar{R}_x` and :math:`\\bar{R}_y` are the mean ranks of sample_1 and sample_2 respectively,
            - :math:`S_x` and :math:`S_y` are the dispersion statistics of sample_1 and sample_2 respectively.
 
         :parameter ndarray sample_1: First 1d array representing feature values.
