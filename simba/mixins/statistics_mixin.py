@@ -3324,8 +3324,7 @@ class Statistics(FeatureExtractionMixin):
 
            Useful background: https://psych.unl.edu/psycrs/handcomp/hccochran.PDF
 
-        .. math::
-           Q = \frac{(k - 1) \left( kG^2 - \left( \sum_{j=1}^{k} C_j \right)^2 \right)}{kR - S}
+        :math:`Q = \frac{(k - 1) \left( kG^2 - \left( \sum_{j=1}^{k} C_j \right)^2 \right)}{kR - S}`
 
         where:
 
