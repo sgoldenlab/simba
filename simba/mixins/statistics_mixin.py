@@ -1366,13 +1366,6 @@ class Statistics(FeatureExtractionMixin):
         Spearman's rank correlation coefficient assesses how well the relationship between two variables can be described using a monotonic function.
         It computes the strength and direction of the monotonic relationship between ranked variables.
 
-        # .. math::
-        #    ρ = 1 - \\frac{{6 ∑(d_i^2)}}{{n(n^2 - 1)}}
-        #
-        # where:
-        # - \( d_i \) is the difference between the ranks of corresponding elements in sample_1 and sample_2.
-        # - \( n \) is the number of observations.
-
         .. seealso::
            :func:`simba.data_processors.cuda.statistics.sliding_spearman_rank_correlation`,
            :func:`simba.mixins.statistics.StatisticsMixin.sliding_spearman_rank_correlation`
@@ -1631,7 +1624,7 @@ class Statistics(FeatureExtractionMixin):
         The equation for the concordance ratio :math:`C` is given by:
 
         .. math::
-           C = \frac{N_c}{N_t}
+           C = \\frac{N_c}{N_t}
 
         where:
            - :math:`N_c` is the count of rows with only one unique value,
@@ -1640,7 +1633,7 @@ class Statistics(FeatureExtractionMixin):
         If the `invert` parameter is set to `True`, the function will return the disconcordance ratio instead, defined as:
 
         .. math::
-            D = \frac{N_d}{N_t}
+            D = \\frac{N_d}{N_t}
 
         where:
 
@@ -3541,9 +3534,8 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit("(float32[:], int64, float64[:], float64)")
-    def sliding_mad_median_rule(
-        data: np.ndarray, k: int, time_windows: np.ndarray, fps: float
-    ) -> np.ndarray:
+    def sliding_mad_median_rule(data: np.ndarray, k: int, time_windows: np.ndarray, fps: float) -> np.ndarray:
+
         """
         Count the number of outliers in a sliding time-window using the MAD-Median Rule.
 
@@ -3554,7 +3546,8 @@ class Statistics(FeatureExtractionMixin):
         :param int k: The outlier threshold defined as k * median absolute deviation in each time window.
         :param np.ndarray time_windows: 1D array of time window sizes in seconds.
         :param float fps: The frequency of the signal.
-        :return np.ndarray: Array of size (data.shape[0], time_windows.shape[0]) with counts if outliers detected.
+        :return: Array of size (data.shape[0], time_windows.shape[0]) with counts if outliers detected.
+        :rtype: np.ndarray
 
         :example:
         >>> data = np.random.randint(0, 50, (50000,)).astype(np.float32)
@@ -3590,7 +3583,7 @@ class Statistics(FeatureExtractionMixin):
         The Dunn Index is given by:
 
         .. math::
-           D = \frac{\min_{i \neq j} \{ \delta(C_i, C_j) \}}{\max_k \{ \Delta(C_k) \}}
+           D = \\frac{\min_{i \neq j} \{ \delta(C_i, C_j) \}}{\max_k \{ \Delta(C_k) \}}
 
         where :math:`\delta(C_i, C_j)` is the distance between clusters :math:`C_i` and :math:`C_j`, and
         :math:`\Delta(C_k)` is the diameter of cluster :math:`C_k`.
@@ -3904,7 +3897,7 @@ class Statistics(FeatureExtractionMixin):
         .. note::
            Normalize arrays sample_1 and sample_2 before passing it to ensure accurate results.
 
-        The equation for the Czebyshev distance is given by: :math:`D_\infty(p, q) = \max_i \left| p_i - q_i \right|`.
+            The equation for the Czebyshev distance is given by :math:`D_\infty(p, q) = \max_i \left| p_i - q_i \right|`.
 
         .. seealso:
            :func:`simba.mixins.statistics_mixin.Statistics.sliding_czebyshev_distance`
@@ -3977,7 +3970,7 @@ class Statistics(FeatureExtractionMixin):
            Adapted from `umap <https://github.com/lmcinnes/umap/blob/e7f2fb9e5e772edd5c8f38612365ec6a35a54373/umap/distances.py#L468>`_.
 
         .. math::
-           D(x, y) = \frac{2 \cdot \sum_{i} w_i \cdot \mathbb{1}(x_i \neq y_i)}{N + \sum_{i} w_i \cdot \mathbb{1}(x_i \neq y_i)}
+           D(x, y) = \\frac{2 \cdot \sum_{i} w_i \cdot \mathbb{1}(x_i \neq y_i)}{N + \sum_{i} w_i \cdot \mathbb{1}(x_i \neq y_i)}
 
         where:
         - :math:`x` and :math:`y` are the binary vectors or matrices.

@@ -45,14 +45,6 @@ html_logo = "../simba/assets/icons/readthedocs_logo.png"
 latex_engine = 'xelatex'
 latex_elements = {'papersize': 'letterpaper'}
 
-mathjax_config = {
-    'TeX': {
-        'Macros': {
-            'bar': r'\overline',
-            # Other macros can be added here
-        }
-    }
-}
 # source_suffix = {
 #     '.rst': 'restructuredtext',
 #     '.ipynb': 'nbsphinx',
