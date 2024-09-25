@@ -1256,7 +1256,7 @@ class Statistics(FeatureExtractionMixin):
 
         where:
            - :math:`n_x` and :math:`n_y` are the sizes of sample_1 and sample_2 respectively,
-           - :math:`\\bar{R}_x` and :math:`\\bar{R}_y` are the mean ranks of sample_1 and sample_2 respectively,
+           - :math:`\bar{R}_x` and :math:`\bar{R}_y` are the mean ranks of sample_1 and sample_2, respectively.
            - :math:`S_x` and :math:`S_y` are the dispersion statistics of sample_1 and sample_2 respectively.
 
         :parameter ndarray sample_1: First 1d array representing feature values.
