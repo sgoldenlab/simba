@@ -1252,7 +1252,7 @@ class Statistics(FeatureExtractionMixin):
 
         .. math::
 
-           W = -\\frac{{n_x \\cdot n_y \\cdot (\\bar{R}_y - \\bar{R}_x)}}{{(n_x + n_y) \\cdot \\sqrt{{n_x \\cdot S_x + n_y \\cdot S_y}}}}
+           W = -\\frac{{n_x \\cdot n_y \\cdot (\bar{R}_y - \bar{R}_x)}}{{(n_x + n_y) \\cdot \\sqrt{{n_x \\cdot S_x + n_y \\cdot S_y}}}}
 
         where:
            - :math:`n_x` and :math:`n_y` are the sizes of sample_1 and sample_2 respectively,
