@@ -206,7 +206,8 @@ class Statistics(FeatureExtractionMixin):
     @staticmethod
     @njit("(float64[:], float64[:])", cache=True)
     def cohens_d(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
-        """
+
+        r"""
         Jitted compute of Cohen's d between two distributions.
 
         Cohen's d is a measure of effect size that quantifies the difference between the means of two distributions in terms of their standard deviation. It is calculated as the difference between the means of the two distributions divided by the pooled standard deviation.
@@ -1240,7 +1241,8 @@ class Statistics(FeatureExtractionMixin):
     @staticmethod
     @jit(nopython=True, cache=True)
     def brunner_munzel(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
-        """
+
+        r"""
         Jitted compute of Brunner-Munzel W between two distributions.
 
         The Brunner-Munzel W statistic compares the central tendency and the spread of two independent samples. It is useful
@@ -3632,7 +3634,8 @@ class Statistics(FeatureExtractionMixin):
 
 
     def davis_bouldin(x: np.ndarray, y: np.ndarray) -> float:
-        """
+
+        r"""
         Calculate the Davis-Bouldin index for evaluating clustering performance.
 
         Davis-Bouldin index measures the clustering quality based on the within-cluster
@@ -3848,7 +3851,8 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     def adjusted_mutual_info(x: np.ndarray, y: np.ndarray) -> float:
-        """
+
+        r"""
         Calculate the Adjusted Mutual Information (AMI) between two clusterings as a measure of similarity.
 
         Calculates the Adjusted Mutual Information (AMI) between two sets of cluster labels.
@@ -3890,7 +3894,8 @@ class Statistics(FeatureExtractionMixin):
     @staticmethod
     @jit(nopython=True)
     def czebyshev_distance(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
-        """
+
+        r"""
         Calculate the Czebyshev distance between two N-dimensional samples.
 
         The Czebyshev distance is defined as the maximum absolute difference
@@ -3899,7 +3904,7 @@ class Statistics(FeatureExtractionMixin):
         .. note::
            Normalize arrays sample_1 and sample_2 before passing it to ensure accurate results.
 
-            The equation for the Czebyshev distance is given by :math:`D_\infty(p, q) = \max_i \left| p_i - q_i \right|`.
+        The equation for the Czebyshev distance is given by :math:`D_\infty(p, q) = \max_i \left| p_i - q_i \right|`.
 
         .. seealso:
            :func:`simba.mixins.statistics_mixin.Statistics.sliding_czebyshev_distance`
