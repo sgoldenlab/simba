@@ -3863,13 +3863,13 @@ class Statistics(FeatureExtractionMixin):
 
         .. math::
 
-           \text{AMI}(x, y) = \frac{\text{MI}(x, y) - E(\text{MI}(x, y))}{\max(H(x), H(y)) - E(\text{MI}(x, y))}
+           \mathrm{AMI}(x, y) = \frac{\mathrm{MI}(x, y) - E(\mathrm{MI}(x, y))}{\max(H(x), H(y)) - E(\mathrm{MI}(x, y))}
 
         where:
-            - :math:`\text{MI}(x, y)` is the mutual information between :math:`x` and :math:`y`.
-            - :math:`E(\text{MI}(x, y))` is the expected mutual information.
-            - :math:`H(x)` and :math:`H(y)` are the entropies of :math:`x` and :math:`y`, respectively.
 
+           - :math:`\text{MI}(x, y)` is the mutual information between :math:`x` and :math:`y`.
+           - :math:`E(\text{MI}(x, y))` is the expected mutual information.
+           - :math:`H(x)` and :math:`H(y)` are the entropies of :math:`x` and :math:`y`, respectively.
 
         :param np.ndarray x: 1D array representing the labels of the first model.
         :param np.ndarray y: 1D array representing the labels of the second model.
