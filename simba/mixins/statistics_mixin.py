@@ -3320,7 +3320,7 @@ class Statistics(FeatureExtractionMixin):
         It can be used to evaluate if the performance of multiple (>=2) classifiers on the same data is the same or significantly different.
 
         .. note::
-           If two classifiers, consider :func:`simba.mixins.statistics.Statistics.mcnemar`.
+           If two classifiers, consider :func:`simba.mixins.statistics.Statistics.mcnemar()`.
 
            Useful background: https://psych.unl.edu/psycrs/handcomp/hccochran.PDF
 
