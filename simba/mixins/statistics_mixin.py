@@ -3306,7 +3306,9 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     def cochrans_q(data: np.ndarray) -> Tuple[float, float]:
-        """
+
+        r"""
+
         Compute Cochrans Q for 2-dimensional boolean array.
 
         Cochran's Q statistic is used to test for significant differences between more than two proportions.
@@ -3318,8 +3320,6 @@ class Statistics(FeatureExtractionMixin):
            Useful background: https://psych.unl.edu/psycrs/handcomp/hccochran.PDF
 
         :math:`Q = \frac{(k - 1) \left( kG^2 - \left( \sum_{j=1}^{k} C_j \right)^2 \right)}{kR - S}`
-        :math:`Q = \frac{(k - 1) \left( kG^2 - \left( \sum_{j=1}^{k} C_j \right)^2 \right)}{kR - S}`
-
 
         where:
 
