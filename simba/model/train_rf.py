@@ -239,9 +239,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
             self.rf_clf = self.clf_define(n_estimators=n_estimators, max_depth=self.rf_max_depth, max_features=max_features, n_jobs=-1, criterion=criterion, min_samples_leaf=min_sample_leaf, verbose=1, class_weight=class_weights)
 
             print(f"Fitting {self.clf_name} model...")
-            self.rf_clf = self.clf_fit(
-                clf=self.rf_clf, x_df=self.x_train, y_df=self.y_train
-            )
+            self.rf_clf = self.clf_fit(clf=self.rf_clf, x_df=self.x_train, y_df=self.y_train)
 
             if compute_permutation_importance in Options.PERFORM_FLAGS.value:
                 self.calc_permutation_importance(

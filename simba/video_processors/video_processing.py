@@ -2307,12 +2307,11 @@ def resize_videos_by_width(video_paths: List[Union[str, os.PathLike]],
             save_path = os.path.join(dir_name, f"{video_name}_{suffix}.mp4")
             new_video_paths.append(save_path)
         if gpu:
-            cmd = f'ffmpeg -y -hwaccel auto -i "{video_path}" -vf scale_npp={width}:-2 -c:v h264_nvenc "{save_path}" -hide_banner -loglevel error -y'
+            cmd = f'ffmpeg -y -hwaccel auto -i "{video_path}" -vf "scale={width}:-2" -c:v h264_nvenc "{save_path}" -hide_banner -loglevel error -stats -y'
         else:
             cmd = f'ffmpeg -y -i "{video_path}" -vf scale={width}:-2 "{save_path}" -hide_banner -loglevel error -stats -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         if overwrite:
-
             shutil.copy(save_path, video_path)
             os.remove(save_path)
         if verbose:
@@ -2321,6 +2320,10 @@ def resize_videos_by_width(video_paths: List[Union[str, os.PathLike]],
     if verbose:
         print(f"Resized width {len(video_paths)} video(s). Elapsed time: {timer.elapsed_time_str}s.")
     return new_video_paths
+
+video_paths= [r"D:\videos\4A_Mouse_5-choice_MustTouchTrainingNEWFINAL_a8_grayscale.mp4"]
+resize_videos_by_width(video_paths=video_paths, width=301, overwrite=False, save_dir=r"D:\videos\test", gpu=True)
+
 
 
 def create_blank_video(path: Union[str, os.PathLike],

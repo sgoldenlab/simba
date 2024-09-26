@@ -4,9 +4,10 @@ __email__ = "sronilsson@gmail.com"
 
 import math
 from typing import Optional, Tuple
-
 import numpy as np
 from numba import cuda
+from scipy.spatial import ConvexHull
+from itertools import combinations
 
 from simba.utils.read_write import read_df
 
@@ -417,7 +418,6 @@ def _cuda_sliding_std(x: np.ndarray, d: np.ndarray, results: np.ndarray):
 
 def sliding_std(x: np.ndarray, time_window: float, sample_rate: int) -> np.ndarray:
     """
-
     :param np.ndarray x: The input 1D numpy array of floats. The array over which the sliding window sum is computed.
     :param float time_window: The size of the sliding window in seconds. This window slides over the array `x` to compute the sum.
     :param int sample_rate: The number of samples per second in the array `x`. This is used to convert the time-based window size into the number of samples.
@@ -510,3 +510,113 @@ def euclidean_distance_to_static_point(data: np.ndarray,
     if centimeter:
         results = results / 10
     return results.get
+
+
+def dunn_index(x: np.ndarray, y: np.ndarray) -> float:
+
+    r"""
+    Computes the Dunn Index for clustering quality using GPU acceleration, which is a ratio of the minimum inter-cluster
+    distance to the maximum intra-cluster distance. The higher the Dunn Index, the better the separation
+    between clusters.
+
+    .. math::
+
+        Dunn\ Index = \\frac{\\min_{i \\neq j} \\delta(c_i, c_j)}{\\max_k \\Delta(c_k)}
+
+    Where:
+    - :math:`\\delta(c_i, c_j)` is the distance between clusters :math:`c_i` and :math:`c_j`.
+    - :math:`\\Delta(c_k)` is the diameter (i.e., maximum intra-cluster distance) of cluster :math:`c_k`.
+
+    The higher the Dunn Index, the better the clustering, as a higher value indicates that the clusters are well-separated relative to their internal cohesion.
+
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/dunn_index_cuda.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+    :param np.ndarray x: The input data points, where each row corresponds to an observation, and columns are features.
+    :param np.ndarray y: Cluster labels for the data points. Each label corresponds to a cluster assignment for the respective observation in `x`.
+    :return: The Dunn Index, a floating point value that measures the quality of clustering.
+    :rtype: float
+
+    :example:
+    >>> centers = [[0, 0], [5, 10], [10, 0], [20, 10]]  # Adjust distances between cluster centers
+    >>> x, y = make_blobs(n_samples=80_000_000, n_features=10, centers=centers, cluster_std=1, random_state=10)
+    >>> v = dunn_index(x=x, y=y)
+    """
+
+    y = cp.array(y)
+    x = cp.array(x)
+    _, y = cp.unique(y, return_inverse=True)
+    ys = cp.sort(cp.unique(y)).astype(cp.int64)
+    boundaries = {}
+    intra_deltas = cp.full(cp.unique(y).shape[0], fill_value=-cp.inf, dtype=cp.float64)
+    inter_deltas = cp.full((cp.unique(y).shape[0], cp.unique(y).shape[0]), fill_value=cp.inf, dtype=cp.float64)
+    for cnt, k in enumerate(ys):
+        k = int(k)
+        idx = cp.argwhere((y == k)).flatten()
+        current_vals = x[idx, :].get()
+        boundaries[k] = cp.array(current_vals[ConvexHull(current_vals).vertices])
+        intra_dists = cdist(boundaries[k], boundaries[k])
+        intra_deltas[cnt] = cp.max(intra_dists)
+    for i, j in combinations(list(boundaries.keys()), 2):
+        inter_dists = cdist(boundaries[i], boundaries[j])
+        min_inter_dist = cp.min(inter_dists)
+        inter_deltas[i, j] = min_inter_dist
+        inter_deltas[j, i] = min_inter_dist
+    v = cp.min(inter_deltas) / cp.max(intra_deltas)
+    return v.get()
+
+def davis_bouldin(x: np.ndarray,
+                  y: np.ndarray) -> float:
+    """
+    Computes the Davis-Bouldin Index using GPU acceleration, a clustering evaluation metric that assesses
+    the quality of clustering based on the ratio of within-cluster and between-cluster distances.
+
+    The lower the Davis-Bouldin Index, the better the clusters are separated and compact.
+    The function calculates the average similarity between each cluster and its most similar cluster.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/davis_bouldin_cuda.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+    :param np.ndarray x: A 2D array of data points where each row corresponds to aan observation and  each column corresponds to a feature.
+    :param np.ndarray y: A 1D array containing the cluster labels for each sample in `x`.
+    :return: The Davis-Bouldin Index as a float, where lower values indicate better-defined clusters.
+    :rtype: float
+
+    :example:
+    >>> centers = [[0, 0], [5, 10], [10, 0], [20, 10]]  # Adjust distances between cluster centers
+    >>> x, y = make_blobs(n_samples=50000, n_features=4, centers=3, cluster_std=0.1)
+    >>> p = davis_bouldin(x, y)
+    """
+
+
+    x, y = cp.array(x), cp.array(y)
+    n_labels, labels = cp.unique(y).shape[0], cp.unique(y)
+    cluster_centers = cp.full((n_labels, x.shape[1]), cp.nan, dtype=cp.float32)
+    intra_center_distances = np.full((n_labels), 0.0)
+    for cnt, cluster_id in enumerate(labels):
+        cluster_data = x[cp.argwhere(y == cluster_id), :]
+        cluster_data = cluster_data.reshape(cluster_data.shape[0], -1)
+        cluster_centers[cnt] = cp.mean(cluster_data, axis=0)
+        center_dists = cdist(cluster_data, cluster_centers[cnt].reshape(1, cluster_centers[cnt].shape[0])).T[0]
+        intra_center_distances[cnt] = cp.mean(center_dists)
+    inter_center_distances = cdist(cluster_centers, cluster_centers)
+    inter_center_distances[inter_center_distances == 0] = np.inf
+
+    db_index = 0
+    for i in range(inter_center_distances.shape[0]):
+        max_ratio = -cp.inf
+        for j in range(inter_center_distances.shape[1]):
+            if i != j:
+                ratio = (intra_center_distances[i] + intra_center_distances[j]) / inter_center_distances[i, j]
+                max_ratio = max(max_ratio, ratio)
+        db_index += max_ratio
+    return db_index / n_labels

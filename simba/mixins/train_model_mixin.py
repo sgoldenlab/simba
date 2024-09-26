@@ -1939,8 +1939,7 @@ class TrainModelMixin(object):
                                           MLParamKeys.CLASSIFIER.value, data_type=Dtypes.STR.value)
         self.tt_size = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.TT_SIZE.value,
                                          data_type=Dtypes.FLOAT.value)
-        self.algo = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.MODEL_TO_RUN.value,
-                                      data_type=Dtypes.STR.value, default_value="rf")
+        self.algo = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.MODEL_TO_RUN.value, data_type=Dtypes.STR.value, default_value="RF")
         self.split_type = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
                                             MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value, data_type=Dtypes.STR.value,
                                             options=Options.TRAIN_TEST_SPLIT.value,

@@ -55,6 +55,9 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         self.machine_model_dropdown = DropDownMenu(machine_model_frm, "ALGORITHM: ", self.clf_options, "25")
         self.machine_model_dropdown.setChoices(self.clf_options[0])
 
+        self.machine_model_dropdown.popupMenu['menu'].entryconfigure(self.clf_options[1], state='disabled')
+        self.machine_model_dropdown.popupMenu['menu'].entryconfigure(self.clf_options[2], state='disabled')
+
         behavior_frm = LabelFrame(self.main_frm, text="BEHAVIOR", font=Formats.FONT_HEADER.value)
         self.behavior_name_dropdown = DropDownMenu(behavior_frm, "BEHAVIOR: ", self.clf_names, "25")
         self.behavior_name_dropdown.setChoices(self.clf_names[0])
@@ -608,4 +611,4 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         ]
 
 
-#_ = MachineModelSettingsPopUp(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini")
+#_ = MachineModelSettingsPopUp(config_path=r"C:\troubleshooting\My_project_2\project_folder\project_config.ini")

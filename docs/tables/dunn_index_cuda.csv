@@ -1,0 +1,14 @@
+OBSERVATIONS (MILLIONS),TIME (S),STDEV (S)
+2,0.2366,0.0114
+4,0.4464,0.0016
+8,0.9037,0.0032
+16,1.8675,0.0019
+32,3.6247,0.006497
+64,7.2898,0.007388
+128,14.822,0.02672
+256,29.316,0.0425
+512,58.23599271,0.477388716
+NVIDIA GeForce RTX 4070,,
+REPEATS = 3,,
+"centers = [[0, 0], [5, 10], [10, 0], [20, 10]]",,
+"x, y = make_blobs(n_samples=OBSERVATIONS, n_features=2, centers=centers, cluster_std=1)",,

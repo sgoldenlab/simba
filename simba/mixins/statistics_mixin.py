@@ -1343,8 +1343,8 @@ class Statistics(FeatureExtractionMixin):
            r = \frac{\sum{(x_i - \bar{x})(y_i - \bar{y})}}{\sqrt{\sum{(x_i - \bar{x})^2}\sum{(y_i - \bar{y})^2}}}
 
         where:
-           - \( x_i \) and \( y_i \) are individual data points in sample_1 and sample_2, respectively.
-           - \( \bar{x} \) and \( \bar{y} \) are the means of sample_1 and sample_2, respectively.
+           - :math:`x_i` and :math:`y_i` are individual data points in sample_1 and sample_2, respectively.
+           - :math:`\bar{x}` and :math:`\bar{y}` are the means of sample_1 and sample_2, respectively.
 
         :param np.ndarray sample_1: First numeric sample.
         :param np.ndarray sample_2: Second numeric sample.
@@ -1381,7 +1381,8 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray sample_1: First 1D array containing feature values.
         :param np.ndarray sample_2: Second 1D array containing feature values.
-        :return float: Spearman's rank correlation coefficient.
+        :return: Spearman's rank correlation coefficient.
+        :rtype: float
 
         :example:
         >>> sample_1 = np.array([7, 2, 9, 4, 5, 6, 7, 8, 9]).astype(np.float32)
@@ -1398,9 +1399,7 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit("(float32[:], float32[:], float64[:], int64)")
-    def sliding_pearsons_r(
-        sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: int
-    ) -> np.ndarray:
+    def sliding_pearsons_r(sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Given two 1D arrays of size N, create sliding window of size time_windows[i] * fps and return Pearson's R
         between the values in the two 1D arrays in each window. Address "what is the correlation between Feature 1 and
@@ -3469,6 +3468,7 @@ class Statistics(FeatureExtractionMixin):
         :return: A tuple containing the test statistic (z-score) and the effect size (r).
         - The test statistic (z-score) measures the deviation of the observed ranks sum from the expected sum.
         - The effect size (r) measures the strength of association between the variables.
+        :rtype: Tuple[float, float]
         """
 
         data = np.hstack((x.reshape(-1, 1), y.reshape(-1, 1)))
@@ -3588,7 +3588,7 @@ class Statistics(FeatureExtractionMixin):
 
         This function calculates the Dunn Index, which is a measure of clustering quality.
         The index considers the ratio of the minimum inter-cluster distance to the maximum
-        intra-cluster distance. The Dunn INdex range from zero to infinity and larger values indicate better clustering.
+        intra-cluster distance. The Dunn Index range from zero to infinity and larger values indicate better clustering.
         The Dunn Index uses Euclidean distances.
 
         The Dunn Index is calculated using the following steps:
@@ -3613,7 +3613,8 @@ class Statistics(FeatureExtractionMixin):
 
         :param np.ndarray x: 2D array representing the data points. Shape (n_samples, n_features).
         :param np.ndarray y: 1D array representing cluster labels for each data point. Shape (n_samples,).
-        :return float: The Dunn index value
+        :return: The Dunn index value
+        :rtype: float
 
         :example:
         >>> x = np.random.randint(0, 100, (100, 2))
@@ -3644,8 +3645,7 @@ class Statistics(FeatureExtractionMixin):
         if v == np.inf: return -1
         else: return v
 
-
-    def davis_bouldin(x: np.ndarray, y: np.ndarray) -> float:
+    def davis_bouldin(self, x: np.ndarray, y: np.ndarray) -> float:
 
         r"""
         Calculate the Davis-Bouldin index for evaluating clustering performance.
@@ -3677,13 +3677,13 @@ class Statistics(FeatureExtractionMixin):
         check_valid_array(
             data=x,
             source=Statistics.davis_bouldin.__name__,
-            accepted_ndims=(2,),
+            accepted_ndims=[(2,)],
             accepted_dtypes=Formats.NUMERIC_DTYPES.value,
         )
         check_valid_array(
             data=y,
             source=Statistics.davis_bouldin.__name__,
-            accepted_ndims=(1,),
+            accepted_ndims=[(1,)],
             accepted_shapes=[(x.shape[0],)],
             accepted_dtypes=Formats.NUMERIC_DTYPES.value,
         )
@@ -4018,7 +4018,7 @@ class Statistics(FeatureExtractionMixin):
                 unequal_cnt += 1 * w[i[0]]
         return (2.0 * unequal_cnt) / (x.size + unequal_cnt)
 
-    def kumar_hassebrook_similarity(x: np.ndarray, y: np.ndarray) -> float:
+    def kumar_hassebrook_similarity(self, x: np.ndarray, y: np.ndarray) -> float:
         """
         Kumar-Hassebrook similarity is a measure used to quantify the similarity between two vectors.
 
@@ -4040,7 +4040,7 @@ class Statistics(FeatureExtractionMixin):
         norm_y = np.linalg.norm(y)
         return dot_product / (norm_x ** 2 + norm_y ** 2 - dot_product)
 
-    def wave_hedges_distance(x: np.ndarray, y: np.ndarray) -> float:
+    def wave_hedges_distance(self, x: np.ndarray, y: np.ndarray) -> float:
         """
 
         Computes the Wave-Hedges distance between two 1-dimensional arrays `x` and `y`. The Wave-Hedges distance is a measure of dissimilarity between arrays.

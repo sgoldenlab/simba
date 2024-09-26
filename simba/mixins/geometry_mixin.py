@@ -934,8 +934,8 @@ class GeometryMixin(object):
         Helper to create a geometry video from a list of shapes.
 
         .. seealso::
-           If more aesthetic videos are needed, overlaid on video, then use func:`simba.plotting.geometry_plotter.GeometryPlotter`
-           If single images of geometries are needed, then use :func:`simba.mixins.geometry_mixin.view_shapes`
+           If more aesthetic videos are needed, overlaid on video, then use func:`simba.plotting.geometry_plotter.GeometryPlotter()`
+           If single images of geometries are needed, then use :func:`simba.mixins.geometry_mixin.view_shapes()`
 
         .. image:: _static/img/geometry_video.gif
            :width: 500
@@ -2223,6 +2223,9 @@ class GeometryMixin(object):
            :width: 500
            :align: center
 
+        .. seealso::
+           See :func:`simba.data_processors.cuda.image.img_stack_brightness()` for GPU acceleration.
+
         :param np.ndarray img: Either an image in numpy array format OR a tuple with cv2.VideoCapture object and the frame index.
         :param List[Union[Polygon, np.ndarray]] geometries: A list of shapes either as vertices in a numpy array, or as shapely Polygons.
         :param Optional[bool] ignore_black: If non-rectangular geometries, then pixels that don't belong to the geometry are masked in black. If True, then these pixels will be ignored when computing averages.
@@ -2437,12 +2440,10 @@ class GeometryMixin(object):
         return results
 
     @staticmethod
-    def geometry_contourcomparison(
-        imgs: List[Union[np.ndarray, Tuple[cv2.VideoCapture, int]]],
-        geometry: Optional[Polygon] = None,
-        method: Optional[Literal["all", "exterior"]] = "all",
-        canny: Optional[bool] = True,
-    ) -> float:
+    def geometry_contourcomparison(imgs: List[Union[np.ndarray, Tuple[cv2.VideoCapture, int]]],
+                                   geometry: Optional[Polygon] = None,
+                                   method: Optional[Literal["all", "exterior"]] = "all",
+                                   canny: Optional[bool] = True) -> float:
         """
         Compare contours between a geometry in two images using shape matching.
 
@@ -2455,11 +2456,12 @@ class GeometryMixin(object):
 
            Used to pick up very subtle changes around pose-estimated body-part locations.
 
-        :parameter List[Union[np.ndarray, Tuple[cv2.VideoCapture, int]]] imgs: List of two input images. Can be either be two images in numpy array format OR a two tuples with cv2.VideoCapture object and the frame index.
-        :parameter Optional[Polygon] geometry: If Polygon, then the geometry in the two images that should be compared. If None, then entire images will be contourcompared.
-        :parameter Literal['all', 'exterior'] method: The method used for contour comparison.
-        :parameter Optional[bool] canny: If True, applies Canny edge detection before contour comparison. Helps reduce noise and enhance contours.  Default is True.
-        :returns float: Contour matching score between the two images. Lower scores indicate higher similarity.
+        :param List[Union[np.ndarray, Tuple[cv2.VideoCapture, int]]] imgs: List of two input images. Can be either be two images in numpy array format OR a two tuples with cv2.VideoCapture object and the frame index.
+        :param Optional[Polygon] geometry: If Polygon, then the geometry in the two images that should be compared. If None, then entire images will be contourcompared.
+        :param Literal['all', 'exterior'] method: The method used for contour comparison.
+        :param Optional[bool] canny: If True, applies Canny edge detection before contour comparison. Helps reduce noise and enhance contours.  Default is True.
+        :returns: Contour matching score between the two images. Lower scores indicate higher similarity.
+        :rtype: float
 
 
         :example:
@@ -2527,9 +2529,7 @@ class GeometryMixin(object):
             imgs = sliced_imgs
             del sliced_imgs
 
-        return ImageMixin().get_contourmatch(
-            img_1=imgs[0], img_2=imgs[1], canny=canny, method=method
-        )
+        return ImageMixin().get_contourmatch(img_1=imgs[0], img_2=imgs[1], canny=canny, method=method)
 
     @staticmethod
     def _multifrm_geometry_histocomparison_helper(frm_index: np.ndarray,
@@ -2758,12 +2758,13 @@ class GeometryMixin(object):
         """
         Convert a list of contours to a list of geometries.
 
-        E.g., convert a list of contours detected with ``ImageMixin.find_contours`` to a list of Shapely geometries
-        that can be used within the ``GeometryMixin``.
+        E.g., convert a list of contours detected with :func:`simba.mixins.image_mixin.ImageMixin.find_contours()` to a list of Shapely geometries
+        that can be used within the :func:`simba.mixins.geometry_mixin.GeometryMixin()`.
 
         :param List[np.ndarray] contours: List of contours represented as 2D arrays.
         :param force_rectangles: If True, then force the resulting geometries to be rectangular.
-        :return List[Polygon]: List of Shapley Polygons.
+        :return: List of Shapley Polygons.
+        :rtype: List[Polygon]
 
         :example:
         >>> video_frm = read_frm_of_video(video_path='/Users/simon/Desktop/envs/platea_featurizer/data/video/3D_Mouse_5-choice_MouseTouchBasic_s9_a4_grayscale.mp4')
@@ -3700,6 +3701,10 @@ class GeometryMixin(object):
         Each set of keypoints consists of a 2D array of coordinates representing points. The function calculates
         the minimum and maximum x and y values from the keypoints to form a rectangle (bounding box) aligned with
         the x and y axes.
+
+        .. image:: _static/img/keypoints_to_axis_aligned_bounding_box.webp
+           :width: 400
+           :align: center
 
         :param np.ndarray keypoints: A 3D array of shape (N, M, 2) where N is the number of observations, and each observation contains M points in 2D space (x, y).
         :return: A 3D array of shape (N, 4, 2), where each entry represents the four corners of the axis-aligned  bounding box corresponding to each set of keypoints.

@@ -433,8 +433,8 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture], f
     """
     Read video metadata (fps, resolution, frame cnt etc.) from video file (e.g., mp4).
 
-    :parameter str video_path: Path to a video file.
-    :parameter bool fps_as_int: If True, force video fps to int through floor rounding, else float. Default = True.
+    :param str video_path: Path to a video file.
+    :param bool fps_as_int: If True, force video fps to int through floor rounding, else float. Default = True.
     :return: The video metadata in dict format with parameter (e.g., ``fps``)  as keys.
     :rtype: Dict[str, Any].
 
@@ -500,6 +500,7 @@ def concatenate_videos_in_folder(in_folder: Union[str, os.PathLike],
     :param Optional[str] substring: If a string, then only videos in in_folder with a filename that contains substring will be joined. If None, then all are joined. Default: None.
     :param Optional[str] video_format: Format of the input video files in ``in_folder``. Default: ``mp4``.
     :param Optional[bool] remove_splits: If true, the input splits in the ``in_folder`` will be removed following concatenation. Default: True.
+    :rtype: None
     """
 
     if not check_nvidea_gpu_available() and gpu:
