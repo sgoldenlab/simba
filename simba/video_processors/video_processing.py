@@ -2262,6 +2262,8 @@ def resize_videos_by_width(video_paths: List[Union[str, os.PathLike]],
     :example:
     >>> video_paths= ['/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat7_8(2).mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat11_12.mp4']
     >>> _ = resize_videos_by_width(video_paths=video_paths, width=300, overwrite=False, save_dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new')
+    >>> video_paths= [r"D:\videos\4A_Mouse_5-choice_MustTouchTrainingNEWFINAL_a8_grayscale.mp4"]
+    >>> resize_videos_by_width(video_paths=video_paths, width=301, overwrite=False, save_dir=r"D:\videos\test", gpu=True)
     """
 
     timer = SimbaTimer(start=True)
@@ -2320,9 +2322,6 @@ def resize_videos_by_width(video_paths: List[Union[str, os.PathLike]],
     if verbose:
         print(f"Resized width {len(video_paths)} video(s). Elapsed time: {timer.elapsed_time_str}s.")
     return new_video_paths
-
-video_paths= [r"D:\videos\4A_Mouse_5-choice_MustTouchTrainingNEWFINAL_a8_grayscale.mp4"]
-resize_videos_by_width(video_paths=video_paths, width=301, overwrite=False, save_dir=r"D:\videos\test", gpu=True)
 
 
 
