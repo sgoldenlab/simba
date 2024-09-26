@@ -3,11 +3,12 @@ __email__ = "sronilsson@gmail.com"
 
 
 import math
+from itertools import combinations
 from typing import Optional, Tuple
+
 import numpy as np
 from numba import cuda
 from scipy.spatial import ConvexHull
-from itertools import combinations
 
 from simba.utils.read_write import read_df
 
