@@ -22,15 +22,7 @@
 
 6. In the terminal, type  `pip install simba-uw-tf-dev`
 
-7. Once it is installed, uninstall shapely, it will then prompt `Proceed([y]/[n])?`, type `y`.
-
-`pip uninstall shapely`
-
-8. Then reinstall using the following command, it will then prompt `Proceed([y]/[n])?`, type `y`.
-
-`conda install -c conda-forge shapely`
-
-9. Type `simba` in the terminal to check if it works.
+7. Type `simba` in the terminal to check if it works.
 
 
 Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
