@@ -522,7 +522,7 @@ def dunn_index(x: np.ndarray, y: np.ndarray) -> float:
 
     .. math::
 
-        Dunn\ Index = \\frac{\\min_{i \\neq j} \\delta(c_i, c_j)}{\\max_k \\Delta(c_k)}
+        Dunn\ Index = \frac{\\min_{i \\neq j} \\delta(c_i, c_j)}{\\max_k \\Delta(c_k)}
 
     Where:
     - :math:`\\delta(c_i, c_j)` is the distance between clusters :math:`c_i` and :math:`c_j`.

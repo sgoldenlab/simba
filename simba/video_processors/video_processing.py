@@ -110,7 +110,7 @@ def convert_to_jpeg(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]]
        Quality above 95 should be avoided; 100 disables portions of the JPEG compression algorithm, and results in large files with hardly any gain in image quality
 
     .. image:: _static/img/convert_to_jpeg.jpeg
-       :width: 600
+       :width: 400
        :align: center
 
     :parameter Union[str, os.PathLike] directory: Path to directory holding image files, a single image file, or a list of paths to image files.
@@ -323,7 +323,7 @@ def convert_to_webp(path: Union[str, os.PathLike],
     Convert the file type of all image files within a directory to WEBP format of passed quality.
 
     .. image:: _static/img/convert_to_webp.webp
-       :width: 600
+       :width: 400
        :align: center
 
     :parameter Union[str, os.PathLike] directory: Path to directory holding image files
@@ -4259,7 +4259,7 @@ def flip_videos(video_path: Union[str, os.PathLike],
     Flip a video or directory of videos horizontally, vertically, or both, and save them to the specified directory.
 
     .. video:: _static/img/flip_videos.webm
-       :width: 900
+       :width: 700
        :loop:
        :autoplay:
 
