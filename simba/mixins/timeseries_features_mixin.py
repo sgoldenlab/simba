@@ -1839,9 +1839,7 @@ class TimeseriesFeatureMixin(object):
         results = np.full((x.shape[0], windows.shape[0]), -1.0)
         for i in range(windows.shape[0]):
             W_s = int(windows[i] * fps)
-            for cnt, (l, r) in enumerate(
-                zip(range(0, x.shape[0] + 1), range(W_s, x.shape[0] + 1))
-            ):
+            for cnt, (l, r) in enumerate(zip(range(0, x.shape[0] + 1), range(W_s, x.shape[0] + 1))):
                 sample = x[l:r]
                 cnts = np.sort(np.unique(sample, return_counts=True)[1])[-n:]
                 results[int(r - 1), i] = np.sum(cnts) / sample.shape[0]

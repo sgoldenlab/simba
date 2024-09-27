@@ -6,9 +6,6 @@ Welcome to SimBA's documentation!
    :width: 1000
    :align: center
 
-
-
-
 These docs are under development. For detailed tutorials, code, and more extensive documentation
 see the `SimBA GitHub repository <https://github.com/sgoldenlab/simba>`_.
 
