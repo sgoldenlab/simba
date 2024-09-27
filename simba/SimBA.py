@@ -16,7 +16,6 @@ from tkinter.filedialog import askdirectory
 from tkinter.messagebox import askyesno
 
 import PIL.Image
-from PIL import ImageTk
 
 from simba.bounding_box_tools.boundary_menus import BoundaryMenus
 from simba.cue_light_tools.cue_light_menues import CueLightAnalyzerMenu
