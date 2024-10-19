@@ -427,6 +427,13 @@ Then try to relaunch simba by typing `simba`.
 
 </details>
 
+### 28. I'm on a mac M2 computer and SimBA won't install properly!
+
+<details>
+  <summary>Show solutions!</summary>
+<br/><br/>
+
+Sorry - I don't have a straightforward installation process for M2's. But [THIS](https://github.com/sgoldenlab/simba/issues/372#issuecomment-2313396518) procedure is reported to work. 
 
 
 

@@ -701,8 +701,8 @@ class TimeseriesFeatureMixin(object):
             PE = - \\sum(p_i \\log(p_i))
 
         where:
-        - PE is the permutation entropy.
-        - p_i is the probability of each unique order pattern.
+           :math:`PE` is the permutation entropy.
+           :math:`p_i` is the probability of each unique order pattern.
 
         :param numpy.ndarray data: The time series data for which permutation entropy is calculated.
         :param int dimension: It specifies the length of the order patterns to be considered.
@@ -762,9 +762,9 @@ class TimeseriesFeatureMixin(object):
             LL = \sum_{i=1}^{N-1} |x[i] - x[i-1]|
 
         where:
-        - LL is the line length.
-        - N is the number of elements in the input data array.
-        - x[i] represents the value of the data at index i.
+        :math:`LL` is the line length.
+        :math:`N` is the number of elements in the input data array.
+        :math:`x[i]` represents the value of the data at index i.
 
 
         .. image:: _static/img/line_length.png
@@ -882,12 +882,20 @@ class TimeseriesFeatureMixin(object):
         :return np.ndarray: Array containing the selected descriptive statistics for each window size, data point, and statistic type. The shape of the result array is (len(statistics), data.shape[0], window_sizes.shape[0).
 
         .. note::
-           - The `statistics` parameter should be a list containing one or more of the following statistics:
-           'var' (variance), 'max' (maximum), 'min' (minimum), 'std' (standard deviation), 'median' (median),
-           'mean' (mean), 'mad' (median absolute deviation), 'sum' (sum), 'mac' (mean absolute change),
-           'rms' (root mean square), 'absenergy' (absolute energy).
-           - If the statistics list is ['var', 'max', 'mean'], the
-           3rd dimension order in the result array will be: [variance, maximum, mean]
+           The `statistics` parameter should be a list containing one or more of the following statistics:
+            * 'var' (variance)
+            * 'max' (maximum)
+            * 'min' (minimum)
+            * 'std' (standard deviation)
+            * 'median' (median)
+            * 'mean' (mean)
+            * 'mad' (median absolute deviation)
+            * 'sum' (sum)
+            * 'mac' (mean absolute change)
+            * 'rms' (root mean square)
+            * 'absenergy' (absolute energy)
+
+           E.g., If the statistics list is ['var', 'max', 'mean'], the 3rd dimension order in the result array will be: [variance, maximum, mean]
 
         :example:
         >>> data = np.array([1, 4, 2, 3, 5, 6, 8, 7, 9, 10]).astype(np.float32)
@@ -1792,7 +1800,7 @@ class TimeseriesFeatureMixin(object):
         Compute the percentage of elements in the top 'n' frequencies in sliding windows of the input array.
 
         .. note::
-          To compute percentage of elements in the top 'n' frequencies in entire array, use ``simba.mixins.statistics_mixin.Statistics.pct_in_top_n``.
+          To compute percentage of elements in the top 'n' frequencies in entire array, use :func:`simba.mixins.statistics_mixin.Statistics.pct_in_top_n()`.
 
         :param np.ndarray x: Input 1D array.
         :param np.ndarray windows: Array of window sizes in seconds.
@@ -1831,9 +1839,7 @@ class TimeseriesFeatureMixin(object):
         results = np.full((x.shape[0], windows.shape[0]), -1.0)
         for i in range(windows.shape[0]):
             W_s = int(windows[i] * fps)
-            for cnt, (l, r) in enumerate(
-                zip(range(0, x.shape[0] + 1), range(W_s, x.shape[0] + 1))
-            ):
+            for cnt, (l, r) in enumerate(zip(range(0, x.shape[0] + 1), range(W_s, x.shape[0] + 1))):
                 sample = x[l:r]
                 cnts = np.sort(np.unique(sample, return_counts=True)[1])[-n:]
                 results[int(r - 1), i] = np.sum(cnts) / sample.shape[0]

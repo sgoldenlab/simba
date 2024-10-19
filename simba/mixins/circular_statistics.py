@@ -63,7 +63,7 @@ class CircularStatisticsMixin(object):
 
             R = \\frac{{\\sqrt{{\\sum_{{i=1}}^N \\cos(\\theta_i - \\bar{\theta})^2 + \\sum_{{i=1}}^N \\sin(\theta_i - \\bar{\\theta})^2}}}}{{N}}
 
-        where \(N\) is the number of data points, \(\theta_i\) is the angle of the ith data point, and \(\bar{\theta}\) is the mean angle.
+        where :math:`N` is the number of data points, :math:`\\theta_i` is the angle of the ith data point, and \(\bar{\theta}\) is the mean angle.
 
         .. seealso::
            :func:`simba.data_processors.cuda.circular_statistics.sliding_resultant_vector_length`,
@@ -131,16 +131,19 @@ class CircularStatisticsMixin(object):
     @staticmethod
     @njit("(float32[:],)")
     def circular_mean(data: np.ndarray) -> float:
-        """
+
+        r"""
         Jitted compute of the circular mean of single sample.
 
+
         .. math::
-            \mu = \text{atan2}\left(\frac{1}{N} \sum_{i=1}^{N} \sin(\theta_i), \frac{1}{N} \sum_{i=1}^{N} \cos(\theta_i)\right)
+
+           \\mu = \\text{atan2}\\left(\\frac{1}{N} \\sum_{i=1}^{N} \\sin(\\theta_i), \\frac{1}{N} \\sum_{i=1}^{N} \\cos(\\theta_i)\\right)
 
         Where:
-        - :math:`\mu` is the circular mean in degrees.
-        - :math:`\theta_i` are the individual angles in degrees.
-        - :math:`N` is the number of samples.
+           - :math:`\\theta_i` are the angles in radians within the sliding window
+           - :math:`N` is the number of samples in the window
+
 
         :param np.ndarray data: 1D array of size len(frames) representing angles in degrees.
         :returns: The circular mean of the angles in degrees.
@@ -226,10 +229,10 @@ class CircularStatisticsMixin(object):
 
            \\sigma_{\\text{circular}} = \\text{rad2deg}\\left(\\sqrt{-2 \\cdot \\log\\left(|\text{mean}(\\exp(j \\cdot \\theta))|\\right)}\\right)
 
-        where \\(\\theta\\) represents the angles in radians
+        where :math:`\\theta` represents the angles in radians
 
 
-        :parameter ndarray data: 1D array of size len(frames) with angles in degrees
+        :param ndarray data: 1D array of size len(frames) with angles in degrees
         :returns: The standard deviation of the data sample in degrees.
         :rtype: float
 
@@ -249,7 +252,8 @@ class CircularStatisticsMixin(object):
     def sliding_circular_std(
         data: np.ndarray, fps: int, time_windows: np.ndarray
     ) -> np.ndarray:
-        """
+
+        r"""
         Compute standard deviation of angular data in sliding time windows.
 
         .. image:: _static/img/angle_stdev.png
@@ -261,9 +265,9 @@ class CircularStatisticsMixin(object):
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.circular_std`
 
 
-        :parameter ndarray data: 1D array of size len(frames) representing degrees.
-        :parameter np.ndarray time_window: Sliding time-window as float in seconds.
-        :parameter int fps: fps of the recorded video
+        :param ndarray data: 1D array of size len(frames) representing degrees.
+        :param np.ndarray time_window: Sliding time-window as float in seconds.
+        :param int fps: fps of the recorded video
         :returns: Size data.shape[0] x time_windows.shape[0] with angular standard deviations in rolling time windows in degrees.
         :rtype: np.ndarray
 
@@ -564,10 +568,20 @@ class CircularStatisticsMixin(object):
     @staticmethod
     @njit("(float32[:], float32[:],)")
     def circular_correlation(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
-        """
+
+        r"""
         Jitted compute of circular correlation coefficient of two samples using the cross-correlation coefficient.
         Ranges from -1 to 1: 1 indicates perfect positive correlation, -1 indicates perfect negative correlation, 0
         indicates no correlation.
+
+        .. math::
+           R = \\frac{\\sum \\sin(\\theta_1 - \\bar{\\theta}_1) \\sin(\\theta_2 - \\bar{\\theta}_2)}
+           {\\sqrt{\\sum \\sin^2(\\theta_1 - \\bar{\\theta}_1) \\sum \\sin^2(\\theta_2 - \\bar{\\theta}_2)}}
+
+        where:
+
+        - :math:`\\theta_1` and :math:`\\theta_2` are the angles (in radians) from `sample_1` and `sample_2`, respectively.
+        - :math:`\\bar{\\theta}_1` and :math:`\\bar{\\theta}_2` are the mean directions of `sample_1` and `sample_2`, respectively.
 
         .. note::
            Adapted from ``astropy.stats.circstats.circcorrcoef``.
@@ -579,9 +593,10 @@ class CircularStatisticsMixin(object):
         .. seealso:
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_circular_correlation`
 
-        :parameter np.ndarray sample_1: Angular data for e.g., Animal 1
-        :parameter np.ndarray sample_1: Angular data for e.g., Animal 2
-        :parameter float circular_correlation: The correlation between the two distributions.
+        :param np.ndarray sample_1: Angular data for e.g., Animal 1
+        :param np.ndarray sample_1: Angular data for e.g., Animal 2
+        :return: The correlation between the two distributions.
+        :rtype: float
 
         :example:
         >>> sample_1 = np.array([50, 90, 20, 60, 20, 90]).astype(np.float32)
@@ -594,15 +609,13 @@ class CircularStatisticsMixin(object):
         m1 = np.arctan2(np.mean(np.sin(sample_1)), np.mean(np.cos(sample_1)))
         m2 = np.arctan2(np.mean(np.sin(sample_2)), np.mean(np.cos(sample_2)))
         sin_1, sin_2 = np.sin(sample_1 - m1), np.sin(sample_2 - m2)
-        return np.abs(
-            np.sum(sin_1 * sin_2)
-            / np.sqrt(np.sum(sin_1 * sin_1) * np.sum(sin_2 * sin_2))
-        )
+        return np.abs(np.sum(sin_1 * sin_2) / np.sqrt(np.sum(sin_1 * sin_1) * np.sum(sin_2 * sin_2)))
 
     @staticmethod
     @njit("(float32[:], float32[:], float64[:], int64)")
     def sliding_circular_correlation(sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: float) -> np.ndarray:
-        """
+
+        r"""
         Jitted compute of correlations between two angular distributions in sliding time-windows
         using the cross-correlation coefficient.
 
@@ -803,9 +816,9 @@ class CircularStatisticsMixin(object):
         """
         Jitted compute of the uniformity of a circular dataset in sliding windows.
 
-        :parameter ndarray data: 1D array of size len(frames) representing degrees.
-        :parameter np.ndarray time_window: Rolling time-window as float in seconds.
-        :parameter int fps: fps of the recorded video
+        :param ndarray data: 1D array of size len(frames) representing degrees.
+        :param np.ndarray time_window: Rolling time-window as float in seconds.
+        :param int fps: fps of the recorded video
         :return np.ndarray: representing rao-spacing U in every sliding windows [-window:n]
 
         .. image:: _static/img/raospacing.png
@@ -868,7 +881,7 @@ class CircularStatisticsMixin(object):
         Where:
 
         - :math:`F_1(\theta)` and :math:`F_2(\theta)` are the empirical cumulative distribution functions (CDFs) of the two circular samples.
-        - :math:`\theta` are the sorted angles in the two samples.
+        - :math:`\\theta` are the sorted angles in the two samples.
 
         .. note::
            Adapted from `Kuiper <https://github.com/aarchiba/kuiper/tree/master>`__ by `Anne Archibald <https://github.com/aarchiba>`_.
@@ -979,20 +992,29 @@ class CircularStatisticsMixin(object):
     @staticmethod
     @njit("(float32[:],)")
     def circular_range(data: np.ndarray) -> float:
-        """
+        r"""
         Jitted compute of circular range in degrees. The range is defined as the angular span of the
         shortest arc that can contain all the data points. A smaller range indicates a more concentrated
         distribution, while a larger range suggests a more dispersed distribution.
 
+        .. math::
+           \text{Range} = \min \left( 2\pi - \max(\delta \theta_i), \theta_{\text{max}} - \theta_{\text{min}} \right)
+
+        where:
+
+        - :math:`\delta \theta_i` is the difference between consecutive angular data points.
+        - :math:`\theta_{\text{max}}` and :math:`\theta_{\text{min}}` are the maximum and minimum angles in the data.
+
+
         .. image:: _static/img/circular_range.png
-           :width: 600
+           :width: 400
            :align: center
 
         .. seealso::
            :func:`simba.data_processors.cuda.circular_statistics.sliding_circular_range`,
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_circular_range`
 
-        :parameter ndarray data: 1D array of circular data measured in degrees
+        :param ndarray data: 1D array of circular data measured in degrees
         :return: The circular range in degrees.
         :rtype: np.ndarray
 

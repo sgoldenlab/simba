@@ -145,7 +145,8 @@ class Statistics(FeatureExtractionMixin):
         sample_2: np.ndarray,
         critical_values: Optional[np.ndarray] = None,
     ) -> (float, Union[None, bool]):
-        """
+
+        r"""
         Jitted compute independent-samples t-test statistic and boolean significance between two distributions.
 
         .. note::
@@ -3781,10 +3782,10 @@ class Statistics(FeatureExtractionMixin):
            ARI = \\frac{TP + TN}{TP + FP + FN + TN}
 
         where:
-            - TP (True Positive) is the number of pairs of elements that are in the same cluster in both x and y,
-            - FP (False Positive) is the number of pairs of elements that are in the same cluster in y but not in x,
-            - FN (False Negative) is the number of pairs of elements that are in the same cluster in x but not in y,
-            - TN (True Negative) is the number of pairs of elements that are in different clusters in both x and y.
+            - :math:`TP` (True Positive) is the number of pairs of elements that are in the same cluster in both x and y,
+            - :math:`FP` (False Positive) is the number of pairs of elements that are in the same cluster in y but not in x,
+            - :math:`FN` (False Negative) is the number of pairs of elements that are in the same cluster in x but not in y,
+            - :math:`TN` (True Negative) is the number of pairs of elements that are in different clusters in both x and y.
 
         The ARI value ranges from -1 to 1. A value of 1 indicates perfect clustering agreement, 0 indicates random clustering, and negative values indicate disagreement between the clusterings.
 
@@ -4052,7 +4053,7 @@ class Statistics(FeatureExtractionMixin):
         :example:
         >>> x = np.random.randint(0, 500, (1000,))
         >>> y = np.random.randint(0, 500, (1000,))
-        >>> wave_hedges_distance(x=x, y=y)
+        >>> Statistics().wave_hedges_distance(x=x, y=y)
         """
 
         check_valid_array(data=x, source=f'{Statistics.wave_hedges_distance.__name__} x', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)

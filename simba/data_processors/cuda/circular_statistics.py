@@ -498,7 +498,7 @@ def _instantaneous_angular_velocity(x, stride, results):
 
 
 def instantaneous_angular_velocity(x: np.ndarray, stride: Optional[int] = 1) -> np.ndarray:
-    """
+    r"""
     Calculate the instantaneous angular velocity between angles in a given array.
 
     This function uses CUDA to perform parallel computations on the GPU.
@@ -650,8 +650,8 @@ def sliding_angular_diff(x: np.ndarray,
        \text{difference} = \pi - |\pi - |a_1 - a_2||
 
     Where:
-    - \( a_1 \) is the angle at position `x`.
-    - \( a_2 \) is the angle at position `x - \text{stride}`.
+    - :math:`a_1` is the angle at position `x`.
+    - :math:`a_2` is the angle at position `x - \text{stride}`.
 
     :param np.ndarray x: 1D array of angles in degrees.
     :param np.ndarray time_windows: 1D array of time windows in seconds to determine the stride (distance in frames) between angles.
