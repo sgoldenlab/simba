@@ -1,26 +1,32 @@
+import base64
+import io
+import itertools
 import json
 import os
-import itertools
-import pandas as pd
-import io
-from PIL import Image
-import base64
 from datetime import datetime
-from typing import Dict, Optional, Tuple, Union, Any
+from typing import Any, Dict, Optional, Tuple, Union
 
 import cv2
 import numpy as np
+import pandas as pd
+from PIL import Image
 from pycocotools import mask
 from shapely.geometry import Polygon
 from skimage.draw import polygon
 
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.image_mixin import ImageMixin
-from simba.utils.checks import check_instance, check_int, check_valid_array, check_if_dir_exists, check_if_keys_exist_in_dict, check_file_exist_and_readable, check_if_valid_img
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists,
+                                check_if_keys_exist_in_dict,
+                                check_if_valid_img, check_instance, check_int,
+                                check_valid_array)
 from simba.utils.enums import Formats
-from simba.utils.read_write import get_video_meta_data, read_df, read_frm_of_video, find_files_of_filetypes_in_directory, get_fn_ext
-from simba.utils.errors import NoFilesFoundError, InvalidInputError
+from simba.utils.errors import InvalidInputError, NoFilesFoundError
 from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, get_video_meta_data, read_df,
+                                    read_frm_of_video)
 
 
 def geometry_to_rle(geometry: Union[np.ndarray, Polygon], img_size: Tuple[int, int]):
