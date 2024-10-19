@@ -23,7 +23,7 @@ class BooleanConditionalSlicerPopUp(PopUpMixin, ConfigReader):
         self.rule_cnt_dropdown.grid(row=0, column=0, sticky="NW")
 
         self.create_run_frm(run_function=self.run)
-        check_if_filepath_list_is_empty( filepaths=self.feature_file_paths, error_msg=f"No data found in {self.features_dir}")
+        check_if_filepath_list_is_empty(filepaths=self.feature_file_paths, error_msg=f"No data found in {self.features_dir}")
         data_df = read_df(file_path=self.feature_file_paths[0], file_type=self.file_type)
         self.bool_cols = data_df.columns[data_df.apply(self._is_bool)]
         if len(self.bool_cols) < 2:
@@ -92,24 +92,14 @@ class BooleanConditionalSlicerPopUp(PopUpMixin, ConfigReader):
         selections = {}
         for rule_id, rule_data in self.rules.items():
             unique_rule_behaviors.append(rule_data["behavior_drpdwn"].getChoices())
-            selections[rule_data["behavior_drpdwn"].getChoices()] = rule_data[
-                "status_drpdwn"
-            ].getChoices()
-        duplicates = list(
-            set(
-                [x for x in unique_rule_behaviors if unique_rule_behaviors.count(x) > 1]
-            )
-        )
+            selections[rule_data["behavior_drpdwn"].getChoices()] = rule_data["status_drpdwn"].getChoices()
+        duplicates = list(set([x for x in unique_rule_behaviors if unique_rule_behaviors.count(x) > 1]))
         if len(duplicates) > 0:
-            raise DuplicationError(
-                msg=f"Each row should be a unique behavior. However, behaviors {duplicates} are selected in more than 1 rows."
-            )
-        boolean_calculator = BooleanConditionalCalculator(
-            config_path=self.config_path, rules=selections
-        )
+            raise DuplicationError(msg=f"Each row should be a unique behavior. However, behaviors {duplicates} are selected in more than 1 rows.")
+        boolean_calculator = BooleanConditionalCalculator(config_path=self.config_path, rules=selections)
         boolean_calculator.run()
         boolean_calculator.save()
 
 
-# roi_featurizer = BooleanConditionalSlicerPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_animals_16bp_032023/project_folder/project_config.ini')
+# roi_featurizer = BooleanConditionalSlicerPopUp(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
 # roi_featurizer = BooleanConditionalSlicerPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

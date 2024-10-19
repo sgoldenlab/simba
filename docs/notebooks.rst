@@ -8,6 +8,8 @@ General processing
 
    nb/CLI Example 1
    nb/shap_example_1
+   nb/shap_example_2
+   nb/shap_log_3
    nb/outlier_correction
    nb/third_party_append
    nb/advanced_smoothing_interpolation

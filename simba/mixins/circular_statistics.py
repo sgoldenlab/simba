@@ -486,7 +486,7 @@ class CircularStatisticsMixin(object):
     @njit("(float32[:],)")
     def rayleigh(data: np.ndarray) -> Tuple[float, float]:
 
-        """
+        r"""
         Jitted compute of Rayleigh Z (test of non-uniformity) of single sample of circular data in degrees.
 
         .. note::
@@ -1042,7 +1042,6 @@ class CircularStatisticsMixin(object):
         results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
         for time_window_cnt in range(time_windows.shape[0]):
             win_size = int(time_windows[time_window_cnt] * fps)
-            print('s')
             for left, right in zip(range(0, (data.shape[0] - win_size) + 1), range(win_size-1, data.shape[0])):
                 sample = np.sort(np.deg2rad(data[left : right + 1]))
                 angular_diffs = np.diff(sample)

@@ -31,15 +31,13 @@ BORDER_COLOR = "border_color"
 POSE = "pose_estimation"
 ANIMAL_NAMES = "animal_names"
 
-STYLE_KEYS = [
-    ROI_CENTERS,
-    ROI_EAR_TAGS,
-    DIRECTIONALITY,
-    BORDER_COLOR,
-    POSE,
-    DIRECTIONALITY_STYLE,
-    ANIMAL_NAMES,
-]
+STYLE_KEYS = [ROI_CENTERS,
+              ROI_EAR_TAGS,
+              DIRECTIONALITY,
+              BORDER_COLOR,
+              POSE,
+              DIRECTIONALITY_STYLE,
+              ANIMAL_NAMES]
 
 
 class ROIfeatureVisualizer(ConfigReader):
@@ -122,7 +120,7 @@ class ROIfeatureVisualizer(ConfigReader):
             for shape in self.shape_names:
                 txt_strs.append(animal_name + ' ' + shape + ' center distance')
         longest_text_str = max(txt_strs, key=len)
-        self.font_size, self.x_scaler, self.y_scaler = PlottingMixin().get_optimal_font_scales(text=longest_text_str, accepted_px_width=(self.video_meta_data['width'] / 3), accepted_px_height=(self.video_meta_data['height'] / 15), text_thickness=2)
+        self.font_size, self.x_scaler, self.y_scaler = PlottingMixin().get_optimal_font_scales(text=longest_text_str, accepted_px_width=int(self.video_meta_data['width'] / 3), accepted_px_height=int(self.video_meta_data['height'] / 15), text_thickness=2)
         self.circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(int(self.video_meta_data['width']), int(self.video_meta_data['height'])), circle_frame_ratio=100)
         for animal_cnt, animal_data in self.bp_lk.items():
             animal, animal_bp, _ = animal_data

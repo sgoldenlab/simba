@@ -942,6 +942,7 @@ class App(object):
         sys.stdout = StdRedirector(self.txt)
 
         if OS.PYTHON_VER.value != "3.6":
+            self.txt['width'], self.txt['height'] = 200, 38
             PythonVersionWarning(msg=f"SimBA is not extensively tested beyond python 3.6. You are using python {OS.PYTHON_VER.value}. If you encounter errors in python>3.6, please report them on GitHub or Gitter (links in the help toolbar) and we will work together to fix the issues!", source=self.__class__.__name__)
 
         if not check_ffmpeg_available():

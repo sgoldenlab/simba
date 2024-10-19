@@ -24,7 +24,7 @@ with open(ARM_REQUIREMENTS_PATH, "r") as f:
 # Setup configuration
 setuptools.setup(
     name="Simba-UW-tf-dev",
-    version="2.2.2",
+    version="2.2.4",
     author="Simon Nilsson, Jia Jie Choong, Sophia Hwang",
     author_email="sronilsson@gmail.com",
     description="Toolkit for computer classification and analysis of behaviors in experimental animals",
@@ -39,7 +39,10 @@ setuptools.setup(
                                                "tests.*",
                                                "tests",
                                                "__pycache__",
-                                               "pose_configurations_archive"]),
+                                               "pose_configurations_archive",
+                                               "sandbox",
+                                               "sandbox.*",
+                                               ]),
     include_package_data=True,
     classifiers=(
         "Programming Language :: Python :: 3",

@@ -48,7 +48,7 @@ from simba.utils.read_write import (find_video_of_file, get_fn_ext,
                                     read_roi_data, write_df)
 
 
-def detect_bouts(data_df: pd.DataFrame, target_lst: List[str], fps: int) -> pd.DataFrame:
+def detect_bouts(data_df: pd.DataFrame, target_lst: List[str], fps: Union[int, float]) -> pd.DataFrame:
     """
     Detect behavior "bouts" (e.g., continous sequence of classified behavior-present frames) for specified classifiers.
 
@@ -57,7 +57,7 @@ def detect_bouts(data_df: pd.DataFrame, target_lst: List[str], fps: int) -> pd.D
 
     :param pd.DataFrame data_df: Dataframe with fields representing classifications in boolean type.
     :param List[str] target_lst: Classifier names. E.g., ['Attack', 'Sniffing', 'Grooming'] or ROIs
-    :param int fps: The fps of the input video.
+    :param Union[int, float] fps: The fps of the input video.
     :return: Dataframe where bouts are represented by rows and fields are represented by 'Event type ', 'Start time', 'End time', 'Start frame', 'End frame', 'Bout time'
     :rtype: pd.DataFrame
 

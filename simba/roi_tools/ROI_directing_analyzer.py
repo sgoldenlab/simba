@@ -35,30 +35,17 @@ class DirectingROIAnalyzer(ConfigReader, FeatureExtractionMixin):
     >>> test.save()
     """
 
-    def __init__(
-        self,
-        config_path: Union[str, os.PathLike],
-        data_path: Optional[Union[str, os.PathLike]] = None,
-    ):
+    def __init__(self, config_path: Union[str, os.PathLike],
+                 data_path: Optional[Union[str, os.PathLike]] = None):
 
         check_file_exist_and_readable(file_path=config_path)
         ConfigReader.__init__(self, config_path=config_path)
         FeatureExtractionMixin.__init__(self, config_path=config_path)
-        self.data_paths = read_data_paths(
-            path=data_path,
-            default=self.outlier_corrected_paths,
-            default_name=self.outlier_corrected_dir,
-            file_type=self.file_type,
-        )
+        self.data_paths = read_data_paths(path=data_path, default=self.outlier_corrected_paths,  default_name=self.outlier_corrected_dir, file_type=self.file_type)
         if not os.path.isfile(self.roi_coordinates_path):
-            raise ROICoordinatesNotFoundError(
-                expected_file_path=self.roi_coordinates_path
-            )
+            raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path)
         if not self.check_directionality_viable()[0]:
-            raise InvalidInputError(
-                msg="Cannot compute directionality towards ROIs. The ear and nose data is tracked in the project",
-                source=self.__class__.__name__,
-            )
+            raise InvalidInputError(msg="Cannot compute directionality towards ROIs. The ear and nose data is tracked in the project", source=self.__class__.__name__)
         self.read_roi_data()
         self.direct_bp_dict = self.check_directionality_cords()
 

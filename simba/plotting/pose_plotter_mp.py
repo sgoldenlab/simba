@@ -3,7 +3,7 @@ import multiprocessing
 import os
 import platform
 from pathlib import Path
-from typing import Dict, Optional, Tuple, Union
+from typing import Dict, Optional, Union
 
 import cv2
 import pandas as pd
@@ -171,6 +171,17 @@ class PosePlotterMultiProcess():
             stdout_success(msg=f"Pose video {video_name} complete and saved at {save_video_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
         self.config.timer.stop_timer()
         stdout_success(f"Pose visualizations for {len(list(self.data.keys()))} video(s) created in {self.out_dir} directory", elapsed_time=self.config.timer.elapsed_time_str, source=self.__class__.__name__)
+
+
+# if __name__ == "__main__":
+#     test = PosePlotterMultiProcess(data_path=r"D:\troubleshooting\pose_estimation\project_folder\csv\pose_estimation\3A_Mouse_5-choice_MustTouchTrainingNEWFINAL_a8_grayscale_clipped.csv",
+#                                    out_dir=None,
+#                                    circle_size=None,
+#                                    core_cnt=-1,
+#                                    palettes=None)
+#     test.run()
+
+
 
 
 # test = PosePlotterMultiProcess(data_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Together_1.csv',

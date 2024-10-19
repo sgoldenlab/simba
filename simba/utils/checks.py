@@ -791,7 +791,7 @@ def check_that_dir_has_list_of_filenames(
 
 def check_valid_array(data: np.ndarray,
                       source: Optional[str] = "",
-                      accepted_ndims: Optional[List[Tuple[int]]] = None,
+                      accepted_ndims: Optional[Tuple[int]] = None,
                       accepted_sizes: Optional[List[int]] = None,
                       accepted_axis_0_shape: Optional[List[int]] = None,
                       accepted_axis_1_shape: Optional[List[int]] = None,

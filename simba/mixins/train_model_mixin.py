@@ -32,8 +32,7 @@ from sklearn.feature_selection import VarianceThreshold
 from sklearn.inspection import partial_dependence, permutation_importance
 from sklearn.metrics import classification_report, precision_recall_curve
 from sklearn.model_selection import ShuffleSplit, learning_curve
-from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer,
-                                   StandardScaler)
+from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer, StandardScaler)
 from sklearn.tree import export_graphviz
 from sklearn.utils import parallel_backend
 from tabulate import tabulate
@@ -58,14 +57,11 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.plotting.shap_agg_stats_visualizer import \
     ShapAggregateStatisticsVisualizer
 from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_dir_exists, check_if_valid_input,
-                                check_instance, check_int, check_str,
-                                check_that_column_exist)
+from simba.utils.checks import (check_file_exist_and_readable, check_float, check_if_dir_exists, check_if_valid_input, check_instance, check_int, check_str, check_that_column_exist, check_valid_dataframe, check_valid_lst)
 from simba.utils.data import (detect_bouts, detect_bouts_multiclass,
                               get_library_version)
 from simba.utils.enums import (OS, ConfigKey, Defaults, Dtypes, Methods,
-                               MLParamKeys, Options)
+                               MLParamKeys, Options, Formats)
 from simba.utils.errors import (ClassifierInferenceError, ColumnNotFoundError,
                                 CorruptedFileError, DataHeaderError,
                                 FaultyTrainingSetError,
@@ -91,13 +87,12 @@ class TrainModelMixin(object):
     def __init__(self):
         pass
 
-    def read_all_files_in_folder(
-            self,
-            file_paths: List[str],
-            file_type: str,
-            classifier_names: Optional[List[str]] = None,
-            raise_bool_clf_error: bool = True,
-    ) -> (pd.DataFrame, List[int]):
+    def read_all_files_in_folder(self,
+                                 file_paths: List[str],
+                                 file_type: str,
+                                 classifier_names: Optional[List[str]] = None,
+                                 raise_bool_clf_error: bool = True) -> (pd.DataFrame, List[int]):
+
         """
         Read in all data files in a folder to a single pd.DataFrame for downstream ML algo.
         Asserts that all classifiers have annotation fields present in concatenated dataframe.
@@ -133,18 +128,9 @@ class TrainModelMixin(object):
             if classifier_names != None:
                 for clf_name in classifier_names:
                     if not clf_name in df.columns:
-                        raise MissingColumnsError(
-                            msg=f"Data for video {vid_name} does not contain any annotations for behavior {clf_name}. Delete classifier {clf_name} from the SimBA project, or add annotations for behavior {clf_name} to the video {vid_name}",
-                            source=self.__class__.__name__,
-                        )
-                    elif (
-                            len(set(df[clf_name].unique()) - {0, 1}) > 0
-                            and raise_bool_clf_error
-                    ):
-                        raise InvalidInputError(
-                            msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file} the {clf_name} field contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}.",
-                            source=self.__class__.__name__,
-                        )
+                        raise MissingColumnsError(msg=f"Data for video {vid_name} does not contain any annotations for behavior {clf_name}. Delete classifier {clf_name} from the SimBA project, or add annotations for behavior {clf_name} to the video {vid_name}", source=self.__class__.__name__,)
+                    elif (len(set(df[clf_name].unique()) - {0, 1}) > 0 and raise_bool_clf_error):
+                        raise InvalidInputError(msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file} the {clf_name} field contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}.", source=self.__class__.__name__)
                     else:
                         df_concat = pd.concat([df_concat, df], axis=0)
             else:
@@ -154,10 +140,7 @@ class TrainModelMixin(object):
         except KeyError:
             pass
         if len(df_concat) == 0:
-            raise NoDataError(
-                msg="SimBA found 0 annotated frames in the project_folder/csv/targets_inserted directory",
-                source=self.__class__.__name__,
-            )
+            raise NoDataError(msg="SimBA found 0 annotated frames in the project_folder/csv/targets_inserted directory", source=self.__class__.__name__)
         df_concat = df_concat.loc[
                     :, ~df_concat.columns.str.contains("^Unnamed")
                     ].fillna(0)
@@ -797,7 +780,7 @@ class TrainModelMixin(object):
         return data_arr, obs_per_split
 
     def create_shap_log(self,
-                        ini_file_path: str,
+                        ini_file_path: Union[str, os.PathLike],
                         rf_clf: RandomForestClassifier,
                         x_df: pd.DataFrame,
                         y_df: pd.Series,
@@ -839,104 +822,60 @@ class TrainModelMixin(object):
         :param int cnt_present: Number of behavior-present frames to calculate SHAP values for.
         :param int cnt_absent: Number of behavior-absent frames to calculate SHAP values for.
         :param str save_path: Directory where to save output in csv file format.
-        :param Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. If none, the classifier is not
-            part of a grid search.
-
+        :param Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. If none, the classifier is not part of a grid search.
         """
 
         print("Calculating SHAP values (SINGLE CORE)...")
+        check_file_exist_and_readable(file_path=ini_file_path)
+        check_instance(source='create_shap_log', instance=rf_clf, accepted_types=(RandomForestClassifier,))
+        check_valid_lst(data=list(x_names), valid_dtypes=(str,))
+        check_valid_dataframe(df=x_df, valid_dtypes=Formats.NUMERIC_DTYPES.value, required_fields=list(x_names))
+        check_str(name='clf_name', value=clf_name)
+        check_int(name='shap cnt_present', value=cnt_present, min_value=1)
+        check_int(name='shap cnt_absent', value=cnt_absent, min_value=1)
         shap_timer = SimbaTimer(start=True)
         data_df = pd.concat([x_df, y_df], axis=1)
         if (save_file_no == None) and (save_path is not None):
-            self.out_df_shap_path = os.path.join(
-                save_path, f"SHAP_values_{clf_name}.csv"
-            )
-            self.out_df_raw_path = os.path.join(
-                save_path, f"RAW_SHAP_feature_values_{clf_name}.csv"
-            )
+            self.out_df_shap_path = os.path.join(save_path, f"SHAP_values_{clf_name}.csv")
+            self.out_df_raw_path = os.path.join(save_path, f"RAW_SHAP_feature_values_{clf_name}.csv")
         elif (save_file_no is not None) and (save_path is not None):
-            self.out_df_shap_path = os.path.join(
-                save_path, f"SHAP_values_{str(save_file_no)}_{clf_name}.csv"
-            )
-            self.out_df_raw_path = os.path.join(
-                save_path, f"RAW_SHAP_feature_values_{str(save_file_no)}_{clf_name}.csv"
-            )
+            self.out_df_shap_path = os.path.join(save_path, f"SHAP_values_{str(save_file_no)}_{clf_name}.csv")
+            self.out_df_raw_path = os.path.join(save_path, f"RAW_SHAP_feature_values_{str(save_file_no)}_{clf_name}.csv")
 
-        target_df, nontarget_df = (
-            data_df[data_df[y_df.name] == 1],
-            data_df[data_df[y_df.name] == 0],
-        )
+        target_df, nontarget_df = (data_df[data_df[y_df.name] == 1], data_df[data_df[y_df.name] == 0])
         if len(target_df) < cnt_present:
-            NotEnoughDataWarning(
-                msg=f"Train data contains {len(target_df)} behavior-present annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_present)}). SimBA will calculate shap scores for the {len(target_df)} behavior-present frames available",
-                source=self.__class__.__name__,
-            )
+            NotEnoughDataWarning(msg=f"Train data contains {len(target_df)} behavior-present annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_present)}). SimBA will calculate shap scores for the {len(target_df)} behavior-present frames available", source=self.__class__.__name__)
             cnt_present = len(target_df)
         if len(nontarget_df) < cnt_absent:
-            NotEnoughDataWarning(
-                msg=f"Train data contains {len(nontarget_df)} behavior-absent annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_absent)}). SimBA will calculate shap scores for the {len(nontarget_df)} behavior-absent frames available",
-                source=self.__class__.__name__,
-            )
+            NotEnoughDataWarning(msg=f"Train data contains {len(nontarget_df)} behavior-absent annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_absent)}). SimBA will calculate shap scores for the {len(nontarget_df)} behavior-absent frames available", source=self.__class__.__name__)
             cnt_absent = len(nontarget_df)
         non_target_for_shap = nontarget_df.sample(cnt_absent, replace=False)
         targets_for_shap = target_df.sample(cnt_present, replace=False)
         shap_df = pd.concat([targets_for_shap, non_target_for_shap], axis=0)
         y_df = shap_df.pop(clf_name).values
-        explainer = shap.TreeExplainer(
-            rf_clf,
-            data=None,
-            model_output="raw",
-            feature_perturbation="tree_path_dependent",
-        )
+        explainer = shap.TreeExplainer(rf_clf, data=None, model_output="raw", feature_perturbation="tree_path_dependent")
         expected_value = explainer.expected_value[1]
         out_df_raw = pd.DataFrame(columns=x_names)
         shap_headers = list(x_names)
-        shap_headers.extend(
-            ("Expected_value", "Sum", "Prediction_probability", clf_name)
-        )
+        shap_headers.extend(("Expected_value", "Sum", "Prediction_probability", clf_name))
         out_df_shap = pd.DataFrame(columns=shap_headers)
         for cnt, frame in enumerate(range(len(shap_df))):
             shap_frm_timer = SimbaTimer(start=True)
             frame_data = shap_df.iloc[[frame]]
-            frame_shap = explainer.shap_values(frame_data, check_additivity=False)[1][
-                0
-            ].tolist()
-            frame_shap.extend(
-                (
-                    expected_value,
-                    sum(frame_shap),
-                    rf_clf.predict_proba(frame_data)[0][1],
-                    y_df[cnt],
-                )
-            )
+            frame_shap = explainer.shap_values(frame_data, check_additivity=False)[1][0].tolist()
+            frame_shap.extend((expected_value, sum(frame_shap), rf_clf.predict_proba(frame_data)[0][1], y_df[cnt]))
             out_df_raw.loc[len(out_df_raw)] = list(shap_df.iloc[frame])
             out_df_shap.loc[len(out_df_shap)] = frame_shap
-            if (
-                    (cnt % save_it == 0)
-                    or (cnt == len(shap_df) - 1)
-                    and (cnt != 0)
-                    and (save_path is not None)
-            ):
+            if ((cnt % save_it == 0) or (cnt == len(shap_df) - 1) and (cnt != 0) and (save_path is not None)):
                 print(f"Saving SHAP data after {cnt} iterations...")
                 out_df_shap.to_csv(self.out_df_shap_path)
                 out_df_raw.to_csv(self.out_df_raw_path)
             shap_frm_timer.stop_timer()
             print(f"SHAP frame: {cnt + 1} / {len(shap_df)}, elapsed time: {shap_frm_timer.elapsed_time_str}...")
-
         shap_timer.stop_timer()
-        stdout_success(
-            msg="SHAP calculations complete",
-            elapsed_time=shap_timer.elapsed_time_str,
-            source=self.__class__.__name__,
-        )
+        stdout_success(msg=f"SHAP calculations complete! Results saved at {self.out_df_shap_path} and {self.out_df_raw_path}", elapsed_time=shap_timer.elapsed_time_str, source=self.__class__.__name__)
         if save_path is not None:
-            _ = ShapAggregateStatisticsVisualizer(
-                config_path=ini_file_path,
-                classifier_name=clf_name,
-                shap_df=out_df_shap,
-                shap_baseline_value=int(expected_value * 100),
-                save_path=save_path,
-            )
+            _ = ShapAggregateStatisticsVisualizer(config_path=ini_file_path, classifier_name=clf_name, shap_df=out_df_shap, shap_baseline_value=int(expected_value * 100), save_path=save_path)
         else:
             return (out_df_shap, out_df_raw, int(expected_value * 100))
 
@@ -1560,10 +1499,8 @@ class TrainModelMixin(object):
             return df_concat, frame_numbers_lst
 
         except BrokenProcessPool or AttributeError:
-            MultiProcessingFailedWarning(
-                msg="Multi-processing file read failed, reverting to single core (increased run-time)."
-            )
-            return TrainModelMixin.read_all_files_in_folder(
+            MultiProcessingFailedWarning(msg="Multi-processing file read failed, reverting to single core (increased run-time).")
+            return TrainModelMixin().read_all_files_in_folder(
                 file_paths=file_paths,
                 file_type=file_type,
                 classifier_names=classifier_names,
@@ -1571,12 +1508,10 @@ class TrainModelMixin(object):
             )
 
     @staticmethod
-    def _read_data_file_helper_futures(
-            file_path: str,
-            file_type: str,
-            clf_names: Optional[List[str]] = None,
-            raise_bool_clf_error: bool = True,
-    ):
+    def _read_data_file_helper_futures(file_path: str,
+                                       file_type: str,
+                                       clf_names: Optional[List[str]] = None,
+                                       raise_bool_clf_error: bool = True):
         """
         Private function called by :meth:`simba.train_model_functions.read_all_files_in_folder_mp_futures`
         """
@@ -1595,13 +1530,12 @@ class TrainModelMixin(object):
         timer.stop_timer()
         return df, vid_name, timer.elapsed_time_str, frm_numbers
 
-    def read_all_files_in_folder_mp_futures(
-            self,
-            annotations_file_paths: List[str],
-            file_type: Literal["csv", "parquet", "pickle"],
-            classifier_names: Optional[List[str]] = None,
-            raise_bool_clf_error: bool = True,
-    ) -> (pd.DataFrame, List[int]):
+    def read_all_files_in_folder_mp_futures(self,
+                                            annotations_file_paths: List[str],
+                                            file_type: Literal["csv", "parquet", "pickle"],
+                                            classifier_names: Optional[List[str]] = None,
+                                            raise_bool_clf_error: bool = True) -> (pd.DataFrame, List[int]):
+
         """
         Multiprocessing helper function to read in all data files in a folder to a single
         pd.DataFrame for downstream ML through ``concurrent.Futures``. Asserts that all classifiers
@@ -1620,22 +1554,17 @@ class TrainModelMixin(object):
         :return pd.DataFrame: Concatenated dataframe of all data in ``file_paths``.
 
         """
+
+        THREADSAFE_CORE_COUNT = 16
         try:
             if (platform.system() == "Darwin") and (multiprocessing.get_start_method() != "spawn"):
                 multiprocessing.set_start_method("spawn", force=True)
             cpu_cnt, _ = find_core_cnt()
-            if (cpu_cnt > Defaults.THREADSAFE_CORE_COUNT.value) and (platform.system() == OS.WINDOWS.value):
-                cpu_cnt = Defaults.THREADSAFE_CORE_COUNT.value
+            if (cpu_cnt > THREADSAFE_CORE_COUNT) and (platform.system() == OS.WINDOWS.value):
+                cpu_cnt = THREADSAFE_CORE_COUNT
             df_lst, frm_number_list = [], []
             with concurrent.futures.ProcessPoolExecutor(max_workers=cpu_cnt) as executor:
-                results = [executor.submit(self._read_data_file_helper_futures,
-                        data,
-                        file_type,
-                        classifier_names,
-                        raise_bool_clf_error,
-                    )
-                    for data in annotations_file_paths
-                ]
+                results = [executor.submit(self._read_data_file_helper_futures, data, file_type, classifier_names, raise_bool_clf_error) for data in annotations_file_paths]
                 for result in concurrent.futures.as_completed(results):
                     df_lst.append(result.result()[0])
                     frm_number_list.extend((result.result()[-1]))
@@ -1699,41 +1628,36 @@ class TrainModelMixin(object):
             )
 
     @staticmethod
-    def _create_shap_mp_helper(
-            data: pd.DataFrame,
-            explainer: shap.TreeExplainer,
-            clf_name: str,
-            rf_clf: RandomForestClassifier,
-            expected_value: float,
-    ):
+    def _create_shap_mp_helper(data: pd.DataFrame,
+                               explainer: shap.TreeExplainer,
+                               clf_name: str,
+                               rf_clf: RandomForestClassifier,
+                               expected_value: float):
 
         target = data.pop(clf_name).values.reshape(-1, 1)
+        print('ppp')
         frame_batch_shap = explainer.shap_values(data.values, check_additivity=False)[1]
         shap_sum = np.sum(frame_batch_shap, axis=1).reshape(-1, 1)
+        print('s')
         proba = rf_clf.predict_proba(data)[:, 1].reshape(-1, 1)
-        frame_batch_shap = np.hstack(
-            (
-                frame_batch_shap,
-                np.full((frame_batch_shap.shape[0]), expected_value).reshape(-1, 1),
-                shap_sum,
-                proba,
-                target,
-            )
-        )
+        print(proba)
+        frame_batch_shap = np.hstack((frame_batch_shap,
+                                      np.full((frame_batch_shap.shape[0]), expected_value).reshape(-1, 1),
+                                      shap_sum,
+                                      proba,
+                                      target))
+        print('ss')
+
         return frame_batch_shap, data.values
 
     @staticmethod
-    def _create_shap_mp_helper(
-            data: pd.DataFrame, explainer: shap.TreeExplainer, clf_name: str
-    ):
-
+    def _create_shap_mp_helper(data: pd.DataFrame, explainer: shap.TreeExplainer, clf_name: str):
         target = data.pop(clf_name).values.reshape(-1, 1)
         group_cnt = data.pop("group").values[0]
         shap_vals = np.full((len(data), len(data.columns)), np.nan)
         for cnt, i in enumerate(list(data.index)):
-            shap_vals[cnt] = explainer.shap_values(
-                data.loc[i].values, check_additivity=False
-            )[1]
+            shap_instance = explainer.shap_values(data.loc[i].values, check_additivity=False)[1]
+            shap_vals[cnt] = explainer.shap_values(data.loc[i].values, check_additivity=False)[1]
             print(f"SHAP complete core frame: {i} (CORE BATCH: {group_cnt})")
         return shap_vals, data.values, target
 
@@ -1778,12 +1702,8 @@ class TrainModelMixin(object):
         shap_timer = SimbaTimer(start=True)
         data_df = pd.concat([x_df, y_df], axis=1)
         if (save_file_no == None) and (save_path is not None):
-            self.out_df_shap_path = os.path.join(
-                save_path, f"SHAP_values_{clf_name}.csv"
-            )
-            self.out_df_raw_path = os.path.join(
-                save_path, f"RAW_SHAP_feature_values_{clf_name}.csv"
-            )
+            self.out_df_shap_path = os.path.join(save_path, f"SHAP_values_{clf_name}.csv")
+            self.out_df_raw_path = os.path.join(save_path, f"RAW_SHAP_feature_values_{clf_name}.csv")
         elif (save_file_no is not None) and (save_path is not None):
             self.out_df_shap_path = os.path.join(
                 save_path, f"SHAP_values_{str(save_file_no)}_{clf_name}.csv"
@@ -1796,9 +1716,7 @@ class TrainModelMixin(object):
             data_df[data_df[y_df.name] == 0],
         )
         if len(target_df) < cnt_present:
-            NotEnoughDataWarning(
-                msg=f"Train data contains {len(target_df)} behavior-present annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_present)}). SimBA will calculate shap scores for the {len(target_df)} behavior-present frames available",
-                source=self.__class__.__name__,
+            NotEnoughDataWarning(msg=f"Train data contains {len(target_df)} behavior-present annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_present)}). SimBA will calculate shap scores for the {len(target_df)} behavior-present frames available", source=self.__class__.__name__,
             )
             cnt_present = len(target_df)
         if len(nontarget_df) < cnt_absent:
@@ -1809,12 +1727,7 @@ class TrainModelMixin(object):
             cnt_absent = len(nontarget_df)
         non_target_for_shap = nontarget_df.sample(cnt_absent, replace=False)
         targets_for_shap = target_df.sample(cnt_present, replace=False)
-        explainer = shap.TreeExplainer(
-            rf_clf,
-            data=None,
-            model_output="raw",
-            feature_perturbation="tree_path_dependent",
-        )
+        explainer = shap.TreeExplainer( rf_clf, data=None, model_output="raw", feature_perturbation="tree_path_dependent")
         expected_value = explainer.expected_value[1]
         cores, _ = find_core_cnt()
         shap_data_df = pd.concat([targets_for_shap, non_target_for_shap], axis=0)
@@ -1822,85 +1735,50 @@ class TrainModelMixin(object):
             batch_size = 1
         if len(shap_data_df) > 100:
             batch_size = 100
-        print(
-            f"Computing {len(shap_data_df)} SHAP values (MULTI-CORE BATCH SIZE: {batch_size}, FOLLOW PROGRESS IN OS TERMINAL)...")
-        shap_data, _ = self.split_and_group_df(df=shap_data_df, splits=int(len(shap_data_df) / batch_size))
+        print(f"Computing {len(shap_data_df)} SHAP values (MULTI-CORE BATCH SIZE: {batch_size}, FOLLOW PROGRESS IN OS TERMINAL)...")
+        shap_data, _ = self.split_and_group_df(df=shap_data_df.reset_index(drop=True), splits=int(len(shap_data_df) / batch_size))
         shap_results, shap_raw = [], []
-        try:
-            with multiprocessing.Pool(cores, maxtasksperchild=10) as pool:
-                constants = functools.partial(
-                    self._create_shap_mp_helper, explainer=explainer, clf_name=clf_name
-                )
-                for cnt, result in enumerate(
-                        pool.imap_unordered(constants, shap_data, chunksize=1)
-                ):
-                    print(
-                        f"Concatenating multi-processed SHAP data (batch {cnt + 1}/{len(shap_data)})"
-                    )
-                    proba = rf_clf.predict_proba(result[1])[:, 1].reshape(-1, 1)
-                    shap_sum = np.sum(result[0], axis=1).reshape(-1, 1)
-                    batch_shap_results = np.hstack(
-                        (
-                            result[0],
-                            np.full((result[0].shape[0]), expected_value).reshape(
-                                -1, 1
-                            ),
-                            shap_sum,
-                            proba,
-                            result[2],
-                        )
-                    )
-                    shap_results.append(batch_shap_results)
-                    shap_raw.append(result[1])
-            pool.terminate()
-            pool.join()
-            shap_save_df = pd.DataFrame(
-                data=np.row_stack(shap_results),
-                columns=list(x_names)
-                        + ["Expected_value", "Sum", "Prediction_probability", clf_name],
-            )
-            raw_save_df = pd.DataFrame(
-                data=np.row_stack(shap_raw), columns=list(x_names)
-            )
+        # try:
+        with multiprocessing.Pool(cores, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
+            constants = functools.partial(self._create_shap_mp_helper, explainer=explainer, clf_name=clf_name)
+            for cnt, result in enumerate(pool.imap_unordered(constants, shap_data, chunksize=1)):
+                print(f"Concatenating multi-processed SHAP data (batch {cnt + 1}/{len(shap_data)})")
+                proba = rf_clf.predict_proba(result[1])[:, 1].reshape(-1, 1)
+                shap_sum = np.sum(result[0], axis=1).reshape(-1, 1)
+                batch_shap_results = np.hstack((result[0], np.full((result[0].shape[0]), expected_value).reshape(-1, 1), shap_sum, proba, result[2]))
+                shap_results.append(batch_shap_results)
+                shap_raw.append(result[1])
+        pool.terminate()
+        pool.join()
+        shap_save_df = pd.DataFrame(data=np.row_stack(shap_results), columns=list(x_names) + ["Expected_value", "Sum", "Prediction_probability", clf_name])
+        raw_save_df = pd.DataFrame(data=np.row_stack(shap_raw), columns=list(x_names))
+        shap_timer.stop_timer()
+        stdout_success(msg="SHAP calculations complete", elapsed_time=shap_timer.elapsed_time_str, source=self.__class__.__name__)
+        if save_path:
+            shap_save_df.to_csv(self.out_df_shap_path)
+            raw_save_df.to_csv(self.out_df_raw_path)
+            _ = ShapAggregateStatisticsVisualizer(config_path=ini_file_path,
+                                                  classifier_name=clf_name,
+                                                  shap_df=shap_save_df,
+                                                  shap_baseline_value=int(expected_value * 100),
+                                                  save_path=save_path)
+        else:
+            return (shap_save_df, raw_save_df, int(expected_value * 100))
 
-            shap_timer.stop_timer()
-            stdout_success(
-                msg="SHAP calculations complete",
-                elapsed_time=shap_timer.elapsed_time_str,
-                source=self.__class__.__name__,
-            )
-            if save_path:
-                shap_save_df.to_csv(self.out_df_shap_path)
-                raw_save_df.to_csv(self.out_df_raw_path)
-                _ = ShapAggregateStatisticsVisualizer(
-                    config_path=ini_file_path,
-                    classifier_name=clf_name,
-                    shap_df=shap_save_df,
-                    shap_baseline_value=int(expected_value * 100),
-                    save_path=save_path,
-                )
-            else:
-                return (shap_save_df, raw_save_df, int(expected_value * 100))
-
-        except Exception as e:
-            print(e.args)
-            ShapWarning(
-                msg="Multiprocessing SHAP values failed. Revert to single core. This will negatively affect run-time. ",
-                source=self.__class__.__name__,
-            )
-            self.create_shap_log(
-                ini_file_path=ini_file_path,
-                rf_clf=rf_clf,
-                x_df=x_df,
-                y_df=y_df,
-                x_names=x_names,
-                clf_name=clf_name,
-                cnt_present=cnt_present,
-                cnt_absent=cnt_absent,
-                save_path=save_path,
-                save_it=len(x_df),
-                save_file_no=save_file_no,
-            )
+        # except Exception as e:
+        #     print(e.args)
+        #     ShapWarning(msg="Multiprocessing SHAP values failed. Revert to single core. This will negatively affect run-time. ", source=self.__class__.__name__)
+        #     self.create_shap_log(ini_file_path=ini_file_path,
+        #                          rf_clf=rf_clf,
+        #                          x_df=x_df,
+        #                          y_df=y_df,
+        #                          x_names=x_names,
+        #                          clf_name=clf_name,
+        #                          cnt_present=cnt_present,
+        #                          cnt_absent=cnt_absent,
+        #                          save_path=save_path,
+        #                          save_it=len(x_df),
+        #                          save_file_no=save_file_no)
 
     def check_df_dataset_integrity(
             self, df: pd.DataFrame, file_name: str, logs_path: Union[str, os.PathLike]
@@ -1926,10 +1804,8 @@ class TrainModelMixin(object):
             pass
 
     def read_model_settings_from_config(self, config: configparser.ConfigParser):
-
         self.model_dir_out = os.path.join(
-            read_config_entry(config, ConfigKey.SML_SETTINGS.value, ConfigKey.MODEL_DIR.value,
-                              data_type=Dtypes.STR.value), "generated_models")
+            read_config_entry(config, ConfigKey.SML_SETTINGS.value, ConfigKey.MODEL_DIR.value, data_type=Dtypes.STR.value), "generated_models")
         if not os.path.exists(self.model_dir_out):
             os.makedirs(self.model_dir_out)
         self.eval_out_path = os.path.join(self.model_dir_out, "model_evaluations")
@@ -2491,7 +2367,7 @@ class TrainModelMixin(object):
         if scaler_name not in Options.SCALER_OPTIONS.value:
             raise InvalidInputError(
                 msg=f"Scaler {scaler_name} not supported. Options: {Options.SCALER_OPTIONS.value}",
-                source=self.__class__.__name__,
+                source=TrainModelMixin.define_scaler.__name__,
             )
         if scaler_name == Options.MIN_MAX_SCALER.value:
             return MinMaxScaler()

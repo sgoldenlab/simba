@@ -38,103 +38,61 @@ class ROIFeatureCreator(ConfigReader, FeatureExtractionMixin):
 
 
     :example:
-    >>> roi_featurizer = ROIFeatureCreator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
-    >>>                                    body_parts=['Nose_1', 'Nose_2'])
+    >>> roi_featurizer = ROIFeatureCreator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', body_parts=['Nose_1', 'Nose_2'])
     >>> roi_featurizer.run()
     >>> roi_featurizer.save()
     """
 
-    def __init__(
-        self,
-        config_path: Union[str, os.PathLike],
-        body_parts: List[str],
-        data_path: Optional[Union[str, os.PathLike]] = None,
-        append_data: Optional[bool] = False,
-    ):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 body_parts: List[str],
+                 data_path: Optional[Union[str, os.PathLike]] = None,
+                 append_data: Optional[bool] = False):
 
-        check_valid_lst(
-            data=body_parts,
-            source=f"{self.__class__.__name__} body-parts",
-            valid_dtypes=(str,),
-            min_len=1,
-        )
+        check_valid_lst(data=body_parts, source=f"{self.__class__.__name__} body-parts", valid_dtypes=(str,), min_len=1)
         if len(set(body_parts)) != len(body_parts):
-            raise CountError(
-                msg=f"All body-part entries have to be unique. Got {body_parts}",
-                source=self.__class__.__name__,
-            )
-        log_event(
-            logger_name=str(__class__.__name__),
-            log_type=TagNames.CLASS_INIT.value,
-            msg=self.create_log_msg_from_init_args(locals=locals()),
-        )
+            raise CountError(msg=f"All body-part entries have to be unique. Got {body_parts}", source=self.__class__.__name__)
+        log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
         ConfigReader.__init__(self, config_path=config_path)
         FeatureExtractionMixin.__init__(self, config_path=config_path)
         self.read_roi_data()
         if not os.path.isfile(self.roi_coordinates_path):
-            raise ROICoordinatesNotFoundError(
-                expected_file_path=self.roi_coordinates_path
-            )
+            raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path)
+
         for bp in body_parts:
             if bp not in self.body_parts_lst:
-                raise BodypartColumnNotFoundError(
-                    msg=f"The body-part {bp} is not a valid body-part in the SimBA project. Options: {self.body_parts_lst}",
-                    source=self.__class__.__name__,
-                )
+                raise BodypartColumnNotFoundError(msg=f"The body-part {bp} is not a valid body-part in the SimBA project. Options: {self.body_parts_lst}", source=self.__class__.__name__)
         self.bp_lk = {}
         for cnt, bp in enumerate(body_parts):
-            animal = self.find_animal_name_from_body_part_name(
-                bp_name=bp, bp_dict=self.animal_bp_dict
-            )
-            self.bp_lk[cnt] = [
-                animal,
-                bp,
-                [f'{bp}_{"x"}', f'{bp}_{"y"}', f'{bp}_{"p"}'],
-            ]
+            animal = self.find_animal_name_from_body_part_name(bp_name=bp, bp_dict=self.animal_bp_dict)
+            self.bp_lk[cnt] = [animal, bp, [f'{bp}_{"x"}', f'{bp}_{"y"}', f'{bp}_{"p"}']]
+
         self.roi_directing_viable = self.check_directionality_viable()[0]
-        log_event(
-            logger_name=str(__class__.__name__),
-            log_type=TagNames.CLASS_INIT.value,
-            msg=self.create_log_msg_from_init_args(locals=locals()),
-        )
-        self.data_paths = read_data_paths(
-            path=data_path,
-            default=self.outlier_corrected_paths,
-            default_name=self.outlier_corrected_dir,
-            file_type=self.file_type,
-        )
+
+        log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
+        self.data_paths = read_data_paths( path=data_path, default=self.outlier_corrected_paths, default_name=self.outlier_corrected_dir, file_type=self.file_type)
         if self.roi_directing_viable:
             print("Directionality calculations are VIABLE.")
-            self.directing_analyzer = DirectingROIAnalyzer(
-                config_path=config_path, data_path=self.data_paths
-            )
+            self.directing_analyzer = DirectingROIAnalyzer(config_path=config_path, data_path=self.data_paths)
             self.directing_analyzer.run()
             self.dr = self.directing_analyzer.results_df
         else:
+            print("Directionality calculations are NOT VIABLE.")
             self.directing_analyzer = None
             self.dr = None
         if len(self.outlier_corrected_paths) == 0:
-            raise NoFilesFoundError(
-                msg=f"No data found in the {self.outlier_corrected_dir} directory",
-                source=self.__class__.__name__,
-            )
+            raise NoFilesFoundError(msg=f"No data found in the {self.outlier_corrected_dir} directory", source=self.__class__.__name__)
         if len(self.feature_file_paths) == 0:
             raise NoFilesFoundError(
                 msg=f"No data found in the {self.features_dir} directory",
                 source=self.__class__.__name__,
             )
         self.append_data = append_data
-        print(
-            f"Processing {len(self.outlier_corrected_paths)} video(s) for ROI features..."
-        )
+        print(f"Processing {len(self.outlier_corrected_paths)} video(s) for ROI features...")
 
     def run(self):
-        check_all_file_names_are_represented_in_video_log(
-            video_info_df=self.video_info_df, data_paths=self.outlier_corrected_paths
-        )
-        self.summary = pd.DataFrame(
-            columns=["VIDEO", "ANIMAL", "SHAPE NAME", "MEASUREMENT", "VALUE"]
-        )
+        check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.outlier_corrected_paths)
+        self.summary = pd.DataFrame(columns=["VIDEO", "ANIMAL", "SHAPE NAME", "MEASUREMENT", "VALUE"])
         if self.append_data:
             _o_paths = set([get_fn_ext(x)[1] for x in self.outlier_corrected_paths])
             _f_paths = set([get_fn_ext(x)[1] for x in self.feature_file_paths])
@@ -285,16 +243,22 @@ class ROIFeatureCreator(ConfigReader, FeatureExtractionMixin):
         )
 
     def save(self):
-        save_path = os.path.join(
-            self.logs_path, f"ROI_features_summary_{self.datetime}.csv"
-        )
+        save_path = os.path.join(self.logs_path, f"ROI_features_summary_{self.datetime}.csv")
         self.summary.to_csv(save_path)
         print(f"ROI feature summary data saved at {save_path}")
         self.timer.stop_timer()
-        stdout_success(
-            msg=f"{len(self.outlier_corrected_paths)} new files with ROI features saved in {self.features_dir}",
-            elapsed_time=self.timer.elapsed_time_str,
-        )
+        stdout_success(msg=f"{len(self.outlier_corrected_paths)} new files with ROI features saved in {self.features_dir}", elapsed_time=self.timer.elapsed_time_str,)
+
+
+
+# roi_featurizer = ROIFeatureCreator(config_path=r"C:\troubleshooting\spontenous_alternation\project_folder\project_config.ini",
+#                                    body_parts=['nose'],
+#                                    data_path=r"C:\troubleshooting\spontenous_alternation\project_folder\csv\outlier_corrected_movement_location\F1 HAB.csv",
+#                                    append_data=True)
+# roi_featurizer.run()
+#roi_featurizer.save()
+
+
 
 
 #

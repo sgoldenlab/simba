@@ -302,6 +302,20 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         if self.frame_setting:
             stdout_success(f"Frames for {len(self.files_found)} videos saved in sub-folders within {self.sklearn_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
+
+# if __name__ == "__main__":
+#     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#                                                  video_setting=True,
+#                                                  frame_setting=False,
+#                                                  rotate=False,
+#                                                  video_file_path='FR_gq_CNO_0621.mp4',
+#                                                  cores=-1,
+#                                                  text_settings=False)
+#     clf_plotter.run()
+
+
+
+
 #text_settings = {'circle_scale': 5, 'font_size': 0.528, 'spacing_scale': 28, 'text_thickness': 2}
 # clf_plotter = PlotSklearnResultsMultiProcess(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/project_config.ini',
 #                                              video_setting=True,

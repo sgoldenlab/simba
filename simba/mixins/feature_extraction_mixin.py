@@ -6,6 +6,7 @@ warnings.filterwarnings("ignore")
 import glob
 import math
 import os
+import re
 from typing import List, Optional
 
 import numpy as np
@@ -519,6 +520,8 @@ class FeatureExtractionMixin(object):
         :return np.ndarray ear_left_coord: If viable, then 2D array with coordinates of the left ear in all frames. Else, empty array.
         :return np.ndarray ear_right_coord: If viable, then 2D array with coordinates of the right ear in all frames. Else, empty array.
         """
+        DELIMITERS = "_ "
+
 
         direction_viable = True
         nose_cords, ear_left_cords, ear_right_cords = [], [], []
@@ -526,17 +529,11 @@ class FeatureExtractionMixin(object):
             for bp_cord in ["X_bps", "Y_bps"]:
                 bp_list = self.animal_bp_dict[animal_name][bp_cord]
                 for bp_name in bp_list:
-                    bp_name_components = bp_name.split("_")
-                    bp_name_components = [x.lower() for x in bp_name_components]
-                    if "nose" in bp_name_components:
+                    if "nose" in bp_name:
                         nose_cords.append(bp_name)
-                    elif ("ear" in bp_name_components) and (
-                        "left" in bp_name_components
-                    ):
+                    elif ("ear" in bp_name) and ("left" in bp_name):
                         ear_left_cords.append(bp_name)
-                    elif ("ear" in bp_name_components) and (
-                        "right" in bp_name_components
-                    ):
+                    elif ("ear" in bp_name) and ("right" in bp_name):
                         ear_right_cords.append(bp_name)
                     else:
                         pass
@@ -546,18 +543,9 @@ class FeatureExtractionMixin(object):
                 direction_viable = False
 
         if direction_viable:
-            nose_cords = [
-                nose_cords[i * 2 : (i + 1) * 2]
-                for i in range((len(nose_cords) + 2 - 1) // 2)
-            ]
-            ear_left_cords = [
-                ear_left_cords[i * 2 : (i + 1) * 2]
-                for i in range((len(ear_left_cords) + 2 - 1) // 2)
-            ]
-            ear_right_cords = [
-                ear_right_cords[i * 2 : (i + 1) * 2]
-                for i in range((len(ear_right_cords) + 2 - 1) // 2)
-            ]
+            nose_cords = [nose_cords[i * 2 : (i + 1) * 2] for i in range((len(nose_cords) + 2 - 1) // 2)]
+            ear_left_cords = [ear_left_cords[i * 2 : (i + 1) * 2] for i in range((len(ear_left_cords) + 2 - 1) // 2)]
+            ear_right_cords = [ear_right_cords[i * 2 : (i + 1) * 2] for i in range((len(ear_right_cords) + 2 - 1) // 2)]
 
         return direction_viable, nose_cords, ear_left_cords, ear_right_cords
 

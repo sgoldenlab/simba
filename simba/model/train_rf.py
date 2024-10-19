@@ -60,26 +60,15 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         """
 
         if self.split_type == Methods.SPLIT_TYPE_FRAMES.value:
-            self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(
-                self.x_df, self.y_df, test_size=self.tt_size
-            )
+            self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.x_df, self.y_df, test_size=self.tt_size)
         elif self.split_type == Methods.SPLIT_TYPE_BOUTS.value:
-            self.x_train, self.x_test, self.y_train, self.y_test = (
-                self.bout_train_test_splitter(
-                    x_df=self.x_df, y_df=self.y_df, test_size=self.tt_size
-                )
-            )
+            self.x_train, self.x_test, self.y_train, self.y_test = ( self.bout_train_test_splitter(x_df=self.x_df, y_df=self.y_df, test_size=self.tt_size))
         if self.under_sample_setting == Methods.RANDOM_UNDERSAMPLE.value.lower():
-            self.x_train, self.y_train = self.random_undersampler(
-                self.x_train, self.y_train, float(self.under_sample_ratio)
-            )
+            self.x_train, self.y_train = self.random_undersampler(self.x_train, self.y_train, float(self.under_sample_ratio))
         if self.over_sample_setting == Methods.SMOTEENN.value.lower():
-            self.x_train, self.y_train = self.smoteen_oversampler(
-                self.x_train, self.y_train, float(self.over_sample_ratio)
-            )
+            self.x_train, self.y_train = self.smoteen_oversampler(self.x_train, self.y_train, float(self.over_sample_ratio))
         elif self.over_sample_setting == Methods.SMOTE.value.lower():
-            self.x_train, self.y_train = self.smote_oversampler(
-                self.x_train, self.y_train, float(self.over_sample_ratio)
+            self.x_train, self.y_train = self.smote_oversampler(self.x_train, self.y_train, float(self.over_sample_ratio)
             )
 
         if self.save_train_test_frm_info:
@@ -384,6 +373,14 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         self.save_rf_model(self.rf_clf, self.clf_name, self.model_dir_out)
         stdout_success(msg=f"Classifier {self.clf_name} saved in models/generated_models directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
         stdout_success(msg=f"Evaluation files are in models/generated_models/model_evaluations folders", source=self.__class__.__name__)
+
+
+
+test = TrainRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+test.run()
+test.save()
+
+
 
 #
 # test = TrainRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")

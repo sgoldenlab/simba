@@ -1249,9 +1249,13 @@ class ImageMixin(object):
         max_width = max(image.shape[1] for image in image_dict.values())
         padded_images = {}
         for key, image in image_dict.items():
+            check_if_valid_img(data=image, source=ImageMixin.pad_img_stack.__name__, raise_error=True)
             pad_height = max_height - image.shape[0]
             pad_width = max_width - image.shape[1]
-            padded_image = np.pad(image, ((0, pad_height), (0, pad_width), (0, 0)), mode="constant", constant_values=pad_value)
+            if image.ndim == 3:
+                padded_image = np.pad(image, ((0, pad_height), (0, pad_width), (0, 0)), mode="constant", constant_values=pad_value)
+            else:
+                padded_image = np.pad(image, ((0, pad_height), (0, pad_width)), mode="constant", constant_values=pad_value)
             padded_images[key] = padded_image
         return padded_images
 

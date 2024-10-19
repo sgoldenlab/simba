@@ -58,8 +58,6 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
             raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path)
         self.read_roi_data()
         FeatureExtractionMixin.__init__(self)
-        if detailed_bout_data and (not os.path.exists(self.detailed_roi_data_dir)):
-            os.makedirs(self.detailed_roi_data_dir)
         self.data_paths = read_data_paths(path=data_path,
                                           default=self.outlier_corrected_paths,
                                           default_name=self.outlier_corrected_dir,
@@ -71,9 +69,7 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
             raise CountError(msg=f"All body-part entries have to be unique. Got {body_parts}", source=self.__class__.__name__)
         self.bp_dict, self.bp_lk = {}, {}
         for bp in body_parts:
-            animal = self.find_animal_name_from_body_part_name(
-                bp_name=bp, bp_dict=self.animal_bp_dict
-            )
+            animal = self.find_animal_name_from_body_part_name(bp_name=bp, bp_dict=self.animal_bp_dict)
             self.bp_dict[animal] = [f'{bp}_{"x"}', f'{bp}_{"y"}', f'{bp}_{"p"}']
             self.bp_lk[animal] = bp
         self.roi_headers = [v for k, v in self.bp_dict.items()]
@@ -218,18 +214,15 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
             self.detailed_df = pd.concat(self.roi_bout_results, axis=0)
             self.detailed_df = self.detailed_df.rename(columns={"Event": "SHAPE NAME", "Start_time": "START TIME", "End Time": "END TIME", "Start_frame": "START FRAME", "End_frame": "END FRAME", "Bout_time": "DURATION (S)"})
             self.detailed_df["BODY-PART"] = self.detailed_df["ANIMAL"].map(self.bp_lk)
-            self.detailed_df = self.detailed_df[["VIDEO", "ANIMAL", "BODY-PART", "SHAPE NAME", "START TIME", "END TIME", "START FRAME", "END FRAME", "DURATION (S)"]]
+            self.detailed_df = self.detailed_df[["VIDEO", "ANIMAL", "BODY-PART", "SHAPE NAME", "START TIME", "END TIME", "START FRAME", "END FRAME", "DURATION (S)"]].reset_index(drop=True)
 
     def save(self):
         self.entry_results["BODY-PART"] = self.entry_results["ANIMAL"].map(self.bp_lk)
         self.time_results["BODY-PART"] = self.time_results["ANIMAL"].map(self.bp_lk)
         self.entry_results = self.entry_results[["VIDEO", "ANIMAL", "BODY-PART", "SHAPE", "ENTRY COUNT"]]
         self.time_results = self.time_results[["VIDEO", "ANIMAL", "BODY-PART", "SHAPE", "TIME (S)"]]
-        self.entry_results.to_csv(os.path.join(self.logs_path, f'{"ROI_entry_data"}_{self.datetime}.csv')
-        )
-        self.time_results.to_csv(
-            os.path.join(self.logs_path, f'{"ROI_time_data"}_{self.datetime}.csv')
-        )
+        self.entry_results.to_csv(os.path.join(self.logs_path, f'{"ROI_entry_data"}_{self.datetime}.csv'))
+        self.time_results.to_csv(os.path.join(self.logs_path, f'{"ROI_time_data"}_{self.datetime}.csv'))
         if self.detailed_bout_data and self.detailed_df is not None:
             detailed_path = os.path.join(self.logs_path, f'{"Detailed_ROI_data"}_{self.datetime}.csv')
             self.detailed_df.to_csv(detailed_path)

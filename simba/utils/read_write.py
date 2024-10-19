@@ -617,11 +617,13 @@ def read_video_info(vid_info_df: pd.DataFrame,
             return None
     else:
         try:
-            px_per_mm = float(video_settings["pixels/mm"])
-            fps = float(video_settings["fps"])
+            px_per_mm = float(video_settings["pixels/mm"].iloc[0])
+            #px_per_mm = float(video_settings["pixels/mm"])
+            fps = float(video_settings["fps"].iloc[0])
+            #fps = float(video_settings["fps"])
             return video_settings, px_per_mm, fps
-        except TypeError:
-            raise ParametersFileError(msg=f"Make sure the videos that are going to be analyzed are represented with APPROPRIATE VALUES inside the project_folder/logs/video_info.csv file in your SimBA project. Could not interpret the fps, pixels per millimeter and/or fps as numerical values for video {video_name}", source=read_video_info.__name__)
+        except TypeError as e:
+            raise ParametersFileError(msg=f"Make sure the videos that are going to be analyzed are represented with APPROPRIATE VALUES inside the project_folder/logs/video_info.csv file in your SimBA project. Could not interpret the fps, pixels per millimeter and/or fps as numerical values for video {video_name}: {e.args}", source=read_video_info.__name__)
 
 
 def find_all_videos_in_directory(directory: Union[str, os.PathLike],
@@ -1035,8 +1037,11 @@ def str_2_bool(input_str: str) -> bool:
     >>> str_2_bool(input_str='yes')
     >>> True
     """
-    check_str(name='input_str', value=input_str)
-    return input_str.lower() in ("yes", "true", "1")
+    if isinstance(input_str, bool):
+        return input_str
+    else:
+        check_str(name='input_str', value=input_str)
+        return input_str.lower() in ("yes", "true", "1")
 
 
 def tabulate_clf_info(clf_path: Union[str, os.PathLike]) -> None:
@@ -1236,7 +1241,8 @@ def get_memory_usage_of_df(df: pd.DataFrame) -> Dict[str, float]:
     >>> df = pd.DataFrame(np.random.randint(0,100,size=(100, 4)), columns=list('ABCD'))
     >>> {'bytes': 3328, 'megabytes': 0.003328, 'gigabytes': 3e-06}
     """
-
+    if not isinstance(df, pd.DataFrame):
+        raise InvalidInputError(msg='df has to be a pandas dataframe', source=get_memory_usage_of_df.__name__)
     results = {}
     results["bytes"] = df.memory_usage(index=True).sum()
     results["megabytes"] = round(results["bytes"] / 1000000, 6)
@@ -2515,3 +2521,19 @@ def labelme_to_dlc(labelme_dir: Union[str, os.PathLike],
         cv2.imwrite(img_save_path, img)
     save_path = os.path.join(save_dir, f'CollectedData_{scorer}.csv')
     results.to_csv(save_path)
+
+def get_memory_usage_array(x: np.ndarray) -> Dict[str, float]:
+    """
+    Calculates the memory usage of a NumPy array in bytes, megabytes, and gigabytes.
+
+    :param x: A NumPy array for which memory usage will be calculated. It should be a valid NumPy array with a defined size and dtype.
+    :return: A dictionary with memory usage information, containing the following keys: - "bytes": Memory usage in bytes. - "megabytes": Memory usage in megabytes. - "gigabytes": Memory usage in gigabytes.
+    """
+
+    check_valid_array(data=x, source=get_memory_usage_array.__name__)
+    results = {}
+    mb = int(x.size * x.itemsize / (1024 ** 2))
+    results["bytes"] = int(mb * 1000)
+    results["megabytes"] = mb
+    results["gigabytes"] = int(mb / 1000)
+    return results

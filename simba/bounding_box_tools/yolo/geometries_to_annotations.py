@@ -10,10 +10,9 @@ from shapely.geometry import Polygon
 from skimage.draw import polygon
 
 from simba.mixins.geometry_mixin import GeometryMixin
-from simba.utils.checks import check_instance, check_int, check_valid_array
+from simba.utils.checks import check_instance, check_int, check_valid_array, check_if_dir_exists
 from simba.utils.enums import Formats
-from simba.utils.read_write import (get_video_meta_data, read_df,
-                                    read_frm_of_video)
+from simba.utils.read_write import (get_video_meta_data, read_df, read_frm_of_video, find_files_of_filetypes_in_directory)
 
 
 def geometry_to_rle(geometry: Union[np.ndarray, Polygon], img_size: Tuple[int, int]):
@@ -28,7 +27,7 @@ def geometry_to_rle(geometry: Union[np.ndarray, Polygon], img_size: Tuple[int, i
     if isinstance(geometry, (Polygon,)):
         geometry = geometry.exterior.coords
     else:
-        check_valid_array(data=geometry, source=geometry_to_rle.__name__, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=geometry, source=geometry_to_rle.__name__, accepted_ndims=[(2,)], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
     binary_mask = np.zeros(img_size, dtype=np.uint8)
     rr, cc = polygon(geometry[:, 0].flatten(), geometry[:, 1].flatten(), img_size)
     binary_mask[rr, cc] = 1
@@ -161,23 +160,33 @@ def geometries_to_yolo(geometries: Dict[Union[str, int], np.ndarray],
     for k, v in results.items():
         name = k.split(sep='.', maxsplit=2)[0]
         file_name = os.path.join(save_labels_dir, f'{name}.txt')
-        with open(file_name, mode='wt', encoding='utf-8') as myfile:
-            myfile.write('\n'.join(v))
+        with open(file_name, mode='wt', encoding='utf-8') as f:
+            f.write('\n'.join(v))
+
+# def labelme_to_dlc(labelme_dir: Union[str, os.PathLike]):
+#     check_if_dir_exists(in_dir=labelme_dir, source=labelme_to_dlc.__name__)
+#     labelme_files = find_files_of_filetypes_in_directory(directory=labelme_dir, extensions=['.json'], raise_error=True)
+#
+#     for file_cnt, file_path in enumerate(labelme_files[0:2]):
+#         with open(file_path, mode='r', encoding='utf-8') as f:
+#             labelme_file = json.load(f)
+#             print(labelme_file)
+#
 
 
 
-#def geometries_to_yolo_obb(geometries: Dict[Union[str, int], np.ndarray]):
-
-
-
+# #def geometries_to_yolo_obb(geometries: Dict[Union[str, int], np.ndarray]):
 #
 #
 #
-data_path = r"C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\FL_gq_CNO_0625.csv"
-animal_data = read_df(file_path=data_path, file_type='csv', usecols=['Nose_x', 'Nose_y', 'Tail_base_x', 'Tail_base_y', 'Left_side_x', 'Left_side_y', 'Right_side_x', 'Right_side_y']).values.reshape(-1, 4, 2).astype(np.int32)
-animal_polygons = GeometryMixin().bodyparts_to_polygon(data=animal_data)
-poygons = GeometryMixin().multiframe_minimum_rotated_rectangle(shapes=animal_polygons)
-animal_polygons = GeometryMixin().geometries_to_exterior_keypoints(geometries=poygons)
-# animal_polygons = GeometryMixin.keypoints_to_axis_aligned_bounding_box(keypoints=animal_polygons)
-animal_polygons = {0: animal_polygons}
-geometries_to_yolo(geometries=animal_polygons, video_path=r'C:\troubleshooting\mitra\project_folder\videos\FL_gq_CNO_0625.mp4', save_dir=r"C:\troubleshooting\coco_data", sample=500, obb=True)
+# #
+# #
+# #
+# data_path = r"C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\FL_gq_CNO_0625.csv"
+# animal_data = read_df(file_path=data_path, file_type='csv', usecols=['Nose_x', 'Nose_y', 'Tail_base_x', 'Tail_base_y', 'Left_side_x', 'Left_side_y', 'Right_side_x', 'Right_side_y']).values.reshape(-1, 4, 2).astype(np.int32)
+# animal_polygons = GeometryMixin().bodyparts_to_polygon(data=animal_data)
+# poygons = GeometryMixin().multiframe_minimum_rotated_rectangle(shapes=animal_polygons)
+# animal_polygons = GeometryMixin().geometries_to_exterior_keypoints(geometries=poygons)
+# # animal_polygons = GeometryMixin.keypoints_to_axis_aligned_bounding_box(keypoints=animal_polygons)
+# animal_polygons = {0: animal_polygons}
+# geometries_to_yolo(geometries=animal_polygons, video_path=r'C:\troubleshooting\mitra\project_folder\videos\FL_gq_CNO_0625.mp4', save_dir=r"C:\troubleshooting\coco_data", sample=500, obb=True)
