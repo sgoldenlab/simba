@@ -7,8 +7,10 @@ from tkinter import font
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.pose_plotter import PosePlotter
 from simba.plotting.pose_plotter_mp import PosePlotterMultiProcess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, FileSelect, FolderSelect)
-from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        FileSelect, FolderSelect)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists)
 from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.read_write import find_core_cnt, str_2_bool
 
