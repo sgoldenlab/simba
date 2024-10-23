@@ -1,14 +1,15 @@
 import os
-from typing import Optional, Tuple, Union, Dict
+from typing import Dict, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
 import torch
 from ultralytics import YOLO
 
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.checks import check_file_exist_and_readable, check_if_dir_exists, check_int, get_fn_ext
-from simba.utils.read_write import (get_video_meta_data)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists, check_int, get_fn_ext)
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_video_meta_data
 
 
 def fit_yolo(initial_weights: Union[str, os.PathLike],
