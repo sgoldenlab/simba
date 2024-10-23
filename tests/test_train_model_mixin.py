@@ -111,6 +111,7 @@ def test_create_x_importance_log(clf_path):
                                                    'tests/data/test_projects/two_c57/models/generated_models/Attack.sav']])
 def test_create_shap_log(config_path, clf_path):
     x, y = pd.DataFrame(np.random.randint(1, 10, size=(500, 2))), pd.Series(np.random.randint(0, 2, size=(500)), name='target')
+    x.columns = [str(x) for x in list(x.columns)]
     clf = read_df(file_path=clf_path, file_type='pickle')
     train_model_mixin = TrainModelMixin()
     train_model_mixin.create_shap_log(ini_file_path=config_path,

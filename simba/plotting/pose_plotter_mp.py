@@ -10,16 +10,12 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import (check_instance, check_int, check_str,
-                                check_that_column_exist)
+from simba.utils.checks import (check_instance, check_int, check_str, check_that_column_exist, check_valid_boolean, check_nvidea_gpu_available)
 from simba.utils.data import create_color_palette
 from simba.utils.enums import OS, Formats, Options
 from simba.utils.errors import CountError, InvalidFilepathError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder,
-                                    find_core_cnt,
-                                    find_files_of_filetypes_in_directory,
-                                    get_fn_ext, get_video_meta_data, read_df)
+from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data, read_df)
 from simba.utils.warnings import FrameRangeWarning
 
 
@@ -65,8 +61,7 @@ class PosePlotterMultiProcess():
     :param str in_directory: Path to SimBA project directory containing pose-estimation data in parquet or CSV format.
     :param str out_directory: Directory to where to save the pose-estimation videos.
     :param int Size of the circles denoting the location of the pose-estimated body-parts.
-    :param Optional[dict] clr_attr: Python dict where animals are keys and color attributes values. E.g., {'Animal_1':  (255, 107, 198)}. If None,
-                                    random palettes will be used.
+    :param Optional[dict] clr_attr: Python dict where animals are keys and color attributes values. E.g., {'Animal_1':  (255, 107, 198)}. If None, random palettes will be used.
 
     .. image:: _static/img/pose_plotter.png
        :width: 600
@@ -83,6 +78,7 @@ class PosePlotterMultiProcess():
                  palettes: Optional[Dict[str, str]] = None,
                  circle_size: Optional[int] = None,
                  core_cnt: Optional[int] = -1,
+                 gpu: Optional[bool] = False,
                  sample_time: Optional[int] = None) -> None:
 
         if os.path.isdir(data_path):
@@ -122,6 +118,11 @@ class PosePlotterMultiProcess():
         if not os.path.exists(self.out_dir):
             os.makedirs(self.out_dir)
         self.data = {}
+        check_valid_boolean(value=[gpu])
+        if gpu and check_nvidea_gpu_available():
+            self.gpu = True
+        else:
+            self.gpu = False
         for file in files_found:
             self.data[file] = self.config.find_video_of_file(video_dir=self.config.video_dir, filename=get_fn_ext(file)[1])
         if platform.system() == OS.MAC.value:
@@ -162,11 +163,11 @@ class PosePlotterMultiProcess():
                                               circle_size=video_circle_size,
                                               video_save_dir=self.temp_folder)
                 for cnt, result in enumerate(pool.imap(constants, pose_lst, chunksize=self.config.multiprocess_chunksize)):
-                    print(f"Image {obs_per_split*(cnt+1)}/{len(pose_df)}, Video {file_cnt+1}/{len(list(self.data.keys()))}...")
+                    print(f"Image {max(len(pose_df), obs_per_split*(cnt+1))}/{len(pose_df)}, Video {file_cnt+1}/{len(list(self.data.keys()))}...")
             pool.terminate()
             pool.join()
             print(f"Joining {video_name} multi-processed video...")
-            concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=save_video_path, remove_splits=True)
+            concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=save_video_path, remove_splits=True, gpu=self.gpu)
             video_timer.stop_timer()
             stdout_success(msg=f"Pose video {video_name} complete and saved at {save_video_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
         self.config.timer.stop_timer()

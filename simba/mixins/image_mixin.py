@@ -1807,6 +1807,48 @@ class ImageMixin(object):
         else:
             return False
 
+    @staticmethod
+    def resize_img_dict(imgs: Dict[str, np.ndarray],
+                        size: Union[Literal['min', 'max'], Tuple[int, int]],
+                        interpolation: Optional[int] = cv2.INTER_LINEAR) -> Dict[str, np.ndarray]:
+
+        """
+        Resize a dictionary of images to a specified size.
+
+        :param Dict[str, np.ndarray] imgs: A dictionary where keys are image names (strings) and values are NumPy arrays representing the images.
+        :param Union[Literal['min', 'max'], Tuple[int, int]] size: The target size for the resizing operation. It can be: - `'min'`: Resize all images to the smallest height and width found among the input images. - `'max'`: Resize all images to the largest height and width found among the input images. - Tuple of two integers `(height, width)`: Explicitly specify the target size for all images.
+        :param interpolation: Interpolation method to use for resizing. This can be one of OpenCV's interpolation methods.
+        :return: A dictionary of resized images, where the keys match the original dictionary, and the values are the resized images as NumPy arrays.
+        :rtype: Dict[str, np.ndarray]
+        """
+
+        check_instance(source=ImageMixin.resize_img_dict.__name__, instance=imgs, accepted_types=(dict,))
+        check_instance(source=ImageMixin.resize_img_dict.__name__, instance=size, accepted_types=(tuple, str,))
+        results = {}
+        if size == 'min':
+            target_h, target_w = np.inf, np.inf
+            for k, v in imgs.items():
+                target_h, target_w = min(v.shape[0], target_h), min(v.shape[1], target_w)
+        elif size == 'max':
+            target_h, target_w = -np.inf, -np.inf
+            for k, v in imgs.items():
+                target_h, target_w = max(v.shape[0], target_h), max(v.shape[1], target_w)
+        elif isinstance(size, tuple):
+            check_valid_tuple(x=size, accepted_lengths=(2,), valid_dtypes=(int,))
+            check_int(name=ImageMixin.resize_img_dict.__name__, value=size[0], min_value=1)
+            check_int(name=ImageMixin.resize_img_dict.__name__, value=size[1], min_value=1)
+            target_h, target_w = size[0], size[1]
+        else:
+            raise InvalidInputError(msg=f'{size} is not a valid size argument.', source=ImageMixin.resize_img_dict.__name__)
+
+        for k, v in imgs.items():
+            check_if_valid_img(data=v, source=ImageMixin.resize_img_dict.__name__)
+            results[k] = cv2.resize(v, dsize=(target_w, target_h), fx=0, fy=0, interpolation=interpolation)
+
+        return results
+    def blah(self):
+        print(1)
+
 
 #x = ImageMixin.get_blob_locations(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled_bg_subtracted.mp4", gpu=True)
 # imgs = ImageMixin().read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples')

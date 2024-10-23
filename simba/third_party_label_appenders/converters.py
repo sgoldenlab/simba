@@ -6,7 +6,11 @@ import io
 from PIL import Image
 import base64
 from datetime import datetime
-from typing import Dict, Optional, Tuple, Union, Any
+from typing import Dict, Optional, Tuple, Union, Any, Iterable
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 
 import cv2
 import numpy as np
@@ -16,7 +20,7 @@ from skimage.draw import polygon
 
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.image_mixin import ImageMixin
-from simba.utils.checks import check_instance, check_int, check_valid_array, check_if_dir_exists, check_if_keys_exist_in_dict, check_file_exist_and_readable, check_if_valid_img
+from simba.utils.checks import check_instance, check_int, check_valid_array, check_if_dir_exists, check_if_keys_exist_in_dict, check_file_exist_and_readable, check_if_valid_img, check_valid_tuple
 from simba.utils.enums import Formats
 from simba.utils.read_write import get_video_meta_data, read_df, read_frm_of_video, find_files_of_filetypes_in_directory, get_fn_ext
 from simba.utils.errors import NoFilesFoundError, InvalidInputError
@@ -50,6 +54,13 @@ def geometries_to_coco(geometries: Dict[str, np.ndarray],
                        description: Optional[str] = None,
                        licences: Optional[str] = None):
     """
+    Convert a dictionary of geometries (keypoints or polygons) into COCO format annotations and save images
+    extracted from a video to a specified directory.
+
+    This function takes a dictionary of geometries (e.g., keypoints, bounding boxes, or polygons) and converts
+    them into COCO format annotations. The geometries are associated with frames of a video, and the corresponding
+    images are extracted from the video, saved as PNG files, and linked to the annotations.
+
     :example:
     >>> data_path = r"C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\FRR_gq_Saline_0624.csv"
     >>> animal_data = read_df(file_path=data_path, file_type='csv', usecols=['Nose_x', 'Nose_y', 'Tail_base_x', 'Tail_base_y', 'Left_side_x', 'Left_side_y', 'Right_side_x', 'Right_side_y']).values.reshape(-1, 4, 2)[0:20].astype(np.int32)
@@ -375,10 +386,15 @@ def normalize_img_dict(img_dict: Dict[str, np.ndarray]) -> Dict[str, np.ndarray]
 def labelme_to_df(labelme_dir: Union[str, os.PathLike],
                   greyscale: Optional[bool] = False,
                   pad: Optional[bool] = False,
-                  normalize: Optional[bool] = False) -> pd.DataFrame:
+                  size: Union[Literal['min', 'max'], Tuple[int, int]] = None,
+                  normalize: Optional[bool] = False,
+                  save_path: Optional[Union[str, os.PathLike]] = None) -> pd.DataFrame:
 
     """
+    :example:
+
     >>> labelme_to_df(labelme_dir=r'C:\troubleshooting\coco_data\labels\test_2')
+    >>> df = labelme_to_df(labelme_dir=r'C:\troubleshooting\coco_data\labels\test_read', greyscale=False, pad=False, normalize=False, size='min')
     """
     check_if_dir_exists(in_dir=labelme_dir)
     annotation_paths = find_files_of_filetypes_in_directory(directory=labelme_dir, extensions=['.json'], raise_error=True)
@@ -390,7 +406,6 @@ def labelme_to_df(labelme_dir: Union[str, os.PathLike],
         img_name = os.path.basename(annot_data['imagePath'])
         images[img_name] = _b64_to_arr(annot_data['imageData'])
         if greyscale:
-            print(greyscale)
             if len(images[img_name].shape) != 2:
                 images[img_name] = (0.07 * images[img_name][:, :, 2] + 0.72 * images[img_name][:, :, 1] + 0.21 * images[img_name][:, :, 0]).astype(np.uint8)
         img_data = {}
@@ -410,10 +425,127 @@ def labelme_to_df(labelme_dir: Union[str, os.PathLike],
         img_lst.append(_arr_to_b64(v))
     out = pd.concat(annotations).reset_index(drop=True)
     out['image'] = img_lst
-    return out
+    if size is not None:
+        pose_data = out.drop(['image', 'image_name'], axis=1)
+        pose_data_arr = pose_data.values.reshape(-1, int(pose_data.shape[1] / 2), 2).astype(np.float32)
+        new_pose, out['image'] = scale_pose_img_sizes(pose_data=pose_data_arr, imgs=list(out['image']), size=size)
+        new_pose = new_pose.reshape(pose_data.shape[0], pose_data.shape[1])
+        out.iloc[:, : new_pose.shape[1]] = new_pose
+
+    if save_path is None:
+        return out
+    else:
+        check_if_dir_exists(in_dir=os.path.dirname(save_path), source=labelme_to_df.__name__)
+        out.to_csv(save_path)
+
+def scale_pose_img_sizes(pose_data: np.ndarray,
+                         imgs: Iterable[Union[np.ndarray, str]],
+                         size: Union[Literal['min', 'max'], Tuple[int, int]],
+                         interpolation: Optional[int] = cv2.INTER_CUBIC ) -> Tuple[np.ndarray, Iterable[Union[np.ndarray, str]]]:
+
+    """
+    Resizes images and scales corresponding pose-estimation data to match the new image sizes.
+
+    .. image:: _static/img/scale_pose_img_sizes.webp
+       :width: 400
+       :align: center
+
+    :param pose_data: 3d MxNxR array of pose-estimation data where N is number of images, N the number of body-parts in each frame and R represents x,y coordinates of the body-parts.
+    :param imgs: Iteralble of images of same size as pose_data M dimension. Can be byte string representation of images of images as arrays.
+    :param size: The target size for the resizing operation. It can be: - `'min'`: Resize all images to the smallest height and width found among the input images. - `'max'`: Resize all images to the largest height and width found among the imgs.
+    :param interpolation: Interpolation method to use for resizing. This can be one of OpenCV's interpolation methods.
+    :return: The converted pose_data and converted images to align with the new size.
+    :rtype: Tuple[np.ndarray, Iterable[Union[np.ndarray, str]]]
+
+    :example:
+    >>> df = labelme_to_df(labelme_dir=r'C:\troubleshooting\coco_data\labels\test_read', greyscale=False, pad=False, normalize=False)
+    >>> imgs = list(df['image'])
+    >>> pose_data = df.drop(['image', 'image_name'], axis=1)
+    >>> pose_data_arr = pose_data.values.reshape(len(pose_data), int(len(pose_data.columns) / 2), 2).astype(np.float32)
+    >>> new_pose, new_imgs = scale_pose_img_sizes(pose_data=pose_data_arr, imgs=imgs, size=(700, 3000))
+
+    """
+    check_valid_array(data=pose_data, source=scale_pose_img_sizes.__name__, accepted_ndims=(3,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_axis_0=1)
+    if pose_data.shape[0] != len(imgs):
+        raise InvalidInputError(f'The number of images {len(imgs)} and the number of pose-estimated data points {pose_data.shape[0]} do not align.', source=scale_pose_img_sizes.__name__)
+    if size == 'min':
+        target_h, target_w = np.inf, np.inf
+        for v in imgs:
+            if isinstance(v, str):
+                v = _b64_to_arr(v)
+            target_h, target_w = min(v.shape[0], target_h), min(v.shape[1], target_w)
+    elif size == 'max':
+        target_h, target_w = -np.inf, -np.inf
+        for v in imgs:
+            if isinstance(v, str):
+                v = _b64_to_arr(v)
+            target_h, target_w = max(v.shape[0], target_h), max(v.shape[1], target_w)
+    elif isinstance(size, tuple):
+        check_valid_tuple(x=size, accepted_lengths=(2,), valid_dtypes=(int,))
+        check_int(name=scale_pose_img_sizes.__name__, value=size[0], min_value=1)
+        check_int(name=scale_pose_img_sizes.__name__, value=size[1], min_value=1)
+        target_h, target_w = size[0], size[1]
+    else:
+        raise InvalidInputError(msg=f'{size} is not a valid size argument.', source=scale_pose_img_sizes.__name__)
+    img_results = []
+    pose_results = np.zeros_like(pose_data)
+    for img_idx in range(pose_data.shape[0]):
+        if isinstance(imgs[img_idx], str):
+            img = _b64_to_arr(imgs[img_idx])
+        else:
+            img = imgs[img_idx]
+        original_h, original_w = img.shape[0:2]
+        scaling_factor_w, scaling_factor_h = target_w / original_w, target_h / original_h
+        img = cv2.resize(img, dsize=(target_w, target_h), fx=0, fy=0, interpolation=interpolation)
+        if isinstance(imgs[img_idx], str):
+            img = _arr_to_b64(img)
+        img_results.append(img)
+        for bp_cnt in range(pose_data[img_idx].shape[0]):
+            new_bp_x, new_bp_y = pose_data[img_idx][bp_cnt][0] * scaling_factor_w, pose_data[img_idx][bp_cnt][1] * scaling_factor_h
+            pose_results[img_idx][bp_cnt] = np.array([new_bp_x, new_bp_y])
+    # out_img = img_results[0]
+    # original_image = _b64_to_arr(imgs[0])
+    # for i in range(pose_results[0].shape[0]):
+    #     new_bp_loc = pose_results[0][i].astype(np.int32)
+    #     old_bp_loc = pose_data[0][i].astype(np.int32)
+    #     out_img = cv2.circle(out_img, (new_bp_loc[0], new_bp_loc[1]), 10, (0, 0, 255), -1)
+    #     original_image = cv2.circle(original_image, (old_bp_loc[0], old_bp_loc[1]), 5, (0, 0, 255), -1)
+    # cv2.imshow('asdasdasd', out_img)
+    # cv2.imshow('fdghfgth', original_image)
+    # cv2.waitKey(120000)
+
+    return (pose_results, img_results)
 
 
-#df = labelme_to_df(labelme_dir=r'C:\troubleshooting\coco_data\labels\test_read', greyscale=False, pad=True, normalize=False)
+
+
+
+
+
+
+
+
+
+
+
+
+
+#df = labelme_to_df(labelme_dir=r'C:\troubleshooting\coco_data\labels\test_read', greyscale=False, pad=False, normalize=False, size='min', save_path=r'C:\Users\sroni\OneDrive\Desktop\labelme_test.csv')
+#imgs = ImageMixin().read_all_img_in_dir(dir=r'C:\Users\sroni\OneDrive\Desktop\predefined_sizes')
+
+
+
+
+# imgs = ImageMixin.resize_img_dict(imgs=imgs, size='max')
+#
+
+
+
+#
+# for k, v in imgs.items():
+#     print(v.shape)
+
+#
 
 
 
@@ -436,8 +568,7 @@ def labelme_to_df(labelme_dir: Union[str, os.PathLike],
 
 #
 # def dlc_to_coco():
-#     pass
-#     #TODO
+
 #
 
 

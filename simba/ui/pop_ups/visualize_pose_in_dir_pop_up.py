@@ -7,12 +7,10 @@ from tkinter import font
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.pose_plotter import PosePlotter
 from simba.plotting.pose_plotter_mp import PosePlotterMultiProcess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        FileSelect, FolderSelect)
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, FileSelect, FolderSelect)
+from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists)
 from simba.utils.enums import Formats, Keys, Links, Options
-from simba.utils.read_write import find_core_cnt
+from simba.utils.read_write import find_core_cnt, str_2_bool
 
 ENTIRE_VIDEOS = "ENTIRE VIDEO(S)"
 AUTO = 'AUTO'
@@ -29,7 +27,7 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
     >>> VisualizePoseInFolderPopUp()
     """
     def __init__(self):
-        PopUpMixin.__init__(self, title="VISUALIZE POSE_ESTIMATION DATA", size=(800, 800))
+        PopUpMixin.__init__(self, title="VISUALIZE POSE ESTIMATION DATA", size=(800, 800))
         self.keypoint_sizes = list(range(1, 101))
         self.keypoint_sizes.insert(0, AUTO)
         self.video_lengths = list(range(10, 210, 10))
@@ -42,7 +40,7 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
         self.animal_cnt_frm.grid(row=0, column=0, sticky=NW)
         self.number_of_animals_dropdown.grid(row=0, column=0, sticky=NW)
         self.__populate_menu(1)
-        #self.main_frm.mainloop()
+        self.main_frm.mainloop()
 
     def __populate_menu(self, x):
         if hasattr(self, 'settings_menu'):
@@ -65,6 +63,9 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
             self.dropdown_dict[title] = DropDownMenu(self.settings_menu, title, self.color_options, "35")
             self.dropdown_dict[title].setChoices(self.color_options[0])
             self.dropdown_dict[title].grid(row=cnt+3, column=0, sticky=NW)
+        self.use_gpu_drpdwn = DropDownMenu(self.settings_menu, "USE GPU IF AVAILABLE:", ['FALSE', 'TRUE'], "35")
+        self.use_gpu_drpdwn.setChoices('FALSE')
+        self.use_gpu_drpdwn.grid(row=self.frame_children(frame=self.settings_menu), column=0, sticky=NW)
         self.multiprocess_var = BooleanVar(value=False)
         multiprocess_cb = Checkbutton(self.settings_menu, text="Multi-process (faster)", font=Formats.FONT_REGULAR.value, variable=self.multiprocess_var, command=lambda: self.enable_dropdown_from_checkbox(check_box_var=self.multiprocess_var, dropdown_menus=[self.multiprocess_dropdown]))
         self.multiprocess_dropdown = DropDownMenu(self.settings_menu, "CPU cores:", list(range(2, find_core_cnt()[0])), "12")
@@ -95,6 +96,7 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
         else:
             data_path = self.file_select.file_path
             check_file_exist_and_readable(file_path=data_path)
+        use_gpu = str_2_bool(self.use_gpu_drpdwn.getChoices())
         save_dir = self.save_dir.folder_path
         check_if_dir_exists(in_dir=save_dir, source=self.__class__.__name__)
         circle_size = self.keypoint_size_dropdown.getChoices()
@@ -122,6 +124,7 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
             plotter = PosePlotterMultiProcess(data_path=data_path,
                                               out_dir=save_dir,
                                               palettes=palettes,
+                                              gpu=use_gpu,
                                               circle_size=circle_size,
                                               sample_time=sample_time,
                                               core_cnt=core_cnt)

@@ -308,6 +308,12 @@ def poly_area(data: np.ndarray,
     .. seealso::
        :func:`~simba.feature_extractors.perimeter_jit.jitted_hull`.
 
+
+    .. image:: _static/img/simba.data_processors.cuda.geometry.poly_area_cuda.webp
+       :width: 450
+       :align: center
+
+
     :param data: A 3D numpy array of shape (N, M, 2), where N is the number of polygons, M is the number of points per polygon, and 2 represents the x and y coordinates.
     :param pixels_per_mm: Optional scaling factor to convert the area from pixels squared  to square millimeters. Default is 1.0.
     :param batch_size: Optional batch size for processing the data in chunks to fit in memory. Default is 0.5e+7.

@@ -99,7 +99,8 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
             idx = data_df.iloc[:, :2]
             check_that_column_exist(df=idx, column_name=TRACK, file_name=video_name)
             idx[TRACK] = idx[TRACK].fillna("track_1")
-            idx[TRACK] = idx[TRACK].str.replace(r"[^\d.]+", "").astype(int)
+            #idx[TRACK] = idx[TRACK].str.replace(r"[^\d.]+", "").astype(int)
+            idx[TRACK] = idx[TRACK].str.replace(r"[^\d.]+", "", regex=True).astype(int)
             data_df = data_df.iloc[:, 2:].fillna(0)
             if self.animal_cnt > 1:
                 self.data_df = pd.DataFrame(self.transpose_multi_animal_table(data=data_df.values, idx=idx.values, animal_cnt=self.animal_cnt))

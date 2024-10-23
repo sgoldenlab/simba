@@ -544,7 +544,6 @@ def concatenate_videos_in_folder(in_folder: Union[str, os.PathLike],
         else:
             raise InvalidInputError(msg=f'FPS of the output video has to be None, or a string index, or a float, or an integer',source=concatenate_videos_in_folder.__name__)
 
-    print(fps)
     if check_nvidea_gpu_available() and gpu:
         if fps is None:
             returned = os.system(f'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -c copy -hide_banner -loglevel info "{save_path}" -y')

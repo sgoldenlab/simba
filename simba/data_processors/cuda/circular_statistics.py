@@ -248,7 +248,7 @@ def sliding_circular_std(x: np.ndarray,
                          sample_rate: float,
                          batch_size: Optional[int] = int(5e+7)) -> np.ndarray:
 
-    """
+    r"""
     Calculate the sliding circular standard deviation of a time series data on GPU.
 
     This function computes the circular standard deviation over a sliding window for a given time series array.
@@ -307,7 +307,7 @@ def sliding_rayleigh_z(x: np.ndarray,
                        sample_rate: float,
                        batch_size: Optional[int] = int(5e+7)) -> Tuple[np.ndarray, np.ndarray]:
 
-    """
+    r"""
     Computes the Rayleigh Z-statistic over a sliding window for a given time series of angles
 
     This function calculates the Rayleigh Z-statistic, which tests the null hypothesis that the population of angles

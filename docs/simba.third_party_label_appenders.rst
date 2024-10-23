@@ -46,3 +46,11 @@ Generic third-party appender tool
 .. automodule:: simba.third_party_label_appenders.third_party_appender
    :members:
    :show-inheritance:
+
+
+Annotation format converters
+---------------------------------------
+
+.. automodule:: simba.third_party_label_appenders.converters
+   :members:
+   :show-inheritance:
