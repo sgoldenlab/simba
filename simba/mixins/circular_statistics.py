@@ -1019,9 +1019,9 @@ class CircularStatisticsMixin(object):
         :rtype: np.ndarray
 
         :example:
-        >>> CircularStatisticsMixin().circular_range([350, 20, 60, 100])
+        >>> CircularStatisticsMixin().circular_range(np.ndarray([350, 20, 60, 100]))
         >>> 110.0
-        >>> CircularStatisticsMixin().circular_range([110, 20, 60, 100])
+        >>> CircularStatisticsMixin().circular_range(np.ndarray([110, 20, 60, 100]))
         >>> 90.0
         """
 

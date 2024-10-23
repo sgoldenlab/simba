@@ -14,7 +14,7 @@ except:
 
 import cv2
 import numpy as np
-from pycocotools import mask
+#from pycocotools import mask
 from shapely.geometry import Polygon
 from skimage.draw import polygon
 
@@ -27,25 +27,25 @@ from simba.utils.errors import NoFilesFoundError, InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
 
 
-def geometry_to_rle(geometry: Union[np.ndarray, Polygon], img_size: Tuple[int, int]):
-    """
-    Converts a geometry (polygon or NumPy array) into a Run-Length Encoding (RLE) mask, suitable for object detection or segmentation tasks.
-
-    :param geometry: The geometry to be converted into an RLE. It can be either a shapely Polygon or a (n, 2) np.ndarray with vertices.
-    :param img_size:  A tuple `(height, width)` representing the size of the image in which the geometry is to be encoded. This defines the dimensions of the output binary mask.
-    :return:
-    """
-    check_instance(source=geometry_to_rle.__name__, instance=geometry, accepted_types=(Polygon, np.ndarray))
-    if isinstance(geometry, (Polygon,)):
-        geometry = geometry.exterior.coords
-    else:
-        check_valid_array(data=geometry, source=geometry_to_rle.__name__, accepted_ndims=[(2,)], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
-    binary_mask = np.zeros(img_size, dtype=np.uint8)
-    rr, cc = polygon(geometry[:, 0].flatten(), geometry[:, 1].flatten(), img_size)
-    binary_mask[rr, cc] = 1
-    rle = mask.encode(np.asfortranarray(binary_mask))
-    rle['counts'] = rle['counts'].decode('utf-8')
-    return rle
+# def geometry_to_rle(geometry: Union[np.ndarray, Polygon], img_size: Tuple[int, int]):
+#     """
+#     Converts a geometry (polygon or NumPy array) into a Run-Length Encoding (RLE) mask, suitable for object detection or segmentation tasks.
+#
+#     :param geometry: The geometry to be converted into an RLE. It can be either a shapely Polygon or a (n, 2) np.ndarray with vertices.
+#     :param img_size:  A tuple `(height, width)` representing the size of the image in which the geometry is to be encoded. This defines the dimensions of the output binary mask.
+#     :return:
+#     """
+#     check_instance(source=geometry_to_rle.__name__, instance=geometry, accepted_types=(Polygon, np.ndarray))
+#     if isinstance(geometry, (Polygon,)):
+#         geometry = geometry.exterior.coords
+#     else:
+#         check_valid_array(data=geometry, source=geometry_to_rle.__name__, accepted_ndims=[(2,)], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+#     binary_mask = np.zeros(img_size, dtype=np.uint8)
+#     rr, cc = polygon(geometry[:, 0].flatten(), geometry[:, 1].flatten(), img_size)
+#     binary_mask[rr, cc] = 1
+#     rle = mask.encode(np.asfortranarray(binary_mask))
+#     rle['counts'] = rle['counts'].decode('utf-8')
+#     return rle
 
 def geometries_to_coco(geometries: Dict[str, np.ndarray],
                        video_path: Union[str, os.PathLike],

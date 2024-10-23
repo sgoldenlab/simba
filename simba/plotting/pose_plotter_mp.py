@@ -163,11 +163,11 @@ class PosePlotterMultiProcess():
                                               circle_size=video_circle_size,
                                               video_save_dir=self.temp_folder)
                 for cnt, result in enumerate(pool.imap(constants, pose_lst, chunksize=self.config.multiprocess_chunksize)):
-                    print(f"Image {max(len(pose_df), obs_per_split*(cnt+1))}/{len(pose_df)}, Video {file_cnt+1}/{len(list(self.data.keys()))}...")
+                    print(f"Image {min(len(pose_df), obs_per_split*(cnt+1))}/{len(pose_df)}, Video {file_cnt+1}/{len(list(self.data.keys()))}...")
             pool.terminate()
             pool.join()
             print(f"Joining {video_name} multi-processed video...")
-            concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=save_video_path, remove_splits=True, gpu=self.gpu)
+            concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=save_video_path, remove_splits=True, gpu=False)
             video_timer.stop_timer()
             stdout_success(msg=f"Pose video {video_name} complete and saved at {save_video_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
         self.config.timer.stop_timer()

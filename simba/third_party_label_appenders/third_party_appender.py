@@ -59,7 +59,7 @@ class ThirdPartyLabelAppender(ConfigReader):
        `Third-party import tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/third_party_annot.md>`__.
 
        `BENTO: expected input <https://github.com/sgoldenlab/simba/blob/master/misc/bento_example.annot`__.
-       `BORIS: expected input <https://github.com/sgoldenlab/simba/blob/master/misc/boris_example.csv>`__..
+       `BORIS: expected input <https://github.com/sgoldenlab/simba/blob/master/misc/boris_example.csv>`__.
        `DEEPETHOGRAM: expected input <https://github.com/sgoldenlab/simba/blob/master/misc/deep_ethogram_labels.csv>`__.
        `ETHOVISION: expected input <https://github.com/sgoldenlab/simba/blob/master/misc/ethovision_example.xlsx>`__.
        `OBSERVER: expected input I <https://github.com/sgoldenlab/simba/blob/master/misc/Observer_example_1.xlsx>`__.

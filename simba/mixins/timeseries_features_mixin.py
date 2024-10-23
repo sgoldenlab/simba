@@ -864,11 +864,11 @@ class TimeseriesFeatureMixin(object):
 
     @staticmethod
     @njit(
-        "(float32[:], float64[:], int64, types.ListType(types.unicode_type))",
+        "(float32[:], float64[:], float64, types.ListType(types.unicode_type))",
         fastmath=True,
         cache=True,
     )
-    def sliding_descriptive_statistics(data: np.ndarray, window_sizes: np.ndarray, sample_rate: int, statistics: Literal["var", "max", "min", "std", "median", "mean", "mad", "sum", "mac", "rms", "absenergy"]) -> np.ndarray:
+    def sliding_descriptive_statistics(data: np.ndarray, window_sizes: np.ndarray, sample_rate: float, statistics: Literal["var", "max", "min", "std", "median", "mean", "mad", "sum", "mac", "rms", "absenergy"]) -> np.ndarray:
         """
         Jitted compute of descriptive statistics over sliding windows in 1D data array.
 
