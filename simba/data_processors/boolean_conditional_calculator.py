@@ -6,11 +6,14 @@ import numpy as np
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_if_df_field_is_boolean, check_instance)
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_if_df_field_is_boolean, check_instance)
+from simba.utils.data import detect_bouts
 from simba.utils.errors import MissingColumnsError
 from simba.utils.printing import stdout_success
-from simba.utils.read_write import (get_fn_ext, read_data_paths, read_df, read_video_info, str_2_bool)
-from simba.utils.data import detect_bouts
+from simba.utils.read_write import (get_fn_ext, read_data_paths, read_df,
+                                    read_video_info, str_2_bool)
 
 
 class BooleanConditionalCalculator(ConfigReader):
