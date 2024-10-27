@@ -225,7 +225,7 @@ Methods for creating machine learning behavior classifiers
 .. toctree::
    :maxdepth: 2
 
-    simba.mixins.train_model_mixin
+   simba.mixins.train_model_mixin
 
 
 
@@ -237,7 +237,7 @@ Methods for reading SimBA configparser.Configparser project config and associate
 .. toctree::
    :maxdepth: 2
 
-    simba.mixins.config_reader
+   simba.mixins.config_reader
 
 
 Cue-light tools
