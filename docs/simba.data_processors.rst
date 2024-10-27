@@ -156,3 +156,10 @@ Spontaneous alternation calculator
 .. automodule:: simba.data_processors.blob_location_computer
    :members:
    :undoc-members:
+
+Egocentric data / video alignment
+------------------------------------------------------------
+
+.. automodule:: simba.data_processors.egocentric_aligner
+   :members:
+   :undoc-members:

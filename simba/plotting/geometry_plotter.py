@@ -16,13 +16,11 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_iterable_length, check_str,
                                 check_valid_boolean)
 from simba.utils.data import create_color_palettes
-from simba.utils.enums import Defaults, Formats, TextOptions
-from simba.utils.errors import InvalidInputError
-from simba.utils.lookups import get_color_dict
+from simba.utils.enums import Defaults, Formats
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, find_video_of_file,
-                                    get_video_meta_data)
+                                    get_video_meta_data, get_fn_ext)
 from simba.utils.warnings import FrameRangeWarning
 
 ACCEPTED_TYPES = [Polygon, LineString, MultiPolygon, MultiLineString, Point]
@@ -74,7 +72,7 @@ def geometry_visualizer(data: np.ndarray,
                 cv2.circle(img,(x, y),circle_size, colors[shape_cnt][::-1], thickness)
         video_writer.write(img.astype(np.uint8))
         if verbose:
-            print(f"Creating frame {frm_id} (core: {group})")
+            print(f"Creating frame {frm_id} (CPU core: {group})")
     video_writer.release()
     cap.release()
 
@@ -104,7 +102,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
     def __init__(self,
                  config_path: Union[str, os.PathLike],
                  geometries: List[List[Union[Polygon, LineString, MultiPolygon, MultiLineString, Point]]],
-                 video_name: str,
+                 video_name: Union[str, os.PathLike],
                  core_cnt: Optional[int] = -1,
                  save_path: Optional[Union[str, os.PathLike]] = None,
                  thickness: Optional[int] = 2,
@@ -124,7 +122,11 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
         check_int( name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
-        self.video_path = find_video_of_file(video_dir=self.video_dir, filename=video_name, raise_error=True)
+        if os.path.isfile(video_name):
+            self.video_path = video_name
+            video_name = get_fn_ext(filepath=video_name)[1]
+        else:
+            self.video_path = find_video_of_file(video_dir=self.video_dir, filename=video_name, raise_error=True)
         self.video_meta_data = get_video_meta_data(video_path=self.video_path)
         for i in range(len(geometries)):
             if len(geometries[i]) != self.video_meta_data[FRAME_COUNT]:

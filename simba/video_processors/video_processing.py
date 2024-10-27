@@ -3722,7 +3722,7 @@ def create_average_frm(video_path: Union[str, os.PathLike],
        If all are None, then the entire video will be used to create the average frame.
 
     .. seealso:
-       :func:`simba.data_processors.cuda.image.create_average_frm_cupy`, :func:`simba.data_processors.cuda.image.create_average_frm_cuda`
+       :func:`simba.data_processors.cuda.image.create_average_frm_cupy`, :func:`simba.data_processors.cuda.image.create_average_frm_cuda` for GPU acceleration.
 
     :param Union[str, os.PathLike] video_path: The path to the video to create the average frame from. Default: None.
     :param Optional[int] start_frm: The first frame in the segment to create the average frame from. Default: None.

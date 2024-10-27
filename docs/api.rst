@@ -222,9 +222,11 @@ Model tools
 
 Methods for creating machine learning behavior classifiers
 
-.. automodule:: simba.mixins.train_model_mixin
-   :members:
-   :show-inheritance:
+.. toctree::
+   :maxdepth: 2
+
+    simba.mixins.train_model_mixin
+
 
 
 Config reader methods
@@ -232,9 +234,10 @@ Config reader methods
 
 Methods for reading SimBA configparser.Configparser project config and associated project data
 
-.. automodule:: simba.mixins.config_reader
-   :members:
-   :show-inheritance:
+.. toctree::
+   :maxdepth: 2
+
+    simba.mixins.config_reader
 
 
 Cue-light tools

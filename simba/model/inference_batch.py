@@ -23,19 +23,23 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
     Run classifier inference on all files with the ``project_folder/csv/features_extracted`` directory.
     Results are stored in the ``project_folder/csv/machine_results`` directory of the SimBA project.
 
-    :param str config_path: path to SimBA project config file in Configparser format
+    .. note::
+       To compute aggrehgte statistics from the output of this class, use :func:`simba.data_processors.agg_clf_calculator.AggregateClfCalculator`
+
+    :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format.
 
     :example:
     >>> _ = InferenceBatch(config_path='MyConfigPath').run()
     """
 
-    def __init__(self, config_path: Union[str, os.PathLike]):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike]):
 
         ConfigReader.__init__(self, config_path=config_path)
         TrainModelMixin.__init__(self)
         log_event(logger_name=str(self.__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
         if len(self.feature_file_paths) == 0:
-            raise NoFilesFoundError("Zero files found in the project_folder/csv/features_extracted directory. Create features before running classifier.", source=self.__class__.__name__,)
+            raise NoFilesFoundError(f"Zero files found in the {self.features_dir}. Create features before running classifier.", source=self.__class__.__name__,)
         print(f"Analyzing {len(self.feature_file_paths)} file(s) with {self.clf_cnt} classifier(s)")
         self.timer = SimbaTimer(start=True)
         self.model_dict = self.get_model_info(config=self.config, model_cnt=self.clf_cnt)
@@ -45,7 +49,7 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
         for file_cnt, file_path in enumerate(self.feature_file_paths):
             video_timer = SimbaTimer(start=True)
             _, file_name, _ = get_fn_ext(file_path)
-            print(f"Analyzing video {file_name}...")
+            print(f"Analyzing video {file_name}... (Video {file_cnt+1}/{len(self.feature_file_paths)})")
             file_save_path = os.path.join(self.machine_results_dir, f"{file_name}.{self.file_type}")
             in_df = read_df(file_path, self.file_type)
             x_df = self.drop_bp_cords(df=in_df).astype(np.float32)
@@ -61,16 +65,16 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
                 out_df[probability_column] = self.clf_predict_proba(clf=clf, x_df=x_df, data_path=file_path, model_name=m_hyp["model_name"])
                 out_df[m_hyp["model_name"]] = np.where(out_df[probability_column] > m_hyp["threshold"], 1, 0)
                 if int(m_hyp["minimum_bout_length"]) > 0:
-                    print(f'Correcting minimum bouts in video {file_name} and classifier {m_hyp["model_name"]} ({m_hyp["minimum_bout_length"]})...')
+                    print(f'Correcting minimum bouts in video {file_name} and classifier {m_hyp["model_name"]} ({m_hyp["minimum_bout_length"]}ms)...')
                     out_df = plug_holes_shortest_bout(data_df=out_df, clf_name=m_hyp["model_name"], fps=fps, shortest_bout=m_hyp["minimum_bout_length"])
             write_df(out_df, self.file_type, file_save_path)
             video_timer.stop_timer()
             print(f"Predictions created for {file_name} (elapsed time: {video_timer.elapsed_time_str}) ...")
         self.timer.stop_timer()
-        stdout_success(msg="Machine predictions complete. Files saved in project_folder/csv/machine_results directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+        stdout_success(msg=f"Machine predictions complete. Files saved in {self.machine_results_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
 
-# test = InferenceBatch(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
+# test = InferenceBatch(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini")
 # test.run()
 
 

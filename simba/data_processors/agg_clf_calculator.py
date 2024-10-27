@@ -28,9 +28,7 @@ class AggregateClfCalculator(ConfigReader):
     Compute aggregate descriptive statistics from classification data.
 
     :param str config_path: path to SimBA project config file in Configparser format
-    :param List[str] data_measures: Aggregate statistics measures to calculate. OPTIONS: ['Bout count', 'Total event duration (s)',
-        'Mean event bout duration (s)', 'Median event bout duration (s)', 'First event occurrence (s)',
-        'Mean event bout interval duration (s)', 'Median event bout interval duration (s)']
+    :param List[str] data_measures: Aggregate statistics measures to calculate. OPTIONS: ['Bout count', 'Total event duration (s)', 'Mean event bout duration (s)', 'Median event bout duration (s)', 'First event occurrence (s)', 'Mean event bout interval duration (s)', 'Median event bout interval duration (s)']
     :param List[str] classifiers: Classifiers to calculate aggregate statistics for. E.g.,: ['Attack', 'Sniffing']
     :param Optional[List[str]] video_meta_data: Video metadata to include in the output. Options: 'Frame count', 'Video length (s)'.
     :param bool detailed_bout_data: If True, save detailed data for each bout in each video (start frame, end frame, bout time etc.)
@@ -38,11 +36,9 @@ class AggregateClfCalculator(ConfigReader):
 
     .. note::
        `GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results>`__.
-
        `Example expected ouput file <https://github.com/sgoldenlab/simba/blob/master/misc/detailed_bout_data_summary_20231011091832.csv>`__.
 
-    Examples
-    -----
+    :example:
     >>> clf_log_creator = AggregateClfCalculator(config_path="MyConfigPath", data_measures=['Bout count', 'Total event duration (s)'], classifiers=['Attack', 'Sniffing'])
     >>> clf_log_creator.run()
     >>> clf_log_creator.save()
@@ -63,19 +59,15 @@ class AggregateClfCalculator(ConfigReader):
             ]
         ],
         classifiers: List[str],
-        detailed_bout_data: bool = False,
-        transpose: bool = False,
+        detailed_bout_data: Optional[bool] = False,
+        transpose: Optional[bool] = False,
         video_meta_data: Optional[
             List[Literal["Frame count", "Video length (s)"]]
         ] = None,
     ):
 
         super().__init__(config_path=config_path)
-        log_event(
-            logger_name=str(self.__class__.__name__),
-            log_type=TagNames.CLASS_INIT.value,
-            msg=self.create_log_msg_from_init_args(locals=locals()),
-        )
+        log_event(logger_name=str(self.__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
         (
             self.chosen_measures,
             self.classifiers,
@@ -114,12 +106,10 @@ class AggregateClfCalculator(ConfigReader):
 
     def run(self):
         self.results_df, self.bouts_df_lst = pd.DataFrame(), []
-        check_all_file_names_are_represented_in_video_log(
-            video_info_df=self.video_info_df, data_paths=self.machine_results_paths
-        )
+        check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.machine_results_paths)
         for file_cnt, file_path in enumerate(self.machine_results_paths):
             _, file_name, _ = get_fn_ext(file_path)
-            print("Analyzing video {}...".format(file_name))
+            print(f"Analyzing video {file_name} ({file_cnt+1}/{len(self.machine_results_paths)})...")
             _, _, fps = self.read_video_info(video_name=file_name)
             check_file_exist_and_readable(file_path)
             data_df = read_df(file_path, self.file_type)
@@ -241,6 +231,15 @@ class AggregateClfCalculator(ConfigReader):
             elapsed_time=self.timer.elapsed_time_str,
             source=self.__class__.__name__,
         )
+
+
+# test = AggregateClfCalculator(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini",
+#                               data_measures=["Bout count", "Total event duration (s)", "Mean event bout duration (s)", "Median event bout duration (s)", "First event occurrence (s)", "Mean event bout interval duration (s)", "Median event bout interval duration (s)"],
+#                               classifiers=['rearing'],
+#                               video_meta_data =['Frame count', "Video length (s)"],
+#                               transpose=True)
+# test.run()
+# test.save()
 
 
 # test = AggregateClfCalculator(config_path=r"/Users/simon/Desktop/envs/troubleshooting/raph/project_folder/project_config.ini",

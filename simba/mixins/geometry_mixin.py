@@ -27,6 +27,7 @@ InsidePolygon = FeatureExtractionMixin.framewise_inside_polygon_roi
 
 
 from simba.mixins.image_mixin import ImageMixin
+from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_float,
                                 check_if_2d_array_has_min_unique_values,
                                 check_if_dir_exists, check_if_valid_img,
@@ -922,13 +923,14 @@ class GeometryMixin(object):
             return img
 
     @staticmethod
-    def geometry_video(shapes: List[List[Union[LineString, Polygon, MultiPolygon, MultiLineString, MultiPoint]]],
-                       size: Optional[Tuple[int]],
+    def geometry_video(shapes: List[List[Union[LineString, Polygon, MultiPolygon, MultiLineString, MultiPoint, Point]]],
+                       size: Optional[Tuple[int, int]],
                        save_path: Optional[Union[str, os.PathLike]] = None,
-                       fps: Optional[int] = 10,
+                       fps: Optional[Union[int, float]] = 10,
                        verbose: Optional[bool] = False,
                        bg_img: Optional[np.ndarray] = None,
-                       bg_clr: Optional[Tuple[int]] = None,
+                       bg_clr: Optional[Tuple[int, int, int]] = None,
+                       circle_size: Optional[int] = None,
                        thickness: Optional[int] = 2) -> None:
         """
         Helper to create a geometry video from a list of shapes.
@@ -954,10 +956,9 @@ class GeometryMixin(object):
         for i in shapes:
             for j in i:
                 check_instance(source=GeometryMixin.geometry_video.__name__, instance=j, accepted_types=( LineString, Polygon, MultiPolygon, MultiPoint, MultiLineString, Point))
-
         if save_path is not None:
             check_if_dir_exists(in_dir=os.path.dirname(save_path))
-        check_int(name="fps", value=fps, min_value=1)
+        check_float(name="fps", value=fps, min_value=1)
         if bg_img is not None:
             check_if_valid_img(data=bg_img, source=GeometryMixin.geometry_video.__name__)
         if bg_clr is not None:
@@ -966,7 +967,7 @@ class GeometryMixin(object):
         if len(size) != 2:
             raise InvalidInputError(msg=f"Size has to be 2 values, got {len(size)}", source=GeometryMixin.geometry_video.__name__)
         for i in size:
-            check_instance(source=GeometryMixin.geometry_video.__name__, instance=i, accepted_types=(int,))
+            check_instance(source=f'{GeometryMixin.geometry_video.__name__} size', instance=i, accepted_types=(int,))
         if bg_img is None:
             if bg_clr is None:
                 img = np.ones((size[0], size[1], 3), dtype=np.uint8) * 255
@@ -974,6 +975,10 @@ class GeometryMixin(object):
                 img = np.full((size[0], size[1], 3), bg_clr, dtype=np.uint8)
         else:
             img = bg_img
+        if circle_size is None:
+            circle_size = PlottingMixin().get_optimal_circle_size(frame_size=size, circle_frame_ratio=100)
+        else:
+            check_int(name='circle_size', value=circle_size, min_value=1)
         clrs = create_color_palettes(no_animals=len(shapes), map_size=1)
         fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         video_writer = cv2.VideoWriter(save_path, fourcc, fps, (size[1], size[0]))
@@ -996,12 +1001,12 @@ class GeometryMixin(object):
                         cv2.polylines(frm_img, [np.array(shape[line_cnt].coords, dtype=np.int32)], False, (clrs[shape_cnt][0][::-1]), thickness=thickness)
                 elif isinstance(shape, MultiPoint):
                     for point in shape:
-                        cv2.circle(frm_img, (int(np.array(point.centroid)[0]), int(np.array(point.centroid)[1])), 0, clrs[shape_cnt][0][::-1], thickness)
+                        cv2.circle(frm_img, (int(np.array(point.centroid)[0]), int(np.array(point.centroid)[1])), circle_size, clrs[shape_cnt][0][::-1], -1)
                 elif isinstance(shape, Point):
-                    cv2.circle(frm_img, (int(np.array(shape.centroid)[0]), int(np.array(shape.centroid)[1])), 0, clrs[shape_cnt][0][::-1], thickness)
+                    cv2.circle(frm_img, (int(np.array(shape.centroid)[0]), int(np.array(shape.centroid)[1])), circle_size, clrs[shape_cnt][0][::-1], -1)
             video_writer.write(frm_img.astype(np.uint8))
             if verbose:
-                print(f"Geometry frame complete ({frm_cnt+1} / {len(shapes)})")
+                print(f"Geometry frame complete ({frm_cnt+1})")
         video_writer.release()
         timer.stop_timer()
         if save_path is not None:
