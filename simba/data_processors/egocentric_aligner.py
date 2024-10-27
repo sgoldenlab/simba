@@ -1,16 +1,27 @@
-import os
-import numpy as np
-import cv2
-import multiprocessing
 import functools
+import multiprocessing
+import os
+from typing import List, Optional, Tuple, Union
+
+import cv2
+import numpy as np
 import pandas as pd
-from typing import Union, Optional, Tuple, List
-from simba.utils.read_write import find_files_of_filetypes_in_directory, get_fn_ext,read_df, find_video_of_file, write_df, get_video_meta_data, read_frm_of_video, find_core_cnt, remove_a_folder, concatenate_videos_in_folder
-from simba.utils.checks import check_all_file_names_are_represented_in_video_log, check_valid_dataframe, check_int
-from simba.utils.enums import Formats
+
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.warnings import FrameRangeWarning
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log, check_int,
+    check_valid_dataframe)
+from simba.utils.enums import Formats
 from simba.utils.printing import SimbaTimer
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    find_core_cnt,
+                                    find_files_of_filetypes_in_directory,
+                                    find_video_of_file, get_fn_ext,
+                                    get_video_meta_data, read_df,
+                                    read_frm_of_video, remove_a_folder,
+                                    write_df)
+from simba.utils.warnings import FrameRangeWarning
+
 
 def _egocentric_aligner(frm_range: np.ndarray,
                         video_path: Union[str, os.PathLike],

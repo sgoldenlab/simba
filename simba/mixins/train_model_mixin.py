@@ -32,7 +32,8 @@ from sklearn.feature_selection import VarianceThreshold
 from sklearn.inspection import partial_dependence, permutation_importance
 from sklearn.metrics import classification_report, precision_recall_curve
 from sklearn.model_selection import ShuffleSplit, learning_curve
-from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer, StandardScaler)
+from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer,
+                                   StandardScaler)
 from sklearn.tree import export_graphviz
 from sklearn.utils import parallel_backend
 from tabulate import tabulate
@@ -75,8 +76,9 @@ from simba.utils.errors import (ClassifierInferenceError, ColumnNotFoundError,
 from simba.utils.lookups import get_meta_data_file_headers
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_core_cnt, get_fn_ext,
-                                    get_memory_usage_of_df, read_config_entry,
-                                    read_df, read_meta_file, str_2_bool, get_pkg_version)
+                                    get_memory_usage_of_df, get_pkg_version,
+                                    read_config_entry, read_df, read_meta_file,
+                                    str_2_bool)
 from simba.utils.warnings import (MissingUserInputWarning,
                                   MultiProcessingFailedWarning,
                                   NoModuleWarning, NotEnoughDataWarning,
