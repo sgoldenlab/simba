@@ -70,7 +70,7 @@ class GeometryMixin(object):
     def bodyparts_to_polygon(data: np.ndarray,
                              cap_style: Optional[Literal["round", "square", "flat"]] = "round",
                              parallel_offset: Optional[int] = 1,
-                             pixels_per_mm: Optional[int] = 1,
+                             pixels_per_mm: Optional[Union[int, float]] = 1,
                              simplify_tolerance: Optional[float] = 2,
                              preserve_topology: Optional[bool] = True) -> List[Polygon]:
 
@@ -761,15 +761,18 @@ class GeometryMixin(object):
         return results
 
     @staticmethod
-    def union(
-        shapes: List[Union[LineString, Polygon, MultiPolygon]]
-    ) -> Union[MultiPolygon, Polygon, MultiLineString]:
+    def union(shapes: List[Union[LineString, Polygon, MultiPolygon]]) -> Union[MultiPolygon, Polygon, MultiLineString]:
         """
         Compute the union of multiple geometries.
 
         .. image:: _static/img/union.png
            :width: 400
            :align: center
+
+        .. video:: _static/img/multiframe_union.webm
+           :width: 500
+           :autoplay:
+           :loop:
 
         .. seealso:
            For multicore solution, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_union`
@@ -1846,10 +1849,25 @@ class GeometryMixin(object):
         pool.terminate()
         return results
 
-    def multiframe_union(
-        self, shapes: Iterable[Union[LineString, MultiLineString]], core_cnt: int = -1
-    ) -> Iterable[Union[LineString, MultiLineString]]:
+    def multiframe_union(self, shapes: Iterable[Union[LineString, MultiLineString, Polygon]], core_cnt: int = -1) -> Iterable[Union[LineString, MultiLineString, Polygon]]:
         """
+        Join multiple shapes frame-wise into a single shape/
+        
+        Can be useful to get more accurate representation of animal by joining animal hull (Polygon) together with animal tail (Linestring or second polygon).
+
+        .. video:: _static/img/multiframe_union.webm
+           :width: 600
+           :autoplay:
+           :loop:
+
+        .. seealso::
+           :func:`simba.mixins.geometry_mixin.GeometryMixin.union()`
+
+        :param shapes: Iterable collection of shapes (`LineString`, `MultiLineString`, or `Polygon`) to be merged. E.g, of size NxM where N is the number of frames and M is the number of shapes in each frame.
+        :param core_cnt: The number of CPU cores to use for parallel processing; defaults to -1, which uses all available cores.
+        :return: An iterable of merged shapes, where each frame is combined into a single shape.
+        :rtype: List[Union[LineString, MultiLineString, Polygon]]
+
         :example:
         >>> data_1 = np.random.randint(0, 100, (5000, 2)).reshape(1000,-1, 2)
         >>> data_2 = np.random.randint(0, 100, (5000, 2)).reshape(1000,-1, 2)
@@ -1859,22 +1877,12 @@ class GeometryMixin(object):
         >>> unions = GeometryMixin().multiframe_union(shapes=data)
         """
 
-        check_int(
-            name="CORE COUNT",
-            value=core_cnt,
-            min_value=-1,
-            max_value=find_core_cnt()[0],
-            raise_error=True,
-        )
+        check_int(name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
         if core_cnt == -1:
             core_cnt = find_core_cnt()[0]
         results = []
-        with multiprocessing.Pool(
-            core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-        ) as pool:
-            for cnt, result in enumerate(
-                pool.imap(GeometryMixin().union, shapes, chunksize=1)
-            ):
+        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
+            for cnt, result in enumerate(pool.imap(GeometryMixin().union, shapes, chunksize=1)):
                 results.append(result)
         pool.join()
         pool.terminate()
