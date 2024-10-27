@@ -55,6 +55,29 @@ def _egocentric_aligner(frm_range: np.ndarray,
 
 class EgocentricalAligner(ConfigReader):
 
+    """
+    Aligns and rotates movement data and associated video frames based on specified anchor points to produce an egocentric view of the subject. The class aligns frames around a selected anchor point, optionally rotating the subject to a consistent direction and saving the output video.
+
+    .. video:: _static/img/EgocentricalAligner.webm
+       :width: 800
+       :autoplay:
+       :loop:
+
+    :param Union[str, os.PathLike] config_path: Path to the configuration file.
+    :param Union[str, os.PathLike] save_dir: Directory where the processed output will be saved.
+    :param Optional[Union[str, os.PathLike]] data_dir: Directory containing CSV files with movement data.
+    :param Optional[str] anchor_1: Primary anchor point (e.g., 'tail_base') around which the alignment centers.
+    :param Optional[str] anchor_2: Secondary anchor point (e.g., 'nose') defining the alignment direction.
+    :param int direction: Target angle, in degrees, for alignment; e.g., `0` aligns along the x-axis.
+    :param Optional[Tuple[int, int]] anchor_location: Pixel location in the output where `anchor_1`  should appear; default is `(250, 250)`.
+    :param Optional[bool] rotate_video: Whether to rotate the video to align with the specified direction.
+    :param Optional[int] cores: Number of CPU cores to use for video rotation; `-1` uses all available cores.
+
+    :example:
+    >>> aligner = EgocentricalAligner(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", rotate_video=True, anchor_1='tail_base', anchor_2='nose', data_dir=r'C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\test', save_dir=r"C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\test\bg_temp\rotated")
+    >>> aligner.run()
+    """
+
     def __init__(self,
                  config_path: Union[str, os.PathLike],
                  save_dir: Union[str, os.PathLike],
@@ -65,28 +88,6 @@ class EgocentricalAligner(ConfigReader):
                  anchor_location: Optional[Tuple[int, int]] = (250, 250),
                  rotate_video: Optional[bool] = False,
                  cores: Optional[int] = -1):
-        """
-        Aligns and rotates movement data and associated video frames based on specified anchor points to produce an egocentric view of the subject. The class aligns frames around a selected anchor point, optionally rotating the subject to a consistent direction and saving the output video.
-
-        .. video:: _static/img/EgocentricalAligner.webm
-           :width: 800
-           :autoplay:
-           :loop:
-
-        :param Union[str, os.PathLike] config_path: Path to the configuration file.
-        :param Union[str, os.PathLike] save_dir: Directory where the processed output will be saved.
-        :param Optional[Union[str, os.PathLike]] data_dir: Directory containing CSV files with movement data.
-        :param Optional[str] anchor_1: Primary anchor point (e.g., 'tail_base') around which the alignment centers.
-        :param Optional[str] anchor_2: Secondary anchor point (e.g., 'nose') defining the alignment direction.
-        :param int direction: Target angle, in degrees, for alignment; e.g., `0` aligns along the x-axis.
-        :param Optional[Tuple[int, int]] anchor_location: Pixel location in the output where `anchor_1`  should appear; default is `(250, 250)`.
-        :param Optional[bool] rotate_video: Whether to rotate the video to align with the specified direction.
-        :param Optional[int] cores: Number of CPU cores to use for video rotation; `-1` uses all available cores.
-
-        :example:
-        >>> aligner = EgocentricalAligner(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", rotate_video=True, anchor_1='tail_base', anchor_2='nose', data_dir=r'C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\test', save_dir=r"C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\test\bg_temp\rotated")
-        >>> aligner.run()
-        """
 
         ConfigReader.__init__(self, config_path=config_path, read_video_info=True, create_logger=False)
         if data_dir is None:
