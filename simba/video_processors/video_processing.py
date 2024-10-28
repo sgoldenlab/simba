@@ -37,7 +37,7 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_valid_boolean, check_valid_lst,
                                 check_valid_tuple)
 from simba.utils.data import find_frame_numbers_from_time_stamp
-from simba.utils.enums import OS, ConfigKey, Formats, Options, Paths
+from simba.utils.enums import OS, ConfigKey, Formats, Options, Paths, Defaults
 from simba.utils.errors import (CountError, DirectoryExistError,
                                 FFMPEGCodecGPUError, FFMPEGNotFoundError,
                                 FileExistError, FrameRangeError,
@@ -3896,8 +3896,8 @@ def _bg_remover_mp(frm_range: Tuple[int, np.ndarray],
     save_path = os.path.join(temp_dir, f"{batch}.mp4")
     cap.set(1, start_frm)
     writer = cv2.VideoWriter(save_path, fourcc, video_meta_data['fps'], (video_meta_data['width'], video_meta_data['height']))
-    bg = np.full_like(bg_frm, bg_clr)
-    bg = bg[:, :, ::-1]
+
+    bg = np.full_like(bg_frm, bg_clr)[..., ::-1]  # Ensure RGB to BGR if needed
     dir, video_name, ext = get_fn_ext(filepath=video_path)
     while current_frm <= end_frm:
         ret, frm = cap.read()
@@ -3908,13 +3908,13 @@ def _bg_remover_mp(frm_range: Tuple[int, np.ndarray],
         gray_diff = 0.2989 * r + 0.5870 * g + 0.1140 * b
         gray_diff = gray_diff.astype(np.uint8)  # Ensure the type is uint8
         mask = np.where(gray_diff > 50, 255, 0).astype(np.uint8)
+        mask_inv = cv2.bitwise_not(mask)
         if fg_clr is None:
             fg = cv2.bitwise_and(frm, frm, mask=mask)
-            result = cv2.add(bg, fg)
+            result = cv2.bitwise_and(bg, bg, mask=mask_inv)
+            result = cv2.add(result, fg)
         else:
-            mask_inv = cv2.bitwise_not(mask)
-            fg_clr_img = np.full_like(frm, fg_clr)
-            fg_clr_img = fg_clr_img[:, :, ::-1]
+            fg_clr_img = np.full_like(frm, fg_clr)[..., ::-1]
             fg_clr_img = cv2.bitwise_and(fg_clr_img, fg_clr_img, mask=mask)
             result = cv2.bitwise_and(bg, bg, mask=mask_inv)
             result = cv2.add(result, fg_clr_img)
@@ -4007,7 +4007,7 @@ def video_bg_substraction_mp(video_path: Union[str, os.PathLike],
     frm_data = []
     for c, i in enumerate(frm_list):
         frm_data.append((c, i))
-    with multiprocessing.Pool(core_cnt, maxtasksperchild=9000) as pool:
+    with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
         constants = functools.partial(_bg_remover_mp,
                                       video_path=video_path,
                                       bg_frm=bg_frm,
@@ -4022,7 +4022,7 @@ def video_bg_substraction_mp(video_path: Union[str, os.PathLike],
         pool.join()
 
     print(f"Joining {video_name} multiprocessed video...")
-    concatenate_videos_in_folder(in_folder=temp_dir, save_path=save_path, video_format=ext[1:], remove_splits=True, gpu=gpu)
+    concatenate_videos_in_folder(in_folder=temp_dir, save_path=save_path, video_format=ext[1:], remove_splits=True, gpu=gpu, fps=video_meta_data['fps'])
     timer.stop_timer()
     stdout_success(msg=f'Video saved at {save_path}', elapsed_time=timer.elapsed_time_str)
 

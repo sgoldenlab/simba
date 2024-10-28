@@ -458,7 +458,7 @@ def scale_pose_img_sizes(pose_data: np.ndarray,
        :align: center
 
     :param pose_data: 3d MxNxR array of pose-estimation data where N is number of images, N the number of body-parts in each frame and R represents x,y coordinates of the body-parts.
-    :param imgs: Iteralble of images of same size as pose_data M dimension. Can be byte string representation of images of images as arrays.
+    :param imgs: Iteralble of images of same size as pose_data M dimension. Can be byte string representation of images, or images as arrays.
     :param size: The target size for the resizing operation. It can be: - `'min'`: Resize all images to the smallest height and width found among the input images. - `'max'`: Resize all images to the largest height and width found among the imgs.
     :param interpolation: Interpolation method to use for resizing. This can be one of OpenCV's interpolation methods.
     :return: The converted pose_data and converted images to align with the new size.

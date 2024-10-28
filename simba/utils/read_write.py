@@ -546,7 +546,7 @@ def concatenate_videos_in_folder(in_folder: Union[str, os.PathLike],
 
     if check_nvidea_gpu_available() and gpu:
         if fps is None:
-            returned = os.system(f'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -c copy -hide_banner -loglevel info "{save_path}" -y')
+            returned = os.system(f'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -c:v h264_nvenc -c:a copy -hide_banner -loglevel info "{save_path}" -y')
         else:
             returned = os.system(f'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -r {out_fps} -c:v h264_nvenc -c:a copy -hide_banner -loglevel info "{save_path}" -y')
     else:
