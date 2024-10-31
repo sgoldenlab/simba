@@ -15,7 +15,7 @@ from collections import ChainMap
 
 import cv2
 import pandas as pd
-from numba import int64, jit, njit, prange, uint8, float64
+from numba import float64, int64, jit, njit, prange, uint8
 from shapely.geometry import Polygon
 from skimage.metrics import structural_similarity
 

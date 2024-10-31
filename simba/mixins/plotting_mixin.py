@@ -23,21 +23,23 @@ try:
 except:
     from typing_extensions import Literal
 
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_dir_exists,
-                                check_if_keys_exist_in_dict,
-                                check_if_valid_rgb_tuple, check_instance,
-                                check_int, check_str, check_that_column_exist,
-                                check_valid_array, check_valid_dataframe,
-                                check_valid_lst, check_valid_tuple, check_valid_boolean, check_all_file_names_are_represented_in_video_log)
+from simba.mixins.config_reader import ConfigReader
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_file_exist_and_readable, check_float, check_if_dir_exists,
+    check_if_keys_exist_in_dict, check_if_valid_rgb_tuple, check_instance,
+    check_int, check_str, check_that_column_exist, check_valid_array,
+    check_valid_boolean, check_valid_dataframe, check_valid_lst,
+    check_valid_tuple)
+from simba.utils.data import create_color_palette, detect_bouts
 from simba.utils.enums import Formats, Keys, Options
 from simba.utils.errors import InvalidInputError
-from simba.utils.lookups import (get_categorical_palettes, get_color_dict,get_named_colors)
+from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
+                                 get_named_colors)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import get_video_meta_data, read_frm_of_video, find_files_of_filetypes_in_directory, read_df, get_fn_ext, read_video_info
-from simba.utils.data import detect_bouts, create_color_palette
-from simba.mixins.config_reader import ConfigReader
-
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, get_video_meta_data, read_df,
+                                    read_frm_of_video, read_video_info)
 
 
 class PlottingMixin(object):
