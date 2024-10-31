@@ -43,28 +43,17 @@ class InteractiveProbabilityGrapher(ConfigReader):
         self.click_counter = 0
         _, self.clf_name, _ = get_fn_ext(filepath=self.model_path)
         if self.clf_name not in self.clf_names:
-            raise InvalidInputError(
-                msg=f"The classifier {self.clf_name} is not a classifier in the SimBA project: {self.clf_names}"
-            )
-        self.data_path = os.path.join(
-            self.project_path,
-            Paths.CLF_DATA_VALIDATION_DIR.value,
-            os.path.basename(self.file_path),
-        )
+            raise InvalidInputError(msg=f"The classifier {self.clf_name} is not a classifier in the SimBA project: {self.clf_names}")
+        self.data_path = os.path.join(self.project_path, Paths.CLF_DATA_VALIDATION_DIR.value, os.path.basename(self.file_path))
         check_file_exist_and_readable(self.data_path)
         _, video_name, _ = get_fn_ext(filepath=file_path)
         self.data_df = read_df(self.data_path, self.file_type)
         if f"Probability_{self.clf_name}" not in self.data_df.columns:
-            raise ColumnNotFoundError(
-                column_name=f"Probability_{self.clf_name}", file_name=self.data_path
-            )
+            raise ColumnNotFoundError(column_name=f"Probability_{self.clf_name}", file_name=self.data_path)
         self.p_arr = self.data_df[["Probability_{}".format(self.clf_name)]].to_numpy()
-        current_video_file_path = self.find_video_of_file(
-            video_dir=self.video_dir, filename=video_name
-        )
-        self.video_frm = InteractiveVideoPlotterWindow(
-            video_path=current_video_file_path, p_arr=self.p_arr
-        )
+        current_video_file_path = self.find_video_of_file(video_dir=self.video_dir, filename=video_name)
+        self.video_frm = InteractiveVideoPlotterWindow(video_path=current_video_file_path, p_arr=self.p_arr)
+        self.video_frm.main_frm.protocol("WM_DELETE_WINDOW", self._close_windows)
 
     @staticmethod
     def __click_event(event):
@@ -74,12 +63,9 @@ class InteractiveProbabilityGrapher(ConfigReader):
 
     def run(self):
         import matplotlib
-
         matplotlib.use("TkAgg")
         global current_x_cord
-        probability_txt = (
-            f"Selected frame: {str(0)}, {self.clf_name} probability: {self.p_arr[0][0]}"
-        )
+        probability_txt = (f"Selected frame: {str(0)}, {self.clf_name} probability: {self.p_arr[0][0]}")
         plt_title = f"Click on the points of the graph to display the corresponding video frame. \n {probability_txt}"
         current_x_cord, prior_x_cord = None, None
 
@@ -92,18 +78,13 @@ class InteractiveProbabilityGrapher(ConfigReader):
         line = None
         fig.canvas.draw()
         fig.canvas.flush_events()
+        plt.show(block=False)
 
-        while True:
-            _ = fig.canvas.mpl_connect(
-                "button_press_event", lambda event: self.__click_event(event)
-            )
+        while plt.fignum_exists(fig.number):
+            _ = fig.canvas.mpl_connect("button_press_event", lambda event: self.__click_event(event))
             if current_x_cord != prior_x_cord:
                 prior_x_cord = copy(current_x_cord)
-                probability_txt = "Selected frame: {}, {} probability: {}".format(
-                    str(current_x_cord),
-                    self.clf_name,
-                    str(self.p_arr[current_x_cord][0]),
-                )
+                probability_txt = "Selected frame: {}, {} probability: {}".format(str(current_x_cord), self.clf_name, str(self.p_arr[current_x_cord][0]))
                 plt_title = f"Click on the points of the graph to display the corresponding video frame. \n {probability_txt}"
                 self.video_frm.load_new_frame(frm_cnt=int(current_x_cord))
                 if line != None:
@@ -116,8 +97,23 @@ class InteractiveProbabilityGrapher(ConfigReader):
             threading.Thread(plt.show()).start()
             plt.pause(0.0001)
 
+        self.video_frm.main_frm.destroy()
 
-# test = InteractiveProbabilityGrapher(config_path=r'/Users/simon/Desktop/envs/troubleshooting/naresh/project_folder/project_config.ini',
-#                                      file_path='/Users/simon/Desktop/envs/troubleshooting/naresh/project_folder/csv/features_extracted/SF2.csv',
-#                                      model_path='/Users/simon/Desktop/envs/troubleshooting/naresh/models/generated_models/Top.sav')
-# test.create_plots()
+    def _close_windows(self):
+        try:
+            self.video_frm.main_frm.destroy()
+        except:
+            pass
+        plt.close('all')
+
+
+
+
+
+#
+# test = InteractiveProbabilityGrapher(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini",
+#                                      file_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\csv\features_extracted\Together_1.csv",
+#                                      model_path=r"C:\troubleshooting\two_black_animals_14bp\models\Attack.sav")
+# test.run()
+#
+#

@@ -7,6 +7,7 @@ import numpy as np
 from PIL import Image as Img
 from PIL import ImageTk
 
+from simba.utils.warnings import FrameRangeWarning
 from simba.utils.errors import FrameRangeError
 from simba.utils.read_write import get_video_meta_data
 
@@ -28,11 +29,7 @@ class InteractiveVideoPlotterWindow(object):
         self.max_frm = np.argmax(p_arr)
         self.frame_id_lbl = Label(self.button_frame, text="FRAME NUMBER")
         self.frame_id_lbl.grid(row=0, column=1, sticky=NW, padx=PADDING)
-        self.forward_next_frm_btn = Button(
-            self.button_frame,
-            text=">",
-            command=lambda: self.load_new_frame(frm_cnt=self.current_frm_number + 1),
-        )
+        self.forward_next_frm_btn = Button(self.button_frame, text=">", command=lambda: self.load_new_frame(frm_cnt=self.current_frm_number + 1))
         self.forward_next_frm_btn.grid(row=1, column=3, sticky=E, padx=PADDING)
 
         self.forward_last_frm_btn = Button(
@@ -93,19 +90,15 @@ class InteractiveVideoPlotterWindow(object):
 
         instructions_frm = Frame(self.main_frm, width=100, height=100)
         instructions_frm.grid(row=0, column=2, sticky=N)
-        key_presses = Label(
-            instructions_frm,
-            text="\n\n Keyboard shortcuts for frame navigation: \n Right Arrow = +1 frame"
-            "\n Left Arrow = -1 frame"
-            "\n Ctrl + l = Last frame"
-            "\n Ctrl + o = First frame",
-        )
+        key_presses = Label(instructions_frm,
+                            text="\n\n Keyboard shortcuts for frame navigation: \n Right Arrow = +1 frame"
+                            "\n Left Arrow = -1 frame"
+                            "\n Ctrl + l = Last frame"
+                            "\n Ctrl + o = First frame")
 
-        move_to_highest_p_btn = Button(
-            instructions_frm,
-            text="SHOW HIGHEST \n PROBABILITY FRAME",
-            command=lambda: self.load_new_frame(frm_cnt=self.max_frm),
-        )
+        move_to_highest_p_btn = Button(instructions_frm,
+                                       text="SHOW HIGHEST \n PROBABILITY FRAME",
+                                       command=lambda: self.load_new_frame(frm_cnt=self.max_frm))
         key_presses.grid(row=0, column=0, sticky=S)
         move_to_highest_p_btn.grid(row=1, column=0, sticky=S)
         self.bind_keys()
@@ -118,15 +111,16 @@ class InteractiveVideoPlotterWindow(object):
 
     def load_new_frame(self, frm_cnt: int):
         if (frm_cnt > self.video_meta_data["frame_count"] - 1) or (frm_cnt < 0):
-            raise FrameRangeError(msg=f'Frame {str(frm_cnt)} is outside of the video frame range: (0-{self.video_meta_data["frame_count"]-1}).')
-        self.cap.set(1, int(frm_cnt))
-        _, self.new_frm = self.cap.read()
-        self.new_frm = cv2.cvtColor(self.new_frm, cv2.COLOR_RGB2BGR)
-        self.new_frm = Img.fromarray(self.new_frm)
-        self.new_frm.thumbnail(MAX_SIZE, Img.LANCZOS)
-        self.new_frm = ImageTk.PhotoImage(master=self.main_frm, image=self.new_frm)
-        self.img_frm = Label(self.main_frm, image=self.new_frm)
-        self.img_frm.image = self.new_frm
-        self.img_frm.grid(row=0, column=0)
-        self.current_frm_number = frm_cnt
-        self.frame_entry_var.set(value=self.current_frm_number)
+            FrameRangeWarning(msg=f'Frame {str(frm_cnt)} is outside of the video frame range: (0-{self.video_meta_data["frame_count"]-1}).')
+        else:
+            self.cap.set(1, int(frm_cnt))
+            _, self.new_frm = self.cap.read()
+            self.new_frm = cv2.cvtColor(self.new_frm, cv2.COLOR_RGB2BGR)
+            self.new_frm = Img.fromarray(self.new_frm)
+            self.new_frm.thumbnail(MAX_SIZE, Img.LANCZOS)
+            self.new_frm = ImageTk.PhotoImage(master=self.main_frm, image=self.new_frm)
+            self.img_frm = Label(self.main_frm, image=self.new_frm)
+            self.img_frm.image = self.new_frm
+            self.img_frm.grid(row=0, column=0)
+            self.current_frm_number = frm_cnt
+            self.frame_entry_var.set(value=self.current_frm_number)
