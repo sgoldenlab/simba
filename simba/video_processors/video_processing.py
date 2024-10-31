@@ -37,7 +37,7 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_valid_boolean, check_valid_lst,
                                 check_valid_tuple)
 from simba.utils.data import find_frame_numbers_from_time_stamp
-from simba.utils.enums import OS, ConfigKey, Formats, Options, Paths, Defaults
+from simba.utils.enums import OS, ConfigKey, Defaults, Formats, Options, Paths
 from simba.utils.errors import (CountError, DirectoryExistError,
                                 FFMPEGCodecGPUError, FFMPEGNotFoundError,
                                 FileExistError, FrameRangeError,
