@@ -1509,7 +1509,7 @@ def read_roi_data(roi_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, pd.D
     Method to read in ROI definitions from SimBA project.
 
     :param Union[str, os.PathLike] roi_path: path to `ROI_definitions.h5` on disk.
-    :return: 3-part Tuple of dataframes representing circles, polygons, and rectangles.
+    :return: 3-part Tuple of dataframes representing rectangles, circles, polygons.
     :rtype: Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]
     """
     check_file_exist_and_readable(file_path=roi_path)

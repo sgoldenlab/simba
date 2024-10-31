@@ -100,6 +100,7 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
                 tracks = f["tracks"][:].T
                 point_scores = f["point_scores"][:].T
 
+
             csv_rows = []
             n_frames, n_nodes, _, n_tracks = tracks.shape
             for frame_ind in range(n_frames):
@@ -147,13 +148,13 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
 
 
 # test = SLEAPImporterH5(config_path=r"C:\troubleshooting\sleap_two_animals_open_field\project_folder\project_config.ini",
-#                         data_folder=r"C:\troubleshooting\sleap_two_animals_open_field\h5",
+#                         data_folder=r"C:\Users\sroni\Downloads\slape_data_fodler_2",
 #                         id_lst=['Jarryd', 'Nilsson'],
 #                         interpolation_settings=None,
 #                         smoothing_settings = None)
 # test.run()
-#
-#
+
+
 
 #
 #

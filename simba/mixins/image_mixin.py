@@ -15,7 +15,7 @@ from collections import ChainMap
 
 import cv2
 import pandas as pd
-from numba import int64, jit, njit, prange, uint8
+from numba import int64, jit, njit, prange, uint8, float64
 from shapely.geometry import Polygon
 from skimage.metrics import structural_similarity
 
@@ -175,7 +175,7 @@ class ImageMixin(object):
         check_str(
             name=f"{ImageMixin().get_histocomparison.__name__} method",
             value=method,
-            options=list(GeometryEnum.HISTOGRAM_COMPARISON_MAP.value.keys()),
+            options=tuple(GeometryEnum.HISTOGRAM_COMPARISON_MAP.value.keys()),
         )
         method = GeometryEnum.HISTOGRAM_COMPARISON_MAP.value[method]
         if absolute:
@@ -405,7 +405,7 @@ class ImageMixin(object):
                       method: Optional[Literal["simple", "none", "l1", "kcos"]] = "simple",
                       ) -> np.ndarray:
         """
-        Find contours in the input image.
+        Find contours in an image.
 
         .. seealso::
            :func:`simba.mixins.image_mixin.ImageMixin.get_contourmatch`
@@ -429,10 +429,9 @@ class ImageMixin(object):
             cnts, hierarchy = cv2.findContours(img, mode, method)[-2:]  # TODO
             interior_contours = []
             for i in range(len(cnts)):
-                if (
-                    hierarchy[0][i][3] == -1
-                ):  # Contour with no parent (interior contour)
+                if (hierarchy[0][i][3] == -1):  # Contour with no parent (interior contour)
                     interior_contours.append(cnts[i])
+            return interior_contours
 
     @staticmethod
     def orb_matching_similarity_(img_1: np.ndarray,
@@ -908,8 +907,10 @@ class ImageMixin(object):
         return results.astype(np.int64)
 
     @staticmethod
-    @njit([(uint8[:, :, :, :], int64), (uint8[:, :, :], int64)])
-    def img_sliding_mse(imgs: np.ndarray, slide_size: int = 1) -> np.ndarray:
+    @njit([(uint8[:, :, :, :], float64, float64), (uint8[:, :, :], float64, float64)])
+    def img_sliding_mse(imgs: np.ndarray,
+                        slide_length: Optional[float] = 1.0,
+                        sample_rate: Optional[float] = 1.0) -> np.ndarray:
         """
         Jitted compute the mean squared error (MSE) between pairs of images in a sliding window manner.
 
@@ -935,12 +936,13 @@ class ImageMixin(object):
         :example:
         >>> imgs = ImageMixin().read_all_img_in_dir(dir='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/Together_4_cropped_frames')
         >>> imgs = np.stack(imgs.values())
-        >>> mse = ImageMixin().img_sliding_mse(imgs=imgs, slide_size=2)
+        >>> mse = ImageMixin().img_sliding_mse(imgs=imgs, slide_length=2)
         """
 
+        slide_length = int(max(0.0, slide_length * sample_rate))
         results = np.full((imgs.shape[0]), 0)
-        for i in prange(slide_size, imgs.shape[0]):
-            results[i] = np.sum((imgs[i - slide_size] - imgs[i]) ** 2) / float(imgs[i - slide_size].shape[0] * imgs[i].shape[1])
+        for i in prange(slide_length, imgs.shape[0]):
+            results[i] = np.sum((imgs[i - slide_length] - imgs[i]) ** 2) / float(imgs[i - slide_length].shape[0] * imgs[i].shape[1])
         return results.astype(int64)
 
     @staticmethod
@@ -1261,7 +1263,7 @@ class ImageMixin(object):
 
     @staticmethod
     def img_stack_to_video(imgs: Dict[int, np.ndarray],
-                           fps: int,
+                           fps: Union[int, float],
                            save_path: Union[str, os.PathLike],
                            verbose: Optional[bool] = True) -> None:
         """
@@ -1281,6 +1283,7 @@ class ImageMixin(object):
 
         timer = SimbaTimer(start=True)
         check_instance(source=ImageMixin.img_stack_to_video.__name__, instance=imgs, accepted_types=(dict,))
+        check_float(name=f'{ImageMixin().img_stack_to_video.__name__} fps', value=fps, min_value=10e-6)
         img_sizes = set()
         for k, v in imgs.items():
             img_sizes.add(v.shape)
@@ -1300,6 +1303,7 @@ class ImageMixin(object):
     @staticmethod
     def _slice_shapes_in_video_file_helper(data: np.ndarray,
                                            video_path: Union[str, os.PathLike],
+                                           bg_color: Tuple[int, int, int],
                                            verbose: bool):
 
         cap = cv2.VideoCapture(video_path)
@@ -1326,7 +1330,8 @@ class ImageMixin(object):
                              imgs: Union[np.ndarray, os.PathLike],
                              shapes: Union[np.ndarray, List[Polygon]],
                              core_cnt: Optional[int] = -1,
-                             verbose: Optional[bool] = False) -> Dict[int, np.ndarray]:
+                             verbose: Optional[bool] = False,
+                             bg_color: Optional[Tuple[int, int, int]] = (255, 255, 255)) -> Dict[int, np.ndarray]:
         """
         Slice regions from a stack of images or a video file, where the regions are based on defined shapes. Uses multiprocessing.
 
@@ -1377,6 +1382,7 @@ class ImageMixin(object):
             core_cnt = find_core_cnt()[0]
         check_instance(source=ImageMixin().slice_shapes_in_imgs.__name__, instance=imgs, accepted_types=(np.ndarray, str))
         check_instance( source=ImageMixin().slice_shapes_in_imgs.__name__, instance=shapes, accepted_types=(np.ndarray, list))
+        check_if_valid_rgb_tuple(data=bg_color)
         if isinstance(shapes, np.ndarray):
             check_valid_array(data=shapes, source=ImageMixin().slice_shapes_in_imgs.__name__, accepted_ndims=(2,), accepted_dtypes=[Polygon])
         else:
@@ -1405,7 +1411,7 @@ class ImageMixin(object):
             results = []
             shapes = np.array_split(np.column_stack((np.arange(len(shapes)), shapes)), core_cnt)
             with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-                constants = functools.partial( self._slice_shapes_in_video_file_helper, video_path=imgs, verbose=verbose)
+                constants = functools.partial( self._slice_shapes_in_video_file_helper, video_path=imgs, bg_color=bg_color, verbose=verbose)
                 for cnt, result in enumerate(pool.imap(constants, shapes, chunksize=1)):
                     results.append(result)
                 results = dict(ChainMap(*results))
@@ -1846,8 +1852,6 @@ class ImageMixin(object):
             results[k] = cv2.resize(v, dsize=(target_w, target_h), fx=0, fy=0, interpolation=interpolation)
 
         return results
-    def blah(self):
-        print(1)
 
 
 #x = ImageMixin.get_blob_locations(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled_bg_subtracted.mp4", gpu=True)

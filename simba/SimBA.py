@@ -13,6 +13,7 @@ import tkinter.ttk as ttk
 import urllib.request
 import webbrowser
 from tkinter.filedialog import askdirectory
+from tkinter.filedialog import askdirectory
 from tkinter.messagebox import askyesno
 
 import PIL.Image
@@ -416,8 +417,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_runvalidmodel = SimbaButton(parent=label_model_validation, txt="RUN MODEL", txt_clr='blue', img='rocket', cmd=self.validate_model_first_step, thread=True)
         button_generateplot = SimbaButton(parent=label_model_validation, txt="INTERACTIVE PROBABILITY PLOT",  img='interactive_blue', txt_clr='blue', cmd=self.launch_interactive_plot, thread=False)
 
-        self.dis_threshold = Entry_Box(label_model_validation, "DISCRIMINATION THRESHOLD (0.0-1.0):", "30")
-        self.min_behaviorbout = Entry_Box(label_model_validation,"MINIMUM BOUT LENGTH (MS):","30",validation="numeric")
+        self.dis_threshold = Entry_Box(label_model_validation, "DISCRIMINATION THRESHOLD (0.0-1.0):", "35")
+        self.min_behaviorbout = Entry_Box(label_model_validation,"MINIMUM BOUT LENGTH (MS):","35",validation="numeric")
         button_validate_model = SimbaButton(parent=label_model_validation, txt="CREATE VALIDATION VIDEO", txt_clr='blue', img='visualize_blue', cmd=ValidationVideoPopUp, cmd_kwargs={'config_path': lambda:config_path, 'simba_main_frm': lambda:self})
 
         label_runmachinemodel = CreateLabelFrameWithIcon(parent=tab9,header="RUN MACHINE MODEL",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.SCENARIO_2.value)

@@ -6,7 +6,7 @@ import os
 import re
 import subprocess
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, Type
 
 import cv2
 import numpy as np
@@ -56,13 +56,12 @@ def check_file_exist_and_readable(file_path: Union[str, os.PathLike]) -> None:
         pass
 
 
-def check_int(
-    name: str,
-    value: Any,
-    max_value: Optional[int] = None,
-    min_value: Optional[int] = None,
-    raise_error: Optional[bool] = True,
-) -> (bool, str):
+def check_int(name: str,
+              value: Any,
+              max_value: Optional[int] = None,
+              min_value: Optional[int] = None,
+              unaccepted_vals: Optional[List[int]] = None,
+              raise_error: Optional[bool] = True) -> (bool, str):
     """
     Check if variable is a valid integer.
 
@@ -70,6 +69,7 @@ def check_int(
     :param Any value: Value of variable
     :param Optional[int] max_value: Maximum allowed value of the variable. If None, then no maximum. Default: None.
     :param Optional[int]: Minimum allowed value of the variable. If None, then no minimum. Default: None.
+    :param Optional[List[int]] unaccepted_vals: Optional list of values that are not accepted. Default: None.
     :param Optional[bool] raise_error: If True, then raise error if invalid integer. Default: True.
 
     :return bool: False if invalid. True if valid.
@@ -101,6 +101,15 @@ def check_int(
                 raise IntegerError(msg=msg, source=check_int.__name__)
             else:
                 return False, msg
+    if unaccepted_vals != None:
+        check_valid_lst(data=unaccepted_vals, source=name, valid_dtypes=(int,), min_len=1)
+        if int(value) in unaccepted_vals:
+            msg = f"{name} is an not an accepted value. Unaccepted values {unaccepted_vals}."
+            if raise_error:
+                raise IntegerError(msg=msg, source=check_int.__name__)
+            else:
+                return False, msg
+
     return True, msg
 
 
@@ -795,7 +804,7 @@ def check_valid_array(data: np.ndarray,
                       accepted_sizes: Optional[List[int]] = None,
                       accepted_axis_0_shape: Optional[List[int]] = None,
                       accepted_axis_1_shape: Optional[List[int]] = None,
-                      accepted_dtypes: Optional[List[str]] = None,
+                      accepted_dtypes: Optional[Union[List[Union[str, Type]], Tuple[Union[str, Type]]]] = None,
                       accepted_values: Optional[List[Any]] = None,
                       accepted_shapes: Optional[List[Tuple[int]]] = None,
                       min_axis_0: Optional[int] = None,
@@ -895,7 +904,7 @@ def check_valid_array(data: np.ndarray,
 
 def check_valid_lst(data: list,
                     source: Optional[str] = "",
-                    valid_dtypes: Optional[Tuple[Any]] = None,
+                    valid_dtypes: Optional[Union[Tuple[Any], List[Any]]] = None,
                     valid_values: Optional[List[Any]] = None,
                     min_len: Optional[int] = 1,
                     max_len: Optional[int] = None,
@@ -1252,12 +1261,12 @@ def check_valid_boolean(value: Union[Any, List[Any]], source: Optional[str] = ''
             else:
                 return False
 
-def check_valid_tuple(
-    x: tuple,
-    source: Optional[str] = "",
-    accepted_lengths: Optional[Tuple[int]] = None,
-    valid_dtypes: Optional[Tuple[Any]] = None,
-):
+def check_valid_tuple(x: tuple,
+                      source: Optional[str] = "",
+                      accepted_lengths: Optional[Tuple[int]] = None,
+                      valid_dtypes: Optional[Tuple[Any]] = None,
+                      minimum_length: Optional[int] = None):
+
     if not isinstance(x, (tuple)):
         raise InvalidInputError(
             msg=f"{check_valid_tuple.__name__} {source} is not a valid tuple",
@@ -1273,10 +1282,16 @@ def check_valid_tuple(
         dtypes = list(set([type(v) for v in x]))
         additional = [x for x in dtypes if x not in valid_dtypes]
         if len(additional) > 0:
-            raise InvalidInputError(
-                msg=f"The tuple {source} has invalid data format(s) {additional}. Valid: {valid_dtypes}",
-                source=source,
-            )
+            raise InvalidInputError(msg=f"The tuple {source} has invalid data format(s) {additional}. Valid: {valid_dtypes}", source=source)
+
+    if minimum_length is not None:
+        check_int(name=f'{check_valid_tuple.__name__} minimum_length', value=minimum_length, min_value=1)
+        tuple_len = len(x)
+        if tuple_len < minimum_length:
+            raise InvalidInputError(msg=f"The tuple {source} is shorter ({tuple_len}) than the minimum required length ({minimum_length}).", source=source)
+
+
+
 
 
 def check_video_and_data_frm_count_align(video: Union[str, os.PathLike, cv2.VideoCapture],
@@ -1387,4 +1402,36 @@ def check_if_video_corrupted(video: Union[str, os.PathLike, cv2.VideoCapture],
     else:
         pass
 
+
+def check_valid_dict(x: dict,
+                     valid_key_dtypes: Optional[Tuple[Any]] = None,
+                     valid_values_dtypes: Optional[Tuple[Any]] = None,
+                     max_len_keys: Optional[int] = None,
+                     min_len_keys: Optional[int] = None,
+                     required_keys: Optional[Tuple[Any]] = None):
+
+
+    check_instance(source=check_valid_dict.__name__, instance=x, accepted_types=(dict,))
+    if valid_key_dtypes is not None:
+        for i in list(x.keys()):
+            if not isinstance(i, valid_key_dtypes):
+                raise InvalidInputError(msg=f'{type(i)} is not a valid key DTYPE. Valid: {valid_key_dtypes}', source=check_valid_dict.__name__)
+    if valid_values_dtypes is not None:
+        for i in list(x.values()):
+            if not isinstance(i, valid_values_dtypes):
+                raise InvalidInputError(msg=f'{type(i)} is not a valid value DTYPE. Valid: {valid_values_dtypes}', source=check_valid_dict.__name__)
+    if max_len_keys is not None:
+        check_int(name=f'{check_valid_dict.__name__} max_len_keys', min_value=1, value=max_len_keys)
+        key_cnt = len(list(x.keys()))
+        if key_cnt > max_len_keys:
+            raise InvalidInputError(msg=f'Dictionary have {key_cnt} keys. Maximum allowed: {max_len_keys}', source=check_valid_dict.__name__)
+    if min_len_keys is not None:
+        check_int(name=f'{check_valid_dict.__name__} min_len_keys', min_value=1, value=min_len_keys)
+        key_cnt = len(list(x.keys()))
+        if key_cnt < min_len_keys:
+            raise InvalidInputError(msg=f'Dictionary have {key_cnt} keys. Minimum allowed: {min_len_keys}', source=check_valid_dict.__name__)
+    if required_keys is not None:
+        for i in list(required_keys):
+            if i not in list(x.keys()):
+                raise InvalidInputError(msg=f'The required key {i} does not exist in the dictionary. Existing keys: {list(x.keys())}', source=check_valid_dict.__name__)
 

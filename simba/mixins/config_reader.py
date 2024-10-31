@@ -217,28 +217,15 @@ class ConfigReader(object):
         """
 
         if not os.path.isfile(self.roi_coordinates_path):
-            raise NoROIDataError(msg="SIMBA ERROR: No ROI definitions were found in your SimBA project. Please draw some ROIs before analyzing your ROI data", source=self.__class__.__name__,
-            )
+            raise NoROIDataError(msg="SIMBA ERROR: No ROI definitions were found in your SimBA project. Please draw some ROIs before analyzing your ROI data", source=self.__class__.__name__)
         else:
-            self.rectangles_df = pd.read_hdf(
-                self.roi_coordinates_path, key=Keys.ROI_RECTANGLES.value
-            )
-            if ("Center_X" in self.rectangles_df.columns) and (
-                self.rectangles_df["Center_X"].isnull().values.any()
-            ):
+            self.rectangles_df = pd.read_hdf(self.roi_coordinates_path, key=Keys.ROI_RECTANGLES.value)
+            if ("Center_X" in self.rectangles_df.columns) and (self.rectangles_df["Center_X"].isnull().values.any()):
                 for idx, row in self.rectangles_df.iterrows():
-                    self.rectangles_df.loc[idx]["Center_X"] = row["Tags"]["Center tag"][
-                        0
-                    ]
-                    self.rectangles_df.loc[idx]["Center_Y"] = row["Tags"]["Center tag"][
-                        1
-                    ]
-            self.circles_df = pd.read_hdf(
-                self.roi_coordinates_path, key=Keys.ROI_CIRCLES.value
-            ).dropna(how="any")
-            self.polygon_df = pd.read_hdf(
-                self.roi_coordinates_path, key=Keys.ROI_POLYGONS.value
-            )
+                    self.rectangles_df.loc[idx]["Center_X"] = row["Tags"]["Center tag"][0]
+                    self.rectangles_df.loc[idx]["Center_Y"] = row["Tags"]["Center tag"][1]
+            self.circles_df = pd.read_hdf(self.roi_coordinates_path, key=Keys.ROI_CIRCLES.value).dropna(how="any")
+            self.polygon_df = pd.read_hdf(self.roi_coordinates_path, key=Keys.ROI_POLYGONS.value)
             if "Center_XCenter_Y" in self.polygon_df.columns:
                 self.polygon_df = self.polygon_df.drop(["Center_XCenter_Y"], axis=1)
             self.polygon_df = self.polygon_df.dropna(how="any")

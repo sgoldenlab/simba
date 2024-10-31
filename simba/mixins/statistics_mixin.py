@@ -2717,10 +2717,10 @@ class Statistics(FeatureExtractionMixin):
         .. note:
            - If calc_medians is True, the function returns cluster medians in addition to centroids and labels.
 
-        :parameter np.ndarray data: 1d array containing feature values.
-        :parameter int k: Number of clusters.
-        :parameter int max_iters: Maximum number of iterations for the k-means algorithm.
-        :parameter bool calc_medians: Flag indicating whether to calculate cluster medians.
+        :param np.ndarray data: 1d array containing feature values.
+        :param int k: Number of clusters.
+        :param int max_iters: Maximum number of iterations for the k-means algorithm.
+        :param bool calc_medians: Flag indicating whether to calculate cluster medians.
         :returns Tuple: Tuple of three elements. Final centroids of the clusters. Labels assigned to each data point based on clusters. Cluster medians (if calc_medians is True), otherwise None.
 
         :example:

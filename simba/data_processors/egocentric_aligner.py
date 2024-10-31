@@ -8,9 +8,7 @@ import numpy as np
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log, check_int,
-    check_valid_dataframe)
+from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_int, check_valid_dataframe, check_if_dir_exists)
 from simba.utils.enums import Formats
 from simba.utils.printing import SimbaTimer
 from simba.utils.read_write import (concatenate_videos_in_folder,
@@ -26,9 +24,11 @@ from simba.utils.warnings import FrameRangeWarning
 def _egocentric_aligner(frm_range: np.ndarray,
                         video_path: Union[str, os.PathLike],
                         temp_dir: Union[str, os.PathLike],
+                        video_name: str,
                         centers: List[Tuple[int, int]],
                         rotation_vectors: np.ndarray,
-                        target: Tuple[int, int]):
+                        target: Tuple[int, int],
+                        color: Tuple[int, int, int] = (255, 255, 255)):
 
     video_meta = get_video_meta_data(video_path=video_path)
     cap = cv2.VideoCapture(video_path)
@@ -41,13 +41,13 @@ def _egocentric_aligner(frm_range: np.ndarray,
         img = read_frm_of_video(video_path=cap, frame_index=frm_id)
         R, center = rotation_vectors[frm_id], centers[frm_id]
         M_rotate = np.hstack([R, np.array([[-center[0] * R[0, 0] - center[1] * R[0, 1] + center[0]], [-center[0] * R[1, 0] - center[1] * R[1, 1] + center[1]]])])
-        rotated_frame = cv2.warpAffine(img, M_rotate, (video_meta['width'], video_meta['height']))
+        rotated_frame = cv2.warpAffine(img, M_rotate, (video_meta['width'], video_meta['height']), borderValue=color)
         translation_x = target[0] - center[0]
         translation_y = target[1] - center[1]
         M_translate = np.float32([[1, 0, translation_x], [0, 1, translation_y]])
-        final_frame = cv2.warpAffine(rotated_frame, M_translate, (video_meta['width'], video_meta['height']))
+        final_frame = cv2.warpAffine(rotated_frame, M_translate, (video_meta['width'], video_meta['height']), borderValue=color)
         writer.write(final_frame)
-        print(f'Creating frame {frm_id} (CPU core: {batch+1}).')
+        print(f'Creating frame {frm_id} ({video_name}, CPU core: {batch+1}).')
 
     cap.release()
     writer.release()
@@ -82,6 +82,7 @@ class EgocentricalAligner(ConfigReader):
                  config_path: Union[str, os.PathLike],
                  save_dir: Union[str, os.PathLike],
                  data_dir: Optional[Union[str, os.PathLike]] = None,
+                 videos_dir: Optional[Union[str, os.PathLike]] = None,
                  anchor_1: Optional[str] = 'tail_base',
                  anchor_2: Optional[str] = 'nose',
                  direction: int = 0,
@@ -106,91 +107,98 @@ class EgocentricalAligner(ConfigReader):
             self.cores = find_core_cnt()[0]
         else:
             self.cores = cores
+        if videos_dir is not None:
+            check_if_dir_exists(in_dir=videos_dir)
+            self.video_dir = videos_dir
 
     def run(self):
         for file_cnt, file_path in enumerate(self.data_paths):
             _, self.video_name, _ = get_fn_ext(filepath=file_path)
             save_path = os.path.join(self.save_dir, f'{self.video_name}.{self.file_type}')
-            df = read_df(file_path=file_path, file_type=self.file_type)
-            original_cols, self.file_path = list(df.columns), file_path
-            df.columns = [x.lower() for x in list(df.columns)]
-            check_valid_dataframe(df=df, source=self.__class__.__name__, valid_dtypes=Formats.NUMERIC_DTYPES.value, required_fields=self.anchor_1_cols + self.anchor_2_cols)
-            self.body_parts_lst = [x.lower() for x in self.body_parts_lst]
-            bp_cols = [x for x in df.columns if not x.endswith('_p')]
-            anchor_1_idx = self.body_parts_lst.index(self.anchor_1)
-            anchor_2_idx = self.body_parts_lst.index(self.anchor_2)
-            data_arr = df[bp_cols].values.reshape(len(df), len(self.body_parts_lst), 2).astype(np.int32)
-            results_arr = np.zeros_like(data_arr)
-            self.rotation_angles, self.rotation_vectors, self.centers, self.deltas = [], [], [], []
-            for frame_index in range(data_arr.shape[0]):
-                frame_points = data_arr[frame_index]
-                frame_anchor_1 = frame_points[anchor_1_idx]
-                self.centers.append(tuple(frame_anchor_1))
-                frame_anchor_2 = frame_points[anchor_2_idx]
-                delta_x, delta_y = frame_anchor_2[0] - frame_anchor_1[0], frame_anchor_2[1] - frame_anchor_1[1]
-                self.deltas.append((delta_x, delta_x))
-                current_angle = np.arctan2(delta_y, delta_x)
-                rotate_angle = self.target_angle - current_angle
-                self.rotation_angles.append(rotate_angle)
-                cos_theta, sin_theta = np.cos(rotate_angle), np.sin(rotate_angle)
-                R = np.array([[cos_theta, -sin_theta], [sin_theta, cos_theta]])
-                self.rotation_vectors.append(R)
-                keypoints_translated = frame_points - frame_anchor_1
-                keypoints_rotated = np.dot(keypoints_translated, R.T)
-                anchor_1_position_after_rotation = keypoints_rotated[anchor_1_idx]
-                translation_to_target = np.array(self.anchor_location) - anchor_1_position_after_rotation
-                keypoints_aligned = keypoints_rotated + translation_to_target
-                results_arr[frame_index] = keypoints_aligned
+            if not os.path.isfile(save_path):
+                df = read_df(file_path=file_path, file_type=self.file_type)
+                original_cols, self.file_path = list(df.columns), file_path
+                df.columns = [x.lower() for x in list(df.columns)]
+                check_valid_dataframe(df=df, source=self.__class__.__name__, valid_dtypes=Formats.NUMERIC_DTYPES.value, required_fields=self.anchor_1_cols + self.anchor_2_cols)
+                self.body_parts_lst = [x.lower() for x in self.body_parts_lst]
+                bp_cols = [x for x in df.columns if not x.endswith('_p')]
+                anchor_1_idx = self.body_parts_lst.index(self.anchor_1)
+                anchor_2_idx = self.body_parts_lst.index(self.anchor_2)
+                data_arr = df[bp_cols].values.reshape(len(df), len(self.body_parts_lst), 2).astype(np.int32)
+                results_arr = np.zeros_like(data_arr)
+                self.rotation_angles, self.rotation_vectors, self.centers, self.deltas = [], [], [], []
+                for frame_index in range(data_arr.shape[0]):
+                    frame_points = data_arr[frame_index]
+                    frame_anchor_1 = frame_points[anchor_1_idx]
+                    self.centers.append(tuple(frame_anchor_1))
+                    frame_anchor_2 = frame_points[anchor_2_idx]
+                    delta_x, delta_y = frame_anchor_2[0] - frame_anchor_1[0], frame_anchor_2[1] - frame_anchor_1[1]
+                    self.deltas.append((delta_x, delta_x))
+                    current_angle = np.arctan2(delta_y, delta_x)
+                    rotate_angle = self.target_angle - current_angle
+                    self.rotation_angles.append(rotate_angle)
+                    cos_theta, sin_theta = np.cos(rotate_angle), np.sin(rotate_angle)
+                    R = np.array([[cos_theta, -sin_theta], [sin_theta, cos_theta]])
+                    self.rotation_vectors.append(R)
+                    keypoints_translated = frame_points - frame_anchor_1
+                    keypoints_rotated = np.dot(keypoints_translated, R.T)
+                    anchor_1_position_after_rotation = keypoints_rotated[anchor_1_idx]
+                    translation_to_target = np.array(self.anchor_location) - anchor_1_position_after_rotation
+                    keypoints_aligned = keypoints_rotated + translation_to_target
+                    results_arr[frame_index] = keypoints_aligned
 
-            results_arr = results_arr.reshape(len(df), len(bp_cols))
-            self.out_df = pd.DataFrame(results_arr, columns=bp_cols)
-            df.update(self.out_df)
-            df.columns = original_cols
-            write_df(df=df, file_type=self.file_type, save_path=save_path)
-            if self.rotate_video:
-                self.run_video_rotation()
+                results_arr = results_arr.reshape(len(df), len(bp_cols))
+                self.out_df = pd.DataFrame(results_arr, columns=bp_cols)
+                df.update(self.out_df)
+                df.columns = original_cols
+                write_df(df=df, file_type=self.file_type, save_path=save_path)
+                if self.rotate_video:
+                    self.run_video_rotation()
 
     def run_video_rotation(self):
         video_timer = SimbaTimer(start=True)
-        video_path = find_video_of_file(video_dir=self.video_dir, filename=self.video_name, raise_error=True)
-        video_meta = get_video_meta_data(video_path=video_path)
-        save_path = os.path.join(self.save_dir, f'{self.video_name}.mp4')
-        temp_dir = os.path.join(self.save_dir, 'temp')
-        if not os.path.isdir(temp_dir):
-            os.makedirs(temp_dir)
-        else:
-            remove_a_folder(folder_dir=temp_dir)
-            os.makedirs(temp_dir)
-        if video_meta['frame_count'] != len(self.out_df):
-            FrameRangeWarning(msg=f'The video {video_path} contains {video_meta["frame_count"]} frames while the file {self.file_path} contains {len(self.out_df)} frames', source=self.__class__.__name__)
-        frm_list = np.arange(0, video_meta['frame_count'])
-        frm_list = np.array_split(frm_list, self.cores)
-        frm_list = [(cnt, x) for cnt, x in enumerate(frm_list)]
-        print(f"Creating rotated videos, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.cores})...")
-        with multiprocessing.Pool(self.cores, maxtasksperchild=self.maxtasksperchild) as pool:
-            constants = functools.partial(_egocentric_aligner,
-                                          temp_dir=temp_dir,
-                                          video_path=video_path,
-                                          centers=self.centers,
-                                          rotation_vectors=self.rotation_vectors,
-                                          target=self.anchor_location)
-            for cnt, result in enumerate(pool.imap(constants, frm_list, chunksize=self.multiprocess_chunksize)):
-                print(f"Rotate batch {result}/{self.cores} complete...")
-            pool.terminate()
-            pool.join()
+        video_path = find_video_of_file(video_dir=self.video_dir, filename=self.video_name, raise_error=False)
+        if video_path is not None:
+            video_meta = get_video_meta_data(video_path=video_path)
+            save_path = os.path.join(self.save_dir, f'{self.video_name}.mp4')
+            temp_dir = os.path.join(self.save_dir, 'temp')
+            if not os.path.isdir(temp_dir):
+                os.makedirs(temp_dir)
+            else:
+                remove_a_folder(folder_dir=temp_dir)
+                os.makedirs(temp_dir)
+            if video_meta['frame_count'] != len(self.out_df):
+                FrameRangeWarning(msg=f'The video {video_path} contains {video_meta["frame_count"]} frames while the file {self.file_path} contains {len(self.out_df)} frames', source=self.__class__.__name__)
+            frm_list = np.arange(0, video_meta['frame_count'])
+            frm_list = np.array_split(frm_list, self.cores)
+            frm_list = [(cnt, x) for cnt, x in enumerate(frm_list)]
+            print(f"Creating rotated videos, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.cores})...")
+            with multiprocessing.Pool(self.cores, maxtasksperchild=self.maxtasksperchild) as pool:
+                constants = functools.partial(_egocentric_aligner,
+                                              temp_dir=temp_dir,
+                                              video_name=self.video_name,
+                                              video_path=video_path,
+                                              centers=self.centers,
+                                              rotation_vectors=self.rotation_vectors,
+                                              target=self.anchor_location)
+                for cnt, result in enumerate(pool.imap(constants, frm_list, chunksize=self.multiprocess_chunksize)):
+                    print(f"Rotate batch {result}/{self.cores} complete...")
+                pool.terminate()
+                pool.join()
 
-        concatenate_videos_in_folder(in_folder=temp_dir, save_path=save_path, remove_splits=True, gpu=False)
-        video_timer.stop_timer()
-        print(f"Egocentric rotation video {save_path} complete (elapsed time: {video_timer.elapsed_time_str}s) ...")
+            concatenate_videos_in_folder(in_folder=temp_dir, save_path=save_path, remove_splits=True, gpu=False)
+            video_timer.stop_timer()
+            print(f"Egocentric rotation video {save_path} complete (elapsed time: {video_timer.elapsed_time_str}s) ...")
 
 
-# if __name__ == "__main__":
-#     aligner = EgocentricalAligner(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
-#                                   rotate_video=True,
-#                                   anchor_1='tail_base',
-#                                   anchor_2='nose',
-#                                   data_dir=r'C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\test',
-#                                   save_dir=r"C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\test\bg_temp\rotated")
-#     aligner.run()
-#
+if __name__ == "__main__":
+    aligner = EgocentricalAligner(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+                                  rotate_video=True,
+                                  anchor_1='tail_base',
+                                  anchor_2='nose',
+                                  data_dir=r'C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location',
+                                  videos_dir=r'C:\troubleshooting\mitra\project_folder\videos\bg_removed',
+                                  save_dir=r"C:\troubleshooting\mitra\project_folder\videos\bg_removed\rotated")
+    aligner.run()
+
 

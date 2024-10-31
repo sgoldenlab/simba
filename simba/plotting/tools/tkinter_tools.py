@@ -69,9 +69,7 @@ class InteractiveVideoPlotterWindow(object):
         self.jump_frm.grid(row=2, column=0)
         self.jump_lbl = Label(self.jump_frm, text="Jump Size:")
         self.jump_lbl.grid(row=0, column=0, sticky=NW)
-        self.jump_size_scale = Scale(
-            self.jump_frm, from_=0, to=100, orient=HORIZONTAL, length=200
-        )
+        self.jump_size_scale = Scale(self.jump_frm, from_=0, to=100, orient=HORIZONTAL, length=200)
         self.jump_size_scale.set(self.jump_size)
         self.jump_size_scale.grid(row=0, column=1, sticky=NW)
         self.jump_back_btn = Button(
@@ -113,31 +111,19 @@ class InteractiveVideoPlotterWindow(object):
         self.bind_keys()
 
     def bind_keys(self):
-        self.main_frm.bind(
-            "<Right>",
-            lambda x: self.load_new_frame(frm_cnt=self.current_frm_number + 1),
-        )
-        self.main_frm.bind(
-            "<Left>", lambda x: self.load_new_frame(frm_cnt=self.current_frm_number - 1)
-        )
-        self.main_frm.bind(
-            "<Control-l>",
-            lambda x: self.load_new_frame(
-                frm_cnt=self.video_meta_data["frame_count"] - 1
-            ),
-        )
+        self.main_frm.bind("<Right>", lambda x: self.load_new_frame(frm_cnt=self.current_frm_number + 1))
+        self.main_frm.bind("<Left>", lambda x: self.load_new_frame(frm_cnt=self.current_frm_number - 1))
+        self.main_frm.bind("<Control-l>", lambda x: self.load_new_frame(frm_cnt=self.video_meta_data["frame_count"] - 1))
         self.main_frm.bind("<Control-o>", lambda x: self.load_new_frame(frm_cnt=0))
 
     def load_new_frame(self, frm_cnt: int):
         if (frm_cnt > self.video_meta_data["frame_count"] - 1) or (frm_cnt < 0):
-            raise FrameRangeError(
-                msg=f'Frame {str(frm_cnt)} is outside of the video frame range: (0-{self.video_meta_data["frame_count"]-1}).'
-            )
+            raise FrameRangeError(msg=f'Frame {str(frm_cnt)} is outside of the video frame range: (0-{self.video_meta_data["frame_count"]-1}).')
         self.cap.set(1, int(frm_cnt))
         _, self.new_frm = self.cap.read()
         self.new_frm = cv2.cvtColor(self.new_frm, cv2.COLOR_RGB2BGR)
         self.new_frm = Img.fromarray(self.new_frm)
-        self.new_frm.thumbnail(MAX_SIZE, Img.ANTIALIAS)
+        self.new_frm.thumbnail(MAX_SIZE, Img.LANCZOS)
         self.new_frm = ImageTk.PhotoImage(master=self.main_frm, image=self.new_frm)
         self.img_frm = Label(self.main_frm, image=self.new_frm)
         self.img_frm.image = self.new_frm

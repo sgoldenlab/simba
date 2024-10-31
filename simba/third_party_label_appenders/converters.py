@@ -18,21 +18,22 @@ import cv2
 import numpy as np
 #from pycocotools import mask
 from shapely.geometry import Polygon
-from skimage.draw import polygon
+import yaml
 
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.image_mixin import ImageMixin
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists,
                                 check_if_keys_exist_in_dict,
-                                check_if_valid_img, check_instance, check_int,
-                                check_valid_array, check_valid_tuple)
+                                check_if_valid_img, check_valid_boolean, check_int,
+                                check_valid_array, check_valid_tuple, check_valid_dict)
 from simba.utils.enums import Formats
 from simba.utils.errors import InvalidInputError, NoFilesFoundError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data, read_df,
-                                    read_frm_of_video)
+                                    read_frm_of_video, find_video_of_file, read_roi_data)
+from simba.mixins.config_reader import ConfigReader
 
 # def geometry_to_rle(geometry: Union[np.ndarray, Polygon], img_size: Tuple[int, int]):
 #     """
@@ -190,9 +191,10 @@ def geometries_to_yolo(geometries: Dict[Union[str, int], np.ndarray],
             f.write('\n'.join(v))
 
 
-def _b64_to_arr(img_b64) -> np.ndarray:
+def b64_to_arr(img_b64) -> np.ndarray:
     """
-    Helper to convert byte string (e.g., from labelme) to image in numpy format
+    Helper to convert byte string (e.g., created by `labelme <https://github.com/wkentaro/labelme>`__.) to image in numpy array format
+
     """
     f = io.BytesIO()
     f.write(base64.b64decode(img_b64))
@@ -201,12 +203,52 @@ def _b64_to_arr(img_b64) -> np.ndarray:
 
 
 
-def _arr_to_b64(x: np.ndarray) -> str:
+def arr_to_b64(x: np.ndarray) -> str:
     """
-    Helper to convert image  to byte string
+    Helper to convert image in array format to an image in byte string format
     """
     _, buffer = cv2.imencode('.jpg', x)
     return base64.b64encode(buffer).decode("utf-8")
+
+def create_yolo_yaml(path: Union[str, os.PathLike],
+                     train: Union[str, os.PathLike],
+                     val: Union[str, os.PathLike],
+                     test: Union[str, os.PathLike],
+                     save_path: Union[str, os.PathLike],
+                     names: Dict[str, int]) -> None:
+    """
+    Given a set of paths to directories, create a model.yaml file for model training though ultralytics wrappers.
+
+    :param Union[str, os.PathLike] path: Parent directory holding both an images and a labels directory.
+    :param Union[str, os.PathLike] train: Directory holding training images. For example, C:\troubleshooting\coco_data\images\train, then a C:\troubleshooting\coco_data\labels\train is expected.
+    :param Union[str, os.PathLike] val: Directory holding validation images.
+    :param Union[str, os.PathLike] test: Directory holding test images.
+    :param Union[str, os.PathLike] save_path: Location where to save the yolo model yaml file.
+    :param Dict[str, int] names: Dictionary mapping pairing object names to object integer identifiers.
+    :return None:
+    """
+
+    for p in [path, train, val, test, os.path.dirname(save_path)]:
+        check_if_dir_exists(in_dir=p, source=create_yolo_yaml.__name__)
+    check_valid_dict(x=names, valid_key_dtypes=(str,), valid_values_dtypes=(int,), min_len_keys=1)
+    reversed_names = {v: k for k, v in names.items()}
+
+    unique_paths = list({path, train, val, test, save_path})
+    if len(unique_paths) < 5:
+        raise InvalidInputError('The paths have to be unique.', source=create_yolo_yaml.__name__)
+
+    train = os.path.relpath(train, path)
+    val = os.path.relpath(val, path)
+    test = os.path.relpath(test, path)
+
+    data = {'path': path,
+            'train': train,  # train images (relative to 'path')
+            'val': val,           # val images (relative to 'path')
+            'test': test,       # test images (relative to 'path')
+            'names': reversed_names}
+
+    with open(save_path, 'w') as file:
+        yaml.dump(data, file, default_flow_style=False)
 
 
 def labelme_to_dlc(labelme_dir: Union[str, os.PathLike],
@@ -215,13 +257,17 @@ def labelme_to_dlc(labelme_dir: Union[str, os.PathLike],
     """
     Convert labels from labelme format to DLC format.
 
+
+    .. note::
+        See `labelme GitHub repo <https://github.com/wkentaro/labelme>`__.
+
     :param Union[str, os.PathLike] labelme_dir: Directory with labelme json files.
     :param Optional[str] scorer: Name of the scorer (anticipated by DLC as header)
     :param Optional[Union[str, os.PathLike]] save_dir: Directory where to save the DLC annotations. If None, then same directory as labelme_dir with `_dlc_annotations` suffix.
     :return: None
 
     :example:
-    >>> labelme_dir = r'D:\ts_annotations'
+    >>> labelme_dir = 'D:\ts_annotations'
     >>> labelme_to_dlc(labelme_dir=labelme_dir)
     """
 
@@ -234,7 +280,7 @@ def labelme_to_dlc(labelme_dir: Union[str, os.PathLike],
             annot_data = json.load(f)
         check_if_keys_exist_in_dict(data=annot_data, key=['shapes', 'imageData', 'imagePath'], name=annot_path)
         img_name = os.path.basename(annot_data['imagePath'])
-        images[img_name] = _b64_to_arr(annot_data['imageData'])
+        images[img_name] = b64_to_arr(annot_data['imageData'])
         for bp_data in annot_data['shapes']:
             check_if_keys_exist_in_dict(data=bp_data, key=['label', 'points'], name=annot_path)
             point_x, point_y = bp_data['points'][0][0], bp_data['points'][0][1]
@@ -276,15 +322,15 @@ def dlc_to_labelme(dlc_dir: Union[str, os.PathLike],
     """
     Convert a folder of DLC annotations into labelme json format.
 
-    :param dlc_dir: Folder with DLC annotations. I.e., directory inside
-    :param save_dir: Directory to where to save the labelme json files.
-    :param labelme_version: Version number encoded in the json files.
-    :param flags: Flags included in the json files.
-    :param verbose: If True, prints progress/
+    :param Union[str, os.PathLike] dlc_dir: Folder with DLC annotations. I.e., directory inside
+    :param Union[str, os.PathLike] save_dir: Directory to where to save the labelme json files.
+    :param Optional[str] labelme_version: Version number encoded in the json files.
+    :param Optional[Dict[Any, Any] flags: Flags included in the json files.
+    :param Optional[bool] verbose: If True, prints progress.
     :return: None
 
     :example:
-    >>> dlc_to_labelme(dlc_dir=r"D:\TS_DLC\labeled-data\ts_annotations", save_dir=r"C:\troubleshooting\coco_data\labels\test")
+    >>> dlc_to_labelme(dlc_dir="D:\TS_DLC\labeled-data\ts_annotations", save_dir="C:\troubleshooting\coco_data\labels\test")
     """
 
     timer = SimbaTimer(start=True)
@@ -329,7 +375,7 @@ def dlc_to_labelme(dlc_dir: Union[str, os.PathLike],
                'flags': flags,
                'shapes': shapes,
                'imagePath': imgPath,
-               'imageData': _arr_to_b64(img),
+               'imageData': arr_to_b64(img),
                'imageHeight': img.shape[0],
                'imageWidth': img.shape[1]}
         save_path = os.path.join(save_dir, get_fn_ext(filepath=imgPath)[1] + '.json')
@@ -340,16 +386,18 @@ def dlc_to_labelme(dlc_dir: Union[str, os.PathLike],
         stdout_success(f'Labelme data for {len(annotation_data)} image(s) saved in {save_dir} directory', elapsed_time=timer.elapsed_time_str)
 
 
-def _b64_dict_to_imgs(x: Dict[str, str]):
+def b64_dict_to_imgs(x: Dict[str, np.ndarray]):
     """
+    Helper to convert a dictionary of images in byte64 format to a dictionary of images in array format.
+
     :example:
     >>> df = labelme_to_df(labelme_dir=r'C:\troubleshooting\coco_data\labels\test_2')
     >>> x = df.set_index('image_name')['image'].to_dict()
-    >>> _b64_dict_to_imgs(x)
+    >>> b64_dict_to_imgs(x)
     """
     results = {}
     for k, v in x.items():
-        results[k] = _b64_to_arr(v)
+        results[k] = b64_to_arr(v)
     return results
 
 
@@ -395,11 +443,24 @@ def labelme_to_df(labelme_dir: Union[str, os.PathLike],
                   pad: Optional[bool] = False,
                   size: Union[Literal['min', 'max'], Tuple[int, int]] = None,
                   normalize: Optional[bool] = False,
-                  save_path: Optional[Union[str, os.PathLike]] = None) -> pd.DataFrame:
+                  save_path: Optional[Union[str, os.PathLike]] = None) -> Union[None, pd.DataFrame]:
 
     """
-    :example:
+    Convert a directory of labelme .json files into a pandas dataframe.
 
+    .. note::
+       The images are stores as a 64-bit bytestring under the ``image`` header of the output dataframe.
+
+    :param Union[str, os.PathLike] labelme_dir: Directory with labelme json files.
+    :param Optional[bool] greyscale: If True, converts the labelme images to greyscale if in rgb format. Default: False.
+    :param Optional[bool] pad: If True, checks if all images are the same size and if not; pads the images with black border so all images are the same size.
+    :param Union[Literal['min', 'max'], Tuple[int, int]] size: The size of the output images. Can be the smallesgt (min) the largest (max) or a tuple with the width and height of the images. Automatically corrects the labels to account for the image size.
+    :param Optional[bool] normalize: If true, normalizes the images. Default: False.
+    :param Optional[Union[str, os.PathLike]] save_path: The location where to store the dataframe. If None, then returns the dataframe. Default: None.
+
+    :rtype: Union[None, pd.DataFrame]
+
+    :example:
     >>> labelme_to_df(labelme_dir=r'C:\troubleshooting\coco_data\labels\test_2')
     >>> df = labelme_to_df(labelme_dir=r'C:\troubleshooting\coco_data\labels\test_read', greyscale=False, pad=False, normalize=False, size='min')
     """
@@ -411,7 +472,7 @@ def labelme_to_df(labelme_dir: Union[str, os.PathLike],
         with open(annot_path) as f: annot_data = json.load(f)
         check_if_keys_exist_in_dict(data=annot_data, key=['shapes', 'imageData'], name=annot_path)
         img_name = os.path.basename(annot_data['imagePath'])
-        images[img_name] = _b64_to_arr(annot_data['imageData'])
+        images[img_name] = b64_to_arr(annot_data['imageData'])
         if greyscale:
             if len(images[img_name].shape) != 2:
                 images[img_name] = (0.07 * images[img_name][:, :, 2] + 0.72 * images[img_name][:, :, 1] + 0.21 * images[img_name][:, :, 0]).astype(np.uint8)
@@ -429,7 +490,7 @@ def labelme_to_df(labelme_dir: Union[str, os.PathLike],
         images = normalize_img_dict(img_dict=images)
     img_lst = []
     for k, v in images.items():
-        img_lst.append(_arr_to_b64(v))
+        img_lst.append(arr_to_b64(v))
     out = pd.concat(annotations).reset_index(drop=True)
     out['image'] = img_lst
     if size is not None:
@@ -479,13 +540,13 @@ def scale_pose_img_sizes(pose_data: np.ndarray,
         target_h, target_w = np.inf, np.inf
         for v in imgs:
             if isinstance(v, str):
-                v = _b64_to_arr(v)
+                v = b64_to_arr(v)
             target_h, target_w = min(v.shape[0], target_h), min(v.shape[1], target_w)
     elif size == 'max':
         target_h, target_w = -np.inf, -np.inf
         for v in imgs:
             if isinstance(v, str):
-                v = _b64_to_arr(v)
+                v = b64_to_arr(v)
             target_h, target_w = max(v.shape[0], target_h), max(v.shape[1], target_w)
     elif isinstance(size, tuple):
         check_valid_tuple(x=size, accepted_lengths=(2,), valid_dtypes=(int,))
@@ -498,14 +559,14 @@ def scale_pose_img_sizes(pose_data: np.ndarray,
     pose_results = np.zeros_like(pose_data)
     for img_idx in range(pose_data.shape[0]):
         if isinstance(imgs[img_idx], str):
-            img = _b64_to_arr(imgs[img_idx])
+            img = b64_to_arr(imgs[img_idx])
         else:
             img = imgs[img_idx]
         original_h, original_w = img.shape[0:2]
         scaling_factor_w, scaling_factor_h = target_w / original_w, target_h / original_h
         img = cv2.resize(img, dsize=(target_w, target_h), fx=0, fy=0, interpolation=interpolation)
         if isinstance(imgs[img_idx], str):
-            img = _arr_to_b64(img)
+            img = arr_to_b64(img)
         img_results.append(img)
         for bp_cnt in range(pose_data[img_idx].shape[0]):
             new_bp_x, new_bp_y = pose_data[img_idx][bp_cnt][0] * scaling_factor_w, pose_data[img_idx][bp_cnt][1] * scaling_factor_h
@@ -522,6 +583,105 @@ def scale_pose_img_sizes(pose_data: np.ndarray,
     # cv2.waitKey(120000)
 
     return (pose_results, img_results)
+
+
+def simba_rois_to_yolo(config_path: Optional[Union[str, os.PathLike]] = None,
+                       roi_path: Optional[Union[str, os.PathLike]] = None,
+                       video_dir: Optional[Union[str, os.PathLike]] = None,
+                       save_dir: Optional[Union[str, os.PathLike]] = None,
+                       roi_frm_cnt: Optional[int] = 10,
+                       obb: Optional[bool] = False,
+                       greyscale: Optional[bool] = True) -> None:
+    """
+    Converts SimBA roi definitions into annotations and images for training yolo network.
+
+    :param Optional[Union[str, os.PathLike]] config_path: Optional path to the project config file in SimBA project.
+    :param Optional[Union[str, os.PathLike]] roi_path: Path to the SimBA roi definitions .h5 file. If None, then the ``roi_coordinates_path`` of the project.
+    :param Optional[Union[str, os.PathLike]] video_dir: Directory where to find the videos. If None, then the videos folder of the project.
+    :param Optional[Union[str, os.PathLike]] save_dir: Directory where to save the labels and images. If None, then the logs folder of the project.
+    :param Optional[int] roi_frm_cnt: Number of frames for each video to create bounding boxes for.
+    :param Optional[bool] obb: If True, created object-oriented yolo bounding boxes. Else, axis aligned yolo bounding boxes. Default False.
+    :param Optional[bool] greyscale: If True, converts the images to greyscale if rgb. Default: True.
+    :return: None
+
+    :example I:
+    >>> simba_rois_to_yolo(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
+
+    :example II:
+    >>> simba_rois_to_yolo(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini", save_dir=r"C:\troubleshooting\RAT_NOR\project_folder\logs\yolo", video_dir=r"C:\troubleshooting\RAT_NOR\project_folder\videos", roi_path=r"C:\troubleshooting\RAT_NOR\project_folder\logs\measures\ROI_definitions.h5")
+    """
+
+    if roi_path is None or video_dir is None or save_dir is None:
+        config = ConfigReader(config_path=config_path)
+        roi_path = config.roi_coordinates_path
+        video_dir = config.video_dir
+        save_dir = config.logs_path
+    check_int(name=f'{simba_rois_to_yolo.__name__} roi_frm_cnt', value=roi_frm_cnt, min_value=1)
+    check_valid_boolean(value=[obb, greyscale], source=f'{simba_rois_to_yolo.__name__} obb')
+    roi_data = read_roi_data(roi_path=roi_path)
+    roi_geometries = \
+    GeometryMixin.simba_roi_to_geometries(rectangles_df=roi_data[0], circles_df=roi_data[1], polygons_df=roi_data[2])[0]
+    roi_geometries_rectangles = {}
+    roi_ids, roi_cnt = {}, 0
+    save_img_dir = os.path.join(save_dir, 'images')
+    save_labels_dir = os.path.join(save_dir, 'labels')
+    if not os.path.isdir(save_img_dir): os.makedirs(save_img_dir)
+    if not os.path.isdir(save_labels_dir): os.makedirs(save_labels_dir)
+    for video_name, roi_data in roi_geometries.items():
+        roi_geometries_rectangles[video_name] = {}
+        for roi_name, roi in roi_data.items():
+            if obb:
+                roi_geometries_rectangles[video_name][roi_name] = GeometryMixin.minimum_rotated_rectangle(shape=roi)
+            else:
+                keypoints = np.array(roi.exterior.coords).astype(np.int32).reshape(1, -1, 2)
+                roi_geometries_rectangles[video_name][roi_name] = Polygon(
+                    GeometryMixin.keypoints_to_axis_aligned_bounding_box(keypoints=keypoints)[0])
+            if roi_name not in roi_ids.keys():
+                roi_ids[roi_name] = roi_cnt
+                roi_cnt += 1
+
+    roi_results = {}
+    img_results = {}
+    for video_name, roi_data in roi_geometries.items():
+        roi_results[video_name] = {}
+        img_results[video_name] = []
+        video_path = find_video_of_file(video_dir=video_dir, filename=video_name)
+        video_meta_data = get_video_meta_data(video_path)
+        if roi_frm_cnt > video_meta_data['frame_count']:
+            roi_frm_cnt = video_meta_data['frame_count']
+        cap = cv2.VideoCapture(video_path)
+        frm_idx = np.sort(np.random.choice(np.arange(0, video_meta_data['frame_count']), size=roi_frm_cnt))
+        for idx in frm_idx:
+            img_results[video_name].append(read_frm_of_video(video_path=cap, frame_index=idx, greyscale=greyscale))
+        w, h = video_meta_data['width'], video_meta_data['height']
+        for roi_name, roi in roi_data.items():
+            roi_id = roi_ids[roi_name]
+            if not obb:
+                shape_stats = GeometryMixin.get_shape_statistics(shapes=roi)
+                x_center = shape_stats['centers'][0][0] / w
+                y_center = shape_stats['centers'][0][1] / h
+                width = shape_stats['widths'][0] / w
+                height = shape_stats['lengths'][0] / h
+                roi_str = ' '.join([str(roi_id), str(x_center), str(y_center), str(width), str(height)])
+            else:
+                img_geometry = np.array(roi.exterior.coords).astype(np.int32)[1:]
+                x1, y1 = img_geometry[0][0] / w, img_geometry[0][1] / h
+                x2, y2 = img_geometry[1][0] / w, img_geometry[1][1] / h
+                x3, y3 = img_geometry[2][0] / w, img_geometry[2][1] / h
+                x4, y4 = img_geometry[3][0] / w, img_geometry[3][1] / h
+                roi_str = ' '.join(
+                    [str(roi_id), str(x1), str(y1), str(x2), str(y2), str(x3), str(y3), str(x4), str(y4)])
+            roi_results[video_name][roi_name] = roi_str
+
+    for video_name, imgs in img_results.items():
+        for img_cnt, img in enumerate(imgs):
+            img_save_path = os.path.join(save_img_dir, f'{video_name}_{img_cnt}.png')
+            cv2.imwrite(img_save_path, img)
+            label_save_path = os.path.join(save_labels_dir, f'{video_name}_{img_cnt}.txt')
+            x = list(roi_results[video_name].values())
+            with open(label_save_path, mode='wt', encoding='utf-8') as f:
+                f.write('\n'.join(x))
+
 
 
 

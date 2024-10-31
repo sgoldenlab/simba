@@ -1019,7 +1019,7 @@ class GeometryMixin(object):
         stdout_success(msg=msg, elapsed_time=timer.elapsed_time_str, source=GeometryMixin.geometry_video.__name__)
 
     @staticmethod
-    def minimum_rotated_rectangle(shape=Polygon) -> Polygon:
+    def minimum_rotated_rectangle(shape: Polygon) -> Polygon:
         """
         Calculate the minimum rotated rectangle that bounds a given polygon.
 
@@ -2785,22 +2785,14 @@ class GeometryMixin(object):
         >>> GeometryMixin.contours_to_geometries(contours=contours)
         """
 
-        check_instance(
-            source=GeometryMixin.contours_to_geometries.__name__,
-            instance=contours,
-            accepted_types=(list,),
-        )
+        check_instance(source=GeometryMixin.contours_to_geometries.__name__, instance=contours, accepted_types=(list,),)
         for i in contours:
-            check_instance(
-                source=f"{GeometryMixin.contours_to_geometries.__name__} {i}",
-                instance=i,
-                accepted_types=(np.ndarray,),
-            )
+            check_instance(source=f"{GeometryMixin.contours_to_geometries.__name__} {i}", instance=i, accepted_types=(np.ndarray,))
         results = []
         for contour in contours:
-            if contour.ndim == 3:
-                contour = contour.reshape(contour.shape[0], 2)
-            polygon = GeometryMixin.bodyparts_to_polygon(data=contour)
+            #if contour.ndim == 3:
+           #     contour = contour.reshape(contour.shape[0], 2)
+            polygon = GeometryMixin.bodyparts_to_polygon(data=contour)[0]
             if force_rectangles:
                 polygon = GeometryMixin.minimum_rotated_rectangle(shape=polygon)
             results.append(polygon)
@@ -3346,12 +3338,11 @@ class GeometryMixin(object):
             results[i] = geometries[i][0].hausdorff_distance(geometries[i][1])
         return results
 
-    def multiframe_hausdorff_distance(
-        self,
-        geometries: List[Union[Polygon, LineString]],
-        lag: Optional[int] = 1,
-        core_cnt: Optional[int] = -1,
-    ) -> List[float]:
+    def multiframe_hausdorff_distance(self,
+                                      geometries: List[Union[Polygon, LineString]],
+                                      lag: Optional[Union[float, int]] = 1,
+                                      sample_rate: Optional[Union[float, int]] = 1,
+                                      core_cnt: Optional[int] = -1) -> List[float]:
         """
         The Hausdorff distance measure of the similarity between sequential time-series  geometries.
 
@@ -3379,13 +3370,9 @@ class GeometryMixin(object):
             max_value=find_core_cnt()[0],
             raise_error=True,
         )
-        check_int(
-            name=f"{GeometryMixin.multiframe_hausdorff_distance.__name__} LAG",
-            value=lag,
-            min_value=-1,
-            max_value=len(geometries) - 1,
-            raise_error=True,
-        )
+        check_float(name=f"{GeometryMixin.multiframe_hausdorff_distance.__name__} LAG", value=lag, min_value=-1, max_value=len(geometries) - 1, raise_error=True)
+        check_float(name=f"{GeometryMixin.multiframe_hausdorff_distance.__name__} sample_rate", value=lag, min_value=-1, max_value=len(geometries) - 1, raise_error=True)
+        lag = max(1, int(lag * sample_rate))
         if core_cnt == -1:
             core_cnt = find_core_cnt()[0]
         reshaped_geometries = []
@@ -3725,7 +3712,7 @@ class GeometryMixin(object):
 
         :example:
         >>> data = np.random.randint(0, 360, (30000, 7, 2))
-        >>> results = keypoints_to_axis_aligned_bounding_box(keypoints=data)
+        >>> results = GeometryMixin.keypoints_to_axis_aligned_bounding_box(keypoints=data)
         """
         results = np.full((keypoints.shape[0], 4, 2), np.nan, dtype=np.int32)
         for i in prange(keypoints.shape[0]):
