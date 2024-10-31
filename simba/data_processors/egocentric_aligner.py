@@ -8,7 +8,9 @@ import numpy as np
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_int, check_valid_dataframe, check_if_dir_exists)
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log, check_if_dir_exists,
+    check_int, check_valid_dataframe)
 from simba.utils.enums import Formats
 from simba.utils.printing import SimbaTimer
 from simba.utils.read_write import (concatenate_videos_in_folder,

@@ -6,7 +6,7 @@ import os
 import re
 import subprocess
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union, Type
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union
 
 import cv2
 import numpy as np

@@ -13,7 +13,6 @@ import tkinter.ttk as ttk
 import urllib.request
 import webbrowser
 from tkinter.filedialog import askdirectory
-from tkinter.filedialog import askdirectory
 from tkinter.messagebox import askyesno
 
 import PIL.Image
