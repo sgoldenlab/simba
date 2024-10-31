@@ -7,9 +7,9 @@ import numpy as np
 from PIL import Image as Img
 from PIL import ImageTk
 
-from simba.utils.warnings import FrameRangeWarning
 from simba.utils.errors import FrameRangeError
 from simba.utils.read_write import get_video_meta_data
+from simba.utils.warnings import FrameRangeWarning
 
 PADDING = 5
 MAX_SIZE = (1080, 650)
