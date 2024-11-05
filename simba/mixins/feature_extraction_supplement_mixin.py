@@ -35,7 +35,6 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
     Additional feature extraction method not called by default feature extraction classes from ``simba.feature_extractors``.
 
     """
-
     def __init__(self):
         FeatureExtractionMixin.__init__(self)
 
@@ -206,7 +205,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
     @staticmethod
     @jit(nopython=True)
-    def consecutive_time_series_categories_count(data: np.ndarray, fps: int):
+    def consecutive_time_series_categories_count(data: np.ndarray, fps: int) -> np.ndarray:
         """
         Compute the count of consecutive milliseconds the feature value has remained static. For example,
         compute for how long in milleseconds the animal has remained in the current cardinal direction or the
@@ -216,9 +215,10 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
            :width: 700
            :align: center
 
-        :parameter np.ndarray data: 1d array of feature values
-        :parameter int fps: Frame-rate of video.
+        :param np.ndarray data: 1d array of feature values
+        :param int fps: Frame-rate of video.
         :returns np.ndarray: Array of size data.shape[0]
+        :rtype: np.ndarray
 
         :example:
         >>> data = np.array([0, 1, 1, 1, 4, 5, 6, 7, 8, 9])
@@ -292,13 +292,12 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
     @staticmethod
     @jit(nopython=True)
-    def border_distances(
-        data: np.ndarray,
-        pixels_per_mm: float,
-        img_resolution: np.ndarray,
-        time_window: float,
-        fps: int,
-    ):
+    def border_distances(data: np.ndarray,
+                         pixels_per_mm: float,
+                         img_resolution: np.ndarray,
+                         time_window: float,
+                         fps: int) -> np.ndarray:
+
         """
         Compute the mean distance of key-point to the left, right, top, and bottom sides of the image in
         rolling time-windows. Uses a straight line.
@@ -310,12 +309,13 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         .. attention::
            Output for initial frames where [current_frm - window_size] < 0 will be populated with ``-1``.
 
-        :parameter np.ndarray data: 2d array of size len(frames)x2 with body-part coordinates.
-        :parameter np.ndarray img_resolution: Resolution of video in WxH format.
-        :parameter float pixels_per_mm: Pixels per millimeter of recorded video.
-        :parameter int fps: FPS of the recorded video
-        :parameter float time_windows: Rolling time-window as floats in seconds. E.g., ``0.2``
-        :returns np.ndarray: Size data.shape[0] x time_windows.shape[0] array with millimeter distances from LEFT, RIGH, TOP, BOTTOM,
+        :param np.ndarray data: 2d array of size len(frames)x2 with body-part coordinates.
+        :param np.ndarray img_resolution: Resolution of video in WxH format.
+        :param float pixels_per_mm: Pixels per millimeter of recorded video.
+        :param int fps: FPS of the recorded video
+        :param float time_windows: Rolling time-window as floats in seconds. E.g., ``0.2``
+        :returns np.ndarray: Size data.shape[0] x 4 array with millimeter distances from LEFT, RIGH, TOP, BOTTOM,
+        :rtype: np.ndarray
 
         :example:
         >>> data = np.array([[250, 250], [250, 250], [250, 250], [500, 500],[500, 500], [500, 500]]).astype(float)
@@ -330,22 +330,67 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
             distances = np.full((4, window_size, 1), np.nan)
             windowed_locs = data[current_frm - window_size : current_frm]
             for bp_cnt, bp_loc in enumerate(windowed_locs):
-                distances[0, bp_cnt] = np.linalg.norm(
-                    np.array([0, bp_loc[1]]) - bp_loc
-                )  # left
-                distances[1, bp_cnt] = np.linalg.norm(
-                    np.array([img_resolution[0], bp_loc[1]]) - bp_loc
-                )  # right
-                distances[2, bp_cnt] = np.linalg.norm(
-                    np.array([bp_loc[0], 0]) - bp_loc
-                )  # top
-                distances[3, bp_cnt] = np.linalg.norm(
-                    np.array([bp_loc[0], img_resolution[1]]) - bp_loc
-                )  # bottpm
-            for i in prange(4):
+                distances[0, bp_cnt] = np.linalg.norm(np.array([0, bp_loc[1]]) - bp_loc)  # left
+                distances[1, bp_cnt] = np.linalg.norm(np.array([img_resolution[0], bp_loc[1]]) - bp_loc)  # right
+                distances[2, bp_cnt] = np.linalg.norm(np.array([bp_loc[0], 0]) - bp_loc)  # top
+                distances[3, bp_cnt] = np.linalg.norm(np.array([bp_loc[0], img_resolution[1]]) - bp_loc)  # bottom
+            for i in range(4):
                 results[current_frm - 1][i] = np.mean(distances[i]) / pixels_per_mm
-
         return results.astype(np.int32)
+
+    @staticmethod
+    @jit(nopython=True)
+    def img_edge_distances(data: np.ndarray,
+                           pixels_per_mm: float,
+                           img_resolution: np.ndarray,
+                           time_window: float,
+                           fps: int) -> np.ndarray:
+
+        """
+        Calculate the distances from a set of points to the edges of an image over a specified time window.
+
+        This function computes the average distances from given coordinates to the four edges (top, right, bottom, left)
+        of an image. The distances are calculated for points within a specified time window, and the results are adjusted
+        based on the pixel-to-mm conversion.
+
+        .. image:: _static/img/img_edge_distances.webp
+           :width: 400
+           :align: center
+
+        :param np.ndarray data: 3d array of size len(frames) x N x 2 with body-part coordinates.
+        :param np.ndarray img_resolution: Resolution of video in WxH format.
+        :param float pixels_per_mm: Pixels per millimeter of recorded video.
+        :param int fps: FPS of the recorded video
+        :param float time_windows: Rolling time-window as floats in seconds. E.g., ``0.2``
+        :returns np.ndarray: Size data.shape[0] x 4 array with millimeter distances from TOP LEFT, TOP RIGH, BOTTOM RIGHT, BOTTOM LEFT.
+        :rtype: np.ndarray
+
+        :example I:
+        >>> data = np.array([[0, 0], [758, 540], [0, 540], [748, 540]])
+        >>> img_edge_distances(data=data, pixels_per_mm=2.13, img_resolution=np.array([748, 540]), time_window=1.0, fps=1)
+
+        :example II:
+        >>> data = read_df(file_path=FILE_PATH, file_type='csv', usecols=['Nose_x', 'Nose_y', 'Tail_base_x', 'Tail_base_y'])
+        >>> data = data.values.reshape(len(data), 2, 2)
+        >>> FeatureExtractionSupplemental.img_edge_distances(data=data, pixels_per_mm=2.13, img_resolution=np.array([748, 540]), time_window=1.0, fps=1)
+
+        """
+
+        results = np.full((data.shape[0], 4), np.nan)
+        window_size = int(time_window * fps)
+        for r in range(window_size, data.shape[0] + 1):
+            l = r - window_size
+            w_data = data[l:r].reshape(-1, 2)
+            w_distances = np.full((4, w_data.shape[0]), np.nan)
+            for idx in range(w_data.shape[0]):
+                w_distances[0, idx] = np.linalg.norm(w_data[idx] - np.array([0, 0]))
+                w_distances[1, idx] = np.linalg.norm(w_data[idx] - np.array([img_resolution[0], 0]))
+                w_distances[2, idx] = np.linalg.norm(w_data[idx] - np.array([img_resolution[0], img_resolution[1]]))
+                w_distances[3, idx] = np.linalg.norm(w_data[idx] - np.array([0, img_resolution[1]]))
+            for i in range(4):
+                results[r - 1][i] = np.mean(w_distances[i]) / pixels_per_mm
+
+        return results.astype(np.float32)
 
     @staticmethod
     def velocity_aggregator(

@@ -2,20 +2,18 @@ __author__ = "Simon Nilsson"
 
 import os
 from copy import deepcopy
-from typing import Union
+from typing import Union, Optional
 
 import numpy as np
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log,
-    check_if_keys_exist_in_dict)
+from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_if_keys_exist_in_dict, check_if_dir_exists)
 from simba.utils.data import plug_holes_shortest_bout
 from simba.utils.enums import TagNames
 from simba.utils.errors import NoFilesFoundError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import get_fn_ext, read_df, write_df
+from simba.utils.read_write import get_fn_ext, read_df, write_df, find_files_of_filetypes_in_directory
 
 
 class InferenceBatch(TrainModelMixin, ConfigReader):
@@ -24,18 +22,36 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
     Results are stored in the ``project_folder/csv/machine_results`` directory of the SimBA project.
 
     .. note::
-       To compute aggrehgte statistics from the output of this class, use :func:`simba.data_processors.agg_clf_calculator.AggregateClfCalculator`
+       To compute aggregate statistics from the output of this class, see :func:`simba.data_processors.agg_clf_calculator.AggregateClfCalculator`
 
     :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format.
+    :param Optional[Union[str, os.PathLike]] features_dir: Optional directory containing featurized files in CSV or parquet format. If None, then the `project_folder/csv/features_extracted` directory of the project will be used.
+    :param Optional[Union[str, os.PathLike]] save_dir: Optional directory to save the data for the analyzed videos. If None, then the `project_folder/csv/machine_results` directory of the project will be used.
 
-    :example:
-    >>> _ = InferenceBatch(config_path='MyConfigPath').run()
+    :example I:
+    >>> inferencer = InferenceBatch(config_path='MyConfigPath')
+    >>> inferencer.run()
+
+    :example II:
+    >>> inferencer = InferenceBatch(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini", features_dir=r"D:\troubleshooting\mitra\project_folder\videos\bg_removed\rotated\tail_features\APPENDED")
+    >>> inferencer.run()
     """
 
     def __init__(self,
-                 config_path: Union[str, os.PathLike]):
+                 config_path: Union[str, os.PathLike],
+                 features_dir: Optional[Union[str, os.PathLike]] = None,
+                 save_dir: Optional[Union[str, os.PathLike]] = None):
 
         ConfigReader.__init__(self, config_path=config_path)
+        if features_dir is not None:
+            check_if_dir_exists(in_dir=features_dir, source=self.__class__.__name__)
+            self.features_dir = features_dir
+            self.feature_file_paths = find_files_of_filetypes_in_directory(directory=self.features_dir, extensions=[f'.{self.file_type}'], raise_warning=False, raise_error=False)
+        if save_dir is not None:
+            check_if_dir_exists(in_dir=features_dir, source=self.__class__.__name__)
+            self.save_dir = save_dir
+        else:
+            self.save_dir = self.machine_results_dir
         TrainModelMixin.__init__(self)
         log_event(logger_name=str(self.__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
         if len(self.feature_file_paths) == 0:
@@ -50,7 +66,7 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
             video_timer = SimbaTimer(start=True)
             _, file_name, _ = get_fn_ext(file_path)
             print(f"Analyzing video {file_name}... (Video {file_cnt+1}/{len(self.feature_file_paths)})")
-            file_save_path = os.path.join(self.machine_results_dir, f"{file_name}.{self.file_type}")
+            file_save_path = os.path.join(self.save_dir, f"{file_name}.{self.file_type}")
             in_df = read_df(file_path, self.file_type)
             x_df = self.drop_bp_cords(df=in_df).astype(np.float32)
             self.check_df_dataset_integrity(df=x_df, logs_path=self.logs_path, file_name=file_name)
@@ -71,10 +87,15 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
             video_timer.stop_timer()
             print(f"Predictions created for {file_name} (elapsed time: {video_timer.elapsed_time_str}) ...")
         self.timer.stop_timer()
-        stdout_success(msg=f"Machine predictions complete. Files saved in {self.machine_results_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+        stdout_success(msg=f"Machine predictions complete. Files saved in {self.save_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
 
-# test = InferenceBatch(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini")
+
+# test = InferenceBatch(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini",
+#                       features_dir=r'D:\troubleshooting\mitra\project_folder\videos\bg_removed\rotated\laying_down_features\APPENDED')
+# test.run()
+
+# test = InferenceBatch(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini", features_dir=r'D:\troubleshooting\mitra\project_folder\videos\bg_removed\rotated\tail_features\APPENDED')
 # test.run()
 
 

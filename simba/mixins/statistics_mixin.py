@@ -217,6 +217,9 @@ class Statistics(FeatureExtractionMixin):
         Higher values indicate a larger effect size, with 0.2 considered a small effect, 0.5 a medium effect, and 0.8 or above a large effect. Negative values indicate that the mean of sample 2 is larger than the mean of sample 1.
 
 
+        .. seealso::
+           :func:`simba.mixins.statistics_mixin.Statistics.rolling_cohens_d`
+
         .. math::
            d = \\frac{{\bar{x}_1 - \bar{x}_2}}{{\\sqrt{{\\frac{{s_1^2 + s_2^2}}{2}}}}}
 
@@ -246,9 +249,12 @@ class Statistics(FeatureExtractionMixin):
         Jitted compute of rolling Cohen's D statistic comparing the current time-window of
         size N to the preceding window of size N.
 
-        :parameter ndarray data: 1D array of size len(frames) representing feature values.
-        :parameter np.ndarray[ints] time_window: Time windows to compute ANOVAs for in seconds.
-        :parameter int fps: Frame-rate of recorded video.
+        .. seealso::
+           :func:`simba.mixins.statistics_mixin.Statistics.cohens_d`
+
+        :param ndarray data: 1D array of size len(frames) representing feature values.
+        :param np.ndarray[ints] time_window: Time windows to compute ANOVAs for in seconds.
+        :param int fps: Frame-rate of recorded video.
         :returns: Array of size data.shape[0] x window_sizes.shape[1] with Cohens D.
         :rtype: np.ndarray
 
@@ -374,14 +380,30 @@ class Statistics(FeatureExtractionMixin):
     def one_way_anova(
         sample_1: np.ndarray,
         sample_2: np.ndarray,
-        critical_values: Optional[np.ndarray] = None,
-    ) -> (float, float):
-        """
-        Jitted compute of one-way ANOVA F statistics and associated p-value for two distributions.
+        critical_values: Optional[np.ndarray] = None) -> Tuple[float, float]:
 
-        :parameter ndarray sample_1: First 1d array representing feature values.
-        :parameter ndarray sample_2: Second 1d array representing feature values.
-        :returns (float float): Representing ANOVA F statistic and associated probability value.
+        r"""
+        Compute the one-way ANOVA F-statistic and associated p-value for two distributions.
+
+        This method calculates the F-statistic to determine if there is a significant difference
+        between the means of the two samples, based on their variances. The F-statistic is computed as:
+
+        .. math::
+          F = \\frac{MS_{\\text{between}}}{MS_{\\text{within}}}
+
+        where:
+        - :math:`SS_{\\text{between}}` is the sum of squares between the groups.
+        - :math:`SS_{\\text{within}}` is the sum of squares within each group.
+        - :math:`MS_{\\text{between}} = \\frac{SS_{\\text{between}}}{df_{\\text{between}}}`
+        - :math:`MS_{\\text{within}} = \\frac{SS_{\\text{within}}}{df_{\\text{within}}}`
+
+        .. seealso::
+           :func:`simba.mixins.statistics_mixin.Statistics.rolling_one_way_anova`
+
+        :param ndarray sample_1: First 1d array representing feature values.
+        :param ndarray sample_2: Second 1d array representing feature values.
+        :returns: Tuple representing ANOVA F statistic and associated probability value.
+        :rtype: Tuple[float, float]
 
         :example:
         >>> sample_1 = np.array([1, 2, 3, 1, 3, 2, 1, 10, 8, 4, 10])
@@ -392,19 +414,14 @@ class Statistics(FeatureExtractionMixin):
         significance_bool = None
         n1, n2 = len(sample_1), len(sample_2)
         m1, m2 = np.mean(sample_1), np.mean(sample_2)
-        ss_between = (
-            n1 * (m1 - np.mean(np.concatenate((sample_1, sample_2)))) ** 2
-            + n2 * (m2 - np.mean(np.concatenate((sample_1, sample_2)))) ** 2
-        )
+        ss_between = (n1 * (m1 - np.mean(np.concatenate((sample_1, sample_2)))) ** 2 + n2 * (m2 - np.mean(np.concatenate((sample_1, sample_2)))) ** 2)
         ss_within = np.sum((sample_1 - m1) ** 2) + np.sum((sample_2 - m2) ** 2)
         df_between, df_within = 1, n1 + n2 - 2
         ms_between, ms_within = ss_between / df_between, ss_within / df_within
         f = ms_between / ms_within
         if critical_values is not None:
             critical_values = critical_values[:, np.array([0, df_between])]
-            critical_value = np.interp(
-                df_within, critical_values[:, 0], critical_values[:, 1]
-            )
+            critical_value = np.interp(df_within, critical_values[:, 0], critical_values[:, 1])
             if f > critical_value:
                 significance_bool = True
             else:
@@ -414,16 +431,19 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     @njit("(float32[:], float64[:], float64)", cache=True)
-    def rolling_one_way_anova(
-        data: np.ndarray, time_windows: np.ndarray, fps: int
-    ) -> np.ndarray:
+    def rolling_one_way_anova(data: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Jitted compute of rolling one-way ANOVA F-statistic comparing the current time-window of
         size N to the preceding window of size N.
 
-        :parameter ndarray data: 1D array of size len(frames) representing feature values.
-        :parameter np.ndarray[ints] time_windows: Time windows to compute ANOVAs for in seconds.
-        :parameter int fps: Frame-rate of recorded video.
+        .. seealso::
+           :func:`simba.mixins.statistics_mixin.Statistics.one_way_anova`
+
+        :param ndarray data: 1D array of size len(frames) representing feature values.
+        :param np.ndarray[ints] time_windows: Time windows to compute ANOVAs for in seconds.
+        :param int fps: Frame-rate of recorded video.
+        :returns: 2D numpy array with F values comparing the current time-window to the immedidatly preceeding time-window.
+        :rtype: np.ndarray
 
         .. image:: _static/img/rolling_anova.png
            :width: 600
@@ -2717,11 +2737,14 @@ class Statistics(FeatureExtractionMixin):
         .. note:
            - If calc_medians is True, the function returns cluster medians in addition to centroids and labels.
 
+           - Use with :func:`simba.mixins.image_mixin.ImageMixin.brightness_intensity` or :func:`simba.data_processors.cuda.image.img_stack_brightness` to detect cue lights on/off states.
+
         :param np.ndarray data: 1d array containing feature values.
         :param int k: Number of clusters.
         :param int max_iters: Maximum number of iterations for the k-means algorithm.
         :param bool calc_medians: Flag indicating whether to calculate cluster medians.
-        :returns Tuple: Tuple of three elements. Final centroids of the clusters. Labels assigned to each data point based on clusters. Cluster medians (if calc_medians is True), otherwise None.
+        :returns: Tuple of three elements. Final centroids of the clusters. Labels assigned to each data point based on clusters. Cluster medians (if calc_medians is True), otherwise None.
+        :rtype: Tuple[np.ndarray, np.ndarray, Union[None, types.DictType]]
 
         :example:
         >>> data_1d = np.array([1, 2, 3, 55, 65, 40, 43, 40]).astype(np.float64)
@@ -3246,10 +3269,17 @@ class Statistics(FeatureExtractionMixin):
         continuity_corrected: Optional[bool] = True,
     ) -> Tuple[float, float]:
         """
-        McNemar's test to compare the difference in predictive accuracy of two models.
+        Perform McNemar's test to compare the predictive accuracy of two models. This test is used
+        to evaluate if the accuracies of two classifiers are significantly different when tested on the same data.
 
-        E.g., can be used to compute if the accuracy of two classifiers are significantly different when transforming the same data.
+        The chi-squared statistic (with continuity correction if `continuity_corrected=True`) is calculated as:
 
+        .. math::
+          X^2 = \\frac{(|b - c| - 1)^2}{b + c} \\,\\text{ if corrected, or }\\, X^2 = \\frac{(b - c)^2}{b + c}
+
+        where:
+           - `b` is the number of instances misclassified by the first model but correctly classified by the second model.
+           - `c` is the number of instances correctly classified by the first model but misclassified by the second model.
         .. note::
            Adapted from `mlextend <https://github.com/rasbt/mlxtend/blob/master/mlxtend/evaluate/mcnemar.py>`__.
 
@@ -3535,7 +3565,18 @@ class Statistics(FeatureExtractionMixin):
     @njit("(float32[:], int64,)")
     def mad_median_rule(data: np.ndarray, k: int) -> np.ndarray:
         """
-        Detect outliers using the MAD-Median Rule. Returns 1d array of size data.shape[0] with 1 representing outlier and 0 representing inlier.
+        Detects outliers in the given data using the Median Absolute Deviation (MAD) rule.
+        Returns a 1D array of size `data.shape[0]`, where `1` represents an outlier and `0`
+        represents an inlier.
+
+        .. seealso::
+           :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_descriptive_statistics`
+           :func:`simba.mixins.statistics_mixin.Statistics.sliding_mad_median_rule`
+
+        :param np.ndarray data: A 1-dimensional array of numerical values to check for outliers.
+        :param int k: The multiplier for the MAD threshold. Higher values make the rule less sensitive to deviations from the median.
+        :returns: A 1D binary array of the same length as `data`, where each element is `1` if the corresponding element in `data` is classified as an outlier, and `0` otherwise.
+        :rtype: np.ndarray
 
         :example:
         >>> data = np.random.randint(0, 600, (9000000,)).astype(np.float32)
@@ -3557,6 +3598,10 @@ class Statistics(FeatureExtractionMixin):
 
         The MAD-Median Rule is a robust method for outlier detection. It calculates the median absolute deviation (MAD)
         and uses it to identify outliers based on a threshold defined as k times the MAD.
+
+        .. seealso::
+           :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_descriptive_statistics`
+           :func:`simba.mixins.statistics_mixin.Statistics.mad_median_rule`
 
         :param np.ndarray data: 1D numerical array representing feature.
         :param int k: The outlier threshold defined as k * median absolute deviation in each time window.
@@ -4097,8 +4142,23 @@ class Statistics(FeatureExtractionMixin):
 
     @staticmethod
     def normalized_google_distance(x: np.ndarray, y: np.ndarray) -> float:
-        """
-        Compute Normalized Google Distance (NGD) between two vectors or matrices.
+
+        r"""
+        Compute the Normalized Google Distance (NGD) between two vectors or matrices.
+
+        Normalized Google Distance is a measure of similarity between two sets based on
+        the relationship between the sums and minimum values of their elements.
+
+        The NGD is calculated as:
+
+        .. math::
+          NGD(x, y) = \\frac{\\max(\\sum x, \\sum y) - \\sum \\min(x, y)}{(\\sum x + \\sum y) - \\min(\\sum x, \\sum y)}
+
+        where:
+        - :math:`\\sum x` is the sum of elements in `x`
+        - :math:`\\sum y` is the sum of elements in `y`
+        - :math:`\\sum \\min(x, y)` is the sum of element-wise minimums of `x` and `y`
+
 
         .. note::
            This function assumes x and y have the same shape. It computes NGD based on the sum of elements and the minimum values between corresponding elements of x and y.

@@ -47,7 +47,7 @@ from simba.utils.errors import (CountError, DirectoryExistError,
                                 ResolutionError)
 from simba.utils.lookups import (get_ffmpeg_crossfade_methods, get_fonts,
                                  percent_to_crf_lookup, percent_to_qv_lk,
-                                 video_quality_to_preset_lookup)
+                                 video_quality_to_preset_lookup, get_named_colors)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
@@ -110,7 +110,7 @@ def convert_to_jpeg(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]]
        Quality above 95 should be avoided; 100 disables portions of the JPEG compression algorithm, and results in large files with hardly any gain in image quality
 
     .. image:: _static/img/convert_to_jpeg.jpeg
-       :width: 400
+       :width: 200
        :align: center
 
     :parameter Union[str, os.PathLike] directory: Path to directory holding image files, a single image file, or a list of paths to image files.
@@ -323,7 +323,7 @@ def convert_to_webp(path: Union[str, os.PathLike],
     Convert the file type of all image files within a directory to WEBP format of passed quality.
 
     .. image:: _static/img/convert_to_webp.webp
-       :width: 400
+       :width: 300
        :align: center
 
     :parameter Union[str, os.PathLike] directory: Path to directory holding image files
@@ -4202,26 +4202,36 @@ def rotate_video(video_path: Union[str, os.PathLike],
                  degrees: int,
                  gpu: Optional[bool] = False,
                  quality: Optional[int] = 60,
+                 fill_color: Optional[str] = 'black',
                  save_dir: Optional[Union[str, os.PathLike]] = None):
 
     """
     Rotate a video or a directory of videos by a specified number of degrees.
 
+    .. video:: _static/img/rotate_video.webm
+       :width: 700
+       :loop:
+       :autoplay:
+
     :param Union[str, os.PathLike] video_path: Path to the input video file or directory containing video files.
     :param int degrees: Number of degrees (between 1 and 359, inclusive) to rotate the video clockwise.
     :param Optional[bool] gpu: If True, attempt to use GPU acceleration for rotation (default is False).
     :param Optional[int] quality: Quality of the output video, an integer between 1 and 100 (default is 60).
-    :param Optional[Union[str, os.PathLike]] save_dir: Directory to save the rotated video(s). If None, the directory of the input video(s) will be used.
+    :param Optional[Union[str, os.PathLike]] save_dir: Directory to save the rotated video(s). If None, the directory of the input video(s) will be used with the `rotated` suiffix.
     :return: None.
 
     :example:
     >>> rotate_video(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/reptile/rot_test.mp4', degrees=180)
+    >>> rotate_video(video_path=r"C:\troubleshooting\mitra\project_folder\videos\clipped\501_MA142_Gi_CNO_0514_clipped.mp4", degrees=65)
+    >>> rotate_video(video_path=r"C:\troubleshooting\mitra\project_folder\videos\clipped\501_MA142_Gi_CNO_0514_clipped.mp4", degrees=10, fill_color='deeppink', gpu=True)
+
     """
 
     check_ffmpeg_available(raise_error=True)
     timer = SimbaTimer(start=True)
     check_int(name=f'{rotate_video.__name__} font_size', value=degrees, min_value=1, max_value=359)
     check_int(name=f'{rotate_video.__name__} quality', value=quality, min_value=1, max_value=100)
+    check_str(name=f'{rotate_video.__name__} fill_color', value=fill_color.lower(), options=tuple(get_named_colors()))
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)", source=rotate_video.__name__)
     crf_lk = percent_to_crf_lookup()
@@ -4240,13 +4250,17 @@ def rotate_video(video_path: Union[str, os.PathLike],
         _, video_name, ext = get_fn_ext(video_path)
         print(f'Rotating video {video_name} {degrees} degrees (Video {file_cnt + 1}/{len(video_paths)})...')
         save_path = os.path.join(save_dir, f'{video_name}_rotated{ext}')
+        print(fill_color)
         if gpu:
-            cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -vf "hwupload_cuda,rotate={degrees}*(PI/180),format=nv12|cuda" -c:v h264_nvenc "{save_path}" -loglevel error -stats -y'
+            cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -vf "rotate={degrees}*(PI/180):fillcolor={fill_color},format=nv12" -c:v h264_nvenc "{save_path}" -loglevel error -stats -y'
         else:
-            cmd = f'ffmpeg -i "{video_path}" -vf "rotate={degrees}*(PI/180)" -c:v libx264 -crf {crf} "{save_path}" -loglevel error -stats -y'
+            cmd = f'ffmpeg -i "{video_path}" -vf "rotate={degrees}*(PI/180):fillcolor={fill_color}" -c:v libx264 -crf {crf} "{save_path}" -loglevel error -stats -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f"{len(video_paths)} video(s) ratated {degrees} and saved in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=rotate_video.__name__,)
+
+
+#rotate_video(video_path=r"C:\troubleshooting\mitra\project_folder\videos\clipped\501_MA142_Gi_CNO_0514_clipped.mp4", degrees=20, fill_color='coral')
 
 
 def flip_videos(video_path: Union[str, os.PathLike],

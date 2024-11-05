@@ -28,7 +28,7 @@ class OutlierCorrecterLocation(ConfigReader):
        :width: 500
        :align: center
 
-    :parameter Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
+    :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
 
     Examples
     ----------

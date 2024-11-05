@@ -27,6 +27,11 @@ class AggregateClfCalculator(ConfigReader):
     """
     Compute aggregate descriptive statistics from classification data.
 
+    .. note::
+       `GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results>`__.
+       `Example expected ouput file <https://github.com/sgoldenlab/simba/blob/master/misc/detailed_bout_data_summary_20231011091832.csv>`__.
+
+
     :param str config_path: path to SimBA project config file in Configparser format
     :param List[str] data_measures: Aggregate statistics measures to calculate. OPTIONS: ['Bout count', 'Total event duration (s)', 'Mean event bout duration (s)', 'Median event bout duration (s)', 'First event occurrence (s)', 'Mean event bout interval duration (s)', 'Median event bout interval duration (s)']
     :param List[str] classifiers: Classifiers to calculate aggregate statistics for. E.g.,: ['Attack', 'Sniffing']
@@ -34,9 +39,6 @@ class AggregateClfCalculator(ConfigReader):
     :param bool detailed_bout_data: If True, save detailed data for each bout in each video (start frame, end frame, bout time etc.)
     :param bool transpose: If True, then one video per row. Else, one meassure per row. Default: False.
 
-    .. note::
-       `GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results>`__.
-       `Example expected ouput file <https://github.com/sgoldenlab/simba/blob/master/misc/detailed_bout_data_summary_20231011091832.csv>`__.
 
     :example:
     >>> clf_log_creator = AggregateClfCalculator(config_path="MyConfigPath", data_measures=['Bout count', 'Total event duration (s)'], classifiers=['Attack', 'Sniffing'])
@@ -235,7 +237,7 @@ class AggregateClfCalculator(ConfigReader):
 
 # test = AggregateClfCalculator(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini",
 #                               data_measures=["Bout count", "Total event duration (s)", "Mean event bout duration (s)", "Median event bout duration (s)", "First event occurrence (s)", "Mean event bout interval duration (s)", "Median event bout interval duration (s)"],
-#                               classifiers=['rearing'],
+#                               classifiers=['lay-on-belly'],
 #                               video_meta_data =['Frame count', "Video length (s)"],
 #                               transpose=True)
 # test.run()

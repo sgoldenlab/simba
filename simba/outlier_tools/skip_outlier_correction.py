@@ -15,12 +15,12 @@ class OutlierCorrectionSkipper(ConfigReader):
 
     :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
 
-    Examples
-    ----------
+    :example:
     >>> _ = OutlierCorrectionSkipper(config_path='MyProjectConfig').run()
     """
 
     def __init__(self, config_path: Union[str, os.PathLike]):
+
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         if not os.path.exists(self.outlier_corrected_dir):os.makedirs(self.outlier_corrected_dir)
         check_if_filepath_list_is_empty(filepaths=self.input_csv_paths, error_msg=f"No files found in {self.input_csv_dir}.",)

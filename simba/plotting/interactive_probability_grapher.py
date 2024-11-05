@@ -51,7 +51,7 @@ class InteractiveProbabilityGrapher(ConfigReader):
         if f"Probability_{self.clf_name}" not in self.data_df.columns:
             raise ColumnNotFoundError(column_name=f"Probability_{self.clf_name}", file_name=self.data_path)
         self.p_arr = self.data_df[["Probability_{}".format(self.clf_name)]].to_numpy()
-        current_video_file_path = self.find_video_of_file(video_dir=self.video_dir, filename=video_name)
+        current_video_file_path = self.find_video_of_file(video_dir=self.video_dir, filename=video_name, raise_error=True)
         self.video_frm = InteractiveVideoPlotterWindow(video_path=current_video_file_path, p_arr=self.p_arr)
         self.video_frm.main_frm.protocol("WM_DELETE_WINDOW", self._close_windows)
 

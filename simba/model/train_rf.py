@@ -2,16 +2,15 @@ __author__ = "Simon Nilsson"
 
 import ast
 import os
-from typing import Union
+from typing import Union, Optional
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.checks import check_if_filepath_list_is_empty, check_int
-from simba.utils.enums import (ConfigKey, Dtypes, Formats, Methods,
-                               MLParamKeys, Options)
+from simba.utils.checks import check_if_filepath_list_is_empty, check_int, check_if_dir_exists
+from simba.utils.enums import (ConfigKey, Dtypes, Formats, Methods, MLParamKeys, Options)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import read_config_entry, write_df
 
@@ -21,7 +20,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
     Train a single random forest model using hyperparameter setting and evaluation methods
     stored within the SimBA project config .ini file (``global environment``).
 
-    :param str config_path: path to SimBA project config file in Configparser format
+    :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
 
     .. note::
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-7-train-machine-model>`_
@@ -68,29 +67,14 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         if self.over_sample_setting == Methods.SMOTEENN.value.lower():
             self.x_train, self.y_train = self.smoteen_oversampler(self.x_train, self.y_train, float(self.over_sample_ratio))
         elif self.over_sample_setting == Methods.SMOTE.value.lower():
-            self.x_train, self.y_train = self.smote_oversampler(self.x_train, self.y_train, float(self.over_sample_ratio)
-            )
+            self.x_train, self.y_train = self.smote_oversampler(self.x_train, self.y_train, float(self.over_sample_ratio))
 
         if self.save_train_test_frm_info:
-            train_data = self.frm_idx[
-                self.frm_idx.index.isin(self.x_train.index)
-            ].set_index("VIDEO")
-            test_data = self.frm_idx[
-                self.frm_idx.index.isin(self.x_test.index)
-            ].set_index("VIDEO")
-            write_df(
-                df=train_data,
-                file_type=Formats.CSV.value,
-                save_path=os.path.join(self.eval_out_path, "train_idx.csv"),
-            )
-            write_df(
-                df=test_data,
-                file_type=Formats.CSV.value,
-                save_path=os.path.join(self.eval_out_path, "test_idx.csv"),
-            )
-            print(
-                f"Frame index for the train and test sets saved in {self.eval_out_path} directory..."
-            )
+            train_data = self.frm_idx[self.frm_idx.index.isin(self.x_train.index)].set_index("VIDEO")
+            test_data = self.frm_idx[self.frm_idx.index.isin(self.x_test.index)].set_index("VIDEO")
+            write_df(df=train_data, file_type=Formats.CSV.value, save_path=os.path.join(self.eval_out_path, "train_idx.csv"))
+            write_df(df=test_data, file_type=Formats.CSV.value, save_path=os.path.join(self.eval_out_path, "test_idx.csv"))
+            print(f"Frame index for the train and test sets saved in {self.eval_out_path} directory...")
 
     def run(self):
         """
@@ -377,6 +361,12 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
 
 
 
+
+
+
+# test = TrainRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+# test.run()
+# test.save()
 
 
 

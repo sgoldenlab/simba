@@ -4,18 +4,15 @@ import os
 from typing import Union
 
 import pandas as pd
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import check_if_filepath_list_is_empty
-from simba.utils.enums import (ConfigKey, Dtypes, Formats, Methods,
-                               MLParamKeys, Options, TagNames)
+from simba.utils.enums import (ConfigKey, Dtypes, Formats, Methods, MLParamKeys, Options)
 from simba.utils.errors import InvalidInputError, NoDataError
-from simba.utils.printing import log_event, stdout_success
-from simba.utils.read_write import (read_config_entry, read_simba_meta_files,
-                                    write_df)
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import (read_config_entry, read_simba_meta_files, write_df)
 
 
 class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
@@ -148,6 +145,10 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
         stdout_success(msg=f"All {len(list(self.meta_dicts.keys()))} model(s) and their evaluations complete. The models/evaluation files are saved in {self.model_dir_out} directory", source=self.__class__.__name__)
 
 
+
+#
+# test = GridSearchRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+# test.run()
 
 #
 # test = GridSearchRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")

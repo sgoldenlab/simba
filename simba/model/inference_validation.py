@@ -18,8 +18,7 @@ from simba.utils.read_write import get_fn_ext, read_df, write_df
 
 class InferenceValidation(ConfigReader, TrainModelMixin):
     """
-    Run a single classifier on a single featurized input file. Results are saved within the
-    ``project_folder/csv/validation`` directory of the SimBA project.
+    Run a single classifier on a single featurized input file. Results are saved within the ``project_folder/csv/validation`` directory of the SimBA project by defau
 
     :param str config_file_path: path to SimBA project config file in Configparser format
     :param str input_file_path: path to file containing features
