@@ -1927,9 +1927,15 @@ class TimeseriesFeatureMixin(object):
 
     @staticmethod
     def linearity_index(x: np.ndarray) -> float:
-
         """
         Calculates the straightness (linearity) index of a path.
+
+        .. image:: _static/img/linearity_index.webp
+           :width: 400
+           :align: center
+
+        .. seealso::
+           :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_linearity_index`
 
         :param np.ndarray x: An (N, M) array representing the path, where N is the number of points and M is the number of spatial dimensions (e.g., 2 for 2D or 3 for 3D). Each row represents the coordinates of a point along the path.
         :return: The straightness index of the path, a value between 0 and 1, where 1 indicates a perfectly straight path.
@@ -1959,6 +1965,9 @@ class TimeseriesFeatureMixin(object):
         Calculates the Linearity Index (Path Straightness) over a sliding window for a path represented by an array of points.
 
         The Linearity Index measures how straight a path is by comparing the straight-line distance between the start and end points of each window to the total distance traveled along the path.
+
+        .. seealso::
+           :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.linearity_index`
 
         :param np.ndarray x: An (N, M) array representing the path, where N is the number of points and M is the number of spatial dimensions (e.g., 2 for 2D or 3 for 3D). Each row represents the coordinates of a point along the path.
         :param float x: The size of the sliding window in seconds. This defines the time window over which the linearity index is calculated. The window size should be specified in seconds.
@@ -2050,9 +2059,9 @@ class TimeseriesFeatureMixin(object):
 
         :example:
         >>> x = np.random.randint(0, 100, (400, 2))
-        >>> results = TimeseriesFeatureMixin.sliding_entropy_of_directional_changes(x=x, bins=16, window_size=5.0, sample_rate=30)
+        >>> results_1 = TimeseriesFeatureMixin.sliding_entropy_of_directional_changes(x=x, bins=16, window_size=5.0, sample_rate=30)
         >>> x = pd.read_csv(r"C:\troubleshooting\two_black_animals_14bp\project_folder\csv\input_csv\Together_1.csv")[['Ear_left_1_x', 'Ear_left_1_y']].values
-        >>> results = TimeseriesFeatureMixin.sliding_entropy_of_directional_changes(x=x, bins=16, window_size=5.0, sample_rate=30)
+        >>> results_2 = TimeseriesFeatureMixin.sliding_entropy_of_directional_changes(x=x, bins=16, window_size=5.0, sample_rate=30)
         """
 
         direction_vectors = np.diff(x, axis=0)
@@ -2073,6 +2082,9 @@ class TimeseriesFeatureMixin(object):
     def path_curvature(x: np.ndarray, agg_type: Literal['mean', 'median', 'max'] = 'mean') -> float:
         """
         Calculate aggregate curvature of a 2D path given an array of points.
+
+        .. seealso::
+           :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_path_curvature`
 
         :param x: A 2D numpy array of shape (N, 2), where N is the number of points and each row is (x, y).
         :param Literal['mean', 'median', 'max'] agg_type: The type of summary statistic to return. Options are 'mean', 'median', or 'max'.
@@ -2111,6 +2123,9 @@ class TimeseriesFeatureMixin(object):
         aggregate curvature values within each window using the mean, median, or maximum, depending on the desired level of
         sensitivity to bends and turns. A higher curvature value indicates a sharper or more frequent directional change within
         the window, while a lower curvature suggests a straighter or smoother path.
+
+        .. seealso::
+           :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.path_curvature`
 
         :param x: A 2D array of shape (N, 2) representing the path, where N is the number of points, and each point has two spatial coordinates (e.g., x and y for 2D space).
         :param Literal['mean', 'median', 'max'] agg_type: Type of aggregation for the curvature within each window.
@@ -2158,6 +2173,9 @@ class TimeseriesFeatureMixin(object):
            :width: 400
            :align: center
 
+        .. seealso::
+           :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_spatial_density`
+
         :param np.ndarray x: A 2D array of shape (N, 2), where N is the number of points and each point has two spatial coordinates.
         :param float radius: The radius within which to count neighboring points around each point. Defines the area of interest around each trajectory point.
         :return: A single float value representing the average spatial density of the trajectory.
@@ -2198,6 +2216,9 @@ class TimeseriesFeatureMixin(object):
         within a specified radius, considering the density over a moving window of points. This function accounts for the
         spatial scale in pixels per millimeter, providing a density measurement that is adjusted for the physical scale
         of the trajectory.
+
+        .. seealso::
+           :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.spatial_density`
 
         :param np.ndarray x: A 2D array of shape (N, 2), where N is the number of points and each point has two spatial coordinates (x, y). The array represents the trajectory path of points in a 2D space (e.g., x and y positions in space).
         :param float radius: The radius (in millimeters) within which to count neighboring points around each trajectory point. Defines the area of interest around each point.
