@@ -22,9 +22,11 @@ except:
 import typing
 from typing import Optional, Tuple, get_type_hints
 
-from simba.utils.checks import (check_float, check_instance, check_int, check_str, check_that_column_exist, check_valid_array, check_valid_lst)
-from simba.utils.read_write import find_core_cnt
+from simba.utils.checks import (check_float, check_instance, check_int,
+                                check_str, check_that_column_exist,
+                                check_valid_array, check_valid_lst)
 from simba.utils.enums import Formats
+from simba.utils.read_write import find_core_cnt
 
 
 class TimeseriesFeatureMixin(object):
