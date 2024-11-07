@@ -3669,6 +3669,10 @@ class GeometryMixin(object):
         """
         Extract exterior keypoints from a list of Polygon geometries in parallel, with optional core count specification for multiprocessing.
 
+        .. image:: _static/img/geometries_to_exterior_keypoints.webp
+           :width: 400
+           :align: center
+
         :param List[Polygon] geometries: A list of Shapely `Polygon` objects representing geometries whose exterior keypoints will be extracted.
         :param Optional[int] core_cnt: The number of CPU cores to use for multiprocessing. If -1, it uses the maximum number of available cores.
         :return: A numpy array of exterior keypoints extracted from the input geometries.
