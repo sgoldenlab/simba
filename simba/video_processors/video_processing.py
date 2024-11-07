@@ -4208,7 +4208,7 @@ def rotate_video(video_path: Union[str, os.PathLike],
     """
     Rotate a video or a directory of videos by a specified number of degrees.
 
-    .. video:: _static/img/rotate_video.webm
+    .. video:: _static/img/rotate_video.mp4
        :width: 700
        :loop:
        :autoplay:
