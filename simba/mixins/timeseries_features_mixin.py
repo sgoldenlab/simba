@@ -2154,6 +2154,10 @@ class TimeseriesFeatureMixin(object):
         areas where points are closely packed, which can suggest slower movement, lingering, or frequent changes in
         direction. Lower density values suggest more spread-out points, often associated with faster, more linear movement.
 
+        .. image:: _static/img/spatial_density.webp
+           :width: 400
+           :align: center
+
         :param np.ndarray x: A 2D array of shape (N, 2), where N is the number of points and each point has two spatial coordinates.
         :param float radius: The radius within which to count neighboring points around each point. Defines the area of interest around each trajectory point.
         :return: A single float value representing the average spatial density of the trajectory.
