@@ -850,12 +850,12 @@ def check_valid_array(data: np.ndarray,
             )
 
     if accepted_axis_0_shape is not None:
-        if data.ndim != 2:
-            raise ArrayError(
-                msg=f"Array not of acceptable dimension. Found {data.ndim}, accepted: 2, {source}",
-                source=check_valid_array.__name__,
-            )
-        elif data.shape[0] not in accepted_axis_0_shape:
+        # if data.ndim != 2:
+        #     raise ArrayError(
+        #         msg=f"Array not of acceptable dimension. Found {data.ndim}, accepted: 2, {source}",
+        #         source=check_valid_array.__name__,
+        #     )
+        if data.shape[0] not in accepted_axis_0_shape:
             raise ArrayError(
                 msg=f"Array not of acceptable shape. Found {data.shape[0]} rows, accepted: {accepted_axis_0_shape}, {source}",
                 source=check_valid_array.__name__,

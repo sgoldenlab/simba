@@ -30,8 +30,7 @@ class OutlierCorrecterLocation(ConfigReader):
 
     :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
 
-    Examples
-    ----------
+    :example:
     >>> _ = OutlierCorrecterLocation(config_path='MyProjectConfig').run()
     """
 
@@ -54,18 +53,8 @@ class OutlierCorrecterLocation(ConfigReader):
         self.outlier_bp_dict = {}
         for animal_name in self.animal_bp_dict.keys():
             self.outlier_bp_dict[animal_name] = {}
-            self.outlier_bp_dict[animal_name]["bp_1"] = read_config_entry(
-                self.config,
-                ConfigKey.OUTLIER_SETTINGS.value,
-                "location_bodypart1_{}".format(animal_name.lower()),
-                "str",
-            )
-            self.outlier_bp_dict[animal_name]["bp_2"] = read_config_entry(
-                self.config,
-                ConfigKey.OUTLIER_SETTINGS.value,
-                "location_bodypart2_{}".format(animal_name.lower()),
-                "str",
-            )
+            self.outlier_bp_dict[animal_name]["bp_1"] = read_config_entry(self.config, ConfigKey.OUTLIER_SETTINGS.value, "location_bodypart1_{}".format(animal_name.lower()),"str")
+            self.outlier_bp_dict[animal_name]["bp_2"] = read_config_entry(self.config, ConfigKey.OUTLIER_SETTINGS.value, "location_bodypart2_{}".format(animal_name.lower()), "str")
 
     def __find_location_outliers(self):
         for animal_name, animal_data in self.bp_dict.items():

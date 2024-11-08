@@ -70,34 +70,24 @@ class OutlierCorrecterMovement(ConfigReader, FeatureExtractionMixin):
 
     @staticmethod
     @jit(nopython=True)
-    def __corrector(data=np.ndarray, criterion=float):
+    def __corrector(data: np.ndarray, criterion: float):
         results, current_value, cnt = np.full(data.shape, np.nan), data[0, :], 0
         for i in range(data.shape[0]):
             dist = abs(np.linalg.norm(current_value - data[i, :]))
             if dist <= criterion:
                 current_value = data[i, :]
+            else:
                 cnt += 1
             results[i, :] = current_value
         return results, cnt
 
     def __outlier_replacer(self):
         for animal_name, animal_body_parts in self.animal_bp_dict.items():
-            for bp_x_name, bp_y_name in zip(
-                animal_body_parts["X_bps"], animal_body_parts["Y_bps"]
-            ):
-                vals, cnt = self.__corrector(
-                    data=self.data_df[[bp_x_name, bp_y_name]].values,
-                    criterion=self.animal_criteria[animal_name],
-                )
+            for bp_x_name, bp_y_name in zip(animal_body_parts["X_bps"], animal_body_parts["Y_bps"]):
+                vals, cnt = self.__corrector(data=self.data_df[[bp_x_name, bp_y_name]].values,criterion=self.animal_criteria[animal_name])
                 df = pd.DataFrame(vals, columns=[bp_x_name, bp_y_name])
                 self.data_df.update(df)
-                self.log.loc[len(self.log)] = [
-                    self.video_name,
-                    animal_name,
-                    bp_x_name[:-2],
-                    cnt,
-                    round(cnt / len(df), 6),
-                ]
+                self.log.loc[len(self.log)] = [self.video_name, animal_name, bp_x_name[:-2], cnt, round(cnt / len(df), 6)]
 
     def run(self):
         """

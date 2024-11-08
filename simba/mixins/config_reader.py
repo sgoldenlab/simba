@@ -152,15 +152,11 @@ class ConfigReader(object):
             self.outlier_corrected_movement_dir + f"/*.{self.file_type}"
         )
         self.cpu_cnt, self.cpu_to_use = find_core_cnt()
-        self.machine_results_paths = glob.glob(
-            self.machine_results_dir + f"/*.{self.file_type}"
-        )
+        self.machine_results_paths = glob.glob(self.machine_results_dir + f"/*.{self.file_type}")
         self.logs_path = os.path.join(self.project_path, "logs")
         self.body_parts_path = os.path.join(self.project_path, Paths.BP_NAMES.value)
         check_file_exist_and_readable(file_path=self.body_parts_path)
-        self.body_parts_lst = (
-            pd.read_csv(self.body_parts_path, header=None).iloc[:, 0].to_list()
-        )
+        self.body_parts_lst = (pd.read_csv(self.body_parts_path, header=None).iloc[:, 0].to_list())
         self.body_parts_lst = [x for x in self.body_parts_lst if str(x) != "nan"]
         self.get_body_part_names()
         self.get_bp_headers()
