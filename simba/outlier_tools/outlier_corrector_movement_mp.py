@@ -1,20 +1,23 @@
 __author__ = "Simon Nilsson"
 
+import functools
+import multiprocessing
 import os
-from typing import Union, Optional, Dict
+from typing import Dict, Optional, Union
 
 import numpy as np
 import pandas as pd
 from numba import jit
-import multiprocessing
-import functools
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.utils.checks import check_float, check_if_dir_exists, check_int
 from simba.utils.enums import ConfigKey, Dtypes
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (get_fn_ext, read_config_entry, read_df, write_df, find_core_cnt, find_files_of_filetypes_in_directory)
-from simba.utils.checks import check_int, check_float, check_if_dir_exists
+from simba.utils.read_write import (find_core_cnt,
+                                    find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_config_entry, read_df,
+                                    write_df)
 
 
 def _movement_outlier_corrector(data_path: str,
