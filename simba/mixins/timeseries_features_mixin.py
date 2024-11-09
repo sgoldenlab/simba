@@ -1849,7 +1849,7 @@ class TimeseriesFeatureMixin(object):
                           time_step: float,
                           sample_rate: float) -> float:
 
-        """
+        r"""
         Calculate the Mean Squared Jerk (MSJ) for a given set of 2D positions over time.
 
         The Mean Squared Jerk is a measure of the smoothness of movement, calculated as the mean of
@@ -1933,7 +1933,8 @@ class TimeseriesFeatureMixin(object):
 
     @staticmethod
     def linearity_index(x: np.ndarray) -> float:
-        """
+
+        r"""
         Calculates the straightness (linearity) index of a path.
 
         .. image:: _static/img/linearity_index.webp
@@ -2009,7 +2010,8 @@ class TimeseriesFeatureMixin(object):
 
     @staticmethod
     def entropy_of_directional_changes(x: np.ndarray, bins: int = 16) -> float:
-        """
+
+        r"""
         Computes the Entropy of Directional Changes (EDC) of a path represented by an array of points.
 
         The output value ranges from 0 to log2(bins).
@@ -2104,7 +2106,8 @@ class TimeseriesFeatureMixin(object):
 
     @staticmethod
     def path_curvature(x: np.ndarray, agg_type: Literal['mean', 'median', 'max'] = 'mean') -> float:
-        """
+
+        r"""
         Calculate aggregate curvature of a 2D path given an array of points.
 
         The curvature quantifies the change in direction along the path. Higher curvature values indicate sharper turns,
