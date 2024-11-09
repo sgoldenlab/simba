@@ -1,10 +1,11 @@
 from time import perf_counter
 from typing import Optional
+
 import numpy as np
 from numba import cuda
 
-from simba.data_processors.cuda.utils import _euclid_dist
-from simba.data_processors.cuda.utils import _cuda_mean, _cuda_std
+from simba.data_processors.cuda.utils import (_cuda_mean, _cuda_std,
+                                              _euclid_dist)
 from simba.utils.checks import check_float, check_valid_array
 from simba.utils.enums import Formats
 
