@@ -1,14 +1,30 @@
-Location outlier methods
+Location outlier removed
 --------------------------------------------------------
 
 .. automodule:: simba.outlier_tools.outlier_corrector_location.OutlierCorrecterLocation
    :members:
    :show-inheritance:
 
-Movement outlier methods
+Movement outlier remover
 --------------------------------------------------------
 
 .. automodule:: simba.outlier_tools.outlier_corrector_movement.OutlierCorrecterMovement
+   :members:
+   :show-inheritance:
+
+
+Movement outlier remover: multi-core
+--------------------------------------------------------
+
+.. automodule:: simba.outlier_tools.outlier_corrector_movement_mp.OutlierCorrecterMovementMultiProcess
+   :members:
+   :show-inheritance:
+
+
+Location outlier remover: multi-core
+--------------------------------------------------------
+
+.. automodule:: simba.outlier_tools.outlier_corrector_location_mp.OutlierCorrecterLocationMultiprocess
    :members:
    :show-inheritance:
 

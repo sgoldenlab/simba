@@ -4192,6 +4192,13 @@ class Statistics(FeatureExtractionMixin):
 
         Zero indicates perfect symmetry. Positive values pepresent increasing asymmetry between the two measurements.
 
+        The Symmetry Index (SI) is calculated as:
+
+        .. math::
+           SI = \frac{|x_i - y_i|}{0.5 \times (x_i + y_i)} \times 100
+
+        where :math:`x_i` and :math:`y_i` are the values of the two measurements at each time point.
+
         :param np.ndarray x: A 1-dimensional array of measurements from one side (e.g., left side), representing a time series or sequence of measurements.
         :param np.ndarray y: A 1-dimensional array of measurements from the other side (e.g., right side), of the same length as `x`.
         :param Literal['mean', 'median'] agg_type: The aggregation method used to summarize the Symmetry Index across all time points.
@@ -4201,13 +4208,11 @@ class Statistics(FeatureExtractionMixin):
         :example:
         >>> x = np.random.randint(0, 155, (100,))
         >>>y = np.random.randint(0, 155, (100,))
-        >>> symmetry_index(x=x, y=y)
+        >>> Statistics.symmetry_index(x=x, y=y)
         """
 
-        check_valid_array(data=x, source=f'{Statistics.symmetry_index.__name__} x', accepted_ndims=(1,), min_axis_0=1,
-                          accepted_dtypes=Formats.NUMERIC_DTYPES.value)
-        check_valid_array(data=x, source=f'{Statistics.symmetry_index.__name__} y', accepted_ndims=(1,), min_axis_0=1,
-                          accepted_axis_0_shape=[x.shape[0]], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=x, source=f'{Statistics.symmetry_index.__name__} x', accepted_ndims=(1,), min_axis_0=1, accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=x, source=f'{Statistics.symmetry_index.__name__} y', accepted_ndims=(1,), min_axis_0=1, accepted_axis_0_shape=[x.shape[0]], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
         check_str(name=f'{Statistics.symmetry_index.__name__} agg_type', value=agg_type, options=('mean', 'median'))
         si_values = np.abs(x - y) / (0.5 * (x + y)) * 100
         if agg_type == 'mean':
