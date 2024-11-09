@@ -17,7 +17,7 @@ from simba.utils.checks import (check_if_dir_exists, check_instance, check_int,
 from simba.utils.enums import Formats
 from simba.utils.errors import FFMPEGCodecGPUError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import read_df, write_df
+from simba.utils.read_write import write_df
 from simba.utils.warnings import NotEnoughDataWarning
 
 

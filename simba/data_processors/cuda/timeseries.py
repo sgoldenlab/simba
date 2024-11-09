@@ -1,9 +1,9 @@
 from time import perf_counter
 from typing import Optional
-
 import numpy as np
 from numba import cuda
 
+from simba.data_processors.cuda.utils import _euclid_dist
 from simba.data_processors.cuda.utils import _cuda_mean, _cuda_std
 from simba.utils.checks import check_float, check_valid_array
 from simba.utils.enums import Formats
@@ -116,3 +116,76 @@ def sliding_percent_beyond_n_std(data: np.ndarray, time_window: float, sample_ra
 
 
 
+@cuda.jit()
+def _sliding_spatial_density_kernel(x, time_window, radius, results):
+    r = cuda.grid(1)
+    if r >= x.shape[0] or r < 0:
+        return
+    l = int(r - time_window[0])
+    if l < 0 or l >= r:
+        return
+    total_neighbors = 0
+    n_points = r - l
+    if n_points <= 0:
+        results[r] = 0
+        return
+    for i in range(l, r):
+        for j in range(l, r):
+            if i != j:
+                dist = _euclid_dist(x[i], x[j])
+                if dist <= radius[0]:
+                    total_neighbors += 1
+
+    results[r] = total_neighbors / n_points if n_points > 0 else 0
+
+
+def sliding_spatial_density_cuda(x: np.ndarray,
+                                 radius: float,
+                                 pixels_per_mm: float,
+                                 window_size: float,
+                                 sample_rate: float) -> np.ndarray:
+    """
+    Computes the spatial density of points within a moving window along a trajectory using CUDA for acceleration.
+
+    This function calculates a spatial density measure for each point along a 2D trajectory path by counting the number
+    of neighboring points within a specified radius. The computation is performed within a sliding window that moves
+    along the trajectory, using GPU acceleration to handle large datasets efficiently.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/sliding_spatial_density_cuda.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+    :param np.ndarray x: A 2D array of shape (N, 2), where N is the number of points and each point has two spatial coordinates (x, y). The array represents the trajectory path of points in a 2D space (e.g., x and y positions in space).
+    :param float radius: The radius (in millimeters) within which to count neighboring points around each trajectory point. Defines the area of interest around each point.
+    :param float pixels_per_mm: The scaling factor that converts the physical radius (in millimeters) to pixel units for spatial density calculations.
+    :param float window_size: The size of the sliding window (in seconds or points) to compute the density of points. A larger window size will consider more points in each density calculation.
+    :param float sample_rate: The rate at which to sample the trajectory points (e.g., frames per second or samples per unit time). It adjusts the granularity of the sliding window.
+    :return: A 1D numpy array where each element represents the computed spatial density for the trajectory at the corresponding point in time (or frame). Higher values indicate more densely packed points within the specified radius, while lower values suggest more sparsely distributed points.
+    :rtype: np.ndarray
+
+    :example:
+    >>> df = pd.read_csv("/mnt/c/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Test_3.csv")
+    >>> x = df[['Nose_1_x', 'Nose_1_y']].values
+    >>> results_cuda = sliding_spatial_density_cuda(x=x, radius=10.0, pixels_per_mm=4.0, window_size=1, sample_rate=20)
+
+    """
+
+    check_valid_array(data=x, source=f'{sliding_spatial_density_cuda.__name__} x', accepted_ndims=(2,), accepted_axis_1_shape=[2, ], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_float(name=f'{sliding_spatial_density_cuda.__name__} radius', value=radius)
+    check_float(name=f'{sliding_spatial_density_cuda.__name__} window_size', value=window_size)
+    check_float(name=f'{sliding_spatial_density_cuda.__name__} sample_rate', value=sample_rate)
+    check_float(name=f'{sliding_spatial_density_cuda.__name__} pixels_per_mm', value=pixels_per_mm)
+
+    x = np.ascontiguousarray(x)
+    pixel_radius = np.array([np.ceil(max(1.0, (radius * pixels_per_mm)))]).astype(np.float64)
+    time_window_frames = np.array([np.ceil(window_size * sample_rate)])
+    x_dev = cuda.to_device(x)
+    time_window_frames_dev = cuda.to_device(time_window_frames)
+    radius_dev = cuda.to_device(pixel_radius)
+    bpg = (x.shape[0] + (THREADS_PER_BLOCK - 1)) // THREADS_PER_BLOCK
+    results = cuda.device_array(shape=x.shape[0], dtype=np.float16)
+    _sliding_spatial_density_kernel[bpg, THREADS_PER_BLOCK](x_dev, time_window_frames_dev, radius_dev, results)
+    return results.copy_to_host()

@@ -2235,7 +2235,7 @@ class TimeseriesFeatureMixin(object):
 
         check_valid_array(data=x, source=f'{TimeseriesFeatureMixin.spatial_density.__name__} x', accepted_ndims=(2,), accepted_axis_1_shape=[2, ], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
         check_float(name=f'{TimeseriesFeatureMixin.spatial_density.__name__} radius', value=radius)
-        check_float(name=f'{TimeseriesFeatureMixin.spatial_density.__name__} radius', value=pixels_per_mm)
+        check_float(name=f'{TimeseriesFeatureMixin.spatial_density.__name__} pixels_per_mm', value=pixels_per_mm)
         pixel_radius = np.ceil(max(1.0, (radius * pixels_per_mm)))
         n_points = x.shape[0]
         total_neighbors = 0

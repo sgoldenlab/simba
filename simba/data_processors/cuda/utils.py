@@ -80,6 +80,10 @@ def _cuda_mse(img_1, img_2):
 #                 arr[j], arr[j + 1] = arr[j + 1], arr[j]
 #     out = arr
 
+@cuda.jit(device=True)
+def _euclid_dist(x, y):
+    return math.sqrt(((y[0] - x[0]) ** 2) + ((y[1] - x[1]) ** 2))
+
 def _cuda_available() -> Tuple[bool, Dict[int, Any]]:
     """
     Check if GPU available. If True, returns the GPUs, the model, physical slots and compute capabilitie(s).
