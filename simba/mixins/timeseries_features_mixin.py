@@ -1794,9 +1794,7 @@ class TimeseriesFeatureMixin(object):
         return results.astype(np.float32)
 
     @staticmethod
-    def sliding_pct_in_top_n(
-        x: np.ndarray, windows: np.ndarray, n: int, fps: float
-    ) -> np.ndarray:
+    def sliding_pct_in_top_n(x: np.ndarray, windows: np.ndarray, n: int, fps: float) -> np.ndarray:
         """
         Compute the percentage of elements in the top 'n' frequencies in sliding windows of the input array.
 
@@ -1857,6 +1855,14 @@ class TimeseriesFeatureMixin(object):
         The Mean Squared Jerk is a measure of the smoothness of movement, calculated as the mean of
         squared third derivatives of the position with respect to time. It provides an indication of
         how abrupt or smooth a trajectory is, with higher values indicating more erratic movements.
+
+        The formula for Mean Squared Jerk is:
+
+        .. math::
+           \text{MSJ} = \frac{1}{N - 3} \sum_{i=1}^{N-3} \| \frac{d^3 x_i}{dt^3} \|^2
+
+        where :math:`N` is the number of points, :math:`x_i` represents the position at each point,
+        and :math:`\frac{d^3 x_i}{dt^3}` is the third derivative of the position with respect to time.
 
         :param np.ndarray x: A 2D array where each row represents the [x, y] position at a time step.
         :param float time_step: The time difference between successive positions in seconds.
@@ -1937,6 +1943,14 @@ class TimeseriesFeatureMixin(object):
         .. seealso::
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_linearity_index`
 
+        .. math::
+           \text{linearity\_index} = \frac{\text{straight\_line\_distance}}{\text{path\_length}}
+
+        Where:
+
+        - :math:`\text{straight\_line\_distance}` is the Euclidean distance between the starting and ending points of the path.
+        - :math:`\text{path\_length}` is the sum of Euclidean distances between consecutive points along the path.
+
         :param np.ndarray x: An (N, M) array representing the path, where N is the number of points and M is the number of spatial dimensions (e.g., 2 for 2D or 3 for 3D). Each row represents the coordinates of a point along the path.
         :return: The straightness index of the path, a value between 0 and 1, where 1 indicates a perfectly straight path.
         :rtype: float
@@ -2007,6 +2021,15 @@ class TimeseriesFeatureMixin(object):
         The function works by calculating the change in direction between consecutive points, discretizing
         those changes into bins, and then computing the Shannon entropy based on the probability distribution
         of the directional changes.
+
+        .. math::
+           H = -\sum_{i=1}^{\text{bins}} p_i \log_2(p_i)
+
+        Where:
+
+        - :math:`p_i` is the probability of the direction falling into the :math:`i`-th bin.
+        - :math:`\text{bins}` represents the total number of bins for discretizing the directional changes.
+
 
         .. seealso::
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_entropy_of_directional_changes`
@@ -2079,9 +2102,20 @@ class TimeseriesFeatureMixin(object):
             results[r-1] = np.max((0.0, -np.sum(hist * np.log2(hist + 1e-10))))
         return results
 
+    @staticmethod
     def path_curvature(x: np.ndarray, agg_type: Literal['mean', 'median', 'max'] = 'mean') -> float:
         """
         Calculate aggregate curvature of a 2D path given an array of points.
+
+        The curvature quantifies the change in direction along the path. Higher curvature values indicate sharper turns,
+        while lower values suggest a straighter path. The function aggregates curvature values across the path using the specified statistic.
+
+        .. math::
+           \kappa = \frac{|x' y'' - y' x''|}{(x'^2 + y'^2)^{3/2}}
+
+        Where:
+        - :math:`x'` and :math:`y'` are the first derivatives (differences) of the x and y coordinates, respectively.
+        - :math:`x''` and :math:`y''` are the second derivatives (differences of differences) of the x and y coordinates.
 
         .. seealso::
            :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_path_curvature`
@@ -2102,8 +2136,7 @@ class TimeseriesFeatureMixin(object):
         dx, dy = np.diff(x[:, 0]), np.diff(x[:, 1])
         x_prime, y_prime = dx[:-1], dy[:-1]
         x_double_prime, y_double_prime = dx[1:] - dx[:-1], dy[1:] - dy[:-1]
-        curvature = np.abs(x_prime * y_double_prime - y_prime * x_double_prime) / (x_prime ** 2 + y_prime ** 2) ** (
-                    3 / 2)
+        curvature = np.abs(x_prime * y_double_prime - y_prime * x_double_prime) / (x_prime ** 2 + y_prime ** 2) ** (3 / 2)
         if agg_type == 'mean':
             return np.float32(np.nanmean(curvature))
         elif agg_type == 'median':
@@ -2168,6 +2201,13 @@ class TimeseriesFeatureMixin(object):
         Spatial density provides insights into the movement pattern along a trajectory. Higher density values indicate
         areas where points are closely packed, which can suggest slower movement, lingering, or frequent changes in
         direction. Lower density values suggest more spread-out points, often associated with faster, more linear movement.
+
+        The function calculates spatial density by counting the number of points within a specified radius around
+        each trajectory point and averaging these counts across all points.
+
+        - **Radius**: The radius specifies the neighborhood around each point, within which other points are counted as neighbors.
+        - **Pixels per mm**: This parameter scales the radius from physical units (e.g., millimeters) to pixel units, making the method adaptable to different spatial scales.
+
 
         .. image:: _static/img/spatial_density.webp
            :width: 400
