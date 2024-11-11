@@ -2891,7 +2891,7 @@ class GeometryMixin(object):
                                     bucket_grid_size: Optional[Iterable[int]] = None,
                                     px_per_mm: Optional[float] = None,
                                     add_correction: Optional[bool] = True,
-                                    verbose: Optional[bool] = True) -> Tuple[Dict[Tuple[int, int], Polygon], float]:
+                                    verbose: Optional[bool] = False) -> Tuple[Dict[Tuple[int, int], Polygon], float]:
         """
         Bucketize an image into squares and return a dictionary of polygons representing the bucket locations.
 
@@ -2904,7 +2904,7 @@ class GeometryMixin(object):
         :param Optional[Iterable[int]] bucket_grid_size: 2-value tuple, list or array representing the grid square in number of horizontal squares x number of vertical squares. If None, then buckets will be defined by the ``bucket_size_mm`` argument.
         :param Optional[float] px_per_mm: Pixels per millimeter conversion factor. Necessery if buckets are defined by ``bucket_size_mm`` argument.
         :param Optional[bool] add_correction: If True, performs correction by adding extra columns or rows to cover any remaining space if using ``bucket_size_mm``. Default True.
-        :param Optional[bool] verbose: If True, prints progress / completion information. Default True.
+        :param Optional[bool] verbose: If True, prints progress / completion information. Default False.
 
         :example:
         >>> img = cv2.imread('/Users/simon/Desktop/Screenshot 2024-01-21 at 10.15.55 AM.png', 1)
@@ -3081,11 +3081,7 @@ class GeometryMixin(object):
         """
 
         timer = SimbaTimer(start=True)
-        check_instance(
-            source=f"{self.__class__.__name__} data",
-            instance=data,
-            accepted_types=np.ndarray,
-        )
+        check_instance( source=f"{self.__class__.__name__} data", instance=data, accepted_types=np.ndarray)
         if (data.shape[1] != 2) or (data.ndim != 2):
             raise CountError(
                 msg=f"A N x 2 array is required (got {data.shape})",
@@ -3673,7 +3669,7 @@ class GeometryMixin(object):
         >>> data_path = r"C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\FRR_gq_Saline_0624.csv"
         >>> animal_data = read_df(file_path=data_path, file_type='csv', usecols=['Nose_x', 'Nose_y', 'Tail_base_x', 'Tail_base_y', 'Left_side_x', 'Left_side_y', 'Right_side_x', 'Right_side_y']).values.reshape(-1, 4, 2)[0:20].astype(np.int32)
         >>> animal_polygons = GeometryMixin().bodyparts_to_polygon(data=animal_data)
-        >>> geometries_to_exterior_keypoints(geometries=animal_polygons)
+        >>> GeometryMixin.geometries_to_exterior_keypoints(geometries=animal_polygons)
         """
         check_int(name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
         if core_cnt == -1: core_cnt = find_core_cnt()[0]

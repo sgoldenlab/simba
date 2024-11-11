@@ -229,8 +229,8 @@ def sliding_linearity_index_cuda(x: np.ndarray,
        :align: center
        :header-rows: 1
 
-        .. seealso::
-           :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_linearity_index`, :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.linearity_index`
+    .. seealso::
+       :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_linearity_index`, :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.linearity_index`
 
 
     :param np.ndarray x: An (N, M) array representing the path, where N is the number of points and M is the number of spatial dimensions (e.g., 2 for 2D or 3 for 3D). Each row represents the coordinates of a point along the path.
