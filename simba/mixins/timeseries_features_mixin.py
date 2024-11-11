@@ -1942,7 +1942,7 @@ class TimeseriesFeatureMixin(object):
            :align: center
 
         .. seealso::
-           :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_linearity_index`
+           :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_linearity_index`, :func:`simba.data_processors.cuda.timeseries.sliding_linearity_index_cuda`
 
         .. math::
            \text{linearity\_index} = \frac{\text{straight\_line\_distance}}{\text{path\_length}}
@@ -1982,7 +1982,7 @@ class TimeseriesFeatureMixin(object):
         The Linearity Index measures how straight a path is by comparing the straight-line distance between the start and end points of each window to the total distance traveled along the path.
 
         .. seealso::
-           :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.linearity_index`
+           :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.linearity_index`, :func:`simba.data_processors.cuda.timeseries.sliding_linearity_index_cuda`
 
         :param np.ndarray x: An (N, M) array representing the path, where N is the number of points and M is the number of spatial dimensions (e.g., 2 for 2D or 3 for 3D). Each row represents the coordinates of a point along the path.
         :param float x: The size of the sliding window in seconds. This defines the time window over which the linearity index is calculated. The window size should be specified in seconds.
@@ -2217,7 +2217,7 @@ class TimeseriesFeatureMixin(object):
            :align: center
 
         .. seealso::
-           :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_spatial_density`
+           :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_spatial_density`, :func:`simba.data_processors.cuda.timeseries.sliding_spatial_density_cuda`
 
         :param np.ndarray x: A 2D array of shape (N, 2), where N is the number of points and each point has two spatial coordinates.
         :param float radius: The radius within which to count neighboring points around each point. Defines the area of interest around each trajectory point.
@@ -2261,7 +2261,7 @@ class TimeseriesFeatureMixin(object):
         of the trajectory.
 
         .. seealso::
-           :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.spatial_density`
+           :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.spatial_density`, :func:`simba.data_processors.cuda.timeseries.sliding_spatial_density_cuda`
 
         :param np.ndarray x: A 2D array of shape (N, 2), where N is the number of points and each point has two spatial coordinates (x, y). The array represents the trajectory path of points in a 2D space (e.g., x and y positions in space).
         :param float radius: The radius (in millimeters) within which to count neighboring points around each trajectory point. Defines the area of interest around each point.
@@ -2288,5 +2288,73 @@ class TimeseriesFeatureMixin(object):
                 neighbors = np.sum(distances <= pixel_radius) - 1
                 total_neighbors += neighbors
             results[r - 1] = total_neighbors / n_points
+
+        return results
+
+    @staticmethod
+    def path_aspect_ratio(x: np.ndarray, px_per_mm: float) -> float:
+        """
+        Calculates the aspect ratio of the bounding box that encloses a given path.
+
+        .. image:: _static/img/path_aspect_ratio.webp
+           :width: 400
+           :align: center
+
+        :param np.ndarray x: A 2D array of shape (N, 2) representing the path, where N is the number of points and each point has two spatial coordinates (e.g., x and y for 2D space). The path should be in the form of an array of consecutive (x, y) points.
+        :param float px_per_mm: Convertion factor representing the number of pixels per millimeter
+        :return: The aspect ratio of the bounding box enclosing the path. If the width or height of the bounding box is zero (e.g., if all points are aligned vertically or horizontally), returns -1.
+        :rtype: float
+
+        :example:
+        >>> x = np.random.randint(0, 500, (10, 2))
+        >>> TimeseriesFeatureMixin.path_aspect_ratio(x=x)
+        """
+
+        check_valid_array(data=x, source=TimeseriesFeatureMixin.path_aspect_ratio.__name__, accepted_ndims=(2,), accepted_axis_1_shape=[2, ], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_float(name=TimeseriesFeatureMixin.path_aspect_ratio.__name__, value=px_per_mm)
+        xmin, ymin = np.min(x[:, 0]), np.min(x[:, 1])
+        xmax, ymax = np.max(x[:, 0]), np.max(x[:, 1])
+        w, h = (xmax - xmin), (ymax - ymin)
+        if w == 0 or h == 0:
+            return -1
+        else:
+            return (w / h) * px_per_mm
+
+    @staticmethod
+    def sliding_path_aspect_ratio(x: np.ndarray,
+                                  window_size: float,
+                                  sample_rate: float,
+                                  px_per_mm: float) -> np.ndarray:
+
+        """
+        Computes the aspect ratio of the bounding box for a sliding window along a path.
+
+        This function calculates the aspect ratio (width/height) of the smallest bounding box that encloses a sequence of points within a sliding window over a 2D path. The path is defined by consecutive (x, y) coordinates. The sliding window moves forward by one point at each step, and the aspect ratio is computed for each position of the window.
+
+        :param np.ndarray x: A 2D array of shape (N, 2) representing the path, where N is the number of points, and each point has two spatial coordinates (x and y).
+        :param float window_size: The size of the sliding window in seconds.
+        :param float px_per_mm: Convertion factor representing the number of pixels per millimeter
+        :param float sample_rate: The sample rate of the path data in points per second.
+
+        :return: An array of aspect ratios for each position of the sliding window. If the window contains a path segment that is aligned vertically or horizontally (leading to a zero width or height), the function returns -1.0 for that position. NaN values are used for the initial positions where the window cannot be fully applied.
+        :rtype: np.ndarray
+
+        :example:
+        >>> x = np.random.randint(0, 500, (10, 2))
+        >>> TimeseriesFeatureMixin.(x=x, window_size=1, sample_rate=2)
+        """
+
+        window_frm = np.ceil(window_size * sample_rate).astype(np.int32)
+        results = np.full(x.shape[0], dtype=np.float32, fill_value=np.nan)
+        for r in range(window_frm, x.shape[0] + 1):
+            l = r - window_frm
+            sample_x = x[l:r, :]
+            xmin, ymin = np.min(sample_x[:, 0]), np.min(sample_x[:, 1])
+            xmax, ymax = np.max(sample_x[:, 0]), np.max(sample_x[:, 1])
+            w, h = (xmax - xmin), (ymax - ymin)
+            if w == 0 or h == 0:
+                results[r - 1] = -1.0
+            else:
+                results[r - 1] = (w / h) * px_per_mm
 
         return results

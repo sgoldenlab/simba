@@ -415,6 +415,12 @@ class SimBAModuleNotFoundError(SimbaError):
         super().__init__(msg=msg, source=source, show_window=show_window)
 
 
+class SimBAGPUError(SimbaError):
+    def __init__(self, msg: str, source: str = "", show_window: bool = False):
+        msg = f"SIMBA GPU ERROR: {msg}"
+        super().__init__(msg=msg, source=source, show_window=show_window)
+
+
 # test = NoSpecifiedOutputError(msg='test', source='test.method')
 # test = FFMPEGNotFoundError(msg='323')
 

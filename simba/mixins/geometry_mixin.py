@@ -3071,7 +3071,7 @@ class GeometryMixin(object):
         Compute the cumulative time a body-part has spent inside a grid of geometries using multiprocessing.
 
         :param np.ndarray data: Input data array where rows represent frames and columns represent body-part x and y coordinates.
-        :param Dict[Tuple[int, int], Polygon] geometries: Dictionary of polygons representing spatial regions. Created by ``GeometryMixin.bucket_img_into_squares``.
+        :param Dict[Tuple[int, int], Polygon] geometries: Dictionary of polygons representing spatial regions. E.g., created by :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square` or :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
         :param Optional[int] fps: Frames per second (fps) for time normalization. If None, cumulative sum of frame count is returned.
 
         :example:
@@ -3154,7 +3154,7 @@ class GeometryMixin(object):
         E.g., compute the cumulative time of classified events within spatial locations at all time-points of the video.
 
         :param np.ndarray data: Array containing spatial data with shape (n, 2). E.g., 2D-array with body-part coordinates.
-        :param Dict[Tuple[int, int], Polygon] geometries: Dictionary of polygons representing spatial regions. Created by ``GeometryMixin.bucket_img_into_squares``.
+        :param Dict[Tuple[int, int], Polygon] geometries: Dictionary of polygons representing spatial regions. E.g., created by :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square` or :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
         :param np.ndarray bool_data: Boolean array with shape (data.shape[0],) or (data.shape[0], 1) indicating the presence or absence in each frame.
         :param Optional[float] fps: Frames per second. If provided, the result is normalized by the frame rate.
         :param Optional[float] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which means using all available cores.
@@ -3246,54 +3246,45 @@ class GeometryMixin(object):
                 results[k[0], k[1]] = 1
         return results
 
-    def cumsum_animal_geometries_grid(
-        self,
-        data: List[Polygon],
-        grid: Dict[Tuple[int, int], Polygon],
-        fps: Optional[int] = None,
-        core_cnt: Optional[int] = -1,
-        verbose: Optional[bool] = True,
-    ):
+    def cumsum_animal_geometries_grid(self,
+                                      data: List[Polygon],
+                                      grid: Dict[Tuple[int, int], Polygon],
+                                      fps: Optional[int] = None,
+                                      core_cnt: Optional[int] = -1,
+                                      verbose: Optional[bool] = True) -> np.ndarray:
+        """
+        .. image:: _static/img/cumsum_animal_geometries_grid.webp
+           :width: 400
+           :align: center
+
+        :param List[Polygon] data: List of polygons where every index represent a frame and every value the animal convex hull
+        :param Dict[Tuple[int, int], Polygon] grid: Dictionary of polygons representing spatial regions. E.g., created by :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square` or :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
+        :param Optional[float] fps: Frames per second. If provided, the result is normalized by the frame rate.
+        :param Optional[float] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which means using all available cores.
+        :param Optional[bool] verbose: If True, then prints progress.
+        :returns np.ndarray: Array of size (frames x horizontal bins x verical bins) with values representing time in seconds (if fps passed) or frames (if fps not passed)
+        """
+
 
         timer = SimbaTimer(start=True)
-        check_valid_lst(
-            data=data,
-            source=GeometryMixin.cumsum_animal_geometries_grid.__name__,
-            valid_dtypes=(Polygon,),
-        )
-        check_instance(
-            source=GeometryMixin.cumsum_animal_geometries_grid.__name__,
-            instance=grid,
-            accepted_types=(dict,),
-        )
-        if fps is not None:
-            check_int(name="fps", value=fps, min_value=1)
+        check_valid_lst(data=data,source=GeometryMixin.cumsum_animal_geometries_grid.__name__,valid_dtypes=(Polygon,))
+        check_instance( source=GeometryMixin.cumsum_animal_geometries_grid.__name__, instance=grid, accepted_types=(dict,))
+        if fps is not None: check_int(name="fps", value=fps, min_value=1)
         check_int(name="core_cnt", value=core_cnt, min_value=-1)
-        if core_cnt == -1:
-            core_cnt = find_core_cnt()[0]
+        if core_cnt == -1: core_cnt = find_core_cnt()[0]
         w, h = 0, 0
         for k in grid.keys():
             w, h = max(w, k[0]), max(h, k[1])
         frm_id = np.arange(0, len(data)).reshape(-1, 1)
         data = np.hstack((frm_id, np.array(data).reshape(-1, 1)))
         img_arr = np.zeros((data.shape[0], h + 1, w + 1))
-        with multiprocessing.Pool(
-            core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-        ) as pool:
-            constants = functools.partial(
-                self._cumsum_animal_geometries_grid_helper,
-                grid=grid,
-                size=(h, w),
-                verbose=verbose,
-            )
+        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
+            constants = functools.partial(self._cumsum_animal_geometries_grid_helper, grid=grid, size=(h, w), verbose=verbose)
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
                 img_arr[cnt] = result
 
         timer.stop_timer()
-        stdout_success(
-            msg="Cumulative animal geometries in grid complete",
-            elapsed_time=timer.elapsed_time_str,
-        )
+        stdout_success(msg="Cumulative animal geometries in grid complete", elapsed_time=timer.elapsed_time_str,)
         if fps is None:
             return np.cumsum(img_arr, axis=0)
         else:
