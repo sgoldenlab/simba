@@ -34,8 +34,8 @@ from simba.utils.checks import (check_float,
                                 check_if_valid_input, check_if_valid_rgb_tuple,
                                 check_instance, check_int,
                                 check_iterable_length, check_str,
-                                check_valid_dict, check_valid_array,
-                                check_valid_boolean, check_valid_lst,
+                                check_valid_array, check_valid_boolean,
+                                check_valid_dict, check_valid_lst,
                                 check_valid_tuple)
 from simba.utils.data import create_color_palette, create_color_palettes
 from simba.utils.enums import (Defaults, Formats, GeometryEnum, Options,
