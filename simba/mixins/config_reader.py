@@ -8,8 +8,8 @@ import logging.config
 import math
 import os
 import shutil
-from copy import deepcopy
 from configparser import ConfigParser
+from copy import deepcopy
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple, Union
 
@@ -21,8 +21,12 @@ try:
 except:
     from typing_extensions import Literal
 
-from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists, check_if_filepath_list_is_empty, check_valid_lst, check_valid_boolean, check_str, check_float, check_valid_dataframe)
-from simba.utils.enums import ConfigKey, Defaults, Dtypes, Keys, Paths, Formats
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists,
+                                check_if_filepath_list_is_empty, check_str,
+                                check_valid_boolean, check_valid_dataframe,
+                                check_valid_lst)
+from simba.utils.enums import ConfigKey, Defaults, Dtypes, Formats, Keys, Paths
 from simba.utils.errors import (BodypartColumnNotFoundError, DataHeaderError,
                                 DuplicationError, InvalidInputError,
                                 MissingProjectConfigEntryError,

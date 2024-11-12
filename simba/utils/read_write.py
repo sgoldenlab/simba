@@ -6,13 +6,13 @@ import glob
 import io
 import itertools
 import json
+import math
 import multiprocessing
 import os
 import pickle
 import platform
 import re
 import shutil
-import math
 import subprocess
 import webbrowser
 from configparser import ConfigParser
