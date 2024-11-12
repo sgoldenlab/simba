@@ -12,6 +12,7 @@ import pickle
 import platform
 import re
 import shutil
+import math
 import subprocess
 import webbrowser
 from configparser import ConfigParser
@@ -354,53 +355,39 @@ def read_project_path_and_file_type(config: configparser.ConfigParser) -> Tuple[
 
 def read_video_info_csv(file_path: Union[str, os.PathLike]) -> pd.DataFrame:
     """
-    Read the project_folder/logs/video_info.csv of the SimBA project as a pd.DataFrame
+    Helper to read the project_folder/logs/video_info.csv of the SimBA project in as a pd.DataFrame
 
-    :paramstr file_path: Path to the SimBA project ``project_folder/logs/video_info.csv`` file
-    :return: The ``project_folder/logs/video_info.csv`` file in pd.DataFrame format.
+    :param Union[str, os.PathLike] file_path: Path to the project_folder/logs/video_info.csv file.
+    :return: Dataframe representation of the file.
     :rtype: pd.DataFrame
-    :raise ParametersFileError: Invalid format of ``project_folder/logs/video_info.csv``.
-    :raise InvalidValueWarning: Some videos are registered with FPS >= 1.
-
-    :example:
-    >>> read_video_info_csv(file_path='project_folder/logs/video_info.csv')
     """
 
-    check_file_exist_and_readable(file_path=file_path)
+    EXPECTED_COLS = ["Video", "fps", "Resolution_width", "Resolution_height", "Distance_in_mm", "pixels/mm"]
+    EXPECTED_FLOAT_COLS = ["fps", "Resolution_width", "Resolution_height", "Distance_in_mm", "pixels/mm"]
+
+    if not os.path.isfile(file_path):
+        raise NoFilesFoundError(msg=f"Could not find the video_info.csv table in your SimBA project. Create it using the [Video parameters] tab. SimBA expects the file at location {file_path}. See SimBA documentation for more info: https://t.ly/OtY79", source=read_video_info_csv.__name__)
     info_df = pd.read_csv(file_path)
-    for c in [
-        "Video",
-        "fps",
-        "Resolution_width",
-        "Resolution_height",
-        "Distance_in_mm",
-        "pixels/mm",
-    ]:
+    for c in EXPECTED_COLS:
         if c not in info_df.columns:
-            raise ParametersFileError(
-                msg=f'The project "project_folder/logs/video_info.csv" does not not have an anticipated header ({c}). Please re-create the file and make sure each video has a {c} value',
-                source=read_video_info_csv.__name__,
-            )
+            raise ParametersFileError(msg=f'The file {file_path} does not not have an anticipated header ({c}). Please re-create the file and make sure each video has a {c} header column name', source=read_video_info_csv.__name__)
     info_df["Video"] = info_df["Video"].astype(str)
-    for c in [
-        "fps",
-        "Resolution_width",
-        "Resolution_height",
-        "Distance_in_mm",
-        "pixels/mm",
-    ]:
-        try:
-            info_df[c] = info_df[c].astype(float)
-        except:
-            raise ParametersFileError(
-                msg=f'One or more values in the {c} column of the "project_folder/logs/video_info.csv" file could not be interpreted as a numeric value. Please re-create the file and make sure the entries in the {c} column are all numeric.',
-                source=read_video_info_csv.__name__,
-            )
+    for c in EXPECTED_FLOAT_COLS:
+        col_vals = list(info_df[c])
+        validity = check_valid_lst(data=col_vals, source='', valid_dtypes=Formats.NUMERIC_DTYPES.value, raise_error=False)
+        if not validity:
+            raise ParametersFileError(msg=f'One or more values in the {c} column of the {file_path} file could not be interpreted as a numeric value. Please check or re-create the file and make sure the entries in the {c} column are all numeric.', source=read_video_info_csv.__name__)
+        else:
+            pass
     if info_df["fps"].min() <= 1:
+        videos_w_low_fps = ', '.join(list(info_df[info_df['fps'] <= 1]['Video']))
         InvalidValueWarning(
-            msg="Videos in your SimBA project have an FPS of 1 or less. Please use videos with more than one frame per second, or correct the inaccurate fps inside the `project_folder/logs/videos_info.csv` file",
-            source=read_video_info_csv.__name__,
-        )
+            msg=f"Video(s) in your SimBA project have an FPS of 1 or less. This includes video(s) {videos_w_low_fps}. It is recommended to use videos with more than one frame per second. If inaccurate, correct the FPS values inside the {file_path} file",
+            source=read_video_info_csv.__name__)
+    if info_df["pixels/mm"].min() == 0:
+        videos_w_low_conversion_factor = ', '.join(list(info_df[info_df['pixels/mm'] == 0]['Video']))
+        InvalidValueWarning(msg=f"Video(s) in your SimBA project have an pixel/mm conversion factor of 0. This includes video(s) {videos_w_low_conversion_factor}. Correct the pixel/mm conversion factor values inside the {file_path} file", source=read_video_info_csv.__name__)
+
     return info_df
 
 
@@ -589,9 +576,10 @@ def get_bp_headers(body_parts_lst: List[str]) -> list:
     return bp_headers
 
 
-def read_video_info(vid_info_df: pd.DataFrame,
-                    video_name: str,
-                    raise_error: Optional[bool] = True) -> Tuple[pd.DataFrame, float, float]:
+def read_video_info(video_name: str,
+                    video_info_df: pd.DataFrame,
+                    raise_error: Optional[bool] = True) -> Union[Tuple[pd.DataFrame, float, float], Tuple[None, None, None]]:
+
     """
     Helper to read the metadata (pixels per mm, resolution, fps etc) from the video_info.csv for a single input file/video
 
@@ -599,31 +587,39 @@ def read_video_info(vid_info_df: pd.DataFrame,
     :parameter str video_name: Name of the video as represented in the ``Video`` column of the ``project_folder/logs/video_info.csv`` file.
     :parameter Optional[bool] raise_error: If True, raises error if the video cannot be found in the ``vid_info_df`` file. If False, returns None if the video cannot be found.
     :returns: 3-part tuple: One row DataFrame representing the video in the ``project_folder/logs/video_info.csv`` file, the frame rate of the video, and the the pixels per millimeter of the video
-    :rtype: Tuple[pd.DataFrame, float, float]
+    :rtype: Union[Tuple[pd.DataFrame, float, float], Tuple[None, None, None]]
 
     :example:
     >>> video_info_df = read_video_info_csv(file_path='project_folder/logs/video_info.csv')
-    >>> read_video_info(vid_info_df=vid_info_df, video_name='Together_1')
+    >>> read_video_info(vid_info_df=video_info_df, video_name='Together_1')
     """
 
-    video_settings = vid_info_df.loc[vid_info_df["Video"] == video_name]
+    check_str(name=f'{read_video_info.__name__} video_name', value=video_name, allow_blank=False)
+    check_valid_boolean(value=[raise_error], source=f'{read_video_info.__name__} raise_error')
+    check_valid_dataframe(df=video_info_df, source='', required_fields=["pixels/mm", "fps", "Video"])
+    video_settings = video_info_df.loc[video_info_df["Video"] == video_name]
     if len(video_settings) > 1:
-        raise DuplicationError(msg=f"SimBA found multiple rows in the project_folder/logs/video_info.csv named {str(video_name)}. Please make sure that each video name is represented ONCE in the video_info.csv", source=read_video_info.__name__)
+        raise DuplicationError(msg=f"SimBA found multiple rows in `project_folder/logs/video_info.csv` for videos named {video_name}. Please make sure that each video name is represented ONCE in the file", source='')
     elif len(video_settings) < 1:
         if raise_error:
-            raise ParametersFileError(msg=f" SimBA could not find {str(video_name)} in the video_info.csv file. Make sure all videos analyzed are represented in the project_folder/logs/video_info.csv file.", source=read_video_info.__name__)
+            raise ParametersFileError(msg=f"SimBA could not find {video_name} in the `project_folder/logs/video_info.csv` file. Make sure all videos analyzed are represented in the file.", source='')
         else:
-            return None
+            return (None, None, None)
     else:
-        try:
-            px_per_mm = float(video_settings["pixels/mm"].iloc[0])
-            #px_per_mm = float(video_settings["pixels/mm"])
-            fps = float(video_settings["fps"].iloc[0])
-            #fps = float(video_settings["fps"])
-            return video_settings, px_per_mm, fps
-        except TypeError as e:
-            raise ParametersFileError(msg=f"Make sure the videos that are going to be analyzed are represented with APPROPRIATE VALUES inside the project_folder/logs/video_info.csv file in your SimBA project. Could not interpret the fps, pixels per millimeter and/or fps as numerical values for video {video_name}: {e.args}", source=read_video_info.__name__)
-
+        px_per_mm = video_settings["pixels/mm"].values[0]
+        fps = video_settings["fps"].values[0]
+        if math.isnan(px_per_mm):
+            raise ParametersFileError(msg=f'Pixels per millimeter for video {video_name} in the `project_folder/logs/video_info.csv` file is not a valid number. Please correct it to proceed.')
+        if math.isnan(fps):
+            raise ParametersFileError(msg=f'The FPS for video {video_name} in the `project_folder/logs/video_info.csv` file is not a valid number. Please correct it to proceed.')
+        check_float(name=f'pixels per millimeter video {video_name}', value=px_per_mm)
+        check_float(name=f'fps video {video_name}', value=fps)
+        px_per_mm, fps = float(px_per_mm), float(fps)
+        if px_per_mm <= 0:
+            InvalidValueWarning(msg=f"Video {video_name} has a pixel per millimeter conversion factor of 0 or less. Correct the pixel/mm conversion factor values inside the `project_folder/logs/video_info.csv` file", source='')
+        if fps <= 1:
+            InvalidValueWarning(msg=f"Video {video_name} an FPS of 1 or less.  It is recommended to use videos with more than one frame per second. If inaccurate, correct the FPS values inside the `project_folder/logs/video_info.csv` file", source='')
+        return video_settings, px_per_mm, fps
 
 def find_all_videos_in_directory(directory: Union[str, os.PathLike],
                                  as_dict: Optional[bool] = False,

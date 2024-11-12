@@ -3313,6 +3313,10 @@ class GeometryMixin(object):
 
         Computes transition probabilities between pairs of spatial grid cells, represented as polygons. For each cell, it calculates the likelihood of transitioning to other cells.
 
+        .. image:: _static/img/geometry_transition_probabilities.webp
+           :width: 500
+           :align: center
+
         :param np.ndarray data: A 2D array where each row represents a point in space with two coordinates [x, y].
         :param Dict[Tuple[int, int], Polygon] grid: A dictionary mapping grid cell identifiers (tuple of int, int) to their corresponding polygon objects.
                                                     Each grid cell is represented by a tuple key (e.g., (row, col)) and its spatial boundaries as a `Polygon`. Can be computed with E.g., created by :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square` or :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.

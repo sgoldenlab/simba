@@ -73,7 +73,7 @@ class ProjectCreatorPopUp(PopUpMixin):
 
         self.clf_name_entries = []
         self.ml_settings_frm = LabelFrame(self.settings_frm, text="MACHINE LEARNING SETTINGS", font=Formats.FONT_HEADER.value, padx=5, pady=5)
-        self.clf_cnt = Entry_Box(self.ml_settings_frm, "Number of classifiers (behaviors): ", "25", validation="numeric")
+        self.clf_cnt = Entry_Box(self.ml_settings_frm, "Number of classifiers (behaviors): ", "30", validation="numeric")
 
         add_clf_btn = SimbaButton(parent=self.ml_settings_frm, txt="<Add predictive classifier(s)>", txt_clr='blue', img='add_on', cmd=self.create_entry_boxes_from_entrybox, cmd_kwargs={'count': lambda: self.clf_cnt.entry_get, 'parent': lambda: self.ml_settings_frm, 'current_entries': lambda: self.clf_name_entries})
 
