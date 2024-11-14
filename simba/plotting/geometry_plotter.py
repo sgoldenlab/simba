@@ -11,12 +11,16 @@ from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point,
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import (check_float, check_if_dir_exists, check_instance, check_int, check_iterable_length, check_valid_boolean)
+from simba.utils.checks import (check_float, check_if_dir_exists,
+                                check_instance, check_int,
+                                check_iterable_length, check_valid_boolean)
 from simba.utils.data import create_color_palettes
 from simba.utils.enums import Defaults, Formats
 from simba.utils.errors import InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, find_video_of_file, get_fn_ext, get_video_meta_data)
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    find_core_cnt, find_video_of_file,
+                                    get_fn_ext, get_video_meta_data)
 from simba.utils.warnings import FrameRangeWarning
 
 ACCEPTED_TYPES = [Polygon, LineString, MultiPolygon, MultiLineString, Point]
