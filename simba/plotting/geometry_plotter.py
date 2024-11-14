@@ -11,16 +11,12 @@ from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point,
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_dir_exists, check_instance, check_int,
-                                check_iterable_length, check_str,
-                                check_valid_boolean)
+from simba.utils.checks import (check_float, check_if_dir_exists, check_instance, check_int, check_iterable_length, check_valid_boolean)
 from simba.utils.data import create_color_palettes
 from simba.utils.enums import Defaults, Formats
+from simba.utils.errors import InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder,
-                                    find_core_cnt, find_video_of_file,
-                                    get_fn_ext, get_video_meta_data)
+from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, find_video_of_file, get_fn_ext, get_video_meta_data)
 from simba.utils.warnings import FrameRangeWarning
 
 ACCEPTED_TYPES = [Polygon, LineString, MultiPolygon, MultiLineString, Point]
@@ -34,10 +30,11 @@ def geometry_visualizer(data: np.ndarray,
                         verbose: bool,
                         bg_opacity: float,
                         palette: str,
-                        circle_size: int):
+                        circle_size: int,
+                        shape_cnt: int):
 
     group = int(data[0][-1])
-    colors = create_color_palettes(no_animals=1, map_size=120, cmaps=[palette])
+    colors = create_color_palettes(no_animals=1, map_size=shape_cnt, cmaps=[palette])
     colors = [x for xs in colors for x in xs]
     start_frm, end_frm = data[0][-2], data[-1][-2]
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
@@ -83,9 +80,9 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
     """
     A class for creating overlay geometry visualization videos based on provided geometries and video name.
 
-    .. note::
-       To quickly create static geometries on a white background (useful for troubleshooting unexpected geometries), use
-       :meth:`simba.mixins.geometry_mixin.GeometryMixin.view_shapes`.
+    .. seealso::
+       To quickly create static geometries on a white background (useful for troubleshooting unexpected geometries), see :func:`simba.mixins.geometry_mixin.GeometryMixin.view_shapes`
+       and :func:`:func:`simba.mixins.geometry_mixin.GeometryMixin.geometry_video`
 
     .. image:: _static/img/GeometryPlotter.gif
        :width: 600
@@ -100,52 +97,59 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
     """
 
     def __init__(self,
-                 config_path: Union[str, os.PathLike],
                  geometries: List[List[Union[Polygon, LineString, MultiPolygon, MultiLineString, Point]]],
                  video_name: Union[str, os.PathLike],
+                 config_path: Optional[Union[str, os.PathLike]] = None,
                  core_cnt: Optional[int] = -1,
-                 save_path: Optional[Union[str, os.PathLike]] = None,
-                 thickness: Optional[int] = 2,
+                 save_dir: Optional[Union[str, os.PathLike]] = None,
+                 thickness: Optional[int] = None,
+                 circle_size: Optional[int] = None,
                  bg_opacity: Optional[float] = 1,
-                 circle_size: Optional[int] = 3,
                  palette: Optional[str] = 'jet',
                  verbose: Optional[bool] = True):
 
-        check_file_exist_and_readable(file_path=config_path)
+        PlottingMixin.__init__(self)
         check_instance(source=self.__class__.__name__, instance=geometries, accepted_types=list)
         check_iterable_length(source=self.__class__.__name__, val=len(geometries), min=1)
-        check_str(name="Video name", value=video_name)
-        check_int(name="thickness", value=thickness, min_value=1)
-        check_int(name="circle_size", value=circle_size, min_value=1)
+        if circle_size is not None:
+            check_int(name="circle_size", value=circle_size, min_value=1)
+        if thickness is not None:
+            check_int(name="thickness", value=thickness, min_value=1)
         check_float(name="video_opacity", value=bg_opacity, min_value=0.0, max_value=1.0)
         check_valid_boolean(value=verbose, source='verbose', raise_error=True)
-        check_int( name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
-        ConfigReader.__init__(self, config_path=config_path)
-        PlottingMixin.__init__(self)
+        check_int(name="CORE COUNT", value=core_cnt, min_value=-1, raise_error=True, unaccepted_vals=[0])
+        self.core_cnt = core_cnt
+        if core_cnt == -1 or core_cnt > find_core_cnt()[0]:
+            self.core_cnt = core_cnt
+        if config_path is not None:
+            ConfigReader.__init__(self, config_path=config_path)
         if os.path.isfile(video_name):
             self.video_path = video_name
-            video_name = get_fn_ext(filepath=video_name)[1]
         else:
+            if config_path is None:
+                raise InvalidInputError(msg=f'When providing a non-path video name, pass config_path')
             self.video_path = find_video_of_file(video_dir=self.video_dir, filename=video_name, raise_error=True)
+        video_name = get_fn_ext(filepath=self.video_path)[1]
         self.video_meta_data = get_video_meta_data(video_path=self.video_path)
+        if circle_size is None:
+            circle_size = self.get_optimal_circle_size(frame_size=(self.video_meta_data['width'], self.video_meta_data['height']), circle_frame_ratio=100)
+        if thickness is None:
+            thickness = circle_size
         for i in range(len(geometries)):
             if len(geometries[i]) != self.video_meta_data[FRAME_COUNT]:
                 FrameRangeWarning(msg=f"Geometry {i+1} contains {len(geometries[i])} shapes but video has {self.video_meta_data[FRAME_COUNT]} frames")
-        if core_cnt == -1:
-            core_cnt = find_core_cnt()[0]
-        self.geometries, self.core_cnt, self.video_name, self.thickness = (geometries, core_cnt, video_name, thickness)
-        self.geometry_dir = os.path.join(self.frames_output_dir, "geometry_visualization")
-        if not os.path.isdir(self.geometry_dir): os.makedirs(self.geometry_dir)
-        self.temp_dir = os.path.join(self.frames_output_dir, self.geometry_dir, video_name, "temp")
+        self.geometries, self.video_name, self.thickness = geometries, video_name, thickness
+        if config_path is None:
+            check_if_dir_exists(in_dir=save_dir)
+            self.save_dir = save_dir
+        else:
+            self.save_dir = os.path.join(self.frames_output_dir, "geometry_visualization")
+        if not os.path.isdir(self.save_dir): os.makedirs(self.save_dir)
+        self.temp_dir = os.path.join(self.save_dir, video_name, "temp")
+        if not os.path.isdir(self.temp_dir): os.makedirs(self.temp_dir)
+        self.save_path = os.path.join(self.save_dir, f'{video_name}.mp4')
         self.verbose, self.bg_opacity, self.palette = verbose, bg_opacity, palette
         self.circles_size = circle_size
-        if not os.path.isdir(self.temp_dir):
-            os.makedirs(self.temp_dir)
-        if save_path is None:
-            self.save_path = os.path.join(self.geometry_dir, f"{video_name}.mp4")
-        else:
-            check_if_dir_exists(in_dir=os.path.dirname(save_path))
-            self.save_path = save_path
 
     def run(self):
         video_timer = SimbaTimer(start=True)
@@ -157,7 +161,16 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
             data[i] = np.concatenate((data[i], new_col), axis=1)
 
         with multiprocessing.Pool(self.core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-            constants = functools.partial(geometry_visualizer, video_path=self.video_path, video_temp_dir=self.temp_dir, video_meta_data=self.video_meta_data, thickness=self.thickness, verbose=self.verbose, bg_opacity=self.bg_opacity, palette=self.palette, circle_size=self.circles_size)
+            constants = functools.partial(geometry_visualizer,
+                                          video_path=self.video_path,
+                                          video_temp_dir=self.temp_dir,
+                                          video_meta_data=self.video_meta_data,
+                                          thickness=self.thickness,
+                                          verbose=self.verbose,
+                                          bg_opacity=self.bg_opacity,
+                                          palette=self.palette,
+                                          circle_size=self.circles_size,
+                                          shape_cnt=len(self.geometries))
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
                 print(f"Section {result}/{len(data)} complete...")
             pool.terminate()

@@ -273,6 +273,7 @@ def create_color_palettes(no_animals: int, map_size: int, cmaps: Optional[List[s
             "autumn",
             "cool",
             "Wistia",
+            "jet",
             "Pastel1",
             "Set1",
             "winter",

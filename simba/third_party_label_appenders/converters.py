@@ -28,14 +28,13 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_keys_exist_in_dict,
                                 check_if_valid_img, check_int,
                                 check_valid_array, check_valid_boolean,
-                                check_valid_dict, check_valid_tuple)
+                                check_valid_dict, check_valid_tuple, check_float)
 from simba.utils.enums import Formats
 from simba.utils.errors import InvalidInputError, NoFilesFoundError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    find_video_of_file, get_fn_ext,
-                                    get_video_meta_data, read_df,
-                                    read_frm_of_video, read_roi_data)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, find_video_of_file, get_fn_ext,
+                                    get_video_meta_data, read_df, read_pickle, copy_files_to_directory,
+                                    read_frm_of_video, read_roi_data, write_pickle)
 
 # def geometry_to_rle(geometry: Union[np.ndarray, Polygon], img_size: Tuple[int, int]):
 #     """
@@ -213,44 +212,50 @@ def arr_to_b64(x: np.ndarray) -> str:
     return base64.b64encode(buffer).decode("utf-8")
 
 def create_yolo_yaml(path: Union[str, os.PathLike],
-                     train: Union[str, os.PathLike],
-                     val: Union[str, os.PathLike],
-                     test: Union[str, os.PathLike],
-                     save_path: Union[str, os.PathLike],
-                     names: Dict[str, int]) -> None:
+                     train_path: Union[str, os.PathLike],
+                     val_path: Union[str, os.PathLike],
+                     test_path: Union[str, os.PathLike],
+                     names: Dict[str, int],
+                     save_path: Optional[Union[str, os.PathLike]] = None) -> Union[None, dict]:
     """
     Given a set of paths to directories, create a model.yaml file for model training though ultralytics wrappers.
 
     :param Union[str, os.PathLike] path: Parent directory holding both an images and a labels directory.
-    :param Union[str, os.PathLike] train: Directory holding training images. For example, C:\troubleshooting\coco_data\images\train, then a C:\troubleshooting\coco_data\labels\train is expected.
-    :param Union[str, os.PathLike] val: Directory holding validation images.
-    :param Union[str, os.PathLike] test: Directory holding test images.
-    :param Union[str, os.PathLike] save_path: Location where to save the yolo model yaml file.
-    :param Dict[str, int] names: Dictionary mapping pairing object names to object integer identifiers.
+    :param Union[str, os.PathLike] train_path: Directory holding training images. For example, if C:\troubleshooting\coco_data\images\train is passed, then a C:\troubleshooting\coco_data\labels\train is expected.
+    :param Union[str, os.PathLike] val_path: Directory holding validation images. For example, if C:\troubleshooting\coco_data\images\test is passed, then a C:\troubleshooting\coco_data\labels\test is expected.
+    :param Union[str, os.PathLike] test_path: Directory holding test images. For example, if C:\troubleshooting\coco_data\images\validation is passed, then a C:\troubleshooting\coco_data\labels\validation is expected.
+    :param Dict[str, int] names: Dictionary mapping pairing object names to object integer identifiers. E.g., {'OBJECT 1': 0, 'OBJECT 2`: 2}
+    :param Union[str, os.PathLike] save_path: Optional location where to save the yolo model yaml file. If None, then the dict is returned.
     :return None:
     """
-
-    for p in [path, train, val, test, os.path.dirname(save_path)]:
+    for p in [path, train_path, val_path, test_path]:
         check_if_dir_exists(in_dir=p, source=create_yolo_yaml.__name__)
     check_valid_dict(x=names, valid_key_dtypes=(str,), valid_values_dtypes=(int,), min_len_keys=1)
     reversed_names = {v: k for k, v in names.items()}
 
-    unique_paths = list({path, train, val, test, save_path})
-    if len(unique_paths) < 5:
-        raise InvalidInputError('The paths have to be unique.', source=create_yolo_yaml.__name__)
+    unique_paths = list({path, train_path, val_path, test_path})
+    if len(unique_paths) < 4:
+        raise InvalidInputError('The passed paths have to be unique.', source=create_yolo_yaml.__name__)
+    if save_path is not None:
+        check_if_dir_exists(in_dir=os.path.dirname(save_path), source=f'{create_yolo_yaml.__name__} save_path')
+        if save_path in [path, train_path, val_path, test_path]:
+            raise InvalidInputError('The save path cannot be the same as the other passed directories.', source=f'{create_yolo_yaml.__name__} save_path')
 
-    train = os.path.relpath(train, path)
-    val = os.path.relpath(val, path)
-    test = os.path.relpath(test, path)
+    train_path = os.path.relpath(train_path, path)
+    val_path = os.path.relpath(val_path, path)
+    test_path = os.path.relpath(test_path, path)
 
     data = {'path': path,
-            'train': train,  # train images (relative to 'path')
-            'val': val,           # val images (relative to 'path')
-            'test': test,       # test images (relative to 'path')
+            'train': train_path,  # train images (relative to 'path')
+            'val': val_path,  # val images (relative to 'path')
+            'test': test_path,  # test images (relative to 'path')
             'names': reversed_names}
 
-    with open(save_path, 'w') as file:
-        yaml.dump(data, file, default_flow_style=False)
+    if save_path is not None:
+        with open(save_path, 'w') as file:
+            yaml.dump(data, file, default_flow_style=False)
+    else:
+        return data
 
 
 def labelme_to_dlc(labelme_dir: Union[str, os.PathLike],
@@ -587,13 +592,82 @@ def scale_pose_img_sizes(pose_data: np.ndarray,
     return (pose_results, img_results)
 
 
+def split_yolo_train_test_val(data_dir: Union[str, os.PathLike],
+                              save_dir: Union[str, os.PathLike],
+                              split: Tuple[float, float, float] = (0.7, 0.2, 0.1),
+                              verbose: bool = False) -> None:
+    """
+    Split a directory of yolo labels and associated images into training, testing, and validation batches and create a mapping file for downstream model training.
+
+    :param Union[str, os.PathLike] data_dir: Directory holding yolo labels and associated images. This directory is created by :func:`simba.third_party_label_appenders.converters.simba_rois_to_yolo`
+    :param Union[str, os.PathLike]: Empty directory where to save the splitted data.
+    :param Tuple[float, float, float] split: The percent size of the training, testing, and validation sets as ratios of the input data.
+    :param bool verbose: If True, prints progress. Default False.
+    :return: None
+    """
+
+    timer = SimbaTimer(start=True)
+    check_if_dir_exists(in_dir=data_dir)
+    check_if_dir_exists(in_dir=save_dir)
+    train_img_dir, test_img_dir, val_img_dir = os.path.join(save_dir, 'images', 'train'), os.path.join(save_dir, 'images', 'test'), os.path.join(save_dir, 'images', 'val')
+    train_lbl_dir, test_lbl_dir, val_lbl_dir = os.path.join(save_dir, 'labels', 'train'), os.path.join(save_dir, 'labels', 'test'), os.path.join(save_dir, 'labels', 'val')
+    for i in [train_img_dir, test_img_dir, val_img_dir, train_lbl_dir, test_lbl_dir, val_lbl_dir]:
+        if not os.path.isdir(i): os.makedirs(i)
+    check_valid_tuple(x=split, source=split_yolo_train_test_val.__name__, accepted_lengths=(3,), valid_dtypes=(float,))
+    if np.round(np.sum(split), 2) != 1.0:
+        raise InvalidInputError(msg=f'Split has to add up to 1. Got: {np.round(np.sum(split), 2)}',  source=split_yolo_train_test_val.__name__)
+    check_valid_boolean(value=[verbose], source=split_yolo_train_test_val.__name__)
+    labels_dir, img_dir = os.path.join(data_dir, 'labels'), os.path.join(data_dir, 'images')
+    check_if_dir_exists(in_dir=labels_dir);
+    check_if_dir_exists(in_dir=img_dir)
+    map_path = os.path.join(data_dir, 'map.pickle')
+    check_file_exist_and_readable(file_path=map_path)
+    map_dict = read_pickle(data_path=map_path, verbose=verbose)
+    yolo_yaml_path = os.path.join(save_dir, 'map.yaml')
+    img_paths = np.array(
+        sorted(find_files_of_filetypes_in_directory(directory=img_dir, extensions=['.png'], raise_error=True)))
+    lbls_paths = np.array(
+        sorted(find_files_of_filetypes_in_directory(directory=labels_dir, extensions=['.txt'], raise_error=True)))
+    img_names = np.array([get_fn_ext(filepath=x)[1] for x in img_paths])
+    lbl_names = np.array([get_fn_ext(filepath=x)[1] for x in lbls_paths])
+    missing_imgs = [x for x in img_names if x not in lbl_names]
+    missing_lbls = [x for x in lbl_names if x not in img_names]
+    if len(missing_imgs) > 0: raise InvalidInputError(
+        msg=f'{len(missing_imgs)} label(s) are missing an image: {missing_imgs}',
+        source=split_yolo_train_test_val.__name__)
+    if len(missing_lbls) > 0: raise InvalidInputError(
+        msg=f'{len(missing_lbls)} images(s) are missing a label: {missing_lbls}',
+        source=split_yolo_train_test_val.__name__)
+    train_cnt, test_cnt, val_cnt = int(np.ceil(len(img_names) * split[0])), int(
+        np.ceil(len(img_names) * split[1])), int(np.ceil(len(img_names) * split[2]))
+    lbl_idx = np.arange(0, len(img_names))
+    np.random.shuffle(lbl_idx)
+    train_idx, test_idx, val_idx = lbl_idx[:train_cnt], lbl_idx[train_cnt:train_cnt + test_cnt], lbl_idx[
+                                                                                                 train_cnt + test_cnt:train_cnt + test_cnt + val_cnt]
+    train_img_paths, test_img_paths, val_img_paths = img_paths[train_idx], img_paths[test_idx], img_paths[val_idx]
+    train_lbl_paths, test_lbl_paths, val_lbl_paths = lbls_paths[train_idx], lbls_paths[test_idx], lbls_paths[val_idx]
+
+    create_yolo_yaml(path=save_dir, train_path=train_img_dir, val_path=val_img_dir, test_path=test_img_dir, names=map_dict, save_path=yolo_yaml_path)
+    copy_files_to_directory(file_paths=list(train_img_paths), dir=train_img_dir, verbose=verbose)
+    copy_files_to_directory(file_paths=list(test_img_paths), dir=test_img_dir, verbose=verbose)
+    copy_files_to_directory(file_paths=list(val_img_paths), dir=val_img_dir, verbose=verbose)
+
+    copy_files_to_directory(file_paths=list(train_lbl_paths), dir=train_lbl_dir, verbose=verbose)
+    copy_files_to_directory(file_paths=list(test_lbl_paths), dir=test_lbl_dir, verbose=verbose)
+    copy_files_to_directory(file_paths=list(val_lbl_paths), dir=val_lbl_dir, verbose=verbose)
+    timer.stop_timer()
+    if verbose:
+        stdout_success(msg=f'YOLO training data saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
+
+
 def simba_rois_to_yolo(config_path: Optional[Union[str, os.PathLike]] = None,
                        roi_path: Optional[Union[str, os.PathLike]] = None,
                        video_dir: Optional[Union[str, os.PathLike]] = None,
                        save_dir: Optional[Union[str, os.PathLike]] = None,
                        roi_frm_cnt: Optional[int] = 10,
                        obb: Optional[bool] = False,
-                       greyscale: Optional[bool] = True) -> None:
+                       greyscale: Optional[bool] = True,
+                       verbose: Optional[bool] = False) -> None:
     """
     Converts SimBA roi definitions into annotations and images for training yolo network.
 
@@ -604,6 +678,7 @@ def simba_rois_to_yolo(config_path: Optional[Union[str, os.PathLike]] = None,
     :param Optional[int] roi_frm_cnt: Number of frames for each video to create bounding boxes for.
     :param Optional[bool] obb: If True, created object-oriented yolo bounding boxes. Else, axis aligned yolo bounding boxes. Default False.
     :param Optional[bool] greyscale: If True, converts the images to greyscale if rgb. Default: True.
+    :param Optional[bool] verbose: If True, prints progress. Default: False.
     :return: None
 
     :example I:
@@ -613,38 +688,43 @@ def simba_rois_to_yolo(config_path: Optional[Union[str, os.PathLike]] = None,
     >>> simba_rois_to_yolo(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini", save_dir=r"C:\troubleshooting\RAT_NOR\project_folder\logs\yolo", video_dir=r"C:\troubleshooting\RAT_NOR\project_folder\videos", roi_path=r"C:\troubleshooting\RAT_NOR\project_folder\logs\measures\ROI_definitions.h5")
     """
 
+    timer = SimbaTimer(start=True)
     if roi_path is None or video_dir is None or save_dir is None:
         config = ConfigReader(config_path=config_path)
         roi_path = config.roi_coordinates_path
         video_dir = config.video_dir
         save_dir = config.logs_path
     check_int(name=f'{simba_rois_to_yolo.__name__} roi_frm_cnt', value=roi_frm_cnt, min_value=1)
-    check_valid_boolean(value=[obb, greyscale], source=f'{simba_rois_to_yolo.__name__} obb')
+    check_valid_boolean(value=[obb, greyscale, verbose], source=f'{simba_rois_to_yolo.__name__} obb greyscale verbose')
     roi_data = read_roi_data(roi_path=roi_path)
-    roi_geometries = \
-    GeometryMixin.simba_roi_to_geometries(rectangles_df=roi_data[0], circles_df=roi_data[1], polygons_df=roi_data[2])[0]
+    roi_geometries = GeometryMixin.simba_roi_to_geometries(rectangles_df=roi_data[0], circles_df=roi_data[1], polygons_df=roi_data[2])[0]
     roi_geometries_rectangles = {}
     roi_ids, roi_cnt = {}, 0
     save_img_dir = os.path.join(save_dir, 'images')
     save_labels_dir = os.path.join(save_dir, 'labels')
     if not os.path.isdir(save_img_dir): os.makedirs(save_img_dir)
     if not os.path.isdir(save_labels_dir): os.makedirs(save_labels_dir)
-    for video_name, roi_data in roi_geometries.items():
+    if verbose: print('Reading in ROI geometries...')
+    for video_cnt, (video_name, roi_data) in enumerate(roi_geometries.items()):
+        if verbose: print(f'Reading ROI geometries for video {video_name}... ({video_cnt+1}/{len(list(roi_geometries.keys()))})')
         roi_geometries_rectangles[video_name] = {}
         for roi_name, roi in roi_data.items():
             if obb:
                 roi_geometries_rectangles[video_name][roi_name] = GeometryMixin.minimum_rotated_rectangle(shape=roi)
             else:
                 keypoints = np.array(roi.exterior.coords).astype(np.int32).reshape(1, -1, 2)
-                roi_geometries_rectangles[video_name][roi_name] = Polygon(
-                    GeometryMixin.keypoints_to_axis_aligned_bounding_box(keypoints=keypoints)[0])
+                roi_geometries_rectangles[video_name][roi_name] = Polygon(GeometryMixin.keypoints_to_axis_aligned_bounding_box(keypoints=keypoints)[0])
             if roi_name not in roi_ids.keys():
                 roi_ids[roi_name] = roi_cnt
                 roi_cnt += 1
 
+    write_pickle(data=roi_ids, save_path=os.path.join(save_dir, 'map.pickle'))
+
     roi_results = {}
     img_results = {}
-    for video_name, roi_data in roi_geometries.items():
+    if verbose: print('Reading ROI coordinates ...')
+    for video_cnt, (video_name, roi_data) in enumerate(roi_geometries.items()):
+        if verbose: print(f'Reading ROI coordinates for video {video_name}... ({video_cnt+1}/{len(list(roi_geometries.keys()))})')
         roi_results[video_name] = {}
         img_results[video_name] = []
         video_path = find_video_of_file(video_dir=video_dir, filename=video_name)
@@ -675,7 +755,9 @@ def simba_rois_to_yolo(config_path: Optional[Union[str, os.PathLike]] = None,
                     [str(roi_id), str(x1), str(y1), str(x2), str(y2), str(x3), str(y3), str(x4), str(y4)])
             roi_results[video_name][roi_name] = roi_str
 
-    for video_name, imgs in img_results.items():
+    if verbose: print('Reading ROI images ...')
+    for video_cnt, (video_name, imgs) in enumerate(img_results.items()):
+        if verbose: print(f'Reading ROI images for video {video_name}... ({video_cnt+1}/{len(list(img_results.keys()))})')
         for img_cnt, img in enumerate(imgs):
             img_save_path = os.path.join(save_img_dir, f'{video_name}_{img_cnt}.png')
             cv2.imwrite(img_save_path, img)
@@ -683,10 +765,42 @@ def simba_rois_to_yolo(config_path: Optional[Union[str, os.PathLike]] = None,
             x = list(roi_results[video_name].values())
             with open(label_save_path, mode='wt', encoding='utf-8') as f:
                 f.write('\n'.join(x))
+    timer.stop_timer()
+    if verbose:
+        stdout_success(msg=f'yolo ROI data saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
 
 
 
+def yolo_obb_data_to_bounding_box(center_x: float, center_y: float, width: float, height: float, angle: float) -> np.ndarray:
+    """
+    Converts the YOLO-oriented bounding box data to a set of bounding box corner points.
 
+    Given the center coordinates, width, height, and rotation angle of an oriented bounding box,
+    this function computes the coordinates of the four corner points of the bounding box,
+    with rotation applied about the center.
+
+    :param float center_x: The x-coordinate of the bounding box center.
+    :param float center_y: The y-coordinate of the bounding box center.
+    :param float width: The width of the bounding box.
+    :param float height: The height of the bounding box.
+    :param float angle: The rotation angle of the bounding box in degrees, measured counterclockwise.
+
+    :return: An array of shape (4, 2) containing the (x, y) coordinates of the four corners of the bounding box in the following order: top-left, top-right, bottom-right, and bottom-left.
+    :rtype: np.ndarray
+    """
+
+    for value in [center_x, center_y, width, height, angle]:
+        check_float(name=yolo_obb_data_to_bounding_box.__name__, value=value)
+    angle_rad = np.deg2rad(angle)
+    half_width, half_height = width / 2, height / 2
+    corners = np.array([[-half_width, -half_height],  # Top-left
+                        [half_width, -half_height],  # Top-right
+                        [half_width, half_height],  # Bottom-right
+                        [-half_width, half_height]])  # Bottom-left
+    rotation_matrix = np.array([[np.cos(angle_rad), -np.sin(angle_rad)],
+                                [np.sin(angle_rad), np.cos(angle_rad)]])
+    box = np.dot(corners, rotation_matrix) + [center_x, center_y]
+    return box.astype(np.int32)
 
 
 

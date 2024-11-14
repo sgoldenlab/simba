@@ -1925,7 +1925,7 @@ def copy_files_to_directory(file_paths: List[Union[str, os.PathLike]],
     :return List[Union[str, os.PathLike]]: List of paths to the copied files
     """
 
-    check_valid_lst(data=file_paths, source=copy_files_to_directory.__name__, min_len=1)
+    check_valid_lst(data=file_paths, source=f'{copy_files_to_directory.__name__} file_paths', min_len=1, valid_dtypes=(str, np.str_,))
     _ = [check_file_exist_and_readable(x) for x in file_paths]
     check_if_dir_exists(in_dir=dir, source=copy_files_to_directory)
     destinations = []

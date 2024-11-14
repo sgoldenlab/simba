@@ -138,13 +138,12 @@ class PlottingMixin(object):
         """Helper to remove a directory, use for cleaning up smaller multiprocessed videos following concat"""
         shutil.rmtree(folder_dir, ignore_errors=True)
 
-    def split_and_group_df(
-        self,
-        df: pd.DataFrame,
-        splits: int,
-        include_row_index: bool = False,
-        include_split_order: bool = True,
-    ) -> (List[pd.DataFrame], int):
+    def split_and_group_df(self,
+                           df: pd.DataFrame,
+                           splits: int,
+                           include_row_index: bool = False,
+                           include_split_order: bool = True) -> (List[pd.DataFrame], int):
+
         """
         Helper to split a dataframe for multiprocessing. If include_split_order, then include the group number
         in split data as a column. If include_row_index, includes a column representing the row index in the array,

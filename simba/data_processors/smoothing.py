@@ -37,7 +37,7 @@ class Smoothing(ConfigReader):
        `Smoothing tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-files>`__.
 
     .. important::
-        The wmoothened data overwrites the original data on disk. If the original data is required, pass ``copy_originals = True`` to save a copy of the original data.
+        The smoothened data overwrites the original data on disk. If the original data is required, pass ``copy_originals = True`` to save a copy of the original data.
 
     :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format.
     :param Union[str, os.PathLike, List[Union[str, os.PathLike]]] data_path: Path to directory containing pose-estimation data, to a file containing pose-estimation data, or a list of paths containing pose-estimation data.

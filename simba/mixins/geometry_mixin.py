@@ -1173,9 +1173,10 @@ class GeometryMixin(object):
                             f"Computing polygon batch {cnt + 1}/{len(data)} (Video: {video_name}, Animal: {animal_name})..."
                         )
                 results.append(mp_return)
-        #
+
         timer.stop_timer()
-        stdout_success(msg="Polygons complete.", elapsed_time=timer.elapsed_time_str)
+        if verbose:
+            stdout_success(msg="Polygons complete.", elapsed_time=timer.elapsed_time_str)
         pool.join()
         pool.terminate()
         return [l for ll in results for l in ll]
@@ -3727,7 +3728,10 @@ class GeometryMixin(object):
             lengths.append(length)
             widths.append(width)
             areas.append(area)
-            centers.append(list(np.array(shape.centroid).astype(np.int32)))
+
+
+
+            centers.append(list(np.array(shape.centroid.coords)[0].astype(np.int32)))
 
         return {'lengths': lengths, 'widths': widths, 'areas': areas, 'centers': centers, 'max_length': max_length, 'min_length': min_length, 'min_width': min_width, 'max_width': max_width, 'min_area': min_area, 'max_area': max_area}
 

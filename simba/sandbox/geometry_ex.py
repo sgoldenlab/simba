@@ -111,7 +111,7 @@ GeometryPlotter(
     geometries=[white_animal_polygons, black_animal_polygons],
     video_name=VIDEO_NAME,
     core_cnt=-1,
-    save_path="/Users/simon/Desktop/envs/simba/troubleshooting/RI/project_folder/frames/output/stack/test_2.mp4",
+    save_dir="/Users/simon/Desktop/envs/simba/troubleshooting/RI/project_folder/frames/output/stack/test_2.mp4",
 ).run()
 
 # #OVERLAP
