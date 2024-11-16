@@ -23,18 +23,21 @@ from shapely.geometry import Polygon
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.image_mixin import ImageMixin
-from simba.utils.checks import (check_file_exist_and_readable,
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_keys_exist_in_dict,
                                 check_if_valid_img, check_int,
                                 check_valid_array, check_valid_boolean,
-                                check_valid_dict, check_valid_tuple, check_float)
+                                check_valid_dict, check_valid_tuple)
 from simba.utils.enums import Formats
 from simba.utils.errors import InvalidInputError, NoFilesFoundError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, find_video_of_file, get_fn_ext,
-                                    get_video_meta_data, read_df, read_pickle, copy_files_to_directory,
-                                    read_frm_of_video, read_roi_data, write_pickle)
+from simba.utils.read_write import (copy_files_to_directory,
+                                    find_files_of_filetypes_in_directory,
+                                    find_video_of_file, get_fn_ext,
+                                    get_video_meta_data, read_df,
+                                    read_frm_of_video, read_pickle,
+                                    read_roi_data, write_pickle)
 
 # def geometry_to_rle(geometry: Union[np.ndarray, Polygon], img_size: Tuple[int, int]):
 #     """

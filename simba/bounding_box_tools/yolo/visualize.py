@@ -1,12 +1,17 @@
 import os
+from typing import Optional, Tuple, Union
+
 import numpy as np
 import pandas as pd
-from typing import Union, Tuple, Optional
-from simba.utils.checks import check_if_dir_exists, check_valid_boolean, check_file_exist_and_readable, check_valid_dataframe, check_int
-from simba.utils.read_write import get_fn_ext, get_video_meta_data, find_core_cnt
-from simba.utils.errors import FrameRangeError
+
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.plotting.geometry_plotter import GeometryPlotter
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists, check_int,
+                                check_valid_boolean, check_valid_dataframe)
+from simba.utils.errors import FrameRangeError
+from simba.utils.read_write import (find_core_cnt, get_fn_ext,
+                                    get_video_meta_data)
 
 EXPECTED_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 FRAME = 'FRAME'

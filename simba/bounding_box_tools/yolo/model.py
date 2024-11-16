@@ -1,20 +1,27 @@
 import os
+
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
-from typing import Dict, Optional, Tuple, Union, List
+from typing import Dict, List, Optional, Tuple, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+
 import numpy as np
 import pandas as pd
 import torch
 from ultralytics import YOLO
 
-from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists, check_int, get_fn_ext, check_valid_lst, check_valid_boolean, check_float, check_str)
+from simba.third_party_label_appenders.converters import \
+    yolo_obb_data_to_bounding_box
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists, check_int, check_str,
+                                check_valid_boolean, check_valid_lst,
+                                get_fn_ext)
+from simba.utils.data import df_smoother, savgol_smoother
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_video_meta_data
-from simba.third_party_label_appenders.converters import yolo_obb_data_to_bounding_box
-from simba.utils.data import df_smoother, savgol_smoother
 
 
 def fit_yolo(initial_weights: Union[str, os.PathLike],
