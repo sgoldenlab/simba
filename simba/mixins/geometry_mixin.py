@@ -1596,18 +1596,20 @@ class GeometryMixin(object):
         pool.terminate()
         return results
 
-    def multiframe_minimum_rotated_rectangle(
-        self,
-        shapes: List[Polygon],
-        video_name: Optional[str] = None,
-        verbose: Optional[bool] = False,
-        animal_name: Optional[bool] = None,
-        core_cnt: int = -1,
-    ) -> List[Polygon]:
+    def multiframe_minimum_rotated_rectangle(self,
+                                             shapes: List[Polygon],
+                                             video_name: Optional[str] = None,
+                                             verbose: Optional[bool] = False,
+                                             animal_name: Optional[bool] = None,
+                                             core_cnt: int = -1) -> List[Polygon]:
+
         """
-        Compute the minimum rotated rectangle for each Polygon in a list using mutiprocessing.
+        Compute the minimum rotated rectangle for each Polygon in a list using multiprocessing.
 
         :param List[Polygon] shapes: List of Polygons.
+        :param Optional[str] video_name: Optional video name to print (if verbose is True).
+        :param Optional[str] animal_name: Optional animal name to print (if verbose is True).
+        :param Optional[bool] verbose: If True, prints progress.
         :param core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores.
         """
 
@@ -1645,9 +1647,8 @@ class GeometryMixin(object):
                 results.append(result)
 
         timer.stop_timer()
-        stdout_success(
-            msg="Rotated rectangles complete.", elapsed_time=timer.elapsed_time_str
-        )
+        if verbose:
+            stdout_success(msg="Rotated rectangles complete.", elapsed_time=timer.elapsed_time_str)
         pool.join()
         pool.terminate()
         return results
@@ -3772,7 +3773,7 @@ class GeometryMixin(object):
                 pool.imap(GeometryMixin._geometries_to_exterior_keypoints_helper, geometries, chunksize=1)):
                 results.append(mp_return)
         results = [i for xs in results for i in xs]
-        return np.array(results).astype(np.int32)
+        return np.ascontiguousarray(np.array(results)).astype(np.int32)
 
     @staticmethod
     @njit("(int32[:, :, :],)", parallel=True)

@@ -5,12 +5,10 @@ import multiprocessing
 
 import numpy as np
 import pandas as pd
-from numba import (boolean, float32, float64, int64, jit, njit, prange, typed,
-                   types)
+from numba import (boolean, float32, float64, int64, jit, njit, prange, typed, types)
 from numba.typed import Dict, List
 from numpy.lib.stride_tricks import as_strided
-from statsmodels.tsa.stattools import (adfuller, grangercausalitytests, kpss,
-                                       zivot_andrews)
+from statsmodels.tsa.stattools import (adfuller, grangercausalitytests, kpss, zivot_andrews)
 
 from simba.utils.errors import InvalidInputError
 
@@ -22,11 +20,10 @@ except:
 import typing
 from typing import Optional, Tuple, get_type_hints
 
-from simba.utils.checks import (check_float, check_instance, check_int,
-                                check_str, check_that_column_exist,
-                                check_valid_array, check_valid_lst)
+from simba.utils.checks import (check_float, check_instance, check_int, check_str, check_that_column_exist, check_valid_array, check_valid_lst)
 from simba.utils.enums import Formats
 from simba.utils.read_write import find_core_cnt
+from simba.mixins.statistics_mixin import Statistics
 
 
 class TimeseriesFeatureMixin(object):
@@ -2358,3 +2355,54 @@ class TimeseriesFeatureMixin(object):
                 results[r - 1] = (w / h) * px_per_mm
 
         return results
+
+    @staticmethod
+    def radial_eccentricity(x: np.ndarray, reference_point: np.ndarray):
+        """
+        Compute the radial eccentricity of a set of points relative to a reference point.
+
+        Radial eccentricity quantifies the degree of elongation in the spatial distribution
+        of points. The value ranges between 0 and 1, where: - 0 indicates a perfectly circular distribution. - Values approaching 1 indicate a highly elongated or linear distribution.
+
+        :param np.ndarray x: 2-dimensional numpy array representing the input data with shape (n, m), where n is the number of frames and m is the coordinates.
+        :param np.ndarray data: A 1D array of shape (n_dimensions,) representing the reference point with  respect to which the radial eccentricity is calculated.
+
+        :example:
+        >>> points = np.random.randint(0, 1000, (100000, 2))
+        >>> reference_point = np.mean(points, axis=0)
+        >>> TimeseriesFeatureMixin.radial_eccentricity(x=points, reference_point=reference_point)
+        """
+
+        check_valid_array(data=x, source=f"{TimeseriesFeatureMixin.radial_eccentricity.__name__} x", accepted_ndims=(2,), accepted_axis_1_shape=[2,], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=reference_point, source=f"{TimeseriesFeatureMixin.radial_eccentricity.__name__} reference_point", accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        centered_points = x - reference_point
+        cov_matrix = Statistics.cov_matrix(data=centered_points.astype(np.float32))
+        eigenvalues, _ = np.linalg.eig(cov_matrix)
+        eigenvalues = np.sort(eigenvalues)[::-1]
+        return np.sqrt(1 - eigenvalues[1] / eigenvalues[0])
+
+
+    @staticmethod
+    def radial_dispersion_index(x: np.ndarray, reference_point: np.ndarray) -> float:
+        """
+        Compute the Radial Dispersion Index (RDI) for a set of points relative to a reference point.
+
+        The RDI quantifies the variability in radial distances of points from the reference point, normalized by the mean radial distance.
+        For example, the radial dispersion from an ROI center.
+
+        :param np.ndarray x: 2-dimensional numpy array representing the input data with shape (n, m), where n is the number of frames and m is the coordinates.
+        :param np.ndarray reference_point: A 1D array of shape (n_dimensions,) representing the reference point with  respect to which the radial dispertion index is calculated.
+        :rtype: float
+
+        :example:
+        >>> points = np.random.randint(0, 1000, (100000, 2))
+        >>> reference_point = np.mean(points, axis=0)
+        >>> TimeseriesFeatureMixin.radial_dispersion_index(x=points, reference_point=reference_point)
+        """
+
+        check_valid_array(data=x, source=f"{TimeseriesFeatureMixin.radial_dispersion_index.__name__} x", accepted_ndims=(2,), accepted_axis_1_shape=[2,], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=reference_point, source=f"{TimeseriesFeatureMixin.radial_dispersion_index.__name__} reference_point", accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        radial_distances = np.linalg.norm(x - reference_point, axis=1)
+        return np.std(radial_distances) / np.mean(radial_distances)
+
+

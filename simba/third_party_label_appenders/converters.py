@@ -120,28 +120,32 @@ def geometries_to_yolo(geometries: Dict[Union[str, int], np.ndarray],
                        save_dir: Union[str, os.PathLike],
                        verbose: Optional[bool] = True,
                        sample: Optional[int] = None,
-                       obb: Optional[bool] = False) -> None:
+                       obb: Optional[bool] = False,
+                       map: Optional[Dict[int, str]] = None) -> None:
     """
     Converts geometrical shapes (like polygons) into YOLO format annotations and saves them along with corresponding video frames as images.
 
     :param Dict[Union[str, int], np.ndarray geometries: A dictionary where the keys represent category IDs (either string or int), and the values are NumPy arrays of shape `(n_frames, n_points, 2)`. Each entry in the array represents the geometry of an object in a particular frame (e.g., keypoints or polygons).
     :param Union[str, os.PathLike] video_path: Path to the video file from which frames are extracted. The video is used to extract images corresponding to the geometrical annotations.
     :param Union[str, os.PathLike] save_dir: The directory where the output images and YOLO annotation files will be saved. Images will be stored in a subfolder `images/` and annotations in `labels/`.
-    :param verbose: If `True`, prints progress while processing each frame. This can be useful for monitoring long-running tasks. Default is `True`.
-    :param sample: If provided, only a random sample of the geometries will be used for annotation. This value represents the number of frames to sample.  If `None`, all frames will be processed. Default is `None`.
-    :param obb: If `True`, uses oriented bounding boxes (OBB) by extracting the four corner points of the geometries. Otherwise, axis-aligned bounding boxes (AABB) are used. Default is `False`.
+    :param Optional[bool] verbose: If `True`, prints progress while processing each frame. This can be useful for monitoring long-running tasks. Default is `True`.
+    :param Optional[int] sample: If provided, only a random sample of the geometries will be used for annotation. This value represents the number of frames to sample.  If `None`, all frames will be processed. Default is `None`.
+    :param Optional[bool] obb: If `True`, uses oriented bounding boxes (OBB) by extracting the four corner points of the geometries. Otherwise, axis-aligned bounding boxes (AABB) are used. Default is `False`.
+    :param Optional[Dict[int, str]] map: If `True`, uses oriented bounding boxes (OBB) by extracting the four corner points of the geometries. Otherwise, axis-aligned bounding boxes (AABB) are used. Default is `False`.
     :return None:
 
     :example:
     >>> data_path = r"C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\501_MA142_Gi_CNO_0514.csv"
     >>> animal_data = read_df(file_path=data_path, file_type='csv', usecols=['Nose_x', 'Nose_y', 'Tail_base_x', 'Tail_base_y', 'Left_side_x', 'Left_side_y', 'Right_side_x', 'Right_side_y']).values.reshape(-1, 4, 2).astype(np.int32)
     >>> animal_polygons = GeometryMixin().bodyparts_to_polygon(data=animal_data)
-    >>> poygons = GeometryMixin().multiframe_minimum_rotated_rectangle(shapes=animal_polygons)
-    >>> animal_polygons = GeometryMixin().geometries_to_exterior_keypoints(geometries=poygons)
+    >>> polygons = GeometryMixin().multiframe_minimum_rotated_rectangle(shapes=animal_polygons)
+    >>> animal_polygons = GeometryMixin().geometries_to_exterior_keypoints(geometries=polygons)
     >>> animal_polygons = {0: animal_polygons}
     >>> geometries_to_yolo(geometries=animal_polygons, video_path=r'C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_CNO_0514.mp4', save_dir=r"C:\troubleshooting\coco_data", sample=500, obb=True)
     """
 
+
+    timer = SimbaTimer(start=True)
     video_data = get_video_meta_data(video_path)
     categories = list(geometries.keys())
     w, h = video_data['width'], video_data['height']
@@ -154,13 +158,17 @@ def geometries_to_yolo(geometries: Dict[Union[str, int], np.ndarray],
     if sample is not None:
         check_int(name='sample', value=sample, min_value=1, max_value=geometries[categories[0]].shape[0])
         samples = np.random.choice(np.arange(0, geometries[categories[0]].shape[0]-1), sample)
+    if map is not None:
+        check_valid_dict(x=map, valid_key_dtypes=(str,), valid_values_dtypes=(int,), min_len_keys=1)
+    category_ids, lbl_cnt = set(), 0
     for category_cnt, (category_id, category_data) in enumerate(geometries.items()):
+        category_ids.add(category_id)
         for img_cnt in range(category_data.shape[0]):
             if sample is not None and img_cnt not in samples:
                 continue
             else:
                 if verbose:
-                    print(f'Writing category {category_cnt}, Image: {img_cnt}.')
+                    print(f'Writing category {category_cnt}, Image: {img_cnt} ({video_data["video_name"]})')
                 img_geometry = category_data[img_cnt]
                 img_name = f'{video_data["video_name"]}_{img_cnt}.png'
                 if not obb:
@@ -184,12 +192,22 @@ def geometries_to_yolo(geometries: Dict[Union[str, int], np.ndarray],
                     results[img_name] = [img_results]
                 else:
                     results[img_name].append(img_results)
+                lbl_cnt =+ 1
 
     for k, v in results.items():
         name = k.split(sep='.', maxsplit=2)[0]
         file_name = os.path.join(save_labels_dir, f'{name}.txt')
         with open(file_name, mode='wt', encoding='utf-8') as f:
             f.write('\n'.join(v))
+
+    if map is None:
+        map = {}
+        for cnt, i in enumerate(list(category_ids)):
+            map[f'Animal_{cnt+1}'] = i
+    write_pickle(data=map, save_path=os.path.join(save_dir, 'map.pickle'))
+    timer.stop_timer()
+    if verbose:
+        stdout_success(msg=f'{lbl_cnt} yolo labels saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
 
 
 def b64_to_arr(img_b64) -> np.ndarray:

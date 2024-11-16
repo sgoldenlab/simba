@@ -38,9 +38,7 @@ extensions = ['sphinx.ext.napoleon',
 mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
 
 
-intersphinx_mapping = {
-  'python': ('https://docs.python.org/3', None),
-  }
+intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
 html_favicon = "../simba/assets/icons/readthedocs_logo.png"
 html_logo = "../simba/assets/icons/readthedocs_logo.png"
 latex_engine = 'xelatex'
@@ -65,7 +63,11 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
-html_css_files = [
-    'css/simba_theme.css',  # Include your existing CSS file
-    'custom.css',  # Include your additional CSS file
+html_css_files = ['css/simba_theme.css',  # Include your existing CSS file
+                  'custom.css']  # Include your additional CSS file
+
+
+html_js_files = [
+    "https://www.googletagmanager.com/gtag/js?id=G-PEKR9R5J47",
+    "custom.js"
 ]

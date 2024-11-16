@@ -59,6 +59,7 @@ def inference_yolo(weights_path: Union[str, os.PathLike],
                    batch_size: Optional[int] = 4,
                    smoothing_method: Optional[Literal['savitzky-golay', 'bartlett', 'blackman', 'boxcar', 'cosine', 'gaussian', 'hamming', 'exponential']] = None,
                    smoothing_time_window: Optional[int] = None,
+                   interpolate: Optional[bool] = False,
                    stream: Optional[bool] = True) -> Union[None, Dict[str, pd.DataFrame]]:
 
     """
@@ -75,7 +76,7 @@ def inference_yolo(weights_path: Union[str, os.PathLike],
     :param Optional[bool] gpu: If True, performs inference on the GPU. Defaults to False.
     :param Optional[bool] stream: If True, iterate over a generater. Default to True. Recommended on longer videos.
     :param Optional[bool] batch_size: Number of frames to process in parallel. Default to 4.
-
+    :param Optional[bool] interpolate: If True, interpolates missing bounding boxes using ``nearest`` method.
 
     :example:
     >>> inference_yolo(weights_path=r"/mnt/c/troubleshooting/coco_data/mdl/train8/weights/best.pt", video_path=r"/mnt/c/troubleshooting/mitra/project_folder/videos/FRR_gq_Saline_0624.mp4", save_dir=r"/mnt/c/troubleshooting/coco_data/mdl/results", verbose=True, gpu=True)
@@ -83,6 +84,7 @@ def inference_yolo(weights_path: Union[str, os.PathLike],
     COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
     OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
     SMOOTHING_METHODS = ('savitzky-golay', 'bartlett', 'blackman', 'boxcar', 'cosine', 'gaussian', 'hamming', 'exponential')
+    NEAREST = 'nearest'
 
     if isinstance(video_path, list):
         check_valid_lst(data=video_path, source=f'{inference_yolo.__name__} video_path', valid_dtypes=(str, np.str_,), min_len=1)
@@ -92,7 +94,7 @@ def inference_yolo(weights_path: Union[str, os.PathLike],
     for i in video_path:
         _ = get_video_meta_data(video_path=i)
     check_file_exist_and_readable(file_path=weights_path)
-    check_valid_boolean(value=[half_precision, gpu, verbose, stream], source=inference_yolo.__name__)
+    check_valid_boolean(value=[half_precision, gpu, verbose, stream, interpolate], source=inference_yolo.__name__)
     check_int(name=f'{inference_yolo.__name__} batch_size', value=batch_size, min_value=1)
     if save_dir is not None:
         check_if_dir_exists(in_dir=save_dir, source=f'{inference_yolo.__name__} save_dir')
@@ -105,6 +107,7 @@ def inference_yolo(weights_path: Union[str, os.PathLike],
     if gpu:
         model.export(format='engine')
         model.to('cuda')
+    class_dict = model.names
     results = {}
     for path in video_path:
         _, video_name, _ = get_fn_ext(filepath=path)
@@ -112,21 +115,26 @@ def inference_yolo(weights_path: Union[str, os.PathLike],
         video_out = []
         video_predictions = model.predict(source=path, half=half_precision, batch=batch_size, stream=stream)
         for frm_cnt, video_prediction in enumerate(video_predictions):
-            class_names = video_prediction.names
             if video_prediction.obb is not None:
                 boxes = np.array(video_prediction.obb.data.cpu()).astype(np.float32)
             else:
                 boxes = np.array(video_prediction.boxes.data.cpu()).astype(np.float32)
-            classes = np.unique(boxes[:, -1])
-            for c in classes:
-                cls_data = boxes[np.argwhere(boxes[:, -1] == c)].reshape(-1, boxes.shape[1])
-                cls_data = cls_data[np.argmax(boxes[:, -2].flatten())]
-                if video_prediction.obb is not None:
-                    box = yolo_obb_data_to_bounding_box(center_x=cls_data[0], center_y=cls_data[1], width=cls_data[2], height=cls_data[3], angle=cls_data[4]).flatten()
+            for c in list(class_dict.keys()):
+                cls_data = boxes[np.argwhere(boxes[:, -1] == c)]
+                if cls_data.shape[0] == 0:
+                    video_out.append(np.array([frm_cnt, c, class_dict[c], -1, -1, -1, -1, -1, -1, -1, -1, -1]))
                 else:
-                    box = np.array([cls_data[0], cls_data[1], cls_data[2], cls_data[1], cls_data[2], cls_data[3], cls_data[0], cls_data[3]]).astype(np.int32)
-                video_out.append([frm_cnt, cls_data[-1], class_names[cls_data[-1]], cls_data[-2]] + list(box))
+                    cls_data = cls_data.reshape(-1, boxes.shape[1])[np.argmax(boxes[:, -2].flatten())]
+                    if video_prediction.obb is not None:
+                        box = yolo_obb_data_to_bounding_box(center_x=cls_data[0], center_y=cls_data[1], width=cls_data[2], height=cls_data[3], angle=cls_data[4]).flatten()
+                    else:
+                        box = np.array([cls_data[0], cls_data[1], cls_data[2], cls_data[1], cls_data[2], cls_data[3], cls_data[0], cls_data[3]]).astype(np.int32)
+                    video_out.append([frm_cnt, cls_data[-1], class_dict[cls_data[-1]], cls_data[-2]] + list(box))
         results[video_name] = pd.DataFrame(video_out, columns=OUT_COLS)
+        if interpolate:
+            for cord_col in COORD_COLS:
+                results[video_name][cord_col] = results[video_name][cord_col].astype(np.int32).replace(to_replace=-1, value=np.nan)
+                results[video_name][cord_col] = results[video_name][cord_col].interpolate(method=NEAREST, axis=0).ffill().bfill()
         if smoothing_method is not None:
             if smoothing_method != 'savitzky-golay':
                 smoothened = df_smoother(data=results[video_name][COORD_COLS], fps=video_meta_data['fps'], time_window=smoothing_time_window, source=inference_yolo.__name__, method=smoothing_method)
