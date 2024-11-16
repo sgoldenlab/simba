@@ -220,24 +220,24 @@ Methods for analyzing animal interactions through `overlapping bounding boxes <h
 Model tools
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Methods for creating machine learning behavior classifiers
+Methods for creating behavior models
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
-   simba.mixins.train_model_mixin.TrainModelMixin
+   simba.model_mixin
 
 
 
 Config reader methods
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Methods for reading SimBA configparser.Configparser project config and associated project data
+Methods for reading SimBA project config and associated project data
 
 .. toctree::
    :maxdepth: 2
 
-   simba.mixins.config_reader.ConfigReader
+   simba.config_reader
 
 
 Cue-light tools
