@@ -4,6 +4,10 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 from numba import float32, float64, int64, jit, njit, prange, typed, types
+from simba.utils.checks import check_valid_array, check_float
+from simba.utils.enums import Formats
+from simba.utils.errors import InvalidInputError
+from simba.utils.data import get_mode
 
 
 class CircularStatisticsMixin(object):
@@ -1202,9 +1206,10 @@ class CircularStatisticsMixin(object):
            :align: center
 
         The result array contains values:
-        - `0` where there is no change between points.
-        - `1` where the angle has increased in the positive direction.
-        - `2` where the angle has decreased in the negative direction.
+        - `-1`: Indicates no rotation is possible for the first frame. This serves as a placeholder since there is no prior frame to compare to.
+        - `0`: Represents no change in the angular value between consecutive frames
+        - `1`: Indicates an increase in the angular value (rotation in the positive direction, counterclockwise)
+        - `2`: Indicates a decrease in the angular value (rotation in the negative direction, clockwise)
 
         :param np.ndarray data: 1D array of size len(frames) representing degrees.
         :return: An array of directional indicators.
@@ -1329,6 +1334,84 @@ class CircularStatisticsMixin(object):
             )
 
         return results
+
+    @staticmethod
+    def preferred_turning_direction(x: np.ndarray) -> int:
+        """
+        Determines the preferred turning direction from a 1D array of circular directional data.
+
+        .. note::
+           The input ``x`` can be created using any of the following methods:
+           - :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.direction_two_bps`
+           - :func:`simba.data_processors.cuda.circular_statistics.direction_from_two_bps`
+           - :func:`simba.data_processors.cuda.circular_statistics.direction_from_three_bps`
+           - :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.direction_three_bps`
+
+        .. seealso::
+           :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.rotational_direction`, :func:`~simba.data_processors.cuda.circular_statistics.rotational_direction`,
+           :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_preferred_turning_direction`
+
+        :param np.ndarray x: 1D array of circular directional data (values between 0 and 360, inclusive). The array represents angular directions measured in degrees.
+        :return:
+            The most frequent turning direction from the input data:
+            - `0`: No change in the angular value between consecutive frames.
+            - `1`: An increase in the angular value (rotation in the positive direction, counterclockwise).
+            - `2`: A decrease in the angular value (rotation in the negative direction, clockwise).
+        :rtype: int
+
+        :example:
+        >>> x = np.random.randint(0, 361, (200,))
+        >>> CircularStatisticsMixin.preferred_turning_direction(x=x)
+        """
+
+        check_valid_array(data=x, source=CircularStatisticsMixin.preferred_turning_direction.__name__, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        if np.max(x) > 360 or np.min(x) < 0:
+            raise InvalidInputError(msg='x has to be values between 0 and 360 inclusive', source=CircularStatisticsMixin.preferred_turning_direction.__name__)
+        rotational_direction = CircularStatisticsMixin.rotational_direction(data=x.astype(np.float32))
+        return get_mode(x=rotational_direction)
+
+    @staticmethod
+    def sliding_preferred_turning_direction(x: np.ndarray,
+                                            time_window: float,
+                                            sample_rate: float) -> np.ndarray:
+        """
+        Computes the sliding preferred turning direction over a given time window from a 1D array of circular directional data.
+
+        Calculates the most frequent turning direction (mode) within a sliding window  of a specified duration.
+
+        .. seealso::
+           :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.rotational_direction`, :func:`~simba.data_processors.cuda.circular_statistics.rotational_direction`,
+           :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.preferred_turning_direction`
+
+
+        :param np.ndarray x: A 1D array of circular directional data (values between 0 and 360, inclusive).  Each value represents an angular direction in degrees.
+        :param float time_window:  The duration of the sliding window in seconds.
+        :param float sample_rate: The sampling rate of the data in Hz (samples per second) or FPS (frames per seconds)
+        :return:
+            A 1D array of integers indicating the preferred turning direction for each window:
+            - `0`: No change in angular values within the window.
+            - `1`: An increase in angular values (counterclockwise rotation).
+            - `2`: A decrease in angular values (clockwise rotation).
+            For indices before the first full window, the value is `-1`.
+        :rtype: np.ndarray
+
+        :example:
+        >>> x = np.random.randint(0, 361, (213,))
+        >>> CircularStatisticsMixin.sliding_preferred_turning_direction(x=x, time_window=1, sample_rate=10)
+        """
+        check_valid_array(data=x, source=CircularStatisticsMixin.sliding_preferred_turning_direction.__name__, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        if np.max(x) > 360 or np.min(x) < 0:
+            raise InvalidInputError(msg='x has to be values between 0 and 360 inclusive', source=CircularStatisticsMixin.sliding_preferred_turning_direction.__name__)
+        check_float(name=f'{CircularStatisticsMixin.sliding_preferred_turning_direction.__name__} time_window', value=time_window)
+        check_float(name=f'{CircularStatisticsMixin.sliding_preferred_turning_direction.__name__} sample_rate', value=sample_rate)
+        rotational_directions = CircularStatisticsMixin.rotational_direction(data=x.astype(np.float32))
+        window_size = np.int64(np.max((1.0, (time_window * sample_rate))))
+        results = np.full(shape=(x.shape[0]), fill_value=-1, dtype=np.int32)
+        for r in range(window_size, x.shape[0] + 1):
+            l = r - window_size
+            sample = rotational_directions[l:r]
+            results[r - 1] = get_mode(x=sample)
+        return results.astype(np.int32)
 
 
 
