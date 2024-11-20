@@ -25,10 +25,10 @@ from simba.utils.checks import (check_float, check_if_dir_exists,
                                 check_that_column_exist, check_valid_array,
                                 check_valid_dataframe, check_valid_lst)
 from simba.utils.data import detect_bouts
+from simba.utils.enums import Formats
 from simba.utils.errors import CountError, InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
-from simba.utils.enums import Formats
 
 
 class FeatureExtractionSupplemental(FeatureExtractionMixin):
