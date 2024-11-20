@@ -520,6 +520,9 @@ def dunn_index(x: np.ndarray, y: np.ndarray) -> float:
     distance to the maximum intra-cluster distance. The higher the Dunn Index, the better the separation
     between clusters.
 
+    .. seelalso:
+       For CPU-based method, use :func:`simba.mixins.statistics_mixin.Statistics.dunn_index`
+
     .. math::
 
         Dunn\ Index = \frac{\\min_{i \\neq j} \\delta(c_i, c_j)}{\\max_k \\Delta(c_k)}
@@ -579,6 +582,9 @@ def davis_bouldin(x: np.ndarray,
 
     The lower the Davis-Bouldin Index, the better the clusters are separated and compact.
     The function calculates the average similarity between each cluster and its most similar cluster.
+
+    .. seealso::
+       For CPU implementation, use :func:`simba.mixins.statistics_mixin.Statistics.davis_bouldin`
 
     .. csv-table::
        :header: EXPECTED RUNTIMES

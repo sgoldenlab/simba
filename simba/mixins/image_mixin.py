@@ -65,7 +65,8 @@ class ImageMixin(object):
         For example, (i) create a list of images containing a light cue ROI, (ii) compute brightness in each image, (iii) perform kmeans on brightness, and get the frames when the light cue is on vs off.
 
         .. seealso::
-           :func:`simba.data_processors.cuda.image.img_stack_brightness`.
+           For GPU acceleration, see :func:`simba.data_processors.cuda.image.img_stack_brightness`.
+           For geometry based brightness, see :func:`simba.mixins.geometry_mixin.GeometryMixin.get_geometry_brightness_intensity`
 
         :param List[np.ndarray] imgs: List of images as arrays to calculate average brightness intensity within.
         :param Optional[bool] ignore_black: If True, ignores black pixels. If the images are sliced non-rectangular geometric shapes created by ``slice_shapes_in_img``, then pixels that don't belong to the shape has been masked in black.
@@ -247,8 +248,8 @@ class ImageMixin(object):
            which uses CPU multiprocessing.
 
         .. seealso::
-           :func:`simba.data_processors.cuda.image.slice_imgs`
-           :func:`simba.mixins.image_mixin.ImageMixin.slice_shapes_in_imgs`
+           For GPU acceleration, see :func:`simba.data_processors.cuda.image.slice_imgs`
+           For single core method, see :func:`simba.mixins.image_mixin.ImageMixin.slice_shapes_in_imgs`
 
         .. video:: _static/img/slice_imgs_gpu.webm
            :width: 800
@@ -379,7 +380,8 @@ class ImageMixin(object):
         Hu moments are a set of seven invariant moments used for image pattern recognition, which are invariant to
         image transformations such as scaling, translation, and rotation.
 
-        See https://en.wikipedia.org/wiki/Image_moment#Hu_invariant_moments
+        .. note::
+           See wiki ` https://en.wikipedia.org/wiki/Image_moment#Hu_invariant_moments <See https://en.wikipedia.org/wiki/Image_moment#Hu_invariant_moments>`__.
 
         :param np.ndarray img: The input image as a 2D or 3D NumPy array. If the image has multiple channels (e.g., RGB or BGR), it will be converted to grayscale.
         :param  Optional[bool] hu_moments: If set to True, the function computes and returns the 7 Hu moments.  If False, it returns the standard moments of the image. Default is False.
@@ -408,7 +410,7 @@ class ImageMixin(object):
         Find contours in an image.
 
         .. seealso::
-           :func:`simba.mixins.image_mixin.ImageMixin.get_contourmatch`
+           For contour comparisons, see :func:`simba.mixins.image_mixin.ImageMixin.get_contourmatch`
 
         :param np.ndarray img: Input image as a NumPy array.
         :param Optional[Literal['all', 'exterior']] img: Contour retrieval mode. E.g., which contours should be kept. Default is 'all'.
@@ -577,8 +579,8 @@ class ImageMixin(object):
            :align: center
 
         .. seealso::
-           If converting multiple images from colour to black and white, consider :func:`simba.mixins.image_mixin.ImageMixin.img_stack_to_bw` or
-           :func:`simba.data_processors.cuda.image.img_stack_to_bw`
+           If converting multiple images from colour to black and white, consider :func:`simba.mixins.image_mixin.ImageMixin.img_stack_to_bw` for multi-core method or
+           :func:`simba.data_processors.cuda.image.img_stack_to_bw` for GPU acceleration.
 
         :param np.ndarray img: Input image as a NumPy array.
         :param Optional[int] lower_thresh: Lower threshold value for binary conversion. Pixels below this value become black. Default is 20.
@@ -587,6 +589,7 @@ class ImageMixin(object):
         :return: Binary black and white image.
         :rtype: np.ndarray
         """
+
         check_if_valid_img(data=img, source=ImageMixin().img_to_bw.__name__)
         check_int(
             name=f"{ImageMixin().img_to_bw.__name__} lower_thresh",
@@ -879,8 +882,8 @@ class ImageMixin(object):
            Also see ``img_sliding_mse``.
 
         .. seealso::
-           :func:`simba.data_processors.cuda.image.stack_sliding_mse`
-           :func:`simba.mixins.image_mixin.ImageMixin.img_sliding_mse`
+           For time-series comparison and GPU acceleration, see :func:`simba.data_processors.cuda.image.stack_sliding_mse`.
+           For time-series comparison and multicore acceleration, see:func:`simba.mixins.image_mixin.ImageMixin.img_sliding_mse`
 
         :param np.ndarray imgs_1: First three (non-color) or four (color) dimensional stack of images in array format.
         :param np.ndarray imgs_1: Second three (non-color) or four (color) dimensional stack of images in array format.
@@ -919,9 +922,8 @@ class ImageMixin(object):
         between each image and the image that is `slide_size` positions before it.
 
         .. seealso::
-           :func:`simba.data_processors.cuda.image.stack_sliding_mse`
-           :func:`simba.mixins.image_mixin.ImageMixin.img_stack_mse`
-
+           For GPU acceleration, see :func:`simba.data_processors.cuda.image.stack_sliding_mse`.
+           To compare images in two stacks, see :func:`simba.mixins.image_mixin.ImageMixin.img_stack_mse`
 
         .. image:: _static/img/img_sliding_mse.webp
            :width: 600
@@ -973,7 +975,7 @@ class ImageMixin(object):
         Read a batch of frames from a video file. This method reads frames from a specified range of frames within a video file using multiprocessing.
 
         .. seealso::
-           :func:`simba.utils.read_write.read_img_batch_from_video_gpu`
+           For GPU acceleration, see :func:`simba.utils.read_write.read_img_batch_from_video_gpu`
 
         :param Union[str, os.PathLike] video_path: Path to the video file.
         :param int start_frm: Starting frame index.
@@ -1135,9 +1137,9 @@ class ImageMixin(object):
            :align: center
 
         .. seealso::
-           :func:`simba.data_processors.cuda.image.stack_sliding_mse`
-           :func:`simba.mixins.image_mixin.ImageMixin.img_sliding_mse`
-           :func:`simba.mixins.image_mixin.ImageMixin.img_stack_mse`
+           For time-series and GPU acceleration, see :func:`simba.data_processors.cuda.image.stack_sliding_mse`.
+           For time-series and multicore CPU solution, see :func:`simba.mixins.image_mixin.ImageMixin.img_sliding_mse`
+           To compare two images, see :func:`simba.mixins.image_mixin.ImageMixin.img_stack_mse`
 
 
         :param np.ndarray imgs: A stack of images represented as a numpy array.
@@ -1166,9 +1168,9 @@ class ImageMixin(object):
         If the input image is already in greyscale (2D array), it is returned as is.
 
         .. seealso::
-           :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cupy`
-           :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cuda`
-           :func:`simba.mixins.image_mixin.ImageMixin.img_stack_to_greyscale`
+           For CuPy based GPU acceleration, see :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cupy`
+           For numba CUDA based GPU acceleration, see :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cuda`
+           For numba based multicore solution, see :func:`simba.mixins.image_mixin.ImageMixin.img_stack_to_greyscale`
 
         :param np.ndarray img: Input image represented as a NumPy array. For a color image, the array should have three channels (RGB).
         :return: The greyscale image as a 2D NumPy array.
@@ -1191,9 +1193,9 @@ class ImageMixin(object):
            :align: center
 
         .. seealso::
-           :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cupy`
-           :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cuda`
-           :func:`simba.mixins.image_mixin.ImageMixin.img_to_greyscale`
+           For CuPy based GPU acceleration, see :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cupy`
+           For numba CUDA based GPU acceleration, see :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cuda`
+           For single image conversion, see :func:`simba.mixins.image_mixin.ImageMixin.img_to_greyscale`
 
         :param np.ndarray imgs: A 4D array representing color images. It should have the shape (num_images, height, width, 3) where the last dimension represents the color channels (R, G, B).
         :returns: A 3D array containing the grayscale versions of the input images. The shape of the output array is (num_images, height, width).
@@ -1239,6 +1241,11 @@ class ImageMixin(object):
            :width: 400
            :align: center
 
+        .. seealso::
+           To read in a dictionary of images from a video using GPU acceleration, see :func:`simba.utils.read_write.read_img_batch_from_video_gpu`
+           To read in a dictionary of images from a video using multicore acceleration, see :func:`simba.mixins.image_mixin.ImageMixin.read_img_batch_from_video`
+           To read in a dictionary of images from a directory using multicore acceleration, use :func:`simba.mixins.image_mixin.ImageMixin.read_all_img_in_dir`
+
         :param Dict[int, np.ndarray] image_dict: A dictionary mapping integer keys to numpy arrays representing images.
         :param Optional[int] pad_value: The value (between 0-255) used for padding. Defaults to 0 (black)
         :return: A dictionary mapping integer keys to numpy arrays representing padded images.
@@ -1273,7 +1280,7 @@ class ImageMixin(object):
            The input dictionary ``imgs`` can be created with ``simba.mixins.ImageMixin.slice_shapes_in_imgs``.
 
         .. seealso::
-           :func:`simba.utils.read_write.img_stack_to_video` for GPU acceleration options.
+           For GPU acceleration, see :func:`simba.utils.read_write.img_stack_to_video`.
 
         :param Dict[int, np.ndarray] imgs: A dictionary containing frames of the video, where the keys represent frame indices and the values are numpy arrays representing the images.
         :param Union[str, os.PathLike] save_path: The path to save the output video file.
@@ -1339,8 +1346,8 @@ class ImageMixin(object):
         slice out the X geometries from each of the N images and return the sliced areas.
 
         .. seealso::
-           :func:`simba.data_processors.cuda.image.slice_imgs`
-           :func:`simba.mixins.image_mixin.ImageMixin.slice_shapes_in_img`
+           For GPU acceleration, see :func:`simba.data_processors.cuda.image.slice_imgs`
+           For single core process, use :func:`simba.mixins.image_mixin.ImageMixin.slice_shapes_in_img`
 
         .. image:: _static/img/slice_shapes_in_imgs_4.gif
            :width: 400
@@ -1431,14 +1438,15 @@ class ImageMixin(object):
         the SSI is computed for each channel.
 
         .. seealso::
-           ``simba.mixins.image_mixin.ImageMixin.structural_similarity_matrix``
-           ``simba.mixins.image_mixin.ImageMixin.sliding_structural_similarity_index``
+           For matrix SSI of image stack, see :func:`simba.mixins.image_mixin.ImageMixin.structural_similarity_matrix`
+           for time-series based comparison, see :func:`simba.mixins.image_mixin.ImageMixin.sliding_structural_similarity_index`
 
         :param np.ndarray img_1: The first input image represented as a NumPy array.
         :param np.ndarray img_2: The second input image represented as a NumPy array.
         :returns: The SSI value representing the similarity between the two images.
         :rtype: float
         """
+
         check_if_valid_img(data=img_1, source=f'{ImageMixin.structural_similarity_index.__name__} img_1')
         check_if_valid_img(data=img_2, source=f'{ImageMixin.structural_similarity_index.__name__} img_2')
         multichannel = False
@@ -1464,8 +1472,8 @@ class ImageMixin(object):
         indicate low similarity.
 
         .. seealso::
-           ``simba.mixins.image_mixin.ImageMixin.structural_similarity_matrix``
-           ``simba.mixins.image_mixin.ImageMixin.structural_similarity_index``
+           For matrix SSI of image stack, see :func:`simba.mixins.image_mixin.ImageMixin.structural_similarity_matrix`
+           For simple comparison of two images, see :func:`simba.mixins.image_mixin.ImageMixin.structural_similarity_index`
 
         :param np.ndarray imgs: A list of images. Each element in the list is expected to be a numpy array representing an image.
         :param Optional[int] stride: The number of images to skip between comparisons. Default is 1.
@@ -1505,9 +1513,8 @@ class ImageMixin(object):
         This function takes a list of images and computes the SSI between each pair of images and produce a symmetric matrix.
 
         .. seealso::
-           ``simba.mixins.image_mixin.ImageMixin.sliding_structural_similarity_index``
-           ``simba.mixins.image_mixin.ImageMixin.structural_similarity_index``
-
+           For time-series based comparison, see :func:`simba.mixins.image_mixin.ImageMixin.sliding_structural_similarity_index`
+           For simple comparison of two images, see :func:`simba.mixins.image_mixin.ImageMixin.structural_similarity_index`
 
         :param List[np.array] imgs: A list of images represented as numpy arrays. If not all images are greyscale or color, they are converted and processed as greyscale.
         :param Optional[bool] verbose: If True, prints progress messages showing which SSI values have been computed.  Default is False.
@@ -1546,8 +1553,11 @@ class ImageMixin(object):
         """
         Computes the Normalized Cross-Correlation (NCC) similarity between two images.
 
-        The NCC measures the similarity between two images by calculating the correlation
-        coefficient of their pixel values. The output value ranges from -1 to 1, where 1 indicates perfect positive correlation, 0 indicates no correlation, and -1 indicates perfect negative correlation.
+        The NCC measures the similarity between two images by calculating the correlation coefficient of their pixel values. The output value ranges from -1 to 1, where 1 indicates perfect positive correlation, 0 indicates no correlation, and -1 indicates perfect negative correlation.
+
+        .. seealso::
+           For time-series based NCC comparisons, see :func:`simba.mixins.image_mixin.ImageMixin.sliding_cross_correlation_similarity`
+           For matrix based NCC comparisons, see :func:`simba.mixins.image_mixin.ImageMixin.cross_correlation_matrix`
 
         :param np.ndarray img_1: The first input image. It can be a 2D grayscale image or a 3D color image.
         :param np.ndarray img_2:  The second input image. It must have the same dimensions as img_1.
@@ -1582,8 +1592,8 @@ class ImageMixin(object):
         the similarity between successive images.
 
         .. seealso::
-           ``simba.mixins.image_mixin.ImageMixin.cross_correlation_similarity``
-           ``simba.mixins.image_mixin.ImageMixin.cross_correlation_matrix``
+           For simple two image NCC comparison, see :func:`simba.mixins.image_mixin.ImageMixin.cross_correlation_similarity`
+           For matrix based NCC comparisons, see :func:`simba.mixins.image_mixin.ImageMixin.cross_correlation_matrix`
 
         :param np.ndarray imgs: A 3D array (for grayscale images) or a 4D array (for color images) containing the sequence of images.  Each image should have the same size.
         :param int stride: The stride length for comparing images. Determines how many steps back in the sequence each image is compared to.
@@ -1623,11 +1633,11 @@ class ImageMixin(object):
         `prange` for parallel execution over the image pairs.
 
         .. seealso::
-           ``simba.mixins.image_mixin.ImageMixin.cross_correlation_similarity``
-           ``simba.mixins.image_mixin.ImageMixin.sliding_cross_correlation_similarity``
+           For simple two image NCC comparison, see :func:`simba.mixins.image_mixin.ImageMixin.cross_correlation_similarity`
+           For time-series based NCC comparisons, see :func:`simba.mixins.image_mixin.ImageMixin.sliding_cross_correlation_similarity`
 
         .. note::
-           Use greyscale images for faster runtime. Ideally should be move dto GPU.
+           Use greyscale images for faster runtime. Ideally should be moved to GPU.
 
 
         :param np.array imgs: A 3D (or 4D) numpy array of images where the first dimension indexes the images,
@@ -1674,7 +1684,7 @@ class ImageMixin(object):
         Find the first frame of non-uniform color in a video.
 
         .. note::
-           Helpful in the ``GetPixelsPerMillimeterInterface`` to ensure that a viable frame is pulled up.
+           Helpful in the :func:`simba.ui.px_to_mm_ui.GetPixelsPerMillimeterInterface` to ensure that a viable frame is pulled up.
 
         :param Union[str, os.PathLike, cv2.VideoCapture] video_path: The path to a video file on disk, or a cv2.VideoCapture object.
         :param Optional[int] start_idx: The first frame (where to start searching for the non-uniform color image). Default: 0 which equals the first frame. None also equals start searching at the first frame.
@@ -1727,8 +1737,7 @@ class ImageMixin(object):
         optionally uses GPU for acceleration. Results can be saved to a specified path or returned as a NumPy array.
 
         .. seealso::
-           :func:`simba.plotting.blob_plotter.BlobPlotter`, :func:`simba.mixins.plotting_mixin.PlottingMixin._plot_blobs`
-
+           For visualization of results, see :func:`simba.plotting.blob_plotter.BlobPlotter` and :func:`simba.mixins.plotting_mixin.PlottingMixin._plot_blobs`
 
         :param Union[str, os.PathLike] video_path: Path to the video file from which to extract frames.
         :param Optional[int] batch_size: Number of frames to process in each batch. Default is 2000.
@@ -1739,9 +1748,10 @@ class ImageMixin(object):
         :return: A NumPy array of shape (N, 2) where N is the number of frames, containing the X and Y coordinates
                  of the centroid of the largest blob in each frame. If `save_path` is provided, returns None.
         :rtype: Union[None, np.ndarray]
+
         :example:
         >>> x = ImageMixin.get_blob_locations(video_path=r"/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4_downsampled_bg_subtracted.mp4", gpu=True)
-        >>> x = ImageMixin.get_blob_locations(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_IOT_1_bg_subtracted.mp4", gpu=True)
+        >>> y = ImageMixin.get_blob_locations(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_IOT_1_bg_subtracted.mp4", gpu=True)
         """
 
         timer = SimbaTimer(start=True)
@@ -1820,6 +1830,12 @@ class ImageMixin(object):
 
         """
         Resize a dictionary of images to a specified size.
+
+        .. seealso::
+
+           To read in a dictionary of images from a video using GPU acceleration, see :func:`simba.utils.read_write.read_img_batch_from_video_gpu`
+           To read in a dictionary of images from a video using multicore acceleration, see :func:`simba.mixins.image_mixin.ImageMixin.read_img_batch_from_video`
+           To read in a dictionary of images from a directory using multicore acceleration, use :func:`simba.mixins.image_mixin.ImageMixin.read_all_img_in_dir`
 
         :param Dict[str, np.ndarray] imgs: A dictionary where keys are image names (strings) and values are NumPy arrays representing the images.
         :param Union[Literal['min', 'max'], Tuple[int, int]] size: The target size for the resizing operation. It can be: - `'min'`: Resize all images to the smallest height and width found among the input images. - `'max'`: Resize all images to the largest height and width found among the input images. - Tuple of two integers `(height, width)`: Explicitly specify the target size for all images.

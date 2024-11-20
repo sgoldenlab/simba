@@ -28,6 +28,7 @@ from simba.utils.data import detect_bouts
 from simba.utils.errors import CountError, InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
+from simba.utils.enums import Formats
 
 
 class FeatureExtractionSupplemental(FeatureExtractionMixin):
@@ -59,14 +60,12 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
         return results
 
-    def euclidean_distance_timeseries_change(
-        self,
-        location_1: np.ndarray,
-        location_2: np.ndarray,
-        fps: int,
-        px_per_mm: float,
-        time_windows: np.ndarray = np.array([0.2, 0.4, 0.8, 1.6]),
-    ) -> np.ndarray:
+    def euclidean_distance_timeseries_change(self,
+                                             location_1: np.ndarray,
+                                             location_2: np.ndarray,
+                                             fps: int,
+                                             px_per_mm: float,
+                                             time_windows: np.ndarray = np.array([0.2, 0.4, 0.8, 1.6])) -> np.ndarray:
         """
         Compute the difference in distance between two points in the current frame versus N.N seconds ago. E.g.,
         computes if two points are traveling away from each other (positive output values) or towards each other
@@ -76,12 +75,13 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
            :width: 700
            :align: center
 
-        :parameter ndarray location_1: 2D array of size len(frames) x 2 representing pose-estimated locations of body-part one
-        :parameter ndarray location_2: 2D array of size len(frames) x 2 representing pose-estimated locations of body-part two
-        :parameter int fps: Fps of the recorded video.
-        :parameter float px_per_mm: The pixels per millimeter in the video.
-        :parameter np.ndarray time_windows: Time windows to compare.
-        :return np.array: Array of size location_1.shape[0] x time_windows.shape[0]
+        :param ndarray location_1: 2D array of size len(frames) x 2 representing pose-estimated locations of body-part one
+        :param ndarray location_2: 2D array of size len(frames) x 2 representing pose-estimated locations of body-part two
+        :param int fps: Fps of the recorded video.
+        :param float px_per_mm: The pixels per millimeter in the video.
+        :param np.ndarray time_windows: Time windows to compare.
+        :return: Array of size location_1.shape[0] x time_windows.shape[0]
+        :rtype: np.array
 
         :example:
         >>> location_1 = np.random.randint(low=0, high=100, size=(2000, 2)).astype('float32')
@@ -107,10 +107,11 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
            :width: 700
            :align: center
 
-        :parameter ndarray data: 1D array of size len(frames) representing feature values.
-        :parameter int bin_size_s: The size of the buckets in seconds.
-        :parameter int fps: Frame-rate of recorded video.
-        :return np.ndarray: Array of size data.shape[0] with peak counts as ratio of len(frames).
+        :param ndarray data: 1D array of size len(frames) representing feature values.
+        :param int bin_size_s: The size of the buckets in seconds.
+        :param int fps: Frame-rate of recorded video.
+        :return: Array of size data.shape[0] with peak counts as ratio of len(frames).
+        :rtype: np.ndarray
 
 
         :example:
@@ -141,7 +142,23 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
     @staticmethod
     @jit(nopython=True)
-    def rolling_peak_count_ratio(data: np.ndarray, time_windows: np.ndarray, fps: int):
+    def rolling_peak_count_ratio(data: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
+        """
+        Computes the ratio of peak counts within rolling windows over time for a given dataset.
+
+        The function calculates the ratio of local peaks (points that are greater than their neighbors)
+        in a sliding time window of varying durations defined by `time_windows`. Peaks at the beginning
+        and end of each window are also included in the count if they satisfy the peak condition. This is performed across multiple windows and for each timestep in the input data.
+
+        .. seealso::
+           For single time-series analysis, see :func:`simba.mixins.feature_extraction_supplement_mixin.FeatureExtractionSupplemental.peak_ratio`
+
+        :param np.ndarray data: A 1D array of numerical data for which the rolling peak count ratio is calculated.
+        :param np.ndarray time_windows: A 1D array of time durations (in seconds) defining the size of each sliding window.
+        :param int fps: Frames per second convertion factor.
+        :return:  A 2D array where each row corresponds to a timestep in `data`, and each column corresponds to a time window. Each element represents the peak count ratio for that timestep and time window.
+        :rtype: np.ndarray
+        """
 
         results = np.full((data.shape[0], time_windows.shape[0]), -1.0)
         for i in prange(time_windows.shape[0]):
@@ -158,12 +175,11 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
                         peak_cnt += 1
                 peak_ratio = peak_cnt / window_data.shape[0]
                 results[j, i] = peak_ratio
-        print(results)
+        return results.astype(np.float32)
 
     @staticmethod
     @jit(nopython=True)
-    def rolling_categorical_switches_ratio(
-        data: np.ndarray, time_windows: np.ndarray, fps: int
+    def rolling_categorical_switches_ratio(data: np.ndarray, time_windows: np.ndarray, fps: int
     ) -> np.ndarray:
         """
         Compute the ratio of in categorical feature switches within rolling windows.
@@ -175,10 +191,11 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
            :width: 700
            :align: center
 
-        :parameter np.ndarray data: 1d array of feature values
-        :parameter np.ndarray time_windows: Rolling time-windows as floats in seconds. E.g., [0.2, 0.4, 0.6]
-        :parameter int fps: fps of the recorded video
-        :returns np.ndarray: Size data.shape[0] x time_windows.shape[0] array
+        :param np.ndarray data: 1d array of feature values
+        :param np.ndarray time_windows: Rolling time-windows as floats in seconds. E.g., [0.2, 0.4, 0.6]
+        :param int fps: fps of the recorded video
+        :returns: Size data.shape[0] x time_windows.shape[0] array
+        :rtype: np.ndarray
 
         :example:
         >>> data = np.array([0, 1, 1, 1, 4, 5, 6, 7, 8, 9])
@@ -240,9 +257,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
     @staticmethod
     @jit(nopython=True)
-    def rolling_horizontal_vs_vertical_movement(
-        data: np.ndarray, pixels_per_mm: float, time_windows: np.ndarray, fps: int
-    ) -> np.ndarray:
+    def rolling_horizontal_vs_vertical_movement(data: np.ndarray, pixels_per_mm: float, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Compute the movement along the x-axis relative to the y-axis in rolling time bins.
 
@@ -253,12 +268,12 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
            :width: 700
            :align: center
 
-        :parameter np.ndarray data: 2d array of size len(frames)x2 with body-part coordinates.
-        :parameter int fps: FPS of the recorded video
-        :parameter float pixels_per_mm: Pixels per millimeter of recorded video.
-        :returns np.ndarray: Size data.shape[0] x time_windows.shape[0] array
-        :parameter np.ndarray time_windows: Rolling time-windows as floats in seconds. E.g., [0.2, 0.4, 0.6]
-        :returns np.ndarray: Size data.shape[0] x time_windows.shape[0]. Greater values denote greater movement on x-axis relative to y-axis.
+        :param np.ndarray data: 2d array of size len(frames)x2 with body-part coordinates.
+        :param int fps: FPS of the recorded video
+        :param float pixels_per_mm: Pixels per millimeter of recorded video.
+        :param np.ndarray time_windows: Rolling time-windows as floats in seconds. E.g., [0.2, 0.4, 0.6]
+        :returns: Size data.shape[0] x time_windows.shape[0]. Greater values denote greater movement on x-axis relative to y-axis.
+        :rtype: np.ndarray
 
         :example:
         >>> data = np.array([[250, 250], [250, 250], [250, 250], [250, 500], [500, 500], 500, 500]]).astype(float)
@@ -602,6 +617,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
         :param np.ndarray data: Nx2 2-dimensional array with the x and y coordinated represented on axis 1.
         :return: Dictionary with the coordinate tuple(x, y) as keys, and sequential frame numbers as values when animals visited, and re-visited the key coordinate.
+        :rtype: Dict[Tuple[int], List[int]]
 
         :example:
         >>> data = read_df(file_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/csv/outlier_corrected_movement_location/SI_DAY3_308_CD1_PRESENT.csv', usecols=['Center_x', 'Center_y'], file_type='csv').values.astype(int)
@@ -629,21 +645,23 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         return {k: v for k, v in seen_dedup.items() if len(v) > 1}
 
     @staticmethod
-    def sequential_lag_analysis(
-        data: pd.DataFrame, criterion: str, target: str, time_window: float, fps: float
-    ):
+    def sequential_lag_analysis(data: pd.DataFrame, criterion: str, target: str, time_window: float, fps: float) -> float:
         """
         Perform sequential lag analysis to determine the temporal relationship between two events.
 
         For every onset of behavior C, count the proportions of behavior T onsets in the time-window preceding the onset
         of behavior C vs the proportion of behavior T onsets in the time-window proceeding the onset of behavior C.
 
-        A value closer to 1.0 indicates that behavior T always precede behavior C. A value closer to 0.0 indicates that behavior T follows behavior C. A value of -1.0 indicates
-        that behavior T never precede nor proceed behavior C.
-
-
         .. seealso::
-           :class:`simba.data_processorsfsttc_calculator.FSTTCCalculator`
+           For altenative method, see :class:`simba.data_processorsfsttc_calculator.FSTTCCalculator`
+
+        :param pd.DataFrame data: Dataframe with boolean values representing frame-wise precense of behaviors.
+        :param str criterion: Name of the field in ``data`` representing behavior C.
+        :param str target: Name of the field in ``data`` representing behavior T.
+        :param float time_window: The time-window to scan proceeding and preceding behavior T.
+        :param float fps: The sample rate of the video used as conversion factor.
+        :returns: A value between -1 and 1 representing the relationship. A value closer to 1.0 indicates that behavior T always precede behavior C. A value closer to 0.0 indicates that behavior T follows behavior C. A value of -1.0 indicates that behavior T never precede nor proceed behavior C.
+        :rtype: float.
 
         :example:
         >>> df = pd.DataFrame(np.random.randint(0, 2, (100, 2)), columns=['Attack', 'Sniffing'])
@@ -676,7 +694,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         check_valid_dataframe(
             df=data,
             source=f"{FeatureExtractionSupplemental.sequential_lag_analysis.__name__} data",
-            valid_dtypes=(np.float32, np.float64, np.int64, np.int32, float, int),
+            valid_dtypes=Formats.NUMERIC_DTYPES.value,
             required_fields=[criterion, target],
         )
 
@@ -684,7 +702,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         if len(bouts) == 0:
             raise CountError(
                 msg=f"No events of behaviors {criterion} and {target} detected in data.",
-                source=FeatureExtractionSupplemental.sequential_lag_analysis,
+                source=FeatureExtractionSupplemental.sequential_lag_analysis.__name__,
             )
         criterion_starts = bouts["Start_frame"][bouts["Event"] == criterion].values
         target_starts = bouts["Start_frame"][bouts["Event"] == target].values
@@ -723,12 +741,10 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
             return np.round(preceding_cnt / (preceding_cnt + proceeding_cnt), 3)
 
     @staticmethod
-    def distance_and_velocity(
-        x: np.ndarray,
-        fps: float,
-        pixels_per_mm: float,
-        centimeters: Optional[bool] = True,
-    ) -> Tuple[float, float]:
+    def distance_and_velocity(x: np.ndarray,
+                              fps: float,
+                              pixels_per_mm: float,
+                              centimeters: Optional[bool] = True) -> Tuple[float, float]:
         """
         Calculate total movement and mean velocity from a sequence of position data.
 
@@ -736,7 +752,8 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         :param fps: Frames per second of the data.
         :param pixels_per_mm: Conversion factor from pixels to millimeters.
         :param Optional[bool] centimeters: If True, results are returned in centimeters and centimeters per second. Defaults to True.
-        :return Tuple[float, float]: A tuple containing total movement and mean velocity.
+        :return: A tuple containing total movement and mean velocity.
+        :rtype: Tuple[float, float]
 
         :example:
         >>> x = np.random.randint(0, 100, (100,))
