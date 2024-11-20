@@ -17,9 +17,9 @@ from scipy.spatial import ConvexHull
 from scipy.spatial.qhull import QhullError
 
 import simba
-from simba.utils.checks import (check_file_exist_and_readable,
+from simba.utils.checks import (check, check_file_exist_and_readable,
                                 check_if_filepath_list_is_empty,
-                                check_minimum_roll_windows, check)
+                                check_minimum_roll_windows)
 from simba.utils.enums import Options, Paths
 from simba.utils.errors import CountError
 from simba.utils.read_write import (get_bp_headers, read_config_file,
