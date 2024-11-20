@@ -211,10 +211,10 @@ Bounding-box tools
 Methods for analyzing animal interactions through `overlapping bounding boxes <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`_.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
 
    simba.bounding_box_tools
-
+   simba.yolo
 
 
 Model tools

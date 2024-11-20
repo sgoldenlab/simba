@@ -38,8 +38,7 @@ from simba.utils.checks import (check_float,
                                 check_valid_dict, check_valid_lst,
                                 check_valid_tuple)
 from simba.utils.data import create_color_palette, create_color_palettes
-from simba.utils.enums import (Defaults, Formats, GeometryEnum, Options,
-                               TextOptions)
+from simba.utils.enums import (Defaults, Formats, GeometryEnum, Options)
 from simba.utils.errors import CountError, InvalidInputError
 from simba.utils.read_write import (SimbaTimer, find_core_cnt,
                                     find_max_vertices_coordinates, read_df,
@@ -52,11 +51,11 @@ class GeometryMixin(object):
     line objects, circles etc. from pose-estimated body-parts and computing metric representations
     of the relationships between created shapes or their attributes (sizes, distances etc.).
 
-    As of 01/24, very much wip and relies heavily on `shapley <https://shapely.readthedocs.io/en/stable/manual.html>`_.
+    Relies heavily on `shapley <https://shapely.readthedocs.io/en/stable/manual.html>`_.
 
     .. note::
-       These methods generally do not create visualizations - they mainly generate geometry data-objects or metrics.
-       To create visualizations with geometries overlay on videos, pass returned shapes to `simba.plotting.geometry_plotter.GeometryPlotter`.
+       These methods, generally, do not involve visualizations - they mainly generate geometry data-objects or metrics.
+       To create visualizations with geometries overlay on videos, pass returned shapes to :func:`simba.plotting.geometry_plotter.GeometryPlotter`.
 
     """
 
@@ -76,12 +75,12 @@ class GeometryMixin(object):
 
 
         """
-        Converts the body-part points into polygoinal representations.
+        Converts the body-part points into polygonal representations.
 
 
         .. seealso::
-           :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_bodyparts_to_polygon`,
-           :func:`simba.data_processors.cuda.geometry.get_convex_hull`
+           If multicore method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_bodyparts_to_polygon`.
+           For GPU method, see :func:`simba.data_processors.cuda.geometry.get_convex_hull`
 
         .. image:: _static/img/bodyparts_to_polygon.png
            :width: 400
@@ -92,7 +91,8 @@ class GeometryMixin(object):
         :param int parallel_offset: How much to "buffer" the polygon from the original size in millimeters. Default: 1.
         :param int pixels_per_mm: The pixels per millimeter conversion factor used for buffering. Default: 1.
         :param float simplify_tolerance: The higher this value, the smaller the number of vertices in the resulting polygon. Default 2.
-        :param bool preserve_topology: If True, operation will avoid creating invalid geometries (checking for collapses, ring-intersections, etc). Deafult True.
+        :param bool preserve_topology: If True, operation will avoid creating invalid geometries (checking for collapses, ring-intersections, etc). Default True.
+        :returns: List of polygons, with one entry for every 2D input array.
 
         :example:
         >>> data = [[[364, 308],[383, 323],[403, 335], [423, 351]]]
@@ -103,7 +103,7 @@ class GeometryMixin(object):
             source=f"{GeometryMixin().bodyparts_to_polygon.__name__} data",
             data=data,
             accepted_ndims=(3,),
-            accepted_dtypes=(np.float64, np.float32, np.int32, np.int64, int, float),
+            accepted_dtypes=Formats.NUMERIC_DTYPES.value,
         )
 
         check_str(
@@ -155,13 +155,15 @@ class GeometryMixin(object):
         return results
 
     @staticmethod
-    def bodyparts_to_points(data: np.ndarray, buffer: Optional[int] = None, px_per_mm: Optional[int] = None) -> List[Union[Point, Polygon]]:
+    def bodyparts_to_points(data: np.ndarray,
+                            buffer: Optional[int] = None,
+                            px_per_mm: Optional[int] = None) -> List[Union[Point, Polygon]]:
         """
         Convert body-parts coordinate to Point geometries.
 
         .. note:
            If buffer and px_per_mm is not None, then the points will be *buffered* and a 2D share polygon created with the specified buffered area.
-           If buffer is provided, then also provide px_per_mm for accurate convesion factor between pixels and millimeters.
+           If buffer is provided, then also provide px_per_mm for accurate conversion factor between pixels and millimeters.
 
         .. seealso::
            If having a large number of body-parts, consider using :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_bodypart_to_point`
@@ -181,7 +183,7 @@ class GeometryMixin(object):
         check_valid_array(
             source=f"{GeometryMixin.bodyparts_to_points} data",
             data=data,
-            accepted_dtypes=(np.int64, np.int32, np.int8),
+            accepted_dtypes=Formats.NUMERIC_DTYPES.value,
             accepted_ndims=(2,),
         )
         area = None
@@ -227,7 +229,7 @@ class GeometryMixin(object):
             data=data,
             source=GeometryMixin.to_linestring.__name__,
             accepted_ndims=(2,),
-            accepted_dtypes=(float, np.float32, np.float64, np.int32, np.int64),
+            accepted_dtypes=Formats.NUMERIC_DTYPES.value,
         )
         return LineString(data)
 
@@ -239,7 +241,7 @@ class GeometryMixin(object):
         Create a circle geometry from a single body-part (x,y) coordinate.
 
         .. note::
-           For multiple frames, call this method using :func:`~simba.mixins.geometry_mixin.GeometryMixin.multiframe_bodyparts_to_circle`
+           For multicore method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_bodyparts_to_circle`
 
         .. image:: _static/img/bodyparts_to_circle.png
            :width: 400
@@ -275,11 +277,11 @@ class GeometryMixin(object):
     @staticmethod
     def bodyparts_to_multistring_skeleton(data: np.ndarray) -> MultiLineString:
         """
-        Create a multistring skeleton from a 3d array where each 2d array represents start and end coordinates of a line
-        within the skeleton.
+        Create a multistring skeleton from a 3d array where each 2d array represents start and end coordinates of a linewithin the skeleton.
 
         :param np.ndarray data: A 3D numpy array where each 2D array represents the start position and end position of each LineString.
-        :returns MultiLineString: Shapely MultiLineString representing animal skeleton.
+        :returns: Shapely MultiLineString representing animal skeleton.
+        :rtype: MultiLineString
 
         .. image:: _static/img/bodyparts_to_multistring_skeleton.png
            :width: 400
@@ -326,7 +328,7 @@ class GeometryMixin(object):
 
         :example:
         >>> polygon = GeometryMixin().bodyparts_to_polygon(np.array([[100, 110],[100, 100],[110, 100],[110, 110]]))
-        >>> buffered_polygon = GeometryMixin().buffer_shape(shape=polygon, size_mm=-1, pixels_per_mm=1)
+        >>> buffered_polygon = GeometryMixin().buffer_shape(shape=polygon[0], size_mm=-1, pixels_per_mm=1)
         """
 
         check_instance(
@@ -371,7 +373,7 @@ class GeometryMixin(object):
             accepted_ndims=(2,),
             max_axis_1=2,
             min_axis_0=1,
-            accepted_dtypes=(Polygon, LineString),
+            accepted_dtypes=[Polygon, LineString],
         )
         results = np.full((shapes.shape[0],), np.nan)
 
@@ -408,16 +410,17 @@ class GeometryMixin(object):
         """
         Computes if two geometrical shapes (Polygon or LineString) overlaps or are disjoint.
 
-        .. note::
-           Only returns if two shapes are overlapping or not overlapping. If the amount of overlap is required, use
-           ``GeometryMixin().compute_shape_overlap()``.
+        .. seealso::
+           For multicore method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_compute_shape_overlap`
+           Only returns if two shapes are overlapping or not overlapping. If the amount of overlap is required, use ``GeometryMixin().compute_shape_overlap()``.
 
         .. image:: _static/img/compute_overlap.png
            :width: 400
            :align: center
 
         :param List[Union[LineString, Polygon]] shapes: A list of two input Polygon or LineString shapes.
-        :return int: Returns 1 if the two shapes overlap, otherwise returns 0.
+        :return: Returns 1 if the two shapes overlap, otherwise returns 0.
+        :rtype: int
         """
 
         for shape in shapes:
@@ -484,7 +487,7 @@ class GeometryMixin(object):
 
         >>> polygon_1 = GeometryMixin().bodyparts_to_polygon(np.array([[10, 10], [10, 100], [100, 10], [100, 100]]))
         >>> polygon_2 = GeometryMixin().bodyparts_to_polygon(np.array([[25, 25], [25, 75], [90, 25], [90, 75]]))
-        >>> GeometryMixin().is_shape_covered(shapes=[polygon_2, polygon_1])
+        >>> GeometryMixin().is_shape_covered(shapes=[polygon_2[0], polygon_1[0]])
         >>> True
 
         """
@@ -502,7 +505,7 @@ class GeometryMixin(object):
         Calculate the area of a geometry in square millimeters.
 
         .. note::
-           If certain that the input data is a valid Polygon, consider using :func:`simba.feature_extractors.perimeter_jit.jitted_hull` or :func:`simba.data_processors.cuda.geometry.poly_area`.
+           If certain that the input data is a valid Polygon, consider using :func:`simba.feature_extractors.perimeter_jit.jitted_hull` or :func:`simba.data_processors.cuda.geometry.poly_area` for numba jit and CUDA acceleration, respectively.
 
         .. seealso:
            For multiprocessing, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_area`
@@ -514,7 +517,7 @@ class GeometryMixin(object):
 
         :example:
         >>> polygon = GeometryMixin().bodyparts_to_polygon(np.array([[10, 10], [10, 100], [100, 10], [100, 100]]))
-        >>> GeometryMixin().area(shape=polygon, pixels_per_mm=4.9)
+        >>> GeometryMixin().area(shape=polygon[0], pixels_per_mm=4.9)
         >>> 1701.556313816644
         """
 
@@ -541,7 +544,7 @@ class GeometryMixin(object):
         :rtype: float
 
         .. seealso:
-           For multiprocessing, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_shape_distance`
+           For multicore method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_shape_distance`
 
         .. image:: _static/img/shape_distance.png
            :width: 400
@@ -576,7 +579,7 @@ class GeometryMixin(object):
         return D
 
     @staticmethod
-    def bodyparts_to_line( data: np.ndarray,
+    def bodyparts_to_line(data: np.ndarray,
                           buffer: Optional[int] = None,
                           px_per_mm: Optional[float] = None) -> Union[Polygon, LineString]:
 
@@ -592,12 +595,19 @@ class GeometryMixin(object):
            :align: center
 
         .. seealso:
-           For multiprocessing, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_bodyparts_to_line`
+           For multicore method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_bodyparts_to_line`
+
+        :param np.ndarray data: 2D dataframe representing the locations of the body-parts in a single image.
+        :param Optional[int] buffer: Optional buffer for the linestring in millimeters. Default None.
+        :param Optional[float] px_per_mm: Optional conversion factor. Pass if ``buffer`` is passed.
+        :returns:
+        :rtype: Union[Polygon, LineString]
+
 
         :example:
         >>> data = np.array([[364, 308],[383, 323], [403, 335],[423, 351]])
         >>> line = GeometryMixin().bodyparts_to_line(data=data)
-        >>> line = GeometryMixin().bodyparts_to_line(data=data, buffer=10, px_per_mm=4)
+        >>> GeometryMixin().bodyparts_to_line(data=data, buffer=10, px_per_mm=4)
         """
 
         if buffer is not None:
@@ -634,6 +644,10 @@ class GeometryMixin(object):
         .. image:: _static/img/get_center.png
            :width: 500
            :align: center
+
+        :param Union[LineString, Polygon, MultiPolygon, List[Union[LineString, Polygon, MultiPolygon]]] shape: A single geometry or a list of geometries.
+        :returns: Array sith x, y coordinates of ``shape`` centers.
+        :rtype: np.ndarray
 
         :example:
         >>> multipolygon = MultiPolygon([Polygon([[200, 110],[200, 100],[200, 100],[200, 110]]), Polygon([[70, 70],[70, 60],[10, 50],[1, 70]])])
@@ -690,27 +704,22 @@ class GeometryMixin(object):
         return shapes[0].touches(shapes[1])
 
     @staticmethod
-    def is_containing(shapes=List[Union[LineString, Polygon]]) -> bool:
+    def is_containing(shapes=Iterable[Union[LineString, Polygon]]) -> bool:
         """
-        Check if the first shape in a list contains a second shape in a list.
+        Check if the first shape in a list contains a second shape in the same list.
 
         .. image:: _static/img/is_containing.png
            :width: 500
            :align: center
 
+        :example:
+        >>> polygon1 = Polygon([(0, 0), (10, 0), (10, 10), (0, 10), (0, 0)])
+        >>> polygon2 = Polygon([(3, 3), (7, 3), (7, 7), (3, 7), (3, 3)])
+        >>> GeometryMixin.is_containing(shapes=[polygon1, polygon2])
         """
         for i in shapes:
-            check_instance(
-                source=GeometryMixin.is_containing.__name__,
-                instance=i,
-                accepted_types=(LineString, Polygon),
-            )
-        check_iterable_length(
-            source=GeometryMixin.is_containing.__name__,
-            val=len(shapes),
-            exact_accepted_length=2,
-        )
-
+            check_instance(source=GeometryMixin.is_containing.__name__, instance=i, accepted_types=(LineString, Polygon))
+        check_iterable_length(source=GeometryMixin.is_containing.__name__, val=len(shapes), exact_accepted_length=2)
         return shapes[0].contains(shapes[1])
 
     @staticmethod
@@ -726,9 +735,8 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
-
         .. seealso:
-           For multicore solution, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_difference`
+           For multicore method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_difference`
 
         :param List[Union[LineString, Polygon, MultiPolygon]] shapes: A list of geometries.
         :return: The first geometry in ``shapes`` is returned where all parts that overlap with the other geometries in ``shapes have been removed.
@@ -775,7 +783,7 @@ class GeometryMixin(object):
            :loop:
 
         .. seealso:
-           For multicore solution, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_union`
+           For multicore method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_union`
 
         :param List[Union[LineString, Polygon, MultiPolygon]] shapes: A list of LineString, Polygon, or MultiPolygon geometries to be unioned.
         :return: The resulting geometry after performing the union operation.
@@ -811,7 +819,6 @@ class GeometryMixin(object):
 
         .. seealso:
            For multicore call, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_symmetric_difference`.
-
 
         :param List[Union[LineString, Polygon, MultiPolygon]] shapes: A list of LineString, Polygon, or MultiPolygon geometries to find the symmetric difference.
         :return: A list containing the resulting geometries after performing symmetric difference operations.
@@ -926,7 +933,7 @@ class GeometryMixin(object):
             return img
 
     @staticmethod
-    def geometry_video(shapes: List[List[Union[LineString, Polygon, MultiPolygon, MultiLineString, MultiPoint, Point]]],
+    def geometry_video(shapes: Iterable[Iterable[Union[LineString, Polygon, MultiPolygon, MultiLineString, MultiPoint, Point]]],
                        size: Optional[Tuple[int, int]],
                        save_path: Optional[Union[str, os.PathLike]] = None,
                        fps: Optional[Union[int, float]] = 10,
@@ -939,7 +946,7 @@ class GeometryMixin(object):
         Helper to create a geometry video from a list of shapes.
 
         .. seealso::
-           If more aesthetic videos are needed, overlaid on video, then use func:`simba.plotting.geometry_plotter.GeometryPlotter()`
+           If more aesthetic videos are needed, overlaid on video, then use func:`simba.plotting.geometry_plotter.GeometryPlotter`
            If single images of geometries are needed, then use :func:`simba.mixins.geometry_mixin.view_shapes()`
 
         .. image:: _static/img/geometry_video.gif
@@ -953,6 +960,7 @@ class GeometryMixin(object):
         :param Optional[bool] verbose: If True, then prints progress frmae-by-frame. Default: False.
         :param Optional[np.ndarray] bg_img: Background image to be used as the canvas for drawing shapes. Defaults to None. Could be e.g., a low opacity image of the arena.
         :param Optional[Tuple[int]] bg_clr: Background color specified as a tuple of RGB values. Defaults to white.
+        :returns: None
         """
 
         timer = SimbaTimer(start=True)
@@ -989,7 +997,7 @@ class GeometryMixin(object):
             frm_img = deepcopy(img)
             for shape_cnt, shape in enumerate(frm_shapes):
                 if isinstance(shape, Polygon):
-                    cv2.polylines(frm_img, [np.array(shape.exterior.coords).astype(np.int)], True, (clrs[shape_cnt][0][::-1]), thickness=thickness)
+                    cv2.polylines(frm_img, [np.array(shape.exterior.coords).astype(np.int32)], True, (clrs[shape_cnt][0][::-1]), thickness=thickness)
                     interior_coords = [np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2)) for interior in shape.interiors]
                     for interior in interior_coords:
                         cv2.polylines(frm_img, [interior], isClosed=True, color=(clrs[shape_cnt][0][::-1]), thickness=thickness,)
@@ -1038,7 +1046,7 @@ class GeometryMixin(object):
 
         :example:
         >>> polygon = GeometryMixin().bodyparts_to_polygon(np.array([[364, 308],[383, 323],[403, 335],[423, 351]]))
-        >>> rectangle = GeometryMixin().minimum_rotated_rectangle(shape=polygon)
+        >>> rectangle = GeometryMixin().minimum_rotated_rectangle(shape=polygon[0])
         """
 
         check_instance(
@@ -1104,7 +1112,7 @@ class GeometryMixin(object):
         Convert multidimensional NumPy array representing body part coordinates to a list of Polygons.
 
         .. note::
-           To convert single frame animal body-part coordinates to polygon, use :func:`simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_polygon`
+           To convert single frame animal body-part coordinates to polygon, use  single core method :func:`simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_polygon`
 
         :param np.ndarray data: NumPy array of body part coordinates. Each subarray represents the coordinates of a body part.
         :param Literal['round', 'square', 'flat'] cap_style: Style of line cap for parallel offset. Options: 'round', 'square', 'flat'.
@@ -1122,7 +1130,7 @@ class GeometryMixin(object):
             data=data,
             source=GeometryMixin().multiframe_bodyparts_to_polygon.__name__,
             accepted_ndims=(3,),
-            accepted_dtypes=(float, int, np.float32, np.float64, np.int32, np.int64),
+            accepted_dtypes=Formats.NUMERIC_DTYPES.value,
         )
         check_int(
             name="CORE COUNT",
@@ -1214,7 +1222,7 @@ class GeometryMixin(object):
 
         check_valid_array(
             data=data,
-            accepted_dtypes=(np.int64, np.int32, np.int8),
+            accepted_dtypes=Formats.NUMERIC_DTYPES.value,
             accepted_ndims=(2, 3),
         )
         check_int(
@@ -1312,8 +1320,12 @@ class GeometryMixin(object):
            :width: 450
            :align: center
 
+        .. seealso::
+           :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_delaunay_triangulate_keypoints`
+
         :param np.ndarray data: NumPy array of body part coordinates. Each subarray represents the coordinates of a body part.
-        :returns  List[Polygon]: A list of `Polygon` objects representing the triangles formed by the Delaunay triangulation.
+        :returns: A list of `Polygon` objects representing the triangles formed by the Delaunay triangulation.
+        :rtype: List[Polygon]
 
         :example:
         >>> data = np.array([[126, 122],[152, 116],[136,  85],[167, 172],[161, 206],[197, 193],[191, 237]])
@@ -1340,11 +1352,15 @@ class GeometryMixin(object):
         """
         Convert multiframe body-parts data to a list of LineString objects using multiprocessing.
 
+        .. seealso::
+           :func:`simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_line`
+
         :param np.ndarray data: Input array representing multiframe body-parts data. It should be a 3D array with dimensions (frames, points, coordinates).
         :param Optional[int] buffer: If not None, then the linestring will be expanded into a 2D geometry polygon with area ``buffer``.
         :param Optional[int] px_per_mm: If ``buffer`` if not None, then provide the pixels to millimeter
         :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. If set to -1, the function will automatically determine the available core count.
-        :return List[LineString]: A list of LineString objects representing the body-parts trajectories.
+        :return: A list of LineString objects representing the body-parts trajectories.
+        :rtype: List[LineString]
 
         :example:
         >>> data = np.random.randint(0, 100, (100, 2))
@@ -1364,16 +1380,16 @@ class GeometryMixin(object):
         if data.ndim != 3:
             raise InvalidInputError(
                 msg=f"Multiframe body-parts to linestring expects a 3D array, got {data.ndim}",
-                source=GeometryMixin.bodyparts_to_line.__name__,
+                source=GeometryMixin.multiframe_bodyparts_to_line.__name__,
             )
         if buffer is not None:
             check_float(
-                name=f"{GeometryMixin.bodyparts_to_points} buffer",
+                name=f"{GeometryMixin.multiframe_bodyparts_to_line} buffer",
                 value=buffer,
                 min_value=1,
             )
             check_float(
-                name=f"{GeometryMixin.bodyparts_to_points} px_per_mm",
+                name=f"{GeometryMixin.multiframe_bodyparts_to_line} px_per_mm",
                 value=px_per_mm,
                 min_value=1,
             )
@@ -1397,7 +1413,7 @@ class GeometryMixin(object):
                                              video_name: Optional[str] = None,
                                              verbose: Optional[bool] = False,
                                              animal_names: Optional[Tuple[str]] = None,
-                                             denominator: Optional[Literal["difference", "shape_1", "shape_2"]] = "difference") -> List[float]:
+                                             denominator: Optional[Literal["difference", "shape_1", "shape_2"]] = "difference") -> np.ndarray:
         """
         Compute the percentage overlap between corresponding Polygons in two lists.
 
@@ -1405,16 +1421,29 @@ class GeometryMixin(object):
            :width: 600
            :align: center
 
+        .. seealso::
+           :func:`simba.mixins.geometry_mixin.GeometryMixin.compute_pct_shape_overlap`. For Boolean rather than percent
+           results (if geometries are overlapping), see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_compute_shape_overlap`
+
         :param List[Polygon] shape_1: List of Polygons.
         :param List[Polygon] shape_2: List of Polygons with the same length as shape_1.
         :param int core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores.
         :param Optional[str] video_name: If not None, then the name of the video being processed for interpretable progress msgs.
         :param Optional[bool] video_name: If True, then prints interpretable progress msgs.
         :param Optional[Tuple[str]] animal_names: If not None, then a two-tuple of animal names (or alternative shape names) interpretable progress msgs.
-
-        :return List[float]: List of percentage overlap between corresponding Polygons.
+        :return: List of length ``shape_1`` with percentage overlap between corresponding Polygons.
+        :rtype: List[float]
 
         :example:
+        >>> df = read_df(file_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\csv\outlier_corrected_movement_location\Together_2.csv", file_type='csv').astype(int)
+        >>> animal_1_cols = [x for x in df.columns if '_1_' in x and not '_p' in x]
+        >>> animal_2_cols = [x for x in df.columns if '_2_' in x and not '_p' in x]
+        >>> animal_1_arr = df[animal_1_cols].values.reshape(len(df), int(len(animal_1_cols)/ 2), 2)
+        >>> animal_2_arr = df[animal_2_cols].values.reshape(len(df), int(len(animal_1_cols)/ 2), 2)
+        >>> animal_1_geo = GeometryMixin.bodyparts_to_polygon(data=animal_1_arr)
+        >>> animal_2_geo = GeometryMixin.bodyparts_to_polygon(data=animal_2_arr)
+        >>> GeometryMixin().multiframe_compute_pct_shape_overlap(shape_1=animal_1_geo, shape_2=animal_2_geo)
+
         """
         check_int(
             name="CORE COUNT",
@@ -1482,25 +1511,38 @@ class GeometryMixin(object):
         pool.terminate()
         return np.hstack(results)
 
-    def multiframe_compute_shape_overlap(
-        self,
-        shape_1: List[Polygon],
-        shape_2: List[Polygon],
-        core_cnt: Optional[int] = -1,
-        verbose: Optional[bool] = False,
-        names: Optional[Tuple[str]] = None,
-    ) -> List[int]:
+    def multiframe_compute_shape_overlap(self,
+                                         shape_1: List[Polygon],
+                                         shape_2: List[Polygon],
+                                         core_cnt: Optional[int] = -1,
+                                         verbose: Optional[bool] = False,
+                                         names: Optional[Tuple[str]] = None) -> List[int]:
         """
         Multiprocess compute overlap between corresponding Polygons in two lists.
 
         .. note::
-           Only returns if two shapes are overlapping or not overlapping. If the amount of overlap is required, use
-           ``GeometryMixin().multifrm_compute_pct_shape_overlap()``.
+           This function only returns Boolean if two shapes are overlapping or not overlapping. If the amount of overlap is required, use :func:`simba.mixins.geometry_mixin.GeometryMixin.compute_pct_shape_overlap`
+           of :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_compute_pct_shape_overlap`.
+
+        .. seealso:
+           :func:`simba.mixins.geometry_mixin.GeometryMixin.compute_shape_overlap`, :func:`simba.mixins.geometry_mixin.GeometryMixin.compute_pct_shape_overlap`, :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_compute_pct_shape_overlap`
 
         :param List[Polygon] shape_1: List of Polygons.
         :param List[Polygon] shape_2: List of Polygons with the same length as shape_1.
         :param int core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores.
         :return List[float]: List of overlap between corresponding Polygons. If overlap 1, else 0.
+
+        :example:
+        >>> df = read_df(file_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\csv\outlier_corrected_movement_location\Together_2.csv", file_type='csv').astype(int)
+        >>> animal_1_cols = [x for x in df.columns if '_1_' in x and not '_p' in x]
+        >>> animal_2_cols = [x for x in df.columns if '_2_' in x and not '_p' in x]
+        >>> animal_1_arr = df[animal_1_cols].values.reshape(len(df), int(len(animal_1_cols)/ 2), 2)
+        >>> animal_2_arr = df[animal_2_cols].values.reshape(len(df), int(len(animal_1_cols)/ 2), 2)
+        >>> animal_1_geo = GeometryMixin.bodyparts_to_polygon(data=animal_1_arr)
+        >>> animal_2_geo = GeometryMixin.bodyparts_to_polygon(data=animal_2_arr)
+        >>> GeometryMixin().multiframe_compute_shape_overlap(shape_1=animal_1_geo, shape_2=animal_2_geo)
+
+
         """
 
         check_int(
@@ -1553,18 +1595,32 @@ class GeometryMixin(object):
     def multiframe_shape_distance(self,
                                   shape_1: List[Union[LineString, Polygon]],
                                   shape_2: List[Union[LineString, Polygon]],
-                                  pixels_per_mm: float,
+                                  pixels_per_mm: Optional[float] = 1,
                                   unit: Literal["mm", "cm", "dm", "m"] = "mm",
                                   core_cnt=-1) -> List[float]:
         """
         Compute shape distances between corresponding shapes in two lists of LineString or Polygon geometries for multiple frames.
 
+        .. seealso::
+           For single core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.shape_distance`
+
         :param List[Union[LineString, Polygon]] shape_1: List of LineString or Polygon geometries.
         :param List[Union[LineString, Polygon]] shape_2: List of LineString or Polygon geometries with the same length as shape_1.
-        :param float pixels_per_mm: Conversion factor from pixels to millimeters.
+        :param float pixels_per_mm: Conversion factor from pixels to millimeters. Default 1.
         :param Literal['mm', 'cm', 'dm', 'm'] unit: Unit of measurement for the result. Options: 'mm', 'cm', 'dm', 'm'. Default: 'mm'.
         :param core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores.
-        :return List[float]: List of shape distances between corresponding shapes in passed unit.
+        :return: List of shape distances between corresponding shapes in passed unit.
+        :rtype: List[float]
+
+        :example:
+        >>> df = read_df(file_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\csv\outlier_corrected_movement_location\Together_2.csv", file_type='csv').astype(int)
+        >>> animal_1_cols = [x for x in df.columns if '_1_' in x and not '_p' in x]
+        >>> animal_2_cols = [x for x in df.columns if '_2_' in x and not '_p' in x]
+        >>> animal_1_arr = df[animal_1_cols].values.reshape(len(df), int(len(animal_1_cols)/ 2), 2)
+        >>> animal_2_arr = df[animal_2_cols].values.reshape(len(df), int(len(animal_1_cols)/ 2), 2)
+        >>> animal_1_geo = GeometryMixin.bodyparts_to_polygon(data=animal_1_arr)
+        >>> animal_2_geo = GeometryMixin.bodyparts_to_polygon(data=animal_2_arr)
+        >>> GeometryMixin().multiframe_shape_distance(shape_1=animal_1_geo, shape_2=animal_2_geo, pixels_per_mm=2.12, unit='cm')
         """
 
         check_int(
@@ -1606,11 +1662,23 @@ class GeometryMixin(object):
         """
         Compute the minimum rotated rectangle for each Polygon in a list using multiprocessing.
 
+        .. seealso::
+           For single-core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.minimum_rotated_rectangle`
+
         :param List[Polygon] shapes: List of Polygons.
         :param Optional[str] video_name: Optional video name to print (if verbose is True).
         :param Optional[str] animal_name: Optional animal name to print (if verbose is True).
         :param Optional[bool] verbose: If True, prints progress.
         :param core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores.
+        :returns: A list of rotated rectangle sof size len(shapes).
+        :rtype: List[Polygon]
+
+        :example:
+        >>> df = read_df(file_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\csv\outlier_corrected_movement_location\Together_2.csv", file_type='csv').astype(int)
+        >>> animal_1_cols = [x for x in df.columns if '_1_' in x and not '_p' in x]
+        >>> animal_1_arr = df[animal_1_cols].values.reshape(len(df), int(len(animal_1_cols)/ 2), 2)
+        >>> animal_1_geo = GeometryMixin.bodyparts_to_polygon(data=animal_1_arr)
+        >>> GeometryMixin().multiframe_minimum_rotated_rectangle(shapes=animal_1_geo)
         """
 
         check_int(
@@ -1668,7 +1736,8 @@ class GeometryMixin(object):
 
         :param numpy.ndarray lines: An array of shape (N, 2, 2) representing N lines, where each line is defined by two points. The first point that denotes the beginning of the line, the second point denotes the end of the line.
         :param numpy.ndarray point: A 2-element array representing the coordinates of the static point.
-        :return np.ndarray: An array of length N containing the results for each line. 2 if the point is on the right side of the line. 1 if the point is on the left side of the line. 0 if the point is on the line.
+        :return: An array of length N containing the results for each line. ``2`` if the point is on the right side of the line, ``1`` if the point is on the left side of the line, and ``0`` if the point is on the line.
+        :rtype: np.ndarray
 
         :example:
         >>> line = np.array([[[25, 25], [25, 20]], [[15, 25], [15, 20]], [[15, 25], [50, 20]]]).astype(np.float32)
@@ -1736,7 +1805,8 @@ class GeometryMixin(object):
 
         :param np.ndarray line_points: Coordinates of the line segment's two points. Two rows and each row represents a point (x, y).
         :param np.ndarray bounding_box: Bounding box coordinates in the format (min_x, min_y, max_x, max_y).
-        :returns np.ndarray: Intersection points where the extended line crosses the bounding box edges. The shape of the array is (2, 2), where each row represents a point (x, y).
+        :returns: Intersection points where the extended line crosses the bounding box edges. The shape of the array is (2, 2), where each row represents a point (x, y).
+        :rtype: np.ndarray
 
         :example:
         >>> line_points = np.array([[25, 25], [45, 25]]).astype(np.float32)
@@ -1779,7 +1849,7 @@ class GeometryMixin(object):
         Split a bounding box into two parts using an extended line.
 
         .. note::
-          Extended line can be found by body-parts using ``GeometryMixin().extend_line_to_bounding_box_edges``.
+          Extended line can be found by body-parts using :func:`simba.mixins.geometry_mixin.GeometryMixin.extend_line_to_bounding_box_edges`.
 
         .. image:: _static/img/line_split_bounding_box.png
            :width: 400
@@ -1791,7 +1861,8 @@ class GeometryMixin(object):
 
         :param np.ndarray line_points: Intersection points where the extended line crosses the bounding box edges. The shape of the array is (2, 2), where each row represents a point (x, y).
         :param np.ndarray bounding_box: Bounding box coordinates in the format (min_x, min_y, max_x, max_y).
-        :returns GeometryCollection: A collection of polygons resulting from splitting the bounding box with the extended line.
+        :returns: A collection of polygons resulting from splitting the bounding box with the extended line.
+        :rtype: GeometryCollection
 
         :example:
         >>> line_points = np.array([[25, 25], [45, 25]]).astype(np.float32)
@@ -1812,14 +1883,17 @@ class GeometryMixin(object):
 
         return split(original_polygon, extended_line)
 
-    def multiframe_length(
-        self,
-        shapes: List[Union[LineString, MultiLineString]],
-        pixels_per_mm: float,
-        core_cnt: int = -1,
-        unit: Literal["mm", "cm", "dm", "m"] = "mm",
-    ) -> List[float]:
+    def multiframe_length(self,
+                          shapes: List[Union[LineString, MultiLineString]],
+                          pixels_per_mm: float,
+                          core_cnt: int = -1,
+                          unit: Literal["mm", "cm", "dm", "m"] = "mm") -> List[float]:
         """
+        Calculate the length of LineStrings using multiprocessing.
+
+        .. seealso::
+           For single core process, see :func:`simba.mixins.geometry_mixin.GeometryMixin.length`
+
         :example:
         >>> data = np.random.randint(0, 100, (5000, 2))
         >>> data = data.reshape(2500,-1, data.shape[1])
@@ -1863,7 +1937,7 @@ class GeometryMixin(object):
            :loop:
 
         .. seealso::
-           :func:`simba.mixins.geometry_mixin.GeometryMixin.union()`
+           For single core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.union`
 
         :param shapes: Iterable collection of shapes (`LineString`, `MultiLineString`, or `Polygon`) to be merged. E.g, of size NxM where N is the number of frames and M is the number of shapes in each frame.
         :param core_cnt: The number of CPU cores to use for parallel processing; defaults to -1, which uses all available cores.
@@ -1890,11 +1964,16 @@ class GeometryMixin(object):
         pool.terminate()
         return results
 
-    def multiframe_symmetric_difference(
-        self, shapes: Iterable[Union[LineString, MultiLineString]], core_cnt: int = -1
-    ):
+    def multiframe_symmetric_difference(self, shapes: Iterable[Union[LineString, MultiLineString, Polygon]], core_cnt: int = -1):
         """
         Compute the symmetric differences between corresponding LineString or MultiLineString geometries usng multiprocessing.
+
+        Computes a new geometry consisting of the parts that are exclusive to each input geometry.
+
+        In other words, it includes the parts that are unique to each geometry while excluding the parts that are common to both.
+
+        .. seealso::
+           For single core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.symmetric_difference`
 
         :example:
         >>> data_1 = np.random.randint(0, 100, (5000, 2)).reshape(1000,-1, 2)
@@ -1925,10 +2004,13 @@ class GeometryMixin(object):
         pool.terminate()
         return results
 
-    def multiframe_delaunay_triangulate_keypoints(
-        self, data: np.ndarray, core_cnt: int = -1
-    ) -> List[List[Polygon]]:
+    def multiframe_delaunay_triangulate_keypoints(self, data: np.ndarray, core_cnt: int = -1) -> List[List[Polygon]]:
         """
+        Triangulates a set of 2D keypoints. E.g., can be used to polygonize animal hull, or triangulate a gridpoint areana.
+
+        .. seealso::
+           For single core process, see :func:`simba.mixins.geometry_mixin.GeometryMixin.delaunay_triangulate_keypoints`
+
         >>> data_path = '/Users/simon/Desktop/envs/troubleshooting/Rat_NOR/project_folder/csv/machine_results/08102021_DOT_Rat7_8(2).csv'
         >>> data = pd.read_csv(data_path, index_col=0).head(1000).iloc[:, 0:21]
         >>> data = data[data.columns.drop(list(data.filter(regex='_p')))]
@@ -1981,12 +2063,16 @@ class GeometryMixin(object):
         """
         Compute the multi-frame difference for a collection of shapes using parallel processing.
 
+        .. seealso::
+           For single core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.difference`
+
         :param Iterable[Union[LineString, Polygon, MultiPolygon]] shapes: A collection of shapes, where each shape is a list containing two geometries.
         :param int core_cnt: The number of CPU cores to use for parallel processing. Default is -1, which automatically detects the available cores.
         :param Optional[bool] verbose: If True, print progress messages during computation. Default is False.
         :param Optional[str] animal_names: Optional string representing the names of animals for informative messages.
         :param Optional[str]video_name: Optional string representing the name of the video for informative messages.
-        :return List[Union[Polygon, MultiPolygon]]: A list of geometries representing the multi-frame difference.
+        :return: A list of geometries representing the multi-frame difference.
+        :rtype: List[Union[Polygon, MultiPolygon]]
         """
 
         check_instance(
@@ -2055,70 +2141,54 @@ class GeometryMixin(object):
         pool.terminate()
         return results
 
-    def multiframe_area(
-        self,
-        shapes: List[Union[MultiPolygon, Polygon]],
-        pixels_per_mm: float,
-        core_cnt: Optional[int] = -1,
-        verbose: Optional[bool] = False,
-        video_name: Optional[bool] = False,
-        animal_names: Optional[bool] = False,
-    ) -> np.ndarray:
+    def multiframe_area(self,
+                        shapes: List[Union[MultiPolygon, Polygon]],
+                        pixels_per_mm: Optional[float] = 1.0,
+                        core_cnt: Optional[int] = -1,
+                        verbose: Optional[bool] = False,
+                        video_name: Optional[bool] = False,
+                        animal_names: Optional[bool] = False) -> List[float]:
 
-        check_instance(
-            source=f"{GeometryMixin().multiframe_area.__name__} shapes",
-            instance=shapes,
-            accepted_types=list,
-        )
+        """
+        Calculate the area of geometries in square millimeters using multiprocessing.
+
+        .. note::
+           If certain that the input data are valid Polygons, consider using :func:`simba.feature_extractors.perimeter_jit.jitted_hull` or :func:`simba.data_processors.cuda.geometry.poly_area` for numba jit and CUDA acceleration, respectively.
+
+        :param List[Union[MultiPolygon, Polygon]] shapes: List of polygons of Multipolygons.
+        :param float pixels_per_mm: Pixel per millimeter conversion factor. Default: 1.0.
+        :param Optional[int] core_cnt: The number of CPU cores to use for parallel processing. Default is -1, which automatically detects the available cores.
+        :param Optional[bool] verbose: If True, prints progress.
+        :param Optional[bool] video_name: If string, prints video name string during progress if verbose.
+        :param Optional[bool] animal_names: If string, prints animal name during progress if verbose.
+        :return: List of length ``len(shapes)`` with area values.
+        :rtype: List[float]
+        """
+
+        check_instance( source=f"{GeometryMixin().multiframe_area.__name__} shapes", instance=shapes, accepted_types=list)
         for i in shapes:
-            check_instance(
-                source=f"{GeometryMixin().multiframe_difference.__name__} shapes {i}",
-                instance=i,
-                accepted_types=(MultiPolygon, Polygon),
-            )
-        check_float(
-            name=f"{self.__class__.__name__} pixels_per_mm",
-            value=pixels_per_mm,
-            min_value=0.01,
-        )
-        check_int(
-            name="CORE COUNT",
-            value=core_cnt,
-            min_value=-1,
-            max_value=find_core_cnt()[0],
-            raise_error=True,
-        )
+            check_instance(source=f"{GeometryMixin().multiframe_difference.__name__} shapes {i}", instance=i, accepted_types=(MultiPolygon, Polygon))
+        check_float(name=f"{self.__class__.__name__} pixels_per_mm",value=pixels_per_mm,min_value=0.01)
+        check_int( name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
         if core_cnt == -1:
             core_cnt = find_core_cnt()[0]
         results, timer = [], SimbaTimer(start=True)
-        with multiprocessing.Pool(
-            core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-        ) as pool:
-            constants = functools.partial(
-                GeometryMixin.area, pixels_per_mm=pixels_per_mm
-            )
+        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
+            constants = functools.partial(GeometryMixin.area, pixels_per_mm=pixels_per_mm)
             for cnt, result in enumerate(pool.imap(constants, shapes, chunksize=1)):
                 if verbose:
                     if not video_name and not animal_names:
                         print(f"Computing area {cnt + 1}/{len(shapes)}...")
                     elif not video_name and animal_names:
-                        print(
-                            f"Computing % area {cnt + 1}/{len(shapes)} (Animals: {animal_names})..."
-                        )
+                        print(f"Computing % area {cnt + 1}/{len(shapes)} (Animals: {animal_names})...")
                     elif video_name and not animal_names:
-                        print(
-                            f"Computing % area {cnt + 1}/{len(shapes)} (Video: {video_name})..."
-                        )
+                        print(f"Computing % area {cnt + 1}/{len(shapes)} (Video: {video_name})...")
                     else:
-                        print(
-                            f"Computing % area {cnt + 1}/{len(shapes)} (Video: {video_name}, Animals: {animal_names})..."
-                        )
+                        print( f"Computing % area {cnt + 1}/{len(shapes)} (Video: {video_name}, Animals: {animal_names})...")
                 results.append(result)
 
         timer.stop_timer()
-        stdout_success(
-            msg="Multi-frame area compute complete", elapsed_time=timer.elapsed_time_str
-        )
+        stdout_success(msg="Multi-frame area compute complete", elapsed_time=timer.elapsed_time_str)
         pool.join()
         pool.terminate()
         return results
@@ -2135,13 +2205,17 @@ class GeometryMixin(object):
         """
         Convert body parts to LineString skeleton representations in a videos using multiprocessing.
 
+        .. seealso::
+           For single core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_multistring_skeleton`
+
         :param pd.DataFrame data_df: Pose-estimation data.
         :param Iterable[str] skeleton: Iterable of body part pairs defining the skeleton structure. Eg., [['Center', 'Lat_left'], ['Center', 'Lat_right'], ['Center', 'Nose'], ['Center', 'Tail_base']]
         :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores.
         :param Optional[bool] verbose: If True, print progress information during computation. Default is False.
         :param Optional[bool] video_name: If True, include video name in progress information. Default is False.
         :param Optional[bool] animal_names: If True, include animal names in progress information. Default is False.
-        :return List[Union[LineString, MultiLineString]]: List of LineString or MultiLineString objects representing the computed skeletons.
+        :return: List of LineString or MultiLineString objects representing the computed skeletons.
+        :rtype: List[Union[LineString, MultiLineString]]
 
         :example:
         >>> df = pd.read_csv('/Users/simon/Desktop/envs/troubleshooting/Rat_NOR/project_folder/csv/machine_results/08102021_DOT_Rat7_8(2).csv', nrows=500).fillna(0).astype(int)
@@ -2239,11 +2313,15 @@ class GeometryMixin(object):
            :align: center
 
         .. seealso::
-           See :func:`simba.data_processors.cuda.image.img_stack_brightness()` for GPU acceleration.
+           For direct image brightness comparisons without geometry slicing, see :func:`simba.mixins.image_mixin.ImageMixin.brightness_intensity`.
+           For GPU acceleration, see :func:`simba.data_processors.cuda.image.img_stack_brightness()`
+
 
         :param np.ndarray img: Either an image in numpy array format OR a tuple with cv2.VideoCapture object and the frame index.
         :param List[Union[Polygon, np.ndarray]] geometries: A list of shapes either as vertices in a numpy array, or as shapely Polygons.
         :param Optional[bool] ignore_black: If non-rectangular geometries, then pixels that don't belong to the geometry are masked in black. If True, then these pixels will be ignored when computing averages.
+        :returns: List of geometry brighness values.
+        :rtype: List[float]
 
         :example:
         >>> img = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/Example_1_frames/1.png').astype(np.uint8)
@@ -2308,11 +2386,15 @@ class GeometryMixin(object):
            :width: 700
            :align: center
 
-        :parameter List[Union[np.ndarray, Tuple[cv2.VideoCapture, int]]] imgs: List of two input images. Can be either an two image in numpy array format OR a two tuples with cv2.VideoCapture object and the frame index.
-        :parameter Optional[Polygon] geometry: If Polygon, then the geometry in the two images that should be compared. If None, then entire images will be histocompared.
-        :parameter Literal['correlation', 'chi_square'] method: The method used for comparison. E.g., if `correlation`, then small output values suggest large differences between the current versus prior image. If `chi_square`, then large output values  suggest large differences between the geometries.
-        :parameter Optional[bool] absolute: If True, the absolute difference between the two histograms. If False, then (image2 histogram) - (image1 histogram)
-        :return float: Value representing the histogram similarities between the geometry in the two images.
+        .. seealso::
+           :func:`simba.mixins.geometry_mixin.GeometryMixin.multifrm_geometry_histocomparison`
+
+        :param List[Union[np.ndarray, Tuple[cv2.VideoCapture, int]]] imgs: List of two input images. Can be either an two image in numpy array format OR a two tuples with cv2.VideoCapture object and the frame index.
+        :param Optional[Polygon] geometry: If Polygon, then the geometry in the two images that should be compared. If None, then entire images will be histocompared.
+        :param Literal['correlation', 'chi_square'] method: The method used for comparison. E.g., if `correlation`, then small output values suggest large differences between the current versus prior image. If `chi_square`, then large output values  suggest large differences between the geometries.
+        :param Optional[bool] absolute: If True, the absolute difference between the two histograms. If False, then (image2 histogram) - (image1 histogram)
+        :return: Value representing the histogram similarities between the geometry in the two images.
+        :rtype: float
 
         :example:
         >>> img_1 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/videos/Example_1_frames/1.png')
@@ -2389,12 +2471,10 @@ class GeometryMixin(object):
             img_1=imgs[0], img_2=imgs[1], method=method, absolute=absolute
         )
 
-    def multiframe_is_shape_covered(
-        self,
-        shape_1: List[Polygon],
-        shape_2: List[Polygon],
-        core_cnt: Optional[int] = -1,
-    ) -> List[bool]:
+    def multiframe_is_shape_covered(self,
+                                    shape_1: List[Polygon],
+                                    shape_2: List[Polygon],
+                                    core_cnt: Optional[int] = -1) -> List[bool]:
         """
         For each shape in time-series of shapes, check if another shape in the same time-series fully covers the
         first shape.
@@ -2403,6 +2483,8 @@ class GeometryMixin(object):
            :width: 600
            :align: center
 
+        .. seealso::
+           For single core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.is_shape_covered`
 
         :example:
         >>> shape_1 = GeometryMixin().multiframe_bodyparts_to_polygon(data=np.random.randint(0, 200, (100, 6, 2)))
@@ -2625,6 +2707,9 @@ class GeometryMixin(object):
            Comparions are made using the intersections of the two image geometries, meaning that the same
            experimental area of the image and arena is used in the comparison and shifts in animal location cannot account for variability.
 
+        .. seealso::
+           For single core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.geometry_histocomparison`
+
         :param Union[str, os.PathLike] video_path: Path to the video file.
         :param np.ndarray data: Input data, typically containing coordinates of one or several body-parts.
         :param Literal['rectangle', 'circle'] shape_type: Type of shape for comparison.
@@ -2632,7 +2717,8 @@ class GeometryMixin(object):
         :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default is -1 which is all available cores.
         :param Optional[int] pixels_per_mm: Pixels per millimeter for conversion. Default is 1.
         :param Optional[int] parallel_offset: Size of the geometry ROI in millimeters. Default 1.
-        :returns np.ndarray: The difference between the successive geometry histograms.
+        :returns: The difference between the successive geometry histograms.
+        :rtype: np.ndarray
 
         :example:
         >>> data = pd.read_csv('/Users/simon/Desktop/envs/troubleshooting/Emergence/project_folder/csv/outlier_corrected_movement_location/Example_1.csv', nrows=2100, usecols=['Nose_x', 'Nose_y']).fillna(-1).values.astype(np.int64)
@@ -2695,10 +2781,11 @@ class GeometryMixin(object):
         Rank a list of polygon geometries based on a specified method. E.g., order the list of geometries according to sizes or distances to each other or from left to right etc.
 
         :param List[Polygon] shapes: List of Shapely polygons to be ranked. List has to contain two or more shapes.
-        :param Literal['area', 'min_center_distance', 'max_center_distance', 'mean_shape_distance'] method: The ranking method to use.
+        :param Literal["area", "min_distance", "max_distance", "mean_distance", "left_to_right", "top_to_bottom"] method: The ranking method to use.
         :param Optional[bool] deviation: If True, rank based on absolute deviation from the mean. Default: False.
         :param Optional[bool] descending: If True, rank in descending order; otherwise, rank in ascending order. Default: False.
-        :return: A input list of Shapely polygons sorted according to the specified ranking method.
+        :return: A list of Shapely polygons sorted according to the specified ranking method.
+        :rtype: List[Polygon]
         """
 
         check_instance(
@@ -2773,8 +2860,8 @@ class GeometryMixin(object):
         """
         Convert a list of contours to a list of geometries.
 
-        E.g., convert a list of contours detected with :func:`simba.mixins.image_mixin.ImageMixin.find_contours()` to a list of Shapely geometries
-        that can be used within the :func:`simba.mixins.geometry_mixin.GeometryMixin()`.
+        E.g., convert a list of contours detected with :func:`simba.mixins.image_mixin.ImageMixin.find_contours` to a list of Shapely geometries
+        that can be used within the :func:`simba.mixins.geometry_mixin.GeometryMixin`.
 
         :param List[np.ndarray] contours: List of contours represented as 2D arrays.
         :param force_rectangles: If True, then force the resulting geometries to be rectangular.
@@ -2849,17 +2936,22 @@ class GeometryMixin(object):
                                     border_sites: Optional[bool] = True) -> Dict[Tuple[int, int], Point]:
 
         """
-        Generate a grid of evenly spaced points within an image. Use for creating spatial markers within an arena.
+        Create a grid of evenly spaced points within an image. Use for creating spatial markers within an arena.
 
         .. image:: _static/img/bucket_img_into_grid_points.png
            :width: 800
            :align: center
 
+        .. seealso::
+           To segment image into **hexagons**, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
+           To segment image into **rectangles**, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square`
+
         :param int point_distance: Distance between adjacent points in millimeters.
         :param float px_per_mm: Pixels per millimeter conversion factor.
         :param Tuple[int, int] img_size: Size of the image in pixels (width, height).
         :param Optional[bool] border_sites: If True, includes points on the border of the image. Default is True.
-        :returns Dict[Tuple[int, int], Point]: Dictionary where keys are (row, column) indices of the point, and values are Shapely Point objects.
+        :returns: Dictionary where keys are (row, column) indices of the point, and values are Shapely Point objects.
+        :rtype: Dict[Tuple[int, int], Point]
 
         :example:
         >>> GeometryMixin.bucket_img_into_grid_points(point_distance=20, px_per_mm=4, img_size=img.shape, border_sites=False)
@@ -2895,11 +2987,15 @@ class GeometryMixin(object):
                                     add_correction: Optional[bool] = True,
                                     verbose: Optional[bool] = False) -> Tuple[Dict[Tuple[int, int], Polygon], float]:
         """
-        Bucketize an image into squares and return a dictionary of polygons representing the bucket locations.
+        Segment an image into squares and return a dictionary of polygons representing the bucket locations.
 
         .. image:: _static/img/bucket_img_into_grid_square_3.png
            :width: 800
            :align: center
+
+        .. seealso::
+           To segment image into **hexagons**, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
+           To segment image into **points**, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_points`
 
         :param Iterable[int] img_size: 2-value tuple, list or array representing the width and height of the image in pixels.
         :param Optional[float] bucket_grid_size_mm: The width/height of each square bucket in millimeters. E.g., 50 will create 5cm by 5cm squares. If None, then buckets will by defined by ``bucket_grid_size`` argument.
@@ -2907,6 +3003,7 @@ class GeometryMixin(object):
         :param Optional[float] px_per_mm: Pixels per millimeter conversion factor. Necessery if buckets are defined by ``bucket_size_mm`` argument.
         :param Optional[bool] add_correction: If True, performs correction by adding extra columns or rows to cover any remaining space if using ``bucket_size_mm``. Default True.
         :param Optional[bool] verbose: If True, prints progress / completion information. Default False.
+        :returns: Size-2 Tuple with (i) Dictionary where the segment index is the key and polygon is the value, and (ii) float representing aspect ratio of each bucket.
 
         :example:
         >>> img = cv2.imread('/Users/simon/Desktop/Screenshot 2024-01-21 at 10.15.55 AM.png', 1)
@@ -2984,9 +3081,7 @@ class GeometryMixin(object):
             return polygons, round((bucket_grid_size[1] / bucket_grid_size[0]), 3)
 
     @staticmethod
-    def bucket_img_into_grid_hexagon(
-        bucket_size_mm: float, img_size: Tuple[int, int], px_per_mm: float
-    ) -> Tuple[Dict[Tuple[int, int], Polygon], float]:
+    def bucket_img_into_grid_hexagon(bucket_size_mm: float, img_size: Tuple[int, int], px_per_mm: float) -> Tuple[Dict[Tuple[int, int], Polygon], float]:
         """
         Bucketize an image into hexagons and return a dictionary of polygons representing the hexagon locations.
 
@@ -2994,10 +3089,15 @@ class GeometryMixin(object):
            :width: 500
            :align: center
 
+        .. seealso::
+           To segment image into **rectangles**, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square`
+           To segment image into **points**, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_points`
+
         :param float bucket_size_mm: The width/height of each hexagon bucket in millimeters.
         :param Tuple[int, int] img_size: Tuple representing the width and height of the image in pixels.
         :param float px_per_mm: Pixels per millimeter conversion factor.
-        :return Tuple[Dict[Tuple[int, int], Polygon], float]: First value is a dictionary where keys are (row, column) indices of the bucket, and values are Shapely Polygon objects representing the corresponding hexagon buckets. Second value is the aspect ratio of the hexagonal grid.
+        :return: First value is a dictionary where keys are (row, column) indices of the bucket, and values are Shapely Polygon objects representing the corresponding hexagon buckets. Second value is the aspect ratio of the hexagonal grid.
+        :rtype: Tuple[Dict[Tuple[int, int], Polygon], float]
 
         :example:
         >>> polygons, aspect_ratio = GeometryMixin().bucket_img_into_grid_hexagon(bucket_size_mm=10, img_size=(800, 600), px_per_mm=5.0, add_correction=True)
@@ -3067,14 +3167,20 @@ class GeometryMixin(object):
                                 geometries: Dict[Tuple[int, int], Polygon],
                                 fps: Optional[int] = None,
                                 core_cnt: Optional[int] = -1,
-                                verbose: Optional[bool] = True):
+                                verbose: Optional[bool] = True) -> np.ndarray:
 
         """
         Compute the cumulative time a body-part has spent inside a grid of geometries using multiprocessing.
 
+        .. seealso::
+           To create grid ``geometries``, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square` or :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
+
         :param np.ndarray data: Input data array where rows represent frames and columns represent body-part x and y coordinates.
         :param Dict[Tuple[int, int], Polygon] geometries: Dictionary of polygons representing spatial regions. E.g., created by :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square` or :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
         :param Optional[int] fps: Frames per second (fps) for time normalization. If None, cumulative sum of frame count is returned.
+        :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default is -1 which is all available cores.
+        :param Optional[bool] verbose: If True, prints progress.
+        :returns:
 
         :example:
         >>> img_geometries = GeometryMixin.bucket_img_into_grid_square(img_size=(640, 640), bucket_grid_size=(10, 10), px_per_mm=1)
@@ -3138,25 +3244,26 @@ class GeometryMixin(object):
                 return (int(data[0]), k[0], k[1])
         return (int(data[0]), -1, -1)
 
-    def cumsum_bool_geometries(
-        self,
-        data: np.ndarray,
-        geometries: Dict[Tuple[int, int], Polygon],
-        bool_data: np.ndarray,
-        fps: Optional[float] = None,
-        core_cnt: Optional[int] = -1,
-    ) -> np.ndarray:
+    def cumsum_bool_geometries(self,
+                               data: np.ndarray,
+                               geometries: Dict[Tuple[int, int], Polygon],
+                               bool_data: np.ndarray,
+                               fps: Optional[float] = None,
+                               core_cnt: Optional[int] = -1) -> np.ndarray:
         """
-        Compute the cumulative sums of boolean events within polygon geometries over time using multiprocessing.
+        Compute the cumulative sums of boolean events within polygon geometries over time using multiprocessing. For example, compute the cumulative time of classified events within spatial locations at all time-points of the video.
 
-        E.g., compute the cumulative time of classified events within spatial locations at all time-points of the video.
+        .. seealso::
+           To create grid ``geometries``, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square` or :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
+
 
         :param np.ndarray data: Array containing spatial data with shape (n, 2). E.g., 2D-array with body-part coordinates.
         :param Dict[Tuple[int, int], Polygon] geometries: Dictionary of polygons representing spatial regions. E.g., created by :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square` or :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
         :param np.ndarray bool_data: Boolean array with shape (data.shape[0],) or (data.shape[0], 1) indicating the presence or absence in each frame.
         :param Optional[float] fps: Frames per second. If provided, the result is normalized by the frame rate.
         :param Optional[float] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which means using all available cores.
-        :returns np.ndarray: Array of size (frames x horizontal bins x verical bins) with times in seconds (if fps passed) or frames (if fps not passed)
+        :returns: Matrix of size (frames x horizontal bins x verical bins) with times in seconds (if fps passed) or frames (if fps not passed)
+        :rtype: np.ndarray
 
         :example:
         >>> geometries = GeometryMixin.bucket_img_into_grid_square(bucket_size_mm=50, img_size=(800, 800) , px_per_mm=5.0)[0]
@@ -3251,6 +3358,15 @@ class GeometryMixin(object):
                                       core_cnt: Optional[int] = -1,
                                       verbose: Optional[bool] = True) -> np.ndarray:
         """
+        Compute the cumulative time the animal has spent in each geometry.
+
+        .. note::
+           The time is computed based on if any part of the animal is inside a specific geometry. Thus, if the hull is larger than the individual geometries, then the total time in the matrix can exceed the time of the video.
+
+        .. seealso::
+           To calculate the time / count of boolean events in geometries, see :func:`simba.mixins.geometry_mixin.GeometryMixin.cumsum_bool_geometries`.
+           To calculate the cumulative time the animal has spent in each geometry using a single key-point, see :func:`simba.mixins.geometry_mixin.GeometryMixin.cumsum_coord_geometries`.
+
         .. image:: _static/img/cumsum_animal_geometries_grid.webp
            :width: 400
            :align: center
@@ -3260,7 +3376,8 @@ class GeometryMixin(object):
         :param Optional[float] fps: Frames per second. If provided, the result is normalized by the frame rate.
         :param Optional[float] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which means using all available cores.
         :param Optional[bool] verbose: If True, then prints progress.
-        :returns np.ndarray: Array of size (frames x horizontal bins x verical bins) with values representing time in seconds (if fps passed) or frames (if fps not passed)
+        :returns: Matrix of size (frames x horizontal bins x verical bins) with values representing time in seconds (if fps passed) or frames (if fps not passed)
+        :rtype: np.ndarray
         """
 
 
@@ -3384,8 +3501,12 @@ class GeometryMixin(object):
         Hausdorff distance can be used to measure the similarity of the geometry in one frame relative to the geometry in the next frame.
         Larger values indicate that the animal has a different shape than in the preceding shape.
 
+        .. seealso::
+           :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_hausdorff_distance`
+
         :param List[List[Union[Polygon, LineString]]] geometries: List of list where each list has two geometries.
-        :return np.ndarray: 1D array of hausdorff distances of geometries in each list.
+        :return: 1D array of hausdorff distances of geometries in each list.
+        :rtype: np.ndarray
 
         :example:
         >>> x = Polygon([[0,1], [0, 2], [1,1]])
@@ -3421,6 +3542,16 @@ class GeometryMixin(object):
                                       core_cnt: Optional[int] = -1) -> List[float]:
         """
         The Hausdorff distance measure of the similarity between sequential time-series  geometries.
+
+        .. seealso::
+           For single core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.hausdorff_distance`
+
+        :param List[Union[Polygon, LineString]] geometries: List of geometries.
+        :param Optional[Union[float, int]] lag: If int, then the number of frames preceeding the current frame to compare the geometry with. Eg., 1 compares the geometry to the immediately preceeding geometry. If float, then evaluated as seconds. E.g., 1 compares the geometry to the geometry 1s prior in the geometries list.
+        :param Optional[Union[float, int]] sample_rate: The FPS of the recording. Used as conversion factor if lag is a float.
+        :param Optional[int] core_cnt: The number of cores to use for parallel processing. Default is -1, which uses the maximum available cores.
+        :returns: List of Hausdorff distance measures.
+        :rtype: List[float].
 
         :example:
         >>> df = read_df(file_path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/csv/outlier_corrected_movement_location/SI_DAY3_308_CD1_PRESENT.csv', file_type='csv')
@@ -3472,7 +3603,7 @@ class GeometryMixin(object):
     def locate_line_point(path: Union[LineString, np.ndarray],
                           geometry: Union[LineString, Polygon, Point],
                           px_per_mm: Optional[float] = 1,
-                          fps: Optional[float] = 1,
+                          fps: Optional[Union[float, int]] = 1,
                           core_cnt: Optional[int] = -1,
                           distance_min: Optional[bool] = True,
                           time_prior: Optional[bool] = True) -> Dict[str, float]:
@@ -3488,6 +3619,16 @@ class GeometryMixin(object):
         .. image:: _static/img/locate_line_point.png
            :width: 600
            :align: center
+
+
+        :param Union[LineString, np.ndarray] path: A LineString or a 2D array with keypoints across time.
+        :param Union[LineString, Polygon, Point] geometry: A geometry of intrest.
+        :param float px_per_mm: Pixels per millimeter conversion factor.
+        :param Optional[Union[float, int]] sample_rate: The FPS of the recording used as conversion factor for time.
+        :param Optional[int] core_cnt: The number of cores to use for parallel processing. Default is -1, which uses the maximum available cores.
+        :param Optional[bool] distance_min: If True, uses the minimim distance between the geometry and the path as the reference point. Else, uses the maximum. Default: True.
+        :param Optional[bool] time_prior: If True, returns the time/distance BEFORE reaching the proximal/distal point in relation to the geometry. Else, returns the time/distance AFTER reaching the proximal/distal point in relation to the geometry. Default True.
+        :rtype: Dict[str, float]
 
         :example:
         >>> line = LineString([[10, 10], [7.5, 7.5], [15, 15], [7.5, 7.5]])
@@ -3571,11 +3712,9 @@ class GeometryMixin(object):
 
     @staticmethod
     @njit("(float32[:,:], float32[:,:], int64)")
-    def linear_frechet_distance(
-        x: np.ndarray, y: np.ndarray, sample: int = 100
-    ) -> float:
+    def linear_frechet_distance(x: np.ndarray, y: np.ndarray, sample: int = 100) -> float:
         """
-        Compute the Linear Fréchet Distance between two trajectories.
+        Jitted compute the Linear Fréchet Distance between two trajectories.
 
         The Fréchet Distance measures the dissimilarity between two continuous
         curves or trajectories represented as sequences of points in a 2-dimensional
@@ -3584,9 +3723,11 @@ class GeometryMixin(object):
         :param ndarray data: First 2D array of size len(frames) representing body-part coordinates x and y.
         :param ndarray data: Second 2D array of size len(frames) representing body-part coordinates x and y.
         :param int sample: The downsampling factor for the trajectories (default is 100If sample > 1, the trajectories are downsampled by selecting every sample-th point.
+        :returns: Linear Fréchet Distance between two trajectories
+        :rtype: float
 
         .. note::
-           Slightly modified from `João Paulo Figueira <https://github.com/joaofig/discrete-frechet/blob/ff5629e5a43cfad44d5e962f4105dd25c90b9289/distances/discrete.py#L67>`_
+           Modified from `João Paulo Figueira <https://github.com/joaofig/discrete-frechet/blob/ff5629e5a43cfad44d5e962f4105dd25c90b9289/distances/discrete.py#L67>`_
 
         :example:
         >>> x = np.random.randint(0, 100, (10000, 2)).astype(np.float32)
@@ -3622,10 +3763,10 @@ class GeometryMixin(object):
         Convert SimBA dataframes holding ROI geometries to nested dictionary holding Shapley polygons.
 
         :example:
-        >>> #config_path = '/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini'
-        >>> #config = ConfigReader(config_path=config_path)
-        >>> #config.read_roi_data()
-        >>> #GeometryMixin.simba_roi_to_geometries(rectangles_df=config.rectangles_df, circles_df=config.circles_df, polygons_df=config.polygon_df)
+        >>> config_path = '/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini'
+        >>> config = ConfigReader(config_path=config_path)
+        >>> config.read_roi_data()
+        >>> GeometryMixin.simba_roi_to_geometries(rectangles_df=config.rectangles_df, circles_df=config.circles_df, polygons_df=config.polygon_df)
         """
 
         results_roi, results_clr = {}, {}
@@ -3788,6 +3929,9 @@ class GeometryMixin(object):
         .. image:: _static/img/keypoints_to_axis_aligned_bounding_box.webp
            :width: 400
            :align: center
+
+        .. seealso::
+           For minimum rotated bounding boxes, see :func:`simba.mixins.geometry_mixin.GeometryMixin.minimum_rotated_rectangle` or :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_minimum_rotated_rectangle`
 
         :param np.ndarray keypoints: A 3D array of shape (N, M, 2) where N is the number of observations, and each observation contains M points in 2D space (x, y).
         :return: A 3D array of shape (N, 4, 2), where each entry represents the four corners of the axis-aligned  bounding box corresponding to each set of keypoints.

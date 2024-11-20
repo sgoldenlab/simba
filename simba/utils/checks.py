@@ -115,7 +115,7 @@ def check_int(name: str,
 
 def check_str(name: str,
               value: Any,
-              options: Optional[Tuple[Any]] = (),
+              options: Optional[Union[Tuple[Any], List[Any]]] = (),
               allow_blank: bool = False,
               invalid_options: Optional[List[str]] = None,
               raise_error: bool = True) -> (bool, str):
@@ -800,7 +800,7 @@ def check_that_dir_has_list_of_filenames(
 
 def check_valid_array(data: np.ndarray,
                       source: Optional[str] = "",
-                      accepted_ndims: Optional[Tuple[int]] = None,
+                      accepted_ndims: Optional[Union[Tuple[int], Any]] = None,
                       accepted_sizes: Optional[List[int]] = None,
                       accepted_axis_0_shape: Optional[List[int]] = None,
                       accepted_axis_1_shape: Optional[List[int]] = None,
@@ -904,7 +904,7 @@ def check_valid_array(data: np.ndarray,
 
 def check_valid_lst(data: list,
                     source: Optional[str] = "",
-                    valid_dtypes: Optional[Union[Tuple[Any], List[Any]]] = None,
+                    valid_dtypes: Optional[Union[Tuple[Any], List[Any], Any]] = None,
                     valid_values: Optional[List[Any]] = None,
                     min_len: Optional[int] = 1,
                     max_len: Optional[int] = None,

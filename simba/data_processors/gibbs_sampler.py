@@ -7,6 +7,30 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.checks import check_valid_array, check_float, check_int, check_if_dir_exists
 
 class GibbSampler():
+
+    """
+     Gibbs sampling for finding "motifs" in categorical sequences.
+
+     :param np.ndarray data: 2-dimensional array where observations are organised by row and each sequential sample in the observation is organized by column.
+     :param Union[str, os.PathLike] save_path: The path location where to save the CSV results.
+     :param int sequence_length: The length of the motif sequence searched for.
+     :param int iterations: Number of iterations per epoch. Default: 1500.
+     :param int epochs: Number of epochs of iterations. Default: 4.
+     :param float stop_val: Terminate once the error value reaches below this threshold. Default 0.001.
+     :param int plateau_val: Terminate epoch when error rate has remained unchanged for ``plateau_val`` count of iterations. Default 50.
+     :param float pseudo_number: Small error value for fuzzy search and avoid division by zero errors. Default: 10e-6.
+
+     :example:
+     >>> data = pd.read_csv(r"/Users/simon/Desktop/envs/simba/simba/tests/data/sample_data/gibbs_sample_cardinal.csv", index_col=0).values
+     >>> sampler = GibbSampler(data=data, save_path=r'/Users/simon/Desktop/gibbs.csv', epochs=5, iterations=600)
+     >>> sampler.run()
+
+     :references:
+        .. [1] Lawrence et al, Detecting Subtle Sequence Signals: a Gibbs Sampling Strategy for Multiple Alignment, Science, vol. 262, pp. 208-214, 1993.
+        .. [2] Great YouTube tutorial / explanation by Xiaole Shirley Liu - `https://www.youtube.com/watch?v=NRjhfyXWHuQ <https://www.youtube.com/watch?v=NRjhfyXWHuQ>`_.
+        .. [3] Weinreb et al. Keypoint-MoSeq: parsing behavior by linking point tracking to pose dynamics, Nature Methods, 21, 1329–1339 (2024).
+     """
+
     def __init__(self,
                  data: np.ndarray,
                  save_path: Union[str, os.PathLike],
@@ -16,30 +40,6 @@ class GibbSampler():
                  stop_val: float = 0.001,
                  pseudo_number: float = 10e-6,
                  plateau_val: int = 50):
-
-        """
-        Gibbs sampling for finding "motifs" in categorical sequences.
-
-        :param np.ndarray data: 2-dimensional array where observations are organised by row and each sequential sample in the observation is organized by column.
-        :param Union[str, os.PathLike] save_path: The path location where to save the CSV results.
-        :param int sequence_length: The length of the motif sequence searched for.
-        :param int iterations: Number of iterations per epoch. Default: 1500.
-        :param int epochs: Number of epochs of iterations. Default: 4.
-        :param float stop_val: Terminate once the error value reaches below this threshold. Default 0.001.
-        :param int plateau_val: Terminate epoch when error rate has remained unchanged for ``plateau_val`` count of iterations. Default 50.
-        :param float pseudo_number: Small error value for fuzzy search and avoid division by zero errors. Default: 10e-6.
-
-        :example:
-        >>> data = pd.read_csv(r"/Users/simon/Desktop/envs/simba/simba/tests/data/sample_data/gibbs_sample_cardinal.csv", index_col=0).values
-        >>> sampler = GibbSampler(data=data, save_path=r'/Users/simon/Desktop/gibbs.csv', epochs=5, iterations=600)
-        >>> sampler.run()
-
-        :references:
-           .. [1] Lawrence et.al, Detecting Subtle Sequence Signals: a Gibbs Sampling Strategy for Multiple Alignment, Science, vol. 262, pp. 208-214, 1993.
-           .. [2] Great YouTube tutorial / explanation by Xiaole Shirley Liu - `https://www.youtube.com/watch?v=NRjhfyXWHuQ <https://www.youtube.com/watch?v=NRjhfyXWHuQ>`_.
-           .. [3] Weinreb et al. Keypoint-MoSeq: parsing behavior by linking point tracking to pose dynamics, Nature Methods, 21, 1329–1339 (2024).
-        """
-
 
         check_valid_array(data=data, source=f'{self.__class__.__name__} data', accepted_ndims=(2,))
         check_float(name=f'{self.__class__.__name__} stop_val', value=stop_val, min_value=0.0)
