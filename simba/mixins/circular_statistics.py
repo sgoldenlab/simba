@@ -4,10 +4,11 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 from numba import float32, float64, int64, jit, njit, prange, typed, types
-from simba.utils.checks import check_valid_array, check_float
+
+from simba.utils.checks import check_float, check_valid_array
+from simba.utils.data import get_mode
 from simba.utils.enums import Formats
 from simba.utils.errors import InvalidInputError
-from simba.utils.data import get_mode
 
 
 class CircularStatisticsMixin(object):

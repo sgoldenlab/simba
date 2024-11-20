@@ -1,16 +1,20 @@
-from typing import Optional, Dict, List
+from typing import Dict, List, Optional
+
 import numpy as np
 import pandas as pd
 import xgboost as xgb
 from sklearn.model_selection import StratifiedKFold
-from simba.utils.checks import check_valid_array, check_int, check_valid_lst, check_str, check_float, check_instance, check_valid_dataframe
+
+from simba.model.regression.metrics import (mean_absolute_error,
+                                            mean_absolute_percentage_error,
+                                            mean_squared_error, r2_score,
+                                            root_mean_squared_error)
+from simba.utils.checks import (check_float, check_instance, check_int,
+                                check_str, check_valid_array,
+                                check_valid_dataframe, check_valid_lst)
 from simba.utils.enums import Formats
 from simba.utils.errors import DataHeaderError
-from simba.model.regression.metrics import (mean_absolute_percentage_error,
-                                            mean_squared_error,
-                                            mean_absolute_error,
-                                            r2_score,
-                                            root_mean_squared_error)
+
 
 def fit_xgb(x: pd.DataFrame,
             y: np.ndarray,
