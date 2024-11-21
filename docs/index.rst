@@ -9,7 +9,10 @@ Welcome to SimBA's documentation!
 These docs are under development. For detailed tutorials, code, and more extensive documentation
 see the `SimBA GitHub repository <https://github.com/sgoldenlab/simba>`_.
 
-For support, see `SimBA Gitter channel <https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im>`_.
+If you find any of the codebase or associated documentation useful, please `cite us <https://www.nature.com/articles/s41593-024-01649-9>`_.
+
+For support, see the `SimBA Gitter channel <https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im>`_.
+
 
 INSTALLATION
 ------------------------
