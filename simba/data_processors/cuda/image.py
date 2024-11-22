@@ -19,10 +19,12 @@ from copy import deepcopy
 
 import cv2
 import numpy as np
+
 try:
     from cupyx.scipy.ndimage import rotate
 except:
     from scipy.ndimage import rotate
+
 from numba import cuda
 
 from simba.data_processors.cuda.utils import _cuda_mse
