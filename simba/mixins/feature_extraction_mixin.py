@@ -533,7 +533,6 @@ class FeatureExtractionMixin(object):
         >>>    2         89               41.0
 
         """
-        check
         data_df_shifted = df.shift(periods=periods)
         data_df_shifted = data_df_shifted.combine_first(df).add_suffix(suffix)
         return pd.concat([df, data_df_shifted], axis=1, join="inner").reset_index(drop=True)

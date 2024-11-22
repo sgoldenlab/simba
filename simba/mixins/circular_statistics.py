@@ -1122,9 +1122,7 @@ class CircularStatisticsMixin(object):
 
     @staticmethod
     @njit("(float32[:], int64[:, :], float64, float64)")
-    def sliding_circular_hotspots(
-        data: np.ndarray, bins: np.ndarray, time_window: float, fps: float
-    ) -> np.ndarray:
+    def sliding_circular_hotspots(data: np.ndarray, bins: np.ndarray, time_window: float, fps: float) -> np.ndarray:
         """
         Jitted compute of sliding circular hotspots in a dataset. Calculates circular hotspots in a time-series dataset by sliding a time window
         across the data and computing hotspot statistics for specified circular bins.

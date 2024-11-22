@@ -434,11 +434,12 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture], f
     if isinstance(video_path, str):
         check_file_exist_and_readable(file_path=video_path)
         cap = cv2.VideoCapture(video_path)
+        _, video_data["video_name"], _ = get_fn_ext(video_path)
     elif isinstance(video_path, cv2.VideoCapture):
         cap = video_path
+        video_data["video_name"] = ''
     else:
         raise InvalidInputError(msg=f'video_path is neither a file path or a cv2.VideoCapture: {type(video_path)}', source=get_video_meta_data.__name__)
-    _, video_data["video_name"], _ = get_fn_ext(video_path)
     video_data["fps"] = cap.get(cv2.CAP_PROP_FPS)
     if fps_as_int:
         video_data["fps"] = int(video_data["fps"])

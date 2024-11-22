@@ -163,3 +163,20 @@ Egocentric data / video alignment
 .. automodule:: simba.data_processors.egocentric_aligner
    :members:
    :undoc-members:
+
+
+Heuristic circling detector
+------------------------------------------------------------
+
+.. automodule:: simba.data_processors.circling_detector
+   :members:
+   :undoc-members:
+
+
+Heuristic freezing detector
+------------------------------------------------------------
+
+.. automodule:: simba.data_processors.freezing_detector
+   :members:
+   :undoc-members:
+

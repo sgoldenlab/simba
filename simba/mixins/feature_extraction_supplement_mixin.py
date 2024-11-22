@@ -179,8 +179,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
     @staticmethod
     @jit(nopython=True)
-    def rolling_categorical_switches_ratio(data: np.ndarray, time_windows: np.ndarray, fps: int
-    ) -> np.ndarray:
+    def rolling_categorical_switches_ratio(data: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Compute the ratio of in categorical feature switches within rolling windows.
 

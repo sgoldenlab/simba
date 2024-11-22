@@ -18,6 +18,8 @@ import cv2
 import numpy as np
 from PIL import Image, ImageTk
 from shapely.geometry import Polygon
+from skimage.segmentation import slic
+from skimage.color import label2rgb
 
 try:
     from typing import Literal
@@ -35,7 +37,7 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_nvidea_gpu_available, check_str,
                                 check_that_hhmmss_start_is_before_end,
                                 check_valid_boolean, check_valid_lst,
-                                check_valid_tuple)
+                                check_valid_tuple, check_if_valid_img)
 from simba.utils.data import find_frame_numbers_from_time_stamp
 from simba.utils.enums import OS, ConfigKey, Defaults, Formats, Options, Paths
 from simba.utils.errors import (CountError, DirectoryExistError,
@@ -62,6 +64,7 @@ from simba.video_processors.extract_frames import video_to_frames
 from simba.video_processors.roi_selector import ROISelector
 from simba.video_processors.roi_selector_circle import ROISelectorCircle
 from simba.video_processors.roi_selector_polygon import ROISelectorPolygon
+
 
 MAX_FRM_SIZE = 1080, 650
 
@@ -114,10 +117,15 @@ def convert_to_jpeg(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]]
        :width: 200
        :align: center
 
-    :parameter Union[str, os.PathLike] directory: Path to directory holding image files, a single image file, or a list of paths to image files.
-    :parameter Optional[int] quality: The quality of the output images (0-100).
+    .. seealso::
+       For BMP images, see :func:`~simba.video_processors.video_processing.convert_to_bmp`. For PNG, see :func:`~simba.video_processors.video_processing.convert_to_png`.
+       For TIFF, see :func:`~simba.video_processors.video_processing.convert_to_tiff`. For WEBP, see :func:`~simba.video_processors.video_processing.convert_to_webp`.
+
+    :param Union[str, os.PathLike] directory: Path to directory holding image files, a single image file, or a list of paths to image files.
+    :param Optional[int] quality: The quality of the output images (0-100).
     :param Optional[bool] save_dir: If not None, then the directory where to store converted images. If None, then stores the images in a subdirectory within the first passed image directory.
-    :parameter Optional[bool] verbose: If True, prints progress. Default False.
+    :param Optional[bool] verbose: If True, prints progress. Default False.
+    :returns: None. New images are saved in ``save_dir``.
 
     :example:
     >>> convert_to_jpeg(path='/Users/simon/Desktop/imgs', verbose=False, quality=15)
@@ -164,10 +172,14 @@ def convert_to_bmp(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]],
     """
     Convert images in a directory to BMP format.
 
+    .. seealso::
+       For JEPG, see :func:`~simba.video_processors.video_processing.convert_to_jpeg`. For PNG, see :func:`~simba.video_processors.video_processing.convert_to_png`.
+       For TIFF, see :func:`~simba.video_processors.video_processing.convert_to_tiff`. For WEBP, see :func:`~simba.video_processors.video_processing.convert_to_webp`.
+
     :param Union[str, os.PathLike] path: path to directory containing images, or path to a single image file, or a list of paths to image files.
     :param Optional[bool] save_dir: If not None, then the directory where to store converted images. If None, then stores the images in a subdirectory within the first passed image directory.
     :param Optional[bool] verbose: If True, print conversion progress. Default is False.
-    :return: None.
+    :returns: None. New images are saved in ``save_dir``.
 
     :example:
     >>> convert_to_bmp(path='/Users/simon/Desktop/test_jpg_/landing_40.jpeg', save_dir='/Users/simon/Desktop/test_jpg_/test__')
@@ -214,10 +226,14 @@ def convert_to_png(path: Union[str, os.PathLike],
     """
     Convert images to PNG format.
 
+    .. seealso::
+       For BMP images, see :func:`~simba.video_processors.video_processing.convert_to_bmp`. For JEPG, see :func:`~simba.video_processors.video_processing.convert_to_jpeg`.
+       For TIFF, see :func:`~simba.video_processors.video_processing.convert_to_tiff`. For WEBP, see :func:`~simba.video_processors.video_processing.convert_to_webp`.
+
     :param Union[str, os.PathLike] path: path to directory containing images, or path to a single image file, or a list of paths to image files.
     :param Optional[bool] save_dir: If not None, then the directory where to store converted images. If None, then stores the images in a subdirectory within the first passed image directory.
     :param Optional[bool] verbose: If True, print conversion progress. Default is False.
-    :return: None.
+    :returns: None. New images are saved in ``save_dir``.
 
     :example:
     >>> convert_to_png(path=['/Users/simon/Desktop/test_jpg_/test__/landing_40.bmp', '/Users/simon/Desktop/test_jpg_/landing_30.jpeg'], save_dir='/Users/simon/Desktop/test_jpg_/test__/HELLO_3')
@@ -264,11 +280,15 @@ def convert_to_tiff(directory: Union[str, os.PathLike],
     """
     Convert images in a directory to TIFF format.
 
+     .. seealso::
+       For BMP images, see :func:`~simba.video_processors.video_processing.convert_to_bmp`. For JEPG, see :func:`~simba.video_processors.video_processing.convert_to_jpeg`.
+       For PNG, see :func:`~simba.video_processors.video_processing.convert_to_png`. For WEBP, see :func:`~simba.video_processors.video_processing.convert_to_webp`.
+
     :param Union[str, os.PathLike] directory: The directory containing the images.
     :param Optional[bool] stack: If True, create a TIFF stack from the images. Default is False.
     :param Literal['raw', 'tiff_deflate', 'tiff_lzw'] compression: Compression method for the TIFF file. Options are 'raw' (no compression), 'tiff_deflate', and 'tiff_lzw'. Default is 'raw'.
     :param Optional[bool] verbose: If True, print conversion progress. Default is False.
-    :return: None.
+    :returns: None. New images are saved in ``save_dir``.
 
     :example:
     >>> convert_to_tiff('/Users/simon/Desktop/imgs', stack=True, compression='tiff_lzw')
@@ -318,7 +338,7 @@ def convert_to_tiff(directory: Union[str, os.PathLike],
 def convert_to_webp(path: Union[str, os.PathLike],
                     quality: Optional[int] = 95,
                     save_dir: Optional[Union[str, os.PathLike]] = None,
-                    verbose: Optional[bool] = True):
+                    verbose: Optional[bool] = True) -> None:
 
     """
     Convert the file type of all image files within a directory to WEBP format of passed quality.
@@ -327,10 +347,15 @@ def convert_to_webp(path: Union[str, os.PathLike],
        :width: 300
        :align: center
 
-    :parameter Union[str, os.PathLike] directory: Path to directory holding image files
-    :parameter Optional[int] quality: The quality of the output images (0-100).
+    .. seealso::
+       For BMP images, see :func:`~simba.video_processors.video_processing.convert_to_bmp`. For JEPG, see :func:`~simba.video_processors.video_processing.convert_to_jpeg`.
+       For PNG, see :func:`~simba.video_processors.video_processing.convert_to_png`. For TIFF, see :func:`~simba.video_processors.video_processing.convert_to_tiff`.
+
+    :param Union[str, os.PathLike] path: Path to directory holding image files
+    :param Optional[int] quality: The quality of the output images (0-100).
     :param Optional[bool] save_dir: If not None, then the directory where to store converted images. If None, then stores the images in a subdirectory within the first passed image directory.
-    :parameter Optional[bool] verbose: If True, prints progress. Default False.
+    :param Optional[bool] verbose: If True, prints progress. Default False.
+    :returns: None. New images are saved in ``save_dir``.
 
     :example:
     >>> convert_to_webp('/Users/simon/Desktop/imgs', quality=80)
@@ -372,16 +397,17 @@ def clahe_enhance_video(file_path: Union[str, os.PathLike],
                          out_path: Optional[Union[str, os.PathLike]] = None) -> None:
 
     """
-    Convert a single video file to clahe-enhanced greyscale .avi file. The result is saved with prefix
-    ``CLAHE_`` in the same directory as in the input file if out_path is not passed. Else saved at the out_path.
+    Convert a single video file to clahe-enhanced greyscale .avi file.
 
     .. image:: _static/img/clahe_enhance_video.gif
        :width: 800
        :align: center
 
-    :parameter Union[str, os.PathLike] file_path: Path to video file.
-    :parameter Optional[int] clip_limit: CLAHE amplification limit. Inccreased clip limit reduce noise in output. Default: 2.
-    :parameter Optional[Tuple[int]] tile_grid_size: The histogram kernel size.
+    :param Union[str, os.PathLike] file_path: Path to video file.
+    :param Optional[int] clip_limit: CLAHE amplification limit. Inccreased clip limit reduce noise in output. Default: 2.
+    :param Optional[Tuple[int]] tile_grid_size: The histogram kernel size.
+    :param Optional[Union[str, os.PathLike]] out_path:  The result is saved with prefix``CLAHE_`` in the same directory as in the input file if out_path is not passed. Else saved at the out_path.
+    :returns: None.
 
     :example:
     >>> _ = clahe_enhance_video(file_path: 'project_folder/videos/Video_1.mp4')
@@ -456,12 +482,14 @@ def extract_frame_range(file_path: Union[str, os.PathLike],
                         save_dir: Optional[Union[str, os.PathLike]] = None,
                         verbose: Optional[bool] = True) -> None:
     """
-    Extract a user-defined range of frames from a video file to `png` format. Images
-    are saved in a folder with the suffix `_frames` within the same directory as the video file.
+    Extract a user-defined range of frames from a video file to `png` format.
 
-    :parameter Union[str, os.PathLike] file_path: Path to video file
-    :parameter int start_frame: First frame in range to extract
-    :parameter int end_frame: Last frame in range to extract.
+    :param Union[str, os.PathLike] file_path: Path to video file
+    :param int start_frame: First frame in range to extract
+    :param int end_frame: Last frame in range to extract.
+    :param Optional[Union[str, os.PathLike]] save_dir: Optional save directory. Images are saved in a folder with the suffix `_frames` within the same directory as the video file, if None is passed.
+    :param Optional[bool] verbose: Wether to print progress. Default False.
+    :returns: None
 
     :example:
     >>> _ = extract_frame_range(file_path='project_folder/videos/Video_1.mp4', start_frame=100, end_frame=500)
@@ -510,6 +538,7 @@ def change_single_video_fps(file_path: Union[str, os.PathLike],
     :param Union[str, os.PathLike] file_path: Path to video file
     :param int fps: FPS of the new video file.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :returns: None
 
     :example:
     >>> _ = change_single_video_fps(file_path='project_folder/videos/Video_1.mp4', fps=15)
@@ -552,10 +581,11 @@ def change_fps_of_multiple_videos(path: Union[str, os.PathLike, List[Union[str, 
     Change the fps of all video files in a folder. Results are stored in the same directory as in the input files with
     the suffix ``_fps_new_fps``.
 
-    :parameter Union[str, os.PathLike] path: Path to video file directory, or a list of video file paths.
-    :parameter int fps: Fps of the new video files.
+    :param Union[str, os.PathLike] path: Path to video file directory, or a list of video file paths.
+    :param int fps: Fps of the new video files.
     :param Optional[bool] save_dir: If not None, then the directory where to store converted videos. If None, then stores the new videos in the same directory as the input video with the ``_new_fps.file_extension`` suffix.
-    :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :returns: None.
 
     :example:
     >>> _ = change_fps_of_multiple_videos(path='project_folder/videos/Video_1.mp4', fps=15)
@@ -604,11 +634,11 @@ def change_fps_of_multiple_videos(path: Union[str, os.PathLike, List[Union[str, 
 
 def convert_video_powerpoint_compatible_format(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
     """
-    Create MS PowerPoint compatible copy of a video file. The result is stored in the same directory as the
-    input file with the ``_powerpointready`` suffix.
+    Create MS PowerPoint compatible copy of a video file.
 
-    :parameter Union[str, os.PathLike] file_path: Path to video file.
-    :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param Union[str, os.PathLike] file_path: Path to video file.
+    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :returns: None. The result is stored in the same directory as the input file with the ``_powerpointready`` suffix.
 
     :example:
     >>> _ = convert_video_powerpoint_compatible_format(file_path='project_folder/videos/Video_1.mp4')
@@ -648,19 +678,21 @@ def convert_video_powerpoint_compatible_format(file_path: Union[str, os.PathLike
 
 def video_to_greyscale(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
     """
-    Convert a video file to greyscale mp4 format. The result is stored in the same directory as the
-    input file with the ``_grayscale.mp4`` suffix.
+    Convert a video file to greyscale mp4 format.
 
     .. image:: _static/img/to_greyscale.gif
        :width: 700
        :align: center
 
     .. seealso::
-       :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cupy`, :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cuda`,
-       :func:`simba.mixins.image_mixin.ImageMixin.img_stack_to_greyscale`, :func:`simba.video_processors.video_processing.batch_video_to_greyscale`
+       For GPU CuPY acceleration, see :func:`~simba.data_processors.cuda.image.img_stack_to_grayscale_cupy`
+       For GPU numba\ CUDA acceleration, see :func:`~simba.data_processors.cuda.image.img_stack_to_grayscale_cuda`,
+       For multicore CPU solutions, see :func:`~simba.mixins.image_mixin.ImageMixin.img_stack_to_greyscale` or :func:`~simba.video_processors.video_processing.batch_video_to_greyscale`
+       For single-core multivideo solution, see :func:`~simba.video_processors.video_processing.batch_video_to_greyscale`
 
-    :parameter Union[str, os.PathLike] file_path: Path to video file.
-    :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param Union[str, os.PathLike] file_path: Path to video file.
+    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :returns: The result is stored in the same directory as the input file with the ``_grayscale.mp4`` suffix.
     :raise FFMPEGCodecGPUError: If no GPU is found and ``gpu == True``.
     :raise FileExistError: If video name with ``_grayscale`` suffix already exist.
 
@@ -700,21 +732,23 @@ def batch_video_to_greyscale(path: Union[str, os.PathLike, List[Union[str, os.Pa
                              save_dir: Optional[Union[str, os.PathLike]] = None,
                              gpu: Optional[bool] = False) -> None:
     """
-    Convert a directory of video file to greyscale mp4 format. The results are stored in the same directory as the
-    input files with the ``_grayscale.mp4`` suffix.
+    Convert a directory of video file to greyscale mp4 format.
 
     .. image:: _static/img/to_greyscale.gif
        :width: 700
        :align: center
 
     .. seealso::
-       :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cupy`, :func:`simba.data_processors.cuda.image.img_stack_to_grayscale_cuda`,
-       :func:`simba.mixins.image_mixin.ImageMixin.img_stack_to_greyscale`, :func:`simba.video_processors.video_processing.video_to_greyscale`
+       For GPU CuPY acceleration, see :func:`~simba.data_processors.cuda.image.img_stack_to_grayscale_cupy`
+       For GPU numba\ CUDA acceleration, see :func:`~simba.data_processors.cuda.image.img_stack_to_grayscale_cuda`,
+       For multicore CPU solutions, see :func:`~simba.mixins.image_mixin.ImageMixin.img_stack_to_greyscale` or :func:`~simba.video_processors.video_processing.batch_video_to_greyscale`
+       For single-core single video solution, see :func:`~simba.video_processors.video_processing.video_to_greyscale`
 
     :param Union[str, os.PathLike] path: Path to directory holding video files in color, or a list of file paths to videos in color.
     :param Optional[bool] save_dir: If not None, then the directory where to store converted videos. If None, then stores the new videos in the same directory as the input video with the ``_grayscale`` suffix.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :raise FFMPEGCodecGPUError: If no GPU is found and ``gpu == True``.
+    :returns: None.
 
     :example:
     >>> _ = batch_video_to_greyscale(path='/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/test_2')
@@ -765,8 +799,7 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
                             fontsize: Optional[int] = 20) -> None:
 
     """
-    Superimpose frame count on a video file. The result is stored in the same directory as the
-    input file with the ``_frame_no.mp4`` suffix if ``save_path`` is None.
+    Superimpose frame count on a video file.
 
     .. image:: _static/img/superimpose_frame_count.png
        :width: 700
@@ -784,6 +817,7 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
     :parameter Optional[str] loc: The location of the font number text. Options: 'top_left', 'top_middle', 'top_right', 'bottom_left', 'bottom_middle', 'bottom_right'. Default: Bottom middle.
     :parameter Optional[str] bg_color: The color of the box which the frame number is printed in. Default: 'White'.
     :parameter Optional[str] font: The font to use for the frame number. Default Arial.
+    :returns: None. The result is stored in the same directory as the input file with the ``_frame_no.mp4`` suffix if ``save_path`` is None.
 
     :example:
     >>> _ = superimpose_frame_count(file_path='/Users/simon/Downloads/1_LH_0_3.mp4', fontsize=90)
@@ -841,13 +875,13 @@ def remove_beginning_of_video(file_path: Union[str, os.PathLike],
                               gpu: Optional[bool] = False) -> None:
 
     """
-    Remove N seconds from the beginning of a video file. If save_path is not passed,
-    the result is stored in the same directory as the input file with the ``_shorten.mp4`` suffix.
+    Remove N seconds from the beginning of a video file.
 
     :param Union[str, os.PathLike] file_path: Path to video file
     :param int time: Number of seconds to remove from the beginning of the video.
     :param Optional[Union[str, os.PathLike]] save_path: Optional save location for the shortened video. If None, then the new video is saved in the same directory as the input video with the ``_shortened`` suffix.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :returns: None. If save_path is not passed, the result is stored in the same directory as the input file with the ``_shorten.mp4`` suffix.
 
     :example:
     >>> _ = remove_beginning_of_video(file_path='project_folder/videos/Video_1.avi', time=10)
@@ -887,16 +921,16 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
                         include_clip_time_in_filename: Optional[bool] = False,
                         gpu: Optional[bool] = False) -> None:
     """
-    Clip video within a specific range. The result is stored in the same directory as the
-    input file with the ``_clipped.mp4`` suffix.
+    Clip video within a specific range.
 
-    :parameter Union[str, os.PathLike] file_path: Path to video file
-    :parameter str start_time: Start time in HH:MM:SS format.
-    :parameter str end_time: End time in HH:MM:SS format.
-    :parameter Optional[Union[str, os.PathLike]] out_dir: If None, then the clip will be stored in the same dir as the input video. If directory, then the location of the output files.
-    :parameter Optional[bool] include_clip_time_in_filename: If True, include the clip start and end in HH-MM-SS format as suffix in the filename. If False, then use integer suffic representing the count.
-    :parameter Optional[bool] overwrite: If True, the overwrite output file if path already exist. If False, then raise FileExistError.
-    :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param Union[str, os.PathLike] file_path: Path to video file
+    :param str start_time: Start time in HH:MM:SS format.
+    :param str end_time: End time in HH:MM:SS format.
+    :param Optional[Union[str, os.PathLike]] out_dir: If None, then the clip will be stored in the same dir as the input video. If directory, then the location of the output files.
+    :param Optional[bool] include_clip_time_in_filename: If True, include the clip start and end in HH-MM-SS format as suffix in the filename. If False, then use integer suffic representing the count.
+    :param Optional[bool] overwrite: If True, the overwrite output file if path already exist. If False, then raise FileExistError.
+    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :returns: If None, then the clip will be stored in the same dir as the input video with the ``_clipped.mp4`` suffix. If directory, then the location of the output files.
 
     :example:
     >>> _ = clip_video_in_range(file_path='project_folder/videos/Video_1.avi', start_time='00:00:05', end_time='00:00:10')
@@ -942,13 +976,13 @@ def downsample_video(file_path: Union[str, os.PathLike],
                      video_width: int,
                      gpu: Optional[bool] = False) -> None:
     """
-    Down-sample a video file. The result is stored in the same directory as the
-    input file with the ``_downsampled.mp4`` suffix.
+    Down-sample a video file.
 
-    :parameter Union[str, os.PathLike] file_path: Path to video file.
-    :parameter int video_height: height of new video.
-    :parameter int video_width: width of new video.
-    :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param Union[str, os.PathLike] file_path: Path to video file.
+    :param int video_height: height of new video.
+    :param int video_width: width of new video.
+    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :returns: None. The result is stored in the same directory as the input file with the ``_downsampled.mp4`` suffix.
 
     :example:
     >>> _ = downsample_video(file_path='project_folder/videos/Video_1.avi', video_height=600, video_width=400)
@@ -1053,20 +1087,18 @@ def gif_creator(file_path: Union[str, os.PathLike],
     stdout_success(msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str, source=gif_creator.__name__)
 
 
-def batch_convert_video_format(
-    directory: Union[str, os.PathLike],
-    input_format: str,
-    output_format: str,
-    gpu: Optional[bool] = False,
-) -> None:
+def batch_convert_video_format(directory: Union[str, os.PathLike],
+                               input_format: str,
+                               output_format: str,
+                               gpu: Optional[bool] = False) -> None:
     """
-    Batch convert all videos in a folder of specific format into a different video format. The results are
-    stored in the same directory as the input files.
+    Batch convert all videos in a folder of specific format into a different video format.
 
     :parameter Union[str, os.PathLike] directory: Path to video file directory.
     :parameter str input_format: Format of the input files (e.g., avi).
     :parameter str output_format: Format of the output files (e.g., mp4).
     :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :returns: None. The results are stored in the same directory as the input files.
 
     :example:
     >>> _ = batch_convert_video_format(directory='project_folder/videos', input_format='avi', output_format='mp4')
@@ -1137,10 +1169,10 @@ def batch_convert_video_format(
 
 def batch_create_frames(directory: Union[str, os.PathLike]) -> None:
     """
-    Extract all frames for all videos in a directory. Results are stored within sub-directories in the input
-    directory named according to the video files.
+    Extract all frames for all videos in a directory.
 
     :parameter str directory: Path to directory containing video files.
+    :returns: None. Results are stored within sub-directories in the input directory named according to the video files.
 
     :example:
     >>> _ = batch_create_frames(directory='project_folder/videos')
@@ -1190,9 +1222,10 @@ def extract_frames_single_video(file_path: Union[str, os.PathLike],
     .. note::
        Image frames are saved as PNG files named with integers in order of appearance, i.e., ``0.png, 1.png ...``
 
-    :parameter Union[str, os.PathLike] file_path: Path to video file.
-    :parameter Optional[Union[str, os.PathLike]] save_dir: Optional directory where to save the frames. If ``save_dir`` is not passed,
-    results are stored within a subdirectory in the same directory as the input file.
+    :param Union[str, os.PathLike] file_path: Path to video file.
+    :param Optional[Union[str, os.PathLike]] save_dir: Optional directory where to save the frames. If ``save_dir`` is not passed, results are stored within a subdirectory in the same directory as the input file.
+    :returns: None
+
 
     :example:
     >>> _ = extract_frames_single_video(file_path='project_folder/videos/Video_1.mp4')
@@ -1217,23 +1250,22 @@ def extract_frames_single_video(file_path: Union[str, os.PathLike],
 #_ = extract_frames_single_video(file_path='/Users/simon/Desktop/video_test/Screen Recording 2024-05-06 at 1.23.31 PM_clipped.mp4')
 
 
-def multi_split_video(
-    file_path: Union[str, os.PathLike],
-    start_times: List[str],
-    end_times: List[str],
-    out_dir: Optional[Union[str, os.PathLike]] = None,
-    include_clip_time_in_filename: Optional[bool] = False,
-    gpu: Optional[bool] = False,
-) -> None:
+def multi_split_video(file_path: Union[str, os.PathLike],
+                      start_times: List[str],
+                      end_times: List[str],
+                      out_dir: Optional[Union[str, os.PathLike]] = None,
+                      include_clip_time_in_filename: Optional[bool] = False,
+                      gpu: Optional[bool] = False) -> None:
     """
     Divide a video file into multiple video files from specified start and stop times.
 
-    :parameter str file_path: Path to input video file.
-    :parameter List[str] start_times: Start times in HH:MM:SS format.
-    :parameter List[str] end_times: End times in HH:MM:SS format.
-    :parameter Optional[Union[str, os.PathLike]] out_dir: If None, then the clips will be stored in the same dir as the input video. If directory, then the location of the output files.
-    :parameter Optional[bool] include_clip_time_in_filename: If True, include the clip start and end in HH-MM-SS format as suffix in the filename. If False, then use integer suffic representing the count.
-    :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param str file_path: Path to input video file.
+    :param List[str] start_times: Start times in HH:MM:SS format.
+    :param List[str] end_times: End times in HH:MM:SS format.
+    :param Optional[Union[str, os.PathLike]] out_dir: If None, then the clips will be stored in the same dir as the input video. If directory, then the location of the output files.
+    :param Optional[bool] include_clip_time_in_filename: If True, include the clip start and end in HH-MM-SS format as suffix in the filename. If False, then use integer suffic representing the count.
+    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :returns: None.
 
     :example:
     >>> _ = multi_split_video(file_path='project_folder/videos/Video_1.mp4', start_times=['00:00:05', '00:00:20'], end_times=['00:00:10', '00:00:25'])
@@ -1306,18 +1338,20 @@ def multi_split_video(
 
 def crop_single_video(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
     """
-    Crop a single video using ``simba.video_processors.roi_selector.ROISelector`` interface. Results is saved in the same directory as input video with the
-    ``_cropped.mp4`` suffix`.
+    Crop a single video using :func:`~simba.video_processors.roi_selector.ROISelector` interface.
+
+    Results is saved in the same directory as input video with the ``_cropped.mp4`` suffix`.
 
     .. image:: _static/img/crop_single_video.gif
        :width: 700
        :align: center
 
     .. seealso::
-       :func:`simba.video_processors.video_processing.crop_multiple_videos`
+       To crop multiple videos, see :func:`~simba.video_processors.video_processing.crop_multiple_videos`
 
-    :parameter str file_path: Path to video file.
-    :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param str file_path: Path to video file.
+    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :returns: None. Results is saved in the same directory as input video with the ``_cropped.mp4`` suffix`.
 
     :example:
     >>> _ = crop_single_video(file_path='project_folder/videos/Video_1.mp4')
@@ -1369,23 +1403,20 @@ def crop_single_video(file_path: Union[str, os.PathLike], gpu: Optional[bool] = 
 # crop_single_video(file_path=r'C:\Users\Nape_Computer_2\Desktop\test_videos\Box1_PM2_day_5_20211104T171021.mp4', gpu=False)
 
 
-def crop_multiple_videos(
-    directory_path: Union[str, os.PathLike],
-    output_path: Union[str, os.PathLike],
-    gpu: Optional[bool] = False,
-) -> None:
+def crop_multiple_videos(directory_path: Union[str, os.PathLike], output_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
     """
     Crop multiple videos in a folder according to crop-coordinates defined in the **first** video.
 
     .. seealso::
-       :func:`simba.video_processors.video_processing.crop_single_video`
+       To crop one video, see :func:`simba.video_processors.video_processing.crop_single_video`
 
+    .. note::
+       Calls the :func:`~simba.video_processors.roi_selector.ROISelector` interface.
 
-    :parameter str directory_path: Directory containing input videos.
-    :parameter str output_path: Directory where to save the cropped videos.
-    :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
-
-
+    :param Union[str, os.PathLike] directory_path: Directory containing input videos.
+    :param Union[str, os.PathLike] output_path: Directory where to save the cropped videos.
+    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :returns: None. Results are stores in passed ``output_path``.
 
     :example:
     >>> _ = crop_multiple_videos(directory_path='project_folder/videos', output_path='project_folder/videos/my_new_folder')
@@ -1486,11 +1517,12 @@ def frames_to_movie(directory: Union[str, os.PathLike],
     .. note::
        The Image files have to have ordered numerical names e.g., ``1.png``, ``2.png`` etc...
 
-    :parameter str directory: Directory containing the images.
-    :parameter int fps: The frame rate of the output video.
-    :parameter int quality: Integer representing quatlity of the output video: 10, 20, 30.. 100. Higher values gives larger videos at higher quality. Higher values may negatively affect runtime.
-    :parameter Optional[Literal['mp4', 'avi', 'webm', 'mov']] out_format: The format of the output video: 'mp4', 'avi', 'webm', or 'mov'. Default: mp4.
-    :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param str directory: Directory containing the images.
+    :param int fps: The frame rate of the output video.
+    :param int quality: Integer representing quatlity of the output video: 10, 20, 30.. 100. Higher values gives larger videos at higher quality. Higher values may negatively affect runtime.
+    :param Optional[Literal['mp4', 'avi', 'webm', 'mov']] out_format: The format of the output video: 'mp4', 'avi', 'webm', or 'mov'. Default: mp4.
+    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :results: None. The video is stored in the same directory as the frames, named after the directory.
 
     :example:
     >>> frames_to_movie(directory='/Users/simon/Desktop/blah', fps=60, quality=60, out_format='mp4')
@@ -1549,7 +1581,8 @@ def video_concatenator(video_one_path: Union[str, os.PathLike],
     :param str video_two_path: Path to the second video in the concatenated video
     :param int or str resolution: If str, then the name of the video which resolution you want to retain. E.g., `Video_1`. Else int, representing the video width (if vertical concat) or height (if horizontal concat). Aspect raio will be retained.
     :param horizontal: If true, then horizontal concatenation. Else vertical concatenation.
-    :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :returns: None. The video is stored in the same directory as the ``video_one_path`` using the video names concatenated as filename.
 
     :example:
     >>> video_concatenator(video_one_path='project_folder/videos/Video_1.mp4', video_two_path='project_folder/videos/Video_2.mp4', resolution=800, horizontal=True)
@@ -1621,17 +1654,18 @@ def video_concatenator(video_one_path: Union[str, os.PathLike],
 
 class VideoRotator(ConfigReader):
     """
-    GUI Tool for rotating video. Rotated video is saved with the ``_rotated_DATETIME.mp4`` suffix.
+    GUI Tool for rotating video.
 
 
     .. image:: _static/img/VideoRotator.gif
        :width: 700
        :align: center
 
-    :parameter str input_path: Path to video to rotate.
-    :parameter str output_dir: Directory where to save the rotated video.
-    :parameter Optional[bool] gpu: If True, use FFMPEG NVIDEA GPU codecs. Else CPU codecs.
-    :parameter Optional[bool] gpu: If True, use FFPMPEG. Else, OpenCV.
+    :param str input_path: Path to video to rotate.
+    :param str output_dir: Directory where to save the rotated video.
+    :param Optional[bool] gpu: If True, use FFMPEG NVIDEA GPU codecs. Else CPU codecs.
+    :param Optional[bool] gpu: If True, use FFPMPEG. Else, OpenCV.
+    :returns: None. Rotated video is saved with the ``_rotated_DATETIME.mp4`` suffix.
 
     :example:
     >>> VideoRotator(input_path='project_folder/videos/Video_1.mp4', output_dir='project_folder/videos')
@@ -1814,10 +1848,11 @@ def extract_frames_from_all_videos_in_directory(config_path: Union[str, os.PathL
                                                 directory: Union[str, os.PathLike]) -> None:
 
     """
-    Extract all frames from all videos in a directory. The results are saved in the project_folder/frames/input directory of the SimBA project
+    Extract all frames from all videos in a directory.
 
-    :parameter str config_path: path to SimBA project config file in Configparser format.
-    :parameter str directory: path to file or folder containing videos in mp4 and/or avi format.
+    :param str config_path: path to SimBA project config file in Configparser format.
+    :param str directory: path to file or folder containing videos in mp4 and/or avi format.
+    :returns: None. The results are saved in the ``project_folder/frames/input directory`` of the SimBA project
 
     :example:
     >>> extract_frames_from_all_videos_in_directory(config_path='project_folder/project_config.ini', source='/tests/test_data/video_tests')
@@ -4431,6 +4466,115 @@ def temporal_concatenation(video_paths: List[Union[str, os.PathLike]],
     stdout_success(msg=f'{len(video_paths)} videos temporally concatenated and saved at {save_path}', elapsed_time=timer.elapsed_time_str)
 
 
+def get_img_slic(img: np.ndarray,
+                 n_segments: Optional[int] = 50,
+                 compactness: Optional[int] = 50,
+                 sigma: Optional[float] = 1) -> np.ndarray:
+
+    """
+    Simplify an image into superpixels using SLIC (Simple Linear Iterative Clustering).
+
+    :param np.ndarray img: Image to segment.
+    :param n_segments: Number of segments to produce.
+    :param compactness: How compact ("square") the output segments are.
+    :param np.ndarray sigma: Amount of Gaussian smoothing.
+    :return: Smoothened version of the input image.
+    :rtype: np.ndarray
+
+    :example:
+    >>> img = read_frm_of_video(video_path=r"C:\troubleshooting\mitra\project_folder\videos\FRR_gq_Saline_0626.mp4", frame_index=0)
+    >>> sliced_img = get_img_slic(img=img)
+    """
+
+    check_if_valid_img(data=img, source=f'{get_img_slic.__name__} img', raise_error=True)
+    check_int(name=f'{get_img_slic.__name__} n_segments', value=n_segments, min_value=2)
+    check_int(name=f'{get_img_slic.__name__} compactness', value=compactness, min_value=1)
+    check_int(name=f'{get_img_slic.__name__} sigma', value=compactness, min_value=0)
+    segments = slic(image=img, n_segments=n_segments, compactness=compactness, sigma=sigma, start_label=0)
+    segmented_image = label2rgb(segments, img, kind='avg', bg_label=0)
+
+    return segmented_image
+
+def _slic_helper(frm_range: np.ndarray,
+                 n_segments: int,
+                 sigma: float,
+                 compactness: int,
+                 save_dir: Union[str, os.PathLike],
+                 video_path: Union[str, os.PathLike]):
+
+    """ SLIC multiprocess helper called by slic.get_video_slic"""
+
+    video_cap = cv2.VideoCapture(video_path)
+    video_meta_data = get_video_meta_data(video_path=video_path)
+    batch, start_frm, end_frm = frm_range[0], frm_range[1][0], frm_range[1][-1]
+    save_path = os.path.join(save_dir, f'{batch}.mp4')
+    fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
+    writer = cv2.VideoWriter(save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"], video_meta_data["height"]))
+    for frm_idx in range(start_frm, end_frm):
+        print(f'Frame {frm_idx}/{end_frm}, Batch {batch}...')
+        img = read_frm_of_video(video_path=video_cap, frame_index=frm_idx)
+        img = get_img_slic(img=img, n_segments=n_segments, compactness=compactness, sigma=sigma)
+        writer.write(img)
+    writer.release()
+    return batch
+
+
+def get_video_slic(video_path: Union[str, os.PathLike],
+                   save_path: Union[str, os.PathLike],
+                   n_segments: Optional[int] = 50,
+                   compactness: Optional[int] = 50,
+                   sigma: Optional[int] = 1,
+                   core_cnt: Optional[int] = -1) -> None:
+
+    """
+    Apply SLIC superpixel segmentation to all frames of a video and save the output as a new video.
+
+    .. video:: _static/img/get_video_slic.webm
+       :width: 800
+       :autoplay:
+       :loop:
+
+    .. seealso::
+       To convert single image, see :func:`simba.video_processors.video_processing.get_img_slic`
+
+    :param Union[str, os.PathLike] video_path: Path to the input video file.
+    :param Union[str, os.PathLike] save_path: Path to save the processed video with SLIC superpixel segmentation.
+    :param Optional[int] n_segments: Approximate number of superpixels for each frame. Defaults to 50.
+    :param Optional[int] compactness: Balance of color and spatial proximity.  Higher values result in more uniformly shaped superpixels. Defaults to 50.
+    :param Optional[int] sigma: Standard deviation for Gaussian smoothing applied to each frame before segmentation. Defaults to 1.
+    :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Set to -1 to use all available cores. Defaults to -1.
+    :return: None. The segmented video is saved to `save_path`.
+
+    :example:
+    >>> #video_path = r"C:\troubleshooting\mitra\project_folder\videos\FRR_gq_Saline_0626.mp4"
+    """
+    timer = SimbaTimer(start=True)
+    check_int(name=f'{get_img_slic.__name__} n_segments', value=n_segments, min_value=2)
+    check_int(name=f'{get_img_slic.__name__} compactness', value=compactness, min_value=1)
+    check_int(name=f'{get_img_slic.__name__} sigma', value=sigma, min_value=1)
+    check_int(name=f'{get_img_slic.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
+    check_file_exist_and_readable(file_path=video_path)
+    video_meta_data = get_video_meta_data(video_path=video_path)
+    if core_cnt == -1 or core_cnt > find_core_cnt()[0]: core_cnt = find_core_cnt()[0]
+    frm_ranges = np.array_split(np.arange(0, video_meta_data['frame_count'] + 1), core_cnt)
+    frm_ranges = [(y, x) for y, x in enumerate(frm_ranges)]
+    out_dir, out_name, _= get_fn_ext(filepath=save_path)
+    temp_folder = os.path.join(out_dir, "temp")
+    if not os.path.isdir(temp_folder): os.makedirs(temp_folder)
+    with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAX_TASK_PER_CHILD.value) as pool:
+        constants = functools.partial(_slic_helper,
+                                      video_path=video_path,
+                                      save_dir=temp_folder,
+                                      n_segments=n_segments,
+                                      compactness=compactness,
+                                      sigma=sigma)
+        for cnt, core_batch in enumerate(pool.map(constants, frm_ranges, chunksize=1)):
+            print(f'Core batch {core_batch} complete...')
+    pool.join()
+    pool.terminate()
+    timer.stop_timer()
+    concatenate_videos_in_folder(in_folder=temp_folder, save_path=save_path)
+    stdout_success(msg=f'SLIC video saved at {save_path}', elapsed_time=timer.elapsed_time_str)
 
 # video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped_gantt.mp4',
 #                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped.mp4',
