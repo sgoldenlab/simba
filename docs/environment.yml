@@ -2,14 +2,14 @@ name: simba_dev
 channels:
   - defaults
 dependencies:
-  - python=3.10
+  - python=3.6
   - shapely
   - matplotlib
   - statsmodels
   - wxpython
-  - hdbscan
+  - hdbscan==0.8.27
   - pip:
-      - pip==24.0
+      - pip==21.2.2
       - sphinx-autodoc-typehints
       - sphinxcontrib-video
       - sphinx-togglebutton==0.3.2
@@ -20,5 +20,4 @@ dependencies:
       - nbsphinx
       - umap-learn==0.5.2
       - pyvis==0.3.2
-      - cupy==13.2.0
-prefix: /Users/simon/.conda/envs/Simba_310
+prefix: /Users/simon/.conda/envs/simba_dev
