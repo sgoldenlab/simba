@@ -21,4 +21,4 @@ dependencies:
       - umap-learn==0.5.2
       - pyvis==0.3.2
       - cupy==13.2.0
-prefix: /Users/simon/.conda/envs/simba_dev
+prefix: /Users/simon/.conda/envs/Simba_310
