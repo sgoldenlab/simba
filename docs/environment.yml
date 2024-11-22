@@ -2,7 +2,7 @@ name: simba_dev
 channels:
   - defaults
 dependencies:
-  - python=3.6
+  - python=3.10
   - shapely
   - matplotlib
   - statsmodels
@@ -20,4 +20,5 @@ dependencies:
       - nbsphinx
       - umap-learn==0.5.2
       - pyvis==0.3.2
+      - cupy==13.2.0
 prefix: /Users/simon/.conda/envs/simba_dev
