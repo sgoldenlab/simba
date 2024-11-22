@@ -18,8 +18,8 @@ import cv2
 import numpy as np
 from PIL import Image, ImageTk
 from shapely.geometry import Polygon
-from skimage.segmentation import slic
 from skimage.color import label2rgb
+from skimage.segmentation import slic
 
 try:
     from typing import Literal
@@ -33,11 +33,11 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
                                 check_if_string_value_is_valid_video_timestamp,
-                                check_instance, check_int,
+                                check_if_valid_img, check_instance, check_int,
                                 check_nvidea_gpu_available, check_str,
                                 check_that_hhmmss_start_is_before_end,
                                 check_valid_boolean, check_valid_lst,
-                                check_valid_tuple, check_if_valid_img)
+                                check_valid_tuple)
 from simba.utils.data import find_frame_numbers_from_time_stamp
 from simba.utils.enums import OS, ConfigKey, Defaults, Formats, Options, Paths
 from simba.utils.errors import (CountError, DirectoryExistError,
@@ -64,7 +64,6 @@ from simba.video_processors.extract_frames import video_to_frames
 from simba.video_processors.roi_selector import ROISelector
 from simba.video_processors.roi_selector_circle import ROISelectorCircle
 from simba.video_processors.roi_selector_polygon import ROISelectorPolygon
-
 
 MAX_FRM_SIZE = 1080, 650
 
