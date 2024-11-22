@@ -7,7 +7,7 @@ dependencies:
   - matplotlib
   - statsmodels
   - wxpython
-  - hdbscan==0.8.27
+  - hdbscan
   - pip:
       - pip==21.2.2
       - sphinx-autodoc-typehints
