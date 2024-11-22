@@ -19,8 +19,8 @@ from copy import deepcopy
 
 import cv2
 import numpy as np
-from numba import cuda
 from cupyx.scipy.ndimage import rotate
+from numba import cuda
 
 from simba.data_processors.cuda.utils import _cuda_mse
 from simba.mixins.image_mixin import ImageMixin
