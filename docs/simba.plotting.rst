@@ -111,6 +111,14 @@ Gantt plot - multiprocess
    :members:
    :show-inheritance:
 
+Gantt plot - fancy
+----------------------------------------
+
+.. automodule:: simba.plotting.gantt_plotly.gantt_plotly
+   :members:
+   :show-inheritance:
+
+
 Classifier heatmaps
 ---------------------------------------
 

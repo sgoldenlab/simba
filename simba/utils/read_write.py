@@ -578,15 +578,17 @@ def get_bp_headers(body_parts_lst: List[str]) -> list:
 
 
 def read_video_info(video_name: str,
-                    video_info_df: pd.DataFrame,
+                    video_info_df: Union[pd.DataFrame, None] = None,
+                    vid_info_df: Union[pd.DataFrame, None] = None,
                     raise_error: Optional[bool] = True) -> Union[Tuple[pd.DataFrame, float, float], Tuple[None, None, None]]:
 
     """
     Helper to read the metadata (pixels per mm, resolution, fps etc) from the video_info.csv for a single input file/video
 
-    :parameter pd.DataFrame vid_info_df: Parsed ``project_folder/logs/video_info.csv`` file. This file can be parsed by :meth:`simba.utils.read_write.read_video_info_csv`.
-    :parameter str video_name: Name of the video as represented in the ``Video`` column of the ``project_folder/logs/video_info.csv`` file.
-    :parameter Optional[bool] raise_error: If True, raises error if the video cannot be found in the ``vid_info_df`` file. If False, returns None if the video cannot be found.
+    :param pd.DataFrame vid_info_df: Parsed ``project_folder/logs/video_info.csv`` file. This file can be parsed by :func:`simba.utils.read_write.read_video_info_csv`.
+    :param pd.DataFrame video_info_df: Alias for ``vid_info_df``. If both are provided, the ``vid_info_df`` is used.
+    :param str video_name: Name of the video as represented in the ``Video`` column of the ``project_folder/logs/video_info.csv`` file.
+    :param Optional[bool] raise_error: If True, raises error if the video cannot be found in the ``vid_info_df`` file. If False, returns None if the video cannot be found.
     :returns: 3-part tuple: One row DataFrame representing the video in the ``project_folder/logs/video_info.csv`` file, the frame rate of the video, and the the pixels per millimeter of the video
     :rtype: Union[Tuple[pd.DataFrame, float, float], Tuple[None, None, None]]
 
@@ -595,10 +597,23 @@ def read_video_info(video_name: str,
     >>> read_video_info(vid_info_df=video_info_df, video_name='Together_1')
     """
 
+
+    FPS = 'fps'
+    PXELS_PER_MM = "pixels/mm"
+    VIDEO = "Video"
+    REQUIRED_FIELDS = [PXELS_PER_MM, FPS, VIDEO]
+
+    if isinstance(vid_info_df, pd.DataFrame):
+        check_valid_dataframe(df=vid_info_df, source=f'{read_video_info.__name__} vid_info_df', required_fields=REQUIRED_FIELDS)
+        video_info_df = deepcopy(vid_info_df)
+    elif isinstance(video_info_df, pd.DataFrame):
+        check_valid_dataframe(df=video_info_df, source=f'{read_video_info.__name__} video_info_df', required_fields=REQUIRED_FIELDS)
+    else:
+        raise InvalidInputError(msg='Both provide a valid dataframe as EITHER vid_info_df or the alias video_info_df.', source=read_video_info.__name__)
+
     check_str(name=f'{read_video_info.__name__} video_name', value=video_name, allow_blank=False)
     check_valid_boolean(value=[raise_error], source=f'{read_video_info.__name__} raise_error')
-    check_valid_dataframe(df=video_info_df, source='', required_fields=["pixels/mm", "fps", "Video"])
-    video_settings = video_info_df.loc[video_info_df["Video"] == video_name]
+    video_settings = video_info_df.loc[video_info_df[VIDEO] == video_name]
     if len(video_settings) > 1:
         raise DuplicationError(msg=f"SimBA found multiple rows in `project_folder/logs/video_info.csv` for videos named {video_name}. Please make sure that each video name is represented ONCE in the file", source='')
     elif len(video_settings) < 1:
@@ -607,8 +622,8 @@ def read_video_info(video_name: str,
         else:
             return (None, None, None)
     else:
-        px_per_mm = video_settings["pixels/mm"].values[0]
-        fps = video_settings["fps"].values[0]
+        px_per_mm = video_settings[PXELS_PER_MM].values[0]
+        fps = video_settings[FPS].values[0]
         if math.isnan(px_per_mm):
             raise ParametersFileError(msg=f'Pixels per millimeter for video {video_name} in the `project_folder/logs/video_info.csv` file is not a valid number. Please correct it to proceed.')
         if math.isnan(fps):
@@ -1770,8 +1785,7 @@ def write_pickle(data: Dict[str, Any], save_path: Union[str, os.PathLike]) -> No
         )
 
 
-def read_pickle(
-    data_path: Union[str, os.PathLike], verbose: Optional[bool] = False) -> Dict[Any, Any]:
+def read_pickle(data_path: Union[str, os.PathLike], verbose: Optional[bool] = False) -> Dict[Any, Any]:
     """
     Read a single or directory of pickled objects. If directory, returns dict with numerical sequential integer keys for
     each object.

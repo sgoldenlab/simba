@@ -12,17 +12,15 @@ except:
     from typing_extensions import Literal
 try:
     import cupy as cp
+    from cupyx.scipy.ndimage import rotate
 except:
     import numpy as cp
+    from scipy.ndimage import rotate
 
 from copy import deepcopy
 
 import cv2
 import numpy as np
-try:
-    from cupyx.scipy.ndimage import rotate
-except:
-    from scipy.ndimage import rotate
 from numba import cuda
 
 from simba.data_processors.cuda.utils import _cuda_mse
