@@ -130,5 +130,5 @@ class FreezingDetector(ConfigReader):
         stdout_success(msg=f'Results saved in {self.save_dir} directory.')
 
 #
-# FreezingDetector(data_dir=r'D:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location',
-#                       config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini")
+# FreezingDetector(data_dir=r'C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location',
+#                  config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini")
