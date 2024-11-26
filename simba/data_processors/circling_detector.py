@@ -32,6 +32,10 @@ class CirclingDetector(ConfigReader):
 
         Circling is detected as `absent` when not present.
 
+    .. note::
+
+       We pass the names of the left and right ears, as the method will use body-parts to compute the `nape` location of the animal.
+
     :param Union[str, os.PathLike] data_dir: Path to directory containing pose-estimated body-part data in CSV format.
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
     :param Optional[str] nose_name: The name of the pose-estimated nose body-part. Defaults to 'nose'.
