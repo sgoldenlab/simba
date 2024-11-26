@@ -28,7 +28,7 @@ class FreezingDetector(ConfigReader):
     .. important::
 
         Freezing is detected as `present` when **the velocity (computed from the mean movement of the nape, nose, and tail-base body-parts) falls below
-        the movement threshold for the duration (and longer) of the specied time-window.
+        the movement threshold for the duration (and longer) of the specied time-window**.
 
         Freezing is detected as `absent` when not present.
 
