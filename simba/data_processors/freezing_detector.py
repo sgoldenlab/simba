@@ -32,6 +32,10 @@ class FreezingDetector(ConfigReader):
 
         Freezing is detected as `absent` when not present.
 
+    .. note::
+
+       We pass the names of the left and right ears, as the method will use body-parts to compute the `nape` location of the animal.
+
     :param Union[str, os.PathLike] data_dir: Path to directory containing pose-estimated body-part data in CSV format.
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
     :param Optional[str] nose_name: The name of the pose-estimated nose body-part. Defaults to 'nose'.
@@ -39,7 +43,7 @@ class FreezingDetector(ConfigReader):
     :param Optional[str] right_ear_name: The name of the pose-estimated right ear body-part. Defaults to 'right_ear'.
     :param Optional[str] tail_base_name: The name of the pose-estimated tail base body-part. Defaults to 'tail_base'.
     :param Optional[int] time_window: The time window in preceding seconds in which to evaluate freezing. Default: 3.
-    :param Optional[int] movement_threshold: A movement threshold in millimeters per second.
+    :param Optional[int] movement_threshold: A movement threshold in millimeters per second. Defaults to 5.
     :param Optional[Union[str, os.PathLike]] save_dir: Directory where to store the results. If None, then results are stored in the ``logs`` directory of the SimBA project.
 
     :example:

@@ -34,7 +34,7 @@ class CirclingDetector(ConfigReader):
 
     .. note::
 
-       We pass the names of the left and right ears, as the method will use body-parts to compute the `nape` location of the animal.
+       We pass the names of the left ear, right ear, and nose, as the method will use these body-parts to compute the direction of the animal in degrees.
 
     :param Union[str, os.PathLike] data_dir: Path to directory containing pose-estimated body-part data in CSV format.
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
