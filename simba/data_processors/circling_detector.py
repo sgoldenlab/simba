@@ -27,8 +27,8 @@ class CirclingDetector(ConfigReader):
 
     .. important::
 
-        Circling is detected as :underline:`present` when **the circular range of the animal is above the ``circular_range_threshold`` within the preceding ``time_threshold``** AND
-        **the movement of the animal (defined as the sum of the center movement) is above the  ``movement_threshold`` within the preceding ``time_threshold``.**
+        Circling is detected as `present` when **the circular range of the animal is above the specied circular range threshold within the passed preceding time threshold** AND
+        **the movement of the animal (defined as the sum of the center movement) is above the specified movement threshold within the passed preceding time threshold.**
 
         Circling is detected as :underline:`absent` when not present.
 
@@ -120,8 +120,9 @@ class CirclingDetector(ConfigReader):
         agg_results.to_csv(agg_results_path)
         stdout_success(msg=f'Results saved in {self.save_dir} directory.')
 
-
-
-# detector = CirclingDetector(data_dir=r'D:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location', config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini")
+#
+#
+# detector = CirclingDetector(data_dir=r'C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location',
+#                             config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
 # detector.run()
 

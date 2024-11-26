@@ -27,10 +27,10 @@ class FreezingDetector(ConfigReader):
 
     .. important::
 
-        Freezing is detected as :underline:`present` when ** the velocity (computed from the mean movement of the nape, nose, and tail-base body-parts) falls below
-        the movement threshold for the duration of the defined time-window or longer.
+        Freezing is detected as `present` when **the velocity (computed from the mean movement of the nape, nose, and tail-base body-parts) falls below
+        the movement threshold for the duration (and longer) of the specied time-window.
 
-        Freezing is detected as :underline:`absent` when not present.
+        Freezing is detected as `absent` when not present.
 
     :param Union[str, os.PathLike] data_dir: Path to directory containing pose-estimated body-part data in CSV format.
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
@@ -90,7 +90,7 @@ class FreezingDetector(ConfigReader):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
         for file_cnt, file_path in enumerate(self.data_paths):
             video_name = get_fn_ext(filepath=file_path)[1]
-            print(f'Analyzing {video_name}...')
+            print(f'Analyzing {video_name}...({file_cnt+1}/{len(self.data_paths)})')
             save_file_path = os.path.join(self.save_dir, f'{video_name}.csv')
             df = read_df(file_path=file_path, file_type='csv').reset_index(drop=True)
             _, px_per_mm, fps = read_video_info(vid_info_df=self.video_info_df, video_name=video_name)
@@ -131,4 +131,4 @@ class FreezingDetector(ConfigReader):
 
 #
 # FreezingDetector(data_dir=r'C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location',
-#                  config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini")
+#                  config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")

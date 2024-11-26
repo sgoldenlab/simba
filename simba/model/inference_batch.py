@@ -92,6 +92,11 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
         self.timer.stop_timer()
         stdout_success(msg=f"Machine predictions complete. Files saved in {self.save_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
+# test = InferenceBatch(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+# test.run()
+
+
+
 
 
 # test = InferenceBatch(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini",

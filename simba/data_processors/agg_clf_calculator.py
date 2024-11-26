@@ -235,9 +235,9 @@ class AggregateClfCalculator(ConfigReader):
         )
 
 
-# test = AggregateClfCalculator(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini",
+# test = AggregateClfCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #                               data_measures=["Bout count", "Total event duration (s)", "Mean event bout duration (s)", "Median event bout duration (s)", "First event occurrence (s)", "Mean event bout interval duration (s)", "Median event bout interval duration (s)"],
-#                               classifiers=['lay-on-belly'],
+#                               classifiers=['rearing'],
 #                               video_meta_data =['Frame count', "Video length (s)"],
 #                               transpose=True)
 # test.run()

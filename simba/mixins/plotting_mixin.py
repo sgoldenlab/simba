@@ -1909,7 +1909,7 @@ class PlottingMixin(object):
         check_valid_lst(data=list(df[y]), source=f"{PlottingMixin.plot_bar_chart.__name__} y", valid_dtypes=Formats.NUMERIC_DTYPES.value)
         fig, ax = plt.subplots(figsize=fig_size)
         sns.barplot(x=x, y=y, data=df, palette=palette, ax=ax)
-        ax.set_xticklabels(df[x], rotation=90, fontsize=8)
+        ax.set_xticklabels(df[x].unique(), rotation=90, fontsize=8)
         if error is not None:
             check_str(name=f"{PlottingMixin.plot_bar_chart.__name__} error", value=error, options=tuple(df.columns))
             check_valid_lst(data=list(df[error]), source=f"{PlottingMixin.plot_bar_chart.__name__} error",valid_dtypes=Formats.NUMERIC_DTYPES.value)
