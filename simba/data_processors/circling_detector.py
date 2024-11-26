@@ -30,7 +30,7 @@ class CirclingDetector(ConfigReader):
         Circling is detected as `present` when **the circular range of the animal is above the specied circular range threshold within the passed preceding time threshold** AND
         **the movement of the animal (defined as the sum of the center movement) is above the specified movement threshold within the passed preceding time threshold.**
 
-        Circling is detected as :underline:`absent` when not present.
+        Circling is detected as `absent` when not present.
 
     :param Union[str, os.PathLike] data_dir: Path to directory containing pose-estimated body-part data in CSV format.
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
