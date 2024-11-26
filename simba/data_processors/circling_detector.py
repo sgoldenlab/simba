@@ -45,7 +45,7 @@ class CirclingDetector(ConfigReader):
     :param Optional[str] center_name: The name of the pose-estimated center body-part. Defaults to 'center'.
     :param Optional[int] time_threshold: The time window in preceding seconds in which to evaluate the animals circular range. Default: 10.
     :param Optional[int] circular_range_threshold: A value in degrees, between 0-360.
-    :param Optional[int] movement_threshold: A movement threshold in millimeters.
+    :param Optional[int] movement_threshold: A movement threshold in millimeters. Defaults to 60.
     :param Optional[Union[str, os.PathLike]] save_dir: Directory where to store the results. If None, then results are stored in the ``logs`` directory of the SimBA project.
 
     References
