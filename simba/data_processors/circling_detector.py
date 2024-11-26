@@ -27,8 +27,8 @@ class CirclingDetector(ConfigReader):
 
     .. important::
 
-        Circling is detected as `present` when **the circular range of the animal is above the specied circular range threshold within the passed preceding time threshold** AND
-        **the movement of the animal (defined as the sum of the center movement) is above the specified movement threshold within the passed preceding time threshold.**
+        Circling is detected as `present` when **the circular range of the animal is above the specied circular range threshold within the specified preceding time threshold** AND
+        **the movement of the animal (defined as the sum of the center movement) is above the specified movement threshold within the specified preceding time threshold.**
 
         Circling is detected as `absent` when not present.
 
@@ -51,6 +51,7 @@ class CirclingDetector(ConfigReader):
     References
     ----------
     .. [1] Sabnis et al., Visual detection of seizures in mice using supervised machine learning, `biorxiv`, doi: https://doi.org/10.1101/2024.05.29.596520.
+    .. [2] Lopez et al., Region-specific Nucleus Accumbens Dopamine Signals Encode Distinct Aspects of Avoidance Learning, `biorxiv`, doi: https://doi.org/10.1101/2024.08.28.610149
 
     :example:
     >>> CirclingDetector(data_dir=r'D:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location', config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini")
