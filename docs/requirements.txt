@@ -22,7 +22,7 @@ tabulate == 0.8.3
 tqdm == 4.30.0
 xgboost == 0.90
 yellowbrick == 0.9.1
-dash == 1.14.0
+dash == 2.15.0
 dash_color_picker == 0.0.1
 dash_core_components == 1.10.2
 dash_colorscales == 0.0.4
