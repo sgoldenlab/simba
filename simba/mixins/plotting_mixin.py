@@ -1064,7 +1064,7 @@ class PlottingMixin(object):
                   fig_size: Optional[Tuple[int]] = (10, 6),
                   error_opacity: Optional[float] = 0.2,
                   palette: Optional[str] = 'Set1',
-                  save_path: Optional[Union[str, os.PathLike]] = None, ):
+                  save_path: Optional[Union[str, os.PathLike]] = None):
 
         check_instance(source=f"{PlottingMixin.line_plot.__name__} df", instance=df, accepted_types=(pd.DataFrame))
         check_str(name=f"{PlottingMixin.line_plot.__name__} x", value=x, options=tuple(df.columns))
@@ -1086,15 +1086,12 @@ class PlottingMixin(object):
         else:
             for i in y:
                 check_str(name=f"{PlottingMixin.line_plot.__name__} y", value=i, options=tuple(df.columns))
-                check_valid_lst(data=list(df[i]), source=f"{PlottingMixin.line_plot.__name__} error",
-                                valid_dtypes=Formats.NUMERIC_DTYPES.value)
+                check_valid_lst(data=list(df[i]), source=f"{PlottingMixin.line_plot.__name__} error", valid_dtypes=Formats.NUMERIC_DTYPES.value)
             if error is not None:
-                check_instance(source=f"{PlottingMixin.line_plot.__name__} error", instance=error,
-                               accepted_types=(list,))
+                check_instance(source=f"{PlottingMixin.line_plot.__name__} error", instance=error, accepted_types=(list,))
                 for i in error:
                     check_str(name=f"{PlottingMixin.line_plot.__name__} error", value=i, options=tuple(df.columns))
-                    check_valid_lst(data=list(df[i]), source=f"{PlottingMixin.line_plot.__name__} error",
-                                    valid_dtypes=Formats.NUMERIC_DTYPES.value)
+                    check_valid_lst(data=list(df[i]), source=f"{PlottingMixin.line_plot.__name__} error", valid_dtypes=Formats.NUMERIC_DTYPES.value)
 
         fig, ax = plt.subplots(figsize=fig_size)
         for i in range(len(y)):
@@ -1913,7 +1910,7 @@ class PlottingMixin(object):
         if error is not None:
             check_str(name=f"{PlottingMixin.plot_bar_chart.__name__} error", value=error, options=tuple(df.columns))
             check_valid_lst(data=list(df[error]), source=f"{PlottingMixin.plot_bar_chart.__name__} error",valid_dtypes=Formats.NUMERIC_DTYPES.value)
-            for i, (value, error) in enumerate(zip(df['FEATURE_IMPORTANCE_MEAN'], df['FEATURE_IMPORTANCE_STDEV'])):
+            for i, (value, error) in enumerate(zip(df[y], df[error])):
                 ax.errorbar(i, value, yerr=[[0], [error]], fmt='o', color='grey', capsize=2)
 
         if x_label is not None:

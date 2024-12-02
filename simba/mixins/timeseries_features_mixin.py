@@ -2417,14 +2417,103 @@ class TimeseriesFeatureMixin(object):
         :param np.ndarray x: A 2D NumPy array of shape (n, 2), where each row contains the x and y  position coordinates of the object at each time step.
         :param float mass: The mass of the object.
         :param float sample_rate: The sampling rate (Hz), i.e., the number of data points per second.
-        :return: The average kinetic energy of the object.
-        :rtype: float: The mean kinetic energy calculated from the velocity data.
+        :return: The average kinetic energy of the animal.
+        :rtype: float
+
+        :example:
+        >>> x = np.random.randint(0, 500, (200, 2))
+        >>> TimeseriesFeatureMixin.avg_kinetic_energy(x=x, mass=35, sample_rate=30)
         """
+
         delta_t = np.round(1 / sample_rate, 2)
         vx, vy = np.gradient(x[:, 0], delta_t), np.gradient(x[:, 1], delta_t)
         speed = np.sqrt(vx ** 2 + vy ** 2)
         kinetic_energy = 0.5 * mass * speed ** 2
+        y = float(np.mean(kinetic_energy).astype(np.float32))
+        return y
 
-        return np.mean(kinetic_energy).astype(np.float32)
+    @staticmethod
+    @jit(nopython=True)
+    def sliding_avg_kinetic_energy(x: np.ndarray, mass: np.ndarray, sample_rate: float, time_window: float) -> np.ndarray:
+        """
+        Calculate the sliding average kinetic energy of an object over a specified time window.
+
+        This function computes the kinetic energy of an object based on its position and mass.
+        The calculation is performed over a sliding time window, returning an array of average
+        kinetic energy values for each valid frame.
+
+        :param np.ndarray x: A 2D NumPy array of shape (n, 2), where each row contains the x and y  position coordinates of the object at each time step.
+        :param np.ndarray mass: A 1D NumPy array of shape (n,), representing the mass of the object at each time step. For instance, this could be derived using  :func:`~simba.feature_extractors.perimeter_jit.jitted_hull`.
+        :param float sample_rate: The sampling rate in Hz (frames per second), representing the number of data points collected per second.
+        :param float time_window: The time window (in seconds) over which to calculate the sliding average kinetic energy.
+        :return: A 1D NumPy array of shape (n,), where each element represents the sliding average kinetic energy at a specific time step. Frames that cannot have a valid calculation (due to insufficient data in the time window) are filled with -1.0.
+        :rtype: np.ndarray
+
+        :example:
+        >>> df = read_df(file_path='/home/simon/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/501_MA142_Gi_Saline_0513.csv', file_type='csv')
+        >>> data = df[['Nose_x', 'Nose_y', 'Left_ear_x', 'Left_ear_y', 'Right_ear_x', 'Right_ear_y', 'Left_side_x', 'Left_side_y', 'Right_side_x', 'Right_side_y', 'Tail_base_x', 'Tail_base_y']].values.astype(np.float32)
+        >>> area = jitted_hull(points=data.reshape(-1, 6, 2), target='perimeter') / 4
+        >>> keypoint = df[['Center_x', 'Center_y']].values
+        >>> TimeseriesFeatureMixin.sliding_avg_kinetic_energy(x=keypoint, mass=area, sample_rate=30.0, time_window=1.0)
+        """
+
+        time_window_frms = np.ceil(sample_rate * time_window)
+        results = np.full(shape=(x.shape[0]), fill_value=-1.0, dtype=np.float32)
+        delta_t = np.round(1 / sample_rate, 2)
+        for r in range(time_window_frms, x.shape[0] + 1):
+            l = r - time_window_frms
+            keypoint_sample, mass_sample = x[l:r], mass[l:r]
+            mass_sample_mean = np.mean(mass_sample)
+            dx, dy = np.diff(keypoint_sample[:, 0].flatten()), np.diff(keypoint_sample[:, 1].flatten())
+            speed = np.sqrt(dx ** 2 + dy ** 2) / delta_t
+            kinetic_energy = 0.5 * mass_sample_mean * speed ** 2
+            sample_results = float(np.mean(kinetic_energy))
+            results[r - 1] = sample_results
+        return results
+
+    @staticmethod
+    def momentum_magnitude(x: np.ndarray, mass: float, sample_rate: float) -> float:
+        """
+        Compute the magnitude of momentum given 2D positional data and mass.
+
+        :param np.ndarray x: 2D array of shape (n_samples, 2) representing positions.
+        :param float mass: Mass of the object.
+        :param float sample_rate: Sampling rate in FPS.
+        :returns: Magnitude of the momentum.
+        :rtype: float
+        """
+
+        check_valid_array(data=x, source=f'{TimeseriesFeatureMixin.momentum_magnitude.__name__} x', accepted_ndims=(2,), accepted_axis_1_shape=[2, ], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_float(name=f'{TimeseriesFeatureMixin.momentum_magnitude.__name__} mass', value=mass, min_value=10e-6)
+        check_float(name=f'{TimeseriesFeatureMixin.momentum_magnitude.__name__} sample_rate', value=sample_rate, min_value=10e-6)
+        dx, dy = np.diff(x[:, 0].flatten()), np.diff(x[:, 1].flatten())
+        speed = np.mean(np.sqrt(dx ** 2 + dy ** 2) / (1 / sample_rate))
+        return mass * speed
+
+    @staticmethod
+    @jit(nopython=True)
+    def sliding_momentum_magnitude(x: np.ndarray, mass: np.ndarray, sample_rate: float, time_window: float) -> np.ndarray:
+        """
+        Compute the sliding window momentum magnitude for 2D positional data.
+
+        :param np.ndarray x: 2D array of shape (n_samples, 2) representing positions.
+        :param np.ndarray mass: Array of mass values for each frame.
+        :param float sample_rate: Sampling rate in FPS.
+        :param float time_window: Time window in seconds for sliding momentum calculation.
+        :returns: Momentum magnitudes computed for each frame, with results from frames that cannot form a complete window filled with -1.0.
+        :rtype: np.ndarray
+
+        """
+        time_window_frms = np.ceil(sample_rate * time_window)
+        results = np.full(shape=(x.shape[0]), fill_value=-1.0, dtype=np.float32)
+        delta_t = 1 / sample_rate
+        for r in range(time_window_frms, x.shape[0] + 1):
+            l = r - time_window_frms
+            keypoint_sample, mass_sample = x[l:r], mass[l:r]
+            mass_sample_mean = np.mean(mass_sample)
+            dx, dy = np.diff(keypoint_sample[:, 0].flatten()), np.diff(keypoint_sample[:, 1].flatten())
+            speed = np.mean(np.sqrt(dx ** 2 + dy ** 2) / delta_t)
+            results[r - 1] = mass_sample_mean * speed
+        return results
 
 

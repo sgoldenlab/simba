@@ -69,7 +69,7 @@ from simba.video_processors.video_processing import (
     superimpose_elapsed_time, superimpose_frame_count, superimpose_freetext,
     superimpose_overlay_video, superimpose_video_names,
     superimpose_video_progressbar, temporal_concatenation, upsample_fps,
-    video_bg_substraction_mp, video_bg_subtraction, video_concatenator,
+    video_bg_subtraction_mp, video_bg_subtraction, video_concatenator,
     video_to_bw, video_to_greyscale, watermark_video)
 
 sys.setrecursionlimit(10**7)
@@ -2770,15 +2770,15 @@ class BackgroundRemoverPopUp(PopUpMixin):
                                  fg_color=fg_clr)
         else:
             core_cnt = int(self.multiprocess_dropdown.getChoices())
-            video_bg_substraction_mp(video_path=video_path,
-                                     bg_video_path=bg_video,
-                                     bg_start_frm=bg_start_frm,
-                                     bg_end_frm=bg_end_frm,
-                                     bg_start_time=bg_start_time,
-                                     bg_end_time=bg_end_time,
-                                     bg_color=bg_clr,
-                                     fg_color=fg_clr,
-                                     core_cnt=core_cnt)
+            video_bg_subtraction_mp(video_path=video_path,
+                                    bg_video_path=bg_video,
+                                    bg_start_frm=bg_start_frm,
+                                    bg_end_frm=bg_end_frm,
+                                    bg_start_time=bg_start_time,
+                                    bg_end_time=bg_end_time,
+                                    bg_color=bg_clr,
+                                    fg_color=fg_clr,
+                                    core_cnt=core_cnt)
 
 
 class RotateVideoSetDegreesPopUp(PopUpMixin):

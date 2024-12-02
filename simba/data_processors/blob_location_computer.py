@@ -25,7 +25,7 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
                                     get_video_meta_data, remove_files,
                                     write_df)
-from simba.video_processors.video_processing import (video_bg_substraction_mp,
+from simba.video_processors.video_processing import (video_bg_subtraction_mp,
                                                      video_bg_subtraction)
 
 
@@ -94,7 +94,7 @@ class BlobLocationComputer(object):
             if not self.multiprocessing:
                 _ = video_bg_subtraction(video_path=video_path, verbose=self.verbose, bg_color=(0, 0, 0), fg_color=(255, 255, 255), save_path=temp_video_path)
             else:
-                _ = video_bg_substraction_mp(video_path=video_path, verbose=self.verbose, bg_color=(0, 0, 0), fg_color=(255, 255, 255), save_path=temp_video_path)
+                _ = video_bg_subtraction_mp(video_path=video_path, verbose=self.verbose, bg_color=(0, 0, 0), fg_color=(255, 255, 255), save_path=temp_video_path)
             self.location_data[video_name] = ImageMixin.get_blob_locations(video_path=temp_video_path, gpu=self.gpu, verbose=self.verbose, batch_size=self.batch_size).astype(np.int32)
             remove_files(file_paths=[temp_video_path])
             video_timer.stop_timer()

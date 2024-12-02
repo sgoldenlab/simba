@@ -4,7 +4,7 @@ __email__ = "sronilsson@gmail.com"
 
 import math
 import os
-from typing import Optional, Union
+from typing import Optional, Union, Tuple
 
 try:
     from typing import Literal
@@ -23,7 +23,7 @@ import cv2
 import numpy as np
 from numba import cuda
 
-from simba.data_processors.cuda.utils import _cuda_mse
+from simba.data_processors.cuda.utils import _cuda_mse, _cuda_available, _cuda_luminance_pixel_to_grey
 from simba.mixins.image_mixin import ImageMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
@@ -31,18 +31,21 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_valid_img, check_instance, check_int,
                                 check_nvidea_gpu_available,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_array, check_valid_boolean)
+                                check_valid_array, check_valid_boolean, check_if_valid_rgb_tuple, is_video_color)
 from simba.utils.data import find_frame_numbers_from_time_stamp
 from simba.utils.enums import Formats
-from simba.utils.errors import FFMPEGCodecGPUError, InvalidInputError
+from simba.utils.errors import FFMPEGCodecGPUError, InvalidInputError, SimBAGPUError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (
-    check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
-    get_video_meta_data, read_img_batch_from_video_gpu)
+from simba.utils.read_write import (check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext, get_video_meta_data, read_img_batch_from_video_gpu)
+from numba.core.errors import NumbaPerformanceWarning
+import warnings
+
+warnings.simplefilter('ignore', category=NumbaPerformanceWarning)
+
 
 PHOTOMETRIC = 'photometric'
 DIGITAL = 'digital'
-THREADS_PER_BLOCK = 20124
+THREADS_PER_BLOCK = 2024
 
 def create_average_frm_cupy(video_path: Union[str, os.PathLike],
                        start_frm: Optional[int] = None,
@@ -124,6 +127,7 @@ def create_average_frm_cupy(video_path: Union[str, os.PathLike],
         if start_idx == end_idx:
             continue
         imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=start_idx, end_frm=end_idx, verbose=verbose)
+        imgs = np.stack(list(imgs.values()), axis=0)
         avg_imgs.append(average_3d_stack(image_stack=imgs))
     avg_img = average_3d_stack(image_stack=np.stack(avg_imgs, axis=0))
     if save_path is not None:
@@ -140,11 +144,11 @@ def average_3d_stack_cupy(image_stack: np.ndarray) -> np.ndarray:
     return img.get()
 
 @cuda.jit()
-def _average_3d_stack_cuda(data, results):
-    y, x, i = cuda.grid(3)
+def _average_3d_stack_cuda_kernel(data, results):
+    x, y, i = cuda.grid(3)
     if i < 0 or x < 0 or y < 0:
         return
-    if i > data.shape[0] - 1 or x > data.shape[1] - 1 or y > data.shape[2] - 1:
+    if i > data.shape[0] - 1 or y > data.shape[1] - 1 or x > data.shape[2] - 1:
         return
     else:
         sum_value = 0.0
@@ -165,7 +169,7 @@ def _average_3d_stack_cuda(image_stack: np.ndarray) -> np.ndarray:
     grid_z = 3
     threads_per_block = (16, 16, 1)
     blocks_per_grid = (grid_y, grid_x, grid_z)
-    _average_3d_stack_cuda[blocks_per_grid, threads_per_block](x_dev, results)
+    _average_3d_stack_cuda_kernel[blocks_per_grid, threads_per_block](x_dev, results)
     results = results.copy_to_host()
     return results
 
@@ -229,17 +233,14 @@ def create_average_frm_cuda(video_path: Union[str, os.PathLike],
         check_int(name='start_frm', value=start_frm, min_value=0, max_value=video_meta_data['frame_count'])
         check_int(name='end_frm', value=end_frm, min_value=0, max_value=video_meta_data['frame_count'])
         if start_frm > end_frm:
-            raise InvalidInputError(msg=f'Start frame ({start_frm}) has to be before end frame ({end_frm}).',
-                                    source=create_average_frm_cuda.__name__)
+            raise InvalidInputError(msg=f'Start frame ({start_frm}) has to be before end frame ({end_frm}).', source=create_average_frm_cuda.__name__)
         frame_ids = list(range(start_frm, end_frm))
     elif (start_time is not None) and (end_time is not None):
         check_if_string_value_is_valid_video_timestamp(value=start_time, name=create_average_frm_cuda.__name__)
         check_if_string_value_is_valid_video_timestamp(value=end_time, name=create_average_frm_cuda.__name__)
-        check_that_hhmmss_start_is_before_end(start_time=start_time, end_time=end_time,
-                                              name=create_average_frm_cuda.__name__)
+        check_that_hhmmss_start_is_before_end(start_time=start_time, end_time=end_time, name=create_average_frm_cuda.__name__)
         check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=start_time, video_path=video_path)
-        frame_ids = find_frame_numbers_from_time_stamp(start_time=start_time, end_time=end_time,
-                                                       fps=video_meta_data['fps'])
+        frame_ids = find_frame_numbers_from_time_stamp(start_time=start_time, end_time=end_time, fps=video_meta_data['fps'])
     else:
         frame_ids = list(range(0, video_meta_data['frame_count']))
     frame_ids = [frame_ids[i:i + batch_size] for i in range(0, len(frame_ids), batch_size)]
@@ -448,7 +449,7 @@ def stack_sliding_mse(x: np.ndarray,
     return out
 
 
-def img_stack_to_grayscale_cupy(imgs: np.ndarray,
+def img_stack_to_grayscale_cupy(imgs: Union[np.ndarray, cp.ndarray],
                                 batch_size: Optional[int] = 250) -> np.ndarray:
     """
     Converts a stack of color images to grayscale using GPU acceleration with CuPy.
@@ -466,9 +467,9 @@ def img_stack_to_grayscale_cupy(imgs: np.ndarray,
        :class: simba-table
        :header-rows: 1
 
-    :param np.ndarray imgs: A 4D NumPy array representing a stack of images with shape (num_images, height, width, channels). The images are expected to have 3 channels (RGB).
+    :param np.ndarray imgs: A 4D NumPy or CuPy array representing a stack of images with shape (num_images, height, width, channels). The images are expected to have 3 channels (RGB).
     :param Optional[int] batch_size: The number of images to process in each batch. Defaults to 250. Adjust this parameter to fit your GPU's memory capacity.
-    :return np.ndarray: m A 3D NumPy array of shape (num_images, height, width) containing the grayscale images. If the input array is not 4D, the function returns the input as is.
+    :return np.ndarray: m A 3D NumPy or CuPy array of shape (num_images, height, width) containing the grayscale images. If the input array is not 4D, the function returns the input as is.
 
     :example:
     >>> imgs = read_img_batch_from_video_gpu(video_path=r"/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_IOT_1_cropped.mp4", verbose=False, start_frm=0, end_frm=i)
@@ -477,7 +478,7 @@ def img_stack_to_grayscale_cupy(imgs: np.ndarray,
     """
 
 
-    check_instance(source=img_stack_to_grayscale_cupy.__name__, instance=imgs, accepted_types=(np.ndarray,))
+    check_instance(source=img_stack_to_grayscale_cupy.__name__, instance=imgs, accepted_types=(np.ndarray, cp.ndarray))
     check_if_valid_img(data=imgs[0], source=img_stack_to_grayscale_cupy.__name__)
     if imgs.ndim != 4:
         return imgs
@@ -492,7 +493,10 @@ def img_stack_to_grayscale_cupy(imgs: np.ndarray,
         vals = (0.07 * img_batch[:, :, :, 2] + 0.72 * img_batch[:, :, :, 1] + 0.21 * img_batch[:, :, :, 0])
         results[start:end] = vals.astype(cp.uint8)
         start = end
-    return results.get()
+    if isinstance(imgs, np.ndarray):
+        return results.get()
+    else:
+        return results
 
 
 
@@ -979,3 +983,214 @@ def rotate_video_cupy(video_path: Union[str, os.PathLike],
     writer.release()
     timer.stop_timer()
     stdout_success(f'Rotated video saved at {save_path}', source=rotate_video_cupy.__name__)
+
+
+@cuda.jit()
+def _bg_subtraction_cuda_kernel(imgs, avg_img, results, is_clr, fg_clr, threshold):
+    x, y, n = cuda.grid(3)
+    if n < 0 or n > (imgs.shape[0] -1):
+        return
+    if y < 0 or y > (imgs.shape[1] -1):
+        return
+    if x < 0 or x > (imgs.shape[2] -1):
+        return
+    if is_clr[0] == 1:
+        r1, g1, b1 = imgs[n][y][x][0],imgs[n][y][x][1], imgs[n][y][x][2]
+        r2, g2, b2 = avg_img[y][x][0], avg_img[y][x][1], avg_img[y][x][2]
+        r_diff, g_diff, b_diff = abs(r1-r2), abs(g1-g2), abs(b1-b2)
+        grey_diff = _cuda_luminance_pixel_to_grey(r_diff, g_diff, b_diff)
+        if grey_diff > threshold[0]:
+            if fg_clr[0] != -1:
+                r_out, g_out, b_out = fg_clr[0], fg_clr[1], fg_clr[2]
+            else:
+                r_out, g_out, b_out = r1, g1, b1
+        else:
+            r_out, g_out, b_out = results[n][y][x][0], results[n][y][x][1], results[n][y][x][2]
+        results[n][y][x][0], results[n][y][x][1], results[n][y][x][2] = r_out, g_out, b_out
+
+    else:
+        val_1, val_2 = imgs[n][y][x][0], avg_img[y][x][0]
+        grey_diff = abs(val_1-val_2)
+        if grey_diff > threshold[0]:
+            if fg_clr[0] != -1:
+                val_out = val_1
+            else:
+                val_out = 255
+        else:
+            val_out = 0
+        results[n][y][x] = val_out
+
+
+def bg_subtraction_cuda(video_path: Union[str, os.PathLike],
+                        avg_frm: np.ndarray,
+                        save_path: Optional[Union[str, os.PathLike]] = None,
+                        bg_clr: Optional[Tuple[int, int, int]] = (0, 0, 0),
+                        fg_clr: Optional[Tuple[int, int, int]] = None,
+                        batch_size: Optional[int] = 500,
+                        threshold: Optional[int] = 50):
+    """
+    Remove background from videos using GPU acceleration.
+
+    .. note::
+       To create an `avg_frm`, use :func:`simba.video_processors.video_processing.create_average_frm`, :func:`simba.data_processors.cuda.image.create_average_frm_cupy`, or :func:`~simba.data_processors.cuda.image.create_average_frm_cuda`
+
+    .. seealso::
+       For CPU-based alternative, see :func:`simba.video_processors.video_processing.video_bg_subtraction` or :func:`~simba.video_processors.video_processing.video_bg_subtraction_mp`
+       For GPU-based alternative, see :func:`~simba.data_processors.cuda.image.bg_subtraction_cupy`.
+       Needs work, CPU/multicore appears faster.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/bg_subtraction_cuda.csv
+       :widths: 10, 45, 45
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    :param Union[str, os.PathLike] video_path: The path to the video to remove the background from.
+    :param np.ndarray avg_frm: Average frame of the video. Can be created with e.g., :func:`simba.video_processors.video_processing.create_average_frm`.
+    :param Optional[Union[str, os.PathLike]] save_path: Optional location to store the background removed video. If None, then saved in the same directory as the input video with the `_bg_removed` suffix.
+    :param Optional[Tuple[int, int, int]] bg_clr: Tuple representing the background color of the video.
+    :param Optional[Tuple[int, int, int]] fg_clr: Tuple representing the foreground color of the video (e.g., the animal). If None, then the original pixel colors will be used. Default: 50.
+    :param Optional[int] batch_size: Number of frames to process concurrently. Use higher values of RAM memory allows. Default: 500.
+    :param Optional[int] threshold: Value between 0-255 representing the difference threshold between the average frame subtracted from each frame. Higher values and more pixels will be considered background. Default: 50.
+
+    :example:
+    >>> video_path = "/mnt/c/troubleshooting/mitra/project_folder/videos/clipped/592_MA147_Gq_CNO_0515.mp4"
+    >>> avg_frm = create_average_frm(video_path=video_path)
+    >>> bg_subtraction_cuda(video_path=video_path, avg_frm=avg_frm, fg_clr=(255, 255, 255))
+    """
+
+    check_if_valid_img(data=avg_frm, source=f'{bg_subtraction_cuda}')
+    check_if_valid_rgb_tuple(data=bg_clr)
+    check_int(name=f'{bg_subtraction_cuda.__name__} batch_size', value=batch_size, min_value=1)
+    check_int(name=f'{bg_subtraction_cuda.__name__} threshold', value=threshold, min_value=0, max_value=255)
+    THREADS_PER_BLOCK = (32, 32, 1)
+    timer = SimbaTimer(start=True)
+    video_meta = get_video_meta_data(video_path=video_path)
+    batch_cnt = int(max(1, np.ceil(video_meta['frame_count'] / batch_size)))
+    frm_batches = np.array_split(np.arange(0, video_meta['frame_count']), batch_cnt)
+    n, w, h = video_meta['frame_count'], video_meta['width'], video_meta['height']
+    avg_frm = cv2.resize(avg_frm, (w, h))
+    if is_video_color(video_path): is_color = np.array([1])
+    else: is_color = np.array([0])
+    fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
+    if save_path is None:
+        in_dir, video_name, _ = get_fn_ext(filepath=video_path)
+        save_path = os.path.join(in_dir, f'{video_name}_bg_removed.mp4')
+    if fg_clr is not None:
+        check_if_valid_rgb_tuple(data=fg_clr)
+        fg_clr = np.array(fg_clr)
+    else:
+        fg_clr = np.array([-1])
+    threshold = np.array([threshold]).astype(np.int32)
+    writer = cv2.VideoWriter(save_path, fourcc, video_meta['fps'], (w, h))
+    y_dev = cuda.to_device(avg_frm.astype(np.float32))
+    fg_clr_dev = cuda.to_device(fg_clr)
+    is_color_dev = cuda.to_device(is_color)
+    for frm_batch_cnt, frm_batch in enumerate(frm_batches):
+        print(f'Processing frame batch {frm_batch_cnt+1} / {len(frm_batches)} (complete: {round((frm_batch_cnt / len(frm_batches)) * 100, 2)}%)')
+        batch_imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=frm_batch[0], end_frm=frm_batch[-1])
+        batch_imgs = np.stack(list(batch_imgs.values()), axis=0).astype(np.float32)
+        batch_n = batch_imgs.shape[0]
+        results = np.zeros_like(batch_imgs).astype(np.uint8)
+        results[:] = bg_clr
+        results = cuda.to_device(results)
+        grid_x = math.ceil(w / THREADS_PER_BLOCK[0])
+        grid_y = math.ceil(h / THREADS_PER_BLOCK[1])
+        grid_z = math.ceil(batch_n / THREADS_PER_BLOCK[2])
+        bpg = (grid_x, grid_y, grid_z)
+        x_dev = cuda.to_device(batch_imgs)
+        _bg_subtraction_cuda_kernel[bpg, THREADS_PER_BLOCK](x_dev, y_dev, results, is_color_dev, fg_clr_dev, threshold)
+        results = results.copy_to_host()
+        for img_cnt, img in enumerate(results):
+            writer.write(img)
+    writer.release()
+    timer.stop_timer()
+    stdout_success(msg=f'Video saved at {save_path}', elapsed_time=timer.elapsed_time_str)
+
+
+def bg_subtraction_cupy(video_path: Union[str, os.PathLike],
+                        avg_frm: np.ndarray,
+                        save_path: Optional[Union[str, os.PathLike]] = None,
+                        bg_clr: Optional[Tuple[int, int, int]] = (0, 0, 0),
+                        fg_clr: Optional[Tuple[int, int, int]] = None,
+                        batch_size: Optional[int] = 500,
+                        threshold: Optional[int] = 50):
+    """
+    Remove background from videos using GPU acceleration through CuPY.
+
+    .. seealso::
+       For CPU-based alternative, see :func:`simba.video_processors.video_processing.video_bg_subtraction` or :func:`~simba.video_processors.video_processing.video_bg_subtraction_mp`
+       For GPU-based alternative, see :func:`~simba.data_processors.cuda.image.bg_subtraction_cuda`.
+       Needs work, CPU/multicore appears faster.
+
+    :param Union[str, os.PathLike] video_path: The path to the video to remove the background from.
+    :param np.ndarray avg_frm: Average frame of the video. Can be created with e.g., :func:`simba.video_processors.video_processing.create_average_frm`.
+    :param Optional[Union[str, os.PathLike]] save_path: Optional location to store the background removed video. If None, then saved in the same directory as the input video with the `_bg_removed` suffix.
+    :param Optional[Tuple[int, int, int]] bg_clr: Tuple representing the background color of the video.
+    :param Optional[Tuple[int, int, int]] fg_clr: Tuple representing the foreground color of the video (e.g., the animal). If None, then the original pixel colors will be used. Default: 50.
+    :param Optional[int] batch_size: Number of frames to process concurrently. Use higher values of RAM memory allows. Default: 500.
+    :param Optional[int] threshold: Value between 0-255 representing the difference threshold between the average frame subtracted from each frame. Higher values and more pixels will be considered background. Default: 50.
+
+
+    :example:
+    >>> avg_frm = create_average_frm(video_path="/mnt/c/troubleshooting/mitra/project_folder/videos/temp/temp_ex_bg_subtraction/original/844_MA131_gq_CNO_0624.mp4")
+    >>> video_path = "/mnt/c/troubleshooting/mitra/project_folder/videos/temp/temp_ex_bg_subtraction/844_MA131_gq_CNO_0624_7.mp4"
+    >>> bg_subtraction_cupy(video_path=video_path, avg_frm=avg_frm, batch_size=500)
+    """
+
+    if not _cuda_available()[0]:
+        raise SimBAGPUError('NP GPU detected using numba.cuda', source=bg_subtraction_cupy.__name__)
+    check_if_valid_img(data=avg_frm, source=f'{bg_subtraction_cupy}')
+    avg_frm = cp.array(avg_frm)
+    check_if_valid_rgb_tuple(data=bg_clr)
+    check_int(name=f'{bg_subtraction_cupy.__name__} batch_size', value=batch_size, min_value=1)
+    check_int(name=f'{bg_subtraction_cupy.__name__} threshold', value=threshold, min_value=0, max_value=255)
+    timer = SimbaTimer(start=True)
+    video_meta = get_video_meta_data(video_path=video_path)
+    avg_frm = cv2.resize(avg_frm, (video_meta['width'], video_meta['height']))
+    batch_cnt = int(max(1, np.ceil(video_meta['frame_count'] / batch_size)))
+    frm_batches = np.array_split(np.arange(0, video_meta['frame_count']), batch_cnt)
+    n, w, h = video_meta['frame_count'], video_meta['width'], video_meta['height']
+    if is_video_color(video_path):
+        is_color = np.array([1])
+    else:
+        is_color = np.array([0])
+    fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
+    if save_path is None:
+        in_dir, video_name, _ = get_fn_ext(filepath=video_path)
+        save_path = os.path.join(in_dir, f'{video_name}_bg_removed_ppp.mp4')
+    if fg_clr is not None:
+        check_if_valid_rgb_tuple(data=fg_clr)
+        fg_clr = np.array(fg_clr)
+    else:
+        fg_clr = np.array([-1])
+    writer = cv2.VideoWriter(save_path, fourcc, video_meta['fps'], (w, h))
+    for frm_batch_cnt, frm_batch in enumerate(frm_batches):
+        print(f'Processing frame batch {frm_batch_cnt + 1} / {len(frm_batches)} (complete: {round((frm_batch_cnt / len(frm_batches)) * 100, 2)}%)')
+        batch_imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=frm_batch[0], end_frm=frm_batch[-1])
+        batch_imgs = cp.array(np.stack(list(batch_imgs.values()), axis=0).astype(np.float32))
+        img_diff = cp.abs(batch_imgs - avg_frm)
+        if is_color:
+            img_diff = img_stack_to_grayscale_cupy(imgs=img_diff, batch_size=img_diff.shape[0])
+            mask = cp.where(img_diff > threshold, 1, 0).astype(cp.uint8)
+            batch_imgs[mask == 0] = bg_clr
+            if fg_clr[0] != -1:
+                batch_imgs[mask == 1] = fg_clr
+        batch_imgs = batch_imgs.astype(cp.uint8).get()
+        for img_cnt, img in enumerate(batch_imgs):
+            writer.write(img)
+    writer.release()
+    timer.stop_timer()
+    stdout_success(msg=f'Video saved at {save_path}', elapsed_time=timer.elapsed_time_str)
+
+
+#from simba.data_processors.cuda.image import create_average_frm_cupy
+SAVE_PATH = "/mnt/c/Users/sroni/Downloads/bg_remove_nb/bg_removed_ex_7.mp4"
+VIDEO_PATH = "/mnt/c/Users/sroni/Downloads/bg_remove_nb/open_field.mp4"
+avg_frm = create_average_frm_cuda(video_path=VIDEO_PATH)
+#
+get_video_meta_data(VIDEO_PATH)
+#
+bg_subtraction_cuda(video_path=VIDEO_PATH, avg_frm=avg_frm, save_path=SAVE_PATH, threshold=70)

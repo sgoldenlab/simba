@@ -64,21 +64,19 @@ def _cuda_mse(img_1, img_2):
     return s / (img_1.shape[0] * img_1.shape[1])
 
 
-# @guvectorize([(float64[:], float64[:])], '(n) -> (n)', target='cuda')
-# def _cuda_bubble_sort(arr, out):
-#     """
-#     :example:
-#     >>> a = np.random.randint(5, 50, (5, 200)).astype('float64')
-#     >>> d_a = cuda.to_device(a)
-#     >>> _cuda_bubble_sort(d_a)
-#     >>> d = d_a.copy_to_host()
-#     """
-#
-#     for i in range(len(arr)):
-#         for j in range(len(arr) - 1 - i):
-#             if arr[j] > arr[j + 1]:
-#                 arr[j], arr[j + 1] = arr[j + 1], arr[j]
-#     out = arr
+@cuda.jit(device=True)
+def _cuda_luminance_pixel_to_grey(r: int, g: int, b: int):
+    r = 0.2126* r
+    g = 0.7152 * g
+    b = 0.0722 * b
+    return b + g + r
+
+@cuda.jit(device=True)
+def _cuda_digital_pixel_to_grey(r: int, g: int, b: int):
+    r = 0.299 * r
+    g = 0.587 * g
+    b = 0.114 * b
+    return b + g + r
 
 @cuda.jit(device=True)
 def _euclid_dist(x, y):
@@ -103,3 +101,20 @@ def _cuda_available() -> Tuple[bool, Dict[int, Any]]:
                                 'PCI_bus_id': gpu.PCI_BUS_ID}
 
     return is_available, devices
+
+
+# @guvectorize([(float64[:], float64[:])], '(n) -> (n)', target='cuda')
+# def _cuda_bubble_sort(arr, out):
+#     """
+#     :example:
+#     >>> a = np.random.randint(5, 50, (5, 200)).astype('float64')
+#     >>> d_a = cuda.to_device(a)
+#     >>> _cuda_bubble_sort(d_a)
+#     >>> d = d_a.copy_to_host()
+#     """
+#
+#     for i in range(len(arr)):
+#         for j in range(len(arr) - 1 - i):
+#             if arr[j] > arr[j + 1]:
+#                 arr[j], arr[j + 1] = arr[j + 1], arr[j]
+#     out = arr

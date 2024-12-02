@@ -12,9 +12,7 @@ except ImportError:
     from typing_extensions import Literal
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log,
-    check_file_exist_and_readable, check_if_filepath_list_is_empty)
+from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_file_exist_and_readable, check_if_filepath_list_is_empty, check_valid_dataframe)
 from simba.utils.data import detect_bouts
 from simba.utils.enums import Options, TagNames
 from simba.utils.errors import InvalidInputError
@@ -115,15 +113,14 @@ class AggregateClfCalculator(ConfigReader):
             _, _, fps = self.read_video_info(video_name=file_name)
             check_file_exist_and_readable(file_path)
             data_df = read_df(file_path, self.file_type)
+            check_valid_dataframe(df=data_df, required_fields=self.clf_names, source=file_path)
             bouts_df = detect_bouts(data_df=data_df, target_lst=self.clf_names, fps=fps)
             if self.detailed_bout_data and (len(bouts_df) > 0):
                 bouts_df_for_detailes = deepcopy(bouts_df)
                 bouts_df_for_detailes.insert(loc=0, column="Video", value=file_name)
                 self.bouts_df_lst.append(bouts_df_for_detailes)
             bouts_df["Shifted start"] = bouts_df["Start_time"].shift(-1)
-            bouts_df["Interval duration"] = (
-                bouts_df["Shifted start"] - bouts_df["End Time"]
-            )
+            bouts_df["Interval duration"] = (bouts_df["Shifted start"] - bouts_df["End Time"])
             for clf in self.clf_names:
                 clf_results_dict = {}
                 clf_data = bouts_df.loc[bouts_df["Event"] == clf]
@@ -237,7 +234,7 @@ class AggregateClfCalculator(ConfigReader):
 
 # test = AggregateClfCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #                               data_measures=["Bout count", "Total event duration (s)", "Mean event bout duration (s)", "Median event bout duration (s)", "First event occurrence (s)", "Mean event bout interval duration (s)", "Median event bout interval duration (s)"],
-#                               classifiers=['rearing'],
+#                               classifiers=['straub_tail'],
 #                               video_meta_data =['Frame count', "Video length (s)"],
 #                               transpose=True)
 # test.run()

@@ -7,7 +7,10 @@ import re
 import subprocess
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union
-
+try:
+    import cupy as cp
+except ModuleNotFoundError:
+    import numpy as cp
 import cv2
 import numpy as np
 import pandas as pd
@@ -61,7 +64,7 @@ def check_int(name: str,
               max_value: Optional[int] = None,
               min_value: Optional[int] = None,
               unaccepted_vals: Optional[List[int]] = None,
-              raise_error: Optional[bool] = True) -> (bool, str):
+              raise_error: Optional[bool] = True) -> Tuple[bool, str]:
     """
     Check if variable is a valid integer.
 
@@ -71,9 +74,8 @@ def check_int(name: str,
     :param Optional[int]: Minimum allowed value of the variable. If None, then no minimum. Default: None.
     :param Optional[List[int]] unaccepted_vals: Optional list of values that are not accepted. Default: None.
     :param Optional[bool] raise_error: If True, then raise error if invalid integer. Default: True.
-
-    :return bool: False if invalid. True if valid.
-    :return str: If invalid, then error msg. Else empty str.
+    :return: If `raise_error` is False, then returns size-2 tuple, with first value being a bool representing if valid integer, and second value a string representing error (if valid is False, else empty string)
+    :rtype: Tuple[bool, str]
 
     :examples:
     >>> check_int(name='My_fps', input=25, min_value=1)
@@ -118,7 +120,7 @@ def check_str(name: str,
               options: Optional[Union[Tuple[Any], List[Any], Iterable[Any]]] = (),
               allow_blank: bool = False,
               invalid_options: Optional[List[str]] = None,
-              raise_error: bool = True) -> (bool, str):
+              raise_error: bool = True) -> Tuple[bool, str]:
 
     """
     Check if variable is a valid string.
@@ -129,9 +131,8 @@ def check_str(name: str,
     :param Optional[bool] allow_blank: If True, allow empty string. Default: False.
     :param Optional[bool] raise_error: If True, then raise error if invalid string. Default: True.
     :param Optional[List[str]] invalid_options: If not None, then a list of strings that are invalid.
-
-    :return bool: False if invalid. True if valid.
-    :return str: If invalid, then error msg. Else empty str.
+    :return: If `raise_error` is False, then returns size-2 Tuple, with first value being a bool representing if valid string, and second value a string representing error reason (if valid is False, else empty string).
+    :rtype: Tuple[bool, str]
 
     :examples:
     >>> check_str(name='split_eval', input='gini', options=['entropy', 'gini'])
@@ -175,7 +176,7 @@ def check_float(
     max_value: Optional[float] = None,
     min_value: Optional[float] = None,
     raise_error: bool = True,
-) -> (bool, str):
+) -> Tuple[bool, str]:
     """
     Check if variable is a valid float.
 
@@ -184,9 +185,9 @@ def check_float(
     :param Optional[int] max_value: Maximum allowed value of the float. If None, then no maximum. Default: None.
     :param Optional[int]: Minimum allowed value of the float. If None, then no minimum. Default: None.
     :param Optional[bool] raise_error: If True, then raise error if invalid float. Default: True.
+    :return: If `raise_error` is False, then returns size-2 tuple, with first value being a bool representing if valid float, and second value a string representing error (if valid is False, else empty string)
+    :rtype: Tuple[bool, str]
 
-    :return bool: False if invalid. True if valid.
-    :return str: If invalid, then error msg. Else empty str.
 
     :examples:
     >>> check_float(name='My_float', value=0.5, max_value=1.0, min_value=0.0)
@@ -756,7 +757,7 @@ def check_if_valid_img(data: np.ndarray, source: Optional[str] = "", raise_error
     :parameter Optional[bool] raise_error: If True, raise InvalidInputError if invalid image representation. Else, return bool.
     """
 
-    check_instance(source=check_if_valid_img.__name__, instance=data, accepted_types=np.ndarray)
+    check_instance(source=check_if_valid_img.__name__, instance=data, accepted_types=(np.ndarray, cp.ndarray))
     if (data.ndim != 2) and (data.ndim != 3):
         if raise_error:
             raise InvalidInputError(
@@ -1435,3 +1436,30 @@ def check_valid_dict(x: dict,
             if i not in list(x.keys()):
                 raise InvalidInputError(msg=f'The required key {i} does not exist in the dictionary. Existing keys: {list(x.keys())}', source=check_valid_dict.__name__)
 
+
+def is_video_color(video: Union[str, os.PathLike, cv2.VideoCapture]) -> bool:
+    """
+    Determines whether a video is in color or greyscale.
+
+    .. seealso::
+       :func:`simba.mixins.image_mixin.ImageMixin.is_video_color`
+
+    :param Union[str, os.PathLike, cv2.VideoCapture] video: The video source, either a cv2.VideoCapture object or a path to a file on disk.
+    :return: Returns `True` if the video is in color (has more than one channel), and `False` if the video is greyscale (single channel).
+    :rtype: bool
+    """
+
+    check_instance(source=is_video_color.__name__, instance=video, accepted_types=(str, cv2.VideoCapture))
+    if isinstance(video, str):
+        check_file_exist_and_readable(file_path=video)
+        video = cv2.VideoCapture(video)
+
+    video.set(cv2.CAP_PROP_POS_FRAMES, 0)
+    _, frm = video.read()
+    if frm.ndim > 2:
+        if frm.shape[2] != 1:
+            return True
+        else:
+            return False
+    else:
+        return False

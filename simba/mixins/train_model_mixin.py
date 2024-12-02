@@ -307,6 +307,7 @@ class TrainModelMixin(object):
                                     clf_name: str,
                                     save_dir: Union[str, os.PathLike],
                                     save_file_no: Optional[int] = None,
+                                    plot: Optional[bool] = True,
                                     n_repeats: Optional[int] = 10) -> None:
         """
         Computes feature permutation importance scores.
@@ -316,7 +317,8 @@ class TrainModelMixin(object):
         :param RandomForestClassifier clf: random forest classifier object
         :param List[str] feature_names: Names of features in x_test
         :param str clf_name: Name of classifier in y_test.
-        :param str save_dir: Directory where to save results in CSV format
+        :param str save_dir: Directory where to save results in CSV format.
+        :param Optional[bool] plot: If True, creates bar plot chart and saves in same directory as the CSV file.
         :param Optional[int] save_file_no: If permutation importance calculation is part of a grid search, provide integer identifier representing the model in the grid serach sequence. This will be used as suffix in output filename.
         :returns: None. A CSV file representing the permutation importances is stored in ``save_dir``.
         """
@@ -330,9 +332,20 @@ class TrainModelMixin(object):
         df = df.sort_values(by=["FEATURE_IMPORTANCE_MEAN"], ascending=False)
         if save_file_no != None:
             save_file_path = os.path.join(save_dir, f'{clf_name}_{save_file_no}_permutations_importances.csv')
+            save_file_path_plot = os.path.join(save_dir, f'{clf_name}_{save_file_no}_permutations_importances.png')
         else:
             save_file_path = os.path.join(save_dir, f"{clf_name}_permutations_importances.csv")
+            save_file_path_plot = os.path.join(save_dir, f"{clf_name}_permutations_importances.png")
         df.to_csv(save_file_path, index=False)
+        if plot:
+            _ = PlottingMixin.plot_bar_chart(df=df,
+                                             x='FEATURE_NAME',
+                                             y="FEATURE_IMPORTANCE_MEAN",
+                                             error='FEATURE_IMPORTANCE_STDEV',
+                                             x_label='FEATURE',
+                                             y_label='IMPORTANCE',
+                                             title=f'SimBA feature importances {clf_name} (permutation)',
+                                             save_path=save_file_path_plot)
         timer.stop_timer()
         print(f"Permutation importance calculation complete (elapsed time: {timer.elapsed_time_str}s) ...")
 
@@ -423,6 +436,7 @@ class TrainModelMixin(object):
                       clf_name: str,
                       save_dir: Union[str, os.PathLike],
                       multiclass: bool = False,
+                      plot: Optional[bool] = True,
                       classifier_map: Dict[int, str] = None,
                       save_file_no: Optional[int] = None) -> None:
         """
@@ -438,6 +452,7 @@ class TrainModelMixin(object):
         :param str clf_name: Classifier name.
         :param str save_dir: Directory where to save output in csv file format.
         :param bool multiclass: If the classifier is a multi-classifier. Default: False.
+        :param Optional[bool] plot: If True, creates and saves line plot PR curve in the same lication as the output CSV file.
         :param Dict[int, str] classifier_map: If multiclass, dictionary mapping integers to classifier names.
         :param Optional[int] save_file_no: If integer, represents the count of the classifier within a grid search. If none, the classifier is not part of a grid search.
         :returns: None. Results are stored in `save_dir``.
@@ -475,9 +490,13 @@ class TrainModelMixin(object):
             pr_df = pd.concat(pr_df_lst, axis=0).reset_index(drop=True)
         if save_file_no != None:
             self.pr_save_path = os.path.join(save_dir, f"{clf_name}_{save_file_no}_pr_curve.csv")
+            self.pr_save_path_plot = os.path.join(save_dir, f"{clf_name}_{save_file_no}_pr_curve.png")
         else:
             self.pr_save_path = os.path.join(save_dir, f"{clf_name}_pr_curve.csv")
+            self.pr_save_path_plot = os.path.join(save_dir, f"{clf_name}_pr_curve.png")
         pr_df.to_csv(self.pr_save_path, index=False)
+        if plot:
+            _ = PlottingMixin.line_plot(df=pr_df, x="DISCRIMINATION THRESHOLDS", y=['PRECISION', 'RECALL', 'F1'], x_label='discrimination threshold', y_label='PERFORMANCE', title=f'SimBA {clf_name} precision-recall curve', save_path=self.pr_save_path_plot)
         timer.stop_timer()
         print(f"Precision-recall curve calculation complete (elapsed time: {timer.elapsed_time_str}s) ...")
 
@@ -1641,18 +1660,14 @@ class TrainModelMixin(object):
                                expected_value: float):
 
         target = data.pop(clf_name).values.reshape(-1, 1)
-        print('ppp')
         frame_batch_shap = explainer.shap_values(data.values, check_additivity=False)[1]
         shap_sum = np.sum(frame_batch_shap, axis=1).reshape(-1, 1)
-        print('s')
         proba = rf_clf.predict_proba(data)[:, 1].reshape(-1, 1)
-        print(proba)
         frame_batch_shap = np.hstack((frame_batch_shap,
                                       np.full((frame_batch_shap.shape[0]), expected_value).reshape(-1, 1),
                                       shap_sum,
                                       proba,
                                       target))
-        print('ss')
 
         return frame_batch_shap, data.values
 

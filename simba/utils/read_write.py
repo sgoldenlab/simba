@@ -537,6 +537,7 @@ def concatenate_videos_in_folder(in_folder: Union[str, os.PathLike],
             returned = os.system(f'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -c:v h264_nvenc -c:a copy -hide_banner -loglevel info "{save_path}" -y')
         else:
             returned = os.system(f'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -r {out_fps} -c:v h264_nvenc -c:a copy -hide_banner -loglevel info "{save_path}" -y')
+            #returned = os.system(f'ffmpeg -hwaccel cuda -hwaccel_output_format cuda -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -vf scale_cuda=1280:720,format=nv12 -r {out_fps} -c:v h264_nvenc -c:a copy -hide_banner -loglevel info "{save_path}" -y')
     else:
         if fps is None:
             returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" "{save_path}" -c copy -hide_banner -loglevel info -y')
@@ -880,17 +881,12 @@ def convert_parquet_to_csv(directory: str) -> None:
     for file_cnt, file_path in enumerate(files_found):
         print("Reading in {} ...".format(os.path.basename(file_path)))
         df = pd.read_parquet(file_path)
-        new_file_path = os.path.join(
-            directory, os.path.basename(file_path).replace(".parquet", ".csv")
-        )
+        new_file_path = os.path.join(directory, os.path.basename(file_path).replace(".parquet", ".csv"))
         if "scorer" in df.columns:
             df = df.set_index("scorer")
         df.to_csv(new_file_path)
         print("Saved {}...".format(new_file_path))
-    stdout_success(
-        msg=f"{str(len(files_found))} parquet files in {directory} converted to csv",
-        source=convert_parquet_to_csv.__name__,
-    )
+    stdout_success(msg=f"{str(len(files_found))} parquet files in {directory} converted to csv", source=convert_parquet_to_csv.__name__)
 
 
 def convert_csv_to_parquet(directory: Union[str, os.PathLike]) -> None:
@@ -931,9 +927,7 @@ def convert_csv_to_parquet(directory: Union[str, os.PathLike]) -> None:
     )
 
 
-def get_file_name_info_in_directory(
-    directory: Union[str, os.PathLike], file_type: str
-) -> Dict[str, str]:
+def get_file_name_info_in_directory(directory: Union[str, os.PathLike], file_type: str) -> Dict[str, str]:
     """
     Get dict of all file paths in a directory with specified extension as values and file base names as keys.
 
@@ -955,9 +949,7 @@ def get_file_name_info_in_directory(
     return results
 
 
-def archive_processed_files(
-    config_path: Union[str, os.PathLike], archive_name: str
-) -> None:
+def archive_processed_files(config_path: Union[str, os.PathLike], archive_name: str) -> None:
     """
     Archive files within a SimBA project.
 
@@ -1068,10 +1060,7 @@ def tabulate_clf_info(clf_path: Union[str, os.PathLike]) -> None:
     try:
         clf_obj = pickle.load(open(clf_path, "rb"))
     except:
-        raise InvalidFilepathError(
-            msg=f"The {clf_path} file is not a pickle file",
-            source=tabulate_clf_info.__name__,
-        )
+        raise InvalidFilepathError(msg=f"The {clf_path} file is not a pickle file", source=tabulate_clf_info.__name__)
     try:
         clf_features_no = clf_obj.n_features_
         clf_criterion = clf_obj.criterion
@@ -2547,3 +2536,6 @@ def get_memory_usage_array(x: np.ndarray) -> Dict[str, float]:
     results["megabytes"] = mb
     results["gigabytes"] = int(mb / 1000)
     return results
+
+
+

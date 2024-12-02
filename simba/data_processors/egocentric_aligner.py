@@ -97,6 +97,7 @@ class EgocentricalAligner(ConfigReader):
             self.data_paths = find_files_of_filetypes_in_directory(directory=self.outlier_corrected_dir, extensions=['.csv'])
         else:
             self.data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=['.csv'])
+
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
         self.anchor_1_cols = [f'{anchor_1}_x'.lower(), f'{anchor_1}_y'.lower()]
         self.anchor_2_cols = [f'{anchor_2}_x'.lower(), f'{anchor_2}_y'.lower()]
@@ -198,9 +199,9 @@ if __name__ == "__main__":
                                   rotate_video=True,
                                   anchor_1='tail_base',
                                   anchor_2='nose',
-                                  data_dir=r'C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location',
-                                  videos_dir=r'C:\troubleshooting\mitra\project_folder\videos\bg_removed',
-                                  save_dir=r"C:\troubleshooting\mitra\project_folder\videos\bg_removed\rotated")
+                                  data_dir=r'C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\temp',
+                                  videos_dir=r'C:\troubleshooting\mitra\project_folder\videos\additional\bg_removed',
+                                  save_dir=r"C:\troubleshooting\mitra\project_folder\videos\additional\bg_removed\rotated")
     aligner.run()
 
 
