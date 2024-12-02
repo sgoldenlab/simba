@@ -25,8 +25,8 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
                                     get_video_meta_data, remove_files,
                                     write_df)
-from simba.video_processors.video_processing import (video_bg_subtraction_mp,
-                                                     video_bg_subtraction)
+from simba.video_processors.video_processing import (video_bg_subtraction,
+                                                     video_bg_subtraction_mp)
 
 
 class BlobLocationComputer(object):

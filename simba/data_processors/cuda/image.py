@@ -4,7 +4,7 @@ __email__ = "sronilsson@gmail.com"
 
 import math
 import os
-from typing import Optional, Union, Tuple
+from typing import Optional, Tuple, Union
 
 try:
     from typing import Literal
@@ -17,28 +17,35 @@ except:
     import numpy as cp
     from scipy.ndimage import rotate
 
+import warnings
 from copy import deepcopy
 
 import cv2
 import numpy as np
 from numba import cuda
+from numba.core.errors import NumbaPerformanceWarning
 
-from simba.data_processors.cuda.utils import _cuda_mse, _cuda_available, _cuda_luminance_pixel_to_grey
+from simba.data_processors.cuda.utils import (_cuda_available,
+                                              _cuda_luminance_pixel_to_grey,
+                                              _cuda_mse)
 from simba.mixins.image_mixin import ImageMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_string_value_is_valid_video_timestamp,
-                                check_if_valid_img, check_instance, check_int,
+                                check_if_valid_img, check_if_valid_rgb_tuple,
+                                check_instance, check_int,
                                 check_nvidea_gpu_available,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_array, check_valid_boolean, check_if_valid_rgb_tuple, is_video_color)
+                                check_valid_array, check_valid_boolean,
+                                is_video_color)
 from simba.utils.data import find_frame_numbers_from_time_stamp
 from simba.utils.enums import Formats
-from simba.utils.errors import FFMPEGCodecGPUError, InvalidInputError, SimBAGPUError
+from simba.utils.errors import (FFMPEGCodecGPUError, InvalidInputError,
+                                SimBAGPUError)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext, get_video_meta_data, read_img_batch_from_video_gpu)
-from numba.core.errors import NumbaPerformanceWarning
-import warnings
+from simba.utils.read_write import (
+    check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
+    get_video_meta_data, read_img_batch_from_video_gpu)
 
 warnings.simplefilter('ignore', category=NumbaPerformanceWarning)
 
