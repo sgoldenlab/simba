@@ -7,10 +7,12 @@ import re
 import subprocess
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union
+
 try:
     import cupy as cp
 except ModuleNotFoundError:
     import numpy as cp
+
 import cv2
 import numpy as np
 import pandas as pd
