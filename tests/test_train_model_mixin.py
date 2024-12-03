@@ -5,7 +5,7 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.read_write import read_config_file, read_df
+from simba.utils.read_write import read_config_file, read_df, read_pickle
 
 
 IN_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
@@ -47,10 +47,11 @@ def test_random_undersampler(sample_ratio):
     assert y_train_out.reset_index(drop=True).equals(pd.Series([1, 0], name='Test'))
 
 @pytest.mark.parametrize("clf_path", ['tests/data/test_projects/two_c57/models/generated_models/Attack.sav'])
+#@pytest.mark.parametrize("clf_path", [r"C:\projects\simba\simba\tests\data\test_projects\two_c57\models\generated_models\Attack.sav"])
 def test_calc_permutation_importance(clf_path):
     x_test = np.array([[1, 2], [1, 2], [1, 2]])
     y_test = np.array([[1], [1], [0]])
-    clf = read_df(file_path=clf_path, file_type='pickle')
+    clf = read_pickle(data_path=clf_path)
     _ = TrainModelMixin().calc_permutation_importance(x_test=x_test, y_test=y_test, clf=clf, feature_names=['Feature_1', 'Feature_2'], clf_name='Attack', save_dir=os.path.dirname(clf_path))
     assert os.path.isfile(os.path.join(os.path.dirname(clf_path), 'Attack_permutations_importances.csv'))
 

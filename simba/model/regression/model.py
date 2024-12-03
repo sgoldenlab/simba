@@ -42,6 +42,7 @@ def fit_xgb(x: pd.DataFrame,
     check_int(name=f'{fit_xgb.__name__} verbosity', value=verbosity, min_value=0, max_value=3)
     check_float(name=f'{fit_xgb.__name__} learning_rate', value=learning_rate, min_value=0.1, max_value=1.0)
     xgb_reg = xgb.XGBRegressor(objective=objective, max_depth=max_depth, n_estimators=n_estimators, verbosity=verbosity)
+
     return xgb_reg.fit(X=x, y=y)
 
 def transform_xgb(x: pd.DataFrame, model: xgb.XGBRegressor):

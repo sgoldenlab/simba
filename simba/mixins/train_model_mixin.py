@@ -326,10 +326,10 @@ class TrainModelMixin(object):
         print("Calculating feature permutation importances...")
         timer = SimbaTimer(start=True)
         p_importances = permutation_importance(clf, x_test, y_test, n_repeats=n_repeats, random_state=0)
-        df = pd.DataFrame(
-            np.column_stack([feature_names, p_importances.importances_mean, p_importances.importances_std]),
-            columns=["FEATURE_NAME", "FEATURE_IMPORTANCE_MEAN", "FEATURE_IMPORTANCE_STDEV"])
+        df = pd.DataFrame(np.column_stack([feature_names, p_importances.importances_mean, p_importances.importances_std]), columns=["FEATURE_NAME", "FEATURE_IMPORTANCE_MEAN", "FEATURE_IMPORTANCE_STDEV"])
         df = df.sort_values(by=["FEATURE_IMPORTANCE_MEAN"], ascending=False)
+        df["FEATURE_IMPORTANCE_MEAN"] = df["FEATURE_IMPORTANCE_MEAN"].astype(np.float64)
+        df["FEATURE_IMPORTANCE_STDEV"] = df["FEATURE_IMPORTANCE_STDEV"].astype(np.float64)
         if save_file_no != None:
             save_file_path = os.path.join(save_dir, f'{clf_name}_{save_file_no}_permutations_importances.csv')
             save_file_path_plot = os.path.join(save_dir, f'{clf_name}_{save_file_no}_permutations_importances.png')

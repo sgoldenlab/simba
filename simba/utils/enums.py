@@ -171,7 +171,7 @@ class Formats(Enum):
         "box": ["bx.h5", "bx_filtered.h5"],
         "ellipse": ["el.h5", "el_filtered.h5"],
     }
-
+    EXPECTED_VIDEO_INFO_COLS = ["Video", "fps", "Resolution_width", "Resolution_height", "Distance_in_mm", "pixels/mm"]
 
 class Options(Enum):
     ROLLING_WINDOW_DIVISORS = [2, 5, 6, 7.5, 15]

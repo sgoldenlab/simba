@@ -48,7 +48,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_instance, check_int,
                                 check_nvidea_gpu_available, check_str,
                                 check_valid_array, check_valid_boolean,
-                                check_valid_dataframe, check_valid_lst)
+                                check_valid_dataframe, check_valid_lst, check_if_valid_rgb_tuple)
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
 from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 FFMPEGCodecGPUError, FileExistError,
@@ -352,6 +352,11 @@ def read_project_path_and_file_type(config: configparser.ConfigParser) -> Tuple[
 
     return project_path, file_type
 
+
+def bgr_to_rgb_tuple(value: Tuple[int, int, int]) -> Tuple[int, int, int]:
+    """ convert bgr tuple to rgb tuple"""
+    check_if_valid_rgb_tuple(data=value)
+    return (value[2], value[1], value[0])
 
 def read_video_info_csv(file_path: Union[str, os.PathLike]) -> pd.DataFrame:
     """

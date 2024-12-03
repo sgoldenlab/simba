@@ -108,7 +108,7 @@ class OutlierCorrecterLocation(ConfigReader, FeatureExtractionMixin):
                 col_names = [f'{body_part_name}_x', f'{body_part_name}_y']
                 if len(frm_idx) > 0:
                     df.loc[frm_idx, col_names] = np.nan
-        return df.fillna(method='ffill', axis=1).fillna(0)
+        return df.fillna(method='ffill', axis=0).fillna(0)
 
     def run(self):
         self.logs, self.frm_cnts = {}, {}
@@ -131,7 +131,6 @@ class OutlierCorrecterLocation(ConfigReader, FeatureExtractionMixin):
                     bp_name = animal_bps["X_bps"][bp_cnt][:-2]
                     bp_dict[animal_name][bp_name] = animal_arr[:, bp_col_start: bp_col_start + 2]
             above_criteria_dict = self.__find_location_outliers(bp_dict=bp_dict, animal_criteria=animal_criteria)
-
             df = self.__correct_outliers(df=df, above_criteria_dict=above_criteria_dict)
             write_df(df=df, file_type=self.file_type, save_path=save_path)
             self.logs[video_name], self.frm_cnts[video_name] = above_criteria_dict, len(df)

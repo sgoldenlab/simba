@@ -50,7 +50,7 @@ def _location_outlier_corrector(data_path: str,
                 col_names = [f'{body_part_name}_x', f'{body_part_name}_y']
                 if len(frm_idx) > 0:
                     df.loc[frm_idx, col_names] = np.nan
-        return df.fillna(method='ffill', axis=1).fillna(0)
+        return df.fillna(method='ffill', axis=0).fillna(0)
 
     video_timer = SimbaTimer(start=True)
     _, video_name, _ = get_fn_ext(data_path)
