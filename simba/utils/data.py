@@ -14,7 +14,7 @@ import cv2
 import h5py
 import numpy as np
 import pandas as pd
-from numba import jit, prange, typed, njit
+from numba import jit, njit, prange, typed
 from pylab import *
 from scipy import stats
 from scipy.signal import savgol_filter
