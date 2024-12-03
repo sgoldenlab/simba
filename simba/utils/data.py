@@ -1506,7 +1506,6 @@ def egocentrically_align_pose_numba(data: np.ndarray,
     one anchor point is aligned to a specified location, and the direction between the two anchors is aligned
     to a target angle.
 
-
     .. video:: _static/img/EgocentricalAligner.webm
        :width: 600
        :autoplay:
