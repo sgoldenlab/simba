@@ -85,7 +85,7 @@ class EgocentricalAligner():
     :param Optional[int] cores: Number of CPU cores to use for video rotation; `-1` uses all available cores.
 
     :example:
-     >>> aligner = EgocentricalAligner(rotate_video=True, anchor_1='tail_base', anchor_2='nose', data_dir=r"C:/Users/sroni/OneDrive/Desktop/rotate_ex/data", videos_dir=r'C:\Users\sroni\OneDrive\Desktop\rotate_ex\videos', save_dir=r"C:\troubleshooting\mitra\project_folder\videos\additional/examples/rotated", video_info=r"C:\troubleshooting\mitra\project_folder\logs\video_info.csv", direction=0, anchor_location=(250, 250), fill_clr=(0, 0, 0))
+     >>> aligner = EgocentricalAligner(rotate_video=True, anchor_1='tail_base', anchor_2='nose', data_dir=r"/data_dir", videos_dir=r'/videos_dir', save_dir=r"/save_dir", video_info=r"C:\troubleshooting\mitra\project_folder\logs\video_info.csv", direction=0, anchor_location=(250, 250), fill_clr=(0, 0, 0))
      >>> aligner.run()
     """
 
