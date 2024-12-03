@@ -1192,12 +1192,12 @@ def bg_subtraction_cupy(video_path: Union[str, os.PathLike],
     timer.stop_timer()
     stdout_success(msg=f'Video saved at {save_path}', elapsed_time=timer.elapsed_time_str)
 
-
-#from simba.data_processors.cuda.image import create_average_frm_cupy
-SAVE_PATH = "/mnt/c/Users/sroni/Downloads/bg_remove_nb/bg_removed_ex_7.mp4"
-VIDEO_PATH = "/mnt/c/Users/sroni/Downloads/bg_remove_nb/open_field.mp4"
-avg_frm = create_average_frm_cuda(video_path=VIDEO_PATH)
 #
-get_video_meta_data(VIDEO_PATH)
-#
-bg_subtraction_cuda(video_path=VIDEO_PATH, avg_frm=avg_frm, save_path=SAVE_PATH, threshold=70)
+# #from simba.data_processors.cuda.image import create_average_frm_cupy
+# SAVE_PATH = "/mnt/c/Users/sroni/Downloads/bg_remove_nb/bg_removed_ex_7.mp4"
+# VIDEO_PATH = "/mnt/c/Users/sroni/Downloads/bg_remove_nb/open_field.mp4"
+# avg_frm = create_average_frm_cuda(video_path=VIDEO_PATH)
+# #
+# get_video_meta_data(VIDEO_PATH)
+# #
+# bg_subtraction_cuda(video_path=VIDEO_PATH, avg_frm=avg_frm, save_path=SAVE_PATH, threshold=70)
