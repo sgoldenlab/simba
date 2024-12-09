@@ -5,7 +5,6 @@ import numpy as np
 from numba import cuda, float64, guvectorize
 
 
-
 @cuda.jit(device=True)
 def _cuda_sum(x: np.ndarray):
     s = 0

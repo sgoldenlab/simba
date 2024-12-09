@@ -1,14 +1,17 @@
 import math
 import time
-
-from simba.utils.checks import check_int, check_valid_array
-import numpy as np
 from typing import Tuple
-from simba.utils.errors import InvalidInputError
-from simba.utils.enums import Formats
-from simba.utils.read_write import read_df
+
+import numpy as np
 from numba import cuda
-from simba.data_processors.cuda.utils import _cuda_matrix_multiplication, _cuda_2d_transpose, _cuda_subtract_2d, _cuda_add_2d
+
+from simba.data_processors.cuda.utils import (_cuda_2d_transpose, _cuda_add_2d,
+                                              _cuda_matrix_multiplication,
+                                              _cuda_subtract_2d)
+from simba.utils.checks import check_int, check_valid_array
+from simba.utils.enums import Formats
+from simba.utils.errors import InvalidInputError
+from simba.utils.read_write import read_df
 
 THREADS_PER_BLOCK = 1024
 
