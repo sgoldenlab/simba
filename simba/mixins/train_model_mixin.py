@@ -585,10 +585,11 @@ class TrainModelMixin(object):
                           save_dir: Union[str, os.PathLike],
                           digits: Optional[int] = 4,
                           clf_name: Optional[str] = None,
-                          img_size: Optional[tuple] = (13.7, 8.27),
+                          img_size: Optional[tuple] = (2500, 4500), #width by height
                           cmap: Optional[str] = "coolwarm",
                           threshold: Optional[int] = 0.5,
-                          save_file_no: Optional[int] = None) -> None:
+                          save_file_no: Optional[int] = None,
+                          dpi: Optional[int] = 300) -> None:
 
         """
         Create classifier truth table report.
@@ -631,18 +632,14 @@ class TrainModelMixin(object):
         y_pred = np.where(y_pred > threshold, 1, 0)
 
         plt.figure()
-        clf_report = classification_report(y_true=y_df.values, y_pred=y_pred, target_names=class_names, digits=digits,
-                                           output_dict=True, zero_division=0)
+        clf_report = classification_report(y_true=y_df.values, y_pred=y_pred, target_names=class_names, digits=digits, output_dict=True, zero_division=0)
         clf_report = pd.DataFrame.from_dict({key: clf_report[key] for key in class_names})
-        img = sns.heatmap(pd.DataFrame(clf_report).T, annot=True, cmap=cmap, vmin=0.0, vmax=1.0, linewidth=2.0,
-                          linecolor='black', fmt='g', annot_kws={"size": 20})
+        plt.figure(figsize=(round((img_size[1] / dpi), 2), round((img_size[0] / dpi), 2)), dpi=dpi)
+        img = sns.heatmap(pd.DataFrame(clf_report).T, annot=True, cmap=cmap, vmin=0.0, vmax=1.0, linewidth=2.0, linecolor='black', fmt='g', annot_kws={"size": 20, "weight": "bold", "color": "white", "family": "sans-serif"})
         img.set_xticklabels(img.get_xticklabels(), size=16)
         img.set_yticklabels(img.get_yticklabels(), size=16)
-
-        img.figure.set_size_inches(img_size)
-        plt.savefig(save_path, dpi=300)
+        plt.savefig(save_path, dpi=dpi)
         plt.close("all")
-
         timer.stop_timer()
         print(f'Classification report saved at {save_path} (elapsed time: {timer.elapsed_time_str}s)')
 

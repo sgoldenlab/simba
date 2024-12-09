@@ -49,7 +49,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_nvidea_gpu_available,
                                 check_str, check_valid_array,
                                 check_valid_boolean, check_valid_dataframe,
-                                check_valid_lst)
+                                check_valid_lst, is_video_color)
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
 from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 FFMPEGCodecGPUError, FileExistError,
@@ -464,10 +464,13 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture], f
     return video_data
 
 
-def remove_a_folder(folder_dir: Union[str, os.PathLike]) -> None:
+def remove_a_folder(folder_dir: Union[str, os.PathLike], ignore_errors: Optional[bool] = True) -> None:
     """Helper to remove a directory"""
     check_if_dir_exists(in_dir=folder_dir, source=remove_a_folder.__name__)
-    shutil.rmtree(folder_dir, ignore_errors=True)
+    try:
+        shutil.rmtree(folder_dir, ignore_errors=ignore_errors)
+    except Exception as e:
+        raise PermissionError(msg=f'Could not delete directory: {folder_dir}. is the directory or its content beeing used by anothe process?', source=remove_a_folder.__name__)
 
 
 def concatenate_videos_in_folder(in_folder: Union[str, os.PathLike],
@@ -477,7 +480,8 @@ def concatenate_videos_in_folder(in_folder: Union[str, os.PathLike],
                                  substring: Optional[str] = None,
                                  remove_splits: Optional[bool] = True,
                                  gpu: Optional[bool] = False,
-                                 fps: Optional[Union[int, str]] = None) -> None:
+                                 fps: Optional[Union[int, str]] = None,
+                                 verbose: bool = True) -> None:
     """
     Concatenate (temporally) all video files in a folder into a single video.
 
@@ -540,9 +544,11 @@ def concatenate_videos_in_folder(in_folder: Union[str, os.PathLike],
 
     if check_nvidea_gpu_available() and gpu:
         if fps is None:
-            returned = os.system(f'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -c:v h264_nvenc -c:a copy -hide_banner -loglevel info "{save_path}" -y')
+            returned = os.system(f"ffmpeg -f concat -safe 0 -i \"{temp_txt_path}\" -c:v h264_nvenc -pix_fmt yuv420p -c:a copy -hide_banner -loglevel info \"{save_path}\" -y")
+           # returned = os.system(f'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -c:v h264_nvenc -c:a copy -hide_banner -loglevel info "{save_path}" -y')
         else:
-            returned = os.system(f'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -r {out_fps} -c:v h264_nvenc -c:a copy -hide_banner -loglevel info "{save_path}" -y')
+            returned = os.system(f"ffmpeg -f concat -safe 0 -i \"{temp_txt_path}\" -r {out_fps} -c:v h264_nvenc -pix_fmt yuv420p -c:a copy -hide_banner -loglevel info \"{save_path}\" -y")
+            #returned = os.system(f'ffmpeg -hwaccel auto -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -r {out_fps} -c:v h264_nvenc -c:a copy -hide_banner -loglevel info "{save_path}" -y')
             #returned = os.system(f'ffmpeg -hwaccel cuda -hwaccel_output_format cuda -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -vf scale_cuda=1280:720,format=nv12 -r {out_fps} -c:v h264_nvenc -c:a copy -hide_banner -loglevel info "{save_path}" -y')
     else:
         if fps is None:
@@ -557,11 +563,8 @@ def concatenate_videos_in_folder(in_folder: Union[str, os.PathLike],
                 remove_a_folder(folder_dir=Path(in_folder))
             break
     timer.stop_timer()
-    stdout_success(
-        msg="Video concatenated",
-        elapsed_time=timer.elapsed_time_str,
-        source=concatenate_videos_in_folder.__name__,
-    )
+    if verbose:
+        stdout_success(msg="Video concatenated", elapsed_time=timer.elapsed_time_str, source=concatenate_videos_in_folder.__name__)
 
 
 def get_bp_headers(body_parts_lst: List[str]) -> list:
@@ -696,7 +699,8 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
                       opacity: Optional[float] = None,
                       size: Optional[Tuple[int, int]] = None,
                       greyscale: Optional[bool] = False,
-                      clahe: Optional[bool] = False) -> np.ndarray:
+                      clahe: Optional[bool] = False,
+                      use_ffmpeg: Optional[bool] = False) -> np.ndarray:
 
     """
     Reads single image from video file.
@@ -721,51 +725,55 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
         check_file_exist_and_readable(file_path=video_path)
         video_meta_data = get_video_meta_data(video_path=video_path)
     else:
-        video_meta_data = {"frame_count": int(video_path.get(cv2.CAP_PROP_FRAME_COUNT))}
+        video_meta_data = {"frame_count": int(video_path.get(cv2.CAP_PROP_FRAME_COUNT)),
+                           "fps": video_path.get(cv2.CAP_PROP_FPS),
+                           'width': int(video_path.get(cv2.CAP_PROP_FRAME_WIDTH)),
+                           'height': int(video_path.get(cv2.CAP_PROP_FRAME_HEIGHT))}
+
     check_int(name='frame_index', value=frame_index, min_value=-1)
-    if frame_index == -1: frame_index = video_meta_data["frame_count"] - 1
+    if frame_index == -1:
+        frame_index = video_meta_data["frame_count"] - 1
     if (frame_index > video_meta_data["frame_count"]) or (frame_index < 0):
         raise FrameRangeError(msg=f'Frame {frame_index} is out of range: The video {video_path} contains {video_meta_data["frame_count"]} frames.', source=read_frm_of_video.__name__)
-    if type(video_path) == str:
-        capture = cv2.VideoCapture(video_path)
+    if not use_ffmpeg:
+        if type(video_path) == str:
+            capture = cv2.VideoCapture(video_path)
+        else:
+            capture = video_path
+        capture.set(cv2.CAP_PROP_POS_FRAMES, frame_index)
+        ret, img = capture.read()
+        if not ret:
+            raise FrameRangeError(msg=f"Frame {frame_index} for video {video_path} could not be read.")
     else:
-        capture = video_path
-    capture.set(cv2.CAP_PROP_POS_FRAMES, frame_index)
-    ret, img = capture.read()
-    if ret:
-        if opacity:
-            opacity = float(opacity / 100)
-            check_float(
-                name="Opacity",
-                value=opacity,
-                min_value=0.00,
-                max_value=1.00,
-                raise_error=True,
-            )
-            opacity = 1 - opacity
-            h, w, clr = img.shape[:3]
-            opacity_image = np.ones((h, w, clr), dtype=np.uint8) * int(255 * opacity)
-            img = cv2.addWeighted(
-                img.astype(np.uint8),
-                1 - opacity,
-                opacity_image.astype(np.uint8),
-                opacity,
-                0,
-            )
-        if size:
-            img = cv2.resize(img, size, interpolation=cv2.INTER_LINEAR)
-        if greyscale:
-            if len(img.shape) > 2:
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        if clahe:
-            if len(img.shape) > 2:
-                img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            img = cv2.createCLAHE(clipLimit=2, tileGridSize=(16, 16)).apply(img)
+        if not isinstance(video_path, str):
+            raise NoDataError(msg='When using FFMpeg, pass video path', source=read_frm_of_video.__name__)
+        is_color = is_video_color(video=video_path)
+        timestamp = frame_index / video_meta_data['fps']
+        if is_color:
+            cmd = f"ffmpeg -hwaccel cuda -ss {timestamp:.10f} -i {video_path} -vframes 1 -f rawvideo -pix_fmt bgr24 -v error -"
+            result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            img = np.frombuffer(result.stdout, np.uint8).reshape((video_meta_data["height"], video_meta_data["width"], 3))
+        else:
+            cmd = f"ffmpeg -hwaccel cuda -ss {timestamp:.10f} -i {video_path} -vframes 1 -f rawvideo -pix_fmt gray -v error -"
+            result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            img = np.frombuffer(result.stdout, np.uint8).reshape((video_meta_data["height"], video_meta_data["width"]))
+    if opacity:
+        opacity = float(opacity / 100)
+        check_float(name="Opacity", value=opacity, min_value=0.00, max_value=1.00, raise_error=True)
+        opacity = 1 - opacity
+        h, w, clr = img.shape[:3]
+        opacity_image = np.ones((h, w, clr), dtype=np.uint8) * int(255 * opacity)
+        img = cv2.addWeighted( img.astype(np.uint8), 1 - opacity, opacity_image.astype(np.uint8), opacity, 0)
+    if size:
+        img = cv2.resize(img, size, interpolation=cv2.INTER_LINEAR)
+    if greyscale:
+        if len(img.shape) > 2:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    if clahe:
+        if len(img.shape) > 2:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img = cv2.createCLAHE(clipLimit=2, tileGridSize=(16, 16)).apply(img)
 
-    else:
-        NoDataFoundWarning(
-            msg=f"Frame {frame_index} for video {video_path} could not be read."
-        )
     return img
 
 
@@ -1540,7 +1548,10 @@ def read_roi_data(roi_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, pd.D
 
 def create_directory(path: Union[str, os.PathLike]):
     if not os.path.exists(path):
-        os.makedirs(path)
+        try:
+            os.makedirs(path)
+        except FileExistsError:
+            raise PermissionError(msg=f'SimBA is not allowed to create the directory {path}.', source=create_directory.__name__)
     else:
         pass
 
@@ -2019,11 +2030,14 @@ def read_data_paths(path: Union[str, os.PathLike, None],
 def img_stack_to_greyscale(imgs: np.ndarray):
     """
     Jitted conversion of a 4D stack of color images (RGB format) to grayscale.
+
     .. image:: _static/img/img_stack_to_greyscale.png
        :width: 600
        :align: center
+
     :parameter np.ndarray imgs: A 4D array representing color images. It should have the shape (num_images, height, width, 3) where the last dimension represents the color channels (R, G, B).
     :returns np.ndarray: A 3D array containing the grayscale versions of the input images. The shape of the output array is (num_images, height, width).
+
     :example:
     >>> imgs = ImageMixin().read_img_batch_from_video( video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Together_1.avi', start_frm=0, end_frm=100)
     >>> imgs = np.stack(list(imgs.values()))
@@ -2082,7 +2096,6 @@ def read_img_batch_from_video_gpu(video_path: Union[str, os.PathLike],
                   '-f', 'rawvideo',
                   '-pix_fmt', f'{color_format}',
                   '-']
-
 
     ffmpeg_process = subprocess.Popen(ffmpeg_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if out_format == 'dict':

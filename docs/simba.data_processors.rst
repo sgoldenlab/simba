@@ -180,3 +180,12 @@ Heuristic freezing detector
    :members:
    :undoc-members:
 
+
+Data GPU methods
+----------------------------------------------
+
+.. automodule:: simba.data_processors.cuda.data
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

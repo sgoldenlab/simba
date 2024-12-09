@@ -158,7 +158,7 @@ class LabellingInterface(ConfigReader):
             self.checkboxes[target] = {}
             self.checkboxes[target]["name"] = target
             if self.current_frm_n.get() not in list(self.data_df_targets.index):
-                raise FrameRangeError(msg=f'Frame data {self.current_frm_n.get()} could not be found in video {self.video_name}. Modify the [Last saved frames] section in the project config if needed.', source=self.__class__.__name__)
+                raise FrameRangeError(msg=f'Frame pose-estimation data for frame {self.current_frm_n.get()} could not be found for video {self.video_name}. This suggests that the video ({self.video_path}) has a different frame number count than the rows in the data files (e.g., {self.targets_inserted_file_path}, {self.features_extracted_file_path}, {self.machine_results_file_path}, where they exist).  Alternatively, modify the [Last saved frames] section in the {self.config_path} if needed.', source=self.__class__.__name__)
             self.checkboxes[target]["var"] = IntVar(value=self.data_df_targets[target].iloc[self.current_frm_n.get()])
             self.checkboxes[target]["cb"] = Checkbutton(self.check_frame,
                 text=target,

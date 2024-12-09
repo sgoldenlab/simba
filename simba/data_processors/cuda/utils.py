@@ -5,6 +5,7 @@ import numpy as np
 from numba import cuda, float64, guvectorize
 
 
+
 @cuda.jit(device=True)
 def _cuda_sum(x: np.ndarray):
     s = 0
@@ -81,6 +82,40 @@ def _cuda_digital_pixel_to_grey(r: int, g: int, b: int):
 @cuda.jit(device=True)
 def _euclid_dist(x, y):
     return math.sqrt(((y[0] - x[0]) ** 2) + ((y[1] - x[1]) ** 2))
+
+@cuda.jit(device=True)
+def _cuda_matrix_multiplication(mA, mB, out):
+    """ Matrix multiplication"""
+    for i in range(mA.shape[0]):
+        for j in range(mB.shape[1]):
+            for k in range(mA.shape[1]):
+                out[i][j] += mA[i][k] * mB[k][j]
+    return out
+
+@cuda.jit(device=True)
+def _cuda_2d_transpose(x, y):
+    """ Transpose a 2d array """
+    for i in range(x.shape[0]):
+        for j in range(x.shape[1]):
+            y[j][i] = x[i][j]
+    return y
+
+@cuda.jit(device=True)
+def _cuda_subtract_2d(x: np.ndarray, vals: np.ndarray) -> np.ndarray:
+    """ Subtract 1d array values for every row in a 2d array"""
+    for i in range(x.shape[0]):
+        for j in range(x.shape[1]):
+            x[i][j] = x[i][j] - vals[j]
+    return x
+
+
+@cuda.jit(device=True)
+def _cuda_add_2d(x: np.ndarray, vals: np.ndarray) -> np.ndarray:
+    """ Add 1d array values for every row in a 2d array"""
+    for i in range(x.shape[0]):
+        for j in range(x.shape[1]):
+            x[i][j] = x[i][j] + vals[j]
+    return x
 
 def _cuda_available() -> Tuple[bool, Dict[int, Any]]:
     """

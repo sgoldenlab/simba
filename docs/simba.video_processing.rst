@@ -51,9 +51,16 @@ Interactive brightness / contrast
    :show-inheritance:
 
 
-Batch process executor
+Batch video process executor
 -----------------------------------------------------------------------
 
 .. automodule:: simba.video_processors.batch_process_create_ffmpeg_commands
+   :members:
+   :show-inheritance:
+
+Egocentrically rotate videos
+-----------------------------------------------------------------------
+
+.. automodule:: simba.video_processors.egocentric_video_rotator
    :members:
    :show-inheritance:
