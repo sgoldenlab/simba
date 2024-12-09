@@ -50,6 +50,7 @@ Some example operations pertaining to working with animals and environments as g
    nb/yolo_ex_1
    nb/yolo_ex_2
    nb/bg_remove
+   nb/egocentric_align
 
 Miscellaneous
 -------------------
