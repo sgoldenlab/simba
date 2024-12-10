@@ -1804,6 +1804,7 @@ def read_pickle(data_path: Union[str, os.PathLike], verbose: Optional[bool] = Fa
     :example:
     >>> data = read_pickle(data_path='/test/unsupervised/cluster_models')
     """
+    data = None
     if os.path.isdir(data_path):
         if verbose:
             print(f"Reading in data directory {data_path}...")
@@ -1841,10 +1842,7 @@ def read_pickle(data_path: Union[str, os.PathLike], verbose: Optional[bool] = Fa
                     source=read_pickle.__name__,
                 )
     else:
-        raise InvalidFilepathError(
-            msg=f"The path {data_path} is neither a valid file or directory path",
-            source=read_pickle.__name__,
-        )
+        raise InvalidFilepathError(msg=f"The path {data_path} is neither a valid file or directory path", source=read_pickle.__name__)
 
     return data
 
