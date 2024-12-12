@@ -141,7 +141,8 @@ class FeatureExtractionMixin(object):
            :align: center
 
         .. seealso::
-           For GPU acceleration, use :func:`simba.data_processors.cuda.statistics.get_3pt_angle`.
+           For GPU acceleration, use :func:`simba.data_processors.cuda.statistics.get_3pt_angle` for single frame alternative,
+           see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt`
 
         :param ndarray data: 2D numerical array with frame number on x and [ax, ay, bx, by, cx, cy] on y.
         :return: 1d float numerical array of size data.shape[0] with angles.
@@ -611,6 +612,7 @@ class FeatureExtractionMixin(object):
         .. image:: _static/img/directing_moving_targets.png
            :width: 400
            :align: center
+
         :param np.ndarray left_ear_array: 2D array of size len(frames) x 2 with the coordinates of the observer animals left ear
         :param np.ndarray right_ear_array: 2D array of size len(frames) x 2 with the coordinates of the observer animals right ear
         :param np.ndarray nose_array: 2D array of size len(frames) x 2 with the coordinates of the observer animals nose
