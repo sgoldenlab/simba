@@ -2334,11 +2334,11 @@ def read_boris_file(file_path: Union[str, os.PathLike],
         expected_headers = [TIME, MEDIA_FILE_PATH, BEHAVIOR, STATUS]
         df = pd.read_csv(file_path)
     check_valid_dataframe(df=df, source=f'{read_boris_file.__name__} {file_path}', required_fields=expected_headers)
+    df = df.dropna(how='all').reset_index(drop=True)
     numeric_check = pd.to_numeric(df[TIME], errors='coerce').notnull().all()
     if not numeric_check:
         if raise_error:
-            raise InvalidInputError(
-                msg=f'SimBA found TIME DATA annotation in file {file_path} that could not be interpreted as numeric values (seconds or frame numbers)')
+            raise InvalidInputError(msg=f'SimBA found TIME DATA annotation in file {file_path} that could not be interpreted as numeric values (seconds or frame numbers)')
         else:
             ThirdPartyAnnotationsInvalidFileFormatWarning(annotation_app="BORIS", file_path=file_path, source=read_boris_file.__name__, log_status=log_setting)
             return {}

@@ -66,4 +66,18 @@ Ordinal classifier methods
    :undoc-members:
 
 
+Regression - metrics
+-------------------------------------------------
+
+.. automodule:: simba.model.regression.metrics
+   :members:
+   :show-inheritance:
+
+Regression - fit and transform
+-------------------------------------------------
+
+.. automodule:: simba.model.regression.model
+   :members:
+   :show-inheritance:
+
 

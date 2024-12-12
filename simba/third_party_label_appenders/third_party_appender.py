@@ -193,6 +193,28 @@ class ThirdPartyLabelAppender(ConfigReader):
 
 
 
+
+log = True
+file_format = 'xlsx'
+error_settings = {'INVALID annotations file data format': 'ERROR',
+                  'ADDITIONAL third-party behavior detected': 'NONE',
+                  'Annotations EVENT COUNT conflict': 'WARNING',
+                  'Annotations OVERLAP inaccuracy': 'WARNING',
+                  'ZERO third-party video behavior annotations found': 'WARNING',
+                  'Annotations and pose FRAME COUNT conflict': 'WARNING',
+                  'Annotations data file NOT FOUND': 'WARNING'}
+
+test = ThirdPartyLabelAppender(config_path=r"C:\troubleshooting\boris_test_2\project_folder\project_config.ini",
+                               data_dir=r"C:\troubleshooting\boris_test_2\project_folder\boris_files",
+                               app='BORIS',
+                               file_format='.csv',
+                               error_settings=error_settings,
+                               log=log)
+test.run()
+
+
+
+
 # log = True
 # file_format = 'xlsx'
 # error_settings = {'INVALID annotations file data format': 'WARNING',

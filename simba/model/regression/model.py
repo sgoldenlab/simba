@@ -1,10 +1,10 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
+from itertools import product
 
 import numpy as np
 import pandas as pd
 import xgboost as xgb
 from sklearn.model_selection import StratifiedKFold
-
 from simba.model.regression.metrics import (mean_absolute_error,
                                             mean_absolute_percentage_error,
                                             mean_squared_error, r2_score,
@@ -15,39 +15,44 @@ from simba.utils.checks import (check_float, check_instance, check_int,
 from simba.utils.enums import Formats
 from simba.utils.errors import DataHeaderError
 
-
 def fit_xgb(x: pd.DataFrame,
             y: np.ndarray,
-            objective: Optional[str] = 'reg:squarederror',
-            n_estimators: Optional[int] = 100,
-            max_depth: Optional[int] = 6,
-            verbosity: Optional[int] = 1,
-            learning_rate: Optional[float] = 0.3,
-            tree_method: Optional[str] = 'auto'):
+            xgb_reg: xgb.XGBRegressor) -> xgb.XGBRegressor:
     """
+    Fits an XGBoost regressor model to the given data.
+
+    :param pd.DataFrame x: Input feature matrix where each row represents a sample and each column a feature. The data must have numeric types.
+    :param np.ndarray y: Target values, must be a 1-dimensional array of numeric types with the same number  of rows as `x`.
+    :param xgb.XGBRegressor xgb_reg: Defined xgb.XGBRegressor. E.g., can be defined with :func:`simba.model.regression.model.xgb_define`,
+    :return: Trained XGBoost regressor model.
+    :rtype: xgb.XGBRegressor
+
     :example:
     >>> x = pd.DataFrame(np.random.randint(0, 500, (100, 20)))
     >>> y = np.random.randint(1, 6, (100,))
     >>> mdl = fit_xgb(x=x, y=y)
     """
-    OBJECTIVES = ('reg:squarederror', 'reg:squaredlogerror', 'reg:logistic', 'reg:pseudohubererror')
-    TREE_METHODS = ('auto', 'exact', 'approx', 'hist', 'gpu_hist')
-
     check_valid_dataframe(df=x, source=f'{fit_xgb.__name__} x', valid_dtypes=Formats.NUMERIC_DTYPES.value)
     check_valid_array(data=y, source=f'{fit_xgb.__name__} y', accepted_ndims=(1,), accepted_axis_0_shape=[x.shape[0]], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
-    check_str(name=f'{fit_xgb.__name__} objective', value=objective, options=OBJECTIVES)
-    check_str(name=f'{fit_xgb.__name__} tree_method', value=tree_method, options=TREE_METHODS)
-    check_int(name=f'{fit_xgb.__name__} n_estimators', value=n_estimators, min_value=1)
-    check_int(name=f'{fit_xgb.__name__} max_depth', value=max_depth, min_value=1)
-    check_int(name=f'{fit_xgb.__name__} verbosity', value=verbosity, min_value=0, max_value=3)
-    check_float(name=f'{fit_xgb.__name__} learning_rate', value=learning_rate, min_value=0.1, max_value=1.0)
-    xgb_reg = xgb.XGBRegressor(objective=objective, max_depth=max_depth, n_estimators=n_estimators, verbosity=verbosity)
-
+    check_instance(source=f'{fit_xgb.__name__} fit_xgb', instance=xgb_reg, accepted_types=(xgb.XGBRegressor,))
     return xgb_reg.fit(X=x, y=y)
 
-def transform_xgb(x: pd.DataFrame, model: xgb.XGBRegressor):
+def transform_xgb(x: pd.DataFrame, model: xgb.XGBRegressor) -> np.ndarray:
 
     """
+    Transforms the input data using the provided XGBoost model by making predictions.
+
+    :param pd.DataFrame x: Input feature matrix where each row represents a sample and each column a feature. The data must have numeric types.
+    :param xgb.XGBRegressor model: Trained XGBoost model to use for making predictions.
+    :return: Predictions rounded to 2 decimal places.
+    :rtype: np.ndarray
+
+    :example:
+    >>> x, y = pd.DataFrame(np.random.randint(0, 500, (100, 20))), np.random.randint(1, 6, (100,))
+    >>> mdl = fit_xgb(x=x, y=y)
+    >>> new_x = pd.DataFrame(np.random.randint(0, 500, (100, 20)))
+    >>> results = transform_xgb(x=new_x, model=mdl)
+
     :example:
     >>> x, y = pd.DataFrame(np.random.randint(0, 500, (100, 20))), np.random.randint(1, 6, (100,))
     >>> mdl = fit_xgb(x=x, y=y)
@@ -110,37 +115,77 @@ def evaluate_xgb(y_pred: np.ndarray,
 
     return results
 
+def xgb_define(objective: str = 'reg:squarederror',
+               n_estimators: int = 100,
+               max_depth: int = 6,
+               verbosity: int = 1,
+               learning_rate: float = 0.3,
+               eta: float = 0.3,
+               gamma: float = 0.0,
+               tree_method: str = 'auto') -> xgb.XGBRegressor:
 
-def kfold_fit_xgb(x: pd.DataFrame,
-                  y: np.ndarray,
-                  objective: Optional[str] = 'reg:squarederror',
-                  n_estimators: Optional[int] = 100,
-                  max_depth: Optional[int] = 6,
-                  verbosity: Optional[int] = 1,
-                  learning_rate: Optional[float] = 0.3,
-                  tree_method: Optional[str] = 'auto',
-                  k: Optional[int] = 5):
+    OBJECTIVES = ('reg:squarederror', 'reg:squaredlogerror', 'reg:logistic', 'reg:pseudohubererror')
+    TREE_METHODS = ('auto', 'exact', 'approx', 'hist', 'gpu_hist')
+    check_str(name=f'{fit_xgb.__name__} objective', value=objective, options=OBJECTIVES)
+    check_str(name=f'{fit_xgb.__name__} tree_method', value=tree_method, options=TREE_METHODS)
+    check_int(name=f'{fit_xgb.__name__} n_estimators', value=n_estimators, min_value=1)
+    check_int(name=f'{fit_xgb.__name__} max_depth', value=max_depth, min_value=1)
+    check_int(name=f'{fit_xgb.__name__} verbosity', value=verbosity, min_value=0, max_value=3)
+    check_float(name=f'{fit_xgb.__name__} learning_rate', value=learning_rate, min_value=0.1, max_value=1.0)
+    check_float(name=f'{fit_xgb.__name__} eta', value=eta, min_value=0.0, max_value=1.0)
+    check_float(name=f'{fit_xgb.__name__} gamma', value=gamma, min_value=0.0)
 
-    # USE xgb.cv
+    return xgb.XGBRegressor(objective=objective, max_depth=max_depth, n_estimators=n_estimators, verbosity=verbosity, learning_rate=learning_rate, eta=eta, gamma=gamma, tree_method=tree_method)
+
+
+def xgb_grid_define(objective: Tuple[str] = ('reg:squarederror',),
+                    n_estimators: Tuple[int] = (100,),
+                    max_depth: Tuple[int] =(6,),
+                    verbosity: Tuple[int] = (1,),
+                    learning_rate: Tuple[float] = (0.3,),
+                    eta: Tuple[float] = (0.3,),
+                    gamma: Tuple[float] = (0.0,),
+                    tree_method: Tuple[str] = ('auto',)) -> List[xgb.XGBRegressor]:
+
+    grid = list(product(objective, n_estimators, max_depth, verbosity, learning_rate, eta, gamma, tree_method))
+    mdls = []
+    for i in grid:
+        mdl = xgb_define(objective=i[0], n_estimators=i[1], max_depth=i[2], verbosity=i[3], learning_rate=i[4], eta=i[5], gamma=i[6], tree_method=i[7])
+        mdls.append(mdl)
+    return mdls
+
+
+
+
+def xgb_grid_fit(x: pd.DataFrame,
+                 y: np.ndarray,
+                 xgb_regs: List[xgb.XGBRegressor]) -> List[xgb.XGBRegressor]:
+    check_valid_lst(data=xgb_regs, source=xgb_grid_fit.__name__, valid_dtypes=())
+
+
+
+
+
+
+    #xgb_define()
+
+
+
+
+
+    # grid_df = pd.DataFrame(grid, columns=['objective', 'n_estimators', 'max_depth', 'learning_rate', 'eta', 'gamma'])
+    # grid_df['verbosity'], grid_df['tree_method'] = verbosity, tree_method
     #
-    # OBJECTIVES = ('reg:squarederror', 'reg:squaredlogerror', 'reg:logistic', 'reg:pseudohubererror')
-    # TREE_METHODS = ('auto', 'exact', 'approx', 'hist', 'gpu_hist')
-    #
-    # check_valid_dataframe(df=x, source=f'{fit_xgb.__name__} x', valid_dtypes=Formats.NUMERIC_DTYPES.value)
-    # check_valid_array(data=y, source=f'{fit_xgb.__name__} y', accepted_ndims=(1,), accepted_axis_0_shape=[x.shape[0]], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
-    # check_str(name=f'{fit_xgb.__name__} objective', value=objective, options=OBJECTIVES)
-    # check_str(name=f'{fit_xgb.__name__} tree_method', value=tree_method, options=TREE_METHODS)
-    # check_int(name=f'{fit_xgb.__name__} n_estimators', value=n_estimators, min_value=1)
-    # check_int(name=f'{fit_xgb.__name__} max_depth', value=max_depth, min_value=1)
-    # check_int(name=f'{fit_xgb.__name__} verbosity', value=verbosity, min_value=0, max_value=3)
-    # check_float(name=f'{fit_xgb.__name__} learning_rate', value=learning_rate, min_value=0.1, max_value=1.0)
-    # check_int(name=f'{fit_xgb.__name__} k', value=k, min_value=2)
-    # k_fold = StratifiedKFold(n_splits=k, shuffle=True)
-    # for fold_cnt, (train_index, test_index) in enumerate(k_fold.split(x, y)):
-    #     x_fold, y_fold = x.loc[train_index], y[test_index]
+    # grid_df.apply(fit, axis=1, result_type='expand')
 
-    pass
 
+
+
+
+
+
+
+xgb_grid_define(max_depth=(6, 3), gamma=(0, 0.3))
 
 # x = pd.DataFrame(np.random.randint(0, 500, (100, 20)))
 # y = np.random.randint(1, 6, (100,))
