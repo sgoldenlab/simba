@@ -845,7 +845,8 @@ class GeometryMixin(object):
                     bg_img: Optional[np.ndarray] = None,
                     bg_clr: Optional[Tuple[int, int, int]] = None,
                     size: Optional[int] = None,
-                    color_palette: Optional[str] = 'Set1',
+                    color_palette: Union[str, List[Tuple[int, int, int]]] = 'Set1',
+                    fill_shapes: Optional[bool] = False,
                     thickness: Optional[int] = 2,
                     pixel_buffer: Optional[int] = 200,
                     circle_size: Optional[int] = 2) -> np.ndarray:
@@ -888,41 +889,41 @@ class GeometryMixin(object):
                 img = np.full((max_vertices[0], max_vertices[1], 3), bg_clr, dtype=np.uint8)
         else:
             img = bg_img
+        check_instance(source='view_shapes color_palette', instance=color_palette, accepted_types=(list, str))
+        if isinstance(color_palette, str):
+            check_str(name='color_palette', value=color_palette, options=Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value)
+            colors = create_color_palette(pallete_name=color_palette, increments=len(shapes) + 1)
+        else:
+            check_valid_lst(data=color_palette, source='color_palette', valid_dtypes=(tuple,), exact_len=len(shapes))
+            for clr in color_palette:
+                check_if_valid_rgb_tuple(data=clr)
+            colors = color_palette
 
-        if color_palette is not None:
-            check_str(name='color_palette', value=color_palette,
-                      options=Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value)
-
-        colors = create_color_palette(pallete_name=color_palette, increments=len(shapes) + 1)
         for shape_cnt, shape in enumerate(shapes):
             if isinstance(shape, Polygon):
-                cv2.polylines(img, [np.array(shape.exterior.coords).astype(np.int32)], True, (colors[shape_cnt][::-1]),
-                              thickness=thickness)
-                interior_coords = [np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2)) for interior in
-                                   shape.interiors]
-                for interior in interior_coords:
-                    cv2.polylines(img, [interior], isClosed=True, color=(colors[shape_cnt][::-1]),
-                                  thickness=thickness, )
-            if isinstance(shape, LineString):
-                if color_palette is None:
-                    cv2.polylines(img, [np.array(shape.coords, dtype=np.int32)], False, (colors[shape_cnt][::-1]),
-                                  thickness=thickness)
+                if not fill_shapes:
+                    cv2.polylines(img, [np.array(shape.exterior.coords).astype(np.int32)], True, (colors[shape_cnt][::-1]), thickness=thickness)
                 else:
-                    lines = np.array(shape.coords, dtype=np.int32)
-                    palette = create_color_palette(pallete_name=color_palette, increments=lines.shape[0])
-                    for i in range(1, lines.shape[0]):
-                        p1, p2 = lines[i - 1], lines[i]
-                        cv2.line(img, tuple(p1), tuple(p2), palette[i], thickness)
+                    cv2.fillPoly(img, [np.array(shape.exterior.coords).astype(np.int32)], (colors[shape_cnt][::-1]))
+                interior_coords = [np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2)) for interior in shape.interiors]
+                for interior in interior_coords:
+                    if not fill_shapes:
+                        cv2.polylines(img, [interior], isClosed=True, color=(colors[shape_cnt][::-1]), thickness=thickness)
+                    else:
+                        cv2.fillPoly(img, [interior], (colors[shape_cnt][::-1]), lineType=None, shift=None, offset=None)
+            if isinstance(shape, LineString):
+                lines = np.array(shape.coords, dtype=np.int32)
+                for i in range(1, lines.shape[0]):
+                    p1, p2 = lines[i - 1], lines[i]
+                    cv2.line(img, tuple(p1), tuple(p2), colors[shape_cnt][::-1], thickness)
 
             if isinstance(shape, MultiPolygon):
-                multi_polygon_clrs = create_color_palette(pallete_name=color_palette, increments=len(shape.geoms) + 1)
                 for polygon_cnt, polygon in enumerate(shape.geoms):
                     polygon_np = np.array((polygon.convex_hull.exterior.coords), dtype=np.int32)
-                    cv2.polylines(img, [polygon_np], True, (multi_polygon_clrs[polygon_cnt][::-1]), thickness=thickness)
+                    cv2.polylines(img, [polygon_np], True, (colors[shape_cnt][::-1]), thickness=thickness)
             if isinstance(shape, MultiLineString):
                 for line_cnt, line in enumerate(shape.geoms):
-                    cv2.polylines(img, [np.array(shape[line_cnt].coords, dtype=np.int32)], False,
-                                  (colors[shape_cnt][::-1]), thickness=thickness)
+                    cv2.polylines(img, [np.array(shape[line_cnt].coords, dtype=np.int32)], False, (colors[shape_cnt][::-1]), thickness=thickness)
             if isinstance(shape, Point):
                 arr = np.array((shape.coords)).astype(np.int32)
                 x, y = arr[0][0], arr[0][1]
@@ -2999,7 +3000,7 @@ class GeometryMixin(object):
 
         :param Iterable[int] img_size: 2-value tuple, list or array representing the width and height of the image in pixels.
         :param Optional[float] bucket_grid_size_mm: The width/height of each square bucket in millimeters. E.g., 50 will create 5cm by 5cm squares. If None, then buckets will by defined by ``bucket_grid_size`` argument.
-        :param Optional[Iterable[int]] bucket_grid_size: 2-value tuple, list or array representing the grid square in number of horizontal squares x number of vertical squares. If None, then buckets will be defined by the ``bucket_size_mm`` argument.
+        :param Optional[Iterable[int, int]] bucket_grid_size: 2-value tuple, list or array representing the grid square in number of horizontal squares x number of vertical squares. If None, then buckets will be defined by the ``bucket_size_mm`` argument.
         :param Optional[float] px_per_mm: Pixels per millimeter conversion factor. Necessery if buckets are defined by ``bucket_size_mm`` argument.
         :param Optional[bool] add_correction: If True, performs correction by adding extra columns or rows to cover any remaining space if using ``bucket_size_mm``. Default True.
         :param Optional[bool] verbose: If True, prints progress / completion information. Default False.
