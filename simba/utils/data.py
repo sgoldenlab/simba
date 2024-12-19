@@ -39,7 +39,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
                                 InvalidFileTypeError, InvalidInputError,
-                                NoFilesFoundError)
+                                NoFilesFoundError, SimBAModuleNotFoundError)
 from simba.utils.printing import stdout_success, stdout_warning
 from simba.utils.read_write import (find_video_of_file, get_fn_ext,
                                     get_video_meta_data, read_config_entry,
@@ -1394,7 +1394,8 @@ def df_smoother(data: pd.DataFrame,
     return data.clip(lower=0)
 
 
-def get_library_version(library_name: str) -> str:
+def get_library_version(library_name: str,
+                        raise_error: bool = False) -> Union[str, bool]:
     """
     Get the version installed package in python environment.
 
@@ -1410,7 +1411,11 @@ def get_library_version(library_name: str) -> str:
         lib = importlib.import_module(library_name)
         return getattr(lib, '__version__', 'Version information not available')
     except ImportError:
-        return f'Library "{library_name}" is not installed'
+        if not raise_error:
+            return False
+        else:
+            raise SimBAModuleNotFoundError(msg=f'The library {library_name} could not be found', source=get_library_version.__name__)
+
 
 
 

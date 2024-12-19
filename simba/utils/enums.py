@@ -496,15 +496,14 @@ class Methods(Enum):
     WARNING = "WARNING"
     ERROR = "ERROR"
     ANOVA = "ANOVA"
+    AGG_METHODS = ('mean', 'median')
     INVALID_THIRD_PARTY_APPENDER_FILE = "INVALID annotations file data format"
     ADDITIONAL_THIRD_PARTY_CLFS = "ADDITIONAL third-party behavior detected"
     ZERO_THIRD_PARTY_VIDEO_ANNOTATIONS = "ZERO third-party video annotations found"
     THIRD_PARTY_FPS_CONFLICT = "Annotations and pose FPS conflict"
     THIRD_PARTY_EVENT_COUNT_CONFLICT = "Annotations EVENT COUNT conflict"
     THIRD_PARTY_EVENT_OVERLAP = "Annotations OVERLAP inaccuracy"
-    ZERO_THIRD_PARTY_VIDEO_BEHAVIOR_ANNOTATIONS = (
-        "ZERO third-party video behavior annotations found"
-    )
+    ZERO_THIRD_PARTY_VIDEO_BEHAVIOR_ANNOTATIONS = ("ZERO third-party video behavior annotations found")
     THIRD_PARTY_FRAME_COUNT_CONFLICT = "Annotations and pose FRAME COUNT conflict"
     THIRD_PARTY_ANNOTATION_FILE_NOT_FOUND = "Annotations data file NOT FOUND"
 
@@ -668,3 +667,74 @@ class MLParamKeys(Enum):
 
 class TestPaths(Enum):
     CRITICAL_VALUES = "../simba/assets/lookups/critical_values_05.pickle"
+
+
+
+
+class UML(Enum):
+    FIT_KEYS = ("n_neighbors", "min_distance", "spread")
+    ALL_FEATURES_EX_POSE = "ALL FEATURES (EXCLUDING POSE)"
+    DATA_SLICE_SELECTION = "data_slice"
+    CLF_SLICE_SELECTION = "clf_slice"
+    ALL_FEATURES_EXCLUDING_POSE = "ALL FEATURES (EXCLUDING POSE)"
+    ALL_FEATURES_INCLUDING_POSE = "ALL FEATURES (INCLUDING POSE)"
+    USER_DEFINED_SET = "USER-DEFINED FEATURE SET"
+    NAMES = "NAMES"
+    START_FRAME = "START_FRAME"
+    END_FRAME = "END_FRAME"
+    CLASSIFIER = "CLASSIFIER"
+    PROBABILITY = "PROBABILITY"
+    FRAME = "FRAME"
+    VIDEO = "VIDEO"
+    FEATURE_PATH = "feature_path"
+    BOUT_AGGREGATION_TYPE = "bout_aggregation_type"
+    MIN_BOUT_LENGTH = "min_bout_length"
+    N_NEIGHBORS = "n_neighbors"
+    HASHED_NAME = "HASH"
+    DATA = "DATA"
+    RAW = "RAW"
+    UMAP = "UMAP"
+    HDBSCAN = "HDBSCAN"
+    TSNE = "TSNE"
+    SCALER_TYPE = "SCALER_TYPE"
+    CSV = "CSV"
+    MULTICOLLINEARITY = "multicollinearity"
+    COLLINEAR_FIELDS = 'COLLINEAR_FIELDS'
+    VARIANCE_THRESHOLD = 'VARIANCE_THRESHOLD'
+    MULTICOLLINEARITY_THRESHOLD = 'MULTICOLLINEARITY_THRESHOLD'
+    FORMAT = "format"
+    SCALED_DATA = "SCALED_DATA"
+    PARAMETERS = "PARAMETERS"
+    METHODS = "METHODS"
+    DR_MODEL = "DR_MODEL"
+    MODEL = "MODEL"
+    CLUSTER_MODEL = 'CLUSTER_MODEL'
+    MIN_DISTANCE = "min_distance"
+    EUCLIDEAN = "euclidean"
+    FEATURE_NAMES = "FEATURE_NAMES"
+    SPREAD = "spread"
+    SCALER = "scaler"
+    SCALED = "scaled"
+    VARIANCE = "variance"
+    HYPERPARAMETERS = [N_NEIGHBORS, MIN_DISTANCE, SPREAD, SCALER, VARIANCE]
+    FRAME_FEATURES = "FRAME_FEATURES"
+    FRAME_POSE = "FRAME_POSE"
+    FRAME_TARGETS = "FRAME_TARGETS"
+    BOUTS_FEATURES = "BOUTS_FEATURES"
+    BOUTS_TARGETS = "BOUTS_TARGETS"
+    DATASET_DATA_FIELDS = [
+        FRAME_FEATURES,
+        FRAME_POSE,
+        FRAME_TARGETS,
+        BOUTS_FEATURES,
+        BOUTS_TARGETS,
+    ]
+    MIN_MAX = "MIN-MAX"
+    STANDARD = "STANDARD"
+    QUANTILE = "QUANTILE"
+    LOW_VARIANCE_FIELDS = "LOW_VARIANCE_FIELDS"
+    ALPHA = "alpha"
+    MIN_CLUSTER_SIZE = "min_cluster_size"
+    MIN_SAMPLES = "min_samples"
+    EPSILON = "cluster_selection_epsilon"
+

@@ -135,7 +135,7 @@ class HeatmapClfPopUp(PopUpMixin, ConfigReader):
                 video_setting=self.heatmap_videos_var.get(),
                 frame_setting=self.heatmap_frames_var.get(),
                 bodypart=self.bp_dropdown.getChoices(),
-                files_found=data_paths,
+                data_paths=data_paths,
                 clf_name=self.clf_dropdown.getChoices(),
             )
 
@@ -150,7 +150,7 @@ class HeatmapClfPopUp(PopUpMixin, ConfigReader):
                 video_setting=self.heatmap_videos_var.get(),
                 frame_setting=self.heatmap_frames_var.get(),
                 bodypart=self.bp_dropdown.getChoices(),
-                files_found=data_paths,
+                data_paths=data_paths,
                 clf_name=self.clf_dropdown.getChoices(),
                 core_cnt=int(self.multiprocess_dropdown.getChoices()),
             )

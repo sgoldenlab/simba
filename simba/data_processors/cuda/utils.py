@@ -27,11 +27,27 @@ def _cuda_cos(x, t):
     return t
 
 @cuda.jit(device=True)
+def _cuda_min(x: np.ndarray):
+    return min(x)
+
+@cuda.jit(device=True)
+def _cuda_max(x: np.ndarray):
+    return max(x)
+
+@cuda.jit(device=True)
+def _cuda_standard_deviation(x):
+    m = _cuda_mean(x)
+    std_sum = 0
+    for i in range(x.shape[0]):
+        std_sum += abs(x[i] - m)
+    return math.sqrt(std_sum / x.shape[0])
+
+@cuda.jit(device=True)
 def _cuda_std(x: np.ndarray, x_hat: float):
     std = 0
     for i in range(x.shape[0]):
         std += (x[0] - x_hat) ** 2
-    return std
+    return math.sqrt(std / x.shape[0])
 
 @cuda.jit(device=True)
 def _rad2deg(x):
@@ -116,6 +132,33 @@ def _cuda_add_2d(x: np.ndarray, vals: np.ndarray) -> np.ndarray:
             x[i][j] = x[i][j] + vals[j]
     return x
 
+
+@cuda.jit(device=True)
+def _cuda_variance(x: np.ndarray):
+    mean = _cuda_mean(x)
+    num = 0
+    for i in range(x.shape[0]):
+        num += abs(x[i] - mean)
+    return num / (x.shape[0] - 1)
+
+
+@cuda.jit(device=True)
+def _cuda_mac(x: np.ndarray):
+    """ mean average change in 1d array (max size 512)"""
+    diff = cuda.local.array(shape=512, dtype=np.float64)
+    for i in range(512):
+        diff[i] = np.inf
+    for j in range(1, x.shape[0]):
+        diff[j] = abs(x[j] - x[j-1])
+    s, cnt = 0, 0
+    for p in range(diff.shape[0]):
+        if (diff[p] != np.inf):
+            s += diff[p]
+            cnt += 1
+    val = s / cnt
+    cuda.syncthreads()
+    return val
+
 def _cuda_available() -> Tuple[bool, Dict[int, Any]]:
     """
     Check if GPU available. If True, returns the GPUs, the model, physical slots and compute capabilitie(s).
@@ -137,18 +180,56 @@ def _cuda_available() -> Tuple[bool, Dict[int, Any]]:
     return is_available, devices
 
 
-# @guvectorize([(float64[:], float64[:])], '(n) -> (n)', target='cuda')
-# def _cuda_bubble_sort(arr, out):
-#     """
-#     :example:
-#     >>> a = np.random.randint(5, 50, (5, 200)).astype('float64')
-#     >>> d_a = cuda.to_device(a)
-#     >>> _cuda_bubble_sort(d_a)
-#     >>> d = d_a.copy_to_host()
-#     """
-#
-#     for i in range(len(arr)):
-#         for j in range(len(arr) - 1 - i):
-#             if arr[j] > arr[j + 1]:
-#                 arr[j], arr[j + 1] = arr[j + 1], arr[j]
-#     out = arr
+
+@cuda.jit(device=True)
+def _cuda_bubble_sort(x):
+    n = x.shape[0]
+    for i in range(n - 1):
+        for j in range(n - i - 1):
+            if x[j] > x[j + 1]:
+                x[j], x[j + 1] = x[j + 1], x[j]
+    return x
+
+
+@cuda.jit(device=True)
+def _cuda_median(x):
+    sorted_arr = _cuda_bubble_sort(x)
+    if not x.shape[0] % 2 == 0:
+        return sorted_arr[int(math.floor(x.shape[0] / 2))]
+    else:
+        loc_1, loc_2 = int((x.shape[0] / 2) - 1), int(x.shape[0] / 2)
+        return (sorted_arr[loc_1] + sorted_arr[loc_2]) / 2
+
+
+@cuda.jit(device=True)
+def _cuda_mad(x):
+    diff = cuda.local.array(shape=512, dtype=np.float32)
+    for i in range(512):
+        diff[i] = np.inf
+    m = _cuda_median(x)
+    for j in range(x.shape[0]):
+       diff[j] = abs(x[j] - m)
+    return _cuda_median(diff[0:x.shape[0]-1])
+
+@cuda.jit(device=True)
+def _cuda_rms(x: np.ndarray):
+    squared = cuda.local.array(shape=512, dtype=np.float64)
+    for i in range(512): squared[i] = np.inf
+    for j in range(x.shape[0]):
+        squared[j] = x[j] ** 2
+    m = _cuda_mean(squared[0: x.shape[0]-1])
+    return math.sqrt(m)
+
+
+@cuda.jit(device=True)
+def _cuda_range(x: np.ndarray):
+    return _cuda_max(x) - _cuda_min(x)
+
+@cuda.jit(device=True)
+def _cuda_abs_energy(x):
+    squared = cuda.local.array(shape=512, dtype=np.float64)
+    for i in range(512): squared[i] = np.inf
+    for j in range(x.shape[0]):
+        squared[j] = x[j] ** 2
+    m = _cuda_sum(squared[0: x.shape[0] - 1])
+    return math.sqrt(m)

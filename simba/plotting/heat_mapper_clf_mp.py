@@ -4,6 +4,7 @@ import functools
 import multiprocessing
 import os
 import platform
+from typing import Union, List
 
 import cv2
 import numpy as np
@@ -13,63 +14,54 @@ from numba import jit, prange
 import simba.mixins.plotting_mixin
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
+from simba.mixins.geometry_mixin import GeometryMixin
 from simba.utils.enums import Formats
-from simba.utils.errors import NoSpecifiedOutputError
+from simba.utils.errors import NoSpecifiedOutputError, InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext,
-                                    read_df, remove_a_folder)
+from simba.utils.read_write import (concatenate_videos_in_folder, get_fn_ext, read_df, remove_a_folder, find_core_cnt)
+from simba.utils.checks import check_valid_boolean, check_int, check_str, check_valid_dict, check_filepaths_in_iterable_exist, check_all_file_names_are_represented_in_video_log, check_valid_dataframe
 
 
-def _heatmap_multiprocessor(
-    data: np.array,
-    video_setting: bool,
-    frame_setting: bool,
-    video_temp_dir: str,
-    video_name: str,
-    frame_dir: str,
-    fps: int,
-    style_attr: dict,
-    max_scale: float,
-    clf_name: str,
-    aspect_ratio: float,
-    size: tuple,
-    make_clf_heatmap_plot: simba.mixins.plotting_mixin.PlottingMixin.make_clf_heatmap_plot,
-):
-    group = int(data[0][0][1])
+def _heatmap_multiprocessor(data: np.array,
+                            video_setting: bool,
+                            frame_setting: bool,
+                            video_temp_dir: str,
+                            video_name: str,
+                            frame_dir: str,
+                            fps: int,
+                            style_attr: dict,
+                            max_scale: float,
+                            clf_name: str,
+                            aspect_ratio: float,
+                            size: tuple,
+                            make_clf_heatmap_plot: simba.mixins.plotting_mixin.PlottingMixin.make_clf_heatmap_plot):
+
+    batch, frm_ids, data = data[0], data[1], data[2]
     if video_setting:
         fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-        video_save_path = os.path.join(video_temp_dir, "{}.mp4".format(str(group)))
+        video_save_path = os.path.join(video_temp_dir, f"{batch}.mp4")
         video_writer = cv2.VideoWriter(video_save_path, fourcc, fps, size)
+    for frm_idx in range(data.shape[0]):
+        frame_id, frm_data = int(frm_ids[frm_idx]), data[frm_idx]
+        img = make_clf_heatmap_plot(frm_data=frm_data,
+                                    max_scale=max_scale,
+                                    palette=style_attr["palette"],
+                                    aspect_ratio=aspect_ratio,
+                                    shading=style_attr["shading"],
+                                    clf_name=clf_name,
+                                    img_size=size)
 
-    for i in range(data.shape[0]):
-        frame_id = int(data[i, 0, 0])
-        frm_data = data[i, :, 2:]
-        img = make_clf_heatmap_plot(
-            frm_data=frm_data,
-            max_scale=max_scale,
-            palette=style_attr["palette"],
-            aspect_ratio=aspect_ratio,
-            shading=style_attr["shading"],
-            clf_name=clf_name,
-            img_size=size,
-            final_img=False,
-        )
-        print(
-            "Heatmap frame created: {}, Video: {}, Processing core: {}".format(
-                str(frame_id + 1), video_name, str(group + 1)
-            )
-        )
+        print(f"Heatmap frame created: {frame_id + 1}, Video: {video_name}, Processing core: {batch+1}")
         if video_setting:
             video_writer.write(img)
-
         if frame_setting:
-            file_path = os.path.join(frame_dir, "{}.png".format(frame_id))
+            file_path = os.path.join(frame_dir, f"{frame_id}.png")
             cv2.imwrite(file_path, img)
 
     if video_setting:
         video_writer.release()
 
-    return group
+    return batch
 
 
 class HeatMapperClfMultiprocess(ConfigReader, PlottingMixin):
@@ -96,276 +88,165 @@ class HeatMapperClfMultiprocess(ConfigReader, PlottingMixin):
         >= 10 within a rectangular bins, it will be filled with the same color.
     :param int core_cnt: Number of cores to use.
 
-    :examples:
+    :example I:
     >>> heat_mapper_clf = HeatMapperClfMultiprocess(config_path='MyConfigPath', final_img_setting=False, video_setting=True, frame_setting=False, bin_size=50, palette='jet', bodypart='Nose_1', clf_name='Attack', max_scale=20)
     >>> heat_mapper_clf.create_heatmaps()
+
+
+    :example II:
+    >>> test = HeatMapperClfMultiprocess(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini",
+    >>>                          style_attr = {'palette': 'jet', 'shading': 'gouraud', 'bin_size': 50, 'max_scale': 'auto'},
+    >>>                          final_img_setting=True,
+    >>>                          video_setting=True,
+    >>>                          frame_setting=True,
+    >>>                          bodypart='Ear_left',
+    >>>                          clf_name='straub_tail',
+    >>>                          data_paths=[r"C:\troubleshooting\RAT_NOR\project_folder\csv\test\2022-06-20_NOB_DOT_4.csv"])
+    >>> test.run()
     """
 
-    def __init__(
-        self,
-        config_path: str,
-        final_img_setting: bool,
-        video_setting: bool,
-        frame_setting: bool,
-        bodypart: str,
-        clf_name: str,
-        files_found: list,
-        style_attr: dict,
-        core_cnt: int,
-    ):
-        ConfigReader.__init__(self, config_path=config_path)
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 bodypart: str,
+                 clf_name: str,
+                 data_paths: List[str],
+                 style_attr: dict,
+                 final_img_setting: bool = True,
+                 video_setting: bool = False,
+                 frame_setting: bool = False,
+                 core_cnt: int = -1):
+
+        ConfigReader.__init__(self, config_path=config_path, create_logger=False)
         PlottingMixin.__init__(self)
 
         if platform.system() == "Darwin":
             multiprocessing.set_start_method("spawn", force=True)
+        check_valid_boolean(value=[frame_setting, video_setting, final_img_setting], source=self.__class__.__name__)
         if (not frame_setting) and (not video_setting) and (not final_img_setting):
-            raise NoSpecifiedOutputError(
-                msg="Please choose to select either heatmap videos, frames, and/or final image."
-            )
+            raise NoSpecifiedOutputError(msg="Please choose to select either heatmap videos, frames, and/or final image.")
+        check_filepaths_in_iterable_exist(file_paths=data_paths, name=f'{self.__class__.__name__} data_paths')
+        check_str(name=f'{self.__class__.__name__} clf_name', value=clf_name)
+        check_str(name=f'{self.__class__.__name__} bodypart', value=bodypart)
+        check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
         self.frame_setting, self.video_setting = frame_setting, video_setting
         self.final_img_setting, self.bp = final_img_setting, bodypart
+        check_valid_dict(x=style_attr, required_keys=('max_scale', 'bin_size', 'shading', 'palette'))
         self.style_attr = style_attr
-        self.bin_size, self.max_scale, self.palette, self.shading, self.core_cnt = (
-            style_attr["bin_size"],
-            style_attr["max_scale"],
-            style_attr["palette"],
-            style_attr["shading"],
-            core_cnt,
-        )
-        self.clf_name, self.files_found = clf_name, files_found
+        self.bin_size, self.max_scale, self.palette, self.shading = (style_attr["bin_size"], style_attr["max_scale"], style_attr["palette"], style_attr["shading"])
+        self.clf_name, self.data_paths = clf_name, data_paths
+        self.core_cnt = [find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt][0]
         if not os.path.exists(self.heatmap_clf_location_dir):
             os.makedirs(self.heatmap_clf_location_dir)
-        self.bp_lst = [self.bp + "_x", self.bp + "_y"]
-        print("Processing {} video(s)...".format(str(len(self.files_found))))
-
-    @staticmethod
-    @jit(nopython=True)
-    def __calculate_cum_array(clf_array: np.array, fps: int):
-        cum_sum_arr = np.full(clf_array.shape, np.nan)
-        for frm_idx in prange(clf_array.shape[0]):
-            frame_cum_sum = np.full((clf_array.shape[1], clf_array.shape[2]), 0.0)
-            sliced_arr = clf_array[0:frm_idx]
-            for i in range(sliced_arr.shape[0]):
-                for j in range(sliced_arr.shape[1]):
-                    for k in range(sliced_arr.shape[2]):
-                        frame_cum_sum[j][k] += sliced_arr[i][j][k]
-            cum_sum_arr[frm_idx] = frame_cum_sum
-
-        return cum_sum_arr / fps
-
-    @staticmethod
-    @jit(nopython=True)
-    def __insert_group_idx_column(data: np.array, group: int, last_frm_idx: int):
-        results = np.full((data.shape[0], data.shape[1], data.shape[2] + 2), np.nan)
-        group_col = np.full((data.shape[1], 1), group)
-        for frm_idx in prange(data.shape[0]):
-            h_stack = np.hstack((group_col, data[frm_idx]))
-            frm_col = np.full((h_stack.shape[0], 1), frm_idx + last_frm_idx)
-            results[frm_idx] = np.hstack((frm_col, h_stack))
-
-        return results
-
-    def __calculate_bin_attr(
-        self,
-        data_df: pd.DataFrame,
-        clf_name: str,
-        bp_lst: list,
-        px_per_mm: int,
-        img_width: int,
-        img_height: int,
-        bin_size: int,
-        fps: int,
-    ):
-        bin_size_px = int(float(px_per_mm) * float(bin_size))
-        horizontal_bin_cnt = int(img_width / bin_size_px)
-        vertical_bin_cnt = int(img_height / bin_size_px)
-        aspect_ratio = round((vertical_bin_cnt / horizontal_bin_cnt), 3)
-
-        clf_idx = (
-            data_df[bp_lst][data_df[clf_name] == 1].reset_index().to_numpy().astype(int)
-        )
-
-        bin_dict = {}
-        x_location, y_location = 0, 0
-        for hbin in range(horizontal_bin_cnt):
-            bin_dict[hbin] = {}
-            for vbin in range(vertical_bin_cnt):
-                bin_dict[hbin][vbin] = {
-                    "top_left_x": x_location,
-                    "top_left_y": y_location,
-                    "bottom_right_x": x_location + bin_size_px,
-                    "bottom_right_y": y_location + bin_size_px,
-                }
-                y_location += bin_size_px
-            y_location = 0
-            x_location += bin_size_px
-
-        clf_array = np.zeros((len(data_df), vertical_bin_cnt, horizontal_bin_cnt))
-
-        for clf_frame in clf_idx:
-            for h_bin_name, v_dict in bin_dict.items():
-                for v_bin_name, c in v_dict.items():
-                    if (
-                        clf_frame[1] <= c["bottom_right_x"]
-                        and clf_frame[1] >= c["top_left_x"]
-                    ):
-                        if (
-                            clf_frame[2] <= c["bottom_right_y"]
-                            and clf_frame[2] >= c["top_left_y"]
-                        ):
-                            clf_array[int(clf_frame[0])][v_bin_name][h_bin_name] = 1
-
-        clf_array = self.__calculate_cum_array(clf_array=clf_array, fps=fps)
-
-        return clf_array, aspect_ratio
+        self.bp_lst = [f"{self.bp}_x", f"{self.bp}_y"]
 
     def __calculate_max_scale(self, clf_array: np.array):
         return np.round(np.max(np.max(clf_array[-1], axis=0)), 3)
 
     def run(self):
-        for file_cnt, file_path in enumerate(self.files_found):
-            video_timer = SimbaTimer()
-            video_timer.start_timer()
+        print(f"Processing {len(self.data_paths)} video(s)...")
+        check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
+        for file_cnt, file_path in enumerate(self.data_paths):
+            video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(file_path)
-            self.video_info, self.px_per_mm, self.fps = self.read_video_info(
-                video_name=self.video_name
-            )
-            self.width, self.height = int(
-                self.video_info["Resolution_width"].values[0]
-            ), int(self.video_info["Resolution_height"].values[0])
-            self.save_frame_folder_dir = os.path.join(
-                self.heatmap_clf_location_dir, self.video_name + "_" + self.clf_name
-            )
-            self.video_folder = os.path.join(
-                self.heatmap_clf_location_dir, self.video_name + "_" + self.clf_name
-            )
-            self.temp_folder = os.path.join(
-                self.heatmap_clf_location_dir,
-                self.video_name + "_" + self.clf_name,
-                "temp",
-            )
-            if self.frame_setting:
-                if os.path.exists(self.save_frame_folder_dir):
-                    remove_a_folder(folder_dir=self.save_frame_folder_dir)
-                if not os.path.exists(self.save_frame_folder_dir):
-                    os.makedirs(self.save_frame_folder_dir)
+            print(f'Plotting heatmap classification map for video {self.video_name}...')
+            self.video_info, self.px_per_mm, self.fps = self.read_video_info(video_name=self.video_name)
+            self.width, self.height = int(self.video_info["Resolution_width"].values[0]), int(self.video_info["Resolution_height"].values[0])
+            self.temp_folder = os.path.join(self.heatmap_clf_location_dir, "temp")
+            self.frames_save_dir = os.path.join(self.heatmap_clf_location_dir, f"{self.video_name}_{self.clf_name}")
             if self.video_setting:
                 if os.path.exists(self.temp_folder):
                     remove_a_folder(folder_dir=self.temp_folder)
-                    remove_a_folder(folder_dir=self.video_folder)
                 os.makedirs(self.temp_folder)
-                self.save_video_path = os.path.join(
-                    self.heatmap_clf_location_dir,
-                    "{}_{}.mp4".format(self.video_name, self.clf_name),
-                )
-
+                self.save_video_path = os.path.join(self.heatmap_clf_location_dir, f"{self.video_name}_{self.clf_name}.mp4")
+            if self.frame_setting:
+                if os.path.exists(self.frames_save_dir):
+                    remove_a_folder(folder_dir=self.frames_save_dir)
+                os.makedirs(self.frames_save_dir)
             self.data_df = read_df(file_path=file_path, file_type=self.file_type)
-            clf_array, aspect_ratio = self.__calculate_bin_attr(
-                data_df=self.data_df,
-                clf_name=self.clf_name,
-                bp_lst=self.bp_lst,
-                px_per_mm=self.px_per_mm,
-                img_width=self.width,
-                img_height=self.height,
-                bin_size=self.bin_size,
-                fps=self.fps,
-            )
-
+            check_valid_dataframe(df=self.data_df, required_fields=[self.clf_name] + self.bp_lst, valid_dtypes=Formats.NUMERIC_DTYPES.value)
+            bp_data = self.data_df[self.bp_lst].values.astype(np.int32)
+            clf_data = self.data_df[self.clf_name].values.astype(np.int32)
+            if len(np.unique(clf_data)) == 1:
+                raise InvalidInputError(msg=f'Cannot plot heatmap for behavior {self.clf_name} in video {self.video_name}. The behavior is classified as {np.unique(clf_data)} in every single frame.')
+            grid, aspect_ratio = GeometryMixin.bucket_img_into_grid_square(img_size=(self.width, self.height), bucket_grid_size_mm=self.bin_size, px_per_mm=self.px_per_mm, add_correction=False, verbose=False)
+            clf_data = GeometryMixin().cumsum_bool_geometries(data=bp_data, geometries=grid, bool_data=clf_data, fps=self.fps, verbose=False)
             if self.max_scale == "auto":
-                self.max_scale = self.__calculate_max_scale(clf_array=clf_array)
-
+                self.max_scale = max(1, self.__calculate_max_scale(clf_array=clf_data))
             if self.final_img_setting:
-                self.make_clf_heatmap_plot(
-                    frm_data=clf_array[-1, :, :],
-                    max_scale=self.max_scale,
-                    palette=self.palette,
-                    aspect_ratio=aspect_ratio,
-                    file_name=os.path.join(
-                        self.heatmap_clf_location_dir,
-                        self.video_name + "_final_frm.png",
-                    ),
-                    shading=self.shading,
-                    clf_name=self.clf_name,
-                    img_size=(self.height, self.width),
-                    final_img=True,
-                )
+                file_name = os.path.join(self.heatmap_clf_location_dir, f"{self.video_name}_{self.clf_name}_final_frm.png")
+                self.make_location_heatmap_plot(frm_data=clf_data[-1:, :, :][0],
+                                                max_scale=self.max_scale,
+                                                palette=self.palette,
+                                                aspect_ratio=aspect_ratio,
+                                                file_name=file_name,
+                                                shading=self.shading,
+                                                img_size=(self.width, self.height))
+                print(f"Final heatmap image saved at {file_name}.")
 
             if self.video_setting or self.frame_setting:
-                frame_arrays = np.array_split(clf_array, self.core_cnt)
-                last_frm_idx = 0
-                for frm_group in range(len(frame_arrays)):
-                    split_arr = frame_arrays[frm_group]
-                    frame_arrays[frm_group] = self.__insert_group_idx_column(
-                        data=split_arr, group=frm_group, last_frm_idx=last_frm_idx
-                    )
-                    last_frm_idx = np.max(
-                        frame_arrays[frm_group].reshape(
-                            (frame_arrays[frm_group].shape[0], -1)
-                        )
-                    )
-                frm_per_core = frame_arrays[0].shape[0]
+                frame_arrays = np.array_split(clf_data, self.core_cnt)
+                frm_per_core_w_batch = []
+                frm_cnt = 0
+                for batch_cnt in range(len(frame_arrays)):
+                    frm_range = np.arange(frm_cnt, frm_cnt+ frame_arrays[batch_cnt].shape[0])
+                    frm_cnt += len(frm_range)
+                    frm_per_core_w_batch.append((batch_cnt, frm_range, frame_arrays[batch_cnt]))
+                del frame_arrays
+                print(f"Creating heatmaps, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
+                with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
+                    constants = functools.partial(_heatmap_multiprocessor,
+                                                  video_setting=self.video_setting,
+                                                  frame_setting=self.frame_setting,
+                                                  style_attr=self.style_attr,
+                                                  fps=self.fps,
+                                                  video_temp_dir=self.temp_folder,
+                                                  frame_dir=self.frames_save_dir,
+                                                  max_scale=self.max_scale,
+                                                  aspect_ratio=aspect_ratio,
+                                                  clf_name=self.clf_name,
+                                                  size=(self.width, self.height),
+                                                  video_name=self.video_name,
+                                                  make_clf_heatmap_plot=self.make_clf_heatmap_plot)
 
-                print(
-                    "Creating heatmaps, multiprocessing (chunksize: {}, cores: {})...".format(
-                        str(self.multiprocess_chunksize), str(self.core_cnt)
-                    )
-                )
-                with multiprocessing.Pool(
-                    self.core_cnt, maxtasksperchild=self.maxtasksperchild
-                ) as pool:
-                    constants = functools.partial(
-                        _heatmap_multiprocessor,
-                        video_setting=self.video_setting,
-                        frame_setting=self.frame_setting,
-                        style_attr=self.style_attr,
-                        fps=self.fps,
-                        video_temp_dir=self.temp_folder,
-                        frame_dir=self.save_frame_folder_dir,
-                        max_scale=self.max_scale,
-                        aspect_ratio=aspect_ratio,
-                        clf_name=self.clf_name,
-                        size=(self.width, self.height),
-                        video_name=self.video_name,
-                        make_clf_heatmap_plot=self.make_clf_heatmap_plot,
-                    )
-
-                    for cnt, result in enumerate(
-                        pool.imap(
-                            constants,
-                            frame_arrays,
-                            chunksize=self.multiprocess_chunksize,
-                        )
-                    ):
-                        print(
-                            "Image {}/{}, Video {}/{}...".format(
-                                str(int(frm_per_core * (result + 1))),
-                                str(len(self.data_df)),
-                                str(file_cnt + 1),
-                                str(len(self.files_found)),
-                            )
-                        )
+                    for cnt, batch in enumerate(pool.imap(constants, frm_per_core_w_batch, chunksize=self.multiprocess_chunksize)):
+                        print(f'Batch core {batch+1}/{self.core_cnt} complete (Video {self.video_name})... ')
                     pool.terminate()
                     pool.join()
 
                 if self.video_setting:
-                    print("Joining {} multiprocessed video...".format(self.video_name))
-                    concatenate_videos_in_folder(
-                        in_folder=self.temp_folder, save_path=self.save_video_path
-                    )
+                    print(f"Joining {self.video_name} multiprocessed video...")
+                    concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.save_video_path)
 
                 video_timer.stop_timer()
-                print(
-                    "Heatmap video {} complete (elapsed time: {}s) ...".format(
-                        self.video_name, video_timer.elapsed_time_str
-                    )
-                )
+                print(f"Heatmap video {self.video_name} complete, (elapsed time: {video_timer.elapsed_time_str}s) ...")
 
         self.timer.stop_timer()
-        stdout_success(
-            msg="heatmap visualizations for {} videos created in project_folder/frames/output/heatmap_classifier locations directory",
-            elapsed_time=self.timer.elapsed_time_str,
-        )
+        stdout_success(msg=f"Heatmap visualizations for {len(self.data_paths)} video(s) created in {self.heatmap_clf_location_dir} directory", elapsed_time=self.timer.elapsed_time_str)
 
+
+# if __name__ == "__main__":
+#     test = HeatMapperClfMultiprocess(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini",
+#                              style_attr = {'palette': 'jet', 'shading': 'gouraud', 'bin_size': 50, 'max_scale': 'auto'},
+#                              final_img_setting=True,
+#                              video_setting=True,
+#                              frame_setting=True,
+#                              bodypart='Ear_left',
+#                              clf_name='straub_tail',
+#                              data_paths=[r"C:\troubleshooting\RAT_NOR\project_folder\csv\test\2022-06-20_NOB_DOT_4.csv"])
+#     test.run()
+
+
+
+# if __name__ == "__main__":
+#     test = HeatMapperClfMultiprocess(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini",
+#                          style_attr = {'palette': 'jet', 'shading': 'gouraud', 'bin_size': 50, 'max_scale': 'auto'},
+#                          final_img_setting=True,
+#                          video_setting=True,
+#                          frame_setting=False,
+#                          bodypart='Ear_left',
+#                          clf_name='straub_tail',
+#                          data_paths=[r"C:\troubleshooting\RAT_NOR\project_folder\csv\test\2022-06-20_NOB_DOT_4.csv"])
+#     test.run()
 
 # test = HeatMapperClfMultiprocess(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
 #                      style_attr = {'palette': 'jet', 'shading': 'gouraud', 'bin_size': 100, 'max_scale': 'auto'},

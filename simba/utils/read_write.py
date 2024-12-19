@@ -1856,16 +1856,8 @@ def drop_df_fields(data: pd.DataFrame, fields: List[str], raise_error: Optional[
     :return pd.DataFrame
     """
 
-    check_instance(
-        source=drop_df_fields.__name__, instance=data, accepted_types=(pd.DataFrame,)
-    )
-    check_valid_lst(
-        data=fields,
-        source=drop_df_fields.__name__,
-        valid_dtypes=(str,),
-        min_len=1,
-        raise_error=raise_error,
-    )
+    check_instance( source=drop_df_fields.__name__, instance=data, accepted_types=(pd.DataFrame,))
+    check_valid_lst(data=fields, source=drop_df_fields.__name__, valid_dtypes=(str,), min_len=1, raise_error=raise_error)
     if raise_error:
         return data.drop(columns=fields, errors="raise")
     else:

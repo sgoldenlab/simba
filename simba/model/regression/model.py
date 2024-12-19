@@ -19,13 +19,13 @@ from simba.utils.errors import DataHeaderError
 
 def fit_xgb(x: pd.DataFrame,
             y: np.ndarray,
-            xgb_reg: xgb.XGBRegressor) -> xgb.XGBRegressor:
+            mdl: xgb.XGBRegressor) -> xgb.XGBRegressor:
     """
     Fits an XGBoost regressor model to the given data.
 
     :param pd.DataFrame x: Input feature matrix where each row represents a sample and each column a feature. The data must have numeric types.
     :param np.ndarray y: Target values, must be a 1-dimensional array of numeric types with the same number  of rows as `x`.
-    :param xgb.XGBRegressor xgb_reg: Defined xgb.XGBRegressor. E.g., can be defined with :func:`simba.model.regression.model.xgb_define`,
+    :param xgb.XGBRegressor mdl: Defined xgb.XGBRegressor. E.g., can be defined with :func:`simba.model.regression.model.xgb_define`,
     :return: Trained XGBoost regressor model.
     :rtype: xgb.XGBRegressor
 
@@ -37,15 +37,16 @@ def fit_xgb(x: pd.DataFrame,
     check_valid_dataframe(df=x, source=f'{fit_xgb.__name__} x', valid_dtypes=Formats.NUMERIC_DTYPES.value)
     check_valid_array(data=y, source=f'{fit_xgb.__name__} y', accepted_ndims=(1,), accepted_axis_0_shape=[x.shape[0]], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
     check_instance(source=f'{fit_xgb.__name__} fit_xgb', instance=xgb_reg, accepted_types=(xgb.XGBRegressor,))
-    return xgb_reg.fit(X=x, y=y)
+    return mdl.fit(X=x, y=y)
 
-def transform_xgb(x: pd.DataFrame, model: xgb.XGBRegressor) -> np.ndarray:
+def transform_xgb(x: pd.DataFrame,
+                  mdl: xgb.XGBRegressor) -> np.ndarray:
 
     """
     Transforms the input data using the provided XGBoost model by making predictions.
 
     :param pd.DataFrame x: Input feature matrix where each row represents a sample and each column a feature. The data must have numeric types.
-    :param xgb.XGBRegressor model: Trained XGBoost model to use for making predictions.
+    :param xgb.XGBRegressor mdl: Trained XGBoost model to use for making predictions.
     :return: Predictions rounded to 2 decimal places.
     :rtype: np.ndarray
 
@@ -53,18 +54,18 @@ def transform_xgb(x: pd.DataFrame, model: xgb.XGBRegressor) -> np.ndarray:
     >>> x, y = pd.DataFrame(np.random.randint(0, 500, (100, 20))), np.random.randint(1, 6, (100,))
     >>> mdl = fit_xgb(x=x, y=y)
     >>> new_x = pd.DataFrame(np.random.randint(0, 500, (100, 20)))
-    >>> results = transform_xgb(x=new_x, model=mdl)
+    >>> results = transform_xgb(x=new_x, mdl=mdl)
 
     :example:
     >>> x, y = pd.DataFrame(np.random.randint(0, 500, (100, 20))), np.random.randint(1, 6, (100,))
     >>> mdl = fit_xgb(x=x, y=y)
     >>> new_x = pd.DataFrame(np.random.randint(0, 500, (100, 20)))
-    >>> results = transform_xgb(x=new_x, model=mdl)
+    >>> results = transform_xgb(x=new_x, mdl=mdl)
     """
 
-    check_instance(source=transform_xgb.__name__, instance=model, accepted_types=(xgb.XGBRegressor,))
+    check_instance(source=transform_xgb.__name__, instance=mdl, accepted_types=(xgb.XGBRegressor,))
     check_valid_dataframe(df=x, source=f'{transform_xgb.__name__} x', valid_dtypes=Formats.NUMERIC_DTYPES.value)
-    expected_x_names = model.get_booster().feature_names
+    expected_x_names = mdl.get_booster().feature_names
     new_x_names = [str(i) for i in list(x.columns)]
     missing_x_names = set([i for i in expected_x_names if i not in new_x_names])
     additional_x_names = set([i for i in new_x_names if i not in expected_x_names])
@@ -74,7 +75,7 @@ def transform_xgb(x: pd.DataFrame, model: xgb.XGBRegressor) -> np.ndarray:
         raise DataHeaderError(msg=f'The new data are missing {len(missing_x_names)} features expected by the model: {missing_x_names}', source=transform_xgb.__name__)
     if expected_x_names != new_x_names:
         raise DataHeaderError(msg=f'The new data contains features in the wrong order from the expected features', source=transform_xgb.__name__)
-    return np.round(model.predict(x), 2)
+    return np.round(mdl.predict(x), 2)
 
 
 def evaluate_xgb(y_pred: np.ndarray,
@@ -97,7 +98,7 @@ def evaluate_xgb(y_pred: np.ndarray,
     >>> y = np.random.randint(1, 6, (100,))
     >>> mdl = fit_xgb(x=x, y=y)
     >>> new_x = pd.DataFrame(np.random.randint(0, 500, (100, 20)))
-    >>> y_pred = transform_xgb(x=new_x, model=mdl)
+    >>> y_pred = transform_xgb(x=new_x, mdl=mdl)
     >>> evaluate_xgb(y_pred=y_pred, y_true=y, metrics=['MAE', 'MAPE', 'RMSE', 'MSE'])
     """
     METRICS = {'MAPE': mean_absolute_percentage_error, 'MSE': mean_squared_error, 'MAE': mean_absolute_error, 'R2': r2_score, 'RMSE': root_mean_squared_error}
@@ -125,6 +126,21 @@ def xgb_define(objective: str = 'reg:squarederror',
                eta: float = 0.3,
                gamma: float = 0.0,
                tree_method: str = 'auto') -> xgb.XGBRegressor:
+
+    """
+    Defines an XGBoost regressor.
+
+    :param str objective: The learning objective for the model.
+    :param int n_estimators: Number of boosting rounds. Must be greater than or equal to 1. Default is 100.
+    :param int max_depth: Maximum depth of a tree. Increasing this value makes the model more complex and more likely to overfit. Must be greater than or equal to 1. Default is 6.
+    :param int verbosity: Verbosity of the training process (0-3).
+    :param float learning_rate: Step size shrinkage used to prevent overfitting. Lower values make the model more robust but require more boosting rounds. Must be between 0.1 and 1.0. Default is 0.3.
+    :param float eta: Learning rate alias. Must be between 0.0 and 1.0. Default is 0.3.
+    :param float gamma: Minimum loss reduction required to make a further partition on a leaf node of the tree. Larger values prevent overfitting. Must be greater than or equal to 0.0. Default is 0.0.
+    :param str tree_method: The tree construction algorithm used in XGBoost.
+    :return: An initialized XGBoost Regressor with the specified configuration.
+    :rtype: xgb.XGBRegressor
+    """
 
     OBJECTIVES = ('reg:squarederror', 'reg:squaredlogerror', 'reg:logistic', 'reg:pseudohubererror')
     TREE_METHODS = ('auto', 'exact', 'approx', 'hist', 'gpu_hist')
@@ -157,19 +173,18 @@ def xgb_grid_define(objective: Tuple[str] = ('reg:squarederror',),
     return mdls
 
 
-
-
 def xgb_grid_fit(x: pd.DataFrame,
                  y: np.ndarray,
-                 xgb_regs: List[xgb.XGBRegressor]) -> List[xgb.XGBRegressor]:
-    check_valid_lst(data=xgb_regs, source=xgb_grid_fit.__name__, valid_dtypes=())
+                 mdls: List[xgb.XGBRegressor]) -> List[xgb.XGBRegressor]:
 
+    check_valid_dataframe(df=x, source=f'{fit_xgb.__name__} x', valid_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=y, source=f'{fit_xgb.__name__} y', accepted_ndims=(1,), accepted_axis_0_shape=[x.shape[0]], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_lst(data=mdls, source=xgb_grid_fit.__name__, valid_dtypes=(xgb.XGBRegressor,))
+    results = []
+    for mdl in mdls:
+        results.append(fit_xgb(x=x, y=y, mdl=mdl))
+    return results
 
-
-
-
-
-    #xgb_define()
 
 
 
@@ -187,7 +202,7 @@ def xgb_grid_fit(x: pd.DataFrame,
 
 
 
-xgb_grid_define(max_depth=(6, 3), gamma=(0, 0.3))
+#xgb_grid_define(max_depth=(6, 3), gamma=(0, 0.3))
 
 # x = pd.DataFrame(np.random.randint(0, 500, (100, 20)))
 # y = np.random.randint(1, 6, (100,))

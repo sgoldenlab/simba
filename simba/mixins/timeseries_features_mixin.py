@@ -428,7 +428,16 @@ class TimeseriesFeatureMixin(object):
             (int64[:], float64[:], int64),
         ]
     )
-    def sliding_unique(x: np.ndarray, time_windows: np.ndarray, fps: int):
+    def sliding_unique(x: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
+        """
+        Compute the number of unique values in a sliding window over an array of feature values.
+
+        :param x: 1D array of feature values for which the unique values are to be counted.
+        :param time_windows: Array of window sizes (in seconds) for which the unique values are counted.
+        :param int fps: The frame rate in frames per second, which is used to calculate the window size in samples.
+        :return: A 2D array where each row corresponds to a time window, and each element represents the count of unique values in the corresponding sliding window of the array `x`.
+        :rtype: np.ndarray
+        """
         results = np.full((x.shape[0], time_windows.shape[0]), -1)
         for i in prange(time_windows.shape[0]):
             window_size = int(time_windows[i] * fps)
@@ -922,10 +931,10 @@ class TimeseriesFeatureMixin(object):
                         results[j, r - 1, i] = np.median(sample)
                     elif statistics[j] == "mean":
                         results[j, r - 1, i] = np.mean(sample)
-                    elif statistics[j] == "mad":
-                        results[j, r - 1, i] = np.median(np.abs(sample - np.median(sample)))
                     elif statistics[j] == "sum":
                         results[j, r - 1, i] = np.sum(sample)
+                    elif statistics[j] == "mad":
+                        results[j, r - 1, i] = np.median(np.abs(sample - np.median(sample)))
                     elif statistics[j] == "mac":
                         results[j, r - 1, i] = np.mean(np.abs(sample[1:] - sample[:-1]))
                     elif statistics[j] == "rms":

@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.mixins.unsupervised_mixin import UMLMixin
 from simba.unsupervised.enums import Clustering, UMLOptions, Unsupervised
 from simba.utils.checks import (check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
@@ -21,7 +21,7 @@ from simba.utils.printing import stdout_success
 from simba.utils.read_write import read_pickle
 
 
-class GridSearchVisualizer(UnsupervisedMixin):
+class GridSearchVisualizer(UMLMixin):
     """
     Visualize grid-searched latent spaces in .png format.
 

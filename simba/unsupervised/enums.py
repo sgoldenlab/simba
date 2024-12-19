@@ -40,6 +40,7 @@ class Unsupervised(Enum):
     DR_MODEL = "DR_MODEL"
     MODEL = "MODEL"
     MIN_DISTANCE = "min_distance"
+
     EUCLIDEAN = "euclidean"
     FEATURE_NAMES = "FEATURE_NAMES"
     SPREAD = "spread"

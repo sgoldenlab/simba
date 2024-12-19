@@ -62,7 +62,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_if_valid_input,
                                 check_instance, check_int, check_str,
                                 check_that_column_exist, check_valid_dataframe,
-                                check_valid_lst)
+                                check_valid_lst, check_valid_array)
 from simba.utils.data import (detect_bouts, detect_bouts_multiclass,
                               get_library_version)
 from simba.utils.enums import (OS, ConfigKey, Defaults, Dtypes, Formats,
@@ -1166,14 +1166,17 @@ class TrainModelMixin(object):
 
     @staticmethod
     @njit("(float32[:, :], float64, types.ListType(types.unicode_type))")
-    def find_highly_correlated_fields(data: np.ndarray,threshold: float,field_names: types.ListType(types.unicode_type),
-    ) -> List[str]:
+    def find_highly_correlated_fields(data: np.ndarray,threshold: float, field_names: types.ListType(types.unicode_type)) -> List[str]:
+
         """
         Find highly correlated fields in a dataset.
 
         Calculates the absolute correlation coefficients between columns in a given dataset and identifies
         pairs of columns that have a correlation coefficient greater than the specified threshold. For every pair of correlated
         features identified, the function returns the field name of one feature. These field names can later be dropped from the input data to reduce memory requirements and collinearity.
+
+        .. seealso::
+           For non-numba method, see :func:`simba.mixins.statistics_mixin.Statistics.find_collinear_features`.
 
         :param np.ndarray data: Two dimension numpy array with features represented as columns and frames represented as rows.
         :param float threshold: Threshold value for significant collinearity.
@@ -1186,7 +1189,6 @@ class TrainModelMixin(object):
         >>> field_names = []
         >>> for i in range(data.shape[1]): field_names.append(f'Feature_{i+1}')
         >>> highly_correlated_fields = TrainModelMixin().find_highly_correlated_fields(data=data, field_names=typed.List(field_names), threshold=0.10)
-
         """
 
         column_corr = np.abs(np.corrcoef(data.T))
@@ -2373,27 +2375,33 @@ class TrainModelMixin(object):
         ).set_index(data.index)
 
     @staticmethod
-    def define_scaler(
-            scaler_name: Literal["MIN-MAX", "STANDARD", "QUANTILE"]
-    ) -> Union[MinMaxScaler, StandardScaler, QuantileTransformer]:
+    def define_scaler(scaler_name: Literal["min-max", "standard", "quantile"]) -> Union[MinMaxScaler, StandardScaler, QuantileTransformer]:
         """
         Defines a sklearn scaler object. See ``UMLOptions.SCALER_OPTIONS.value`` for accepted scalers.
 
         :example:
-        >>> TrainModelMixin.define_scaler(scaler_name='MIN-MAX')
+        >>> TrainModelMixin.define_scaler(scaler_name='min-max')
         """
 
-        if scaler_name not in Options.SCALER_OPTIONS.value:
-            raise InvalidInputError(
-                msg=f"Scaler {scaler_name} not supported. Options: {Options.SCALER_OPTIONS.value}",
-                source=TrainModelMixin.define_scaler.__name__,
-            )
-        if scaler_name == Options.MIN_MAX_SCALER.value:
+        if scaler_name.upper() not in Options.SCALER_OPTIONS.value:
+            raise InvalidInputError(msg=f"Scaler {scaler_name} not supported. Options: {Options.SCALER_OPTIONS.value}", source=TrainModelMixin.define_scaler.__name__)
+        if scaler_name.upper() == Options.MIN_MAX_SCALER.value:
             return MinMaxScaler()
-        elif scaler_name == Options.STANDARD_SCALER.value:
+        elif scaler_name.upper() == Options.STANDARD_SCALER.value:
             return StandardScaler()
-        elif scaler_name == Options.QUANTILE_SCALER.value:
+        elif scaler_name.upper() == Options.QUANTILE_SCALER.value:
             return QuantileTransformer()
+
+    @staticmethod
+    def fit_scaler(scaler: Union[MinMaxScaler, QuantileTransformer, StandardScaler],
+                   data: Union[pd.DataFrame, np.ndarray]) -> Union[
+        MinMaxScaler, QuantileTransformer, StandardScaler, object]:
+
+        check_instance(source=f'{TrainModelMixin.fit_scaler} data', instance=data, accepted_types=(pd.DataFrame, np.ndarray))
+        check_instance(source=f'{TrainModelMixin.fit_scaler} scaler', instance=scaler, accepted_types=(MinMaxScaler, QuantileTransformer, StandardScaler))
+        if isinstance(data, pd.DataFrame): data = data.values
+        check_valid_array(data=data, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        return scaler.fit(data)
 
     @staticmethod
     def scaler_transform(
@@ -2439,20 +2447,14 @@ class TrainModelMixin(object):
         :param float variance: Variance threshold (0.0-1.0).
         :return List[str]:
         """
-        feature_selector = VarianceThreshold(
-            threshold=round((variance_threshold / 100), 2)
-        )
+
+        check_valid_dataframe(df=data, source=TrainModelMixin.find_low_variance_fields.__name__, valid_dtypes=(Formats.NUMERIC_DTYPES.value))
+        check_float(name=TrainModelMixin.find_low_variance_fields.__name__, value=variance_threshold, min_value=0.0, max_value=1.0)
+        feature_selector = VarianceThreshold(threshold=variance_threshold)
         feature_selector.fit(data)
-        low_variance_fields = [
-            c
-            for c in data.columns
-            if c not in data.columns[feature_selector.get_support()]
-        ]
+        low_variance_fields = [c for c in data.columns if c not in data.columns[feature_selector.get_support()]]
         if len(low_variance_fields) == len(data.columns):
-            raise NoDataError(
-                msg=f"All feature columns show a variance below the {variance_threshold} threshold. Thus, no data remain for analysis.",
-                source=TrainModelMixin.find_low_variance_fields.__name__,
-            )
+            raise NoDataError(msg=f"All feature columns show a variance below the {variance_threshold} threshold. Thus, no data remain for analysis.", source=TrainModelMixin.find_low_variance_fields.__name__)
         return low_variance_fields
 
 

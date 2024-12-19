@@ -14,13 +14,11 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_file_exist_and_readable, check_float, check_if_keys_exist_in_dict,
-    check_int, check_valid_lst)
+    check_int, check_valid_lst, check_filepaths_in_iterable_exist)
 from simba.utils.enums import Defaults, Formats, TagNames
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder,
-                                    find_core_cnt, get_fn_ext, read_df,
-                                    remove_a_folder)
+from simba.utils.read_write import (concatenate_videos_in_folder,find_core_cnt, get_fn_ext, read_df, remove_a_folder)
 
 STYLE_PALETTE = 'palette'
 STYLE_SHADING = 'shading'
@@ -83,13 +81,12 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
        :align: center
 
     :param str config_path: path to SimBA project config file in Configparser format
-    :param str bodypart: The name of the body-part used to infer the location of the animal.
-    :param int bin_size: The rectangular size of each heatmap location in millimeters. For example, `50` will divide the video frames into 5 centimeter rectangular spatial bins.
-    :param str palette:  Heatmap pallette. Eg. 'jet', 'magma', 'inferno','plasma', 'viridis', 'gnuplot2'
-    :param dict style_attr: Style attributes of heatmap {'palette': 'jet', 'shading': 'gouraud', 'bin_size': 100, 'max_scale': 'auto'}
-    :param bool final_img_setting: If True, create a single image representing the last frame of the input video
+    :param bool final_img_setting: If True, then create a single image representing the last frame of the input video
     :param bool video_setting: If True, then create a video of heatmaps.
     :param bool frame_setting: If True, then create individual heatmap frames.
+    :param str clf_name: The name of the classified behavior.
+    :param str bodypart: The name of the body-part used to infer the location of the classified behavior
+    :param Dict style_attr: Dict containing settings for colormap, bin-size, max scale, and smooothing operations. For example: {'palette': 'jet', 'shading': 'gouraud', 'bin_size': 50, 'max_scale': 'auto'}.
     :param int core_cnt: The number of CPU cores to use. If -1, then all available cores.
 
     :example:
@@ -114,6 +111,7 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
         check_valid_lst(data=data_paths, valid_dtypes=(str,), min_len=1)
         check_if_keys_exist_in_dict(data=style_attr, key=STYLE_ATTR, name=f'{self.__class__.__name__} style_attr')
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, max_value=find_core_cnt()[0])
+        check_filepaths_in_iterable_exist(file_paths=data_paths, name=f'{self.__class__.__name__} data_paths')
         if core_cnt == -1: core_cnt = find_core_cnt()[0]
         self.core_cnt = core_cnt
         ConfigReader.__init__(self, config_path=config_path, create_logger=False)
@@ -161,6 +159,9 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
                 self.save_video_path = os.path.join(self.heatmap_location_dir, f"{self.video_name}.mp4")
 
             self.data_df = read_df(file_path=file_path, file_type=self.file_type, usecols=self.bp_lst)
+
+
+
             squares, aspect_ratio = GeometryMixin().bucket_img_into_grid_square(bucket_grid_size_mm=self.style_attr[STYLE_BIN_SIZE], img_size=(self.width, self.height), px_per_mm=self.px_per_mm)
             cum_sum_squares = GeometryMixin().cumsum_coord_geometries(data=self.data_df.values, fps=self.fps, geometries=squares)
             if self.style_attr[STYLE_MAX_SCALE] == "auto":

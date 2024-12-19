@@ -497,7 +497,7 @@ class PlottingMixin(object):
         canvas.draw()
         mat = np.array(canvas.renderer._renderer)
         image = cv2.cvtColor(mat, cv2.COLOR_RGB2BGR)
-        image = cv2.resize(mat, img_size)
+        image = cv2.resize(image, img_size)
         image = np.uint8(image)
         plt.close("all")
         if file_name is not None:

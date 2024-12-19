@@ -18,7 +18,7 @@ from matplotlib import cm
 import simba
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists)
-from simba.utils.enums import OS, FontPaths, Methods, Paths
+from simba.utils.enums import OS, FontPaths, Methods, Paths, UML
 from simba.utils.read_write import get_fn_ext
 from simba.utils.warnings import NoDataFoundWarning
 
@@ -662,6 +662,10 @@ def get_log_config():
         "loggers": {"": {"level": "INFO", "handlers": ["file_handler"]}},
     }
 
+
+def get_model_names():
+    model_names_dir = os.path.join(os.path.dirname(simba.__file__), Paths.UNSUPERVISED_MODEL_NAMES.value)
+    return list(pd.read_parquet(model_names_dir)[UML.NAMES.value])
 
 #
 # def rao_spacing_critical_values():

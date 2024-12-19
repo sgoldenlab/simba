@@ -795,10 +795,7 @@ def check_that_dir_has_list_of_filenames(
     files_in_dir = [os.path.basename(x) for x in files_in_dir]
     for file_name in file_name_lst:
         if os.path.basename(file_name) not in files_in_dir:
-            raise NoFilesFoundError(
-                msg=f"File name {os.path.basename(file_name)} could not be found in the directory {dir}",
-                source=check_that_dir_has_list_of_filenames.__name__,
-            )
+            raise NoFilesFoundError(msg=f"File name {os.path.basename(file_name)} could not be found in the directory {dir}", source=check_that_dir_has_list_of_filenames.__name__)
 
 
 def check_valid_array(data: np.ndarray,
@@ -1035,9 +1032,7 @@ def check_if_keys_exist_in_dict(
     return True
 
 
-def check_that_directory_is_empty(
-    directory: Union[str, os.PathLike], raise_error: Optional[bool] = True
-) -> None:
+def check_that_directory_is_empty(directory: Union[str, os.PathLike], raise_error: Optional[bool] = True) -> None:
     """
     Checks if a directory is empty. If the directory has content, then returns False or raises ``DirectoryNotEmptyError``.
 
@@ -1268,7 +1263,8 @@ def check_valid_tuple(x: tuple,
                       source: Optional[str] = "",
                       accepted_lengths: Optional[Tuple[int]] = None,
                       valid_dtypes: Optional[Tuple[Any]] = None,
-                      minimum_length: Optional[int] = None):
+                      minimum_length: Optional[int] = None,
+                      accepted_values: Optional[Iterable[Any]] = None):
 
     if not isinstance(x, (tuple)):
         raise InvalidInputError(
@@ -1293,6 +1289,11 @@ def check_valid_tuple(x: tuple,
         if tuple_len < minimum_length:
             raise InvalidInputError(msg=f"The tuple {source} is shorter ({tuple_len}) than the minimum required length ({minimum_length}).", source=source)
 
+    if accepted_values is not None:
+        check_instance(source=f'{check_valid_tuple.__name__} accepted_values', accepted_types=(list, tuple,), instance=accepted_values)
+        for i in x:
+            if i not in accepted_values:
+                raise InvalidInputError(msg=f"The tuple {source} has a value that is NOT accepted: {i}, (accepted: {accepted_values}).", source=source)
 
 
 
@@ -1411,7 +1412,7 @@ def check_valid_dict(x: dict,
                      valid_values_dtypes: Optional[Tuple[Any]] = None,
                      max_len_keys: Optional[int] = None,
                      min_len_keys: Optional[int] = None,
-                     required_keys: Optional[Tuple[Any]] = None):
+                     required_keys: Optional[Tuple[Any, ...]] = None):
 
 
     check_instance(source=check_valid_dict.__name__, instance=x, accepted_types=(dict,))
@@ -1465,3 +1466,15 @@ def is_video_color(video: Union[str, os.PathLike, cv2.VideoCapture]) -> bool:
             return False
     else:
         return False
+
+
+def check_filepaths_in_iterable_exist(file_paths: Iterable[str],
+                                      name: Optional[str] = None):
+
+    check_instance(source=f'{check_filepaths_in_iterable_exist.__name__} file_paths {name}', instance=file_paths, accepted_types=(list, tuple,))
+    if len(file_paths) == 0:
+        raise NoFilesFoundError(msg=f'{name} {file_paths} is empty')
+    for file_path in file_paths:
+        check_str(name=f'{check_filepaths_in_iterable_exist.__name__} {file_path} {name}', value=file_path)
+        if not os.path.isfile(file_path):
+            raise NoFilesFoundError(msg=f'{name} {file_path} is not a valid file path')

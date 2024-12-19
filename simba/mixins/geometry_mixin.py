@@ -845,7 +845,7 @@ class GeometryMixin(object):
                     bg_img: Optional[np.ndarray] = None,
                     bg_clr: Optional[Tuple[int, int, int]] = None,
                     size: Optional[int] = None,
-                    color_palette: Union[str, List[Tuple[int, int, int]]] = 'Set1',
+                    color_palette: Union[str, List[Tuple[int, ...]]] = 'Set1',
                     fill_shapes: Optional[bool] = False,
                     thickness: Optional[int] = 2,
                     pixel_buffer: Optional[int] = 200,
@@ -864,7 +864,7 @@ class GeometryMixin(object):
         :param Optional[np.ndarray] bg_img: Optional. An image array (in np.ndarray format) to use as the background. If not provided, a blank canvas will be created.
         :param Optional[Tuple[int, int, int]] bg_clr: A tuple representing the RGB color of the background (e.g., (255, 255, 255) for white). This is ignored if bg_img is provided. If None the background is white.
         :param Optional[int] size: Optional. An integer to specify the size of the canvas (width and height). Only applicable if bg_img is not provided.
-        :param Optional[str] color_palette: Optional. A string specifying the color palette to be used for the shapes. Default is 'Set1', which uses distinct colors.
+        :param Optional[str] color_palette: Optional. A string specifying the color palette to be used for the shapes. Default is 'Set1', which uses distinct colors. Alternatively, a list of RGB value tuples of same length as `shapes`.
         :param Optional[int] thickness: Optional. An integer specifying the thickness of the lines when rendering LineString or Polygon borders. Default is 2.
         :param Optional[int] pixel_buffer: Optional. An integer specifying the number of pixels to add around the bounding box of the shapes for padding. Default is 200.
         :return: An image (np.ndarray) with the rendered shapes.
@@ -3233,13 +3233,13 @@ class GeometryMixin(object):
             return np.cumsum(img_arr, axis=0) / fps
 
     @staticmethod
-    def _cumsum_bool_helper(
-        data: np.ndarray, geometries: Dict[Tuple[int, int], Polygon]
-    ):
+    def _cumsum_bool_helper(data: np.ndarray,
+                            geometries: Dict[Tuple[int, int], Polygon],
+                            verbose: bool = True):
+
         data_point = Point(data[1:3])
-        print(
-            f"Processing animal grid square location for boolean in frame {int(data[0])}..."
-        )
+        if verbose:
+            print(f"Processing animal grid square location for boolean in frame {int(data[0])}...")
         for k, r in geometries.items():
             if r.contains(data_point):
                 return (int(data[0]), k[0], k[1])
@@ -3250,6 +3250,7 @@ class GeometryMixin(object):
                                geometries: Dict[Tuple[int, int], Polygon],
                                bool_data: np.ndarray,
                                fps: Optional[float] = None,
+                               verbose: bool = True,
                                core_cnt: Optional[int] = -1) -> np.ndarray:
         """
         Compute the cumulative sums of boolean events within polygon geometries over time using multiprocessing. For example, compute the cumulative time of classified events within spatial locations at all time-points of the video.
@@ -3262,6 +3263,7 @@ class GeometryMixin(object):
         :param Dict[Tuple[int, int], Polygon] geometries: Dictionary of polygons representing spatial regions. E.g., created by :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square` or :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
         :param np.ndarray bool_data: Boolean array with shape (data.shape[0],) or (data.shape[0], 1) indicating the presence or absence in each frame.
         :param Optional[float] fps: Frames per second. If provided, the result is normalized by the frame rate.
+        :param bool verbose: If true, prints progress. Default: True.
         :param Optional[float] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which means using all available cores.
         :returns: Matrix of size (frames x horizontal bins x verical bins) with times in seconds (if fps passed) or frames (if fps not passed)
         :rtype: np.ndarray
@@ -3275,39 +3277,14 @@ class GeometryMixin(object):
         >>> (500, 4, 4)
         """
 
-        check_valid_array(
-            data=data,
-            accepted_sizes=[2],
-            source=f"{GeometryMixin.cumsum_bool_geometries.__name__} data",
-        )
-        check_instance(
-            source=f"{GeometryMixin.cumsum_bool_geometries.__name__} geometries",
-            instance=geometries,
-            accepted_types=dict,
-        )
-        check_valid_array(
-            data=bool_data,
-            accepted_shapes=[(data.shape[0], 1), (data.shape[0],)],
-            source=f"{GeometryMixin.cumsum_bool_geometries.__name__} bool_data",
-        )
+        check_valid_array(data=data, accepted_sizes=[2], source=f"{GeometryMixin.cumsum_bool_geometries.__name__} data")
+        check_instance(source=f"{GeometryMixin.cumsum_bool_geometries.__name__} geometries",instance=geometries,accepted_types=dict)
+        check_valid_array(data=bool_data,accepted_shapes=[(data.shape[0], 1), (data.shape[0],)],source=f"{GeometryMixin.cumsum_bool_geometries.__name__} bool_data")
         if fps is not None:
-            check_float(
-                name=f"{GeometryMixin.cumsum_bool_geometries.__name__} fps",
-                value=fps,
-                min_value=1.0,
-            )
-        check_int(
-            name=f"{GeometryMixin.cumsum_bool_geometries.__name__} core_cnt",
-            value=core_cnt,
-            min_value=-1,
-        )
-        if not np.array_equal(
-            np.sort(np.unique(bool_data)).astype(int), np.array([0, 1])
-        ):
-            raise InvalidInputError(
-                msg=f"Invalid boolean data. Expected {np.array([0, 1])} but found {np.sort(np.unique(bool_data)).astype(int)}",
-                source=GeometryMixin.cumsum_bool_geometries.__name__,
-            )
+            check_float(name=f"{GeometryMixin.cumsum_bool_geometries.__name__} fps", value=fps, min_value=1.0)
+        check_int(name=f"{GeometryMixin.cumsum_bool_geometries.__name__} core_cnt", value=core_cnt, min_value=-1)
+        if not np.array_equal(np.sort(np.unique(bool_data)).astype(int), np.array([0, 1])):
+            raise InvalidInputError(msg=f"Invalid boolean data. Expected {np.array([0, 1])} but found {np.sort(np.unique(bool_data)).astype(int)}", source=GeometryMixin.cumsum_bool_geometries.__name__)
         if core_cnt == -1:
             core_cnt = find_core_cnt()[0]
         w, h = 0, 0
@@ -3320,12 +3297,10 @@ class GeometryMixin(object):
         data = np.hstack((frm_id, data))
         img_arr = np.zeros((data.shape[0], h + 1, w + 1))
         data = data[np.argwhere((data[:, 3] == 1))].reshape(-1, 4)
-        with multiprocessing.Pool(
-            core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-        ) as pool:
-            constants = functools.partial(
-                self._cumsum_bool_helper, geometries=geometries
-            )
+        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
+            constants = functools.partial(self._cumsum_bool_helper,
+                                          geometries=geometries,
+                                          verbose=verbose)
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
                 if result[1] != -1:
                     img_arr[result[0], result[2] - 1, result[1] - 1] = 1
