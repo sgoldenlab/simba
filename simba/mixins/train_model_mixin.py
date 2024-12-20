@@ -61,8 +61,8 @@ from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_if_valid_input,
                                 check_instance, check_int, check_str,
-                                check_that_column_exist, check_valid_dataframe,
-                                check_valid_lst, check_valid_array)
+                                check_that_column_exist, check_valid_array,
+                                check_valid_dataframe, check_valid_lst)
 from simba.utils.data import (detect_bouts, detect_bouts_multiclass,
                               get_library_version)
 from simba.utils.enums import (OS, ConfigKey, Defaults, Dtypes, Formats,

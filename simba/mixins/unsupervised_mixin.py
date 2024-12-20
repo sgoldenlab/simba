@@ -1,23 +1,28 @@
 __author__ = "Simon Nilsson"
-from typing import Union
-import pandas as pd
-import numpy as np
 import datetime
+from typing import Union
+
+import numpy as np
+import pandas as pd
+
 from simba.data_processors.cuda.utils import _cuda_available
-from simba.utils.checks import check_float, check_int, check_valid_boolean, check_instance, check_valid_array
-from simba.utils.errors import SimBAGPUError
+from simba.utils.checks import (check_float, check_instance, check_int,
+                                check_valid_array, check_valid_boolean)
 from simba.utils.data import get_library_version
-from simba.utils.lookups import get_model_names
 from simba.utils.enums import Formats
+from simba.utils.errors import SimBAGPUError
+from simba.utils.lookups import get_model_names
+
 try:
-    import cuml.umap as cuml_umap
     import cuml.cluster.hdbscan as cuml_hdbscan
+    import cuml.umap as cuml_umap
 except ModuleNotFoundError:
-    import umap as cuml_umap
     import hdbscan as cuml_hdbscan
+    import umap as cuml_umap
     pass
-import umap
 import hdbscan
+import umap
+
 
 class UMLMixin(object):
     def __init__(self):
