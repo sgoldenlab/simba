@@ -24,7 +24,8 @@ from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 DirectoryNotEmptyError, FFMPEGNotFoundError,
                                 FloatError, FrameRangeError, IntegerError,
                                 InvalidFilepathError, InvalidInputError,
-                                NoDataError, NoFilesFoundError, NoROIDataError,
+                                MissingColumnsError, NoDataError,
+                                NoFilesFoundError, NoROIDataError,
                                 NotDirectoryError, ParametersFileError,
                                 StringError)
 from simba.utils.warnings import (CorruptedFileWarning, FrameRangeWarning,
@@ -1478,3 +1479,17 @@ def check_filepaths_in_iterable_exist(file_paths: Iterable[str],
         check_str(name=f'{check_filepaths_in_iterable_exist.__name__} {file_path} {name}', value=file_path)
         if not os.path.isfile(file_path):
             raise NoFilesFoundError(msg=f'{name} {file_path} is not a valid file path')
+
+def check_all_dfs_in_list_has_same_cols(dfs: List[pd.DataFrame], raise_error: bool = True, source: str = '') -> bool:
+    """ Checks that all dataframes in list has the same column names"""
+    check_valid_lst(data=dfs, source=check_all_dfs_in_list_has_same_cols.__name__, valid_dtypes=(pd.DataFrame,), min_len=1)
+    col_headers = [list(x.columns) for x in dfs]
+    common_headers = set(col_headers[0]).intersection(*col_headers[1:])
+    all_headers = set(item for sublist in col_headers for item in sublist)
+    missing_headers = list(all_headers - common_headers)
+    if len(missing_headers) > 0:
+        if raise_error:
+            raise MissingColumnsError(msg=f"The data in {source} directory do not contain the same headers. Some files are missing the headers: {missing_headers}", source=check_all_dfs_in_list_has_same_cols.__name__)
+        else:
+            return False
+    return True
