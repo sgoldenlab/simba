@@ -1,14 +1,21 @@
 import os
-from typing import Union, Optional
+from typing import Optional, Union
+
 import matplotlib
 import numpy as np
+
 matplotlib.use('Agg')  # For non-GUI environments
 import matplotlib.pyplot as plt
-import seaborn as sns
 import pandas as pd
-from simba.utils.checks import check_if_dir_exists, check_all_file_names_are_represented_in_video_log, check_float
-from simba.utils.read_write import find_files_of_filetypes_in_directory, read_df, read_video_info_csv, get_fn_ext, read_video_info
+import seaborn as sns
+
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log, check_float,
+    check_if_dir_exists)
 from simba.utils.data import detect_bouts
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_df, read_video_info,
+                                    read_video_info_csv)
 
 GROUP_COLORS = {'CNO': 'red', 'SALINE': 'blue'}
 

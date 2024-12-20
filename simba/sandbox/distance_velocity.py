@@ -1,6 +1,9 @@
-import numpy as np
 from typing import Optional, Tuple
+
+import numpy as np
+
 from simba.utils.checks import check_float, check_valid_array
+
 
 def distance_and_velocity(x: np.array,
                           fps: float, pixels_per_mm: float,

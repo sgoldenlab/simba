@@ -1,6 +1,8 @@
 import numpy as np
 from sklearn.metrics import adjusted_rand_score
+
 from simba.utils.checks import check_valid_array
+
 
 def adjusted_rand_index(x: np.ndarray, y: np.ndarray) -> float:
     """

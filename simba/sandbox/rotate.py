@@ -54,6 +54,7 @@ from simba.video_processors.extract_frames import video_to_frames
 from simba.video_processors.roi_selector import ROISelector
 from simba.video_processors.roi_selector_circle import ROISelectorCircle
 from simba.video_processors.roi_selector_polygon import ROISelectorPolygon
+
 __author__ = "Simon Nilsson"
 
 import glob
@@ -115,13 +116,14 @@ from simba.video_processors.video_processing import (
     crop_multiple_videos, crop_multiple_videos_circles,
     crop_multiple_videos_polygons, crop_single_video, crop_single_video_circle,
     crop_single_video_polygon, downsample_video, extract_frame_range,
-    extract_frames_single_video, frames_to_movie, gif_creator,
+    extract_frames_single_video, flip_videos, frames_to_movie, gif_creator,
     multi_split_video, remove_beginning_of_video, resize_videos_by_height,
-    resize_videos_by_width, roi_blurbox, superimpose_elapsed_time,
-    superimpose_frame_count, superimpose_freetext, superimpose_overlay_video,
-    superimpose_video_names, superimpose_video_progressbar,
-    video_bg_subtraction_mp, video_bg_subtraction, video_concatenator,
-    video_to_greyscale, watermark_video, rotate_video, flip_videos)
+    resize_videos_by_width, roi_blurbox, rotate_video,
+    superimpose_elapsed_time, superimpose_frame_count, superimpose_freetext,
+    superimpose_overlay_video, superimpose_video_names,
+    superimpose_video_progressbar, video_bg_subtraction,
+    video_bg_subtraction_mp, video_concatenator, video_to_greyscale,
+    watermark_video)
 
 sys.setrecursionlimit(10**7)
 #

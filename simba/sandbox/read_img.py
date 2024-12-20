@@ -13,7 +13,6 @@ import pickle
 import platform
 import re
 import shutil
-import ffmpeg
 import subprocess
 import webbrowser
 from configparser import ConfigParser
@@ -22,8 +21,10 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
-from simba.utils.read_write import get_video_meta_data
+import ffmpeg
 from PIL import Image
+
+from simba.utils.read_write import get_video_meta_data
 
 try:
     from typing import Literal
@@ -66,7 +67,6 @@ from simba.utils.warnings import (
     FileExistWarning, FrameRangeWarning, InvalidValueWarning,
     NoDataFoundWarning, NoFileFoundWarning,
     ThirdPartyAnnotationsInvalidFileFormatWarning)
-
 
 
 def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],

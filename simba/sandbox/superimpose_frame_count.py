@@ -1,11 +1,16 @@
 from tkinter import *
-from simba.utils.checks import check_ffmpeg_available, check_int, check_file_exist_and_readable, check_if_dir_exists
+
 from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        FileSelect, FolderSelect)
+from simba.utils.checks import (check_ffmpeg_available,
+                                check_file_exist_and_readable,
+                                check_if_dir_exists, check_int)
 from simba.utils.enums import Keys, Links, Options
-from simba.ui.tkinter_functions import FileSelect, CreateLabelFrameWithIcon, DropDownMenu, FolderSelect
-from simba.video_processors.video_processing import superimpose_frame_count
-from simba.utils.read_write import find_files_of_filetypes_in_directory
 from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import find_files_of_filetypes_in_directory
+from simba.video_processors.video_processing import superimpose_frame_count
+
 
 class SuperImposeFrameCountPopUp(PopUpMixin):
     def __init__(self):

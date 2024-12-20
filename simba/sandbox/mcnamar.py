@@ -1,6 +1,8 @@
 from typing import Optional, Tuple
+
 import numpy as np
 from scipy.stats.distributions import chi2
+
 from simba.utils.checks import check_valid_array
 from simba.utils.errors import CountError, InvalidInputError
 

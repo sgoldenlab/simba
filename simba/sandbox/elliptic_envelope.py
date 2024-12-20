@@ -1,10 +1,11 @@
-from sklearn.covariance import EllipticEnvelope
 from typing import Optional
-from simba.utils.read_write import read_pickle
-import numpy as np
-from simba.mixins.plotting_mixin import PlottingMixin
 
-from simba.utils.checks import check_valid_array, check_float
+import numpy as np
+from sklearn.covariance import EllipticEnvelope
+
+from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.checks import check_float, check_valid_array
+from simba.utils.read_write import read_pickle
 
 
 def elliptic_envelope(data: np.ndarray,

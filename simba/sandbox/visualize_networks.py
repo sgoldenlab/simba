@@ -1,18 +1,22 @@
-from simba.mixins.network_mixin import NetworkMixin
-import networkx as nx
 import os
-from typing import Union, Optional, Tuple, Dict
+from typing import Dict, Optional, Tuple, Union
+
+import networkx as nx
 from pyvis.network import Network
+
+from simba.mixins.network_mixin import NetworkMixin
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 
-from simba.utils.checks import check_instance, check_valid_tuple, check_if_dir_exists, check_float, check_int, check_valid_hex_color, check_valid_lst
-from simba.utils.errors import InvalidInputError
+from simba.utils.checks import (check_float, check_if_dir_exists,
+                                check_instance, check_int,
+                                check_valid_hex_color, check_valid_lst,
+                                check_valid_tuple)
 from simba.utils.data import create_color_palette
-
-
+from simba.utils.errors import InvalidInputError
 
 
 def visualize(graph: Union[nx.Graph, nx.MultiGraph],

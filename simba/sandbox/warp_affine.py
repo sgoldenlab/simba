@@ -1,5 +1,5 @@
-import numpy as np
 import cv2
+import numpy as np
 
 # Original coordinates of the body parts (7 coordinates)
 original_coords = np.array([

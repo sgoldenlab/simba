@@ -1,13 +1,17 @@
 import os
-from typing import Union, Optional, List
+import warnings
+from typing import List, Optional, Union
+
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
-from simba.utils.checks import (check_valid_array, check_instance, check_str, check_that_column_exist, check_if_dir_exists)
-from simba.utils.lookups import get_categorical_palettes
+
+from simba.utils.checks import (check_if_dir_exists, check_instance, check_str,
+                                check_that_column_exist, check_valid_array)
 from simba.utils.errors import InvalidInputError
-import warnings
+from simba.utils.lookups import get_categorical_palettes
+
 warnings.filterwarnings("ignore")
 
 

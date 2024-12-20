@@ -1,6 +1,8 @@
+import time
+
 import numpy as np
 from numba import njit, prange
-import time
+
 
 @njit('(float64[:], float64[:], float64[:], float64, boolean, float64)')
 def sliding_two_signal_crosscorrelation(x: np.ndarray,

@@ -1,5 +1,6 @@
 import numpy as np
-from sklearn.metrics import (adjusted_mutual_info_score, adjusted_rand_score, fowlkes_mallows_score)
+from sklearn.metrics import (adjusted_mutual_info_score, adjusted_rand_score,
+                             fowlkes_mallows_score)
 
 
 def cluster_comparison(x: np.ndarray, y: np.ndarray, method: str = 'adjusted_rand_score'):

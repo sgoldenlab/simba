@@ -1,23 +1,25 @@
+import base64
+import json
+import multiprocessing
 import os
-from typing import List, Optional, Union, Dict, Any, Tuple
-from pycocotools import mask
+from datetime import datetime
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import cv2
-import json
-from simba.mixins.image_mixin import ImageMixin
-from simba.utils.read_write import read_df, get_video_meta_data, read_frm_of_video, find_core_cnt
 import numpy as np
-from simba.mixins.geometry_mixin import GeometryMixin
-from shapely.geometry import Polygon
-from datetime import datetime
 from numba import njit, prange
-from simba.utils.enums import Defaults
-import multiprocessing
-from simba.sandbox.keyPoi import _geometries_to_exterior_keypoints_helper
-from simba.utils.checks import check_int, check_valid_lst, check_instance, check_valid_array
-from simba.utils.enums import Formats
+from pycocotools import mask
+from shapely.geometry import Polygon
 from skimage.draw import polygon
-import base64
+
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.mixins.image_mixin import ImageMixin
+from simba.sandbox.keyPoi import _geometries_to_exterior_keypoints_helper
+from simba.utils.checks import (check_instance, check_int, check_valid_array,
+                                check_valid_lst)
+from simba.utils.enums import Defaults, Formats
+from simba.utils.read_write import (find_core_cnt, get_video_meta_data,
+                                    read_df, read_frm_of_video)
 
 
 def geometry_to_rle(geometry: Union[np.ndarray, Polygon], img_size: Tuple[int, int]):

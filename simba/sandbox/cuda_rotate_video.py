@@ -1,14 +1,18 @@
 import os
-from typing import Union, Optional
-from cupyx.scipy.ndimage import rotate
+from typing import Optional, Union
+
 import cupy as cp
+import cv2
 import numpy as np
-from simba.utils.read_write import read_img_batch_from_video_gpu, get_video_meta_data, get_fn_ext
-from simba.utils.checks import check_valid_array, check_int
+from cupyx.scipy.ndimage import rotate
+
 from simba.mixins.image_mixin import ImageMixin
+from simba.utils.checks import check_int, check_valid_array
 from simba.utils.enums import Formats
 from simba.utils.printing import SimbaTimer, stdout_success
-import cv2
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
+                                    read_img_batch_from_video_gpu)
+
 
 def rotate_img_stack_cupy(imgs: np.ndarray,
                           rotation_degrees: Optional[float] = 180,
@@ -85,6 +89,7 @@ def rotate_video_cupy(video_path: Union[str, os.PathLike],
 # rotate_video_cupy(video_path=video_path, rotation_degrees=45)
 
 import time
+
 its = 3
 for i in [500, 1000, 2000, 4000, 8000, 16000, 32000]: #1000, 2000, 4000, 8000, 16000, 32000]
     imgs = np.random.randint(0, 255, (i, 320, 240))

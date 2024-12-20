@@ -1,9 +1,15 @@
-from typing import List, Optional, Tuple, Union, Dict, Any
-from simba.utils.printing import stdout_success, SimbaTimer
 import os
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 import cv2
 import numpy as np
-from simba.utils.checks import check_int, check_instance, check_valid_lst, check_if_valid_rgb_tuple, check_if_dir_exists, check_valid_array, check_if_keys_exist_in_dict, check_float
+
+from simba.utils.checks import (check_float, check_if_dir_exists,
+                                check_if_keys_exist_in_dict,
+                                check_if_valid_rgb_tuple, check_instance,
+                                check_int, check_valid_array, check_valid_lst)
+from simba.utils.printing import SimbaTimer, stdout_success
+
 
 def make_path_plot(data: List[np.ndarray],
                    colors: List[Tuple[int, int, int]],

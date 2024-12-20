@@ -1,7 +1,7 @@
-from numba import cuda, float32
 import math
+
 import numpy as np
-from numba import cuda
+from numba import cuda, float32
 
 
 @cuda.jit(device=True)

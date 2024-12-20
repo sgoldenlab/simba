@@ -2,8 +2,6 @@ import numpy as np
 from scipy.stats import norm
 
 
-
-
 def wald_wolfowitz_runs_test(data: np.ndarray):
     diffs = np.diff(data)
     trans = np.count_nonzero(diffs != 0)

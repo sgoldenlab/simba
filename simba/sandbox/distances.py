@@ -1,16 +1,17 @@
+from typing import Optional
+
 import numpy as np
 from scipy import stats
-from typing import Optional
 
 try:
     from typing import Literal
 except ImportError:
     from typing_extensions import Literal
 
-from simba.utils.checks import check_valid_array, check_str
+from simba.mixins.statistics_mixin import Statistics
+from simba.utils.checks import check_str, check_valid_array
 from simba.utils.data import bucket_data
 from simba.utils.enums import Options
-from simba.mixins.statistics_mixin import Statistics
 
 
 class DistanceStatistics(object):

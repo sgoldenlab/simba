@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def directed_hausdorff_nb(ar1, ar2):
     N1 = ar1.shape[0]
     N2 = ar2.shape[0]

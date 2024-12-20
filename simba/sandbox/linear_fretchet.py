@@ -1,7 +1,8 @@
 import time
 
 import numpy as np
-from numba import njit, jit, prange
+from numba import jit, njit, prange
+
 
 @njit('(float32[:,:], float32[:,:], int64)')
 def linear_frechet_distance(x: np.ndarray, y: np.ndarray, sample: int = 100) -> float:

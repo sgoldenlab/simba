@@ -1,7 +1,9 @@
-from numba import njit, jit
 import numpy as np
-from simba.utils.enums import Formats
+from numba import jit, njit
+
 from simba.utils.checks import check_valid_array
+from simba.utils.enums import Formats
+
 
 def kumar_hassebrook_similarity(x: np.ndarray, y: np.ndarray) -> float:
     """

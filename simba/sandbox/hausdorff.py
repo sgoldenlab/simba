@@ -1,12 +1,14 @@
-from shapely.geometry import Polygon, LineString
-from typing import List, Union, Optional
-from simba.utils.checks import check_valid_lst, check_instance, check_int
-import numpy as np
-from simba.utils.read_write import read_df, find_core_cnt
-from simba.mixins.geometry_mixin import GeometryMixin
-from simba.utils.enums import Defaults
-
 import multiprocessing
+from typing import List, Optional, Union
+
+import numpy as np
+from shapely.geometry import LineString, Polygon
+
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.utils.checks import check_instance, check_int, check_valid_lst
+from simba.utils.enums import Defaults
+from simba.utils.read_write import find_core_cnt, read_df
+
 
 def hausdorff_distance(geometries: List[List[Union[Polygon, LineString]]]) -> np.ndarray:
     """

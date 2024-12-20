@@ -1,10 +1,11 @@
-from typing import List, Tuple, Optional
+from typing import List, Optional, Tuple
+
+import cv2
 import numpy as np
 from shapely.geometry import Polygon
-from simba.utils.checks import check_valid_lst, check_valid_tuple
-from simba.mixins.geometry_mixin import GeometryMixin
-import cv2
 
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.utils.checks import check_valid_lst, check_valid_tuple
 
 
 def adjust_geometry_locations(geometries: List[Polygon],

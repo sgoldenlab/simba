@@ -1,8 +1,11 @@
-import numpy as np
-from typing import Tuple
-from numba import jit, prange, njit
-from simba.utils.read_write import read_df
 import time
+from typing import Tuple
+
+import numpy as np
+from numba import jit, njit, prange
+
+from simba.utils.read_write import read_df
+
 
 @njit("(int32[:, :, :], int64, int64, int64, int32[:])")
 def egocentrically_align_pose_numba(data: np.ndarray,

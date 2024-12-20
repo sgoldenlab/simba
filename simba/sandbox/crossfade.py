@@ -1,11 +1,12 @@
-from typing import Union, Optional
 import os.path
 import subprocess
-from simba.utils.read_write import get_fn_ext, get_video_meta_data
-from simba.utils.checks import check_int, check_str, check_if_dir_exists
-from simba.utils.lookups import get_ffmpeg_crossfade_methods
-from simba.utils.printing import stdout_success, SimbaTimer
+from typing import Optional, Union
+
+from simba.utils.checks import check_if_dir_exists, check_int, check_str
 from simba.utils.errors import InvalidInputError
+from simba.utils.lookups import get_ffmpeg_crossfade_methods
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_fn_ext, get_video_meta_data
 
 
 def crossfade_two_videos(video_path_1: Union[str, os.PathLike],

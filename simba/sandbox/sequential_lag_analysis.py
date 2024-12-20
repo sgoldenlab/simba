@@ -1,12 +1,13 @@
 import numpy as np
 import pandas as pd
-
-from simba.utils.data import detect_bouts
-from simba.utils.read_write import read_df
-from simba.utils.checks import check_instance, check_str, check_that_column_exist, check_float
-from simba.utils.errors import CountError
-
 from statsmodels.sandbox.stats.runs import runstest_1samp
+
+from simba.utils.checks import (check_float, check_instance, check_str,
+                                check_that_column_exist)
+from simba.utils.data import detect_bouts
+from simba.utils.errors import CountError
+from simba.utils.read_write import read_df
+
 
 def sequential_lag_analysis(data: pd.DataFrame, criterion: str, target:str, time_window: float, fps: float):
     """

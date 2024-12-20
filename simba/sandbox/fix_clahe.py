@@ -1,10 +1,12 @@
 import os
+from typing import Union
+
 import cv2
 import numpy as np
-from typing import Union
-from simba.utils.read_write import get_fn_ext, get_video_meta_data
-from simba.utils.enums import Formats
+
 from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.enums import Formats
+from simba.utils.read_write import get_fn_ext, get_video_meta_data
 
 
 def clahe_enhance_video(file_path: Union[str, os.PathLike]) -> None:

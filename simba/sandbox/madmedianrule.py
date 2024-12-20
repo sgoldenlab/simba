@@ -3,6 +3,7 @@ import time
 import numpy as np
 from numba import njit
 
+
 @njit('(float32[:], float64,)')
 def mad_median_rule(data: np.ndarray, k: int) -> np.ndarray:
     """

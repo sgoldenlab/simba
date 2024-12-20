@@ -1,18 +1,18 @@
+import argparse
 import os.path
 from copy import deepcopy
-import numpy as np
 
+import numpy as np
 import pandas as pd
 
-from simba.utils.read_write import read_df, get_fn_ext, write_df, find_core_cnt
+from simba.mixins.abstract_classes import AbstractFeatureExtraction
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.geometry_mixin import GeometryMixin
-from simba.mixins.abstract_classes import AbstractFeatureExtraction
+from simba.plotting.geometry_plotter import GeometryPlotter
 from simba.utils.errors import NoFilesFoundError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.plotting.geometry_plotter import GeometryPlotter
-import argparse
+from simba.utils.read_write import find_core_cnt, get_fn_ext, read_df, write_df
 
 WHITE = 'white'
 BLACK = 'black'

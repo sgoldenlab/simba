@@ -1,13 +1,13 @@
 import cv2
 import numpy as np
 import pandas as pd
-from simba.utils.read_write import read_frm_of_video
-from simba.mixins.geometry_mixin import GeometryMixin
-from simba.plotting.geometry_plotter import GeometryPlotter
-from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+
 from simba.mixins.circular_statistics import CircularStatisticsMixin
 from simba.mixins.config_reader import ConfigReader
-
+from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.plotting.geometry_plotter import GeometryPlotter
+from simba.utils.read_write import read_frm_of_video
 
 CONFIG_PATH = '/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini'
 config = ConfigReader(config_path=CONFIG_PATH, create_logger=False)

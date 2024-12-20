@@ -1,16 +1,14 @@
-from simba.mixins.geometry_mixin import GeometryMixin
-from simba.mixins.config_reader import ConfigReader
-from simba.utils.read_write import read_df, read_frm_of_video
-from simba.utils.data import savgol_smoother
-from simba.mixins.image_mixin import ImageMixin
 import cv2
-from simba.utils.read_write import get_video_meta_data
 import numpy as np
 from sklearn.cluster import KMeans
+
+from simba.mixins.config_reader import ConfigReader
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.mixins.image_mixin import ImageMixin
 from simba.utils.checks import check_valid_array
-
-
-
+from simba.utils.data import savgol_smoother
+from simba.utils.read_write import (get_video_meta_data, read_df,
+                                    read_frm_of_video)
 
 
 def img_kmeans(data: np.ndarray,

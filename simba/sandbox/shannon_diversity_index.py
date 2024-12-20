@@ -1,6 +1,7 @@
 import numpy as np
 from numba import jit
 
+
 @jit(nopython=True)
 def shannon_diversity_index(x: np.ndarray) -> float:
     """

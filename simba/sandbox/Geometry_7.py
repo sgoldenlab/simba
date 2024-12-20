@@ -1,11 +1,12 @@
 import os
+
 import numpy as np
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.image_mixin import ImageMixin
-from simba.utils.read_write import read_df
 from simba.plotting.geometry_plotter import GeometryPlotter
+from simba.utils.read_write import read_df
 
 CONFIG_PATH = '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini'
 VIDEO_NAME = '2022-06-20_NOB_DOT_4'

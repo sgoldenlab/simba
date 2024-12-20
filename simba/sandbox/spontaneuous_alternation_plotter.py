@@ -1,21 +1,26 @@
+import functools
+import multiprocessing
 import os
-from shapely.geometry import Polygon
+import platform
+import shutil
+from typing import Dict, List, Optional, Tuple, Union
+
 import cv2
 import numpy as np
 import pandas as pd
-from typing import Union, Optional, List, Dict, Tuple
-from simba.sandbox.spontaneous_alternation_calculator import SpontaneousAlternationCalculator
-from simba.utils.checks import check_valid_lst, check_int, check_float, check_file_exist_and_readable, check_str
-from simba.utils.errors import AnimalNumberError, InvalidInputError
-from simba.mixins.config_reader import ConfigReader
-from simba.utils.read_write import find_core_cnt, find_video_of_file, get_video_meta_data, concatenate_videos_in_folder
-from simba.utils.data import detect_bouts
-from simba.utils.enums import Formats, TextOptions, Paths
+from shapely.geometry import Polygon
 
-import multiprocessing
-import functools
-import platform
-import shutil
+from simba.mixins.config_reader import ConfigReader
+from simba.sandbox.spontaneous_alternation_calculator import \
+    SpontaneousAlternationCalculator
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_int, check_str, check_valid_lst)
+from simba.utils.data import detect_bouts
+from simba.utils.enums import Formats, Paths, TextOptions
+from simba.utils.errors import AnimalNumberError, InvalidInputError
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    find_core_cnt, find_video_of_file,
+                                    get_video_meta_data)
 
 ALTERNATION_COLOR = (0, 255, 0)
 ERROR_COLOR = (0, 0, 255)

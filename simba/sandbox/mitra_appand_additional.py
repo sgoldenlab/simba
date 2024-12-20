@@ -1,9 +1,9 @@
 import os.path
 
 import pandas as pd
-from simba.utils.read_write import find_files_of_filetypes_in_directory, get_fn_ext
 
-
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext)
 
 ADDITIONAL_FEATURES_LIST_PATH = r"C:\troubleshooting\mitra\additional_features_TAIL.csv"
 FEATURES_DIR = r'C:\troubleshooting\mitra\project_folder\csv\features_extracted'

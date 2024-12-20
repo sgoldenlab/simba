@@ -1,16 +1,18 @@
-from typing import Union, Optional
+from typing import Optional, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 
-import seaborn as sns
 import os
+
 import matplotlib.pyplot as plt
 import pandas as pd
+import seaborn as sns
+
 from simba.utils.lookups import get_named_colors
 from simba.utils.printing import stdout_success
-
 
 
 def violin_plot(data: pd.DataFrame,

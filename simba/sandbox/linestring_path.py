@@ -1,10 +1,11 @@
 import os.path
+
 import cv2
 
-from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.config_reader import ConfigReader
-
-from simba.utils.read_write import read_df, find_video_of_file, read_frm_of_video
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.utils.read_write import (find_video_of_file, read_df,
+                                    read_frm_of_video)
 
 """
 Here we create simple images representing the animals

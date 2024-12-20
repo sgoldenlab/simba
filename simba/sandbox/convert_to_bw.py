@@ -1,13 +1,3 @@
-from typing import Union, Optional
-import os
-import subprocess
-from simba.utils.read_write import get_fn_ext, find_all_videos_in_directory, get_video_meta_data
-from simba.video_processors.roi_selector import ROISelector
-from simba.utils.checks import check_ffmpeg_available, check_float, check_if_dir_exists, check_file_exist_and_readable
-from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.errors import InvalidInputError
-import threading
-
 import glob
 import os
 import subprocess
@@ -30,7 +20,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
                                         CreateToolTip, DropDownMenu, Entry_Box,
                                         FileSelect, FolderSelect)
 from simba.utils.checks import (check_ffmpeg_available,
-                                check_file_exist_and_readable,
+                                check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
                                 check_if_string_value_is_valid_video_timestamp,
@@ -56,6 +46,7 @@ from simba.video_processors.clahe_ui import interactive_clahe_ui
 from simba.video_processors.extract_seqframes import extract_seq_frames
 from simba.video_processors.multi_cropper import MultiCropper
 from simba.video_processors.px_to_mm import get_coordinates_nilsson
+from simba.video_processors.roi_selector import ROISelector
 from simba.video_processors.video_processing import (
     VideoRotator, batch_convert_video_format, batch_create_frames,
     batch_video_to_greyscale, change_fps_of_multiple_videos, change_img_format,
@@ -67,13 +58,14 @@ from simba.video_processors.video_processing import (
     crop_multiple_videos, crop_multiple_videos_circles,
     crop_multiple_videos_polygons, crop_single_video, crop_single_video_circle,
     crop_single_video_polygon, downsample_video, extract_frame_range,
-    extract_frames_single_video, frames_to_movie, gif_creator,
+    extract_frames_single_video, flip_videos, frames_to_movie, gif_creator,
     multi_split_video, remove_beginning_of_video, resize_videos_by_height,
-    resize_videos_by_width, roi_blurbox, superimpose_elapsed_time,
-    superimpose_frame_count, superimpose_freetext, superimpose_overlay_video,
-    superimpose_video_names, superimpose_video_progressbar,
-    video_bg_subtraction_mp, video_bg_subtraction, video_concatenator,
-    video_to_greyscale, watermark_video, rotate_video, flip_videos, upsample_fps, reverse_videos)
+    resize_videos_by_width, reverse_videos, roi_blurbox, rotate_video,
+    superimpose_elapsed_time, superimpose_frame_count, superimpose_freetext,
+    superimpose_overlay_video, superimpose_video_names,
+    superimpose_video_progressbar, upsample_fps, video_bg_subtraction,
+    video_bg_subtraction_mp, video_concatenator, video_to_greyscale,
+    watermark_video)
 
 sys.setrecursionlimit(10**7)
 

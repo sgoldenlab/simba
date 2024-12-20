@@ -1,9 +1,11 @@
 import time
 
 import numpy as np
-from simba.mixins.statistics_mixin import Statistics
 from numba import jit, njit, prange
 from scipy.spatial.distance import cdist
+
+from simba.mixins.statistics_mixin import Statistics
+
 
 @jit('(float32[:,:],)')
 def mahalanobis_distance_cdist(data: np.ndarray) -> np.ndarray:

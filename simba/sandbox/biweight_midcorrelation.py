@@ -1,7 +1,8 @@
-import numpy as np
-from pingouin.correlation import bicor
-from numba import jit
 import time
+
+import numpy as np
+from numba import jit
+from pingouin.correlation import bicor
 
 
 @jit(nopython=True)

@@ -1,16 +1,21 @@
 import os
-from datetime import datetime
 import threading
+from datetime import datetime
 from tkinter import *
 from tkinter import Button
-from simba.utils.enums import Keys, Links, Options
+
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, FileSelect, FolderSelect
-from simba.utils.checks import check_file_exist_and_readable, check_if_dir_exists
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
+                                        FolderSelect)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists)
+from simba.utils.enums import Keys, Links, Options
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext)
 from simba.video_processors.clahe_ui import interactive_clahe_ui
 from simba.video_processors.video_processing import clahe_enhance_video
-from simba.utils.read_write import find_files_of_filetypes_in_directory, get_fn_ext
-from simba.utils.printing import stdout_success, SimbaTimer
+
 
 class CLAHEPopUp(PopUpMixin):
     def __init__(self):

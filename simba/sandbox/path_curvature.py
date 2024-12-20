@@ -1,9 +1,12 @@
 import numpy as np
+
 from simba.utils.checks import check_str, check_valid_array
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+
     from simba.utils.enums import Formats
 
 

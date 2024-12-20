@@ -1,22 +1,27 @@
 
-import os
-from typing import List, Tuple, Dict, Union, Optional
-import pandas as pd
-import numpy as np
-from copy import deepcopy
 import itertools
+import os
 import warnings
-warnings.filterwarnings("ignore")
-from shapely.geometry import Polygon, Point
+from copy import deepcopy
+from typing import Dict, List, Optional, Tuple, Union
 
-from simba.utils.checks import check_instance, check_valid_lst, check_that_column_exist, check_file_exist_and_readable, check_if_dir_exists, check_that_column_exist
-from simba.utils.errors import CountError, NoFilesFoundError, NoROIDataError
+import numpy as np
+import pandas as pd
+
+warnings.filterwarnings("ignore")
+from shapely.geometry import Point, Polygon
+
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.read_write import get_file_name_info_in_directory, get_fn_ext, read_df
-from simba.utils.warnings import NoFileFoundWarning
-from simba.utils.enums import Keys
-from simba.roi_tools.ROI_analyzer import ROIAnalyzer
 from simba.mixins.geometry_mixin import GeometryMixin
+from simba.roi_tools.ROI_analyzer import ROIAnalyzer
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists, check_instance,
+                                check_that_column_exist, check_valid_lst)
+from simba.utils.enums import Keys
+from simba.utils.errors import CountError, NoFilesFoundError, NoROIDataError
+from simba.utils.read_write import (get_file_name_info_in_directory,
+                                    get_fn_ext, read_df)
+from simba.utils.warnings import NoFileFoundWarning
 
 # def __spontaneous_alternations(data: pd.DataFrame,
 #                               roi_names: List[str]) -> Tuple[int, Dict[str, np.ndarray]]:

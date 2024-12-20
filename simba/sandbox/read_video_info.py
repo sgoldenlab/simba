@@ -1,14 +1,18 @@
-import pandas as pd
-from typing import Union, Optional, Tuple
-import os
 import math
-from simba.utils.errors import NoFilesFoundError, ParametersFileError, DuplicationError
-from simba.utils.warnings import InvalidValueWarning
-from simba.utils.checks import check_valid_lst, check_float
-from simba.utils.enums import Formats
-from simba.utils.checks import check_str, check_valid_boolean, check_file_exist_and_readable, check_valid_dataframe
-from simba.utils.read_write import read_video_info_csv
+import os
 from copy import deepcopy
+from typing import Optional, Tuple, Union
+
+import pandas as pd
+
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_str, check_valid_boolean,
+                                check_valid_dataframe, check_valid_lst)
+from simba.utils.enums import Formats
+from simba.utils.errors import (DuplicationError, NoFilesFoundError,
+                                ParametersFileError)
+from simba.utils.read_write import read_video_info_csv
+from simba.utils.warnings import InvalidValueWarning
 
 
 def read_video_info(video_name: str,

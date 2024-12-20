@@ -1,15 +1,27 @@
 import os
-from typing import Union, Tuple, Optional
-import numpy as np
-import cv2
 import time
+from typing import Optional, Tuple, Union
 
-from simba.utils.checks import check_if_valid_rgb_tuple, check_valid_boolean, check_int, check_file_exist_and_readable, check_if_dir_exists, check_valid_array, check_valid_tuple
-from simba.utils.enums import Formats
-from simba.utils.read_write import get_video_meta_data, get_fn_ext, find_core_cnt, remove_a_folder, read_frm_of_video, concatenate_videos_in_folder, read_df, read_img_batch_from_video_gpu
-from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.data import egocentrically_align_pose, center_rotation_warpaffine_vectors, align_target_warpaffine_vectors, egocentric_frm_rotator
+import cv2
+import numpy as np
+
 from simba.mixins.image_mixin import ImageMixin
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists, check_if_valid_rgb_tuple,
+                                check_int, check_valid_array,
+                                check_valid_boolean, check_valid_tuple)
+from simba.utils.data import (align_target_warpaffine_vectors,
+                              center_rotation_warpaffine_vectors,
+                              egocentric_frm_rotator,
+                              egocentrically_align_pose)
+from simba.utils.enums import Formats
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    find_core_cnt, get_fn_ext,
+                                    get_video_meta_data, read_df,
+                                    read_frm_of_video,
+                                    read_img_batch_from_video_gpu,
+                                    remove_a_folder)
 
 
 class EgocentricVideoRotatorAccelerated():

@@ -5,6 +5,7 @@ from typing import Any, Dict, Optional, Union
 
 import numpy as np
 import pandas as pd
+
 pd.options.mode.chained_assignment = None
 
 
@@ -14,11 +15,14 @@ except ImportError:
     from typing_extensions import Literal
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_valid_boolean, check_instance, check_that_column_exist, check_str, check_file_exist_and_readable)
+from simba.utils.checks import (check_file_exist_and_readable, check_instance,
+                                check_str, check_that_column_exist,
+                                check_valid_boolean)
 from simba.utils.errors import DataHeaderError, InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, read_df, write_df, copy_files_to_directory)
-
+from simba.utils.read_write import (copy_files_to_directory,
+                                    find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_df, write_df)
 
 BODY_PART_TYPE = 'body-part'
 ANIMAL_TYPE = 'animal'

@@ -1,6 +1,7 @@
 import numpy as np
 
-from simba.utils.checks import check_valid_array, check_int, check_float
+from simba.utils.checks import check_float, check_int, check_valid_array
+
 
 def pct_in_top_n(x: np.ndarray, n: float) -> float:
     """

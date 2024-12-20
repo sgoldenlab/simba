@@ -1,10 +1,12 @@
-from simba.mixins.geometry_mixin import GeometryMixin
+import os
+
+import cv2
+import numpy as np
+
 from simba.mixins.config_reader import ConfigReader
+from simba.mixins.geometry_mixin import GeometryMixin
 from simba.utils.data import savgol_smoother
 from simba.utils.read_write import read_df, read_frm_of_video
-import numpy as np
-import os
-import cv2
 
 FRAME_IDX = -1
 VIDEO_NAME = '2022-06-20_NOB_DOT_4'

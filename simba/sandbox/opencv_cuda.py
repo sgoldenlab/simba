@@ -1,7 +1,9 @@
-from numba import cuda
 import math
-import numpy as np
 import time
+
+import numpy as np
+from numba import cuda
+
 
 @cuda.jit
 def add_array(a, b, c):

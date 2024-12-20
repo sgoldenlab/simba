@@ -2,8 +2,10 @@ import time
 
 import numpy as np
 from numba import jit, typed, types
+
 from simba.utils.checks import check_valid_array
 from simba.utils.data import get_mode
+
 
 def berger_parker(x: np.ndarray) -> float:
     """

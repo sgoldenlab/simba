@@ -1,9 +1,10 @@
 import os
+from typing import Union
 
 import cv2
 import numpy as np
 import pandas as pd
-from typing import Union
+
 from simba.utils.read_write import read_frm_of_video
 
 

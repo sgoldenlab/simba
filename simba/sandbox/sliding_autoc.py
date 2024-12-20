@@ -1,6 +1,8 @@
+import time
+
 import numpy as np
 from numba import njit, prange
-import time
+
 
 @njit("(float32[:], float64, float64, float64)")
 def sliding_autocorrelation(data: np.ndarray, max_lag: float, time_window: float, fps: float):

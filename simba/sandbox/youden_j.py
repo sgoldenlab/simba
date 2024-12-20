@@ -1,7 +1,6 @@
 import numpy as np
+
 from simba.utils.checks import check_valid_array
-
-
 
 
 def youden_j(sample_1: np.ndarray, sample_2: np.ndarray) -> float:

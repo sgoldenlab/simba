@@ -1,13 +1,14 @@
-from shapely.geometry import Polygon, LineString, MultiPolygon
+import multiprocessing
 from typing import List, Optional
+
 import numpy as np
+from shapely.geometry import LineString, MultiPolygon, Polygon
+
 from simba.mixins.geometry_mixin import GeometryMixin
-from simba.utils.checks import check_valid_lst, check_int
+from simba.utils.checks import check_int, check_valid_lst
+from simba.utils.enums import Defaults
 from simba.utils.errors import InvalidInputError
 from simba.utils.read_write import find_core_cnt
-import multiprocessing
-from simba.utils.enums import Defaults
-
 
 
 def multiframe_is_shape_covered(self,

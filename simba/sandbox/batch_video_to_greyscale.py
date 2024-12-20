@@ -1,11 +1,13 @@
 import os
-from typing import Union, Optional
 import subprocess
+from typing import Optional, Union
 
-from simba.utils.checks import check_ffmpeg_available, check_nvidea_gpu_available, check_if_dir_exists
+from simba.utils.checks import (check_ffmpeg_available, check_if_dir_exists,
+                                check_nvidea_gpu_available)
 from simba.utils.errors import FFMPEGCodecGPUError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import find_all_videos_in_directory, get_fn_ext
+
 
 def batch_video_to_greyscale(directory: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
     """

@@ -1,8 +1,8 @@
 import time
 
-import numpy as np
-from numba import njit, uint8, types, bool_
 import cv2
+import numpy as np
+from numba import bool_, njit, types, uint8
 
 
 @njit([(uint8[:,:,:], bool_)])

@@ -1,5 +1,5 @@
 import os
-from typing import Union, Optional, Iterable, List
+from typing import Iterable, List, Optional, Union
 
 import pandas as pd
 from numba import typed
@@ -8,24 +8,29 @@ try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+
+import functools
+import multiprocessing
+from copy import deepcopy
+
 import numpy as np
 
-from copy import deepcopy
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.read_write import find_files_of_filetypes_in_directory, find_video_of_file, get_fn_ext, read_df, \
-    read_video_info, read_frm_of_video, find_core_cnt, write_df
-from simba.utils.checks import check_all_file_names_are_represented_in_video_log, check_valid_dataframe, check_int, \
-    check_float
-from simba.utils.enums import Formats, Defaults
-from simba.video_processors.video_processing import video_bg_subtraction_mp
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.image_mixin import ImageMixin
-from simba.plotting.geometry_plotter import GeometryPlotter
-from simba.utils.checks import check_valid_array
-import multiprocessing
-import functools
-from simba.utils.printing import SimbaTimer
 from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
+from simba.plotting.geometry_plotter import GeometryPlotter
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log, check_float, check_int,
+    check_valid_array, check_valid_dataframe)
+from simba.utils.enums import Defaults, Formats
+from simba.utils.printing import SimbaTimer
+from simba.utils.read_write import (find_core_cnt,
+                                    find_files_of_filetypes_in_directory,
+                                    find_video_of_file, get_fn_ext, read_df,
+                                    read_frm_of_video, read_video_info,
+                                    write_df)
+from simba.video_processors.video_processing import video_bg_subtraction_mp
 
 NOSE = 'nose'
 LEFT_SIDE = 'left_side'

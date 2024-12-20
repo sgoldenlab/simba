@@ -1,14 +1,18 @@
-import pandas as pd
-import numpy as np
-import plotly.express as px
-import PIL
 import io
-import cv2
 from typing import Optional, Tuple, Union
+
+import cv2
+import numpy as np
+import pandas as pd
+import PIL
+import plotly.express as px
+
+from simba.utils.checks import (check_float, check_instance, check_int,
+                                check_valid_dataframe)
 from simba.utils.data import create_color_palettes, detect_bouts
-from simba.utils.checks import check_float, check_int, check_instance, check_valid_dataframe
-from simba.utils.read_write import seconds_to_timestamp, read_df
 from simba.utils.errors import InvalidInputError
+from simba.utils.read_write import read_df, seconds_to_timestamp
+
 
 def gantt_plotly(bouts_df: pd.DataFrame,
                  img_size: Optional[Tuple[int, int]] = (640, 480),

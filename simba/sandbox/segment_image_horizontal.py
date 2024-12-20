@@ -1,9 +1,11 @@
 import time
 
-import numpy as np
 import cv2
-from simba.mixins.image_mixin import ImageMixin
+import numpy as np
 from numba import jit, prange
+
+from simba.mixins.image_mixin import ImageMixin
+
 
 @jit(nopython=True, parallel=True)
 def segment_img_stack_horizontal(imgs: np.ndarray, pct: int, lower: bool, both: bool) -> np.ndarray:

@@ -1,11 +1,12 @@
-from sklearn.ensemble import IsolationForest
-import numpy as np
-from typing import Union, Optional
-from sklearn.datasets import make_blobs
-import pandas as pd
+from typing import Optional, Union
 
-from simba.utils.checks import check_valid_array, check_float, check_int
+import numpy as np
+import pandas as pd
+from sklearn.datasets import make_blobs
+from sklearn.ensemble import IsolationForest
+
 from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.checks import check_float, check_int, check_valid_array
 
 
 def isolation_forest(x: np.ndarray,

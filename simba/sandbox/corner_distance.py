@@ -1,5 +1,7 @@
 import numpy as np
+
 from simba.utils.read_write import read_df
+
 
 def img_edge_distances(data: np.ndarray,
                    pixels_per_mm: float,

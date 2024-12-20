@@ -1,16 +1,20 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
-from typing import List
-from simba.utils.checks import check_float, check_instance, check_int, check_valid_dataframe, check_str
-from typing import Optional, Tuple, Any
-from simba.utils.errors import InvalidInputError
-from simba.mixins.statistics_mixin import Statistics
+
 from itertools import combinations
+from typing import Any, List, Optional, Tuple
+
+from simba.mixins.statistics_mixin import Statistics
+from simba.utils.checks import (check_float, check_instance, check_int,
+                                check_str, check_valid_dataframe)
+from simba.utils.errors import InvalidInputError
 from simba.utils.read_write import read_pickle
+
 
 def find_collinear_features(df: pd.DataFrame,
                            threshold: float,

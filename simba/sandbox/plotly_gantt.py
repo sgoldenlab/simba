@@ -1,11 +1,12 @@
 
-import pandas as pd
-import numpy as np
-import plotly.express as px
-import PIL
 import io
-import cv2
 from typing import Optional
+
+import cv2
+import numpy as np
+import pandas as pd
+import PIL
+import plotly.express as px
 
 
 def gantt_plotly(bouts_df: pd.DataFrame,

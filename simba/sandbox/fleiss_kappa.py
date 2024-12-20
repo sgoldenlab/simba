@@ -1,6 +1,7 @@
 import numpy as np
-from simba.utils.checks import check_valid_array
 from statsmodels.stats.inter_rater import fleiss_kappa
+
+from simba.utils.checks import check_valid_array
 
 
 def fleiss_kappa_(data: np.ndarray):

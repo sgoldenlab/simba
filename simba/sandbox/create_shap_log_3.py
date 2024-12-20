@@ -6,12 +6,12 @@
 # In this example, we have previously created a classifier. We have the data used to create this classifier, and now we want to compute SHAP explainability scores
 # for this classifier using GPU (to speed things up a MASSIVELY).
 
-from simba.sandbox.create_shap_log import create_shap_log
-from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.mixins.config_reader import ConfigReader
-from simba.utils.read_write import read_df, read_config_file
 import glob
 
+from simba.mixins.config_reader import ConfigReader
+from simba.mixins.train_model_mixin import TrainModelMixin
+from simba.sandbox.create_shap_log import create_shap_log
+from simba.utils.read_write import read_config_file, read_df
 
 # DEFINITIONS
 CONFIG_PATH = r"/mnt/c/troubleshooting/mitra/project_folder/project_config.ini"

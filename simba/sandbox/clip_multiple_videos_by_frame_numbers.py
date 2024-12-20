@@ -1,15 +1,20 @@
 import os
-from typing import Union
 from tkinter import *
+from typing import Union
 
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.utils.checks import check_if_dir_exists, check_int, check_float, check_that_hhmmss_start_is_before_end
-from simba.utils.read_write import find_all_videos_in_directory, get_video_meta_data, seconds_to_timestamp, check_if_hhmmss_timestamp_is_valid_part_of_video
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, FolderSelect)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        FolderSelect)
+from simba.utils.checks import (check_float, check_if_dir_exists, check_int,
+                                check_that_hhmmss_start_is_before_end)
 from simba.utils.enums import Keys, Links
 from simba.utils.errors import FrameRangeError
-from simba.video_processors.video_processing import clip_videos_by_frame_ids, clip_video_in_range
-from simba.utils.printing import stdout_success, SimbaTimer
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (
+    check_if_hhmmss_timestamp_is_valid_part_of_video,
+    find_all_videos_in_directory, get_video_meta_data, seconds_to_timestamp)
+from simba.video_processors.video_processing import (clip_video_in_range,
+                                                     clip_videos_by_frame_ids)
 
 
 class ClipMultipleVideosByFrameNumbers(PopUpMixin):

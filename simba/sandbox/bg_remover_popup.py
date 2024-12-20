@@ -1,22 +1,28 @@
 import os
-
-from typing import Union
-from copy import deepcopy
-from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, FileSelect, FolderSelect, DropDownMenu, Entry_Box
-from simba.utils.enums import Keys, Links, Options
-from simba.utils.checks import check_file_exist_and_readable, check_if_dir_exists, check_str, check_int, check_that_hhmmss_start_is_before_end
-from simba.utils.data import check_if_string_value_is_valid_video_timestamp
-from simba.video_processors.video_processing import watermark_video, superimpose_elapsed_time, superimpose_video_progressbar, superimpose_overlay_video, superimpose_video_names, superimpose_freetext, roi_blurbox
-from simba.utils.lookups import get_color_dict
-from simba.utils.read_write import get_video_meta_data
 import threading
+from copy import deepcopy
 from tkinter import *
+from typing import Union
+
 import numpy as np
-from simba.utils.errors import InvalidInputError, DuplicationError
+
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, FileSelect, FolderSelect)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists, check_int, check_str,
+                                check_that_hhmmss_start_is_before_end)
+from simba.utils.data import check_if_string_value_is_valid_video_timestamp
+from simba.utils.enums import Formats, Keys, Links, Options
+from simba.utils.errors import DuplicationError, InvalidInputError
+from simba.utils.lookups import get_color_dict
 from simba.utils.read_write import get_video_meta_data, str_2_bool
-from simba.utils.enums import Formats
-from simba.video_processors.video_processing import video_bg_subtraction, video_bg_subtraction_mp
+from simba.video_processors.video_processing import (
+    roi_blurbox, superimpose_elapsed_time, superimpose_freetext,
+    superimpose_overlay_video, superimpose_video_names,
+    superimpose_video_progressbar, video_bg_subtraction,
+    video_bg_subtraction_mp, watermark_video)
+
 
 class BackgroundRemoverPopUp(PopUpMixin):
     def __init__(self):

@@ -1,9 +1,11 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
+from scipy import stats
+
 from simba.utils.checks import check_valid_array
 from simba.utils.errors import InvalidInputError
 from simba.utils.read_write import read_pickle
-from scipy import stats
+
 
 def cochrans_q(data: np.ndarray) -> float:
     """

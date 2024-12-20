@@ -1,6 +1,7 @@
+import cv2
 import numpy as np
 from skimage import feature
-import cv2
+
 
 def local_binary_patterns(img: np.ndarray, P=1, R=3):
     lbp = feature.local_binary_pattern(img, P=P, R=R, method="default")

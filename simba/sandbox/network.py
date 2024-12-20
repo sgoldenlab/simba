@@ -1,24 +1,27 @@
 import itertools
 import os
 from typing import Dict, List, Optional, Tuple, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 
+from itertools import combinations
+
 import networkx as nx
 import numpy as np
 from numba import jit
 from pyvis.network import Network
-from simba.mixins.network_mixin import NetworkMixin
 
-from simba.utils.checks import (check_float, check_instance, check_int,
+from simba.mixins.network_mixin import NetworkMixin
+from simba.utils.checks import (check_float, check_if_dir_exists,
+                                check_instance, check_int,
                                 check_iterable_length, check_str,
                                 check_valid_array, check_valid_hex_color,
-                                check_valid_tuple, check_if_dir_exists, check_valid_lst)
+                                check_valid_lst, check_valid_tuple)
 from simba.utils.data import create_color_palette, find_ranked_colors, get_mode
 from simba.utils.errors import CountError, InvalidInputError
-from itertools import combinations
 
 
 def graph_load_centrality(g: nx.Graph):

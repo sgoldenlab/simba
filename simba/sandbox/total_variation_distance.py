@@ -1,16 +1,17 @@
 from typing import Optional
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
-import numpy as np
 
-from simba.utils.checks import check_str, check_valid_array
-from simba.utils.enums import Options
-from simba.mixins.statistics_mixin import Statistics
-from simba.utils.data import bucket_data
+import numpy as np
 from numba import jit
 
+from simba.mixins.statistics_mixin import Statistics
+from simba.utils.checks import check_str, check_valid_array
+from simba.utils.data import bucket_data
+from simba.utils.enums import Options
 
 
 def total_variation_distance(x: np.ndarray, y: np.ndarray, bucket_method: Optional[Literal["fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"]] = "auto"):

@@ -1,14 +1,10 @@
+import cv2
 import numpy as np
-from simba.utils.read_write import read_df
-from simba.utils.data import egocentrically_align_pose
 from numba import jit
-from simba.utils.read_write import read_df, read_img_batch_from_video_gpu
-from simba.utils.data import egocentrically_align_pose
-import cv2
 
-from simba.utils.read_write import read_df, read_img_batch_from_video_gpu
 from simba.utils.data import egocentrically_align_pose
-import cv2
+from simba.utils.read_write import read_df, read_img_batch_from_video_gpu
+
 
 @jit(nopython=True)
 def center_rotation_warpaffine_vectors(rotation_vectors: np.ndarray, centers: np.ndarray):

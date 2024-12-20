@@ -1,6 +1,9 @@
-import numpy as np
-from simba.utils.checks import check_valid_array
 from typing import Optional
+
+import numpy as np
+
+from simba.utils.checks import check_valid_array
+
 
 def grubbs_test(x: np.ndarray, left_tail: Optional[bool] = False) -> float:
     """

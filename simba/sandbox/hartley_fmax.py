@@ -1,5 +1,7 @@
 import numpy as np
+
 from simba.utils.checks import check_valid_array
+
 
 def hartley_fmax(x: np.ndarray, y: np.ndarray):
     """

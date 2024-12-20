@@ -6,12 +6,11 @@
 In this notebook, we will create a bunch of different styled path plots representing visualizations for where the animal spends its time.
 """
 
+import cv2
+from matplotlib import pyplot as plt
+
 #%matplotlib inline
 from simba.plotting.path_plotter_mp import PathPlotterMulticore
-from matplotlib import pyplot as plt
-import cv2
-
-
 
 #Path to SimBA project config file.
 CONFIG_PATH = '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/project_config.ini'

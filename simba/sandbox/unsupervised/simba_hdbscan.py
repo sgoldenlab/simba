@@ -1,15 +1,22 @@
-import os
-import itertools
 import datetime
+import itertools
+import os
+import random
+from typing import Tuple, Union
+
 import numpy as np
-from typing import Union, Tuple
+
+from simba.mixins.unsupervised_mixin import UMLMixin
 from simba.utils.checks import check_if_dir_exists, check_valid_tuple
-from simba.utils.read_write import find_files_of_filetypes_in_directory, read_pickle, check_if_keys_exist_in_dict, check_valid_array, check_int, check_float, check_valid_boolean, write_pickle
 from simba.utils.enums import UML, Formats
 from simba.utils.lookups import get_model_names
-from simba.mixins.unsupervised_mixin import UMLMixin
 from simba.utils.printing import SimbaTimer, stdout_success
-import random
+from simba.utils.read_write import (check_float, check_if_keys_exist_in_dict,
+                                    check_int, check_valid_array,
+                                    check_valid_boolean,
+                                    find_files_of_filetypes_in_directory,
+                                    read_pickle, write_pickle)
+
 
 class SimBAHdbscan():
 

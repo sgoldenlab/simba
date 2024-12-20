@@ -1,11 +1,16 @@
-import pandas as pd
 import warnings
+
+import pandas as pd
+
 warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
-import os
 import ast
+import os
+
 import numpy as np
+
 from simba.roi_tools.ROI_multiply import create_emty_df
-from simba.utils.checks import check_file_exist_and_readable, check_if_dir_exists
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists)
 
 RECTANGLES_CSV_PATH = '/Users/simon/Desktop/test/rectangles_20240314085952.csv'
 POLYGONS_CSV_PATH = '/Users/simon/Desktop/test/polygons_20240314085952.csv'

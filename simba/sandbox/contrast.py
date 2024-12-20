@@ -1,17 +1,20 @@
-from typing import Union, Tuple
 import os
-
-from datetime import datetime
 import subprocess
-
+from datetime import datetime
 from tkinter import Button
-from simba.utils.enums import Keys, Links, Options
+from typing import Tuple, Union
+
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, FileSelect, FolderSelect
-from simba.utils.checks import check_file_exist_and_readable, check_if_dir_exists
-from simba.video_processors.brightness_contrast_ui import brightness_contrast_ui
-from simba.utils.read_write import find_files_of_filetypes_in_directory, get_fn_ext
-from simba.utils.printing import stdout_success, SimbaTimer
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
+                                        FolderSelect)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists)
+from simba.utils.enums import Keys, Links, Options
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext)
+from simba.video_processors.brightness_contrast_ui import \
+    brightness_contrast_ui
 
 
 class BrightnessContrastPopUp(PopUpMixin):

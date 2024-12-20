@@ -6,6 +6,7 @@ from sklearn.metrics.cluster import davies_bouldin_score
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.utils.checks import check_valid_array
 
+
 def davis_bouldin(x: np.ndarray, y: np.ndarray) -> float:
     """
     Calculate the Davis-Bouldin index for evaluating clustering performance.
