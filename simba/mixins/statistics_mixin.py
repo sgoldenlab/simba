@@ -18,12 +18,13 @@ from numba import (bool_, float32, float64, int8, jit, njit, prange, typed,
                    types)
 from scipy import stats
 from scipy.stats.distributions import chi2
+from statsmodels.stats.libqsturng import psturng
+from statsmodels.stats.multicomp import pairwise_tukeyhsd
 from sklearn.covariance import EllipticEnvelope
 from sklearn.ensemble import IsolationForest
 
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.utils.checks import (check_float, check_int, check_str,
-                                check_valid_array, check_valid_dataframe)
+from simba.utils.checks import (check_float, check_int, check_str, check_valid_array, check_valid_dataframe, check_valid_lst)
 from simba.utils.data import bucket_data, fast_mean_rank
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import CountError, InvalidInputError
@@ -409,7 +410,7 @@ class Statistics(FeatureExtractionMixin):
         :rtype: Tuple[float, float]
 
         :example:
-        >>> sample_1 = np.array([1, 2, 3, 1, 3, 2, 1, 10, 8, 4, 10])
+        >>> saxfmple_1 = np.array([1, 2, 3, 1, 3, 2, 1, 10, 8, 4, 10])
         >>> sample_2 = np.array([8, 5, 5, 8, 8, 9, 10, 1, 7, 10, 10])
         >>> Statistics().one_way_anova(sample_1=sample_2, sample_2=sample_1)
         """
@@ -4377,3 +4378,113 @@ class Statistics(FeatureExtractionMixin):
             results[r - 1] = upper_val - lower_val
         return results
 
+    @staticmethod
+    def one_way_anova_scipy(x: np.ndarray,
+                            y: np.ndarray,
+                            variable_names: List[str],
+                            x_name: str = '',
+                            y_name: str = '') -> pd.DataFrame:
+        """
+        Compute one-way ANOVAs comparing each column (axis 1) on two arrays.
+
+        .. notes::
+           Use for computing and presenting aggregate statistics. Not suitable for featurization.
+
+        .. seealso::
+           For featurization instead use :func:`simba.mixins.statistics_mixin.Statistics.rolling_one_way_anova` or
+           :func:`simba.mixins.statistics_mixin.Statistics.one_way_anova`
+
+        :param np.ndarray x: First 2d array with observations rowwise and variables columnwise.
+        :param np.ndarray y: Second 2d array with observations rowwise and variables columnwise. Must be same number of columns as x.
+        :param List[str, ...] variable_names: Names of columnwise variable names. Same length as number of data columns.
+        :param str x_name: Name of the first group (x).
+        :param str y_name: Name of the second group (y).
+        :return: Dataframe with one row per column representing the ANOVA F-statistic and P-values comparing the variables between x and y.
+        :rtype: pd.DataFrame
+        """
+
+        check_valid_array(data=x, source=f'{Statistics.one_way_anova_scipy.__name__} x', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, source=f'{Statistics.one_way_anova_scipy.__name__} y', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_1_shape=(x.shape[1],))
+        check_str(name=f'{Statistics.one_way_anova_scipy.__name__} x_name', value=x_name, allow_blank=True)
+        check_str(name=f'{Statistics.one_way_anova_scipy.__name__} y_name', value=y_name, allow_blank=True)
+        check_valid_lst(source=f'{Statistics.one_way_anova_scipy.__name__} variable_names', data=variable_names, valid_dtypes=(str,), exact_len=x.shape[1])
+        results = pd.DataFrame(variable_names, columns=['FEATURE'])
+        results[['GROUP_1', 'GROUP_2']] = x_name, y_name
+        results['F-STATISTIC'], results['P-VALUE'] = stats.f_oneway(x, y)
+
+        results['P-VALUE'] = results['P-VALUE'].round(8)
+
+        return results
+
+    @staticmethod
+    def kruskal_scipy(x: np.ndarray,
+                      y: np.ndarray,
+                      variable_names: List[str],
+                      x_name: str = '',
+                      y_name: str = '') -> pd.DataFrame:
+        """
+        Compute Kruskal-Wallis comparing each column (axis 1) on two arrays.
+
+        .. notes::
+           Use for computing and presenting aggregate statistics. Not suitable for featurization.
+
+        .. seealso::
+           For featurization instead use :func:`simba.mixins.statistics_mixin.Statistics.kruskal_wallis`
+
+        :param np.ndarray x: First 2d array with observations rowwise and variables columnwise.
+        :param np.ndarray y: Second 2d array with observations rowwise and variables columnwise. Must be same number of columns as x.
+        :param List[str, ...] variable_names: Names of columnwise variable names. Same length as number of data columns.
+        :param str x_name: Name of the first group (x).
+        :param str y_name: Name of the second group (y).
+        :return: Dataframe with one row per column representing the Kruskal-Wallis statistic and P-values comparing the variables between x and y.
+        :rtype: pd.DataFrame
+        """
+
+        check_valid_array(data=x, source=f'{Statistics.kruskal_scipy.__name__} x', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, source=f'{Statistics.kruskal_scipy.__name__} y', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_1_shape=(x.shape[1],))
+        check_str(name=f'{Statistics.kruskal_scipy.__name__} x_name', value=x_name, allow_blank=True)
+        check_str(name=f'{Statistics.kruskal_scipy.__name__} y_name', value=y_name, allow_blank=True)
+        check_valid_lst(source=f'{Statistics.kruskal_scipy.__name__} variable_names', data=variable_names, valid_dtypes=(str,), exact_len=x.shape[1])
+        results = pd.DataFrame(variable_names, columns=['FEATURE'])
+        results[['GROUP_1', 'GROUP_2']] = x_name, y_name
+        results['STATISTIC'], results['P-VALUE'] = stats.kruskal(x, y)
+
+        results['P-VALUE'] = results['P-VALUE'].round(8)
+
+        return results
+
+
+
+    @staticmethod
+    def pairwise_tukeyhsd_scipy(data: np.ndarray,
+                                group: np.ndarray,
+                                variable_names: List[str],
+                                verbose: bool = False) -> pd.DataFrame:
+
+        """
+        Compute pairwise grouped Tukey-HSD tests.
+
+        .. notes::
+           Use for computing and presenting aggregate statistics. Not suitable for featurization.
+
+        :param np.ndarray data: 2D array  with observations rowwise (axis 0) and features columnwise (axis 1)
+        :param np.ndarray group: 1D array with the same number of observations as rows in ``data`` containing the group for each sample.
+        :param List[str, ...] variable_names: Names of columnwise variable names. Same length as number of data columns.
+        :return: Dataframe comparing each group for each variable.
+        :rtype: pd.DataFrame
+        """
+
+        check_valid_array(data=data, source=f'{Statistics.pairwise_tukeyhsd_scipy.__name__} data', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=group, source=f'{Statistics.pairwise_tukeyhsd_scipy.__name__} group', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=(data.shape[0],))
+        check_valid_lst(source=f'{Statistics.pairwise_tukeyhsd_scipy.__name__} variable_names', data=variable_names, valid_dtypes=(str,), exact_len=data.shape[1])
+        results = []
+        for var in range(data.shape[1]):
+            if verbose:
+                print(f'Computing Tukey HSD for variable {var+1}/{data.shape[1]}...')
+            tukey_data = pairwise_tukeyhsd(data[:, var], group)
+            df = pd.DataFrame(data=tukey_data._results_table.data[1:], columns=tukey_data._results_table.data[0])
+            df['P-VALUE'] = psturng(np.abs(tukey_data.meandiffs / tukey_data.std_pairs), len(tukey_data.groupsunique), tukey_data.df_total)
+            df['FEATURE'] = variable_names[var]
+            results.append(df)
+
+        return pd.concat(results, axis=0)
