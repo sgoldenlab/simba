@@ -24,9 +24,10 @@ from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 DirectoryNotEmptyError, FFMPEGNotFoundError,
                                 FloatError, FrameRangeError, IntegerError,
                                 InvalidFilepathError, InvalidInputError,
-                                NoDataError, NoFilesFoundError, NoROIDataError,
+                                MissingColumnsError, NoDataError,
+                                NoFilesFoundError, NoROIDataError,
                                 NotDirectoryError, ParametersFileError,
-                                StringError, MissingColumnsError)
+                                StringError)
 from simba.utils.warnings import (CorruptedFileWarning, FrameRangeWarning,
                                   InvalidValueWarning, NoDataFoundWarning)
 

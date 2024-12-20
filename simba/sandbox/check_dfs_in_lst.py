@@ -1,7 +1,9 @@
-import pandas as pd
 from typing import List
 
+import pandas as pd
+
 from simba.utils.checks import check_valid_lst
+
 
 def check_all_dfs_in_list_has_same_cols(dfs: List[pd.DataFrame], raise_error: bool = True) -> bool:
     check_valid_lst(data=dfs, source=check_all_dfs_in_list_has_same_cols.__name__, valid_dtypes=(pd.DataFrame,), min_len=1)

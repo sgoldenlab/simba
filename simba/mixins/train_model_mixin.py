@@ -58,11 +58,13 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.plotting.shap_agg_stats_visualizer import \
     ShapAggregateStatisticsVisualizer
 from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
+from simba.utils.checks import (check_all_dfs_in_list_has_same_cols,
+                                check_file_exist_and_readable,
+                                check_filepaths_in_iterable_exist, check_float,
                                 check_if_dir_exists, check_if_valid_input,
                                 check_instance, check_int, check_str,
                                 check_that_column_exist, check_valid_array,
-                                check_valid_dataframe, check_valid_lst, check_all_dfs_in_list_has_same_cols, check_filepaths_in_iterable_exist)
+                                check_valid_dataframe, check_valid_lst)
 from simba.utils.data import (detect_bouts, detect_bouts_multiclass,
                               get_library_version)
 from simba.utils.enums import (OS, ConfigKey, Defaults, Dtypes, Formats,
