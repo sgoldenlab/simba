@@ -1,8 +1,11 @@
-import pandas as pd
-
-from simba.video_processors.video_processing import video_bg_subtraction_mp, create_average_frm, read_frm_of_video
 import matplotlib
 import matplotlib.pyplot as plt
+import pandas as pd
+
+from simba.video_processors.video_processing import (create_average_frm,
+                                                     read_frm_of_video,
+                                                     video_bg_subtraction_mp)
+
 dpi = matplotlib.rcParams["figure.dpi"]
 import cv2
 

@@ -1,15 +1,18 @@
-import pandas as pd
-import libpysal as lps
-import esda
-import numpy as np
 from typing import Dict, Tuple
-from simba.mixins.geometry_mixin import GeometryMixin
+
+import esda
+import libpysal as lps
+import numpy as np
+import pandas as pd
 from shapely.geometry import Polygon
-from simba.utils.read_write import read_df, get_video_meta_data, read_frm_of_video
+
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.utils.checks import check_valid_array, check_valid_dict
 from simba.utils.data import create_color_palette, find_ranked_colors
 from simba.utils.enums import Formats
-from simba.utils.checks import check_valid_dict, check_valid_array
 from simba.utils.errors import InvalidInputError
+from simba.utils.read_write import (get_video_meta_data, read_df,
+                                    read_frm_of_video)
 
 QUAD_MAP = {1: 'HH', 2: 'LH', 3: 'LL', 4: 'HL'}
 MORAN_COLORS = {'HH': (215,25,28), 'LH': (171,217,233), 'LL': (44,123,182), 'HL': (253,174,97)}
@@ -56,6 +59,7 @@ cumsum_time = GeometryMixin().cumsum_coord_geometries(data=data_arr, geometries=
 data, img = morans_local_i(x=cumsum_time, grid=grid, bg_img=np.zeros(shape=(668, 540)))
 
 import cv2
+
 cv2.imshow('sdasdasd', img)
 cv2.waitKey(10000)
 

@@ -1,11 +1,14 @@
-import pandas as pd
-from typing import Union, List, Optional, Tuple
 import os
-import seaborn as sns
-from simba.utils.checks import check_instance, check_str, check_valid_lst, check_if_dir_exists
-from simba.utils.enums import Formats
-import numpy as np
+from typing import List, Optional, Tuple, Union
+
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import seaborn as sns
+
+from simba.utils.checks import (check_if_dir_exists, check_instance, check_str,
+                                check_valid_lst)
+from simba.utils.enums import Formats
 
 
 def plot_bar_chart(df: pd.DataFrame,

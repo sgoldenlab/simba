@@ -1,9 +1,13 @@
-import pandas as pd
-from statsmodels.tsa.stattools import grangercausalitytests
-import numpy as np
 import itertools
 from typing import List
-from simba.utils.checks import check_int, check_instance, check_that_column_exist, check_str, check_valid_lst, check_int
+
+import numpy as np
+import pandas as pd
+from statsmodels.tsa.stattools import grangercausalitytests
+
+from simba.utils.checks import (check_instance, check_int, check_str,
+                                check_that_column_exist, check_valid_lst)
+
 try:
     from typing import Literal
 except:

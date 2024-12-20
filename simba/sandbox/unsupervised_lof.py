@@ -1,9 +1,10 @@
 from typing import List, Union
+
 import numpy as np
+import pandas as pd
 from sklearn.neighbors import LocalOutlierFactor
 
-import pandas as pd
-from simba.utils.checks import check_valid_lst, check_valid_array
+from simba.utils.checks import check_valid_array, check_valid_lst
 from simba.utils.errors import InvalidInputError
 
 

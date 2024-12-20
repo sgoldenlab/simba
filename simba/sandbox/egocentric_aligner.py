@@ -7,20 +7,22 @@ import cv2
 import numpy as np
 import pandas as pd
 
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log,
-                                check_if_dir_exists, check_int, check_valid_dataframe,
-                                check_str, check_valid_tuple, check_valid_boolean, check_instance,
-                                check_valid_array, check_if_valid_rgb_tuple)
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log, check_if_dir_exists,
+    check_if_valid_rgb_tuple, check_instance, check_int, check_str,
+    check_valid_array, check_valid_boolean, check_valid_dataframe,
+    check_valid_tuple)
+from simba.utils.data import egocentrically_align_pose
 from simba.utils.enums import Formats, Options
 from simba.utils.printing import SimbaTimer
-from simba.utils.data import egocentrically_align_pose
-from simba.utils.read_write import (concatenate_videos_in_folder,
+from simba.utils.read_write import (bgr_to_rgb_tuple,
+                                    concatenate_videos_in_folder,
                                     find_core_cnt,
                                     find_files_of_filetypes_in_directory,
                                     find_video_of_file, get_fn_ext,
                                     get_video_meta_data, read_df,
-                                    read_frm_of_video, remove_a_folder,
-                                    write_df, read_video_info_csv, bgr_to_rgb_tuple)
+                                    read_frm_of_video, read_video_info_csv,
+                                    remove_a_folder, write_df)
 from simba.utils.warnings import FrameRangeWarning
 
 

@@ -1,11 +1,12 @@
-from typing import Optional, Union, Dict
+from typing import Dict, Optional, Union
 
-from numba import jit
-from numba import typed, types, prange
 import numpy as np
+from numba import jit, prange, typed, types
+
+from simba.mixins.image_mixin import ImageMixin
 from simba.utils.checks import check_float
 from simba.utils.errors import InvalidInputError
-from simba.mixins.image_mixin import ImageMixin
+
 
 @jit(nopython=True)
 def _reduce_img_sizes(imgs: typed.Dict, scale: float):

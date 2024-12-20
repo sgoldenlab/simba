@@ -1,9 +1,8 @@
-import numpy as np
-import numba as nb
-from numba import guvectorize
-from numba import cuda
 import time
 
+import numba as nb
+import numpy as np
+from numba import cuda, guvectorize
 
 a = np.random.rand(1024 * 1024, 32).astype('float32')
 b = np.random.rand(1024 * 1024, 32).astype('float32')

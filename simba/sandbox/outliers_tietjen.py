@@ -1,5 +1,7 @@
 from typing import List, Union
+
 import numpy as np
+
 
 def outliers_tietjen(x: Union[List, np.ndarray], k: int = 2, hypo: bool = False, alpha: float = 0.05) -> Union[np.ndarray, bool]:
     arr = np.copy(x)

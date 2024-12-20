@@ -1,10 +1,14 @@
+from typing import Optional, Union
+
 import numpy as np
-from shapely.geometry import LineString, Polygon, Point
-from typing import Union, Optional
-from simba.utils.checks import check_instance, check_valid_array, check_float, check_int
+from shapely.geometry import LineString, Point, Polygon
+
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.geometry_mixin import GeometryMixin
+from simba.utils.checks import (check_float, check_instance, check_int,
+                                check_valid_array)
 from simba.utils.read_write import find_core_cnt
+
 
 def locate_line_point(path: Union[LineString, np.ndarray],
                       geometry: Union[LineString, Polygon, Point],

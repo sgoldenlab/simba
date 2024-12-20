@@ -1,15 +1,19 @@
 import os
-import yaml
+from typing import Any, Dict, Optional, Tuple, Union
+
 import cv2
 import numpy as np
-from typing import Union, Optional, Dict, Tuple, Any
-from simba.mixins.config_reader import ConfigReader
-from simba.utils.enums import Keys
-from simba.utils.read_write import read_roi_data, find_video_of_file, get_video_meta_data, read_frm_of_video
-from simba.mixins.geometry_mixin import GeometryMixin
+import yaml
 from shapely.geometry import Polygon
-from simba.utils.checks import check_int, check_valid_boolean, check_if_dir_exists, check_valid_dict
+
+from simba.mixins.config_reader import ConfigReader
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.utils.checks import (check_if_dir_exists, check_int,
+                                check_valid_boolean, check_valid_dict)
+from simba.utils.enums import Keys
 from simba.utils.errors import InvalidInputError
+from simba.utils.read_write import (find_video_of_file, get_video_meta_data,
+                                    read_frm_of_video, read_roi_data)
 
 
 def simba_rois_to_yolo(config_path: Optional[Union[str, os.PathLike]] = None,

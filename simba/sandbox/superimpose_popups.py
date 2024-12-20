@@ -1,17 +1,22 @@
 import os
-
-from typing import Union
-from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, FileSelect, FolderSelect, DropDownMenu, Entry_Box
-from simba.utils.enums import Keys, Links, Options
-from simba.utils.checks import check_file_exist_and_readable, check_if_dir_exists, check_str
-from simba.video_processors.video_processing import watermark_video, superimpose_elapsed_time, superimpose_video_progressbar, superimpose_overlay_video, superimpose_video_names, superimpose_freetext, roi_blurbox
-from simba.utils.lookups import get_color_dict
 import threading
 from tkinter import *
-import numpy as np
-from simba.utils.read_write import get_video_meta_data, str_2_bool
+from typing import Union
 
+import numpy as np
+
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, FileSelect, FolderSelect)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists, check_str)
+from simba.utils.enums import Keys, Links, Options
+from simba.utils.lookups import get_color_dict
+from simba.utils.read_write import get_video_meta_data, str_2_bool
+from simba.video_processors.video_processing import (
+    roi_blurbox, superimpose_elapsed_time, superimpose_freetext,
+    superimpose_overlay_video, superimpose_video_names,
+    superimpose_video_progressbar, watermark_video)
 
 
 class SuperimposeWatermarkPopUp(PopUpMixin):

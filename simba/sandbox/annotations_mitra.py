@@ -1,8 +1,10 @@
-import pandas as pd
 import glob
 import os
-from simba.utils.read_write import get_fn_ext
 import shutil
+
+import pandas as pd
+
+from simba.utils.read_write import get_fn_ext
 
 # ANNOTATED_VIDEOS_PATH = '/Users/simon/Desktop/envs/simba/troubleshooting/mitra/annotated_videos.csv'
 # DATA_PATH = '/Users/simon/Desktop/envs/simba/troubleshooting/mitra/project_folder/csv/input_csv/originals'

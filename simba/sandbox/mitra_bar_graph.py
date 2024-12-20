@@ -1,5 +1,6 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 from simba.mixins.plotting_mixin import PlottingMixin
 
 GI_PATH = r"C:\troubleshooting\mitra\project_folder\logs\straub_tail\straub_tail_aggregates\straub_tail_aggregates_gi.csv"

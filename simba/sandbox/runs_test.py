@@ -1,6 +1,8 @@
-import numpy as np
 from typing import Optional
+
+import numpy as np
 from scipy import stats
+
 
 def runs_test_one_sample(x: np.ndarray):
     cutoff = np.mean(x)

@@ -1,6 +1,6 @@
 import cProfile
-import App
 
+import App
 
 profiler = cProfile.Profile()
 profiler.enable()

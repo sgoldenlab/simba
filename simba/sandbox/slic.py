@@ -1,21 +1,25 @@
-import os
-
-import matplotlib.pyplot as plt
-from skimage import io
-from skimage.segmentation import slic
-from skimage.segmentation import mark_boundaries
-import numpy as np
-from typing import Optional, Union
-from simba.utils.checks import check_valid_array, check_int, check_if_valid_img, check_file_exist_and_readable
-from simba.utils.read_write import read_frm_of_video, get_video_meta_data, find_core_cnt, get_fn_ext, concatenate_videos_in_folder
-from skimage.segmentation import slic
-from skimage.color import label2rgb
-import cv2
-from copy import deepcopy
-import multiprocessing
 import functools
+import multiprocessing
+import os
+from copy import deepcopy
+from typing import Optional, Union
+
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+from skimage import io
+from skimage.color import label2rgb
+from skimage.segmentation import mark_boundaries, slic
+
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_valid_img, check_int,
+                                check_valid_array)
 from simba.utils.enums import Defaults, Formats
 from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    find_core_cnt, get_fn_ext,
+                                    get_video_meta_data, read_frm_of_video)
+
 
 def get_img_slic(img: np.ndarray,
                  n_segments: Optional[int] = 50,

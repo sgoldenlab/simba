@@ -1,10 +1,11 @@
 import os
-from typing import List, Union, Tuple, Optional
 import subprocess
-from simba.utils.read_write import get_video_meta_data, get_fn_ext
-from simba.utils.checks import check_valid_lst, check_int, check_if_dir_exists
+from typing import List, Optional, Tuple, Union
+
+from simba.utils.checks import check_if_dir_exists, check_int, check_valid_lst
 from simba.utils.errors import FrameRangeError
-from simba.utils.printing import stdout_success, SimbaTimer
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_fn_ext, get_video_meta_data
 
 
 def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]],

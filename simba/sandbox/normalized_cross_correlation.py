@@ -1,10 +1,12 @@
-from skimage.metrics import structural_similarity
-import numpy as np
-import cv2
-from simba.utils.checks import check_if_valid_img, check_valid_lst, check_int
 from typing import List, Optional
-from simba.mixins.image_mixin import ImageMixin
+
+import cv2
+import numpy as np
 from numba import jit, njit, prange
+from skimage.metrics import structural_similarity
+
+from simba.mixins.image_mixin import ImageMixin
+from simba.utils.checks import check_if_valid_img, check_int, check_valid_lst
 
 
 @njit(["(uint8[:, :], uint8[:, :])",
@@ -142,6 +144,7 @@ imgs = ImageMixin.img_stack_to_greyscale(imgs=imgs)
 results = cross_correlation_matrix(imgs=imgs)
 
 import time
+
 start = time.time()
 results = cross_correlation_matrix(imgs=imgs)
 print(time.time() - start)

@@ -1,6 +1,7 @@
 import numpy as np
 from numba import njit
 
+
 @njit('(int32[:,:], float64, float64)')
 def sliding_bearing(x: np.ndarray, lag: float, fps: float) -> np.ndarray:
     """

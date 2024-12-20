@@ -1,10 +1,14 @@
 import os
-from typing import List, Union, Optional
-from simba.utils.read_write import get_video_meta_data
-from simba.utils.checks import check_valid_lst, check_if_dir_exists, check_int, check_ffmpeg_available, check_nvidea_gpu_available
-from simba.utils.errors import InvalidInputError, FFMPEGCodecGPUError
-from simba.utils.printing import SimbaTimer
 import subprocess
+from typing import List, Optional, Union
+
+from simba.utils.checks import (check_ffmpeg_available, check_if_dir_exists,
+                                check_int, check_nvidea_gpu_available,
+                                check_valid_lst)
+from simba.utils.errors import FFMPEGCodecGPUError, InvalidInputError
+from simba.utils.printing import SimbaTimer
+from simba.utils.read_write import get_video_meta_data
+
 
 def vertical_video_concatenator(video_paths: List[Union[str, os.PathLike]],
                                 save_path: Union[str, os.PathLike],

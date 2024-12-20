@@ -1,5 +1,6 @@
 import requests
 
+
 def get_package_sizes(package_name):
     # Fetch package information from PyPI
     url = f'https://pypi.org/pypi/{package_name}/json'

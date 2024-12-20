@@ -2,7 +2,6 @@ import numpy as np
 from numba import cuda, njit
 
 
-
 @njit("(float32[:], float64, float64)")
 def sliding_iqr(x: np.ndarray, window_size: float, sample_rate: float) -> np.ndarray:
     """

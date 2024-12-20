@@ -1,9 +1,11 @@
+import time
+
 import numpy as np
 from numba import cuda
-import time
+
+from simba.data_processors.cuda.utils import _cuda_available, _euclid_dist
+from simba.utils.checks import check_float, check_valid_array
 from simba.utils.enums import Formats
-from simba.utils.checks import check_valid_array, check_float
-from simba.data_processors.cuda.utils import _euclid_dist, _cuda_available
 from simba.utils.errors import SimBAGPUError
 
 THREADS_PER_BLOCK = 1024

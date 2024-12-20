@@ -1,14 +1,16 @@
-from typing import Union, Optional
+from typing import Optional, Union
+
 import numpy as np
 import pandas as pd
-from sklearn.covariance import EllipticEnvelope
 from pyod.models.abod import ABOD
-
-from simba.utils.checks import check_valid_array, check_float, check_int
-from sklearn.neighbors import LocalOutlierFactor
+from sklearn.covariance import EllipticEnvelope
 from sklearn.datasets import make_blobs
-from simba.mixins.plotting_mixin import PlottingMixin
+from sklearn.neighbors import LocalOutlierFactor
+
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.checks import check_float, check_int, check_valid_array
+
 
 def angle_based_od(data: np.ndarray,
                    k: Union[int, float] = 5,

@@ -3,7 +3,7 @@ __author__ = "Simon Nilsson"
 import itertools
 import os
 from copy import deepcopy
-from typing import Tuple, Optional, Union, Dict
+from typing import Dict, Optional, Tuple, Union
 
 import cv2
 import numpy as np
@@ -11,12 +11,15 @@ import numpy as np
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.roi_tools.ROI_analyzer import ROIAnalyzer
-from simba.utils.data import create_color_palettes, slice_roi_dict_for_video, detect_bouts
-from simba.utils.checks import check_float, check_if_keys_exist_in_dict, check_file_exist_and_readable, check_video_and_data_frm_count_align
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_keys_exist_in_dict,
+                                check_video_and_data_frm_count_align)
+from simba.utils.data import (create_color_palettes, detect_bouts,
+                              slice_roi_dict_for_video)
 from simba.utils.enums import Formats, Paths, TagNames, TextOptions
 from simba.utils.errors import DuplicationError, NoFilesFoundError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (get_fn_ext, get_video_meta_data)
+from simba.utils.read_write import get_fn_ext, get_video_meta_data
 from simba.utils.warnings import DuplicateNamesWarning
 
 SHOW_BODY_PARTS = 'show_body_part'

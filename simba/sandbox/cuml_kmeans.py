@@ -1,9 +1,10 @@
-import numpy as np
 from typing import Optional, Tuple
 
+import numpy as np
 
-from simba.utils.read_write import read_img_batch_from_video_gpu
 from simba.mixins.image_mixin import ImageMixin
+from simba.utils.read_write import read_img_batch_from_video_gpu
+
 try:
    from cuml.cluster import KMeans
 except:
@@ -36,6 +37,7 @@ def kmeans_cuml(data: np.ndarray,
     return  (mdl.cluster_centers_, mdl.predict(data))
 
 import time
+
 for i in [1000000, 2000000]:
     data = np.random.randint(0, 500, (i, 400)).astype(np.int32)
     start = time.perf_counter()

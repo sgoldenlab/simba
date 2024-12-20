@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
-from simba.utils.checks import check_valid_array, check_float, check_int
+
+from simba.utils.checks import check_float, check_int, check_valid_array
 from simba.utils.enums import Formats
 
 

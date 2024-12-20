@@ -1,6 +1,7 @@
 import numpy as np
 from numba import njit
 
+
 @njit('(int32[:,:], float64[:], float64, float64)')
 def sliding_displacement(x: np.ndarray,
                          time_windows: np.ndarray,

@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from numba import jit
 
+
 @jit(nopython=True)
 def sliding_eta_squared(x: np.ndarray, y: np.ndarray, window_sizes: np.ndarray, sample_rate: int) -> np.ndarray:
     """

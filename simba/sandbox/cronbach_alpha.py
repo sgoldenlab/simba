@@ -1,8 +1,8 @@
 import time
 
 import numpy as np
-from numba import prange, jit, njit
 import pandas as pd
+from numba import jit, njit, prange
 from pingouin.reliability import cronbach_alpha
 
 

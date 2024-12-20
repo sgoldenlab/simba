@@ -1,6 +1,9 @@
+from typing import List, Optional, Tuple, Union
+
 import cv2
-from typing import Optional, Tuple, Union, List
+
 from simba.utils.checks import check_int, check_valid_tuple
+
 
 def get_optimal_font_scale(text: Union[str, List[str]],
                            accepted_px_width: int,

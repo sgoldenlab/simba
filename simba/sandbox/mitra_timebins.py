@@ -1,11 +1,16 @@
 import os
 from typing import Union
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 
-from simba.utils.checks import check_int, check_if_dir_exists, check_file_exist_and_readable, check_str, check_valid_dataframe, check_all_file_names_are_represented_in_video_log
-from simba.utils.read_write import find_files_of_filetypes_in_directory, read_df, get_fn_ext, read_video_info_csv, read_video_info
-
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_file_exist_and_readable, check_if_dir_exists, check_int, check_str,
+    check_valid_dataframe)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_df, read_video_info,
+                                    read_video_info_csv)
 
 
 def mitra_timebins(data_dir: Union[str, os.PathLike],

@@ -1,8 +1,8 @@
-from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.mixins.config_reader import ConfigReader
-from simba.utils.read_write import read_df, read_config_file
 import glob
 
+from simba.mixins.config_reader import ConfigReader
+from simba.mixins.train_model_mixin import TrainModelMixin
+from simba.utils.read_write import read_config_file, read_df
 
 # DEFINITIONS
 CONFIG_PATH = r"C:\troubleshooting\mitra\project_folder\project_config.ini"

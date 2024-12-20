@@ -1,18 +1,28 @@
 
-from typing import Union, Optional, Tuple, Dict, Any
-import cv2
-import multiprocessing
-from datetime import datetime
 import functools
+import multiprocessing
 import os
-import numpy as np
 from copy import deepcopy
-from simba.utils.checks import check_file_exist_and_readable, check_int, check_that_hhmmss_start_is_before_end, check_if_string_value_is_valid_video_timestamp, check_if_dir_exists
+from datetime import datetime
+from typing import Any, Dict, Optional, Tuple, Union
+
+import cv2
+import numpy as np
+
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists,
+                                check_if_string_value_is_valid_video_timestamp,
+                                check_int,
+                                check_that_hhmmss_start_is_before_end)
 from simba.utils.data import find_frame_numbers_from_time_stamp
-from simba.utils.read_write import get_video_meta_data, check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext, find_core_cnt, concatenate_videos_in_folder
-from simba.utils.errors import InvalidInputError
 from simba.utils.enums import Formats
+from simba.utils.errors import InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (
+    check_if_hhmmss_timestamp_is_valid_part_of_video,
+    concatenate_videos_in_folder, find_core_cnt, get_fn_ext,
+    get_video_meta_data)
+
 
 def create_average_frm(video_path: Union[str, os.PathLike],
                        start_frm: Optional[int] = None,

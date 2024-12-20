@@ -1,9 +1,10 @@
 import time
 
-import numpy as np
 import cv2
-from simba.mixins.image_mixin import ImageMixin
+import numpy as np
 from numba import jit
+
+from simba.mixins.image_mixin import ImageMixin
 
 
 @jit(nopython=True)

@@ -3,7 +3,6 @@ import numba
 import numpy as np
 
 
-
 @numba.jit(nopython=True, cache=True)
 def _bilinear_interpolate(image: np.ndarray, x: int, y: int):
     """
@@ -40,10 +39,12 @@ def warp_affine_numpy(frames: np.ndarray, rotation_matrices: np.ndarray):
     return warped_frames
 
 
-from simba.utils.read_write import read_df, read_img_batch_from_video_gpu
-from simba.utils.data import egocentrically_align_pose
-from simba.sandbox.warp_numba import center_rotation_warpaffine_vectors, align_target_warpaffine_vectors
 import cv2
+
+from simba.sandbox.warp_numba import (align_target_warpaffine_vectors,
+                                      center_rotation_warpaffine_vectors)
+from simba.utils.data import egocentrically_align_pose
+from simba.utils.read_write import read_df, read_img_batch_from_video_gpu
 
 DATA_PATH = r"/mnt/c/Users/sroni/OneDrive/Desktop/rotate_ex/data/501_MA142_Gi_Saline_0513.csv"
 VIDEO_PATH = r"/mnt/c/Users/sroni/OneDrive/Desktop/rotate_ex/videos/501_MA142_Gi_Saline_0513.mp4"

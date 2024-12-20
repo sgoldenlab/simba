@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def knn(data: np.ndarray,
         k: int,
         target: np.ndarray):

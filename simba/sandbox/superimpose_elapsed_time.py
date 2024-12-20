@@ -1,12 +1,17 @@
-from typing import Union, Optional
 import os
 import subprocess
-from simba.utils.read_write import get_fn_ext, find_all_videos_in_directory, get_video_meta_data
-from simba.video_processors.roi_selector import ROISelector
-from simba.utils.checks import check_ffmpeg_available, check_float, check_if_dir_exists, check_file_exist_and_readable, check_str, check_int
-from simba.utils.printing import SimbaTimer, stdout_success
+from typing import Optional, Union
+
+from simba.utils.checks import (check_ffmpeg_available,
+                                check_file_exist_and_readable, check_float,
+                                check_if_dir_exists, check_int, check_str)
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import get_fonts
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
+                                    get_video_meta_data)
+from simba.video_processors.roi_selector import ROISelector
+
 try:
     from typing import Literal
 except:

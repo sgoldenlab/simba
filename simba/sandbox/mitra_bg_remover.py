@@ -1,7 +1,7 @@
-import os
 import glob
-from simba.utils.read_write import get_fn_ext
+import os
 
+from simba.utils.read_write import get_fn_ext
 from simba.video_processors.video_processing import video_bg_subtraction_mp
 
 video_paths = glob.glob(r'C:\troubleshooting\mitra\project_folder\videos\additional' + '/*.mp4')

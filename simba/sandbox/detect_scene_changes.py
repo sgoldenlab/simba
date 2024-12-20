@@ -1,6 +1,6 @@
-from typing import Union, Optional
 import os
 import subprocess
+from typing import Optional, Union
 
 
 def detect_scene_changes(video_path: Union[str, os.PathLike], threshold: Optional[float] = 0.4):

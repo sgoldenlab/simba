@@ -1,6 +1,7 @@
 import time
 
 import numpy as np
+
 from simba.utils.checks import check_valid_array
 
 

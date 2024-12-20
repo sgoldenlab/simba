@@ -2,23 +2,27 @@ from __future__ import division
 
 import os.path
 from copy import deepcopy
+
 import numpy as np
 import pandas as pd
 from numba import typed
 
 from simba.data_processors.interpolation_smoothing import Interpolate
-from simba.utils.checks import check_if_filepath_list_is_empty, check_all_file_names_are_represented_in_video_log
+from simba.feature_extractors.perimeter_jit import jitted_hull
+from simba.mixins.circular_statistics import CircularStatisticsMixin
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
-from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
-from simba.mixins.circular_statistics import CircularStatisticsMixin
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.mixins.feature_extraction_supplement_mixin import \
+    FeatureExtractionSupplemental
 from simba.mixins.statistics_mixin import Statistics
-from simba.utils.read_write import get_fn_ext, read_df, read_video_info, write_df
+from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_if_filepath_list_is_empty)
 from simba.utils.lookups import cardinality_to_integer_lookup
-from simba.feature_extractors.perimeter_jit import jitted_hull
-
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (get_fn_ext, read_df, read_video_info,
+                                    write_df)
 
 ANIMAL_NAMES = ['Cleaner', 'Client']
 MID_BODYPARTS = ['BodyMid_1', 'BodyMid_2']

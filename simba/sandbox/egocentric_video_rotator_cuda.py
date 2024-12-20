@@ -5,14 +5,17 @@ from typing import Optional, Union
 
 import cv2
 import numpy as np
+from numba import cuda, jit, njit, prange
 
-
-from simba.utils.read_write import read_df, read_img_batch_from_video_gpu, get_video_meta_data, get_fn_ext
-from simba.utils.data import egocentrically_align_pose, align_target_warpaffine_vectors, center_rotation_warpaffine_vectors
-from simba.utils.checks import check_valid_array, check_int, check_if_dir_exists
+from simba.utils.checks import (check_if_dir_exists, check_int,
+                                check_valid_array)
+from simba.utils.data import (align_target_warpaffine_vectors,
+                              center_rotation_warpaffine_vectors,
+                              egocentrically_align_pose)
 from simba.utils.enums import Formats
 from simba.utils.errors import FrameRangeError
-from numba import cuda, njit, prange, jit
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_df,
+                                    read_img_batch_from_video_gpu)
 
 THREADS_PER_BLOCK = 256
 

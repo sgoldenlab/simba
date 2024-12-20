@@ -1,8 +1,8 @@
-import redis
 import json
-import numpy as np
 import multiprocessing
 
+import numpy as np
+import redis
 
 data = np.random.randint(0, 100, (1000, 5))
 r = redis.Redis(host='localhost', port=6379)

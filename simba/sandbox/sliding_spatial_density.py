@@ -2,10 +2,11 @@ import time
 
 import numpy as np
 import pandas as pd
-from simba.utils.checks import check_valid_array, check_float
-from simba.utils.enums import Formats
-from simba.data_processors.cuda.utils import _euclid_dist
 from numba import cuda
+
+from simba.data_processors.cuda.utils import _euclid_dist
+from simba.utils.checks import check_float, check_valid_array
+from simba.utils.enums import Formats
 
 THREADS_PER_BLOCK = 1024
 

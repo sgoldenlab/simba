@@ -1,5 +1,6 @@
 import subprocess
 
+
 def create_mosaic(input_files, output_file, panel_width, panel_height):
     num_videos = len(input_files)
     num_cols = (num_videos + 1) // 2  # Ensure at least 2 columns

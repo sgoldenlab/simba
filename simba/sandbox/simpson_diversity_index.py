@@ -1,6 +1,8 @@
 from typing import Optional
+
 import numpy as np
 from numba import jit
+
 
 @jit(nopython=True)
 def simpson_index(x: np.ndarray) -> float:

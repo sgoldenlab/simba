@@ -1,18 +1,26 @@
 import os
-from datetime import datetime
-from typing import Union, Optional
 import subprocess
+from datetime import datetime
+from typing import Optional, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
-from simba.utils.checks import check_instance, check_ffmpeg_available, check_str, check_if_dir_exists, check_int, check_nvidea_gpu_available
-from simba.utils.read_write import find_files_of_filetypes_in_directory, get_fn_ext, find_files_of_filetypes_in_directory
-from simba.utils.enums import Options
-from simba.utils.errors import InvalidInputError, FFMPEGCodecGPUError, NotDirectoryError
-from simba.utils.lookups import percent_to_crf_lookup, percent_to_qv_lk
-from simba.utils.printing import stdout_success, SimbaTimer
+
 import cv2
+
+from simba.utils.checks import (check_ffmpeg_available, check_if_dir_exists,
+                                check_instance, check_int,
+                                check_nvidea_gpu_available, check_str)
+from simba.utils.enums import Options
+from simba.utils.errors import (FFMPEGCodecGPUError, InvalidInputError,
+                                NotDirectoryError)
+from simba.utils.lookups import percent_to_crf_lookup, percent_to_qv_lk
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext)
+
 
 def frames_to_movie(directory: Union[str, os.PathLike],
                     fps: int,

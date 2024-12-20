@@ -1,8 +1,9 @@
-import numpy as np
-from numba import jit, prange, njit
 import time
 
+import numpy as np
+from numba import jit, njit, prange
 from sklearn.metrics.cluster import calinski_harabasz_score
+
 
 @njit("(float32[:,:], int64[:])", cache=True)
 def calinski_harabasz(x: np.ndarray,

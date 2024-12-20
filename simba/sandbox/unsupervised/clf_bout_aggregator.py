@@ -1,7 +1,8 @@
 __author__ = "Simon Nilsson"
 
 import os
-from typing import List, Optional, Union, Tuple
+from typing import List, Optional, Tuple, Union
+
 try:
     from typing import Literal
 except:
@@ -10,11 +11,19 @@ except:
 import pandas as pd
 from joblib import Parallel, delayed
 from joblib.externals.loky import get_reusable_executor
-from simba.utils.checks import (check_valid_boolean, check_int, check_str, check_valid_lst, check_float, check_all_file_names_are_represented_in_video_log, check_valid_dataframe, check_if_dir_exists)
+
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log, check_float,
+    check_if_dir_exists, check_int, check_str, check_valid_boolean,
+    check_valid_dataframe, check_valid_lst)
 from simba.utils.data import detect_bouts
 from simba.utils.enums import Formats, Methods
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import find_core_cnt, read_video_info, read_df, read_video_info_csv, find_files_of_filetypes_in_directory, get_fn_ext, write_pickle
+from simba.utils.read_write import (find_core_cnt,
+                                    find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_df, read_video_info,
+                                    read_video_info_csv, write_pickle)
+
 
 def video_clf_bout_aggregator(data: Union[str, os.PathLike],
                               feature_names: List[str],

@@ -1,12 +1,13 @@
-from typing import Union, Optional
 import os
+from typing import Optional, Union
+
 import cv2
 import numpy as np
 
 from simba.utils.checks import check_file_exist_and_readable, check_instance
-
-from simba.utils.errors import InvalidInputError, CorruptedFileError
+from simba.utils.errors import CorruptedFileError, InvalidInputError
 from simba.utils.warnings import CorruptedFileWarning
+
 
 def check_if_video_corrupted(video: Union[str, os.PathLike, cv2.VideoCapture],
                              frame_interval: Optional[int] = None,

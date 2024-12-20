@@ -1,8 +1,10 @@
 import cv2
-import pandas as pd
-from simba.utils.read_write import read_df
 import numpy as np
+import pandas as pd
+
 from simba.mixins.geometry_mixin import GeometryMixin
+from simba.utils.read_write import read_df
+
 
 def egocentric_alignment(df: pd.DataFrame,
                          anchor_1: int,

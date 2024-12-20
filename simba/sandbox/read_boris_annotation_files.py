@@ -1,28 +1,28 @@
-from typing import Dict, List, Union, Optional
+from typing import Dict, List, Optional, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 
-import numpy as np
-import pandas as pd
 import os
 
+import numpy as np
+import pandas as pd
+
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_file_exist_and_readable, check_if_dir_exists, check_int, check_str,
+    check_valid_boolean, check_valid_dataframe, check_valid_lst)
 from simba.utils.data import detect_bouts
 from simba.utils.enums import Methods
-from simba.utils.errors import ColumnNotFoundError, InvalidFileTypeError, InvalidInputError, FrameRangeError
-from simba.utils.read_write import get_fn_ext, read_video_info, bento_file_reader, read_video_info_csv, find_files_of_filetypes_in_directory, write_pickle
+from simba.utils.errors import (ColumnNotFoundError, FrameRangeError,
+                                InvalidFileTypeError, InvalidInputError)
+from simba.utils.read_write import (bento_file_reader,
+                                    find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_video_info,
+                                    read_video_info_csv, write_pickle)
 from simba.utils.warnings import ThirdPartyAnnotationsInvalidFileFormatWarning
-from simba.utils.checks import (check_valid_lst,
-                                check_valid_dataframe,
-                                check_all_file_names_are_represented_in_video_log,
-                                check_str,
-                                check_valid_boolean,
-                                check_file_exist_and_readable,
-                                check_if_dir_exists,
-                                check_int)
-
-
 
 
 def is_new_boris_version(pd_df: pd.DataFrame):

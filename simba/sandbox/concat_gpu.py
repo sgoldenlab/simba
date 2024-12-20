@@ -39,7 +39,7 @@ from numba import njit, prange
 from pyarrow import csv
 from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point,
                               Polygon)
-from simba.utils.read_write import get_video_meta_data, get_fn_ext, remove_a_folder
+
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
@@ -60,6 +60,8 @@ from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 NoFilesFoundError, NotDirectoryError,
                                 ParametersFileError, PermissionError)
 from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
+                                    remove_a_folder)
 from simba.utils.warnings import (
     FileExistWarning, FrameRangeWarning, InvalidValueWarning,
     NoDataFoundWarning, NoFileFoundWarning,

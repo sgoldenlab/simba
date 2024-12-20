@@ -1,8 +1,9 @@
-from simba.utils.read_write import read_frm_of_video
-from simba.mixins.image_mixin import ImageMixin
-from simba.mixins.geometry_mixin import GeometryMixin
 import cv2
 import numpy as np
+
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.mixins.image_mixin import ImageMixin
+from simba.utils.read_write import read_frm_of_video
 
 video_path = r"C:\troubleshooting\mitra\project_folder\videos\bg_removed\503_MA109_Gi_Saline_0513.mp4"
 img = read_frm_of_video(video_path=video_path, frame_index=0, greyscale=True)

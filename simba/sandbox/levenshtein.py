@@ -1,6 +1,7 @@
 import numpy as np
 from numba import jit
 
+
 #@jit(nopython=True)
 def _levenshtein(x, y):
     D = np.zeros((len(x) + 1, len(y) + 1), dtype=int)

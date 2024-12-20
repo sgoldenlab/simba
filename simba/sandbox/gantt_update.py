@@ -1,12 +1,6 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 
-
-
-
-
-
-
 df = pd.DataFrame({
     'task': ['Task A', 'Task B', 'Task C'],
     'start': [0, 2, 5],

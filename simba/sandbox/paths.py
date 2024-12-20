@@ -1,11 +1,13 @@
-import pandas as pd
-import numpy as np
-from typing import Optional
-import cv2
-from simba.utils.read_write import read_df
 from itertools import groupby
+from typing import Optional
+
+import cv2
+import numpy as np
+import pandas as pd
+
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.utils.checks import check_valid_array
+from simba.utils.read_write import read_df
 
 
 def find_path_loops(data: np.ndarray):

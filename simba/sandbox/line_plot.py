@@ -1,9 +1,11 @@
 import os
 from typing import Optional, Union
+
+import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
-import matplotlib.pyplot as plt
-from simba.utils.checks import check_instance, check_str, check_if_dir_exists
+
+from simba.utils.checks import check_if_dir_exists, check_instance, check_str
 
 
 def line_plot(df: pd.DataFrame,

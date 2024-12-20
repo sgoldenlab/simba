@@ -1,9 +1,13 @@
 import time
 
-import pandas as pd
 import numpy as np
-from simba.utils.checks import check_valid_dataframe,  check_float, check_int, check_instance, check_if_df_field_is_boolean
+import pandas as pd
+
+from simba.utils.checks import (check_float, check_if_df_field_is_boolean,
+                                check_instance, check_int,
+                                check_valid_dataframe)
 from simba.utils.data import detect_bouts
+
 
 def plug_holes_shortest_bout(data_df: pd.DataFrame,
                             clf_name: str,

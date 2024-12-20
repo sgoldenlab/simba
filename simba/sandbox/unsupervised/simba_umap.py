@@ -1,23 +1,31 @@
 import datetime
-import os
-from copy import deepcopy
-import random
-import pandas as pd
-import numpy as np
-from simba.utils.checks import check_file_exist_and_readable, check_valid_dict, check_float, check_int,check_str, check_if_keys_exist_in_dict, check_valid_boolean
-from simba.utils.read_write import read_pickle, drop_df_fields, write_pickle
-from simba.utils.lookups import get_model_names
-from simba.utils.enums import Options, UML
-from typing import Union, Optional
 import itertools
+import os
+import random
+from copy import deepcopy
+from typing import Optional, Union
+
+import numpy as np
+import pandas as pd
 from numba import typed
+
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_keys_exist_in_dict, check_int,
+                                check_str, check_valid_boolean,
+                                check_valid_dict)
+from simba.utils.enums import UML, Options
+from simba.utils.lookups import get_model_names
+from simba.utils.read_write import drop_df_fields, read_pickle, write_pickle
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.mixins.unsupervised_mixin import UMLMixin
-from simba.utils.printing import stdout_success, SimbaTimer
+from simba.utils.printing import SimbaTimer, stdout_success
+
 
 class SimBAUmap():
 

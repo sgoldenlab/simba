@@ -1,12 +1,12 @@
-from typing import List, Optional, Union
+import io
 import os
+from typing import List, Optional, Union
 
 import cv2
 import numpy as np
 import plotly.graph_objs as go
 import plotly.io as pio
 from PIL import Image
-import io
 
 from simba.utils.lookups import get_color_dict
 from simba.utils.printing import stdout_success

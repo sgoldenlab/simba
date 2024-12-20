@@ -1,8 +1,9 @@
+import numpy as np
 import pandas as pd
+from numba import jit
 
 from simba.utils.checks import check_valid_array
-import numpy as np
-from numba import jit
+
 
 def relative_risk(x: np.ndarray, y: np.ndarray) -> float:
     """

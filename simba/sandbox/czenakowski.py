@@ -1,9 +1,12 @@
-import numpy as np
-from simba.utils.checks import check_valid_array
-from simba.utils.enums import Formats
-from numba import jit, njit
 import time
 from typing import Optional
+
+import numpy as np
+from numba import jit, njit
+
+from simba.utils.checks import check_valid_array
+from simba.utils.enums import Formats
+
 
 @jit(nopython=True)
 def czebyshev_distance(sample_1: np.ndarray, sample_2: np.ndarray) -> float:

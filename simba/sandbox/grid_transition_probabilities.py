@@ -1,14 +1,16 @@
-import numpy as np
-from shapely.geometry import Polygon, Point
-from typing import Dict, Tuple, Optional
 import functools
 import multiprocessing
+from typing import Dict, Optional, Tuple
 
-from simba.utils.read_write import get_video_meta_data, read_df, find_core_cnt
+import numpy as np
+from shapely.geometry import Point, Polygon
+
 from simba.mixins.geometry_mixin import GeometryMixin
+from simba.utils.checks import check_int, check_valid_array, check_valid_dict
+from simba.utils.enums import Defaults, Formats
 from simba.utils.printing import SimbaTimer
-from simba.utils.checks import check_valid_array, check_valid_dict, check_int
-from simba.utils.enums import Formats, Defaults
+from simba.utils.read_write import find_core_cnt, get_video_meta_data, read_df
+
 
 def _compute_framewise_geometry_idx(data: np.ndarray,
                                     grid: Dict[Tuple[int, int], Polygon],

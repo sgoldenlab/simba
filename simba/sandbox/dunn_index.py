@@ -1,7 +1,10 @@
-import numpy as np
 from itertools import permutations
+
+import numpy as np
+
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.utils.checks import check_valid_array
+
 
 def dunn_index(x: np.ndarray, y: np.ndarray) -> float:
     """

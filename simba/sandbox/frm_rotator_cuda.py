@@ -1,8 +1,9 @@
-import numpy as np
 from typing import Optional
-from simba.utils.read_write import read_img_batch_from_video_gpu, read_df
-from simba.utils.data import egocentrically_align_pose_numba
 
+import numpy as np
+
+from simba.utils.data import egocentrically_align_pose_numba
+from simba.utils.read_write import read_df, read_img_batch_from_video_gpu
 
 
 def egocentric_frm_rotator_cuda(imgs: np.ndarray,

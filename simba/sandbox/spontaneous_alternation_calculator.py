@@ -1,20 +1,29 @@
 
-import os
-from typing import List, Tuple, Dict, Union, Optional
 import itertools
-import pandas as pd
-import numpy as np
+import os
 import warnings
+from typing import Dict, List, Optional, Tuple, Union
+
+import numpy as np
+import pandas as pd
+
 warnings.filterwarnings("ignore")
 
-from simba.utils.checks import check_instance, check_valid_lst, check_that_column_exist, check_file_exist_and_readable, check_if_dir_exists, check_that_column_exist, check_int, check_float, check_if_keys_exist_in_dict, check_video_has_rois, check_str
-from simba.utils.errors import CountError, NoFilesFoundError, NoROIDataError, AnimalNumberError, InvalidInputError
-from simba.utils.read_write import get_file_name_info_in_directory, get_fn_ext, read_df, read_frm_of_video
-from simba.utils.warnings import NoFileFoundWarning
-from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.config_reader import ConfigReader
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists,
+                                check_if_keys_exist_in_dict, check_instance,
+                                check_int, check_str, check_that_column_exist,
+                                check_valid_lst, check_video_has_rois)
 from simba.utils.data import detect_bouts
+from simba.utils.errors import (AnimalNumberError, CountError,
+                                InvalidInputError, NoFilesFoundError,
+                                NoROIDataError)
 from simba.utils.printing import stdout_success
+from simba.utils.read_write import (get_file_name_info_in_directory,
+                                    get_fn_ext, read_df, read_frm_of_video)
+from simba.utils.warnings import NoFileFoundWarning
 
 TAIL_END = 'tail_end'
 

@@ -1,7 +1,8 @@
 import numpy as np
 
-from simba.utils.checks import check_valid_array, check_float
+from simba.utils.checks import check_float, check_valid_array
 from simba.utils.enums import Formats
+
 
 def linearity_index(x: np.ndarray) -> float:
 

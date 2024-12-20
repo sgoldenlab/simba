@@ -2,6 +2,7 @@ import numba
 import numpy as np
 from numba import cuda
 
+
 @cuda.jit
 def partition(arr, left, right, pivot_index, partition_index):
     tid = cuda.grid(1)

@@ -1,8 +1,6 @@
-import cv2
 import json
 
-
-
+import cv2
 
 DATA_PATH = r"C:\troubleshooting\coco_data\annotations.json"
 IMAGE_PATH = r"C:\troubleshooting\coco_data\img\FRR_gq_Saline_0624_0.png"

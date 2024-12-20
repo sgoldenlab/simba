@@ -1,6 +1,9 @@
 import numpy as np
+from sklearn.metrics import (adjusted_mutual_info_score, adjusted_rand_score,
+                             fowlkes_mallows_score)
+
 from simba.utils.checks import check_valid_array
-from sklearn.metrics import adjusted_rand_score, fowlkes_mallows_score, adjusted_mutual_info_score
+
 
 def adjusted_rand(x: np.ndarray, y: np.ndarray) -> float:
     """

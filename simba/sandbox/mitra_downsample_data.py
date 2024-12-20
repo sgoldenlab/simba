@@ -1,12 +1,16 @@
 import os
-from typing import Union
-import pandas as pd
-import numpy as np
 from copy import deepcopy
+from typing import Union
+
+import numpy as np
+import pandas as pd
+
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import check_file_exist_and_readable
-from simba.utils.read_write import read_df, write_df, find_files_of_filetypes_in_directory, get_fn_ext
 from simba.utils.printing import SimbaTimer
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_df, write_df)
+
 
 class MitraDownSampler(ConfigReader):
 

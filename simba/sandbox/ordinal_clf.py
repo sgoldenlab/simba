@@ -1,13 +1,16 @@
 import os
-from typing import Union, Optional, Dict
-from sklearn.ensemble import RandomForestClassifier
+from typing import Dict, Optional, Union
+
 import numpy as np
 from joblib import Parallel, delayed
 from sklearn import clone
+from sklearn.ensemble import RandomForestClassifier
+
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.errors import SamplingError, InvalidInputError
-from simba.utils.checks import check_valid_array, check_int, check_if_dir_exists
+from simba.utils.checks import (check_if_dir_exists, check_int,
+                                check_valid_array)
 from simba.utils.enums import Formats
+from simba.utils.errors import InvalidInputError, SamplingError
 from simba.utils.read_write import find_core_cnt, write_pickle
 
 ACCEPTED_MODELS = RandomForestClassifier

@@ -3,19 +3,23 @@ try:
     from typing import Literal
 except:
     from typing_extensions import Literal
-from typing import Union, Optional
-import os
-from tkinter import *
-from datetime import datetime
-from PIL import Image
-from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, DropDownMenu, FolderSelect
-import cv2
 
-from simba.utils.checks import check_if_dir_exists, check_str, check_int
-from simba.utils.enums import Options, Keys, Links
-from simba.utils.read_write import find_files_of_filetypes_in_directory, get_fn_ext, str_2_bool
+import os
+from datetime import datetime
+from tkinter import *
+from typing import Optional, Union
+
+import cv2
+from PIL import Image
+
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        FolderSelect)
+from simba.utils.checks import check_if_dir_exists, check_int, check_str
+from simba.utils.enums import Keys, Links, Options
 from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, str_2_bool)
 from simba.video_processors.video_processing import convert_to_tiff
 
 

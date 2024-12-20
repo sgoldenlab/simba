@@ -1,11 +1,13 @@
 import os.path
+
 import numpy as np
 import pandas as pd
 
-from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.read_write import read_df, write_df, get_fn_ext, read_frm_of_video
+from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.utils.checks import check_if_dir_exists
+from simba.utils.read_write import (get_fn_ext, read_df, read_frm_of_video,
+                                    write_df)
 
 #CHANGE THIS TO THE PATH OF YOUR SIMBA PROJECT CONFIG
 CONFIG_PATH = '/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini'

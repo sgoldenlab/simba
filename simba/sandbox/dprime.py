@@ -1,7 +1,8 @@
 import math
+from typing import Optional
+
 import numpy as np
 from scipy.stats import norm
-from typing import Optional
 
 
 def d_prime(x: np.ndarray, y: np.ndarray):
