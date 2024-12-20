@@ -686,6 +686,7 @@ class UML(Enum):
     PROBABILITY = "PROBABILITY"
     FRAME = "FRAME"
     VIDEO = "VIDEO"
+    FEATURES = 'FEATURES'
     FEATURE_PATH = "feature_path"
     BOUT_AGGREGATION_TYPE = "bout_aggregation_type"
     MIN_BOUT_LENGTH = "min_bout_length"
@@ -708,6 +709,9 @@ class UML(Enum):
     METHODS = "METHODS"
     DR_MODEL = "DR_MODEL"
     MODEL = "MODEL"
+    TRAIN_DATA = "TRAIN_DATA"
+    SCALED_TRAIN_DATA = 'SCALED_TRAIN_DATA'
+    UNSCALED_TRAIN_DATA = 'UNSCALED_TRAIN_DATA'
     CLUSTER_MODEL = 'CLUSTER_MODEL'
     MIN_DISTANCE = "min_distance"
     EUCLIDEAN = "euclidean"

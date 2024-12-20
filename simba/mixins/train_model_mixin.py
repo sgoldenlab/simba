@@ -2365,14 +2365,9 @@ class TrainModelMixin(object):
 
         if hasattr(scaler, "n_features_in_"):
             if len(data.columns) != scaler.n_features_in_:
-                raise FeatureNumberMismatchError(
-                    msg=f"The scaler {name} expects {scaler.n_features_in_} features. Got {len(data.columns)}.",
-                    source=TrainModelMixin.scaler_transform.__name__,
-                )
+                raise FeatureNumberMismatchError(msg=f"The scaler {name} expects {scaler.n_features_in_} features. Got {len(data.columns)}.", source=TrainModelMixin.scaler_transform.__name__)
 
-        return pd.DataFrame(
-            scaler.inverse_transform(data), columns=data.columns
-        ).set_index(data.index)
+        return pd.DataFrame(scaler.inverse_transform(data), columns=data.columns).set_index(data.index)
 
     @staticmethod
     def define_scaler(scaler_name: Literal["min-max", "standard", "quantile"]) -> Union[MinMaxScaler, StandardScaler, QuantileTransformer]:

@@ -24,10 +24,8 @@ build/
 *.tar.gz
 *.whl
 
-
-
 # dev
-simba/sandbox/
+simba/sandbox/pose_estimation
 
 #local docs build
 _build/html/
