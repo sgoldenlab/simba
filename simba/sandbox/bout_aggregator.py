@@ -1,17 +1,22 @@
 import os
 from copy import deepcopy
-from typing import Literal, Optional, List, Union
+from typing import List, Literal, Optional, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+
 import pandas as pd
-from simba.utils.checks import check_valid_lst, check_int, check_str, check_valid_dataframe, check_instance
-from simba.utils.read_write import find_core_cnt, read_video_info
-from simba.utils.printing import SimbaTimer
-from simba.utils.enums import Formats
+
+from simba.utils.checks import (check_instance, check_int, check_str,
+                                check_valid_dataframe, check_valid_lst)
 from simba.utils.data import detect_bouts, read_df
+from simba.utils.enums import Formats
 from simba.utils.errors import InvalidInputError
+from simba.utils.printing import SimbaTimer
+from simba.utils.read_write import find_core_cnt, read_video_info
+
 
 def video_bout_aggregator(data: Union[str, os.PathLike, pd.DataFrame],
                           clfs: List[str],

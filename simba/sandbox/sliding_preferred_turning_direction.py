@@ -1,9 +1,10 @@
 import numpy as np
-from simba.utils.checks import check_valid_array, check_float
+
+from simba.mixins.circular_statistics import CircularStatisticsMixin
+from simba.utils.checks import check_float, check_valid_array
+from simba.utils.data import get_mode
 from simba.utils.enums import Formats
 from simba.utils.errors import InvalidInputError
-from simba.mixins.circular_statistics import CircularStatisticsMixin
-from simba.utils.data import get_mode
 
 
 def sliding_preferred_turning_direction(x: np.ndarray,

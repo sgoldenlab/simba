@@ -1,14 +1,20 @@
+from typing import Tuple
+
 import numpy as np
 from numba import cuda
-from typing import Tuple
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
-from simba.utils.checks import check_valid_array, check_valid_tuple, check_float
-from simba.utils.enums import Formats
-from simba.data_processors.cuda.utils import _cuda_mean
+
 import math
+
+from simba.data_processors.cuda.utils import _cuda_mean
+from simba.utils.checks import (check_float, check_valid_array,
+                                check_valid_tuple)
+from simba.utils.enums import Formats
+
 
 def _cuda_variance(x: np.ndarray):
     #mean = _cuda_mean(x=x)

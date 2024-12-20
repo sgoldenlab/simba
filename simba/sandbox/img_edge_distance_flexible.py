@@ -1,7 +1,6 @@
 import numpy as np
 
 
-
 def img_edge_distances_flexible(data: np.ndarray,
                                 edge_distances: np.ndarray,
                                 pixels_per_mm: float,
