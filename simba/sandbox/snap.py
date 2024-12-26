@@ -1,5 +1,7 @@
 import numpy as np
+
 from simba.utils.read_write import read_df
+
 
 def snap(x: np.ndarray, sample_rate: float, pixels_per_mm: float):
     """

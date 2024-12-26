@@ -1,16 +1,20 @@
-from typing import Union, Optional, List, Tuple
-import os
-import numpy as np
-import cv2
-
-from simba.utils.read_write import (get_video_meta_data,  find_core_cnt, get_fn_ext, read_frm_of_video, concatenate_videos_in_folder)
+import functools
 #from simba.utils.checks import
 import multiprocessing
-import functools
-from simba.utils.enums import Defaults, Formats
+import os
+from typing import List, Optional, Tuple, Union
+
+import cv2
+import numpy as np
 from skimage.color import label2rgb
 from skimage.segmentation import felzenszwalb
+
+from simba.utils.enums import Defaults, Formats
 from simba.utils.printing import SimbaTimer
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    find_core_cnt, get_fn_ext,
+                                    get_video_meta_data, read_frm_of_video)
+
 
 def _felzenszwalb_helper(frm_range: Tuple[int, List[int]],
                          scale: int,

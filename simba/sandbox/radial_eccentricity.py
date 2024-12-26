@@ -1,7 +1,9 @@
 import numpy as np
+
 from simba.mixins.statistics_mixin import Statistics
 from simba.utils.checks import check_valid_array
 from simba.utils.enums import Formats
+
 
 def radial_eccentricity(x: np.ndarray, reference_point: np.ndarray):
     """
