@@ -40,6 +40,7 @@ from pyarrow import csv
 from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point,
                               Polygon)
 
+import simba
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
@@ -65,7 +66,6 @@ from simba.utils.warnings import (
     NoDataFoundWarning, NoFileFoundWarning,
     ThirdPartyAnnotationsInvalidFileFormatWarning)
 
-import simba
 SIMBA_DIR = os.path.dirname(simba.__file__)
 
 PARSE_OPTIONS = csv.ParseOptions(delimiter=",")

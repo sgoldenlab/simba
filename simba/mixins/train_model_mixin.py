@@ -20,11 +20,11 @@ from itertools import repeat
 from json import loads
 from subprocess import call
 
+import cv2
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import shap
-import cv2
 from imblearn.combine import SMOTEENN
 from imblearn.over_sampling import SMOTE
 from numba import njit, typed, types
@@ -65,7 +65,8 @@ from simba.utils.checks import (check_all_dfs_in_list_has_same_cols,
                                 check_if_dir_exists, check_if_valid_input,
                                 check_instance, check_int, check_str,
                                 check_that_column_exist, check_valid_array,
-                                check_valid_dataframe, check_valid_lst, check_valid_boolean)
+                                check_valid_boolean, check_valid_dataframe,
+                                check_valid_lst)
 from simba.utils.data import (detect_bouts, detect_bouts_multiclass,
                               get_library_version)
 from simba.utils.enums import (OS, ConfigKey, Defaults, Dtypes, Formats,

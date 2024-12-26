@@ -47,8 +47,10 @@ PERMUTATION_IMPORTANCE = "permutation_importance"
 DESCRIPTIVE_STATISTICS = "descriptive_statistics"
 ANOVA_HEADERS = ["FEATURE NAME", "F-STATISTIC", "P-VALUE"]
 
-from simba.utils.checks import check_if_dir_exists, check_valid_boolean, check_valid_dict
-from simba.utils.enums import Formats, UML
+from simba.utils.checks import (check_if_dir_exists, check_valid_boolean,
+                                check_valid_dict)
+from simba.utils.enums import UML, Formats
+
 
 class ClusterXAICalculator():
     """

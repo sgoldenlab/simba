@@ -1,19 +1,28 @@
-from typing import Optional, Union, List, Tuple
-import cv2
-import pandas as pd
-import numpy as np
-import shap
+import functools
+import multiprocessing
 import os
+from typing import List, Optional, Tuple, Union
+
+import cv2
+import numpy as np
+import pandas as pd
+import shap
 from sklearn.ensemble import RandomForestClassifier
-from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.enums import Formats, Defaults
-from simba.utils.warnings import NotEnoughDataWarning, ShapWarning
-from simba.utils.errors import NoDataError
-from simba.utils.read_write import find_core_cnt
-from simba.plotting.shap_agg_stats_visualizer import ShapAggregateStatisticsCalculator
-import multiprocessing, functools
-from simba.utils.checks import (check_valid_dataframe, check_valid_array, check_instance, check_valid_boolean, check_valid_lst, check_str, check_int, check_file_exist_and_readable, check_if_dir_exists)
+
 from simba.mixins.train_model_mixin import TrainModelMixin
+from simba.plotting.shap_agg_stats_visualizer import \
+    ShapAggregateStatisticsCalculator
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists, check_instance, check_int,
+                                check_str, check_valid_array,
+                                check_valid_boolean, check_valid_dataframe,
+                                check_valid_lst)
+from simba.utils.enums import Defaults, Formats
+from simba.utils.errors import NoDataError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import find_core_cnt
+from simba.utils.warnings import NotEnoughDataWarning, ShapWarning
+
 
 def _create_shap_mp_helper(data: Tuple[int, pd.DataFrame],
                            explainer: shap.TreeExplainer,

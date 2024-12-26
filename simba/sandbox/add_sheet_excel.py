@@ -11,15 +11,15 @@ except:
     from typing_extensions import Literal
 
 from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists, check_valid_boolean,
-                                check_if_keys_exist_in_dict, check_valid_lst,
-                                check_valid_dataframe, check_str)
-
-
+                                check_if_dir_exists,
+                                check_if_keys_exist_in_dict, check_str,
+                                check_valid_boolean, check_valid_dataframe,
+                                check_valid_lst)
 from simba.utils.enums import Formats
 from simba.utils.errors import CountError, DuplicationError
 from simba.utils.printing import stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, read_pickle)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_pickle)
 
 ADJ_MUTUAL_INFO = "adjusted mutual information"
 FOWLKES_MALLOWS = "fowlkes mallows"

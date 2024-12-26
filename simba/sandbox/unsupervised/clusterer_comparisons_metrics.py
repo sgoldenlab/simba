@@ -1,15 +1,19 @@
-import os
 import itertools
+import os
 from typing import Union
+
 import pandas as pd
 
-from simba.utils.checks import (check_if_dir_exists, check_valid_boolean, check_if_keys_exist_in_dict)
-
 from simba.mixins.statistics_mixin import Statistics
-from simba.utils.enums import Formats, UML
+from simba.utils.checks import (check_if_dir_exists,
+                                check_if_keys_exist_in_dict,
+                                check_valid_boolean)
+from simba.utils.enums import UML, Formats
 from simba.utils.errors import CountError
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, read_pickle, create_empty_xlsx_file, df_to_xlsx_sheet)
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (create_empty_xlsx_file, df_to_xlsx_sheet,
+                                    find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_pickle)
 
 # HOMOGENEITY_SCORE, V_MEASURE_SCORE, COMPLETENESS_SCORE, SILHOUETTE_SCORE
 

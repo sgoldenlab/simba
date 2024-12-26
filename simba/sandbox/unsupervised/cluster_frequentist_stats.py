@@ -4,14 +4,18 @@ from typing import Union
 
 import numpy as np
 import pandas as pd
+
 from simba.mixins.statistics_mixin import Statistics
 from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists,
                                 check_if_keys_exist_in_dict,
-                                check_valid_boolean, check_if_dir_exists)
+                                check_valid_boolean)
 from simba.utils.enums import UML
 from simba.utils.errors import InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_unique_values_in_iterable, read_pickle, df_to_xlsx_sheet)
+from simba.utils.read_write import (df_to_xlsx_sheet,
+                                    find_files_of_filetypes_in_directory,
+                                    get_unique_values_in_iterable, read_pickle)
 
 
 class ClusterFrequentistCalculator():
