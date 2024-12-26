@@ -50,7 +50,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_str, check_valid_array,
                                 check_valid_boolean, check_valid_dataframe,
                                 check_valid_lst, is_video_color)
-from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
+from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options, Paths
 from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 FFMPEGCodecGPUError, FileExistError,
                                 FrameRangeError, IntegerError,
@@ -65,8 +65,8 @@ from simba.utils.warnings import (
     NoDataFoundWarning, NoFileFoundWarning,
     ThirdPartyAnnotationsInvalidFileFormatWarning)
 
-# from simba.utils.keyboard_listener import KeyboardListener
-
+import simba
+SIMBA_DIR = os.path.dirname(simba.__file__)
 
 PARSE_OPTIONS = csv.ParseOptions(delimiter=",")
 READ_OPTIONS = csv.ReadOptions(encoding="utf8")
@@ -2530,6 +2530,39 @@ def labelme_to_dlc(labelme_dir: Union[str, os.PathLike],
     save_path = os.path.join(save_dir, f'CollectedData_{scorer}.csv')
     results.to_csv(save_path)
 
+
+def read_shap_feature_categories_csv() -> Tuple[pd.DataFrame, List[str], List[str], List[str]]:
+    """ Helper to read feature names and their categories used for binning and visualizing shapely values"""
+    feature_categories_csv_path = os.path.join(SIMBA_DIR, Paths.SIMBA_SHAP_CATEGORIES_PATH.value)
+    check_file_exist_and_readable(file_path=feature_categories_csv_path)
+    feature_categories_df = pd.read_csv(feature_categories_csv_path, header=[0, 1])
+    x_names = [list(x) for x in list(feature_categories_df.values)]
+    x_names = [item for sublist in x_names for item in sublist]
+    x_names = [x for x in x_names if not x is np.nan]
+    x_cat_names, time_bin_names = set(list(feature_categories_df.columns.levels[0])), set(list(feature_categories_df.columns.levels[1]))
+    return (feature_categories_df, x_names, x_cat_names, time_bin_names)
+
+
+def read_shap_img_paths():
+    """ Helper to read in the images used to create the SHAP visualization"""
+    shap_img_path = os.path.join(SIMBA_DIR, Paths.SIMBA_SHAP_IMG_PATH.value)
+    check_if_dir_exists(in_dir=shap_img_path)
+    scale_img_paths = {"baseline_scale": os.path.join(shap_img_path, "baseline_scale.jpg"),
+                       "small_arrow": os.path.join(shap_img_path, "down_arrow.jpg"),
+                       "side_scale": os.path.join(shap_img_path, "side_scale.jpg"),
+                       "color_bar": os.path.join(shap_img_path, "color_bar.jpg")}
+    for k, v in scale_img_paths.items(): check_file_exist_and_readable(file_path=v)
+    category_img_paths = {"Animal distances": os.path.join(shap_img_path, "animal_distances.jpg"),
+                          "Intruder movement": os.path.join(shap_img_path, "intruder_movement.jpg"),
+                          "Resident+intruder movement": os.path.join(shap_img_path, "resident_intruder_movement.jpg"),
+                          "Resident movement": os.path.join(shap_img_path, "resident_movement.jpg"),
+                          "Intruder shape": os.path.join(shap_img_path, "intruder_shape.jpg"),
+                          "Resident+intruder shape": os.path.join(shap_img_path, "resident_intruder_shape.jpg"),
+                          "Resident shape": os.path.join(shap_img_path, "resident_shape.jpg")}
+    for k, v in category_img_paths.items(): check_file_exist_and_readable(file_path=v)
+
+    return scale_img_paths, category_img_paths
+
 def get_memory_usage_array(x: np.ndarray) -> Dict[str, float]:
     """
     Calculates the memory usage of a NumPy array in bytes, megabytes, and gigabytes.
@@ -2545,6 +2578,42 @@ def get_memory_usage_array(x: np.ndarray) -> Dict[str, float]:
     results["megabytes"] = mb
     results["gigabytes"] = int(mb / 1000)
     return results
+
+
+def df_to_xlsx_sheet(xlsx_path: Union[str, os.PathLike],
+                     df: pd.DataFrame,
+                     sheet_name: str,
+                     create_file: bool = True) -> None:
+
+    """
+    Append a dataframe as a new sheet in an MS Excel file.
+
+    :param Union[str, os.PathLike] xlsx_path: Path to an existing MS Excel file on disk.
+    :param pd.DataFrame df: A dataframe to save as a sheet in the MS Excel file.
+    :param str sheet_name: Name of the sheet to save the dataframe under.
+    """
+
+    check_valid_boolean(value=[create_file], source=df_to_xlsx_sheet.__name__, raise_error=True)
+    if not os.path.isfile(xlsx_path):
+        if not create_file:
+            raise NoFilesFoundError(msg=f'{xlsx_path} is not a valid file path')
+        else:
+            create_empty_xlsx_file(xlsx_path=xlsx_path)
+    check_valid_dataframe(df=df, source=df_to_xlsx_sheet.__name__)
+    check_str(name=f'{df_to_xlsx_sheet} sheet_name', value=sheet_name, allow_blank=False)
+    excel_file = pd.ExcelFile(xlsx_path)
+    if sheet_name in excel_file.sheet_names:
+        raise DuplicationError(msg=f'Sheet name {sheet_name} already exist in file {xlsx_path} with sheetnames: {excel_file.sheet_names}', source=df_to_xlsx_sheet.__name__)
+    with pd.ExcelWriter(xlsx_path, mode='a') as writer:
+        df.to_excel(writer, sheet_name=sheet_name)
+
+def create_empty_xlsx_file(xlsx_path: Union[str, os.PathLike]):
+    """
+    Create an empty MS Excel file.
+    :param Union[str, os.PathLike] xlsx_path: Path where to save MS Excel file on disk.
+    """
+    check_if_dir_exists(in_dir=os.path.dirname(xlsx_path))
+    pd.DataFrame().to_excel(xlsx_path, index=False)
 
 
 

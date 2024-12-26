@@ -40,6 +40,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         TrainModelMixin.__init__(self)
         self.read_model_settings_from_config(config=self.config)
         check_if_filepath_list_is_empty(filepaths=self.target_file_paths, error_msg=f"Zero annotation files found in directory {self.targets_folder}, cannot create model.")
+        self.bp_config = read_config_entry(config=self.config, section=ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, option=ConfigKey.POSE_SETTING.value, default_value='user_defined', data_type=Dtypes.STR.value)
         print(f"Reading in {len(self.target_file_paths)} annotated files...")
         self.data_df, self.frm_idx = self.read_all_files_in_folder_mp_futures(self.target_file_paths, self.file_type, [self.clf_name])
         self.frm_idx = pd.DataFrame({"VIDEO": list(self.data_df.index), "FRAME_IDX": self.frm_idx})
@@ -217,24 +218,23 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
             self.rf_clf = self.clf_fit(clf=self.rf_clf, x_df=self.x_train, y_df=self.y_train)
 
             if compute_permutation_importance in Options.PERFORM_FLAGS.value:
-                self.calc_permutation_importance(
-                    self.x_test,
-                    self.y_test,
-                    self.rf_clf,
-                    self.feature_names,
-                    self.clf_name,
-                    self.eval_out_path,
-                )
+                self.calc_permutation_importance(x_test=self.x_test,
+                                                 y_test=self.y_test,
+                                                 clf=self.rf_clf,
+                                                 feature_names=self.feature_names,
+                                                 clf_name=self.clf_name,
+                                                 save_dir=self.eval_out_path,
+                                                 save_file_no=None,
+                                                 plot=True)
+
             if generate_learning_curve in Options.PERFORM_FLAGS.value:
-                self.calc_learning_curve(
-                    x_y_df=self.x_y_df,
-                    clf_name=self.clf_name,
-                    shuffle_splits=shuffle_splits,
-                    dataset_splits=dataset_splits,
-                    tt_size=self.tt_size,
-                    rf_clf=self.rf_clf,
-                    save_dir=self.eval_out_path,
-                )
+                self.calc_learning_curve(x_y_df=self.x_y_df,
+                                         clf_name=self.clf_name,
+                                         shuffle_splits=shuffle_splits,
+                                         dataset_splits=dataset_splits,
+                                         tt_size=self.tt_size,
+                                         rf_clf=self.rf_clf,
+                                         save_dir=self.eval_out_path)
 
             if generate_precision_recall_curve in Options.PERFORM_FLAGS.value:
                 self.calc_pr_curve(
@@ -281,6 +281,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
                     self.eval_out_path,
                 )
             if generate_shap_scores in Options.PERFORM_FLAGS.value:
+                shap_plot = self.bp_config in {'14', '16'}
                 if not shap_multiprocess in Options.PERFORM_FLAGS.value:
                     self.create_shap_log(
                         ini_file_path=self.config_path,
@@ -295,17 +296,15 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
                         save_path=self.eval_out_path,
                     )
                 else:
-                    self.create_shap_log_mp(
-                        ini_file_path=self.config_path,
-                        rf_clf=self.rf_clf,
-                        x_df=self.x_train,
-                        y_df=self.y_train,
-                        x_names=self.feature_names,
-                        clf_name=self.clf_name,
-                        cnt_present=shap_target_present_cnt,
-                        cnt_absent=shap_target_absent_cnt,
-                        save_path=self.eval_out_path,
-                    )
+                    self.create_shap_log_mp(rf_clf=self.rf_clf,
+                                            x=self.x_train,
+                                            y=self.y_train,
+                                            x_names=self.feature_names,
+                                            clf_name=self.clf_name,
+                                            cnt_present=shap_target_present_cnt,
+                                            cnt_absent=shap_target_absent_cnt,
+                                            save_dir=self.eval_out_path,
+                                            plot=shap_plot)
 
             if compute_partial_dependency in Options.PERFORM_FLAGS.value:
                 self.partial_dependence_calculator(

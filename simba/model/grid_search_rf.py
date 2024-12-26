@@ -37,6 +37,7 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
         ConfigReader.__init__(self, config_path=config_path, create_logger=False)
         TrainModelMixin.__init__(self)
         self.model_dir_out = os.path.join(read_config_entry(self.config,ConfigKey.SML_SETTINGS.value,ConfigKey.MODEL_DIR.value,data_type=Dtypes.STR.value), "validations")
+        self.bp_config = read_config_entry(config=self.config, section=ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, option=ConfigKey.POSE_SETTING.value, default_value='user_defined', data_type=Dtypes.STR.value)
         if not os.path.exists(self.model_dir_out): os.makedirs(self.model_dir_out)
         check_if_filepath_list_is_empty(filepaths=self.target_file_paths, error_msg=f"Zero data files found in {self.targets_folder}, cannot create models.")
         if not os.path.exists(self.configs_meta_dir): os.makedirs(self.configs_meta_dir)
@@ -90,7 +91,14 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
             print(f"Fitting {self.clf_name} model...")
             self.rf_clf = self.clf_fit(clf=self.rf_clf, x_df=self.x_train, y_df=self.y_train)
             if (meta_dict[MLParamKeys.PERMUTATION_IMPORTANCE.value] in Options.PERFORM_FLAGS.value):
-                self.calc_permutation_importance(self.x_test,self.y_test, self.rf_clf, self.feature_names, self.clf_name, self.model_dir_out, save_file_no=config_cnt)
+                self.calc_permutation_importance(x_test=self.x_test,
+                                                 y_test=self.y_test,
+                                                 clf=self.rf_clf,
+                                                 feature_names=self.feature_names,
+                                                 clf_name=self.clf_name,
+                                                 save_dir=self.model_dir_out,
+                                                 save_file_no=config_cnt,
+                                                 plot=True)
             if (meta_dict[MLParamKeys.LEARNING_CURVE.value] in Options.PERFORM_FLAGS.value):
                 self.calc_learning_curve(self.x_y_df, self.clf_name, meta_dict[MLParamKeys.LEARNING_CURVE_K_SPLITS.value], meta_dict[MLParamKeys.LEARNING_CURVE_DATA_SPLITS.value], meta_dict[MLParamKeys.TT_SIZE.value], self.rf_clf, self.model_dir_out, save_file_no=config_cnt)
             if (meta_dict[MLParamKeys.PRECISION_RECALL.value] in Options.PERFORM_FLAGS.value):
@@ -103,8 +111,10 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                 self.create_x_importance_log(self.rf_clf,self.feature_names,self.clf_name,self.model_dir_out,save_file_no=config_cnt)
             if (meta_dict[MLParamKeys.IMPORTANCE_BAR_CHART.value] in Options.PERFORM_FLAGS.value):
                 self.create_x_importance_bar_chart(self.rf_clf, self.feature_names, self.clf_name, self.model_dir_out, meta_dict[MLParamKeys.N_FEATURE_IMPORTANCE_BARS.value], save_file_no=config_cnt)
+
             if MLParamKeys.SHAP_SCORES.value in meta_dict.keys():
                 save_n = (meta_dict[MLParamKeys.SHAP_PRESENT.value] + meta_dict[MLParamKeys.SHAP_ABSENT.value])
+                shap_plot = self.bp_config in {'14', '16'}
                 shap_multiprocess = False
                 if MLParamKeys.SHAP_SAVE_ITERATION.value in meta_dict.keys():
                     try:
@@ -127,16 +137,16 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                                              save_it=save_n,
                                              save_file_no=config_cnt)
                     else:
-                        self.create_shap_log_mp(ini_file_path=self.config_path,
-                                                rf_clf=self.rf_clf,
-                                                x_df=self.x_train,
-                                                y_df=self.y_train,
+                        self.create_shap_log_mp(rf_clf=self.rf_clf,
+                                                x=self.x_train,
+                                                y=self.y_train,
                                                 x_names=self.feature_names,
                                                 clf_name=self.clf_name,
                                                 cnt_present=meta_dict[MLParamKeys.SHAP_PRESENT.value],
                                                 cnt_absent=meta_dict[MLParamKeys.SHAP_ABSENT.value],
-                                                save_path=self.model_dir_out,
-                                                save_file_no=config_cnt)
+                                                save_dir=self.model_dir_out,
+                                                save_file_suffix=config_cnt,
+                                                plot=shap_plot)
 
             if MLParamKeys.PARTIAL_DEPENDENCY.value in meta_dict.keys():
                 if (meta_dict[MLParamKeys.PARTIAL_DEPENDENCY.value] in Options.PERFORM_FLAGS.value):

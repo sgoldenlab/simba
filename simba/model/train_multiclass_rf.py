@@ -25,13 +25,9 @@ class TrainMultiClassRandomForestClassifier(ConfigReader, TrainModelMixin):
 
         ConfigReader.__init__(self, config_path=config_path)
         TrainModelMixin.__init__(self)
-        log_event(
-            logger_name=str(self.__class__.__name__),
-            log_type=TagNames.CLASS_INIT.value,
-            msg=self.create_log_msg_from_init_args(locals=locals()),
-        )
+        log_event(logger_name=str(self.__class__.__name__),log_type=TagNames.CLASS_INIT.value,msg=self.create_log_msg_from_init_args(locals=locals()))
         self.read_model_settings_from_config(config=self.config)
-
+        self.bp_config = read_config_entry(config=self.config, section=ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, option=ConfigKey.POSE_SETTING.value, default_value='user_defined', data_type=Dtypes.STR.value)
         check_if_filepath_list_is_empty(
             filepaths=self.target_file_paths,
             error_msg="Zero annotation files found in project_folder/csv/targets_inserted, cannot create model.",
@@ -176,14 +172,15 @@ class TrainMultiClassRandomForestClassifier(ConfigReader, TrainModelMixin):
         )
         self.rf_clf = self.clf_fit(clf=self.rf_clf, x_df=self.x_df, y_df=self.y_df)
         if self.compute_permutation_importance in Options.PERFORM_FLAGS.value:
-            self.calc_permutation_importance(
-                self.x_test,
-                self.y_test,
-                self.rf_clf,
-                self.feature_names,
-                self.clf_name,
-                self.eval_out_path,
-            )
+            self.calc_permutation_importance(x_test=self.x_test,
+                                             y_test=self.y_test,
+                                             clf=self.rf_clf,
+                                             feature_names=self.feature_names,
+                                             clf_name=self.clf_name,
+                                             save_dir=self.eval_out_path,
+                                             save_file_no=None,
+                                             plot=True)
+
         if self.generate_learning_curve in Options.PERFORM_FLAGS.value:
             self.calc_learning_curve(
                 x_y_df=self.x_y_df,
@@ -245,6 +242,9 @@ class TrainMultiClassRandomForestClassifier(ConfigReader, TrainModelMixin):
             )
 
         if self.generate_shap_scores in Options.PERFORM_FLAGS.value:
+            shap_plot = self.bp_config in {'14', '16'}
+
+
             if not self.shap_multiprocess in Options.PERFORM_FLAGS.value:
                 self.create_shap_log(
                     ini_file_path=self.config_path,
@@ -259,17 +259,15 @@ class TrainMultiClassRandomForestClassifier(ConfigReader, TrainModelMixin):
                     save_path=self.eval_out_path,
                 )
             else:
-                self.create_shap_log_mp(
-                    ini_file_path=self.config_path,
-                    rf_clf=self.rf_clf,
-                    x_df=self.x_train,
-                    y_df=self.y_train,
-                    x_names=self.feature_names,
-                    clf_name=self.clf_name,
-                    cnt_present=self.shap_target_present_cnt,
-                    cnt_absent=self.shap_target_absent_cnt,
-                    save_path=self.eval_out_path,
-                )
+                self.create_shap_log_mp(rf_clf=self.rf_clf,
+                                        x=self.x_train,
+                                        y=self.y_train,
+                                        x_names=self.feature_names,
+                                        clf_name=self.clf_name,
+                                        cnt_present=self.shap_target_present_cnt,
+                                        cnt_absent=self.shap_target_absent_cnt,
+                                        save_dir=self.eval_out_path,
+                                        plot=shap_plot)
 
             if self.compute_partial_dependency in Options.PERFORM_FLAGS.value:
                 self.partial_dependence_calculator(

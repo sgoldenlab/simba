@@ -3,6 +3,7 @@ __author__ = "Simon Nilsson"
 import ast
 import os
 from itertools import product
+from typing import Union
 
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
@@ -22,45 +23,23 @@ from simba.utils.read_write import (read_config_entry, read_simba_meta_files,
 
 class GridSearchMulticlassRandomForestClassifier(ConfigReader, TrainModelMixin):
 
-    def __init__(self, config_path: str):
+    def __init__(self, config_path: Union[str, os.PathLike]):
 
         ConfigReader.__init__(self, config_path=config_path)
-        log_event(
-            logger_name=str(self.__class__.__name__),
-            log_type=TagNames.CLASS_INIT.value,
-            msg=self.create_log_msg_from_init_args(locals=locals()),
-        )
+        log_event(logger_name=str(self.__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
         TrainModelMixin.__init__(self)
-        self.model_dir_out = os.path.join(
-            read_config_entry(
-                self.config,
-                ConfigKey.SML_SETTINGS.value,
-                ConfigKey.MODEL_DIR.value,
-                data_type=Dtypes.STR.value,
-            ),
-            "validations",
-        )
+        self.model_dir_out = os.path.join(read_config_entry(self.config, ConfigKey.SML_SETTINGS.value, ConfigKey.MODEL_DIR.value, data_type=Dtypes.STR.value, ), "validations")
+        self.bp_config = read_config_entry(config=self.config, section=ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, option=ConfigKey.POSE_SETTING.value, default_value='user_defined', data_type=Dtypes.STR.value)
         if not os.path.exists(self.model_dir_out):
             os.makedirs(self.model_dir_out)
-        check_if_filepath_list_is_empty(
-            filepaths=self.target_file_paths,
-            error_msg="Zero annotation files found in project_folder/csv/targets_inserted, cannot create models.",
-        )
+        check_if_filepath_list_is_empty(filepaths=self.target_file_paths, error_msg="Zero annotation files found in project_folder/csv/targets_inserted, cannot create models.")
         if not os.path.exists(self.configs_meta_dir):
             os.makedirs(self.configs_meta_dir)
-        self.meta_file_lst = sorted(
-            read_simba_meta_files(folder_path=self.configs_meta_dir, raise_error=True)
-        )
+        self.meta_file_lst = sorted(read_simba_meta_files(folder_path=self.configs_meta_dir, raise_error=True))
         print(f"Reading in {len(self.target_file_paths)} annotated files...")
-        self.data_df, self.frm_idx = self.read_all_files_in_folder_mp_futures(
-            self.target_file_paths, self.file_type
-        )
-        self.frm_idx = pd.DataFrame(
-            {"VIDEO": list(self.data_df.index), "FRAME_IDX": self.frm_idx}
-        )
-        self.data_df = self.check_raw_dataset_integrity(
-            self.data_df, logs_path=self.logs_path
-        )
+        self.data_df, self.frm_idx = self.read_all_files_in_folder_mp_futures(self.target_file_paths, self.file_type)
+        self.frm_idx = pd.DataFrame({"VIDEO": list(self.data_df.index), "FRAME_IDX": self.frm_idx})
+        self.data_df = self.check_raw_dataset_integrity(self.data_df, logs_path=self.logs_path)
         self.data_df = self.drop_bp_cords(df=self.data_df)
 
     def _check_presence_of_classes_post_sampling(self, meta_dict: dict):
@@ -199,15 +178,14 @@ class GridSearchMulticlassRandomForestClassifier(ConfigReader, TrainModelMixin):
                 meta_dict[MLParamKeys.PERMUTATION_IMPORTANCE.value]
                 in Options.PERFORM_FLAGS.value
             ):
-                self.calc_permutation_importance(
-                    self.x_test,
-                    self.y_test,
-                    self.rf_clf,
-                    self.feature_names,
-                    self.clf_name,
-                    self.model_dir_out,
-                    save_file_no=config_cnt,
-                )
+                self.calc_permutation_importance(x_test=self.x_test,
+                                                 y_test=self.y_test,
+                                                 clf=self.rf_clf,
+                                                 feature_names=self.feature_names,
+                                                 clf_name=self.clf_name,
+                                                 save_dir=self.model_dir_out,
+                                                 save_file_no=config_cnt,
+                                                 plot=True)
             if (
                 meta_dict[MLParamKeys.LEARNING_CURVE.value]
                 in Options.PERFORM_FLAGS.value
@@ -277,29 +255,21 @@ class GridSearchMulticlassRandomForestClassifier(ConfigReader, TrainModelMixin):
                     self.clf_name,
                     self.model_dir_out,
                     meta_dict[MLParamKeys.N_FEATURE_IMPORTANCE_BARS.value],
-                    save_file_no=config_cnt,
-                )
+                    save_file_no=config_cnt)
+
             if MLParamKeys.SHAP_SCORES.value in meta_dict.keys():
-                save_n = (
-                    meta_dict[MLParamKeys.SHAP_PRESENT.value]
-                    + meta_dict[MLParamKeys.SHAP_ABSENT.value]
-                )
+                shap_plot = self.bp_config in {'14', '16'}
+                save_n = (meta_dict[MLParamKeys.SHAP_PRESENT.value] + meta_dict[MLParamKeys.SHAP_ABSENT.value])
                 shap_multiprocess = False
                 if MLParamKeys.SHAP_SAVE_ITERATION.value in meta_dict.keys():
                     try:
                         save_n = int(meta_dict[MLParamKeys.SHAP_SAVE_ITERATION.value])
                     except ValueError:
-                        save_n = (
-                            meta_dict[MLParamKeys.SHAP_PRESENT.value]
-                            + meta_dict[MLParamKeys.SHAP_ABSENT.value]
-                        )
+                        save_n = (meta_dict[MLParamKeys.SHAP_PRESENT.value] + meta_dict[MLParamKeys.SHAP_ABSENT.value])
                 if MLParamKeys.SHAP_MULTIPROCESS.value in meta_dict.keys():
                     shap_multiprocess = meta_dict[MLParamKeys.SHAP_MULTIPROCESS.value]
 
-                if (
-                    meta_dict[MLParamKeys.SHAP_SCORES.value]
-                    in Options.PERFORM_FLAGS.value
-                ):
+                if (meta_dict[MLParamKeys.SHAP_SCORES.value] in Options.PERFORM_FLAGS.value):
                     if not shap_multiprocess in Options.PERFORM_FLAGS.value:
                         self.create_shap_log(
                             ini_file_path=self.config_path,
@@ -315,18 +285,16 @@ class GridSearchMulticlassRandomForestClassifier(ConfigReader, TrainModelMixin):
                             save_file_no=config_cnt,
                         )
                     else:
-                        self.create_shap_log_mp(
-                            ini_file_path=self.config_path,
-                            rf_clf=self.rf_clf,
-                            x_df=self.x_train,
-                            y_df=self.y_train,
-                            x_names=self.feature_names,
-                            clf_name=self.clf_name,
-                            cnt_present=meta_dict[MLParamKeys.SHAP_PRESENT.value],
-                            cnt_absent=meta_dict[MLParamKeys.SHAP_ABSENT.value],
-                            save_path=self.model_dir_out,
-                            save_file_no=config_cnt,
-                        )
+                        self.create_shap_log_mp(rf_clf=self.rf_clf,
+                                                x=self.x_train,
+                                                y=self.y_train,
+                                                x_names=self.feature_names,
+                                                clf_name=self.clf_name,
+                                                cnt_present=meta_dict[MLParamKeys.SHAP_PRESENT.value],
+                                                cnt_absent=meta_dict[MLParamKeys.SHAP_ABSENT.value],
+                                                save_dir=self.model_dir_out,
+                                                save_file_suffix=config_cnt,
+                                                plot=shap_plot)
 
                 if MLParamKeys.PARTIAL_DEPENDENCY.value in meta_dict.keys():
                     if (

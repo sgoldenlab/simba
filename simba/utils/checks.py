@@ -1265,7 +1265,8 @@ def check_valid_tuple(x: tuple,
                       accepted_lengths: Optional[Tuple[int]] = None,
                       valid_dtypes: Optional[Tuple[Any]] = None,
                       minimum_length: Optional[int] = None,
-                      accepted_values: Optional[Iterable[Any]] = None):
+                      accepted_values: Optional[Iterable[Any]] = None,
+                      min_integer: Optional[int] = None):
 
     if not isinstance(x, (tuple)):
         raise InvalidInputError(
@@ -1296,7 +1297,12 @@ def check_valid_tuple(x: tuple,
             if i not in accepted_values:
                 raise InvalidInputError(msg=f"The tuple {source} has a value that is NOT accepted: {i}, (accepted: {accepted_values}).", source=source)
 
-
+    if min_integer is not None:
+        check_int(name=f'{check_valid_tuple.__name__} min_integer', value=min_integer)
+        for i in x:
+            if isinstance(i, int):
+                if i < min_integer:
+                    raise InvalidInputError(msg=f"The tuple {source} has an integer value below the minimum allowed integer value: {i}, (minimum: {min_integer}).", source=source)
 
 
 def check_video_and_data_frm_count_align(video: Union[str, os.PathLike, cv2.VideoCapture],

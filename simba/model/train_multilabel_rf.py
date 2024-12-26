@@ -96,14 +96,15 @@ class TrainMultiLabelRandomForestClassifier(ConfigReader, TrainModelMixin):
         )
         self.rf_clf = self.clf_fit(clf=self.rf_clf, x_df=self.x_df, y_df=self.y_df)
         if self.compute_permutation_importance in Options.PERFORM_FLAGS.value:
-            self.calc_permutation_importance(
-                self.x_test,
-                self.y_test,
-                self.rf_clf,
-                self.feature_names,
-                self.clf_name,
-                self.eval_out_path,
-            )
+            self.calc_permutation_importance(x_test=self.x_test,
+                                             y_test=self.y_test,
+                                             clf=self.rf_clf,
+                                             feature_names=self.feature_names,
+                                             clf_name=self.clf_name,
+                                             save_dir=self.eval_out_path,
+                                             save_file_no=None,
+                                             plot=True)
+
         if self.generate_learning_curve in Options.PERFORM_FLAGS.value:
             self.calc_learning_curve(
                 x_y_df=self.x_y_df,

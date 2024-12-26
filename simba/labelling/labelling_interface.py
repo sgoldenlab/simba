@@ -17,17 +17,14 @@ except ImportError:
     from typing_extensions import Literal
 
 import simba
+from simba.ui.tkinter_functions import Entry_Box
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_int, check_that_column_exist)
+from simba.utils.checks import (check_valid_dataframe, check_valid_boolean, check_str, check_valid_dict, check_file_exist_and_readable, check_float, check_int, check_that_column_exist)
 from simba.utils.enums import Options, TagNames
-from simba.utils.errors import FrameRangeError, NoDataError
-from simba.utils.lookups import (get_labelling_img_kbd_bindings,
-                                 get_labelling_video_kbd_bindings)
+from simba.utils.errors import FrameRangeError, NoDataError, NoFilesFoundError
+from simba.utils.lookups import (get_labelling_img_kbd_bindings, get_labelling_video_kbd_bindings)
 from simba.utils.printing import log_event, stdout_success
-from simba.utils.read_write import (get_all_clf_names, get_fn_ext,
-                                    get_video_meta_data, read_config_entry,
-                                    read_df, write_df)
+from simba.utils.read_write import (read_frm_of_video, get_all_clf_names, get_fn_ext, get_video_meta_data, read_config_entry, read_df, write_df)
 from simba.utils.warnings import FrameRangeWarning
 
 PLAY_VIDEO_SCRIPT_PATH = os.path.join(os.path.dirname(simba.__file__), "labelling/play_annotation_video.py")
@@ -45,10 +42,10 @@ class LabellingInterface(ConfigReader):
        :align: center
 
 
-    :param str config_path: path to SimBA project config file in Configparser format
-    :param str file_path: Path to video that is to be annotated
-    :param str setting: String representing annotation method. OPTIONS: ``from_scratch`` or ``pseudo``
-    :param dict threshold_dict: If setting ``pseudo``, threshold_dict dict contains the machine probability thresholds, with the classifier names as keys and the classification probabilities as values, e.g. {'Attack': 0.40, 'Sniffing': 0.7).
+    :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
+    :param Union[str, os.PathLike] file_path: Path to video that is to be annotated.
+    :param Literal["from_scratch", "pseudo"] setting: String representing annotation method. OPTIONS: ``from_scratch`` or ``pseudo``
+    :param Optional[Dict[str, float]] threshold_dict: If setting ``pseudo``, threshold_dict dict contains the machine probability thresholds, with the classifier names as keys and the classification probabilities as values, e.g. {'Attack': 0.40, 'Sniffing': 0.7).
     :param bool continuing: If True, continouing previously started annotation session.
 
     Examples
@@ -82,12 +79,14 @@ class LabellingInterface(ConfigReader):
         self.max_frm_no = max(self.frame_lst)
         self.target_lst = get_all_clf_names(config=self.config, target_cnt=self.clf_cnt)
         if len(self.target_lst) == 0:
-            raise NoDataError(msg='To annotate behaviors, your SimBA project needs at least one defined classifier. Found 0', source=self.__class__.__name__)
+            raise NoDataError(msg='To annotate behaviors, your SimBA project needs at least one defined classifier. Found 0 classifiers defined in SimBA project', source=self.__class__.__name__)
         self.max_frm_size = 1080, 650
         self.main_window = Toplevel()
         if continuing:
-            check_file_exist_and_readable(file_path=self.targets_inserted_file_path)
-            check_file_exist_and_readable(file_path=self.features_extracted_file_path)
+            if not os.path.isfile(self.targets_inserted_file_path):
+                raise NoFilesFoundError(msg=f'When continuing annotations, SimBA expects a file at {self.targets_inserted_file_path}. SimBA could not find this file.', source=self.__class__.__name__)
+            if not os.path.isfile(self.features_extracted_file_path):
+                raise NoFilesFoundError(msg=f'When continuing annotations, SimBA expects a file at {self.features_extracted_file_path}. SimBA could not find this file.', source=self.__class__.__name__)
             self.data_df = read_df(self.targets_inserted_file_path, self.file_type)
             self.data_df_features = read_df(self.features_extracted_file_path, self.file_type)
             missing_idx = self.data_df_features.index.difference(self.data_df.index)
@@ -105,11 +104,13 @@ class LabellingInterface(ConfigReader):
                 for target in self.target_lst:
                     self.data_df[target] = 0
             elif setting == "pseudo":
-                check_file_exist_and_readable(file_path=self.machine_results_file_path)
+                if not os.path.isfile(self.machine_results_file_path):
+                    raise NoFilesFoundError(msg=f'When doing pseudo-annotations, SimBA expects a file at {self.machine_results_file_path}. SimBA could not find this file.', source=self.__class__.__name__)
                 self.data_df = read_df(self.machine_results_file_path, self.file_type)
+                check_valid_dataframe(df=self.data_df, source=self.__class__.__name__, required_fields=self.target_lst)
                 for target in self.target_lst:
-                    self.data_df.loc[self.data_df["Probability_{}".format(target)] > self.threshold_dict[target], target] = 1
-                    self.data_df.loc[self.data_df["Probability_{}".format(target)] <= self.threshold_dict[target], target] = 0
+                    self.data_df.loc[self.data_df[f"Probability_{target}"] > self.threshold_dict[target], target] = 1
+                    self.data_df.loc[self.data_df[f"Probability_{target}"] <= self.threshold_dict[target], target] = 0
                 self.main_window.title("SIMBA ANNOTATION INTERFACE (PSEUDO-LABELLING) - {}".format(self.video_name))
         self.data_df_targets = self.data_df
         for target in self.target_lst:
@@ -242,7 +243,7 @@ class LabellingInterface(ConfigReader):
         print(tabulate(table_view, headers, tablefmt="github"))
 
     def __play_video(self):
-        p = Popen("python {}".format(PLAY_VIDEO_SCRIPT_PATH),stdin=PIPE, stdout=PIPE, shell=True,)
+        p = Popen(f"python {PLAY_VIDEO_SCRIPT_PATH}",stdin=PIPE, stdout=PIPE, shell=True,)
         main_project_dir = os.path.dirname(self.config_path)
         p.stdin.write(bytes(self.video_path, "utf-8"))
         p.stdin.close()
@@ -257,9 +258,9 @@ class LabellingInterface(ConfigReader):
         self.__advance_frame(new_frm_number=vid_frame_no)
         f.close()
 
-    def __read_frm(self, frm_number=None):
-        self.cap.set(1, frm_number)
-        _, self.current_frm_npy = self.cap.read()
+    def __read_frm(self, frm_number: int):
+        check_int(name=f'{self.video_name} {frm_number}', value=frm_number, min_value=0)
+        self.current_frm_npy = read_frm_of_video(video_path=self.cap, frame_index=frm_number)
         self.current_frm_npy = cv2.cvtColor(self.current_frm_npy, cv2.COLOR_RGB2BGR)
         self.current_frm_pil = Image.fromarray(self.current_frm_npy)
         self.current_frm_pil.thumbnail(self.max_frm_size, Image.LANCZOS)
@@ -346,15 +347,19 @@ class LabellingInterface(ConfigReader):
 
 
 def select_labelling_video(config_path: Union[str, os.PathLike],
-                           threshold_dict: Optional[Dict[str, float]] = None,
+                           threshold_dict: Optional[Dict[str, Entry_Box]] = None,
                            setting: str = None,
                            continuing: bool = None,
-                           video_file_path=Union[str, os.PathLike]):
+                           video_file_path: Union[str, os.PathLike] = None):
+    check_file_exist_and_readable(file_path=config_path)
+    if threshold_dict is not None:
+        check_valid_dict(x=threshold_dict, valid_key_dtypes=(str,), valid_values_dtypes=(float,))
+    check_str(name='setting', value=setting, options=('pseudo', "from_scratch"))
+    check_valid_boolean(value=[continuing], source=select_labelling_video.__name__)
+
 
     if setting is not "pseudo":
-        video_file_path = filedialog.askopenfilename(
-            filetypes=[("Video files", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)]
-        )
+        video_file_path = filedialog.askopenfilename(filetypes=[("Video files", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
     else:
         threshold_dict_values = {}
         for k, v in threshold_dict.items():
@@ -362,21 +367,21 @@ def select_labelling_video(config_path: Union[str, os.PathLike],
             threshold_dict_values[k] = float(v.entry_get)
         threshold_dict = threshold_dict_values
 
-    check_file_exist_and_readable(video_file_path)
+    check_file_exist_and_readable(file_path=video_file_path)
     video_meta = get_video_meta_data(video_file_path)
     _, video_name, _ = get_fn_ext(video_file_path)
 
-    print(f"ANNOTATING VIDEO {video_name} \n VIDEO INFO: {video_meta}")
-    _ = LabellingInterface(
-        config_path=config_path,
-        file_path=video_file_path,
-        threshold_dict=threshold_dict,
-        setting=setting,
-        continuing=continuing,
-    )
 
-#
-# test = select_labelling_video(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini",
+
+    print(f"ANNOTATING VIDEO {video_name} \n VIDEO INFO: {video_meta}")
+    _ = LabellingInterface(config_path=config_path,
+                           file_path=video_file_path,
+                           threshold_dict=threshold_dict,
+                           setting=setting,
+                           continuing=continuing)
+
+# #
+# test = select_labelling_video(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/mitra/project_folder/project_config.ini",
 #                               threshold_dict={'Attack': 0.4},
 #                               setting='from_scratch',
-#                               continuing=True)
+#                               continuing=False)

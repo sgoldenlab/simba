@@ -12,7 +12,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.mixins.unsupervised_mixin import UnsupervisedMixin
 from simba.plotting.shap_agg_stats_visualizer import \
-    ShapAggregateStatisticsVisualizer
+    ShapAggregateStatisticsCalculator
 from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_keys_exist_in_dict, check_instance)
@@ -304,7 +304,7 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
                     cnt_present=sample_n,
                     cnt_absent=sample_n,
                 )
-                _ = ShapAggregateStatisticsVisualizer(
+                _ = ShapAggregateStatisticsCalculator(
                     config_path=self.config_path,
                     classifier_name=mdl_name,
                     shap_df=shap_df,
@@ -382,7 +382,7 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
                     cnt_present=sample_n,
                     cnt_absent=sample_n,
                 )
-                _ = ShapAggregateStatisticsVisualizer(
+                _ = ShapAggregateStatisticsCalculator(
                     config_path=self.config_path,
                     classifier_name=shap_mdl_name,
                     shap_df=shap_df,

@@ -11,7 +11,7 @@ from simba.utils.checks import (check_file_exist_and_readable,
 from simba.utils.enums import UML
 from simba.utils.errors import InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_unique_values_in_iterable, read_pickle)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_unique_values_in_iterable, read_pickle, df_to_xlsx_sheet)
 
 
 class ClusterFrequentistCalculator():
@@ -53,9 +53,6 @@ class ClusterFrequentistCalculator():
             self.data_paths = [data_path]
         self.scaled, self.anova, self.tukey, self.descriptive, self.pairwise, self.kruskal = scaled, anova, tukey, descriptive, pairwise, kruskal_wallis
         self.save_path = save_path
-        with pd.ExcelWriter(save_path, mode="w") as writer:
-            pd.DataFrame().to_excel(writer, sheet_name=" ", index=True)
-
 
     def run(self):
         for file_cnt, file_path in enumerate(self.data_paths):
@@ -104,8 +101,7 @@ class ClusterFrequentistCalculator():
             stdout_success(msg=f'Cluster descriptive statistics saved at {self.save_path}', elapsed_time=self.timer.elapsed_time_str)
 
     def __save_results(self, df: pd.DataFrame, name: str):
-        with pd.ExcelWriter(self.save_path, mode="a") as writer:
-            df.to_excel(writer, sheet_name=name, index=True)
+        df_to_xlsx_sheet(xlsx_path=self.save_path, df=df, sheet_name=name, create_file=True)
 
 # calculator = ClusterFrequentistCalculator(data_path=r"/Users/simon/Downloads/academic_elgamal.pickle", scaled=False, save_path=r"/Users/simon/Desktop/test.xlsx", pairwise=True, tukey=False)
 # calculator.run()
