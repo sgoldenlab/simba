@@ -43,43 +43,43 @@ class LabellingInterface(ConfigReader):
 
 
     :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
-    :param Union[str, os.PathLike] file_path: Path to video that is to be annotated.
+    :param Union[str, os.PathLike] video_path: Path to video that is to be annotated.
     :param Literal["from_scratch", "pseudo"] setting: String representing annotation method. OPTIONS: ``from_scratch`` or ``pseudo``
-    :param Optional[Dict[str, float]] threshold_dict: If setting ``pseudo``, threshold_dict dict contains the machine probability thresholds, with the classifier names as keys and the classification probabilities as values, e.g. {'Attack': 0.40, 'Sniffing': 0.7).
+    :param Optional[Dict[str, float]] thresholds: If setting ``pseudo``, threshold_dict dict contains the machine probability thresholds, with the classifier names as keys and the classification probabilities as values, e.g. {'Attack': 0.40, 'Sniffing': 0.7).
     :param bool continuing: If True, continouing previously started annotation session.
 
-    Examples
-    ----------
+    :example:
     >>> select_labelling_video(config_path='MyConfigPath', threshold_dict={'Attack': 0.4}, file_path='MyVideoFilePath', setting='pseudo', continuing=False)
     """
 
     def __init__(self,
                  config_path: Union[str, os.PathLike],
-                 file_path: Union[str, os.PathLike],
-                 threshold_dict: Optional[Dict[str, float]] = None,
+                 video_path: Union[str, os.PathLike],
+                 thresholds: Optional[Dict[str, float]] = None,
                  setting: Literal["from_scratch", "pseudo"] = "pseudo",
                  continuing: Optional[bool] = False):
 
         ConfigReader.__init__(self, config_path=config_path)
+        if len(self.clf_names) == 0:
+            raise NoDataError(msg='To annotate behaviors, your SimBA project needs at least one defined classifier. Found 0 classifiers defined in SimBA project', source=self.__class__.__name__)
         log_event(logger_name=str(self.__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
-        self.frm_no, self.threshold_dict, self.file_path = 0, threshold_dict, file_path
-        self.setting = setting
-        _, self.video_name, _ = get_fn_ext(filepath=file_path)
+        self.video_meta_data = get_video_meta_data(video_path=video_path)
+        check_str(name='setting', value=setting, options=('pseudo', "from_scratch"))
+        check_valid_boolean(value=[continuing], source=select_labelling_video.__name__)
+        if thresholds is not None:
+            check_valid_dict(x=thresholds, valid_key_dtypes=(str,), valid_values_dtypes=(float,), min_value=0, max_value=1.0)
+        self.frm_no, self.thresholds, self.file_path, self.setting, self.video_path = 0, thresholds, video_path, setting, video_path
+        _, self.video_name, _ = get_fn_ext(filepath=video_path)
         self.features_extracted_file_path = os.path.join(self.features_dir, f"{self.video_name}.{self.file_type}")
         self.targets_inserted_file_path = os.path.join(self.targets_folder, f"{self.video_name}.{self.file_type}")
         self.machine_results_file_path = os.path.join(self.machine_results_dir, f"{self.video_name}.{self.file_type}")
-        self.video_path = file_path
         self.cap = cv2.VideoCapture(self.video_path)
         self.img_kbd_bindings = get_labelling_img_kbd_bindings()
         self.video_kbd_bindings = get_labelling_video_kbd_bindings()
         self.__create_frm_key_presses_lbl()
         self.__create_video_key_presses_lbl()
-        self.video_meta_data = get_video_meta_data(video_path=self.video_path)
         self.frame_lst = list(range(0, self.video_meta_data["frame_count"]))
         self.max_frm_no = max(self.frame_lst)
-        self.target_lst = get_all_clf_names(config=self.config, target_cnt=self.clf_cnt)
-        if len(self.target_lst) == 0:
-            raise NoDataError(msg='To annotate behaviors, your SimBA project needs at least one defined classifier. Found 0 classifiers defined in SimBA project', source=self.__class__.__name__)
         self.max_frm_size = 1080, 650
         self.main_window = Toplevel()
         if continuing:
@@ -95,27 +95,31 @@ class LabellingInterface(ConfigReader):
                 self.data_df = pd.concat([self.data_df.astype(int), self.data_df_features], axis=0).sort_index()
             self.main_window.title("SIMBA ANNOTATION INTERFACE (CONTINUING ANNOTATIONS) - {}".format( self.video_name))
             self.frm_no = read_config_entry(self.config, "Last saved frames", self.video_name, data_type="int", default_value=0)
+            if self.frm_no not in self.frame_lst:
+                FrameRangeWarning(msg=f'SimBA attempted to open the last saved frame of video {self.video_name} as denoted in the section [Last saved frames] in the project_config.ini. However, this frame does not exist in the video. The video {self.video_name} has {self.max_frm_no} frames. SimBA will begin with the first frame instead.')
+                self.frm_no = 0
 
         else:
             if setting == "from_scratch":
                 check_file_exist_and_readable(file_path=self.features_extracted_file_path)
                 self.data_df = read_df(self.features_extracted_file_path, self.file_type)
                 self.main_window.title("SIMBA ANNOTATION INTERFACE (ANNOTATING FROM SCRATCH) - {}".format(self.video_name))
-                for target in self.target_lst:
+                for target in self.clf_names:
                     self.data_df[target] = 0
             elif setting == "pseudo":
                 if not os.path.isfile(self.machine_results_file_path):
                     raise NoFilesFoundError(msg=f'When doing pseudo-annotations, SimBA expects a file at {self.machine_results_file_path}. SimBA could not find this file.', source=self.__class__.__name__)
                 self.data_df = read_df(self.machine_results_file_path, self.file_type)
-                check_valid_dataframe(df=self.data_df, source=self.__class__.__name__, required_fields=self.target_lst)
-                for target in self.target_lst:
-                    self.data_df.loc[self.data_df[f"Probability_{target}"] > self.threshold_dict[target], target] = 1
-                    self.data_df.loc[self.data_df[f"Probability_{target}"] <= self.threshold_dict[target], target] = 0
+                check_valid_dataframe(df=self.data_df, source=self.__class__.__name__, required_fields=self.clf_names)
+                for target in self.clf_names:
+                    self.data_df.loc[self.data_df[f"Probability_{target}"] > self.thresholds[target], target] = 1
+                    self.data_df.loc[self.data_df[f"Probability_{target}"] <= self.thresholds[target], target] = 0
                 self.main_window.title("SIMBA ANNOTATION INTERFACE (PSEUDO-LABELLING) - {}".format(self.video_name))
+
         self.data_df_targets = self.data_df
-        for target in self.target_lst:
-            check_that_column_exist(df=self.data_df_targets, column_name=target, file_name=file_path)
-        self.data_df_targets = self.data_df_targets[self.target_lst]
+        for target in self.clf_names:
+            check_that_column_exist(df=self.data_df_targets, column_name=target, file_name=video_path)
+        self.data_df_targets = self.data_df_targets[self.clf_names]
         self.folder = Frame(self.main_window)
         self.buttons_frm = Frame(self.main_window, bd=2, width=700, height=300)
         self.current_frm_n = IntVar(self.main_window, value=self.frm_no)
@@ -155,7 +159,7 @@ class LabellingInterface(ConfigReader):
         self.check_behavior_lbl.grid(sticky=N)
 
         self.checkboxes = {}
-        for target_cnt, target in enumerate(self.target_lst):
+        for target_cnt, target in enumerate(self.clf_names):
             self.checkboxes[target] = {}
             self.checkboxes[target]["name"] = target
             if self.current_frm_n.get() not in list(self.data_df_targets.index):
@@ -232,7 +236,7 @@ class LabellingInterface(ConfigReader):
 
     def print_annotation_statistics(self):
         table_view = [["Video name", self.video_name], ["Video frames", self.video_meta_data["frame_count"]]]
-        for target in self.target_lst:
+        for target in self.clf_names:
             present = len(self.data_df_targets[self.data_df_targets[target] == 1])
             absent = len(self.data_df_targets[self.data_df_targets[target] == 0])
             table_view.append([target + " present labels", present])
@@ -271,12 +275,12 @@ class LabellingInterface(ConfigReader):
 
     def __advance_frame(self, new_frm_number: int, save_and_keep_checks=False):
         if new_frm_number > self.max_frm_no:
-            print("FRAME {} CANNOT BE SHOWN - YOU ARE VIEWING THE FINAL FRAME OF THE VIDEO (FRAME NUMBER {})".format(str(new_frm_number), str(self.max_frm_no)))
+            print(f"FRAME {new_frm_number} CANNOT BE SHOWN - YOU ARE VIEWING THE FINAL FRAME OF THE VIDEO (FRAME NUMBER {self.max_frm_no})")
             self.current_frm_n = IntVar(value=self.max_frm_no)
             self.change_frm_box.delete(0, END)
             self.change_frm_box.insert(0, str(self.current_frm_n.get()))
         elif new_frm_number < 0:
-            print("FRAME {} CANNOT BE SHOWN - YOU ARE VIEWING THE FIRST FRAME OF THE VIDEO (FRAME NUMBER {})".format(str(new_frm_number), str(self.max_frm_no)))
+            print(f"FRAME {new_frm_number} CANNOT BE SHOWN - YOU ARE VIEWING THE FIRST FRAME OF THE VIDEO (FRAME NUMBER 0)")
             self.current_frm_n = IntVar(value=0)
             self.change_frm_box.delete(0, END)
             self.change_frm_box.insert(0, str(self.current_frm_n.get()))
@@ -286,14 +290,14 @@ class LabellingInterface(ConfigReader):
             self.change_frm_box.delete(0, END)
             self.change_frm_box.insert(0, str(self.current_frm_n.get()))
             if not save_and_keep_checks:
-                for target in self.target_lst:
+                for target in self.clf_names:
                     self.checkboxes[target]["var"].set(bool(self.data_df_targets[target].loc[int(self.current_frm_n.get())]))
             else:
-                for target in self.target_lst:
+                for target in self.clf_names:
                     self.checkboxes[target]["var"].set(
                         self.data_df_targets[target].loc[int(self.current_frm_n.get() - 1)])
                     self.save_behavior_in_frm(target=target)
-            self.__read_frm(frm_number=int(self.current_frm_n.get()))
+        self.__read_frm(frm_number=int(self.current_frm_n.get()))
 
     def __save_behavior_in_range(self, start_frm=None, end_frm=None):
         if not self.range_on.get():
@@ -302,7 +306,7 @@ class LabellingInterface(ConfigReader):
             check_int("START FRAME", int(start_frm), max_value=self.max_frm_no, min_value=0)
             check_int("END FRAME", int(end_frm), max_value=self.max_frm_no, min_value=0)
             for frm_no in range(int(start_frm), int(end_frm) + 1):
-                for target in self.target_lst:
+                for target in self.clf_names:
                     self.data_df_targets[target].loc[frm_no] = self.checkboxes[target]["var"].get()
             self.__read_frm(frm_number=int(end_frm))
             self.change_frm_box.delete(0, END)
@@ -330,7 +334,7 @@ class LabellingInterface(ConfigReader):
     def __create_print_statements(self, frame_range: bool = None, start_frame: int = None, end_frame: int = None):
         print("USER FRAME SELECTION(S):")
         if not frame_range:
-            for target in self.target_lst:
+            for target in self.clf_names:
                 target_present_choice = self.checkboxes[target]["var"].get()
                 if target_present_choice == 0:
                     print("{} ABSENT IN FRAME {}".format(target, self.current_frm_n.get()))
@@ -338,7 +342,7 @@ class LabellingInterface(ConfigReader):
                     print("{} PRESENT IN FRAME {}".format(target, self.current_frm_n.get()))
 
         if frame_range:
-            for target in self.target_lst:
+            for target in self.clf_names:
                 target_present_choice = self.checkboxes[target]["var"].get()
                 if target_present_choice == 1:
                     print("{} PRESENT IN FRAMES {} to {}".format(target, str(start_frame), str(end_frame)))
@@ -348,16 +352,15 @@ class LabellingInterface(ConfigReader):
 
 def select_labelling_video(config_path: Union[str, os.PathLike],
                            threshold_dict: Optional[Dict[str, Entry_Box]] = None,
-                           setting: str = None,
+                           setting: Literal['pseudo', 'from_scratch'] = 'from_scratch',
                            continuing: bool = None,
                            video_file_path: Union[str, os.PathLike] = None):
+
     check_file_exist_and_readable(file_path=config_path)
     if threshold_dict is not None:
         check_valid_dict(x=threshold_dict, valid_key_dtypes=(str,), valid_values_dtypes=(float,))
     check_str(name='setting', value=setting, options=('pseudo', "from_scratch"))
     check_valid_boolean(value=[continuing], source=select_labelling_video.__name__)
-
-
     if setting is not "pseudo":
         video_file_path = filedialog.askopenfilename(filetypes=[("Video files", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
     else:
@@ -375,13 +378,13 @@ def select_labelling_video(config_path: Union[str, os.PathLike],
 
     print(f"ANNOTATING VIDEO {video_name} \n VIDEO INFO: {video_meta}")
     _ = LabellingInterface(config_path=config_path,
-                           file_path=video_file_path,
-                           threshold_dict=threshold_dict,
+                           video_path=video_file_path,
+                           thresholds=threshold_dict,
                            setting=setting,
                            continuing=continuing)
 
-# #
-# test = select_labelling_video(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/mitra/project_folder/project_config.ini",
+#
+# test = select_labelling_video(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #                               threshold_dict={'Attack': 0.4},
 #                               setting='from_scratch',
-#                               continuing=False)
+#                               continuing=True)

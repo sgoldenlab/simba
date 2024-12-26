@@ -125,22 +125,22 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                     shap_multiprocess = meta_dict[MLParamKeys.SHAP_MULTIPROCESS.value]
                 if (meta_dict[MLParamKeys.SHAP_SCORES.value] in Options.PERFORM_FLAGS.value):
                     if not shap_multiprocess in Options.PERFORM_FLAGS.value:
-                        self.create_shap_log(ini_file_path=self.config_path,
-                                             rf_clf=self.rf_clf,
-                                             x_df=self.x_train,
-                                             y_df=self.y_train,
-                                             x_names=self.feature_names,
+                        self.create_shap_log(rf_clf=self.rf_clf,
+                                             x=self.x_train,
+                                             y=self.y_train,
+                                             x_names=list(self.feature_names),
                                              clf_name=self.clf_name,
                                              cnt_present=meta_dict[MLParamKeys.SHAP_PRESENT.value],
                                              cnt_absent=meta_dict[MLParamKeys.SHAP_ABSENT.value],
-                                             save_path=self.model_dir_out,
+                                             verbose=True,
+                                             plot=shap_plot,
                                              save_it=save_n,
-                                             save_file_no=config_cnt)
+                                             save_dir=self.model_dir_out)
                     else:
                         self.create_shap_log_mp(rf_clf=self.rf_clf,
                                                 x=self.x_train,
                                                 y=self.y_train,
-                                                x_names=self.feature_names,
+                                                x_names=list(self.feature_names),
                                                 clf_name=self.clf_name,
                                                 cnt_present=meta_dict[MLParamKeys.SHAP_PRESENT.value],
                                                 cnt_absent=meta_dict[MLParamKeys.SHAP_ABSENT.value],
@@ -159,8 +159,8 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
 
 
 #
-# test = GridSearchRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
-# test.run()
+test = GridSearchRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+test.run()
 
 #
 # test = GridSearchRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")

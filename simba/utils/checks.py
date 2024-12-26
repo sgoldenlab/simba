@@ -1419,7 +1419,9 @@ def check_valid_dict(x: dict,
                      valid_values_dtypes: Optional[Tuple[Any]] = None,
                      max_len_keys: Optional[int] = None,
                      min_len_keys: Optional[int] = None,
-                     required_keys: Optional[Tuple[Any, ...]] = None):
+                     required_keys: Optional[Tuple[Any, ...]] = None,
+                     max_value: Optional[Union[float, int]] = None,
+                     min_value: Optional[Union[float, int]] = None):
 
 
     check_instance(source=check_valid_dict.__name__, instance=x, accepted_types=(dict,))
@@ -1445,7 +1447,20 @@ def check_valid_dict(x: dict,
         for i in list(required_keys):
             if i not in list(x.keys()):
                 raise InvalidInputError(msg=f'The required key {i} does not exist in the dictionary. Existing keys: {list(x.keys())}', source=check_valid_dict.__name__)
-
+    if max_value is not None:
+        if not isinstance(max_value, (float, int)):
+            raise InvalidInputError(msg=f'{check_valid_dict.__name__} max_value has to be a float or integer, got {type(max_value)}.')
+        for k, v in x.items():
+            if isinstance(v, (float, int)):
+                if v > max_value:
+                    raise InvalidInputError(msg=f'The required key {k} has value {v} which is above the max allowed: {max_value}.', source=check_valid_dict.__name__)
+    if min_value is not None:
+        if not isinstance(min_value, (float, int)):
+            raise InvalidInputError(msg=f'{check_valid_dict.__name__} max_value has to be a float or integer, got {type(min_value)}.')
+        for k, v in x.items():
+            if isinstance(v, (float, int)):
+                if v < min_value:
+                    raise InvalidInputError(msg=f'The required key {k} has value {v} which is less than the minimum allowed: {min_value}.', source=check_valid_dict.__name__)
 
 def is_video_color(video: Union[str, os.PathLike, cv2.VideoCapture]) -> bool:
     """

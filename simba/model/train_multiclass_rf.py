@@ -246,23 +246,23 @@ class TrainMultiClassRandomForestClassifier(ConfigReader, TrainModelMixin):
 
 
             if not self.shap_multiprocess in Options.PERFORM_FLAGS.value:
-                self.create_shap_log(
-                    ini_file_path=self.config_path,
-                    rf_clf=self.rf_clf,
-                    x_df=self.x_train,
-                    y_df=self.y_train,
-                    x_names=self.feature_names,
-                    clf_name=self.clf_name,
-                    cnt_present=self.shap_target_present_cnt,
-                    cnt_absent=self.shap_target_absent_cnt,
-                    save_it=self.shap_save_n,
-                    save_path=self.eval_out_path,
-                )
+                self.create_shap_log(rf_clf=self.rf_clf,
+                                     x=self.x_train,
+                                     y=self.y_train,
+                                     x_names=list(self.feature_names),
+                                     clf_name=self.clf_name,
+                                     cnt_present=self.shap_target_present_cnt,
+                                     cnt_absent=self.shap_target_absent_cnt,
+                                     verbose=True,
+                                     plot=shap_plot,
+                                     save_it=self.shap_save_n,
+                                     save_dir=self.eval_out_path)
+
             else:
                 self.create_shap_log_mp(rf_clf=self.rf_clf,
                                         x=self.x_train,
                                         y=self.y_train,
-                                        x_names=self.feature_names,
+                                        x_names=list(self.feature_names),
                                         clf_name=self.clf_name,
                                         cnt_present=self.shap_target_present_cnt,
                                         cnt_absent=self.shap_target_absent_cnt,

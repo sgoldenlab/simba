@@ -53,7 +53,7 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         self.feature_names = self.x_df.columns
         self.check_sampled_dataset_integrity(x_df=self.x_df, y_df=self.y_df)
         print(f"Number of features in dataset: {len(self.x_df.columns)}")
-        print(f"Number of {self.clf_name} frames in dataset: {self.y_df.sum()} ({str(round(self.y_df.sum() / len(self.y_df), 4) * 100)}%)")
+        print(f"Number of {self.clf_name} frames in dataset: {int(self.y_df.sum())} ({str(round(self.y_df.sum() / len(self.y_df), 4) * 100)}%)")
 
     def perform_sampling(self):
         """
@@ -283,23 +283,22 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
             if generate_shap_scores in Options.PERFORM_FLAGS.value:
                 shap_plot = self.bp_config in {'14', '16'}
                 if not shap_multiprocess in Options.PERFORM_FLAGS.value:
-                    self.create_shap_log(
-                        ini_file_path=self.config_path,
-                        rf_clf=self.rf_clf,
-                        x_df=self.x_train,
-                        y_df=self.y_train,
-                        x_names=self.feature_names,
-                        clf_name=self.clf_name,
-                        cnt_present=shap_target_present_cnt,
-                        cnt_absent=shap_target_absent_cnt,
-                        save_it=shap_save_n,
-                        save_path=self.eval_out_path,
-                    )
+                    self.create_shap_log(rf_clf=self.rf_clf,
+                                         x=self.x_train,
+                                         y=self.y_train,
+                                         x_names=list(self.feature_names),
+                                         clf_name=self.clf_name,
+                                         cnt_present=shap_target_present_cnt,
+                                         cnt_absent=shap_target_absent_cnt,
+                                         verbose=True,
+                                         plot=shap_plot,
+                                         save_it=shap_save_n,
+                                         save_dir=self.eval_out_path)
                 else:
                     self.create_shap_log_mp(rf_clf=self.rf_clf,
                                             x=self.x_train,
                                             y=self.y_train,
-                                            x_names=self.feature_names,
+                                            x_names=list(self.feature_names),
                                             clf_name=self.clf_name,
                                             cnt_present=shap_target_present_cnt,
                                             cnt_absent=shap_target_absent_cnt,
@@ -356,11 +355,10 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         if not os.listdir(self.model_dir_out):
             os.makedirs(self.model_dir_out)
         self.save_rf_model(self.rf_clf, self.clf_name, self.model_dir_out)
-        stdout_success(msg=f"Classifier {self.clf_name} saved in models/generated_models directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
-        stdout_success(msg=f"Evaluation files are in models/generated_models/model_evaluations folders", source=self.__class__.__name__)
+        stdout_success(msg=f"Classifier {self.clf_name} saved in {self.model_dir_out} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+        stdout_success(msg=f"Evaluation files are in {self.eval_out_path} folders", source=self.__class__.__name__)
 
 
-#
 # test = TrainRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
 # test.run()
 # test.save()

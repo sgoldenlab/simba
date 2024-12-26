@@ -805,7 +805,7 @@ class TrainModelMixin(object):
                         plot: bool = True,
                         save_it: Optional[int] = 100,
                         save_dir: Optional[Union[str, os.PathLike]] = None,
-                        save_file_suffix: Optional[int] = None) -> Union[None, Tuple[pd.DataFrame]]:
+                        save_file_suffix: Optional[int] = None) -> Union[None, Tuple[pd.DataFrame, pd.DataFrame, Dict[str, pd.DataFrame], np.ndarray]]:
 
         """
         Compute SHAP values for a random forest classifier.
@@ -1675,9 +1675,7 @@ class TrainModelMixin(object):
                 raise_bool_clf_error=raise_bool_clf_error,
             )
 
-    def check_raw_dataset_integrity(
-            self, df: pd.DataFrame, logs_path: Optional[Union[str, os.PathLike]]
-    ) -> None:
+    def check_raw_dataset_integrity(self, df: pd.DataFrame, logs_path: Optional[Union[str, os.PathLike]]) -> None:
         """
         Helper to check column-wise NaNs in raw input data for fitting model.
 
@@ -1744,7 +1742,7 @@ class TrainModelMixin(object):
                            verbose: bool = True,
                            save_dir: Optional[Union[str, os.PathLike]] = None,
                            save_file_suffix: Optional[int] = None,
-                           plot: bool = False) -> Union[None, Tuple[pd.DataFrame]]:
+                           plot: bool = False) -> Union[None, Tuple[pd.DataFrame, pd.DataFrame, Dict[str, pd.DataFrame], np.ndarray]]:
         """
         Compute SHAP values using multiprocessing.
 
@@ -1814,29 +1812,24 @@ class TrainModelMixin(object):
         if len(absent_df) < cnt_absent:
             NotEnoughDataWarning(msg=f"Train data contains {len(absent_df)} behavior-absent annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_absent)}). SimBA will calculate shap scores for the {len(absent_df)} behavior-absent frames available", source=TrainModelMixin.create_shap_log_mp.__name__)
             cnt_absent = len(absent_df)
-        shap_data = pd.concat(
-            [present_df.sample(cnt_present, replace=False), absent_df.sample(cnt_absent, replace=False)],
-            axis=0).reset_index(drop=True)
+        shap_data = pd.concat([present_df.sample(cnt_present, replace=False), absent_df.sample(cnt_absent, replace=False)], axis=0).reset_index(drop=True)
         batch_cnt = max(1, int(np.ceil(len(shap_data) / chunk_size)))
         shap_data = np.array_split(shap_data, batch_cnt)
         shap_data = [(x, y) for x, y in enumerate(shap_data)]
         explainer = TrainModelMixin().define_tree_explainer(clf=rf_clf)
         expected_value = explainer.expected_value[1]
         shap_results, shap_raw = [], []
-        print(
-            f"Computing {cnt_present + cnt_absent} SHAP values. Follow progress in OS terminal... (CORES: {core_cnt}, CHUNK SIZE: {chunk_size})")
+        print(f"Computing {cnt_present + cnt_absent} SHAP values. Follow progress in OS terminal... (CORES: {core_cnt}, CHUNK SIZE: {chunk_size})")
         with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
             constants = functools.partial(TrainModelMixin._create_shap_mp_helper, explainer=explainer, clf_name=clf_name, verbose=verbose)
             for cnt, result in enumerate(pool.imap_unordered(constants, shap_data, chunksize=1)):
-                proba = TrainModelMixin().clf_predict_proba(clf=rf_clf,
-                                                            x_df=shap_data[result[1]][1].drop(clf_name, axis=1),
-                                                            model_name=clf_name).reshape(-1, 1)
+                proba = TrainModelMixin().clf_predict_proba(clf=rf_clf, x_df=shap_data[result[1]][1].drop(clf_name, axis=1), model_name=clf_name).reshape(-1, 1)
                 shap_sum = np.sum(result[0], axis=1).reshape(-1, 1)
-                batch_shap_results = np.hstack((result[0], np.full((result[0].shape[0]), expected_value).reshape(-1, 1), shap_sum, proba, shap_data[result[1]][1][clf_name].values.reshape(-1, 1))).astype(np.float32)
+                batch_shap_results = np.hstack((result[0], np.full((result[0].shape[0]), expected_value).reshape(-1, 1), shap_sum + expected_value, proba, shap_data[result[1]][1][clf_name].values.reshape(-1, 1))).astype(np.float32)
                 shap_results.append(batch_shap_results)
                 shap_raw.append(shap_data[result[1]][1].drop(clf_name, axis=1))
                 if verbose:
-                    print(f"Completed SHAP data (Batch {result[1] + 1}/{len(shap_data)}).")
+                    print(f"Completed SHAP batch (Batch {result[1] + 1}/{len(shap_data)}).")
 
         pool.terminate(); pool.join()
         shap_df = pd.DataFrame(data=np.row_stack(shap_results), columns=list(x_names) + ["Expected_value", "Sum", "Prediction_probability", clf_name])
