@@ -63,7 +63,7 @@ class LabellingInterface(ConfigReader):
                  config_path: Union[str, os.PathLike],
                  file_path: Union[str, os.PathLike],
                  threshold_dict: Optional[Dict[str, float]] = None,
-                 setting: Literal["from_scratch", "pseudo"] = "pseudo",
+                 setting: Optional[Literal["from_scratch", "pseudo"]] = "from_scratch",
                  continuing: Optional[bool] = False):
 
         ConfigReader.__init__(self, config_path=config_path)
@@ -360,7 +360,8 @@ def select_labelling_video(config_path: Union[str, os.PathLike],
     check_file_exist_and_readable(file_path=config_path)
     if threshold_dict is not None:
         check_valid_dict(x=threshold_dict, valid_key_dtypes=(str,), valid_values_dtypes=(float,))
-    check_str(name='setting', value=setting, options=('pseudo', "from_scratch"))
+    if setting is not None:
+        check_str(name='setting', value=setting, options=('pseudo', "from_scratch",))
     check_valid_boolean(value=[continuing], source=select_labelling_video.__name__)
 
 
