@@ -95,7 +95,7 @@ def _cuda_digital_pixel_to_grey(r: int, g: int, b: int):
     return b + g + r
 
 @cuda.jit(device=True)
-def _euclid_dist(x, y):
+def _euclid_dist_2d(x, y):
     return math.sqrt(((y[0] - x[0]) ** 2) + ((y[1] - x[1]) ** 2))
 
 @cuda.jit(device=True)
@@ -159,7 +159,7 @@ def _cuda_mac(x: np.ndarray):
     cuda.syncthreads()
     return val
 
-def _cuda_available() -> Tuple[bool, Dict[int, Any]]:
+def _is_cuda_available() -> Tuple[bool, Dict[int, Any]]:
     """
     Check if GPU available. If True, returns the GPUs, the model, physical slots and compute capabilitie(s).
 

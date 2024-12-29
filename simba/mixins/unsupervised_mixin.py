@@ -5,7 +5,7 @@ from typing import Union
 import numpy as np
 import pandas as pd
 
-from simba.data_processors.cuda.utils import _cuda_available
+from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.checks import (check_float, check_instance, check_int,
                                 check_valid_array, check_valid_boolean)
 from simba.utils.data import get_library_version
@@ -42,7 +42,7 @@ class UMLMixin(object):
         check_float(name=f'umap_define spread', value=spread, min_value=min_distance)
         check_valid_boolean(value=[gpu], source=f'umap_define gpu')
         check_valid_boolean(value=[verbose], source=f'{UMLMixin.umap_fit.__name__} verbose')
-        if gpu and not _cuda_available()[0]:
+        if gpu and not _is_cuda_available()[0]:
             raise SimBAGPUError(msg='No GPU detected and GPU as True passed', source=UMLMixin.umap_define.__name__)
         if gpu and not get_library_version(library_name='cuml'):
             raise SimBAGPUError(msg='cuML library not detected and GPU as True passed', source=UMLMixin.umap_define.__name__)
@@ -75,7 +75,7 @@ class UMLMixin(object):
         check_float(name=f'hdbscan_define cluster_selection_epsilon', value=cluster_selection_epsilon, min_value=0.0)
         check_valid_boolean(value=[gpu], source=f'hdbscan_define gpu')
         check_valid_boolean(value=[verbose], source=f'hdbscan_define verbose')
-        if gpu and not _cuda_available()[0]:
+        if gpu and not _is_cuda_available()[0]:
             raise SimBAGPUError(msg='No GPU detected and GPU as True passed', source=UMLMixin.hdbscan_define.__name__)
         if gpu and not get_library_version(library_name='cuml'):
             raise SimBAGPUError(msg='cuML library not detected and GPU as True passed', source=UMLMixin.hdbscan_define.__name__)

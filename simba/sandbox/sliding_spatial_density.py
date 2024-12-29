@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from numba import cuda
 
-from simba.data_processors.cuda.utils import _euclid_dist
+from simba.data_processors.cuda.utils import _euclid_dist_2d
 from simba.utils.checks import check_float, check_valid_array
 from simba.utils.enums import Formats
 
@@ -26,7 +26,7 @@ def _sliding_spatial_density_kernel(x, time_window, radius, results):
     for i in range(l, r):
         for j in range(l, r):
             if i != j:
-                dist = _euclid_dist(x[i], x[j])
+                dist = _euclid_dist_2d(x[i], x[j])
                 if dist <= radius[0]:
                     total_neighbors += 1
 

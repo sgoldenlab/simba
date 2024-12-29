@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 
 from simba.data_processors.cuda.image import img_stack_to_grayscale_cupy
-from simba.data_processors.cuda.utils import (_cuda_available,
+from simba.data_processors.cuda.utils import (_is_cuda_available,
                                               _cuda_luminance_pixel_to_grey)
 from simba.utils.checks import (check_if_valid_img, check_if_valid_rgb_tuple,
                                 check_int, is_video_color)
@@ -49,7 +49,7 @@ def bg_subtraction_cupy(video_path: Union[str, os.PathLike],
     >>> bg_subtraction_cupy(video_path=video_path, avg_frm=avg_frm, batch_size=500)
     """
 
-    if not _cuda_available()[0]: raise SimBAGPUError('NP GPU detected using numba.cuda', source=bg_subtraction_cupy.__name__)
+    if not _is_cuda_available()[0]: raise SimBAGPUError('NP GPU detected using numba.cuda', source=bg_subtraction_cupy.__name__)
     check_if_valid_img(data=avg_frm, source=f'{bg_subtraction_cupy}')
     avg_frm = cp.array(avg_frm)
     check_if_valid_rgb_tuple(data=bg_clr)

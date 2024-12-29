@@ -25,7 +25,7 @@ import numpy as np
 from numba import cuda
 from numba.core.errors import NumbaPerformanceWarning
 
-from simba.data_processors.cuda.utils import (_cuda_available,
+from simba.data_processors.cuda.utils import (_is_cuda_available,
                                               _cuda_luminance_pixel_to_grey,
                                               _cuda_mse)
 from simba.mixins.image_mixin import ImageMixin
@@ -546,7 +546,7 @@ def img_stack_to_grayscale_cuda(x: np.ndarray) -> np.ndarray:
     >>> imgs = np.stack(list(imgs.values()), axis=0).astype(np.uint8)
     >>> grey_images = img_stack_to_grayscale_cuda(x=imgs)
     """
-    check_instance(source=img_stack_to_grayscale_cuda.__name__, instance=imgs, accepted_types=(np.ndarray,))
+    check_instance(source=img_stack_to_grayscale_cuda.__name__, instance=x, accepted_types=(np.ndarray,))
     check_if_valid_img(data=x[0], source=img_stack_to_grayscale_cuda.__name__)
     if x.ndim != 4:
         return x
@@ -1147,7 +1147,7 @@ def bg_subtraction_cupy(video_path: Union[str, os.PathLike],
     >>> bg_subtraction_cupy(video_path=video_path, avg_frm=avg_frm, batch_size=500)
     """
 
-    if not _cuda_available()[0]:
+    if not _is_cuda_available()[0]:
         raise SimBAGPUError('NP GPU detected using numba.cuda', source=bg_subtraction_cupy.__name__)
     check_if_valid_img(data=avg_frm, source=f'{bg_subtraction_cupy}')
     avg_frm = cp.array(avg_frm)

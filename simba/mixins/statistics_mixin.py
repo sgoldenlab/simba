@@ -30,6 +30,7 @@ from simba.utils.checks import (check_float, check_int, check_str,
 from simba.utils.data import bucket_data, fast_mean_rank
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import CountError, InvalidInputError
+from scipy.spatial.distance import cdist
 
 
 class Statistics(FeatureExtractionMixin):

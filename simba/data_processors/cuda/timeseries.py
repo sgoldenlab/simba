@@ -4,8 +4,8 @@ from typing import Optional
 import numpy as np
 from numba import cuda
 
-from simba.data_processors.cuda.utils import (_cuda_available, _cuda_mean,
-                                              _cuda_std, _euclid_dist)
+from simba.data_processors.cuda.utils import (_is_cuda_available, _cuda_mean,
+                                              _cuda_std, _euclid_dist_2d)
 from simba.utils.checks import check_float, check_valid_array
 from simba.utils.enums import Formats
 from simba.utils.errors import SimBAGPUError
@@ -134,7 +134,7 @@ def _sliding_spatial_density_kernel(x, time_window, radius, results):
     for i in range(l, r):
         for j in range(l, r):
             if i != j:
-                dist = _euclid_dist(x[i], x[j])
+                dist = _euclid_dist_2d(x[i], x[j])
                 if dist <= radius[0]:
                     total_neighbors += 1
 
@@ -205,10 +205,10 @@ def _sliding_linearity_index_kernel(x, time_frms, results):
     if l < 0 or l >= r:
         return
     sample_x = x[l:r]
-    straight_line_distance = _euclid_dist(sample_x[0], sample_x[-1])
+    straight_line_distance = _euclid_dist_2d(sample_x[0], sample_x[-1])
     path_dist = 0
     for i in range(1, sample_x.shape[0]):
-        path_dist += _euclid_dist(sample_x[i - 1], sample_x[i])
+        path_dist += _euclid_dist_2d(sample_x[i - 1], sample_x[i])
     if path_dist == 0:
         results[r] = 0.0
     else:
@@ -252,7 +252,7 @@ def sliding_linearity_index_cuda(x: np.ndarray,
     check_float(name=f'{sliding_linearity_index_cuda.__name__} sample_rate', value=sample_rate)
     x = np.ascontiguousarray(x)
     time_window_frames = np.array([max(1.0, np.ceil(window_size * sample_rate))])
-    if not _cuda_available()[0]:
+    if not _is_cuda_available()[0]:
         SimBAGPUError(msg='No GPU found', source=sliding_linearity_index_cuda.__name__)
     x_dev = cuda.to_device(x)
     time_window_frames_dev = cuda.to_device(time_window_frames)
