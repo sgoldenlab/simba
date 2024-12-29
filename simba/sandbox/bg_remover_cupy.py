@@ -6,8 +6,8 @@ import cv2
 import numpy as np
 
 from simba.data_processors.cuda.image import img_stack_to_grayscale_cupy
-from simba.data_processors.cuda.utils import (_is_cuda_available,
-                                              _cuda_luminance_pixel_to_grey)
+from simba.data_processors.cuda.utils import (_cuda_luminance_pixel_to_grey,
+                                              _is_cuda_available)
 from simba.utils.checks import (check_if_valid_img, check_if_valid_rgb_tuple,
                                 check_int, is_video_color)
 from simba.utils.enums import Formats

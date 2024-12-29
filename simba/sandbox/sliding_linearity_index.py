@@ -3,7 +3,8 @@ import time
 import numpy as np
 from numba import cuda
 
-from simba.data_processors.cuda.utils import _is_cuda_available, _euclid_dist_2d
+from simba.data_processors.cuda.utils import (_euclid_dist_2d,
+                                              _is_cuda_available)
 from simba.utils.checks import check_float, check_valid_array
 from simba.utils.enums import Formats
 from simba.utils.errors import SimBAGPUError

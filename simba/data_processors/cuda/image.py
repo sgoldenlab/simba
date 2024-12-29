@@ -25,9 +25,8 @@ import numpy as np
 from numba import cuda
 from numba.core.errors import NumbaPerformanceWarning
 
-from simba.data_processors.cuda.utils import (_is_cuda_available,
-                                              _cuda_luminance_pixel_to_grey,
-                                              _cuda_mse)
+from simba.data_processors.cuda.utils import (_cuda_luminance_pixel_to_grey,
+                                              _cuda_mse, _is_cuda_available)
 from simba.mixins.image_mixin import ImageMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
