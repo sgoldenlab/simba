@@ -57,7 +57,8 @@ from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
     concatenate_videos_in_folder, find_all_videos_in_directory, find_core_cnt,
     find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data,
-    read_config_entry, read_config_file, read_frm_of_video, read_img_batch_from_video_gpu)
+    read_config_entry, read_config_file, read_frm_of_video,
+    read_img_batch_from_video_gpu)
 from simba.utils.warnings import (FileExistWarning, FrameRangeWarning,
                                   InValidUserInputWarning,
                                   SameInputAndOutputWarning)
