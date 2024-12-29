@@ -50,7 +50,7 @@ class CheckVideoSeekablePopUp(PopUpMixin):
     def run(self, directory: bool):
         if directory:
             data_path = self.directory_path.folder_path
-            check_if_dir_exists(in_dir=dir, source=self.__class__.__name__)
+            check_if_dir_exists(in_dir=data_path, source=self.__class__.__name__)
             file_paths = find_files_of_filetypes_in_directory(directory=data_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True)
             for file_path in file_paths:
                 _ = is_valid_video_file(file_path=file_path, raise_error=True)
@@ -70,3 +70,6 @@ class CheckVideoSeekablePopUp(PopUpMixin):
                               batch_size=batch_size,
                               verbose=False,
                               save_path=save_path)
+
+
+#CheckVideoSeekablePopUp()
