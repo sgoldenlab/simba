@@ -2617,12 +2617,28 @@ def create_empty_xlsx_file(xlsx_path: Union[str, os.PathLike]):
 
 def get_desktop_path(raise_error: bool = False):
     """ Get the path to the user desktop directory """
-    desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
-    if not os.path.isdir(desktop_path):
+    desktop_path_option_1 = os.path.join(os.path.expanduser("~"), "Desktop")
+    if not os.path.isdir(desktop_path_option_1):
+        desktop_path_option_2 = os.path.join(os.path.expanduser("~"), "OneDrive", "Desktop")
+        if os.path.isdir(desktop_path_option_2):
+            return desktop_path_option_2
+        else:
+            if raise_error:
+                raise InvalidFilepathError(msg=f'{desktop_path_option_1} OR {desktop_path_option_2} are not valid directories')
+            else:
+                return None
+    else:
+        return desktop_path_option_1
+
+def get_downloads_path(raise_error: bool = False):
+    """ Get the path to the user downloads directory """
+    downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
+    if not os.path.isdir(downloads_path):
         if raise_error:
-            raise InvalidFilepathError(msg=f'{desktop_path} is not a valid directory')
+            raise InvalidFilepathError(msg=f'{downloads_path} is not a valid directory')
         else:
             return None
     else:
-        return desktop_path
+        return downloads_path
+
 

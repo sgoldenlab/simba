@@ -4601,6 +4601,7 @@ def is_video_seekable(data_path: Union[str, os.PathLike],
     >>> _ = is_video_seekable(data_path='/Users/simon/Desktop/unseekable/20200730_AB_7dpf_850nm_0003_fps_5.mp4', batch_size=400)
     """
 
+    timer = SimbaTimer(start=True)
     if batch_size is not None:
         check_int(name=f'{is_video_seekable.__name__}', value=batch_size, min_value=1)
     if save_path is not None:
@@ -4623,30 +4624,31 @@ def is_video_seekable(data_path: Union[str, os.PathLike],
         _, video_name, _ = get_fn_ext(filepath=file_path)
         print(f'Checking seekability video {video_name}...')
         video_meta_data = get_video_meta_data(video_path=file_path)
-        video_frm_ranges = np.arange(0, video_meta_data['frame_count']+1)
+        video_frm_ranges = np.arange(0, video_meta_data['frame_count'])
         if batch_size is not None:
             video_frm_ranges = np.array_split(video_frm_ranges, max(1, int(video_frm_ranges.shape[0]/batch_size)))
         else:
             video_frm_ranges = [video_frm_ranges]
         video_error_frms = []
         for video_frm_range in video_frm_ranges:
+            print(f'Processing frame {video_frm_range[0]} to {video_frm_range[-1]} (video: {video_name})...')
             if not gpu:
-                imgs = ImageMixin.read_img_batch_from_video(video_path=file_path, start_frm=video_frm_range[0], end_frm=video_frm_range[-1], verbose=verbose)
+                imgs = ImageMixin.read_img_batch_from_video(video_path=file_path, start_frm=video_frm_range[0], end_frm=video_frm_range[-1], verbose=False)
             else:
-                imgs = read_img_batch_from_video_gpu(video_path=file_path, start_frm=video_frm_range[0], end_frm=video_frm_range[-1], verbose=verbose)
+                imgs = read_img_batch_from_video_gpu(video_path=file_path, start_frm=video_frm_range[0], end_frm=video_frm_range[-1], verbose=False)
             invalid_frms = [k for k, v in imgs.items() if v is None]
             video_error_frms.extend(invalid_frms)
         results[video_name] = video_error_frms
 
+    timer.stop_timer()
     if all(len(v) == 0 for v in results.values()):
-        if verbose:
-            stdout_success(msg=f'The {len(data_paths)} videos are valid.', source=is_video_seekable.__name__)
+        stdout_success(msg=f'The {len(data_paths)} videos are valid.', source=is_video_seekable.__name__, elapsed_time=timer.elapsed_time_str)
         return True
     else:
         if save_path is not None:
             out_df = pd.DataFrame.from_dict(data=results).T
             out_df.to_csv(save_path)
-            FrameRangeWarning(msg=f'Some videos have unseekable frames. See {save_path} for results', source=is_video_seekable.__name__)
+            FrameRangeWarning(msg=f'Some videos have unseekable frames. See {save_path} for results. Elapsed time: {timer.elapsed_time_str}s', source=is_video_seekable.__name__)
         if raise_error:
             raise FrameRangeError(msg=f'{results} The frames in the videos listed are unreadable. Consider re-encoding these videos.', source=is_video_seekable.__name__)
         else:

@@ -8,7 +8,7 @@ from simba.ui.tkinter_functions import (DropDownMenu, FileSelect, FolderSelect,
 from simba.utils.checks import check_if_dir_exists, is_valid_video_file
 from simba.utils.enums import Formats, Options
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_desktop_path)
+                                    get_desktop_path, get_downloads_path)
 from simba.video_processors.video_processing import is_video_seekable
 
 
@@ -26,8 +26,8 @@ class CheckVideoSeekablePopUp(PopUpMixin):
         batch_size_options = list(range(100, 5100, 100))
         batch_size_options.insert(0, 'NONE')
         self.use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=settings_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
-        self.batch_size_dropdown = DropDownMenu(settings_frm, "FRAME BATCH SIZE:", batch_size_options, "15")
-        self.batch_size_dropdown.setChoices('NONE')
+        self.batch_size_dropdown = DropDownMenu(settings_frm, "FRAME BATCH SIZE:", batch_size_options, "25")
+        self.batch_size_dropdown.setChoices(400)
         single_video_frm = LabelFrame(self.main_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value)
         self.single_video_path = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         single_run_btn = SimbaButton(parent=single_video_frm, txt="RUN", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'directory': lambda: False})
@@ -49,7 +49,7 @@ class CheckVideoSeekablePopUp(PopUpMixin):
         multiple_video_frm.grid(row=2, column=0, sticky=NW)
         self.directory_path.grid(row=0, column=0, sticky=NW)
         dir_run_btn.grid(row=1, column=0, sticky=NW)
-        #self.main_frm.mainloop()
+        self.main_frm.mainloop()
 
     def run(self, directory: bool):
         if directory:
@@ -67,8 +67,10 @@ class CheckVideoSeekablePopUp(PopUpMixin):
             batch_size = None
         else:
             batch_size = int(batch_size)
-        desktop_path = get_desktop_path()
-        save_path = os.path.join(desktop_path, f'seekability_test_{datetime.now().strftime("%Y%m%d%H%M%S")}.csv')
+        save_dir = get_desktop_path()
+        if save_dir is None:
+            save_dir = get_downloads_path(raise_error=True)
+        save_path = os.path.join(save_dir, f'seekability_test_{datetime.now().strftime("%Y%m%d%H%M%S")}.csv')
         _ = is_video_seekable(data_path=data_path,
                               gpu=gpu,
                               batch_size=batch_size,
@@ -76,4 +78,4 @@ class CheckVideoSeekablePopUp(PopUpMixin):
                               save_path=save_path)
 
 
-#CheckVideoSeekablePopUp()
+CheckVideoSeekablePopUp()
