@@ -63,6 +63,8 @@ from simba.ui.pop_ups.archive_files_pop_up import ArchiveProcessedFilesPopUp
 from simba.ui.pop_ups.batch_preprocess_pop_up import BatchPreProcessPopUp
 from simba.ui.pop_ups.boolean_conditional_slicer_pup_up import \
     BooleanConditionalSlicerPopUp
+from simba.ui.pop_ups.check_videos_seekable_pop_up import \
+    CheckVideoSeekablePopUp
 from simba.ui.pop_ups.clf_add_remove_print_pop_up import (
     AddClfPopUp, PrintModelInfoPopUp, RemoveAClassifierPopUp)
 from simba.ui.pop_ups.clf_annotation_counts_pop_up import \
@@ -893,7 +895,8 @@ class App(object):
         video_process_menu.add_command(label="Box blur videos", compound="left", image=self.menu_icons["blur"]["img"], command=BoxBlurPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Cross-fade videos", compound="left", image=self.menu_icons["crossfade"]["img"], command=CrossfadeVideosPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Create average frames from videos", compound="left", image=self.menu_icons["average"]["img"], command=CreateAverageFramePopUp, font=Formats.FONT_REGULAR.value)
-        video_process_menu.add_command(label="Video background remover...", compound="left", image=self.menu_icons["remove_bg"]["img"], command=BackgroundRemoverPopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_command(label="Video background remover", compound="left", image=self.menu_icons["remove_bg"]["img"], command=BackgroundRemoverPopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_command(label="Validate video seekability", compound="left", image=self.menu_icons["search"]["img"], command=CheckVideoSeekablePopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Visualize pose-estimation in folder...", compound="left", image=self.menu_icons["visualize"]["img"], command=VisualizePoseInFolderPopUp, font=Formats.FONT_REGULAR.value)
         help_menu = Menu(menu)
         menu.add_cascade(label="Help", menu=help_menu)

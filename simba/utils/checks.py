@@ -1514,3 +1514,27 @@ def check_all_dfs_in_list_has_same_cols(dfs: List[pd.DataFrame], raise_error: bo
         else:
             return False
     return True
+
+
+def is_valid_video_file(file_path: Union[str, os.PathLike], raise_error: bool = True):
+    """
+    Check if a file path is a valid video file.
+    """
+    check_file_exist_and_readable(file_path=file_path)
+    try:
+        cap = cv2.VideoCapture(file_path)
+        if not cap.isOpened():
+            if not raise_error:
+                return False
+            else:
+                raise InvalidFilepathError(msg=f'The path {file_path} is not a valid video file', source=is_valid_video_file.__name__)
+        return True
+    except Exception:
+        if not raise_error:
+            return False
+        else:
+            raise InvalidFilepathError(msg=f'The path {file_path} is not a valid video file', source=is_valid_video_file.__name__)
+    finally:
+        if 'cap' in locals():
+            if cap.isOpened():
+                cap.release()
