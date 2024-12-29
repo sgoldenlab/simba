@@ -1,12 +1,16 @@
 import os
 from datetime import datetime
-from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import SimbaCheckbox, DropDownMenu, FileSelect, FolderSelect, SimbaButton
-from simba.utils.enums import Formats, Options
 from tkinter import *
+
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.ui.tkinter_functions import (DropDownMenu, FileSelect, FolderSelect,
+                                        SimbaButton, SimbaCheckbox)
 from simba.utils.checks import check_if_dir_exists, is_valid_video_file
-from simba.utils.read_write import find_files_of_filetypes_in_directory, get_desktop_path
+from simba.utils.enums import Formats, Options
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_desktop_path)
 from simba.video_processors.video_processing import is_video_seekable
+
 
 class CheckVideoSeekablePopUp(PopUpMixin):
     """
