@@ -2615,5 +2615,14 @@ def create_empty_xlsx_file(xlsx_path: Union[str, os.PathLike]):
     check_if_dir_exists(in_dir=os.path.dirname(xlsx_path))
     pd.DataFrame().to_excel(xlsx_path, index=False)
 
-
+def get_desktop_path(raise_error: bool = False):
+    """ Get the path to the user desktop directory """
+    desktop_path = os.path.join(os.path.expanduser("~"), "Desktop")
+    if not os.path.isdir(desktop_path):
+        if raise_error:
+            raise InvalidFilepathError(msg=f'{desktop_path} is not a valid directory')
+        else:
+            return None
+    else:
+        return desktop_path
 

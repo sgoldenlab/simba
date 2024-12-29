@@ -108,6 +108,7 @@ from simba.ui.pop_ups.roi_analysis_pop_up import ROIAnalysisPopUp
 from simba.ui.pop_ups.roi_analysis_time_bins_pop_up import \
     ROIAnalysisTimeBinsPopUp
 from simba.ui.pop_ups.roi_features_plot_pop_up import VisualizeROIFeaturesPopUp
+from simba.ui.pop_ups.check_videos_seekable_pop_up import CheckVideoSeekablePopUp
 from simba.ui.pop_ups.roi_size_standardizer_popup import \
     ROISizeStandardizerPopUp
 from simba.ui.pop_ups.roi_tracking_plot_pop_up import VisualizeROITrackingPopUp
@@ -893,7 +894,8 @@ class App(object):
         video_process_menu.add_command(label="Box blur videos", compound="left", image=self.menu_icons["blur"]["img"], command=BoxBlurPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Cross-fade videos", compound="left", image=self.menu_icons["crossfade"]["img"], command=CrossfadeVideosPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Create average frames from videos", compound="left", image=self.menu_icons["average"]["img"], command=CreateAverageFramePopUp, font=Formats.FONT_REGULAR.value)
-        video_process_menu.add_command(label="Video background remover...", compound="left", image=self.menu_icons["remove_bg"]["img"], command=BackgroundRemoverPopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_command(label="Video background remover", compound="left", image=self.menu_icons["remove_bg"]["img"], command=BackgroundRemoverPopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_command(label="Validate video seekability", compound="left", image=self.menu_icons["search"]["img"], command=CheckVideoSeekablePopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Visualize pose-estimation in folder...", compound="left", image=self.menu_icons["visualize"]["img"], command=VisualizePoseInFolderPopUp, font=Formats.FONT_REGULAR.value)
         help_menu = Menu(menu)
         menu.add_cascade(label="Help", menu=help_menu)

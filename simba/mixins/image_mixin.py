@@ -989,6 +989,10 @@ class ImageMixin(object):
         :example:
         >>> ImageMixin().read_img_batch_from_video(video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Together_1.avi', start_frm=0, end_frm=50)
         """
+        if platform.system() == "Darwin":
+            if not multiprocessing.get_start_method(allow_none=True):
+                multiprocessing.set_start_method("fork", force=True)
+
         check_file_exist_and_readable(file_path=video_path)
         video_meta_data = get_video_meta_data(video_path=video_path)
         check_int(name=ImageMixin().__class__.__name__,value=start_frm, min_value=0,max_value=video_meta_data["frame_count"])

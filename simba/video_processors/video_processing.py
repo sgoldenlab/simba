@@ -16,6 +16,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 
 import cv2
 import numpy as np
+import pandas as pd
 from PIL import Image, ImageTk
 from shapely.geometry import Polygon
 from skimage.color import label2rgb
@@ -46,7 +47,7 @@ from simba.utils.errors import (CountError, DirectoryExistError,
                                 InvalidFileTypeError, InvalidInputError,
                                 InvalidVideoFileError, NoDataError,
                                 NoFilesFoundError, NotDirectoryError,
-                                ResolutionError)
+                                ResolutionError, SimBAGPUError)
 from simba.utils.lookups import (get_ffmpeg_crossfade_methods, get_fonts,
                                  get_named_colors, percent_to_crf_lookup,
                                  percent_to_qv_lk,
@@ -56,7 +57,7 @@ from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
     concatenate_videos_in_folder, find_all_videos_in_directory, find_core_cnt,
     find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data,
-    read_config_entry, read_config_file, read_frm_of_video)
+    read_config_entry, read_config_file, read_frm_of_video, read_img_batch_from_video_gpu)
 from simba.utils.warnings import (FileExistWarning, FrameRangeWarning,
                                   InValidUserInputWarning,
                                   SameInputAndOutputWarning)
@@ -4573,6 +4574,82 @@ def get_video_slic(video_path: Union[str, os.PathLike],
     timer.stop_timer()
     concatenate_videos_in_folder(in_folder=temp_folder, save_path=save_path)
     stdout_success(msg=f'SLIC video saved at {save_path}', elapsed_time=timer.elapsed_time_str)
+
+
+
+def is_video_seekable(data_path: Union[str, os.PathLike],
+                      gpu: bool = False,
+                      batch_size: Optional[int] = None,
+                      verbose: bool = False,
+                      raise_error: bool = True,
+                      save_path: Optional[Union[str, os.PathLike]] = None) -> Union[None, bool, Tuple[Dict[str, List[int]]]]:
+    """
+    Determines if the given video file(s) are seekable and can be processed frame-by-frame without issues.
+
+    This function checks if all frames in the specified video(s) can be read sequentially. It can process videos
+    using either CPU or GPU, with optional batch processing to handle memory limitations. If unreadable frames are
+    detected, the function can either raise an error or return a result indicating the issue.
+
+    :param Union[str, os.PathLike] data_path: Path to the video file or a path to a directory containing video files.
+    :param bool gpu: If True, then use GPU. Else, CPU.
+    :param Optional[int] batch_size: Optional int representing the number of frames in each video to process sequentially. If None, all frames in a video is processed at once. Use a smaller value to avoid MemoryErrors. Default None.
+    :param bool verbose: If True, prints progress. Default None.
+    :param bool raise_error: If True, raises error if not all passed videos are seeakable.
+
+    :example:
+    >>> _ = is_video_seekable(data_path='/Users/simon/Desktop/unseekable/20200730_AB_7dpf_850nm_0003_fps_5.mp4', batch_size=400)
+    """
+
+    if batch_size is not None:
+        check_int(name=f'{is_video_seekable.__name__}', value=batch_size, min_value=1)
+    if save_path is not None:
+        check_if_dir_exists(in_dir=os.path.dirname(save_path))
+    check_valid_boolean(value=[verbose], source=f'{is_video_seekable.__name__} verbose')
+    if not check_ffmpeg_available():
+        raise FFMPEGNotFoundError(msg='SimBA could not find FFMPEG on the computer.', source=is_video_seekable.__name__)
+    if gpu and not check_nvidea_gpu_available():
+        raise SimBAGPUError(msg='SimBA could not find a NVIDEA GPU on the computer and GPU is set to True.', source=is_video_seekable.__name__)
+    if os.path.isfile(data_path):
+        data_paths = [data_path]
+    elif os.path.isdir(data_path):
+        data_paths = find_files_of_filetypes_in_directory(directory=data_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True)
+    else:
+        raise InvalidInputError(msg=f'{data_path} is not a valid in directory or file path.', source=is_video_seekable.__name__)
+    _ = [get_video_meta_data(video_path=x) for x in data_paths]
+
+    results = {}
+    for file_cnt, file_path in enumerate(data_paths):
+        _, video_name, _ = get_fn_ext(filepath=file_path)
+        print(f'Checking seekability video {video_name}...')
+        video_meta_data = get_video_meta_data(video_path=file_path)
+        video_frm_ranges = np.arange(0, video_meta_data['frame_count']+1)
+        if batch_size is not None:
+            video_frm_ranges = np.array_split(video_frm_ranges, max(1, int(video_frm_ranges.shape[0]/batch_size)))
+        else:
+            video_frm_ranges = [video_frm_ranges]
+        video_error_frms = []
+        for video_frm_range in video_frm_ranges:
+            if not gpu:
+                imgs = ImageMixin.read_img_batch_from_video(video_path=file_path, start_frm=video_frm_range[0], end_frm=video_frm_range[-1], verbose=verbose)
+            else:
+                imgs = read_img_batch_from_video_gpu(video_path=file_path, start_frm=video_frm_range[0], end_frm=video_frm_range[-1], verbose=verbose)
+            invalid_frms = [k for k, v in imgs.items() if v is None]
+            video_error_frms.extend(invalid_frms)
+        results[video_name] = video_error_frms
+
+    if all(len(v) == 0 for v in results.values()):
+        if verbose:
+            stdout_success(msg=f'The {len(data_paths)} videos are valid.', source=is_video_seekable.__name__)
+        return True
+    else:
+        if save_path is not None:
+            out_df = pd.DataFrame.from_dict(data=results).T
+            out_df.to_csv(save_path)
+            FrameRangeWarning(msg=f'Some videos have unseekable frames. See {save_path} for results', source=is_video_seekable.__name__)
+        if raise_error:
+            raise FrameRangeError(msg=f'{results} The frames in the videos listed are unreadable. Consider re-encoding these videos.', source=is_video_seekable.__name__)
+        else:
+            return (False, results)
 
 # video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped_gantt.mp4',
 #                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped.mp4',
