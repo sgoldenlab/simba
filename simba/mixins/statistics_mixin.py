@@ -3907,6 +3907,7 @@ class Statistics(FeatureExtractionMixin):
         :float: float
 
         :example:
+        :example:
         >>> x = np.random.random((100, 2)).astype(np.float32)
         >>> y = np.random.randint(0, 100, (100,)).astype(np.int64)
         >>> Statistics.calinski_harabasz(x=x, y=y)
