@@ -3973,6 +3973,201 @@ class Statistics(FeatureExtractionMixin):
         return np.mean(results)
 
     @staticmethod
+    def xie_beni(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Computes the Xie-Beni index for clustering evaluation.
+
+        :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
+        :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
+        :returns: The Xie-Beni score for the dataset.
+        :rtype: float
+
+        :example:
+        >>> from sklearn.datasets import make_blobs
+        >>> X, y = make_blobs(n_samples=100000, centers=40, n_features=600, random_state=0, cluster_std=0.3)
+        >>> Statistics.xie_beni(x=X, y=y)
+
+        :references:
+        .. [1] X. L. Xie, G. Beni (1991). A validity measure for fuzzy clustering.
+               In: IEEE Transactions on Pattern Analysis and Machine Intelligence 13(8), 841 - 847. DOI: 10.1109/34.85677
+        """
+        check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=[x.shape[0], ])
+        cluster_ids = np.unique(y)
+        centroids = np.full(shape=(cluster_ids.shape[0], x.shape[1]), fill_value=-1.0, dtype=np.float32)
+        intra_centroid_distances = np.full(shape=(y.shape[0]), fill_value=-1.0, dtype=np.float32)
+        obs_cnt = 0
+        for cnt, cluster_id in enumerate(cluster_ids):
+            cluster_obs = x[np.argwhere(y == cluster_id).flatten()]
+            centroids[cnt] = np.mean(cluster_obs, axis=0)
+            intra_dist = np.linalg.norm(cluster_obs - centroids[cnt], axis=1)
+            intra_centroid_distances[obs_cnt: cluster_obs.shape[0] + obs_cnt] = intra_dist
+            obs_cnt += cluster_obs.shape[0]
+        compactness = np.mean(np.square(intra_centroid_distances))
+        cluster_dists = cdist(centroids, centroids).flatten()
+        d = np.sqrt(cluster_dists[np.argwhere(cluster_dists > 0).flatten()])
+        separation = np.min(d)
+
+        return compactness / separation
+
+    @staticmethod
+    def bouguessa_wang_sun_v2(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Compute the Bouguessa-Wang-Sun (BWS) index using covariance matrices and means.
+
+        :param np.ndarray x: A 2D array of shape (n_samples, n_features) representing the feature vectors of the data points.
+        :param np.ndarray y: A 1D array of shape (n_samples,) containing the cluster labels for each data point.
+        :returns: The BWS index value. Lower values indicate better clustering.
+        :rtype: float
+
+        :example:
+        >>> from sklearn.datasets import make_blobs
+        >>> X, y = make_blobs(n_samples=500, centers=3, random_state=42)
+        >>> Statistics.bouguessa_wang_sun_v2(X, y)
+
+        :references:
+        .. [1] Bouguessa, Wang & Sun (2006).Bouguessa M, Wang S, Sun H. An objective approach to cluster validation.
+               Pattern Recognition Letters. 2006;27:1419–1430. doi: 10.1016/j.patrec.2006.01.015.
+        """
+
+        unique_y = np.unique(y)
+        global_mean = np.mean(x, axis=0)
+        compactness, separation = 0, 0
+        check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=[x.shape[0], ])
+
+        for cluster_id in unique_y:
+            cluster_data = x[y == cluster_id]
+            cluster_mean = np.mean(cluster_data, axis=0)
+            cov_matrix = np.cov(cluster_data, rowvar=False)
+            compactness += np.trace(cov_matrix)
+            diff_mean = cluster_mean - global_mean
+            separation += len(cluster_data) * np.outer(diff_mean, diff_mean)
+
+        separation_trace = np.trace(separation)
+        return separation_trace / compactness
+
+    @staticmethod
+    def i_index(x: np.ndarray, y: np.ndarray):
+
+        """
+        Calculate the I-Index for evaluating clustering quality.
+
+        The I-Index is a metric that measures the compactness and separation of clusters.
+        A higher I-Index indicates better clustering with compact and well-separated clusters.
+
+        :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
+        :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
+        :returns: The I-index score for the dataset.
+        :rtype: float
+
+        :references:
+            .. [1] Zhao, Q., Xu, M., Fränti, P. (2009). Sum-of-Squares Based Cluster Validity Index and Significance Analysis.
+                   In: Kolehmainen, M., Toivanen, P., Beliczynski, B. (eds) Adaptive and Natural Computing Algorithms. ICANNGA 2009.
+                    Lecture Notes in Computer Science, vol 5495. Springer, Berlin, Heidelberg. https://doi.org/10.1007/978-3-642-04921-7_32
+
+        :example:
+        >>> X, y = make_blobs(n_samples=5000, centers=20, n_features=3, random_state=0, cluster_std=0.1)
+        >>> Statistics.i_index(x=X, y=y)
+        """
+        check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=[x.shape[0], ])
+        unique_y = np.unique(y)
+        n_y = unique_y.shape[0]
+        global_centroid = np.mean(x, axis=0)
+        sst = np.sum(np.linalg.norm(x - global_centroid, axis=1) ** 2)
+
+        swc = 0
+        for cluster_cnt, cluster_id in enumerate(unique_y):
+            cluster_obs = x[np.argwhere(y == cluster_id).flatten()]
+            cluster_centroid = np.mean(cluster_obs, axis=0)
+            swc += np.sum(np.linalg.norm(cluster_obs - cluster_centroid, axis=1) ** 2)
+
+        return sst / (n_y * swc)
+
+    @staticmethod
+    def sd_index(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Compute the SD (Scatter and Discriminant) Index for evaluating the quality of a clustering solution.
+
+        :param np.ndarray x: A 2D array of shape (n_samples, n_features) representing the feature vectors of the data points.
+        :param np.ndarray y: A 1D array of shape (n_samples,) containing the cluster labels for each data point.
+        :returns: The SD Index value. Lower values indicate better clustering quality with more compact and well-separated clusters.
+        :rtype: float
+
+        :example:
+        >>> X, y = make_blobs(n_samples=800, centers=2, n_features=3, random_state=0, cluster_std=0.1)
+        >>> Statistics.sd_index(x=X, y=y)
+
+        :references:
+        .. [1] Halkidi, M., Vazirgiannis, M., Batistakis, Y. (2000). Quality Scheme Assessment in the Clustering Process. In: Zighed, D.A., Komorowski, J., Żytkow, J. (eds) Principles of Data Mining and Knowledge Discovery. PKDD 2000.
+               Lecture Notes in Computer Science(), vol 1910. Springer, Berlin, Heidelberg. https://doi.org/10.1007/3-540-45372-5_26
+        """
+        check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=(int,), accepted_axis_0_shape=[x.shape[0], ])
+        global_std = np.std(x)
+        global_m = np.mean(x, axis=0)
+        unique_clusters = np.unique(y)
+        cnt_y = unique_clusters.shape[0]
+        scat, dis = 0, 0
+
+        centroids = np.full(shape=(cnt_y, x.shape[1]), fill_value=-1.0, dtype=np.float32)
+        for cnt, cluster in enumerate(unique_clusters):
+            cluster_data = x[y == cluster]
+            centroids[cnt] = np.mean(cluster_data, axis=0)
+            scat += np.mean(np.std(cluster_data, axis=0)) / global_std
+
+        for i in range(cnt_y):
+            for j in range(i + 1, cnt_y):
+                dist_between_clusters = np.linalg.norm(centroids[i] - centroids[j])
+                dist_to_global = (np.linalg.norm(centroids[i] - global_m) + np.linalg.norm(centroids[j] - global_m)) / 2
+                dis += dist_between_clusters / dist_to_global
+
+        scat /= cnt_y
+        dis /= (cnt_y * (cnt_y - 1) / 2)
+
+        return scat + dis
+
+    @staticmethod
+    def c_index(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Calculate the C Index for clustering evaluation.
+
+        :param np.ndarray x: A 2D array of shape (n_samples, n_features) containing the data points.
+        :param np.ndarray x: A 1D array of shape (n_samples,) containing cluster labels for the data points.
+        :return: The C Index value, ranging from 0 to 1.
+        :rtype: float
+
+        The C Index ranges from 0 to 1:
+           - 0 indicates perfect clustering (clusters are as compact as possible).
+           - 1 indicates worst clustering (clusters are highly spread out).
+
+        :example:
+        >>> X, y = make_blobs(n_samples=800, centers=2, n_features=3, random_state=0, cluster_std=0.1)
+        >>> Statistics.c_index(x=X, y=y)
+        """
+
+        check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=(int,), accepted_axis_0_shape=[x.shape[0], ])
+        unique_y = np.unique(y)
+        S_w = 0
+        N_w = 0
+        for cluster_id in unique_y:
+            cluster_obs = x[np.argwhere(y == cluster_id).flatten()]
+            dists = cdist(cluster_obs, cluster_obs)
+            triu_indices = np.triu_indices_from(dists, k=1)
+            S_w += np.sum(dists[triu_indices])
+            N_w += len(triu_indices[0])
+
+        all_dists = cdist(x, x)
+        triu_indices = np.triu_indices_from(all_dists, k=1)
+        sorted_dists = np.sort(all_dists[triu_indices])
+        S_min = np.sum(sorted_dists[:N_w])
+        S_max = np.sum(sorted_dists[-N_w:])
+
+        return (S_w - S_min) / (S_max - S_min)
+
+    @staticmethod
     def adjusted_rand(x: np.ndarray, y: np.ndarray) -> float:
         """
         Calculate the Adjusted Rand Index (ARI) between two clusterings.
