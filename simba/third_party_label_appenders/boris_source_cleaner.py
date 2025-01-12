@@ -1,11 +1,12 @@
 import os
-from typing import Union, List, Dict
+from typing import Dict, List, Union
 
 import pandas as pd
 
 from simba.utils.checks import check_if_dir_exists, check_that_column_exist
 from simba.utils.printing import stdout_success, stdout_warning
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, write_df)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, write_df)
 
 """
 INSTRUCTIONS:
