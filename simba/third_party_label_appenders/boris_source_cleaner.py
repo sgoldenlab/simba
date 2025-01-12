@@ -1,29 +1,28 @@
 import os
-from typing import Union
+from typing import Union, List, Dict
 
 import pandas as pd
 
 from simba.utils.checks import check_if_dir_exists, check_that_column_exist
 from simba.utils.printing import stdout_success, stdout_warning
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext, write_df)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, write_df)
 
 """
 INSTRUCTIONS:
-1. Change the DATA_DIR to the directory where you have your BORIS annotation files on line 8.
-2. Change the SAVE_DIR to the directory where you want to save your new fixed BORIS files on line 9
-3. If the names of the subjects or behavior columns changes, change these two names to the names of the columns.
-4. The SETTINGS specifies to example two rules, (i) for every row where the subject is focal and the behavior is invest_no, change the behavior name to focal_invest_no, and 
-   (ii) for every row where the subject is stimulus and the behavior is invest_no, change the behavior name to stimulus_invest_no. Change these rules or add more if you have more behaviors or animals.
-5. Save the file.
+1. Below, on line 23, change the DATA_DIR to the directory where you have your BORIS annotation files.
+2. Below, on line 29, change the SAVE_DIR to the directory where you want to save your new fixed BORIS files.
+3. If the names of the subjects or behavior columns in the BORIS CSV changes, change these two names to the names of the columns in SETTINGS (see step 4 as an example)
+4. The SETTINGS specifies the example two rules, (i) for every row in the BORIS files where the subject is focal and the behavior is invest_no, change the behavior name to focal_invest_no, and  (ii) for every row where the subject is stimulus and the behavior is invest_no, change the behavior name to stimulus_invest_no. Change these rules or add more if you have more behaviors or animals.
+5. Save this file.
 6. Activate the SimBA conda environment and navigate to the directory where the boris_source_cleaner.py is located.
-7. Run it by typing python boris_source_cleaner.py
+7. Run the script by by typing `python boris_source_cleaner.py`
+8. 
 """
 
 DATA_DIR = r"/Users/simon/Downloads/boris_data"  # Directory with BORIS annotations in CSV format.
 SAVE_DIR = r"/Users/simon/Downloads/save_dir"  # Directory where to save the modified BORIS annotations in CSV format.
-SUBJECT_COL = "Subject"  # The name of the Subject column in BORIS files. Change this if the animal names are encoded in a different column than *Subject*.
-BEHAVIOR_COL = "Behavior"  # The name of the Behavior column in BORIS files. Change this if the behavior names are encoded in a different column than *Behavior*.
+SUBJECT_COL = "Subject"  # The name of the Subject column in BORIS files. Change this if the animal names in the BORIS files are encoded in a different column than *Subject*.
+BEHAVIOR_COL = "Behavior"  # The name of the Behavior column in BORIS files. Change this if the behavior names in the BORIS are encoded in a different column than *Behavior*.
 
 SETTINGS = [
     {
@@ -63,7 +62,7 @@ class BorisSourceCleaner(object):
         self,
         data_dir: Union[str, os.PathLike],
         save_dir: Union[str, os.PathLike],
-        settings: dict,
+        settings: List[Dict[str, str]],
     ):
         check_if_dir_exists(in_dir=data_dir)
         check_if_dir_exists(in_dir=save_dir)
@@ -115,7 +114,5 @@ class BorisSourceCleaner(object):
 
 
 if __name__ == "__main__":
-    boris_cleaner = BorisSourceCleaner(
-        data_dir=DATA_DIR, save_dir=SAVE_DIR, settings=SETTINGS
-    )
+    boris_cleaner = BorisSourceCleaner(data_dir=DATA_DIR, save_dir=SAVE_DIR, settings=SETTINGS)
     boris_cleaner.run()
