@@ -10,9 +10,9 @@ from simba.utils.read_write import (find_files_of_filetypes_in_directory,
 
 """
 INSTRUCTIONS:
-1. Below, on line 23, change the DATA_DIR to the directory where you have your BORIS annotation files.
-2. Below, on line 29, change the SAVE_DIR to the directory where you want to save your new fixed BORIS files.
-3. If the names of the subjects or behavior columns in the BORIS CSV changes, change these two names to the names of the columns in SETTINGS (see step 4 as an example)
+1. Below, on line 22, change the DATA_DIR to the directory where you have your BORIS annotation files.
+2. Below, on line 23, change the SAVE_DIR to the directory where you want to save your new, fixed, BORIS files.
+3. If the names of the `Subject` or `Behavior` columns in the BORIS CSV changes, change these two names to the names of the columns in SETTINGS (see step 4 as an example)
 4. The SETTINGS specifies the example two rules, (i) for every row in the BORIS files where the subject is focal and the behavior is invest_no, change the behavior name to focal_invest_no, and  (ii) for every row where the subject is stimulus and the behavior is invest_no, change the behavior name to stimulus_invest_no. Change these rules or add more if you have more behaviors or animals.
 5. Save this file.
 6. Activate the SimBA conda environment and navigate to the directory where the boris_source_cleaner.py is located.
