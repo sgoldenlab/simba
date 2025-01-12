@@ -17,7 +17,6 @@ INSTRUCTIONS:
 5. Save this file.
 6. Activate the SimBA conda environment and navigate to the directory where the boris_source_cleaner.py is located.
 7. Run the script by by typing `python boris_source_cleaner.py`
-8. 
 """
 
 DATA_DIR = r"/Users/simon/Downloads/boris_data"  # Directory with BORIS annotations in CSV format.
