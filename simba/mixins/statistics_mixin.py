@@ -31,6 +31,7 @@ from simba.utils.checks import (check_float, check_int, check_str,
 from simba.utils.data import bucket_data, fast_mean_rank
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import CountError, InvalidInputError
+from simba.utils.read_write import get_unique_values_in_iterable
 
 
 class Statistics(FeatureExtractionMixin):
@@ -4218,6 +4219,166 @@ class Statistics(FeatureExtractionMixin):
             accepted_shapes=[(x.shape[0],)],
         )
         return adjusted_rand_score(labels_true=x, labels_pred=y)
+
+    @staticmethod
+    def rmsstd(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Compute the Root-Mean-Square Standard Deviation (RMSSTD) for a clustering result.
+
+        :param np.ndarray x: A 2D array of shape (n_samples, n_features) representing the feature vectors of the data points.
+        :param np.ndarray y: A 1D array of shape (n_samples,) containing the cluster labels for each data point.
+        :returns: The RMSSTD index value. Lower values indicate better clustering.
+        :rtype: float
+
+        :references:
+        .. [1] Milligan, G. W., & Cooper, M. C. (1985). An examination of procedures for determining the number of clusters in a data set.
+               Psychometrika, 50(2), 159–179. https://doi.org/10.1007/BF02294245
+
+        :example:
+        >>> X, y = make_blobs(n_samples=100, centers=10, n_features=3, random_state=0, cluster_std=0.1)
+        >>> d = Statistics.rmsstd(x=X, y=y)
+        """
+
+        check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value,
+                          accepted_axis_0_shape=[x.shape[0], ])
+        _ = get_unique_values_in_iterable(data=y, name=Statistics.rmsstd.__name__, min=2)
+        unique_clusters = np.unique(y)
+        p = x.shape[1]
+        numerator, denominator = 0, 0
+        for cluster_id in unique_clusters:
+            cluster_points = x[y == cluster_id]
+            cluster_mean = np.mean(cluster_points, axis=0)
+            squared_diff = np.sum((cluster_points - cluster_mean) ** 2)
+            numerator += squared_diff
+            denominator += (cluster_points.shape[0] - 1) * p
+
+        return np.sqrt(numerator / denominator)
+
+    @staticmethod
+    def krzanowski_lai_index(x: np.ndarray, y: np.ndarray, epsilon: float = 1e-16) -> float:
+        """
+        Computes the Krzanowski-Lai (KL) Index for a given clustering result.
+
+        :param np.ndarray x: A 2D array of shape (n_samples, n_features) representing the feature vectors of the data points.
+        :param np.ndarray y: A 1D array of shape (n_samples,) containing the cluster labels for each data point.
+        :param float epsilon: Small correction factor to avoid division by zero. Default 1e-16.
+        :returns: The KL index value. Higher values indicate better clustering.
+        :rtype: float
+
+        :references:
+        .. [1] Krzanowski, W. J., & Lai, Y. T. (1988). A criterion for determining the number of groups in a data set using sum-of-squares clustering.
+               Biometrics, 44(1), 23–34. https://doi.org/10.2307/2531893
+
+        :example:
+        >>> X, y = make_blobs(n_samples=100, centers=10, n_features=3, random_state=0, cluster_std=100)
+        >>> Statistics.krzanowski_lai_index(x=X, y=y)
+        """
+
+        check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value,
+                          accepted_axis_0_shape=[x.shape[0], ])
+        unique_clusters = np.unique(y)
+        _ = get_unique_values_in_iterable(data=y, name=Statistics.krzanowski_lai_index.__name__, min=2)
+        x_center = np.mean(x, axis=0)
+        BSS, WSS = 0.0, 0.0
+        for cluster_id in unique_clusters:
+            cluster_x = x[y == cluster_id]
+            cluster_center = np.mean(cluster_x, axis=0)
+            BSS += cluster_x.shape[0] * np.linalg.norm(cluster_center - x_center) ** 2
+            WSS += np.sum(np.linalg.norm(cluster_x - cluster_center, axis=1) ** 2)
+        return BSS / (WSS + epsilon)
+
+    @staticmethod
+    def cop_index(x: np.ndarray, y: np.ndarray, epsilon: float = 1e-16) -> float:
+        """
+        Computes the Clustering Overall Performance (COP) Index for evaluating clustering quality.
+
+        The COP Index is defined as the ratio of the average intra-cluster compactness (C)
+        to the average inter-cluster separation (S). A lower COP index indicates better clustering,
+        as it implies tight clusters and greater separation between them.
+
+        :param np.ndarray x: A 2D array of shape (n_samples, n_features) representing the feature vectors of the data points.
+        :param np.ndarray y: A 1D array of shape (n_samples,) containing the cluster labels for each data point.
+        :returns: The COP index value. Lower values indicate better clustering.
+        :rtype: float
+
+        :references:
+        .. [1] Gurrutxaga, I., Albisua, I., Arbelaitz, O., Martín, J. I., Muguerza, J., Pérez, J. M., & Perona, I. (2011).
+               SEP/COP: An efficient method to find the best partition in hierarchical clustering based on a new cluster validity index.
+               Pattern Recognition, 44(4), 810-820. https://doi.org/10.1016/j.patcog.2010.10.002
+
+        :example:
+        >>> X, y = make_blobs(n_samples=50000, centers=10, n_features=3, random_state=0, cluster_std=1)
+        >>> cop_index(x=X, y=y)
+        """
+
+        unique_clusters = np.unique(y)
+        cluster_combinations = list(combinations(unique_clusters, 2))
+        intra_cluster_dists = np.full(shape=(len(unique_clusters)), fill_value=np.nan, dtype=np.float64)
+        inter_cluster_dists = np.full(shape=(len(cluster_combinations)), fill_value=np.nan, dtype=np.float32)
+
+        for cluster_cnt, cluster_id in enumerate(unique_clusters):
+            cluster_x = x[np.argwhere(y == cluster_id).flatten()]
+            intra_cluster_dist = np.sum(cdist(cluster_x, cluster_x))
+            intra_cluster_dists[cluster_cnt] = intra_cluster_dist / (len(cluster_x) ** 2)
+
+        C = np.mean(intra_cluster_dists)
+        for cnt, (k, j) in enumerate(cluster_combinations):
+            cluster_k = x[np.argwhere(y == k).flatten()]
+            cluster_j = x[np.argwhere(y == j).flatten()]
+            inter_cluster_dists[cnt] = np.min(cdist(cluster_k, cluster_j))
+
+        S = np.mean(inter_cluster_dists)
+
+        return C / (S + epsilon)
+
+    @staticmethod
+    def pbm_index(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Compute the PBM (Performance of the Best Matching) Index, a measure of clustering quality that combines the compactness
+        of the clusters and the separation between them. The PBM index evaluates how well-defined the clusters are in terms
+        of their intra-cluster distance and the distance between their centroids.
+
+        Higher values indicates better clustering.
+
+        :param np.ndarray x: A 2D array of shape (n_samples, n_features) containing the data points.
+        :param np.ndarray x: A 1D array of shape (n_samples,) containing cluster labels for the data points.
+        :return: The PBM Index value.
+        :rtype: float
+
+        :references:
+        .. [1] Pakhira, M. K., Bandyopadhyay, S., & Maulik, U. (2004). Validity index for crisp and fuzzy clusters.
+               Pattern Recognition, 37(4), 487–501. https://doi.org/10.1016/j.patcog.2003.09.021
+
+        :example:
+        >>> X, y = make_blobs(n_samples=5, centers=2, n_features=3, random_state=0, cluster_std=5)
+        >>> Statistics.pbm_index(x=X, y=y)
+
+        """
+
+        check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=[x.shape[0], ])
+        unique_clusters, X_cnt = np.unique(y), x.shape[1]
+        N_clusters = get_unique_values_in_iterable(data=y, name=Statistics.pbm_index.__name__, min=2)
+        x_center = np.mean(x, axis=0)
+        center_dists = np.linalg.norm(x - x_center, axis=1)
+        E1 = np.sum(center_dists)
+        intra_cluster_dists = np.full(shape=(len(unique_clusters)), fill_value=np.nan, dtype=np.float64)
+        cluster_centers = np.full(shape=(len(unique_clusters), X_cnt), fill_value=np.nan, dtype=np.float64)
+        for cnt, cluster_id in enumerate(unique_clusters):
+            cluster_x = x[np.argwhere(y == cluster_id).flatten()]
+            cluster_centers[cnt] = np.mean(cluster_x, axis=0)
+            center_center_dists = np.linalg.norm(cluster_x - cluster_centers[cnt], axis=1)
+            intra_cluster_dists[cnt] = np.sum(center_center_dists)
+
+        EK = np.sum(intra_cluster_dists)
+
+        cluster_dists = cdist(cluster_centers, cluster_centers)
+        cluster_dists[cluster_dists == 0] = np.inf
+        Dmin = np.min(cluster_dists)
+
+        return (((1 / N_clusters) * E1) ** 2) / (EK * Dmin)
 
     @staticmethod
     def fowlkes_mallows(x: np.ndarray, y: np.ndarray) -> float:
