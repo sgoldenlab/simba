@@ -1721,13 +1721,21 @@ class TrainModelMixin(object):
     def _create_shap_mp_helper(data: Tuple[int, pd.DataFrame],
                                explainer: shap.TreeExplainer,
                                clf_name: str,
-                               verbose: bool) -> Tuple[int, pd.DataFrame]:
+                               verbose: bool) -> Tuple[pd.DataFrame, int]:
 
         if verbose:
-            print(f'Processing SHAP batch {data[0] + 1}... ({len(data[1])} observations)')
+            print(f'Processing SHAP core batch {data[0] + 1}... ({len(data[1])} observations)')
         _ = data[1].pop(clf_name).values.reshape(-1, 1)
-        shap_results = explainer.shap_values(data[1].values, check_additivity=False)[1]
-        return shap_results, data[0]
+        shap_batch_results = np.full(shape=(len(data[1]), len(data[1].columns)), fill_value=np.nan, dtype=np.float32)
+        for idx in range(len(data[1])):
+            timer = SimbaTimer(start=True)
+            obs = data[1].iloc[idx, :].values
+            shap_batch_results[idx] = explainer.shap_values(obs, check_additivity=False)[1]
+            timer.stop_timer()
+            if verbose:
+                print(f'SHAP frame complete (core batch: {data[0] + 1}, core batch frame: {idx+1}/{len(data[1])}, frame processing time: {timer.elapsed_time_str}s)')
+
+        return shap_batch_results, data[0]
 
     def create_shap_log_mp(self,
                            rf_clf: RandomForestClassifier,
@@ -1798,7 +1806,7 @@ class TrainModelMixin(object):
         check_int(name=f'{TrainModelMixin.create_shap_log_mp.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
         check_int(name=f'{TrainModelMixin.create_shap_log_mp.__name__} chunk_size', value=chunk_size, min_value=1)
         check_valid_boolean(value=[verbose, plot], source=f'{TrainModelMixin.create_shap_log_mp.__name__} verbose, plot')
-        core_cnt = [find_core_cnt()[0] if core_cnt is -1 or core_cnt > find_core_cnt()[0] else core_cnt][0]
+        core_cnt = [find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt][0]
         df = pd.DataFrame(np.hstack((x, y.reshape(-1, 1))), columns=x_names + [clf_name])
         del x; del y
         present_df, absent_df = df[df[clf_name] == 1], df[df[clf_name] == 0]
@@ -1822,14 +1830,14 @@ class TrainModelMixin(object):
         print(f"Computing {cnt_present + cnt_absent} SHAP values. Follow progress in OS terminal... (CORES: {core_cnt}, CHUNK SIZE: {chunk_size})")
         with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
             constants = functools.partial(TrainModelMixin._create_shap_mp_helper, explainer=explainer, clf_name=clf_name, verbose=verbose)
-            for cnt, result in enumerate(pool.imap_unordered(constants, shap_data, chunksize=1)):
+            for cnt, result in enumerate(pool.imap(constants, shap_data, chunksize=1)):
                 proba = TrainModelMixin().clf_predict_proba(clf=rf_clf, x_df=shap_data[result[1]][1].drop(clf_name, axis=1), model_name=clf_name).reshape(-1, 1)
                 shap_sum = np.sum(result[0], axis=1).reshape(-1, 1)
                 batch_shap_results = np.hstack((result[0], np.full((result[0].shape[0]), expected_value).reshape(-1, 1), shap_sum + expected_value, proba, shap_data[result[1]][1][clf_name].values.reshape(-1, 1))).astype(np.float32)
                 shap_results.append(batch_shap_results)
                 shap_raw.append(shap_data[result[1]][1].drop(clf_name, axis=1))
                 if verbose:
-                    print(f"Completed SHAP batch (Batch {result[1] + 1}/{len(shap_data)}).")
+                    print(f"Completed SHAP care batch (Batch {result[1] + 1}/{len(shap_data)}).")
 
         pool.terminate(); pool.join()
         shap_df = pd.DataFrame(data=np.row_stack(shap_results), columns=list(x_names) + ["Expected_value", "Sum", "Prediction_probability", clf_name])

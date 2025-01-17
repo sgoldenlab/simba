@@ -38,6 +38,10 @@ def create_shap_log(rf_clf: Union[str, os.PathLike, RandomForestClassifier],
        :width: 500
        :align: center
 
+    .. note::
+       (i) The SHAP library has to be built from git repo rather than pip: `pip install git+https://github.com/slundberg/shap.git`.
+       (ii) The scikit model cannot be built using max_depth > 31. You can set this in the SimBA config under [create ensemble settings][rf_max_depth], or `rf_max_depth` in the config CSV's.
+
     :param Union[str, os.PathLike, RandomForestClassifier] rf_clf: Trained RandomForestClassifier model or path to the saved model. Can be a string, os.PathLike object, or an instance of RandomForestClassifier.
     :param Union[pd.DataFrame, np.ndarray] x: Input features used for SHAP value computation. Can be a pandas DataFrame or numpy ndarray.
     :param Union[pd.DataFrame, pd.Series, np.ndarray] y:  Target labels corresponding to the input features. Can be a pandas DataFrame, pandas Series, or numpy ndarray with 0 and 1 values.

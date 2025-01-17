@@ -9,14 +9,16 @@ from typing import Optional, Tuple
 import numpy as np
 from numba import cuda
 from scipy.spatial import ConvexHull
-
-from simba.utils.read_write import read_df
-
+from simba.utils.read_write import read_df, get_unique_values_in_iterable
+from simba.utils.warnings import GPUToolsWarning
 try:
     import cupy as cp
     from cupyx.scipy.spatial.distance import cdist
 except:
+    GPUToolsWarning(msg='GPU tools not detected, reverting to CPU')
+    from scipy.spatial.distance import cdist
     import numpy as cp
+
 try:
    from cuml.cluster import KMeans
 except:
@@ -500,6 +502,7 @@ def euclidean_distance_to_static_point(data: np.ndarray,
     :param pixels_per_millimeter: A scaling factor that indicates how many pixels correspond to one millimeter. Defaults to 1 if no scaling is necessary.
     :param centimeter:  A flag to indicate whether the output distances should be converted from millimeters to centimeters. If True, the result is divided by 10. Defaults to False (millimeters).
     :param batch_size: The number of points to process in each batch to avoid memory overflow on the GPU. The default  batch size is set to 65 million points (6.5e+7). Adjust this parameter based on GPU memory capacity.
+    :param batch_size: The number of points to process in each batch to avoid memory overflow on the GPU. The default  batch size is set to 65 million points (6.5e+7). Adjust this parameter based on GPU memory capacity.
     :return: A 1D array of distances between each point in `data` and the static `point`, either in millimeters or centimeters depending on the `centimeter` flag.
     :rtype: np.ndarray
     """
@@ -514,7 +517,7 @@ def euclidean_distance_to_static_point(data: np.ndarray,
         results[l:r]  = cdist(batch_data, point).astype(np.float32) / pixels_per_millimeter
     if centimeter:
         results = results / 10
-    return results.get
+    return results.get()
 
 
 def dunn_index(x: np.ndarray, y: np.ndarray) -> float:
@@ -654,3 +657,96 @@ def kmeans_cuml(data: np.ndarray,
 
     return (mdl.cluster_centers_, mdl.predict(data))
 
+
+
+def xie_beni(x: np.ndarray, y: np.ndarray) -> float:
+    """
+    Computes the Xie-Beni index for clustering evaluation.
+
+    The score is calculated as the ratio between the average intra-cluster variance and the squared minimum distance between cluster centroids. This ensures that the index penalizes both loosely packed clusters and clusters that are too close to each other.
+
+    A lower Xie-Beni index indicates better clustering quality, signifying well-separated and compact clusters.
+
+    .. seealso::
+       To compute Xie-Beni on the CPU, use :func:`~simba.mixins.statistics_mixin.Statistics.xie_beni`
+       Significant GPU savings detected at about 1m features, 25 clusters.
+
+    :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
+    :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
+    :returns: The Xie-Beni score for the dataset.
+    :rtype: float
+
+    :example:
+    >>> from sklearn.datasets import make_blobs
+    >>> X, y = make_blobs(n_samples=100000, centers=40, n_features=600, random_state=0, cluster_std=0.3)
+    >>> xie_beni(x=X, y=y)
+
+    :references:
+    .. [1] X. L. Xie, G. Beni (1991). A validity measure for fuzzy clustering.
+           In: IEEE Transactions on Pattern Analysis and Machine Intelligence 13(8), 841 - 847. DOI: 10.1109/34.85677
+    """
+    check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=[x.shape[0], ])
+    _ = get_unique_values_in_iterable(data=y, name=xie_beni.__name__, min=2)
+    x, y = cp.array(x), cp.array(y)
+    cluster_ids = cp.unique(y)
+    centroids = cp.full(shape=(cluster_ids.shape[0], x.shape[1]), fill_value=-1.0, dtype=cp.float32)
+    intra_centroid_distances = cp.full(shape=(y.shape[0]), fill_value=-1.0, dtype=cp.float32)
+    obs_cnt = 0
+    for cnt, cluster_id in enumerate(cluster_ids):
+        cluster_obs = x[cp.argwhere(y == cluster_id).flatten()]
+        centroids[cnt] = cp.mean(cluster_obs, axis=0)
+        intra_dist = cp.linalg.norm(cluster_obs - centroids[cnt], axis=1)
+        intra_centroid_distances[obs_cnt: cluster_obs.shape[0] + obs_cnt] = intra_dist
+        obs_cnt += cluster_obs.shape[0]
+    compactness = cp.mean(cp.square(intra_centroid_distances))
+    cluster_dists = cdist(centroids, centroids).flatten()
+    d = cp.sqrt(cluster_dists[cp.argwhere(cluster_dists > 0).flatten()])
+    separation = cp.min(d)
+    xb = compactness / separation
+    return xb
+
+
+def i_index(x: np.ndarray, y: np.ndarray):
+    """
+    Calculate the I-Index for evaluating clustering quality.
+
+    The I-Index is a metric that measures the compactness and separation of clusters.
+    A higher I-Index indicates better clustering with compact and well-separated clusters.
+
+    .. seealso::
+       To compute Xie-Beni on the CPU, use :func:`~simba.mixins.statistics_mixin.Statistics.i_index`
+
+    :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
+    :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
+    :returns: The I-index score for the dataset.
+    :rtype: float
+
+    :references:
+        .. [1] Zhao, Q., Xu, M., Fränti, P. (2009). Sum-of-Squares Based Cluster Validity Index and Significance Analysis.
+               In: Kolehmainen, M., Toivanen, P., Beliczynski, B. (eds) Adaptive and Natural Computing Algorithms. ICANNGA 2009.
+                Lecture Notes in Computer Science, vol 5495. Springer, Berlin, Heidelberg. https://doi.org/10.1007/978-3-642-04921-7_32
+
+    :example:
+    >>> X, y = make_blobs(n_samples=5000, centers=20, n_features=3, random_state=0, cluster_std=0.1)
+    >>> i_index(x=X, y=y)
+    """
+    check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value,
+                      accepted_axis_0_shape=[x.shape[0], ])
+    _ = get_unique_values_in_iterable(data=y, name=i_index.__name__, min=2)
+    x, y = cp.array(x), cp.array(y)
+    unique_y = cp.unique(y)
+    n_y = unique_y.shape[0]
+    global_centroid = cp.mean(x, axis=0)
+    sst = cp.sum(cp.linalg.norm(x - global_centroid, axis=1) ** 2)
+
+    swc = 0
+    for cluster_cnt, cluster_id in enumerate(unique_y):
+        cluster_obs = x[cp.argwhere(y == cluster_id).flatten()]
+        cluster_centroid = cp.mean(cluster_obs, axis=0)
+        swc += cp.sum(cp.linalg.norm(cluster_obs - cluster_centroid, axis=1) ** 2)
+
+    i_idx = sst / (n_y * swc)
+
+    return i_idx

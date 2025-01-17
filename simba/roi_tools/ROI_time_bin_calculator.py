@@ -67,7 +67,7 @@ class ROITimebinCalculator(ConfigReader):
                 raise BodypartColumnNotFoundError(msg=f'The body-part {bp} is not a valid body-part in the SimBA project. Options: {self.body_parts_lst}', source=self.__class__.__name__)
         if len(set(body_parts)) != len(body_parts):
             raise DuplicationError(msg=f'All body-part entries have to be unique. Got {body_parts}', source=self.__class__.__name__)
-        self.roi_analyzer = ROIAnalyzer(config_path=self.config_path, data_path=self.outlier_corrected_dir, calculate_distances=False, threshold=threshold, body_parts=body_parts)
+        self.roi_analyzer = ROIAnalyzer(config_path=self.config_path, data_path=self.outlier_corrected_dir, calculate_distances=False, threshold=threshold, body_parts=body_parts, detailed_bout_data=True)
         self.roi_analyzer.run()
         self.animal_names = list(self.roi_analyzer.bp_dict.keys())
         self.bp_dict = self.roi_analyzer.bp_dict
@@ -107,22 +107,10 @@ class ROITimebinCalculator(ConfigReader):
                     if self.movement:
                         if len(frms_inside_roi_in_timebin) > 0:
                             bin_move = (self.movement_timebins.movement_dict[self.video_name].iloc[frms_inside_roi_in_timebin].values.flatten().astype(np.float32))
-                            _, velocity = (FeatureExtractionSupplemental.distance_and_velocity(x=bin_move,fps=fps, pixels_per_mm=1, centimeters=True))
-                            self.results_movement_velocity.loc[len(self.results_movement_velocity)] = [self.video_name,
-                                                                                                       shape_name,
-                                                                                                       animal_name,
-                                                                                                       body_part,
-                                                                                                       bin_cnt,
-                                                                                                       bin_move[1:].sum() / 10,
-                                                                                                       velocity]
+                            movement, velocity = (FeatureExtractionSupplemental.distance_and_velocity(x=bin_move,fps=fps, pixels_per_mm=1, centimeters=False))
+                            self.results_movement_velocity.loc[len(self.results_movement_velocity)] = [self.video_name, shape_name, animal_name, body_part, bin_cnt, bin_move[1:].sum() / 10, velocity]
                         else:
-                            self.results_movement_velocity.loc[len(self.results_movement_velocity)] = [self.video_name,
-                                                                                                       shape_name,
-                                                                                                       animal_name,
-                                                                                                       body_part,
-                                                                                                       bin_cnt,
-                                                                                                       0,
-                                                                                                       0]
+                            self.results_movement_velocity.loc[len(self.results_movement_velocity)] = [self.video_name, shape_name, animal_name, body_part, bin_cnt, 0, 0]
             video_timer.stop_timer()
             print(f"Video {self.video_name} complete (elapsed time {video_timer.elapsed_time_str}s)")
 
@@ -133,14 +121,18 @@ class ROITimebinCalculator(ConfigReader):
         stdout_success(msg=f"ROI time bin entry data saved at {self.save_path_entries}", elapsed_time=self.timer.elapsed_time_str)
         stdout_success(msg=f"ROI time bin time data saved at {self.save_path_time}", elapsed_time=self.timer.elapsed_time_str)
         if self.movement:
-            self.results_movement_velocity.sort_values(
-                by=["VIDEO", "SHAPE", "ANIMAL", "TIME BIN #"]
-            ).set_index("VIDEO").to_csv(self.save_path_movement_velocity)
-            stdout_success(
-                msg=f"ROI time-bin movement data saved at {self.save_path_movement_velocity}",
-                elapsed_time=self.timer.elapsed_time_str,
-            )
+            self.results_movement_velocity.sort_values(by=["VIDEO", "SHAPE", "ANIMAL", "TIME BIN #"]).set_index("VIDEO").to_csv(self.save_path_movement_velocity)
+            stdout_success(msg=f"ROI time-bin movement data saved at {self.save_path_movement_velocity}", elapsed_time=self.timer.elapsed_time_str)
 
+
+
+# test = ROITimebinCalculator(config_path=r"C:\troubleshooting\ROI_movement_test\project_folder\project_config.ini",
+#                             bin_length=0.5,
+#                             body_parts=['Head'],
+#                             threshold=0.00,
+#                             movement=True)
+# test.run()
+# test.save()
 
 # test = ROITimebinCalculator(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini",
 #                             bin_length=1,

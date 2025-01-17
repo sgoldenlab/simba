@@ -78,4 +78,4 @@ class CheckVideoSeekablePopUp(PopUpMixin):
                               save_path=save_path)
 
 
-CheckVideoSeekablePopUp()
+#CheckVideoSeekablePopUp()

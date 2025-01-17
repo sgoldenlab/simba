@@ -259,3 +259,8 @@ def CorruptedFileWarning(msg: str, source: str = ""):
 @log_warning
 def ResolutionWarning(msg: str, source: str = ""):
     pass
+
+
+@log_warning
+def GPUToolsWarning(msg: str, source: str = ""):
+    pass

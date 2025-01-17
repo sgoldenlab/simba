@@ -747,7 +747,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         """
         Calculate total movement and mean velocity from a sequence of position data.
 
-        :param x: Array containing movement data. For example, created by ``simba.mixins.FeatureExtractionMixin.framewise_euclidean_distance``.
+        :param x: Array containing movement data. For example, created by ``simba.mixins.FeatureExtractionMixin.framewise_euclidean_distance``. If its a 2-dimensional array, then we assume its pixel coordinates. If it's a 1d array, we assume its frame-wise euclidean distances.
         :param fps: Frames per second of the data.
         :param pixels_per_mm: Conversion factor from pixels to millimeters.
         :param Optional[bool] centimeters: If True, results are returned in centimeters and centimeters per second. Defaults to True.
@@ -759,40 +759,25 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         >>> sum_movement, avg_velocity = FeatureExtractionSupplemental.distance_and_velocity(x=x, fps=10, pixels_per_mm=10, centimeters=True)
         """
 
-        check_valid_array(
-            data=x,
-            source=FeatureExtractionSupplemental.distance_and_velocity.__name__,
-            accepted_ndims=(1, 2),
-            accepted_dtypes=(np.float32, np.float64, np.int32, np.int64, int, float),
-        )
-        check_float(
-            name=f"{FeatureExtractionSupplemental.distance_and_velocity.__name__} fps",
-            value=fps,
-            min_value=1,
-        )
-        check_float(
-            name=f"{FeatureExtractionSupplemental.distance_and_velocity.__name__} pixels_per_mm",
-            value=pixels_per_mm,
-            min_value=10e-6,
-        )
+        check_valid_array(data=x, source=FeatureExtractionSupplemental.distance_and_velocity.__name__, accepted_ndims=(1, 2), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_float(name=f"{FeatureExtractionSupplemental.distance_and_velocity.__name__} fps", value=fps, min_value=1)
+        check_float(name=f"{FeatureExtractionSupplemental.distance_and_velocity.__name__} pixels_per_mm", value=pixels_per_mm, min_value=10e-6)
         if x.ndim == 2:
-            check_valid_array(
-                data=x,
-                source=FeatureExtractionSupplemental.distance_and_velocity.__name__,
-                accepted_axis_1_shape=(2,),
-            )
-            t = np.full((x.shape[0]), 0.0)
+            check_valid_array(data=x, source=FeatureExtractionSupplemental.distance_and_velocity.__name__, accepted_axis_1_shape=[2, ])
+            framewise_px_movement = np.full((x.shape[0]), 0.0, dtype=np.float64)
             for i in range(1, x.shape[0]):
-                t[i] = np.linalg.norm(x[i] - x[i - 1])
-            x = np.copy(t) / pixels_per_mm
-        movement = np.sum(x) / pixels_per_mm
+                framewise_px_movement[i] = np.linalg.norm(x[i] - x[i - 1])
+        else:
+            framewise_px_movement = x
+        movement = np.sum(framewise_px_movement) / pixels_per_mm
         v = []
-        for i in range(0, x.shape[0], int(fps)):
-            w = x[i : (i + int(fps))]
+        for i in range(1, framewise_px_movement.shape[0], int(fps)):
+            w = framewise_px_movement[i: (i + int(fps))]
             v.append((np.sum(w) / pixels_per_mm) * (1 / (w.shape[0] / int(fps))))
         if centimeters:
             v = [vi / 10 for vi in v]
             movement = movement / 10
+
         return movement, np.mean(v)
 
 

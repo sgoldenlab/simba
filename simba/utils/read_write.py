@@ -72,16 +72,14 @@ PARSE_OPTIONS = csv.ParseOptions(delimiter=",")
 READ_OPTIONS = csv.ReadOptions(encoding="utf8")
 
 
-def read_df(
-    file_path: Union[str, os.PathLike],
-    file_type: Union[str, os.PathLike],
-    has_index: Optional[bool] = True,
-    remove_columns: Optional[List[str]] = None,
-    usecols: Optional[List[str]] = None,
-    anipose_data: Optional[bool] = False,
-    check_multiindex: Optional[bool] = False,
-    multi_index_headers_to_keep: Optional[int] = None,
-) -> pd.DataFrame:
+def read_df(file_path: Union[str, os.PathLike],
+            file_type: Union[str, os.PathLike],
+            has_index: Optional[bool] = True,
+            remove_columns: Optional[List[str]] = None,
+            usecols: Optional[List[str]] = None,
+            anipose_data: Optional[bool] = False,
+            check_multiindex: Optional[bool] = False,
+            multi_index_headers_to_keep: Optional[int] = None) -> Union[pd.DataFrame, dict]:
     """
     Read single tabular data file or pickle
 

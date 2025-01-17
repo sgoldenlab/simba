@@ -3978,6 +3978,14 @@ class Statistics(FeatureExtractionMixin):
         """
         Computes the Xie-Beni index for clustering evaluation.
 
+        The score is calculated as the ratio between the average intra-cluster variance and the squared minimum distance between cluster centroids. This ensures that the index penalizes both loosely packed clusters and clusters that are too close to each other.
+
+        A lower Xie-Beni index indicates better clustering quality, signifying well-separated and compact clusters.
+
+        .. seealso::
+           To compute Xie-Beni on the GPU, use :func:`~simba.mixins.statistics_mixin.Statistics.xie_beni`
+
+
         :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
         :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
         :returns: The Xie-Beni score for the dataset.
@@ -4057,6 +4065,9 @@ class Statistics(FeatureExtractionMixin):
         The I-Index is a metric that measures the compactness and separation of clusters.
         A higher I-Index indicates better clustering with compact and well-separated clusters.
 
+        .. seealso::
+           To compute I-index on GPU, use :func:`~simba.data_processors.cuda.statistics.i_index`
+
         :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
         :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
         :returns: The I-index score for the dataset.
@@ -4073,6 +4084,7 @@ class Statistics(FeatureExtractionMixin):
         """
         check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
         check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=[x.shape[0], ])
+        _ = get_unique_values_in_iterable(data=y, name=Statistics.i_index.__name__, min=2)
         unique_y = np.unique(y)
         n_y = unique_y.shape[0]
         global_centroid = np.mean(x, axis=0)
@@ -4091,6 +4103,12 @@ class Statistics(FeatureExtractionMixin):
         """
         Compute the SD (Scatter and Discriminant) Index for evaluating the quality of a clustering solution.
 
+        The SD Index combines two components to measure clustering quality:
+        1. **Scatter (SCAT)**: Evaluates the compactness of clusters by measuring the ratio of intra-cluster variance to the global standard deviation.
+        2. **Discriminant (DIS)**: Measures the separation between clusters relative to their distance from the global mean.
+
+        A lower SD Index indicates better clustering quality, reflecting compact and well-separated clusters.
+
         :param np.ndarray x: A 2D array of shape (n_samples, n_features) representing the feature vectors of the data points.
         :param np.ndarray y: A 1D array of shape (n_samples,) containing the cluster labels for each data point.
         :returns: The SD Index value. Lower values indicate better clustering quality with more compact and well-separated clusters.
@@ -4106,6 +4124,7 @@ class Statistics(FeatureExtractionMixin):
         """
         check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
         check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=(int,), accepted_axis_0_shape=[x.shape[0], ])
+        _ = get_unique_values_in_iterable(data=y, name=Statistics.sd_index.__name__, min=2)
         global_std = np.std(x)
         global_m = np.mean(x, axis=0)
         unique_clusters = np.unique(y)
@@ -4142,6 +4161,10 @@ class Statistics(FeatureExtractionMixin):
         The C Index ranges from 0 to 1:
            - 0 indicates perfect clustering (clusters are as compact as possible).
            - 1 indicates worst clustering (clusters are highly spread out).
+
+        :references:
+        .. [1] Ubert, L. J., & Levin, J. R. (1976). A general statistical framework for assessing categorical clustering in free recall. Psychological Bulletin, 83(5), 1072–1080.
+
 
         :example:
         >>> X, y = make_blobs(n_samples=800, centers=2, n_features=3, random_state=0, cluster_std=0.1)
@@ -4310,7 +4333,7 @@ class Statistics(FeatureExtractionMixin):
 
         :example:
         >>> X, y = make_blobs(n_samples=50000, centers=10, n_features=3, random_state=0, cluster_std=1)
-        >>> cop_index(x=X, y=y)
+        >>> Statistics.cop_index(x=X, y=y)
         """
 
         unique_clusters = np.unique(y)
@@ -4350,6 +4373,7 @@ class Statistics(FeatureExtractionMixin):
         :references:
         .. [1] Pakhira, M. K., Bandyopadhyay, S., & Maulik, U. (2004). Validity index for crisp and fuzzy clusters.
                Pattern Recognition, 37(4), 487–501. https://doi.org/10.1016/j.patcog.2003.09.021
+        .. [2] Bernard Desgraupes, University Paris Ouest Lab Modal’X, https://cran.r-project.org/web/packages/clusterCrit/vignettes/clusterCrit.pdf
 
         :example:
         >>> X, y = make_blobs(n_samples=5, centers=2, n_features=3, random_state=0, cluster_std=5)
@@ -4379,6 +4403,240 @@ class Statistics(FeatureExtractionMixin):
         Dmin = np.min(cluster_dists)
 
         return (((1 / N_clusters) * E1) ** 2) / (EK * Dmin)
+
+    @staticmethod
+    def banfeld_raftery_index(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Computes the Banfeld-Raftery index for clustering evaluation.
+
+        Smaller values represent better clustering. Values can be negative.
+
+        :param x: 2D NumPy array of shape (n_samples, n_features) representing the dataset.
+        :param y: 1D NumPy array of shape (n_samples,) containing cluster labels for each data point.
+        :return: The Banfeld-Raftery index.
+        :rtype: float
+
+        :references:
+           .. [1] Banfield, J. D., & Raftery, A. E. (1993). Model-based Gaussian and non-Gaussian clustering. Biometrics, 49(3), 803-821. https://doi.org/10.2307/2532201
+
+        """
+        check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=[x.shape[0], ])
+        _ = get_unique_values_in_iterable(data=y, name=Statistics.banfeld_raftery_index.__name__, min=2)
+        unique_labels = np.unique(y)
+        val = 0.0
+        for cluster_label in unique_labels:
+            cluster_data = x[y == cluster_label]
+            n_k = cluster_data.shape[0]
+            covariance_matrix = np.cov(cluster_data, rowvar=False)
+            determinant = np.linalg.det(covariance_matrix)
+            determinant = max(determinant, 1e-10)
+            val += n_k * np.log(determinant)
+
+        return val
+
+    @staticmethod
+    def scott_symons_index(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Compute the Scott-Symons index for clustering evaluation.
+
+        Smaller values represent better clustering. Values can be negative.
+
+        :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
+        :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
+        :returns: The Scott-Symons index score.
+        :rtype: float
+
+
+        :references:
+           .. [1] . J. Scott and M. J. Symons. Clustering methods based on likelihood ratio criteria. Biometrics, 27:387–397, 1971.
+        """
+
+        check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=[x.shape[0], ])
+        _ = get_unique_values_in_iterable(data=y, name=Statistics.scott_symons_index.__name__, min=2)
+        unique_labels = np.unique(y)
+        val = 0.0
+
+        for label in unique_labels:
+            cluster_points = x[y == label]
+            n_k = cluster_points.shape[0]
+            cov_matrix = np.cov(cluster_points, rowvar=False)
+            det_cov = np.linalg.det(cov_matrix)
+            val += n_k * np.log(det_cov / n_k)
+        return val
+
+    @staticmethod
+    def wemmert_gancarski_index(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Compute the Wemmert-Gançarski index for clustering evaluation.
+
+        The best case is when the index approaches 1, indicating good clustering. The worst case is when the index approaches 0, indicating poor clustering.
+
+        :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
+        :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
+        :returns: The Wemmert-Gançarski index score.
+        :rtype: float
+
+        :references:
+           .. [1] Bernard Desgraupes, University Paris Ouest Lab Modal’X, https://cran.r-project.org/web/packages/clusterCrit/vignettes/clusterCrit.pdf
+        """
+
+        check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=[x.shape[0], ])
+        _ = get_unique_values_in_iterable(data=y, name=Statistics.wemmert_gancarski_index.__name__, min=2)
+        unique_labels = np.unique(y)
+        total_score = 0.0
+
+        for label in unique_labels:
+            cluster_points = x[y == label]
+            n_k = cluster_points.shape[0]
+            G_k = np.mean(cluster_points, axis=0)
+
+            R_values = []
+            for point in cluster_points:
+                dist_to_G_k = np.linalg.norm(point - G_k)
+                distances_to_other_centroids = [np.linalg.norm(point - np.mean(x[y == other_label], axis=0)) for other_label in unique_labels if other_label != label]
+                min_dist_to_other_centroids = min(distances_to_other_centroids)
+                R_values.append(dist_to_G_k / min_dist_to_other_centroids)
+
+            J_k = max(0, 1 - (1 / n_k) * np.sum(R_values))
+            total_score += n_k * J_k
+
+        return total_score / x.shape[0]
+
+    @staticmethod
+    def mclain_rao_index(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Computes the McClain-Rao Index, which measures the quality of clustering by evaluating the ratio of
+        the mean within-cluster distances to the mean between-cluster distances.
+
+        The McClain-Rao Index is computed by calculating the mean ratio of intra-cluster distances (distances
+        between points within the same cluster) to inter-cluster distances (distances between points from
+        different clusters). A lower value indicates a better clustering result, with clusters being compact and well-separated.
+
+        :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
+        :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
+        :returns: The McClain-Rao Index score, a lower value indicates better clustering quality.
+        :rtype: float
+
+        :references:
+           .. [1] McClain, J. O., & Rao, V. R. (1975). CLUSTISZ: A program to test for the quality of clustering of a set of objects.  *Journal of Marketing Research, 12*(4), 456-460. https://doi.org/10.1177/002224377501200410
+        """
+
+        check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=[x.shape[0], ])
+        _ = get_unique_values_in_iterable(data=y, name=Statistics.mclain_rao_index.__name__, min=2)
+        unique_labels = np.unique(y)
+        ratios = np.full(shape=(len(unique_labels)), fill_value=np.nan, dtype=np.float64)
+        for cluster_cnt, cluster_id in enumerate(unique_labels):
+            cluster_obs = x[np.argwhere(y == cluster_id).flatten()]
+            noncluster_obs = x[np.argwhere(y != cluster_id).flatten()]
+            intra_dists = cdist(cluster_obs, cluster_obs)
+            np.fill_diagonal(intra_dists, np.nan)
+            intra_dist_mean = np.nanmean(intra_dists)
+            inter_dist_mean = np.mean(cdist(cluster_obs, noncluster_obs))
+            ratios[cluster_cnt] = intra_dist_mean / inter_dist_mean
+
+        return np.mean(ratios)
+
+    @staticmethod
+    def s_dbw_index(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Compute the S_Dbw index for evaluating the clustering quality.
+
+        A lower value indicates a better clustering result.
+
+        :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
+        :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
+        :returns: The S_Dbw index score.
+        :rtype: float
+
+        .. note::
+           Behaves weird as the number of dimensions increase (> 20).
+
+        :example:
+        >>> from sklearn.datasets import make_blobs
+        >>> X, labels = make_blobs(n_samples=5000, centers=5, random_state=42, n_features=3, cluster_std=2)
+        >>> score = Statistics.s_dbw_index(X, labels)
+
+        :references:
+           .. [1]  M. Halkidi and M. Vazirgiannis. Clustering validity assessment: Finding the optimal partitioning of a data set. Proceedings IEEE International Conference on Data Mining, pages 187–194, 2001.
+           .. [2]  M. Halkidi and M. Vazirgiannis. Clustering validity assessment: Finding the optimal partitioning of a data set. Proceedings IEEE International Conference on Data Mining, pages 187–194, 2001.
+        """
+
+        check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value,
+                          accepted_axis_0_shape=[x.shape[0], ])
+        _ = get_unique_values_in_iterable(data=y, name=Statistics.s_dbw_index.__name__, min=2)
+        unique_labels = np.unique(y)
+        K = len(unique_labels)
+        centroids = np.array([x[y == label].mean(axis=0) for label in unique_labels])
+        variances = np.array([np.var(x[y == label], axis=0) for label in unique_labels])
+        sigma = np.sqrt(np.sum(np.linalg.norm(variances, axis=1)) / K)
+        s_dbw = 0.0
+        for k in range(K):
+            for k_prime in range(k + 1, K):
+                cluster_k = x[y == unique_labels[k]]
+                cluster_k_prime = x[y == unique_labels[k_prime]]
+                G_k = centroids[k]
+                G_k_prime = centroids[k_prime]
+                H_kk_prime = (G_k + G_k_prime) / 2
+                density_at_Gk = np.sum(np.linalg.norm(cluster_k - G_k, axis=1) < sigma) + np.sum(np.linalg.norm(cluster_k_prime - G_k, axis=1) < sigma)
+                density_at_Gk_prime = np.sum(np.linalg.norm(cluster_k - G_k_prime, axis=1) < sigma) + np.sum(np.linalg.norm(cluster_k_prime - G_k_prime, axis=1) < sigma)
+                density_at_Hkk_prime = np.sum(np.linalg.norm(cluster_k - H_kk_prime, axis=1) < sigma) + np.sum(np.linalg.norm(cluster_k_prime - H_kk_prime, axis=1) < sigma)
+                if max(density_at_Gk, density_at_Gk_prime) == 0:
+                    pass
+                else:
+                    Rkk_prime = density_at_Hkk_prime / max(density_at_Gk, density_at_Gk_prime)
+                    s_dbw += Rkk_prime
+
+        s_dbw /= (K * (K - 1)) / 2
+        return s_dbw
+
+    @staticmethod
+    def ray_turi_index(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Compute the Ray-Turi index for evaluating the clustering quality.
+
+        A lower value indicates a better clustering result.
+
+        :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
+        :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
+        :returns: The Ray-Turi  index score.
+        :rtype: float
+
+        :example:
+        >>> from sklearn.datasets import make_blobs
+        >>> X, labels = make_blobs(n_samples=5000, centers=5, random_state=42, n_features=3, cluster_std=2)
+        >>> score = Statistics.s_dbw_index(X, labels)
+
+        :references:
+           .. [1] Ray, S., & Turi, R. H. (1999). Determination of number of clusters in k-means clustering and application in colour image segmentation. Proceedings of the 4th International Conference on Advances in Pattern Recognition and Digital Techniques, 137–143.
+        """
+
+        check_valid_array(data=x, accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=y, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=[x.shape[0], ])
+        n_clusters = get_unique_values_in_iterable(data=y, name=Statistics.ray_turi_index.__name__, min=2)
+        unique_labels = np.unique(y)
+
+        centroids = np.array([x[y == label].mean(axis=0) for label in unique_labels])
+        intra_dists = np.full(shape=(x.shape[0]), fill_value=np.nan, dtype=np.float32)
+        min_cluster_distance = np.inf
+        obs_cnt = 0
+        for cnt, cluster_id in enumerate(unique_labels):
+            cluster_obs = x[np.argwhere(y == cluster_id).flatten()]
+            centroids[cnt] = np.mean(cluster_obs, axis=0)
+            dists = np.linalg.norm(cluster_obs - centroids[cnt], axis=1) ** 2
+            intra_dists[obs_cnt: obs_cnt + dists.shape[0]] = dists
+            obs_cnt += dists.shape[0]
+
+        for i in range(n_clusters):
+            for j in range(i + 1, n_clusters):
+                distance = np.sum((centroids[i] - centroids[j]) ** 2)
+                min_cluster_distance = min(min_cluster_distance, distance)
+
+        return np.mean(intra_dists) / min_cluster_distance
 
     @staticmethod
     def fowlkes_mallows(x: np.ndarray, y: np.ndarray) -> float:

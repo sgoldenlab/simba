@@ -801,9 +801,7 @@ class TimeseriesFeatureMixin(object):
 
     @staticmethod
     @njit("(float32[:], float64[:], int64)", fastmath=True)
-    def sliding_line_length(
-        data: np.ndarray, window_sizes: np.ndarray, sample_rate: int
-    ) -> np.ndarray:
+    def sliding_line_length(data: np.ndarray, window_sizes: np.ndarray, sample_rate: int) -> np.ndarray:
         """
         Jitted compute of  sliding line length for a given time series using different window sizes.
 
@@ -1096,7 +1094,7 @@ class TimeseriesFeatureMixin(object):
 
                 results[r1 - 1, i] = result
 
-            return results
+        return results
 
     @staticmethod
     @njit(

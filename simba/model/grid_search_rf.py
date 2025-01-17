@@ -42,10 +42,10 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
         check_if_filepath_list_is_empty(filepaths=self.target_file_paths, error_msg=f"Zero data files found in {self.targets_folder}, cannot create models.")
         if not os.path.exists(self.configs_meta_dir): os.makedirs(self.configs_meta_dir)
         self.meta_file_lst = sorted(read_simba_meta_files(self.configs_meta_dir))
-        print(f"Reading in {len(self.target_file_paths)} annotated files...")
+        print(f"Reading in {len(self.target_file_paths)} annotated files found in the {self.targets_folder} directory...")
         self.data_df, self.frm_idx = self.read_all_files_in_folder_mp_futures(self.target_file_paths, self.file_type)
         self.frm_idx = pd.DataFrame({"VIDEO": list(self.data_df.index), "FRAME_IDX": self.frm_idx})
-        self.data_df = self.check_raw_dataset_integrity(self.data_df, logs_path=self.logs_path)
+        _ = self.check_raw_dataset_integrity(self.data_df, logs_path=self.logs_path)
         self.data_df = self.drop_bp_cords(df=self.data_df)
 
     def perform_sampling(self, meta_dict: dict):

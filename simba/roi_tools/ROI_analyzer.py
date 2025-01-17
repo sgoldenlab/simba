@@ -1,27 +1,25 @@
 __author__ = "Simon Nilsson"
 
 import os
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Tuple
+
 
 import numpy as np
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.mixins.feature_extraction_supplement_mixin import \
-    FeatureExtractionSupplemental
+from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_file_exist_and_readable, check_float, check_that_column_exist,
     check_valid_lst)
 from simba.utils.data import detect_bouts, slice_roi_dict_for_video
 from simba.utils.enums import Keys
-from simba.utils.errors import (CountError, MissingColumnsError,
-                                ROICoordinatesNotFoundError)
+from simba.utils.errors import (CountError, MissingColumnsError, ROICoordinatesNotFoundError)
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_data_paths, read_df
 from simba.utils.warnings import NoDataFoundWarning
-
 
 class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
     """
@@ -47,9 +45,9 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
     def __init__(self,
                  config_path: Union[str, os.PathLike],
                  data_path: Optional[Union[str, os.PathLike, List[str]]] = None,
-                 detailed_bout_data: Optional[bool] = False,
-                 calculate_distances: Optional[bool] = False,
-                 threshold: Optional[float] = 0.0,
+                 detailed_bout_data: bool = False,
+                 calculate_distances: bool = False,
+                 threshold: float = 0.0,
                  body_parts: Optional[List[str]] = None):
 
         check_file_exist_and_readable(file_path=config_path)
@@ -58,11 +56,7 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
             raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path)
         self.read_roi_data()
         FeatureExtractionMixin.__init__(self)
-        self.data_paths = read_data_paths(path=data_path,
-                                          default=self.outlier_corrected_paths,
-                                          default_name=self.outlier_corrected_dir,
-                                          file_type=self.file_type)
-
+        self.data_paths = read_data_paths(path=data_path, default=self.outlier_corrected_paths, default_name=self.outlier_corrected_dir, file_type=self.file_type)
         check_float(name="Body-part probability threshold", value=threshold, min_value=0.0, max_value=1.0)
         check_valid_lst(data=body_parts, source=f"{self.__class__.__name__} body-parts", valid_dtypes=(str,))
         if len(set(body_parts)) != len(body_parts):
@@ -110,7 +104,7 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                         roi_bouts["VIDEO"] = video_name
                         self.roi_bout_results.append(roi_bouts)
                         animal_bout_results[row["Name"]] = roi_bouts
-                        self.entry_results.loc[len(self.entry_results)] = [video_name,animal_name,row["Name"],len(roi_bouts)]
+                        self.entry_results.loc[len(self.entry_results)] = [video_name,animal_name,row["Name"], len(roi_bouts)]
                         self.time_results.loc[len(self.time_results)] = [video_name,animal_name,row["Name"],roi_bouts["Bout_time"].sum()]
                     for _, row in self.sliced_roi_dict[Keys.ROI_CIRCLES.value].iterrows():
 
@@ -159,58 +153,23 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                     if self.calculate_distances:
                         for roi_name, roi_data in animal_bout_results.items():
                             if len(roi_data) == 0:
-                                self.movements_df.loc[len(self.movements_df)] = [
-                                    video_name,
-                                    animal_name,
-                                    roi_name,
-                                    "Movement (cm)",
-                                    0,
-                                ]
-                                self.movements_df.loc[len(self.movements_df)] = [
-                                    video_name,
-                                    animal_name,
-                                    roi_name,
-                                    "Average velocity (cm/s)",
-                                    "None",
-                                ]
+                                self.movements_df.loc[len(self.movements_df)] = [video_name, animal_name, roi_name, "Movement (cm)", 0,]
+                                self.movements_df.loc[len(self.movements_df)] = [video_name, animal_name, roi_name, "Average velocity (cm/s)", "None",]
                             else:
                                 distances, velocities = [], []
-                                roi_frames = roi_data[
-                                    ["Start_frame", "End_frame"]
-                                ].values
+                                roi_frames = roi_data[["Start_frame", "End_frame"]].values
                                 for event in roi_frames:
-                                    event_pose = animal_df.loc[
-                                        np.arange(event[0], event[1] + 1), bp_names
-                                    ]
-                                    event_pose = event_pose[
-                                        event_pose[bp_names[2]] > self.threshold
-                                    ][bp_names[:2]].values
+                                    event_pose = animal_df.loc[np.arange(event[0], event[1] + 1), bp_names]
+                                    event_pose = event_pose[event_pose[bp_names[2]] > self.threshold][bp_names[:2]].values
                                     if event_pose.shape[0] > 1:
-                                        distance, velocity = (
-                                            FeatureExtractionSupplemental.distance_and_velocity(
-                                                x=event_pose,
-                                                fps=self.fps,
-                                                pixels_per_mm=pix_per_mm,
-                                                centimeters=True,
-                                            )
-                                        )
+                                        distance, velocity = (FeatureExtractionSupplemental.distance_and_velocity(x=event_pose, fps=self.fps, pixels_per_mm=pix_per_mm, centimeters=True))
                                         distances.append(distance)
+                                        print(distances, velocity)
                                         velocities.append(velocity)
-                                self.movements_df.loc[len(self.movements_df)] = [
-                                    video_name,
-                                    animal_name,
-                                    roi_name,
-                                    "Movement (cm)",
-                                    sum(distances),
-                                ]
-                                self.movements_df.loc[len(self.movements_df)] = [
-                                    video_name,
-                                    animal_name,
-                                    roi_name,
-                                    "Average velocity (cm/s)",
-                                    np.average(velocities),
-                                ]
-        if len(self.roi_bout_results) > 1:
+                                self.movements_df.loc[len(self.movements_df)] = [video_name, animal_name, roi_name, "Movement (cm)", sum(distances)]
+                                self.movements_df.loc[len(self.movements_df)] = [video_name, animal_name, roi_name, "Average velocity (cm/s)", np.average(velocities)]
+
+        if len(self.roi_bout_results) > 0:
             self.detailed_df = pd.concat(self.roi_bout_results, axis=0)
             self.detailed_df = self.detailed_df.rename(columns={"Event": "SHAPE NAME", "Start_time": "START TIME", "End Time": "END TIME", "Start_frame": "START FRAME", "End_frame": "END FRAME", "Bout_time": "DURATION (S)"})
             self.detailed_df["BODY-PART"] = self.detailed_df["ANIMAL"].map(self.bp_lk)
@@ -234,6 +193,17 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
             self.movements_df.to_csv(movement_path)
             print(f"ROI aggregate movement data saved at {movement_path}...")
         stdout_success(msg=f"ROI time and ROI entry saved in the {self.logs_path} directory in CSV format.")
+
+
+# test = ROIAnalyzer(config_path = r"C:\troubleshooting\ROI_movement_test\project_folder\project_config.ini",
+#                    data_path=None,
+#                    calculate_distances=True,
+#                    detailed_bout_data=True,
+#                    body_parts=['Head'],
+#                    threshold=0.0)
+# test.run()
+
+
 
 
 # test = ROIAnalyzer(config_path = r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini",
