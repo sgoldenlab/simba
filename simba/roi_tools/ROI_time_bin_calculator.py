@@ -108,9 +108,9 @@ class ROITimebinCalculator(ConfigReader):
                         if len(frms_inside_roi_in_timebin) > 0:
                             bin_move = (self.movement_timebins.movement_dict[self.video_name].iloc[frms_inside_roi_in_timebin].values.flatten().astype(np.float32))
                             movement, velocity = (FeatureExtractionSupplemental.distance_and_velocity(x=bin_move,fps=fps, pixels_per_mm=1, centimeters=False))
-                            self.results_movement_velocity.loc[len(self.results_movement_velocity)] = [self.video_name, shape_name, animal_name, body_part, bin_cnt, bin_move[1:].sum() / 10, velocity]
+                            self.results_movement_velocity.loc[len(self.results_movement_velocity)] = [self.video_name, shape_name, animal_name, body_part, bin_cnt, movement, velocity]
                         else:
-                            self.results_movement_velocity.loc[len(self.results_movement_velocity)] = [self.video_name, shape_name, animal_name, body_part, bin_cnt, 0, 0]
+                            self.results_movement_velocity.loc[len(self.results_movement_velocity)] = [self.video_name, shape_name, animal_name, body_part, bin_cnt, 0, "None"]
             video_timer.stop_timer()
             print(f"Video {self.video_name} complete (elapsed time {video_timer.elapsed_time_str}s)")
 
