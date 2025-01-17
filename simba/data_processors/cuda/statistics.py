@@ -9,15 +9,17 @@ from typing import Optional, Tuple
 import numpy as np
 from numba import cuda
 from scipy.spatial import ConvexHull
-from simba.utils.read_write import read_df, get_unique_values_in_iterable
+
+from simba.utils.read_write import get_unique_values_in_iterable, read_df
 from simba.utils.warnings import GPUToolsWarning
+
 try:
     import cupy as cp
     from cupyx.scipy.spatial.distance import cdist
 except:
     GPUToolsWarning(msg='GPU tools not detected, reverting to CPU')
-    from scipy.spatial.distance import cdist
     import numpy as cp
+    from scipy.spatial.distance import cdist
 
 try:
    from cuml.cluster import KMeans
