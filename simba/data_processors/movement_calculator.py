@@ -7,14 +7,16 @@ from typing import List, Optional, Tuple
 import numpy as np
 import pandas as pd
 
-from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
 from simba.feature_extractors.perimeter_jit import jitted_centroid
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.utils.checks import (check_if_filepath_list_is_empty,check_that_column_exist, check_valid_array, check_float)
+from simba.mixins.feature_extraction_supplement_mixin import \
+    FeatureExtractionSupplemental
+from simba.utils.checks import (check_float, check_if_filepath_list_is_empty,
+                                check_that_column_exist, check_valid_array)
+from simba.utils.enums import Formats
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
-from simba.utils.enums import Formats
 
 
 class MovementCalculator(ConfigReader, FeatureExtractionMixin):
