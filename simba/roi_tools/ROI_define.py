@@ -1,11 +1,12 @@
-from typing import Union
 import copy
 import os
+import warnings
 from tkinter import *
+from typing import Union
 
 import cv2
 import pandas as pd
-import warnings
+
 warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 import PIL.Image
 from PIL import ImageTk
