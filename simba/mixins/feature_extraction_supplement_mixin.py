@@ -750,12 +750,15 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         :param x: Array containing movement data. For example, created by ``simba.mixins.FeatureExtractionMixin.framewise_euclidean_distance``. If its a 2-dimensional array, then we assume its pixel coordinates. If it's a 1d array, we assume its frame-wise euclidean distances.
         :param fps: Frames per second of the data.
         :param pixels_per_mm: Conversion factor from pixels to millimeters.
-        :param Optional[bool] centimeters: If True, results are returned in centimeters and centimeters per second. Defaults to True.
+        :param Optional[bool] centimeters: If True, results are returned in centimeters and centimeters per second. Defaults to True. If false, then milimeters and millimeters per second.
         :return: A tuple containing total movement and mean velocity.
         :rtype: Tuple[float, float]
 
         :example:
         >>> x = np.random.randint(0, 100, (100,))
+        >>> sum_movement, avg_velocity = FeatureExtractionSupplemental.distance_and_velocity(x=x, fps=10, pixels_per_mm=10, centimeters=True)
+
+        >>> x = np.random.randint(0, 100, (100, 2))
         >>> sum_movement, avg_velocity = FeatureExtractionSupplemental.distance_and_velocity(x=x, fps=10, pixels_per_mm=10, centimeters=True)
         """
 

@@ -532,16 +532,15 @@ def dunn_index(x: np.ndarray, y: np.ndarray) -> float:
     .. seelalso:
        For CPU-based method, use :func:`simba.mixins.statistics_mixin.Statistics.dunn_index`
 
+    The Dunn Index is given by:
+
     .. math::
+       D = \frac{\min_{i \neq j} \{ \delta(C_i, C_j) \}}{\max_k \{ \Delta(C_k) \}}
 
-        Dunn\ Index = \frac{\\min_{i \\neq j} \\delta(c_i, c_j)}{\\max_k \\Delta(c_k)}
-
-    Where:
-    - :math:`\\delta(c_i, c_j)` is the distance between clusters :math:`c_i` and :math:`c_j`.
-    - :math:`\\Delta(c_k)` is the diameter (i.e., maximum intra-cluster distance) of cluster :math:`c_k`.
+    where :math:`\delta(C_i, C_j)` is the distance between clusters :math:`C_i` and :math:`C_j`, and
+    :math:`\Delta(C_k)` is the diameter of cluster :math:`C_k`.
 
     The higher the Dunn Index, the better the clustering, as a higher value indicates that the clusters are well-separated relative to their internal cohesion.
-
 
     .. csv-table::
        :header: EXPECTED RUNTIMES

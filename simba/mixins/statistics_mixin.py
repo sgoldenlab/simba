@@ -3756,7 +3756,7 @@ class Statistics(FeatureExtractionMixin):
         The Dunn Index is given by:
 
         .. math::
-           D = \\frac{\min_{i \neq j} \{ \delta(C_i, C_j) \}}{\max_k \{ \Delta(C_k) \}}
+           D = \frac{\min_{i \neq j} \{ \delta(C_i, C_j) \}}{\max_k \{ \Delta(C_k) \}}
 
         where :math:`\delta(C_i, C_j)` is the distance between clusters :math:`C_i` and :math:`C_j`, and
         :math:`\Delta(C_k)` is the diameter of cluster :math:`C_k`.
@@ -3983,8 +3983,13 @@ class Statistics(FeatureExtractionMixin):
         A lower Xie-Beni index indicates better clustering quality, signifying well-separated and compact clusters.
 
         .. seealso::
-           To compute Xie-Beni on the GPU, use :func:`~simba.mixins.statistics_mixin.Statistics.xie_beni`
+           To compute Xie-Beni on the GPU, use :func:`~simba.mixins.statistics_mixin.Statistics.xie_beni`.
+           Significant GPU savings detected at about 1m features, 25 clusters
 
+        .. math::
+           \\text{XB} = \\frac{\\frac{1}{n} \\sum_{i=1}^{n} \\| x_i - c_{y_i} \\|^2}{\\min_{i \\neq j} \\| c_i - c_j \\|^2}
+
+        where :math:`n` is the total number of points in the dataset, :math:`x_i` is the :math:`i`-th data point, :math:`c_{y_i}` is the centroid of the cluster to which :math:`x_i` belongs, and :math:`\\| \\cdot \\|` denotes the Euclidean norm.
 
         :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
         :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
@@ -4864,7 +4869,6 @@ class Statistics(FeatureExtractionMixin):
 
     def wave_hedges_distance(self, x: np.ndarray, y: np.ndarray) -> float:
         """
-
         Computes the Wave-Hedges distance between two 1-dimensional arrays `x` and `y`. The Wave-Hedges distance is a measure of dissimilarity between arrays.
 
         .. note::
@@ -4879,6 +4883,9 @@ class Statistics(FeatureExtractionMixin):
         >>> x = np.random.randint(0, 500, (1000,))
         >>> y = np.random.randint(0, 500, (1000,))
         >>> Statistics().wave_hedges_distance(x=x, y=y)
+
+        :references:
+           .. [1] Hedges, T. S. (1976). An empirical modification to linear wave theory. Proceedings of the Institution of Civil Engineers, Part 2, 61(3), 575–579. https://doi.org/10.1680/iicep.1976.3408
         """
 
         check_valid_array(data=x, source=f'{Statistics.wave_hedges_distance.__name__} x', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
@@ -4906,6 +4913,11 @@ class Statistics(FeatureExtractionMixin):
         :example:
         >>> x, y = np.random.randint(0, 500, (1000, 6000)), np.random.randint(0, 500, (1000, 6000))
         >>> Statistics.gower_distance(x=x, y=y)
+
+
+        :references:
+           .. [1] Gower, J. C. (1971). A general coefficient of similarity and some of its properties. Biometrics, 27(4), 857–874. https://doi.org/10.2307/2528823
+
 
         """
         check_valid_array(data=x, source=f'{Statistics.gower_distance.__name__} x', accepted_ndims=(1, 2), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
@@ -4952,6 +4964,10 @@ class Statistics(FeatureExtractionMixin):
         :example:
         >>> x, y = np.random.randint(0, 500, (1000,200)), np.random.randint(0, 500, (1000,200))
         >>> Statistics.normalized_google_distance(x=y, y=x)
+
+        :references:
+           .. [1] Cilibrasi, R., & Vitányi, P. (2007). Clustering by compression. IEEE Transactions on Information Theory, 51(4), 1523-1545. https://doi.org/10.1109/TIT.2005.862080
+
         """
         check_valid_array(data=x, source=f'{Statistics.normalized_google_distance.__name__} x', accepted_ndims=(1, 2), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
         check_valid_array(data=y, source=f'{Statistics.normalized_google_distance.__name__} y', accepted_ndims=(x.ndim,), accepted_shapes=(x.shape,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)

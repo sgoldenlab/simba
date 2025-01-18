@@ -835,15 +835,10 @@ def find_files_of_filetypes_in_directory(directory: Union[str, os.PathLike],
     """
 
     try:
-        all_files_in_folder = [
-            f for f in next(os.walk(directory))[2] if not f[0] == "."
-        ]
+        all_files_in_folder = [f for f in next(os.walk(directory))[2] if not f[0] == "."]
     except StopIteration:
         if raise_warning:
-            raise NoFilesFoundError(
-                msg=f"No files found in the {directory} directory with accepted extensions {str(extensions)}",
-                source=find_files_of_filetypes_in_directory.__name__,
-            )
+            raise NoFilesFoundError(msg=f"No files found in the {directory} directory with accepted extensions {str(extensions)}", source=find_files_of_filetypes_in_directory.__name__)
         else:
             all_files_in_folder = []
             pass

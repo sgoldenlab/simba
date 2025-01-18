@@ -1,9 +1,12 @@
+from typing import Union
 import copy
 import os
 from tkinter import *
 
 import cv2
 import pandas as pd
+import warnings
+warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 import PIL.Image
 from PIL import ImageTk
 
@@ -39,17 +42,17 @@ class ROI_definitions(ConfigReader, PopUpMixin):
     video_path: str
         path to video file for which ROIs should be defined.
 
-    Notes
-    ----------
-    `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
+    .. note::
+       `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
 
-    Examples
-    ----------
+    :example:
     >>> _ = ROI_definitions(config_path='MyProjectConfig', video_path='MyVideoPath')
 
     """
 
-    def __init__(self, config_path: str, video_path: str):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 video_path: Union[str, os.PathLike]):
 
         check_file_exist_and_readable(file_path=config_path)
         check_file_exist_and_readable(file_path=video_path)
@@ -67,9 +70,6 @@ class ROI_definitions(ConfigReader, PopUpMixin):
 
         self.menu_icons = get_icons_paths()
 
-        for k in self.menu_icons.keys():
-            self.menu_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname(__file__), self.menu_icons[k]["icon_path"])))
-
         self.roi_root = Toplevel()
         self.roi_root.minsize(WINDOW_SIZE[0], WINDOW_SIZE[1])
         self.screen_width = self.roi_root.winfo_screenwidth()
@@ -78,6 +78,9 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         self.roi_root.geometry("%dx%d+%d+%d" % (WINDOW_SIZE[0], WINDOW_SIZE[1], self.default_top_left_x, 0))
         self.roi_root.wm_title("Region of Interest Settings")
         self.roi_root.protocol("WM_DELETE_WINDOW", self._terminate)
+
+        for k in self.menu_icons.keys():
+            self.menu_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname(__file__), self.menu_icons[k]["icon_path"])))
 
         self.shape_thickness_list = list(range(1, 26))
         self.ear_tag_size_list = list(range(1, 26))
@@ -113,7 +116,7 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         if len(self.video_ROIs) > 0:
             self.update_delete_ROI_menu()
 
-        self.master.mainloop()
+        #self.master.mainloop()
 
     def _terminate(self):
         self.Exit()
