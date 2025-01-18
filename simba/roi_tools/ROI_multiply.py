@@ -1,19 +1,23 @@
 __author__ = "Simon Nilsson"
 __email__ = "sronilsson@gmail.com"
 
-from typing import Union
 import os
-from copy import deepcopy
-import pandas as pd
 import warnings
+from copy import deepcopy
+from typing import Union
+
+import pandas as pd
+
 warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 
 
-from simba.utils.enums import ConfigKey, Keys, Paths, Options
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_valid_dataframe)
+from simba.utils.enums import ConfigKey, Keys, Options, Paths
 from simba.utils.errors import NoROIDataError, NotDirectoryError
 from simba.utils.printing import stdout_success
-from simba.utils.read_write import get_fn_ext, read_config_file, find_files_of_filetypes_in_directory
-from simba.utils.checks import check_file_exist_and_readable, check_valid_dataframe
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_config_file)
 
 
 def create_emty_df(shape_type):
