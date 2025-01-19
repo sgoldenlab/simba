@@ -363,14 +363,12 @@ class TwoOptionQuestionPopUp(object):
     :parameter Optional[str] link: If not None, then a link to documentation presenting background info about the user choices.
     """
 
-    def __init__(
-        self,
-        question: str,
-        option_one: str,
-        option_two: str,
-        title: str,
-        link: Optional[str] = None,
-    ):
+    def __init__(self,
+                 question: str,
+                 option_one: str,
+                 option_two: str,
+                 title: str,
+                 link: Optional[str] = None):
 
         self.main_frm = Toplevel()
         self.main_frm.geometry("600x200")
@@ -378,28 +376,14 @@ class TwoOptionQuestionPopUp(object):
 
         question_frm = Frame(self.main_frm)
         question_frm.pack(expand=True, fill="both")
-        Label(
-            question_frm, text=question, font=Formats.LABELFRAME_HEADER_FORMAT.value
-        ).pack()
-        button_one = Button(
-            question_frm,
-            text=option_one,
-            fg="blue",
-            command=lambda: self.run(option_one),
-        )
-        button_two = Button(
-            question_frm,
-            text=option_two,
-            fg="red",
-            command=lambda: self.run(option_two),
-        )
+        Label(question_frm, text=question, font=Formats.LABELFRAME_HEADER_FORMAT.value).pack()
+
+        button_one = SimbaButton(parent=question_frm, txt=option_one, txt_clr="blue", bg_clr="lightgrey", img='check_blue', cmd=self.run, cmd_kwargs={'selected_option': lambda: option_one}, font=Formats.FONT_LARGE.value)
+        button_two = SimbaButton(parent=question_frm, txt=option_two, txt_clr="red", bg_clr="lightgrey", img='close', cmd=self.run, cmd_kwargs={'selected_option': lambda: option_two}, font=Formats.FONT_LARGE.value)
+        #button_one = Button(question_frm, text=option_one, fg="blue", command=lambda: self.run(option_one))
+        #button_two = Button(question_frm, text=option_two, fg="red", command=lambda: self.run(option_two))
         if link:
-            link_lbl = Label(
-                question_frm,
-                text="Click here for more information.",
-                cursor="hand2",
-                fg="blue",
-            )
+            link_lbl = Label(question_frm, text="Click here for more information.", cursor="hand2", fg="blue")
             link_lbl.bind("<Button-1>", lambda e: callback(link))
             link_lbl.place(relx=0.5, rely=0.30, anchor=CENTER)
         button_one.place(relx=0.5, rely=0.50, anchor=CENTER)

@@ -1702,9 +1702,7 @@ def copy_files_in_directory(in_dir: Union[str, os.PathLike],
             shutil.copy(file_path, out_dir)
 
 
-def remove_files(
-    file_paths: List[Union[str, os.PathLike]], raise_error: Optional[bool] = False
-) -> None:
+def remove_files(file_paths: List[Union[str, os.PathLike]], raise_error: Optional[bool] = False) -> None:
     """
     Delete (remove) the files specified within a list of filepaths.
 
@@ -1718,10 +1716,7 @@ def remove_files(
 
     for file_path in file_paths:
         if not os.path.isfile(file_path) and raise_error:
-            raise NoFilesFoundError(
-                msg=f"Cannot delete {file_path}. File does not exist",
-                source=remove_files.__name__,
-            )
+            raise NoFilesFoundError(msg=f"Cannot delete {file_path}. File does not exist", source=remove_files.__name__)
         elif not os.path.isfile(file_path):
             pass
         else:
@@ -1729,10 +1724,7 @@ def remove_files(
                 os.remove(file_path)
             except:
                 if raise_error:
-                    raise PermissionError(
-                        msg=f"Cannot read {file_path}. Is the file open in an alternative app?",
-                        source=remove_files.__name__,
-                    )
+                    raise PermissionError(msg=f"Cannot read {file_path}. Is the file open in an alternative app?", source=remove_files.__name__)
                 else:
                     pass
 

@@ -78,7 +78,7 @@ def multiply_ROIs(config_path: Union[str, os.PathLike],
 
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
     :param Union[str, os.PathLike] filename: Path to video in project for which ROIs should be duplicated in the other videos in the project
-    :return: None
+    :return: None. The results are stored in the ``/project_folder/logs/measures\ROI_definitions.h5`` of the SimBA project
 
     :example:
     >>> multiply_ROIs(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", filename=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_CNO_0514.mp4")
