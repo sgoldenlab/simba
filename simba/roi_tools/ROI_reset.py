@@ -1,14 +1,16 @@
-from typing import Union
 import os
 from tkinter import *
+from typing import Union
 
 import pandas as pd
-from simba.utils.enums import ConfigKey, Keys, Paths, Links
+
+from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_valid_dataframe)
+from simba.utils.enums import ConfigKey, Keys, Links, Paths
 from simba.utils.errors import NoROIDataError
 from simba.utils.printing import stdout_trash
 from simba.utils.read_write import get_fn_ext, read_config_file, remove_files
-from simba.utils.checks import check_file_exist_and_readable,check_valid_dataframe
-from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
 
 
 def reset_video_ROIs(config_path: Union[str, os.PathLike],
