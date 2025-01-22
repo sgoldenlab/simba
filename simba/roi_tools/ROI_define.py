@@ -63,7 +63,7 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         self.video_path = video_path
         _, self.file_name, self.file_ext = get_fn_ext(self.video_path)
         self.other_video_paths = list(find_all_videos_in_directory(directory=self.video_dir, as_dict=True).values())
-        self.other_video_paths.remove(video_path)
+        self.other_video_paths = [x for x in self.other_video_paths if x != video_path]
         self.other_video_file_names = []
         for video in self.other_video_paths:
             self.other_video_file_names.append(os.path.basename(video))
@@ -94,7 +94,7 @@ class ROI_definitions(ConfigReader, PopUpMixin):
         self.img_no = 1
         self.duplicate_jump_size = 20
         self.click_sens = 10
-        self.text_size, _, _ = PlottingMixin().get_optimal_font_scales(text='TEN DIGITS', accepted_px_width=int(self.video_info['Resolution_width']/10), accepted_px_height=int(self.video_info['Resolution_height']/10), text_thickness=2, font=cv2.FONT_HERSHEY_SIMPLEX)
+        self.text_size, _, _ = PlottingMixin().get_optimal_font_scales(text='TEN DIGITS', accepted_px_width=int(self.video_info['Resolution_width'].iloc[0]/10), accepted_px_height=int(self.video_info['Resolution_height'].iloc[0]/10), text_thickness=2, font=cv2.FONT_HERSHEY_SIMPLEX)
         self.text_thickness = 2
         self.line_type = -1
         self.named_shape_colors = get_color_dict()

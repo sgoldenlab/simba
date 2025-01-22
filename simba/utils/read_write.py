@@ -775,6 +775,36 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
     return img
 
 
+def read_img(img_path: Union[str, os.PathLike],
+             greyscale: bool = False,
+             clahe: bool = False,
+             opacity: Optional[float] = None) -> np.ndarray:
+
+    file_ext = get_fn_ext(filepath=img_path)[2].lower()
+    if file_ext not in Options.ALL_IMAGE_FORMAT_OPTIONS.value:
+        raise InvalidFilepathError(
+            msg=f'The image path {img_path} does not have a valid image extension. Got: {file_ext}. Valid: {Options.ALL_IMAGE_FORMAT_OPTIONS.value}',
+            source=read_img.__name__)
+    check_file_exist_and_readable(file_path=img_path)
+    img = cv2.imread(filename=img_path)
+    if opacity is not None:
+        opacity = float(opacity / 100)
+        check_float(name="Opacity", value=opacity, min_value=0.00, max_value=1.00, raise_error=True)
+        opacity = 1 - opacity
+        h, w, clr = img.shape[:3]
+        opacity_image = np.ones((h, w, clr), dtype=np.uint8) * int(255 * opacity)
+        img = cv2.addWeighted(img.astype(np.uint8), 1 - opacity, opacity_image.astype(np.uint8), opacity, 0)
+    if greyscale:
+        if len(img.shape) > 2:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    if clahe:
+        if len(img.shape) > 2:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img = cv2.createCLAHE(clipLimit=2, tileGridSize=(16, 16)).apply(img)
+
+    return img.astype(np.uint8)
+
+
 def find_video_of_file(video_dir: Union[str, os.PathLike],
                        filename: str,
                        raise_error: Optional[bool] = False,

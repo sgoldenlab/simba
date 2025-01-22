@@ -3,20 +3,14 @@ __email__ = "sronilsson@gmail.com"
 
 
 
-
-from tkinter import NW, Label, LabelFrame
-from typing import Dict, Optional, Tuple
-
 import numpy as np
-
+from tkinter import NW, Label, LabelFrame
+from shapely.geometry import Polygon
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.ROI_image import ROI_image_class
-from simba.roi_tools.ROI_size_calculations import (get_ear_tags_for_rectangle,
-                                                   get_half_circle_vertices,
-                                                   get_triangle_vertices,
-                                                   get_vertices_hexagon)
+from simba.roi_tools.ROI_size_calculations import (get_ear_tags_for_rectangle, get_half_circle_vertices, get_triangle_vertices, get_vertices_hexagon)
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, SimbaButton
-from simba.utils.checks import check_int, check_str, check_valid_tuple
+from simba.utils.checks import check_int, check_str
 from simba.utils.enums import Formats
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import get_color_dict
@@ -53,7 +47,7 @@ class DrawFixedROIPopUp(PopUpMixin):
         self.clr_drpdwn.setChoices('Red')
         self.thickness_drpdwn = DropDownMenu(self.settings_frm, 'THICKNESS:', THICKNESS_OPTIONS, 10)
         self.thickness_drpdwn.setChoices(10)
-        self.eartag_size_drpdwn = DropDownMenu(self.settings_frm, 'EAR TAG SIZE', EAR_TAG_SIZE_OPTIONS, 10)
+        self.eartag_size_drpdwn = DropDownMenu(self.settings_frm, 'EAR TAG SIZE', EAR_TAG_SIZE_OPTIONS, 12)
         self.eartag_size_drpdwn.setChoices(5)
 
         self.settings_frm.grid(row=0, column=0, sticky=NW)
@@ -254,6 +248,7 @@ class DrawFixedROIPopUp(PopUpMixin):
         shape_center = (int(self.img_center[0]) + (self.jump_size*self.shape_cnt), int(self.img_center[1] + (self.jump_size*self.shape_cnt)))
         direction = self.half_circle_direction_drpdwn.getChoices()
         vertices, vertices_dict = get_half_circle_vertices(center=shape_center, radius=radius, direction=direction)
+        shape_center = np.array(Polygon(vertices).centroid.coords)[0].astype(np.int32)
 
         results = {"Video": self.roi_define.file_name,
                    "Shape_type": "Polygon",
@@ -261,8 +256,8 @@ class DrawFixedROIPopUp(PopUpMixin):
                    "Color name": self.clr_name,
                    "Color BGR": self.clrs_dict[self.clr_name],
                    "Thickness": self.thickness,
-                    "Center_X": shape_center[0],
-                    "Center_Y": shape_center[1],
+                    "Center_X": vertices_dict['Center_tag'][0],
+                    "Center_Y": vertices_dict['Center_tag'][1],
                     "vertices": vertices,
                     "Tags": vertices_dict,
                     "Ear_tag_size": self.ear_tag_size}

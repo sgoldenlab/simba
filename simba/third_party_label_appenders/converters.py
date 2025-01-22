@@ -24,12 +24,12 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.image_mixin import ImageMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_dir_exists,
+                                check_if_dir_exists, check_str,
                                 check_if_keys_exist_in_dict,
                                 check_if_valid_img, check_int,
                                 check_valid_array, check_valid_boolean,
                                 check_valid_dict, check_valid_tuple)
-from simba.utils.enums import Formats
+from simba.utils.enums import Formats, Options
 from simba.utils.errors import InvalidInputError, NoFilesFoundError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (copy_files_to_directory,
@@ -222,7 +222,6 @@ def b64_to_arr(img_b64) -> np.ndarray:
     f.write(base64.b64decode(img_b64))
     img_arr = np.array(Image.open(f))
     return img_arr
-
 
 
 def arr_to_b64(x: np.ndarray) -> str:
@@ -824,6 +823,41 @@ def yolo_obb_data_to_bounding_box(center_x: float, center_y: float, width: float
     return box.astype(np.int32)
 
 
+def labelme_to_img_dir(labelme_dir: Union[str, os.PathLike],
+                       img_dir: Union[str, os.PathLike],
+                       img_format: str = 'png') -> None:
+
+    """
+    Given a directory of labelme JSON annotations, extract the images from the JSONs in b64 format and store them as images in a directory
+
+    :param labelme_dir: Directory containing labelme json annotations.
+    :param img_dir: Directory where to store the images.
+    :param img_format: Format in which to save the images.
+    :return: None
+
+    :example:
+    >>> labelme_to_img_dir(img_dir=r"C:\troubleshooting\coco_data\labels\train_images", labelme_dir=r'C:\troubleshooting\coco_data\labels\train_')
+    """
+
+    timer = SimbaTimer(start=True)
+    check_if_dir_exists(in_dir=labelme_dir)
+    check_if_dir_exists(in_dir=img_dir)
+    check_str(name=f'{labelme_to_img_dir.__name__} img_format', value=f'.{img_format}', options=Options.ALL_IMAGE_FORMAT_OPTIONS.value)
+    img_format = f'.{img_format}'
+    annotation_paths = find_files_of_filetypes_in_directory(directory=labelme_dir, extensions=['.json'], raise_error=True)
+    for file_cnt, annot_path in enumerate(annotation_paths):
+        with open(annot_path) as f: annot_data = json.load(f)
+        check_if_keys_exist_in_dict(data=annot_data, key=['shapes', 'imageData', 'imagePath'], name=annot_path)
+        img_name = os.path.basename(annot_data['imagePath'])
+        print(f'Reading image {file_cnt+1}/{len(annotation_paths)} ({img_name})...')
+        img = b64_to_arr(annot_data['imageData'])
+        save_path = os.path.join(img_dir, f'{img_name}{img_format}')
+        cv2.imwrite(filename=save_path, img=img)
+    timer.stop_timer()
+    stdout_success(msg=f'{len(annotation_paths)} images saved in {img_dir}.', elapsed_time=timer.elapsed_time_str)
+
+
+#labelme_to_img_dir(img_dir=r"C:\troubleshooting\coco_data\labels\train_images", labelme_dir=r'C:\troubleshooting\coco_data\labels\train_')
 
 
 

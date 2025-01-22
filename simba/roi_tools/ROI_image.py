@@ -286,11 +286,11 @@ class ROI_image_class:
 
     def initiate_draw(self, draw_dict):
         self.draw_info = draw_dict
-        if self.draw_info["Shape_type"] is "rectangle":
+        if self.draw_info["Shape_type"] == "rectangle":
             self.draw_rectangle(self.draw_info)
-        if self.draw_info["Shape_type"] is "circle":
+        if self.draw_info["Shape_type"] == "circle":
             self.draw_circle(self.draw_info)
-        if self.draw_info["Shape_type"] is "polygon":
+        if self.draw_info["Shape_type"] == "polygon":
             self.draw_polygon()
 
         self.all_shape_names = []
@@ -609,42 +609,17 @@ class ROI_image_class:
             self.no_shapes += 1
             pts = np.array(pg["vertices"]).reshape((-1, 1, 2))
             try:
-                cv2.polylines(
-                    self.working_frame,
-                    [pts],
-                    True,
-                    pg["Color BGR"],
-                    int(pg["Thickness"]),
-                    lineType=self.line_type,
-                )
+                cv2.polylines(self.working_frame, [pts], True, pg["Color BGR"], int(pg["Thickness"]), lineType=self.line_type)
             except cv2.error as e:
-                cv2.polylines(
-                    self.working_frame,
-                    [pts],
-                    True,
-                    pg["Color BGR"],
-                    int(pg["Thickness"]),
-                    lineType=4,
-                )
+                cv2.polylines(self.working_frame, [pts], True, pg["Color BGR"], int(pg["Thickness"]), lineType=4)
 
             if ROI_ear_tags is True:
                 for p in pg["Tags"]:
                     try:
-                        cv2.circle(
-                            self.working_frame,
-                            p,
-                            int(pg["Ear_tag_size"]),
-                            self.colors[pg["Color name"]],
-                            -1,
-                        )
+                        cv2.circle(self.working_frame, p, int(pg["Ear_tag_size"]), self.colors[pg["Color name"]], -1)
                     except:
-                        cv2.circle(
-                            self.working_frame,
-                            tuple(pg["Tags"][p]),
-                            int(pg["Ear_tag_size"]),
-                            self.colors[pg["Color name"]],
-                            -1,
-                        )
+                        cv2.circle(self.working_frame, tuple(pg["Tags"][p]), int(pg["Ear_tag_size"]), self.colors[pg["Color name"]], -1)
+
             if show_size_info is True:
                 area_cm = self.polygon_size_dict["Polygons"][pg["Name"]]["area_cm"]
                 self.working_frame = PlottingMixin().put_text(img=self.working_frame, text=f'AREA: {str(area_cm)}', pos=(pg["Center_X"], pg["Center_Y"]), font_size=self.text_size, font_thickness=self.text_thickness, font=cv2.FONT_HERSHEY_SIMPLEX, text_color=self.colors[pg["Color name"]])

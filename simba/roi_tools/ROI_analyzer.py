@@ -166,7 +166,6 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                                     if event_pose.shape[0] > 1:
                                         distance, velocity = (FeatureExtractionSupplemental.distance_and_velocity(x=event_pose, fps=self.fps, pixels_per_mm=pix_per_mm, centimeters=True))
                                         distances.append(distance)
-                                        print(distances, velocity)
                                         velocities.append(velocity)
                                 self.movements_df.loc[len(self.movements_df)] = [video_name, animal_name, roi_name, "Movement (cm)", sum(distances)]
                                 self.movements_df.loc[len(self.movements_df)] = [video_name, animal_name, roi_name, "Average velocity (cm/s)", np.average(velocities)]

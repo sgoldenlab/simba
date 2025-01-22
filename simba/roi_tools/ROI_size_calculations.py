@@ -1,13 +1,12 @@
 __author__ = "Simon Nilsson"
 __email__ = "sronilsson@gmail.com"
 
-
-
 import math
 from typing import Dict, Optional, Tuple, Union
 
 import numpy as np
 from scipy.spatial import ConvexHull
+from shapely.geometry import Polygon
 
 from simba.utils.checks import check_int, check_str, check_valid_tuple
 from simba.utils.enums import Formats
@@ -105,7 +104,9 @@ def get_half_circle_vertices(center: Tuple[int, int],
         a = np.linspace(np.pi, 2 * np.pi, n_points)
     x, y = x_c + radius * np.cos(a), y_c + radius * np.sin(a)
     vertices = np.column_stack((x, y)).astype(np.int32)
-    vertices_dict = {"Center_tag": (center[0], center[1])}
+    shape_center = np.array(Polygon(vertices).centroid.coords)[0].astype(np.int32)
+    vertices_dict = {"Center_tag": (shape_center[0], shape_center[1])}
+
     for tag_id in range(vertices.shape[0]):
         vertices_dict[f"Tag_{tag_id}"] = (vertices[tag_id][0], vertices[tag_id][1])
     return (np.array(vertices).astype("int32"), vertices_dict)
