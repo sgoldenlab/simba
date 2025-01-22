@@ -24,9 +24,9 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.image_mixin import ImageMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_dir_exists, check_str,
+                                check_if_dir_exists,
                                 check_if_keys_exist_in_dict,
-                                check_if_valid_img, check_int,
+                                check_if_valid_img, check_int, check_str,
                                 check_valid_array, check_valid_boolean,
                                 check_valid_dict, check_valid_tuple)
 from simba.utils.enums import Formats, Options
