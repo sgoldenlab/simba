@@ -24,7 +24,6 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.video_processors.video_processing import crop_video
 
 
-
 class MultiCropper(object):
     """
     Crop each video of a specific file format (e.g., mp4) in a directory into N smaller cropped videos.
@@ -106,7 +105,10 @@ class MultiCropper(object):
                 roi_selector = ROISelector(path=img, title=f"VIDEO IMAGE")
                 roi_selector.run()
                 cv2.destroyAllWindows()
-                self.crop_df.loc[len(self.crop_df)] = [video_path, roi_selector.height, roi_selector.width, roi_selector.top_left[0], roi_selector.top_left[1]]
+                if roi_selector.complete:
+                    self.crop_df.loc[len(self.crop_df)] = [video_path, roi_selector.height, roi_selector.width, roi_selector.top_left[0], roi_selector.top_left[1]]
+                else:
+                    break
 
         self.__test_crop_locations()
         cv2.destroyAllWindows()

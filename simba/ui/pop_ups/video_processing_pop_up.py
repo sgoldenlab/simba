@@ -120,31 +120,36 @@ class CLAHEPopUp(PopUpMixin):
 
 class CropVideoPopUp(PopUpMixin):
     def __init__(self):
-        super().__init__(title="CROP SINGLE VIDEO")
-        crop_video_lbl_frm = LabelFrame( self.main_frm, text="Crop Video", font=Formats.FONT_HEADER.value)
-        selected_video = FileSelect(crop_video_lbl_frm, "Video path", title="Select a video file", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
-
+        super().__init__(title="CROP VIDEO(S)")
+        crop_video_lbl_frm = LabelFrame( self.main_frm, text="CROP SINGLE VIDEO", font=Formats.FONT_HEADER.value)
+        selected_video = FileSelect(crop_video_lbl_frm, "VIDEO PATH: ", title="Select a video file", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         use_gpu_cb_single, use_gpu_var_single = SimbaCheckbox(parent=crop_video_lbl_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
         button_crop_video_single = SimbaButton(parent=crop_video_lbl_frm, txt="CROP SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=crop_single_video, cmd_kwargs={'file_path': lambda: selected_video.file_path, 'gpu': lambda: use_gpu_var_single.get()})
-        crop_video_lbl_frm_multiple = LabelFrame(self.main_frm, text="Fixed coordinates crop for multiple videos", font=Formats.FONT_HEADER.value, padx=5, pady=5)
-        input_folder = FolderSelect(crop_video_lbl_frm_multiple, "Video directory:", title="Select Folder with videos", lblwidth=20)
-        output_folder = FolderSelect(crop_video_lbl_frm_multiple,"Output directory:",title="Select a folder for your output videos",lblwidth=20)
 
+
+        crop_video_lbl_frm_multiple = LabelFrame(self.main_frm, text="CROP MULTIPLE VIDEOS", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        instructions_1 = Label(crop_video_lbl_frm_multiple, text="The crop coordinates you draw in the first video,\n will be applied on all videos in directory.", font=Formats.FONT_REGULAR.value)
+        instructions_2 = Label(crop_video_lbl_frm_multiple, text="To draw crop coordinates on each individual video,\n instead use SimBA batch processing.", font=Formats.FONT_REGULAR.value)
+        input_folder = FolderSelect(crop_video_lbl_frm_multiple, "VIDEO DIRECTORY:", title="Select Folder with videos", lblwidth=20)
+        output_folder = FolderSelect(crop_video_lbl_frm_multiple,"OUTPUT DIRECTORY:",title="Select a folder for your output videos",lblwidth=20)
         use_gpu_cb_multiple, use_gpu_var_multiple = SimbaCheckbox(parent=crop_video_lbl_frm_multiple, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
         button_crop_video_multiple = SimbaButton(parent=crop_video_lbl_frm_multiple, txt="CROP VIDEO DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=crop_multiple_videos, cmd_kwargs={'directory_path': lambda:input_folder.folder_path, 'output_path': lambda:output_folder.folder_path,  'gpu': use_gpu_var_multiple.get()})
+
         crop_video_lbl_frm.grid(row=0, sticky=NW)
         selected_video.grid(row=0, sticky=NW)
         use_gpu_cb_single.grid(row=1, column=0, sticky=NW)
         button_crop_video_single.grid(row=2, sticky=NW)
+
         crop_video_lbl_frm_multiple.grid(row=1, sticky=NW)
-        input_folder.grid(row=0, sticky=NW)
-        output_folder.grid(row=1, sticky=NW)
-        use_gpu_cb_multiple.grid(row=2, sticky=NW)
-        button_crop_video_multiple.grid(row=3, sticky=NW)
+        instructions_1.grid(row=0, sticky=NW)
+        instructions_2.grid(row=1, sticky=NW)
+        input_folder.grid(row=2, sticky=NW)
+        output_folder.grid(row=3, sticky=NW)
+        use_gpu_cb_multiple.grid(row=4, sticky=NW)
+        button_crop_video_multiple.grid(row=5, sticky=NW)
         self.main_frm.mainloop()
 
 #_ = CropVideoPopUp()
-
 
 class ClipVideoPopUp(PopUpMixin):
     def __init__(self):

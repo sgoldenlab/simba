@@ -61,7 +61,7 @@ from simba.utils.read_write import (
     read_img_batch_from_video_gpu)
 from simba.utils.warnings import (FileExistWarning, FrameRangeWarning,
                                   InValidUserInputWarning,
-                                  SameInputAndOutputWarning, CropWarning)
+                                  SameInputAndOutputWarning, CropWarning, FFMpegCodecWarning)
 from simba.video_processors.extract_frames import video_to_frames
 from simba.video_processors.roi_selector import ROISelector
 from simba.video_processors.roi_selector_circle import ROISelectorCircle
@@ -1360,44 +1360,24 @@ def crop_single_video(file_path: Union[str, os.PathLike], gpu: Optional[bool] = 
 
     check_ffmpeg_available(raise_error=True)
     if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(
-            msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None",
-            source=crop_single_video.__name__,
-        )
+        raise FFMPEGCodecGPUError(msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None", source=crop_single_video.__name__)
     check_file_exist_and_readable(file_path=file_path)
     _ = get_video_meta_data(video_path=file_path)
     dir_name, file_name, ext = get_fn_ext(filepath=file_path)
     roi_selector = ROISelector(path=file_path)
     roi_selector.run()
-    if (
-        (roi_selector.top_left[0] < 0)
-        or (roi_selector.top_left[1] < 0)
-        or (roi_selector.bottom_right[0] < 0)
-        or (roi_selector.bottom_right[1] < 1)
-    ):
-        raise CountError(
-            msg="CROP FAILED: Cannot use negative crop coordinates.",
-            source=crop_multiple_videos.__name__,
-        )
+    if ((roi_selector.top_left[0] < 0) or (roi_selector.top_left[1] < 0) or (roi_selector.bottom_right[0] < 0) or (roi_selector.bottom_right[1] < 1)):
+        raise CountError( msg="CROP FAILED: Cannot use negative crop coordinates.", source=crop_multiple_videos.__name__)
     save_path = os.path.join(dir_name, f"{file_name}_cropped.mp4")
     if os.path.isfile(save_path):
-        raise FileExistError(msg=f"SIMBA ERROR: The out file  already exist: {save_path}.", source=crop_single_video.__name__,
-        )
+        raise FileExistError(msg=f"SIMBA ERROR: The out file  already exist: {save_path}.", source=crop_single_video.__name__)
     timer = SimbaTimer(start=True)
-    if gpu:
-        command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "crop={roi_selector.width}:{roi_selector.height}:{roi_selector.top_left[0]}:{roi_selector.top_left[1]}" -c:v h264_nvenc -c:a copy "{save_path}"'
-    else:
-        command = f'ffmpeg -y -i "{file_path}" -vf "crop={roi_selector.width}:{roi_selector.height}:{roi_selector.top_left[0]}:{roi_selector.top_left[1]}" -c:v libx264 -crf 17 -c:a copy "{save_path}"'
-    subprocess.call(command, shell=True)
+    crop_video(video_path=file_path, save_path=save_path, size=(roi_selector.width, roi_selector.height), top_left=(roi_selector.top_left[0], roi_selector.top_left[1]), gpu=gpu, verbose=False)
     timer.stop_timer()
-    stdout_success(
-        f"Video {file_name} cropped and saved at {save_path}",
-        elapsed_time=timer.elapsed_time_str,
-        source=crop_single_video.__name__,
-    )
+    stdout_success(msg=f"Video {file_name} cropped and saved at {save_path}", elapsed_time=timer.elapsed_time_str, source=crop_single_video.__name__)
 
 
-# _ = crop_single_video(file_path='/Users/simon/Desktop/envs/troubleshooting/ARES_data/Termite Test 1/Termite Test 1.mp4')
+#_ = crop_single_video(file_path=r"C:\troubleshooting\mitra\test\501_MA142_Gi_Saline_0515.mp4", gpu=False)
 
 # crop_single_video(file_path=r'C:\Users\Nape_Computer_2\Desktop\test_videos\Box1_PM2_day_5_20211104T171021.mp4', gpu=False)
 
@@ -1415,94 +1395,43 @@ def crop_multiple_videos(directory_path: Union[str, os.PathLike], output_path: U
     :param Union[str, os.PathLike] directory_path: Directory containing input videos.
     :param Union[str, os.PathLike] output_path: Directory where to save the cropped videos.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
-    :returns: None. Results are stores in passed ``output_path``.
+    :returns: None. Results are stored in passed ``output_path``.
 
     :example:
     >>> _ = crop_multiple_videos(directory_path='project_folder/videos', output_path='project_folder/videos/my_new_folder')
+    >>> _ = crop_multiple_videos(directory_path=r'C:\troubleshooting\mitra\test', output_path=r'C:\troubleshooting\mitra\test\cropped', gpu=True)
     """
 
     check_ffmpeg_available(raise_error=True)
     if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(
-            msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None",
-            source=crop_multiple_videos.__name__,
-        )
-    if not os.path.isdir(directory_path):
-        raise NotDirectoryError(
-            msg="SIMBA ERROR: {} is not a valid directory".format(directory_path),
-            source=crop_multiple_videos.__name__,
-        )
-    video_paths = []
-    file_paths_in_folder = [
-        f for f in glob.glob(directory_path + "/*") if os.path.isfile(f)
-    ]
-    for file_path in file_paths_in_folder:
-        _, _, ext = get_fn_ext(filepath=file_path)
-        if ext.lower() in Options.ALL_VIDEO_FORMAT_OPTIONS.value:
-            video_paths.append(file_path)
-    if len(video_paths) < 1:
-        raise NoFilesFoundError(
-            msg="SIMBA ERROR: No files with .mp4, .avi, .mov, .flv file ending found in the {} directory".format(
-                directory_path
-            ),
-            source=crop_multiple_videos.__name__,
-        )
-    roi_selector = ROISelector(path=file_paths_in_folder[0])
+        raise FFMPEGCodecGPUError(msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None", source=crop_multiple_videos.__name__)
+    check_if_dir_exists(in_dir=directory_path)
+    check_if_dir_exists(in_dir=output_path)
+    check_valid_boolean(value=[gpu], source=crop_multiple_videos.__name__)
+    if gpu and not check_nvidea_gpu_available():
+        raise FFMPEGCodecGPUError(msg='Cannot crop using GPU. No GPU detected through FFMPEG', source=crop_multiple_videos.__name__)
+    video_paths = find_all_videos_in_directory(directory=directory_path, as_dict=True, raise_error=True)
+    video_paths = list(video_paths.values())
+    roi_selector = ROISelector(path=video_paths[0])
     roi_selector.run()
-    if (roi_selector.width == 0 and roi_selector.height == 0) or (
-        roi_selector.width
-        + roi_selector.height
-        + roi_selector.top_left[0]
-        + roi_selector.top_left[1]
-        == 0
-    ):
-        raise CountError(
-            msg="CROP FAILED: Cropping height and width are both 0. Please try again.",
-            source=crop_multiple_videos.__name__,
-        )
-    if (
-        (roi_selector.top_left[0] < 0)
-        or (roi_selector.top_left[1] < 0)
-        or (roi_selector.bottom_right[0] < 0)
-        or (roi_selector.bottom_right[1] < 1)
-    ):
-        raise CountError(
-            msg="CROP FAILED: Cannot use negative crop coordinates.",
-            source=crop_multiple_videos.__name__,
-        )
+    if (roi_selector.width == 0 and roi_selector.height == 0) or (roi_selector.width + roi_selector.height + roi_selector.top_left[0] + roi_selector.top_left[1] == 0):
+        raise CountError(msg="CROP FAILED: Cropping height and width are both 0. Please try again.", source=crop_multiple_videos.__name__)
+    if ((roi_selector.top_left[0] < 0) or (roi_selector.top_left[1] < 0) or (roi_selector.bottom_right[0] < 0) or (roi_selector.bottom_right[1] < 1)):
+        raise CountError(msg=f"CROP FAILED: Cannot use negative crop coordinates. Got top_left: {roi_selector.top_left}, bottom_right: {roi_selector.bottom_right}", source=crop_multiple_videos.__name__)
     timer = SimbaTimer(start=True)
     for file_cnt, file_path in enumerate(video_paths):
         video_timer = SimbaTimer(start=True)
         dir_name, file_name, ext = get_fn_ext(filepath=file_path)
-        print(f"Cropping video {file_name}...")
+        print(f"Cropping video {file_name} ({file_cnt+1}/{len(video_paths)})...")
         video_meta_data = get_video_meta_data(file_path)
-        if (roi_selector.bottom_right[0] > video_meta_data["width"]) or (
-            roi_selector.bottom_right[1] > video_meta_data["height"]
-        ):
-            raise InvalidInputError(
-                msg=f'Cannot crop video {file_name} of size {video_meta_data["resolution_str"]} at location top left: {roi_selector.top_left}, bottom right: {roi_selector.bottom_right}',
-                source=crop_multiple_videos.__name__,
-            )
-        save_path = os.path.join(output_path, file_name + "_cropped.mp4")
-        if gpu:
-            command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "crop={roi_selector.width}:{roi_selector.height}:{roi_selector.top_left[0]}:{roi_selector.top_left[1]}" -c:v h264_nvenc -c:a copy "{save_path}" -y'
-        else:
-            command = f'ffmpeg -i "{file_path}" -vf "crop={roi_selector.width}:{roi_selector.height}:{roi_selector.top_left[0]}:{roi_selector.top_left[1]}" -c:v libx264 -crf 17 -c:a copy "{save_path}" -y'
-        subprocess.call(command, shell=True)
+        if (roi_selector.bottom_right[0] > video_meta_data["width"]) or (roi_selector.bottom_right[1] > video_meta_data["height"]):
+            raise InvalidInputError(msg=f'Cannot crop video {file_name} of size {video_meta_data["resolution_str"]} at location top left: {roi_selector.top_left}, bottom right: {roi_selector.bottom_right}', source=crop_multiple_videos.__name__)
+        save_path = os.path.join(output_path, f"{file_name}_cropped.mp4")
+        crop_video(video_path=file_path, save_path=save_path, size=(roi_selector.width, roi_selector.height), top_left=(roi_selector.top_left[0], roi_selector.top_left[1]), gpu=gpu, verbose=False)
         video_timer.stop_timer()
-        print(
-            f"Video {file_name} cropped (Video {file_cnt+1}/{len(video_paths)}, elapsed time: {video_timer.elapsed_time_str})"
-        )
+        print(f"Video {file_name} cropped (Video {file_cnt+1}/{len(video_paths)}, elapsed time: {video_timer.elapsed_time_str})")
     timer.stop_timer()
-    stdout_success(
-        msg=f"{str(len(video_paths))} videos cropped and saved in {directory_path} directory",
-        elapsed_time=timer.elapsed_time_str,
-        source=crop_multiple_videos.__name__,
-    )
-
-
-# _ = crop_multiple_videos(directory_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos', output_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/test/test')
-
+    stdout_success(msg=f"{str(len(video_paths))} videos cropped and saved in {directory_path} directory", elapsed_time=timer.elapsed_time_str, source=crop_multiple_videos.__name__,)
 
 def frames_to_movie(directory: Union[str, os.PathLike],
                     fps: int,
@@ -1614,35 +1543,33 @@ def video_concatenator(video_one_path: Union[str, os.PathLike],
     print(f"Concatenating videos {file_name_1} and {file_name_2}...")
     save_path = os.path.join(dir, f"{file_name_1}_{file_name_2}_concat.mp4")
     if horizontal:
-        if gpu:
-            cmd = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{video_one_path}" -hwaccel auto -c:v h264_cuvid -i "{video_two_path}" -filter_complex "[0:v]scale=-1:{video_meta_data["height"]}[v0];[v0][1:v]hstack=inputs=2" -c:v h264_nvenc "{save_path}" -hide_banner -loglevel error -stats -y'
-        else:
-            cmd = (f'ffmpeg -y -i "{video_one_path}" -i "{video_two_path}" '
+        cpu_cmd = (f'ffmpeg -y -i "{video_one_path}" -i "{video_two_path}" '
                    f'-filter_complex "[0:v]scale=ceil(iw/2)*2:{video_meta_data["height"]}[v0];'
                    f'[1:v]scale=ceil(iw/2)*2:{video_meta_data["height"]}[v1];'
                    f'[v0][v1]hstack=inputs=2" "{save_path}" -hide_banner -loglevel error -stats -y')
+        gpu_cmd = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{video_one_path}" -hwaccel auto -c:v h264_cuvid -i "{video_two_path}" -filter_complex "[0:v]scale=-1:{video_meta_data["height"]}[v0];[v0][1:v]hstack=inputs=2" -c:v h264_nvenc "{save_path}" -hide_banner -loglevel debug -stats -y'
     else:
-        if gpu:
-            cmd = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{video_one_path}" -hwaccel auto -c:v h264_cuvid -i "{video_two_path}" -filter_complex "[0:v]scale={video_meta_data["width"]}:-1[v0];[v0][1:v]vstack=inputs=2" -c:v h264_nvenc "{save_path}" -hide_banner -loglevel error -stats -y'
-        else:
-            cmd = (f'ffmpeg -y -i "{video_one_path}" -i "{video_two_path}" '
+        cpu_cmd = (f'ffmpeg -y -i "{video_one_path}" -i "{video_two_path}" '
                    f'-filter_complex "[0:v]scale={video_meta_data["width"]}:-1[v0];'
                    f'[1:v]scale={video_meta_data["width"]}:-1[v1];'
                    f'[v0][v1]vstack=inputs=2" "{save_path}" -hide_banner -loglevel error -stats -y')
+        gpu_cmd = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{video_one_path}" -hwaccel auto -c:v h264_cuvid -i "{video_two_path}" -filter_complex "[0:v]scale={video_meta_data["width"]}:-1[v0];[v0][1:v]vstack=inputs=2" -c:v h264_nvenc "{save_path}" -hide_banner -loglevel error -stats -y'
     if gpu:
-        process = subprocess.Popen(cmd, shell=True)
-        output, error = process.communicate()
-        if process.returncode != 0:
-            if "Unknown decoder" in str(error.split(b"\n")[-2]):
-                raise FFMPEGCodecGPUError(msg="GPU codec not found: reverting to CPU. Properly configure FFMpeg and ensure you have GPU available or use CPU.", source=video_concatenator.__name__)
-            else:
-                raise FFMPEGCodecGPUError(msg="GPU error. Properly configure FFMpeg and ensure you have GPU available, or use CPU.", source=video_concatenator.__name__)
-        else:
-            pass
+        try:
+            subprocess.run(gpu_cmd, check=True, shell=True)
+        except subprocess.CalledProcessError as e:
+            print(e.args)
+            FFMpegCodecWarning(msg=f'GPU concatenation for video {video_meta_data["video_name"]} failed, reverting to CPU', source=video_concatenator.__name__)
+            subprocess.call(cpu_cmd, shell=True)
     else:
-        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+        subprocess.call(cpu_cmd, shell=True)
+
     timer.stop_timer()
     stdout_success(msg=f"Videos concatenated and saved at {save_path}", elapsed_time=timer.elapsed_time_str, source=video_concatenator.__name__)
+
+#video_concatenator(video_one_path=r"C:\troubleshooting\mitra\project_folder\frames\output\pose_ex\704_MA115_Gi_CNO_0521_original.mp4", video_two_path=r"C:\troubleshooting\mitra\project_folder\frames\output\pose_ex\test_1.mp4", resolution='video 1', horizontal=True, gpu=True)
+
+
 
 
 # video_concatenator(video_one_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_downsampled.mp4',

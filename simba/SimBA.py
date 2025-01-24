@@ -371,7 +371,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
 
         label_pseudo = CreateLabelFrameWithIcon(parent=tab7,header="PSEUDO-LABELLING",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.PSEUDO_LBL.value)
-        pseudo_intructions_lbl_1 = Label(label_pseudo,text="Note: SimBA pseudo-labelling require initial machine predictions.", font=Formats.FONT_REGULAR.value)
+        pseudo_intructions_lbl_1 = Label(label_pseudo, text="Note: SimBA pseudo-labelling require initial machine predictions.", font=Formats.FONT_REGULAR.value)
         pseudo_intructions_lbl_2 = Label( label_pseudo, text="Click here more information on how to use the SimBA pseudo-labelling interface.", font=Formats.FONT_REGULAR.value, cursor="hand2", fg="blue")
         pseudo_intructions_lbl_2.bind("<Button-1>", lambda e: self.callback("https://github.com/sgoldenlab/simba/blob/master/docs/label_behavior.md"))
         pLabel_framedir = FileSelect(label_pseudo, "Video Path", lblwidth="10")

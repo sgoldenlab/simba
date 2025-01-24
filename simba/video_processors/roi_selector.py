@@ -13,7 +13,7 @@ from simba.utils.read_write import get_fn_ext, get_video_meta_data
 from simba.utils.warnings import CropWarning
 
 
-class ROISelector:
+class ROISelector(object):
     """
     A class for selecting and reflecting Regions of Interest (ROI) in an image.
     The selected region variables are stored in self: top_left, bottom_right, width, height.
@@ -46,6 +46,7 @@ class ROISelector:
         self.roi_end = None
         self.selecting_roi = False
         self.clr = clr
+        self.complete = False
         self.thickness = int(thickness)
 
         if isinstance(path, np.ndarray):
@@ -96,7 +97,6 @@ class ROISelector:
     def run(self):
         cv2.namedWindow(self.title, cv2.WINDOW_NORMAL)
         cv2.setMouseCallback(self.title, self.mouse_callback)
-
         while True:
             if self.selecting_roi or self.img_cpy is None:
                 self.img_cpy = self.image.copy()
@@ -119,6 +119,10 @@ class ROISelector:
                     cv2.waitKey(1)
                     break
 
+            if cv2.getWindowProperty(self.title, cv2.WND_PROP_VISIBLE) < 1:
+                cv2.destroyAllWindows()
+                break
+
     def run_checks(self):
         self.top_left = min(self.roi_start[0], self.roi_end[0]), min(self.roi_start[1], self.roi_end[1])
         self.bottom_right = max(self.roi_start[0], self.roi_end[0]), max(self.roi_start[1], self.roi_end[1])
@@ -136,9 +140,14 @@ class ROISelector:
             self.bottom_right = (self.bottom_right[0], self.h)
         self.width = self.bottom_right[0] - self.top_left[0]
         self.height = self.bottom_right[1] - self.top_left[1]
+        self.complete = True
 
         if (self.width == 0 and self.height == 0) or (self.width + self.height + self.top_left[0] + self.top_left[1] == 0):
             CropWarning(msg="CROP WARNING: Cropping height and width are both 0. Please try again.", source=self.__class__.__name__)
             return False
         else:
             return True
+
+
+# img_selector = ROISelector(path=r"C:\troubleshooting\mitra\test\503_MA109_Gi_CNO_0521.mp4", clr=(0, 255, 0), thickness=2)
+# img_selector.run()
