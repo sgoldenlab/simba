@@ -3,12 +3,17 @@ __email__ = "sronilsson@gmail.com"
 
 
 
-import numpy as np
 from tkinter import NW, Label, LabelFrame
+
+import numpy as np
 from shapely.geometry import Polygon
+
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.ROI_image import ROI_image_class
-from simba.roi_tools.ROI_size_calculations import (get_ear_tags_for_rectangle, get_half_circle_vertices, get_triangle_vertices, get_vertices_hexagon)
+from simba.roi_tools.ROI_size_calculations import (get_ear_tags_for_rectangle,
+                                                   get_half_circle_vertices,
+                                                   get_triangle_vertices,
+                                                   get_vertices_hexagon)
 from simba.ui.tkinter_functions import DropDownMenu, Entry_Box, SimbaButton
 from simba.utils.checks import check_int, check_str
 from simba.utils.enums import Formats
