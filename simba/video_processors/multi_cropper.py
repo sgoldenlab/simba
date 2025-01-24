@@ -14,15 +14,17 @@ try:
 except:
     from typing_extensions import Literal
 
-from simba.utils.checks import check_int, check_str, check_if_dir_exists, check_valid_boolean
-from simba.utils.enums import Formats, Options, TextOptions
-from simba.utils.errors import (CountError)
-from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import get_fn_ext, get_video_meta_data, find_files_of_filetypes_in_directory, read_frm_of_video
-from simba.video_processors.roi_selector import ROISelector
 from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.checks import (check_if_dir_exists, check_int, check_str,
+                                check_valid_boolean)
+from simba.utils.enums import Formats, Options, TextOptions
+from simba.utils.errors import CountError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, get_video_meta_data,
+                                    read_frm_of_video)
+from simba.video_processors.roi_selector import ROISelector
 from simba.video_processors.video_processing import crop_video
-
 
 
 class MultiCropper(object):
