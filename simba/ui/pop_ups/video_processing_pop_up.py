@@ -38,7 +38,7 @@ from simba.utils.errors import (CountError, DuplicationError,
                                 NoChoosenClassifierError, NoFilesFoundError,
                                 NotDirectoryError, ResolutionError)
 from simba.utils.lookups import (get_color_dict, get_ffmpeg_crossfade_methods,
-                                 get_fonts)
+                                 get_fonts, percent_to_crf_lookup)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
@@ -612,37 +612,40 @@ class ExtractAllFramesPopUp(PopUpMixin):
 
 class MultiCropPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="MULTI-CROP", size=(500, 300))
-        self.input_folder = FolderSelect(self.main_frm, "Input Video Folder", lblwidth=15)
-        self.output_folder = FolderSelect(self.main_frm, "Output Folder", lblwidth=15)
-        video_options = ["mp4", "avi", "mov", "flv", "m4v"]
-        self.video_type_dropdown = DropDownMenu(self.main_frm, "Video type:", video_options, "15")
-        self.video_type_dropdown.setChoices("mp4")
-        self.crop_cnt_dropdown = DropDownMenu(self.main_frm, "Crop count:", list(range(1, 31)), "15")
-        self.crop_cnt_dropdown.setChoices(2)
 
+        PopUpMixin.__init__(self, title="MULTI-CROP", size=(500, 300))
+        self.input_folder = FolderSelect(self.main_frm, "INPUT VIDEO FOLDER: ", lblwidth=25)
+        self.output_folder = FolderSelect(self.main_frm, "OUTPUT FOLDER: ", lblwidth=25)
+        video_options = Options.ALL_VIDEO_FORMAT_OPTIONS_2.value
+        self.video_type_dropdown = DropDownMenu(self.main_frm, "INPUT VIDEO FORMAT: ", video_options, "25")
+        self.video_type_dropdown.setChoices("mp4")
+        self.crop_cnt_dropdown = DropDownMenu(self.main_frm, "CROPS PER VIDEO: ", list(range(2, 31)), "25")
+        self.crop_cnt_dropdown.setChoices(2)
+        quality_options = list(percent_to_crf_lookup().keys())
+        self.quality_dropdown = DropDownMenu(self.main_frm, "CROP OUTPUT QUALITY: ", quality_options, "25")
+        self.quality_dropdown.setChoices(60)
         self.use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=self.main_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
         self.create_run_frm(run_function=self.run)
         self.input_folder.grid(row=0, sticky=NW)
         self.output_folder.grid(row=1, sticky=NW)
         self.video_type_dropdown.grid(row=2, sticky=NW)
         self.crop_cnt_dropdown.grid(row=3, sticky=NW)
-        self.use_gpu_cb.grid(row=4, sticky=NW)
+        self.quality_dropdown.grid(row=4, sticky=NW)
+        self.use_gpu_cb.grid(row=5, sticky=NW)
         self.create_run_frm(run_function=self.run)
 
     def run(self):
         check_if_dir_exists(in_dir=self.input_folder.folder_path)
         check_if_dir_exists(in_dir=self.output_folder.folder_path)
-        MultiCropper(
-            file_type=self.video_type_dropdown.getChoices(),
-            input_folder=self.input_folder.folder_path,
-            output_folder=self.output_folder.folder_path,
-            crop_cnt=self.crop_cnt_dropdown.getChoices(),
-            gpu=self.use_gpu_var.get(),
-        ).run()
 
+        cropper = MultiCropper(file_type=self.video_type_dropdown.getChoices(),
+                               input_folder=self.input_folder.folder_path,
+                               output_folder=self.output_folder.folder_path,
+                               crop_cnt=int(self.crop_cnt_dropdown.getChoices()),
+                               gpu=self.use_gpu_var.get(),
+                               quality=int(self.quality_dropdown.getChoices()))
+        cropper.run()
 
-# MultiCropPopUp()
 
 
 class ChangeFpsSingleVideoPopUp(PopUpMixin):

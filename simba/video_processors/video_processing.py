@@ -61,7 +61,7 @@ from simba.utils.read_write import (
     read_img_batch_from_video_gpu)
 from simba.utils.warnings import (FileExistWarning, FrameRangeWarning,
                                   InValidUserInputWarning,
-                                  SameInputAndOutputWarning)
+                                  SameInputAndOutputWarning, CropWarning)
 from simba.video_processors.extract_frames import video_to_frames
 from simba.video_processors.roi_selector import ROISelector
 from simba.video_processors.roi_selector_circle import ROISelectorCircle
@@ -1381,9 +1381,7 @@ def crop_single_video(file_path: Union[str, os.PathLike], gpu: Optional[bool] = 
         )
     save_path = os.path.join(dir_name, f"{file_name}_cropped.mp4")
     if os.path.isfile(save_path):
-        raise FileExistError(
-            msg=f"SIMBA ERROR: The out file  already exist: {save_path}.",
-            source=crop_single_video.__name__,
+        raise FileExistError(msg=f"SIMBA ERROR: The out file  already exist: {save_path}.", source=crop_single_video.__name__,
         )
     timer = SimbaTimer(start=True)
     if gpu:
@@ -4653,6 +4651,67 @@ def is_video_seekable(data_path: Union[str, os.PathLike],
             raise FrameRangeError(msg=f'{results} The frames in the videos listed are unreadable. Consider re-encoding these videos.', source=is_video_seekable.__name__)
         else:
             return (False, results)
+
+
+def crop_video(video_path: Union[str, os.PathLike],
+               save_path: Union[str, os.PathLike],
+               size: Tuple[int, int],
+               top_left: Tuple[int, int],
+               gpu: bool = False,
+               verbose: bool = True,
+               quality: int = 60):
+    """
+    Crops a video from the given file at `video_path` and saves the result to `save_path`.
+    Optionally uses GPU acceleration for faster processing, falling back to CPU if GPU fails.
+
+    :param video_path Union[str, os.PathLike]: The path to the input video file to crop. Can be a string or path-like object.
+    :param save_path Union[str, os.PathLike]: The path to save the cropped video file. Can be a string or path-like object.
+    :param size Tuple[int, int]: A tuple (width, height) specifying the size of the output cropped video.
+    :param top_left Tuple[int, int]: A tuple (x, y) specifying the top-left corner of the cropping area.
+    :param gpu bool:  True, attempts to use GPU acceleration for the video cropping. Defaults to False.
+    :param verbose bool: If True, prints progress messages and the elapsed time. Defaults to True.
+    :param quality bool:  The quality of the output video, on a scale from 1 to 100. Defaults to 60 (balances encoding time vs file size).
+    :return: None. The result is saved at `save_path`. If `verbose` is True, prints the elapsed time and success message.
+    """
+
+    timer = SimbaTimer(start=True)
+    if not check_ffmpeg_available():
+        raise FFMPEGNotFoundError(msg="FFMPEG not found on the computer. Install FFMPEG to use the crop videos.", source=crop_video.__name__)
+    check_valid_boolean(value=[gpu], source=f'{crop_video.__name__} gpu')
+    check_valid_boolean(value=[verbose], source=f'{crop_video.__name__} verbose')
+    if gpu and not check_nvidea_gpu_available():
+        raise FFMPEGCodecGPUError(msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None. Try without GPU selection", source=crop_video.__name__)
+    video_meta_data = get_video_meta_data(video_path=video_path)
+    check_int(name=f'{crop_video.__name__} quality', value=quality, min_value=1, max_value=100)
+    quality_lk = {int(k):v for k, v in percent_to_crf_lookup().items()}
+    closest_key = min(quality_lk, key=lambda k: abs(k - quality))
+    quality_code = quality_lk[closest_key]
+    check_if_dir_exists(in_dir=os.path.dirname(save_path))
+    check_valid_tuple(x=size, source=f'{crop_video.__name__} size', accepted_lengths=(2,), valid_dtypes=(int,), min_integer=1)
+    check_valid_tuple(x=top_left, source=f'{crop_video.__name__} top_left', accepted_lengths=(2,), valid_dtypes=(int,), min_integer=0)
+    bottom_right = (int(top_left[0] + size[0]), int(top_left[1] + size[1]))
+    if top_left[0] < 0: top_left = (0, top_left[1])
+    if top_left[1] < 0: top_left = (top_left[0], 0)
+    if bottom_right[0] < 0: bottom_right = (0, bottom_right[1])
+    if bottom_right[1] < 0: bottom_right = (bottom_right[0], 0)
+    if bottom_right[0] > video_meta_data['width']: bottom_right = (video_meta_data['width'], bottom_right[1])
+    if bottom_right[1] > video_meta_data['height']: bottom_right = (bottom_right[0], video_meta_data['height'])
+    width, height = int(bottom_right[0] - top_left[0]), (bottom_right[1] - top_left[1])
+    width, height = (width + 1) // 2 * 2, (height + 1) // 2 * 2
+    top_left_x, top_left_y = top_left[0], top_left[1]
+    gpu_cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{video_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}, format=yuv420p" -c:v h264_nvenc -cq {quality_code} -c:a copy "{save_path}" -hide_banner -loglevel error -stats -y'
+    cpu_cmd = f'ffmpeg -i "{video_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}" -c:v {Formats.BATCH_CODEC.value} -crf {quality_code} -c:a copy "{save_path}" -hide_banner -loglevel error -stats -y'
+    if gpu:
+        try:
+            subprocess.run(gpu_cmd, check=True, shell=True)
+        except subprocess.CalledProcessError as e:
+            CropWarning(msg=f'GPU crop for video {video_meta_data["video_name"]} failed, reverting to CPU. Crop dimensions may be to small for GPU codec.', source=crop_video.__name__)
+            subprocess.call(cpu_cmd, shell=True)
+    else:
+        subprocess.call(cpu_cmd, shell=True)
+    timer.stop_timer()
+    if verbose:
+        stdout_success(msg=f'Cropped video saved at {save_path}', elapsed_time=timer.elapsed_time_str)
 
 # video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped_gantt.mp4',
 #                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped.mp4',

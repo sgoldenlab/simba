@@ -122,7 +122,7 @@ def check_str(name: str,
               value: Any,
               options: Optional[Union[Tuple[Any], List[Any], Iterable[Any]]] = (),
               allow_blank: bool = False,
-              invalid_options: Optional[List[str]] = None,
+              invalid_options: Optional[Union[List[str], Tuple[str]]] = None,
               raise_error: bool = True) -> Tuple[bool, str]:
 
     """
@@ -161,6 +161,9 @@ def check_str(name: str,
             return True, msg
 
     if invalid_options is not None:
+        check_instance(source=f'{name} invalid_options', accepted_types=(tuple, list,), instance=invalid_options)
+        if isinstance(invalid_options, tuple):
+            invalid_options = list(invalid_options)
         check_valid_lst(data=invalid_options, valid_dtypes=(str,), min_len=1)
         if value in invalid_options:
             msg = f"{name} is set to {value} in SimBA, but this is among invalid options: {invalid_options}"

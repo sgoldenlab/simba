@@ -41,7 +41,7 @@ from simba.utils.data import find_frame_numbers_from_time_stamp, create_color_pa
 from simba.utils.enums import Formats
 from simba.utils.errors import (FFMPEGCodecGPUError, InvalidInputError, SimBAGPUError, FrameRangeError)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext, get_video_meta_data, read_img_batch_from_video_gpu, read_df)
+from simba.utils.read_write import (check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext, get_video_meta_data, read_img_batch_from_video_gpu, read_df, get_memory_usage_array)
 
 warnings.simplefilter('ignore', category=NumbaPerformanceWarning)
 
@@ -1216,7 +1216,7 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
                  save_path: Union[str, os.PathLike],
                  circle_size: Optional[int] = None,
                  colors: Optional[str] = 'Set1',
-                 batch_size: int = 1500,
+                 batch_size: int = 750,
                  verbose: bool = True) -> None:
 
     """
@@ -1234,7 +1234,7 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
     :param Union[str, os.PathLike] video_path: Path to a video file where the ``data`` has been pose-estimated.
     :param Union[str, os.PathLike] save_path: Location where to store the output visualization.
     :param Optional[int] circle_size: The size of the circles representing the location of the pose-estimated locations. If None, the optimal size will be inferred as a 100th of the max(resultion_w, h).
-    :param int batch_size: The number of frames to process concurrently on the GPU. Default: 1500. Increase of host and device RAM allows it to improve runtime.
+    :param int batch_size: The number of frames to process concurrently on the GPU. Default: 1500. Increase of host and device RAM allows it to improve runtime. Decrease if you hit memory errors.
 
     :example:
     >>> DATA_PATH = "/mnt/c/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/501_MA142_Gi_CNO_0514.csv"
@@ -1280,19 +1280,24 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
     total_timer = SimbaTimer(start=True)
     for batch_cnt, l in enumerate(range(0, data.shape[0], batch_size)):
         r = min(data.shape[0], l + batch_size - 1)
-        if verbose:
-            print(f'Processing frames {l}-{r} of {data.shape[0]} frames (video: {video_meta_data["video_name"]})...')
+        if verbose: print(f'Processing frames {l}-{r} of {data.shape[0]} frames (video: {video_meta_data["video_name"]})...')
         batch_data = data[l:r + 1]
         batch_n = batch_data.shape[0]
+        if verbose: print(f'Reading frames {l}-{r}...')
         batch_frms = read_img_batch_from_video_gpu(video_path=video_path, start_frm=l, end_frm=r, out_format='array').astype(np.int32)
-        grid_x = math.ceil(batch_frms.shape[0] / THREADS_PER_BLOCK[0])
-        grid_z = math.ceil(batch_n / THREADS_PER_BLOCK[2])
-        bpg = (grid_x, grid_z)
+        if verbose: print(f'Moving frames {l}-{r} to device...')
         img_dev[:batch_n].copy_to_device(batch_frms[:batch_n])
         data_dev[:batch_n] = cuda.to_device(batch_data[:batch_n])
+        del batch_frms; del batch_data
 
+        grid_x = math.ceil(batch_n / THREADS_PER_BLOCK[0])
+        grid_z = math.ceil(batch_n / THREADS_PER_BLOCK[2])
+        bpg = (grid_x, grid_z)
+        if verbose: print(f'Creating frames {l}-{r} ...')
         _pose_plot_kernel[bpg, THREADS_PER_BLOCK](img_dev, data_dev, circle_size_dev, resolution_dev, colors_dev)
+        if verbose: print(f'Moving frames to host {l}-{r} ...')
         batch_frms = img_dev.copy_to_host()
+        if verbose: print(f'Writing frames to host {l}-{r} ...')
         for img_idx in range(0, batch_n):
             video_writer.write(batch_frms[img_idx].astype(np.uint8))
 
@@ -1300,6 +1305,20 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
     total_timer.stop_timer()
     if verbose:
         stdout_success(msg=f'Pose-estimation video saved at {save_path}.', elapsed_time=total_timer.elapsed_time_str)
+
+
+
+# DATA_PATH = "/mnt/c/troubleshooting/RAT_NOR/project_folder/csv/outlier_corrected_movement_location/03152021_NOB_IOT_8.csv"
+# VIDEO_PATH = "/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/03152021_NOB_IOT_8.mp4"
+# SAVE_PATH = "/mnt/c/troubleshooting/mitra/project_folder/frames/output/pose_ex/test.mp4"
+#
+#
+# # DATA_PATH = "/mnt/c/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/501_MA142_Gi_CNO_0514.csv"
+# # VIDEO_PATH = "/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0514.mp4"
+# # SAVE_PATH = "/mnt/c/troubleshooting/mitra/project_folder/frames/output/pose_ex/test.mp4"
+# pose_plotter(data=DATA_PATH, video_path=VIDEO_PATH, save_path=SAVE_PATH, circle_size=10, batch_size=100)
+
+
 
 #
 # #from simba.data_processors.cuda.image import create_average_frm_cupy
