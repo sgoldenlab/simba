@@ -25,9 +25,10 @@ import numpy as np
 from numba import cuda
 from numba.core.errors import NumbaPerformanceWarning
 
-from simba.data_processors.cuda.utils import (_cuda_luminance_pixel_to_grey, _cuda_mse, _is_cuda_available)
-from simba.mixins.plotting_mixin import PlottingMixin
+from simba.data_processors.cuda.utils import (_cuda_luminance_pixel_to_grey,
+                                              _cuda_mse, _is_cuda_available)
 from simba.mixins.image_mixin import ImageMixin
+from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_string_value_is_valid_video_timestamp,
@@ -37,11 +38,16 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_that_hhmmss_start_is_before_end,
                                 check_valid_array, check_valid_boolean,
                                 is_video_color)
-from simba.utils.data import find_frame_numbers_from_time_stamp, create_color_palette
+from simba.utils.data import (create_color_palette,
+                              find_frame_numbers_from_time_stamp)
 from simba.utils.enums import Formats
-from simba.utils.errors import (FFMPEGCodecGPUError, InvalidInputError, SimBAGPUError, FrameRangeError)
+from simba.utils.errors import (FFMPEGCodecGPUError, FrameRangeError,
+                                InvalidInputError, SimBAGPUError)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext, get_video_meta_data, read_img_batch_from_video_gpu, read_df, get_memory_usage_array)
+from simba.utils.read_write import (
+    check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
+    get_memory_usage_array, get_video_meta_data, read_df,
+    read_img_batch_from_video_gpu)
 
 warnings.simplefilter('ignore', category=NumbaPerformanceWarning)
 
