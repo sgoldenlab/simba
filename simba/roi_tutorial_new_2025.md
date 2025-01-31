@@ -131,30 +131,21 @@ Each shape in SimBA has to have a unique name. This name cannot be shared with a
 Once you have defined your shape, it is time to draw it. The methods for drawing the three different shape types (`Rectangle`, `Circle` and `Polygon`) is slightly different from each other and detailed below. However, regardless of the shape type you are currently drawing, begin by clicking on <kbd>DRAW</kbd> button.
   
 ### DRAW RECTANGLE
-To draw a rectangle, click and hold the left mouse button at the top left corner of your rectangle and drag the mouse to the bottom right corner of the rectangle. If you're unhappy with your rectangle, you can start to draw the rectangle again by holding the left mouse button at the top left corner of your, new, revised, rectangle. The previous rectangle will be automatically discarded. When you are happy with your rectangle, **press the keyboard `ESC` button**  to save your rectangle.
+To draw a rectangle, click and hold the left mouse button at the top left corner of your rectangle and drag the mouse to the bottom right corner of the rectangle. If you're unhappy with your rectangle, you can start to draw the rectangle again by holding the left mouse button at the top left corner of your, new, revised, rectangle. The previous rectangle will be automatically discarded. When you are happy with your rectangle, **press the keyboard `ESCAPE` key**  to save your rectangle.
 
->Note: The rectangle will remain blue *while* you drawing it. After you hit `ESC`, the rectangle will take the color you picked in the *Shape color attribute* dropdown menu above.
+[draw_rectangle.webm](https://github.com/user-attachments/assets/1005bca1-7be0-4862-8ce9-f91af0bea398)
 
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Draw_rectangle.gif" />
-</p>
+### DRAW CIRCLE
+Begin by **clicking and holding down** the left mouse button at the center of the circle. Next, drag the mouse, **while holding down the left mouse button**, towards the outer bounds of the circle. Once the circle looks good, **without letting go of the left left mouse button**, hit the **keyboard `ESCAPE` key**. If the circle looks off while you are drawing it: let go of the left mouse button, the circle will dissapear, and you can start again by pressing and holding down the left mouse button at the center of the circle. 
 
-  
-### Circle
-Begin by left mouse clicking on the image where you would like the center of the circle to be. You should see a small filled circle appear where you clicked, with the color selected in the *Shape color attribute* dropdown menu. This circle marks the center location of your circle. Next, left click on the image where you would like the outer bound of the circle to be. You should now see your entire circle ROI.
+[draw_circle.webm](https://github.com/user-attachments/assets/900c30cb-5e42-4ee9-a8a8-1e4b890ed96b)
 
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Draw_circle.gif" />
-</p>
+### DRAW POLYGON 
+Left mouse click on **at least three different locations** in the image that defines the outer bounds of your polygon. You should see filled circles, representing the polygon vertices, and and lines connecting the vertices, appear where you click. Once you are happy with your polygon, hit the **keyboard `ESCAPE` key** and the polygon will appear in full. 
 
-### Polygon
-Left mouse click on at least three different locations in the image that defines the outer bounds of your polygon. You should see a small filled circle appear where you clicked, marking the locations of the polygons outer bounds. When you are happy with your polygons outer bounds, **press the keyboard `ESC` button**  to save your polygon. After you press keyboard `ESC` button, the polygon with its connecting lines should appear. 
+[draw_polygon.webm](https://github.com/user-attachments/assets/35ec9778-0f67-4c6f-bfa1-cfe9d1401516)
 
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Draw_polygon.gif" />
-</p>
-  
-## Shape manipulations
+## SHAPE MANIPULATIONS
 
 SimBA allows several forms of shape manipulations that are described in detail below, this includes:
 
@@ -166,157 +157,103 @@ SimBA allows several forms of shape manipulations that are described in detail b
 
 * [Change the shape of ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#changing-the-shape-of-the-roi) - allows you to change the width and/or hight of a rectangle, radius of a circle, or the locations of the outer bounds of a polygon.
 
-* [Aligning ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#aligning-rois) - allows you to move ROIs while ensuring that they are completely aligned with other ROIs in the image. 
-
-* [Change ROI attributes](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#change-roi-attributes) - allows you to change the name, color or other attributes of an already created ROI.
+* [Drawing shapes of fixed metric sizes](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#change-roi-attributes) - allows you to change the name, color or other attributes of an already created ROI.
   
-### Deleting ROIs
+### DELETING ROIs
 
-* To delete all drawn ROIs, click on `Delete ALL` in the `Draw` sub-menu. 
+* To delete all drawn ROIs, click the <kbd>DELETE ALL</kbd> button in the `DRAW` sub-menu:
 
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Delete_all_shapes.gif" />
-</p>
-  
-* To delete a specific ROI, first use the `Select ROI` dropdown menu in the `Draw` sub-menu to select the ROI you wish to delete. Next, click on the `Delete ROI` button.
+[delete_all.webm](https://github.com/user-attachments/assets/4d8297a3-46b4-46f5-8016-d87f99692410)
 
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Delete_specific_shape.gif" />
-</p>
-  
-### Duplicating ROIs
+* To delete a specific ROI, first use the `ROI` drop-down menu in the `DRAW` sub-menu to select the ROI you wish to delete. Next, click on the <kbd>DELETE SELECTED ROI</kbd> button:
 
-1. To duplicate an already-draw ROI, first use the `Select ROI` dropdown menu in the `Draw` sub-menu to select the ROI you wish to duplicate. Next, click on the `Duplicate ROI` button. A new ROI, with the same dimensions and attributes as the ROI selected in the `Select ROI` dropdown menu, should appear in the frame near the original ROI.
+[delete_selected.webm](https://github.com/user-attachments/assets/8bfe62a0-0361-4481-894e-0f2b422f883f)
+
+### DUPLICATE ROIs
+
+1) To duplicate an already-draw ROI, first use the `ROI` drop-down menu in the `DRAW` sub-menu to select the ROI you wish to duplicate. Next, click on the <kbd>DUPLICATE SELECTED ROI</kbd> button. A new ROI, with the same dimensions and attributes as the ROI selected in the `ROI` drop-down menu, should appear in the frame near the original ROI:
+
+[duplicate_rectangle.webm](https://github.com/user-attachments/assets/3e5af366-ec63-434d-a53e-900d8800b4bf)
+
+2. The duplicated ROI will inherit the name of the original ROI with the `_duplicated` suffix appended to the name. Thus, if you look in the `ROI` dropdown menu, you should see a new ROI with a name in this format: `MY_ROI_NAME_duplicated`. To change this name, and/or any other attribute belonging to this ROI, see the [Change ROI attributes](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#change-roi-attributes) section below. 
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Duplicate_ROI.gif" />
-</p>
-
-2. The first duplicated ROI will inherit the name of the original ROI with `_copy_1` appended (... the second duplicated ROI will inherit the name of the original ROI with `_copy_2` appended etc. Thus, if you look in the `Select ROI` dropdown menu, you should see a new ROI with a name in this format: `My selected shape: MyShapeName_copy_1`. To change this name, and/or other attribute belonging to this ROI, see the [Change ROI attributes](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#change-roi-attributes) below. 
-
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Duplicate_dropdown.png" />
-</p>
-
-### Changing ROI locations
-  
-1. To change the location of an ROI, begin by clicking the `Move shape` button in the `Interaction` sub-menu. Once clicked, the `ear tags` of each shape will be displayed in the left `Define shape` frame window. Rectangles will have 9 ear tags, circles have 2 ear-tags, and polygons have as many ear-tags as there are user-defined outer bounds (plus a **center** ear tag). 
-  
-2. Next, left mouse click on the **center** ear tag of the ROI you wish to move. You should see the entire ROI shape changing its color to **grey** marking that it has been selected.
-  
-3. Next, left mouse click at the new location the where you want your ROI to be located. Once complete, you should see your ROI being displayed in the new location. If you want to move a second ROI shape, go ahead and click on `Move shape` again before clicking on the center tag of the second ROI shape. 
-
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Move_shapes.gif" />
-</p>
-
-  
-### Changing the shape of the ROI
-  
-1. To change the shape of an ROI, begin by clicking the `Move shape` button in the `Interaction` sub-menu. Once clicked, the `ear tags` of each shape will be displayed in the frame window. Again, rectangles will have 9 ear tags, circles have 2 ear-tags, and polygons have as many ear-tags as there are user-defined outer bounds (plus a center ear tag).
-  
-2. Next, left mouse-click on the ear-tag you wish to use to manipulate the ROI. Once you left click on the ear-tag, the part of the ROI shape you are manipulating should change its color to grey. Different ROI ear-tags will help you to manipulate different parts of the ROI. For example:
-  
-    *Rectangles*:
-    
-    - Clicking on the left middle ear-tag of a rectangle allows you to control the location of the left border or the rectangle.
-  
-    - Clicking on the top-left corner ear-tag of a rectangle allows you to control the top border and left border of the rectangle.   
-  
-    - Clicking on the bottom middle ear-tag of a rectangle allows you to control the bottom border or the rectangle. 
-  
-   Circles:
-    - Clicking on the left border ear-tag of a circle allows you to control the radius of the circle. 
-  
-   Polygon:
-    - Clicking on any of the outer bounds of the polygon allows you to control the location of the outer bound in the polygon (i.e., control the two lines connected to the clicked-on ear-tag).
-  
-3. After selecting an ear-tag, left mouse-click at the location where you want the parts you are manipulating to be located. Once you have clicked on the new location, the new ROI shape should be displayed. 
-
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Change_ROI_shapes.gif" />
-</p>
-  
-### Aligning ROIs
-  
-1. To align two ROIs, begin by clicking the `Move shape` button in the `Interaction` sub-menu. Once clicked, the `ear tags` of each shape will be displayed in the frame window. Again, rectangles will have 9 ear tags, circles have 2 ear-tags, and polygons have as many ear-tags as there are user-defined outer bounds (plus a center ear tag).
-  
-2. Next, left mouse-click on the ear-tag you wish to move and make in-alignment with another ROIs ear-tag. Once you left-click on the ear-tag, a successful selection will be highlighted by the ear-tag and its connected lines turning grey.  
-
-3. Next, left mouse-click on the ear-tag of a second ROI representing the line with which you want to align the ROI you selected in `Step 2` above. 
-  
->Note: If you are aligning a **Rectangle or Circle** with a second ROI, then the entire shape will move and the coordinates of the ear-tag selected in `Step 2` will inherit the same coordinates as the ear-tag selected in `Step 3`. If you are aligning a **Polygon** with a second ROI, then only the the ear-tag selected in `Step 2` will move and inherit the same coordinates as the ear-tag selected in `Step 3`. If you want to align several edges a polygon with edges in a second ROI, proceed to repeat `Step 2` and `Step 3` for those additional edges.
-
-
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Align_shapes.gif" />
-</p>
-
-  
-### Change ROI attributes
-
-1. To change the attributes of an already-created ROI, begin by selecting the ROI which attributes you want to change in the `Select ROI` drop-down menu. Next, click on `Change ROI` and a new menu window should pop open. 
-
-2. To change the ROI name, enter a new name in the `Shape name` entry box. To change the ROI shape thickness, ear-tag size, or shape color, use the associated dropdown menus. Once done, click on `Save`. Your ROI with new attributes should show in the left frame and the `Change ROI` attributes menu is closed. 
-
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Change_shape_attr.gif" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/roi_tutorial_5.webp"/>
 </p>
 
 
-## Apply shapes from another video
+### CHANGING ROI LOCATIONS
+  
+1. To change the location of an ROI, begin by clicking the <kbd>MOVE SHAPE</kbd> button in the `SHAPE INTERACTION` sub-menu to enter into **MOVE MODE**. Once clicked, the "EAR TAGS" of each shape will be displayed in the drawing window. Rectangles will have 9 ear tags, circles have 2 ear-tags, and polygons have as many ear-tags as there are user-defined outer bounds (plus a **center** ear tag). 
+  
+2. Next, **click and hold the left mouse button** on the **center** ear tag of the ROI that you wish to move. You should see the entire ROI shape changing its color to **grey**, marking that the entire has been selected (if this grey color is unsutable, not to worry, I will show you how to change it later on). 
+  
+3. Next, **while holding the mouse left button**, drag the mouse cursor to the new location the where you want your ROI to be located. Once in location, **let go of the left mouse button**. You should see your ROI, in its defined color, being displayed in the new location. If you want to change a second ROI location, go ahead and drag the **center** tag for that ROI. 
 
-Sometimes we have created ROIs in one video, saved them, and opened up a second video to start drawing new ROIs on this second video. Now we may want to replicate the ROIs on the first video on the second video, and we can do this with the `Apply shapes from another video` sub-menu. 
+4. Once the ROIs have been moved into their correct location. We need to exit the **MOVE MODE**. Select the `DEFINE SHAPE` window (e.g., by clicking the top bar), and hit the **keyboard `ESCAPE` key**.
 
-1. To duplicate the ROI shapes already defined in a different video on the current video, navigate to the `Select video` dropdown menu in the `Apply shapes from another video` menu. This dropdown menu will show the videos in your SimBA project that has defined ROIs. 
+[move_shapes.webm](https://github.com/user-attachments/assets/7e120954-1ca4-4cf4-af97-36a0393b609c)
 
-2. In this dropdown menu, select the video which has the ROIs you wish to replicate. Once selected, click `Apply`. The ROIs from the video in the `Select video` dropdown menu will appear on the frame.
+### CHANGING ROI SHAPES
+  
+1. To change the shape of an ROI, begin by clicking the <kbd>MOVE SHAPE</kbd> button in the `SHAPE INTERACTION` sub-menu to enter into **MOVE MODE**. Once clicked, the "EAR TAGS" of each shape will be displayed in the drawing window. Rectangles will have 9 ear tags, circles have 2 ear-tags, and polygons have as many ear-tags as there are user-defined outer bounds (plus a **center** ear tag). 
+  
+2. Next, **click and hold the left mouse button** on the edge ear tag which you want to manipulate. Once you ***click and hold the left mouse button** on the ear-tag, the part of the ROI shape you are manipulating changes its color to grey (if this grey color is unsutable, not to worry, I will show you how to change it later on). Different ROI ear-tags will help you to manipulate different parts of the ROI. For example:
+  
+    **Rectangles**:
+    - Clicking and holding the left middle ear-tag of a rectangle allows you to control the location of the left border or the rectangle.
+  
+    - Clicking and holding the top-left corner ear-tag of a rectangle allows you to control the top border and left border of the rectangle.   
+  
+    - Clicking and holding the bottom middle ear-tag of a rectangle allows you to control the bottom border or the rectangle. 
+  
+   **Circles**:
+    - Clicking and holding the left border ear-tag of a circle allows you to control the radius of the circle. 
+  
+   **Circles**:
+    - Clicking and holding the outer bounds of the polygon allows you to control the location of the outer bound in the polygon (i.e., control the two lines connected to the clicked-on ear-tag).
+  
+3. Next, after selecting an ear-tag, **while holding the mouse left button**, drag the mouse cursor to the new location the where you want the edge you are manipulating to be located. Once the edge is in the location you want, **let go of the left mouse button**, and the new ROI shape should be displayed.
+
+4. Finally, once the ROIs have been moved into their correct location. We need to exit the **MOVE MODE**. Select the `DEFINE SHAPE` window (e.g., by clicking the top bar), and hit the **keyboard `ESCAPE` key**.
+
+[change_shapes.webm](https://github.com/user-attachments/assets/0bd0753e-5769-4961-8a82-8ee92881517d)
+   
+### CHANGE ROI ATTRIBUTES
+
+1. To change the attributes of an already-created ROI, click on the <kbd>CHANGE ROI</kbd> button and a pop-up menu will appear. This pop-up menu has a drop-down menu, titled `CHANGE ROI`, which allows you to select the ROI that you want to change.
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Apply_shapes_other_video.gif" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/change_roi_popup.webp"/>
 </p>
 
-## Show shape size information. 
+2. To change the name of the ROI, enter a new name in the `NEW SHAPE NAME` entry box. TO change the color, thickness, or ear-tag size of the shape, use the respective dropdown windows. Once complete, hit the <kbd>SAVE ATTRIBUTES</kbd> button.
 
-Sometimes we need some metrics representing the sizes of the ROIs we have drawn. We can display this by clicking on the `Show shape info.` button located to the right in the `Shape interaction` submenu. 
+[change_attributes.webm](https://github.com/user-attachments/assets/927cd32a-f81d-4002-aa18-869bf97b049d)
+
+## SHOW SHAPE SIZE INFORMATION. 
+
+Sometimes we need some metrics representing the sizes of the ROIs we have drawn. We can display this by clicking on the <kbd>SHOW SHAPE INFO</kbd> button located to the right in the `SHAPE INTERACTION` submenu. 
 
 1. By clicking the `Show shape info.` button, some numbers are displayed inside our ROIs:
 
-  (i). Three numbers are displayed inside each of your drawn **rectangles, representing the length, width and area of the rectangle**
+  (i). One number is displayed inside each of your drawn **rectangles, representing the area cm2 of the rectangle** (based on your pixel per millimeter conversion factor in your `project_folder/logs/video_info.csv`)
   
-  (ii) One number is displayed inside each of your drawn **circles, representing the area of your circle.**
+  (ii) One number is displayed inside each of your drawn **circles, representing the cm radius your circle.** (based on your pixel per millimeter conversion factor in your `project_folder/logs/video_info.csv`)
   
-  (iii) One number is displayed inside each of your drawn **polygons, representing the area of your polygon.**
+  (iii) One number is displayed inside each of your drawn **polygons, representing the area cm2 of your polygon.** (based on your pixel per millimeter conversion factor in your `project_folder/logs/video_info.csv`)
   
-2. When you have clicked the ``Show shape info.` button, the text of the button toggles to `Hide shape info.` Click the button again to hide the shape information. 
+2. When the <kbd>SHOW SHAPE INFO</kbd> button is clicked, the text of the button toggles to <kbd>HIDE SHAPE INFO</kbd>. Click the button again to hide the shape size information. 
 
-3. The font in which the ROI size information is printed on the image might be grainy, too big, or too small, depending on your video resolution. If that is the case, navigate to the `Preference menu` and correct the `Font size` and `Font thickness` to make the font larger or smaller, as in the last half of the gif below. 
-
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/test_9.gif" />
-</p>
-
-
-
-## Delete all ROI definitions in your SimBA project
-
-Somtimes we may want to delete all ROI definitions in a SimBA project and start from scratch.
-
-1. To delete all the ROI definitions in the SimBA projects, click on the `Delete all ROI definitions` under the [ROI] tab in the load project menu, and the following menu should pop open:
-
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_delete.png" />
-</p>
-
-2. Click `Yes` to delete all ROI definitions in a SimBA project. 
-
-
+[show_shape_size.webm](https://github.com/user-attachments/assets/aa253592-fe9a-49b3-ae0c-c80e166c21a4)
 
 ## DRAW SHAPES OF USER-DEFINED METRIC SIZES
 
-First, open the `File (ROI)` drop-down menu at the head of the `Region of interest` window and click the `Draw ROIs of pre-defined sizes` option.
+To draw shapes of specific metric sizes (i.e., specified size in millimeters), first open the `File (ROI)` drop-down menu at the head of the **REGION OF INTEREST (ROI) SETTINGS** menu and click the `Draw ROIs of pre-defined sizes` option:
 
-![predefined_sizes_1](https://github.com/user-attachments/assets/d57d09ee-a909-4ad4-a025-6e54ab00c35a)
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/fix_metric_size.webp"/>
+</p>
 
 Once clicked, you should see the following pop-up opening allowing you to draw a range of different shapes with specified sizes. If you need a shape-type that is missing, consider letting us know through [Gitter](https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im) or by opening en issue on [GithHub](https://github.com/sgoldenlab/simba/issues/new?assignees=&labels=&projects=&template=feature_request.md&title=).
 
@@ -353,6 +290,46 @@ To draw a HALF CIRCLE with a specific radius with its chunky part pointing UP, f
 To draw a HALF CIRCLE with a specific radius with its chunky part pointing LEFT, fill in its metric radius in millimeter, choose `WEST` in the `direction drop-down menu`, and click ``ADD HALF CIRCLE`` as in the video below:
 
 [predefined_sizes_half_circle_west.webm](https://github.com/user-attachments/assets/3127e41f-ca83-4617-8ed8-7d9b6ece4079)
+
+
+
+
+
+
+
+
+
+## Apply shapes from another video
+
+Sometimes we have created ROIs in one video, saved them, and opened up a second video to start drawing new ROIs on this second video. Now we may want to replicate the ROIs on the first video on the second video, and we can do this with the `Apply shapes from another video` sub-menu. 
+
+1. To duplicate the ROI shapes already defined in a different video on the current video, navigate to the `Select video` dropdown menu in the `Apply shapes from another video` menu. This dropdown menu will show the videos in your SimBA project that has defined ROIs. 
+
+2. In this dropdown menu, select the video which has the ROIs you wish to replicate. Once selected, click `Apply`. The ROIs from the video in the `Select video` dropdown menu will appear on the frame.
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/Apply_shapes_other_video.gif" />
+</p>
+
+
+
+
+
+## Delete all ROI definitions in your SimBA project
+
+Somtimes we may want to delete all ROI definitions in a SimBA project and start from scratch.
+
+1. To delete all the ROI definitions in the SimBA projects, click on the `Delete all ROI definitions` under the [ROI] tab in the load project menu, and the following menu should pop open:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_delete.png" />
+</p>
+
+2. Click `Yes` to delete all ROI definitions in a SimBA project. 
+
+
+
+
 
 
 
