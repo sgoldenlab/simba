@@ -33,7 +33,6 @@ Specifically, for working with ROIs in SimBA, begin by
 (iii) [Set the video parameters](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-set-video-parameters), 
 and lastly (iv) [Correct outliers](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-4-outlier-correction) (or click to indicate that you want to *Skip outlier correction* as detailed in the Correct outliers tutorial)
 
-
 > [!NOTE]
 >**A short explanation on what is meant by 
 > "using ROI data as features for random forest classifiers"** When ROIs have been drawn in SimBA, 
@@ -47,94 +46,92 @@ and lastly (iv) [Correct outliers](https://github.com/sgoldenlab/simba/blob/mast
 
 # Part 1. Defining ROIs in SimBA
 
-
-
-
-
 1. In the main SimBA console window, begin loading your project by clicking on `File` and `Load project`. In the **[Load Project]** tab, click on `Browse File` and select the `project_config.ini` that belongs to your project. 
 
-2. Navigate to the **ROI** tab, which should look like the image below (we will be using the menu highted by the red rectangle):
+2. Navigate to the **ROI** tab, which should look like the image below (we will be using the menu highted by the red rectangle and red arrow):
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_1.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/roi_tutorial_1.webp" />
 </p>
 
-3. Next, click on the `Define ROIs` button, and the following table will pop open.
+> [!NOTE]
+> If you have ROIs on some or all the videos in your project, and want to delete your ROI work and start from scratch, use the `Delete all ROIs` button directly below the `Define ROIs` button.
+>  More info at [the end](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#delete-all-roi-definitions-in-your-simba-project) of this tutorial.  
+
+3. Next, we click on the `Define ROIs` button, and the following table will pop open.
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_table.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/roi_tutorial_2.webp" height="600"/>
 </p>
 
-> Note: If you have ROIs on some or all the videos in your project, and want to delete your work and start from scratch, use the `Delete all ROIs` button. More info at [the end](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#delete-all-roi-definitions-in-your-simba-project) of this tutorial.  
+This table contain one row for each of the videos in the project (each video inside the `project_folder/videos directory in the SImBA procet). Each video in the project has three buttons associated with it: **Draw, Reset,** and **Apply to all**. 
+The functions associated with each button is described in detail below. But in brief:
 
-This table contain one row for each of the videos in the project. Each video in the project has three buttons associated with it: **Draw, Reset,** and **Apply to all**. The functions associated with each button is described in detail below. In brief:
+* The <kbd>**Draw**</kbd> button allows you to start to draw ROI shapes on the specific video. If drawings already exist for the specific video, then the <kbd>**Draw**</kbd> buttons opens an interface where you can move, re-define, or add ROI shapes onto the video.  
 
-* The **Draw** button allows you to start to draw ROI shapes on the specific video. If drawings already exist for the specific video, then the **Draw** buttons opens an interface where you can move, re-define, or add ROI shapes on the video.  
+* The <kbd>**Reset**</kbd> button deletes any ROIs made on the specific video and allows you to restart the ROI drawings from scratch by next clicking on the <kbd>**Draw**</kbd> button. 
 
-* The **Reset** button deletes any ROIs made on the specific video and allows you to restart the ROI drawings from scratch by next clicking on the **Draw** button. 
+* The <kbd>**Apply to all**</kbd> buttons copies the ROI drawing made on the specific video and replicates them on all other videos in the project. If a drawing has been applied to all videos videos in the project by clicking on the <kbd>**Apply to all**</kbd> button, then the shapes for any specific video can be moved or re-defined (and new ROI shapes can be added) by clicking on the <kbd>**Draw**</kbd> button.
 
-* The **Apply to all** buttons copies the ROI drawing made on the specific video and replicates it on all other videos in the project. If a drawing has been applied to all videos videos in the project by clicking on the **Apply to all** button, then the shapes for any specific video can be moved or re-defined (and new ROI shapes can be added) by clicking on the **Draw** button.
-
-6. To begin to draw your ROI shapes, click on the **Draw** button for the first video in the table. Once clicked, two windows will pop up that look like this:
+4. To begin to draw your ROI shapes, click on the <kbd>**Draw**</kbd> button for the first video in the table. Once clicked, two windows will pop up that look like this:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_img1.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/roi_tutorial_3.webp"/>
 </p>
 
-The left window (titled *Define shape*) will display the first frame of the video. The right window (titled *Region of Interest Settings*) will contain information, buttons and entry-boxes for creating and manpulating your ROI shapes, and we will go through their function in detail below.  
+The right window (titled **Define shape**) will display the first frame of the video. The left window (titled **REGION OF INTEREST (ROI) SETTINGS**) will contain information, buttons and entry-boxes for creating and manpulating your ROI shapes, and we will go through each of their function in detail below.  
 
->Note: The aesthetics of the menus might look slightly different on your computer (this tutorial was written using MacOS). The functions however are the same regardless of operating system.   
+> [!NOTE]
+> The aesthetics of the menus might look slightly different on your computer (this tutorial was written on a Microsoft Windows computer). The functions, however, are the same regardless of operating system.   
 
+# THE **REGION OF INTEREST (ROI) SETTINGS** WINDOW
 
-# The "Region of Interest Settings" menu
+## VIDEO AND FRAME INFORMATION
 
-## Video Information
+The first top part of the **REGION OF INTEREST (ROI) SETTINGS** menu is titled *VIDEO AND FRAME INFORMATION* and is useful for general troubleshooting. This menu displays the name of the current video, the format of the current video, its frame rate, and the frame number and the timestamp of the frame that is being displayed in the right **Define shape** window. 
 
-The first part of the "Region of Interest Settings" menu is titled *Video Information* and is useful for general troubleshooting. This menu displays the name of the current video, the format of the video, its frame rate, and the frame number and the timestamp of the frame that is being displayed in the left window. 
+## CHANGE IMAGE
 
-## Change image
+Occationally, the very first frame of the video isn't suitable for defining your ROIs and you'd like to use a different frame while drawing. Alternatively, you might want to check how your ROIs look in a different frame of the video. To manipulate the frame being displayed in the **Define shape** window, use the buttons in the **CHANGE IMAGE** menus (see the video below): 
 
-Occationally, the first frame of the video isn't suitable for defining your ROIs and you'd like to use a different frame while drawing. Alternatively, you might want to check how your ROIs look in a different frame of the video. To manipulate the frame being displayed, us the buttons in the *Change image* menu (see gif below): 
+* Click on `+1s` to display a frame one second *later* in the video relative to the frame currently being displayed.
 
-* Click on `+1s` to display a frame one second later in the video than the frame currently being displayed.
+* Click on `-1s` to display a frame one second *earlier* in the video relative to the frame currently displayed. 
 
-* Conversely, clicking on `-1s` will display a frame one second earlier in the video than the frame currently displayed. 
+* If you need move a custom distance forward or backwards in the video, then enter the number of seconds you want to move forward or backward in the `CUSTOM SECONDS` entry box, and either click on the <kbd>FORWARD</kbd> or <kbd>REVERSE</kbd> buttons.
+ 
+* If you want to display the first frame of the video, click on the <kbd>FIRST FRAME</kbd>. If you want to display the last frame of the video, click on the <kbd>LAST FRAME</kbd>.
 
-* If you need move a custom distance forward in the video, then enter the number of seconds you want to move forward in the `Seconds forward` entry box, and then click on the `Move` button. 
+[roi_tutorial_4.webm](https://github.com/user-attachments/assets/3835bc80-18e3-4247-a107-3f74e025075b)
 
-* If you want to display the first frame of the video, click on the `Reset first frame` button. 
+## SET NEW SHAPE
 
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Change_frame.gif" />
-</p>
+In the  next menu, titles **SET NEW SHAPE**, we define which shape type we want to draw. SimBA supports three shape types - rectangles, circles, and polygon. Select the shape type you want to draw by clicking the appropriate button. The selected ROI shape type will be highlighted in red font.
 
-## New shape
-The next menu is used to create new ROI shapes and contains three sub-menus (`Shape type`, `Shape attributes`, and `Shape name`)
-
-### Shape type
-To begin creating a new ROI, start by selecting its type. SimBA supports three shape types - rectangles, circles, and polygons. Select the shape type you want to draw by clicking the appropriate button. 
-
-### Shape attributes 
-Next, once you have selected the `Shape type`, you can pick a few of its attributes (or go ahead with the default values). Users drawing ROIs in SimBA are often working in a wide variety of video and monitor resolutions and are sometimes drawing relatively complex geometries involving many shapes. The options in this menu can help make shapes visible, distinguable and aligned while drawing. SimBA allowes the user to set three different *shape attributes* (if you want to change these attributes later, after drawing your ROI shape, you can - more info below):
+## SHAPE ATTRIBUTES
+Next, once you have selected the `Shape type`, you can pick a few of its attributes (or go ahead with the default values). Users drawing ROIs in SimBA are often working in a wide variety of video and monitor resolutions and are sometimes drawing relatively complex geometries involving many shapes. The options in this menu can help you keep shapes visible, distinguable and aligned while drawing. SimBA allowes the user to set three different *shape attributes*:
 
 * **Shape thickness**: This dropdown menu controls the thickness of the lines in the ROIs (see the top of the image below). If you select a higher value in the `Shape thickness` dropdown menu, then the lines of your ROI will be thicker. 
   
 * **Ear tag size**: Each shape that you draw will have *ear tags* (more info below). These tags can be clicked on to move shapes, align shapes, or manipulate the dimensions of the shapes. In this dropdown menu, select the size that the ear-tags of your ROI should have (see the bottom of the image below). If you select a higher value in the `Ear tag size` dropdown, then the ear-tags of the ROI will be bigger. 
   
-* **Shape color**: Each shape that you draw will have a color. From the dropdown, select the color that your ROI should have. 
-  
+* **Shape color**: Each shape that you draw will have a color. From the dropdown, select the color that your ROI should have.
+
+> [!NOTE]
+> If you want to change these shape attributes later, after completing your drawing, you can - more info below):
+
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_new_2.png" />
 </p>
 
-### Shape name
-Each shape in SimBA has a name. In this menu, enter the name of your shape as a string (e.g., `bottom left corner`, or `center` etc..). 
+## SHAPE NAME
+Each shape in SimBA has to have a unique name. This name cannot be shared with another ROI name for the same video. In the `SHAPE NAME` entry box, enter the name of your shape as a string (e.g., `bottom left corner`, or `center` etc..). 
   
-## Draw shape
-Once you have defined your shape attributes, it is time to draw it. The methods for drawing the three different shape types (`Rectangle`, `Circle` and `Polygon`) is slightly different from each other and detailed below. However, regardless of the shape type you are currently drawing, begin by clicking on `Draw`.
+## DRAW
+Once you have defined your shape, it is time to draw it. The methods for drawing the three different shape types (`Rectangle`, `Circle` and `Polygon`) is slightly different from each other and detailed below. However, regardless of the shape type you are currently drawing, begin by clicking on <kbd>DRAW</kbd> button.
   
-### Rectangle
-To draw a rectangle, click and hold the left mouse button at the top left corner of your rectangle and drag the mouse to the bottom right corner of the rectangle. If you're unhappy with your rectangle, start to draw the rectangle again by holding the left mouse button at the top left corner of your, new, revised, rectangle. The previous rectangle will be automatically discarded. When you are happy with your rectangle, **press the keyboard `ESC` button**  to save your rectangle.
+### DRAW RECTANGLE
+To draw a rectangle, click and hold the left mouse button at the top left corner of your rectangle and drag the mouse to the bottom right corner of the rectangle. If you're unhappy with your rectangle, you can start to draw the rectangle again by holding the left mouse button at the top left corner of your, new, revised, rectangle. The previous rectangle will be automatically discarded. When you are happy with your rectangle, **press the keyboard `ESC` button**  to save your rectangle.
 
 >Note: The rectangle will remain blue *while* you drawing it. After you hit `ESC`, the rectangle will take the color you picked in the *Shape color attribute* dropdown menu above.
 
