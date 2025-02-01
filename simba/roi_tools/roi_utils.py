@@ -1,22 +1,28 @@
-import os
-from typing import Tuple, Union, Dict, Optional
 import math
-from shapely.geometry import Polygon
-from copy import copy, deepcopy
+import os
 import warnings
+from copy import copy, deepcopy
+from typing import Dict, Optional, Tuple, Union
+
+import numpy as np
 import pandas as pd
 from scipy.spatial.distance import cdist
-import numpy as np
+from shapely.geometry import Polygon
 
-
-from simba.utils.enums import ROI_SETTINGS, Formats, ConfigKey, Keys, Options, Paths
-from simba.utils.checks import check_valid_tuple, check_int, check_str, check_file_exist_and_readable, check_valid_dataframe
+from simba.utils.checks import (check_file_exist_and_readable, check_int,
+                                check_str, check_valid_dataframe,
+                                check_valid_tuple)
+from simba.utils.enums import (ROI_SETTINGS, ConfigKey, Formats, Keys, Options,
+                               Paths)
 from simba.utils.errors import NoROIDataError, NotDirectoryError
 from simba.utils.printing import stdout_success, stdout_trash
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, read_config_file, read_roi_data)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_config_file,
+                                    read_roi_data)
 from simba.video_processors.roi_selector import ROISelector
 from simba.video_processors.roi_selector_circle import ROISelectorCircle
 from simba.video_processors.roi_selector_polygon import ROISelectorPolygon
+
 warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"

@@ -1,11 +1,12 @@
 import os
 from typing import Union
+
 from simba.ui.tkinter_functions import TwoOptionQuestionPopUp
 from simba.utils.checks import check_file_exist_and_readable
-from simba.utils.read_write import read_config_file,remove_files
-from simba.utils.printing import stdout_trash
+from simba.utils.enums import ConfigKey, Links, Paths
 from simba.utils.errors import NoROIDataError
-from simba.utils.enums import ConfigKey, Paths, Links
+from simba.utils.printing import stdout_trash
+from simba.utils.read_write import read_config_file, remove_files
 
 
 def delete_all_rois_pop_up(config_path: Union[str, os.PathLike]) -> None:

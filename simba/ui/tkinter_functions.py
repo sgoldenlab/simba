@@ -4,10 +4,10 @@ import os.path
 import platform
 import threading
 import webbrowser
+from copy import copy
 from tkinter import *
 from tkinter.filedialog import askdirectory, askopenfilename
 from typing import Any, Callable, Dict, Optional, Tuple, Union
-from copy import copy
 
 try:
     from typing import Literal

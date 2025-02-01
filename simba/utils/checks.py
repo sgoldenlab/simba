@@ -19,7 +19,7 @@ import pandas as pd
 import trafaret as t
 from shapely.geometry import Polygon
 
-from simba.utils.enums import Keys, Options, UMAPParam, Formats
+from simba.utils.enums import Formats, Keys, Options, UMAPParam
 from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 CorruptedFileError, CountError,
                                 DirectoryNotEmptyError, FFMPEGNotFoundError,

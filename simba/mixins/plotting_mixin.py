@@ -2,8 +2,8 @@ __author__ = "Simon Nilsson"
 import io
 import os
 import shutil
-from typing import Any, Dict, List, Optional, Tuple, Union
 from copy import copy
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import cv2
 import imutils
@@ -35,11 +35,13 @@ from simba.utils.checks import (
 from simba.utils.data import create_color_palette, detect_bouts
 from simba.utils.enums import Formats, Keys, Options
 from simba.utils.errors import InvalidInputError
-from simba.utils.warnings import NoDataFoundWarning
 from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
                                  get_named_colors)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data, read_df, read_frm_of_video, read_video_info)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, get_video_meta_data, read_df,
+                                    read_frm_of_video, read_video_info)
+from simba.utils.warnings import NoDataFoundWarning
 
 
 class PlottingMixin(object):

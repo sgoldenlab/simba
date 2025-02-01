@@ -1,47 +1,49 @@
+import ctypes
+import math
 import os
 import time
-from typing import Union, Optional
+from copy import copy, deepcopy
 from tkinter import *
+from typing import Optional, Union
+
 import cv2
 import numpy as np
-from copy import copy, deepcopy
-import ctypes
 import pandas as pd
-import math
-from shapely.geometry import Polygon
 from scipy.spatial.distance import cdist
+from shapely.geometry import Polygon
 
-from simba.utils.checks import check_str, check_int
-from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.errors import FrameRangeError, NoROIDataError, InvalidInputError
+from simba.roi_tools.roi_utils import (create_circle_entry,
+                                       create_duplicated_circle_entry,
+                                       create_duplicated_polygon_entry,
+                                       create_duplicated_rectangle_entry,
+                                       create_polygon_entry,
+                                       create_rectangle_entry,
+                                       get_circle_df_headers,
+                                       get_ear_tags_for_rectangle,
+                                       get_half_circle_vertices,
+                                       get_polygon_df_headers,
+                                       get_rectangle_df_headers, get_roi_data,
+                                       get_roi_df_from_dict,
+                                       get_triangle_vertices,
+                                       get_vertices_hexagon,
+                                       get_video_roi_data_from_dict,
+                                       set_roi_metric_sizes)
+from simba.sandbox.roi.interactive_modifier_ui import InteractiveROIModifier
+from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, SimbaButton,
+                                        SimBALabel, get_menu_icons)
+from simba.utils.checks import check_int, check_str
 from simba.utils.enums import ROI_SETTINGS, Formats, Keys
+from simba.utils.errors import (FrameRangeError, InvalidInputError,
+                                NoROIDataError)
 from simba.utils.lookups import get_color_dict
-from simba.utils.warnings import DuplicateNamesWarning
-from simba.ui.tkinter_functions import SimbaButton, Entry_Box, SimBALabel, DropDownMenu, get_menu_icons
-from simba.video_processors.roi_selector import ROISelector
 from simba.utils.printing import stdout_success
+from simba.utils.read_write import get_video_meta_data, read_frm_of_video
+from simba.utils.warnings import DuplicateNamesWarning
+from simba.video_processors.roi_selector import ROISelector
 from simba.video_processors.roi_selector_circle import ROISelectorCircle
 from simba.video_processors.roi_selector_polygon import ROISelectorPolygon
-from simba.roi_tools.roi_utils import (get_video_roi_data_from_dict,
-                                         get_roi_data,
-                                         set_roi_metric_sizes,
-                                         get_roi_df_from_dict,
-                                         create_polygon_entry,
-                                         create_rectangle_entry,
-                                         get_half_circle_vertices,
-                                         get_triangle_vertices,
-                                         create_circle_entry,
-                                         get_rectangle_df_headers,
-                                         get_circle_df_headers,
-                                         get_polygon_df_headers,
-                                         create_duplicated_rectangle_entry,
-                                         create_duplicated_circle_entry,
-                                         create_duplicated_polygon_entry,
-                                         get_ear_tags_for_rectangle,
-                                         get_vertices_hexagon)
-from simba.sandbox.roi.interactive_modifier_ui import InteractiveROIModifier
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"
 CIRCLE = 'circle'
