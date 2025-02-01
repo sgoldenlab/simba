@@ -292,6 +292,26 @@ To draw a HALF CIRCLE with a specific radius with its chunky part pointing LEFT,
 [predefined_sizes_half_circle_west.webm](https://github.com/user-attachments/assets/3127e41f-ca83-4617-8ed8-7d9b6ece4079)
 
 
+## PREFRENCES
+
+The `File` drop-down in the  **REGION OF INTEREST (ROI) SETTINGS** header also contains a *Preferences* option. Clicking this, will bring-up a pop-up window that allows you to control some aspects of how the SimBA ROI interface behaves. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/preferences_toolbar.webp"/>
+</p>
+
+1) **ROI SELECT COLOR**: This controls the color of teh selected edges while in **MOVE MODE** as in the video below. 
+
+2) **DUPLICATION JUMP SIZE**: When ROIs are duplicated, each edge of the duplicated copy are placed, by defaults +20 by +20 pixels from the original ROI. Use this dropdown to select an alternative "*duplication-jump-size*".
+
+3) **LINE TYPE**: Most often you wouldn't need to worry about this. It controls how lines are visualized on the frame through the [OpenCV](https://hawk-tech-blog.com/python-opencv-line-type/) library. In most cases its safe to keep this at `-1`.  
+
+
+[change_highlight_clr.webm](https://github.com/user-attachments/assets/bef08c2f-155e-4ff3-a9b0-395bfcffd535)
+
+
+To draw shapes of specific metric sizes (i.e., specified size in millimeters), first open the `File (ROI)` drop-down menu at the head of the **REGION OF INTEREST (ROI) SETTINGS** menu and click the `Draw ROIs of pre-defined sizes` option:
+
 
 
 
@@ -310,9 +330,6 @@ Sometimes we have created ROIs in one video, saved them, and opened up a second 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/Apply_shapes_other_video.gif" />
 </p>
-
-
-
 
 
 ## Delete all ROI definitions in your SimBA project
