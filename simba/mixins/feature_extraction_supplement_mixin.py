@@ -652,7 +652,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         of behavior C vs the proportion of behavior T onsets in the time-window proceeding the onset of behavior C.
 
         .. seealso::
-           For altenative method, see :class:`simba.data_processorsfsttc_calculator.FSTTCCalculator`
+           For altenative method, see :func:`~simba.data_processorsfsttc_calculator.FSTTCCalculator`
 
         :param pd.DataFrame data: Dataframe with boolean values representing frame-wise precense of behaviors.
         :param str criterion: Name of the field in ``data`` representing behavior C.
@@ -668,8 +668,8 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
         References
         ----------
-        .. [1] Casarrubea et al., Structural analyses in the study of behavior: From rodents to non-human primates, `Frontiers in Psychology`,
-               2022.
+        .. [1] Casarrubea, M., Leca, J.-B., Gunst, N., Jonsson, G. K., Portell, M., Di Giovanni, G., Aiello, S., & Crescimanno, G. (2022). Structural analyses in the study of behavior: From rodents to non-human primates. Frontiers in Psychology, 13. https://doi.org/10.3389/fpsyg.2022.1033561
+        .. [2] Lloyd, B. P., Yoder, P. J., Tapp, J., & Staubitz, J. L. (2016). The relative accuracy and interpretability of five sequential analysis methods: A simulation study. Behavior Research Methods, 48(4), 1482–1491. https://doi.org/10.3758/s13428-015-0661-5
         """
 
         check_str(

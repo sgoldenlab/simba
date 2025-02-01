@@ -137,20 +137,7 @@ class GeometryMixin(object):
             if not check_if_2d_array_has_min_unique_values(data=data[i], min=3):
                 results.append(Polygon([(0, 0), (0, 0), (0, 0)]))
             else:
-                results.append(
-                    Polygon(
-                        LineString(data[i].tolist())
-                        .buffer(
-                            distance=buffer,
-                            cap_style=GeometryEnum.CAP_STYLE_MAP.value[cap_style],
-                        )
-                        .simplify(
-                            tolerance=simplify_tolerance,
-                            preserve_topology=preserve_topology,
-                        )
-                        .convex_hull
-                    )
-                )
+                results.append(Polygon(LineString(data[i].tolist()).buffer(distance=buffer,cap_style=GeometryEnum.CAP_STYLE_MAP.value[cap_style]).simplify(tolerance=simplify_tolerance, preserve_topology=preserve_topology).convex_hull))
 
         return results
 

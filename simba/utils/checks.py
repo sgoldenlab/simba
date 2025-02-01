@@ -17,8 +17,9 @@ import cv2
 import numpy as np
 import pandas as pd
 import trafaret as t
+from shapely.geometry import Polygon
 
-from simba.utils.enums import Keys, Options, UMAPParam
+from simba.utils.enums import Keys, Options, UMAPParam, Formats
 from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 CorruptedFileError, CountError,
                                 DirectoryNotEmptyError, FFMPEGNotFoundError,
@@ -67,6 +68,7 @@ def check_int(name: str,
               max_value: Optional[int] = None,
               min_value: Optional[int] = None,
               unaccepted_vals: Optional[List[int]] = None,
+              accepted_vals: Optional[List[int]] = None,
               raise_error: Optional[bool] = True) -> Tuple[bool, str]:
     """
     Check if variable is a valid integer.
@@ -76,6 +78,7 @@ def check_int(name: str,
     :param Optional[int] max_value: Maximum allowed value of the variable. If None, then no maximum. Default: None.
     :param Optional[int]: Minimum allowed value of the variable. If None, then no minimum. Default: None.
     :param Optional[List[int]] unaccepted_vals: Optional list of values that are not accepted. Default: None.
+    :param Optional[List[int]] accepted_vals: Optional list of values that are accepted. Default: None.
     :param Optional[bool] raise_error: If True, then raise error if invalid integer. Default: True.
     :return: If `raise_error` is False, then returns size-2 tuple, with first value being a bool representing if valid integer, and second value a string representing error (if valid is False, else empty string)
     :rtype: Tuple[bool, str]
@@ -114,6 +117,15 @@ def check_int(name: str,
                 raise IntegerError(msg=msg, source=check_int.__name__)
             else:
                 return False, msg
+    if accepted_vals != None:
+        check_valid_lst(data=accepted_vals, source=name, valid_dtypes=(int,), min_len=1)
+        if int(value) not in accepted_vals:
+            msg = f"{name} is an not an accepted value. Got: {value}. Accepted values {accepted_vals}."
+            if raise_error:
+                raise IntegerError(msg=msg, source=check_int.__name__)
+            else:
+                return False, msg
+
 
     return True, msg
 
@@ -1541,3 +1553,28 @@ def is_valid_video_file(file_path: Union[str, os.PathLike], raise_error: bool = 
         if 'cap' in locals():
             if cap.isOpened():
                 cap.release()
+
+
+def check_valid_polygon(polygon: Union[np.ndarray, Polygon], raise_error: bool = True, name: Optional[str] = None) -> Union[bool, None]:
+    """
+    Validates whether the given polygon is a valid geometric shape.
+
+    :param Union[np.ndarray, Polygon] polygon: The polygon to validate, either as a NumPy array of shape (N, 2) or a shapely Polygon object.
+    :param bool raise_error: If True, raises an InvalidInputError if the polygon is invalid; otherwise, returns False.
+    :param Optional[str] name: An optional name for the polygon to include in error messages.
+    :return: True if the polygon is valid, False if invalid (and raise_error is False), or None if an error is raised.
+    """
+
+
+    name = '' if name is None else name
+    check_instance(source=f'{check_valid_polygon.__name__} polygon', accepted_types=(np.ndarray, Polygon,), instance=polygon)
+    if isinstance(polygon, np.ndarray):
+        check_valid_array(data=polygon, source=f'{check_valid_polygon.__name__} polygon', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_axis_0=3, accepted_axis_1_shape=[2,])
+        polygon = Polygon(polygon.astype(np.int32))
+    if not polygon.is_valid:
+        if raise_error:
+            raise InvalidInputError(msg=f'The polygon {name} is invalid', source=check_valid_polygon.__name__)
+        else:
+            return False
+    else:
+        return True

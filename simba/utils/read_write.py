@@ -29,7 +29,6 @@ except:
     from typing_extensions import Literal
 
 from urllib.parse import urlparse
-
 import cv2
 import numpy as np
 import pandas as pd
@@ -1552,20 +1551,13 @@ def read_roi_data(roi_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, pd.D
     """
     check_file_exist_and_readable(file_path=roi_path)
     try:
-        rectangles_df = pd.read_hdf(roi_path, key=Keys.ROI_RECTANGLES.value).dropna(
-            how="any"
-        )
+        rectangles_df = pd.read_hdf(roi_path, key=Keys.ROI_RECTANGLES.value).dropna(how="any")
         circles_df = pd.read_hdf(roi_path, key=Keys.ROI_CIRCLES.value).dropna(how="any")
         polygon_df = pd.read_hdf(roi_path, key=Keys.ROI_POLYGONS.value)
     except:
-        raise InvalidFileTypeError(
-            msg=f"{roi_path} is not a valid SimBA ROI definitions file",
-            source=read_roi_data.__name__,
-        )
+        raise InvalidFileTypeError(msg=f"{roi_path} is not a valid SimBA ROI definitions file", source=read_roi_data.__name__)
     if "Center_XCenter_Y" in polygon_df.columns:
         polygon_df = polygon_df.drop(["Center_XCenter_Y"], axis=1)
-    polygon_df = polygon_df.dropna(how="any")
-
     return rectangles_df, circles_df, polygon_df
 
 

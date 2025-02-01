@@ -7,6 +7,7 @@ import webbrowser
 from tkinter import *
 from tkinter.filedialog import askdirectory, askopenfilename
 from typing import Any, Callable, Dict, Optional, Tuple, Union
+from copy import copy
 
 try:
     from typing import Literal
@@ -398,9 +399,10 @@ def SimbaButton(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                 txt: str,
                 txt_clr: Optional[str] = 'black',
                 bg_clr: Optional[str] = None,
+                active_bg_clr: Optional[str] = None,
                 font: Optional[Tuple] = Formats.FONT_REGULAR.value,
-                width: Optional[str] = None,
-                height: Optional[str] = None,
+                width: Optional[int] = None,
+                height: Optional[int] = None,
                 compound: Optional[str] = 'left',
                 img: Optional[Union[ImageTk.PhotoImage, str]] = None,
                 cmd: Optional[Callable] = None,
@@ -433,13 +435,13 @@ def SimbaButton(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                  image=img,
                  relief=RAISED,
                  fg=txt_clr,
+                 activebackground=active_bg_clr,
                  font=font,
                  bg=bg_clr,
                  command=command)
 
     if img is not None:
         btn.image = img
-
     if width is not None:
         btn.config(width=width)
     if height is not None:
@@ -475,3 +477,28 @@ def SimbaCheckbox(parent: Union[Frame, Toplevel, LabelFrame, Canvas],
     if state == DISABLED:
         cb.configure(state=DISABLED)
     return cb, var
+
+def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
+               txt: str,
+               txt_clr: str = 'black',
+               bg_clr: Optional[str] = None,
+               font: tuple = Formats.FONT_REGULAR.value,
+               relief: str = FLAT,
+               width: Optional[int] = None):
+
+    lbl = Label(parent,
+                text=txt,
+                font=font,
+                fg=txt_clr,
+                bg=bg_clr,
+                relief=relief)
+    if width is not None:
+        lbl.configure(width=width)
+    return lbl
+
+
+def get_menu_icons():
+    menu_icons = copy(MENU_ICONS)
+    for k in menu_icons.keys():
+        menu_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname(__file__), menu_icons[k]["icon_path"])))
+    return menu_icons

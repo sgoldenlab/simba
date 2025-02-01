@@ -197,13 +197,17 @@ class CustomFeatureExtractor(ConfigReader):
             sys.modules[class_name] = user_module
             spec.loader.exec_module(user_module)
             user_class = getattr(user_module, class_name)
-
             if has_abstract_inheritance:
                 feature_extractor = user_class(self.config_path)
                 feature_extractor.run()
 
             else:
                 user_class(self.config_path)
+
+# test = CustomFeatureExtractor(extractor_file_path=r"C:\Users\sroni\Downloads\CustomSimbaWithNotes.py",
+#                               config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+# test.run()
+
 
 # test = CustomFeatureExtractor(extractor_file_path='/Users/simon/Desktop/envs/simba/simba/simba/feature_extractors/amber_feature_extractor.py',
 #                               config_path='/Users/simon/Desktop/envs/simba/troubleshooting/Amber_test/project_folder/project_config.ini')

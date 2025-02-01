@@ -48,7 +48,7 @@ class GetPixelsPerMillimeterInterface():
         check_float(name='distance', value=known_metric_mm, min_value=1)
         known_metric_mm = float(known_metric_mm)
         self.video_path, self.known_metric_mm = video_path, known_metric_mm
-        self.frame = ImageMixin.find_first_non_uniform_clr_frm(video_path=video_path, start_idx=0, end_idx=self.video_meta_data['fps'])
+        self.frame, _ = ImageMixin.find_first_non_uniform_clr_frm(video_path=video_path, start_idx=0, end_idx=self.video_meta_data['fps'])
         self.video_dir, self.video_name, _ = get_fn_ext(filepath=self.video_path)
         self.font_scale, self.spacing_x, self.spacing_y = PlottingMixin().get_optimal_font_scales(text='"Select coordinates: double left mouse click at two locations. Press ESC when done"', accepted_px_width=int(self.video_meta_data['width']), accepted_px_height=int(self.video_meta_data['height'] * 0.3))
         self.circle_scale = PlottingMixin().get_optimal_circle_size(frame_size=(int(self.video_meta_data['width']), int(self.video_meta_data['height'])), circle_frame_ratio=70)
@@ -62,48 +62,6 @@ class GetPixelsPerMillimeterInterface():
         self.change_loop = False
         self.coord_change = []
         self.new_cord_lst = []
-
-
-    def find_first_non_uniform_clr_frm(self,
-                                       video_path: Union[str, os.PathLike, cv2.VideoCapture],
-                                       start_idx: Optional[int] = None,
-                                       end_idx: Optional[int] = None):
-
-        check_instance(source='find_first_non_uniform_clr_frm', instance=video_path, accepted_types=(str, cv2.VideoCapture))
-        video_meta_data = get_video_meta_data(video_path=video_path)
-        if isinstance(start_idx, int) and isinstance(end_idx, int):
-            if start_idx >= end_idx:
-                raise FrameRangeError(msg=f'Start frame ({start_idx}) has to be before the end frame ({end_idx})', source='find_first_non_uniform_clr_frm')
-
-        if isinstance(start_idx, int):
-            check_int(name='start_idx', value=start_idx, min_value=0)
-            if start_idx > (video_meta_data['frame_count'] - 1):
-                start_idx = int(video_meta_data['frame_count'] - 1)
-        elif start_idx is None:
-            start_idx = 0
-        else:
-            raise FrameRangeError(msg=f'Start frame idx {(start_idx)} has to be None or an integer', source='find_first_non_uniform_clr_frm')
-        if isinstance(end_idx, int):
-            check_int(name='end_idx', value=start_idx, min_value=0)
-            if end_idx > (video_meta_data['frame_count']):
-                end_idx = int(video_meta_data['frame_count'])
-        elif end_idx is None:
-            end_idx = int(video_meta_data['fps'])
-        else:
-            raise FrameRangeError(msg=f'End frame idx {(end_idx)} has to be None or an integer', source='find_first_non_uniform_clr_frm')
-
-        for frame_index in range(int(start_idx), int(end_idx)):
-            self.frame = read_frm_of_video(video_path=video_path, frame_index=frame_index)
-            if self.frame.ndim == 2:
-                clr_cnt = np.unique(self.frame).shape[0]
-            else:
-                clr_cnt = np.unique(self.frame.reshape(-1, self.frame.shape[-1]), axis=0).shape[0]
-            if clr_cnt > 1:
-                return self.frame
-
-
-
-
 
     def _draw_circle(self, event, x, y, flags, param):
         if (event == cv2.EVENT_LBUTTONDBLCLK) and (len(self.cord_results) < 4):

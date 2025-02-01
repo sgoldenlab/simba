@@ -10,7 +10,7 @@ from simba.utils.checks import (check_file_exist_and_readable,
 from simba.utils.enums import Options
 from simba.utils.errors import InvalidFileTypeError
 from simba.utils.read_write import get_fn_ext, read_frm_of_video
-from simba.utils.warnings import CropWarning
+from simba.utils.warnings import CropWarning, ROIWarning
 
 
 class ROISelectorCircle(object):
@@ -40,15 +40,13 @@ class ROISelectorCircle(object):
     >>> circle_selector.run()
     """
 
-    def __init__(
-        self,
-        path: Union[str, os.PathLike],
-        thickness: int = 10,
-        clr: Tuple[int, int, int] = (147, 20, 255),
-        title: Optional[str] = None,
-    ) -> None:
+    def __init__(self,
+                 path: Union[str, os.PathLike, np.ndarray],
+                 thickness: int = 10,
+                 clr: Tuple[int, int, int] = (147, 20, 255),
+                 title: Optional[str] = None,
+                 destroy: bool = True) -> None:
 
-        check_file_exist_and_readable(file_path=path)
         check_if_valid_rgb_tuple(data=clr)
         check_int(name="Thickness", value=thickness, min_value=1, raise_error=True)
         if title is not None:
@@ -78,6 +76,7 @@ class ROISelectorCircle(object):
         else:
             self.title = title
 
+        self.destroy = destroy
         self.drawing, self.clr, self.thickness = False, clr, thickness
         self.circle_center, self.circle_radius = (-1, -1), 1
 
@@ -87,14 +86,10 @@ class ROISelectorCircle(object):
             self.circle_center = (x, y)
         elif event == cv2.EVENT_MOUSEMOVE:
             if self.drawing:
-                self.circle_radius = max(
-                    abs(x - self.circle_center[0]), abs(y - self.circle_center[1])
-                )
+                self.circle_radius = max(abs(x - self.circle_center[0]), abs(y - self.circle_center[1]))
         elif event == cv2.EVENT_LBUTTONUP:
             self.drawing = False
-            self.circle_radius = max(
-                abs(x - self.circle_center[0]), abs(y - self.circle_center[1])
-            )
+            self.circle_radius = max(abs(x - self.circle_center[0]), abs(y - self.circle_center[1]))
 
     def run(self):
         cv2.namedWindow(self.title, cv2.WINDOW_NORMAL)
@@ -102,38 +97,28 @@ class ROISelectorCircle(object):
         while True:
             img_copy = self.image.copy()
             if self.drawing:
-                cv2.circle(
-                    img_copy,
-                    self.circle_center,
-                    self.circle_radius,
-                    self.clr,
-                    self.thickness,
-                )
+                cv2.circle(img_copy, self.circle_center, self.circle_radius, self.clr, self.thickness )
             cv2.imshow(self.title, img_copy)
             key = cv2.waitKey(1)
             if key in [27, ord("q"), ord("Q"), ord(" ")]:
                 if self.run_checks():
-                    cv2.destroyAllWindows()
+                    if self.destroy:
+                        cv2.destroyAllWindows()
                     cv2.waitKey(1)
                     break
 
+        self.left_border_tag = (int(self.circle_center[0] - self.circle_radius), self.circle_center[1])
+        self.right_border_tag = (int(self.circle_center[0] + self.circle_radius), self.circle_center[1])
+        self.top_border_tag = (self.circle_center[0], int(self.circle_center[1] - self.circle_radius))
+        self.bottom_border_tag = (self.circle_center[0], int(self.circle_center[1] + self.circle_radius))
+
+
     def run_checks(self):
-        if (
-            ((self.circle_center[0] - self.circle_radius) < 0)
-            or ((self.circle_center[0] + self.circle_radius) > self.w)
-            or ((self.circle_center[1] - self.circle_radius) < 0)
-            or ((self.circle_center[1] + self.circle_radius) > self.h)
-        ):
-            CropWarning(
-                msg="CROP WARNING: Selected ROI radius extends beyond the image. Please try again.",
-                source=self.__class__.__name__,
-            )
+        if (((self.circle_center[0] - self.circle_radius) < 0) or ((self.circle_center[0] + self.circle_radius) > self.w) or ((self.circle_center[1] - self.circle_radius) < 0) or ((self.circle_center[1] + self.circle_radius) > self.h)):
+            ROIWarning(msg="ROI WARNING: The drawn circular ROI radius extends beyond the image. Please try again.", source=self.__class__.__name__,)
             return False
         if self.circle_radius == 0:
-            CropWarning(
-                msg="CROP WARNING: Selected ROI radius equals 0. Please try again.",
-                source=self.__class__.__name__,
-            )
+            ROIWarning(msg="ROI WARNING: The drawn circular ROI radius equals 0. Please try again.", source=self.__class__.__name__)
             return False
         else:
             return True

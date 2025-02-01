@@ -133,9 +133,9 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
         self.timer.stop_timer()
         stdout_success(msg=f"{len(list(self.data_and_videos_lk.keys()))} file(s) imported to the SimBA project {self.input_csv_dir}", source=self.__class__.__name__)
 
-# test = SLEAPImporterCSV(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/project_folder/project_config.ini',
-#                  data_folder=r'/Users/simon/Desktop/envs/simba/troubleshooting/sleap_two_animals/csv_import',
-#                  id_lst=['Simon', 'jj'],
+# test = SLEAPImporterCSV(config_path=r"C:\troubleshooting\sleap_import_two_tracks\project_folder\project_config.ini",
+#                  data_folder=r'C:\troubleshooting\sleap_import_two_tracks\data_csv',
+#                  id_lst=['Track_0', 'Track_1'],
 #                  interpolation_settings={'type': 'animals', 'method': 'linear'},
 #                  smoothing_settings = {'time_window': 500, 'method': 'gaussian'})
 # test.run()

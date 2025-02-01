@@ -3,6 +3,7 @@ import io
 import os
 import shutil
 from typing import Any, Dict, List, Optional, Tuple, Union
+from copy import copy
 
 import cv2
 import imutils
@@ -34,12 +35,11 @@ from simba.utils.checks import (
 from simba.utils.data import create_color_palette, detect_bouts
 from simba.utils.enums import Formats, Keys, Options
 from simba.utils.errors import InvalidInputError
+from simba.utils.warnings import NoDataFoundWarning
 from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
                                  get_named_colors)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext, get_video_meta_data, read_df,
-                                    read_frm_of_video, read_video_info)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data, read_df, read_frm_of_video, read_video_info)
 
 
 class PlottingMixin(object):
@@ -1488,157 +1488,106 @@ class PlottingMixin(object):
             return img
 
     @staticmethod
-    def rectangles_onto_image(
-        img: np.ndarray,
-        rectangles: pd.DataFrame,
-        show_center: Optional[bool] = False,
-        show_tags: Optional[bool] = False,
-        circle_size: Optional[int] = 2,
-    ) -> np.ndarray:
+    def rectangles_onto_image(img: np.ndarray,
+                              rectangles: pd.DataFrame,
+                              show_center: Optional[bool] = False,
+                              show_tags: Optional[bool] = False,
+                              circle_size: Optional[int] = 2,
+                              line_type: int = -1,
+                              print_metrics: bool = False,
+                              txt_size: Optional[Union[float, int]] = None) -> np.ndarray:
 
         check_valid_array(data=img, source=PlottingMixin.rectangles_onto_image.__name__)
-        check_valid_dataframe(
-            df=rectangles,
-            source=PlottingMixin.rectangles_onto_image.__name__,
-            required_fields=[
-                "topLeftX",
-                "topLeftY",
-                "Bottom_right_X",
-                "Bottom_right_Y",
-                "Color BGR",
-                "Thickness",
-                "Center_X",
-                "Center_Y",
-                "Tags",
-            ],
-        )
-        check_int(
-            name=PlottingMixin.rectangles_onto_image.__name__,
-            value=circle_size,
-            min_value=1,
-        )
+        check_valid_dataframe(df=rectangles, source=PlottingMixin.rectangles_onto_image.__name__, required_fields=["topLeftX", "topLeftY", "Bottom_right_X", "Bottom_right_Y", "Color BGR", "Thickness", "Center_X", "Center_Y", "Tags", "Ear_tag_size", 'width', 'height'])
+        check_int(name='line_type', value=line_type, accepted_vals=[4, 8, 16, -1], raise_error=True)
+        if circle_size is not None: check_int(name=PlottingMixin.rectangles_onto_image.__name__, value=circle_size, min_value=1)
         for _, row in rectangles.iterrows():
-            img = cv2.rectangle(
-                img,
-                (int(row["topLeftX"]), int(row["topLeftY"])),
-                (int(row["Bottom_right_X"]), int(row["Bottom_right_Y"])),
-                row["Color BGR"],
-                int(row["Thickness"]),
-            )
+            rectangle_line_type = [4 if row['Thickness'] == 1 else line_type][0]
+            tag_size = [row['Ear_tag_size'] if circle_size is None else circle_size][0]
+            img = cv2.rectangle(img, (int(row["topLeftX"]), int(row["topLeftY"])), (int(row["Bottom_right_X"]), int(row["Bottom_right_Y"])), row["Color BGR"], int(row["Thickness"]), lineType=rectangle_line_type)
             if show_center:
-                img = cv2.circle(
-                    img,
-                    (int(row["Center_X"]), int(row["Center_Y"])),
-                    circle_size,
-                    row["Color BGR"],
-                    -1,
-                )
+                img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), tag_size, row["Color BGR"], -1)
             if show_tags:
                 for tag_name, tag_data in row["Tags"].items():
-                    img = cv2.circle(
-                        img, tuple(tag_data), circle_size, row["Color BGR"], -1
-                    )
+                    img = cv2.circle(img, tuple(tag_data), tag_size, row["Color BGR"], -1)
+            if (print_metrics) and ('area_cm' in rectangles.columns):
+                if txt_size is None:
+                    font_size, _, _ = PlottingMixin().get_optimal_font_scales(text='10 DIGIT TEXT', accepted_px_height=row['height'], accepted_px_width=row['width'])
+                else:
+                    font_size = copy(txt_size)
+                img = PlottingMixin().put_text(img=img, text=str(row['area_cm']), pos=row['Tags']['Left tag'], font_size=font_size, text_bg_alpha=0.6)
         return img
 
+
     @staticmethod
-    def circles_onto_image(
-        img: np.ndarray,
-        circles: pd.DataFrame,
-        show_center: Optional[bool] = False,
-        show_tags: Optional[bool] = False,
-        circle_size: Optional[int] = 2,
-    ) -> np.ndarray:
+    def circles_onto_image(img: np.ndarray,
+                           circles: pd.DataFrame,
+                           show_center: Optional[bool] = False,
+                           show_tags: Optional[bool] = False,
+                           circle_size: Optional[int] = 2,
+                           line_type: Optional[int] = -1,
+                           print_metrics: bool = False,
+                           txt_size: Optional[Union[float, int]] = None) -> np.ndarray:
 
         check_valid_array(data=img, source=PlottingMixin.circles_onto_image.__name__)
-        check_valid_dataframe(
-            df=circles,
-            source=PlottingMixin.circles_onto_image.__name__,
-            required_fields=[
-                "centerX",
-                "centerY",
-                "radius",
-                "Color BGR",
-                "Thickness",
-                "Tags",
-            ],
-        )
-        check_int(
-            name=PlottingMixin.circles_onto_image.__name__,
-            value=circle_size,
-            min_value=1,
-        )
+        check_valid_dataframe(df=circles, source=PlottingMixin.circles_onto_image.__name__, required_fields=["centerX", "centerY", "radius", "Color BGR", "Thickness", "Tags", "Ear_tag_size"])
+        if circle_size is not None:  check_int(name=PlottingMixin.circles_onto_image.__name__, value=circle_size, min_value=1)
+        check_int(name='line_type', value=line_type, accepted_vals=[4, 8, 16, -1], raise_error=True)
         for _, row in circles.iterrows():
-            img = cv2.circle(
-                img,
-                (int(row["centerX"]), int(row["centerY"])),
-                row["radius"],
-                row["Color BGR"],
-                int(row["Thickness"]),
-            )
+            circle_line_type = [4 if row['Thickness'] == 1 else line_type][0]
+            tag_size = [row['Ear_tag_size'] if circle_size is None else circle_size][0]
+            img = cv2.circle(img, (int(row["centerX"]), int(row["centerY"])), row["radius"], row["Color BGR"], int(row["Thickness"]), lineType=circle_line_type)
             if show_center:
-                img = cv2.circle(
-                    img,
-                    (int(row["Center_X"]), int(row["Center_Y"])),
-                    circle_size,
-                    row["Color BGR"],
-                    -1,
-                )
+                img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), tag_size, row["Color BGR"], -1, lineType=circle_line_type)
             if show_tags:
                 for tag_data in row["Tags"].values():
-                    img = cv2.circle(
-                        img, tuple(tag_data), circle_size, row["Color BGR"], -1
-                    )
+                    img = cv2.circle(img, tuple(tag_data), tag_size, row["Color BGR"], -1, lineType=circle_line_type)
+            if (print_metrics) and ('radius_cm' in circles.columns):
+                if txt_size is None:
+                    font_size, _, _ = PlottingMixin().get_optimal_font_scales(text='10 DIGIT TEXT', accepted_px_height=row['radius'] * 2, accepted_px_width=row['radius'] * 2)
+                else:
+                    font_size = copy(txt_size)
+                img = PlottingMixin().put_text(img=img, text=str(row['radius_cm']), pos=row['Tags']['Border tag'], font_size=font_size, text_bg_alpha=0.6)
+
         return img
 
     @staticmethod
-    def polygons_onto_image(
-        img: np.ndarray,
-        polygons: pd.DataFrame,
-        show_center: Optional[bool] = False,
-        show_tags: Optional[bool] = False,
-        circle_size: Optional[int] = 2,
-    ) -> np.ndarray:
-        """
-        Helper to insert polygon overlays onto an image.
-
-        :param np.ndarray img:
-        :param polygons:
-        :param show_center:
-        :param show_tags:
-        :param circle_size:
-        :return:
-        """
+    def polygons_onto_image(img: np.ndarray,
+                            polygons: pd.DataFrame,
+                            show_center: Optional[bool] = False,
+                            show_tags: Optional[bool] = False,
+                            circle_size: Optional[int] = 2,
+                            line_type: Optional[int] = -1,
+                            print_metrics: bool = False,
+                            txt_size: Optional[Union[float, int]] = None) -> np.ndarray:
 
         check_valid_array(data=img, source=f"{PlottingMixin.polygons_onto_image.__name__} img")
         check_valid_dataframe(df=polygons, source=f"{PlottingMixin.polygons_onto_image.__name__} polygons", required_fields=["vertices", "Color BGR", "Thickness", "Tags"])
-        check_int(name=PlottingMixin.polygons_onto_image.__name__, value=circle_size, min_value=1)
+        check_int(name='line_type', value=line_type, accepted_vals=[4, 8, 16, -1], raise_error=True)
+        if circle_size is not None: check_int(name=PlottingMixin.polygons_onto_image.__name__, value=circle_size, min_value=1)
         for _, row in polygons.iterrows():
-            img = cv2.polylines(
-                img,
-                [row["vertices"].astype(int)],
-                True,
-                row["Color BGR"],
-                thickness=int(row["Thickness"]),
-            )
+            polygon_line_type = [4 if row['Thickness'] == 1 else line_type][0]
+            tag_size = [row['Ear_tag_size'] if circle_size is None else circle_size][0]
+            img = cv2.polylines( img, [row["vertices"].astype(int)], True, row["Color BGR"], thickness=int(row["Thickness"]), lineType=polygon_line_type)
             if show_center:
-                img = cv2.circle(
-                    img,
-                    (int(row["Center_X"]), int(row["Center_Y"])),
-                    circle_size,
-                    row["Color BGR"],
-                    -1,
-                )
+                img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), tag_size, row["Color BGR"], polygon_line_type)
             if show_tags:
-                for tag_data in row["vertices"]:
-                    img = cv2.circle(
-                        img, tuple(tag_data), circle_size, row["Color BGR"], -1
-                    )
+                for tag_name, tag_data in row["Tags"].items():
+                    img = cv2.circle(img, tuple(tag_data), tag_size, row["Color BGR"], polygon_line_type)
+            if (print_metrics) and ('area_cm' in polygons.columns) and ('max_vertice_distance' in polygons.columns) and ('center' in polygons.columns):
+                if txt_size is None:
+                    font_size, _, _ = PlottingMixin().get_optimal_font_scales(text='10 DIGIT TEXT', accepted_px_height=int(row['max_vertice_distance'] / 2), accepted_px_width=int(row['max_vertice_distance'] / 2))
+                    print(font_size)
+                else:
+                    font_size = copy(txt_size)
+                img = PlottingMixin().put_text(img=img, text=str(row['area_cm']), pos=(int(row['center'][0]), int(row['center'][1])), font_size=font_size, text_bg_alpha=0.6)
+
         return img
 
     @staticmethod
     def roi_dict_onto_img(img: np.ndarray,
                           roi_dict: Dict[str, pd.DataFrame],
-                          circle_size: Optional[int] = 2,
+                          circle_size: Optional[int] = None,
                           show_center: Optional[bool] = False,
                           show_tags: Optional[bool] = False) -> np.ndarray:
 

@@ -12,7 +12,6 @@ import pkg_resources
 
 import simba
 
-
 class ConfigKey(Enum):
     GENERAL_SETTINGS = "General settings"
     PROJECT_PATH = "project_path"
@@ -742,4 +741,25 @@ class UML(Enum):
     MIN_CLUSTER_SIZE = "min_cluster_size"
     MIN_SAMPLES = "min_samples"
     EPSILON = "cluster_selection_epsilon"
+
+
+
+class ROI_SETTINGS(Enum):
+    SELECT_COLOR = "red"
+    UNSELECT_COLOR = "black"
+    CLICK_SENSITIVITY = 10
+    TEXT_THICKNESS = 2
+    DUPLICATION_JUMP_SIZE = 20
+    LINE_TYPE = -1
+    SHAPE_THICKNESS_OPTIONS = list(range(1, 26))
+    EAR_TAG_SIZE_OPTIONS = list(range(1, 31))
+    LINE_TYPE_OPTIONS = [4, 8, 16, -1]
+    FONT = cv2.FONT_HERSHEY_SIMPLEX
+    ROI_SELECT_CLR = (105, 105, 105) # BGR
+    GREY_CLR = (128, 128, 128)
+    CIRCLE = 'circle'
+    POLYGON = 'polygon'
+    RECTANGLE = 'rectangle'
+
+
 

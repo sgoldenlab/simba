@@ -16,7 +16,7 @@ from simba.utils.warnings import CropWarning
 class ROISelector(object):
     """
     A class for selecting and reflecting Regions of Interest (ROI) in an image.
-    The selected region variables are stored in self: top_left, bottom_right, width, height.
+    The selected region variables are stored in self: top_left, bottom_right, width, height etc.
 
     .. image:: _static/img/roi_selector.gif
        :width: 600
@@ -26,6 +26,7 @@ class ROISelector(object):
     :param int thickness: Thickness of the rectangle border for visualizing the ROI.
     :param Tuple[int, int, int] clr: BGR color tuple for visualizing the ROI. Default: deep pink.
     :param Optional[str] title: Title of the drawing window. If None, then `Draw ROI - Press ESC when drawn`.
+    :param bool destroy: If True, destroy drawing window when completed. Default: True.
 
     :example:
     >>> img_selector = ROISelector(path='/Users/simon/Desktop/compute_overlap.png', clr=(0, 255, 0), thickness=2)
@@ -36,7 +37,8 @@ class ROISelector(object):
                  path: Union[str, os.PathLike, np.ndarray],
                  thickness: int = 10,
                  clr: Tuple[int, int, int] = (147, 20, 255),
-                 title: Optional[str] = None) -> None:
+                 title: Optional[str] = None,
+                 destroy: bool = True) -> None:
 
         check_if_valid_rgb_tuple(data=clr)
         check_int(name="Thickness", value=thickness, min_value=1, raise_error=True)
@@ -48,6 +50,7 @@ class ROISelector(object):
         self.clr = clr
         self.complete = False
         self.thickness = int(thickness)
+        self.destroy = destroy
 
         if isinstance(path, np.ndarray):
             self.image = path
@@ -65,9 +68,7 @@ class ROISelector(object):
                 self.image = cv2.imread(path).astype(np.uint8)
 
             else:
-                raise InvalidFileTypeError(
-                    msg=f"Cannot crop a {ext} file.", source=self.__class__.__name__
-                )
+                raise InvalidFileTypeError(msg=f"Cannot crop a {ext} file.", source=self.__class__.__name__)
             if title is None:
                 title = f"Draw ROI video {filename} - Press ESC when drawn"
 
@@ -115,12 +116,14 @@ class ROISelector(object):
 
             elif key == 27:
                 if self.run_checks():
-                    cv2.destroyAllWindows()
+                    if self.destroy:
+                        cv2.destroyAllWindows()
                     cv2.waitKey(1)
                     break
 
             if cv2.getWindowProperty(self.title, cv2.WND_PROP_VISIBLE) < 1:
-                cv2.destroyAllWindows()
+                if self.destroy:
+                    cv2.destroyAllWindows()
                 break
 
     def run_checks(self):
@@ -140,10 +143,20 @@ class ROISelector(object):
             self.bottom_right = (self.bottom_right[0], self.h)
         self.width = self.bottom_right[0] - self.top_left[0]
         self.height = self.bottom_right[1] - self.top_left[1]
+        self.center = (int(self.top_left[0] + (self.width / 2)), int(self.top_left[1] + (self.height / 2)))
+
+        self.bottom_right_tag = (int(self.top_left[0] + self.width), int(self.top_left[1] + self.height))
+        self.top_right_tag = (int(self.top_left[0] + self.width), int(self.top_left[1]))
+        self.bottom_left_tag = (int(self.top_left[0]), int(self.top_left[1] + self.height))
+        self.top_tag = (int(self.top_left[0] + self.width / 2), int(self.top_left[1]))
+        self.right_tag = (int(self.top_left[0] + self.width), int(self.top_left[1] + self.height / 2))
+        self.left_tag = (int(self.top_left[0]), int(self.top_left[1] + self.height / 2))
+        self.bottom_tag = (int(self.top_left[0] + self.width / 2), int(self.top_left[1] + self.height))
+
         self.complete = True
 
         if (self.width == 0 and self.height == 0) or (self.width + self.height + self.top_left[0] + self.top_left[1] == 0):
-            CropWarning(msg="CROP WARNING: Cropping height and width are both 0. Please try again.", source=self.__class__.__name__)
+            CropWarning(msg="CROP WARNING: ROI height and width are both 0. Please try again.", source=self.__class__.__name__)
             return False
         else:
             return True

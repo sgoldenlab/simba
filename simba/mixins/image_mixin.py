@@ -1668,7 +1668,7 @@ class ImageMixin(object):
     @staticmethod
     def find_first_non_uniform_clr_frm(video_path: Union[str, os.PathLike, cv2.VideoCapture],
                                        start_idx: Optional[int] = 0,
-                                       end_idx: Optional[int] = None) -> np.ndarray:
+                                       end_idx: Optional[int] = None) -> Tuple[np.ndarray, int]:
         """
         Find the first frame of non-uniform color in a video.
 
@@ -1678,7 +1678,7 @@ class ImageMixin(object):
         :param Union[str, os.PathLike, cv2.VideoCapture] video_path: The path to a video file on disk, or a cv2.VideoCapture object.
         :param Optional[int] start_idx: The first frame (where to start searching for the non-uniform color image). Default: 0 which equals the first frame. None also equals start searching at the first frame.
         :param Optional[int] end_idx: The last frame (where to end searching for the non-uniform color image). Default: None, which equals 1s into the video.
-        :returns: The first non-uniform color image in the video as np.ndarray.
+        :returns: The first non-uniform color image in the video as np.ndarray and the index of the first frame.
         :rtype: np.ndarray
         """
 
@@ -1712,8 +1712,8 @@ class ImageMixin(object):
             else:
                 clr_cnt = np.unique(frame.reshape(-1, frame.shape[-1]), axis=0).shape[0]
             if clr_cnt > 1:
-                return frame
-        return first_frm
+                return frame, frame_index
+        return first_frm, 0
 
     @staticmethod
     def get_blob_locations(video_path: Union[str, os.PathLike],

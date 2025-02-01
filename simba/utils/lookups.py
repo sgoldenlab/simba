@@ -305,7 +305,7 @@ def get_categorical_palettes():
     ]
 
 
-def get_color_dict() -> Dict[str, Tuple[int]]:
+def get_color_dict() -> Dict[str, Tuple[int, int, int]]:
     """
     Get dict of color names as keys and RGB tuples as values
     """
@@ -662,10 +662,13 @@ def get_log_config():
         "loggers": {"": {"level": "INFO", "handlers": ["file_handler"]}},
     }
 
-
 def get_model_names():
     model_names_dir = os.path.join(os.path.dirname(simba.__file__), Paths.UNSUPERVISED_MODEL_NAMES.value)
     return list(pd.read_parquet(model_names_dir)[UML.NAMES.value])
+
+
+
+
 
 #
 # def rao_spacing_critical_values():

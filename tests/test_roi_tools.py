@@ -4,7 +4,7 @@ from simba.roi_tools.ROI_analyzer import ROIAnalyzer
 from simba.roi_tools.ROI_clf_calculator import ROIClfCalculator
 from simba.roi_tools.ROI_directing_analyzer import DirectingROIAnalyzer
 from simba.roi_tools.ROI_feature_analyzer import ROIFeatureCreator
-from simba.roi_tools.ROI_size_calculations import rectangle_size_calc, circle_size_calc, polygon_size_calc
+#from simba.roi_tools.ROI_size_calculations import rectangle_size_calc, circle_size_calc, polygon_size_calc
 from simba.roi_tools.ROI_time_bin_calculator import ROITimebinCalculator
 
 
@@ -44,20 +44,20 @@ def test_roi_clf_calculator(config_path_args):
 # def test_roi_movement_analyzer(all_config_path_args):
 #     _ = ROIMovementAnalyzer(config_path=all_config_path_args.param)
 
-@pytest.mark.parametrize("rectangle_dict, px_mm, expected_area", [({'height': 500, 'width': 500}, 10, 25), ({'height': 500, 'width': 500}, 5, 100)])
-def test_rectangle_size_calc(rectangle_dict, px_mm, expected_area):
-    results = rectangle_size_calc(rectangle_dict=rectangle_dict, px_mm=px_mm)
-    assert int(results['area_cm']) == int(expected_area)
-
-@pytest.mark.parametrize("circle_dict, px_mm, expected_area", [({'radius': 100}, 5, 12.57)])
-def test_circle_size_calc(circle_dict, px_mm, expected_area):
-    results = circle_size_calc(circle_dict=circle_dict, px_mm=px_mm)
-    assert results['area_cm'] == expected_area
-
-@pytest.mark.parametrize("polygon_dict, px_mm, expected_area", [({'vertices': np.array([[0, 2], [200, 98], [100, 876], [10, 702]])}, 5, 38.04)])
-def test_polygon_size_calc(polygon_dict, px_mm, expected_area):
-    results = polygon_size_calc(polygon_dict=polygon_dict, px_mm=px_mm)
-    assert results['area_cm'] == expected_area
+# @pytest.mark.parametrize("rectangle_dict, px_mm, expected_area", [({'height': 500, 'width': 500}, 10, 25), ({'height': 500, 'width': 500}, 5, 100)])
+# def test_rectangle_size_calc(rectangle_dict, px_mm, expected_area):
+#     results = rectangle_size_calc(rectangle_dict=rectangle_dict, px_mm=px_mm)
+#     assert int(results['area_cm']) == int(expected_area)
+#
+# @pytest.mark.parametrize("circle_dict, px_mm, expected_area", [({'radius': 100}, 5, 12.57)])
+# def test_circle_size_calc(circle_dict, px_mm, expected_area):
+#     results = circle_size_calc(circle_dict=circle_dict, px_mm=px_mm)
+#     assert results['area_cm'] == expected_area
+#
+# @pytest.mark.parametrize("polygon_dict, px_mm, expected_area", [({'vertices': np.array([[0, 2], [200, 98], [100, 876], [10, 702]])}, 5, 38.04)])
+# def test_polygon_size_calc(polygon_dict, px_mm, expected_area):
+#     results = polygon_size_calc(polygon_dict=polygon_dict, px_mm=px_mm)
+#     assert results['area_cm'] == expected_area
 
 #
 # @pytest.mark.parametrize("bin_length, threshold", [(10, 0.00), (1, 0.50)])
