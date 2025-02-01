@@ -306,20 +306,10 @@ The `File` drop-down in the  **REGION OF INTEREST (ROI) SETTINGS** header also c
 
 3) **LINE TYPE**: Most often you wouldn't need to worry about this. It controls how lines are visualized on the frame through the [OpenCV](https://hawk-tech-blog.com/python-opencv-line-type/) library. In most cases its safe to keep this at `-1`.  
 
-
 [change_highlight_clr.webm](https://github.com/user-attachments/assets/bef08c2f-155e-4ff3-a9b0-395bfcffd535)
 
 
-To draw shapes of specific metric sizes (i.e., specified size in millimeters), first open the `File (ROI)` drop-down menu at the head of the **REGION OF INTEREST (ROI) SETTINGS** menu and click the `Draw ROIs of pre-defined sizes` option:
-
-
-
-
-
-
-
-
-## Apply shapes from another video
+## APPLY SHAPES FROM ANOTHER VIDEO
 
 Sometimes we have created ROIs in one video, saved them, and opened up a second video to start drawing new ROIs on this second video. Now we may want to replicate the ROIs on the first video on the second video, and we can do this with the `Apply shapes from another video` sub-menu. 
 
@@ -327,9 +317,8 @@ Sometimes we have created ROIs in one video, saved them, and opened up a second 
 
 2. In this dropdown menu, select the video which has the ROIs you wish to replicate. Once selected, click `Apply`. The ROIs from the video in the `Select video` dropdown menu will appear on the frame.
 
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/Apply_shapes_other_video.gif" />
-</p>
+
+[apply_video_from_different.webm](https://github.com/user-attachments/assets/df8c497d-05c0-4259-94ab-032c9c29d290)
 
 
 ## Delete all ROI definitions in your SimBA project
@@ -342,21 +331,13 @@ Somtimes we may want to delete all ROI definitions in a SimBA project and start 
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_delete.png" />
 </p>
 
-2. Click `Yes` to delete all ROI definitions in a SimBA project. 
+2. Click `Yes` to delete all ROI definitions in a SimBA project.
+
+> [!NOTE]
+> Your ROIs are saved inside your SImBA project, at the location `project_folder/logs/measures/ROIdefinitions.h5`. To delete the ROIs in the SImBA project, you could also manually delete this file. 
 
 
-
-
-
-
-
-
-
-
-
-
-
-## Next steps
+## NEXT STEPS
 Once your ROI definitions are all defined, close the `ROI table`, `Regions of Interest Settings` and `Define Shape` windows and head back to the [ROI] tab in the load project menu. 
 
 
