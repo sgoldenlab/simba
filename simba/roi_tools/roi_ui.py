@@ -57,7 +57,7 @@ class ROI_ui(ROI_mixin, ConfigReader):
         self.set_img(img=self.img)
         self.get_file_menu(root=self.define_ui.root)
         self.define_ui.root.protocol("WM_DELETE_WINDOW", self._close)
-        self.define_ui.main_frm.mainloop()
+        #self.define_ui.main_frm.mainloop()
 
     def _close(self):
         self.close_img()
