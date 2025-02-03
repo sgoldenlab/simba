@@ -26,8 +26,7 @@ To install SimBA via pip, use the following command:
 pip install simba-uw-tf-dev
 ```
 
-
-## Feb-02-2024: SimBA version 1.31 release
+## Feb-02-2024: SimBA ROI interface update
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_new_1.png" />
@@ -35,6 +34,20 @@ pip install simba-uw-tf-dev
 
 We have improved the GUI for region-of-interest segmentation and analysis, which includes new interactive controls for drawing shapes. 
 [Click here to go to the new ROI documentation page.](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md)
+
+The SimBA region of interest (ROI) interface allows users to define and 
+draw ROIs on videos. ROI data can be used to calculate basic descriptive 
+statistics based on animals movements and locations such as:
+
+* How much time the animals have spent in different ROIs.
+* How many times the animals have entered different ROIs.
+* The distance animals have moved in the different ROIs.
+* Calculate how animals have engaged in different classified behaviors in each ROI.
+etc....
+* 
+Furthermore, the ROI data can  be used to build potentially valuable, additional, features for random forest predictive classifiers. Such features can be used to generate a machine model that classify behaviors that depend on the spatial location of body parts in relation to the ROIs. **CAUTION**: If spatial locations are irrelevant for the behaviour being classified, then such features should *not* be included in the machine model generation as they just 
+only introduce noise.
+
 
 ## Apr-16-2023: API Reference
 
@@ -55,21 +68,6 @@ As always, reach out to us on [Gitter chat](https://gitter.im/SimBA-Resource/com
 
 We have released a significantly improved GUI for region-of-interest segmentation and analysis.
 [Click here to go to the new ROI documentation page.](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md)
-
-### <p align="center"> Regions of Interest (ROIs) in SimBA </p>
-
-The SimBA region of interest (ROI) interface allows users to define and 
-draw ROIs on videos. ROI data can be used to calculate basic descriptive 
-statistics based on animals movements and locations such as:
-
-* How much time the animals have spent in different ROIs.
-* How many times the animals have entered different ROIs.
-* The distance animals have moved in the different ROIs.
-* Calculate how animals have engaged in different classified behaviors in each ROI.
-etc....
-
-Furthermore, the ROI data can  be used to build potentially valuable, additional, features for random forest predictive classifiers. Such features can be used to generate a machine model that classify behaviors that depend on the spatial location of body parts in relation to the ROIs. **CAUTION**: If spatial locations are irrelevant for the behaviour being classified, then such features should *not* be included in the machine model generation as they just 
-only introduce noise.
 
 ## Feb-08-2021: SimBA version 1.3 release
 
