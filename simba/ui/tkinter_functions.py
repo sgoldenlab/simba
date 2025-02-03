@@ -317,12 +317,17 @@ def CreateToolTip(widget, text):
 def CreateLabelFrameWithIcon(parent: Union[Toplevel, LabelFrame, Canvas, Frame],
                              header: str,
                              icon_name: str,
+                             padx: Optional[int] = None,
+                             pady: Optional[int] = None,
+                             relief: str = 'flat',
+                             width: Optional[int] = None,
+                             font: tuple = Formats.FONT_HEADER.value,
                              icon_link: Optional[Union[str, None]] = None):
 
     icon = PIL.Image.open(MENU_ICONS[icon_name]["icon_path"])
     icon = ImageTk.PhotoImage(icon)
     frm = Frame(parent)
-    label_text = Label(frm, text=header, font=Formats.FONT_HEADER.value)
+    label_text = Label(frm, text=header, font=font)
     label_text.grid(row=0, column=0)
     label_image = Label(frm, image=icon)
     label_image.image = icon
@@ -502,3 +507,5 @@ def get_menu_icons():
     for k in menu_icons.keys():
         menu_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname(__file__), menu_icons[k]["icon_path"])))
     return menu_icons
+
+

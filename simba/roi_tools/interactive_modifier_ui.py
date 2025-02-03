@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from simba.utils.enums import ROI_SETTINGS, Keys
 from simba.utils.checks import check_valid_polygon
-from simba.sandbox.roi.roi_utils import get_polygon_df_headers, get_rectangle_df_headers, get_circle_df_headers
+from simba.roi_tools.roi_utils import get_polygon_df_headers, get_rectangle_df_headers, get_circle_df_headers
 from simba.mixins.plotting_mixin import PlottingMixin
 from shapely.geometry import Polygon
 

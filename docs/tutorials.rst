@@ -5,6 +5,7 @@ Tutorials
    :maxdepth: 2
 
    tutorials_rst/roi
+   tutorials_rst/roi_new
    tutorials_rst/FSTTC
    tutorials_rst/feature_subsets
    tutorials_rst/user_defined_feature_class

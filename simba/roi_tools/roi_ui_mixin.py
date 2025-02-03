@@ -19,7 +19,7 @@ from simba.utils.errors import FrameRangeError, NoROIDataError, InvalidInputErro
 from simba.utils.enums import ROI_SETTINGS, Formats, Keys
 from simba.utils.lookups import get_color_dict
 from simba.utils.warnings import DuplicateNamesWarning
-from simba.ui.tkinter_functions import SimbaButton, Entry_Box, SimBALabel, DropDownMenu, get_menu_icons
+from simba.ui.tkinter_functions import SimbaButton, Entry_Box, SimBALabel, DropDownMenu, get_menu_icons, CreateLabelFrameWithIcon
 from simba.video_processors.roi_selector import ROISelector
 from simba.utils.printing import stdout_success
 from simba.video_processors.roi_selector_circle import ROISelectorCircle
@@ -41,7 +41,7 @@ from simba.roi_tools.roi_utils import (get_video_roi_data_from_dict,
                                          create_duplicated_polygon_entry,
                                          get_ear_tags_for_rectangle,
                                          get_vertices_hexagon)
-from simba.sandbox.roi.interactive_modifier_ui import InteractiveROIModifier
+from simba.roi_tools.interactive_modifier_ui import InteractiveROIModifier
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"
 CIRCLE = 'circle'
@@ -66,11 +66,13 @@ class ROI_mixin(ConfigReader):
         self.color_option_dict = get_color_dict()
         self.menu_icons = get_menu_icons()
         cv2.namedWindow(DRAW_FRAME_NAME, cv2.WINDOW_NORMAL)
+        self.win_x, self.win_y, self.win_w, self.win_h = cv2.getWindowImageRect(DRAW_FRAME_NAME)
         self.draw_frm_handle = ctypes.windll.user32.FindWindowW(None, DRAW_FRAME_NAME)
         ctypes.windll.user32.SetWindowPos(self.draw_frm_handle, -1, 0, 0, 0, 0, 3)
         self.settings = {item.name: item.value for item in ROI_SETTINGS}
         self.rectangles_df, self.circles_df, self.polygon_df, self.roi_dict, self.roi_names, self.other_roi_dict, self.other_video_names_w_rois = get_roi_data(roi_path=self.roi_coordinates_path, video_name=self.video_meta['video_name'])
         self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
+
 
     def get_file_menu(self,
                       root: Toplevel):
@@ -114,7 +116,8 @@ class ROI_mixin(ConfigReader):
                              parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                              row_idx: int):
 
-        self.change_attr_panel = LabelFrame(parent_frame, text="VIDEO AND FRAME INFORMATION", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        self.change_attr_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="VIDEO AND FRAME INFORMATION", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='info')
+        #self.change_attr_panel = LabelFrame(parent_frame, text="VIDEO AND FRAME INFORMATION", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         self.video_name_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'VIDEO NAME: {self.video_meta["video_name"]}')
         self.video_fps_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'FPS: {self.video_meta["fps"]}')
         self.video_frame_id_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'DISPLAY FRAME #: {self.img_idx}')
@@ -256,6 +259,7 @@ class ROI_mixin(ConfigReader):
             msg = f'Cannot move ROIs: No ROIs have been drawn on video {self.video_meta["video_name"]}.'
             self.set_status_bar_panel(text=msg, fg="red")
             raise NoROIDataError(msg, source=self.__class__.__name__)
+        self.win_x, self.win_y, self.win_w, self.win_h = cv2.getWindowImageRect(DRAW_FRAME_NAME)
         self.overlay_rois_on_image(show_ear_tags=True, show_roi_info=False)
         self.set_status_bar_panel(text='IN ROI MOVE MODE. SELECT "DEFINE SHAPE" WINDOW AND CLICK ESCAPE TO EXIT MOVE MODE', fg="darkred")
         interactive_modifier = InteractiveROIModifier(window_name=DRAW_FRAME_NAME, roi_dict=self.roi_dict, img=self.img, orginal_img=self.read_img(frame_idx=self.img_idx), settings=self.settings)
@@ -292,7 +296,7 @@ class ROI_mixin(ConfigReader):
     def draw(self):
         self.shape_info_btn.configure(text="SHOW SHAPE INFO")
         shape_name = self.shape_name_eb.entry_get.strip()
-        #self.win_pos_x, self.win_pos_y, self.win_pos_w, self.win_pos_h = cv2.getWindowImageRect(DRAW_FRAME_NAME)
+        self.win_x, self.win_y, self.win_w, self.win_h = cv2.getWindowImageRect(DRAW_FRAME_NAME)
         if self.selected_shape_type is None:
             msg = "No shape type selected. Select shape type before drawing"
             self.set_status_bar_panel(text=msg, fg='red')
@@ -422,6 +426,8 @@ class ROI_mixin(ConfigReader):
     def draw_cv2_window(self):
         cv2.destroyAllWindows()
         cv2.namedWindow(DRAW_FRAME_NAME, cv2.WINDOW_NORMAL)
+        cv2.resizeWindow(DRAW_FRAME_NAME, self.win_w, self.win_h)
+        cv2.moveWindow(DRAW_FRAME_NAME, self.win_x-10, self.win_y-30)
         cv2.imshow(DRAW_FRAME_NAME, self.img)
 
     def show_shape_info(self):
@@ -444,6 +450,7 @@ class ROI_mixin(ConfigReader):
             dropdown.setChoices(new_options[0])
 
     def delete_all(self):
+        self.win_x, self.win_y, self.win_w, self.win_h = cv2.getWindowImageRect(DRAW_FRAME_NAME)
         self.reset_img_shape_memory()
         self.set_img(img=self.read_img(frame_idx=self.img_idx))
         self.set_status_bar_panel(text='Deleted all ROIs', fg='blue')
@@ -453,6 +460,7 @@ class ROI_mixin(ConfigReader):
             msg = 'No ROI selected. First select an ROI in drop-down to delete it'
             self.set_status_bar_panel(text=msg, fg='red')
             raise NoROIDataError(msg=msg, source=self.__class__.__name__)
+        self.win_x, self.win_y, self.win_w, self.win_h = cv2.getWindowImageRect(DRAW_FRAME_NAME)
         self.rectangles_df = self.rectangles_df[self.rectangles_df['Name'] != name].reset_index(drop=True)
         self.polygon_df = self.polygon_df[self.polygon_df['Name'] != name].reset_index(drop=True)
         self.circles_df = self.circles_df[self.circles_df['Name'] != name].reset_index(drop=True)
@@ -479,6 +487,7 @@ class ROI_mixin(ConfigReader):
             self.set_status_bar_panel(text=msg, fg='red')
             raise NoROIDataError(msg=msg, source=self.__class__.__name__)
         shape_to_duplicate = copy(self.roi_dict[selected_roi_name])
+        self.win_x, self.win_y, self.win_w, self.win_h = cv2.getWindowImageRect(DRAW_FRAME_NAME)
         if selected_roi_name in list(self.rectangles_df['Name'].unique()):
             duplicated_shape_entry = create_duplicated_rectangle_entry(shape_entry=shape_to_duplicate, jump_size=self.settings['DUPLICATION_JUMP_SIZE'])
         elif selected_roi_name in list(self.circles_df['Name'].unique()):
