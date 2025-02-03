@@ -35,7 +35,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, SimbaButton, SimBALabel,
                                         get_menu_icons)
 from simba.utils.checks import check_int, check_str
-from simba.utils.enums import ROI_SETTINGS, Formats, Keys
+from simba.utils.enums import ROI_SETTINGS, Formats, Keys, OS
 from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 NoROIDataError)
 from simba.utils.lookups import get_color_dict
@@ -70,8 +70,9 @@ class ROI_mixin(ConfigReader):
         self.menu_icons = get_menu_icons()
         cv2.namedWindow(DRAW_FRAME_NAME, cv2.WINDOW_NORMAL)
         self.win_x, self.win_y, self.win_w, self.win_h = cv2.getWindowImageRect(DRAW_FRAME_NAME)
-        self.draw_frm_handle = ctypes.windll.user32.FindWindowW(None, DRAW_FRAME_NAME)
-        ctypes.windll.user32.SetWindowPos(self.draw_frm_handle, -1, 0, 0, 0, 0, 3)
+        if self.platform == OS.WINDOWS.value:
+            self.draw_frm_handle = ctypes.windll.user32.FindWindowW(None, DRAW_FRAME_NAME)
+            ctypes.windll.user32.SetWindowPos(self.draw_frm_handle, -1, 0, 0, 0, 0, 3)
         self.settings = {item.name: item.value for item in ROI_SETTINGS}
         self.rectangles_df, self.circles_df, self.polygon_df, self.roi_dict, self.roi_names, self.other_roi_dict, self.other_video_names_w_rois = get_roi_data(roi_path=self.roi_coordinates_path, video_name=self.video_meta['video_name'])
         self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
@@ -135,7 +136,8 @@ class ROI_mixin(ConfigReader):
                              parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                              row_idx: int):
 
-        self.select_img_panel = LabelFrame(parent_frame, text="CHANGE IMAGE", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        self.select_img_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="CHANGE IMAGE", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='frames')
+        #self.select_img_panel = LabelFrame(parent_frame, text="CHANGE IMAGE", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         self.forward_1s_btn = SimbaButton(parent=self.select_img_panel, txt="+1s", img='plus_green_2', font=Formats.FONT_REGULAR.value, txt_clr='darkgreen', cmd=self.change_img, cmd_kwargs={'stride': int(self.video_meta['fps'])})
         self.backwards_1s_btn = SimbaButton(parent=self.select_img_panel, txt="-1s", img='minus_blue_2', font=Formats.FONT_REGULAR.value, txt_clr='darkblue', cmd=self.change_img, cmd_kwargs={'stride': -int(self.video_meta['fps'])})
         self.custom_seconds_entry = Entry_Box(parent=self.select_img_panel, fileDescription='CUSTOM SECONDS:', labelwidth=18, validation='numeric', entry_box_width=4)
@@ -157,7 +159,7 @@ class ROI_mixin(ConfigReader):
                                     parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                                     row_idx: int):
 
-        self.select_shape_type_panel = LabelFrame(parent_frame, text="SET NEW SHAPE", font=Formats.FONT_HEADER.value, padx=5, pady=5, bd=5)
+        self.select_shape_type_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SET NEW SHAPE", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='shapes_large')
         self.rectangle_button = SimbaButton(parent=self.select_shape_type_panel, txt='RECTANGLE', txt_clr='black', font=Formats.FONT_REGULAR.value, img='rectangle_1_large', cmd=self.set_selected_shape_type, cmd_kwargs={'shape_type': lambda: RECTANGLE})
         self.circle_button = SimbaButton(parent=self.select_shape_type_panel, txt='CIRCLE', txt_clr='black', font=Formats.FONT_REGULAR.value, img='circle_large', cmd=self.set_selected_shape_type, cmd_kwargs={'shape_type': lambda: CIRCLE})
         self.polygon_button = SimbaButton(parent=self.select_shape_type_panel, txt='POLYGON', txt_clr='black', font=Formats.FONT_REGULAR.value, img='polygon_large', cmd=self.set_selected_shape_type, cmd_kwargs={'shape_type': lambda: POLYGON})
@@ -171,7 +173,8 @@ class ROI_mixin(ConfigReader):
                              parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                              row_idx: int):
 
-        self.shape_attr_panel = LabelFrame(parent_frame, text="SHAPE ATTRIBUTES", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        self.shape_attr_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE ATTRIBUTES", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='attributes_large')
+        #self.shape_attr_panel = LabelFrame(parent_frame, text="SHAPE ATTRIBUTES", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         self.thickness_dropdown = DropDownMenu(self.shape_attr_panel, "SHAPE THICKNESS: ", ROI_SETTINGS.SHAPE_THICKNESS_OPTIONS.value, 17)
         self.thickness_dropdown.setChoices(5)
         self.color_dropdown = DropDownMenu(self.shape_attr_panel, "SHAPE COLOR: ", list(self.color_option_dict.keys()), 17)
@@ -188,7 +191,8 @@ class ROI_mixin(ConfigReader):
                              parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                              row_idx: int):
 
-        self.shape_name_panel = LabelFrame(parent_frame, text="SHAPE NAME", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        self.shape_name_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE NAME", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='label_large')
+        #self.shape_name_panel = LabelFrame(parent_frame, text="SHAPE NAME", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         self.shape_name_eb = Entry_Box(parent=self.shape_name_panel, fileDescription="SHAPE NAME: ", labelwidth=15, entry_box_width=55)
         self.shape_name_panel.grid(row=row_idx, sticky=W, pady=10)
         self.shape_name_eb.grid(row=0, column=0, sticky=W, pady=10)
@@ -197,8 +201,8 @@ class ROI_mixin(ConfigReader):
     def get_interact_panel(self,
                            parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                            row_idx: int):
-
-        self.interact_panel = LabelFrame(parent_frame, text="SHAPE INTERACTION", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        self.interact_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE INTERACTION", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='interaction_large')
+        #self.interact_panel = LabelFrame(parent_frame, text="SHAPE INTERACTION", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         self.move_shape_btn = SimbaButton(parent=self.interact_panel, txt="MOVE SHAPE", img='move_large', txt_clr='black', cmd=self.move_shapes)
         self.shape_info_btn = SimbaButton(parent=self.interact_panel, txt="SHOW SHAPE INFO", img='info_large', txt_clr='black', enabled=True, cmd=self.show_shape_info)
         self.interact_panel.grid(row=row_idx, sticky=W, pady=10)
@@ -210,7 +214,7 @@ class ROI_mixin(ConfigReader):
                            parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                            row_idx: int):
 
-        self.save_roi_panel = LabelFrame(parent_frame, text="SAVE VIDEO ROI DATA", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        self.save_roi_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE INTERACTION", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='save_large')
         self.save_data_btn = SimbaButton(parent=self.save_roi_panel, txt="SAVE VIDEO ROI DATA", img='save_large', txt_clr='black', cmd=self.save_video_rois)
         self.save_roi_panel.grid(row=row_idx, sticky=W, pady=10)
         self.save_data_btn.grid(row=0, column=0, sticky=W, pady=10, padx=(0, 10))
@@ -235,7 +239,7 @@ class ROI_mixin(ConfigReader):
                                           parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                                           row_idx: int):
 
-        self.shapes_from_other_video_panel = LabelFrame(parent_frame, text="APPLY SHAPES FROM DIFFERENT VIDEO", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        self.shapes_from_other_video_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="APPLY SHAPES FROM DIFFERENT VIDEO", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='duplicate_2_large')
         self.other_videos_dropdown = DropDownMenu(self.shapes_from_other_video_panel, "FROM VIDEO: ", self.other_video_names_w_rois, 15)
         self.other_videos_dropdown.setChoices(self.other_video_names_w_rois[0])
         self.apply_other_video_btn = SimbaButton(parent=self.shapes_from_other_video_panel, txt="APPLY", img='tick_large', txt_clr='black', enabled=True, cmd=self.apply_different_video, cmd_kwargs={'video_name': lambda: self.other_videos_dropdown.getChoices()})
@@ -278,7 +282,7 @@ class ROI_mixin(ConfigReader):
                        parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                        row_idx: int):
 
-        self.draw_panel = LabelFrame(parent_frame, text="DRAW", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        self.draw_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="DRAW", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='palette_large')
         self.draw_btn = SimbaButton(parent=self.draw_panel, txt='DRAW', img='brush_large', txt_clr='black', cmd=self.draw)
         self.delete_all_btn = SimbaButton(parent=self.draw_panel, txt='DELETE ALL', img='delete_large_red', txt_clr='black', cmd=self.delete_all)
         self.roi_dropdown = DropDownMenu(self.draw_panel, "ROI: ", self.roi_names, 5)
@@ -312,7 +316,8 @@ class ROI_mixin(ConfigReader):
             msg = f'Cannot draw ROI named {shape_name}. An ROI named {shape_name} already exist in for the video.'
             self.set_status_bar_panel(text=msg, fg='red')
             raise InvalidInputError(msg=msg, source=f'{self.__class__.__name__} draw')
-        ctypes.windll.user32.SetWindowPos(self.draw_frm_handle, -1, 0, 0, 0, 0, 3)
+        if self.platform == OS.WINDOWS.value:
+            ctypes.windll.user32.SetWindowPos(self.draw_frm_handle, -1, 0, 0, 0, 0, 3)
         if self.selected_shape_type == RECTANGLE:
             rectangle_selector = ROISelector(path=self.img, thickness=int(self.thickness_dropdown.getChoices()), clr=self.color_option_dict[self.color_dropdown.getChoices()], title=DRAW_FRAME_NAME, destroy=True)
             rectangle_selector.run()

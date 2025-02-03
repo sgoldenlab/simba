@@ -23,6 +23,8 @@ class ROI_ui(ROI_mixin, ConfigReader):
 
     :example:
     >>> ROI_ui(config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini", video_path=r"C:\troubleshooting\mouse_open_field\project_folder\videos\Video1.mp4")
+    >>> ROI_ui(config_path=r"/mnt/c/troubleshooting/mouse_open_field/project_folder/project_config.ini", video_path=r"/mnt/c/troubleshooting/mouse_open_field/project_folder/videos/Video1.mp4")
+
     """
 
     def __init__(self,
@@ -55,11 +57,16 @@ class ROI_ui(ROI_mixin, ConfigReader):
         self.set_img(img=self.img)
         self.get_file_menu(root=self.define_ui.root)
         self.define_ui.root.protocol("WM_DELETE_WINDOW", self._close)
-        #self.define_ui.main_frm.mainloop()
+        self.define_ui.main_frm.mainloop()
 
     def _close(self):
         self.close_img()
         self.define_ui.root.destroy()
+
+#ROI_ui(config_path=r"/mnt/c/troubleshooting/mouse_open_field/project_folder/project_config.ini", video_path=r"/mnt/c/troubleshooting/mouse_open_field/project_folder/videos/Video1.mp4")
+
+
+
 
 #ROI_ui(config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini", video_path=r"C:\troubleshooting\mouse_open_field\project_folder\videos\Video1.mp4")
 

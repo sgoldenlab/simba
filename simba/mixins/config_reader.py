@@ -2,7 +2,7 @@ __author__ = "Simon Nilsson"
 
 import glob
 import itertools
-import json
+import platform
 import logging
 import logging.config
 import math
@@ -200,6 +200,7 @@ class ConfigReader(object):
             self.clr_lst,
         )
         self.project_bps = list(set([x[:-2] for x in self.bp_headers]))
+        self.platform = platform.system()
         self.color_dict = get_color_dict()
         if create_logger:
             self.create_logger()
