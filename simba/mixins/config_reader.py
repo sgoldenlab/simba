@@ -2,11 +2,11 @@ __author__ = "Simon Nilsson"
 
 import glob
 import itertools
-import platform
 import logging
 import logging.config
 import math
 import os
+import platform
 import shutil
 from configparser import ConfigParser
 from copy import deepcopy

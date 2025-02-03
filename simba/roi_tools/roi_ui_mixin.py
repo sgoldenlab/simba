@@ -35,7 +35,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, SimbaButton, SimBALabel,
                                         get_menu_icons)
 from simba.utils.checks import check_int, check_str
-from simba.utils.enums import ROI_SETTINGS, Formats, Keys, OS
+from simba.utils.enums import OS, ROI_SETTINGS, Formats, Keys
 from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 NoROIDataError)
 from simba.utils.lookups import get_color_dict
