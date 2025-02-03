@@ -12,6 +12,7 @@ import pkg_resources
 
 import simba
 
+
 class ConfigKey(Enum):
     GENERAL_SETTINGS = "General settings"
     PROJECT_PATH = "project_path"

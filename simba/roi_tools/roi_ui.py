@@ -1,14 +1,17 @@
 import os
-from typing import Union
-from simba.utils.checks import check_file_exist_and_readable
-from simba.utils.read_write import get_video_meta_data, find_all_videos_in_directory, get_fn_ext
-from simba.mixins.config_reader import ConfigReader
-from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.mixins.plotting_mixin import PlottingMixin
-from simba.mixins.image_mixin import ImageMixin
-from simba.utils.enums import ROI_SETTINGS
-from simba.roi_tools.roi_ui_mixin import ROI_mixin
 import warnings
+from typing import Union
+
+from simba.mixins.config_reader import ConfigReader
+from simba.mixins.image_mixin import ImageMixin
+from simba.mixins.plotting_mixin import PlottingMixin
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.roi_tools.roi_ui_mixin import ROI_mixin
+from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.enums import ROI_SETTINGS
+from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
+                                    get_video_meta_data)
+
 warnings.filterwarnings("ignore")
 
 

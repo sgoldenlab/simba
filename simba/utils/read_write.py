@@ -29,6 +29,7 @@ except:
     from typing_extensions import Literal
 
 from urllib.parse import urlparse
+
 import cv2
 import numpy as np
 import pandas as pd
