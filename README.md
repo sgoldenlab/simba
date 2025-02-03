@@ -26,6 +26,16 @@ To install SimBA via pip, use the following command:
 pip install simba-uw-tf-dev
 ```
 
+
+## Feb-02-2024: SimBA version 1.31 release
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_new_1.png" />
+</p>
+
+We have improved the GUI for region-of-interest segmentation and analysis, which includes new interactive controls for drawing shapes. 
+[Click here to go to the new ROI documentation page.](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md)
+
 ## Apr-16-2023: API Reference
 
 See SimBA on [readthedocs](https://simba-uw-tf-dev.readthedocs.io/) for [API reference](https://simba-uw-tf-dev.readthedocs.io/en/latest/api.html) and [example notebooks](https://simba-uw-tf-dev.readthedocs.io/en/latest/notebooks.html) when you prefer to run methods available in SimBA through the command line over the GUI. If you find that notebook examples are lacking, please reach out to us [Gitter](https://gitter.im/SimBA-Resource/community) or by opening an issue and let's chat about typing up further examples!
@@ -47,10 +57,6 @@ We have released a significantly improved GUI for region-of-interest segmentatio
 [Click here to go to the new ROI documentation page.](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md)
 
 ### <p align="center"> Regions of Interest (ROIs) in SimBA </p>
-
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_new_1.png" />
-</p>
 
 The SimBA region of interest (ROI) interface allows users to define and 
 draw ROIs on videos. ROI data can be used to calculate basic descriptive 

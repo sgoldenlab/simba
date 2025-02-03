@@ -2,10 +2,10 @@ Tutorials
 =============
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
 
    tutorials_rst/roi
-   tutorials_rst/roi_new
+   tutorials_rst/roi_tutorial_new_2025
    tutorials_rst/FSTTC
    tutorials_rst/feature_subsets
    tutorials_rst/user_defined_feature_class
