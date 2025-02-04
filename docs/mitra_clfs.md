@@ -2,7 +2,10 @@
 
 ## 1) PRE-PROCESSING: Egocentric alignment and background subtraction for Straub tail classification. 
 
-For accurately classyifing Straub tail, we need features constructed from **images** of the animals tail (not, as done by default, features constructed from the **pose-estimated locations** of the animal). 
+For accurately classyifing Straub tail, we need features constructed from **images** of the animals tail (not, as done by default, features constructed from the **pose-estimated locations** of the animal). To get standardized images of the animals 
+tails, we need to create copies of the original videos and original pose-estimation data where the background have been subtracted and the videos have been egocentrically aligned. 
+
+For these steps, I have jupyter notebook examples below, but please let me know if your prefer to go through these steps by clicking in a graphical user interface and I can make it available. 
 
 #### Background subtraction
 
@@ -15,9 +18,8 @@ To create copies of videos where the background is removed, you can use [THIS](h
 
 #### Egocentric alignment
 
-In order to do this, we first need to create copies of the original videos 
-which are [egocentrically align](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.data_processors.html#simba.data_processors.egocentric_aligner.EgocentricalAligner). This means that we spin the videos around so that the animal is always faacing in the same direction (e.g., east), 
-as in the example below. We do this to remove any variability associated with animal direction: i.e., the animal direction in itself should can not change how the tail looks like.
+After peforming the background subtraction, we need to [egocentrically aligned](https://simba-uw-tf-dev.readthedocs.io/en/latest/simba.data_processors.html#simba.data_processors.egocentric_aligner.EgocentricalAligner) copies of the background subtracted videos. 
+This means that we spin the videos around so that the animal is always faacing in the same direction (e.g., east), as in the example below. We do this to remove any variability associated with animal direction: i.e., the animal direction in itself should can not change how the tail looks like.
 
 [EgocentricalAligner.webm](https://github.com/user-attachments/assets/7caf920b-0e86-49c2-bfde-2b606de6d6d8)
 
@@ -28,13 +30,13 @@ located in the rotated videos,  and we can perform any calculations from the bod
 To perform pose-estimation based video and data rotation, use [THIS](https://simba-uw-tf-dev.readthedocs.io/en/latest/nb/egocentric_align.html) notebook. 
 
 > [!NOTE] 
-> I can insert GUI options for doing these operations (background subtraction and egocentric alignment) if you prefer!
+> Again I can insert GUI options for doing these operations (background subtraction and egocentric alignment) if you prefer!
 
 ## 2) DATA IMPORT: Interpolation and smoothing.
 
-When importing the SLEAP pose-estimation data into SimBA, perform `Body-part: Nearest` interpolation. This ensures that for any frame a body-part is missing in, the body-part will take the location of when the body-part was last visibale. 
+Next, import the raw, original pose-estimation data into SimBA, perform `Body-part: Nearest` interpolation. This ensures that for any frame a body-part is missing in, the body-part will take the location of when the body-part was last visibale. 
 
-Also, perform Savitzky-Golay smoothing using a 500ms time-window to remove pose-estimation jitter. 
+Also perform Savitzky-Golay smoothing using a 400ms time-window to remove pose-estimation jitter. 
 
 Do not perform any outlier correction. 
 
@@ -49,10 +51,10 @@ and is located [HERE](https://github.com/sgoldenlab/simba/blob/master/simba/sand
 After feature extraction, your good to go and run the `grooming` and `rearing` classifier. Run the classifiers
 in SimBA as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data).
 
-GROOMING THRESHOLD:             XX
-GROOMING MINIMUM BOUT LENGTH:   XX
-REARING THRESHOLD:              XX
-REARING MINIMUM BOUT LENGTH:    XX
+GROOMING THRESHOLD:             0.35                                            
+GROOMING MINIMUM BOUT LENGTH:   200ms
+REARING THRESHOLD:              0.30
+REARING MINIMUM BOUT LENGTH:    200ms
 
 ## COMPUTE ADDITIONAL STRAUB TAIL FEATURES
 
@@ -60,20 +62,21 @@ Now, in order to run the Straub tail classifier, we need to compute some additio
 features computed in the prior step, to create the final feature set for the Straub tail classifier.  
 
 **Step i**: To compute these features, use [THIS](https://github.com/sgoldenlab/simba/blob/master/simba/sandbox/mitra_tail_analyzer.py)
-script. This produces a set of files, one for each of the videos, inside your chosen ``save_dir``
+script. This produces a set of files, one for each of the videos, inside your passed ``save_dir``
 
 **Step ii**: In step 2, we need to combine these features created in (i) with some features created in step `"3) CUSTOM FEATURE EXTRACTION"` to create the final
 feature set for the tail classifier. To do this, run [THIS](https://github.com/sgoldenlab/simba/blob/master/simba/sandbox/mitra_appand_additional.py) scrip.
-This produces a final set of files inside the chosen ``SAVE_DIR``.
+This produces a final set of files inside the passed ``SAVE_DIR``.
 
-**Step ii**: Move these files ouputted in Step (ii) to the ``project_folder/csv/features_extracted`` directory of your SimBA project (move the files you have used for the grooming/rearing classifications first).
+**Step ii**: Move the files ouputted in step (ii) to the ``project_folder/csv/features_extracted`` directory of your SimBA project (move the files you have used for the grooming/rearing classifications first). 
+Alternatively, place thse files inside the ``project_folder/csv/features_extracted`` directory of a new SimBA project only designed to classify Straub tail. 
 
 ## 4) RUN STRAUB TAIL CLASSIFIER
 
 Run the straub tail classifier in SimBA as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data).
 
-STRAUB TAIL THRESHOLD:          XX
-STRAUB TAIL MINIMUM BOUT LENGTH:   XX
+STRAUB TAIL THRESHOLD:             0.30
+STRAUB TAIL MINIMUM BOUT LENGTH:   200ms
 
 
 
