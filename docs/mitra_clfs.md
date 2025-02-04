@@ -51,9 +51,12 @@ and is located [HERE](https://github.com/sgoldenlab/simba/blob/master/simba/sand
 After feature extraction, your good to go and run the `grooming` and `rearing` classifier. Run the classifiers
 in SimBA as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data).
 
-GROOMING THRESHOLD:             0.35                                            
+GROOMING THRESHOLD:             0.35  
+
 GROOMING MINIMUM BOUT LENGTH:   200ms
+
 REARING THRESHOLD:              0.30
+
 REARING MINIMUM BOUT LENGTH:    200ms
 
 ## COMPUTE ADDITIONAL STRAUB TAIL FEATURES
@@ -76,6 +79,7 @@ Alternatively, place thse files inside the ``project_folder/csv/features_extract
 Run the straub tail classifier in SimBA as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-3-run-the-classifier-on-new-data).
 
 STRAUB TAIL THRESHOLD:             0.30
+
 STRAUB TAIL MINIMUM BOUT LENGTH:   200ms
 
 
