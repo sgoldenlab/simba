@@ -5,12 +5,15 @@ from typing import List, Optional, Union
 import numpy as np
 import pandas as pd
 
-from simba.data_processors.timebins_movement_calculator import TimeBinsMovementCalculator
+from simba.data_processors.timebins_movement_calculator import \
+    TimeBinsMovementCalculator
 from simba.mixins.config_reader import ConfigReader
-from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
+from simba.mixins.feature_extraction_supplement_mixin import \
+    FeatureExtractionSupplemental
 from simba.roi_tools.ROI_analyzer import ROIAnalyzer
 from simba.utils.checks import check_float
-from simba.utils.errors import (BodypartColumnNotFoundError, DuplicationError, FrameRangeError, ROICoordinatesNotFoundError)
+from simba.utils.errors import (BodypartColumnNotFoundError, DuplicationError,
+                                FrameRangeError, ROICoordinatesNotFoundError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_data_paths, read_df
 
