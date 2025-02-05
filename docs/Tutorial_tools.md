@@ -40,6 +40,7 @@ We have developed video and image processing tools and incorporated them into th
 - [Extract ROI definitions to human-readable format](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-roi-definitions-to-human-readable-format)
 - [Temporally join videos](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#temporal-join-videos)
 - [Extract project annotation counts](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-project-annotation-counts)
+- [Remove video backgrounds](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#remove-background-from-all-videos-in-a-directory)
 
 ## Shorten Videos
 This is a tool used to trim video lengths. The tool contains two different methods: 
@@ -647,6 +648,40 @@ iv) Click the `RUN` button. You can follow the progress in the main SimBA termin
 v) Once complete, new videos will be stored in your selected output directory.
 
 
+### REMOVE BACKGROUND FROM A SINGLE VIDEO 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/bg_removal_single.webp" />
+</p>
+
+* In `VIDEO PATH`, click <kbd>BROWSE</kbd> and select the file you which to remove the background from.
+* OPTIONAL: In `BACKGROUND REFERENCE VIDEO PATH`, click <kbd>BROWSE</kbd> and select a video file that represents the background (has no animals visible but otherwise representative / near identical copy of video selected in `VIDEO PATH`)
+> [!NOTE]
+> `BACKGROUND REFERENCE VIDEO PATH` can often be left blank (do not select any video). If no video is selected, the background with be computed from the `VIDEO PATH`.
+* `COMPUTE BACKGROUND FROM ENTIRE VIDEO`: The background can be computed from the entire video, of a segment of the video. If you want to compute it from teh entire video, check the `COMPUTE BACKGROUND FROM ENTIRE VIDEO` checkbox.
+   - `BACKGROUND VIDEO START (FRAME # OR TIME)`: If **un-checking** the `COMPUTE BACKGROUND FROM ENTIRE VIDEO`, we need to select a segment of the background video which we will use to compute the background. Enter the **START** time (e.g., `00:00:00`) or or start frame (e.g., `0`) of the segment here.
+   - `BACKGROUND VIDEO END (FRAME # OR TIME)`: If **un-checking** the `COMPUTE BACKGROUND FROM ENTIRE VIDEO`, we need to select a segment of the background video which we will use to compute the background. Enter the **END** time (e.g., `00:00:20`) or or start frame (e.g., `1200`) of the segment here.
+* `MULTIPROCESS VIDEO (FASTER): To use multiprocessing, and process each image of the video in parallel on each of your available CPU cores, check this box and select how many cores you want to use in the `CPU cores` dropdown.
+
+Once complete, hit the <kbd>RUN</kbd> button. You can follow the progress in the main SimBA terminal window and the operating system terminal window. The background removed video will be saved in the same directory as the `VIDEO PATH` with the `_bg_subtracted` suffix. 
+
+### REMOVE BACKGROUND FROM ALL VIDEOS IN A DIRECTORY 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/bg_removal_directory.webp" />
+</p>
+
+* In `VIDEO DIRECTORY`, click <kbd>BROWSE</kbd> and select the directory containing videos you want to remove the background from. 
+* OPTIONAL: In `BACKGROUND VIDEO DIRECTORY`, click <kbd>BROWSE</kbd> and select a directory containing videos mirring the filenames of the videos in the `VIDEO DIRECTORY` but have animals visible but otherwise representative / near identical copy of video selected in `VIDEO DIRECTORY`.
+> [!NOTE]
+> `BACKGROUND VIDEO DIRECTORY` can most often be left blank (do not select any directory). If no directory is selected, the background with be computed from the  videos in `VIDEO DIRECTORY` themselves. 
+* `COMPUTE BACKGROUND FROM ENTIRE VIDEO`: The background can be computed from the entire videos, of a segment of the videos. If you want to compute it from the entire videos, check the `COMPUTE BACKGROUND FROM ENTIRE VIDEO` checkbox.
+   - `BACKGROUND VIDEO START (FRAME # OR TIME)`: If **un-checking** the `COMPUTE BACKGROUND FROM ENTIRE VIDEO`, we need to select a segments of the background videos which we will use to compute the background. Enter the **START** time (e.g., `00:00:00`) or or start frame (e.g., `0`) of the segment here.
+   - `BACKGROUND VIDEO END (FRAME # OR TIME)`: If **un-checking** the `COMPUTE BACKGROUND FROM ENTIRE VIDEO`, we need to select a segments of the background videos which we will use to compute the background. Enter the **END** time (e.g., `00:00:20`) or or start frame (e.g., `1200`) of the segment here.
+* `MULTIPROCESS VIDEO (FASTER): To use multiprocessing, and process each image of the video in parallel on each of your available CPU cores, check this box and select how many cores you want to use in the `CPU cores` dropdown.
+
+Once complete, hit the <kbd>RUN</kbd> button. You can follow the progress in the main SimBA terminal window and the operating system terminal window. The background removed video will be saved in the same directory as the `VIDEO PATH` with the `_bg_subtracted` suffix. 
+   
 ##
 Author [Simon N](https://github.com/sronilsson), [JJ Choong](https://github.com/inoejj)
 
