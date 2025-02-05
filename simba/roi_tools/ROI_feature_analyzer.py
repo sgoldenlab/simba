@@ -9,13 +9,20 @@ import pandas as pd
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.roi_tools.ROI_directing_analyzer import DirectingROIAnalyzer
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_file_exist_and_readable, check_that_column_exist, check_valid_lst, check_valid_boolean)
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_file_exist_and_readable, check_that_column_exist,
+    check_valid_boolean, check_valid_lst)
 from simba.utils.data import slice_roi_dict_for_video
 from simba.utils.enums import Keys, TagNames
-from simba.utils.errors import (BodypartColumnNotFoundError, CountError, NoFilesFoundError, ROICoordinatesNotFoundError, InvalidFilepathError, InvalidInputError)
+from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
+                                InvalidFilepathError, InvalidInputError,
+                                NoFilesFoundError, ROICoordinatesNotFoundError)
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, read_data_paths, read_df, write_df)
-from simba.utils.warnings import ROIWarning, DuplicateNamesWarning
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_data_paths, read_df,
+                                    write_df)
+from simba.utils.warnings import DuplicateNamesWarning, ROIWarning
 
 
 class ROIFeatureCreator(ConfigReader, FeatureExtractionMixin):

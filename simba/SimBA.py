@@ -130,13 +130,13 @@ from simba.ui.pop_ups.third_party_annotator_appender_pop_up import ThirdPartyAnn
 from simba.ui.pop_ups.egocentric_alignment_pop_up import EgocentricAlignPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
-    BackgroundRemoverSingleVideoPopUp, BackgroundRemoverDirectoryPopUp, BoxBlurPopUp, BrightnessContrastPopUp,
-    CalculatePixelsPerMMInVideoPopUp, ChangeFpsMultipleVideosPopUp,
-    ChangeFpsSingleVideoPopUp, CLAHEPopUp, ClipSingleVideoByFrameNumbers,
-    ClipVideoPopUp, ConcatenatingVideosPopUp, ConcatenatorPopUp,
-    Convert2AVIPopUp, Convert2BlackWhitePopUp, Convert2bmpPopUp,
-    Convert2jpegPopUp, Convert2MOVPopUp, Convert2MP4PopUp, Convert2PNGPopUp,
-    Convert2TIFFPopUp, Convert2WEBMPopUp, Convert2WEBPPopUp,
+    BackgroundRemoverDirectoryPopUp, BackgroundRemoverSingleVideoPopUp,
+    BoxBlurPopUp, BrightnessContrastPopUp, CalculatePixelsPerMMInVideoPopUp,
+    ChangeFpsMultipleVideosPopUp, ChangeFpsSingleVideoPopUp, CLAHEPopUp,
+    ClipSingleVideoByFrameNumbers, ClipVideoPopUp, ConcatenatingVideosPopUp,
+    ConcatenatorPopUp, Convert2AVIPopUp, Convert2BlackWhitePopUp,
+    Convert2bmpPopUp, Convert2jpegPopUp, Convert2MOVPopUp, Convert2MP4PopUp,
+    Convert2PNGPopUp, Convert2TIFFPopUp, Convert2WEBMPopUp, Convert2WEBPPopUp,
     ConvertROIDefinitionsPopUp, CreateAverageFramePopUp, CreateGIFPopUP,
     CropVideoCirclesPopUp, CropVideoPolygonsPopUp, CropVideoPopUp,
     CrossfadeVideosPopUp, DownsampleMultipleVideosPopUp,
