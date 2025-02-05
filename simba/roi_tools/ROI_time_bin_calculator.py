@@ -5,15 +5,12 @@ from typing import List, Optional, Union
 import numpy as np
 import pandas as pd
 
-from simba.data_processors.timebins_movement_calculator import \
-    TimeBinsMovementCalculator
+from simba.data_processors.timebins_movement_calculator import TimeBinsMovementCalculator
 from simba.mixins.config_reader import ConfigReader
-from simba.mixins.feature_extraction_supplement_mixin import \
-    FeatureExtractionSupplemental
+from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
 from simba.roi_tools.ROI_analyzer import ROIAnalyzer
-from simba.utils.checks import check_float, check_if_filepath_list_is_empty
-from simba.utils.errors import (BodypartColumnNotFoundError, DuplicationError,
-                                FrameRangeError, ROICoordinatesNotFoundError)
+from simba.utils.checks import check_float
+from simba.utils.errors import (BodypartColumnNotFoundError, DuplicationError, FrameRangeError, ROICoordinatesNotFoundError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_data_paths, read_df
 
@@ -124,6 +121,15 @@ class ROITimebinCalculator(ConfigReader):
             self.results_movement_velocity.sort_values(by=["VIDEO", "SHAPE", "ANIMAL", "TIME BIN #"]).set_index("VIDEO").to_csv(self.save_path_movement_velocity)
             stdout_success(msg=f"ROI time-bin movement data saved at {self.save_path_movement_velocity}", elapsed_time=self.timer.elapsed_time_str)
 
+
+
+# test = ROITimebinCalculator(config_path=r"C:\troubleshooting\spontenous_alternation\project_folder\project_config.ini",
+#                             bin_length=0.5,
+#                             body_parts=['nose'],
+#                             threshold=0.00,
+#                             movement=True)
+# test.run()
+# test.save()
 
 
 # test = ROITimebinCalculator(config_path=r"C:\troubleshooting\ROI_movement_test\project_folder\project_config.ini",

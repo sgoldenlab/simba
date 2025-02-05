@@ -130,7 +130,7 @@ from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
     ThirdPartyAnnotatorAppenderPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
-    BackgroundRemoverPopUp, BoxBlurPopUp, BrightnessContrastPopUp,
+    BackgroundRemoverSingleVideoPopUp, BackgroundRemoverDirectoryPopUp, BoxBlurPopUp, BrightnessContrastPopUp,
     CalculatePixelsPerMMInVideoPopUp, ChangeFpsMultipleVideosPopUp,
     ChangeFpsSingleVideoPopUp, CLAHEPopUp, ClipSingleVideoByFrameNumbers,
     ClipVideoPopUp, ConcatenatingVideosPopUp, ConcatenatorPopUp,
@@ -891,6 +891,12 @@ class App(object):
         superimpose_menu.add_command(label="Superimpose free-text", compound="left", image=self.menu_icons["text_black"]["img"], command=SuperimposeTextPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_cascade(label="Superimpose on videos...", compound="left", image=self.menu_icons["superimpose"]["img"], menu=superimpose_menu, font=Formats.FONT_REGULAR.value)
 
+        remove_bg_menu = Menu(menu)
+        remove_bg_menu.add_command(label="Remove background from single video (mean subtraction)", compound="left", image=self.menu_icons["remove_bg"]["img"], command=BackgroundRemoverSingleVideoPopUp, font=Formats.FONT_REGULAR.value)
+        remove_bg_menu.add_command(label="Remove background from multiple videos (mean subtraction)", compound="left", image=self.menu_icons["remove_bg"]["img"], command=BackgroundRemoverDirectoryPopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_cascade(label="Remove video backgrounds...", compound="left", image=self.menu_icons["remove_bg"]["img"], menu=remove_bg_menu, font=Formats.FONT_REGULAR.value)
+
+
         temporal_join_videos = Menu(menu)
         temporal_join_videos.add_command(label="Temporal join all videos in directory", command=VideoTemporalJoinPopUp, font=Formats.FONT_REGULAR.value)
         temporal_join_videos.add_command(label="Temporal join selected videos", command=ManualTemporalJoinPopUp, font=Formats.FONT_REGULAR.value)
@@ -898,7 +904,6 @@ class App(object):
         video_process_menu.add_command(label="Box blur videos", compound="left", image=self.menu_icons["blur"]["img"], command=BoxBlurPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Cross-fade videos", compound="left", image=self.menu_icons["crossfade"]["img"], command=CrossfadeVideosPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Create average frames from videos", compound="left", image=self.menu_icons["average"]["img"], command=CreateAverageFramePopUp, font=Formats.FONT_REGULAR.value)
-        video_process_menu.add_command(label="Video background remover", compound="left", image=self.menu_icons["remove_bg"]["img"], command=BackgroundRemoverPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Validate video seekability", compound="left", image=self.menu_icons["search"]["img"], command=CheckVideoSeekablePopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Visualize pose-estimation in folder...", compound="left", image=self.menu_icons["visualize"]["img"], command=VisualizePoseInFolderPopUp, font=Formats.FONT_REGULAR.value)
         help_menu = Menu(menu)

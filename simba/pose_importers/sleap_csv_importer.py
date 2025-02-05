@@ -11,20 +11,14 @@ from simba.data_processors.interpolate import Interpolate
 from simba.data_processors.smoothing import Smoothing
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pose_importer_mixin import PoseImporterMixin
-from simba.utils.checks import (check_if_dir_exists,
-                                check_if_keys_exist_in_dict, check_int,
-                                check_str, check_that_column_exist,
-                                check_valid_lst)
-from simba.utils.enums import Methods, TagNames
-from simba.utils.errors import CountError
+from simba.utils.checks import (check_if_dir_exists, check_if_keys_exist_in_dict, check_int, check_str, check_that_column_exist, check_valid_lst)
+from simba.utils.enums import TagNames, Methods
+from simba.utils.errors import CountError, NoFilesFoundError, AnimalNumberError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (clean_sleap_file_name,
-                                    find_all_videos_in_project, get_fn_ext,
-                                    get_video_meta_data, write_df)
+from simba.utils.read_write import (clean_sleap_file_name, find_all_videos_in_project, get_fn_ext, get_video_meta_data, write_df, find_files_of_filetypes_in_directory)
 
 TRACK = "track"
 INSTANCE_SCORE = "instance.score"
-
 
 class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
     """
@@ -73,7 +67,7 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
         self.data_folder, self.id_lst = data_folder, id_lst
         self.import_log_path = os.path.join(self.logs_path, f"data_import_log_{self.datetime}.csv")
         self.video_paths = find_all_videos_in_project(videos_dir=self.video_dir)
-        self.input_data_paths = self.find_data_files(dir=self.data_folder, extensions=[".csv"])
+        self.input_data_paths = find_files_of_filetypes_in_directory(directory=self.data_folder, extensions=['.csv'], raise_error=True)
         if self.pose_setting is Methods.USER_DEFINED.value:
             self.__update_config_animal_cnt()
         if self.animal_cnt > 1:
@@ -84,12 +78,12 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
                 self.update_bp_headers_file(update_bp_headers=True)
         else:
             self.data_and_videos_lk = dict([(get_fn_ext(file_path)[1], {"DATA": file_path, "VIDEO": None}) for file_path in self.input_data_paths])
-        print(f"Importing {len(list(self.data_and_videos_lk.keys()))} file(s)...")
+        print(f"Importing {len(list(self.data_and_videos_lk.keys()))} SLEAP CSV file(s)...")
 
     def run(self):
         for file_cnt, (video_name, video_data) in enumerate(self.data_and_videos_lk.items()):
             output_filename = clean_sleap_file_name(filename=video_name)
-            print(f"Analysing {output_filename}...")
+            print(f"Importing {output_filename}...")
             video_timer = SimbaTimer(start=True)
             self.video_name = video_name
             self.save_path = os.path.join(os.path.join(self.input_csv_dir, f"{output_filename}.{self.file_type}"))
@@ -97,10 +91,13 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
             if INSTANCE_SCORE in data_df.columns:
                 data_df = data_df.drop([INSTANCE_SCORE], axis=1)
             idx = data_df.iloc[:, :2]
+            data_unique_tracks = list(idx[TRACK].unique())
             check_that_column_exist(df=idx, column_name=TRACK, file_name=video_name)
-            idx[TRACK] = idx[TRACK].fillna("track_1")
-            #idx[TRACK] = idx[TRACK].str.replace(r"[^\d.]+", "").astype(int)
-            idx[TRACK] = idx[TRACK].str.replace(r"[^\d.]+", "", regex=True).astype(int)
+            idx[TRACK] = idx[TRACK].fillna(data_unique_tracks[0])
+            idx[TRACK] = idx[TRACK].str.replace(r"[^\d.]+", "").astype(int)
+            #idx[TRACK] = idx[TRACK].str.replace(r"[^\d.]+", "", regex=True).astype(int)
+            if len(data_unique_tracks) != self.animal_cnt:
+                raise AnimalNumberError(msg=f'The SLEAP CSV file {video_data["DATA"]} contains data for {len(data_unique_tracks)} tracks (found tracks: {data_unique_tracks}). The SimBA project config says the SimBA project expects data for {self.animal_cnt} animals.')
             data_df = data_df.iloc[:, 2:].fillna(0)
             if self.animal_cnt > 1:
                 self.data_df = pd.DataFrame(self.transpose_multi_animal_table(data=data_df.values, idx=idx.values, animal_cnt=self.animal_cnt))
@@ -111,7 +108,7 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
                 self.data_df = self.data_df.reindex(range(0, self.data_df.index[-1] + 1), fill_value=0)
 
             if len(self.bp_headers) != len(self.data_df.columns):
-                raise CountError(msg=f"SimBA project expects {len(self.bp_headers)} data columns, but your SLEAP data file {video_name} contains {len(self.data_df.columns)} columns. Missing columns: {list(set(self.bp_headers) - set(self.data_df.columns))}", source=self.__class__.__name__)
+                raise CountError(msg=f"SimBA project expects {len(self.bp_headers)} data columns, but your SLEAP data file {video_name} contains {len(self.data_df.columns)} columns.", source=self.__class__.__name__)
             self.data_df.columns = self.bp_headers
             self.out_df = deepcopy(self.data_df)
 
@@ -132,6 +129,20 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
             stdout_success(msg=f"Video {video_name} data imported...", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
         self.timer.stop_timer()
         stdout_success(msg=f"{len(list(self.data_and_videos_lk.keys()))} file(s) imported to the SimBA project {self.input_csv_dir}", source=self.__class__.__name__)
+
+
+
+
+#
+# test = SLEAPImporterCSV(config_path=r"C:\troubleshooting\sleap_import_two_tracks\project_folder\project_config.ini",
+#                  data_folder=r'C:\troubleshooting\sleap_import_two_tracks\data_csv',
+#                  id_lst=['Track_0', 'Track_1'],
+#                  interpolation_settings={'type': 'animals', 'method': 'linear'},
+#                  smoothing_settings = {'time_window': 500, 'method': 'gaussian'})
+# test.run()
+
+
+
 
 # test = SLEAPImporterCSV(config_path=r"C:\troubleshooting\sleap_import_two_tracks\project_folder\project_config.ini",
 #                  data_folder=r'C:\troubleshooting\sleap_import_two_tracks\data_csv',

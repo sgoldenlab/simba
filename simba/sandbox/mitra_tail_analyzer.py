@@ -165,10 +165,10 @@ class MitraTailAnalyzer(ConfigReader):
                     write_df(df=out_df, file_type='csv', save_path=save_path)
                     print(video_timer.elapsed_time_str)
 
-runner = MitraTailAnalyzer(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
-                           data_dir=r'C:\troubleshooting\mitra\project_folder\videos\additional\bg_removed\rotated',
-                           video_dir=r'C:\troubleshooting\mitra\project_folder\videos\additional\bg_removed\rotated',
-                           save_dir=r'C:\troubleshooting\mitra\project_folder\videos\additional\bg_removed\rotated\tail_features_additional',
-                           anchor_points=('tail_base', 'tail_center', 'tail_tip'),
-                           body_parts=('nose', 'left_ear', 'right_ear', 'right_side', 'left_side', 'tail_base'))
-runner.run()
+# runner = MitraTailAnalyzer(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#                            data_dir=r'C:\troubleshooting\mitra\project_folder\videos\additional\bg_removed\rotated',
+#                            video_dir=r'C:\troubleshooting\mitra\project_folder\videos\additional\bg_removed\rotated',
+#                            save_dir=r'C:\troubleshooting\mitra\project_folder\videos\additional\bg_removed\rotated\tail_features_additional',
+#                            anchor_points=('tail_base', 'tail_center', 'tail_tip'),
+#                            body_parts=('nose', 'left_ear', 'right_ear', 'right_side', 'left_side', 'tail_base'))
+# runner.run()

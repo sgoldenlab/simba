@@ -11,10 +11,10 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.data import slice_roi_dict_for_video
-from simba.utils.errors import (InvalidInputError, NoDataError,
-                                ROICoordinatesNotFoundError)
+from simba.utils.errors import (InvalidInputError, NoDataError, ROICoordinatesNotFoundError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_data_paths, read_df
+from simba.utils.enums import ROI_SETTINGS
 
 
 class DirectingROIAnalyzer(ConfigReader, FeatureExtractionMixin):
@@ -97,14 +97,8 @@ class DirectingROIAnalyzer(ConfigReader, FeatureExtractionMixin):
             if shape_type == "Circle":
                 reversed_roi_lines = roi_lines[::-1]
                 for j in prange(roi_lines.shape[0]):
-                    dist_1 = np.sqrt(
-                        (eye[0] - roi_lines[j][0]) ** 2
-                        + (eye[1] - roi_lines[j][1]) ** 2
-                    )
-                    dist_2 = np.sqrt(
-                        (eye[0] - roi_lines[j][2]) ** 2
-                        + (eye[1] - roi_lines[j][3]) ** 2
-                    )
+                    dist_1 = np.sqrt((eye[0] - roi_lines[j][0]) ** 2 + (eye[1] - roi_lines[j][1]) ** 2)
+                    dist_2 = np.sqrt((eye[0] - roi_lines[j][2]) ** 2 + (eye[1] - roi_lines[j][3]) ** 2)
                     if (dist_1 < min_distance) or (dist_2 < min_distance):
                         min_distance = min(dist_1, dist_2)
                         results[i] = reversed_roi_lines[j]
@@ -112,16 +106,9 @@ class DirectingROIAnalyzer(ConfigReader, FeatureExtractionMixin):
             else:
                 for j in prange(roi_lines.shape[0]):
                     line_a, line_b = roi_lines[j][0:2], roi_lines[j][2:4]
-                    center_x, center_y = (
-                        line_a[0] + line_b[0] // 2,
-                        line_a[1] + line_b[1] // 2,
-                    )
-                    if calc(eye, line_a, line_b) != calc(roi, line_a, line_b) or calc(
-                        eye, roi, line_a
-                    ) != calc(eye, roi, line_b):
-                        distance = np.sqrt(
-                            (eye[0] - center_x) ** 2 + (eye[1] - center_y) ** 2
-                        )
+                    center_x, center_y = (line_a[0] + line_b[0] // 2, line_a[1] + line_b[1] // 2)
+                    if calc(eye, line_a, line_b) != calc(roi, line_a, line_b) or calc(eye, roi, line_a) != calc(eye, roi, line_b):
+                        distance = np.sqrt((eye[0] - center_x) ** 2 + (eye[1] - center_y) ** 2)
                         if distance < min_distance:
                             results[i] = roi_lines[j]
                             min_distance = distance
@@ -132,61 +119,29 @@ class DirectingROIAnalyzer(ConfigReader, FeatureExtractionMixin):
 
         eye_lines = bp_data[["Eye_x", "Eye_y", "ROI_x", "ROI_y"]].values.astype(int)
         roi_lines = None
-        if shape_info["Shape_type"] == "Rectangle":
+        if shape_info["Shape_type"].lower() == ROI_SETTINGS.RECTANGLE.value:
             top_left_x, top_left_y = (shape_info["topLeftX"], shape_info["topLeftY"])
-            bottom_right_x, bottom_right_y = (
-                shape_info["Bottom_right_X"],
-                shape_info["Bottom_right_Y"],
-            )
+            bottom_right_x, bottom_right_y = (shape_info["Bottom_right_X"], shape_info["Bottom_right_Y"])
             top_right_x, top_right_y = top_left_x + shape_info["width"], top_left_y
-            bottom_left_x, bottom_left_y = (
-                bottom_right_x - shape_info["width"],
-                bottom_right_y,
-            )
-            roi_lines = np.array(
-                [
-                    [top_left_x, top_left_y, bottom_left_x, bottom_left_y],
-                    [bottom_left_x, bottom_left_y, bottom_right_x, bottom_right_y],
-                    [bottom_right_x, bottom_right_y, top_right_x, top_right_y],
-                    [top_right_x, top_right_y, top_left_x, top_left_y],
-                ]
-            )
+            bottom_left_x, bottom_left_y = (bottom_right_x - shape_info["width"], bottom_right_y)
+            roi_lines = np.array([[top_left_x, top_left_y, bottom_left_x, bottom_left_y],
+                                  [bottom_left_x, bottom_left_y, bottom_right_x, bottom_right_y],
+                                  [bottom_right_x, bottom_right_y, top_right_x, top_right_y],
+                                  [top_right_x, top_right_y, top_left_x, top_left_y]])
 
-        elif shape_info["Shape_type"] == "Polygon":
+        elif shape_info["Shape_type"].lower() == ROI_SETTINGS.POLYGON.value:
             roi_lines = np.full((shape_info["vertices"].shape[0], 4), np.nan)
-            roi_lines[-1] = np.hstack(
-                (shape_info["vertices"][0], shape_info["vertices"][-1])
-            )
+            roi_lines[-1] = np.hstack((shape_info["vertices"][0], shape_info["vertices"][-1]))
             for i in range(shape_info["vertices"].shape[0] - 1):
-                roi_lines[i] = np.hstack(
-                    (shape_info["vertices"][i], shape_info["vertices"][i + 1])
-                )
+                roi_lines[i] = np.hstack((shape_info["vertices"][i], shape_info["vertices"][i + 1]))
 
-        elif shape_info["Shape_type"] == "Circle":
+        elif shape_info["Shape_type"].lower() == ROI_SETTINGS.CIRCLE.value:
             center = shape_info[["centerX", "centerY"]].values.astype(int)
             roi_lines = np.full((2, 4), np.nan)
-            roi_lines[0] = np.array(
-                [
-                    center[0],
-                    center[1] - shape_info["radius"],
-                    center[0],
-                    center[1] + shape_info["radius"],
-                ]
-            )
-            roi_lines[1] = np.array(
-                [
-                    center[0] - shape_info["radius"],
-                    center[1],
-                    center[0] + shape_info["radius"],
-                    center[1],
-                ]
-            )
+            roi_lines[0] = np.array([center[0], center[1] - shape_info["radius"], center[0], center[1] + shape_info["radius"]])
+            roi_lines[1] = np.array([center[0] - shape_info["radius"], center[1], center[0] + shape_info["radius"], center[1]])
 
-        return self.ccw(
-            roi_lines=roi_lines,
-            eye_lines=eye_lines,
-            shape_type=shape_info["Shape_type"],
-        )
+        return self.ccw(roi_lines=roi_lines, eye_lines=eye_lines, shape_type=shape_info["Shape_type"])
 
     def run(self):
         self.results = []
@@ -204,19 +159,8 @@ class DirectingROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                     for _, row in roi_type_data.iterrows():
                         roi_center = np.array([row["Center_X"], row["Center_Y"]])
                         roi_name = row["Name"]
-                        direction_data = FeatureExtractionMixin.jitted_line_crosses_to_static_targets(
-                            left_ear_array=ear_left_arr,
-                            right_ear_array=ear_right_arr,
-                            nose_array=nose_arr,
-                            target_array=roi_center,
-                        )
-                        bp_data = self.__format_direction_data(
-                            direction_data=direction_data,
-                            nose_arr=nose_arr,
-                            roi_center=roi_center,
-                            animal_name=animal_name,
-                            shape_name=roi_name,
-                        )
+                        direction_data = FeatureExtractionMixin.jitted_line_crosses_to_static_targets(left_ear_array=ear_left_arr, right_ear_array=ear_right_arr, nose_array=nose_arr, target_array=roi_center)
+                        bp_data = self.__format_direction_data(direction_data=direction_data, nose_arr=nose_arr, roi_center=roi_center, animal_name=animal_name, shape_name=roi_name)
 
                         eye_roi_intersections = pd.DataFrame(
                             self.__find_roi_intersections(
@@ -253,6 +197,6 @@ class DirectingROIAnalyzer(ConfigReader, FeatureExtractionMixin):
 
 
 #
-# test = DirectingROIAnalyzer(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini')
+# test = DirectingROIAnalyzer(config_path=r"C:\troubleshooting\spontenous_alternation\project_folder\project_config.ini")
 # test.run()
 # test.save()

@@ -40,16 +40,10 @@ class ROISizeStandardizer(ConfigReader, FeatureExtractionMixin):
 
     def checks(self):
         if self.reference_video_name not in self.video_names_w_rois:
-            raise NoROIDataError(
-                msg=f"The reference video {self.reference_video_name} does not have any defined ROIs.",
-                source=self.__class__.__name__,
-            )
+            raise NoROIDataError(msg=f"The reference video {self.reference_video_name} does not have any defined ROIs.", source=self.__class__.__name__)
         for video_name in self.video_names_w_rois:
             if video_name not in list(self.video_info_df["Video"]):
-                raise ParametersFileError(
-                    msg=f"Found defined ROIs for video {video_name}, but this video does not have pixels per millimeter defined in the project_folder/logs/video_info.csv file.",
-                    source=self.__class__.__name__,
-                )
+                raise ParametersFileError(msg=f"Found defined ROIs for video {video_name}, but this video does not have pixels per millimeter defined in the {self.video_info_path} file.", source=self.__class__.__name__)
 
     def compute_correction_factors(self):
         self.correction_factors = {}
@@ -198,10 +192,7 @@ class ROISizeStandardizer(ConfigReader, FeatureExtractionMixin):
         store["circleDf"] = self.circles_df
         store["polygons"] = self.polygon_df
         store.close()
-        stdout_success(
-            msg=f"ROI size definitions standardized according to pixels per millimeter in video {self.reference_video_name}",
-            source=self.__class__.__name__,
-        )
+        stdout_success(msg=f"ROI size definitions standardized according to pixels per millimeter in video {self.reference_video_name}", source=self.__class__.__name__)
 
 
 # test = ROISizeStandardizer(config_path='/Users/simon/Desktop/envs/troubleshooting/DLC_2_Black_animals/project_folder/project_config.ini', reference_video='Together_1')
