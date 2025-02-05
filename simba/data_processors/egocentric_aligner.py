@@ -4,18 +4,13 @@ from typing import Optional, Tuple, Union
 import numpy as np
 import pandas as pd
 
-from simba.utils.checks import (check_if_dir_exists, check_if_valid_rgb_tuple,
-                                check_int, check_str, check_valid_boolean,
-                                check_valid_dataframe, check_valid_tuple)
+from simba.utils.checks import (check_if_dir_exists, check_if_valid_rgb_tuple, check_int, check_str, check_valid_boolean, check_valid_dataframe, check_valid_tuple)
 from simba.utils.data import egocentrically_align_pose_numba
 from simba.utils.enums import Formats, Options
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (bgr_to_rgb_tuple, find_core_cnt,
-                                    find_files_of_filetypes_in_directory,
-                                    find_video_of_file, get_fn_ext, read_df,
-                                    write_df)
-from simba.video_processors.egocentric_video_rotator import \
-    EgocentricVideoRotator
+from simba.utils.read_write import (bgr_to_rgb_tuple, find_core_cnt, find_files_of_filetypes_in_directory, find_video_of_file, get_fn_ext, read_df, write_df, get_video_meta_data)
+from simba.video_processors.egocentric_video_rotator import EgocentricVideoRotator
+from simba.utils.errors import InvalidInputError
 
 
 class EgocentricalAligner():
@@ -60,12 +55,12 @@ class EgocentricalAligner():
                  anchor_1: str = 'tail_base',
                  anchor_2: str = 'nose',
                  direction: int = 0,
-                 anchor_location: Union[Tuple[int, int], str] = (250, 250),
                  core_cnt: int = -1,
                  fill_clr: Tuple[int, int, int] = (250, 250, 255),
                  verbose: bool = True,
                  gpu: bool = False,
-                 videos_dir: Optional[Union[str, os.PathLike]] = None):
+                 videos_dir: Optional[Union[str, os.PathLike]] = None,
+                 anchor_location: Optional[Union[Tuple[int, int], str]] = (250, 250)):
 
         self.data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=['.csv'])
         check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir')
@@ -74,10 +69,13 @@ class EgocentricalAligner():
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], unaccepted_vals=[0])
         if core_cnt == -1: self.core_cnt = find_core_cnt()[0]
         check_int(name=f'{self.__class__.__name__} direction', value=direction, min_value=0, max_value=360)
-        check_valid_tuple(x=anchor_location, source=f'{self.__class__.__name__} anchor_location', accepted_lengths=(2,), valid_dtypes=(int,))
+        if isinstance(anchor_location, tuple):
+            check_valid_tuple(x=anchor_location, source=f'{self.__class__.__name__} anchor_location', accepted_lengths=(2,), valid_dtypes=(int,))
+            for i in anchor_location:
+                check_int(name=f'{self.__class__.__name__} anchor_location', value=i, min_value=1)
+        if videos_dir is None and anchor_location is None:
+            raise InvalidInputError(msg='If anchor_location is None, please pass video_dir')
         check_valid_boolean(value=[gpu], source=f'{self.__class__.__name__} gpu')
-        for i in anchor_location:
-            check_int(name=f'{self.__class__.__name__} anchor_location', value=i, min_value=1)
         if videos_dir is not None:
             check_if_valid_rgb_tuple(data=fill_clr)
             fill_clr = bgr_to_rgb_tuple(value=fill_clr)
@@ -98,13 +96,16 @@ class EgocentricalAligner():
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(filepath=file_path)
             if self.verbose:
-                print(f'Analyzing video {self.video_name}... ({file_cnt+1}/{len(self.data_paths)})')
+                print(f'Rotating data video {self.video_name}... ({file_cnt+1}/{len(self.data_paths)})')
+            if self.anchor_location is None:
+                video_path = find_video_of_file(video_dir=self.videos_dir, filename=self.video_name, raise_error=False)
+                video_meta_data = get_video_meta_data(video_path=video_path)
+                self.anchor_location = (int(video_meta_data['width']/2), int(video_meta_data['height']/2))
             save_path = os.path.join(self.save_dir, f'{self.video_name}.{Formats.CSV.value}')
             df = read_df(file_path=file_path, file_type=Formats.CSV.value)
             original_cols, self.file_path = list(df.columns), file_path
             df.columns = [x.lower() for x in list(df.columns)]
             check_valid_dataframe(df=df, source=self.__class__.__name__, valid_dtypes=Formats.NUMERIC_DTYPES.value, required_fields=self.anchor_1_cols + self.anchor_2_cols)
-
             bp_cols = [x for x in df.columns if not x.endswith('_p')]
             body_parts_lst = []
             _= [body_parts_lst.append(x[:-2]) for x in bp_cols if x[:-2] not in body_parts_lst]

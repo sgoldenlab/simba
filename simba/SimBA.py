@@ -126,8 +126,8 @@ from simba.ui.pop_ups.spontaneous_alternation_pop_up import \
     SpontaneousAlternationPopUp
 from simba.ui.pop_ups.subset_feature_extractor_pop_up import \
     FeatureSubsetExtractorPopUp
-from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
-    ThirdPartyAnnotatorAppenderPopUp
+from simba.ui.pop_ups.third_party_annotator_appender_pop_up import ThirdPartyAnnotatorAppenderPopUp
+from simba.ui.pop_ups.egocentric_alignment_pop_up import EgocentricAlignPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
     BackgroundRemoverSingleVideoPopUp, BackgroundRemoverDirectoryPopUp, BoxBlurPopUp, BrightnessContrastPopUp,
@@ -266,6 +266,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         reverse_btn = SimbaButton(parent=further_methods_frm, txt="REVERSE TRACKING IDENTITIES IN SIMBA PROJECT", txt_clr='blue', compound='right', img='reverse_blue', font=Formats.FONT_REGULAR.value, cmd=None)
         interpolate_btn = SimbaButton(parent=further_methods_frm, txt="INTERPOLATE POSE IN SIMBA PROJECT", txt_clr='blue', compound='right', img='line_chart_blue', font=Formats.FONT_REGULAR.value, cmd=InterpolatePopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         smooth_btn = SimbaButton(parent=further_methods_frm, txt="SMOOTH POSE IN SIMBA PROJECT", txt_clr='blue', compound='right', img='wand_blue', font=Formats.FONT_REGULAR.value, cmd=SmoothingPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        egocentric_align_btn = SimbaButton(parent=further_methods_frm, txt="EGOCENTRICALLY ALIGN POSE AND VIDEO", txt_clr='blue', compound='right', img='mouse_small', font=Formats.FONT_REGULAR.value, cmd=EgocentricAlignPopUp, cmd_kwargs={'config_path': lambda: self.config_path})
 
         label_setscale = CreateLabelFrameWithIcon(parent=tab3, header="VIDEO PARAMETERS (FPS, RESOLUTION, PPX/MM ....)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_PARAMETERS.value)
         self.distance_in_mm_eb = Entry_Box(label_setscale, "KNOWN DISTANCE (MILLIMETERS)", "35", validation="numeric")
@@ -495,6 +496,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         reverse_btn.grid(row=6, column=0, sticky=NW)
         interpolate_btn.grid(row=7, column=0, sticky=NW)
         smooth_btn.grid(row=8, column=0, sticky=NW)
+        egocentric_align_btn.grid(row=9, column=0, sticky=NW)
 
         label_setscale.grid(row=0, sticky=NW, pady=5, padx=5)
         self.distance_in_mm_eb.grid(row=0, column=0, sticky=NW)

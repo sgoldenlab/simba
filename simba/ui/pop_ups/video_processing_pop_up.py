@@ -32,7 +32,7 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_that_hhmmss_start_is_before_end)
 from simba.utils.data import convert_roi_definitions
 from simba.utils.enums import Dtypes, Formats, Keys, Links, Options, Paths
-from simba.utils.errors import (CountError, DuplicationError,
+from simba.utils.errors import (CountError, DuplicationError, NoDataError,
                                 FFMPEGCodecGPUError, FrameRangeError,
                                 InvalidInputError, MixedMosaicError,
                                 NoChoosenClassifierError, NoFilesFoundError,
@@ -2710,37 +2710,42 @@ class BackgroundRemoverSingleVideoPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="REMOVE BACKGROUND IN A VIDEO")
         self.clr_dict = get_color_dict()
+        self.foreground_clr_options = list(self.clr_dict.keys())
+        self.foreground_clr_options.append('Original')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.video_path = FileSelect(settings_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=45)
         self.bg_video_path = FileSelect(settings_frm, "BACKGROUND REFERENCE VIDEO PATH (OPTIONAL):", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=45)
         self.bg_clr_dropdown = DropDownMenu(settings_frm, "BACKGROUND COLOR:", list(self.clr_dict.keys()), labelwidth=45)
-        self.fg_clr_dropdown = DropDownMenu(settings_frm, "FOREGROUND COLOR:", list(self.clr_dict.keys()), labelwidth=45)
+        self.fg_clr_dropdown = DropDownMenu(settings_frm, "FOREGROUND COLOR:", self.foreground_clr_options, labelwidth=45)
+        self.bg_threshold_dropdown = DropDownMenu(settings_frm, "BACKGROUND THRESHOLD:", list(range(1, 100)), labelwidth=45)
         self.bg_start_eb = Entry_Box(parent=settings_frm, labelwidth=45, entry_box_width=15, fileDescription='BACKGROUND VIDEO START (FRAME # OR TIME):')
         self.bg_end_eb = Entry_Box(parent=settings_frm, labelwidth=45, entry_box_width=15, fileDescription='BACKGROUND VIDEO END (FRAME # OR TIME):')
         self.bg_start_eb.set_state(DISABLED)
         self.bg_end_eb.set_state(DISABLED)
         self.entire_video_as_bg_var = BooleanVar(value=True)
         self.entire_video_as_bg_cb = Checkbutton(settings_frm, text="COMPUTE BACKGROUND FROM ENTIRE VIDEO", font=Formats.FONT_REGULAR.value, variable=self.entire_video_as_bg_var, command=lambda: self.enable_entrybox_from_checkbox(check_box_var=self.entire_video_as_bg_var, entry_boxes=[self.bg_start_eb, self.bg_end_eb], reverse=True))
-        self.multiprocessing_var = BooleanVar()
+        self.multiprocessing_var = BooleanVar(value=True)
         self.multiprocess_cb = Checkbutton(settings_frm, text="MULTIPROCESS VIDEO (FASTER)", font=Formats.FONT_REGULAR.value, variable=self.multiprocessing_var, command=lambda: self.enable_dropdown_from_checkbox(check_box_var=self.multiprocessing_var, dropdown_menus=[self.multiprocess_dropdown]))
         self.multiprocess_dropdown = DropDownMenu(settings_frm, "CPU cores:", list(range(2, self.cpu_cnt)), "12")
-        self.multiprocess_dropdown.setChoices(2)
-        self.multiprocess_dropdown.disable()
-        self.bg_clr_dropdown.setChoices('Black')
-        self.fg_clr_dropdown.setChoices('White')
+        self.multiprocess_dropdown.setChoices(self.cpu_cnt)
+        self.bg_clr_dropdown.setChoices('White')
+        self.fg_clr_dropdown.setChoices('Original')
         self.bg_start_eb.entry_set('00:00:00')
         self.bg_end_eb.entry_set('00:00:20')
+        self.bg_threshold_dropdown.setChoices('30')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.video_path.grid(row=0, column=0, sticky=NW)
         self.bg_video_path.grid(row=1, column=0, sticky=NW)
         self.bg_clr_dropdown.grid(row=2, column=0, sticky=NW)
         self.fg_clr_dropdown.grid(row=3, column=0, sticky=NW)
-        self.entire_video_as_bg_cb.grid(row=4, column=0, sticky=NW)
-        self.bg_start_eb.grid(row=5, column=0, sticky=NW)
-        self.bg_end_eb.grid(row=6, column=0, sticky=NW)
-        self.multiprocess_cb.grid(row=7, column=0, sticky=NW)
-        self.multiprocess_dropdown.grid(row=7, column=1, sticky=NW)
+        self.bg_threshold_dropdown.grid(row=4, column=0, sticky=NW)
+        self.entire_video_as_bg_cb.grid(row=5, column=0, sticky=NW)
+        self.bg_start_eb.grid(row=6, column=0, sticky=NW)
+        self.bg_end_eb.grid(row=7, column=0, sticky=NW)
+        self.multiprocess_cb.grid(row=8, column=0, sticky=NW)
+        self.multiprocess_dropdown.grid(row=9, column=1, sticky=NW)
+
         self.create_run_frm(run_function=self.run)
         self.main_frm.mainloop()
 
@@ -2748,8 +2753,14 @@ class BackgroundRemoverSingleVideoPopUp(PopUpMixin):
         video_path = self.video_path.file_path
         video_meta_data = get_video_meta_data(video_path=video_path)
         bg_video = self.bg_video_path.file_path
+        bg_threshold = int(self.bg_threshold_dropdown.getChoices())
+        bg_threshold = int((bg_threshold/100) * 255)
         bg_clr = self.colors_dict[self.bg_clr_dropdown.getChoices()]
-        fg_clr = self.colors_dict[self.fg_clr_dropdown.getChoices()]
+        fg_clr = self.fg_clr_dropdown.getChoices()
+        if fg_clr != 'Original':
+            fg_clr = self.colors_dict[self.fg_clr_dropdown.getChoices()]
+        else:
+            fg_clr = None
         if bg_clr == fg_clr:
             raise DuplicationError(msg=f'The background and foreground color cannot be the same color ({fg_clr})', source=self.__class__.__name__)
         if not os.path.isfile(bg_video):
@@ -2786,7 +2797,8 @@ class BackgroundRemoverSingleVideoPopUp(PopUpMixin):
                                  bg_start_time=bg_start_time,
                                  bg_end_time=bg_end_time,
                                  bg_color=bg_clr,
-                                 fg_color=fg_clr)
+                                 fg_color=fg_clr,
+                                 threshold=bg_threshold)
         else:
             core_cnt = int(self.multiprocess_dropdown.getChoices())
             video_bg_subtraction_mp(video_path=video_path,
@@ -2797,55 +2809,64 @@ class BackgroundRemoverSingleVideoPopUp(PopUpMixin):
                                     bg_end_time=bg_end_time,
                                     bg_color=bg_clr,
                                     fg_color=fg_clr,
-                                    core_cnt=core_cnt)
-
-
+                                    core_cnt=core_cnt,
+                                    threshold=bg_threshold)
 
 
 class BackgroundRemoverDirectoryPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="REMOVE BACKGROUNDS IN MULTIPLE VIDEOS")
         self.clr_dict = get_color_dict()
+        self.foreground_clr_options = list(self.clr_dict.keys())
+        self.foreground_clr_options.append('Original')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.dir_path = FolderSelect(settings_frm, "VIDEO DIRECTORY:", lblwidth=45)
         self.bg_dir_path = FolderSelect(settings_frm, "BACKGROUND VIDEO DIRECTORY (OPTIONAL):", lblwidth=45)
         self.bg_clr_dropdown = DropDownMenu(settings_frm, "BACKGROUND COLOR:", list(self.clr_dict.keys()), labelwidth=45)
-        self.fg_clr_dropdown = DropDownMenu(settings_frm, "FOREGROUND COLOR:", list(self.clr_dict.keys()), labelwidth=45)
+        self.fg_clr_dropdown = DropDownMenu(settings_frm, "FOREGROUND COLOR:", self.foreground_clr_options, labelwidth=45)
+        self.bg_threshold_dropdown = DropDownMenu(settings_frm, "BACKGROUND THRESHOLD:", list(range(1, 100)), labelwidth=45)
         self.bg_start_eb = Entry_Box(parent=settings_frm, labelwidth=45, entry_box_width=15, fileDescription='BACKGROUND VIDEO START (FRAME # OR TIME):')
         self.bg_end_eb = Entry_Box(parent=settings_frm, labelwidth=45, entry_box_width=15, fileDescription='BACKGROUND VIDEO END (FRAME # OR TIME):')
         self.bg_start_eb.set_state(DISABLED)
         self.bg_end_eb.set_state(DISABLED)
         self.entire_video_as_bg_var = BooleanVar(value=True)
         self.entire_video_as_bg_cb = Checkbutton(settings_frm, text="COMPUTE BACKGROUND FROM ENTIRE VIDEO", font=Formats.FONT_REGULAR.value, variable=self.entire_video_as_bg_var, command=lambda: self.enable_entrybox_from_checkbox(check_box_var=self.entire_video_as_bg_var, entry_boxes=[self.bg_start_eb, self.bg_end_eb], reverse=True))
-        self.multiprocessing_var = BooleanVar()
+        self.multiprocessing_var = BooleanVar(value=True)
         self.multiprocess_cb = Checkbutton(settings_frm, text="MULTIPROCESS VIDEO (FASTER)", font=Formats.FONT_REGULAR.value, variable=self.multiprocessing_var, command=lambda: self.enable_dropdown_from_checkbox(check_box_var=self.multiprocessing_var, dropdown_menus=[self.multiprocess_dropdown]))
         self.multiprocess_dropdown = DropDownMenu(settings_frm, "CPU cores:", list(range(2, self.cpu_cnt)), "12")
-        self.multiprocess_dropdown.setChoices(2)
-        self.multiprocess_dropdown.disable()
-        self.bg_clr_dropdown.setChoices('Black')
-        self.fg_clr_dropdown.setChoices('White')
+        self.multiprocess_dropdown.setChoices(self.cpu_cnt)
+        self.bg_clr_dropdown.setChoices('White')
+        self.fg_clr_dropdown.setChoices('Original')
         self.bg_start_eb.entry_set('00:00:00')
         self.bg_end_eb.entry_set('00:00:20')
+        self.bg_threshold_dropdown.setChoices('30')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.dir_path.grid(row=0, column=0, sticky=NW)
         self.bg_dir_path.grid(row=1, column=0, sticky=NW)
         self.bg_clr_dropdown.grid(row=2, column=0, sticky=NW)
         self.fg_clr_dropdown.grid(row=3, column=0, sticky=NW)
-        self.entire_video_as_bg_cb.grid(row=4, column=0, sticky=NW)
-        self.bg_start_eb.grid(row=5, column=0, sticky=NW)
-        self.bg_end_eb.grid(row=6, column=0, sticky=NW)
-        self.multiprocess_cb.grid(row=7, column=0, sticky=NW)
-        self.multiprocess_dropdown.grid(row=7, column=1, sticky=NW)
+        self.bg_threshold_dropdown.grid(row=4, column=0, sticky=NW)
+        self.entire_video_as_bg_cb.grid(row=5, column=0, sticky=NW)
+        self.bg_start_eb.grid(row=6, column=0, sticky=NW)
+        self.bg_end_eb.grid(row=7, column=0, sticky=NW)
+        self.multiprocess_cb.grid(row=8, column=0, sticky=NW)
+        self.multiprocess_dropdown.grid(row=9, column=1, sticky=NW)
         self.create_run_frm(run_function=self.run)
         #self.main_frm.mainloop()
 
     def run(self):
         videos_directory_path = self.dir_path.folder_path
         bg_videos_directory_path = self.bg_dir_path.folder_path
+        bg_threshold = int(self.bg_threshold_dropdown.getChoices())
+        bg_threshold = int((bg_threshold/100) * 255)
         check_if_dir_exists(in_dir=videos_directory_path)
         bg_clr = self.colors_dict[self.bg_clr_dropdown.getChoices()]
-        fg_clr = self.colors_dict[self.fg_clr_dropdown.getChoices()]
+        fg_clr = self.fg_clr_dropdown.getChoices()
+        if fg_clr != 'Original':
+            fg_clr = self.colors_dict[self.fg_clr_dropdown.getChoices()]
+        else:
+            fg_clr = None
         if bg_clr == fg_clr:
             raise DuplicationError(msg=f'The background and foreground color cannot be the same color ({fg_clr})', source=self.__class__.__name__)
         video_paths = find_all_videos_in_directory(directory=videos_directory_path, as_dict=True, raise_error=True)
@@ -2889,7 +2910,8 @@ class BackgroundRemoverDirectoryPopUp(PopUpMixin):
                                      bg_start_time=bg_start_time,
                                      bg_end_time=bg_end_time,
                                      bg_color=bg_clr,
-                                     fg_color=fg_clr)
+                                     fg_color=fg_clr,
+                                     threshold=bg_threshold)
             else:
                 core_cnt = int(self.multiprocess_dropdown.getChoices())
                 video_bg_subtraction_mp(video_path=video_path,
@@ -2900,7 +2922,8 @@ class BackgroundRemoverDirectoryPopUp(PopUpMixin):
                                         bg_end_time=bg_end_time,
                                         bg_color=bg_clr,
                                         fg_color=fg_clr,
-                                        core_cnt=core_cnt)
+                                        core_cnt=core_cnt,
+                                        threshold=bg_threshold)
 
 
 
