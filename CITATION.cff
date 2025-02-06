@@ -48,22 +48,4 @@ contact:
   - family-names: "Nilsson"
     given-names: "Simon R. O."
     email: "sronilsson@gmail.com"
-date-released: "2024-05-22"
-url: "https://simba-uw-tf-dev.readthedocs.io/"
-repository-code: "https://github.com/sgoldenlab/simba"
-repository: "https://osf.io/tmu6y/"
-identifiers:
-  - type: doi
-    value: "10.1038/s41593-024-01649-9"
-    description: "DOI for the published article"
-license: GPL-3.0
-type: article
-keywords:
-  - behavioral neuroscience
-  - machine learning
-  - animal behavior analysis
-  - explainable AI
-related-resources:
-  - type: software
-    url: "https://github.com/sgoldenlab/simba-plugin"
-preferred-citation: "Goodwin, N.L., et al. (2024). Simple Behavioral Analysis (SimBA). Nature Neuroscience, 27, 1411–1424. https://doi.org/10.1038/s41593-024-01649-9"
+date-released: "2024-05-22
