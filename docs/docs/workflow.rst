@@ -1,14 +1,17 @@
-SimBA basic workflow
+SimBA workflow
 ==========================================================
 
+Workflow diagram
+----------------------------------
 .. image:: ../_static/img/simba_workflow.png
   :width: 2000
   :align: center
 
 Download workflow PDF :download:`pdf <../_static/pdf/SimBA_workflow.pdf>`
 
-
-.. image:: ../_static/img/simba_workflow.webp
+SimBA Poster
+----------------------------------
+.. image:: ../_static/img/SimBA_poster_sam.webp
   :width: 2000
   :align: center
 
