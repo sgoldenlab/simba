@@ -2,48 +2,71 @@
 # Visit https://bit.ly/cffinit to generate yours today!
 
 cff-version: 1.2.0
-title: >-
-  Simple Behavioral Analysis (SimBA): an open source toolkit
-  for computer classification of complex social behaviors in
-  experimental animals
-message: >-
-  If you use this software, please cite it using the
-  metadata from this file
-type: software
+message: "If you use this research or software, please cite the following publication."
+title: "Simple Behavioral Analysis (SimBA) as a platform for explainable machine learning in behavioral neuroscience"
 authors:
-  - given-names: Simon
-    family-names: Nilsson
-    email: sronilsson@gmail.com
-  - given-names: Nastacia
-    family-names: Goodwin
-  - given-names: Jia Jie
-    family-names: Choong
-  - given-names: Sophia
-    family-names: Hwang
-  - given-names: Hayden
-    family-names: Wright
-  - given-names: Zane
-    family-names: Norville
-  - given-names: Xiaoyu
-    family-names: Tong
-  - given-names: Dayu
-    family-names: Lin
-  - given-names: Brandon
-    family-names: Bentzley
-  - given-names: Neir
-    family-names: Eshel
-  - given-names: Ryan
-    family-names: McLaughlin
-  - given-names: Sam
-    family-names: Golden
+  - family-names: "Goodwin"
+    given-names: "Nastacia L."
+  - family-names: "Choong"
+    given-names: "Jia J."
+  - family-names: "Hwang"
+    given-names: "Sophia"
+  - family-names: "Pitts"
+    given-names: "Kayla"
+  - family-names: "Bloom"
+    given-names: "Liana"
+  - family-names: "Islam"
+    given-names: "Aasiya"
+  - family-names: "Zhang"
+    given-names: "Yizhe Y."
+  - family-names: "Szelenyi"
+    given-names: "Eric R."
+  - family-names: "Tong"
+    given-names: "Xiaoyu"
+  - family-names: "Newman"
+    given-names: "Emily L."
+  - family-names: "Miczek"
+    given-names: "Klaus"
+  - family-names: "Wright"
+    given-names: "Hayden R."
+  - family-names: "McLaughlin"
+    given-names: "Ryan J."
+  - family-names: "Norville"
+    given-names: "Zane C."
+  - family-names: "Eshel"
+    given-names: "Neir"
+  - family-names: "Heshmati"
+    given-names: "Mitra"
+  - family-names: "Nilsson"
+    given-names: "Simon R. O."
+  - family-names: "Golden"
+    given-names: "Sam A."
+contact:
+  - family-names: "Golden"
+    given-names: "Sam A."
+    email: "sgolden@uw.edu"
+  - family-names: "Nilsson"
+    given-names: "Simon R. O."
+    email: "sronilsson@gmail.com"
+date-released: "2024-05-22"
+url: "https://simba-uw-tf-dev.readthedocs.io/"
+repository-code: "https://github.com/sgoldenlab/simba"
+repository: "https://osf.io/tmu6y/"
 identifiers:
   - type: doi
-    value: 10.1101/2020.04.19.049452
-    description: bioRxiv preprint
-repository-code: 'https://github.com/sgoldenlab/simba'
-url: 'https://simba-uw-tf-dev.readthedocs.io/'
-repository: 'https://osf.io/tmu6y/'
+    value: "10.1038/s41593-024-01649-9"
+    description: "DOI for the published article"
 abstract: >-
-  Toolkit for classification of behaviors in experimental
-  animals
+  The study of complex behaviors is often challenging when using manual annotation due to the absence of quantifiable behavioral definitions and the subjective nature of behavioral annotation. Integration of supervised machine learning approaches mitigates some of these issues through accessible and explainable model interpretation. To decrease barriers to access, we developed Simple Behavioral Analysis (SimBA) for behavioral neuroscientists. SimBA introduces machine learning interpretability tools, including SHapley Additive exPlanation (SHAP) scores, for explainable classifiers, enabling comparisons across species and providing a sharable framework.
 license: GPL-3.0
+type: article
+keywords:
+  - behavioral neuroscience
+  - machine learning
+  - animal behavior analysis
+  - explainable AI
+related-resources:
+  - type: software
+    url: "https://github.com/sgoldenlab/simba-plugin"
+preferred-citation: "Goodwin, N.L., et al. (2024). Simple Behavioral Analysis (SimBA). Nature Neuroscience, 27, 1411–1424. https://doi.org/10.1038/s41593-024-01649-9"
+
