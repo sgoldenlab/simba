@@ -52,3 +52,7 @@ date-released: "2024-05-22"
 url: "https://simba-uw-tf-dev.readthedocs.io/"
 repository-code: "https://github.com/sgoldenlab/simba"
 repository: "https://osf.io/tmu6y/"
+identifiers:
+  - type: doi
+    value: "10.1038/s41593-024-01649-9"
+    description: "DOI for the published article"
