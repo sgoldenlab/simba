@@ -239,18 +239,19 @@ This project is licensed under the GPLv3. Note that the software is provided 'as
 
 If you find **any** part of the code or data useful for your own work, please cite us. You can view and download the citation file by clicking the <kbd>Cite this repository</kbd> button at the top right of this page. Thank you 🙏!
 
-    @article{Nilsson2020.04.19.049452,
-      author = {Nilsson, Simon RO and Goodwin, Nastacia L. and Choong, Jia Jie and Hwang, Sophia and Wright, Hayden R and Norville, Zane C and Tong, Xiaoyu and Lin, Dayu and Bentzley, Brandon S. and Eshel, Neir and McLaughlin, Ryan J and Golden, Sam A.},
-      title = {Simple Behavioral Analysis (SimBA) {\textendash} an open source toolkit for computer classification of complex social behaviors in experimental animals},
-      elocation-id = {2020.04.19.049452},
-      year = {2020},
-      doi = {10.1101/2020.04.19.049452},
-      publisher = {Cold Spring Harbor Laboratory},
-      URL = {https://www.biorxiv.org/content/early/2020/04/21/2020.04.19.049452},
-      eprint = {https://www.biorxiv.org/content/early/2020/04/21/2020.04.19.049452.full.pdf},
-      journal = {bioRxiv}
-    }
-
+	@article{Goodwin2024,
+  		author = {Goodwin, Nastacia L. and Choong, Jia J. and Hwang, Sophia and Pitts, Kayla and Bloom, Liana and Islam, Aasiya and Zhang, Yizhe Y. and Szelenyi, Eric R. and Tong, Xiaoyu and Newman, Emily L. and Miczek, Klaus and Wright, 	Hayden R. and McLaughlin, Ryan J. and Norville, Zane C. and Eshel, Neir and Heshmati, Mitra and Nilsson, Simon R. O. and Golden, Sam A.},
+  		title = {Simple Behavioral Analysis (SimBA) as a platform for explainable machine learning in behavioral neuroscience},
+  		journal = {Nature Neuroscience},
+  		volume = {27},
+  		pages = {1411--1424},
+  		year = {2024},
+  		doi = {10.1038/s41593-024-01649-9},
+  		publisher = {Nature Publishing Group},
+  		URL = {https://simba-uw-tf-dev.readthedocs.io/},
+  		repository = {https://github.com/sgoldenlab/simba},
+    		license = {GPL-3.0}
+			}
 ## References 📜
 
 [![Foo](https://github.com/sgoldenlab/simba/blob/master/images/cos_center_logo_small.original.png)](https://osf.io/d69jt/)
