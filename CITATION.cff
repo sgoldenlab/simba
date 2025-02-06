@@ -58,5 +58,3 @@ identifiers:
     description: "DOI for the published article"
 abstract: >-
   The study of complex behaviors is often challenging when using manual annotation due to the absence of quantifiable behavioral definitions and the subjective nature of behavioral annotation. Integration of supervised machine learning approaches mitigates some of these issues through accessible and explainable model interpretation. To decrease barriers to access, we developed Simple Behavioral Analysis (SimBA) for behavioral neuroscientists. SimBA introduces machine learning interpretability tools, including SHapley Additive exPlanation (SHAP) scores, for explainable classifiers, enabling comparisons across species and providing a sharable framework.
-license: GPL-3.0
-type: article
