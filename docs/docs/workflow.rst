@@ -11,8 +11,8 @@ Download workflow PDF :download:`pdf <../_static/pdf/SimBA_workflow.pdf>`
 
 SimBA Poster
 ----------------------------------
-.. image:: ../_static/img/SimBA_poster_sam.webp
+.. image:: ../_static/img/simba_sam_poster_2.webp
   :width: 2000
   :align: center
 
-Download poster PDF :download:`pdf <../_static/pdf/SimBA_poster_sam.pdf>`
+Download poster PDF :download:`pdf <../_static/pdf/simba_poster_sam_2.pdf>`
