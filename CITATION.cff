@@ -48,3 +48,7 @@ contact:
   - family-names: "Nilsson"
     given-names: "Simon R. O."
     email: "sronilsson@gmail.com"
+date-released: "2024-05-22"
+url: "https://simba-uw-tf-dev.readthedocs.io/"
+repository-code: "https://github.com/sgoldenlab/simba"
+repository: "https://osf.io/tmu6y/"
