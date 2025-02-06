@@ -41,3 +41,10 @@ authors:
     given-names: "Simon R. O."
   - family-names: "Golden"
     given-names: "Sam A."
+contact:
+  - family-names: "Golden"
+    given-names: "Sam A."
+    email: "sgolden@uw.edu"
+  - family-names: "Nilsson"
+    given-names: "Simon R. O."
+    email: "sronilsson@gmail.com"
