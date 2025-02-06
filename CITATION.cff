@@ -31,7 +31,7 @@ authors:
     given-names: "Hayden R."
   - family-names: "McLaughlin"
     given-names: "Ryan J."
-  - family-names: "Norville"
+  - family-nnames: "Norville"
     given-names: "Zane C."
   - family-names: "Eshel"
     given-names: "Neir"
@@ -69,4 +69,3 @@ related-resources:
   - type: software
     url: "https://github.com/sgoldenlab/simba-plugin"
 preferred-citation: "Goodwin, N.L., et al. (2024). Simple Behavioral Analysis (SimBA). Nature Neuroscience, 27, 1411–1424. https://doi.org/10.1038/s41593-024-01649-9"
-
