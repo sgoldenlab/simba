@@ -107,7 +107,7 @@ class OutlierSettingsPopUp(PopUpMixin, ConfigReader):
             padx=5,
         )
         self.agg_type_dropdown = DropDownMenu(
-            agg_type_frm, "Aggregation method:", ["mean", "median"], "15"
+            agg_type_frm, "Aggregation method:", ["mean", "median"], "20"
         )
         self.agg_type_dropdown.setChoices("median")
         self.agg_type_dropdown.grid(row=0, column=0, sticky=NW)
