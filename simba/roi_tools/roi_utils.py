@@ -1,14 +1,14 @@
 import math
 import os
 import warnings
-from tkinter import *
-import cv2
-from PIL import ImageTk
 from copy import copy, deepcopy
+from tkinter import *
 from typing import Dict, Optional, Tuple, Union
 
+import cv2
 import numpy as np
 import pandas as pd
+from PIL import ImageTk
 from scipy.spatial.distance import cdist
 from shapely.geometry import Polygon
 
@@ -17,7 +17,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_int,
                                 check_valid_tuple)
 from simba.utils.enums import (ROI_SETTINGS, ConfigKey, Formats, Keys, Options,
                                Paths)
-from simba.utils.errors import NoROIDataError, NotDirectoryError, InvalidInputError
+from simba.utils.errors import (InvalidInputError, NoROIDataError,
+                                NotDirectoryError)
 from simba.utils.printing import stdout_success, stdout_trash
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, read_config_file,

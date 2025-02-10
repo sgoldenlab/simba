@@ -3,20 +3,22 @@ import math
 import os
 import threading
 from copy import copy, deepcopy
-from pynput import keyboard
 from tkinter import *
 from typing import Optional, Union
 
 import cv2
 import numpy as np
 import pandas as pd
+from PIL import Image, ImageTk
+from pynput import keyboard
 from scipy.spatial.distance import cdist
 from shapely.geometry import Polygon
-from PIL import Image, ImageTk
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.sandbox.roi_tkinter.interactive_roi_modifier_tkinter import InteractiveROIModifier
+from simba.roi_tools.roi_relector_polygon_tkinter import ROISelectorPolygon
+from simba.roi_tools.roi_selector_circle_tkinter import ROISelectorCircle
+from simba.roi_tools.roi_selector_rectangle_tkinter import ROISelector
 from simba.roi_tools.roi_utils import (create_circle_entry,
                                        create_duplicated_circle_entry,
                                        create_duplicated_polygon_entry,
@@ -33,19 +35,19 @@ from simba.roi_tools.roi_utils import (create_circle_entry,
                                        get_vertices_hexagon,
                                        get_video_roi_data_from_dict,
                                        set_roi_metric_sizes)
+from simba.sandbox.roi_tkinter.interactive_roi_modifier_tkinter import \
+    InteractiveROIModifier
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, SimbaButton, SimBALabel,
                                         get_menu_icons)
 from simba.utils.checks import check_int, check_str
 from simba.utils.enums import OS, ROI_SETTINGS, Formats, Keys
-from simba.utils.errors import (FrameRangeError, InvalidInputError, NoROIDataError)
+from simba.utils.errors import (FrameRangeError, InvalidInputError,
+                                NoROIDataError)
 from simba.utils.lookups import get_color_dict
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 from simba.utils.warnings import DuplicateNamesWarning
-from simba.roi_tools.roi_selector_rectangle_tkinter import ROISelector
-from simba.roi_tools.roi_selector_circle_tkinter import ROISelectorCircle
-from simba.roi_tools.roi_relector_polygon_tkinter import ROISelectorPolygon
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"
 CIRCLE = 'circle'
