@@ -1,11 +1,11 @@
 import math
-from typing import Optional, Tuple
 from tkinter import *
-from PIL import Image, ImageTk
+from typing import Optional, Tuple
 
 import cv2
 import numpy as np
 import pandas as pd
+from PIL import Image, ImageTk
 from shapely.geometry import Polygon
 
 from simba.mixins.plotting_mixin import PlottingMixin

@@ -1,14 +1,16 @@
 import os
-from typing import Optional, Tuple, Union
 from tkinter import *
+from typing import Optional, Tuple, Union
+
 import cv2
 import numpy as np
+from PIL import Image, ImageTk
 from scipy.spatial.distance import cdist
 from shapely.geometry import Polygon
-from PIL import Image, ImageTk
 
-from simba.utils.checks import (check_if_valid_rgb_tuple, check_int, check_instance)
 from simba.roi_tools.roi_utils import get_image_from_label
+from simba.utils.checks import (check_if_valid_rgb_tuple, check_instance,
+                                check_int)
 from simba.utils.warnings import ROIWarning
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"

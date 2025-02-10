@@ -1,16 +1,19 @@
 import math
-from typing import Optional, Tuple
 from tkinter import *
-from PIL import Image, ImageTk
+from typing import Optional, Tuple
 
 import cv2
 import numpy as np
 import pandas as pd
+from PIL import Image, ImageTk
 from shapely.geometry import Polygon
 
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.roi_tools.roi_utils import (get_circle_df_headers, get_polygon_df_headers, get_rectangle_df_headers, get_image_from_label)
-from simba.utils.checks import check_valid_polygon, check_instance
+from simba.roi_tools.roi_utils import (get_circle_df_headers,
+                                       get_image_from_label,
+                                       get_polygon_df_headers,
+                                       get_rectangle_df_headers)
+from simba.utils.checks import check_instance, check_valid_polygon
 from simba.utils.enums import ROI_SETTINGS, Keys
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"
