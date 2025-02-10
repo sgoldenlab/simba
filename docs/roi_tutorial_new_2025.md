@@ -131,19 +131,30 @@ Each shape in SimBA has to have a unique name. This name cannot be shared with a
 Once you have defined your shape, it is time to draw it. The methods for drawing the three different shape types (`Rectangle`, `Circle` and `Polygon`) is slightly different from each other and detailed below. However, regardless of the shape type you are currently drawing, begin by clicking on <kbd>DRAW</kbd> button.
   
 ### DRAW RECTANGLE
-To draw a rectangle, click and hold the left mouse button at the top left corner of your rectangle and drag the mouse to the bottom right corner of the rectangle. If you're unhappy with your rectangle, you can start to draw the rectangle again by holding the left mouse button at the top left corner of your, new, revised, rectangle. The previous rectangle will be automatically discarded. When you are happy with your rectangle, **press the keyboard `ESCAPE` key**  to save your rectangle.
+To draw a rectangle, click and hold the left mouse button at the top left corner of your rectangle and drag the mouse to the bottom right corner of the rectangle. If you're unhappy with your rectangle, you can start to draw the rectangle again by holding the left mouse button at the top left corner of your, new, revised, rectangle. The previous rectangle will be automatically discarded. When you are happy with your rectangle, **press the keyboard `ESCAPE` key**  OR **click the left mouse button anywhere in the ROI SETTINGS window** to save your rectangle to memory. 
+
+> [!NOTE]
+> If you want to modify the appearance, location, or size, width, height of your rectangle, you can do this later - see the `CHANGE ROI SIZES` or `CHANGE ROI ATTRIBUTES` sections below. 
 
 [draw_rectangle.webm](https://github.com/user-attachments/assets/1005bca1-7be0-4862-8ce9-f91af0bea398)
 
 ### DRAW CIRCLE
-Begin by **clicking and holding down** the left mouse button at the center of the circle. Next, drag the mouse, **while holding down the left mouse button**, towards the outer bounds of the circle. Once the circle looks good, **without letting go of the left left mouse button**, hit the **keyboard `ESCAPE` key**. If the circle looks off while you are drawing it: let go of the left mouse button, the circle will dissapear, and you can start again by pressing and holding down the left mouse button at the center of the circle. 
+Begin by **clicking and holding down** the left mouse button at the center of the circle. Next, drag the mouse, **while holding down the left mouse button**, towards the outer bounds of the circle. Once the circle looks good, **let go of the left mouse button**. If you're unhappy with your circle, begin again by **clicking and holding down** the left mouse button at the center of the circle and start dragging the cursor to the outer bounds of the rectangle. Once the circle looks good, hit the **keyboard `ESCAPE` key** OR **click the left mouse button anywhere in the ROI SETTINGS window** and the circle will be saved to memory.
 
 [draw_circle.webm](https://github.com/user-attachments/assets/900c30cb-5e42-4ee9-a8a8-1e4b890ed96b)
 
+> [!NOTE]
+> If you want to modify the appearance, location, or radius of your circle, you can do this later - see the `CHANGE ROI SIZES` or `CHANGE ROI ATTRIBUTES` sections below. 
+
+
 ### DRAW POLYGON 
-Left mouse click on **at least three different locations** in the image that defines the outer bounds of your polygon. You should see filled circles, representing the polygon vertices, and and lines connecting the vertices, appear where you click. Once you are happy with your polygon, hit the **keyboard `ESCAPE` key** and the polygon will appear in full. 
+Left mouse click on **at least three different locations** in the image that defines the outer bounds of your polygon. You should see filled circles, representing the polygon vertices, and and lines connecting the vertices, appear where you click. Once you are happy with your polygon, hit the **keyboard `ESCAPE` key** OR 
+**click the left mouse button anywhere in the ROI SETTINGS window** and the polygon will appear in full and the polygon will be saved to memory.
 
 [draw_polygon.webm](https://github.com/user-attachments/assets/35ec9778-0f67-4c6f-bfa1-cfe9d1401516)
+
+> [!NOTE]
+> If you want to modify the appearance, location, or size, or positions of the polygon edges, you can do this later - see the `CHANGE ROI SIZES` or `CHANGE ROI ATTRIBUTES` sections below. 
 
 ## SHAPE MANIPULATIONS
 
