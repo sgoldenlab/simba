@@ -268,6 +268,7 @@ class ROI_mixin(ConfigReader):
         self.click_event, self.got_attributes = BooleanVar(value=False), False
         self.win_x, self.win_y, _, _ = cv2.getWindowImageRect(DRAW_FRAME_NAME)
         self.root = parent_frame
+
         if not check_str(name=f'shape name', value=shape_name, allow_blank=False, raise_error=False)[0]:
             msg = f"Invalid shape name: {shape_name}. Type a shape name before drawing."
             self.set_status_bar_panel(text=msg, fg='red')
@@ -276,6 +277,7 @@ class ROI_mixin(ConfigReader):
             msg = f'Cannot draw ROI named {shape_name}. An ROI named {shape_name} already exist in for the video.'
             self.set_status_bar_panel(text=msg, fg='red')
             raise InvalidInputError(msg=msg, source=f'{self.__class__.__name__} draw')
+        self.set_btn_clrs(btn=self.draw_btn)
         if self.platform == OS.WINDOWS.value:
             ctypes.windll.user32.SetWindowPos(self.draw_frm_handle, -1, 0, 0, 0, 0, 3)
         if self.selected_shape_type == RECTANGLE:
@@ -301,6 +303,12 @@ class ROI_mixin(ConfigReader):
         del self.selector; del self.root
         self.overlay_rois_on_image()
 
+    def set_btn_clrs(self, btn: SimbaButton):
+        btn.configure(fg=ROI_SETTINGS.SELECT_COLOR.value)
+        for other_btns in [self.delete_all_btn, self.draw_btn, self.chg_attr_btn, self.delete_selected_btn, self.duplicate_selected_btn, self.move_shape_btn, self.shape_info_btn, self.save_data_btn]:
+            if btn != other_btns:
+                other_btns.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
+
 
     def move_shapes(self, parent_frame):
         if len(list(self.roi_dict.keys())) == 0:
@@ -313,6 +321,8 @@ class ROI_mixin(ConfigReader):
             self.root.unbind("<Button-1>"); self.root.unbind("<Escape>"); self.img_window.unbind("<Escape>");
             self.interactive_modifier.unbind_keys()
             self.set_status_bar_panel(text="ROI MOVE MODE EXITED", fg="blue")
+
+        self.set_btn_clrs(btn=self.move_shape_btn)
 
         self.overlay_rois_on_image(show_ear_tags=True, show_roi_info=False)
         self.set_status_bar_panel(text="IN ROI MOVE MODE. MODIFY ROI'S BY DRAGGING EAR TAGS. CLICK ESC OCH CLICK SETTINGS WINDOW TO EXIT MOVE MODE", fg="darkred")
@@ -379,10 +389,8 @@ class ROI_mixin(ConfigReader):
         self.selected_shape_type = copy(shape_type)
 
 
-
-
-
     def show_shape_info(self):
+        self.set_btn_clrs(btn=self.shape_info_btn)
         if self.shape_info_btn.cget("text") == "SHOW SHAPE INFO":
             self.shape_info_btn.configure(text="HIDE SHAPE INFO")
             self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=True)
@@ -392,6 +400,7 @@ class ROI_mixin(ConfigReader):
 
 
     def delete_all(self):
+        self.set_btn_clrs(btn=self.delete_all_btn)
         self.reset_img_shape_memory()
         self.set_img(frame_idx=self.img_idx)
         self.draw_img()
@@ -414,6 +423,7 @@ class ROI_mixin(ConfigReader):
             dropdown.setChoices(new_options[0])
 
     def delete_named_shape(self, name: str):
+        self.set_btn_clrs(btn=self.delete_selected_btn)
         if not check_str(name='', value=name, raise_error=False)[0]:
             msg = 'No ROI selected. First select an ROI in drop-down to delete it'
             self.set_status_bar_panel(text=msg, fg='red')
@@ -432,6 +442,7 @@ class ROI_mixin(ConfigReader):
 
 
     def duplicate_selected(self):
+        self.set_btn_clrs(btn=self.duplicate_selected_btn)
         selected_roi_name, duplicated_shape_entry = self.roi_dropdown.getChoices(), None
         if not check_str(name='', value=selected_roi_name, raise_error=False)[0]:
             msg = 'First select an ROI in drop-down to duplicate it'
@@ -481,6 +492,7 @@ class ROI_mixin(ConfigReader):
             raise NoROIDataError(msg=msg,  source=self.__class__.__name__)
         if hasattr(self, 'change_attr_frm'):
             self.change_attr_frm.destroy()
+        self.set_btn_clrs(btn=self.chg_attr_btn)
         selected_roi_name = self.roi_dropdown.getChoices()
         self.change_attr_frm = Toplevel()
         self.change_attr_frm.minsize(400, 300)
@@ -557,6 +569,7 @@ class ROI_mixin(ConfigReader):
             self.set_status_bar_panel(text=f'NO ROIs FOUND FOR VIDEO {video_name}', fg='darkred')
 
     def save_video_rois(self):
+        self.set_btn_clrs(btn=self.save_data_btn)
         other_rectangles_df, other_circles_df, other_polygons_df = get_roi_df_from_dict(roi_dict=self.other_roi_dict)
         out_rectangles = pd.concat([self.rectangles_df, other_rectangles_df], axis=0).reset_index(drop=True)
         out_circles = pd.concat([self.circles_df, other_circles_df], axis=0).reset_index(drop=True)

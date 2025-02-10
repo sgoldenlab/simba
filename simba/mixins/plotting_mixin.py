@@ -700,7 +700,6 @@ class PlottingMixin(object):
             img[:] = style_attr["bg color"]
             for animal_cnt, animal_data in enumerate(frame_data):
                 animal_clr = style_attr["animal clrs"][animal_cnt]
-                print(animal_data)
                 cv2.line(
                     img, tuple(animal_data), animal_clr, int(style_attr["line width"])
                 )
@@ -1579,7 +1578,6 @@ class PlottingMixin(object):
             if (print_metrics) and ('area_cm' in polygons.columns) and ('max_vertice_distance' in polygons.columns) and ('center' in polygons.columns):
                 if txt_size is None:
                     font_size, _, _ = PlottingMixin().get_optimal_font_scales(text='10 DIGIT TEXT', accepted_px_height=int(row['max_vertice_distance'] / 2), accepted_px_width=int(row['max_vertice_distance'] / 2))
-                    print(font_size)
                 else:
                     font_size = copy(txt_size)
                 img = PlottingMixin().put_text(img=img, text=str(row['area_cm']), pos=(int(row['center'][0]), int(row['center'][1])), font_size=font_size, text_bg_alpha=0.6)
