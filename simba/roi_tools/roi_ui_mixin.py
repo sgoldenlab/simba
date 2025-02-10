@@ -1,8 +1,9 @@
 import ctypes
 import math
 import os
-import time
+import threading
 from copy import copy, deepcopy
+from pynput import keyboard
 from tkinter import *
 from typing import Optional, Union
 
@@ -11,10 +12,11 @@ import numpy as np
 import pandas as pd
 from scipy.spatial.distance import cdist
 from shapely.geometry import Polygon
+from PIL import Image, ImageTk
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.roi_tools.interactive_modifier_ui import InteractiveROIModifier
+from simba.sandbox.roi_tkinter.interactive_roi_modifier_tkinter import InteractiveROIModifier
 from simba.roi_tools.roi_utils import (create_circle_entry,
                                        create_duplicated_circle_entry,
                                        create_duplicated_polygon_entry,
@@ -36,15 +38,14 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         get_menu_icons)
 from simba.utils.checks import check_int, check_str
 from simba.utils.enums import OS, ROI_SETTINGS, Formats, Keys
-from simba.utils.errors import (FrameRangeError, InvalidInputError,
-                                NoROIDataError)
+from simba.utils.errors import (FrameRangeError, InvalidInputError, NoROIDataError)
 from simba.utils.lookups import get_color_dict
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 from simba.utils.warnings import DuplicateNamesWarning
-from simba.video_processors.roi_selector import ROISelector
-from simba.video_processors.roi_selector_circle import ROISelectorCircle
-from simba.video_processors.roi_selector_polygon import ROISelectorPolygon
+from simba.roi_tools.roi_selector_rectangle_tkinter import ROISelector
+from simba.roi_tools.roi_selector_circle_tkinter import ROISelectorCircle
+from simba.roi_tools.roi_relector_polygon_tkinter import ROISelectorPolygon
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"
 CIRCLE = 'circle'
@@ -68,16 +69,57 @@ class ROI_mixin(ConfigReader):
         self.selected_shape_type = None
         self.color_option_dict = get_color_dict()
         self.menu_icons = get_menu_icons()
-        cv2.namedWindow(DRAW_FRAME_NAME, cv2.WINDOW_NORMAL)
-        self.win_x, self.win_y, _, _ = cv2.getWindowImageRect(DRAW_FRAME_NAME)
         self.win_w, self.win_h = self.video_meta['width'], self.video_meta['height']
         if self.platform == OS.WINDOWS.value:
             self.draw_frm_handle = ctypes.windll.user32.FindWindowW(None, DRAW_FRAME_NAME)
             ctypes.windll.user32.SetWindowPos(self.draw_frm_handle, -1, 0, 0, 0, 0, 3)
+        self.img_window = Toplevel()
+        self.img_window.title(DRAW_FRAME_NAME)
+        self.img_lbl = Label(self.img_window, name='img_lbl')
+        self.img_lbl.pack()
         self.settings = {item.name: item.value for item in ROI_SETTINGS}
         self.rectangles_df, self.circles_df, self.polygon_df, self.roi_dict, self.roi_names, self.other_roi_dict, self.other_video_names_w_rois = get_roi_data(roi_path=self.roi_coordinates_path, video_name=self.video_meta['video_name'])
         self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
 
+
+    def read_img(self, frame_idx: int):
+        return read_frm_of_video(video_path=self.video_path, frame_index=frame_idx)
+
+    def set_img(self, frame_idx: int):
+        self.img = read_frm_of_video(video_path=self.video_path, frame_index=frame_idx)
+
+    def overlay_rois_on_image(self,
+                              show_ear_tags: bool = False,
+                              show_roi_info: bool = False):
+
+        self.set_img(frame_idx=self.img_idx)
+        self.img = PlottingMixin.rectangles_onto_image(img=self.img, rectangles=self.rectangles_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'])
+        self.img = PlottingMixin.circles_onto_image(img=self.img, circles=self.circles_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'])
+        self.img = PlottingMixin.polygons_onto_image(img=self.img, polygons=self.polygon_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'])
+        self.draw_img()
+
+    def draw_img(self):
+        img_rgb = cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB)
+        self.pil_image = Image.fromarray(img_rgb)
+        self.tk_image = ImageTk.PhotoImage(self.pil_image)
+        self.img_lbl.configure(image=self.tk_image)
+        self.img_lbl.image = self.tk_image
+
+
+    def get_video_info_panel(self,
+                             parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
+                             row_idx: int):
+
+        self.change_attr_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="VIDEO AND FRAME INFORMATION", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='info')
+        self.video_name_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'VIDEO NAME: {self.video_meta["video_name"]}')
+        self.video_fps_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'FPS: {self.video_meta["fps"]}')
+        self.video_frame_id_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'DISPLAY FRAME #: {self.img_idx}')
+        self.video_frame_time_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'DISPLAY FRAME (S): {(round((self.img_idx / self.video_meta["fps"]), 2))}')
+        self.change_attr_panel.grid(row=row_idx, sticky=W)
+        self.video_name_lbl.grid(row=0, column=1)
+        self.video_fps_lbl.grid(row=0, column=2)
+        self.video_frame_id_lbl.grid(row=0, column=3)
+        self.video_frame_time_lbl.grid(row=0, column=4)
 
     def get_file_menu(self,
                       root: Toplevel):
@@ -89,56 +131,11 @@ class ROI_mixin(ConfigReader):
         file_menu.add_command(label="Draw ROIs of pre-defined sizes...", compound="left", image=self.menu_icons["size_black"]["img"], command=lambda: self.fixed_roi_pop_up())
         root.config(menu=menu)
 
-
-    def preferences_pop_up(self):
-        if hasattr(self, 'preferences_frm'):
-            self.preferences_frm.destroy()
-        self.preferences_frm = Toplevel()
-        self.preferences_frm.minsize(400, 300)
-        self.preferences_frm.wm_title("PREFERENCES")
-        pref_frm_panel = LabelFrame(self.preferences_frm, text="PREFERENCES", font=Formats.FONT_HEADER.value, padx=5, pady=5)
-        self.line_type_dropdown = DropDownMenu(self.preferences_frm, "LINE TYPE: ", ROI_SETTINGS.LINE_TYPE_OPTIONS.value, 25)
-        self.line_type_dropdown.setChoices(self.settings['LINE_TYPE'])
-        self.roi_select_clr_dropdown = DropDownMenu(self.preferences_frm, "ROI SELECT COLOR: ", list(self.color_option_dict.keys()), 25)
-        set_clr = next(key for key, val in self.color_option_dict.items() if val == self.settings['ROI_SELECT_CLR'])
-        self.roi_select_clr_dropdown.setChoices(set_clr)
-        self.duplication_jump_dropdown = DropDownMenu(self.preferences_frm, "DUPLICATION JUMP SIZE: ", list(range(1, 100, 5)), 25)
-        self.duplication_jump_dropdown.setChoices(self.settings['DUPLICATION_JUMP_SIZE'])
-        pref_save_btn = SimbaButton(parent=self.preferences_frm, txt="SAVE", img='save_large', font=Formats.FONT_REGULAR.value, cmd=self.set_settings)
-        pref_frm_panel.grid(row=0, column=0, sticky=NW)
-        self.line_type_dropdown.grid(row=0, column=0, sticky=NW, pady=5)
-        self.roi_select_clr_dropdown.grid(row=1, column=0, sticky=NW, pady=5)
-        self.duplication_jump_dropdown.grid(row=2, column=0, sticky=NW, pady=5)
-        pref_save_btn.grid(row=3, column=0, sticky=NW, pady=5)
-
-    def set_settings(self):
-        self.settings['LINE_TYPE'] = int(self.line_type_dropdown.getChoices())
-        self.settings['ROI_SELECT_CLR'] = self.color_option_dict[self.roi_select_clr_dropdown.getChoices()]
-        self.settings['DUPLICATION_JUMP_SIZE'] = int(self.duplication_jump_dropdown.getChoices())
-        self.overlay_rois_on_image()
-
-    def get_video_info_panel(self,
-                             parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
-                             row_idx: int):
-
-        self.change_attr_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="VIDEO AND FRAME INFORMATION", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='info')
-        #self.change_attr_panel = LabelFrame(parent_frame, text="VIDEO AND FRAME INFORMATION", font=Formats.FONT_HEADER.value, padx=5, pady=5)
-        self.video_name_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'VIDEO NAME: {self.video_meta["video_name"]}')
-        self.video_fps_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'FPS: {self.video_meta["fps"]}')
-        self.video_frame_id_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'DISPLAY FRAME #: {self.img_idx}')
-        self.video_frame_time_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'DISPLAY FRAME (S): {(round((self.img_idx / self.video_meta["fps"]), 2))}')
-        self.change_attr_panel.grid(row=row_idx, sticky=W)
-        self.video_name_lbl.grid(row=0, column=1)
-        self.video_fps_lbl.grid(row=0, column=2)
-        self.video_frame_id_lbl.grid(row=0, column=3)
-        self.video_frame_time_lbl.grid(row=0, column=4)
-
     def get_select_img_panel(self,
                              parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                              row_idx: int):
 
         self.select_img_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="CHANGE IMAGE", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='frames')
-        #self.select_img_panel = LabelFrame(parent_frame, text="CHANGE IMAGE", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         self.forward_1s_btn = SimbaButton(parent=self.select_img_panel, txt="+1s", img='plus_green_2', font=Formats.FONT_REGULAR.value, txt_clr='darkgreen', cmd=self.change_img, cmd_kwargs={'stride': int(self.video_meta['fps'])})
         self.backwards_1s_btn = SimbaButton(parent=self.select_img_panel, txt="-1s", img='minus_blue_2', font=Formats.FONT_REGULAR.value, txt_clr='darkblue', cmd=self.change_img, cmd_kwargs={'stride': -int(self.video_meta['fps'])})
         self.custom_seconds_entry = Entry_Box(parent=self.select_img_panel, fileDescription='CUSTOM SECONDS:', labelwidth=18, validation='numeric', entry_box_width=4)
@@ -146,7 +143,6 @@ class ROI_mixin(ConfigReader):
         self.custom_backwards_btn = SimbaButton(parent=self.select_img_panel, txt="REVERSE", img='rewind_blue_2', font=Formats.FONT_REGULAR.value, txt_clr='darkblue', cmd=self.change_img,cmd_kwargs={'stride': 'custom_backward'})
         self.first_frm_btn = SimbaButton(parent=self.select_img_panel, txt="FIRST FRAME", img='first_frame_blue', font=Formats.FONT_REGULAR.value, txt_clr='darkblue', cmd=self.change_img, cmd_kwargs={'stride': 'first'})
         self.last_frm_btn = SimbaButton(parent=self.select_img_panel, txt="LAST FRAME", img='last_frame_blue', font=Formats.FONT_REGULAR.value, txt_clr='darkblue', cmd=self.change_img, cmd_kwargs={'stride': 'last'})
-
         self.select_img_panel.grid(row=row_idx, sticky=NW)
         self.forward_1s_btn.grid(row=0, column=0, sticky=NW, pady=10)
         self.backwards_1s_btn.grid(row=0, column=1, sticky=NW, pady=10, padx=10)
@@ -168,7 +164,7 @@ class ROI_mixin(ConfigReader):
         self.rectangle_button.grid(row=0, sticky=NW, pady=10, padx=(0, 10))
         self.circle_button.grid(row=0, column=1, sticky=NW, pady=10, padx=(0, 10))
         self.polygon_button.grid(row=0, column=2, sticky=NW, pady=10, padx=(0, 10))
-
+        self.set_selected_shape_type(shape_type=RECTANGLE)
 
     def get_shape_attr_panel(self,
                              parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
@@ -187,104 +183,52 @@ class ROI_mixin(ConfigReader):
         self.ear_tag_size_dropdown.grid(row=0, column=2, sticky=W, pady=10, padx=(0, 10))
         self.color_dropdown.grid(row=0, column=3, sticky=W, pady=10, padx=(0, 10))
 
-
     def get_shape_name_panel(self,
                              parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                              row_idx: int):
 
         self.shape_name_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE NAME", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='label_large')
-        #self.shape_name_panel = LabelFrame(parent_frame, text="SHAPE NAME", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         self.shape_name_eb = Entry_Box(parent=self.shape_name_panel, fileDescription="SHAPE NAME: ", labelwidth=15, entry_box_width=55)
         self.shape_name_panel.grid(row=row_idx, sticky=W, pady=10)
         self.shape_name_eb.grid(row=0, column=0, sticky=W, pady=10)
-
-
-    def get_interact_panel(self,
-                           parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
-                           row_idx: int):
-        self.interact_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE INTERACTION", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='interaction_large')
-        #self.interact_panel = LabelFrame(parent_frame, text="SHAPE INTERACTION", font=Formats.FONT_HEADER.value, padx=5, pady=5)
-        self.move_shape_btn = SimbaButton(parent=self.interact_panel, txt="MOVE SHAPE", img='move_large', txt_clr='black', cmd=self.move_shapes)
-        self.shape_info_btn = SimbaButton(parent=self.interact_panel, txt="SHOW SHAPE INFO", img='info_large', txt_clr='black', enabled=True, cmd=self.show_shape_info)
-        self.interact_panel.grid(row=row_idx, sticky=W, pady=10)
-        self.move_shape_btn.grid(row=0, column=0, sticky=W, pady=10, padx=(0, 10))
-        self.shape_info_btn.grid(row=0, column=1, sticky=W, pady=10, padx=(0, 10))
-
 
     def get_save_roi_panel(self,
                            parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                            row_idx: int):
 
-        self.save_roi_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE INTERACTION", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='save_large')
+        self.save_roi_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SAVE ROI DRAWINGS", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='save_large')
         self.save_data_btn = SimbaButton(parent=self.save_roi_panel, txt="SAVE VIDEO ROI DATA", img='save_large', txt_clr='black', cmd=self.save_video_rois)
         self.save_roi_panel.grid(row=row_idx, sticky=W, pady=10)
         self.save_data_btn.grid(row=0, column=0, sticky=W, pady=10, padx=(0, 10))
 
 
-    def save_video_rois(self):
-        other_rectangles_df, other_circles_df, other_polygons_df = get_roi_df_from_dict(roi_dict=self.other_roi_dict)
-        out_rectangles = pd.concat([self.rectangles_df, other_rectangles_df], axis=0).reset_index(drop=True)
-        out_circles = pd.concat([self.circles_df, other_circles_df], axis=0).reset_index(drop=True)
-        out_polygons = pd.concat([self.polygon_df, other_polygons_df], axis=0).reset_index(drop=True)
-        store = pd.HDFStore(self.roi_coordinates_path, mode="w")
-        store[Keys.ROI_RECTANGLES.value] = out_rectangles
-        store[Keys.ROI_CIRCLES.value] = out_circles
-        store[Keys.ROI_POLYGONS.value] = out_polygons
-        store.close()
-        msg = f"ROI definitions saved for video: {self.video_meta['video_name']} ({len(list(self.roi_dict.keys()))} ROI(s))"
-        self.set_status_bar_panel(text=msg, fg='blue')
-        stdout_success(msg=f"ROI definitions saved for video: {self.video_meta['video_name']}", source=self.__class__.__name__)
+    def get_interact_panel(self,
+                           parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
+                           row_idx: int,
+                           top_level: Toplevel):
 
+        self.interact_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE INTERACTION", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='interaction_large')
+        self.move_shape_btn = SimbaButton(parent=self.interact_panel, txt="MOVE SHAPE", img='move_large', txt_clr='black', cmd=self.move_shapes, cmd_kwargs={'parent_frame': lambda : top_level})
+        self.shape_info_btn = SimbaButton(parent=self.interact_panel, txt="SHOW SHAPE INFO", img='info_large', txt_clr='black', enabled=True, cmd=self.show_shape_info)
+        self.interact_panel.grid(row=row_idx, sticky=W, pady=10)
+        self.move_shape_btn.grid(row=0, column=0, sticky=W, pady=10, padx=(0, 10))
+        self.shape_info_btn.grid(row=0, column=1, sticky=W, pady=10, padx=(0, 10))
 
-    def get_shapes_from_other_video_panel(self,
-                                          parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
-                                          row_idx: int):
+    def get_status_bar_panel(self,
+                             parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
+                             row_idx: int):
 
-        self.shapes_from_other_video_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="APPLY SHAPES FROM DIFFERENT VIDEO", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='duplicate_2_large')
-        self.other_videos_dropdown = DropDownMenu(self.shapes_from_other_video_panel, "FROM VIDEO: ", self.other_video_names_w_rois, 15)
-        self.other_videos_dropdown.setChoices(self.other_video_names_w_rois[0])
-        self.apply_other_video_btn = SimbaButton(parent=self.shapes_from_other_video_panel, txt="APPLY", img='tick_large', txt_clr='black', enabled=True, cmd=self.apply_different_video, cmd_kwargs={'video_name': lambda: self.other_videos_dropdown.getChoices()})
-        self.shapes_from_other_video_panel.grid(row=row_idx, sticky=W, pady=10)
-        self.other_videos_dropdown.grid(row=0, column=0, sticky=W, pady=10, padx=(0, 10))
-        self.apply_other_video_btn.grid(row=0, column=1, sticky=W, pady=10, padx=(0, 10))
-
-    def apply_different_video(self, video_name: str):
-        if video_name == '':
-            error_txt = f'No other video in the SimBA project has ROIs. Draw ROIs on other videos in the SimBA project to transfer ROIs between videos'
-            self.status_bar.configure(text=error_txt, fg="red")
-            raise InvalidInputError(msg=error_txt, source=self.__class__.__name__)
-        video_roi_dict = get_video_roi_data_from_dict(roi_dict=self.other_roi_dict, video_name=video_name)
-        if len(video_roi_dict.keys()) > 0:
-            self.reset_img_shape_memory()
-            self.roi_names = list(video_roi_dict.keys())
-            self.roi_dict = copy(video_roi_dict)
-            self.rectangles_df, self.circles_df, self.polygon_df = get_roi_df_from_dict(roi_dict=self.roi_dict)
-            self.update_dropdown_menu(dropdown=self.roi_dropdown, new_options=self.roi_names, set_index=0)
-            self.overlay_rois_on_image(show_roi_info=False, show_ear_tags=False)
-
-    def move_shapes(self):
-        if len(list(self.roi_dict.keys())) == 0:
-            msg = f'Cannot move ROIs: No ROIs have been drawn on video {self.video_meta["video_name"]}.'
-            self.set_status_bar_panel(text=msg, fg="red")
-            raise NoROIDataError(msg, source=self.__class__.__name__)
-        self.win_x, self.win_y, _, _ = cv2.getWindowImageRect(DRAW_FRAME_NAME)
-        self.overlay_rois_on_image(show_ear_tags=True, show_roi_info=False)
-        self.set_status_bar_panel(text='IN ROI MOVE MODE. SELECT "DEFINE SHAPE" WINDOW AND CLICK ESCAPE TO EXIT MOVE MODE', fg="darkred")
-        interactive_modifier = InteractiveROIModifier(window_name=DRAW_FRAME_NAME, roi_dict=self.roi_dict, img=self.img, orginal_img=self.read_img(frame_idx=self.img_idx), settings=self.settings)
-        interactive_modifier.run()
-        self.set_status_bar_panel(text='Exited ROI move mode', fg="black")
-        self.roi_dict = deepcopy(interactive_modifier.roi_dict)
-        del interactive_modifier
-        self.roi_dict = set_roi_metric_sizes(roi_dict=self.roi_dict, px_conversion_factor=self.px_per_mm)
-        self.rectangles_df, self.circles_df, self.polygon_df = get_roi_df_from_dict(roi_dict=self.roi_dict)
-        self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
+        self.status_bar = SimBALabel(parent=parent_frame, txt='', txt_clr='black', bg_clr=None, font=Formats.FONT_REGULAR.value, relief='sunken')
+        self.status_bar.grid(row=row_idx, column=0, sticky='we')
+        parent_frame.grid_rowconfigure(row_idx, weight=0)
 
     def get_draw_panel(self,
                        parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
-                       row_idx: int):
+                       row_idx: int,
+                       top_level: Union[Frame, Canvas, LabelFrame, Toplevel]):
 
         self.draw_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="DRAW", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='palette_large')
-        self.draw_btn = SimbaButton(parent=self.draw_panel, txt='DRAW', img='brush_large', txt_clr='black', cmd=self.draw)
+        self.draw_btn = SimbaButton(parent=self.draw_panel, txt='DRAW', img='brush_large', txt_clr='black', cmd=self.draw, cmd_kwargs={'parent_frame': top_level})
         self.delete_all_btn = SimbaButton(parent=self.draw_panel, txt='DELETE ALL', img='delete_large_red', txt_clr='black', cmd=self.delete_all)
         self.roi_dropdown = DropDownMenu(self.draw_panel, "ROI: ", self.roi_names, 5)
         self.roi_dropdown.setChoices(self.roi_names[0])
@@ -300,16 +244,31 @@ class ROI_mixin(ConfigReader):
         self.chg_attr_btn.grid(row=0, column=6, sticky=W, pady=2, padx=(0, 10))
 
 
+    def get_shapes_from_other_video_panel(self,
+                                          parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
+                                          row_idx: int):
 
-    def draw(self):
+        self.shapes_from_other_video_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="APPLY SHAPES FROM DIFFERENT VIDEO", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='duplicate_2_large')
+        self.other_videos_dropdown = DropDownMenu(self.shapes_from_other_video_panel, "FROM VIDEO: ", self.other_video_names_w_rois, 15)
+        self.other_videos_dropdown.setChoices(self.other_video_names_w_rois[0])
+        self.apply_other_video_btn = SimbaButton(parent=self.shapes_from_other_video_panel, txt="APPLY", img='tick_large', txt_clr='black', enabled=True, cmd=self.apply_different_video, cmd_kwargs={'video_name': lambda: self.other_videos_dropdown.getChoices()})
+        self.shapes_from_other_video_panel.grid(row=row_idx, sticky=W, pady=10)
+        self.other_videos_dropdown.grid(row=0, column=0, sticky=W, pady=10, padx=(0, 10))
+        self.apply_other_video_btn.grid(row=0, column=1, sticky=W, pady=10, padx=(0, 10))
+
+    def draw(self, parent_frame):
+
+        def on_click(event):
+            self.click_event.set(True)
+            self.got_attributes = self.selector.get_attributes()
+            self.root.unbind("<Button-1>"); self.root.unbind("<Escape>"); self.img_window.unbind("<Escape>");
+
         self.shape_info_btn.configure(text="SHOW SHAPE INFO")
         shape_name = self.shape_name_eb.entry_get.strip()
+        self.click_event, self.got_attributes = BooleanVar(value=False), False
         self.win_x, self.win_y, _, _ = cv2.getWindowImageRect(DRAW_FRAME_NAME)
-        if self.selected_shape_type is None:
-            msg = "No shape type selected. Select shape type before drawing"
-            self.set_status_bar_panel(text=msg, fg='red')
-            raise NoROIDataError(msg=msg, source=f'{self.__class__.__name__} draw')
-        elif not check_str(name=f'shape name', value=shape_name, allow_blank=False, raise_error=False)[0]:
+        self.root = parent_frame
+        if not check_str(name=f'shape name', value=shape_name, allow_blank=False, raise_error=False)[0]:
             msg = f"Invalid shape name: {shape_name}. Type a shape name before drawing."
             self.set_status_bar_panel(text=msg, fg='red')
             raise InvalidInputError(msg=msg, source=f'{self.__class__.__name__} draw')
@@ -320,44 +279,200 @@ class ROI_mixin(ConfigReader):
         if self.platform == OS.WINDOWS.value:
             ctypes.windll.user32.SetWindowPos(self.draw_frm_handle, -1, 0, 0, 0, 0, 3)
         if self.selected_shape_type == RECTANGLE:
-            rectangle_selector = ROISelector(path=self.img, thickness=int(self.thickness_dropdown.getChoices()), clr=self.color_option_dict[self.color_dropdown.getChoices()], title=DRAW_FRAME_NAME, destroy=True)
-            rectangle_selector.run()
-            shape_entry = create_rectangle_entry(rectangle_selector=rectangle_selector, video_name=self.video_meta['video_name'], shape_name=shape_name, clr_name=self.color_dropdown.getChoices(), clr_bgr=self.color_option_dict[self.color_dropdown.getChoices()], thickness=int(self.thickness_dropdown.getChoices()), ear_tag_size=int(self.ear_tag_size_dropdown.getChoices()), px_conversion_factor=self.px_per_mm)
-            del rectangle_selector
+            self.selector = ROISelector(img_window=self.img_window, thickness=int(self.thickness_dropdown.getChoices()), clr=self.color_option_dict[self.color_dropdown.getChoices()])
         elif self.selected_shape_type == CIRCLE:
-            circle_selector = ROISelectorCircle(path=self.img, thickness=int(self.thickness_dropdown.getChoices()), clr=self.color_option_dict[self.color_dropdown.getChoices()], title=DRAW_FRAME_NAME, destroy=True)
-            circle_selector.run()
-            shape_entry = create_circle_entry(circle_selector=circle_selector, video_name=self.video_meta['video_name'], shape_name=shape_name, clr_name=self.color_dropdown.getChoices(), clr_bgr=self.color_option_dict[self.color_dropdown.getChoices()], thickness=int(self.thickness_dropdown.getChoices()), ear_tag_size=int(self.ear_tag_size_dropdown.getChoices()), px_conversion_factor=self.px_per_mm)
-            del circle_selector
-        else:
-            polygon_selector = ROISelectorPolygon(path=self.img, thickness=int(self.thickness_dropdown.getChoices()), vertice_size=int(self.ear_tag_size_dropdown.getChoices()), clr=self.color_option_dict[self.color_dropdown.getChoices()], title=DRAW_FRAME_NAME, destroy=True)
-            polygon_selector.run()
-            shape_entry = create_polygon_entry(polygon_selector=polygon_selector, video_name=self.video_meta['video_name'], shape_name=shape_name, clr_name=self.color_dropdown.getChoices(), clr_bgr=self.color_option_dict[self.color_dropdown.getChoices()], thickness=int(self.thickness_dropdown.getChoices()), ear_tag_size=int(self.ear_tag_size_dropdown.getChoices()), px_conversion_factor=self.px_per_mm)
-            del polygon_selector
-        self.add_roi(shape_entry=shape_entry)
+            self.selector = ROISelectorCircle(img_window=self.img_window, thickness=int(self.thickness_dropdown.getChoices()), clr=self.color_option_dict[self.color_dropdown.getChoices()])
+        elif self.selected_shape_type == POLYGON:
+            self.selector = ROISelectorPolygon(img_window=self.img_window, thickness=int(self.thickness_dropdown.getChoices()), clr=self.color_option_dict[self.color_dropdown.getChoices()], vertice_size=int(self.ear_tag_size_dropdown.getChoices()))
+        self.root.bind("<Button-1>", on_click); self.root.bind("<Escape>", on_click); self.img_window.bind("<Escape>", on_click)
+        self.root.wait_variable(self.click_event)
+        if self.got_attributes:
+            if self.selected_shape_type == RECTANGLE:
+                shape_entry = create_rectangle_entry(rectangle_selector=self.selector, video_name=self.video_meta['video_name'], shape_name=shape_name, clr_name=self.color_dropdown.getChoices(), clr_bgr=self.color_option_dict[self.color_dropdown.getChoices()], thickness=int(self.thickness_dropdown.getChoices()), ear_tag_size=int(self.ear_tag_size_dropdown.getChoices()), px_conversion_factor=self.px_per_mm)
+            elif self.selected_shape_type == CIRCLE:
+                shape_entry = create_circle_entry(circle_selector=self.selector, video_name=self.video_meta['video_name'], shape_name=shape_name, clr_name=self.color_dropdown.getChoices(), clr_bgr=self.color_option_dict[self.color_dropdown.getChoices()], thickness=int(self.thickness_dropdown.getChoices()), ear_tag_size=int(self.ear_tag_size_dropdown.getChoices()), px_conversion_factor=self.px_per_mm)
+            else:
+                shape_entry = create_polygon_entry(polygon_selector=self.selector, video_name=self.video_meta['video_name'], shape_name=shape_name, clr_name=self.color_dropdown.getChoices(), clr_bgr=self.color_option_dict[self.color_dropdown.getChoices()], thickness=int(self.thickness_dropdown.getChoices()), ear_tag_size=int(self.ear_tag_size_dropdown.getChoices()), px_conversion_factor=self.px_per_mm)
+            self.add_roi(shape_entry=shape_entry)
+            self.update_dropdown_menu(dropdown=self.roi_dropdown, new_options=self.roi_names, set_index=0)
+            self.img_window = self.selector.img_window
+            self.set_status_bar_panel(text=F'ROI ADDED (NAME: {shape_entry["Name"]}, TYPE {self.selected_shape_type.upper()})', fg='blue')
+
+        del self.selector; del self.root
         self.overlay_rois_on_image()
+
+
+    def move_shapes(self, parent_frame):
+        if len(list(self.roi_dict.keys())) == 0:
+            msg = f'Cannot move ROIs: No ROIs have been drawn on video {self.video_meta["video_name"]}.'
+            self.set_status_bar_panel(text=msg, fg="red")
+            raise NoROIDataError(msg, source=self.__class__.__name__)
+
+        def on_click(event):
+            self.click_event.set(True)
+            self.root.unbind("<Button-1>"); self.root.unbind("<Escape>"); self.img_window.unbind("<Escape>");
+            self.interactive_modifier.unbind_keys()
+            self.set_status_bar_panel(text="ROI MOVE MODE EXITED", fg="blue")
+
+        self.overlay_rois_on_image(show_ear_tags=True, show_roi_info=False)
+        self.set_status_bar_panel(text="IN ROI MOVE MODE. MODIFY ROI'S BY DRAGGING EAR TAGS. CLICK ESC OCH CLICK SETTINGS WINDOW TO EXIT MOVE MODE", fg="darkred")
+        self.click_event, self.got_attributes = BooleanVar(value=False), False
+        self.root = parent_frame
+        self.interactive_modifier = InteractiveROIModifier(img_window=self.img_window, original_img=self.read_img(frame_idx=self.img_idx), roi_dict=self.roi_dict, settings=self.settings)
+        self.root.bind("<Button-1>", on_click); self.root.bind("<Escape>", on_click); self.img_window.bind("<Escape>", on_click)
+        self.root.wait_variable(self.click_event)
+
+        self.img_window = self.interactive_modifier.img_window
+        self.roi_dict = copy(self.interactive_modifier.roi_dict)
+        self.rectangles_df, self.circles_df, self.polygon_df = get_roi_df_from_dict(roi_dict=self.roi_dict)
+        del self.interactive_modifier; del self.root
+        self.overlay_rois_on_image()
+
+
+    def change_img(self, stride: Union[int, str]):
+        custom_s, new_frm_idx = self.custom_seconds_entry.entry_get.strip(), None
+        if isinstance(stride, int):
+            new_frm_idx = self.img_idx + stride
+        elif stride == 'custom_forward':
+            check_int(name='CUSTOM SECONDS', value=custom_s, min_value=1)
+            custom_s = int(custom_s)
+            new_frm_idx = int(self.img_idx + (custom_s * self.video_meta['fps']))
+        elif stride == 'custom_backward':
+            check_int(name='CUSTOM SECONDS', value=custom_s, min_value=1)
+            custom_s = int(custom_s)
+            new_frm_idx = int(self.img_idx - (custom_s * self.video_meta['fps']))
+        elif stride == 'first':
+            new_frm_idx = 0
+        elif stride == 'last':
+            new_frm_idx = self.video_meta['frame_count']-1
+        if (0 > new_frm_idx) or (new_frm_idx > self.video_meta['frame_count']-1):
+            msg = f'Cannot change frame. The new frame index {new_frm_idx} is outside the video {self.video_meta["video_name"]} frame range (video has {self.video_meta["frame_count"]} frames).'
+            self.set_status_bar_panel(text=msg, fg='red')
+            raise FrameRangeError(msg=msg, source=self.__class__.__name__)
+        else:
+            self.set_img(frame_idx=new_frm_idx)
+            self.img_idx = copy(new_frm_idx)
+            self.overlay_rois_on_image(show_roi_info=False, show_ear_tags=False)
+            frm_time = round((self.img_idx / self.video_meta["fps"]), 2)
+            self.video_frame_id_lbl.configure(text=f'DISPLAY FRAME #: {self.img_idx}')
+            self.video_frame_time_lbl.configure(text=f'DISPLAY FRAME (S): {frm_time}')
+            self.set_status_bar_panel(text=f'Set frame to frame number {new_frm_idx} ({frm_time}s)', fg='blue')
+
+    def set_selected_shape_type(self, shape_type: Optional[str] = None):
+        if shape_type == None:
+            self.rectangle_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
+            self.circle_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
+            self.polygon_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
+        elif shape_type != self.selected_shape_type:
+            if shape_type == RECTANGLE:
+                self.rectangle_button.configure(fg=ROI_SETTINGS.SELECT_COLOR.value)
+                self.circle_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
+                self.polygon_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
+            elif shape_type == CIRCLE:
+                self.rectangle_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
+                self.circle_button.configure(fg=ROI_SETTINGS.SELECT_COLOR.value)
+                self.polygon_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
+            elif shape_type == POLYGON:
+                self.rectangle_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
+                self.circle_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
+                self.polygon_button.configure(fg=ROI_SETTINGS.SELECT_COLOR.value)
+        self.selected_shape_type = copy(shape_type)
+
+
+
+
+
+    def show_shape_info(self):
+        if self.shape_info_btn.cget("text") == "SHOW SHAPE INFO":
+            self.shape_info_btn.configure(text="HIDE SHAPE INFO")
+            self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=True)
+        else:
+            self.shape_info_btn.configure(text="SHOW SHAPE INFO")
+            self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
+
+
+    def delete_all(self):
+        self.reset_img_shape_memory()
+        self.set_img(frame_idx=self.img_idx)
+        self.draw_img()
+        self.set_status_bar_panel(text='Deleted all ROIs', fg='blue')
+
+    def reset_img_shape_memory(self):
+        self.roi_names, self.roi_dict = [''], {}
+        self.rectangles_df, self.circles_df, self.polygon_df = pd.DataFrame(columns=get_rectangle_df_headers()), pd.DataFrame(columns=get_circle_df_headers()), pd.DataFrame(columns=get_polygon_df_headers())
         self.update_dropdown_menu(dropdown=self.roi_dropdown, new_options=self.roi_names, set_index=0)
-        self.set_status_bar_panel(text=f'Added ROI {shape_entry["Name"]}.', fg='blue')
 
-    # def place_cv2_window_at_location(self, x, y, w, h):
-    #     cv2.destroyAllWindows()
-    #     cv2.namedWindow(DRAW_FRAME_NAME, cv2.WINDOW_NORMAL)
-    #     cv2.moveWindow(DRAW_FRAME_NAME, x, y)
-    #     cv2.resizeWindow(DRAW_FRAME_NAME, w, h)
-    #     self.img = cv2.resize(self.img, (w, h))
-    #     self.draw_cv2_window()
+    def update_dropdown_menu(self, dropdown: DropDownMenu, new_options: list, set_index: Optional[int] = 0, set_str: Optional[str] = None):
+        dropdown.popupMenu['menu'].delete(0, 'end')
+        for option in new_options:
+            dropdown.popupMenu['menu'].add_command(label=option, command=lambda value=option: dropdown.dropdownvar.set(value))
+        if isinstance(set_index, int) and (set_index < (len(new_options) - 1)):
+            dropdown.setChoices(new_options[set_index])
+        elif (set_str is not None) and (set_str in new_options):
+            dropdown.setChoices(set_str)
+        else:
+            dropdown.setChoices(new_options[0])
 
-    def get_status_bar_panel(self,
-                             parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
-                             row_idx: int):
+    def delete_named_shape(self, name: str):
+        if not check_str(name='', value=name, raise_error=False)[0]:
+            msg = 'No ROI selected. First select an ROI in drop-down to delete it'
+            self.set_status_bar_panel(text=msg, fg='red')
+            raise NoROIDataError(msg=msg, source=self.__class__.__name__)
+        self.win_x, self.win_y, _, _ = cv2.getWindowImageRect(DRAW_FRAME_NAME)
+        self.rectangles_df = self.rectangles_df[self.rectangles_df['Name'] != name].reset_index(drop=True)
+        self.polygon_df = self.polygon_df[self.polygon_df['Name'] != name].reset_index(drop=True)
+        self.circles_df = self.circles_df[self.circles_df['Name'] != name].reset_index(drop=True)
+        self.roi_names = [x for x in self.roi_names if x != name]
+        if len(self.roi_names) == 0: self.roi_names = ['']
+        self.roi_dict = {k: v for k, v in self.roi_dict.items() if k != name}
+        self.update_dropdown_menu(dropdown=self.roi_dropdown, new_options=self.roi_names, set_index=0)
+        self.set_img(frame_idx=self.img_idx)
+        self.overlay_rois_on_image()
+        self.set_status_bar_panel(text=f"DELETED ROI: {name}", fg='blue')
 
-        self.status_bar = SimBALabel(parent=parent_frame, txt='', txt_clr='black', bg_clr=None, font=Formats.FONT_REGULAR.value, relief='sunken')
-        self.status_bar.grid(row=row_idx, column=0, sticky='we')
-        parent_frame.grid_rowconfigure(row_idx, weight=0)
 
-    def set_status_bar_panel(self, text: str, fg: str):
-        self.status_bar.configure(text=text, fg=fg)
-        self.status_bar.update_idletasks()
+    def duplicate_selected(self):
+        selected_roi_name, duplicated_shape_entry = self.roi_dropdown.getChoices(), None
+        if not check_str(name='', value=selected_roi_name, raise_error=False)[0]:
+            msg = 'First select an ROI in drop-down to duplicate it'
+            self.set_status_bar_panel(text=msg, fg='red')
+            raise NoROIDataError(msg=msg, source=self.__class__.__name__)
+        if selected_roi_name not in list(self.roi_dict.keys()):
+            msg = f'{selected_roi_name} is not a valid ROI'
+            self.set_status_bar_panel(text=msg, fg='red')
+            raise NoROIDataError(msg=msg, source=self.__class__.__name__)
+        shape_to_duplicate = copy(self.roi_dict[selected_roi_name])
+        self.win_x, self.win_y, _, _ = cv2.getWindowImageRect(DRAW_FRAME_NAME)
+        if selected_roi_name in list(self.rectangles_df['Name'].unique()):
+            duplicated_shape_entry = create_duplicated_rectangle_entry(shape_entry=shape_to_duplicate, jump_size=self.settings['DUPLICATION_JUMP_SIZE'])
+        elif selected_roi_name in list(self.circles_df['Name'].unique()):
+            duplicated_shape_entry = create_duplicated_circle_entry(shape_entry=shape_to_duplicate, jump_size=self.settings['DUPLICATION_JUMP_SIZE'])
+        elif selected_roi_name in list(self.polygon_df['Name'].unique()):
+            duplicated_shape_entry = create_duplicated_polygon_entry(shape_entry=shape_to_duplicate, jump_size=self.settings['DUPLICATION_JUMP_SIZE'])
+        self.add_roi(shape_entry=duplicated_shape_entry)
+        self.overlay_rois_on_image()
+        self.update_dropdown_menu(dropdown=self.roi_dropdown, new_options=self.roi_names, set_index=-1)
+        self.set_status_bar_panel(text=f'DUPLICATED ROI {selected_roi_name}', fg='blue')
+
+
+    def add_roi(self, shape_entry: dict):
+        if shape_entry['Name'] in self.roi_names:
+            error_txt = f'Cannot add ROI named {shape_entry["Name"]} to video {self.video_meta["video_name"]}. An ROI named {shape_entry["Name"]} already exist'
+            #self.status_bar['txt'] = error_txt
+            DuplicateNamesWarning(msg=error_txt, source=self.__class__.__name__)
+        else:
+            if shape_entry['Shape_type'].lower() == ROI_SETTINGS.RECTANGLE.value:
+                self.rectangles_df = pd.concat([self.rectangles_df, pd.DataFrame([shape_entry])], ignore_index=True)
+            elif shape_entry['Shape_type'].lower() == ROI_SETTINGS.CIRCLE.value:
+                self.circles_df = pd.concat([self.circles_df, pd.DataFrame([shape_entry])], ignore_index=True)
+            elif shape_entry['Shape_type'].lower() == ROI_SETTINGS.POLYGON.value:
+                self.polygon_df = pd.concat([self.polygon_df, pd.DataFrame([shape_entry])], ignore_index=True)
+            self.roi_dict[shape_entry['Name']] = shape_entry
+            if self.roi_names[0] == '':
+                self.roi_names = [shape_entry['Name']]
+            else:
+                self.roi_names.append(shape_entry["Name"])
+
 
     def change_attr_pop_up(self):
         if len(list(self.roi_dict.keys())) == 0:
@@ -396,6 +511,7 @@ class ROI_mixin(ConfigReader):
         self.new_color_dropdown.setChoices(self.roi_dict[selected_shape_name]['Color name'])
         self.new_ear_tag_size_dropdown.setChoices(self.roi_dict[selected_shape_name]['Ear_tag_size'])
 
+
     def save_attr_changes(self):
         name = self.change_attr_input_dropdown.getChoices()
         new_name = self.new_shape_name_eb.entry_get.strip()
@@ -422,168 +538,70 @@ class ROI_mixin(ConfigReader):
             self.change_attr_frm.destroy()
         self.set_status_bar_panel(text=f'Changed attributes for shape {name}', fg='blue')
 
-    def overlay_rois_on_image(self,
-                              show_ear_tags: bool = False,
-                              show_roi_info: bool = False):
 
-        self.set_img(img=self.read_img(frame_idx=self.img_idx))
-        self.img = PlottingMixin.rectangles_onto_image(img=self.img, rectangles=self.rectangles_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'])
-        self.img = PlottingMixin.circles_onto_image(img=self.img, circles=self.circles_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'])
-        self.img = PlottingMixin.polygons_onto_image(img=self.img, polygons=self.polygon_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'])
-        self.draw_cv2_window()
-
-    def draw_cv2_window(self):
-        cv2.destroyAllWindows()
-        cv2.namedWindow(DRAW_FRAME_NAME, cv2.WINDOW_NORMAL)
-        cv2.resizeWindow(DRAW_FRAME_NAME, self.win_w, self.win_h)
-        cv2.moveWindow(DRAW_FRAME_NAME, self.win_x-10, self.win_y-30)
-        cv2.imshow(DRAW_FRAME_NAME, self.img)
-        cv2.waitKey(100)
-
-    def show_shape_info(self):
-        if self.shape_info_btn.cget("text") == "SHOW SHAPE INFO":
-            self.shape_info_btn.configure(text="HIDE SHAPE INFO")
-            self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=True)
-        else:
-            self.shape_info_btn.configure(text="SHOW SHAPE INFO")
-            self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
-
-    def update_dropdown_menu(self, dropdown: DropDownMenu, new_options: list, set_index: Optional[int] = 0, set_str: Optional[str] = None):
-        dropdown.popupMenu['menu'].delete(0, 'end')
-        for option in new_options:
-            dropdown.popupMenu['menu'].add_command(label=option, command=lambda value=option: dropdown.dropdownvar.set(value))
-        if isinstance(set_index, int) and (set_index < (len(new_options) - 1)):
-            dropdown.setChoices(new_options[set_index])
-        elif (set_str is not None) and (set_str in new_options):
-            dropdown.setChoices(set_str)
-        else:
-            dropdown.setChoices(new_options[0])
-
-    def delete_all(self):
-        self.win_x, self.win_y, _, _ = cv2.getWindowImageRect(DRAW_FRAME_NAME)
-        self.reset_img_shape_memory()
-        self.set_img(img=self.read_img(frame_idx=self.img_idx))
-        self.set_status_bar_panel(text='Deleted all ROIs', fg='blue')
-
-    def delete_named_shape(self, name: str):
-        if not check_str(name='', value=name, raise_error=False)[0]:
-            msg = 'No ROI selected. First select an ROI in drop-down to delete it'
-            self.set_status_bar_panel(text=msg, fg='red')
-            raise NoROIDataError(msg=msg, source=self.__class__.__name__)
-        self.win_x, self.win_y, _, _ = cv2.getWindowImageRect(DRAW_FRAME_NAME)
-        self.rectangles_df = self.rectangles_df[self.rectangles_df['Name'] != name].reset_index(drop=True)
-        self.polygon_df = self.polygon_df[self.polygon_df['Name'] != name].reset_index(drop=True)
-        self.circles_df = self.circles_df[self.circles_df['Name'] != name].reset_index(drop=True)
-        self.roi_names = [x for x in self.roi_names if x != name]
-        if len(self.roi_names) == 0: self.roi_names = ['']
-        self.roi_dict = {k: v for k, v in self.roi_dict.items() if k != name}
-        self.update_dropdown_menu(dropdown=self.roi_dropdown, new_options=self.roi_names, set_index=0)
-        self.set_img(img=self.read_img(frame_idx=self.img_idx))
-        self.overlay_rois_on_image()
-
-    def reset_img_shape_memory(self):
-        self.roi_names, self.roi_dict = [''], {}
-        self.rectangles_df, self.circles_df, self.polygon_df = pd.DataFrame(columns=get_rectangle_df_headers()), pd.DataFrame(columns=get_circle_df_headers()), pd.DataFrame(columns=get_polygon_df_headers())
-        self.update_dropdown_menu(dropdown=self.roi_dropdown, new_options=self.roi_names, set_index=0)
-
-    def duplicate_selected(self):
-        selected_roi_name, duplicated_shape_entry = self.roi_dropdown.getChoices(), None
-        if not check_str(name='', value=selected_roi_name, raise_error=False)[0]:
-            msg = 'First select an ROI in drop-down to duplicate it'
-            self.set_status_bar_panel(text=msg, fg='red')
-            raise NoROIDataError(msg=msg, source=self.__class__.__name__)
-        if selected_roi_name not in list(self.roi_dict.keys()):
-            msg = f'{selected_roi_name} is not a valid ROI'
-            self.set_status_bar_panel(text=msg, fg='red')
-            raise NoROIDataError(msg=msg, source=self.__class__.__name__)
-        shape_to_duplicate = copy(self.roi_dict[selected_roi_name])
-        self.win_x, self.win_y, _, _ = cv2.getWindowImageRect(DRAW_FRAME_NAME)
-        if selected_roi_name in list(self.rectangles_df['Name'].unique()):
-            duplicated_shape_entry = create_duplicated_rectangle_entry(shape_entry=shape_to_duplicate, jump_size=self.settings['DUPLICATION_JUMP_SIZE'])
-        elif selected_roi_name in list(self.circles_df['Name'].unique()):
-            duplicated_shape_entry = create_duplicated_circle_entry(shape_entry=shape_to_duplicate, jump_size=self.settings['DUPLICATION_JUMP_SIZE'])
-        elif selected_roi_name in list(self.polygon_df['Name'].unique()):
-            duplicated_shape_entry = create_duplicated_polygon_entry(shape_entry=shape_to_duplicate, jump_size=self.settings['DUPLICATION_JUMP_SIZE'])
-        self.add_roi(shape_entry=duplicated_shape_entry)
-        self.overlay_rois_on_image()
-        self.update_dropdown_menu(dropdown=self.roi_dropdown, new_options=self.roi_names, set_index=-1)
-        self.set_status_bar_panel(text=f'Duplicated shape {selected_roi_name}', fg='blue')
-
-
-    def change_img(self, stride: Union[int, str]):
-        custom_s, new_frm_idx = self.custom_seconds_entry.entry_get.strip(), None
-        if isinstance(stride, int):
-            new_frm_idx = self.img_idx + stride
-        elif stride == 'custom_forward':
-            check_int(name='CUSTOM SECONDS', value=custom_s, min_value=1)
-            custom_s = int(custom_s)
-            new_frm_idx = int(self.img_idx + (custom_s * self.video_meta['fps']))
-        elif stride == 'custom_backward':
-            check_int(name='CUSTOM SECONDS', value=custom_s, min_value=1)
-            custom_s = int(custom_s)
-            new_frm_idx = int(self.img_idx - (custom_s * self.video_meta['fps']))
-        elif stride == 'first':
-            new_frm_idx = 0
-        elif stride == 'last':
-            new_frm_idx = self.video_meta['frame_count']-1
-        if (0 > new_frm_idx) or (new_frm_idx > self.video_meta['frame_count']-1):
-            msg = f'Cannot change frame. The new frame index {new_frm_idx} is outside the video {self.video_meta["video_name"]} frame range (video has {self.video_meta["frame_count"]} frames).'
-            self.set_status_bar_panel(text=msg, fg='red')
-            raise FrameRangeError(msg=msg, source=self.__class__.__name__)
-        else:
-            new_img = self.read_img(frame_idx=new_frm_idx)
-            self.set_img(img=new_img)
-            self.img_idx = copy(new_frm_idx)
+    def apply_different_video(self, video_name: str):
+        if video_name == '':
+            error_txt = f'No other video in the SimBA project has ROIs. Draw ROIs on other videos in the SimBA project to transfer ROIs between videos'
+            self.status_bar.configure(text=error_txt, fg="red")
+            raise InvalidInputError(msg=error_txt, source=self.__class__.__name__)
+        video_roi_dict = get_video_roi_data_from_dict(roi_dict=self.other_roi_dict, video_name=video_name)
+        if len(video_roi_dict.keys()) > 0:
+            self.reset_img_shape_memory()
+            self.roi_names = list(video_roi_dict.keys())
+            self.roi_dict = copy(video_roi_dict)
+            self.rectangles_df, self.circles_df, self.polygon_df = get_roi_df_from_dict(roi_dict=self.roi_dict)
+            self.update_dropdown_menu(dropdown=self.roi_dropdown, new_options=self.roi_names, set_index=0)
             self.overlay_rois_on_image(show_roi_info=False, show_ear_tags=False)
-            frm_time = round((self.img_idx / self.video_meta["fps"]), 2)
-            self.video_frame_id_lbl.configure(text=f'DISPLAY FRAME #: {self.img_idx}')
-            self.video_frame_time_lbl.configure(text=f'DISPLAY FRAME (S): {frm_time}')
-            self.set_status_bar_panel(text=f'Set frame to frame number {new_frm_idx} ({frm_time}s)', fg='blue')
-
-    def set_img(self, img: np.ndarray):
-        self.img = img
-        self.draw_cv2_window()
-
-    def read_img(self, frame_idx: int):
-        return read_frm_of_video(video_path=self.video_path, frame_index=frame_idx)
-
-    def set_selected_shape_type(self, shape_type: Optional[str] = None):
-        if shape_type == None:
-            self.rectangle_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
-            self.circle_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
-            self.polygon_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
-        elif shape_type != self.selected_shape_type:
-            if shape_type == RECTANGLE:
-                self.rectangle_button.configure(fg=ROI_SETTINGS.SELECT_COLOR.value)
-                self.circle_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
-                self.polygon_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
-            elif shape_type == CIRCLE:
-                self.rectangle_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
-                self.circle_button.configure(fg=ROI_SETTINGS.SELECT_COLOR.value)
-                self.polygon_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
-            elif shape_type == POLYGON:
-                self.rectangle_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
-                self.circle_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
-                self.polygon_button.configure(fg=ROI_SETTINGS.SELECT_COLOR.value)
-        self.selected_shape_type = copy(shape_type)
-
-    def add_roi(self, shape_entry: dict):
-        if shape_entry['Name'] in self.roi_names:
-            error_txt = f'Cannot add ROI named {shape_entry["Name"]} to video {self.video_meta["video_name"]}. An ROI named {shape_entry["Name"]} already exist'
-            self.status_bar['txt'] = error_txt
-            DuplicateNamesWarning(msg=error_txt, source=self.__class__.__name__)
+            self.set_status_bar_panel(text=f'COPIED {len(self.roi_names)} ROI(s) FROM VIDEO {video_name}', fg='blue')
         else:
-            if shape_entry['Shape_type'].lower() == ROI_SETTINGS.RECTANGLE.value:
-                self.rectangles_df = pd.concat([self.rectangles_df, pd.DataFrame([shape_entry])], ignore_index=True)
-            elif shape_entry['Shape_type'].lower() == ROI_SETTINGS.CIRCLE.value:
-                self.circles_df = pd.concat([self.circles_df, pd.DataFrame([shape_entry])], ignore_index=True)
-            elif shape_entry['Shape_type'].lower() == ROI_SETTINGS.POLYGON.value:
-                self.polygon_df = pd.concat([self.polygon_df, pd.DataFrame([shape_entry])], ignore_index=True)
-            self.roi_dict[shape_entry['Name']] = shape_entry
-            if self.roi_names[0] == '':
-                self.roi_names = [shape_entry['Name']]
-            else:
-                self.roi_names.append(shape_entry["Name"])
+            self.set_status_bar_panel(text=f'NO ROIs FOUND FOR VIDEO {video_name}', fg='darkred')
+
+    def save_video_rois(self):
+        other_rectangles_df, other_circles_df, other_polygons_df = get_roi_df_from_dict(roi_dict=self.other_roi_dict)
+        out_rectangles = pd.concat([self.rectangles_df, other_rectangles_df], axis=0).reset_index(drop=True)
+        out_circles = pd.concat([self.circles_df, other_circles_df], axis=0).reset_index(drop=True)
+        out_polygons = pd.concat([self.polygon_df, other_polygons_df], axis=0).reset_index(drop=True)
+        store = pd.HDFStore(self.roi_coordinates_path, mode="w")
+        store[Keys.ROI_RECTANGLES.value] = out_rectangles
+        store[Keys.ROI_CIRCLES.value] = out_circles
+        store[Keys.ROI_POLYGONS.value] = out_polygons
+        store.close()
+        msg = f"ROI definitions saved for video: {self.video_meta['video_name']} ({len(list(self.roi_dict.keys()))} ROI(s))"
+        self.set_status_bar_panel(text=msg, fg='blue')
+        stdout_success(msg=f"ROI definitions saved for video: {self.video_meta['video_name']}", source=self.__class__.__name__)
+
+
+    def set_status_bar_panel(self, text: str, fg: str = 'blue'):
+        self.status_bar.configure(text=text, fg=fg)
+        self.status_bar.update_idletasks()
+
+
+    def preferences_pop_up(self):
+        if hasattr(self, 'preferences_frm'):
+            self.preferences_frm.destroy()
+        self.preferences_frm = Toplevel()
+        self.preferences_frm.minsize(400, 300)
+        self.preferences_frm.wm_title("PREFERENCES")
+        pref_frm_panel = LabelFrame(self.preferences_frm, text="PREFERENCES", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        self.line_type_dropdown = DropDownMenu(self.preferences_frm, "LINE TYPE: ", ROI_SETTINGS.LINE_TYPE_OPTIONS.value, 25)
+        self.line_type_dropdown.setChoices(self.settings['LINE_TYPE'])
+        self.roi_select_clr_dropdown = DropDownMenu(self.preferences_frm, "ROI SELECT COLOR: ", list(self.color_option_dict.keys()), 25)
+        set_clr = next(key for key, val in self.color_option_dict.items() if val == self.settings['ROI_SELECT_CLR'])
+        self.roi_select_clr_dropdown.setChoices(set_clr)
+        self.duplication_jump_dropdown = DropDownMenu(self.preferences_frm, "DUPLICATION JUMP SIZE: ", list(range(1, 100, 5)), 25)
+        self.duplication_jump_dropdown.setChoices(self.settings['DUPLICATION_JUMP_SIZE'])
+        pref_save_btn = SimbaButton(parent=self.preferences_frm, txt="SAVE", img='save_large', font=Formats.FONT_REGULAR.value, cmd=self.set_settings)
+        pref_frm_panel.grid(row=0, column=0, sticky=NW)
+        self.line_type_dropdown.grid(row=0, column=0, sticky=NW, pady=5)
+        self.roi_select_clr_dropdown.grid(row=1, column=0, sticky=NW, pady=5)
+        self.duplication_jump_dropdown.grid(row=2, column=0, sticky=NW, pady=5)
+        pref_save_btn.grid(row=3, column=0, sticky=NW, pady=5)
+
+    def set_settings(self):
+        self.settings['LINE_TYPE'] = int(self.line_type_dropdown.getChoices())
+        self.settings['ROI_SELECT_CLR'] = self.color_option_dict[self.roi_select_clr_dropdown.getChoices()]
+        self.settings['DUPLICATION_JUMP_SIZE'] = int(self.duplication_jump_dropdown.getChoices())
+        self.overlay_rois_on_image()
 
 
     def fixed_roi_pop_up(self):
@@ -831,5 +849,7 @@ class ROI_mixin(ConfigReader):
 
 
     def close_img(self):
-        cv2.destroyAllWindows()
-
+        try:
+            self.img_window.destroy()
+        except:
+            pass

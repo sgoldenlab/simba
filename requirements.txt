@@ -1,11 +1,11 @@
 Pillow==8.3.2; python_version=="3.6"
 Pillow==10.3.0; python_version>="3.9"
-pyyaml == 5.3.1
+pyyaml==5.3.1
 shapely == 1.8.0; python_version=="3.6"
 shapely == 2.0.2; python_version>="3.9"
 dtreeviz == 0.8.1
 eli5 == 0.10.1
-graphviz == 0.11
+graphviz==0.11
 imbalanced-learn==0.6.2; python_version=="3.6"
 imbalanced-learn==0.12.2; python_version>="3.9"
 imgaug == 0.4.0

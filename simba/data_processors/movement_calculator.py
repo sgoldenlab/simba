@@ -44,6 +44,7 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
                  body_parts: List[str],
                  threshold: float = 0.00,
                  file_paths: Optional[List[str]] = None):
+
         ConfigReader.__init__(self, config_path=config_path)
         FeatureExtractionMixin.__init__(self)
         self.save_path = os.path.join(self.logs_path, "Movement_log_{}.csv".format(self.datetime))
@@ -66,10 +67,10 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
     def run(self):
         self.results = pd.DataFrame(columns=["VIDEO", "ANIMAL", "BODY-PART", "MEASURE", "VALUE"])
         self.movement_dfs = {}
-        for file_path in self.file_paths:
+        for file_cnt, file_path in enumerate(self.file_paths):
             self.__find_body_part_columns()
             _, video_name, _ = get_fn_ext(file_path)
-            print(f"Analysing {video_name}...")
+            print(f"Analysing {video_name}... (Video {file_cnt+1}/{len(self.file_paths)})")
             self.data_df = read_df(file_path=file_path, file_type=self.file_type)
             self.video_info, self.px_per_mm, self.fps = self.read_video_info(video_name=video_name)
             self.movement_dfs[video_name] = pd.DataFrame()

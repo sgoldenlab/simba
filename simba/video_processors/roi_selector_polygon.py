@@ -3,13 +3,10 @@ from typing import Optional, Tuple, Union
 
 import cv2
 import numpy as np
-from scipy.spatial import ConvexHull
 from scipy.spatial.distance import cdist
 from shapely.geometry import Polygon
 
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_valid_img, check_if_valid_rgb_tuple,
-                                check_int, check_str)
+from simba.utils.checks import (check_file_exist_and_readable, check_if_valid_img, check_if_valid_rgb_tuple, check_int, check_str)
 from simba.utils.enums import Options
 from simba.utils.errors import InvalidFileTypeError
 from simba.utils.read_write import get_fn_ext, read_frm_of_video
@@ -79,7 +76,7 @@ class ROISelectorPolygon(object):
             self.title = title
 
         self.drawing, self.clr, self.thickness, self.destroy, self.vertice_size = False, clr, thickness, destroy, vertice_size
-        self.polygon_vertices = []
+        self.polygon_vertices, self.terminate = [], False
 
     def draw_polygon(self, event, x, y, flags, param):
         if event == cv2.EVENT_LBUTTONDOWN:
@@ -101,7 +98,7 @@ class ROISelectorPolygon(object):
     def run(self):
         cv2.namedWindow(self.title, cv2.WINDOW_NORMAL)
         cv2.setMouseCallback(self.title, self.draw_polygon)
-        while True:
+        while not self.terminate:
             img_copy = self.image.copy()
             for i in range(len(self.polygon_vertices)):
                 cv2.circle(img_copy, center=self.polygon_vertices[i], radius=self.vertice_size, color=self.clr, thickness=-1)
@@ -116,14 +113,7 @@ class ROISelectorPolygon(object):
                     if self.destroy:
                         cv2.destroyAllWindows()
                     cv2.waitKey(1)
-                    self.polygon = Polygon(np.array(self.polygon_vertices)).simplify(tolerance=20, preserve_topology=True)
-                    self.polygon_vertices = np.array(self.polygon.exterior.coords)
-                    self.polygon_area = self.polygon.area
-                    self.polygon_arr = np.array(self.polygon.exterior.coords).astype(np.int32)[1:]
-                    self.max_vertice_distance = np.max(cdist(self.polygon_vertices, self.polygon_vertices).astype(np.int32))
-                    self.polygon_centroid = np.array(self.polygon.centroid).astype(int)
-                    self.tags = {f'Tag_{cnt}': tuple(y) for cnt, y in enumerate(self.polygon_arr)}
-                    self.tags['Center_tag'] = tuple(self.polygon_centroid)
+                    self.terminate = True
                     break
 
     def run_checks(self):
@@ -131,4 +121,12 @@ class ROISelectorPolygon(object):
             ROIWarning(msg="ROI WARNING: At least 3 unique vertices are needed to form a polygon. Please try again.", source=self.__class__.__name__)
             return False
         else:
+            self.polygon = Polygon(np.array(self.polygon_vertices)).simplify(tolerance=20, preserve_topology=True)
+            self.polygon_vertices = np.array(self.polygon.exterior.coords)
+            self.polygon_area = self.polygon.area
+            self.polygon_arr = np.array(self.polygon.exterior.coords).astype(np.int32)[1:]
+            self.max_vertice_distance = np.max(cdist(self.polygon_vertices, self.polygon_vertices).astype(np.int32))
+            self.polygon_centroid = np.array(self.polygon.centroid).astype(int)
+            self.tags = {f'Tag_{cnt}': tuple(y) for cnt, y in enumerate(self.polygon_arr)}
+            self.tags['Center_tag'] = tuple(self.polygon_centroid)
             return True

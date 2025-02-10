@@ -465,6 +465,12 @@ def percent_to_crf_lookup() -> Dict[str, int]:
         "100": 10,
     }
 
+
+def gpu_quality_to_cpu_quality_lk():
+    return {'fast': 34,
+            'medium': 23,
+            'slow': 13}
+
 def percent_to_qv_lk():
     """
     Create dictionary that matches human-readable percent values to FFmpeg regulates video quality in CPU codecs.

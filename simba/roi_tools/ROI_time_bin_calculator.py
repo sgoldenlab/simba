@@ -87,6 +87,7 @@ class ROITimebinCalculator(ConfigReader):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(filepath=file_path)
             _, px_per_mm, fps = self.read_video_info(video_name=self.video_name)
+            print(f'Analyzing time-bins for {self.video_name} (Video {file_cnt+1}/{len(self.data_paths)})...')
             frames_per_bin = int(fps * self.bin_length)
             if frames_per_bin == 0:
                 raise FrameRangeError(msg=f"The specified time-bin length of {self.bin_length} is TOO SHORT for video {self.video_name} which has a specified FPS of {fps}. This results in time bins that are LESS THAN a single frame.", source=self.__class__.__name__)

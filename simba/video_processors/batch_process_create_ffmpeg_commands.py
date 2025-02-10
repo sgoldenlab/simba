@@ -12,6 +12,8 @@ import simba
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.enums import Formats
 from simba.utils.read_write import get_video_meta_data
+from simba.utils.warnings import CropWarning
+from simba.utils.lookups import gpu_quality_to_cpu_quality_lk
 
 
 class FFMPEGCommandCreator(object):
@@ -55,6 +57,7 @@ class FFMPEGCommandCreator(object):
             self.gpu = False
             self.quality = 23
         self.temp_dir = os.path.join(self.out_dir, "temp")
+        self.gpu_to_cpu_quality_lk = gpu_quality_to_cpu_quality_lk()
         self.time_format = "%H:%M:%S"
         if os.path.exists(self.temp_dir):
             shutil.rmtree(self.temp_dir)
@@ -251,19 +254,21 @@ class FFMPEGCommandCreator(object):
             print(f"Applying crop {video}...")
             if video_data["last_operation"] == "crop":
                 self.quality = video_data["output_quality"]
-            in_path, out_path = video_data["path"], os.path.join(
-                self.process_dir, os.path.basename(video_data["path"])
-            )
+            in_path, out_path = video_data["path"], os.path.join(self.process_dir, os.path.basename(video_data["path"]))
             crop_settings = self.video_dict["video_data"][video]["crop_settings"]
             width, height = str(crop_settings["width"]), str(crop_settings["height"])
-            top_left_x, top_left_y = str(crop_settings["top_left_x"]), str(
-                crop_settings["top_left_y"]
-            )
+            top_left_x, top_left_y = str(crop_settings["top_left_x"]), str(crop_settings["top_left_y"])
+            gpu_cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}, format=yuv420p" -c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
             if self.gpu:
-                command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}" -c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error'
+                try:
+                    subprocess.run(gpu_cmd, check=True, shell=True)
+                except subprocess.CalledProcessError as e:
+                    CropWarning(msg=f'GPU crop for video {video} failed, reverting to CPU crop.', source=self.__class__.__name__)
+                    cpu_cmd = f'ffmpeg -i "{in_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}" -c:v {Formats.BATCH_CODEC.value} -crf {self.gpu_to_cpu_quality_lk[self.quality]} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
+                    subprocess.call(cpu_cmd, shell=True)
             else:
-                command = f'ffmpeg -i "{in_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}" -c:v {Formats.BATCH_CODEC.value} -crf {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error'
-            subprocess.call(command, shell=True, stdout=subprocess.PIPE)
+                cpu_cmd = f'ffmpeg -i "{in_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}" -c:v {Formats.BATCH_CODEC.value} -crf {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
+                subprocess.call(cpu_cmd, shell=True)
         self.replace_files_in_temp()
         print("Applying crop complete...")
 

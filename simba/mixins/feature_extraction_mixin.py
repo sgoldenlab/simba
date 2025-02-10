@@ -558,14 +558,16 @@ class FeatureExtractionMixin(object):
             for bp_cord in ["X_bps", "Y_bps"]:
                 bp_list = self.animal_bp_dict[animal_name][bp_cord]
                 for bp_name in bp_list:
-                    if "nose" in bp_name:
+                    if "nose" in bp_name.lower():
                         nose_cords.append(bp_name)
-                    elif ("ear" in bp_name) and ("left" in bp_name):
+                    elif ("ear" in bp_name.lower()) and ("left" in bp_name.lower()):
                         ear_left_cords.append(bp_name)
-                    elif ("ear" in bp_name) and ("right" in bp_name):
+                    elif ("ear" in bp_name.lower()) and ("right" in bp_name.lower()):
                         ear_right_cords.append(bp_name)
                     else:
                         pass
+
+
 
         for cord in [nose_cords, ear_left_cords, ear_right_cords]:
             if len(cord) != len(self.animal_bp_dict.keys()) * 2:

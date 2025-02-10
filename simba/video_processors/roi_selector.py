@@ -49,6 +49,7 @@ class ROISelector(object):
         self.selecting_roi = False
         self.clr = clr
         self.complete = False
+        self.terminate = False
         self.thickness = int(thickness)
         self.destroy = destroy
 
@@ -98,7 +99,7 @@ class ROISelector(object):
     def run(self):
         cv2.namedWindow(self.title, cv2.WINDOW_NORMAL)
         cv2.setMouseCallback(self.title, self.mouse_callback)
-        while True:
+        while not self.terminate:
             if self.selecting_roi or self.img_cpy is None:
                 self.img_cpy = self.image.copy()
                 if self.roi_start is not None and self.roi_end is not None:
@@ -119,12 +120,17 @@ class ROISelector(object):
                     if self.destroy:
                         cv2.destroyAllWindows()
                     cv2.waitKey(1)
+                    self.terminate = True
                     break
 
             if cv2.getWindowProperty(self.title, cv2.WND_PROP_VISIBLE) < 1:
                 if self.destroy:
                     cv2.destroyAllWindows()
+                    self.terminate = True
                 break
+
+        if self.terminate:
+            self.run_checks()
 
     def run_checks(self):
         self.top_left = min(self.roi_start[0], self.roi_end[0]), min(self.roi_start[1], self.roi_end[1])
@@ -162,5 +168,5 @@ class ROISelector(object):
             return True
 
 
-# img_selector = ROISelector(path=r"C:\troubleshooting\mitra\test\503_MA109_Gi_CNO_0521.mp4", clr=(0, 255, 0), thickness=2)
+# img_selector = ROISelector(path=r"C:\troubleshooting\mitra\test\503_MA109_Gi_CNO_0521.mp4", clr=(0, 255, 0), thickness=2, destroy=False)
 # img_selector.run()

@@ -38,6 +38,8 @@ class ROISelectorCircle(object):
     >>> circle_selector.run()
     >>> circle_selector = ROISelectorCircle(path='/Users/simon/Desktop/Box2_IF19_7_20211109T173625_4_851_873_1_cropped.mp4')
     >>> circle_selector.run()
+    >>> circle_selector = ROISelectorCircle(path=r"C:\troubleshooting\mitra\test\503_MA109_Gi_CNO_0521.mp4")
+    >>> circle_selector.run()
     """
 
     def __init__(self,
@@ -51,7 +53,6 @@ class ROISelectorCircle(object):
         check_int(name="Thickness", value=thickness, min_value=1, raise_error=True)
         if title is not None:
             check_str(name="ROI title window", value=title)
-
         if isinstance(path, np.ndarray):
             check_if_valid_img(path, source=self.__class__.__name__, raise_error=True)
             self.image = path
@@ -77,6 +78,8 @@ class ROISelectorCircle(object):
             self.title = title
 
         self.destroy = destroy
+        self.terminate = False
+        self.img_copy = None
         self.drawing, self.clr, self.thickness = False, clr, thickness
         self.circle_center, self.circle_radius = (-1, -1), 1
 
@@ -90,30 +93,32 @@ class ROISelectorCircle(object):
         elif event == cv2.EVENT_LBUTTONUP:
             self.drawing = False
             self.circle_radius = max(abs(x - self.circle_center[0]), abs(y - self.circle_center[1]))
+            self.img_copy = self.image.copy()
+            cv2.circle(img=self.img_copy, center=self.circle_center, radius=self.circle_radius, color=self.clr, thickness=self.thickness)
+            cv2.imshow(self.title, self.img_copy)
 
     def run(self):
         cv2.namedWindow(self.title, cv2.WINDOW_NORMAL)
         cv2.setMouseCallback(self.title, self.draw_circle)
-        while True:
-            img_copy = self.image.copy()
-            if self.drawing:
-                cv2.circle(img_copy, self.circle_center, self.circle_radius, self.clr, self.thickness )
-            cv2.imshow(self.title, img_copy)
+        while not self.terminate:
+            if self.drawing or self.img_copy is None:
+                self.img_copy = self.image.copy()
+                cv2.circle(self.img_copy, self.circle_center, self.circle_radius, self.clr, self.thickness )
+            cv2.imshow(self.title, self.img_copy)
             key = cv2.waitKey(1)
             if key in [27, ord("q"), ord("Q"), ord(" ")]:
                 if self.run_checks():
                     if self.destroy:
                         cv2.destroyAllWindows()
                     cv2.waitKey(1)
+                    self.terminate = True
                     break
 
+    def run_checks(self):
         self.left_border_tag = (int(self.circle_center[0] - self.circle_radius), self.circle_center[1])
         self.right_border_tag = (int(self.circle_center[0] + self.circle_radius), self.circle_center[1])
         self.top_border_tag = (self.circle_center[0], int(self.circle_center[1] - self.circle_radius))
         self.bottom_border_tag = (self.circle_center[0], int(self.circle_center[1] + self.circle_radius))
-
-
-    def run_checks(self):
         if (((self.circle_center[0] - self.circle_radius) < 0) or ((self.circle_center[0] + self.circle_radius) > self.w) or ((self.circle_center[1] - self.circle_radius) < 0) or ((self.circle_center[1] + self.circle_radius) > self.h)):
             ROIWarning(msg="ROI WARNING: The drawn circular ROI radius extends beyond the image. Please try again.", source=self.__class__.__name__,)
             return False
@@ -122,3 +127,7 @@ class ROISelectorCircle(object):
             return False
         else:
             return True
+
+
+# circle_selector = ROISelectorCircle(path=r"C:\troubleshooting\mitra\test\503_MA109_Gi_CNO_0521.mp4")
+# circle_selector.run()

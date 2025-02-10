@@ -288,7 +288,8 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
                                           animal_names=self.animal_names,
                                           animal_bp_dict=self.animal_bp_dict,
                                           bp_lk=self.bp_lk,
-                                          roi_features_df=self.roi_features_df)
+                                          roi_features_df=self.roi_features_df.reset_index(drop=True))
+
             for cnt, result in enumerate(pool.imap(constants, frame_range, chunksize=self.multiprocess_chunksize)):
                print(f"Batch core {result+1}/{self.core_cnt} complete...")
             print(f"Joining {self.video_name} multi-processed video...")
@@ -297,6 +298,22 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
             pool.terminate()
             pool.join()
             stdout_success(msg=f"Video {self.video_name} complete. Video saved in directory {self.roi_features_save_dir}.", elapsed_time=self.timer.elapsed_time_str)
+
+
+
+# if __name__ == '__main__':
+#     style_attr = {'roi_centers': True, 'roi_ear_tags': True, 'directionality': True, 'directionality_style': 'funnel', 'border_color': (0, 0, 0), 'pose_estimation': True, 'animal_names': True}
+#     test = ROIfeatureVisualizerMultiprocess(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#                                                 video_path=r"C:\troubleshooting\mitra\project_folder\videos\503_MA109_Gi_CNO_0514.mp4",
+#                                                 style_attr=style_attr,
+#                                                 body_parts=['Center'],
+#                                                 core_cnt=-1)
+#     test.run()
+#
+
+
+
+
 
 
 # if __name__ == '__main__':

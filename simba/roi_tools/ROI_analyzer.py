@@ -82,7 +82,7 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
         self.detailed_df = None
         for file_cnt, file_path in enumerate(self.data_paths):
             _, video_name, _ = get_fn_ext(file_path)
-            print(f"Analysing ROI data for video {video_name}...")
+            print(f"Analysing ROI data for video {video_name}... (Video {file_cnt+1}/{len(self.data_paths)})")
             video_settings, pix_per_mm, self.fps = self.read_video_info(video_name=video_name)
             self.sliced_roi_dict, video_shape_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=video_name)
             if len(video_shape_names) == 0:

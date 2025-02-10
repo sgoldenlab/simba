@@ -1,6 +1,9 @@
 import math
 import os
 import warnings
+from tkinter import *
+import cv2
+from PIL import ImageTk
 from copy import copy, deepcopy
 from typing import Dict, Optional, Tuple, Union
 
@@ -14,7 +17,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_int,
                                 check_valid_tuple)
 from simba.utils.enums import (ROI_SETTINGS, ConfigKey, Formats, Keys, Options,
                                Paths)
-from simba.utils.errors import NoROIDataError, NotDirectoryError
+from simba.utils.errors import NoROIDataError, NotDirectoryError, InvalidInputError
 from simba.utils.printing import stdout_success, stdout_trash
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, read_config_file,
@@ -472,4 +475,13 @@ def reset_video_ROIs(config_path: Union[str, os.PathLike],
     store.close()
     stdout_trash(msg=f"Deleted ROI records for video {video_name}. Deleted rectangle count: {len(video_rectangle_roi_records)}, circles: {len(video_circle_roi_records)}, polygons: {len(video_polygon_roi_records)}.")
 
+def get_image_from_label(tk_lbl: Label):
+    """ Given a tkinter label with an image, retrieve image in array format"""
 
+    if not hasattr(tk_lbl, 'image'):
+        raise InvalidInputError(msg=f'The label {tk_lbl} does not have a valid image')
+    else:
+        tk_img = tk_lbl.image
+        pil_image = ImageTk.getimage(tk_img)
+        img = np.asarray(pil_image)
+        return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)

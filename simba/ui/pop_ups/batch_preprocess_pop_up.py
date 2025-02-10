@@ -28,7 +28,7 @@ class BatchPreProcessPopUp(PopUpMixin):
         self.input_folder_select.grid(row=0, column=0, sticky=NW)
         self.output_folder_select.grid(row=1, column=0, sticky=NW)
         confirm_btn.grid(row=2, column=0, sticky=NW)
-        #self.main_frm.mainloop()
+        self.main_frm.mainloop()
 
     def run(self):
         if not os.path.isdir(self.input_folder_select.folder_path):
@@ -49,3 +49,4 @@ class BatchPreProcessPopUp(PopUpMixin):
             batch_preprocessor.main_frm.mainloop()
 
 
+#BatchPreProcessPopUp()
