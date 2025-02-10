@@ -846,7 +846,7 @@ class TrainModelMixin(object):
         >>> rf_clf = TrainModelMixin().clf_define(n_estimators=100)
         >>> rf_clf = TrainModelMixin().clf_fit(clf=rf_clf, x_df=x, y_df=y)
         >>> feature_names = [str(x) for x in list(x.columns)]
-        >>> create_shap_log(rf_clf=rf_clf, x=x, y=y, x_names=feature_names, clf_name='test', save_it=10, cnt_present=50, cnt_absent=50, plot=True, save_dir=r'/Users/simon/Desktop/feltz')
+        >>> TrainModelMixin.create_shap_log(rf_clf=rf_clf, x=x, y=y, x_names=feature_names, clf_name='test', save_it=10, cnt_present=50, cnt_absent=50, plot=True, save_dir=r'/Users/simon/Desktop/feltz')
         """
 
         print("Calculating SHAP values (SINGLE CORE)...")

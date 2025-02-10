@@ -1,7 +1,7 @@
 __author__ = "Simon Nilsson"
 
 import os
-from typing import Union
+from typing import Union, Optional
 
 import numpy as np
 import pandas as pd
@@ -11,8 +11,9 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.utils.enums import ConfigKey, Dtypes
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (get_fn_ext, read_config_entry, read_df,
-                                    write_df)
+from simba.utils.read_write import (get_fn_ext, read_config_entry, read_df, write_df, find_files_of_filetypes_in_directory)
+from simba.utils.checks import check_if_dir_exists
+from simba.utils.errors import NoFilesFoundError
 
 
 class OutlierCorrecterMovement(ConfigReader, FeatureExtractionMixin):
@@ -21,8 +22,6 @@ class OutlierCorrecterMovement(ConfigReader, FeatureExtractionMixin):
     in the current frame from preceeding frame. Uses critera stored in the SimBA project project_config.ini
     under the [Outlier settings] header.
 
-    :param str config_path: path to SimBA project config file in Configparser format
-
     .. image:: _static/img/movement_outlier.png
        :width: 500
        :align: center
@@ -30,14 +29,18 @@ class OutlierCorrecterMovement(ConfigReader, FeatureExtractionMixin):
     .. note::
        `Outlier correction documentation <https://github.com/sgoldenlab/simba/blob/master/misc/Outlier_settings.pdf>`__.
 
-    Examples
-    ----------
+    :param str config_path: path to SimBA project config file in Configparser format
+
+    :example:
     >>> outlier_correcter_movement = OutlierCorrecterMovement(config_path='MyProjectConfig')
     >>> outlier_correcter_movement.run()
     """
 
     def __init__(self,
-                 config_path: Union[str, os.PathLike]):
+                 config_path: Union[str, os.PathLike],
+                 data_dir: Optional[Union[str, os.PathLike]] = None,
+                 save_dir: Optional[Union[str, os.PathLike]] = None):
+
         ConfigReader.__init__(self, config_path=config_path)
         FeatureExtractionMixin.__init__(self)
         if not os.path.exists(self.outlier_corrected_movement_dir): os.makedirs(self.outlier_corrected_movement_dir)
@@ -45,28 +48,27 @@ class OutlierCorrecterMovement(ConfigReader, FeatureExtractionMixin):
             self.animal_id = read_config_entry(self.config, ConfigKey.MULTI_ANIMAL_ID_SETTING.value, ConfigKey.MULTI_ANIMAL_IDS.value, Dtypes.STR.value)
             if self.animal_id != "None":
                 self.animal_bp_dict[self.animal_id] = self.animal_bp_dict.pop("Animal_1")
+        if data_dir is None:
+            data_dir = self.input_csv_dir
+        else:
+            check_if_dir_exists(in_dir=data_dir)
+        self.data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=[f'.{self.file_type}'])
+        if len(self.data_paths) == 0:
+            raise NoFilesFoundError(msg=f'Cannot correct movement outliers: No imported pose estimation data files found in {data_dir} directory.', source=self.__class__.__name__)
+        if save_dir is None:
+            save_dir = self.outlier_corrected_movement_dir
+        else:
+            check_if_dir_exists(in_dir=save_dir)
+        self.save_dir = save_dir
         self.above_criterion_dict_dict = {}
-        self.criterion = read_config_entry(
-            self.config,
-            ConfigKey.OUTLIER_SETTINGS.value,
-            ConfigKey.MOVEMENT_CRITERION.value,
-            Dtypes.FLOAT.value,
-        )
+        self.criterion = read_config_entry(self.config, ConfigKey.OUTLIER_SETTINGS.value, ConfigKey.MOVEMENT_CRITERION.value, Dtypes.FLOAT.value)
         self.outlier_bp_dict = {}
         for animal_name in self.animal_bp_dict.keys():
             self.outlier_bp_dict[animal_name] = {}
-            self.outlier_bp_dict[animal_name]["bp_1"] = read_config_entry(
-                self.config,
-                "Outlier settings",
-                "movement_bodypart1_{}".format(animal_name.lower()),
-                "str",
-            )
-            self.outlier_bp_dict[animal_name]["bp_2"] = read_config_entry(
-                self.config,
-                "Outlier settings",
-                "movement_bodypart2_{}".format(animal_name.lower()),
-                "str",
-            )
+            self.outlier_bp_dict[animal_name]["bp_1"] = read_config_entry(self.config, "Outlier settings", "movement_bodypart1_{}".format(animal_name.lower()), "str")
+            self.outlier_bp_dict[animal_name]["bp_2"] = read_config_entry(self.config, "Outlier settings", "movement_bodypart2_{}".format(animal_name.lower()), "str")
+
+
 
     @staticmethod
     @jit(nopython=True)
@@ -94,38 +96,19 @@ class OutlierCorrecterMovement(ConfigReader, FeatureExtractionMixin):
         Runs outlier detection and correction. Results are stored in the
         ``project_folder/csv/outlier_corrected_movement`` directory of the SimBA project.
         """
-        self.log = pd.DataFrame(
-            columns=[
-                "VIDEO",
-                "ANIMAL",
-                "BODY-PART",
-                "CORRECTION COUNT",
-                "CORRECTION PCT",
-            ]
-        )
-        for file_cnt, file_path in enumerate(self.input_csv_paths):
+        self.log = pd.DataFrame(columns=["VIDEO", "ANIMAL", "BODY-PART", "CORRECTION COUNT", "CORRECTION PCT"])
+        for file_cnt, file_path in enumerate(self.data_paths):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(file_path)
             print(f"Processing video {self.video_name}. Video {file_cnt+1}/{len(self.input_csv_paths)}...")
             self.above_criterion_dict_dict[self.video_name] = {}
-            save_path = os.path.join(self.outlier_corrected_movement_dir, f"{self.video_name}.{self.file_type}")
+            save_path = os.path.join(self.save_dir, f"{self.video_name}.{self.file_type}")
             self.data_df = read_df(file_path, self.file_type, check_multiindex=True)
             self.data_df = self.insert_column_headers_for_outlier_correction(data_df=self.data_df, new_headers=self.bp_headers, filepath=file_path)
             self.data_df_combined = self.create_shifted_df(df=self.data_df)
             self.animal_criteria = {}
             for animal_name, animal_bps in self.outlier_bp_dict.items():
-                animal_bp_distances = np.sqrt(
-                    (
-                        self.data_df[animal_bps["bp_1"] + "_x"]
-                        - self.data_df[animal_bps["bp_2"] + "_x"]
-                    )
-                    ** 2
-                    + (
-                        self.data_df[animal_bps["bp_1"] + "_y"]
-                        - self.data_df[animal_bps["bp_2"] + "_y"]
-                    )
-                    ** 2
-                )
+                animal_bp_distances = np.sqrt((self.data_df[animal_bps["bp_1"] + "_x"] - self.data_df[animal_bps["bp_2"] + "_x"]) ** 2 + (self.data_df[animal_bps["bp_1"] + "_y"] - self.data_df[animal_bps["bp_2"] + "_y"]) ** 2)
                 self.animal_criteria[animal_name] = (animal_bp_distances.mean() * self.criterion)
             self.__outlier_replacer()
             write_df(df=self.data_df, file_type=self.file_type, save_path=save_path)
@@ -139,6 +122,10 @@ class OutlierCorrecterMovement(ConfigReader, FeatureExtractionMixin):
         self.timer.stop_timer()
         stdout_success(msg=f'Log for corrected "movement outliers" saved in {self.logs_path}', elapsed_time=self.timer.elapsed_time_str)
 
+
+#
+# test = OutlierCorrecterMovement(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
+# test.run()
 
 #
 # test = OutlierCorrecterMovement(config_path='/Users/simon/Desktop/envs/troubleshooting/dorian_2/project_folder/project_config.ini')

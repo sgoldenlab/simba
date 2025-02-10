@@ -1,8 +1,5 @@
 __author__ = "Simon Nilsson"
 
-
-import functools
-import multiprocessing
 import os
 from typing import Dict, Optional, Union
 
@@ -14,9 +11,8 @@ from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.utils.checks import check_float, check_if_dir_exists
 from simba.utils.enums import ConfigKey, Dtypes
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext, read_config_entry, read_df,
-                                    write_df)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, read_config_entry, read_df, write_df)
+from simba.utils.errors import NoFilesFoundError
 
 
 class OutlierCorrecterLocation(ConfigReader, FeatureExtractionMixin):
@@ -113,6 +109,8 @@ class OutlierCorrecterLocation(ConfigReader, FeatureExtractionMixin):
     def run(self):
         self.logs, self.frm_cnts = {}, {}
         data_paths = find_files_of_filetypes_in_directory(directory=self.data_dir, extensions=[f'.{self.file_type}'], raise_error=True)
+        if len(data_paths) == 0:
+            raise NoFilesFoundError(msg=f'Cannot correct location outliers: No data files found in {self.data_dir} directory.', source=self.__class__.__name__)
         for file_cnt, data_path in enumerate(data_paths):
             video_timer = SimbaTimer(start=True)
             _, video_name, _ = get_fn_ext(data_path)
@@ -151,6 +149,9 @@ class OutlierCorrecterLocation(ConfigReader, FeatureExtractionMixin):
         stdout_success(msg='Log for corrected "location outliers" saved in project_folder/logs', elapsed_time=self.timer.elapsed_time_str)
 
 
+
+# test = OutlierCorrecterLocation(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
+# test.run()
 
 # test = OutlierCorrecterLocation(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
 # test.run()
