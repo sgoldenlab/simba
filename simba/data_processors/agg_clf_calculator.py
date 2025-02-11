@@ -3,18 +3,24 @@ __author__ = "Simon Nilsson"
 import os
 from copy import deepcopy
 from typing import List, Optional, Union
+
 try:
     from typing import Literal
 except ImportError:
     from typing_extensions import Literal
 
 import pandas as pd
+
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_file_exist_and_readable, check_valid_boolean, check_valid_dataframe, check_valid_lst)
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_file_exist_and_readable, check_valid_boolean, check_valid_dataframe,
+    check_valid_lst)
 from simba.utils.data import detect_bouts
 from simba.utils.enums import TagNames
 from simba.utils.printing import log_event, stdout_success
-from simba.utils.read_write import get_fn_ext, read_df, find_files_of_filetypes_in_directory
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_df)
 from simba.utils.warnings import NoDataFoundWarning
 
 DATA_OPTIONS = ["Bout count", "Total event duration (s)", "Mean event bout duration (s)", "Median event bout duration (s)", "First event occurrence (s)", "Mean event bout interval duration (s)", "Median event bout interval duration (s)"]
