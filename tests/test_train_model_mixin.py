@@ -122,7 +122,8 @@ def test_create_shap_log(config_path, clf_path):
                                       clf_name='target',
                                       cnt_present=1,
                                       cnt_absent=1,
-                                      save_dir=os.path.dirname(clf_path))
+                                      save_dir=os.path.dirname(clf_path),
+                                      plot=False)
     # assert os.path.isfile(train_model_mixin.out_df_shap_path)
     # assert os.path.isfile(train_model_mixin.out_df_raw_path)
 
