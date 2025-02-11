@@ -2,6 +2,7 @@ import os
 from tkinter import *
 from typing import Union
 
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.roi_ui import ROI_ui
@@ -13,7 +14,6 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
 from simba.utils.enums import Keys, Links
 from simba.utils.errors import NoFilesFoundError
 from simba.utils.read_write import find_all_videos_in_directory, get_fn_ext
-
 
 class ROIVideoTable(ConfigReader, PopUpMixin):
 
@@ -35,22 +35,20 @@ class ROIVideoTable(ConfigReader, PopUpMixin):
         self.get_file_menu()
         self.run()
 
-
-
     def get_file_menu(self):
         menu = Menu(self.root)
         file_menu = Menu(menu)
         menu.add_cascade(label="File...", menu=file_menu)
-        file_menu.add_command(label="Stanardize ROI sizes by metric conversion factor...", compound="left", image=self.menu_icons["settings"]["img"], command=lambda: ROISizeStandardizerPopUp(config_path=self.config_path))
+        file_menu.add_command(label="Standardize ROI sizes by metric conversion factor...", compound="left", image=self.menu_icons["settings"]["img"], command=lambda: ROISizeStandardizerPopUp(config_path=self.config_path))
         self.root.config(menu=menu)
 
     def run(self):
         video_names = list(self.video_dict.keys())
         max_video_name_len = len(max(video_names, key=len))
-        self.table_rows = []
+        self.open_roi_uis = []
         self.video_table = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEOS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI.value)
         for table_idx in range(len(video_names)):
-            _ = ROITableRow(config_path=self.config_path, parent=self.video_table, video_path=self.video_dict[video_names[table_idx]], str_width=max_video_name_len, row_idx=table_idx)
+             _ = ROITableRow(config_path=self.config_path, parent=self.video_table, video_path=self.video_dict[video_names[table_idx]], str_width=max_video_name_len, row_idx=table_idx)
         self.video_table.grid(row=0, column=0, sticky=NW)
         self.main_frm.mainloop()
 
@@ -78,6 +76,7 @@ class ROITableRow():
         self.reset_btn.grid(row=row_idx, column=3, sticky=NW)
         self.apply_to_all_btn = SimbaButton(parent=parent, txt='APPLY TO ALL', img='add_on', cmd=self.apply_to_all, cmd_kwargs={'config_path': lambda: config_path, 'video_path': lambda: video_path})
         self.apply_to_all_btn.grid(row=row_idx, column=4, sticky=NW)
+
 
     def draw(self, config_path: Union[str, os.PathLike], video_path: Union[str, os.PathLike]):
         ROI_ui(config_path=config_path, video_path=video_path)

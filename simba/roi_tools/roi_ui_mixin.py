@@ -1,8 +1,7 @@
 import ctypes
 import math
 import os
-import threading
-from copy import copy, deepcopy
+from copy import copy
 from tkinter import *
 from typing import Optional, Union
 
@@ -10,7 +9,6 @@ import cv2
 import numpy as np
 import pandas as pd
 from PIL import Image, ImageTk
-from pynput import keyboard
 from scipy.spatial.distance import cdist
 from shapely.geometry import Polygon
 
@@ -34,7 +32,8 @@ from simba.roi_tools.roi_utils import (create_circle_entry,
                                        get_triangle_vertices,
                                        get_vertices_hexagon,
                                        get_video_roi_data_from_dict,
-                                       set_roi_metric_sizes)
+                                       set_roi_metric_sizes,
+                                       change_roi_dict_video_name)
 from simba.sandbox.roi_tkinter.interactive_roi_modifier_tkinter import \
     InteractiveROIModifier
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
@@ -60,7 +59,8 @@ class ROI_mixin(ConfigReader):
     def __init__(self,
                  video_path: Union[str, os.PathLike],
                  config_path: Union[str, os.PathLike],
-                 img_idx: int):
+                 img_idx: int,
+                 main_frm: Toplevel):
 
         ConfigReader.__init__(self, config_path=config_path, read_video_info=True, create_logger=False)
         self.video_meta = get_video_meta_data(video_path=video_path)
@@ -68,6 +68,8 @@ class ROI_mixin(ConfigReader):
         _, self.px_per_mm, _ = self.read_video_info(video_name=self.video_meta['video_name'], video_info_df_path=self.video_info_path)
         self.video_path = video_path
         self.img_idx = img_idx
+        self.main_frm = main_frm
+
         self.selected_shape_type = None
         self.color_option_dict = get_color_dict()
         self.menu_icons = get_menu_icons()
@@ -79,6 +81,7 @@ class ROI_mixin(ConfigReader):
         self.img_window.title(DRAW_FRAME_NAME)
         self.img_lbl = Label(self.img_window, name='img_lbl')
         self.img_lbl.pack()
+        self.img_window.protocol("WM_DELETE_WINDOW", self.close_img)
         self.settings = {item.name: item.value for item in ROI_SETTINGS}
         self.rectangles_df, self.circles_df, self.polygon_df, self.roi_dict, self.roi_names, self.other_roi_dict, self.other_video_names_w_rois = get_roi_data(roi_path=self.roi_coordinates_path, video_name=self.video_meta['video_name'])
         self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
@@ -166,14 +169,12 @@ class ROI_mixin(ConfigReader):
         self.rectangle_button.grid(row=0, sticky=NW, pady=10, padx=(0, 10))
         self.circle_button.grid(row=0, column=1, sticky=NW, pady=10, padx=(0, 10))
         self.polygon_button.grid(row=0, column=2, sticky=NW, pady=10, padx=(0, 10))
-        self.set_selected_shape_type(shape_type=RECTANGLE)
 
     def get_shape_attr_panel(self,
                              parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                              row_idx: int):
 
         self.shape_attr_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE ATTRIBUTES", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='attributes_large')
-        #self.shape_attr_panel = LabelFrame(parent_frame, text="SHAPE ATTRIBUTES", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         self.thickness_dropdown = DropDownMenu(self.shape_attr_panel, "SHAPE THICKNESS: ", ROI_SETTINGS.SHAPE_THICKNESS_OPTIONS.value, 17)
         self.thickness_dropdown.setChoices(5)
         self.color_dropdown = DropDownMenu(self.shape_attr_panel, "SHAPE COLOR: ", list(self.color_option_dict.keys()), 17)
@@ -259,11 +260,11 @@ class ROI_mixin(ConfigReader):
         self.apply_other_video_btn.grid(row=0, column=1, sticky=W, pady=10, padx=(0, 10))
 
     def draw(self, parent_frame):
-
         def on_click(event):
             self.click_event.set(True)
             self.got_attributes = self.selector.get_attributes()
             self.root.unbind("<Button-1>"); self.root.unbind("<Escape>"); self.img_window.unbind("<Escape>");
+            self.set_btn_clrs()
 
         self.shape_info_btn.configure(text="SHOW SHAPE INFO")
         shape_name = self.shape_name_eb.entry_get.strip()
@@ -305,9 +306,10 @@ class ROI_mixin(ConfigReader):
         del self.selector; del self.root
         self.overlay_rois_on_image()
 
-    def set_btn_clrs(self, btn: SimbaButton):
-        btn.configure(fg=ROI_SETTINGS.SELECT_COLOR.value)
-        for other_btns in [self.delete_all_btn, self.draw_btn, self.chg_attr_btn, self.delete_selected_btn, self.duplicate_selected_btn, self.move_shape_btn, self.shape_info_btn, self.save_data_btn]:
+    def set_btn_clrs(self, btn: Optional[SimbaButton] = None):
+        if btn is not None:
+            btn.configure(fg=ROI_SETTINGS.SELECT_COLOR.value)
+        for other_btns in [self.delete_all_btn, self.draw_btn, self.chg_attr_btn, self.delete_selected_btn, self.duplicate_selected_btn, self.move_shape_btn, self.shape_info_btn, self.save_data_btn, self.apply_other_video_btn]:
             if btn != other_btns:
                 other_btns.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
 
@@ -322,6 +324,7 @@ class ROI_mixin(ConfigReader):
             self.click_event.set(True)
             self.root.unbind("<Button-1>"); self.root.unbind("<Escape>"); self.img_window.unbind("<Escape>");
             self.interactive_modifier.unbind_keys()
+            self.set_btn_clrs()
             self.set_status_bar_panel(text="ROI MOVE MODE EXITED", fg="blue")
 
         self.set_btn_clrs(btn=self.move_shape_btn)
@@ -335,10 +338,10 @@ class ROI_mixin(ConfigReader):
         self.root.wait_variable(self.click_event)
 
         self.img_window = self.interactive_modifier.img_window
-        self.roi_dict = copy(self.interactive_modifier.roi_dict)
+        self.roi_dict = self.interactive_modifier.roi_dict
         self.rectangles_df, self.circles_df, self.polygon_df = get_roi_df_from_dict(roi_dict=self.roi_dict)
         del self.interactive_modifier; del self.root
-        self.overlay_rois_on_image()
+        self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
 
 
     def change_img(self, stride: Union[int, str]):
@@ -389,6 +392,7 @@ class ROI_mixin(ConfigReader):
                 self.circle_button.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
                 self.polygon_button.configure(fg=ROI_SETTINGS.SELECT_COLOR.value)
         self.selected_shape_type = copy(shape_type)
+        self.set_btn_clrs()
 
 
     def show_shape_info(self):
@@ -550,6 +554,7 @@ class ROI_mixin(ConfigReader):
         self.update_dropdown_menu(dropdown=self.roi_dropdown, new_options=self.roi_names, set_index=None, set_str=new_name)
         if hasattr(self, 'change_attr_frm'):
             self.change_attr_frm.destroy()
+            self.set_btn_clrs()
         self.set_status_bar_panel(text=f'Changed attributes for shape {name}', fg='blue')
 
 
@@ -560,19 +565,21 @@ class ROI_mixin(ConfigReader):
             raise InvalidInputError(msg=error_txt, source=self.__class__.__name__)
         video_roi_dict = get_video_roi_data_from_dict(roi_dict=self.other_roi_dict, video_name=video_name)
         if len(video_roi_dict.keys()) > 0:
+            video_roi_dict = change_roi_dict_video_name(roi_dict=video_roi_dict, video_name=self.video_meta['video_name'])
             self.reset_img_shape_memory()
             self.roi_names = list(video_roi_dict.keys())
-            self.roi_dict = copy(video_roi_dict)
+            self.roi_dict = video_roi_dict
             self.rectangles_df, self.circles_df, self.polygon_df = get_roi_df_from_dict(roi_dict=self.roi_dict)
             self.update_dropdown_menu(dropdown=self.roi_dropdown, new_options=self.roi_names, set_index=0)
             self.overlay_rois_on_image(show_roi_info=False, show_ear_tags=False)
             self.set_status_bar_panel(text=f'COPIED {len(self.roi_names)} ROI(s) FROM VIDEO {video_name}', fg='blue')
         else:
             self.set_status_bar_panel(text=f'NO ROIs FOUND FOR VIDEO {video_name}', fg='darkred')
+        self.set_btn_clrs(btn=self.apply_other_video_btn)
 
     def save_video_rois(self):
         self.set_btn_clrs(btn=self.save_data_btn)
-        other_rectangles_df, other_circles_df, other_polygons_df = get_roi_df_from_dict(roi_dict=self.other_roi_dict)
+        other_rectangles_df, other_circles_df, other_polygons_df = get_roi_df_from_dict(roi_dict=self.other_roi_dict, video_name_nesting=True)
         out_rectangles = pd.concat([self.rectangles_df, other_rectangles_df], axis=0).reset_index(drop=True)
         out_circles = pd.concat([self.circles_df, other_circles_df], axis=0).reset_index(drop=True)
         out_polygons = pd.concat([self.polygon_df, other_polygons_df], axis=0).reset_index(drop=True)
@@ -583,6 +590,8 @@ class ROI_mixin(ConfigReader):
         store.close()
         msg = f"ROI definitions saved for video: {self.video_meta['video_name']} ({len(list(self.roi_dict.keys()))} ROI(s))"
         self.set_status_bar_panel(text=msg, fg='blue')
+        #self.rectangles_df, self.circles_df, self.polygon_df, self.roi_dict, self.roi_names, self.other_roi_dict, self.other_video_names_w_rois = get_roi_data(roi_path=self.roi_coordinates_path, video_name=self.video_meta['video_name'])
+        #self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
         stdout_success(msg=f"ROI definitions saved for video: {self.video_meta['video_name']}", source=self.__class__.__name__)
 
 
@@ -724,6 +733,7 @@ class ROI_mixin(ConfigReader):
         self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
         self.fixed_roi_status_bar['text'] = self.txt
         stdout_success(msg=self.txt)
+        self.set_btn_clrs()
 
 
     def fixed_roi_rectangle(self):
@@ -756,6 +766,7 @@ class ROI_mixin(ConfigReader):
                                                'Ear_tag_size': self.ear_tag_size}
         self.txt = f'New rectangle {self.fixed_roi_name} (MM h: {mm_height}, w: {mm_width}; PIXELS h {height}, w: {width}) inserted using pixel per millimeter {self.px_per_mm} conversion factor.)'
         self._fixed_roi_draw()
+
 
 
     def fixed_roi_circle(self):
@@ -866,5 +877,10 @@ class ROI_mixin(ConfigReader):
     def close_img(self):
         try:
             self.img_window.destroy()
+        except:
+            pass
+        try:
+            self.main_frm.destroy()
+            self.main_frm.quit()
         except:
             pass

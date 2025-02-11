@@ -160,32 +160,62 @@ def set_roi_metric_sizes(roi_dict: dict, px_conversion_factor: Union[int, float]
     return out
 
 
-def get_roi_df_from_dict(roi_dict: dict) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+def get_roi_df_from_dict(roi_dict: dict, video_name_nesting: Optional[bool] = False) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Helper create DataFrames from a shape dictionary.
     """
     rectangles_df, circles_df, polygon_df = pd.DataFrame(columns=get_rectangle_df_headers()), pd.DataFrame(columns=get_circle_df_headers()), pd.DataFrame(columns=get_polygon_df_headers())
-    for name, data in roi_dict.items():
-        if data['Shape_type'].lower() == ROI_SETTINGS.RECTANGLE.value:
-            rectangles_df = pd.concat([rectangles_df, pd.DataFrame([data])], ignore_index=True)
-        elif data['Shape_type'].lower() == ROI_SETTINGS.CIRCLE.value:
-            circles_df = pd.concat([circles_df, pd.DataFrame([data])], ignore_index=True)
-        elif data['Shape_type'].lower() == ROI_SETTINGS.POLYGON.value:
-            polygon_df = pd.concat([polygon_df, pd.DataFrame([data])], ignore_index=True)
+    if not video_name_nesting:
+        for shape_name, shape_data in roi_dict.items():
+            if shape_data['Shape_type'].lower() == ROI_SETTINGS.RECTANGLE.value:
+                rectangles_df = pd.concat([rectangles_df, pd.DataFrame([shape_data])], ignore_index=True)
+            elif shape_data['Shape_type'].lower() == ROI_SETTINGS.CIRCLE.value:
+                circles_df = pd.concat([circles_df, pd.DataFrame([shape_data])], ignore_index=True)
+            elif shape_data['Shape_type'].lower() == ROI_SETTINGS.POLYGON.value:
+                polygon_df = pd.concat([polygon_df, pd.DataFrame([shape_data])], ignore_index=True)
+    else:
+        for video_name, video_data in roi_dict.items():
+            for shape_name, shape_data in video_data.items():
+                if shape_data['Shape_type'].lower() == ROI_SETTINGS.RECTANGLE.value:
+                    rectangles_df = pd.concat([rectangles_df, pd.DataFrame([shape_data])], ignore_index=True)
+                elif shape_data['Shape_type'].lower() == ROI_SETTINGS.CIRCLE.value:
+                    circles_df = pd.concat([circles_df, pd.DataFrame([shape_data])], ignore_index=True)
+                elif shape_data['Shape_type'].lower() == ROI_SETTINGS.POLYGON.value:
+                    polygon_df = pd.concat([polygon_df, pd.DataFrame([shape_data])], ignore_index=True)
+
     return (rectangles_df, circles_df, polygon_df)
 
 
-def get_roi_dict_from_dfs(rectangle_df: pd.DataFrame, circle_df: pd.DataFrame, polygon_df: pd.DataFrame) -> dict:
+def get_roi_dict_from_dfs(rectangle_df: pd.DataFrame,
+                          circle_df: pd.DataFrame,
+                          polygon_df: pd.DataFrame,
+                          video_name_nesting: Optional[bool] = False) -> dict:
     """
     Helper create dict from a shape dataframes.
     """
+
     out = {}
     for idx, row in rectangle_df.iterrows():
-        out[row['Name']] = row.to_dict()
+        if not video_name_nesting:
+            out[row['Name']] = row.to_dict()
+        else:
+            if row['Video'] not in list(out.keys()):
+                out[row['Video']] = {}
+            out[row['Video']][row['Name']] = row.to_dict()
     for idx, row in circle_df.iterrows():
-        out[row['Name']] = row.to_dict()
+        if not video_name_nesting:
+            out[row['Name']] = row.to_dict()
+        else:
+            if row['Video'] not in list(out.keys()):
+                out[row['Video']] = {}
+            out[row['Video']][row['Name']] = row.to_dict()
     for idx, row in polygon_df.iterrows():
-        out[row['Name']] = row.to_dict()
+        if not video_name_nesting:
+            out[row['Name']] = row.to_dict()
+        else:
+            if row['Video'] not in list(out.keys()):
+                out[row['Video']] = {}
+            out[row['Video']][row['Name']] = row.to_dict()
     return out
 
 
@@ -208,19 +238,34 @@ def get_roi_data(roi_path: Union[str, os.PathLike], video_name: str) -> tuple:
         other_rectangles_df = in_rectangles_df[in_rectangles_df['Video'] != video_name].reset_index(drop=True)
         other_circles_df = in_circles_df[in_circles_df['Video'] != video_name].reset_index(drop=True)
         other_polygon_df = in_polygon_df[in_polygon_df['Video'] != video_name].reset_index(drop=True)
-        other_roi_dict = get_roi_dict_from_dfs(rectangle_df=other_rectangles_df, circle_df=other_circles_df, polygon_df=other_polygon_df)
+        other_roi_dict = get_roi_dict_from_dfs(rectangle_df=other_rectangles_df,
+                                               circle_df=other_circles_df,
+                                               polygon_df=other_polygon_df,
+                                               video_name_nesting=True)
         if len(rectangles_df) + len(circles_df) + len(polygon_df) > 0:
             roi_names = list(set(list(rectangles_df['Name'].unique()) + list(circles_df['Name'].unique()) + list(polygon_df['Name'].unique())))
-            roi_dict = get_roi_dict_from_dfs(rectangle_df=rectangles_df, circle_df=circles_df, polygon_df=polygon_df)
+            roi_dict = get_roi_dict_from_dfs(rectangle_df=rectangles_df, circle_df=circles_df, polygon_df=polygon_df, video_name_nesting=False)
 
     return (rectangles_df, circles_df, polygon_df, roi_dict, roi_names, other_roi_dict, other_video_names_w_rois)
 
 def get_video_roi_data_from_dict(roi_dict: dict, video_name: str) -> dict:
     out = {}
-    for shape_name, shape_data in roi_dict.items():
-        if shape_data['Video'] == video_name:
-            out[shape_name] = shape_data
+    for video_key, data in roi_dict.items():
+        if video_key == video_name:
+            for shape_name, shape_data in data.items():
+                out[shape_name] = shape_data
     return out
+
+
+def change_roi_dict_video_name(roi_dict: dict, video_name: str) -> dict:
+    out = {}
+    for shape_name, shape_data in roi_dict.items():
+        new_shape_data = copy(shape_data)
+        new_shape_data['Video'] = video_name
+        out[shape_name] = new_shape_data
+    return out
+
+
 
 
 def get_ear_tags_for_rectangle(center: Tuple[int, int], width: int, height: int) -> Dict[str, Union[int, Tuple[int, int]]]:

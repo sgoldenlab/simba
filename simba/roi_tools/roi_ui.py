@@ -37,7 +37,7 @@ class ROI_ui(ROI_mixin, ConfigReader):
         self.video_ext = get_fn_ext(filepath=video_path)[2][1:]
         self.img, self.img_idx = ImageMixin.find_first_non_uniform_clr_frm(video_path=video_path)
         self.define_ui = PopUpMixin(title="REGION OF INTEREST (ROI) SETTINGS", size=WINDOW_SIZE)
-        self.roi_mixin = ROI_mixin.__init__(self, video_path=video_path, config_path=config_path, img_idx=self.img_idx)
+        ROI_mixin.__init__(self, video_path=video_path, config_path=config_path, img_idx=self.img_idx, main_frm=self.define_ui.root)
         self.other_project_video_paths = find_all_videos_in_directory(directory=self.video_dir, as_dict=True).values()
         self.other_project_video_paths = [x for x in self.other_project_video_paths if x != video_path]
         self.other_project_video_names = [get_fn_ext(x)[1] for x in self.other_project_video_paths]
@@ -53,15 +53,21 @@ class ROI_ui(ROI_mixin, ConfigReader):
         self.get_save_roi_panel(parent_frame=self.define_ui.main_frm, row_idx=8)
         self.get_status_bar_panel(parent_frame=self.define_ui.main_frm, row_idx=9)
         self.get_file_menu(root=self.define_ui.root)
+        self.set_selected_shape_type(shape_type='rectangle')
         self.define_ui.root.protocol("WM_DELETE_WINDOW", self._close)
         self.define_ui.main_frm.mainloop()
 
     def _close(self):
-        self.define_ui.root.destroy()
         try:
-            self.roi_mixin.close_img()
+            self.close_img()
         except:
             pass
+        self.define_ui.root.destroy()
+        self.define_ui.root.quit()
 
-#ROI_ui(config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini", video_path=r"C:\troubleshooting\mouse_open_field\project_folder\videos\Video1.mp4")
+# ROI_ui(config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini",
+#        video_path=r'C:\troubleshooting\mouse_open_field\project_folder\videos\Video2.mp4')
+
+# ROI_ui(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#        video_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_CNO_0514.mp4")
 
