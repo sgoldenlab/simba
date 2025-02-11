@@ -118,7 +118,7 @@ def test_create_shap_log(config_path, clf_path):
     train_model_mixin.create_shap_log(rf_clf=clf,
                                       x=x,
                                       y=y,
-                                      x_names=x.columns,
+                                      x_names=list(x.columns),
                                       clf_name='target',
                                       cnt_present=1,
                                       cnt_absent=1,
