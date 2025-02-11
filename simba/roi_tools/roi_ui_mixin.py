@@ -33,6 +33,7 @@ from simba.roi_tools.roi_utils import (create_circle_entry,
                                        get_vertices_hexagon,
                                        get_video_roi_data_from_dict,
                                        set_roi_metric_sizes,
+                                       get_roi_data_for_video_name,
                                        change_roi_dict_video_name)
 from simba.sandbox.roi_tkinter.interactive_roi_modifier_tkinter import \
     InteractiveROIModifier
@@ -563,9 +564,9 @@ class ROI_mixin(ConfigReader):
             error_txt = f'No other video in the SimBA project has ROIs. Draw ROIs on other videos in the SimBA project to transfer ROIs between videos'
             self.status_bar.configure(text=error_txt, fg="red")
             raise InvalidInputError(msg=error_txt, source=self.__class__.__name__)
-        video_roi_dict = get_video_roi_data_from_dict(roi_dict=self.other_roi_dict, video_name=video_name)
+        video_roi_dict = get_roi_data_for_video_name(roi_path=self.roi_coordinates_path, video_name=video_name)
+        video_roi_dict = change_roi_dict_video_name(roi_dict=video_roi_dict, video_name=self.video_meta['video_name'])
         if len(video_roi_dict.keys()) > 0:
-            video_roi_dict = change_roi_dict_video_name(roi_dict=video_roi_dict, video_name=self.video_meta['video_name'])
             self.reset_img_shape_memory()
             self.roi_names = list(video_roi_dict.keys())
             self.roi_dict = video_roi_dict

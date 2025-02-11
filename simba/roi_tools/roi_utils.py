@@ -248,6 +248,17 @@ def get_roi_data(roi_path: Union[str, os.PathLike], video_name: str) -> tuple:
 
     return (rectangles_df, circles_df, polygon_df, roi_dict, roi_names, other_roi_dict, other_video_names_w_rois)
 
+
+def get_roi_data_for_video_name(roi_path: Union[str, os.PathLike], video_name: str):
+    in_rectangles_df, in_circles_df, in_polygon_df = read_roi_data(roi_path=roi_path)
+    rectangles_df = in_rectangles_df[in_rectangles_df['Video'] == video_name].reset_index(drop=True)
+    circles_df = in_circles_df[in_circles_df['Video'] == video_name].reset_index(drop=True)
+    polygon_df = in_polygon_df[in_polygon_df['Video'] == video_name].reset_index(drop=True)
+    roi_dict = get_roi_dict_from_dfs(rectangle_df=rectangles_df, circle_df=circles_df, polygon_df=polygon_df, video_name_nesting=False)
+    return roi_dict
+
+
+
 def get_video_roi_data_from_dict(roi_dict: dict, video_name: str) -> dict:
     out = {}
     for video_key, data in roi_dict.items():
