@@ -393,7 +393,7 @@ class TwoOptionQuestionPopUp(object):
             link_lbl.bind("<Button-1>", lambda e: callback(link))
             link_lbl.place(relx=0.5, rely=0.30, anchor=CENTER)
         button_one.place(relx=0.5, rely=0.50, anchor=CENTER)
-        button_two.place(relx=0.5, rely=0.70, anchor=CENTER)
+        button_two.place(relx=0.5, rely=0.80, anchor=CENTER)
         self.main_frm.wait_window()
 
     def run(self, selected_option):

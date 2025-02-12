@@ -35,11 +35,12 @@ class AggregateClfCalculator(ConfigReader):
 
 
     :param str config_path: path to SimBA project config file in Configparser format
-    :param List[str] data_measures: Aggregate statistics measures to calculate. OPTIONS: ['Bout count', 'Total event duration (s)', 'Mean event bout duration (s)', 'Median event bout duration (s)', 'First event occurrence (s)', 'Mean event bout interval duration (s)', 'Median event bout interval duration (s)']
+    :param List[str] data_measures: Aggregate statistics measures to calculate. OPTIONS: ['Bout count', 'Total event duration (s)', 'Mean event bout duration (s)', 'Median event bout duration (s)', 'First event occurrence (s)', 'Mean event bout interval duration (s)', 'Median event bout interval duration (s)']. If None, then all measures are calculated.
     :param List[str] classifiers: Classifiers to calculate aggregate statistics for. E.g.,: ['Attack', 'Sniffing']
     :param Optional[List[str]] video_meta_data: Video metadata to include in the output. Options: 'Frame count', 'Video length (s)'.
     :param bool detailed_bout_data: If True, save detailed data for each bout in each video (start frame, end frame, bout time etc.)
     :param bool transpose: If True, then one video per row. Else, one meassure per row. Default: False.
+    :param Optional[Union[str, os.PathLike]] data_dir: Directory location of the data files. If None, the the ``project_folder/csv/machine_results`` directory is used.
 
 
     :example:
@@ -50,8 +51,8 @@ class AggregateClfCalculator(ConfigReader):
 
     def __init__(self,
                  config_path: Union[str, os.PathLike],
-                 data_measures: List[Literal["Bout count", "Total event duration (s)", "Mean event bout duration (s)", "Median event bout duration (s)", "First event occurrence (s)", "Mean event bout interval duration (s)", "Median event bout interval duration (s)"]],
                  classifiers: List[str],
+                 data_measures: Optional[List[Literal["Bout count", "Total event duration (s)", "Mean event bout duration (s)", "Median event bout duration (s)", "First event occurrence (s)", "Mean event bout interval duration (s)", "Median event bout interval duration (s)"]]] = None,
                  detailed_bout_data: Optional[bool] = False,
                  transpose: Optional[bool] = False,
                  video_meta_data: Optional[List[Literal["Frame count", "Video length (s)"]]] = None,
@@ -59,7 +60,10 @@ class AggregateClfCalculator(ConfigReader):
 
         super().__init__(config_path=config_path)
         log_event(logger_name=str(self.__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
-        check_valid_lst(data=data_measures, source=f'{self.__class__.__name__} data_measures', min_len=1, valid_dtypes=(str,), valid_values=DATA_OPTIONS)
+        if data_measures is not None:
+            check_valid_lst(data=data_measures, source=f'{self.__class__.__name__} data_measures', min_len=1, valid_dtypes=(str,), valid_values=DATA_OPTIONS)
+        else:
+            data_measures = DATA_OPTIONS
         check_valid_lst(data=classifiers, source=f'{self.__class__.__name__} classifiers', min_len=1, valid_dtypes=(str,), valid_values=self.clf_names)
         if video_meta_data is not None:
             check_valid_lst(data=video_meta_data, source=f'{self.__class__.__name__} data_measures', min_len=1, valid_dtypes=(str,), valid_values=["Frame count", "Video length (s)"])

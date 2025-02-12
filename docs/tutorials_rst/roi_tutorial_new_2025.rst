@@ -595,7 +595,7 @@ the video below:
   :width: 800
   :align: center
 
-PREFRENCES
+PREFERENCES
 ----------
 
 The ``File`` drop-down in the **REGION OF INTEREST (ROI) SETTINGS**
