@@ -401,5 +401,6 @@ If you have any questions, bug reports or feature requests, please let us know b
 
 ##
 Author [Simon N](https://github.com/sronilsson)
+[sronilsson@gmail.com](mailto:yourname@example.com)
 
 
