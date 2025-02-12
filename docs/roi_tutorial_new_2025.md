@@ -102,7 +102,7 @@ Occationally, the very first frame of the video isn't suitable for defining your
  
 * If you want to display the first frame of the video, click on the <kbd>FIRST FRAME</kbd>. If you want to display the last frame of the video, click on the <kbd>LAST FRAME</kbd>.
 
-[roi_tutorial_4.webm](https://github.com/user-attachments/assets/3835bc80-18e3-4247-a107-3f74e025075b)
+[roi_tutorial_4.webm](https://github.com/user-attachments/assets/e448bb20-95ec-4504-a52d-9ec588b040bd)
 
 ## SET NEW SHAPE
 
@@ -133,15 +133,15 @@ Once you have defined your shape, it is time to draw it. The methods for drawing
 ### DRAW RECTANGLE
 To draw a rectangle, click and hold the left mouse button at the top left corner of your rectangle and drag the mouse to the bottom right corner of the rectangle. If you're unhappy with your rectangle, you can start to draw the rectangle again by holding the left mouse button at the top left corner of your, new, revised, rectangle. The previous rectangle will be automatically discarded. When you are happy with your rectangle, **press the keyboard `ESCAPE` key**  OR **click the left mouse button anywhere in the ROI SETTINGS window** to save your rectangle to memory. 
 
+[draw_rectangle.webm](https://github.com/user-attachments/assets/a2dbec23-e652-4e1e-809d-fe070dd24d02)
+
 > [!NOTE]
 > If you want to modify the appearance, location, or size, width, height of your rectangle, you can do this later - see the `CHANGE ROI SIZES` or `CHANGE ROI ATTRIBUTES` sections below. 
-
-[draw_rectangle.webm](https://github.com/user-attachments/assets/1005bca1-7be0-4862-8ce9-f91af0bea398)
 
 ### DRAW CIRCLE
 Begin by **clicking and holding down** the left mouse button at the center of the circle. Next, drag the mouse, **while holding down the left mouse button**, towards the outer bounds of the circle. Once the circle looks good, **let go of the left mouse button**. If you're unhappy with your circle, begin again by **clicking and holding down** the left mouse button at the center of the circle and start dragging the cursor to the outer bounds of the rectangle. Once the circle looks good, hit the **keyboard `ESCAPE` key** OR **click the left mouse button anywhere in the ROI SETTINGS window** and the circle will be saved to memory.
 
-[draw_circle.webm](https://github.com/user-attachments/assets/900c30cb-5e42-4ee9-a8a8-1e4b890ed96b)
+[draw_circle.webm](https://github.com/user-attachments/assets/962783ea-8923-414f-8b53-3d462fe1c08b)
 
 > [!NOTE]
 > If you want to modify the appearance, location, or radius of your circle, you can do this later - see the `CHANGE ROI SIZES` or `CHANGE ROI ATTRIBUTES` sections below. 
@@ -151,7 +151,7 @@ Begin by **clicking and holding down** the left mouse button at the center of th
 Left mouse click on **at least three different locations** in the image that defines the outer bounds of your polygon. You should see filled circles, representing the polygon vertices, and and lines connecting the vertices, appear where you click. Once you are happy with your polygon, hit the **keyboard `ESCAPE` key** OR 
 **click the left mouse button anywhere in the ROI SETTINGS window** and the polygon will appear in full and the polygon will be saved to memory.
 
-[draw_polygon.webm](https://github.com/user-attachments/assets/35ec9778-0f67-4c6f-bfa1-cfe9d1401516)
+[draw_polygon.webm](https://github.com/user-attachments/assets/586d08bb-bf9c-4e8c-86b0-c7e46a133237)
 
 > [!NOTE]
 > If you want to modify the appearance, location, or size, or positions of the polygon edges, you can do this later - see the `CHANGE ROI SIZES` or `CHANGE ROI ATTRIBUTES` sections below. 
@@ -173,8 +173,9 @@ SimBA allows several forms of shape manipulations that are described in detail b
 ### DELETING ROIs
 
 * To delete all drawn ROIs, click the <kbd>DELETE ALL</kbd> button in the `DRAW` sub-menu:
+* 
+[delete_all.webm](https://github.com/user-attachments/assets/f7cddd4a-2009-4fa5-9b4b-a54dc0bd1783)
 
-[delete_all.webm](https://github.com/user-attachments/assets/4d8297a3-46b4-46f5-8016-d87f99692410)
 
 * To delete a specific ROI, first use the `ROI` drop-down menu in the `DRAW` sub-menu to select the ROI you wish to delete. Next, click on the <kbd>DELETE SELECTED ROI</kbd> button:
 
@@ -228,7 +229,8 @@ SimBA allows several forms of shape manipulations that are described in detail b
 
 4. Finally, once the ROIs have been moved into their correct location. We need to exit the **MOVE MODE**. Select the `DEFINE SHAPE` window (e.g., by clicking the top bar), and hit the **keyboard `ESCAPE` key**.
 
-[change_shapes.webm](https://github.com/user-attachments/assets/0bd0753e-5769-4961-8a82-8ee92881517d)
+[change_shapes.webm](https://github.com/user-attachments/assets/3f4ebcf6-b343-4c52-9779-42d84e11bee5)
+
    
 ### CHANGE ROI ATTRIBUTES
 
@@ -240,7 +242,8 @@ SimBA allows several forms of shape manipulations that are described in detail b
 
 2. To change the name of the ROI, enter a new name in the `NEW SHAPE NAME` entry box. TO change the color, thickness, or ear-tag size of the shape, use the respective dropdown windows. Once complete, hit the <kbd>SAVE ATTRIBUTES</kbd> button.
 
-[change_attributes.webm](https://github.com/user-attachments/assets/927cd32a-f81d-4002-aa18-869bf97b049d)
+[change_attributes.webm](https://github.com/user-attachments/assets/0af65571-8c72-4125-aa04-8d9524567dd5)
+
 
 ## SHOW SHAPE SIZE INFORMATION. 
 
@@ -256,7 +259,8 @@ Sometimes we need some metrics representing the sizes of the ROIs we have drawn.
   
 2. When the <kbd>SHOW SHAPE INFO</kbd> button is clicked, the text of the button toggles to <kbd>HIDE SHAPE INFO</kbd>. Click the button again to hide the shape size information. 
 
-[show_shape_size.webm](https://github.com/user-attachments/assets/aa253592-fe9a-49b3-ae0c-c80e166c21a4)
+[show_shape_size.webm](https://github.com/user-attachments/assets/6fdb61c1-7110-46dc-8845-cd6c47c10cef)
+
 
 ## DRAW SHAPES OF USER-DEFINED METRIC SIZES
 
@@ -328,9 +332,7 @@ Sometimes we have created ROIs in one video, saved them, and opened up a second 
 
 2. In this dropdown menu, select the video which has the ROIs you wish to replicate. Once selected, click `Apply`. The ROIs from the video in the `Select video` dropdown menu will appear on the frame.
 
-
-[apply_video_from_different.webm](https://github.com/user-attachments/assets/df8c497d-05c0-4259-94ab-032c9c29d290)
-
+[apply_video_from_different.webm](https://github.com/user-attachments/assets/de87053e-8ad9-4f66-8d20-6de6927ae5fd)
 
 ## Delete all ROI definitions in your SimBA project
 
@@ -362,4 +364,5 @@ If you have any questions, bug reports or feature requests, please let us know b
 
 ##
 Author [Simon N](https://github.com/sronilsson)
+
 
