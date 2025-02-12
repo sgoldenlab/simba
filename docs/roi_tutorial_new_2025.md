@@ -19,6 +19,37 @@ Moreover, the ROI data can  be used to build potentially valuable, additional, f
 > If spatial locations are irrelevant for the behaviour being classified, then such features should *not* be included in the machine model generation as they just 
 > only introduce noise.
 
+
+# SECTIONS
+ * [Before analyzing ROIs in SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#before-analyzing-rois-in-simba)
+ * [Defining ROIs in SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#part-1-defining-rois-in-simba)
+ * [VIDEO AND FRAME INFORMATION](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#video-and-frame-information)
+ * [CHANGE IMAGE](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#change-image)
+ * [SET NEW SHAPE](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#set-new-shape)
+ * [SHAPE ATTRIBUTES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#shape-attributes)
+ * [SHAPE NAME](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#shape-name)
+ * [DRAW RECTANGLE](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-rectangle)
+ * [DRAW CIRCLE](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-circle)
+ * [DRAW POLYGON](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-polygon)
+ * [SHAPE MANIPULATIONS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#shape-manipulations)
+ * [DELETING ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#deleting-rois)
+ * [DUPLICATE ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#duplicate-rois)
+ * [CHANGING ROI LOCATIONS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#changing-roi-locations)
+ * [CHANGING ROI SHAPES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#changing-roi-shapes)
+ * [CHANGE ROI ATTRIBUTES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#change-roi-attributes)
+ * [SHOW SHAPE SIZE INFORMATION](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#show-shape-size-information)
+ * [DRAW SHAPES OF USER-DEFINED METRIC SIZES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-shapes-of-user-defined-metric-sizes)
+ * [DRAW A RECTANGLE OF METRIC WIDTH & HEIGHT](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-a-rectangle-of-metric-width--height)
+ * [DRAW A CIRCLE OF METRIC RADIUS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-a-circle-of-metric-radius)
+ * [DRAW A HEXAGON METRIC RADIUS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-a-hexagon-metric-radius)
+ * [DRAW A HALF CIRCLE OF METRIC RADIUS POINTING NORTH](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-a-half-circle-of-metric-radius-pointing-north)
+ * [DRAW A HALF CIRCLE OF METRIC RADIUS POINTING WEST](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-a-half-circle-of-metric-radius-pointing-west)
+ * [PREFRENCES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#prefrences)
+ * [APPLY SHAPES FROM ANOTHER VIDEO](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#apply-shapes-from-another-video)
+ * [DELETE ALL ROI DEFINITIONS IN SIMBA PROJECT](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#delete-all-roi-definitions-in-simba-project)
+ * [SAVE ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#save-rois)
+ * [NEXT STEPS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#next-steps)
+
 # Before analyzing ROIs in SimBA
 
 To analyze ROI data in SimBA (for descriptive statistics, machine learning features, or both descriptive statistics and 
@@ -44,7 +75,7 @@ and lastly (iv) [Correct outliers](https://github.com/sgoldenlab/simba/blob/mast
 > up to and including the any frame, the animal has spent within a specific ROI. These and other ROI-based features could be useful additions 
 > for classifying behaviors in certain scenarios.
 
-# Part 1. Defining ROIs in SimBA
+# Defining ROIs in SimBA
 
 1. In the main SimBA console window, begin loading your project by clicking on `File` and `Load project`. In the **[Load Project]** tab, click on `Browse File` and select the `project_config.ini` that belongs to your project. 
 
@@ -102,7 +133,7 @@ Occationally, the very first frame of the video isn't suitable for defining your
  
 * If you want to display the first frame of the video, click on the <kbd>FIRST FRAME</kbd>. If you want to display the last frame of the video, click on the <kbd>LAST FRAME</kbd>.
 
-[roi_tutorial_4.webm](https://github.com/user-attachments/assets/3835bc80-18e3-4247-a107-3f74e025075b)
+[roi_tutorial_4.webm](https://github.com/user-attachments/assets/e448bb20-95ec-4504-a52d-9ec588b040bd)
 
 ## SET NEW SHAPE
 
@@ -133,25 +164,24 @@ Once you have defined your shape, it is time to draw it. The methods for drawing
 ### DRAW RECTANGLE
 To draw a rectangle, click and hold the left mouse button at the top left corner of your rectangle and drag the mouse to the bottom right corner of the rectangle. If you're unhappy with your rectangle, you can start to draw the rectangle again by holding the left mouse button at the top left corner of your, new, revised, rectangle. The previous rectangle will be automatically discarded. When you are happy with your rectangle, **press the keyboard `ESCAPE` key**  OR **click the left mouse button anywhere in the ROI SETTINGS window** to save your rectangle to memory. 
 
+[draw_rectangle.webm](https://github.com/user-attachments/assets/a2dbec23-e652-4e1e-809d-fe070dd24d02)
+
 > [!NOTE]
 > If you want to modify the appearance, location, or size, width, height of your rectangle, you can do this later - see the `CHANGE ROI SIZES` or `CHANGE ROI ATTRIBUTES` sections below. 
-
-[draw_rectangle.webm](https://github.com/user-attachments/assets/1005bca1-7be0-4862-8ce9-f91af0bea398)
 
 ### DRAW CIRCLE
 Begin by **clicking and holding down** the left mouse button at the center of the circle. Next, drag the mouse, **while holding down the left mouse button**, towards the outer bounds of the circle. Once the circle looks good, **let go of the left mouse button**. If you're unhappy with your circle, begin again by **clicking and holding down** the left mouse button at the center of the circle and start dragging the cursor to the outer bounds of the rectangle. Once the circle looks good, hit the **keyboard `ESCAPE` key** OR **click the left mouse button anywhere in the ROI SETTINGS window** and the circle will be saved to memory.
 
-[draw_circle.webm](https://github.com/user-attachments/assets/900c30cb-5e42-4ee9-a8a8-1e4b890ed96b)
+[draw_circle.webm](https://github.com/user-attachments/assets/962783ea-8923-414f-8b53-3d462fe1c08b)
 
 > [!NOTE]
 > If you want to modify the appearance, location, or radius of your circle, you can do this later - see the `CHANGE ROI SIZES` or `CHANGE ROI ATTRIBUTES` sections below. 
-
 
 ### DRAW POLYGON 
 Left mouse click on **at least three different locations** in the image that defines the outer bounds of your polygon. You should see filled circles, representing the polygon vertices, and and lines connecting the vertices, appear where you click. Once you are happy with your polygon, hit the **keyboard `ESCAPE` key** OR 
 **click the left mouse button anywhere in the ROI SETTINGS window** and the polygon will appear in full and the polygon will be saved to memory.
 
-[draw_polygon.webm](https://github.com/user-attachments/assets/35ec9778-0f67-4c6f-bfa1-cfe9d1401516)
+[draw_polygon.webm](https://github.com/user-attachments/assets/586d08bb-bf9c-4e8c-86b0-c7e46a133237)
 
 > [!NOTE]
 > If you want to modify the appearance, location, or size, or positions of the polygon edges, you can do this later - see the `CHANGE ROI SIZES` or `CHANGE ROI ATTRIBUTES` sections below. 
@@ -173,8 +203,9 @@ SimBA allows several forms of shape manipulations that are described in detail b
 ### DELETING ROIs
 
 * To delete all drawn ROIs, click the <kbd>DELETE ALL</kbd> button in the `DRAW` sub-menu:
+* 
+[delete_all.webm](https://github.com/user-attachments/assets/f7cddd4a-2009-4fa5-9b4b-a54dc0bd1783)
 
-[delete_all.webm](https://github.com/user-attachments/assets/4d8297a3-46b4-46f5-8016-d87f99692410)
 
 * To delete a specific ROI, first use the `ROI` drop-down menu in the `DRAW` sub-menu to select the ROI you wish to delete. Next, click on the <kbd>DELETE SELECTED ROI</kbd> button:
 
@@ -228,7 +259,8 @@ SimBA allows several forms of shape manipulations that are described in detail b
 
 4. Finally, once the ROIs have been moved into their correct location. We need to exit the **MOVE MODE**. Select the `DEFINE SHAPE` window (e.g., by clicking the top bar), and hit the **keyboard `ESCAPE` key**.
 
-[change_shapes.webm](https://github.com/user-attachments/assets/0bd0753e-5769-4961-8a82-8ee92881517d)
+[change_shapes.webm](https://github.com/user-attachments/assets/3f4ebcf6-b343-4c52-9779-42d84e11bee5)
+
    
 ### CHANGE ROI ATTRIBUTES
 
@@ -240,7 +272,8 @@ SimBA allows several forms of shape manipulations that are described in detail b
 
 2. To change the name of the ROI, enter a new name in the `NEW SHAPE NAME` entry box. TO change the color, thickness, or ear-tag size of the shape, use the respective dropdown windows. Once complete, hit the <kbd>SAVE ATTRIBUTES</kbd> button.
 
-[change_attributes.webm](https://github.com/user-attachments/assets/927cd32a-f81d-4002-aa18-869bf97b049d)
+[change_attributes.webm](https://github.com/user-attachments/assets/0af65571-8c72-4125-aa04-8d9524567dd5)
+
 
 ## SHOW SHAPE SIZE INFORMATION. 
 
@@ -256,7 +289,8 @@ Sometimes we need some metrics representing the sizes of the ROIs we have drawn.
   
 2. When the <kbd>SHOW SHAPE INFO</kbd> button is clicked, the text of the button toggles to <kbd>HIDE SHAPE INFO</kbd>. Click the button again to hide the shape size information. 
 
-[show_shape_size.webm](https://github.com/user-attachments/assets/aa253592-fe9a-49b3-ae0c-c80e166c21a4)
+[show_shape_size.webm](https://github.com/user-attachments/assets/6fdb61c1-7110-46dc-8845-cd6c47c10cef)
+
 
 ## DRAW SHAPES OF USER-DEFINED METRIC SIZES
 
@@ -272,31 +306,31 @@ Once clicked, you should see the following pop-up opening allowing you to draw a
 
 In the `SETTINGS` frame, fill in the name of your ROI, and choose its color, thickness, and ear tag size. 
 
-#### DRAW A RECTANGLE OF SET SIZE
+#### DRAW A RECTANGLE OF METRIC WIDTH & HEIGHT
 
 To draw a RECTANGLE of set size, fill in its metric width and height in millimeter and click ``ADD RECTANGLE`` as in the video below:
 
 [predefined_sizes_rectangle.webm](https://github.com/user-attachments/assets/f669e54a-c8d7-4e2c-b2a9-bb39dd483b3f)
 
-#### DRAW A CIRCLE OF A SPECIFIC RADIUS
+#### DRAW A CIRCLE OF METRIC RADIUS
 
 To draw a CIRCLE with a specific radius, fill in its metric radius in millimeter and click ``ADD CIRCLE`` as in the video below:
 
 [predefined_sizes_circle.webm](https://github.com/user-attachments/assets/9c745aa3-20bf-49fb-8e65-90144ac7e3c7)
 
-#### DRAW A HEXAGON SPECIFIC RADIUS
+#### DRAW A HEXAGON METRIC RADIUS
 
 To draw a HEXAGON with a specific radius, fill in its metric radius in millimeter and click ``ADD HEXAGON`` as in the video below:
 
 [predefined_sizes_hexagon.webm](https://github.com/user-attachments/assets/eda60da0-693f-414e-95c5-51a7fc5a033c)
 
-#### DRAW A HALF CIRCLE POINTING NORTH
+#### DRAW A HALF CIRCLE OF METRIC RADIUS POINTING NORTH
 
 To draw a HALF CIRCLE with a specific radius with its chunky part pointing UP, fill in its metric radius in millimeter, choose `NORTH` in the `direction drop-down menu`, and click ``ADD HALF CIRCLE`` as in the video below:
 
 [predefined_sizes_half_circle_north.webm](https://github.com/user-attachments/assets/d0323574-f163-4038-bfcd-b8f2e4595d0c)
 
-#### DRAW A HALF CIRCLE POINTING WEST
+#### DRAW A HALF CIRCLE OF METRIC RADIUS POINTING WEST
 
 To draw a HALF CIRCLE with a specific radius with its chunky part pointing LEFT, fill in its metric radius in millimeter, choose `WEST` in the `direction drop-down menu`, and click ``ADD HALF CIRCLE`` as in the video below:
 
@@ -328,11 +362,9 @@ Sometimes we have created ROIs in one video, saved them, and opened up a second 
 
 2. In this dropdown menu, select the video which has the ROIs you wish to replicate. Once selected, click `Apply`. The ROIs from the video in the `Select video` dropdown menu will appear on the frame.
 
+[apply_video_from_different.webm](https://github.com/user-attachments/assets/de87053e-8ad9-4f66-8d20-6de6927ae5fd)
 
-[apply_video_from_different.webm](https://github.com/user-attachments/assets/df8c497d-05c0-4259-94ab-032c9c29d290)
-
-
-## Delete all ROI definitions in your SimBA project
+## DELETE ALL ROI DEFINITIONS IN SIMBA PROJECT
 
 Somtimes we may want to delete all ROI definitions in a SimBA project and start from scratch.
 
@@ -347,6 +379,13 @@ Somtimes we may want to delete all ROI definitions in a SimBA project and start 
 > [!NOTE]
 > Your ROIs are saved inside your SImBA project, at the location `project_folder/logs/measures/ROIdefinitions.h5`. To delete the ROIs in the SImBA project, you could also manually delete this file. 
 
+## SAVE ROIs
+
+Once all the ROI drawings on the video looks good. remember to hit the `SAVE` button shown to save your video's ROIs to disk as in the image below. After clicking the save button, you are good to close the ROI **REGION OF INTEREST (ROI) SETTINGS** window and **DEFINE SHAPES** window. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/save_btn.webp"/>
+</p>
 
 ## NEXT STEPS
 Once your ROI definitions are all defined, close the `ROI table`, `Regions of Interest Settings` and `Define Shape` windows and head back to the [ROI] tab in the load project menu. 
@@ -362,4 +401,6 @@ If you have any questions, bug reports or feature requests, please let us know b
 
 ##
 Author [Simon N](https://github.com/sronilsson)
+[sronilsson@gmail.com](mailto:yourname@example.com)
+
 

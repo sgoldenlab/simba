@@ -17,7 +17,8 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.roi_tools.roi_relector_polygon_tkinter import ROISelectorPolygon
 from simba.roi_tools.roi_selector_circle_tkinter import ROISelectorCircle
 from simba.roi_tools.roi_selector_rectangle_tkinter import ROISelector
-from simba.roi_tools.roi_utils import (create_circle_entry,
+from simba.roi_tools.roi_utils import (change_roi_dict_video_name,
+                                       create_circle_entry,
                                        create_duplicated_circle_entry,
                                        create_duplicated_polygon_entry,
                                        create_duplicated_rectangle_entry,
@@ -28,13 +29,12 @@ from simba.roi_tools.roi_utils import (create_circle_entry,
                                        get_half_circle_vertices,
                                        get_polygon_df_headers,
                                        get_rectangle_df_headers, get_roi_data,
+                                       get_roi_data_for_video_name,
                                        get_roi_df_from_dict,
                                        get_triangle_vertices,
                                        get_vertices_hexagon,
                                        get_video_roi_data_from_dict,
-                                       set_roi_metric_sizes,
-                                       get_roi_data_for_video_name,
-                                       change_roi_dict_video_name)
+                                       set_roi_metric_sizes)
 from simba.sandbox.roi_tkinter.interactive_roi_modifier_tkinter import \
     InteractiveROIModifier
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
