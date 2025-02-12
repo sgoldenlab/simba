@@ -19,6 +19,37 @@ Moreover, the ROI data can  be used to build potentially valuable, additional, f
 > If spatial locations are irrelevant for the behaviour being classified, then such features should *not* be included in the machine model generation as they just 
 > only introduce noise.
 
+
+# SECTIONS
+ * [Before analyzing ROIs in SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#before-analyzing-rois-in-simba)
+ * [Defining ROIs in SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#part-1-defining-rois-in-simba)
+ * [VIDEO AND FRAME INFORMATION](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#video-and-frame-information)
+ * [CHANGE IMAGE](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#change-image)
+ * [SET NEW SHAPE](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#set-new-shape)
+ * [SHAPE ATTRIBUTES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#shape-attributes)
+ * [SHAPE NAME](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#shape-name)
+ * [DRAW RECTANGLE](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-rectangle)
+ * [DRAW CIRCLE](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-circle)
+ * [DRAW POLYGON](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-polygon)
+ * [SHAPE MANIPULATIONS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#shape-manipulations)
+ * [DELETING ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#deleting-rois)
+ * [DUPLICATE ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#duplicate-rois)
+ * [CHANGING ROI LOCATIONS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#changing-roi-locations)
+ * [CHANGING ROI SHAPES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#changing-roi-shapes)
+ * [CHANGE ROI ATTRIBUTES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#change-roi-attributes)
+ * [SHOW SHAPE SIZE INFORMATION](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#show-shape-size-information)
+ * [DRAW SHAPES OF USER-DEFINED METRIC SIZES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-shapes-of-user-defined-metric-sizes)
+ * [DRAW A RECTANGLE OF METRIC WIDTH & HEIGHT](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-a-rectangle-of-set-size)
+ * DRAW A CIRCLE OF METRIC RADIUS
+ * DRAW A HEXAGON METRIC RADIUS
+ * DRAW A HALF CIRCLE OF METRIC RADIUS POINTING NORTH
+ * DRAW A HALF CIRCLE OF METRIC RADIUS POINTING WEST
+ * PREFRENCES
+ * APPLY SHAPES FROM ANOTHER VIDEO
+ * DELETE ALL ROI DEFINITIONS IN SIMBA PROJECT
+ * SAVE ROIs
+ * NEXT STEPS
+
 # Before analyzing ROIs in SimBA
 
 To analyze ROI data in SimBA (for descriptive statistics, machine learning features, or both descriptive statistics and 
@@ -44,7 +75,7 @@ and lastly (iv) [Correct outliers](https://github.com/sgoldenlab/simba/blob/mast
 > up to and including the any frame, the animal has spent within a specific ROI. These and other ROI-based features could be useful additions 
 > for classifying behaviors in certain scenarios.
 
-# Part 1. Defining ROIs in SimBA
+# Defining ROIs in SimBA
 
 1. In the main SimBA console window, begin loading your project by clicking on `File` and `Load project`. In the **[Load Project]** tab, click on `Browse File` and select the `project_config.ini` that belongs to your project. 
 
@@ -145,7 +176,6 @@ Begin by **clicking and holding down** the left mouse button at the center of th
 
 > [!NOTE]
 > If you want to modify the appearance, location, or radius of your circle, you can do this later - see the `CHANGE ROI SIZES` or `CHANGE ROI ATTRIBUTES` sections below. 
-
 
 ### DRAW POLYGON 
 Left mouse click on **at least three different locations** in the image that defines the outer bounds of your polygon. You should see filled circles, representing the polygon vertices, and and lines connecting the vertices, appear where you click. Once you are happy with your polygon, hit the **keyboard `ESCAPE` key** OR 
@@ -276,31 +306,31 @@ Once clicked, you should see the following pop-up opening allowing you to draw a
 
 In the `SETTINGS` frame, fill in the name of your ROI, and choose its color, thickness, and ear tag size. 
 
-#### DRAW A RECTANGLE OF SET SIZE
+#### DRAW A RECTANGLE OF METRIC WIDTH & HEIGHT
 
 To draw a RECTANGLE of set size, fill in its metric width and height in millimeter and click ``ADD RECTANGLE`` as in the video below:
 
 [predefined_sizes_rectangle.webm](https://github.com/user-attachments/assets/f669e54a-c8d7-4e2c-b2a9-bb39dd483b3f)
 
-#### DRAW A CIRCLE OF A SPECIFIC RADIUS
+#### DRAW A CIRCLE OF METRIC RADIUS
 
 To draw a CIRCLE with a specific radius, fill in its metric radius in millimeter and click ``ADD CIRCLE`` as in the video below:
 
 [predefined_sizes_circle.webm](https://github.com/user-attachments/assets/9c745aa3-20bf-49fb-8e65-90144ac7e3c7)
 
-#### DRAW A HEXAGON SPECIFIC RADIUS
+#### DRAW A HEXAGON METRIC RADIUS
 
 To draw a HEXAGON with a specific radius, fill in its metric radius in millimeter and click ``ADD HEXAGON`` as in the video below:
 
 [predefined_sizes_hexagon.webm](https://github.com/user-attachments/assets/eda60da0-693f-414e-95c5-51a7fc5a033c)
 
-#### DRAW A HALF CIRCLE POINTING NORTH
+#### DRAW A HALF CIRCLE OF METRIC RADIUS POINTING NORTH
 
 To draw a HALF CIRCLE with a specific radius with its chunky part pointing UP, fill in its metric radius in millimeter, choose `NORTH` in the `direction drop-down menu`, and click ``ADD HALF CIRCLE`` as in the video below:
 
 [predefined_sizes_half_circle_north.webm](https://github.com/user-attachments/assets/d0323574-f163-4038-bfcd-b8f2e4595d0c)
 
-#### DRAW A HALF CIRCLE POINTING WEST
+#### DRAW A HALF CIRCLE OF METRIC RADIUS POINTING WEST
 
 To draw a HALF CIRCLE with a specific radius with its chunky part pointing LEFT, fill in its metric radius in millimeter, choose `WEST` in the `direction drop-down menu`, and click ``ADD HALF CIRCLE`` as in the video below:
 
@@ -334,7 +364,7 @@ Sometimes we have created ROIs in one video, saved them, and opened up a second 
 
 [apply_video_from_different.webm](https://github.com/user-attachments/assets/de87053e-8ad9-4f66-8d20-6de6927ae5fd)
 
-## Delete all ROI definitions in your SimBA project
+## DELETE ALL ROI DEFINITIONS IN SIMBA PROJECT
 
 Somtimes we may want to delete all ROI definitions in a SimBA project and start from scratch.
 
@@ -349,6 +379,13 @@ Somtimes we may want to delete all ROI definitions in a SimBA project and start 
 > [!NOTE]
 > Your ROIs are saved inside your SImBA project, at the location `project_folder/logs/measures/ROIdefinitions.h5`. To delete the ROIs in the SImBA project, you could also manually delete this file. 
 
+## SAVE ROIs
+
+Once all the ROI drawings on the video looks good. remember to hit the `SAVE` button shown to save your video's ROIs to disk as in the image below. After clicking the save button, you are good to close the ROI **REGION OF INTEREST (ROI) SETTINGS** window and **DEFINE SHAPES** window. 
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/save_btn.webp"/>
+</p>
 
 ## NEXT STEPS
 Once your ROI definitions are all defined, close the `ROI table`, `Regions of Interest Settings` and `Define Shape` windows and head back to the [ROI] tab in the load project menu. 
