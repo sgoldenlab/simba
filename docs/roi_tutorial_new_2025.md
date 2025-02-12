@@ -39,16 +39,16 @@ Moreover, the ROI data can  be used to build potentially valuable, additional, f
  * [CHANGE ROI ATTRIBUTES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#change-roi-attributes)
  * [SHOW SHAPE SIZE INFORMATION](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#show-shape-size-information)
  * [DRAW SHAPES OF USER-DEFINED METRIC SIZES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-shapes-of-user-defined-metric-sizes)
- * [DRAW A RECTANGLE OF METRIC WIDTH & HEIGHT](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-a-rectangle-of-set-size)
- * DRAW A CIRCLE OF METRIC RADIUS
- * DRAW A HEXAGON METRIC RADIUS
- * DRAW A HALF CIRCLE OF METRIC RADIUS POINTING NORTH
- * DRAW A HALF CIRCLE OF METRIC RADIUS POINTING WEST
- * PREFRENCES
- * APPLY SHAPES FROM ANOTHER VIDEO
- * DELETE ALL ROI DEFINITIONS IN SIMBA PROJECT
- * SAVE ROIs
- * NEXT STEPS
+ * [DRAW A RECTANGLE OF METRIC WIDTH & HEIGHT](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-a-rectangle-of-metric-width--height)
+ * [DRAW A CIRCLE OF METRIC RADIUS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-a-circle-of-metric-radius)
+ * [DRAW A HEXAGON METRIC RADIUS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-a-hexagon-metric-radius)
+ * [DRAW A HALF CIRCLE OF METRIC RADIUS POINTING NORTH](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-a-half-circle-of-metric-radius-pointing-north)
+ * [DRAW A HALF CIRCLE OF METRIC RADIUS POINTING WEST](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-a-half-circle-of-metric-radius-pointing-west)
+ * [PREFRENCES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#prefrences)
+ * [APPLY SHAPES FROM ANOTHER VIDEO](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#apply-shapes-from-another-video)
+ * [DELETE ALL ROI DEFINITIONS IN SIMBA PROJECT](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#delete-all-roi-definitions-in-simba-project)
+ * [SAVE ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#save-rois)
+ * [NEXT STEPS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#next-steps)
 
 # Before analyzing ROIs in SimBA
 
