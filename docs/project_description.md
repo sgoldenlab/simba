@@ -9,10 +9,12 @@ See below for raison d'être, detailed API, tutorials, data, documentation, supp
 - GitHub: [https://github.com/sgoldenlab/simba](https://github.com/sgoldenlab/simba)
 - Documentation readthedocs: [https://simba-uw-tf-dev.readthedocs.io/en/latest/](https://simba-uw-tf-dev.readthedocs.io/en/latest/)
 - API: [https://simba-uw-tf-dev.readthedocs.io/en/latest/api.html](https://simba-uw-tf-dev.readthedocs.io/en/latest/api.html)
-- Gitter Chat: [https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im](https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im)
+- Gitter chat support: [https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im](https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im)
 - bioRxiv preprint: [https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)
 - Nature Neuroscience paper: [https://www.nature.com/articles/s41593-024-01649-9](https://www.nature.com/articles/s41593-024-01649-9)
 - Open Science Framework (OSF) data buckets: [https://osf.io/tmu6y/](https://osf.io/tmu6y/)
+- Video examples: [http://youtube.com/playlist?list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl](http://youtube.com/playlist?list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl)
+- Slide examples: [https://simba-uw-tf-dev.readthedocs.io/en/latest/docs/workflow.html](https://simba-uw-tf-dev.readthedocs.io/en/latest/docs/workflow.html)
 
 ### Installation
 To install SimBA, use the following command:
@@ -20,7 +22,6 @@ To install SimBA, use the following command:
 ```bash
 pip install simba-uw-tf-dev
 ```
-
 
 ### Citation
 If you use the code, please cite:
@@ -44,4 +45,8 @@ SimBA is licensed under GNU Lesser General Public License v3.0.
 
 ### Contributors
 Contributers on Github https://github.com/sgoldenlab/simba#contributors
+
+### Contact
+* [Simon N](https://github.com/sronilsson), [sronilsson@gmail.com](mailto:sronilsson@gmail.com)
+
 
