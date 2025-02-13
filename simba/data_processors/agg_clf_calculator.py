@@ -65,8 +65,9 @@ class AggregateClfCalculator(ConfigReader):
         else:
             data_measures = DATA_OPTIONS
         check_valid_lst(data=classifiers, source=f'{self.__class__.__name__} classifiers', min_len=1, valid_dtypes=(str,), valid_values=self.clf_names)
-        if video_meta_data is not None:
-            check_valid_lst(data=video_meta_data, source=f'{self.__class__.__name__} data_measures', min_len=1, valid_dtypes=(str,), valid_values=["Frame count", "Video length (s)"])
+        if (video_meta_data is not None):
+            if isinstance(video_meta_data, list) and len(video_meta_data) > 0:
+                check_valid_lst(data=video_meta_data, source=f'{self.__class__.__name__} data_measures', min_len=0, valid_dtypes=(str,), valid_values=["Frame count", "Video length (s)"])
         else:
             video_meta_data = []
         check_valid_boolean(value=[transpose, detailed_bout_data], source=self.__class__.__name__)

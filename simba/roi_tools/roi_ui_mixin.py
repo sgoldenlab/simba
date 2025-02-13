@@ -270,7 +270,6 @@ class ROI_mixin(ConfigReader):
         self.shape_info_btn.configure(text="SHOW SHAPE INFO")
         shape_name = self.shape_name_eb.entry_get.strip()
         self.click_event, self.got_attributes = BooleanVar(value=False), False
-        self.win_x, self.win_y, _, _ = cv2.getWindowImageRect(DRAW_FRAME_NAME)
         self.root = parent_frame
 
         if not check_str(name=f'shape name', value=shape_name, allow_blank=False, raise_error=False)[0]:
@@ -435,7 +434,6 @@ class ROI_mixin(ConfigReader):
             msg = 'No ROI selected. First select an ROI in drop-down to delete it'
             self.set_status_bar_panel(text=msg, fg='red')
             raise NoROIDataError(msg=msg, source=self.__class__.__name__)
-        self.win_x, self.win_y, _, _ = cv2.getWindowImageRect(DRAW_FRAME_NAME)
         self.rectangles_df = self.rectangles_df[self.rectangles_df['Name'] != name].reset_index(drop=True)
         self.polygon_df = self.polygon_df[self.polygon_df['Name'] != name].reset_index(drop=True)
         self.circles_df = self.circles_df[self.circles_df['Name'] != name].reset_index(drop=True)
@@ -460,7 +458,6 @@ class ROI_mixin(ConfigReader):
             self.set_status_bar_panel(text=msg, fg='red')
             raise NoROIDataError(msg=msg, source=self.__class__.__name__)
         shape_to_duplicate = copy(self.roi_dict[selected_roi_name])
-        self.win_x, self.win_y, _, _ = cv2.getWindowImageRect(DRAW_FRAME_NAME)
         if selected_roi_name in list(self.rectangles_df['Name'].unique()):
             duplicated_shape_entry = create_duplicated_rectangle_entry(shape_entry=shape_to_duplicate, jump_size=self.settings['DUPLICATION_JUMP_SIZE'])
         elif selected_roi_name in list(self.circles_df['Name'].unique()):
