@@ -5,67 +5,70 @@
 >[!NOTE]  
 > SimBA is validated using python 3.6, and the developers maintain SimBA mainly using 3.6. However, you can use python 3.10 if necessery. If you encounter bugs using 3.10, please each out to us by opening an [issue](https://github.com/sgoldenlab/simba/issues) and sending us a messeage on [Gitter](https://app.gitter.im/#/room/#SimBA-Resource_community).
 * [FFmpeg](https://www.ffmpeg.org/)
-See installation instructions for [Windows](https://m.wikihow.com/Install-FFmpeg-on-Windows), [MacOS/Linux](https://www.ffmpeg.org/download.html)
+>[!NOTE] 
+> See installation instructions for [Windows](https://m.wikihow.com/Install-FFmpeg-on-Windows), [MacOS/Linux](https://www.ffmpeg.org/download.html). FFMpeg is used in SimBA for video pre-processing and video editing, and visualization tools. FFMpeg is not a strict requirement, but is strongly recommended.
 
 ## Install options:
 
-* In main Python environment:
-* Using conda:
-* Using Anaconda Navigator:
-* Uing Python venv:
+* Install SimBA in main Python environment:
+* Install SimBA using conda:
+* Install SimBA using Anaconda Navigator:
+* Install SimBA using Python venv:
 
 
-### Option 1: Install SimBA using Anaconda (recommended)
+### Option 1: Install SimBA using conda (recommended)
 
-Click [here](/docs/anaconda_installation.md) for a detail step by step guide on how to install using anaconda.
+Click [HERE](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for instructions for how to install conda.
 
-1. Once conda is installed, create a new python3.6 environment
+1. Once conda is installed, create a new python3.6 environment using:
 
 `````````
 conda create -n my_simba_env python=3.6 anaconda -y
 `````````
 
-.... or python3.10, if really needed:
-
+.... or using python3.10, if really needed:
 
 `````````
 conda create -n my_simba_env python=3.10 anaconda -y
 `````````
 
 
-2. Enter the conda environment by typing:
+2. Enter the conda `my_simba_env` environment created in Step 1 by typing:
 
 `````````
 conda activate my_simba_env
 `````````
 
 
-3. Install SimBa in the new `my_simba_env` environment by typing:
+3. Install SimBA in the `my_simba_env` environment by typing:
 
 ```
 pip install simba-uw-tf-dev
 ```
 
-or, if in **python 3.10** and youre hitting errors:
+or, if you are in **python 3.10**, and hitting errors, try:
 ````
 pip install simba-uw-tf-dev --ignore-installed
 ````
 
-4) Now launch SImBA by opening a command prompt and type:
+4) Now launch SimBA by opening a command prompt and typing:
 
 `````````
 simba
 `````````
 
-.. and hit the  <kbd>Enter</kbd> key. Note: SimBA may take a little time to launch depending in your computer, but you should eventually see a splash screen and the main GUI windows below
+.. and hit the  <kbd>Enter</kbd> key.
+
+>[!NOTE]
+> SimBA may take a little time to launch depending in your computer, but you should eventually see a splash screen and the main GUI windows below:
 
 > [!TIP]
-> You can also use the Anaconda Navigoator GUI to get this done, which creates conda environments through a graphical interface rather than through the command line. You can read about how to install SimBA using the Anaconda Navigator [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/anaconda_installation.md).
+> You can also use the Anaconda Navigator GUI interface to get the SimBA installation done. This methid creates conda environments through a graphical interface rather than through the command line. You can read about how to install SimBA through the Anaconda Navigator [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/anaconda_installation.md).
 
 
 ### Option 2: Install SimBA in main python.
 
-1). Open bash or command prompt and type the following commands on current working directory
+1). After installing python, open a command prompt and type the following command:
 
 ```
 pip install simba-uw-tf-dev
@@ -73,7 +76,7 @@ pip install simba-uw-tf-dev
 
 >Note: If you are seeing error messages related to some dependency conflicts, then you need to either downgrade your pypi package or instruct SimBA to ignore these dependency conflicts - either works. To find more information on how to do this, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/FAQ.md#when-i-install-or-update-simba-i-see-a-bunch-or-messages-in-the-console-telling-there-has-been-some-dependency-conflicts-the-messages-may-look-a-little-like-this).
 
-2) Now launch SImBA by opening a command prompt and type:
+2) Now launch SimBA by typing:
 
 `````````
 simba
