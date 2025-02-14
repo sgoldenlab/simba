@@ -60,7 +60,7 @@ simba
 .. and hit the  <kbd>Enter</kbd> key.
 
 >[!NOTE]
-> SimBA may take a little time to launch depending in your computer, but you should eventually see a splash screen and the main GUI windows below:
+> SimBA may take a little time to launch depending in your computer, but you should eventually see [THIS](https://github.com/sgoldenlab/simba/blob/master/simba/assets/img/splash_2024.mp4) splash screen followed by [THIS](https://github.com/sgoldenlab/simba/blob/master/images/main_gui_frm.webp) main GUI window.
 
 > [!TIP]
 > You can also use the Anaconda Navigator GUI interface to get the SimBA installation done. This methid creates conda environments through a graphical interface rather than through the command line. You can read about how to install SimBA through the Anaconda Navigator [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/anaconda_installation.md).
