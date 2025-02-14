@@ -123,3 +123,12 @@ pip3 install pyparsing==2.4.7
 ```
 simba
 ```
+
+### Requirements
+
+For a list of the SimBA dependencies, and the packages that gets installed when running `pip install simba-uw-tf-dev`, see [THIS](https://github.com/sgoldenlab/simba/blob/master/requirements.txt) file.
+
+##
+Author [Simon N](https://github.com/sronilsson)
+[sronilsson@gmail.com](mailto:yourname@example.com)
+
