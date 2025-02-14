@@ -10,10 +10,10 @@
 
 ## Install options:
 
-* Install SimBA in main Python environment:
-* Install SimBA using conda:
-* Install SimBA using Anaconda Navigator:
-* Install SimBA using Python venv:
+* [Install SimBA in main Python environment](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md#option-2-install-simba-in-main-python)
+* [Install SimBA using conda](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md#option-1-install-simba-using-conda-recommended)
+* [Install SimBA using Anaconda Navigator](https://github.com/sgoldenlab/simba/blob/master/docs/anaconda_installation.md)
+* [Install SimBA using Python venv](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md#option-3-install-simba-using-python-venv)
 
 
 ### Option 1: Install SimBA using conda (recommended)
