@@ -1,8 +1,8 @@
 # SimBA Installation
 
 # Requirements
-1. [Python 3.6](https://www.python.org/downloads/release/python-360/)  **<-- VALIDATED WITH 3.6.0**
-2. [Git](https://git-scm.com/downloads) 
+* [Python 3.6](https://www.python.org/downloads/release/python-360/)>[!NOTE]  
+> Highlights information that users should take into account, even when skimming.
 3. [FFmpeg](https://m.wikihow.com/Install-FFmpeg-on-Windows)
 
 # Installing SimBA Option 1 
