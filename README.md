@@ -21,10 +21,11 @@
 </p>
 
 
-To install SimBA via pip, use the following command:
+To install SimBA via pip, use the following command (preferably using python3.6, or python 3.10 if necessary):
 ```bash
 pip install simba-uw-tf-dev
 ```
+For detailed installation instructions, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md)
 
 ## Feb-11-2025: SimBA ROI interface update
 
@@ -82,7 +83,7 @@ The newest release of SimBA, v1.3, provides a significant jump in features, qual
 Please update using `pip install simba-uw-tf==1.3.7`, [this version](https://pypi.org/project/Simba-UW-tf/) has native deeplabcut and deepposekit GUI support disabled. Hence, tensorflow is not needed. Pose-estimation developers have created excellent GUIs for their pipelines, and we do a disservice to you by not supporting the most updated versions. SimBA now supports pose-estimation dataframe imports from Deeplabcut, DeepPoseKit, SLEAP, MARS and others. If you are developing a new pose-estimation method and would like it directly supported in SimBA, please let us know! 
 
 ### Selected New Features
-- Easy install of SimBA via `pip` - [Documentation](/docs/installation.md)
+- Easy install of SimBA via `pip` - [Documentation](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md)
 - Install simba using anaconda - [Documentation](/docs/anaconda_installation.md)
 - Introduction of SHAP for behavioral neuroscience classifier explainability and standarization- [Documentation](/docs/SHAP.md)
 - Plotly integration for immediate data visualization - [Documentation](/docs/plotly_dash.md)
@@ -99,7 +100,7 @@ Please update using `pip install simba-uw-tf==1.3.7`, [this version](https://pyp
 - Multi-animal DLC support - [Documentation](/docs/Multi_animal_pose.md)
 - Multi-animal SLEAP support - [Documentation](/docs/Multi_animal_pose.md)
 - SimBA 'pseudo-labelling' module - [Documentation](/docs/pseudoLabel.md)
-- Easy install of SimBA via `pip` - [Documentation](/docs/installation.md)
+- Easy install of SimBA via `pip` - [Documentation](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md)
 - Plenty of new quality-of-life features (e.g., time-bin analyzes / improved visualizations options) - [Documentation](/docs/Scenario1.md)
 - Many, many, many, many bug-fixes
 
@@ -135,7 +136,7 @@ SimBA does not require computer science and programing experience, and SimBA is 
 
 **SimBA provides several validated classifer libraries using videos filmed from above at 90° angle with pose-estimation data from 8 body parts per animal; please see our [OSF repository](https://osf.io/tmu6y/) for access to all files. SimBA now accepts any user-defined pose-estimation annotation schemes with the inclusion of the [Flexible Annotation Module in v1.1](https://github.com/sgoldenlab/simba/blob/master/docs/Pose_config.md). SimBA now supports maDLC and SLEAP for similar looking animals with the release of [maDLC/SLEAP module in v1.2](/docs/Multi_animal_pose.md).** 
 
-**Installation note:** SimBA can be installed either with TensorFlow compatability (for generating DeepLabCut, DeepPoseKit and SLEAP pose-estimation models), or without TensorFlow (for stand-alone use with classifiers and other functions). Please choose the appropriate branch for your needs, using pip install. More details are found in the [Installation Documentation](https://github.com/sgoldenlab/simba/blob/master/README.md#installation-%EF%B8%8F).
+**Installation note:** SimBA can be installed either with TensorFlow compatability (for generating DeepLabCut, DeepPoseKit and SLEAP pose-estimation models), or without TensorFlow (for stand-alone use with classifiers and other functions). Please choose the appropriate branch for your needs, using pip install. More details are found in the [Installation Documentation](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md).
 
 **Listserv for release information:** If you would like to receive notification for new releases of SimBA, please **[fill out this form](https://forms.gle/R47RWN4stNSJBj9D9)** and you will be added to the listserv.
 
@@ -178,7 +179,7 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 
 ## Installation ⚙️
 
-- [Install SimBA](docs/installation.md)
+- [Install SimBA]([docs/installation.md](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md)
 
 - [Install SimBA using Anaconda](docs/anaconda_installation.md)
 
