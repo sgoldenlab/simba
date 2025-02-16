@@ -154,7 +154,9 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     VideoRotatorPopUp, VideoTemporalJoinPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, FileSelect, SimbaButton, hxtScrollbar, SimBALabel)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        FileSelect, SimbaButton, SimBALabel,
+                                        hxtScrollbar)
 from simba.ui.video_info_ui import VideoInfoTable
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_int)
