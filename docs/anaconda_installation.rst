@@ -17,14 +17,14 @@ For Linux/macOS, click `HERE <https://docs.anaconda.com/navigator/install/>`__.
 
 **STEP 1**. Run Anaconda Navigator. The application looks like this:
 
-.. image:: img/roi/anaconda_navigator_1.webp
+.. image:: img/installation/anaconda_navigator_1.webp
   :width: 700
   :align: center
 
 **STEP 2**. On the left, click on the ``Environments`` tab, followed by
 the <kbdCreate button highlighted in this image:
 
-.. image:: img/roi/anaconda_navigator_2.webp
+.. image:: img/installation/anaconda_navigator_2.webp
   :width: 700
   :align: center
 
@@ -33,7 +33,7 @@ enter the name of your new python conda environment, and which python
 version it should have. Here, we select python 3.6, and name the
 environment ``simba_env``. Next, we click the <kbdCreate button.
 
-.. image:: img/roi/anaconda_navigator_3.webp
+.. image:: img/installation/anaconda_navigator_3.webp
   :width: 700
   :align: center
 
