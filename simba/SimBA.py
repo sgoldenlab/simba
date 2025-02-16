@@ -385,17 +385,17 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             plabel_threshold[count].grid(row=count + 2, sticky=W)
 
         pseudo_lbl_btn = SimbaButton(parent=label_pseudo, txt="Correct labels", cmd=select_labelling_video, cmd_kwargs={'config_path': lambda:self.config_path, 'threshold_dict': lambda:dict(zip(self.clf_names, plabel_threshold)), 'setting': lambda:'pseudo', 'continuing': lambda:False, 'video_file_path': lambda:pLabel_framedir.file_path}, thread=False)
-
         label_adv_label = CreateLabelFrameWithIcon(parent=tab7, header="ADVANCED LABEL BEHAVIOR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ADVANCED_LBL.value)
-        label_adv_note_1 = Label(label_adv_label, text="Note that you will have to specify the presence of *both* behavior and non-behavior on your own.", font=Formats.FONT_REGULAR.value)
-        label_adv_note_2 = Label(label_adv_label, text="Click here more information on how to use the SimBA labelling interface.", font=Formats.FONT_REGULAR.value, cursor="hand2", fg="blue")
-        label_adv_note_2.bind("<Button-1>", lambda e: self.callback("https://github.com/sgoldenlab/simba/blob/master/docs/advanced_labelling.md"))
+
+        label_adv_note_1 = SimBALabel(parent=label_adv_label, txt="Note: you will have to specify the presence of *both* behavior and non-behavior on your own.", font=Formats.FONT_REGULAR.value)
+        label_adv_note_2 = SimBALabel(parent=label_adv_label, txt="Click here more information on how to use the SimBA labelling interface.", txt_clr='blue', cursor='hand2', font=Formats.FONT_REGULAR.value, link=Links.ADVANCED_LBL.value)
 
         adv_label_btn_new = SimbaButton(parent=label_adv_label, txt="Select video (create new video annotation)", cmd=select_labelling_video_advanced, cmd_kwargs={'config_path': lambda:self.config_path, 'continuing': lambda:False}, thread=False)
         adv_label_btn_continue = SimbaButton(parent=label_adv_label, txt="Select video (continue existing video annotation)", cmd=select_labelling_video_advanced, cmd_kwargs={'config_path': lambda:self.config_path, 'continuing': lambda:True}, thread=False)
 
         targeted_clip_annotator_frm = CreateLabelFrameWithIcon(parent=tab7,header="TARGETED CLIP ANNOTATOR",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.ADVANCED_LBL.value)
-        targeted_clip_annotator_note = Label(targeted_clip_annotator_frm, font=Formats.FONT_REGULAR.value, text="A bout annotator that creates annotated clips from videos associated with ML results.")
+
+        targeted_clip_annotator_note = SimBALabel(parent=targeted_clip_annotator_frm, txt="A bout annotator that creates annotated clips from videos associated with ML results.", txt_clr='blue', cursor='hand2', font=Formats.FONT_REGULAR.value, link=Links.ADVANCED_LBL.value)
         targeted_clip_annotator_btn = SimbaButton(parent=targeted_clip_annotator_frm, txt="Select video", cmd=select_labelling_video_targeted_clips, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
 
         lbl_tools_frm = LabelFrame(tab7, text="LABELLING TOOLS", font=Formats.FONT_HEADER.value, fg="black")

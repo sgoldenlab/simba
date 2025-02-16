@@ -6,6 +6,8 @@ Welcome to SimBA's documentation!
    :width: 1000
    :align: center
 
+____________________________
+
 These docs are under development. For detailed tutorials, code, and more extensive documentation
 see the `SimBA GitHub repository <https://github.com/sgoldenlab/simba>`_.
 
@@ -13,6 +15,7 @@ If you find any of the codebase or associated documentation useful, please `cite
 
 For support, see the `SimBA Gitter channel <https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im>`_.
 
+________________________________
 
 INSTALLATION
 ------------------------
@@ -27,6 +30,7 @@ For detailed installation instructions via pip, click :doc:`HERE <pip_installati
 
 For detailed installation instructions via Anaconda Navigator, click :doc:`HERE <anaconda_installation>` or `HERE <https://github.com/sgoldenlab/simba/blob/master/docs/anaconda_2025.md>`_.
 
+____________________________________
 
 MORE INFORMATION
 ------------------------
@@ -39,6 +43,10 @@ See below for raison d'être, detailed API, tutorials, data, documentation, supp
 - Nature Neuroscience paper: `https://www.nature.com/articles/s41593-024-01649-9 <https://www.nature.com/articles/s41593-024-01649-9>`_
 - Open Science Framework (OSF) data buckets: `https://osf.io/tmu6y/ <https://osf.io/tmu6y/>`_
 - Python Package Index (PyPI): `https://pypi.org/project/Simba-UW-tf-dev/ <https://pypi.org/project/Simba-UW-tf-dev/>`_
+
+
+
+________________________________________________
 
 .. toctree::
    :maxdepth: 3
