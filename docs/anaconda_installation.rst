@@ -17,14 +17,14 @@ For Linux/macOS, click `HERE <https://docs.anaconda.com/navigator/install/>`__.
 
 **STEP 1**. Run Anaconda Navigator. The application looks like this:
 
-.. image:: img/installation/anaconda_navigator_1.webp
+.. image:: tutorials_rst/img/installation/anaconda_navigator_1.webp
   :width: 700
   :align: center
 
 **STEP 2**. On the left, click on the ``Environments`` tab, followed by
 the <kbdCreate button highlighted in this image:
 
-.. image:: img/installation/anaconda_navigator_2.webp
+.. image:: tutorials_rst/img/installation/anaconda_navigator_2.webp
   :width: 700
   :align: center
 
@@ -33,7 +33,7 @@ enter the name of your new python conda environment, and which python
 version it should have. Here, we select python 3.6, and name the
 environment ``simba_env``. Next, we click the <kbdCreate button.
 
-.. image:: img/installation/anaconda_navigator_3.webp
+.. image:: tutorials_rst/img/installation/anaconda_navigator_3.webp
   :width: 700
   :align: center
 
@@ -41,7 +41,7 @@ environment ``simba_env``. Next, we click the <kbdCreate button.
 the graphical interface, together with any other environments you have
 on your system:
 
-.. image:: img/installation/anaconda_navigator_4.webp
+.. image:: tutorials_rst/img/installation/anaconda_navigator_4.webp
   :width: 700
   :align: center
 
@@ -49,7 +49,7 @@ on your system:
 associated with it. Once we click on the play button, we will see some
 options. Go ahead and click on the ``Open Terminal`` option:
 
-.. image:: img/installation/anaconda_navigator_5.webp
+.. image:: tutorials_rst/img/installation/anaconda_navigator_5.webp
   :width: 700
   :align: center
 
@@ -68,7 +68,7 @@ window.
 **STEP 7**. Once installed, type ``simba`` in your ternimal window, and
 hit Enter, and SimBA will launch.
 
-.. image:: img/installation/anaconda_navigator_7.webp
+.. image:: tutorials_rst/img/installation/anaconda_navigator_7.webp
   :width: 700
   :align: center
 

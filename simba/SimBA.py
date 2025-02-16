@@ -2,7 +2,6 @@ __author__ = "Simon Nilsson"
 
 import os.path
 import warnings
-
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 import atexit
