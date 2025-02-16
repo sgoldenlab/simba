@@ -16,9 +16,16 @@ For support, see the `SimBA Gitter channel <https://app.gitter.im/#/room/#SimBA-
 
 INSTALLATION
 ------------------------
+
+To install SimBA via pip, use the following command (preferably using python3.6, or python 3.10 if necessary):
+
 .. code:: bash
 
     pip install simba-uw-tf-dev
+
+For detailed installation instructions via pip, click :doc:`HERE <pip_installation>` or `HERE <https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md>`_.
+
+For detailed installation instructions via Anaconda Navigator, click :doc:`HERE <anaconda_installation>` or `HERE <https://github.com/sgoldenlab/simba/blob/master/docs/anaconda_2025.md>`_.
 
 
 MORE INFORMATION
@@ -48,6 +55,7 @@ See below for raison d'être, detailed API, tutorials, data, documentation, supp
    :maxdepth: 1
    :caption: USER GUIDE / TUTORIALS:
 
+   installation
    tutorials
 
 .. toctree::
