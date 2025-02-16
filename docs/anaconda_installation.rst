@@ -75,3 +75,5 @@ hit Enter, and SimBA will launch.
 .. hint::
    SimBA may take a little time to launch depending in your computer, but you should eventually see `THIS <https://github.com/sgoldenlab/simba/blob/master/simba/assets/img/splash_2024.mp4>`__
    splash screen followed by `THIS <https://github.com/sgoldenlab/simba/blob/master/images/main_gui_frm.webp>`__ main GUI window.
+
+
