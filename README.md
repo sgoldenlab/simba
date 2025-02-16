@@ -84,7 +84,7 @@ Please update using `pip install simba-uw-tf==1.3.7`, [this version](https://pyp
 
 ### Selected New Features
 - Easy install of SimBA via `pip` - [Documentation](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md)
-- Install simba using anaconda - [Documentation](/docs/anaconda_installation.md)
+- Install simba using anaconda - [Documentation](https://github.com/sgoldenlab/simba/blob/master/docs/anaconda_2025.md)
 - Introduction of SHAP for behavioral neuroscience classifier explainability and standarization- [Documentation](/docs/SHAP.md)
 - Plotly integration for immediate data visualization - [Documentation](/docs/plotly_dash.md)
 - Labelling/annotating behaviors with many third-party apps - [Documentation](/docs/third_party_annot.md)
@@ -179,9 +179,9 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 
 ## Installation ⚙️
 
-- [Install SimBA]([docs/installation.md](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md)
+- [Install SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md)
 
-- [Install SimBA using Anaconda](docs/anaconda_installation.md)
+- [Install SimBA using Anaconda](https://github.com/sgoldenlab/simba/blob/master/docs/anaconda_2025.md)
 
 ## Tutorial 📚
 - [API](https://simba-uw-tf-dev.readthedocs.io/en/latest/index.html) 📘

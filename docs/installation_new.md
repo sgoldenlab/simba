@@ -12,7 +12,7 @@
 
 * [Install SimBA in main Python environment](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md#option-2-install-simba-in-main-python)
 * [Install SimBA using conda](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md#option-1-install-simba-using-conda-recommended)
-* [Install SimBA using Anaconda Navigator](https://github.com/sgoldenlab/simba/blob/master/docs/anaconda_installation.md)
+* [Install SimBA using Anaconda Navigator](https://github.com/sgoldenlab/simba/blob/master/docs/anaconda_2025.md)
 * [Install SimBA using Python venv](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md#option-3-install-simba-using-python-venv)
 
 
@@ -123,6 +123,11 @@ pip3 install pyparsing==2.4.7
 ```
 simba
 ```
+
+### Option 4: Install SimBA using Anaconda Navigator. 
+
+See [THESE](https://github.com/sgoldenlab/simba/blob/master/docs/anaconda_2025.md) instructions. 
+
 
 ### Requirements
 
