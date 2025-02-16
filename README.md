@@ -179,7 +179,7 @@ To faciliate the initial use of SimBA, we provide several use scenarios. We have
 
 ## Installation ⚙️
 
-- [Install SimBA]([docs/installation.md](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md)
+- [Install SimBA](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md)
 
 - [Install SimBA using Anaconda](https://github.com/sgoldenlab/simba/blob/master/docs/anaconda_2025.md)
 
