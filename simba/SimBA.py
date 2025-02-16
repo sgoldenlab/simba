@@ -154,8 +154,7 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     VideoRotatorPopUp, VideoTemporalJoinPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
-                                        FileSelect, SimbaButton, hxtScrollbar)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, FileSelect, SimbaButton, hxtScrollbar, SimBALabel)
 from simba.ui.video_info_ui import VideoInfoTable
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_int)
@@ -376,9 +375,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
 
         label_pseudo = CreateLabelFrameWithIcon(parent=tab7,header="PSEUDO-LABELLING",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.PSEUDO_LBL.value)
-        pseudo_intructions_lbl_1 = Label(label_pseudo, text="Note: SimBA pseudo-labelling require initial machine predictions.", font=Formats.FONT_REGULAR.value)
-        pseudo_intructions_lbl_2 = Label( label_pseudo, text="Click here more information on how to use the SimBA pseudo-labelling interface.", font=Formats.FONT_REGULAR.value, cursor="hand2", fg="blue")
-        pseudo_intructions_lbl_2.bind("<Button-1>", lambda e: self.callback("https://github.com/sgoldenlab/simba/blob/master/docs/label_behavior.md"))
+        pseudo_intructions_lbl_1 = SimBALabel(parent=label_pseudo, txt="Note: SimBA pseudo-labelling require initial machine predictions", font=Formats.FONT_REGULAR.value)
+        pseudo_intructions_lbl_2 = SimBALabel(parent=label_pseudo, txt="Click here more information on how to use the SimBA pseudo-labelling interface.", txt_clr='blue', cursor="hand2", font=Formats.FONT_REGULAR.value, link=Links.LABEL_BEHAVIOR.value)
         pLabel_framedir = FileSelect(label_pseudo, "Video Path", lblwidth="10")
         plabelframe_threshold = LabelFrame(label_pseudo, text="Threshold", pady=5, padx=5, font=Formats.FONT_HEADER.value)
         plabel_threshold = [0] * len(self.clf_names)

@@ -41,7 +41,7 @@ environment ``simba_env``. Next, we click the <kbdCreate button.
 the graphical interface, together with any other environments you have
 on your system:
 
-.. image:: img/roi/anaconda_navigator_4.webp
+.. image:: img/installation/anaconda_navigator_4.webp
   :width: 700
   :align: center
 
@@ -49,7 +49,7 @@ on your system:
 associated with it. Once we click on the play button, we will see some
 options. Go ahead and click on the ``Open Terminal`` option:
 
-.. image:: img/roi/anaconda_navigator_5.webp
+.. image:: img/installation/anaconda_navigator_5.webp
   :width: 700
   :align: center
 
@@ -61,14 +61,14 @@ right in the image below) and hit Enter. After hitting Enter, SimBA will
 install on your system and you can follow the progress in the terminal
 window.
 
-.. image:: img/roi/anaconda_navigator_6.webp
+.. image:: img/installation/anaconda_navigator_6.webp
   :width: 700
   :align: center
 
 **STEP 7**. Once installed, type ``simba`` in your ternimal window, and
 hit Enter, and SimBA will launch.
 
-.. image:: img/roi/anaconda_navigator_7.webp
+.. image:: img/installation/anaconda_navigator_7.webp
   :width: 700
   :align: center
 

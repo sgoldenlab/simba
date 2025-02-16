@@ -489,16 +489,24 @@ def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                bg_clr: Optional[str] = None,
                font: tuple = Formats.FONT_REGULAR.value,
                relief: str = FLAT,
-               width: Optional[int] = None):
+               link: Optional[str] = None,
+               width: Optional[int] = None,
+               cursor: Optional[str] = None):
 
     lbl = Label(parent,
                 text=txt,
                 font=font,
                 fg=txt_clr,
                 bg=bg_clr,
-                relief=relief)
+                relief=relief,
+                cursor=cursor)
+
     if width is not None:
         lbl.configure(width=width)
+
+    if link is not None:
+        lbl.bind("<Button-1>", lambda e: callback(link))
+
     return lbl
 
 
