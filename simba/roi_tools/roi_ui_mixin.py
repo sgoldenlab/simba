@@ -14,8 +14,8 @@ from shapely.geometry import Polygon
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.roi_tools.roi_selector_polygon_tkinter import ROISelectorPolygon
 from simba.roi_tools.roi_selector_circle_tkinter import ROISelectorCircle
+from simba.roi_tools.roi_selector_polygon_tkinter import ROISelectorPolygon
 from simba.roi_tools.roi_selector_rectangle_tkinter import ROISelector
 from simba.roi_tools.roi_utils import (change_roi_dict_video_name,
                                        create_circle_entry,
