@@ -668,6 +668,34 @@ and start from scratch.
    delete the ROIs in the SImBA project, you could also manually delete
    this file.
 
+SAVE ROIs
+------------------------------------------------
+
+Once all the ROI drawings on the video looks good. remember to hit the `SAVE` button at the bottom of the **REGION OF INTEREST (ROI) SETTINGS** window. After clicking the save button, you are good to close the ROI **REGION OF INTEREST (ROI) SETTINGS** window and **DEFINE SHAPES** window.
+
+
+STANDARDIZE ROI SIZE ACROSS VIDEOS
+------------------------------------------------
+
+There may be situations where you have manually drawn ROIs on a bunch of videos where the camera location has shifted slightly across recordings.
+You may also want to ROIs to have the same metric sizes across recordings, but due to this shift in camera locations, some videos may have different
+pixel per millimeter conversion factors.
+
+In these situations, you may want to "standardize" the ROI metric sizes relative to some baseline measurement. For example, say that this baseline video has a pixel per millimeter of `10`.
+Say there are a further two videos in the project with ROIs, and these videos has pixels per millimeter of ``9`` and ``11``.
+At runtime, the area of the rectangles, circles and polygons in the two additional videos get their ROI areas increased/decreased with 10% while the baseline video ROIs are unchanged.
+To do this, click the ``File`` heading in the ``PROJECT VIDEOS: ROI TABLE`` window. This shows a pop-up with a single dropdown window, as in the screengrabs
+below:
+
+
+.. image:: img/roi/roi_tutorial_metric.webp
+  :width: 800
+  :align: center
+
+
+Select the video that you want to act as the "baseline" reference video which the ROI sizes should be corrected against. Once selected, click the
+RUN button. All ROIs in the project will be standardized using the ROIs in the baseline video as reference.
+
 NEXT STEPS
 ----------
 

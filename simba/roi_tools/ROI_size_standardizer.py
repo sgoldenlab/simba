@@ -23,8 +23,11 @@ class ROISizeStandardizer(ConfigReader, FeatureExtractionMixin):
        Say there are a further two videos in the project with ROIs, and these videos has pixels per millimeter of `9` and `11`.
        At runtime, the area of the rectangles, circles and polygons in the two additional videos get their ROI areas increased/decreased with 10% while the baseline video ROIs are unchanged.
 
-    :parameter str config_path: path to SimBA project config file in Configparser format.
-    :parameter: str join_bouts_within_delta: Name of baseline video without extension, e.g., `Video_1`.
+    ..note::
+      See ROI tutorial on `GitHub <https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md>`_ or `ReadTheDocs https://simba-uw-tf-dev.readthedocs.io/en/latest/tutorials_rst/roi_tutorial_new_2025.html>`_
+
+    :param str Union[str, os.PathLike]: path to SimBA project config file in Configparser format.
+    :param str reference_video: Name of baseline video without extension, e.g., `Video_1`.
 
     :example:
     >>> test = ROISizeStandardizer(config_path='/Users/simon/Desktop/envs/troubleshooting/DLC_2_Black_animals/project_folder/project_config.ini', reference_video='Together_1')

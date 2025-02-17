@@ -387,6 +387,28 @@ Once all the ROI drawings on the video looks good. remember to hit the `SAVE` bu
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/save_btn.webp"/>
 </p>
 
+
+## STANDARDIZE ROI SIZE ACROSS VIDEOS
+
+There may be situations where you have manually drawn ROIs on a bunch of videos where the camera location has shifted slightly across recordings.
+You may also want to ROIs to have the same metric sizes across recordings, but due to this shift in camera locations, some videos may have different 
+pixel per millimeter conversion factors. 
+
+In these situations, you may want to "standardize" the ROI metric sizes relative to some baseline measurement. For example, say that this baseline video has a pixel per millimeter of `10`.
+Say there are a further two videos in the project with ROIs, and these videos has pixels per millimeter of `9` and `11`. 
+At runtime, the area of the rectangles, circles and polygons in the two additional videos get their ROI areas increased/decreased with 10% while the baseline video ROIs are unchanged.
+To do this, click the `File` heading in the `PROJECT VIDEOS: ROI TABLE` window. This shows a pop-up with a single dropdown window, as in the screengrabs
+below:
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/docs/tutorials_rst/img/roi/roi_tutorial_metric.webp"/>
+</p>
+
+Select the video that you want to act as the "baseline" reference video which the ROI sizes should be corrected against. Once selected, click the 
+<kbd>RUN</kbd> button. All ROIs in the project will be standardized using the ROIs in the baseline video as reference. 
+
+
+
 ## NEXT STEPS
 Once your ROI definitions are all defined, close the `ROI table`, `Regions of Interest Settings` and `Define Shape` windows and head back to the [ROI] tab in the load project menu. 
 

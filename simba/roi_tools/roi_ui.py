@@ -19,13 +19,16 @@ WINDOW_SIZE = (775, 900)
 class ROI_ui(ROI_mixin, ConfigReader):
 
     """
+    Main antry-point for drawing ROIs on videos.
+
+    ..note::
+      See ROI tutorial on `GitHub <https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md>`_ or `ReadTheDocs https://simba-uw-tf-dev.readthedocs.io/en/latest/tutorials_rst/roi_tutorial_new_2025.html>`_
 
     :example:
     >>> ROI_ui(config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini", video_path=r"C:\troubleshooting\mouse_open_field\project_folder\videos\Video1.mp4")
     >>> ROI_ui(config_path=r"/mnt/c/troubleshooting/mouse_open_field/project_folder/project_config.ini", video_path=r"/mnt/c/troubleshooting/mouse_open_field/project_folder/videos/Video1.mp4")
 
     """
-
     def __init__(self,
                  config_path: Union[str, os.PathLike],
                  video_path: Union[str, os.PathLike]):
