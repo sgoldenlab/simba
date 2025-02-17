@@ -12,10 +12,24 @@ ROI classification calculator
    :members:
    :show-inheritance:
 
-ROI GUI
+ROI gui
 -----------------------------------
 
-.. automodule:: simba.roi_tools.ROI_define
+.. automodule:: simba.roi_tools.roi_ui
+   :members:
+   :show-inheritance:
+
+ROI gui mixin
+----------------------------------
+
+.. automodule:: simba.roi_tools.roi_ui_mixin
+   :members:
+   :show-inheritance:
+
+ROI gui utils
+----------------------------------
+
+.. automodule:: simba.roi_tools.roi_utils
    :members:
    :show-inheritance:
 
@@ -33,24 +47,11 @@ ROI feature analyzer
    :members:
    :show-inheritance:
 
-ROI GUI - IMAGE
-----------------------------------
 
-.. automodule:: simba.roi_tools.ROI_image
-   :members:
-   :show-inheritance:
-
-ROI GUI
-----------------------------------
-
-.. automodule:: simba.roi_tools.ROI_menus
-   :members:
-   :show-inheritance:
-
-Moving roi shapes
+ROI gui interactive modifier
 ----------------------------------------
 
-.. automodule:: simba.roi_tools.ROI_move_shape
+.. automodule:: simba.roi_tools.interactive_roi_modifier_tkinter
    :members:
    :show-inheritance:
 
@@ -61,19 +62,6 @@ ROI Movement analyzer
    :members:
    :show-inheritance:
 
-Multiply ROIs
--------------------------------------
-
-.. automodule:: simba.roi_tools.ROI_multiply
-   :members:
-   :show-inheritance:
-
-ROI resetter
-----------------------------------
-
-.. automodule:: simba.roi_tools.ROI_reset
-   :members:
-   :show-inheritance:
 
 ROI size calculators
 -----------------------------------------------
@@ -83,13 +71,6 @@ ROI size calculators
    :show-inheritance:
 
 
-ROI size standardizer through pixels by millimeter
---------------------------------------------
-
-.. automodule:: simba.roi_tools.ROI_size_standardizer
-   :members:
-   :show-inheritance:
-
 ROI time-bin calculator
 --------------------------------------------------
 
@@ -97,10 +78,24 @@ ROI time-bin calculator
    :members:
    :show-inheritance:
 
-ROI zoom methods
----------------------------------
+ROI gui rectangle draw
+--------------------------------------------------
 
-.. automodule:: simba.roi_tools.ROI_zoom
+.. automodule:: simba.roi_tools.roi_selector_polygon_tkinter
    :members:
    :show-inheritance:
-:
+
+
+ROI gui circle draw
+--------------------------------------------------
+
+.. automodule:: simba.roi_tools.roi_selector_circle_tkinter
+   :members:
+   :show-inheritance:
+
+ROI gui polygon draw
+--------------------------------------------------
+
+.. automodule:: simba.roi_tools.roi_selector_polygon_tkinter
+   :members:
+   :show-inheritance:

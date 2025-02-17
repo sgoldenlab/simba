@@ -12,6 +12,22 @@ from simba.utils.warnings import ROIWarning
 DRAW_FRAME_NAME = "DEFINE SHAPE"
 
 class ROISelector:
+    """
+    A class to allow users to interactively select a Region of Interest (ROI) rectangle from an image displayed in a Tkinter window.
+
+    .. video:: tutorials_rst/img/roi/draw_rectangle.webm
+       :width: 900
+       :loop:
+
+    .. seealso::
+       For OpenCV based method, see :func:`simba.video_processors.roi_selector.ROISelector`
+
+    :param img_window (Toplevel): The Tkinter Toplevel window containing the image.
+    :param thickness (int): The thickness of the ROI selection rectangle.
+    :param clr (Tuple[int, int, int]): The color of the ROI selection rectangle in RGB format.
+
+    :example:
+    """
     def __init__(self,
                  img_window: Toplevel,
                  thickness: int = 10,

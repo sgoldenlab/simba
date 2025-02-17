@@ -14,6 +14,23 @@ DRAW_FRAME_NAME = "DEFINE SHAPE"
 
 
 class ROISelectorCircle(object):
+
+    """
+    A class to allow users to interactively select a Region of Interest (ROI) circle from an image displayed in a Tkinter window.
+
+    .. video:: tutorials_rst/img/roi/draw_circle.webm
+       :width: 900
+       :loop:
+
+    .. seealso::
+       For OpenCV based method, see :func:`simba.video_processors.roi_selector_circle.ROISelectorCircle`
+
+    :param Toplevel img_window: The Tkinter Toplevel window containing the image.
+    :param int thickness: The thickness of the ROI selection circle.
+    :param Tuple[int, int, int] clr: The color of the ROI circle rectangle in RGB format.
+
+    :example:
+    """
     def __init__(self,
                  img_window: Toplevel,
                  thickness: int = 10,

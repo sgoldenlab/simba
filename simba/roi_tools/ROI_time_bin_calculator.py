@@ -21,8 +21,7 @@ from simba.utils.read_write import get_fn_ext, read_data_paths, read_df
 class ROITimebinCalculator(ConfigReader):
     """
     Compute how much time and how many entries animals are making into user-defined ROIs
-    within user-defined time bins. Also compute the average velocity and distance moved within user-defined ROIs
-    split by time-bins.
+    within user-defined time bins. Also compute the average velocity and distance moved within user-defined ROIs split by time-bins.
 
     Results are stored in the ``project_folder/logs`` directory of
     the SimBA project.

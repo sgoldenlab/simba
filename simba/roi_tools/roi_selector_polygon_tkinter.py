@@ -16,27 +16,24 @@ from simba.utils.warnings import ROIWarning
 DRAW_FRAME_NAME = "DEFINE SHAPE"
 
 class ROISelectorPolygon(object):
+
     """
     Class for selecting a polygonal region of interest (ROI) within an image or video frame.
     The selected region vertices are stored in self: polygon_vertices.
 
-    .. image:: _static/img/roi_selector_polygon.gif
-       :width: 700
-       :align: center
+    .. video:: tutorials_rst/img/roi/draw_polygon.webm
+       :width: 900
+       :loop:
 
-    :param Union[str, os.PathLike] path: Path to the image or video file. Can also be an image represented as a numpy array.
-    :param int thickness: Thickness of the polygon border when visualizing the ROI.
-    :param Tuple[int, int, int] clr: BGR color tuple for visualizing the ROI. Default: deep pink.
-    :param Optional[str] title: Title of the drawing window. If None, then `Draw ROI - Press ESC when drawn`.
+    .. seealso::
+       For OpenCV based method, see :func:`simba.video_processors.roi_selector_polygon.ROISelectorPolygon`
 
-    :raises InvalidFileTypeError: If the file type is not supported.
-    :raises CropWarning: If the selected ROI extends beyond the image boundaries or if the number of vertices is less than 3.
+    :param Toplevel img_window: The Tkinter window where the image is displayed.
+    :param int thickness: Thickness of the polygon edges.
+    :param int vertice_size: Size of the vertices drawn.
+    :param Tuple[int, int, int] clr: RGB color for the polygon.
 
     :example:
-    >>> polygon_selector = ROISelectorPolygon(path='/Users/simon/Desktop/amber.png')
-    >>> polygon_selector.run()
-    >>> polygon_selector = ROISelectorPolygon(path='/Users/simon/Desktop/Box2_IF19_7_20211109T173625_4_851_873_1_cropped.mp4')
-    >>> polygon_selector.run()
     """
 
     def __init__(self,
@@ -44,8 +41,6 @@ class ROISelectorPolygon(object):
                  thickness: int = 10,
                  vertice_size: int = 2,
                  clr: Tuple[int, int, int] = (147, 20, 255)) -> None:
-
-
 
         check_instance(source=self.__class__.__name__, instance=img_window, accepted_types=(Toplevel,))
         check_int(name=f'{self.__class__.__name__} thickness', value=thickness, min_value=1)

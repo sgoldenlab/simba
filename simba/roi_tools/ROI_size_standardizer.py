@@ -1,4 +1,6 @@
 import math
+import os
+from typing import Union
 
 import numpy as np
 import pandas as pd
@@ -19,8 +21,7 @@ class ROISizeStandardizer(ConfigReader, FeatureExtractionMixin):
     .. note::
        Example: You select a "baseline" video, say that this baseline video has a pixel per millimeter of `10`.
        Say there are a further two videos in the project with ROIs, and these videos has pixels per millimeter of `9` and `11`.
-       At runtime, the area of the rectangles, circles and polygons in the two additional videos get their ROI areas increased/decreased
-       with 10% while the baseline video ROIs are unchanged.
+       At runtime, the area of the rectangles, circles and polygons in the two additional videos get their ROI areas increased/decreased with 10% while the baseline video ROIs are unchanged.
 
     :parameter str config_path: path to SimBA project config file in Configparser format.
     :parameter: str join_bouts_within_delta: Name of baseline video without extension, e.g., `Video_1`.
@@ -31,7 +32,10 @@ class ROISizeStandardizer(ConfigReader, FeatureExtractionMixin):
     >>> test.save()
     """
 
-    def __init__(self, config_path: str, reference_video: str):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 reference_video: str):
+
         ConfigReader.__init__(self, config_path=config_path)
         FeatureExtractionMixin.__init__(self)
         self.reference_video_name = reference_video
