@@ -9,7 +9,6 @@ from pathlib import Path
 import cv2
 import numpy as np
 import pkg_resources
-
 import simba
 
 
@@ -119,6 +118,10 @@ class OS(Enum):
     LINUX = "Linux"
     MAC = "Darwin"
     PYTHON_VER = str(f"{sys.version_info.major}.{sys.version_info.minor}")
+    try:
+        SIMBA_VERSION = pkg_resources.get_distribution("simba-uw-tf-dev").version
+    except pkg_resources.DistributionNotFound:
+        SIMBA_VERSION = None
 
 class FontPaths(Enum):
     POPPINS_REGULAR = Path("assets/fonts/Poppins Regular.ttf")
@@ -591,7 +594,7 @@ class Links(Enum):
     COUNT_ANNOTATIONS_IN_PROJECT = "https://github.com/sgoldenlab/simba/blob/master/docs/label_behavior.md#count-annotations-in-simba-project"
     COUNT_ANNOTATIONS_OUTSIDE_PROJECT = "https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-project-annotation-counts"
     CIRCLE_CROP = "https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#circle-crop"
-
+    SIMBA_PIP_URL = 'https://pypi.org/pypi/simba-uw-tf-dev/json'
 
 class Labelling(Enum):
     PADDING = 5

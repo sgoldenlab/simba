@@ -690,6 +690,18 @@ def check_valid_hex_color(color_hex: str, raise_error: Optional[bool] = True) ->
     else:
         return True
 
+def check_valid_url(url: str) -> bool:
+    """ Helper to check if a string is a valid url"""
+    regex = re.compile(
+        r'^(https?|ftp)://'  # protocol
+        r'(\S+(:\S*)?@)?'  # user:password (optional)
+        r'((\d{1,3}\.){3}\d{1,3}|'  # IP address
+        r'([a-zA-Z0-9.-]+\.[a-zA-Z]{2,}))'  # domain name
+        r'(:\d+)?'  # port (optional)
+        r'(/[\S]*)?$',  # path (optional)
+        re.IGNORECASE)
+    return re.match(regex, url) is not None
+
 
 def check_if_2d_array_has_min_unique_values(data: np.ndarray, min: int) -> bool:
     """

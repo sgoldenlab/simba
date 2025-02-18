@@ -1,6 +1,7 @@
 __author__ = "Simon Nilsson"
 
 import os.path
+import time
 import warnings
 
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -23,8 +24,7 @@ from PIL import ImageTk
 
 from simba.bounding_box_tools.boundary_menus import BoundaryMenus
 from simba.cue_light_tools.cue_light_menues import CueLightAnalyzerMenu
-from simba.labelling.labelling_advanced_interface import \
-    select_labelling_video_advanced
+from simba.labelling.labelling_advanced_interface import select_labelling_video_advanced
 from simba.labelling.labelling_interface import select_labelling_video
 from simba.labelling.targeted_annotations_clips import \
     select_labelling_video_targeted_clips
@@ -158,17 +158,15 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         FileSelect, SimbaButton, SimBALabel,
                                         hxtScrollbar)
 from simba.ui.video_info_ui import VideoInfoTable
-from simba.utils.checks import (check_ffmpeg_available,
-                                check_file_exist_and_readable, check_int)
+from simba.utils.checks import (check_ffmpeg_available, check_file_exist_and_readable, check_int)
 from simba.utils.custom_feature_extractor import CustomFeatureExtractor
 from simba.utils.enums import (OS, Defaults, Formats, Keys, Links, Paths,
                                TagNames)
 from simba.utils.errors import InvalidInputError
-from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
-                                 get_icons_paths, load_simba_fonts)
+from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis, get_icons_paths, load_simba_fonts)
 from simba.utils.printing import stdout_success, stdout_warning
-from simba.utils.read_write import find_core_cnt, get_video_meta_data
-from simba.utils.warnings import FFMpegNotFoundWarning, PythonVersionWarning
+from simba.utils.read_write import find_core_cnt, get_video_meta_data, fetch_pip_data
+from simba.utils.warnings import FFMpegNotFoundWarning, PythonVersionWarning, VersionWarning
 from simba.video_processors.video_processing import \
     extract_frames_from_all_videos_in_directory
 
@@ -960,6 +958,12 @@ class App(object):
 
         if not check_ffmpeg_available():
             FFMpegNotFoundWarning(msg='SimBA could not find a FFMPEG installation on computer (as evaluated by "ffmpeg" returning None). SimBA works best with FFMPEG and it is recommended to install it on your computer', source=self.__class__.__name__)
+
+        simba_pip_data = fetch_pip_data(pip_url=Links.SIMBA_PIP_URL.value)
+        if (simba_pip_data[1] is not None) and OS.SIMBA_VERSION.value is not None:
+            if simba_pip_data[1] != OS.SIMBA_VERSION.value:
+                msg = f"A new version of SimBA is available: {simba_pip_data[1]} (you have version {OS.SIMBA_VERSION.value}). Consider upgrading using: pip install simba-uw-tf-dev --upgrade"
+                VersionWarning(msg=msg)
 
     def restart(self):
         confirm_restart = askyesno(title="RESTART", message="Are you sure that you want restart SimBA?")

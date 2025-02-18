@@ -29,6 +29,8 @@ except:
     from typing_extensions import Literal
 
 from urllib.parse import urlparse
+from urllib import request
+
 
 import cv2
 import numpy as np
@@ -37,8 +39,7 @@ import pkg_resources
 import pyarrow as pa
 from numba import njit, prange
 from pyarrow import csv
-from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point,
-                              Polygon)
+from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point, Polygon)
 
 import simba
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
@@ -50,8 +51,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_nvidea_gpu_available,
                                 check_str, check_valid_array,
                                 check_valid_boolean, check_valid_dataframe,
-                                check_valid_lst, is_video_color)
-from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options, Paths
+                                check_valid_lst, is_video_color, check_valid_url)
+from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options, Paths, Links
 from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 FFMPEGCodecGPUError, FileExistError,
                                 FrameRangeError, IntegerError,
@@ -61,10 +62,7 @@ from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 NoFilesFoundError, NotDirectoryError,
                                 ParametersFileError, PermissionError)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.warnings import (
-    FileExistWarning, FrameRangeWarning, InvalidValueWarning,
-    NoDataFoundWarning, NoFileFoundWarning,
-    ThirdPartyAnnotationsInvalidFileFormatWarning)
+from simba.utils.warnings import (FileExistWarning, FrameRangeWarning, InvalidValueWarning, NoFileFoundWarning, ThirdPartyAnnotationsInvalidFileFormatWarning)
 
 SIMBA_DIR = os.path.dirname(simba.__file__)
 
@@ -1775,6 +1773,24 @@ def get_pkg_version(pkg: str):
         return pkg_resources.get_distribution(pkg).version
     except pkg_resources.DistributionNotFound:
         return None
+
+def fetch_pip_data(pip_url: str = Links.SIMBA_PIP_URL.value) -> Union[Tuple[Dict[str, Any], str], Tuple[None, None]]:
+    """ Helper to fetch the pypi data associated with a package """
+    if check_valid_url(url=pip_url):
+        try:
+            opener = request.build_opener(request.HTTPHandler(), request.HTTPSHandler())
+            with opener.open(pip_url, timeout=2) as response:
+                if response.status == 200:
+                    encoding = response.info().get_content_charset("utf-8")
+                    data = response.read().decode(encoding)
+                    json_data = json.loads(data)
+                    latest_release = json_data.get("info", {}).get("version", "")
+                    return json_data, latest_release
+        except Exception as e:
+            #print(e.args)
+            return None, None
+    else:
+        return None, None
 
 
 def write_pickle(data: Dict[str, Any], save_path: Union[str, os.PathLike]) -> None:

@@ -264,3 +264,7 @@ def ResolutionWarning(msg: str, source: str = ""):
 @log_warning
 def GPUToolsWarning(msg: str, source: str = ""):
     pass
+
+@log_warning
+def VersionWarning(msg: str, source: str = ""):
+    pass

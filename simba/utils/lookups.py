@@ -6,6 +6,8 @@ import platform
 import re
 import struct
 import sys
+import json
+import urllib
 from multiprocessing import Lock, Value
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
@@ -16,8 +18,7 @@ import pyglet
 from matplotlib import cm
 
 import simba
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists)
+from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists)
 from simba.utils.enums import OS, UML, FontPaths, Methods, Paths
 from simba.utils.read_write import get_fn_ext
 from simba.utils.warnings import NoDataFoundWarning
@@ -671,9 +672,6 @@ def get_log_config():
 def get_model_names():
     model_names_dir = os.path.join(os.path.dirname(simba.__file__), Paths.UNSUPERVISED_MODEL_NAMES.value)
     return list(pd.read_parquet(model_names_dir)[UML.NAMES.value])
-
-
-
 
 
 #
