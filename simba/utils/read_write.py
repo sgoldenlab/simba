@@ -28,9 +28,8 @@ try:
 except:
     from typing_extensions import Literal
 
-from urllib.parse import urlparse
 from urllib import request
-
+from urllib.parse import urlparse
 
 import cv2
 import numpy as np
@@ -39,7 +38,8 @@ import pkg_resources
 import pyarrow as pa
 from numba import njit, prange
 from pyarrow import csv
-from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point, Polygon)
+from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point,
+                              Polygon)
 
 import simba
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
@@ -51,8 +51,10 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_nvidea_gpu_available,
                                 check_str, check_valid_array,
                                 check_valid_boolean, check_valid_dataframe,
-                                check_valid_lst, is_video_color, check_valid_url)
-from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options, Paths, Links
+                                check_valid_lst, check_valid_url,
+                                is_video_color)
+from simba.utils.enums import (ConfigKey, Dtypes, Formats, Keys, Links,
+                               Options, Paths)
 from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 FFMPEGCodecGPUError, FileExistError,
                                 FrameRangeError, IntegerError,
@@ -62,7 +64,9 @@ from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 NoFilesFoundError, NotDirectoryError,
                                 ParametersFileError, PermissionError)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.warnings import (FileExistWarning, FrameRangeWarning, InvalidValueWarning, NoFileFoundWarning, ThirdPartyAnnotationsInvalidFileFormatWarning)
+from simba.utils.warnings import (
+    FileExistWarning, FrameRangeWarning, InvalidValueWarning,
+    NoFileFoundWarning, ThirdPartyAnnotationsInvalidFileFormatWarning)
 
 SIMBA_DIR = os.path.dirname(simba.__file__)
 

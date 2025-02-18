@@ -24,7 +24,8 @@ from PIL import ImageTk
 
 from simba.bounding_box_tools.boundary_menus import BoundaryMenus
 from simba.cue_light_tools.cue_light_menues import CueLightAnalyzerMenu
-from simba.labelling.labelling_advanced_interface import select_labelling_video_advanced
+from simba.labelling.labelling_advanced_interface import \
+    select_labelling_video_advanced
 from simba.labelling.labelling_interface import select_labelling_video
 from simba.labelling.targeted_annotations_clips import \
     select_labelling_video_targeted_clips
@@ -158,15 +159,19 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         FileSelect, SimbaButton, SimBALabel,
                                         hxtScrollbar)
 from simba.ui.video_info_ui import VideoInfoTable
-from simba.utils.checks import (check_ffmpeg_available, check_file_exist_and_readable, check_int)
+from simba.utils.checks import (check_ffmpeg_available,
+                                check_file_exist_and_readable, check_int)
 from simba.utils.custom_feature_extractor import CustomFeatureExtractor
 from simba.utils.enums import (OS, Defaults, Formats, Keys, Links, Paths,
                                TagNames)
 from simba.utils.errors import InvalidInputError
-from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis, get_icons_paths, load_simba_fonts)
+from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
+                                 get_icons_paths, load_simba_fonts)
 from simba.utils.printing import stdout_success, stdout_warning
-from simba.utils.read_write import find_core_cnt, get_video_meta_data, fetch_pip_data
-from simba.utils.warnings import FFMpegNotFoundWarning, PythonVersionWarning, VersionWarning
+from simba.utils.read_write import (fetch_pip_data, find_core_cnt,
+                                    get_video_meta_data)
+from simba.utils.warnings import (FFMpegNotFoundWarning, PythonVersionWarning,
+                                  VersionWarning)
 from simba.video_processors.video_processing import \
     extract_frames_from_all_videos_in_directory
 
