@@ -9,7 +9,7 @@ import platform
 import shutil
 import subprocess
 import time
-from copy import deepcopy, copy
+from copy import copy, deepcopy
 from datetime import datetime
 from tkinter import *
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -18,8 +18,8 @@ import cv2
 import numpy as np
 import pandas as pd
 from PIL import Image, ImageTk
-from shapely.geometry import Polygon, MultiPolygon
 from shapely.affinity import scale
+from shapely.geometry import MultiPolygon, Polygon
 from skimage.color import label2rgb
 from skimage.segmentation import slic
 
