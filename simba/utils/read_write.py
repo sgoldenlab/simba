@@ -7,6 +7,7 @@ import io
 import itertools
 import json
 import math
+import functools
 import multiprocessing
 import os
 import pickle
@@ -51,8 +52,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_nvidea_gpu_available,
                                 check_str, check_valid_array,
                                 check_valid_boolean, check_valid_dataframe,
-                                check_valid_lst, is_video_color, check_valid_url)
-from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options, Paths, Links
+                                check_valid_lst, is_video_color, check_valid_url, is_img_bw)
+from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options, Paths, Links, Defaults
 from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 FFMPEGCodecGPUError, FileExistError,
                                 FrameRangeError, IntegerError,
@@ -1560,14 +1561,22 @@ def read_roi_data(roi_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, pd.D
     return rectangles_df, circles_df, polygon_df
 
 
-def create_directory(path: Union[str, os.PathLike]):
+def create_directory(path: Union[str, os.PathLike], overwrite: bool = False):
     if not os.path.exists(path):
         try:
             os.makedirs(path)
         except FileExistsError:
             raise PermissionError(msg=f'SimBA is not allowed to create the directory {path}.', source=create_directory.__name__)
     else:
-        pass
+        if not overwrite:
+            pass
+        else:
+            try:
+                remove_a_folder(folder_dir=path)
+                os.makedirs(path)
+            except FileExistsError:
+                raise PermissionError(msg=f'SimBA is not allowed to create the directory {path}.', source=create_directory.__name__)
+
 
 
 def find_max_vertices_coordinates(shapes: List[Union[Polygon, LineString, MultiPolygon, Point]], buffer: Optional[int] = None) -> Tuple[int, int]:
@@ -2066,21 +2075,30 @@ def img_stack_to_greyscale(imgs: np.ndarray):
 def read_img_batch_from_video_gpu(video_path: Union[str, os.PathLike],
                                   start_frm: Optional[int] = None,
                                   end_frm: Optional[int] = None,
-                                  verbose: Optional[bool] = False,
-                                  greyscale: Optional[bool] = False,
+                                  verbose: bool = False,
+                                  greyscale: bool = False,
+                                  black_and_white: bool = False,
                                   out_format: Literal['dict', 'array'] = 'dict') -> Union[Dict[int, np.ndarray], np.ndarray]:
 
     """
     Reads a batch of frames from a video file using GPU acceleration.
 
-    This function uses FFmpeg with CUDA acceleration to read frames from a specified range in a video file.
-    It supports both RGB and greyscale video formats. Frames are returned as a dictionary where the keys are
+    This function uses FFmpeg with CUDA acceleration to read frames from a specified range in a video file. It supports both RGB and greyscale video formats. Frames are returned as a dictionary where the keys are
     frame indices and the values are NumPy arrays representing the image data.
+
+    .. note::
+       When black-and-white videos are saved as MP4, there can be some small errors in pixel values during compression. A video with only (0, 255) pixel values therefore gets other pixel values, around 0 and 255, when read in again.
+       If you expect that the video you are reading in is black and white, set ``black_and_white`` to True to round any of these wonly value sto 0 and 255.
+
+    .. seealso::
+       For CPU multicore acceleration, see :func:`simba.mixins.image_mixin.ImageMixin.read_img_batch_from_video`
 
     :param video_path: Path to the video file. Can be a string or an os.PathLike object.
     :param start_frm: The starting frame index to read. If None, starts from the beginning of the video.
     :param end_frm: The ending frame index to read. If None, reads until the end of the video.
     :param verbose: If True, prints progress information to the console.
+    :param greyscale: If True, returns the images in greyscale. Default False.
+    :param black_and_white: If True, returns the images in black and white. Default False.
     :return: A dictionary where keys are frame indices (integers) and values are NumPy arrays containing the image data of each frame.
     """
 
@@ -2135,7 +2153,7 @@ def read_img_batch_from_video_gpu(video_path: Union[str, os.PathLike],
             frames[iteration_frm_cnt] = img
         frm_cnt += 1
         iteration_frm_cnt += 1
-    if greyscale:
+    if greyscale or black_and_white:
         if out_format == 'dict':
             greyscale_imgs = img_stack_to_greyscale(imgs=np.stack(list(frames.values()), axis=0)).astype(np.uint8)
             for cnt, i in enumerate(range(start_frm, end_frm)):
@@ -2143,11 +2161,39 @@ def read_img_batch_from_video_gpu(video_path: Union[str, os.PathLike],
         else:
             frames = img_stack_to_greyscale(imgs=frames).astype(np.uint8)
 
+    if black_and_white:
+        binary_frms = {}
+        if out_format == 'dict':
+            for frm_id, frm in frames.items():
+                binary_frms[frm_id] = np.where(frm > 127, 255, 0).astype(np.uint8)
+        else:
+            for frm_id in range(frames.shape[0]):
+                binary_frms[frm_id] = np.where(frames[frm_id] > 127, 255, 0).astype(np.uint8)
+        frames = binary_frms
+
     return frames
 
 
-def find_largest_blob_location(imgs: dict, verbose: Optional[bool] = False, video_name: Optional[str] = None):
-    results = {}
+def find_largest_blob_location(imgs: Dict[int, np.ndarray],
+                               verbose: bool = False,
+                               video_name: Optional[str] = None,
+                               inclusion_zone: Optional[Union[Polygon, MultiPolygon,]] = None) -> Dict[int, np.ndarray]:
+    """
+    Helper to find the largest connected component in binary image. E.g., Use to find a "blob" (i.e., animal) within a background subtracted image.
+
+    :param Dict[int, np.ndarray] imgs: Dictionary of images where the key is the frame id and the value is an image in np.ndarray format.
+    :param bool verbose: If True, prints progress. Default: False.
+    :param video_name video_name: The name of the video being processed for interpretable progress msg if ``verbose``.
+    :param Optional[np.ndarray] inclusion_zones: If not None, then 2D numpy array of ROI / shape vertices. If not None, the largest blob will be searched for only in the ROI.
+    :return: Dictionary where the key is the frame id and the value is a 2D array with x and y coordinates.
+    :rtype: Dict[int, np.ndarray]
+    """
+
+    check_valid_boolean(value=[verbose], source=f'{find_largest_blob_location.__name__} verbose', raise_error=True)
+    if inclusion_zone is not None:
+        check_instance(source=f'{find_largest_blob_location.__name__} inclusion_zone', instance=inclusion_zone, accepted_types=(MultiPolygon, Polygon,), raise_error=True)
+
+    results, prior_window = {}, None
     for frm_idx, img in imgs.items():
         if verbose:
             if video_name is None:
@@ -2156,7 +2202,11 @@ def find_largest_blob_location(imgs: dict, verbose: Optional[bool] = False, vide
                 print(f'Finding blob in image {frm_idx} (Video {video_name})...')
         try:
             num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(img, connectivity=8)
-            if num_labels == 1:
+            if (inclusion_zone is not None) and num_labels != 1:
+                centroid_points = [Point(xy) for xy in centroids]
+                centroid_idx = [inclusion_zone.contains(Point(xy)) for xy in centroid_points]
+                centroids, stats, labels = centroids[centroid_idx], stats[centroid_idx], labels[centroid_idx]
+            if (num_labels == 1) or (centroids.shape[0] == 0):
                 results[frm_idx] = np.array([0, 0]).astype(np.int32)
             else:
                 largest_blob_label = 1 + np.argmax(stats[1:, cv2.CC_STAT_AREA])
@@ -2165,7 +2215,6 @@ def find_largest_blob_location(imgs: dict, verbose: Optional[bool] = False, vide
             print(e.args)
             results[frm_idx] = np.array([np.nan, np.nan])
     return results
-
 
 
 def bento_file_reader(file_path: Union[str, os.PathLike],
@@ -2666,3 +2715,75 @@ def get_downloads_path(raise_error: bool = False):
         return downloads_path
 
 
+def _read_img_batch_from_video_helper(frm_idx: np.ndarray, video_path: Union[str, os.PathLike], greyscale: bool, verbose: bool, black_and_white: bool):
+    """Multiprocess helper used by read_img_batch_from_video to read in images from video file."""
+    start_idx, end_frm, current_frm = frm_idx[0], frm_idx[-1] + 1, frm_idx[0]
+    results = {}
+    cap = cv2.VideoCapture(video_path)
+    cap.set(1, current_frm)
+    while current_frm < end_frm:
+        if verbose:
+            print(f'Reading frame idx {current_frm}...')
+        img = cap.read()[1]
+        if greyscale or black_and_white:
+            if len(img.shape) != 2:
+                img = (0.07 * img[:, :, 2] + 0.72 * img[:, :, 1] + 0.21 * img[:, :, 0]).astype(np.uint8)
+            else:
+                img = img.astype(np.uint8)
+        if black_and_white:
+            img = np.where(img > 127, 255, 0).astype(np.uint8)
+        results[current_frm] = img
+        current_frm += 1
+    return results
+
+def read_img_batch_from_video(video_path: Union[str, os.PathLike],
+                              start_frm: int,
+                              end_frm: int,
+                              greyscale: bool = False,
+                              black_and_white: bool = False,
+                              core_cnt: int = -1,
+                              verbose: bool = False) -> Dict[int, np.ndarray]:
+    """
+    Read a batch of frames from a video file. This method reads frames from a specified range of frames within a video file using multiprocessing.
+    .. seealso::
+       For GPU acceleration, see :func:`simba.utils.read_write.read_img_batch_from_video_gpu`
+
+    .. note::
+      When black-and-white videos are saved as MP4, there can be some small errors in pixel values during compression. A video with only (0, 255) pixel values therefore gets other pixel values, around 0 and 255, when read in again.
+      If you expect that the video you are reading in is black and white, set ``black_and_white`` to True to round any of these wonly value sto 0 and 255.
+
+    :param Union[str, os.PathLike] video_path: Path to the video file.
+    :param int start_frm: Starting frame index.
+    :param int end_frm: Ending frame index.
+    :param Optionalint] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, indicating using all available cores.
+    :param Optional[bool] greyscale: If True, reads the images as greyscale. If False, then as original color scale. Default: False.
+    :param bool black_and_white: If True, returns the images in black and white. Default False.
+    :returns: A dictionary containing frame indices as keys and corresponding frame arrays as values.
+    :rtype: Dict[int, np.ndarray]
+    :example:
+    >>> read_img_batch_from_video(video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Together_1.avi', start_frm=0, end_frm=50)
+    """
+
+    if platform.system() == "Darwin":
+        if not multiprocessing.get_start_method(allow_none=True):
+            multiprocessing.set_start_method("fork", force=True)
+    check_file_exist_and_readable(file_path=video_path)
+    video_meta_data = get_video_meta_data(video_path=video_path)
+    check_int(name=read_img_batch_from_video.__name__,value=start_frm, min_value=0,max_value=video_meta_data["frame_count"])
+    check_int(name=read_img_batch_from_video.__name__, value=end_frm, min_value=start_frm+1, max_value=video_meta_data["frame_count"])
+    check_int(name=read_img_batch_from_video.__name__, value=core_cnt, min_value=-1)
+    check_valid_boolean(value=[greyscale, black_and_white], source=f'{read_img_batch_from_video.__name__} greyscale black_and_white')
+    if core_cnt < 0:
+        core_cnt = multiprocessing.cpu_count()
+    if end_frm <= start_frm:
+        FrameRangeError(msg=f"Start frame ({start_frm}) has to be before end frame ({end_frm})", source=read_img_batch_from_video.__name__)
+    frm_lst = np.array_split(np.arange(start_frm, end_frm + 1), core_cnt)
+    results = {}
+    with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
+        constants = functools.partial(_read_img_batch_from_video_helper, video_path=video_path, greyscale=greyscale, black_and_white=black_and_white, verbose=verbose)
+        for cnt, result in enumerate(pool.imap(constants, frm_lst, chunksize=1)):
+            results.update(result)
+    pool.join()
+    pool.terminate()
+
+    return results

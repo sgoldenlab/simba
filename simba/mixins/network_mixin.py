@@ -199,10 +199,6 @@ class NetworkMixin(object):
     def graph_current_flow_closeness_centrality(graph: nx.Graph, weights: Optional[str] = "weight"):
 
         """
-
-
-
-
         :example:
         >>> graph = NetworkMixin.create_graph(data={('Animal_1', 'Animal_2'): 1.0, ('Animal_1', 'Animal_3'): 0.2, ('Animal_2', 'Animal_3'): 0.5})
         >>> NetworkMixin().graph_current_flow_closeness_centrality(graph=graph)

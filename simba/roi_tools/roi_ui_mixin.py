@@ -4,6 +4,7 @@ import os
 from copy import copy
 from tkinter import *
 from typing import Optional, Union
+import platform
 
 import cv2
 import numpy as np
@@ -40,7 +41,7 @@ from simba.sandbox.roi_tkinter.interactive_roi_modifier_tkinter import \
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, SimbaButton, SimBALabel,
                                         get_menu_icons)
-from simba.utils.checks import check_int, check_str
+from simba.utils.checks import check_int, check_str, check_file_exist_and_readable
 from simba.utils.enums import OS, ROI_SETTINGS, Formats, Keys
 from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 NoROIDataError)
@@ -53,29 +54,37 @@ DRAW_FRAME_NAME = "DEFINE SHAPE"
 CIRCLE = 'circle'
 POLYGON = 'polygon'
 RECTANGLE = 'rectangle'
+PLATFORM = platform.system()
 
 
 class ROI_mixin(ConfigReader):
 
     def __init__(self,
                  video_path: Union[str, os.PathLike],
-                 config_path: Union[str, os.PathLike],
                  img_idx: int,
-                 main_frm: Toplevel):
+                 main_frm: Toplevel,
+                 config_path: Optional[Union[str, os.PathLike]] = None,
+                 roi_coordinates_path: Optional[Union[str, os.PathLike]] = None):
 
-        ConfigReader.__init__(self, config_path=config_path, read_video_info=True, create_logger=False)
         self.video_meta = get_video_meta_data(video_path=video_path)
+
+        if config_path is not None:
+            ConfigReader.__init__(self, config_path=config_path, read_video_info=False, create_logger=False)
+            check_file_exist_and_readable(file_path=config_path)
+            _, self.px_per_mm, _ = self.read_video_info(video_name=self.video_meta['video_name'], video_info_df_path=self.video_info_path)
+        if roi_coordinates_path is not None:
+            self.roi_coordinates_path = roi_coordinates_path
+            self.px_per_mm = 1
+
         self.img_center = (int(self.video_meta['height']  / 2), int(self.video_meta['height'] / 2))
-        _, self.px_per_mm, _ = self.read_video_info(video_name=self.video_meta['video_name'], video_info_df_path=self.video_info_path)
         self.video_path = video_path
         self.img_idx = img_idx
         self.main_frm = main_frm
-
         self.selected_shape_type = None
         self.color_option_dict = get_color_dict()
         self.menu_icons = get_menu_icons()
         self.win_w, self.win_h = self.video_meta['width'], self.video_meta['height']
-        if self.platform == OS.WINDOWS.value:
+        if PLATFORM == OS.WINDOWS.value:
             self.draw_frm_handle = ctypes.windll.user32.FindWindowW(None, DRAW_FRAME_NAME)
             ctypes.windll.user32.SetWindowPos(self.draw_frm_handle, -1, 0, 0, 0, 0, 3)
         self.img_window = Toplevel()
@@ -280,8 +289,11 @@ class ROI_mixin(ConfigReader):
             msg = f'Cannot draw ROI named {shape_name}. An ROI named {shape_name} already exist in for the video.'
             self.set_status_bar_panel(text=msg, fg='red')
             raise InvalidInputError(msg=msg, source=f'{self.__class__.__name__} draw')
+        else:
+            msg = f'Draw {self.selected_shape_type} ROI {shape_name}.'
+            self.set_status_bar_panel(text=msg, fg='blue')
         self.set_btn_clrs(btn=self.draw_btn)
-        if self.platform == OS.WINDOWS.value:
+        if PLATFORM == OS.WINDOWS.value:
             ctypes.windll.user32.SetWindowPos(self.draw_frm_handle, -1, 0, 0, 0, 0, 3)
         if self.selected_shape_type == RECTANGLE:
             self.selector = ROISelector(img_window=self.img_window, thickness=int(self.thickness_dropdown.getChoices()), clr=self.color_option_dict[self.color_dropdown.getChoices()])
@@ -536,10 +548,11 @@ class ROI_mixin(ConfigReader):
             msg = f'New ROI name for {name} is invalid: {new_name}'
             self.set_status_bar_panel(text=msg, fg="red")
             raise NoROIDataError(msg=msg, source=self.__class__.__name__)
-        if (new_name in self.roi_names) and (new_name != name):
+        elif (new_name in self.roi_names) and (new_name != name):
             msg = f'Cannot change ROI name from {name} to {new_name}: an ROI named {new_name} already exist.'
             self.set_status_bar_panel(text=msg, fg="red")
             raise NoROIDataError(msg=msg, source=self.__class__.__name__)
+
         shape_entry['Name'] = new_name
         shape_entry['Thickness'] = int(self.new_thickness_dropdown.getChoices())
         shape_entry['Color name'] = self.new_color_dropdown.getChoices()

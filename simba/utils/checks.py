@@ -345,11 +345,10 @@ def check_all_file_names_are_represented_in_video_log(
         )
 
 
-def check_if_dir_exists(
-    in_dir: Union[str, os.PathLike],
-    source: Optional[str] = None,
-    create_if_not_exist: Optional[bool] = False,
-) -> None:
+def check_if_dir_exists(in_dir: Union[str, os.PathLike],
+                        source: Optional[str] = None,
+                        create_if_not_exist: Optional[bool] = False,
+                        raise_error: bool = True) -> Union[None, bool]:
     """
     Check if a directory path exists.
 
@@ -359,7 +358,13 @@ def check_if_dir_exists(
     :raise NotDirectoryError: The directory does not exist.
     """
 
-    if not os.path.isdir(in_dir):
+    if not isinstance(in_dir, (str, Path, os.PathLike)):
+        if raise_error:
+            raise NotDirectoryError(msg=f"{in_dir} is not a valid directory", source=check_if_dir_exists.__name__)
+        else:
+            return False
+
+    elif not os.path.isdir(in_dir):
         if create_if_not_exist:
             try:
                 os.makedirs(in_dir)
@@ -367,9 +372,17 @@ def check_if_dir_exists(
                 pass
         else:
             if source is None:
-                raise NotDirectoryError(msg=f"{in_dir} is not a valid directory", source=check_if_dir_exists.__name__)
+                if raise_error:
+                    raise NotDirectoryError(msg=f"{in_dir} is not a valid directory", source=check_if_dir_exists.__name__)
+                else:
+                    return False
             else:
-                raise NotDirectoryError(msg=f"{in_dir} is not a valid directory", source=source)
+                if raise_error:
+                    raise NotDirectoryError(msg=f"{in_dir} is not a valid directory", source=source)
+                else:
+                    return False
+    else:
+        return True
 
 
 def check_that_column_exist(
@@ -1586,6 +1599,21 @@ def check_valid_polygon(polygon: Union[np.ndarray, Polygon], raise_error: bool =
     if not polygon.is_valid:
         if raise_error:
             raise InvalidInputError(msg=f'The polygon {name} is invalid', source=check_valid_polygon.__name__)
+        else:
+            return False
+    else:
+        return True
+
+
+def is_img_bw(img: np.ndarray, raise_error: bool = True, source: Optional[str] = ''):
+    """
+    Helper to check if an image is binarey black and white.
+    """
+    check_if_valid_img(data=img, source=is_img_bw.__name__, raise_error=True)
+    px_vals = np.sort(np.unique(img)).astype(np.int32)
+    if not np.array_equal(np.array([0, 255]), px_vals):
+        if raise_error:
+            raise InvalidInputError(msg=f'The image {source} is not a black-and-white image. Expected: [0, 255], got {px_vals}', source=is_img_bw.__name__)
         else:
             return False
     else:

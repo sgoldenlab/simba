@@ -1,7 +1,8 @@
 __author__ = "Simon Nilsson"
 
-import os.path
 import time
+
+import os.path
 import warnings
 
 warnings.filterwarnings("ignore", category=FutureWarning)

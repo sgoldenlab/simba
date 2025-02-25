@@ -3833,9 +3833,6 @@ class GeometryMixin(object):
             lengths.append(length)
             widths.append(width)
             areas.append(area)
-
-
-
             centers.append(list(np.array(shape.centroid.coords)[0].astype(np.int32)))
 
         return {'lengths': lengths, 'widths': widths, 'areas': areas, 'centers': centers, 'max_length': max_length, 'min_length': min_length, 'min_width': min_width, 'max_width': max_width, 'min_area': min_area, 'max_area': max_area}

@@ -2,31 +2,28 @@ __author__ = "Simon Nilsson"
 __email__ = "sronilsson@gmail.com"
 
 import os
-from copy import deepcopy
-from typing import Optional, Union
-
+import cv2
+from copy import deepcopy, copy
+from typing import Optional, Union, Dict
+from shapely.geometry import Polygon, MultiPolygon
+from shapely.affinity import scale
 import numpy as np
 
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
-
 import pandas as pd
 
 from simba.mixins.image_mixin import ImageMixin
-from simba.utils.checks import (check_if_dir_exists, check_int,
-                                check_nvidea_gpu_available, check_str,
-                                check_valid_boolean)
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.utils.checks import (check_if_dir_exists, check_int, check_nvidea_gpu_available, check_str, check_valid_boolean, check_instance, is_img_bw, check_float)
 from simba.utils.data import df_smoother, savgol_smoother
 from simba.utils.enums import Formats, Methods, Options
 from simba.utils.errors import FFMPEGCodecGPUError, InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
-                                    get_video_meta_data, remove_files,
-                                    write_df)
-from simba.video_processors.video_processing import (video_bg_subtraction,
-                                                     video_bg_subtraction_mp)
+from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext, get_video_meta_data, remove_files, write_df)
+from simba.video_processors.video_processing import (video_bg_subtraction, video_bg_subtraction_mp)
 
 
 class BlobLocationComputer(object):
@@ -54,10 +51,10 @@ class BlobLocationComputer(object):
                  data_path: Union[str, os.PathLike],
                  verbose: Optional[bool] = True,
                  gpu: Optional[bool] = True,
-                 batch_size: Optional[int] = 2500,
+                 batch_size: int = 2500,
                  save_dir: Optional[Union[str, os.PathLike]] = None,
                  smoothing: Optional[str] = None,
-                 multiprocessing: Optional[bool] = False):
+                 multiprocessing: bool = False):
 
 
         if os.path.isdir(data_path):
@@ -121,6 +118,14 @@ class BlobLocationComputer(object):
         else:
             if self.verbose:
                 stdout_success(f'Video blob detection complete for {len(self.data_paths)} video', elapsed_time=timer.elapsed_time_str)
+
+
+
+
+
+
+
+
 
 # x = BlobLocationComputer(data_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled.mp4", multiprocessing=True, gpu=True, batch_size=2000, save_dir=r"C:\troubleshooting\RAT_NOR\project_folder\csv\blob_positions", smoothing='Savitzky Golay')
 # x.run()

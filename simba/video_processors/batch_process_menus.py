@@ -385,9 +385,8 @@ class BatchProcessFrame(PopUpMixin):
                 self.videos_frm,
                 text="Crop",
                 fg="black",
-                command=lambda k=self.videos[name]["video_name_lbl"][
-                    "text"
-                ]: self.batch_process_crop_function(k),
+                command=lambda k=self.videos[name]["video_name_lbl"]["text"]: self.batch_process_crop_function(k),
+
             )
             self.videos[name]["start_time_var"] = StringVar()
             self.videos[name]["start_time_var"].set("00:00:00")

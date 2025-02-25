@@ -9,7 +9,7 @@ import platform
 import shutil
 import subprocess
 import time
-from copy import deepcopy
+from copy import deepcopy, copy
 from datetime import datetime
 from tkinter import *
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -18,7 +18,8 @@ import cv2
 import numpy as np
 import pandas as pd
 from PIL import Image, ImageTk
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, MultiPolygon
+from shapely.affinity import scale
 from skimage.color import label2rgb
 from skimage.segmentation import slic
 
@@ -3685,7 +3686,7 @@ def create_average_frm(video_path: Union[str, os.PathLike],
        If all are None, then the entire video will be used to create the average frame.
 
     .. seealso:
-       :func:`simba.data_processors.cuda.image.create_average_frm_cupy`, :func:`simba.data_processors.cuda.image.create_average_frm_cuda` for GPU acceleration.
+       See :func:`simba.data_processors.cuda.image.create_average_frm_cupy`, :func:`simba.data_processors.cuda.image.create_average_frm_cuda` for GPU acceleration.
 
     :param Union[str, os.PathLike] video_path: The path to the video to create the average frame from. Default: None.
     :param Optional[int] start_frm: The first frame in the segment to create the average frame from. Default: None.
@@ -3756,7 +3757,8 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
                          bg_color: Optional[Tuple[int, int, int]] = (0, 0, 0),
                          fg_color: Optional[Tuple[int, int, int]] = None,
                          save_path: Optional[Union[str, os.PathLike]] = None,
-                         verbose: Optional[bool] = True) -> None:
+                         verbose: Optional[bool] = True,
+                         method: str = 'absolute') -> None:
     """
     Subtract the background from a video.
 
@@ -3816,6 +3818,7 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
     else:
         check_if_dir_exists(in_dir=os.path.dirname(save_path), source=video_bg_subtraction_mp.__name__)
     check_int(name=f'{video_bg_subtraction.__name__} threshold', value=threshold, min_value=1, max_value=255)
+    check_str(name='method', value=method, options=['absolute', 'light', 'dark'], raise_error=True)
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
     writer = cv2.VideoWriter(save_path, fourcc, video_meta_data['fps'],(video_meta_data['width'], video_meta_data['height']))
     avg_frm = create_average_frm(video_path=bg_video_path, start_frm=bg_start_frm, end_frm=bg_end_frm, start_time=bg_start_time, end_time=bg_end_time)
@@ -3828,7 +3831,14 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
             #FrameRangeWarning(msg=f'Could not read frame {frm_cnt} in video {video_path}', source=video_bg_subtraction.__name__)
             break
         out_frm = deepcopy(frm)
-        diff = cv2.absdiff(frm, avg_frm)
+        if method == 'absolute':
+            diff = cv2.absdiff(frm, avg_frm)
+        elif method == 'light':  # Assumes background is black, highlights light areas
+            diff = np.abs(frm.astype(np.int16) - avg_frm.astype(np.int16)).astype(np.uint8)
+        elif method == 'dark':  # Assumes background is white, highlights dark areas
+            diff = np.abs(avg_frm.astype(np.int16) - frm.astype(np.int16)).astype(np.uint8)
+        else:
+            diff = cv2.absdiff(frm, avg_frm)
         gray_diff = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
         mask = np.where(gray_diff > threshold, 1, 0).astype(np.uint8)
         out_frm[mask == 0] = bg_color
@@ -3853,7 +3863,8 @@ def _bg_remover_mp(frm_range: Tuple[int, np.ndarray],
                    video_meta_data: Dict[str, Any],
                    temp_dir: Union[str, os.PathLike],
                    verbose: bool,
-                   threshold: int):
+                   threshold: int,
+                   method: str):
 
     batch, frm_range = frm_range[0], frm_range[1]
     start_frm, current_frm, end_frm = frm_range[0], frm_range[0], frm_range[-1]
@@ -3868,7 +3879,14 @@ def _bg_remover_mp(frm_range: Tuple[int, np.ndarray],
         if not ret:
             break
         out_frm = deepcopy(frm)
-        diff = cv2.absdiff(frm, bg_frm)
+        if method == 'absolute':
+            diff = cv2.absdiff(frm, bg_frm)
+        elif method == 'light':  # Assumes background is black, highlights light areas
+            diff = np.abs(frm.astype(np.int16) - bg_frm.astype(np.int16)).astype(np.uint8)
+        elif method == 'dark':  # Assumes background is white, highlights dark areas
+            diff = np.abs(bg_frm.astype(np.int16) - frm.astype(np.int16)).astype(np.uint8)
+        else:
+            diff = cv2.absdiff(frm, bg_frm)
         gray_diff = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
         mask = np.where(gray_diff > threshold, 1, 0).astype(np.uint8)
         out_frm[mask == 0] = bg_clr
@@ -3883,18 +3901,19 @@ def _bg_remover_mp(frm_range: Tuple[int, np.ndarray],
     return batch
 
 def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
-                            bg_video_path: Optional[Union[str, os.PathLike]] = None,
+                            bg_video_path: Union[str, os.PathLike] = None,
                             bg_start_frm: Optional[int] = None,
                             bg_end_frm: Optional[int] = None,
                             bg_start_time: Optional[str] = None,
                             bg_end_time: Optional[str] = None,
-                            bg_color: Optional[Tuple[int, int, int]] = (0, 0, 0),
+                            bg_color: Tuple[int, int, int] = (0, 0, 0),
                             fg_color: Optional[Tuple[int, int, int]] = None,
                             save_path: Optional[Union[str, os.PathLike]] = None,
-                            core_cnt: Optional[int] = -1,
+                            core_cnt: int = -1,
                             verbose: Optional[bool] = True,
                             gpu: Optional[bool] = False,
-                            threshold: Optional[int] = 50) -> None:
+                            threshold: Optional[int] = 50,
+                            method: str = 'absolute') -> None:
 
     """
     Subtract the background from a video using multiprocessing.
@@ -3948,6 +3967,7 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
     timer = SimbaTimer(start=True)
     check_file_exist_and_readable(file_path=video_path)
     check_int(name=f'{video_bg_subtraction_mp.__name__} threshold', value=threshold, min_value=1, max_value=255)
+    check_str(name='method', value=method, options=['absolute', 'light', 'dark'], raise_error=True)
     if bg_video_path is None:
         bg_video_path = deepcopy(video_path)
     video_meta_data = get_video_meta_data(video_path=video_path)
@@ -3977,7 +3997,8 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
                                       video_meta_data=video_meta_data,
                                       temp_dir=temp_dir,
                                       verbose=verbose,
-                                      threshold=threshold)
+                                      threshold=threshold,
+                                      method=method)
         for cnt, result in enumerate(pool.imap(constants, frm_data, chunksize=1)):
             print(f'Frame batch {result+1} completed...')
         pool.terminate()
@@ -3989,7 +4010,7 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
     stdout_success(msg=f'Video saved at {save_path}', elapsed_time=timer.elapsed_time_str)
 
 
-#video_bg_subtraction(video_path=r"C:\troubleshooting\open_field_below\project_folder\videos\TheVideoName_text_superimposed_0.mp4", bg_color=(0, 0, 0), fg_color=(255, 255, 255))
+#video_bg_subtraction(video_path=r"C:\troubleshooting\mitra\test\temp\501_MA142_Gi_CNO_0516.mp4", bg_color=(0, 0, 0), fg_color=(255, 255, 255), verbose=False)
 
 def superimpose_video_names(video_path: Union[str, os.PathLike],
                             font: Optional[str] = 'Arial',
@@ -4640,6 +4661,8 @@ def crop_video(video_path: Union[str, os.PathLike],
     timer.stop_timer()
     if verbose:
         stdout_success(msg=f'Cropped video saved at {save_path}', elapsed_time=timer.elapsed_time_str)
+
+
 
 # video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped_gantt.mp4',
 #                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped.mp4',

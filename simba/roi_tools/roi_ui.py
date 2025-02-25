@@ -1,15 +1,15 @@
 import os
 import warnings
-from typing import Union
+from typing import Union, Optional
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.image_mixin import ImageMixin
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.roi_ui_mixin import ROI_mixin
-from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.checks import check_file_exist_and_readable, check_if_dir_exists
 from simba.utils.enums import ROI_SETTINGS
-from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
-                                    get_video_meta_data)
+from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext, get_video_meta_data)
+from simba.utils.errors import InvalidInputError
 
 warnings.filterwarnings("ignore")
 
@@ -30,17 +30,27 @@ class ROI_ui(ROI_mixin, ConfigReader):
 
     """
     def __init__(self,
-                 config_path: Union[str, os.PathLike],
-                 video_path: Union[str, os.PathLike]):
+                 video_path: Union[str, os.PathLike],
+                 config_path: Optional[Union[str, os.PathLike]] = None,
+                 roi_coordinates_path: Optional[Union[str, os.PathLike]] = None,
+                 video_dir: Optional[Union[str, os.PathLike]] = None):
 
-        check_file_exist_and_readable(file_path=config_path)
         check_file_exist_and_readable(file_path=video_path)
-        ConfigReader.__init__(self, config_path=config_path, read_video_info=False, create_logger=False)
+        if config_path is None:
+            if (video_dir is None) and (roi_coordinates_path is None):
+                raise InvalidInputError(msg='If not passing a config path, then pass roi_coordinates_path and video_dir', source=self.__class__.__name__)
+        if config_path is not None:
+            ConfigReader.__init__(self, config_path=config_path, read_video_info=False, create_logger=False)
+            check_file_exist_and_readable(file_path=config_path)
+        if roi_coordinates_path is not None:
+            self.roi_coordinates_path = roi_coordinates_path
+            check_if_dir_exists(in_dir=video_dir)
+            self.video_dir = video_dir
         self.video_meta =  get_video_meta_data(video_path=video_path, fps_as_int=False)
         self.video_ext = get_fn_ext(filepath=video_path)[2][1:]
         self.img, self.img_idx = ImageMixin.find_first_non_uniform_clr_frm(video_path=video_path)
         self.define_ui = PopUpMixin(title="REGION OF INTEREST (ROI) SETTINGS", size=WINDOW_SIZE)
-        ROI_mixin.__init__(self, video_path=video_path, config_path=config_path, img_idx=self.img_idx, main_frm=self.define_ui.root)
+        ROI_mixin.__init__(self, video_path=video_path, config_path=config_path, img_idx=self.img_idx, main_frm=self.define_ui.root, roi_coordinates_path=self.roi_coordinates_path)
         self.other_project_video_paths = find_all_videos_in_directory(directory=self.video_dir, as_dict=True).values()
         self.other_project_video_paths = [x for x in self.other_project_video_paths if x != video_path]
         self.other_project_video_names = [get_fn_ext(x)[1] for x in self.other_project_video_paths]
@@ -68,8 +78,18 @@ class ROI_ui(ROI_mixin, ConfigReader):
         self.define_ui.root.destroy()
         self.define_ui.root.quit()
 
+# ROI_ui(config_path=None,
+#        video_path=r"C:\troubleshooting\mitra\test\501_MA142_Gi_Saline_0515.mp4",
+#        roi_coordinates_path=r"C:\troubleshooting\mitra\test\.temp\ROI_definitions.h5",
+#        video_dir=r"C:\troubleshooting\mitra\test")
+
 # ROI_ui(config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini",
 #        video_path=r'C:\troubleshooting\mouse_open_field\project_folder\videos\Video2.mp4')
+
+# ROI_ui(config_path=None,
+#        video_path=r'C:\troubleshooting\mouse_open_field\project_folder\videos\Video2.mp4',
+#        roi_coordinates_path=r"C:\troubleshooting\mitra\project_folder\logs\measures\ROI_definitions.h5",
+#        video_dir=r"C:\troubleshooting\mitra\test")
 
 # ROI_ui(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #        video_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_CNO_0514.mp4")

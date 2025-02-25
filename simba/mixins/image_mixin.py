@@ -1,8 +1,6 @@
 import platform
 from typing import Dict, List, Optional, Tuple, Union
-
 import numpy as np
-
 try:
     from typing import Literal
 except:
@@ -16,7 +14,7 @@ from collections import ChainMap
 import cv2
 import pandas as pd
 from numba import float64, int64, jit, njit, prange, uint8
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, MultiPolygon
 from skimage.metrics import structural_similarity
 
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
@@ -31,12 +29,8 @@ from simba.utils.errors import (ArrayError, FFMPEGCodecGPUError,
                                 FrameRangeError, InvalidInputError,
                                 NotDirectoryError)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_core_cnt,
-                                    find_files_of_filetypes_in_directory,
-                                    find_largest_blob_location, get_fn_ext,
-                                    get_video_meta_data, read_frm_of_video,
-                                    read_img_batch_from_video_gpu, write_df)
-
+from simba.utils.read_write import (find_core_cnt, find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data, read_frm_of_video, read_img_batch_from_video_gpu, write_df)
+from simba.data_processors.find_animal_blob_location import find_animal_blob_location
 
 class ImageMixin(object):
     """
@@ -948,7 +942,7 @@ class ImageMixin(object):
         return results.astype(int64)
 
     @staticmethod
-    def _read_img_batch_from_video_helper(frm_idx: np.ndarray, video_path: Union[str, os.PathLike], greyscale: bool, verbose: bool):
+    def _read_img_batch_from_video_helper(frm_idx: np.ndarray, video_path: Union[str, os.PathLike], greyscale: bool, verbose: bool, black_and_white: bool):
 
         """Multiprocess helper used by read_img_batch_from_video to read in images from video file."""
         start_idx, end_frm, current_frm = frm_idx[0], frm_idx[-1] + 1, frm_idx[0]
@@ -959,8 +953,10 @@ class ImageMixin(object):
             if verbose:
                 print(f'Reading frame idx {current_frm}...')
             img = cap.read()[1]
-            if greyscale:
+            if greyscale or black_and_white:
                 img = ImageMixin.img_to_greyscale(img=img)
+            if black_and_white:
+                img = np.where(img > 127, 255, 0).astype(np.uint8)
             results[current_frm] = img
             current_frm += 1
         return results
@@ -969,20 +965,26 @@ class ImageMixin(object):
     def read_img_batch_from_video(video_path: Union[str, os.PathLike],
                                   start_frm: int,
                                   end_frm: int,
-                                  greyscale: Optional[bool] = False,
-                                  core_cnt: Optional[int] = -1,
-                                  verbose: Optional[bool] = False) -> Dict[int, np.ndarray]:
+                                  greyscale: bool = False,
+                                  black_and_white: bool = False,
+                                  core_cnt: int = -1,
+                                  verbose: bool = False) -> Dict[int, np.ndarray]:
         """
         Read a batch of frames from a video file. This method reads frames from a specified range of frames within a video file using multiprocessing.
 
         .. seealso::
            For GPU acceleration, see :func:`simba.utils.read_write.read_img_batch_from_video_gpu`
 
+        .. note::
+          When black-and-white videos are saved as MP4, there can be some small errors in pixel values during compression. A video with only (0, 255) pixel values therefore gets other pixel values, around 0 and 255, when read in again.
+          If you expect that the video you are reading in is black and white, set ``black_and_white`` to True to round any of these wonly value sto 0 and 255.
+
         :param Union[str, os.PathLike] video_path: Path to the video file.
         :param int start_frm: Starting frame index.
         :param int end_frm: Ending frame index.
         :param Optionalint] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, indicating using all available cores.
         :param Optional[bool] greyscale: If True, reads the images as greyscale. If False, then as original color scale. Default: False.
+        :param bool black_and_white: If True, returns the images in black and white. Default False.
         :returns: A dictionary containing frame indices as keys and corresponding frame arrays as values.
         :rtype: Dict[int, np.ndarray]
 
@@ -998,7 +1000,7 @@ class ImageMixin(object):
         check_int(name=ImageMixin().__class__.__name__,value=start_frm, min_value=0,max_value=video_meta_data["frame_count"])
         check_int(name=ImageMixin().__class__.__name__, value=end_frm, min_value=start_frm+1, max_value=video_meta_data["frame_count"])
         check_int(name=ImageMixin().__class__.__name__, value=core_cnt, min_value=-1)
-        check_valid_boolean(value=[greyscale], source=f'{ImageMixin().__class__.__name__} greyscale')
+        check_valid_boolean(value=[greyscale, black_and_white], source=f'{ImageMixin().__class__.__name__} greyscale black_and_white')
         if core_cnt < 0:
             core_cnt = multiprocessing.cpu_count()
         if end_frm <= start_frm:
@@ -1006,7 +1008,7 @@ class ImageMixin(object):
         frm_lst = np.array_split(np.arange(start_frm, end_frm + 1), core_cnt)
         results = {}
         with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-            constants = functools.partial(ImageMixin()._read_img_batch_from_video_helper, video_path=video_path, greyscale=greyscale, verbose=verbose)
+            constants = functools.partial(ImageMixin()._read_img_batch_from_video_helper, video_path=video_path, greyscale=greyscale, black_and_white=black_and_white, verbose=verbose)
             for cnt, result in enumerate(pool.imap(constants, frm_lst, chunksize=1)):
                 results.update(result)
 
@@ -1717,25 +1719,30 @@ class ImageMixin(object):
 
     @staticmethod
     def get_blob_locations(video_path: Union[str, os.PathLike],
-                           batch_size: Optional[int] = 3000,
-                           gpu: Optional[bool] = False,
-                           verbose: Optional[bool] = True,
-                           save_path: Optional[Union[str, os.PathLike]] = None) -> Union[None, np.ndarray]:
+                           batch_size: int = 3000,
+                           gpu: bool = False,
+                           verbose: bool = True,
+                           save_path: Optional[Union[str, os.PathLike]] = None,
+                           inclusion_zone: Optional[Union[Polygon, MultiPolygon]] = None,
+                           window_size: Optional[float] = None) -> Union[None, np.ndarray]:
         """
-        Detects the location of the largest blob in each frame of a video. Processes frames in batches and
-        optionally uses GPU for acceleration. Results can be saved to a specified path or returned as a NumPy array.
+        Detects the location of the largest blob in each frame of a video. Processes frames in batches and optionally uses GPU for acceleration. Results can be saved to a specified path or returned as a NumPy array.
 
         .. seealso::
            For visualization of results, see :func:`simba.plotting.blob_plotter.BlobPlotter` and :func:`simba.mixins.plotting_mixin.PlottingMixin._plot_blobs`
+           Background subtraction can be performed using :func:`~simba.video_processors.video_processing.video_bg_subtraction_mp` or :func:`~simba.video_processors.video_processing.video_bg_subtraction`.
 
-        :param Union[str, os.PathLike] video_path: Path to the video file from which to extract frames.
-        :param Optional[int] batch_size: Number of frames to process in each batch. Default is 2000.
+        .. note::
+           In ``inclusion_zones`` is not None, then the largest blob will be searches for **inside** the passed vertices.
+
+        :param Union[str, os.PathLike] video_path: Path to the video file from which to extract frames. Often, a background subtracted video, which can be created with e.g., :func:`simba.video_processors.video_processing.video_bg_subtraction_mp`.
+        :param Optional[int] batch_size: Number of frames to process in each batch. Default is 3k.
         :param Optional[bool] gpu: Whether to use GPU acceleration for processing. Default is False.
         :param Optional[bool] verbose: Whether to print progress and status messages. Default is True.
         :param Optional[Union[str, os.PathLike]] save_path: Path to save the results as a CSV file. If None, results are not saved.
-
-        :return: A NumPy array of shape (N, 2) where N is the number of frames, containing the X and Y coordinates
-                 of the centroid of the largest blob in each frame. If `save_path` is provided, returns None.
+        :param Optional[Union[Polygon, MultiPolygon]] inclusion_zones: Optional shapely polygon, or multipolygon, restricting where to search for the largest blob. Default: None.
+        :param Optional[int] window_size: If not None, then integer representing the size multiplier of the animal geometry in previous frame. If not None, the animal geometry will only be searched for within this geometry.
+        :return: A NumPy array of shape (N, 2) where N is the number of frames, containing the X and Y coordinates of the centroid of the largest blob in each frame. If `save_path` is provided, returns None.
         :rtype: Union[None, np.ndarray]
 
         :example:
@@ -1754,6 +1761,10 @@ class ImageMixin(object):
         check_valid_boolean(value=gpu, source=f'{ImageMixin.get_blob_locations.__name__} verbose')
         if gpu and not check_nvidea_gpu_available():
             raise FFMPEGCodecGPUError(msg='No GPU detected, try to set GPU to False', source=ImageMixin.get_blob_locations.__name__)
+        if inclusion_zone is not None:
+            check_instance(source=f'{ImageMixin.get_blob_locations} inclusion_zone', instance=inclusion_zone, accepted_types=(MultiPolygon, Polygon,), raise_error=True)
+        if window_size is not None:
+            check_float(name='window_size', value=window_size, min_value=1.0, raise_error=True)
         frame_ids = list(range(0, video_meta['frame_count']))
         frame_ids = [frame_ids[i:i + batch_size] for i in range(0, len(frame_ids), batch_size)]
         core_cnt = find_core_cnt()[0]
@@ -1763,10 +1774,10 @@ class ImageMixin(object):
         for frame_batch in range(len(frame_ids)):
             start_frm, end_frm = frame_ids[frame_batch][0], frame_ids[frame_batch][-1]
             if gpu:
-                imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=start_frm, end_frm=end_frm,  verbose=False, out_format='array', greyscale=False)
+                imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=start_frm, end_frm=end_frm,  verbose=False, out_format='array', black_and_white=True)
             else:
-                imgs = ImageMixin.read_img_batch_from_video(video_path=video_path, start_frm=start_frm, end_frm=end_frm, verbose=verbose)
-            imgs = ImageMixin.img_stack_to_greyscale(imgs=imgs).astype(np.uint8)
+                imgs = ImageMixin.read_img_batch_from_video(video_path=video_path, start_frm=start_frm, end_frm=end_frm, verbose=verbose, black_and_white=True)
+                imgs = np.stack(list(imgs.values()))
             keys = np.arange(start_frm, end_frm+1)
             img_dict = {}
             for cnt, img_id in enumerate(range(start_frm, end_frm+1)):
@@ -1775,23 +1786,28 @@ class ImageMixin(object):
             img_dict = [{k: img_dict[k] for k in subset} for subset in np.array_split(keys, core_cnt)]
             del imgs
             with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-                constants = functools.partial(find_largest_blob_location, verbose=verbose, video_name=video_name)
+                constants = functools.partial(find_animal_blob_location,
+                                              verbose=verbose,
+                                              video_name=video_name,
+                                              inclusion_zone=inclusion_zone)
                 for cnt, result in enumerate(pool.imap(constants, img_dict, chunksize=1)):
                     batch_results.update(result)
             results.update(batch_results)
             pool.join()
             pool.terminate()
-        results = list(results.values())
-        results = np.stack(results, axis=0)
-        timer.stop_timer()
-        if save_path:
-            df = pd.DataFrame(results, columns=['X', 'Y'])
-            write_df(df=df, file_type=Formats.CSV.value, save_path=save_path)
-            if verbose:
-                stdout_success(f'Video {video_meta["video_name"]} blob detection complete, saved at {save_path}', elapsed_time=timer.elapsed_time_str)
-        else:
-            stdout_success(f'Video {video_meta["video_name"]} blob detection complete', elapsed_time=timer.elapsed_time_str)
-            return results.astype(np.int32)
+        results = dict(sorted(results.items()))
+        print(results)
+        # results = list(results.values())
+        # results = np.stack(results, axis=0)
+        # timer.stop_timer()
+        # if save_path:
+        #     df = pd.DataFrame(results, columns=['X', 'Y'])
+        #     write_df(df=df, file_type=Formats.CSV.value, save_path=save_path)
+        #     if verbose:
+        #         stdout_success(f'Video {video_meta["video_name"]} blob detection complete, saved at {save_path}', elapsed_time=timer.elapsed_time_str)
+        # else:
+        #     stdout_success(f'Video {video_meta["video_name"]} blob detection complete', elapsed_time=timer.elapsed_time_str)
+        #     return results.astype(np.int32)
 
     @staticmethod
     def is_video_color(video: Union[str, os.PathLike, cv2.VideoCapture]):
@@ -1857,6 +1873,11 @@ class ImageMixin(object):
             results[k] = cv2.resize(v, dsize=(target_w, target_h), fx=0, fy=0, interpolation=interpolation)
 
         return results
+
+
+
+
+
 
 
 #x = ImageMixin.get_blob_locations(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled_bg_subtracted.mp4", gpu=True)
@@ -1959,3 +1980,7 @@ class ImageMixin(object):
 #
 # ImageMixin.img_matrix_mse(imgs=imgs_stack)
 
+
+#if
+
+#ImageMixin.get_blob_locations(video_path=r"C:\troubleshooting\mitra\test\temp\501_MA142_Gi_Saline_0515.mp4")

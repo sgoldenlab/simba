@@ -14,7 +14,7 @@ from shapely.geometry import Polygon
 
 from simba.utils.checks import (check_file_exist_and_readable, check_int,
                                 check_str, check_valid_dataframe,
-                                check_valid_tuple)
+                                check_valid_tuple, check_if_dir_exists)
 from simba.utils.enums import (ROI_SETTINGS, ConfigKey, Formats, Keys, Options,
                                Paths)
 from simba.utils.errors import (InvalidInputError, NoROIDataError,
@@ -405,8 +405,10 @@ def get_triangle_vertices(center: Tuple[int, int], side_length: int, direction: 
 
 
 
-def multiply_ROIs(config_path: Union[str, os.PathLike],
-                  filename: Union[str, os.PathLike]) -> None:
+def multiply_ROIs(filename: Union[str, os.PathLike],
+                  config_path: Optional[Union[str, os.PathLike]] = None,
+                  roi_coordinates_path: Optional[Union[str, os.PathLike]] = None,
+                  videos_dir: Optional[Union[str, os.PathLike]] = None) -> None:
 
     """
     Reproduce ROIs in one video to all other videos in SimBA project.
@@ -419,13 +421,16 @@ def multiply_ROIs(config_path: Union[str, os.PathLike],
     >>> multiply_ROIs(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", filename=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_CNO_0514.mp4")
     """
 
-    check_file_exist_and_readable(file_path=config_path)
+    if config_path is not None:
+        check_file_exist_and_readable(file_path=config_path)
+        config = read_config_file(config_path=config_path)
+        project_path = config.get(ConfigKey.GENERAL_SETTINGS.value, ConfigKey.PROJECT_PATH.value)
+        videos_dir = os.path.join(project_path, "videos")
+        roi_coordinates_path = os.path.join(project_path, "logs", Paths.ROI_DEFINITIONS.value)
+
     check_file_exist_and_readable(file_path=filename)
     _, video_name, video_ext = get_fn_ext(filename)
-    config = read_config_file(config_path=config_path)
-    project_path = config.get(ConfigKey.GENERAL_SETTINGS.value, ConfigKey.PROJECT_PATH.value)
-    videos_dir = os.path.join(project_path, "videos")
-    roi_coordinates_path = os.path.join(project_path, "logs", Paths.ROI_DEFINITIONS.value)
+
     if not os.path.isdir(videos_dir):
         raise NotDirectoryError(msg=f'Could not find the videos directory in the SimBA project. SimBA expected a directory at location: {videos_dir}')
     if not os.path.isfile(roi_coordinates_path):
@@ -483,7 +488,7 @@ def multiply_ROIs(config_path: Union[str, os.PathLike],
     store[Keys.ROI_POLYGONS.value] = polygon_results
     store.close()
     stdout_success(msg=f"ROIs for {video_name} applied to a further {len(other_video_file_paths)} videos (Duplicated rectangles count: {len(r_df)}, circles: {len(c_df)}, polygons: {len(p_df)}).")
-    print('Next, click on "DRAW" to modify ROI location(s) or click on "RESET" to remove ROI drawing(s)')
+    #print('Next, click on "DRAW" to modify ROI location(s) or click on "RESET" to remove ROI drawing(s)')
 
 def reset_video_ROIs(config_path: Union[str, os.PathLike],
                      filename: Union[str, os.PathLike]) -> None:
