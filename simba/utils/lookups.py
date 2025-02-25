@@ -1,12 +1,12 @@
 __author__ = "Simon Nilsson"
 
 import glob
+import json
 import os
 import platform
 import re
 import struct
 import sys
-import json
 import urllib
 from multiprocessing import Lock, Value
 from pathlib import Path
@@ -18,7 +18,8 @@ import pyglet
 from matplotlib import cm
 
 import simba
-from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists)
 from simba.utils.enums import OS, UML, FontPaths, Methods, Paths
 from simba.utils.read_write import get_fn_ext
 from simba.utils.warnings import NoDataFoundWarning
