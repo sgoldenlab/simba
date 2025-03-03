@@ -16,8 +16,8 @@ import pandas as pd
 from numba import jit, njit, prange, typed
 from pylab import *
 from scipy import stats
-from scipy.signal import savgol_filter
 from scipy.interpolate import interp1d
+from scipy.signal import savgol_filter
 
 try:
     from typing import Literal
@@ -35,7 +35,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_valid_rgb_tuple, check_instance,
                                 check_int, check_str, check_that_column_exist,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_array, check_valid_dataframe, check_valid_lst)
+                                check_valid_array, check_valid_dataframe,
+                                check_valid_lst)
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
                                 InvalidFileTypeError, InvalidInputError,

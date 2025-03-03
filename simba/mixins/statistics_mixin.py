@@ -4,7 +4,8 @@ from itertools import combinations, permutations
 from typing import List, Optional, Tuple, Union
 
 import pandas as pd
-from sklearn.metrics import (adjusted_mutual_info_score, adjusted_rand_score, fowlkes_mallows_score)
+from sklearn.metrics import (adjusted_mutual_info_score, adjusted_rand_score,
+                             fowlkes_mallows_score)
 from sklearn.neighbors import LocalOutlierFactor
 
 try:
@@ -13,7 +14,8 @@ except:
     from typing_extensions import Literal
 
 import numpy as np
-from numba import (bool_, float32, float64, int8, jit, njit, prange, typed, types)
+from numba import (bool_, float32, float64, int8, jit, njit, prange, typed,
+                   types)
 from scipy import stats
 from scipy.spatial.distance import cdist
 from scipy.stats.distributions import chi2
@@ -23,12 +25,13 @@ from statsmodels.stats.libqsturng import psturng
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.utils.checks import (check_float, check_int, check_str, check_valid_array, check_valid_dataframe, check_valid_lst)
+from simba.utils.checks import (check_float, check_int, check_str,
+                                check_valid_array, check_valid_dataframe,
+                                check_valid_lst)
 from simba.utils.data import bucket_data, fast_mean_rank
-from simba.utils.enums import Formats, Options, ENV_VARS
+from simba.utils.enums import ENV_VARS, Formats, Options
 from simba.utils.errors import CountError, InvalidInputError
 from simba.utils.read_write import get_unique_values_in_iterable, read_sys_env
-
 
 NUMBA_PRECOMPILE = read_sys_env()[ENV_VARS.NUMBA_PRECOMPILE.value]
 

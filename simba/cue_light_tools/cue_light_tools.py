@@ -1,7 +1,9 @@
 __author__ = "Simon Nilsson"
 
 from typing import List
+
 import pandas as pd
+
 from simba.utils.data import detect_bouts
 
 
