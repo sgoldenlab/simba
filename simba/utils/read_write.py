@@ -2832,4 +2832,6 @@ def read_sys_env():
     env = {}
     env[ENV_VARS.PRINT_EMOJIS.value] = str_2_bool(os.getenv(ENV_VARS.PRINT_EMOJIS.value, "True"))
     env[ENV_VARS.UNSUPERVISED_INTERFACE.value] = str_2_bool(os.getenv(ENV_VARS.UNSUPERVISED_INTERFACE.value, "False"))
+    env[ENV_VARS.UNSUPERVISED_INTERFACE.value] = str_2_bool(os.getenv(ENV_VARS.UNSUPERVISED_INTERFACE.value, "False"))
+    env[ENV_VARS.NUMBA_PRECOMPILE.value] = str_2_bool(os.getenv(ENV_VARS.NUMBA_PRECOMPILE.value, "False"))
     return env

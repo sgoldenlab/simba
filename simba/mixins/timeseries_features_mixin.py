@@ -24,8 +24,19 @@ import typing
 from typing import Optional, Tuple, get_type_hints
 from simba.mixins.statistics_mixin import Statistics
 from simba.utils.checks import (check_float, check_instance, check_int, check_str, check_that_column_exist, check_valid_array, check_valid_lst)
-from simba.utils.enums import Formats
-from simba.utils.read_write import find_core_cnt
+from simba.utils.enums import Formats, ENV_VARS
+from simba.utils.read_write import find_core_cnt, read_sys_env
+
+
+NUMBA_PRECOMPILE = read_sys_env()[ENV_VARS.NUMBA_PRECOMPILE.value]
+
+def dynamic_numba_decorator(dtypes, cache=True, fastmath=False):
+    def decorator(func):
+        if NUMBA_PRECOMPILE:
+            return njit(dtypes, cache=cache, fastmath=fastmath)(func)
+        else:
+            return jit(nopython=True, cache=cache, fastmath=fastmath)(func)
+    return decorator
 
 
 class TimeseriesFeatureMixin(object):
@@ -55,7 +66,8 @@ class TimeseriesFeatureMixin(object):
         pass
 
     @staticmethod
-    @njit("(float32[:],)")
+    #@njit("(float32[:],)")
+    @dynamic_numba_decorator(dtypes="(float32[:],)", cache=True, fastmath=False)
     def hjort_parameters(data: np.ndarray) -> Tuple[float, float, float]:
         """
         Jitted compute of Hjorth parameters for a given time series data. Hjorth parameters describe
@@ -95,7 +107,8 @@ class TimeseriesFeatureMixin(object):
         return activity, mobility, complexity
 
     @staticmethod
-    @njit("(float32[:], float64[:], int64)")
+    #@njit("(float32[:], float64[:], int64)")
+    @dynamic_numba_decorator(dtypes="(float32[:], float64[:], int64)", cache=True, fastmath=False)
     def sliding_hjort_parameters(data: np.ndarray, window_sizes: np.ndarray, sample_rate: int) -> np.ndarray:
         """
         Jitted compute of Hjorth parameters, including mobility, complexity, and activity, for
@@ -137,7 +150,8 @@ class TimeseriesFeatureMixin(object):
         return results.astype(np.float32)
 
     @staticmethod
-    @njit([(float32[:], boolean), (float32[:], types.misc.Omitted(True))])
+    #@njit([(float32[:], boolean), (float32[:], types.misc.Omitted(True))])
+    @dynamic_numba_decorator(dtypes=[(float32[:], boolean), (float32[:], types.misc.Omitted(True))], cache=True, fastmath=False)
     def local_maxima_minima(data: np.ndarray, maxima: Optional[bool] = True) -> np.ndarray:
         """
         Jitted compute of the local maxima or minima defined as values which are higher or lower than immediately preceding and proceeding time-series neighbors, repectively.
@@ -182,7 +196,8 @@ class TimeseriesFeatureMixin(object):
         return results[np.argwhere(results[:, 0].T != -1).flatten()].astype(np.float32)
 
     @staticmethod
-    @njit("(float32[:], float64)")
+    #@njit("(float32[:], float64)")
+    @dynamic_numba_decorator(dtypes="(float32[:], float64)", cache=True, fastmath=False)
     def crossings(data: np.ndarray, val: float) -> int:
         """
         Jitted compute of the count in time-series where sequential values crosses a defined value.
@@ -218,7 +233,9 @@ class TimeseriesFeatureMixin(object):
         return cnt
 
     @staticmethod
-    @njit("(float32[:], float64,  float64[:], int64,)")
+    #@njit("(float32[:], float64,  float64[:], int64,)")
+    @dynamic_numba_decorator(dtypes="(float32[:], float64,  float64[:], int64,)", cache=True, fastmath=False)
+
     def sliding_crossings(data: np.ndarray, val: float, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Compute the number of crossings over sliding windows in a data array.
@@ -271,7 +288,8 @@ class TimeseriesFeatureMixin(object):
         return results.astype(np.int32)
 
     @staticmethod
-    @njit("(float32[:], int64, int64, )", cache=True, fastmath=True)
+    #@njit("(float32[:], int64, int64, )", cache=True, fastmath=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], int64, int64, )", cache=True, fastmath=True)
     def percentile_difference(data: np.ndarray, upper_pct: int, lower_pct: int) -> float:
         """
         Jitted compute of the difference between the ``upper`` and ``lower`` percentiles of the data as
@@ -305,7 +323,9 @@ class TimeseriesFeatureMixin(object):
         return np.abs(upper_val - lower_val) / np.median(data)
 
     @staticmethod
-    @njit("(float32[:], int64, int64, float64[:], int64, )", cache=True, fastmath=True)
+    #@njit("(float32[:], int64, int64, float64[:], int64, )", cache=True, fastmath=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], int64, int64, float64[:], int64, )", cache=True, fastmath=True)
+
     def sliding_percentile_difference(
         data: np.ndarray,
         upper_pct: int,
@@ -350,7 +370,9 @@ class TimeseriesFeatureMixin(object):
         return results.astype(np.float32)
 
     @staticmethod
-    @njit("(float64[:], float64,)")
+    #@njit("(float64[:], float64,)")
+    @dynamic_numba_decorator(dtypes="(float64[:], float64,)", cache=True, fastmath=False)
+
     def percent_beyond_n_std(data: np.ndarray, n: float) -> float:
         """
         Jitted compute of the ratio of values in time-series more than N standard deviations from the mean of the time-series.
@@ -387,7 +409,9 @@ class TimeseriesFeatureMixin(object):
         return np.argwhere(data > target).shape[0] / data.shape[0]
 
     @staticmethod
-    @njit("(float64[:], float64, float64[:], int64,)", cache=True, fastmath=True)
+    #@njit("(float64[:], float64, float64[:], int64,)", cache=True, fastmath=True)
+    @dynamic_numba_decorator(dtypes="(float64[:], float64, float64[:], int64,)", cache=True, fastmath=True)
+
     def sliding_percent_beyond_n_std(data: np.ndarray, n: float, window_sizes: np.ndarray, sample_rate: int) -> np.ndarray:
         """
         Computed the percentage of data points that exceed 'n' standard deviations from the mean for each position in
@@ -420,12 +444,13 @@ class TimeseriesFeatureMixin(object):
         return results.astype(np.float32)
 
     @staticmethod
-    @njit(
-        [
-            (float32[:], float64[:], int64),
-            (int64[:], float64[:], int64),
-        ]
-    )
+    # @njit(
+    #     [
+    #         (float32[:], float64[:], int64),
+    #         (int64[:], float64[:], int64),
+    #     ]
+    # )
+    @dynamic_numba_decorator(dtypes=[(float32[:], float64[:], int64), (int64[:], float64[:], int64), ], cache=True, fastmath=False)
     def sliding_unique(x: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Compute the number of unique values in a sliding window over an array of feature values.
@@ -448,7 +473,8 @@ class TimeseriesFeatureMixin(object):
         return results
 
     @staticmethod
-    @njit("(float32[:], int64, int64, )", fastmath=True)
+    #@njit("(float32[:], int64, int64, )", fastmath=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], int64, int64, )", cache=True, fastmath=True)
     def percent_in_percentile_window(data: np.ndarray, upper_pct: int, lower_pct: int):
         """
         Jitted compute of the ratio of values in time-series that fall between the ``upper`` and ``lower`` percentile.
@@ -484,7 +510,8 @@ class TimeseriesFeatureMixin(object):
         )
 
     @staticmethod
-    @njit("(float32[:], int64, int64, float64[:], int64)", cache=True, fastmath=True)
+    #@njit("(float32[:], int64, int64, float64[:], int64)", cache=True, fastmath=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], int64, int64, float64[:], int64)", cache=True, fastmath=True)
     def sliding_percent_in_percentile_window(
         data: np.ndarray,
         upper_pct: int,
@@ -531,7 +558,8 @@ class TimeseriesFeatureMixin(object):
         return results.astype(np.float32)
 
     @staticmethod
-    @njit("(float32[:],)", fastmath=True, cache=True)
+    #@njit("(float32[:],)", fastmath=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:],)", cache=True, fastmath=True)
     def petrosian_fractal_dimension(data: np.ndarray) -> float:
         """
         Calculate the Petrosian Fractal Dimension (PFD) of a given time series data. The PFD is a measure of the
@@ -584,7 +612,9 @@ class TimeseriesFeatureMixin(object):
         )
 
     @staticmethod
-    @njit("(float32[:], float64[:], int64)", fastmath=True, cache=True)
+    #@njit("(float32[:], float64[:], int64)", fastmath=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float64[:], int64)", cache=True, fastmath=True)
+
     def sliding_petrosian_fractal_dimension(
         data: np.ndarray, window_sizes: np.ndarray, sample_rate: int
     ) -> np.ndarray:
@@ -641,7 +671,9 @@ class TimeseriesFeatureMixin(object):
         return results.astype(np.float32)
 
     @staticmethod
-    @njit("(float32[:], int64)")
+    #@njit("(float32[:], int64)")
+    @dynamic_numba_decorator(dtypes="(float32[:], int64)", cache=True, fastmath=False)
+
     def higuchi_fractal_dimension(data: np.ndarray, kmax: Optional[int] = 10):
         """
         Jitted compute of the Higuchi Fractal Dimension of a given time series data. The Higuchi Fractal Dimension provides a measure of the fractal
@@ -695,7 +727,8 @@ class TimeseriesFeatureMixin(object):
         return np.linalg.lstsq(x, L.astype(np.float32))[0][0]
 
     @staticmethod
-    @njit("(float32[:], int64, int64,)", fastmath=True)
+    #@njit("(float32[:], int64, int64,)", fastmath=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], int64, int64,)", cache=True, fastmath=True)
     def permutation_entropy(data: np.ndarray, dimension: int, delay: int) -> float:
         """
         Calculate the permutation entropy of a time series.
@@ -758,7 +791,9 @@ class TimeseriesFeatureMixin(object):
         return -np.sum(probs * np.log(probs))
 
     @staticmethod
-    @njit("(float32[:],)", fastmath=True)
+    #@njit("(float32[:],)", fastmath=True)
+    @dynamic_numba_decorator(dtypes="(float32[:],)", cache=True, fastmath=True)
+
     def line_length(data: np.ndarray) -> float:
         """
         Calculate the line length of a 1D array.
@@ -798,7 +833,8 @@ class TimeseriesFeatureMixin(object):
         return np.sum(diff)
 
     @staticmethod
-    @njit("(float32[:], float64[:], int64)", fastmath=True)
+    #@njit("(float32[:], float64[:], int64)", fastmath=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float64[:], int64)", cache=True, fastmath=True)
     def sliding_line_length(data: np.ndarray, window_sizes: np.ndarray, sample_rate: int) -> np.ndarray:
         """
         Jitted compute of  sliding line length for a given time series using different window sizes.
@@ -837,7 +873,9 @@ class TimeseriesFeatureMixin(object):
         return results.astype(np.float32)
 
     @staticmethod
-    @njit("(float32[:], float64[:], int64)", fastmath=True, cache=True)
+    #@njit("(float32[:], float64[:], int64)", fastmath=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float64[:], int64)", cache=True, fastmath=True)
+
     def sliding_variance(data: np.ndarray, window_sizes: np.ndarray, sample_rate: int) -> np.ndarray:
         """
         Jitted compute of the variance of data within sliding windows of varying sizes applied to
@@ -870,11 +908,12 @@ class TimeseriesFeatureMixin(object):
         return results.astype(np.float32)
 
     @staticmethod
-    @njit(
-        "(float32[:], float64[:], float64, types.ListType(types.unicode_type))",
-        fastmath=True,
-        cache=True,
-    )
+    # @njit(
+    #     "(float32[:], float64[:], float64, types.ListType(types.unicode_type))",
+    #     fastmath=True,
+    #     cache=True,
+    # )
+    @dynamic_numba_decorator(dtypes="(float32[:], float64[:], float64, types.ListType(types.unicode_type))", cache=True, fastmath=True)
     def sliding_descriptive_statistics(data: np.ndarray, window_sizes: np.ndarray, sample_rate: float, statistics: Literal["var", "max", "min", "std", "median", "mean", "mad", "sum", "mac", "rms", "absenergy"]) -> np.ndarray:
         """
         Jitted compute of descriptive statistics over sliding windows in 1D data array.
@@ -962,12 +1001,13 @@ class TimeseriesFeatureMixin(object):
         return frequencies[np.argsort(magnitude)[-(k + 1) : -1]]
 
     @staticmethod
-    @njit(
-        [
-            (float32[:], float64, boolean),
-            (float32[:], float64, types.misc.Omitted(True)),
-        ]
-    )
+    # @njit(
+    #     [
+    #         (float32[:], float64, boolean),
+    #         (float32[:], float64, types.misc.Omitted(True)),
+    #     ]
+    # )
+    @dynamic_numba_decorator(dtypes=[(float32[:], float64, boolean), (float32[:], float64, types.misc.Omitted(True)),], cache=True, fastmath=False)
     def longest_strike(data: np.ndarray, threshold: float, above: bool = True) -> int:
         """
         Jitted compute of the length of the longest consecutive sequence of values in the input data that either exceed
@@ -1017,12 +1057,13 @@ class TimeseriesFeatureMixin(object):
         return int(result)
 
     @staticmethod
-    @njit(
-        [
-            (float32[:], float64, float64[:], int64, boolean),
-            (float32[:], float64, float64[:], int64, types.misc.Omitted(True)),
-        ]
-    )
+    # @njit(
+    #     [
+    #         (float32[:], float64, float64[:], int64, boolean),
+    #         (float32[:], float64, float64[:], int64, types.misc.Omitted(True)),
+    #     ]
+    # )
+    @dynamic_numba_decorator(dtypes=[(float32[:], float64, float64[:], int64, boolean), (float32[:], float64, float64[:], int64, types.misc.Omitted(True)),], cache=True, fastmath=False)
     def sliding_longest_strike(
         data: np.ndarray,
         threshold: float,
@@ -1095,12 +1136,13 @@ class TimeseriesFeatureMixin(object):
         return results
 
     @staticmethod
-    @njit(
-        [
-            (float32[:], float64, int64, boolean),
-            (float32[:], float64, int64, types.misc.Omitted(True)),
-        ]
-    )
+    # @njit(
+    #     [
+    #         (float32[:], float64, int64, boolean),
+    #         (float32[:], float64, int64, types.misc.Omitted(True)),
+    #     ]
+    # )
+    @dynamic_numba_decorator(dtypes=[(float32[:], float64, int64, boolean), (float32[:], float64, int64, types.misc.Omitted(True)),], cache=True, fastmath=False)
     def time_since_previous_threshold(
         data: np.ndarray, threshold: float, fps: int, above: bool
     ) -> np.ndarray:
@@ -1148,12 +1190,13 @@ class TimeseriesFeatureMixin(object):
         return results
 
     @staticmethod
-    @njit(
-        [
-            (float32[:], float64, int64, boolean),
-            (float32[:], float64, int64, types.misc.Omitted(True)),
-        ]
-    )
+    # @njit(
+    #     [
+    #         (float32[:], float64, int64, boolean),
+    #         (float32[:], float64, int64, types.misc.Omitted(True)),
+    #     ]
+    # )
+    @dynamic_numba_decorator(dtypes=[(float32[:], float64, int64, boolean), (float32[:], float64, int64, types.misc.Omitted(True))], cache=True, fastmath=False)
     def time_since_previous_target_value(
         data: np.ndarray, value: float, fps: int, inverse: Optional[bool] = False
     ) -> np.ndarray:
@@ -1204,7 +1247,8 @@ class TimeseriesFeatureMixin(object):
         return results
 
     @staticmethod
-    @njit("(float32[:],)")
+    #@njit("(float32[:],)")
+    @dynamic_numba_decorator(dtypes="(float32[:],)", cache=True, fastmath=False)
     def benford_correlation(data: np.ndarray) -> float:
         """
         Jitted compute of the correlation between the Benford's Law distribution and the first-digit distribution of given data.
@@ -1247,7 +1291,8 @@ class TimeseriesFeatureMixin(object):
         return np.corrcoef(benford_distribution, digit_ratio)[0, 1]
 
     @staticmethod
-    @njit("(float32[:], float64[:], int64)")
+    #@njit("(float32[:], float64[:], int64)")
+    @dynamic_numba_decorator(dtypes="(float32[:], float64[:], int64)", cache=True, fastmath=False)
     def sliding_benford_correlation(
         data: np.ndarray, time_windows: np.ndarray, sample_rate: int
     ) -> np.ndarray:
@@ -1311,7 +1356,8 @@ class TimeseriesFeatureMixin(object):
         return results.astype(np.float32)
 
     @staticmethod
-    @njit("(float32[:], float64, float64, float64, float64, float64)", fastmath=True)
+    #@njit("(float32[:], float64, float64, float64, float64, float64)", fastmath=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float64, float64, float64, float64, float64)", cache=True, fastmath=True)
     def spike_finder(
         data: np.ndarray,
         sample_rate: int,
@@ -1584,14 +1630,20 @@ class TimeseriesFeatureMixin(object):
         return stat, p_vals
 
     @staticmethod
-    @njit(
-        [
+    # @njit(
+    #     [
+    #         "(float32[:], float64, int64, float64, types.unicode_type)",
+    #         '(float32[:], float64, int64, float64, types.misc.Omitted("mm"))',
+    #         "(float32[:], float64, int64, types.misc.Omitted(1), types.unicode_type)",
+    #         '(float32[:], float64, int64, types.misc.Omitted(1), types.misc.Omitted("mm"))',
+    #     ]
+    # )
+    @dynamic_numba_decorator(dtypes=[
             "(float32[:], float64, int64, float64, types.unicode_type)",
             '(float32[:], float64, int64, float64, types.misc.Omitted("mm"))',
             "(float32[:], float64, int64, types.misc.Omitted(1), types.unicode_type)",
             '(float32[:], float64, int64, types.misc.Omitted(1), types.misc.Omitted("mm"))',
-        ]
-    )
+        ], cache=True, fastmath=False)
     def acceleration(data: np.ndarray,
                      pixels_per_mm: float,
                      fps: int,
@@ -1712,7 +1764,8 @@ class TimeseriesFeatureMixin(object):
         return df
 
     @staticmethod
-    @njit("(int32[:,:], float64[:], float64, float64)")
+    #@njit("(int32[:,:], float64[:], float64, float64)")
+    @dynamic_numba_decorator(dtypes="(int32[:,:], float64[:], float64, float64)", cache=True, fastmath=False)
     def sliding_displacement(x: np.ndarray, time_windows: np.ndarray, fps: float, px_per_mm: float) -> np.ndarray:
         """
         Calculate sliding Euclidean displacement of a body-part point over time windows.
@@ -1744,7 +1797,8 @@ class TimeseriesFeatureMixin(object):
         return results.astype(np.float32)
 
     @staticmethod
-    @njit("(float64[:], float64[:], float64[:], float64, boolean, float64)")
+    #@njit("(float64[:], float64[:], float64[:], float64, boolean, float64)")
+    @dynamic_numba_decorator(dtypes="(float64[:], float64[:], float64[:], float64, boolean, float64)", cache=True, fastmath=False)
     def sliding_two_signal_crosscorrelation(
         x: np.ndarray,
         y: np.ndarray,

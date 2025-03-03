@@ -23,14 +23,22 @@ from statsmodels.stats.libqsturng import psturng
 from statsmodels.stats.multicomp import pairwise_tukeyhsd
 
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.utils.checks import (check_float, check_int, check_str,
-                                check_valid_array, check_valid_dataframe,
-                                check_valid_lst)
+from simba.utils.checks import (check_float, check_int, check_str, check_valid_array, check_valid_dataframe, check_valid_lst)
 from simba.utils.data import bucket_data, fast_mean_rank
-from simba.utils.enums import Formats, Options
+from simba.utils.enums import Formats, Options, ENV_VARS
 from simba.utils.errors import CountError, InvalidInputError
-from simba.utils.read_write import get_unique_values_in_iterable
+from simba.utils.read_write import get_unique_values_in_iterable, read_sys_env
 
+
+NUMBA_PRECOMPILE = read_sys_env()[ENV_VARS.NUMBA_PRECOMPILE.value]
+
+def dynamic_numba_decorator(dtypes, cache=True, fastmath=False):
+    def decorator(func):
+        if NUMBA_PRECOMPILE:
+            return njit(dtypes, cache=cache, fastmath=fastmath)(func)
+        else:
+            return jit(nopython=True, cache=cache, fastmath=fastmath)(func)
+    return decorator
 
 class Statistics(FeatureExtractionMixin):
     """
@@ -85,7 +93,7 @@ class Statistics(FeatureExtractionMixin):
         return hist.astype(np.float64)
 
     @staticmethod
-    @njit("(float32[:], float64, float64)", cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float64, float64)", cache=True, fastmath=False)
     def rolling_independent_sample_t(data: np.ndarray, time_window: float, fps: float) -> np.ndarray:
 
         r"""
@@ -135,12 +143,7 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    @njit(
-        [
-            (float32[:], float32[:], float64[:, :]),
-            (float32[:], float32[:], types.misc.Omitted(None)),
-        ]
-    )
+    @dynamic_numba_decorator(dtypes=[(float32[:], float32[:], float64[:, :]), (float32[:], float32[:], types.misc.Omitted(None))], cache=True, fastmath=False)
     def independent_samples_t(
         sample_1: np.ndarray,
         sample_2: np.ndarray,
@@ -208,7 +211,7 @@ class Statistics(FeatureExtractionMixin):
         return t_statistic, significance_bool
 
     @staticmethod
-    @njit("(float64[:], float64[:])", cache=True)
+    @dynamic_numba_decorator(dtypes="(float64[:], float64[:])", cache=True, fastmath=False)
     def cohens_d(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
 
         r"""
@@ -245,7 +248,7 @@ class Statistics(FeatureExtractionMixin):
         )
 
     @staticmethod
-    @njit("(float64[:], float64[:], float64)", cache=True)
+    @dynamic_numba_decorator(dtypes="(float64[:], float64[:], float64)", cache=True, fastmath=False)
     def rolling_cohens_d(data: np.ndarray, time_windows: np.ndarray, fps: float) -> np.ndarray:
         """
         Jitted compute of rolling Cohen's D statistic comparing the current time-window of
@@ -284,7 +287,9 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    @njit("(float32[:], float64, float64)")
+    #@njit("(float32[:], float64, float64)")
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float64, float64)", cache=True, fastmath=False)
     def rolling_two_sample_ks(data: np.ndarray, time_window: float, fps: float) -> np.ndarray:
         """
         Jitted compute Kolmogorov two-sample statistics for sequentially binned values in a time-series.
@@ -323,12 +328,14 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    @njit(
-        [
-            (float32[:], float32[:], float64[:, :]),
-            (float32[:], float32[:], types.misc.Omitted(None)),
-        ]
-    )
+    # @njit(
+    #     [
+    #         (float32[:], float32[:], float64[:, :]),
+    #         (float32[:], float32[:], types.misc.Omitted(None)),
+    #     ]
+    # )
+    # @jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes=[(float32[:], float32[:], float64[:, :]), (float32[:], float32[:], types.misc.Omitted(None))], cache=True, fastmath=False)
     def two_sample_ks(
         sample_1: np.ndarray,
         sample_2: np.ndarray,
@@ -436,7 +443,9 @@ class Statistics(FeatureExtractionMixin):
         return (f, significance_bool)
 
     @staticmethod
-    @njit("(float32[:], float64[:], float64)", cache=True)
+    #@njit("(float32[:], float64[:], float64)", cache=True)
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float64[:], float64)", cache=True, fastmath=False)
     def rolling_one_way_anova(data: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Jitted compute of rolling one-way ANOVA F-statistic comparing the current time-window of
@@ -1093,7 +1102,9 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    @njit("(float64[:], float64[:])", cache=True)
+    #@njit("(float64[:], float64[:])", cache=True)
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float64[:], float64[:])", cache=True, fastmath=False)
     def kruskal_wallis(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
         """
         Compute the Kruskal-Wallis H statistic between two distributions.
@@ -1162,7 +1173,9 @@ class Statistics(FeatureExtractionMixin):
         return np.sum(cnts) / x.shape[0]
 
     @staticmethod
-    @njit("(float64[:], float64[:])", cache=True)
+    #@njit("(float64[:], float64[:])", cache=True)
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float64[:], float64[:])", cache=True, fastmath=False)
     def mann_whitney(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
         """
         Jitted compute of Mann-Whitney U between two distributions.
@@ -1263,7 +1276,9 @@ class Statistics(FeatureExtractionMixin):
         return (l_statistic, significance_bool)
 
     @staticmethod
-    @njit("(float64[:], float64[:], float64)", cache=True)
+    #@njit("(float64[:], float64[:], float64)", cache=True)
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float64[:], float64[:], float64)", cache=True, fastmath=False)
     def rolling_levenes(data: np.ndarray, time_windows: np.ndarray, fps: float) -> np.ndarray:
         """
         Jitted compute of rolling Levene's W comparing the current time-window of size N to the preceding window of size N.
@@ -1359,7 +1374,10 @@ class Statistics(FeatureExtractionMixin):
         return -wbfn
 
     @staticmethod
-    @njit("(float32[:], float64[:], float64)", cache=True)
+    #@njit("(float32[:], float64[:], float64)", cache=True)
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float64[:], float64)", cache=True, fastmath=False)
+
     def rolling_barletts_test(data: np.ndarray, time_windows: np.ndarray, fps: float) -> np.ndarray:
 
         results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
@@ -1393,7 +1411,10 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    @njit("(float32[:], float32[:])")
+    #@njit("(float32[:], float32[:])")
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float32[:])", cache=True, fastmath=False)
+
     def pearsons_r(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
 
         r"""
@@ -1438,7 +1459,10 @@ class Statistics(FeatureExtractionMixin):
         return r
 
     @staticmethod
-    @njit("(float32[:], float32[:])")
+    #@njit("(float32[:], float32[:])")
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float32[:])", cache=True, fastmath=False)
+
     def spearman_rank_correlation(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
         """
         Jitted compute of Spearman's rank correlation coefficient between two samples.
@@ -1469,7 +1493,10 @@ class Statistics(FeatureExtractionMixin):
         return 1 - (6 * d_squared) / (len(sample_1) * (len(sample_2) ** 2 - 1))
 
     @staticmethod
-    @njit("(float32[:], float32[:], float64[:], int64)")
+    #@njit("(float32[:], float32[:], float64[:], int64)")
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float32[:], float64[:], int64)", cache=True, fastmath=False)
+
     def sliding_pearsons_r(sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Given two 1D arrays of size N, create sliding window of size time_windows[i] * fps and return Pearson's R
@@ -1517,14 +1544,21 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    @njit(
-        [
+    # @njit(
+    #     [
+    #         "(float32[:], float32[:], float64[:,:], types.unicode_type)",
+    #         '(float32[:], float32[:], float64[:,:], types.misc.Omitted("goodness_of_fit"))',
+    #         "(float32[:], float32[:], types.misc.Omitted(None), types.unicode_type)",
+    #         '(float32[:], float32[:], types.misc.Omitted(None), types.misc.Omitted("goodness_of_fit"))',
+    #     ]
+    # )
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes=[
             "(float32[:], float32[:], float64[:,:], types.unicode_type)",
             '(float32[:], float32[:], float64[:,:], types.misc.Omitted("goodness_of_fit"))',
             "(float32[:], float32[:], types.misc.Omitted(None), types.unicode_type)",
             '(float32[:], float32[:], types.misc.Omitted(None), types.misc.Omitted("goodness_of_fit"))',
-        ]
-    )
+        ], cache=True, fastmath=False)
     def chi_square(
         sample_1: np.ndarray,
         sample_2: np.ndarray,
@@ -1588,7 +1622,9 @@ class Statistics(FeatureExtractionMixin):
         return chi_square, significance_bool
 
     @staticmethod
-    @njit("(float32[:], float32, float32, float32[:,:], float32)")
+    #njit@("(float32[:], float32, float32, float32[:,:], float32)")
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float32, float32, float32[:,:], float32)", cache=True, fastmath=False)
     def sliding_independent_samples_t(
         data: np.ndarray,
         time_window: float,
@@ -1655,7 +1691,10 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    @njit("(float32[:], float64[:], float32)")
+    #@njit("(float32[:], float64[:], float32)")
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float64[:], float32)", cache=True, fastmath=False)
+
     def rolling_mann_whitney(data: np.ndarray, time_windows: np.ndarray, fps: float) -> np.ndarray:
         """
         Jitted compute of rolling Mann-Whitney U comparing the current time-window of
@@ -1704,7 +1743,10 @@ class Statistics(FeatureExtractionMixin):
         pass
 
     @staticmethod
-    @njit("(int64[:, :]), bool_")
+    #@njit("(int64[:, :]), bool_")
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(int64[:, :]), bool_", cache=True, fastmath=False)
+
     def concordance_ratio(x: np.ndarray, invert: bool) -> float:
         """
         Calculate the concordance ratio of a 2D numpy array. The concordance ratio is a measure of agreement in a dataset. It is calculated as the ratio of the number of
@@ -1747,7 +1789,10 @@ class Statistics(FeatureExtractionMixin):
         return conc_count / x.shape[0]
 
     @staticmethod
-    @njit("(float32[:], float32[:], float64[:], int64)")
+    #@njit("(float32[:], float32[:], float64[:], int64)")
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float32[:], float64[:], int64)", cache=True, fastmath=False)
+
     def sliding_spearman_rank_correlation(sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
         """
         Given two 1D arrays of size N, create sliding window of size time_windows[i] * fps and return Spearman's rank correlation
@@ -1788,7 +1833,10 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    @njit("(float32[:], float64, float64, float64)")
+    #@njit("(float32[:], float64, float64, float64)")
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float64, float64, float64)", cache=True, fastmath=False)
+
     def sliding_autocorrelation(data: np.ndarray, max_lag: float, time_window: float, fps: float) -> np.ndarray:
         """
         Jitted computation of sliding autocorrelations, which measures the correlation of a feature with itself using lagged windows.
@@ -1858,7 +1906,11 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    @njit("(float32[:], float32[:])")
+    #@njit("(float32[:], float32[:])")
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float32[:])", cache=True, fastmath=False)
+
+
     def kendall_tau(sample_1: np.ndarray, sample_2: np.ndarray) -> Tuple[float, float]:
         """
         Jitted compute of Kendall Tau (rank correlation coefficient). Non-parametric method for computing correlation
@@ -1908,7 +1960,10 @@ class Statistics(FeatureExtractionMixin):
         return t, z
 
     @staticmethod
-    @njit("(float32[:], float32[:], float64[:], int64)")
+    #@njit("(float32[:], float32[:], float64[:], int64)")
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float32[:], float64[:], int64)", cache=True, fastmath=False)
+
     def sliding_kendall_tau(sample_1: np.ndarray, sample_2: np.ndarray, time_windows: np.ndarray, fps: float) -> np.ndarray:
         """
         Compute sliding Kendall's Tau correlation coefficient.
@@ -2450,7 +2505,10 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    @njit("(float32[:], float64[:], int64,)")
+    #@njit("(float32[:], float64[:], int64,)")
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float64[:], int64,)", cache=True, fastmath=False)
+
     def sliding_z_scores(data: np.ndarray, time_windows: np.ndarray, fps: int) -> np.ndarray:
 
         """
@@ -2483,7 +2541,10 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    @njit("(int64[:, :],)")
+    #@njit("(int64[:, :],)")
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(int64[:, :],)", cache=True, fastmath=False)
+
     def phi_coefficient(data: np.ndarray) -> float:
         """
         Compute the phi coefficient for a Nx2 array of binary data.
@@ -2622,7 +2683,10 @@ class Statistics(FeatureExtractionMixin):
 
 
     @staticmethod
-    @njit("(int32[:, :], float64[:], int64)")
+    #@njit("(int32[:, :], float64[:], int64)")
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(int32[:, :], float64[:], int64)", cache=True, fastmath=False)
+
     def sliding_phi_coefficient(data: np.ndarray, window_sizes: np.ndarray, sample_rate: int) -> np.ndarray:
         """
         Calculate sliding phi coefficients for a 2x2 contingency table derived from binary data.
@@ -2746,7 +2810,10 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    @njit("int64[:], int64[:],")
+    #@njit("int64[:], int64[:],")
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="int64[:], int64[:],", cache=True, fastmath=False)
+
     def cohens_h(sample_1: np.ndarray, sample_2: np.ndarray) -> float:
         """
         Jitted compute Cohen's h effect size for two samples of binary [0, 1] values. Cohen's h is a measure of effect size
@@ -2782,7 +2849,8 @@ class Statistics(FeatureExtractionMixin):
         return phi_sample_1 - phi_sample_2
 
     @staticmethod
-    @jit("(float32[:], float64[:], int64,)")
+    #@jit("(float32[:], float64[:], int64,)")
+    @dynamic_numba_decorator(dtypes="(float32[:], float64[:], int64,)", cache=True, fastmath=False)
     def sliding_skew(data: np.ndarray, time_windows: np.ndarray, sample_rate: int) -> np.ndarray:
         """
         Compute the skewness of a 1D array within sliding time windows.
@@ -2807,7 +2875,9 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    @jit("(float32[:], float64[:], int64,)")
+    #@jit("(float32[:], float64[:], int64,)")
+    @dynamic_numba_decorator(dtypes="(float32[:], float64[:], int64,)", cache=True, fastmath=False)
+
     def sliding_kurtosis(data: np.ndarray, time_windows: np.ndarray, sample_rate: int) -> np.ndarray:
         """
         Compute the kurtosis of a 1D array within sliding time windows.
@@ -2895,8 +2965,21 @@ class Statistics(FeatureExtractionMixin):
         return centroids, labels, medians
 
     @staticmethod
-    @njit(
-        [
+    # @njit(
+    #     [
+    #         (int8[:], int8[:], types.misc.Omitted(value=False), float32[:]),
+    #         (
+    #             int8[:],
+    #             int8[:],
+    #             types.misc.Omitted(value=False),
+    #             types.misc.Omitted(None),
+    #         ),
+    #         (int8[:], int8[:], bool_, float32[:]),
+    #         (int8[:], int8[:], bool_, types.misc.Omitted(None)),
+    #     ]
+    # )
+    # @jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes=[
             (int8[:], int8[:], types.misc.Omitted(value=False), float32[:]),
             (
                 int8[:],
@@ -2906,8 +2989,7 @@ class Statistics(FeatureExtractionMixin):
             ),
             (int8[:], int8[:], bool_, float32[:]),
             (int8[:], int8[:], bool_, types.misc.Omitted(None)),
-        ]
-    )
+        ], cache=True, fastmath=False)
     def hamming_distance(x: np.ndarray,
                          y: np.ndarray,
                          sort: Optional[bool] = False,w: Optional[np.ndarray] = None) -> float:
@@ -2952,9 +3034,11 @@ class Statistics(FeatureExtractionMixin):
         return results / x.shape[0]
 
     @staticmethod
-    @njit(
-        [(int8[:], int8[:], float32[:]), (int8[:], int8[:], types.misc.Omitted(None))]
-    )
+    # @njit(
+    #     [(int8[:], int8[:], float32[:]), (int8[:], int8[:], types.misc.Omitted(None))]
+    # )
+    # @jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes=[(int8[:], int8[:], float32[:]), (int8[:], int8[:], types.misc.Omitted(None))], cache=True, fastmath=False)
     def yule_coef(
         x: np.ndarray, y: np.ndarray, w: Optional[np.ndarray] = None
     ) -> float64:
@@ -3004,9 +3088,12 @@ class Statistics(FeatureExtractionMixin):
             return (2.0 * t_f * f_t) / (t_t * f_f + t_f * f_t)
 
     @staticmethod
-    @njit(
-        [(int8[:], int8[:], types.misc.Omitted(None)), (int8[:], int8[:], float32[:])]
-    )
+    # @njit(
+    #     [(int8[:], int8[:], types.misc.Omitted(None)), (int8[:], int8[:], float32[:])]
+    # )
+    # @jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes=[(int8[:], int8[:], types.misc.Omitted(None)), (int8[:], int8[:], float32[:])], cache=True, fastmath=False)
+
     def sokal_sneath(
         x: np.ndarray, y: np.ndarray, w: Optional[np.ndarray] = None
     ) -> float64:
@@ -3050,7 +3137,9 @@ class Statistics(FeatureExtractionMixin):
             return (f_t + t_f) / (2 * (t_cnt + f_cnt) + f_t + t_f)
 
     @staticmethod
-    @njit([(float32[:, :], float32[:, :]), (float32[:, :], types.misc.Omitted(None))])
+    # # @njit([(float32[:, :], float32[:, :]), (float32[:, :], types.misc.Omitted(None))])
+    # @jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes=[(float32[:, :], float32[:, :]), (float32[:, :], types.misc.Omitted(None))], cache=True, fastmath=False)
     def bray_curtis_dissimilarity(x: np.ndarray, w: Optional[np.ndarray] = None) -> np.ndarray:
         """
         Jitted compute of the Bray-Curtis dissimilarity matrix between samples based on feature values.
@@ -3091,7 +3180,10 @@ class Statistics(FeatureExtractionMixin):
         return results.astype(float32)
 
     @staticmethod
-    @njit((float32[:], float32[:]))
+    #@njit((float32[:], float32[:]))
+    # @jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes=(float32[:], float32[:]), cache=True, fastmath=False)
+
     def _hellinger_helper(x: np.ndarray, y: np.ndarray):
         """Jitted helper for computing Hellinger distances from ``hellinger_distance``"""
         result, norm_x, norm_y = 0.0, 0.0, 0.0
@@ -3217,7 +3309,9 @@ class Statistics(FeatureExtractionMixin):
         return results
 
     @staticmethod
-    @jit('(float32[:,:],)')
+    #@jit('(float32[:,:],)')
+    @dynamic_numba_decorator(dtypes='(float32[:,:],)', cache=True, fastmath=False)
+
     def mahalanobis_distance_cdist(data: np.ndarray) -> np.ndarray:
         """
         Compute the Mahalanobis distance between every pair of observations in a 2D array using numba.
@@ -3253,7 +3347,10 @@ class Statistics(FeatureExtractionMixin):
         return distances
 
     @staticmethod
-    @njit("(int64[:], int64[:])")
+    # @njit("(int64[:], int64[:])")
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(int64[:], int64[:])", cache=True, fastmath=False)
+
     def cohens_kappa(sample_1: np.ndarray, sample_2: np.ndarray):
         """
         Jitted compute Cohen's Kappa coefficient for two binary samples.
@@ -3644,9 +3741,11 @@ class Statistics(FeatureExtractionMixin):
         return z, r
 
     @staticmethod
-    @njit(
-        "(float32[:,:], )",
-    )
+    # @njit(
+    #     "(float32[:,:], )",
+    # )
+    # @jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:,:], )", cache=True, fastmath=False)
     def cov_matrix(data: np.ndarray):
         """
         Jitted helper to compute the covariance matrix of the input data. Helper for computing cronbach alpha,
@@ -3671,7 +3770,9 @@ class Statistics(FeatureExtractionMixin):
         return cov
 
     @staticmethod
-    @njit("(float32[:], int64,)")
+    # @njit("(float32[:], int64,)")
+    # @jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], int64,)", cache=True, fastmath=False)
     def mad_median_rule(data: np.ndarray, k: int) -> np.ndarray:
         """
         Detects outliers in the given data using the Median Absolute Deviation (MAD) rule.
@@ -3699,7 +3800,9 @@ class Statistics(FeatureExtractionMixin):
         return outliers * 1
 
     @staticmethod
-    @njit("(float32[:], int64, float64[:], float64)")
+    # @njit("(float32[:], int64, float64[:], float64)")
+    # @jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], int64, float64[:], float64)", cache=True, fastmath=False)
     def sliding_mad_median_rule(data: np.ndarray, k: int, time_windows: np.ndarray, fps: float) -> np.ndarray:
 
         """
@@ -3876,7 +3979,10 @@ class Statistics(FeatureExtractionMixin):
         return np.mean(np.max(combined_intra_dists / centroid_distances, axis=1))
 
     @staticmethod
-    @njit("(float32[:,:], int64[:])", cache=True)
+    # @njit("(float32[:,:], int64[:])", cache=True)
+    # @jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:,:], int64[:])", cache=True, fastmath=False)
+
     def calinski_harabasz(x: np.ndarray, y: np.ndarray) -> float:
         """
         Compute the Calinski-Harabasz score to evaluate clustering quality.
@@ -4794,7 +4900,10 @@ class Statistics(FeatureExtractionMixin):
         return c
 
     @staticmethod
-    @njit(["(float32[:, :], float64[:], int64)", ])
+    #@njit(["(float32[:, :], float64[:], int64)", ])
+    #@jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes=["(float32[:, :], float64[:], int64)", ], cache=True, fastmath=False)
+
     def sliding_czebyshev_distance(x: np.ndarray, window_sizes: np.ndarray, sample_rate: float) -> np.ndarray:
         """
         Calculate the sliding Chebyshev distance for a given signal with different window sizes.
@@ -4832,8 +4941,10 @@ class Statistics(FeatureExtractionMixin):
         return result
 
     @staticmethod
-    @njit(["(int64[:], int64[:], float64[:])", "(int64[:], int64[:], types.misc.Omitted(None))",
-           "(int64[:, :], int64[:, :], float64[:])", "(int64[:, :], int64[:, :], types.misc.Omitted(None))"])
+    # @njit(["(int64[:], int64[:], float64[:])", "(int64[:], int64[:], types.misc.Omitted(None))",
+    #        "(int64[:, :], int64[:, :], float64[:])", "(int64[:, :], int64[:, :], types.misc.Omitted(None))"])
+    # @jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes=["(int64[:], int64[:], float64[:])", "(int64[:], int64[:], types.misc.Omitted(None))", "(int64[:, :], int64[:, :], float64[:])", "(int64[:, :], int64[:, :], types.misc.Omitted(None))"], cache=True, fastmath=False)
     def sokal_michener(x: np.ndarray, y: np.ndarray, w: Optional[np.ndarray] = None) -> float:
 
         r"""
@@ -5053,7 +5164,10 @@ class Statistics(FeatureExtractionMixin):
             return np.float32(np.nanmedian(si_values))
 
     @staticmethod
-    @njit("(float32[:], float64, float64)")
+    # @njit("(float32[:], float64, float64)")
+    # @jit(nopython=True, cache=True)
+    @dynamic_numba_decorator(dtypes="(float32[:], float64, float64)", cache=True, fastmath=False)
+
     def sliding_iqr(x: np.ndarray, window_size: float, sample_rate: float) -> np.ndarray:
         """
         Compute the sliding interquartile range (IQR) for a 1D array of feature values.
