@@ -47,33 +47,36 @@ def geometry_visualizer(data: np.ndarray,
     cap = cv2.VideoCapture(video_path)
     for frm_cnt, frm_id in enumerate(range(start_frm, end_frm + 1)):
         cap.set(1, int(frm_id))
-        _, img = cap.read()
-        if bg_opacity != 1.0:
-            opacity = 1 - bg_opacity
-            h, w, clr = img.shape[:3]
-            opacity_image = np.ones((h, w, clr), dtype=np.uint8) * int(255 * opacity)
-            img = cv2.addWeighted(img.astype(np.uint8), 1 - opacity, opacity_image.astype(np.uint8), opacity, 0)
-        for shape_cnt, shape in enumerate(data[frm_cnt][0:-2]):
-            if isinstance(shape, Polygon):
-                cv2.polylines(img, [np.array(shape.exterior.coords).astype(np.int32)], True, (colors[shape_cnt][::-1]), thickness=thickness)
-                interior_coords = [np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2)) for interior in shape.interiors]
-                for interior in interior_coords:
-                    cv2.polylines(img, [interior], isClosed=True, color=(colors[shape_cnt][::-1]), thickness=thickness)
-            elif isinstance(shape, LineString):
-                cv2.polylines(img, [np.array(shape.coords, dtype=np.int32)], False, (colors[shape_cnt][::-1]), thickness=thickness)
-            elif isinstance(shape, MultiPolygon):
-                for polygon_cnt, polygon in enumerate(shape.geoms):
-                    cv2.polylines(img, [np.array((polygon.convex_hull.exterior.coords), dtype=np.int32)], True, (colors[shape_cnt + polygon_cnt + 1][::-1]), thickness=thickness)
-            elif isinstance(shape, MultiLineString):
-                for line_cnt, line in enumerate(shape.geoms):
-                    cv2.polylines(img, [np.array(shape[line_cnt].coords, dtype=np.int32)], False, (colors[shape_cnt][::-1]), thickness=thickness)
-            elif isinstance(shape, Point):
-                arr = np.array((shape.coords)).astype(np.int32)
-                x, y = arr[0][0], arr[0][1]
-                cv2.circle(img,(x, y),circle_size, colors[shape_cnt][::-1], thickness)
-        video_writer.write(img.astype(np.uint8))
-        if verbose:
-            print(f"Creating frame {frm_id} (CPU core: {group})")
+        ret, img = cap.read()
+        if ret:
+            if bg_opacity != 1.0:
+                opacity = 1 - bg_opacity
+                h, w, clr = img.shape[:3]
+                opacity_image = np.ones((h, w, clr), dtype=np.uint8) * int(255 * opacity)
+                img = cv2.addWeighted(img.astype(np.uint8), 1 - opacity, opacity_image.astype(np.uint8), opacity, 0)
+            for shape_cnt, shape in enumerate(data[frm_cnt][0:-2]):
+                if isinstance(shape, Polygon):
+                    cv2.polylines(img, [np.array(shape.exterior.coords).astype(np.int32)], True, (colors[shape_cnt][::-1]), thickness=thickness)
+                    interior_coords = [np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2)) for interior in shape.interiors]
+                    for interior in interior_coords:
+                        cv2.polylines(img, [interior], isClosed=True, color=(colors[shape_cnt][::-1]), thickness=thickness)
+                elif isinstance(shape, LineString):
+                    cv2.polylines(img, [np.array(shape.coords, dtype=np.int32)], False, (colors[shape_cnt][::-1]), thickness=thickness)
+                elif isinstance(shape, MultiPolygon):
+                    for polygon_cnt, polygon in enumerate(shape.geoms):
+                        cv2.polylines(img, [np.array((polygon.convex_hull.exterior.coords), dtype=np.int32)], True, (colors[shape_cnt + polygon_cnt + 1][::-1]), thickness=thickness)
+                elif isinstance(shape, MultiLineString):
+                    for line_cnt, line in enumerate(shape.geoms):
+                        cv2.polylines(img, [np.array(shape[line_cnt].coords, dtype=np.int32)], False, (colors[shape_cnt][::-1]), thickness=thickness)
+                elif isinstance(shape, Point):
+                    arr = np.array((shape.coords)).astype(np.int32)
+                    x, y = arr[0][0], arr[0][1]
+                    cv2.circle(img,(x, y),circle_size, colors[shape_cnt][::-1], thickness)
+            video_writer.write(img.astype(np.uint8))
+            if verbose:
+                print(f"Creating frame {frm_id} / {video_meta_data['frame_count']} (CPU core: {group}, video name: {video_meta_data['video_name']})")
+        else:
+            pass
     video_writer.release()
     cap.release()
 
@@ -124,7 +127,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
         check_int(name="CORE COUNT", value=core_cnt, min_value=-1, raise_error=True, unaccepted_vals=[0])
         self.core_cnt = core_cnt
         if core_cnt == -1 or core_cnt > find_core_cnt()[0]:
-            self.core_cnt = core_cnt
+            self.core_cnt = find_core_cnt()[0]
         if config_path is not None:
             ConfigReader.__init__(self, config_path=config_path)
         if os.path.isfile(video_name):

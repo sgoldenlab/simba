@@ -12,14 +12,10 @@ import multiprocessing
 import platform
 
 from simba.mixins.config_reader import ConfigReader
-from simba.mixins.feature_extraction_supplement_mixin import \
-    FeatureExtractionSupplemental
+from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
 from simba.mixins.geometry_mixin import GeometryMixin
-from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log, check_float, check_int,
-    check_str, check_valid_lst, check_video_has_rois)
-from simba.utils.errors import (AnimalNumberError, InvalidInputError,
-                                NoFilesFoundError, ROICoordinatesNotFoundError)
+from simba.utils.checks import ( check_all_file_names_are_represented_in_video_log, check_float, check_int, check_str, check_valid_lst, check_video_has_rois)
+from simba.utils.errors import (AnimalNumberError, InvalidInputError, NoFilesFoundError, ROICoordinatesNotFoundError)
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_data_paths, read_df
 from simba.utils.warnings import NoFileFoundWarning

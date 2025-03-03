@@ -53,6 +53,7 @@ class ConfigKey(Enum):
 
 
 class Paths(Enum):
+    ENV_PATH = Path("assets/.env")
     INPUT_CSV = Path("csv/input_csv/")
     LINE_PLOT_DIR = Path("frames/output/line_plot/")
     VIDEO_INFO = Path("logs/video_info.csv")
@@ -89,9 +90,7 @@ class Paths(Enum):
     SIMBA_NO_ANIMALS_PATH = Path("pose_configurations/no_animals/no_animals.csv")
     SIMBA_SHAP_IMG_PATH = Path("assets/shap/")
     SCHEMATICS = Path("pose_configurations/schematics/")
-    PROJECT_POSE_CONFIG_NAMES = Path(
-        "pose_configurations/configuration_names/pose_config_names.csv"
-    )
+    PROJECT_POSE_CONFIG_NAMES = Path("pose_configurations/configuration_names/pose_config_names.csv")
     CONCAT_VIDEOS_DIR = Path("frames/output/merged/")
     GANTT_PLOT_DIR = Path("frames/output/gantt_plots/")
     HEATMAP_CLF_LOCATION_DIR = Path("frames/output/heatmaps_classifier_locations/")
@@ -112,6 +111,9 @@ class Paths(Enum):
     LOGO_ICON_WINDOWS_PATH = Path("assets/icons/SimBA_logo_3.ico")
     LOGO_ICON_DARWIN_PATH = Path("assets/icons/SimBA_logo_3.png")
     UNSUPERVISED_MODEL_NAMES = Path("assets/lookups/model_names.parquet")
+
+
+
     CRITICAL_VALUES = Path("simba/assets/lookups/critical_values_05.pickle")
 
 class OS(Enum):
@@ -583,6 +585,7 @@ class Links(Enum):
     CREATE_PROJECT = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-1-generate-project-config"
     LOAD_PROJECT = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-2-load-project-1"
     SCENARIO_2 = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md"
+    SCENARIO_4 = "https://github.com/sgoldenlab/simba/blob/master/docs/Scenario4_new.md"
     BBOXES = "https://github.com/sgoldenlab/simba/blob/master/docs/anchored_rois.md"
     CUE_LIGHTS = (
         "https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md"
@@ -767,4 +770,6 @@ class ROI_SETTINGS(Enum):
     RECTANGLE = 'rectangle'
 
 
-
+class ENV_VARS(Enum):
+    PRINT_EMOJIS = 'PRINT_EMOJIS'
+    UNSUPERVISED_INTERFACE = 'UNSUPERVISED_INTERFACE'

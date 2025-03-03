@@ -1,23 +1,17 @@
 __author__ = "Simon Nilsson"
 
 import os
-from typing import List, Optional, Tuple, Union
-
+from typing import List, Optional, Union
 import numpy as np
 import pandas as pd
-
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.mixins.feature_extraction_supplement_mixin import \
-    FeatureExtractionSupplemental
-from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log,
-    check_file_exist_and_readable, check_float, check_that_column_exist,
-    check_valid_lst)
+from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
+
+from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_file_exist_and_readable, check_float, check_that_column_exist, check_valid_lst)
 from simba.utils.data import detect_bouts, slice_roi_dict_for_video
 from simba.utils.enums import Keys
-from simba.utils.errors import (CountError, MissingColumnsError,
-                                ROICoordinatesNotFoundError)
+from simba.utils.errors import (CountError, MissingColumnsError, ROICoordinatesNotFoundError)
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_data_paths, read_df
 from simba.utils.warnings import NoDataFoundWarning
@@ -124,12 +118,7 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
                         self.time_results.loc[len(self.time_results)] = [video_name,animal_name,row["Name"],roi_bouts["Bout_time"].sum()]
                     for _, row in self.sliced_roi_dict[Keys.ROI_POLYGONS.value].iterrows():
                         roi_coords = np.array(list(zip(row["vertices"][:, 0], row["vertices"][:, 1])))
-                        animal_df[row["Name"]] = (
-                            FeatureExtractionMixin.framewise_inside_polygon_roi(
-                                bp_location=animal_df.values[:, 0:2],
-                                roi_coords=roi_coords,
-                            )
-                        )
+                        animal_df[row["Name"]] = (FeatureExtractionMixin.framewise_inside_polygon_roi(bp_location=animal_df.values[:, 0:2], roi_coords=roi_coords))
                         animal_df.loc[
                             animal_df[bp_names[2]] < self.threshold, row["Name"]
                         ] = 0

@@ -13,7 +13,6 @@ from simba.utils.errors import NoFilesFoundError
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_config_entry, read_df
 
-
 class CueLightClfAnalyzer(ConfigReader):
     """
     Compute aggregate statistics when classified behaviors are occurring in relation to the cue light

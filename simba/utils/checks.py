@@ -791,32 +791,51 @@ def check_valid_extension(
         raise InvalidFilepathError(msg=f"File extension for file {path} has an invalid extension. Found {extension}, accepted: {accepted_extensions}", source=check_valid_extension.__name__)
 
 
-def check_if_valid_img(data: np.ndarray, source: Optional[str] = "", raise_error: Optional[bool] = True) -> Union[bool, None]:
+def check_if_valid_img(data: np.ndarray,
+                       source: str = "",
+                       raise_error: bool = True,
+                       greyscale: bool = False,
+                       color: bool = False) -> Union[bool, None]:
     """
     Check if a variable is a valid image.
 
-    :parameter str source: Name of the variable and/or class origin for informative error messaging and logging.
-    :parameter np.ndarray data: Data variable to check if a valid image representation.
-    :parameter Optional[bool] raise_error: If True, raise InvalidInputError if invalid image representation. Else, return bool.
+    :param str source: Name of the variable and/or class origin for informative error messaging and logging.
+    :param np.ndarray data: Data variable to check if a valid image representation.
+    :param bool greyscale: Checks that the image is greyscale. Default False.
+    :param bool color: Checks that the image is color. Default False.
+    :parameter bool raise_error: If True, raise InvalidInputError if invalid image representation. Else, return bool.
     """
 
     check_instance(source=check_if_valid_img.__name__, instance=data, accepted_types=(np.ndarray, cp.ndarray))
     if (data.ndim != 2) and (data.ndim != 3):
         if raise_error:
-            raise InvalidInputError(
-                msg=f"The {source} data is not a valid image. It has {data.ndim} dimensions",
-                source=check_if_valid_img.__name__,
-            )
+            raise InvalidInputError(msg=f"The {source} data is not a valid image. It has {data.ndim} dimensions", source=check_if_valid_img.__name__)
         else:
             return False
     if data.dtype not in [np.uint8, np.uint16, np.float32, np.float64]:
         if raise_error:
-            raise InvalidInputError(
-                msg=f"The {source} data is not a valid image. It is dtype {data.dtype}",
-                source=check_if_valid_img.__name__,
-            )
+            raise InvalidInputError(msg=f"The {source} data is not a valid image. It is dtype {data.dtype}", source=check_if_valid_img.__name__)
         else:
             return False
+    if np.max(data) > 255:
+        if raise_error:
+            raise InvalidInputError(msg=f"The {source} data is not a valid image. Values found that are above 255: {np.max(data)}", source=check_if_valid_img.__name__)
+    if greyscale:
+        if (data.ndim != 2):
+            if raise_error:
+                raise InvalidInputError(msg=f"The {source} image is not a greyscale image. Got {data.ndim} dimensions", source=check_if_valid_img.__name__)
+            else:
+                return False
+    if color:
+        if (data.ndim != 3):
+            if raise_error:
+                raise InvalidInputError(msg=f"The {source} image is not a color image. Got {data.ndim} dimensions", source=check_if_valid_img.__name__)
+            else:
+                return False
+
+
+
+    return True
 
 
 def check_that_dir_has_list_of_filenames(
@@ -1610,11 +1629,26 @@ def is_img_bw(img: np.ndarray, raise_error: bool = True, source: Optional[str] =
     Helper to check if an image is binarey black and white.
     """
     check_if_valid_img(data=img, source=is_img_bw.__name__, raise_error=True)
-    px_vals = np.sort(np.unique(img)).astype(np.int32)
-    if not np.array_equal(np.array([0, 255]), px_vals):
+    px_vals = set(list(np.sort(np.unique(img)).astype(np.int32)))
+    additional = list(px_vals - {0, 255})
+    if len(additional) > 0:
         if raise_error:
-            raise InvalidInputError(msg=f'The image {source} is not a black-and-white image. Expected: [0, 255], got {px_vals}', source=is_img_bw.__name__)
+            raise InvalidInputError(msg=f'The image {source} is not a black-and-white image. Expected: [0, 255], got {additional}', source=is_img_bw.__name__)
         else:
             return False
     else:
         return True
+
+
+def is_wsl() -> bool:
+    """ Helper to check if SimBA is running in Microsoft WSL """
+    try:
+        with open("/proc/version", "r") as f:
+            return "microsoft" in f.read().lower()
+    except FileNotFoundError:
+        return False
+
+def is_windows_path(value):
+    """Check if the value is a valid Windows path."""
+    return isinstance(value, str) and (len(value) > 1 and value[1] == ':' and value[0].isalpha())
+    

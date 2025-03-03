@@ -12,9 +12,9 @@ import imutils
 import numpy as np
 import pandas as pd
 from numba import jit, njit, prange, typed, types
-from shapely.geometry import (GeometryCollection, LineString, MultiLineString,
-                              MultiPoint, MultiPolygon, Point, Polygon)
+from shapely.geometry import (GeometryCollection, LineString, MultiLineString,MultiPoint, MultiPolygon, Point, Polygon)
 from shapely.ops import linemerge, split, triangulate, unary_union
+from scipy.interpolate import splprep, splev
 
 try:
     from typing_extensions import Literal
@@ -3945,6 +3945,60 @@ class GeometryMixin(object):
                     idx += 1
             p = InsidePolygon(bp_location=grid, roi_coords=x[i]).astype(types.bool_)
             results.append(grid[p])
+        return results
+
+    @staticmethod
+    def smooth_geometry_bspline(data: Union[np.ndarray, Polygon, List[Polygon]], smooth_factor: float = 1.0,
+                                points: int = 50) -> List[Polygon]:
+        """
+        Smooths the geometry of polygons or coordinate arrays using B-spline interpolation.
+
+        Accepts an input geometry, which can be a NumPy array, a single Polygon,
+        or a list of Polygons, and applies a B-spline smoothing operation. The degree of
+        smoothing is controlled by `smooth_factor`, and the number of interpolated points
+        along the new smoothed boundary is determined by `points`.
+
+        :param Union[np.ndarray, Polygon, List[Polygon]] data: The input geometry to be smoothed. This can be: A NumPy array of shape (N, 2) representing a single polygon. A NumPy array of shape (M, N, 2) representing multiple polygons. A `Polygon` object from Shapely. A list of `Polygon` objects.
+        :param float smooth_factor: The smoothing factor for the B-spline. Higher values  result in smoother curves. Must be >= 0.1.
+        :param int points: The number of interpolated points used to redefine the smoothed polygon boundary. Must be >= 3.
+        :return: A list of smoothed polygons obtained by applying B-spline interpolation to the input geometry.
+        :rtype: List[Polygon]
+
+        :example:
+        >>> polygon = np.array([[0, 0], [2, 1], [3, 3], [1, 4], [0, 3], [0, 0]])
+        >>> polygon = Polygon(polygon)
+        >>> smoothed_polygon = smooth_geometry_bspline(polygon)
+        """
+
+        check_float(name=f'{GeometryMixin.smooth_geometry_bspline.__name__} smooth_factor', min_value=0.1, raise_error=True, value=smooth_factor)
+        check_int(name=f'{GeometryMixin.smooth_geometry_bspline.__name__} points', min_value=3, raise_error=True, value=points)
+        check_instance(source=f'{GeometryMixin.smooth_geometry_bspline.__name__} data', instance=data, accepted_types=(np.ndarray, Polygon, list), raise_error=True)
+        if isinstance(data, Polygon):
+            coords = [np.array(data.exterior.coords)]
+        elif isinstance(data, np.ndarray):
+            check_valid_array(data=data, source=f'{GeometryMixin.smooth_geometry_bspline.__name__} data', accepted_ndims=(2, 3,), min_axis_0=3, accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+            if data.ndim == 2:
+                coords = [np.copy(data)]
+            else:
+                coords = np.copy(data)
+        else:
+            coords = []
+            for i in range(len(data)):
+                coords.append(np.array(data[i].exterior.coords))
+        u = np.linspace(0, 1, points)  # Number of interpolated points
+        results = []
+        if isinstance(data, (Polygon, list,)):
+            for i in range(len(coords)):
+                tck, _ = splprep(coords[i].T, s=smooth_factor, per=True)
+                results.append(Polygon(np.array(splev(u, tck)).T))
+        else:
+            for i in range(len(coords)):
+                try:
+                    tck, _ = splprep(coords[i].T, s=smooth_factor, per=True)
+                except ValueError:
+                    print(coords[i])
+                    #results.append(coords[i])
+                results.append(np.array(splev(u, tck)).T)
         return results
 
 

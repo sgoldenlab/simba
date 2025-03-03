@@ -3748,6 +3748,7 @@ def create_average_frm(video_path: Union[str, os.PathLike],
 
 
 def video_bg_subtraction(video_path: Union[str, os.PathLike],
+                         avg_frm: Optional[np.ndarray] = None,
                          bg_video_path: Optional[Union[str, os.PathLike]] = None,
                          bg_start_frm: Optional[int] = None,
                          bg_end_frm: Optional[int] = None,
@@ -3792,7 +3793,8 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
        For GPU based alternative, see :func:`simba.data_processors.cuda.image.bg_subtraction_cuda` or :func:`simba.data_processors.cuda.image.bg_subtraction_cupy`.
 
     :param Union[str, os.PathLike] video_path: The path to the video to remove the background from.
-    :param Optional[Union[str, os.PathLike]] bg_video_path: Path to the video which contains a segment with the background only. If None, then ``video_path`` will be used.
+    :param Optional[np.ndarray] avg_frm: The average frame to use to compute the background. If None is passed, then the average frame will be computed.
+    :param Optional[Union[str, os.PathLike]] bg_video_path: Only used if ``avg_frm`` is None. Path to the video which contains a segment with the background only. If None, then ``video_path`` will be used.
     :param Optional[int] bg_start_frm: The first frame in the background video to use when creating a representative background image. Default: None.
     :param Optional[int] bg_end_frm: The last frame in the background video to use when creating a representative background image. Default: None.
     :param Optional[str] bg_start_time: The start timestamp in `HH:MM:SS` format in the background video to use to create a representative background image. Default: None.
@@ -3821,8 +3823,12 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
     check_str(name='method', value=method, options=['absolute', 'light', 'dark'], raise_error=True)
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
     writer = cv2.VideoWriter(save_path, fourcc, video_meta_data['fps'],(video_meta_data['width'], video_meta_data['height']))
-    avg_frm = create_average_frm(video_path=bg_video_path, start_frm=bg_start_frm, end_frm=bg_end_frm, start_time=bg_start_time, end_time=bg_end_time)
-    avg_frm = cv2.resize(avg_frm, (video_meta_data['width'], video_meta_data['height']))
+    if avg_frm is None:
+        avg_frm = create_average_frm(video_path=bg_video_path, start_frm=bg_start_frm, end_frm=bg_end_frm, start_time=bg_start_time, end_time=bg_end_time)
+        avg_frm = cv2.resize(avg_frm, (video_meta_data['width'], video_meta_data['height']))
+    else:
+        check_if_valid_img(data=avg_frm, source=f'{video_bg_subtraction_mp.__name__} avg_frm')
+        avg_frm = cv2.resize(avg_frm, (video_meta_data['width'], video_meta_data['height']))
     cap = cv2.VideoCapture(video_path)
     frm_cnt = 0
     while True:
@@ -3877,13 +3883,14 @@ def _bg_remover_mp(frm_range: Tuple[int, np.ndarray],
     while current_frm <= end_frm:
         ret, frm = cap.read()
         if not ret:
+            FrameRangeWarning(msg=f'Could nor read frame {current_frm} in video {video_meta_data["video_name"]}', source=_bg_remover_mp.__name__)
             break
         out_frm = deepcopy(frm)
         if method == 'absolute':
             diff = cv2.absdiff(frm, bg_frm)
-        elif method == 'light':  # Assumes background is black, highlights light areas
+        elif method == 'light':
             diff = np.abs(frm.astype(np.int16) - bg_frm.astype(np.int16)).astype(np.uint8)
-        elif method == 'dark':  # Assumes background is white, highlights dark areas
+        elif method == 'dark':
             diff = np.abs(bg_frm.astype(np.int16) - frm.astype(np.int16)).astype(np.uint8)
         else:
             diff = cv2.absdiff(frm, bg_frm)
@@ -3895,7 +3902,7 @@ def _bg_remover_mp(frm_range: Tuple[int, np.ndarray],
         writer.write(out_frm)
         current_frm += 1
         if verbose:
-            print(f'Background subtraction frame {current_frm}/{video_meta_data["frame_count"]} (Video: {video_name})')
+            print(f'Background subtracted frame {current_frm}/{video_meta_data["frame_count"]} (Video: {video_name})')
     writer.release()
     cap.release()
     return batch
@@ -3906,12 +3913,13 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
                             bg_end_frm: Optional[int] = None,
                             bg_start_time: Optional[str] = None,
                             bg_end_time: Optional[str] = None,
+                            avg_frm: Optional[np.ndarray] = None,
                             bg_color: Tuple[int, int, int] = (0, 0, 0),
                             fg_color: Optional[Tuple[int, int, int]] = None,
                             save_path: Optional[Union[str, os.PathLike]] = None,
                             core_cnt: int = -1,
-                            verbose: Optional[bool] = True,
-                            gpu: Optional[bool] = False,
+                            verbose: bool = True,
+                            gpu: bool = False,
                             threshold: Optional[int] = 50,
                             method: str = 'absolute') -> None:
 
@@ -3948,13 +3956,14 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
         For GPU based alternative, see :func:`~simba.data_processors.cuda.image.bg_subtraction_cuda` or :func:`~simba.data_processors.cuda.image.bg_subtraction_cupy`.
 
     :param Union[str, os.PathLike] video_path: The path to the video to remove the background from.
+    :param Optional[np.ndarray] avg_frm: The average frame to use to compute the background. If None is passed, then the average frame will be computed.
     :param Optional[Union[str, os.PathLike]] bg_video_path: Path to the video which contains a segment with the background only. If None, then ``video_path`` will be used.
     :param Optional[int] bg_start_frm: The first frame in the background video to use when creating a representative background image. Default: None.
     :param Optional[int] bg_end_frm: The last frame in the background video to use when creating a representative background image. Default: None.
     :param Optional[str] bg_start_time: The start timestamp in `HH:MM:SS` format in the background video to use to create a representative background image. Default: None.
     :param Optional[str] bg_end_time: The end timestamp in `HH:MM:SS` format in the background video to use to create a representative background image. Default: None.
+    :param Optional[str] bg_end_time: The end timestamp in `HH:MM:SS` format in the background video to use to create a representative background image. Default: None.
     :param Optional[Tuple[int, int, int]] bg_color: The RGB color of the moving objects in the output video. Defaults to None, which represents the original colors of the moving objects.
-    :param Optional[Tuple[int, int, int]] fg_color: The RGB color of the background output video. Defaults to black (0, 0, 0).
     :param Optional[Union[str, os.PathLike]] save_path: The patch to where to save the output video where the background is removed. If None, saves the output video in the same directory as the input video with the ``_bg_subtracted`` suffix. Default: None.
     :param Optional[int] core_cnt: The number of cores to use. Defaults to -1 representing all available cores.
     :param Optional[int] threshold: Value between 0-255 representing the difference threshold between the average frame subtracted from each frame. Higher values and more pixels will be considered background. Default: 50.
@@ -3977,13 +3986,17 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
     else:
         check_if_dir_exists(in_dir=os.path.dirname(save_path), source=video_bg_subtraction_mp.__name__)
     dt = datetime.now().strftime("%Y%m%d%H%M%S")
-    temp_dir = os.path.join(dir, f'temp_{video_name}_{dt}')
+    temp_dir = os.path.join(os.path.dirname(save_path), f'temp_{video_name}_{dt}')
     os.makedirs(temp_dir)
     check_int(name=f'{video_bg_subtraction_mp.__name__} core_cnt', value=core_cnt, min_value=-1, max_value=find_core_cnt()[0])
     if core_cnt == -1: core_cnt = find_core_cnt()[0]
-    bg_frm = create_average_frm(video_path=bg_video_path, start_frm=bg_start_frm, end_frm=bg_end_frm, start_time=bg_start_time, end_time=bg_end_time)
+    if avg_frm is None:
+        bg_frm = create_average_frm(video_path=bg_video_path, start_frm=bg_start_frm, end_frm=bg_end_frm, start_time=bg_start_time, end_time=bg_end_time)
+        bg_frm = bg_frm[:, :, ::-1]
+    else:
+        check_if_valid_img(data=avg_frm, source=f'{video_bg_subtraction_mp.__name__} avg_frm')
+        bg_frm = np.copy(avg_frm)
     bg_frm = cv2.resize(bg_frm, (video_meta_data['width'], video_meta_data['height']))
-    bg_frm = bg_frm[:, :, ::-1]
     frm_list = np.array_split(list(range(0, video_meta_data['frame_count'])), core_cnt)
     frm_data = []
     for c, i in enumerate(frm_list):
@@ -4001,16 +4014,12 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
                                       method=method)
         for cnt, result in enumerate(pool.imap(constants, frm_data, chunksize=1)):
             print(f'Frame batch {result+1} completed...')
-        pool.terminate()
-        pool.join()
-
-    print(f"Joining {video_name} multiprocessed video...")
+    pool.terminate()
+    pool.join()
+    print(f"Joining {video_name} multi-processed video...")
     concatenate_videos_in_folder(in_folder=temp_dir, save_path=save_path, video_format=ext[1:], remove_splits=True, gpu=gpu, fps=video_meta_data['fps'])
     timer.stop_timer()
     stdout_success(msg=f'Video saved at {save_path}', elapsed_time=timer.elapsed_time_str)
-
-
-#video_bg_subtraction(video_path=r"C:\troubleshooting\mitra\test\temp\501_MA142_Gi_CNO_0516.mp4", bg_color=(0, 0, 0), fg_color=(255, 255, 255), verbose=False)
 
 def superimpose_video_names(video_path: Union[str, os.PathLike],
                             font: Optional[str] = 'Arial',

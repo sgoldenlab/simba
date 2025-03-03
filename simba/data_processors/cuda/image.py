@@ -57,13 +57,13 @@ DIGITAL = 'digital'
 THREADS_PER_BLOCK = 2024
 
 def create_average_frm_cupy(video_path: Union[str, os.PathLike],
-                       start_frm: Optional[int] = None,
-                       end_frm: Optional[int] = None,
-                       start_time: Optional[str] = None,
-                       end_time: Optional[str] = None,
-                       save_path: Optional[Union[str, os.PathLike]] = None,
-                       batch_size: Optional[int] = 3000,
-                       verbose: Optional[bool] = False) -> Union[None, np.ndarray]:
+                            start_frm: Optional[int] = None,
+                            end_frm: Optional[int] = None,
+                            start_time: Optional[str] = None,
+                            end_time: Optional[str] = None,
+                            save_path: Optional[Union[str, os.PathLike]] = None,
+                            batch_size: Optional[int] = 3000,
+                            verbose: Optional[bool] = False) -> Union[None, np.ndarray]:
 
     """
     Computes the average frame using GPU acceleration from a specified range of frames or time interval in a video file.
@@ -1045,8 +1045,10 @@ def bg_subtraction_cuda(video_path: Union[str, os.PathLike],
 
     .. seealso::
        For CPU-based alternative, see :func:`simba.video_processors.video_processing.video_bg_subtraction` or :func:`~simba.video_processors.video_processing.video_bg_subtraction_mp`
-       For GPU-based alternative, see :func:`~simba.data_processors.cuda.image.bg_subtraction_cupy`.
-       Needs work, CPU/multicore appears faster.
+       For GPU-based alternative, see :func:`~simba.data_processors.cuda.image.bg_subtraction_cupy`. Needs work, CPU/multicore appears faster.
+
+    .. seealso::
+       To create average frame on the CPU, see :func:`simba.video_processors.video_processing.create_average_frm`.
 
     .. csv-table::
        :header: EXPECTED RUNTIMES

@@ -1561,6 +1561,7 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
     """
     :example:
     >>> ClipMultipleVideosByTimestamps(data_dir=r"C:\troubleshooting\RAT_NOR\project_folder\videos\test", save_dir=r"C:\troubleshooting\RAT_NOR\project_folder\videos\test\out")
+    >>> ClipMultipleVideosByTimestamps(data_dir=r"C:\troubleshooting\mitra\project_folder\videos", save_dir=r"C:\troubleshooting\mitra\project_folder\videos\temp_3")
     """
     def __init__(self, data_dir: Union[str, os.PathLike], save_dir: Union[str, os.PathLike]):
 
@@ -1571,11 +1572,19 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         max_video_name_len = len(max(list(self.video_paths.keys()))) + 5
         super().__init__(title="CLIP MULTIPLE VIDEOS BY TIME-STAMPS")
         self.save_dir = save_dir
-        data_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        data_frm.grid(row=0, column=0, sticky=NW)
+        batch_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BATCH SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        batch_start_entry = Entry_Box(parent=batch_settings_frm, fileDescription='START TIME:', labelwidth=10, entry_box_width=12)
+        batch_start_btn = SimbaButton(parent=batch_settings_frm, txt='SET', img='tick', cmd=self._batch_set_val, cmd_kwargs={'text': lambda: batch_start_entry.entry_get.strip(), 'box_type': lambda: 'start'})
+        batch_end_entry = Entry_Box(parent=batch_settings_frm, fileDescription='END TIME:', labelwidth=10, entry_box_width=12)
+        batch_end_btn = SimbaButton(parent=batch_settings_frm, txt='SET', img='tick', cmd=self._batch_set_val, cmd_kwargs={'text': lambda: batch_start_entry.entry_get.strip(), 'box_type': lambda: 'end'})
+        batch_settings_frm.grid(row=0, column=0, sticky=NW)
+        batch_start_entry.grid(row=0, column=0, sticky=NW)
+        batch_start_btn.grid(row=0, column=1, sticky=NW)
+        batch_end_entry.grid(row=1, column=0, sticky=NW)
+        batch_end_btn.grid(row=1, column=1, sticky=NW)
         self.save_dir = save_dir
         data_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        data_frm.grid(row=0, column=0, sticky=NW)
+        data_frm.grid(row=1, column=0, sticky=NW)
         Label(data_frm, text="VIDEO NAME", width=max_video_name_len).grid(row=0, column=0, sticky=NW)
         Label(data_frm, text="VIDEO LENGTH", width=12).grid(row=0, column=1)
         Label(data_frm, text="START TIME (HH:MM:SS)", width=18).grid(row=0, column=2)
@@ -1595,10 +1604,18 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
 
         gpu_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GPU SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         gpu_cb, self.gpu_var = SimbaCheckbox(parent=gpu_frm, txt='USE GPU', txt_img='gpu')
-        gpu_frm.grid(row=1, column=0, sticky=NW)
+        gpu_frm.grid(row=2, column=0, sticky=NW)
         gpu_cb.grid(row=0, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run, btn_txt_clr="blue")
         self.main_frm.mainloop()
+
+    def _batch_set_val(self, text: str, box_type: str):
+        for cnt, video_name in enumerate(self.video_paths.keys()):
+            if box_type == 'start':
+                self.entry_boxes[video_name]["start"].entry_set(text)
+            else:
+                self.entry_boxes[video_name]["end"].entry_set(text)
+
 
     def run(self):
         timer = SimbaTimer(start=True)
@@ -1609,20 +1626,12 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
             check_that_hhmmss_start_is_before_end(start_time=start, end_time=end, name=video_name)
             check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=start, video_path=self.video_paths[video_name])
             check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=end, video_path=self.video_paths[video_name])
-            clip_video_in_range(
-                file_path=self.video_paths[video_name],
-                start_time=start,
-                end_time=end,
-                out_dir=self.save_dir,
-                overwrite=True,
-                include_clip_time_in_filename=False,
-                gpu=self.gpu_var.get(),
-            )
+            clip_video_in_range(file_path=self.video_paths[video_name], start_time=start, end_time=end, out_dir=self.save_dir, overwrite=True, include_clip_time_in_filename=False, gpu=self.gpu_var.get())
         timer.stop_timer()
-        stdout_success(
-            msg=f"{len(self.entry_boxes)} videos clipped by time-stamps and saved in {self.save_dir}",
-            elapsed_time=timer.elapsed_time_str,
-        )
+        stdout_success(msg=f"{len(self.entry_boxes)} videos clipped by time-stamps and saved in {self.save_dir}", elapsed_time=timer.elapsed_time_str,)
+
+
+
 
 
 class InitiateClipMultipleVideosByTimestampsPopUp(PopUpMixin):

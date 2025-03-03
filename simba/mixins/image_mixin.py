@@ -1796,18 +1796,55 @@ class ImageMixin(object):
             pool.join()
             pool.terminate()
         results = dict(sorted(results.items()))
-        print(results)
-        # results = list(results.values())
-        # results = np.stack(results, axis=0)
-        # timer.stop_timer()
-        # if save_path:
-        #     df = pd.DataFrame(results, columns=['X', 'Y'])
-        #     write_df(df=df, file_type=Formats.CSV.value, save_path=save_path)
-        #     if verbose:
-        #         stdout_success(f'Video {video_meta["video_name"]} blob detection complete, saved at {save_path}', elapsed_time=timer.elapsed_time_str)
-        # else:
-        #     stdout_success(f'Video {video_meta["video_name"]} blob detection complete', elapsed_time=timer.elapsed_time_str)
-        #     return results.astype(np.int32)
+        results = list(results.values())
+        results = np.stack(results, axis=0)
+        timer.stop_timer()
+        if save_path:
+            df = pd.DataFrame(results, columns=['X', 'Y'])
+            write_df(df=df, file_type=Formats.CSV.value, save_path=save_path)
+            if verbose:
+                stdout_success(f'Video {video_meta["video_name"]} blob detection complete, saved at {save_path}', elapsed_time=timer.elapsed_time_str)
+        else:
+            stdout_success(f'Video {video_meta["video_name"]} blob detection complete', elapsed_time=timer.elapsed_time_str)
+            return results.astype(np.int32)
+
+    @staticmethod
+    def img_diff(x: np.ndarray,
+                 y: np.ndarray,
+                 threshold: int,
+                 method: str = 'absolute') -> np.ndarray:
+
+        """
+        Computes the difference between two images using the specified method and applies a threshold to produce a binary image.
+
+        :param np.ndarray x: The first input image as a NumPy array.
+        :param np.ndarray y: The second input image as a NumPy array.
+        :param int threshold: The pixel intensity threshold for binarizing the difference image (range: 1-255).
+        :param str method: The method to compute the difference. Options are: - 'absolute': Uses OpenCV's `absdiff` function. - 'light': Computes absolute difference with potential overexposure handling. - 'dark': Computes absolute difference with potential underexposure handling.
+        :return: A binary image (NumPy array) where pixel values are either 255 (significant difference) or 0 (insignificant difference).
+        :rtype: np.ndarray
+
+        :example:
+        >>> img1 = np.random.randint(0, 255, (100, 100, 3), dtype=np.uint8)
+        >>> img2 = np.random.randint(0, 255, (100, 100, 3), dtype=np.uint8)
+        >>> result = ImageMixin.img_diff(img1, img2, threshold=50, method='absolute')
+        """
+
+        check_if_valid_img(data=x, source=f'{ImageMixin.img_diff.__name__} x', raise_error=True)
+        check_if_valid_img(data=y, source=f'{ImageMixin.img_diff.__name__} y', raise_error=True)
+        check_int(name=f'{ImageMixin.img_diff.__name__} threshold', value=threshold, max_value=255, min_value=1)
+        check_str(name='method', value=method, options=['absolute', 'light', 'dark'], raise_error=True)
+        if method == 'absolute':
+            diff = cv2.absdiff(x, y)
+        elif method == 'light':
+            diff = np.abs(x.astype(np.int16) - y.astype(np.int16)).astype(np.uint8)
+        elif method == 'dark':
+            diff = np.abs(x.astype(np.int16) - y.astype(np.int16)).astype(np.uint8)
+        else:
+            diff = cv2.absdiff(x, y)
+        gray_diff = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
+
+        return np.where(gray_diff > threshold, 255, 0).astype(np.uint8)
 
     @staticmethod
     def is_video_color(video: Union[str, os.PathLike, cv2.VideoCapture]):

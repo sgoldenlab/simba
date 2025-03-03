@@ -1,29 +1,24 @@
 __author__ = "Simon Nilsson"
-
+import time
+start = time.time()
 import glob
 import itertools
 import os
 from typing import Dict, List, Optional, Tuple, Union
-
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 from numba import jit, prange, typed
-
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
-
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
-from simba.utils.checks import (check_float, check_if_dir_exists,
-                                check_if_filepath_list_is_empty,
-                                check_instance, check_str,
-                                check_that_column_exist, check_valid_array,
-                                check_valid_dataframe, check_valid_lst)
+from simba.utils.checks import (check_float, check_if_dir_exists, check_if_filepath_list_is_empty,  check_instance, check_str, check_valid_array, check_valid_dataframe, check_valid_lst)
+
 from simba.utils.data import detect_bouts
 from simba.utils.enums import Formats
 from simba.utils.errors import CountError, InvalidInputError

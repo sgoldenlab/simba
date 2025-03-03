@@ -10,7 +10,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-import cv2
 import h5py
 import numpy as np
 import pandas as pd
@@ -18,6 +17,7 @@ from numba import jit, njit, prange, typed
 from pylab import *
 from scipy import stats
 from scipy.signal import savgol_filter
+from scipy.interpolate import interp1d
 
 try:
     from typing import Literal
@@ -35,7 +35,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_valid_rgb_tuple, check_instance,
                                 check_int, check_str, check_that_column_exist,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_array, check_valid_dataframe)
+                                check_valid_array, check_valid_dataframe, check_valid_lst)
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
                                 InvalidFileTypeError, InvalidInputError,
@@ -1623,7 +1623,7 @@ def egocentric_frm_rotator(frames: np.ndarray,
                            rotation_matrices: np.ndarray,
                            interpolate: Optional[bool] = True) -> np.ndarray:
     """
-    Rotates a sequence of frames using the provided rotation matrices in an egocentric manner using acceleration through numba JIT..
+    Rotates a sequence of frames using the provided rotation matrices in an egocentric manner using acceleration through numba JIT.
 
     Applies a geometric transformation to each frame in the input sequence based on
     its corresponding rotation matrix. The transformation includes rotation and translation,
@@ -1674,6 +1674,42 @@ def egocentric_frm_rotator(frames: np.ndarray,
                     val = _bilinear_interpolate(frame[:, :, ch], src_x, src_y)
                     warped_frames[i, r, c, ch] = val
     return warped_frames
+
+
+def resample_geometry_vertices(vertices: Union[List[np.ndarray], np.ndarray], vertice_cnt: int) -> np.ndarray:
+    """
+    Resample geometry vertices to a specified number of vertices in each polygon.
+
+    This function takes a list or a single array of 2D coordinates representing the vertices of polygons
+    and resamples each polygon to have exactly `vertice_cnt` vertices. The resampling is done by
+    interpolating the distances between consecutive vertices and then uniformly distributing the
+    requested number of vertices along the perimeter of each polygon.
+
+    :param Union[List[np.ndarray], np.ndarray]: A list of 2D coordinate arrays or a single 3D array  representing the vertices of polygons. Each 2D array should have shape (n, 2), where `n` is the number of  vertices.
+    :param int vertice_cnt: The target number of vertices for resampling in each polygon. This value should be at least 3.
+    :return: A 3D array of shape (len(vertices), vertice_cnt, 2), where each 2D array in the result contains the resampled vertices of the corresponding polygon.
+    :rtype: np.ndarray
+    """
+
+    check_int(name=f'{resample_geometry_vertices.__name__} vertice_cnt', value=vertice_cnt, min_value=3)
+    check_instance(source=f'{resample_geometry_vertices.__name__} vertices', instance=vertices, accepted_types=(list, np.ndarray,))
+    if isinstance(vertices, list):
+        check_valid_lst(data=vertices, source=f'{resample_geometry_vertices.__name__} vertices', valid_dtypes=(np.ndarray,))
+    else:
+        check_valid_array(data=vertices, source=f'{resample_geometry_vertices.__name__} vertices', accepted_ndims=(3,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    results = np.full((len(vertices), vertice_cnt, 2), fill_value=np.nan, dtype=np.float32)
+    for idx in range(len(vertices)):
+        try:
+            coords = vertices[idx]
+            distances = np.cumsum(np.r_[0, np.linalg.norm(np.diff(coords, axis=0), axis=1)])
+            uniform_distances = np.linspace(0, distances[-1], vertice_cnt)
+            interp_x = interp1d(distances, coords[:, 0], kind='linear')
+            interp_y = interp1d(distances, coords[:, 1], kind='linear')
+            results[idx] = np.column_stack([interp_x(uniform_distances), interp_y(uniform_distances)]).astype(np.int32)
+        except:
+            pass
+    return results
+
 
 
 # run_user_defined_feature_extraction_class(config_path='/Users/simon/Desktop/envs/troubleshooting/circular_features_zebrafish/project_folder/project_config.ini', file_path='/Users/simon/Desktop/fish_feature_extractor_2023_version_5.py')

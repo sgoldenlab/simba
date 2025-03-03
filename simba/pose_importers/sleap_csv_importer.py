@@ -139,15 +139,15 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
         self.timer.stop_timer()
         stdout_success(msg=f"{len(list(self.data_and_videos_lk.keys()))} file(s) imported to the SimBA project {self.input_csv_dir}", source=self.__class__.__name__)
 
-
+#
 # test = SLEAPImporterCSV(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini",
 #                  data_folder=r'D:\troubleshooting\mitra\raw_tracking_data',
 #                  id_lst=['Track_0'],
 #                  interpolation_settings={'type': 'body-parts', 'method': 'linear'},
 #                  smoothing_settings = {'time_window': 500, 'method': 'gaussian'})
 # test.run()
-
-
+#
+#
 
 
 #

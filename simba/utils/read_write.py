@@ -16,6 +16,7 @@ import re
 import shutil
 import subprocess
 import webbrowser
+from ast import literal_eval
 from configparser import ConfigParser
 from copy import deepcopy
 from datetime import datetime, timedelta
@@ -53,7 +54,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_str, check_valid_array,
                                 check_valid_boolean, check_valid_dataframe,
                                 check_valid_lst, is_video_color, check_valid_url, is_img_bw)
-from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options, Paths, Links, Defaults
+from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options, Paths, Links, Defaults, ENV_VARS
 from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 FFMPEGCodecGPUError, FileExistError,
                                 FrameRangeError, IntegerError,
@@ -848,21 +849,30 @@ def find_video_of_file(video_dir: Union[str, os.PathLike],
 
 def find_files_of_filetypes_in_directory(directory: Union[str, os.PathLike],
                                          extensions: List[str],
-                                         raise_warning: Optional[bool] = True,
-                                         raise_error: Optional[bool] = False) -> List[str]:
+                                         raise_warning: bool = True,
+                                         as_dict: bool = False,
+                                         raise_error: bool = False) -> Union[List[str], Dict[str, str]]:
     """
     Find all files in a directory of specified extensions/types.
 
     :param str directory: Directory holding files.
     :param List[str] extensions: Accepted file extensions.
-    :param bool raise_warning: If True, raise error if no files are found.
+    :param bool raise_warning: If True, raise warning if no files are found. Default True.
+    :param bool raise_error: If True, raise error if no files are found. Default False.
+    :param bool as_dict: If True, returns a dictionary with all filenames as keys and filepaths as values. If False, then a list of all filepaths. Default False.
     :return: All files in ``directory`` with the specified extension(s).
-    :rtype: List[str]
+    :rtype: Union[List[str], Dict[str, str]]
 
     :example:
     >>> find_files_of_filetypes_in_directory(directory='project_folder/videos', extensions=['mp4', 'avi', 'png'], raise_warning=False)
     """
 
+    if not os.path.isdir(directory):
+        if raise_warning:
+            NoFileFoundWarning(msg=f'{directory} is not a valid directory', source=find_files_of_filetypes_in_directory.__name__)
+            return []
+        if raise_error:
+            raise NoFilesFoundError(msg=f'{directory} is not a valid directory', source=find_files_of_filetypes_in_directory.__name__)
     try:
         all_files_in_folder = [f for f in next(os.walk(directory))[2] if not f[0] == "."]
     except StopIteration:
@@ -878,16 +888,17 @@ def find_files_of_filetypes_in_directory(directory: Union[str, os.PathLike],
         if ext.lower() in extensions:
             accepted_file_paths.append(file_path)
     if not accepted_file_paths and raise_warning:
-        NoFileFoundWarning(
-            msg=f"SimBA could not find any files with accepted extensions {extensions} in the {directory} directory",
-            source=find_files_of_filetypes_in_directory.__name__,
-        )
+        NoFileFoundWarning(msg=f"SimBA could not find any files with accepted extensions {extensions} in the {directory} directory", source=find_files_of_filetypes_in_directory.__name__)
     if not accepted_file_paths and raise_error:
-        raise NoDataError(
-            msg=f"SimBA could not find any files with accepted extensions {extensions} in the {directory} directory",
-            source=find_files_of_filetypes_in_directory.__name__,
-        )
-    return accepted_file_paths
+        raise NoDataError(msg=f"SimBA could not find any files with accepted extensions {extensions} in the {directory} directory", source=find_files_of_filetypes_in_directory.__name__)
+    if as_dict:
+        out = {}
+        for file_path in accepted_file_paths:
+            _, file_name, _ = get_fn_ext(file_path)
+            out[file_name] = file_path
+        return out
+    else:
+        return accepted_file_paths
 
 
 def convert_parquet_to_csv(directory: str) -> None:
@@ -2719,11 +2730,12 @@ def _read_img_batch_from_video_helper(frm_idx: np.ndarray, video_path: Union[str
     """Multiprocess helper used by read_img_batch_from_video to read in images from video file."""
     start_idx, end_frm, current_frm = frm_idx[0], frm_idx[-1] + 1, frm_idx[0]
     results = {}
+    video_meta_data = get_video_meta_data(video_path=video_path)
     cap = cv2.VideoCapture(video_path)
     cap.set(1, current_frm)
     while current_frm < end_frm:
         if verbose:
-            print(f'Reading frame idx {current_frm}...')
+            print(f'Reading frame {current_frm}/{video_meta_data["frame_count"]} ({video_meta_data["video_name"]})...')
         img = cap.read()[1]
         if greyscale or black_and_white:
             if len(img.shape) != 2:
@@ -2760,6 +2772,7 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
     :param bool black_and_white: If True, returns the images in black and white. Default False.
     :returns: A dictionary containing frame indices as keys and corresponding frame arrays as values.
     :rtype: Dict[int, np.ndarray]
+
     :example:
     >>> read_img_batch_from_video(video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Together_1.avi', start_frm=0, end_frm=50)
     """
@@ -2780,10 +2793,43 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
     frm_lst = np.array_split(np.arange(start_frm, end_frm + 1), core_cnt)
     results = {}
     with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-        constants = functools.partial(_read_img_batch_from_video_helper, video_path=video_path, greyscale=greyscale, black_and_white=black_and_white, verbose=verbose)
+        constants = functools.partial(_read_img_batch_from_video_helper,
+                                      video_path=video_path,
+                                      greyscale=greyscale,
+                                      black_and_white=black_and_white,
+                                      verbose=verbose)
         for cnt, result in enumerate(pool.imap(constants, frm_lst, chunksize=1)):
             results.update(result)
     pool.join()
     pool.terminate()
 
     return results
+
+
+def read_df_array(df: pd.DataFrame, column: str):
+    """
+    Convert string representations of arrays in a DataFrame column to list of numpy arrays.
+
+    :param pd.DataFrame df: The DataFrame containing the column to be processed.
+    :param str column: The name of the column in the DataFrame that contains string representations of arrays.
+    :returns: A list of numpy arrays, each corresponding to an entry in the specified column. Each array is created by evaluating the string in the DataFrame colum
+    :rtype: List[np.ndarray]
+    """
+
+    check_str(name=column, value=column)
+    check_valid_dataframe(df=df, source=read_df_array.__name__, required_fields=[column])
+
+    def _col_to_arrays(s):
+        s = s.replace('\n', '')
+        s = s.replace(' ', ',')
+        return np.array(literal_eval(s))
+
+    return list(df[column].apply(_col_to_arrays).values)
+
+
+
+def read_sys_env():
+    env = {}
+    env[ENV_VARS.PRINT_EMOJIS.value] = str_2_bool(os.getenv(ENV_VARS.PRINT_EMOJIS.value, "True"))
+    env[ENV_VARS.UNSUPERVISED_INTERFACE.value] = str_2_bool(os.getenv(ENV_VARS.UNSUPERVISED_INTERFACE.value, "False"))
+    return env
