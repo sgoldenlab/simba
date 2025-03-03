@@ -1,11 +1,9 @@
 __author__ = "Simon Nilsson"
 
-import time
-start = time.time()
+from simba.utils.printing import stdout_success, stdout_warning, SimbaTimer
+load_timer = SimbaTimer(start=True)
 import os.path
 import warnings
-
-
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 import atexit
@@ -135,17 +133,14 @@ from simba.utils.custom_feature_extractor import CustomFeatureExtractor
 from simba.utils.enums import (OS, Defaults, Formats, Keys, Links, Paths, TagNames, ENV_VARS)
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis, get_icons_paths, load_simba_fonts)
-from simba.utils.printing import stdout_success, stdout_warning
 from simba.utils.read_write import (fetch_pip_data, find_core_cnt, get_video_meta_data, read_sys_env)
 from simba.utils.warnings import (FFMpegNotFoundWarning, PythonVersionWarning, VersionWarning)
 from simba.video_processors.video_processing import extract_frames_from_all_videos_in_directory
 sys.setrecursionlimit(10**6)
 currentPlatform = platform.system()
 ENV = read_sys_env()
-print(ENV)
-elapsed = time.time() - start
-print(elapsed)
-
+load_timer.stop_timer()
+print(f'SimBA environment variables: {ENV}. Load time: {load_timer.elapsed_time_str}s')
 
 class LoadProjectPopUp(object):
     def __init__(self):
