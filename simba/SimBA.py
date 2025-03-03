@@ -2,8 +2,6 @@ __author__ = "Simon Nilsson"
 
 import time
 start = time.time()
-
-
 import os.path
 import warnings
 
@@ -143,9 +141,10 @@ from simba.utils.warnings import (FFMpegNotFoundWarning, PythonVersionWarning, V
 from simba.video_processors.video_processing import extract_frames_from_all_videos_in_directory
 sys.setrecursionlimit(10**6)
 currentPlatform = platform.system()
-
-
 ENV = read_sys_env()
+print(ENV)
+elapsed = time.time() - start
+print(elapsed)
 
 
 class LoadProjectPopUp(object):
