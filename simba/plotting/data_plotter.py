@@ -10,7 +10,9 @@ from joblib import Parallel, delayed
 
 from simba.data_processors.movement_calculator import MovementCalculator
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_if_keys_exist_in_dict, check_valid_lst)
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_if_keys_exist_in_dict, check_valid_lst)
 from simba.utils.enums import Formats
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.lookups import get_color_dict

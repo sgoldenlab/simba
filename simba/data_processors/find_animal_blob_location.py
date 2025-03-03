@@ -1,17 +1,25 @@
-from shapely.geometry import Polygon, MultiPolygon
-from shapely.affinity import scale
-from typing import Dict, Optional, Union
-from copy import copy
-import numpy as np
-import cv2
-import os
-import gc
-from simba.utils.read_write import read_img_batch_from_video_gpu, get_video_meta_data, find_core_cnt, get_fn_ext, read_img_batch_from_video
-from simba.utils.checks import (check_float, check_instance, check_valid_boolean, is_img_bw, check_int, check_nvidea_gpu_available)
-from simba.utils.errors import FFMPEGCodecGPUError, SimBAGPUError
 import functools
+import gc
 import multiprocessing
+import os
+from copy import copy
+from typing import Dict, Optional, Union
+
+import cv2
+import numpy as np
+from shapely.affinity import scale
+from shapely.geometry import MultiPolygon, Polygon
+
+from simba.utils.checks import (check_float, check_instance, check_int,
+                                check_nvidea_gpu_available,
+                                check_valid_boolean, is_img_bw)
 from simba.utils.enums import Defaults
+from simba.utils.errors import FFMPEGCodecGPUError, SimBAGPUError
+from simba.utils.read_write import (find_core_cnt, get_fn_ext,
+                                    get_video_meta_data,
+                                    read_img_batch_from_video,
+                                    read_img_batch_from_video_gpu)
+
 
 def find_animal_blob_location(imgs: Dict[int, np.ndarray],
                               verbose: bool = False,
