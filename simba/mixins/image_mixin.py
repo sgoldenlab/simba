@@ -1,6 +1,8 @@
 import platform
 from typing import Dict, List, Optional, Tuple, Union
+
 import numpy as np
+
 try:
     from typing import Literal
 except:
@@ -14,9 +16,11 @@ from collections import ChainMap
 import cv2
 import pandas as pd
 from numba import float64, int64, jit, njit, prange, uint8
-from shapely.geometry import Polygon, MultiPolygon
+from shapely.geometry import MultiPolygon, Polygon
 from skimage.metrics import structural_similarity
 
+from simba.data_processors.find_animal_blob_location import \
+    find_animal_blob_location
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_if_valid_img,
                                 check_if_valid_rgb_tuple, check_instance,
@@ -29,8 +33,12 @@ from simba.utils.errors import (ArrayError, FFMPEGCodecGPUError,
                                 FrameRangeError, InvalidInputError,
                                 NotDirectoryError)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_core_cnt, find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data, read_frm_of_video, read_img_batch_from_video_gpu, write_df)
-from simba.data_processors.find_animal_blob_location import find_animal_blob_location
+from simba.utils.read_write import (find_core_cnt,
+                                    find_files_of_filetypes_in_directory,
+                                    get_fn_ext, get_video_meta_data,
+                                    read_frm_of_video,
+                                    read_img_batch_from_video_gpu, write_df)
+
 
 class ImageMixin(object):
     """

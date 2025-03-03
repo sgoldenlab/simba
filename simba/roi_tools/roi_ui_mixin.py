@@ -1,10 +1,10 @@
 import ctypes
 import math
 import os
+import platform
 from copy import copy
 from tkinter import *
 from typing import Optional, Union
-import platform
 
 import cv2
 import numpy as np
@@ -41,7 +41,8 @@ from simba.sandbox.roi_tkinter.interactive_roi_modifier_tkinter import \
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, SimbaButton, SimBALabel,
                                         get_menu_icons)
-from simba.utils.checks import check_int, check_str, check_file_exist_and_readable
+from simba.utils.checks import (check_file_exist_and_readable, check_int,
+                                check_str)
 from simba.utils.enums import OS, ROI_SETTINGS, Formats, Keys
 from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 NoROIDataError)
