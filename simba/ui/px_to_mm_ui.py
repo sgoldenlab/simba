@@ -12,8 +12,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_instance, check_int)
 from simba.utils.enums import TextOptions
 from simba.utils.errors import FrameRangeError
-from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
-                                    read_frm_of_video)
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_frm_of_video)
 
 PIXEL_SENSITIVITY = 20
 DRAW_COLOR = (144, 0, 255)
@@ -46,11 +45,10 @@ class GetPixelsPerMillimeterInterface():
         check_file_exist_and_readable(file_path=video_path)
         self.video_meta_data = get_video_meta_data(video_path=video_path)
         check_float(name='distance', value=known_metric_mm, min_value=1)
-        known_metric_mm = float(known_metric_mm)
-        self.video_path, self.known_metric_mm = video_path, known_metric_mm
+        self.video_path, self.known_metric_mm = video_path, float(known_metric_mm)
         self.frame, _ = ImageMixin.find_first_non_uniform_clr_frm(video_path=video_path, start_idx=0, end_idx=self.video_meta_data['fps'])
         self.video_dir, self.video_name, _ = get_fn_ext(filepath=self.video_path)
-        self.font_scale, self.spacing_x, self.spacing_y = PlottingMixin().get_optimal_font_scales(text='"Select coordinates: double left mouse click at two locations. Press ESC when done"', accepted_px_width=int(self.video_meta_data['width']), accepted_px_height=int(self.video_meta_data['height'] * 0.3))
+        self.font_scale, self.spacing_x, self.spacing_y = PlottingMixin().get_optimal_font_scales(text='"Press ESC to save and exit"', accepted_px_width=int(self.video_meta_data['width']), accepted_px_height=int(self.video_meta_data['height'] * 0.3))
         self.circle_scale = PlottingMixin().get_optimal_circle_size(frame_size=(int(self.video_meta_data['width']), int(self.video_meta_data['height'])), circle_frame_ratio=70)
         self.original_frm = self.frame.copy()
         self.overlay_frm = self.frame.copy()

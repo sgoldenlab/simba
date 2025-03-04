@@ -588,7 +588,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
     def create_video_info_table(self):
         video_info_tabler = VideoInfoTable(config_path=self.config_path)
-        video_info_tabler.create_window()
+        video_info_tabler.run()
 
     def initiate_skip_outlier_correction(self):
         outlier_correction_skipper = OutlierCorrectionSkipper(config_path=self.config_path)

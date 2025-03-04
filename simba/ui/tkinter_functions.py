@@ -186,6 +186,8 @@ class Entry_Box(Frame):
                  status=None,
                  validation=None,
                  entry_box_width=None,
+                 value: Optional[str] = None,
+                 justify: str = 'left',
                  **kw):
 
         super(Entry_Box, self).__init__(master=parent)
@@ -197,10 +199,12 @@ class Entry_Box(Frame):
         self.lblName = Label(self, text=fileDescription, width=labelwidth, anchor=W, font=Formats.FONT_REGULAR.value)
         self.lblName.grid(row=0, column=0)
         if not entry_box_width:
-            self.entPath = Entry(self, textvariable=self.filePath, state=self.status,  validate="key", validatecommand=self.validation_methods.get(validation, None), font=Formats.FONT_REGULAR.value)
+            self.entPath = Entry(self, textvariable=self.filePath, state=self.status,  validate="key", validatecommand=self.validation_methods.get(validation, None), font=Formats.FONT_REGULAR.value, justify=justify)
         else:
-            self.entPath = Entry(self, textvariable=self.filePath, state=self.status, width=entry_box_width, validate="key", font=Formats.FONT_REGULAR.value, validatecommand=self.validation_methods.get(validation, None))
+            self.entPath = Entry(self, textvariable=self.filePath, state=self.status, width=entry_box_width, validate="key", font=Formats.FONT_REGULAR.value, justify=justify, validatecommand=self.validation_methods.get(validation, None))
         self.entPath.grid(row=0, column=1)
+        if value is not None:
+            self.entry_set(val=value)
 
     @property
     def entry_get(self):

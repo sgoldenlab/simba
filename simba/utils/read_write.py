@@ -1432,9 +1432,7 @@ def copy_multiple_videos_to_project(
     )
 
 
-def find_all_videos_in_project(
-    videos_dir: Union[str, os.PathLike], basename: Optional[bool] = False
-) -> List[str]:
+def find_all_videos_in_project(videos_dir: Union[str, os.PathLike], basename: Optional[bool] = False) -> List[str]:
     """
     Get filenames of .avi and .mp4 files within a directory
 
