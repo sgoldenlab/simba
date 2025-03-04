@@ -321,6 +321,33 @@ class FeatureExtractionMixin(object):
 
     @staticmethod
     @jit(nopython=True)
+    def is_inside_circle(bp: np.ndarray, roi_center: np.ndarray, roi_radius: int) -> np.ndarray:
+        """
+        Determines whether each body part in `bp` is inside or outside a given circular region.
+
+        This function calculates the Euclidean distance between each body part's (x, y) coordinates
+        and the center of the region of interest (ROI). If the distance is less than or equal to
+        the specified radius, the body part is considered inside the circle (marked as 1); otherwise,
+        it is considered outside (marked as 0).
+
+        :param np.ndarray bp: A (N, 2) array containing the (x, y) coordinates of N body parts.
+        :param np.ndarray roi_center: A (2,) array representing the (x, y) coordinates of the circle center.
+        :param int roi_radius: The radius of the circular region of interest.
+        :return: A 1D numpy array of size `len(bp)`, where 1 represents a body part inside the circle and 0 represents a body part outside the circle.
+        :rtype: np.ndarray
+        """
+
+        results = np.full(shape=(bp.shape[0]), fill_value=-1, dtype=np.int32)
+        for i in prange(bp.shape[0]):
+            px_dist = int(np.sqrt((bp[i][0] - roi_center[0]) ** 2 + (bp[i][1] - roi_center[1]) ** 2))
+            if px_dist <= roi_radius:
+                results[i] = 1
+            else:
+                results[i] = 0
+        return results
+
+    @staticmethod
+    @jit(nopython=True)
     def framewise_inside_polygon_roi(bp_location: np.ndarray, roi_coords: np.ndarray) -> np.ndarray:
         """
         Jitted helper for frame-wise detection if animal is inside static polygon ROI.

@@ -1,337 +1,162 @@
 __author__ = "Simon Nilsson"
 
+from typing import Union, Tuple, Optional, List
 import os
 
+import cv2
 import numpy as np
 import pandas as pd
-from shapely import geometry
-from shapely.geometry import Point, Polygon
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_if_filepath_list_is_empty,
-                                check_that_column_exist)
+from simba.utils.checks import (check_if_dir_exists, check_valid_dataframe, check_file_exist_and_readable, check_valid_tuple, check_valid_lst, check_all_file_names_are_represented_in_video_log)
 from simba.utils.data import detect_bouts
-from simba.utils.errors import NoChoosenClassifierError, NoROIDataError
-from simba.utils.printing import stdout_success
-from simba.utils.read_write import get_fn_ext, read_config_entry, read_df
-from simba.utils.warnings import NoDataFoundWarning, ROIWarning
+from simba.utils.errors import NoROIDataError, InvalidInputError
+from simba.utils.printing import stdout_success, SimbaTimer
+from simba.utils.read_write import get_fn_ext,  read_df
+from simba.utils.warnings import ROIWarning
+from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 
+MEASURES = ('TOTAL BEHAVIOR TIME IN ROI (S)', 'STARTED BEHAVIOR BOUTS IN ROI (COUNT)', 'ENDED BEHAVIOR BOUTS IN ROI (COUNT)')
 
 class ROIClfCalculator(ConfigReader):
     """
     Compute aggregate statistics of classification results within user-defined ROIs.
     Results are stored in `project_folder/logs` directory of the SimBA project.
 
-    :param str config_path: path to SimBA project config file in Configparser format
+    :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
+    :param List[str] bp_names: List of body-parts to use as proxy for animal locations.
+    :param Optional[Union[str, os.PathLike]] save_path: Optional location where to store the results in CSV format. If None, then results are stored in logs folder of SImBA project.
+    :param Optional[List[Union[str, os.PathLike]]] data_paths: Optional list of data files to analyze. If None, then all file sin the ``machine_results`` directory is analyzed.
+    :param Optional[List[str]] clf_names: Optional List of classifiers to analyze. If None, then all classifiers in SimBA project are analyzed.
+    :param Optional[List[str]] roi_names: Optional list of ROI names to analyze. If None, then all ROI names are analyzed.
+    :param Tuple[str] measures: Tuple of measures to include. Options: 'TOTAL BEHAVIOR TIME IN ROI (S)', 'STARTED BEHAVIOR BOUTS IN ROI (COUNT)', 'ENDED BEHAVIOR BOUTS IN ROI (COUNT)'.
 
     .. note:
        'GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results`__.
 
-    Examples
-    -----
-    >>> clf_ROI_analyzer = ROIClfCalculator(config_ini="MyConfigPath")
-    >>> clf_ROI_analyzer.run(behavior_list=['Attack', 'Sniffing'], ROI_dict_lists={'Rectangle': ['rec'], 'Circle': ['Stimulus 1', 'Stimulus 2', 'Stimulus 3']}, body_part_list=['Nose_1'], measurements=['Total time by ROI (s)', 'Started bouts by ROI (count)', 'Ended bouts by ROI (count)'])
+    :example:
+    >>> analyzer = ROIClfCalculator(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini", bp_names=('nose',), clf_names=('straub_tail',))
+    >>> analyzer.run()
+    >>> analyzer.save()
     """
 
-    def __init__(self, config_ini: str):
-        ConfigReader.__init__(self, config_path=config_ini)
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 bp_names: List[str],
+                 save_path: Optional[Union[str, os.PathLike]] = None,
+                 data_paths: Optional[List[Union[str, os.PathLike]]] = None,
+                 clf_names: Optional[List[str]] = None,
+                 roi_names: Optional[List[str]] = None,
+                 measures: List[str] = ['TOTAL BEHAVIOR TIME IN ROI (S)', 'STARTED BEHAVIOR BOUTS IN ROI (COUNT)', 'ENDED BEHAVIOR BOUTS IN ROI (COUNT)']):
+
+        check_file_exist_and_readable(file_path=config_path)
+        ConfigReader.__init__(self, config_path=config_path)
         self.read_roi_data()
-
-    def __inside_rectangle(
-        self, bp_x, bp_y, top_left_x, top_left_y, bottom_right_x, bottom_right_y
-    ):
-        """
-        Private helper to calculate if body-part is inside a rectangle.
-        """
-        if ((top_left_x) <= bp_x <= (bottom_right_x)) and (
-            (top_left_y) <= bp_y <= (bottom_right_y)
-        ):
-            return 1
+        if data_paths is None:
+            data_paths = self.machine_results_paths
+        check_valid_lst(data=data_paths, source=f'{self.__class__.__name__} data_paths', valid_dtypes=(str,), min_len=1)
+        if clf_names is not None:
+            check_valid_lst(data=clf_names, source=f'{self.__class__.__name__} clf_names', min_len=1, valid_dtypes=(str,))
+            self.clf_names = clf_names
+        if roi_names is not None:
+            check_valid_lst(data=roi_names, source=f'{self.__class__.__name__} roi_names', min_len=1, valid_dtypes=(str,))
+            self.roi_names = roi_names
         else:
-            return 0
-
-    def __inside_circle(self, bp_x, bp_y, center_x, center_y, radius):
-        """
-        Private helper to calculate if body-part is inside a circle.
-        """
-        px_dist = int(np.sqrt((bp_x - center_x) ** 2 + (bp_y - center_y) ** 2))
-        if px_dist <= radius:
-            return 1
+            self.roi_names = self.shape_names
+        unaccepted_measures = [x for x in measures if x not in MEASURES]
+        check_valid_lst(data=measures, source=f'{self.__class__.__name__} measures', min_len=1, valid_dtypes=(str,))
+        if len(unaccepted_measures) > 0:
+            raise InvalidInputError(msg=f'{unaccepted_measures} are invalid measure options. Accepted: {MEASURES}', source=self.__class__.__name__)
+        check_valid_lst(data=bp_names, source=f'{self.__class__.__name__} bp_names', min_len=1, valid_dtypes=(str,))
+        unaccepted_bps = [x for x in bp_names if x not in self.body_parts_lst]
+        if len(unaccepted_bps) > 0:
+            raise InvalidInputError(msg=f'{unaccepted_bps} are invalid body-part options. Accepted: {self.body_parts_lst}', source=self.__class__.__name__)
+        if save_path is None:
+            self.save_path = os.path.join(self.logs_path, f"Classification_time_by_ROI_{self.datetime}.csv")
         else:
-            return 0
+            check_if_dir_exists(os.path.dirname(save_path))
+            self.save_path = save_path
+        self.bp_names, self.measures = bp_names, measures
+        self.data_paths = data_paths
+        self.bp_cols = []
+        for bp_name in self.bp_names: self.bp_cols.append([f"{bp_name}_x", f"{bp_name}_y", f"{bp_name}_p"])
+        self.required_fields = [i for ii in self.bp_cols for i in ii] + list(self.clf_names)
+        self.results_df = pd.DataFrame(columns=['VIDEO', 'CLASSIFIER', 'ROI', 'BODY-PART', 'MEASURE', 'VALUE'])
 
-    def __inside_polygon(self, bp_x, bp_y, polygon):
-        """
-        Private helper to calculate if body-part is inside a polygon.
-        """
-        if polygon.contains(Point(int(bp_x), int(bp_y))):
-            return 1
-        else:
-            return 0
-
-    def __compute_agg_statistics(self, data: pd.DataFrame):
-        """
-
-        Parameters
-        ----------
-        data: pd.DataFrame
-            Dataframe with boolean columns representing behaviors (behavior present: 1, behavior absent: 0)
-            and ROI data (inside ROI: 1, outside ROI: 0).
-
-        """
-        self.results_dict[self.video_name] = {}
-        for clf in self.behavior_list:
-            self.results_dict[self.video_name][clf] = {}
-            for roi in self.found_rois:
-                self.results_dict[self.video_name][clf][roi] = {}
-                if "Total time by ROI (s)" in self.measurements:
-                    frame_cnt = len(data.loc[(data[clf] == 1) & (data[roi] == 1)])
-                    if frame_cnt > 0:
-                        self.results_dict[self.video_name][clf][roi][
-                            "Total time by ROI (s)"
-                        ] = (frame_cnt / self.fps)
-                    else:
-                        self.results_dict[self.video_name][clf][roi][
-                            "Total time (s)"
-                        ] = 0
-                if "Started bouts by ROI (count)" in self.measurements:
-                    start_frames = list(
-                        detect_bouts(data_df=data, target_lst=[clf], fps=int(self.fps))[
-                            "Start_frame"
-                        ]
-                    )
-                    self.results_dict[self.video_name][clf][roi][
-                        "Started bouts by ROI (count)"
-                    ] = len(data[(data.index.isin(start_frames)) & (data[roi] == 1)])
-                if "Ended bouts by ROI (count)" in self.measurements:
-                    start_frames = list(
-                        detect_bouts(data_df=data, target_lst=[clf], fps=int(self.fps))[
-                            "End_frame"
-                        ]
-                    )
-                    self.results_dict[self.video_name][clf][roi][
-                        "Ended bouts by ROI (count)"
-                    ] = len(data[(data.index.isin(start_frames)) & (data[roi] == 1)])
-
-    def __print_missing_roi_warning(self, roi_type: str, roi_name: str):
-        """
-        Private helper to print warnings when ROI shapes have been defined in some videos but missing in others.
-        """
-        names = "None"
-        ROIWarning(
-            msg=f'ROI named "{roi_name}" of shape type "{roi_type}" not found for video {self.video_name}. Skipping shape...'
-        )
-        if roi_type.lower() == "rectangle":
-            names = list(
-                self.rectangles_df["Name"][
-                    self.rectangles_df["Video"] == self.video_name
-                ]
-            )
-        elif roi_type.lower() == "circle":
-            names = list(
-                self.circles_df["Name"][self.circles_df["Video"] == self.video_name]
-            )
-        elif roi_type.lower() == "polygon":
-            names = list(
-                self.polygon_df["Name"][self.polygon_df["Video"] == self.video_name]
-            )
-        ROIWarning(
-            msg=f"NOTE: Video {self.video_name} has the following {roi_type} shape names: {names}"
-        )
-
-    def run(
-        self,
-        ROI_dict_lists: dict,
-        measurements: list,
-        behavior_list: list,
-        body_part_list: list,
-    ):
-        """
-        Parameters
-        ----------
-        ROI_dict_lists: dict
-            A dictionary with the shape type as keys (i.e., Rectangle, Circle, Polygon) and lists of shape names
-            as values.
-        measurements: list
-            Measurements to calculate aggregate statistics for. E.g., ['Total time by ROI (s)', 'Started bouts', 'Ended bouts']
-        behavior_list: list
-            Classifier names to calculate ROI statistics. E.g., ['Attack', 'Sniffing']
-        body_part_list: list
-            Body-part names to use to infer animal location. Eg., ['Nose_1'].
-        """
-
-        self.ROI_dict_lists, self.behavior_list, self.measurements = (
-            ROI_dict_lists,
-            self.clf_names,
-            measurements,
-        )
-        self.file_type = read_config_entry(
-            config=self.config,
-            section="General settings",
-            option="workflow_file_type",
-            data_type="str",
-        )
-        check_if_filepath_list_is_empty(
-            filepaths=self.machine_results_paths,
-            error_msg="SIMBA ERROR: No machine learning results found in the project_folder/csv/machine_results directory. Create machine classifications before analyzing classifications by ROI",
-        )
-        if len(behavior_list) == 0:
-            raise NoChoosenClassifierError()
-        print(f"Analyzing {str(len(self.machine_results_paths))} files...")
-        body_part_col_names = []
-        body_part_col_names_x, body_part_col_names_y = [], []
-        for body_part in body_part_list:
-            body_part_col_names.extend(
-                (body_part + "_x", body_part + "_y", body_part + "_p")
-            )
-            body_part_col_names_x.append(body_part + "_x")
-            body_part_col_names_y.append(body_part + "_y")
-        all_columns = body_part_col_names + self.behavior_list
-        self.results_dict = {}
-
-        self.frame_counter_dict = {}
-        for file_cnt, file_path in enumerate(self.machine_results_paths):
-            _, self.video_name, ext = get_fn_ext(file_path)
-            print("Analyzing {}....".format(self.video_name))
-            data_df = read_df(file_path, self.file_type)
-            for column in all_columns:
-                check_that_column_exist(
-                    file_name=self.video_name, df=data_df, column_name=column
-                )
-            data_df = data_df[all_columns]
-            self.results = data_df[self.behavior_list]
-            shapes_in_video = (
-                len(
-                    self.rectangles_df.loc[
-                        (self.rectangles_df["Video"] == self.video_name)
-                    ]
-                )
-                + len(
-                    self.circles_df.loc[(self.circles_df["Video"] == self.video_name)]
-                )
-                + len(
-                    self.polygon_df.loc[(self.polygon_df["Video"] == self.video_name)]
-                )
-            )
-            if shapes_in_video == 0:
-                NoDataFoundWarning(
-                    msg="Skipping {self.video_name}: Video {self.video_name} has 0 user-defined ROI shapes."
-                )
+    def run(self):
+        check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
+        results = {}
+        for cnt, data_path in enumerate(self.data_paths):
+            video_timer = SimbaTimer(start=True)
+            video_name = get_fn_ext(filepath=data_path)[1]
+            print(f'Analyzing classification ROI data for video {video_name} (File {cnt+1}/{len(self.data_paths)})...')
+            _, _, self.fps = self.read_video_info(video_name=video_name)
+            results[video_name] = {}
+            video_rectangles = self.rectangles_df[self.rectangles_df['Video'] == video_name]
+            video_circles = self.circles_df[self.circles_df['Video'] == video_name]
+            video_polygons = self.polygon_df[self.circles_df['Video'] == video_name]
+            if len(video_rectangles) + len(video_circles) + len(video_polygons) == 0:
+                ROIWarning(msg=f'Skipping video {video_name}: No drawn ROIs found for video {video_name}', source=self.__class__.__name__)
                 continue
-            _, _, self.fps = self.read_video_info(video_name=self.video_name)
-            self.found_rois = []
-            for roi_type, roi_data in self.ROI_dict_lists.items():
-                shape_info = pd.DataFrame()
-                for roi_name in roi_data:
-                    if roi_type.lower() == "rectangle":
-                        shape_info = self.rectangles_df.loc[
-                            (self.rectangles_df["Video"] == self.video_name)
-                            & (self.rectangles_df["Shape_type"] == roi_type)
-                            & (self.rectangles_df["Name"] == roi_name)
-                        ]
-                    elif roi_type.lower() == "circle":
-                        shape_info = self.circles_df.loc[
-                            (self.circles_df["Video"] == self.video_name)
-                            & (self.circles_df["Shape_type"] == roi_type)
-                            & (self.circles_df["Name"] == roi_name)
-                        ]
-                    elif roi_type.lower() == "polygon":
-                        shape_info = self.polygon_df.loc[
-                            (self.polygon_df["Video"] == self.video_name)
-                            & (self.polygon_df["Shape_type"] == roi_type)
-                            & (self.polygon_df["Name"] == roi_name)
-                        ]
-                    if len(shape_info) == 0:
-                        self.__print_missing_roi_warning(
-                            roi_type=roi_type, roi_name=roi_name
-                        )
-                        continue
-                    if roi_type.lower() == "rectangle":
-                        data_df["top_left_x"], data_df["top_left_y"] = (
-                            shape_info["topLeftX"].values[0],
-                            shape_info["topLeftY"].values[0],
-                        )
-                        data_df["bottom_right_x"], data_df["bottom_right_y"] = (
-                            shape_info["Bottom_right_X"].values[0],
-                            shape_info["Bottom_right_Y"].values[0],
-                        )
-                        self.results[roi_name] = data_df.apply(
-                            lambda x: self.__inside_rectangle(
-                                bp_x=x[body_part_col_names_x[0]],
-                                bp_y=x[body_part_col_names_y[0]],
-                                top_left_x=x["top_left_x"],
-                                top_left_y=x["top_left_y"],
-                                bottom_right_x=x["bottom_right_x"],
-                                bottom_right_y=x["bottom_right_y"],
-                            ),
-                            axis=1,
-                        )
-                        self.found_rois.append(roi_name)
-                    elif roi_type.lower() == "circle":
-                        data_df["center_x"], data_df["center_y"], data_df["radius"] = (
-                            shape_info["centerX"].values[0],
-                            shape_info["centerY"].values[0],
-                            shape_info["radius"].values[0],
-                        )
-                        self.results[roi_name] = data_df.apply(
-                            lambda x: self.__inside_circle(
-                                bp_x=x[body_part_col_names_x[0]],
-                                bp_y=x[body_part_col_names_y[0]],
-                                center_x=x["center_x"],
-                                center_y=x["center_y"],
-                                radius=x["radius"],
-                            ),
-                            axis=1,
-                        )
-                        self.found_rois.append(roi_name)
-                    elif roi_type.lower() == "polygon":
-                        polygon_vertices = []
-                        for i in shape_info["vertices"].values[0]:
-                            polygon_vertices.append(geometry.Point(i))
-                        polygon = Polygon([[p.x, p.y] for p in polygon_vertices])
-                        self.results[roi_name] = data_df.apply(
-                            lambda x: self.__inside_polygon(
-                                bp_x=x[body_part_col_names_x[0]],
-                                bp_y=x[body_part_col_names_y[0]],
-                                polygon=polygon,
-                            ),
-                            axis=1,
-                        )
-                        self.found_rois.append(roi_name)
-                self.__compute_agg_statistics(data=self.results)
-        self.__organize_output_data()
+            else:
+                data_df = read_df(file_path=data_path, file_type=self.file_type)
+                check_valid_dataframe(df=data_df, source=f'{data_path}', required_fields=self.required_fields)
+                data_df = data_df[self.required_fields]
+                for (bp_x, bp_y, bp_p) in self.bp_cols:
+                    bp_name = bp_x[:-2]
+                    bp_arr = data_df[[bp_x, bp_y]].values.astype(np.int32)
+                    results[video_name][bp_name] = {}
+                    for idx, rectangle in video_rectangles.iterrows():
+                        roi_coords = np.array([rectangle[['topLeftX', 'topLeftY']].values, rectangle[['Bottom_right_X', 'Bottom_right_Y']].values]).astype(np.int32)
+                        results[video_name][bp_name][rectangle['Name']] = FeatureExtractionMixin.framewise_inside_rectangle_roi(bp_location=bp_arr, roi_coords=roi_coords)
+                    for idx, circle in video_circles.iterrows():
+                        circle_center = np.array(circle[['Center_X', 'Center_Y']].values).astype(np.int32)
+                        results[video_name][bp_name][circle['Name']] = FeatureExtractionMixin.is_inside_circle(bp=bp_arr, roi_center=circle_center, roi_radius=circle['radius'])
+                    for idx, polygon in video_polygons.iterrows():
+                        vertices = polygon['vertices'].astype(np.int32)
+                        results[video_name][bp_name][polygon['Name']] = FeatureExtractionMixin.framewise_inside_polygon_roi(bp_location=bp_arr, roi_coords=vertices)
 
-    def __organize_output_data(self):
-        """
-        Helper to organize the results[dict] into a human-readable CSV file.
-        """
-        if len(self.results_dict.keys()) == 0:
-            raise NoROIDataError(
-                msg="ZERO ROIs found the videos represented in the project_folder/csv/machine_results directory"
-            )
-        out_df = pd.DataFrame(
-            columns=["VIDEO", "CLASSIFIER", "ROI", "MEASUREMENT", "VALUE"]
-        )
-        for video_name, video_data in self.results_dict.items():
-            for clf, clf_data in video_data.items():
-                for roi_name, roi_data in clf_data.items():
-                    for measurement_name, mesurement_value in roi_data.items():
-                        out_df.loc[len(out_df)] = [
-                            video_name,
-                            clf,
-                            roi_name,
-                            measurement_name,
-                            mesurement_value,
-                        ]
-        out_path = os.path.join(
-            self.logs_path, f"Classification_time_by_ROI_{self.datetime}.csv"
-        )
-        out_df.to_csv(out_path)
-        self.timer.stop_timer()
-        stdout_success(
-            msg=f"Classification data by ROIs saved in {out_path}.",
-            elapsed_time=self.timer.elapsed_time_str,
-        )
+                for clf_name in self.clf_names:
+                    clf_data = data_df[clf_name].values
+                    for bp_name, bp_data in results[video_name].items():
+                        for roi_name, roi_data in results[video_name][bp_name].items():
+                            field_name = f'{clf_name}_{bp_name}_{roi_name}'
+                            data_df[field_name] = 0
+                            roi_clf_idx = np.where((roi_data == 1) & (clf_data == 1))[0]
+                            data_df[field_name].iloc[roi_clf_idx] = 1
+                            bouts = detect_bouts(data_df=data_df, target_lst=[field_name], fps=int(self.fps))
+                            total_time = bouts['Bout_time'].sum()
+                            start_frames, end_frames = list(bouts["Start_frame"]), list(bouts["End_frame"])
+                            roi_clf_start_cnt = len([x for x in start_frames if x in roi_clf_idx])
+                            roi_clf_end_cnt = len([x for x in start_frames if x in roi_clf_idx])
+                            self.results_df.loc[len(self.results_df)] = [video_name, clf_name, roi_name, bp_name, 'TOTAL BEHAVIOR TIME IN ROI (S)', total_time]
+                            self.results_df.loc[len(self.results_df)] = [video_name, clf_name, roi_name, bp_name, 'STARTED BEHAVIOR BOUTS IN ROI (COUNT)', roi_clf_start_cnt]
+                            self.results_df.loc[len(self.results_df)] = [video_name, clf_name, roi_name, bp_name, 'ENDED BEHAVIOR BOUTS IN ROI (COUNT)', roi_clf_end_cnt]
+                video_timer.stop_timer()
+                print(f'Video {video_name} complete (elapsed time {video_timer.elapsed_time_str}s) ...')
+    def save(self):
+        if len(self.results_df) == 0:
+            raise NoROIDataError(f'No ROI drawings detected for the {len(self.data_paths)} video file(s). No data is saved.', source=self.__class__.__name__)
+        else:
+            self.results_df = self.results_df[self.results_df['MEASURE'].isin(self.measures)].set_index('VIDEO')
+            self.results_df = self.results_df.sort_values(by=['VIDEO', 'CLASSIFIER', 'ROI', 'BODY-PART', 'MEASURE'])
+            self.results_df['VALUE'] = self.results_df['VALUE'].round(4)
+            self.results_df.to_csv(self.save_path)
+            self.timer.stop_timer()
+            stdout_success(msg=f"Classification by ROI data for {len(self.data_paths)} video(s) saved in {self.save_path}.", elapsed_time=self.timer.elapsed_time_str)
+
+
+# analyzer = ROIClfCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", bp_names=['Nose'], clf_names=['straub_tail'], measures=['TOTAL BEHAVIOR TIME IN ROI (S)'])
+# analyzer.run()
+# analyzer.save()
+
+
+#clf_ROI_analyzer = clf_within_ROI(config_ini="/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini")
+#clf_ROI_analyzer.run(behavior_list=['Attack', 'Sniffing'], ROI_dict_lists={'Rectangle': ['rec'], 'Circle': ['Stimulus 1', 'Stimulus 2', 'Stimulus 3']}, body_part_list=['Nose_1'], measurements=['Total time by ROI (s)', 'Started bouts by ROI (count)', 'Ended bouts by ROI (count)'])
+
+
+
+
 
 
 #
