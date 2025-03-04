@@ -12,7 +12,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_instance, check_int)
 from simba.utils.enums import TextOptions
 from simba.utils.errors import FrameRangeError
-from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_frm_of_video)
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
+                                    read_frm_of_video)
 
 PIXEL_SENSITIVITY = 20
 DRAW_COLOR = (144, 0, 255)
