@@ -1,20 +1,23 @@
 __author__ = "Simon Nilsson"
 
-from typing import Union, Tuple, Optional, List
 import os
+from typing import List, Optional, Tuple, Union
 
 import cv2
 import numpy as np
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_if_dir_exists, check_valid_dataframe, check_file_exist_and_readable, check_valid_tuple, check_valid_lst, check_all_file_names_are_represented_in_video_log)
-from simba.utils.data import detect_bouts
-from simba.utils.errors import NoROIDataError, InvalidInputError
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.read_write import get_fn_ext,  read_df
-from simba.utils.warnings import ROIWarning
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_file_exist_and_readable, check_if_dir_exists, check_valid_dataframe,
+    check_valid_lst, check_valid_tuple)
+from simba.utils.data import detect_bouts
+from simba.utils.errors import InvalidInputError, NoROIDataError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_fn_ext, read_df
+from simba.utils.warnings import ROIWarning
 
 MEASURES = ('TOTAL BEHAVIOR TIME IN ROI (S)', 'STARTED BEHAVIOR BOUTS IN ROI (COUNT)', 'ENDED BEHAVIOR BOUTS IN ROI (COUNT)')
 

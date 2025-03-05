@@ -11,8 +11,10 @@ from simba.roi_tools.ROI_clf_calculator import ROIClfCalculator
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         SimbaButton, SimbaCheckbox)
 from simba.utils.enums import Formats, Keys, Links
-from simba.utils.errors import (NoChoosenClassifierError, NoChoosenMeasurementError, NoChoosenROIError, ROICoordinatesNotFoundError, NoROIDataError, NoDataError)
-
+from simba.utils.errors import (NoChoosenClassifierError,
+                                NoChoosenMeasurementError, NoChoosenROIError,
+                                NoDataError, NoROIDataError,
+                                ROICoordinatesNotFoundError)
 
 MEASURES = ('TOTAL BEHAVIOR TIME IN ROI (S)', 'STARTED BEHAVIOR BOUTS IN ROI (COUNT)', 'ENDED BEHAVIOR BOUTS IN ROI (COUNT)')
 
