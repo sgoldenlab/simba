@@ -76,8 +76,6 @@ class PosePlotter(object):
         for file in self.files_found:
             self.data[file] = self.config.find_video_of_file(video_dir=self.config.video_dir, filename=get_fn_ext(file)[1])
 
-
-
     def run(self):
         for file_cnt, (pose_path, video_path) in enumerate(self.data.items()):
             video_timer = SimbaTimer(start=True)
@@ -104,6 +102,8 @@ class PosePlotter(object):
             frm_cnt = 0
             while cap.isOpened():
                 ret, frame = cap.read()
+                if frm_cnt >= len(pose_df):
+                    break
                 if ret:
                     for animal_cnt, (animal_name, animal_data) in enumerate(self.config.animal_bp_dict.items()):
                         for bp_cnt, (bp_x, bp_y) in enumerate(zip(animal_data["X_bps"], animal_data["Y_bps"])):
@@ -124,5 +124,7 @@ class PosePlotter(object):
         stdout_success(msg=f"All pose videos complete. Results located in {self.out_dir} directory", elapsed_time=self.config.timer.elapsed_time_str)
 
 
+# x = PosePlotter(data_path=r'C:\troubleshooting\mitra\project_folder\csv\input_csv', sample_time=100)
+# x.run()
 # x = PosePlotter(data_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/csv/input_csv/Together_1.csv')
 # x.run()

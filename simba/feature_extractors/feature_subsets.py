@@ -24,7 +24,7 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_headers_in_dfs_are_unique,
                                 check_same_number_of_rows_in_dfs,
                                 check_that_column_exist)
-from simba.utils.enums import Formats, Options
+from simba.utils.enums import Formats
 from simba.utils.errors import CountError, DataHeaderError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df, write_df
@@ -51,15 +51,14 @@ class FeatureSubsetsCalculator(ConfigReader, FeatureExtractionMixin, TrainModelM
     >>> _ = FeatureSubsetsCalculator(config_path='project_folder/project_config.ini', feature_family='Frame-by-frame body-parts inside ROIs (Boolean)', save_dir='data').run()
     """
 
-    def __init__(
-        self,
-        config_path: Union[str, os.PathLike],
-        save_dir: Union[str, os.PathLike, None],
-        feature_families: List[str],
-        include_file_checks: Optional[bool] = False,
-        append_to_features_extracted: Optional[bool] = False,
-        append_to_targets_inserted: Optional[bool] = False,
-    ):
+    def __init__(self,
+                  config_path: Union[str, os.PathLike],
+                  save_dir: Union[str, os.PathLike, None],
+                  feature_families: List[str],
+                  include_file_checks: Optional[bool] = False,
+                  append_to_features_extracted: Optional[bool] = False,
+                  append_to_targets_inserted: Optional[bool] = False):
+
         FeatureExtractionMixin.__init__(self, config_path=config_path)
         ConfigReader.__init__(self, config_path=config_path)
         TrainModelMixin.__init__(self)
