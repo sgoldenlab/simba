@@ -218,7 +218,7 @@ class PopUpMixin(object):
             self.run_frm.grid(row=idx, column=0, sticky=NW)
         self.run_btn.grid(row=0, column=0, sticky=NW)
 
-    def create_choose_number_of_body_parts_frm(self, project_body_parts: List[str], run_function: object):
+    def create_choose_number_of_body_parts_frm(self, project_body_parts: List[str], run_function: object, title: str = "SELECT NUMBER OF BODY-PARTS", dropdown_lbl: str = "# of body-parts"):
         """
         Many menus depend on how many animals the user choose to compute metrics for. Thus, we need to populate the menus
         dynamically. This function creates a single drop-down menu where the user select the number of animals the
@@ -229,13 +229,11 @@ class PopUpMixin(object):
         :param object run_function: Function tied to the choice in the dropdown menu.
         """
 
-        self.bp_cnt_frm = LabelFrame( self.main_frm, text="SELECT NUMBER OF BODY-PARTS", font=Formats.FONT_HEADER.value,)
-        self.bp_cnt_dropdown = DropDownMenu( self.bp_cnt_frm, "# of body-parts", list(range(1, len(project_body_parts) + 1)), "12",)
+        self.bp_cnt_frm = LabelFrame(self.main_frm, text=title, font=Formats.FONT_HEADER.value,)
+        self.bp_cnt_dropdown = DropDownMenu( self.bp_cnt_frm, dropdown_lbl, list(range(1, len(project_body_parts) + 1)), "12",)
         self.bp_cnt_dropdown.setChoices(1)
-
-
-
-        self.bp_cnt_confirm_btn = Button( self.bp_cnt_frm, text="Confirm", font=Formats.FONT_REGULAR.value, command=lambda: self.create_choose_bp_frm(project_body_parts, run_function),)
+        self.bp_cnt_confirm_btn = SimbaButton(parent=self.bp_cnt_frm, txt="CONFIRM", txt_clr='black', img='tick', font=Formats.FONT_HEADER.value, cmd=self.create_choose_bp_frm, cmd_kwargs={'bp_list': lambda: project_body_parts, 'run_function': lambda: run_function})
+        #self.bp_cnt_confirm_btn = Button(self.bp_cnt_frm, text="CONFIRM", font=Formats.FONT_REGULAR.value, command=lambda: self.create_choose_bp_frm(project_body_parts, run_function))
         self.bp_cnt_frm.grid(row=0, sticky=NW)
         self.bp_cnt_dropdown.grid(row=0, column=0, sticky=NW)
         self.bp_cnt_confirm_btn.grid(row=0, column=1, sticky=NW)
@@ -308,21 +306,16 @@ class PopUpMixin(object):
                 msg=f"Selected video {os.path.basename(video_path)} is not a video file in the SimBA project video directory."
             )
 
-    def create_choose_bp_frm(self, project_body_parts, run_function):
+    def create_choose_bp_frm(self, bp_list: List[str], run_function: Any):
         if hasattr(self, "body_part_frm"):
             self.body_part_frm.destroy()
         self.body_parts_dropdowns = {}
         self.body_part_frm = LabelFrame(self.main_frm, text="CHOOSE ANIMAL BODY-PARTS", font=Formats.FONT_HEADER.value, name="choose animal body-parts",)
         self.body_part_frm.grid(row=self.children_cnt_main(), sticky=NW)
         for bp_cnt in range(int(self.bp_cnt_dropdown.getChoices())):
-            self.body_parts_dropdowns[bp_cnt] = DropDownMenu(
-                self.body_part_frm,
-                f"Body-part {str(bp_cnt+1)}:",
-                project_body_parts,
-                "25",
-            )
+            self.body_parts_dropdowns[bp_cnt] = DropDownMenu(self.body_part_frm, f"Body-part {str(bp_cnt+1)}:", bp_list, "25",)
             self.body_parts_dropdowns[bp_cnt].grid(row=bp_cnt, column=0, sticky=NW)
-            self.body_parts_dropdowns[bp_cnt].setChoices(project_body_parts[bp_cnt])
+            self.body_parts_dropdowns[bp_cnt].setChoices(bp_list[bp_cnt])
         self.create_run_frm(run_function=run_function)
 
     def choose_bp_frm(self, parent: LabelFrame, bp_options: list):

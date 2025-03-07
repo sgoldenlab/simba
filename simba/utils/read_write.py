@@ -1728,21 +1728,43 @@ def copy_files_in_directory(in_dir: Union[str, os.PathLike],
     """
 
     check_if_dir_exists(in_dir=in_dir)
-    if not os.listdir(out_dir):
+    if not os.path.isdir(out_dir):
         os.makedirs(out_dir)
     if filetype is not None:
         file_paths = glob.glob(in_dir + f"/*.{filetype}")
     else:
         file_paths = glob.glob(in_dir + f"/*.")
     if len(file_paths) == 0 and raise_error:
-        raise NoFilesFoundError(
-            msg=f"No files found in {in_dir}", source=copy_files_in_directory.__name__
-        )
+        raise NoFilesFoundError(msg=f"No files found in {in_dir}", source=copy_files_in_directory.__name__)
     elif len(file_paths) == 0:
         pass
     else:
         for file_path in file_paths:
             shutil.copy(file_path, out_dir)
+
+
+def remove_multiple_folders(folders: List[Union[os.PathLike, str]], raise_error: Optional[bool] = False) -> None:
+
+    """
+    Helper to remove multiple directories.
+    :param folders List[os.PathLike]: List of directory paths.
+    :param bool raise_error: If True, raise ``NotDirectoryError`` error of folder does not exist. if False, then pass. Default False.
+    :raises NotDirectoryError: If ``raise_error`` and directory does not exist.
+
+    :example:
+    >>> remove_multiple_folders(folders= ['gerbil/gerbil_data/featurized_data/temp'])
+    """
+
+    folders = [x for x in folders if x is not None]
+    for folder_path in folders:
+        if raise_error and not os.path.isdir(folder_path):
+            raise NotDirectoryError(msg=f"Cannot delete directory {folder_path}. The directory does not exist.", source=remove_multiple_folders.__name__)
+        if os.path.isdir(folder_path):
+            shutil.rmtree(folder_path, ignore_errors=True)
+        else:
+            pass
+
+
 
 
 def remove_files(file_paths: List[Union[str, os.PathLike]], raise_error: Optional[bool] = False) -> None:

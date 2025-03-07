@@ -26,8 +26,7 @@ import PIL.Image
 from PIL import ImageTk
 
 from simba.bounding_box_tools.boundary_menus import BoundaryMenus
-from simba.cue_light_tools.cue_light_menues import \
-    CueLightAnalyzerMenu  # ######### LAZY
+from simba.cue_light_tools.cue_light_menues import CueLightAnalyzerMenu
 from simba.labelling.labelling_advanced_interface import \
     select_labelling_video_advanced
 from simba.labelling.labelling_interface import select_labelling_video
@@ -133,6 +132,7 @@ from simba.ui.pop_ups.spontaneous_alternation_pop_up import \
     SpontaneousAlternationPopUp  # ## LAZY
 from simba.ui.pop_ups.subset_feature_extractor_pop_up import \
     FeatureSubsetExtractorPopUp
+from simba.ui.pop_ups.roi_aggregate_stats_popup import ROIAggregateDataAnalyzerPopUp
 from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
     ThirdPartyAnnotatorAppenderPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
@@ -292,9 +292,9 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         self.delete_all_ROIs.grid(row=1, column=0, sticky=NW)
 
         self.roi_draw = LabelFrame(tab6, text="ANALYZE ROI DATA", font=Formats.FONT_HEADER.value)
-        analyze_roi_btn = SimbaButton(parent=self.roi_draw, txt="ANALYZE ROI DATA: AGGREGATES", txt_clr='green', img='analyze_green', font=Formats.FONT_REGULAR.value, cmd=ROIAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        #analyze_roi_btn = SimbaButton(parent=self.roi_draw, txt="ANALYZE ROI DATA: AGGREGATES", txt_clr='green', img='analyze_green', font=Formats.FONT_REGULAR.value, cmd=None, cmd_kwargs={'config_path': lambda:self.config_path})
-        #analyze_roi_time_bins_btn = SimbaButton(parent=self.roi_draw, txt="ANALYZE ROI DATA: TIME-BINS", txt_clr='blue', img='analyze_blue', font=Formats.FONT_REGULAR.value, cmd=None, cmd_kwargs={'config_path': lambda:self.config_path})
+        #analyze_roi_btn = SimbaButton(parent=self.roi_draw, txt="ANALYZE ROI DATA: AGGREGATES", txt_clr='green', img='shapes_small', font=Formats.FONT_REGULAR.value, cmd=ROIAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        analyze_roi_btn = SimbaButton(parent=self.roi_draw, txt="ANALYZE ROI DATA: AGGREGATES", txt_clr='green', img='shapes_small', font=Formats.FONT_REGULAR.value, cmd=ROIAggregateDataAnalyzerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+
         analyze_roi_time_bins_btn = SimbaButton(parent=self.roi_draw, txt="ANALYZE ROI DATA: TIME-BINS", txt_clr='blue', img='analyze_blue', font=Formats.FONT_REGULAR.value, cmd=ROIAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
 
@@ -305,7 +305,6 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         self.roi_draw1 = LabelFrame(tab6, text="VISUALIZE ROI DATA", font=Formats.FONT_HEADER.value)
 
         visualizeROI = SimbaButton(parent=self.roi_draw1, txt="VISUALIZE ROI TRACKING", txt_clr='green', img='visualize_green', font=Formats.FONT_REGULAR.value, cmd=VisualizeROITrackingPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        #visualizeROI = SimbaButton(parent=self.roi_draw1, txt="VISUALIZE ROI TRACKING", txt_clr='green', img='visualize_green', font=Formats.FONT_REGULAR.value, cmd=None, cmd_kwargs={'config_path': lambda:self.config_path})
         visualizeROIfeature = SimbaButton(parent=self.roi_draw1, txt="VISUALIZE ROI FEATURES", txt_clr='blue', img='visualize_blue', font=Formats.FONT_REGULAR.value, cmd=VisualizeROIFeaturesPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
         ##organize
@@ -314,11 +313,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         visualizeROIfeature.grid(row=1, sticky="NW")
 
         processmovementdupLabel = LabelFrame( tab6, text="OTHER ANALYSES / VISUALIZATIONS", font=Formats.FONT_HEADER.value)
-        #analyze_distances_velocity_btn = SimbaButton(parent=processmovementdupLabel, txt="ANALYZE DISTANCES / VELOCITY: AGGREGATES", img='metrics_green', txt_clr='green', font=Formats.FONT_REGULAR.value, cmd=None, cmd_kwargs={'config_path': lambda:self.config_path})
         analyze_distances_velocity_btn = SimbaButton(parent=processmovementdupLabel, txt="ANALYZE DISTANCES / VELOCITY: AGGREGATES", img='metrics_green', txt_clr='green', font=Formats.FONT_REGULAR.value, cmd=MovementAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         analyze_distances_velocity_timebins_btn = SimbaButton(parent=processmovementdupLabel, txt="ANALYZE DISTANCES / VELOCITY: TIME-BINS", img='metrics_blue',  txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=MovementAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        #analyze_distances_velocity_timebins_btn = SimbaButton(parent=processmovementdupLabel, txt="ANALYZE DISTANCES / VELOCITY: TIME-BINS", img='metrics_blue',  txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=None, cmd_kwargs={'config_path': lambda:self.config_path})
-
         heatmaps_location_button = SimbaButton(parent=processmovementdupLabel, txt="CREATE LOCATION HEATMAPS", txt_clr='red', img='heatmap', font=Formats.FONT_REGULAR.value, cmd=HeatmapLocationPopup, cmd_kwargs={'config_path': lambda:self.config_path})
         button_lineplot = SimbaButton(parent=processmovementdupLabel, txt="CREATE PATH PLOTS", txt_clr='orange', img='path', font=Formats.FONT_REGULAR.value, cmd=QuickLineplotPopup, cmd_kwargs={'config_path': lambda:self.config_path})
 
@@ -328,8 +324,10 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_visualizeDirection_bp = SimbaButton(parent=processmovementdupLabel, txt="VISUALIZE DIRECTIONALITY BETWEEN BODY PARTS", img='direction', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=DirectingAnimalToBodyPartVisualizerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
         btn_agg_boolean_conditional_statistics = SimbaButton(parent=processmovementdupLabel, txt="AGGREGATE BOOLEAN CONDITIONAL STATISTICS", img='details', txt_clr='grey', font=Formats.FONT_REGULAR.value, cmd=BooleanConditionalSlicerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        #spontaneous_alternation_pop_up_btn = SimbaButton(parent=processmovementdupLabel, txt="SPONTANEOUS ALTERNATION", img='t', txt_clr='navy', font=Formats.FONT_REGULAR.value, cmd=None, cmd_kwargs={'config_path': lambda:self.config_path})
         spontaneous_alternation_pop_up_btn = SimbaButton(parent=processmovementdupLabel, txt="SPONTANEOUS ALTERNATION", img='t', txt_clr='navy', font=Formats.FONT_REGULAR.value, cmd=SpontaneousAlternationPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        #roi_stats_btn = SimbaButton(parent=processmovementdupLabel, txt="ROI AGGREGATE STATISTICS", img='shapes_small', txt_clr='green', font=Formats.FONT_REGULAR.value, cmd=ROIAggregateDataAnalyzerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+
+
 
         processmovementdupLabel.grid(row=0, column=3, sticky=NW)
         analyze_distances_velocity_btn.grid(row=0, sticky=NW)
@@ -342,6 +340,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_visualizeDirection_bp.grid(row=7, sticky=NW)
         btn_agg_boolean_conditional_statistics.grid(row=8, sticky=NW)
         spontaneous_alternation_pop_up_btn.grid(row=9, sticky=NW)
+        #roi_stats_btn.grid(row=10, sticky=NW)
 
         label_outliercorrection = CreateLabelFrameWithIcon(parent=tab4, header="OUTLIER CORRECTION", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.OUTLIERS_DOC.value)
         button_settings_outlier = SimbaButton(parent=label_outliercorrection, txt="SETTINGS", txt_clr='blue', img='settings', font=Formats.FONT_REGULAR.value, cmd=OutlierSettingsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})

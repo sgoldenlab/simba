@@ -784,6 +784,47 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
 
         return movement, np.mean(v)
 
+    @staticmethod
+    def movement_stats_from_bouts_df(bp_data: np.ndarray,
+                                     event_name: str,
+                                     bout_df: pd.DataFrame, fps: float, px_per_mm: float) -> Tuple[float, Union[None, float]]:
+
+        """
+        Compute the sum distance moved and the mean velocity during a defined event.
+
+        .. seealso::
+           To compute ``bout_df``, use :func:`simba.utils.data.detect_bouts`
+
+        :param np.ndarray bp_data: 2D array with position data.
+        :param str event_name: Name of the event to compute velocity and movement from. E.g., can be a classified behavior or an ROI name.
+        :param pd.DataFrame bout_df: Dataframe with detected events. Returned by :func:`simba.utils.data.detect_bouts`.
+        :param float fps: The sample rate of the video.
+        :param float px_per_mm: The pixel per millimeter conversion factor of the video.
+        :return: Tuple of two floats representing movement and velocity. If no events of ``event_name`` is detected, then 0 and ``None.
+        :rtype: Tuple[float, float]
+        """
+
+        check_valid_dataframe(df=bout_df, source=FeatureExtractionSupplemental.movement_stats_from_bouts_df.__name__, required_fields=['Event', 'Start_time', 'End Time', 'Start_frame', 'End_frame', 'Bout_time'])
+        check_valid_array(data=bp_data, source=f'{FeatureExtractionSupplemental.movement_stats_from_bouts_df.__name__} bp_data', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_1_shape=[2, ])
+        check_str(name=f'{FeatureExtractionSupplemental.movement_stats_from_bouts_df.__name__} event_name)', value=event_name, raise_error=True)
+        if len(bout_df) == 0:
+            return 0, None
+        elif event_name not in list(bout_df['Event'].unique()):
+            return 0, None
+        else:
+            distances, velocities = [], []
+            roi_frames = bout_df[["Start_frame", "End_frame"]].values
+            for event_start_frm, event_end_frm in roi_frames:
+                event_pose = bp_data[event_start_frm:event_end_frm + 1, :]
+                if event_pose.shape[0] > 1:
+                    distance, velocity = FeatureExtractionSupplemental.distance_and_velocity(x=event_pose, fps=fps, pixels_per_mm=px_per_mm, centimeters=True)
+                    distances.append(distance)
+                    velocities.append(velocity)
+            if len(distances) == 0:
+                movement, velocity = 0, None
+            else:
+                movement, velocity = sum(distances), np.average(velocities)
+        return movement, velocity
 
 # x = np.random.randint(0, 100, (100, 2))
 # FeatureExtractionSupplemental.distance_and_velocity(

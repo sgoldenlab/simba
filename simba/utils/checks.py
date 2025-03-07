@@ -33,6 +33,7 @@ from simba.utils.warnings import (CorruptedFileWarning, FrameRangeWarning,
                                   InvalidValueWarning, NoDataFoundWarning)
 
 
+
 def check_file_exist_and_readable(file_path: Union[str, os.PathLike]) -> None:
     """
     Checks if a path points to a readable file.
@@ -1168,61 +1169,43 @@ def check_umap_hyperparameters(hyper_parameters: Dict[str, Any]) -> None:
         min_value=0.0,
         max_value=100.0,
     )
-
-
-def check_video_has_rois(roi_dict: dict, video_names: List[str], roi_names: List[str]):
+def check_video_has_rois(roi_dict: Dict[str, pd.DataFrame],
+                         roi_names: List[str] = None,
+                         video_names: List[str] = None,
+                         source: str = 'roi dict',
+                         raise_error: bool = True):
     """
     Check that specified videos all have user-defined ROIs with specified names.
     """
-    check_if_keys_exist_in_dict(
-        data=roi_dict,
-        key=[
-            Keys.ROI_RECTANGLES.value,
-            Keys.ROI_CIRCLES.value,
-            Keys.ROI_POLYGONS.value,
-        ],
-        name="roi dict",
-    )
-    check_valid_lst(
-        data=roi_names,
-        source=check_video_has_rois.__name__,
-        valid_dtypes=(str,),
-        min_len=1,
-    )
-    check_valid_lst(
-        data=video_names,
-        source=check_video_has_rois.__name__,
-        valid_dtypes=(str,),
-        min_len=1,
-    )
-    for k, v in roi_dict.items():
-        check_instance(
-            source=check_video_has_rois.__name__,
-            instance=v,
-            accepted_types=(pd.DataFrame,),
-        )
-        check_that_column_exist(df=v, column_name="Video", file_name="")
+
+    check_valid_dict(x=roi_dict, valid_key_dtypes=(str,), valid_values_dtypes=(pd.DataFrame,), required_keys=(Keys.ROI_RECTANGLES.value, Keys.ROI_CIRCLES.value, Keys.ROI_POLYGONS.value,),)
+    check_valid_dataframe(df=roi_dict[Keys.ROI_RECTANGLES.value], source=f'{check_video_has_rois.__name__} {source} roi_dict {Keys.ROI_RECTANGLES.value}', required_fields=['Video', 'Name'])
+    check_valid_dataframe(df=roi_dict[Keys.ROI_CIRCLES.value], source=f'{check_video_has_rois.__name__} {source} roi_dict {Keys.ROI_CIRCLES.value}', required_fields=['Video', 'Name'])
+    check_valid_dataframe(df=roi_dict[Keys.ROI_POLYGONS.value], source=f'{check_video_has_rois.__name__} {source} roi_dict {Keys.ROI_POLYGONS.value}', required_fields=['Video', 'Name'])
+    if roi_names is not None:
+        check_valid_lst(data=roi_names, source=f'{check_video_has_rois.__name__} {source} roi_names', valid_dtypes=(str,), min_len=1)
+    else:
+        roi_names = list(set(list(roi_dict[Keys.ROI_RECTANGLES.value]['Name'].unique()) + list(roi_dict[Keys.ROI_CIRCLES.value]['Name'].unique()) + list(roi_dict[Keys.ROI_POLYGONS.value]['Name'].unique())))
+    if video_names is not None:
+        check_valid_lst(data=video_names, source=f'{check_video_has_rois.__name__} {source} video_names', min_len=1,)
+    else:
+        video_names = list(set(list(roi_dict[Keys.ROI_RECTANGLES.value]['Video'].unique()) + list(roi_dict[Keys.ROI_CIRCLES.value]['Video'].unique()) + list(roi_dict[Keys.ROI_POLYGONS.value]['Video'].unique())))
+    missing_rois = {}
+    rois_missing = False
     for video_name in video_names:
-        video_rectangles = roi_dict[Keys.ROI_RECTANGLES.value][
-            roi_dict[Keys.ROI_RECTANGLES.value]["Video"] == video_name
-        ]
-        video_circles = roi_dict[Keys.ROI_CIRCLES.value][
-            roi_dict[Keys.ROI_CIRCLES.value]["Video"] == video_name
-        ]
-        video_polygons = roi_dict[Keys.ROI_POLYGONS.value][
-            roi_dict[Keys.ROI_POLYGONS.value]["Video"] == video_name
-        ]
-        video_shape_names = (
-            list(video_circles["Name"])
-            + list(video_rectangles["Name"])
-            + list(video_polygons["Name"])
-        )
-        missing_rois = list(set(roi_names) - set(video_shape_names))
-        if len(missing_rois) > 0:
-            raise NoROIDataError(
-                msg=f"{len(missing_rois)} ROI(s) are missing from {video_name}: {missing_rois}",
-                source=check_video_has_rois.__name__,
-            )
+        missing_rois[video_name] = []
+        for roi_name in roi_names:
+            rect_filt = roi_dict[Keys.ROI_RECTANGLES.value][(roi_dict[Keys.ROI_RECTANGLES.value]['Video'] == video_name) & (roi_dict[Keys.ROI_RECTANGLES.value]['Name'] == roi_name)]
+            circ_filt = roi_dict[Keys.ROI_CIRCLES.value][(roi_dict[Keys.ROI_CIRCLES.value]['Video'] == video_name) & (roi_dict[Keys.ROI_CIRCLES.value]['Name'] == roi_name)]
+            poly_filt = roi_dict[Keys.ROI_POLYGONS.value][(roi_dict[Keys.ROI_POLYGONS.value]['Video'] == video_name) & (roi_dict[Keys.ROI_POLYGONS.value]['Name'] == roi_name)]
+            if (len(rect_filt) + len(circ_filt) + len(poly_filt)) == 0:
+                missing_rois[video_name].append(roi_name); rois_missing = True
+    if rois_missing and raise_error:
+        raise NoROIDataError(msg=f'Some videos are missing some ROIs: {missing_rois}', source=f'{check_video_has_rois.__name__} {source}')
+    elif rois_missing:
+        return False, missing_rois
+    else:
+        return True
 
 
 def check_if_df_field_is_boolean(df: pd.DataFrame,
@@ -1651,4 +1634,22 @@ def is_wsl() -> bool:
 def is_windows_path(value):
     """Check if the value is a valid Windows path."""
     return isinstance(value, str) and (len(value) > 1 and value[1] == ':' and value[0].isalpha())
-    
+
+
+def check_same_files_exist_in_all_directories(dirs: List[Union[str, os.PathLike]], raise_error: bool = False, file_type: str = "csv") -> bool:
+    """
+    Check if the same files of a given type exist in all specified directories.
+
+    :param List[Union[str, os.PathLike]] dirs: List of directory paths to check.
+    :param bool raise_error: If True, raises an error when file names do not match across directories. Defaults to False.
+    :param bool raise_error: File extension (without the dot) to check for (e.g., 'csv', 'txt'). Defaults to 'csv'.
+    """
+
+    check_valid_lst( data=dirs, source=f"{check_same_files_exist_in_all_directories.__name__} dirs", valid_dtypes=(str, os.PathLike), min_len=2)
+    file_sets = [{os.path.basename(f) for f in glob.glob(os.path.join(dir, f"*.{file_type}"))} for dir in dirs]
+    common_files = set.intersection(*file_sets) if file_sets else set()
+    if not all(files == common_files for files in file_sets):
+        if raise_error:
+            raise NoFilesFoundError( msg=f"Files of type '{file_type}' do not match across directories: {dirs}.",  source=check_same_files_exist_in_all_directories.__name__)
+        return False
+    return True
