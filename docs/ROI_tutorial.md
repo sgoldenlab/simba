@@ -12,104 +12,51 @@ Specifically, for working with ROIs in SimBA, begin by (i) [Importing your video
 
 # Part 1. Defining ROIs in SimBA
 
-1. In the main SimBA console window, begin loading your project by clicking on `File` and `Load project`. In the **[Load Project]** tab, click on `Browse File` and select the `project_config.ini` that belongs to your project. 
-
-2. Navigate to the **ROI** tab, which should look like this:
-
-![](https://github.com/sgoldenlab/simba/blob/master/images/ROI_11.PNG)
-
-3. Begin at the left hand side of the **ROI** tab: using the sub-menu **Define ROI**. This menu lets you define **the number of rectangles, circles, and polygons** that you which to draw on the videos in the project. 
-
->*Note:* All videos in the project needs to contain the same number of shapes. For example, if you wish to analyze four ROIs in the first video of your peoject, but only three ROIs in the second video of your project, then you still need to draw four ROIs for both the first and second video in your project. 
-
-In the entry boxes associated with each shape, enter the number of each shape that you wish to draw. If you do *not* want to draw a specific shape, then leave the entry box empty.
-
-4. Once you've entered the number of shapes that you wish to draw, then click on the `Show Shape Definitions Table` button and the following table will pop up.
-
-![](/images/roidef1.PNG)
-
-In this table, enter a name for each of your shapes in the Rectangle Name, Circle Name, and Polygon Name entry boxes. Make sure that the names of each of the shapes are different from each other - e.g., there cannot be teo shapes that are both named `Area_1`. When all the shape names have been entered, click on the `Set Shape Definitions` button which is located at the bottom of the `Shape Definitions Table`.
-
->*Note:* Each *Circle* and *Rectangle* row has further size-related columns associated with them: Width, Height, or Radius. These columns are set to 0 and should, for now, **remain set to 0**. These settings will - **in future version of SimBA** - be used to draw shapes that are of precise metric sizes (e.g., a 40x40mm rectangle).   
-
-5. After clicking on the `Set Shape Definitions` button, the following table will pop open.
-
-![](https://github.com/sgoldenlab/simba/blob/master/images/ROI_menu.JPG)
-
-This table contain one row for each of the videos in the project. Each video in the project has three buttons associated with it: **Draw, Reset,** and **Apply to all**. The functions associated with each button is described in detail below. However, in brief, the **Draw** button allows you to start to draw the defined shapes on the specific video. If drawings already exist for the specific video, then the **Draw** buttons opens an interface where you can move the shapes that has previously been drawn on the video. The **Reset** button deletes any drawing made on the specific video and allows you to restart the drawings from scratch by next clicking on the **Draw** button. The **Apply to all** buttons copies the drawing made on the specific video and replicates it on all other videos in the project. If a drawing has been applied to all videos videos in the project by clicking on the **Apply to all** button, then the shapes for any specific video can be moved by clicking on the **Draw** button.
-
-6. To begin to draw your shapes, click on the **Draw** button for the first video in the table. Once clicked, a window will first pop up that contains instructions for how to draw your shapes. The instructanctions for drawing rectangles, circles, and polygons are slightly different and are descriped below. 
-
-Any user-defined regles will be processed first. The instructions for drawing rectangles will look like the image below on the left, and the process of drawing the rectangle should look like the gif image below on the right:
-
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_rectangle.JPG" width="425"/> <img src="https://github.com/sgoldenlab/simba/blob/master/images/Rectangle_draw.gif" width="425"/>
-
-In this example, to begin to draw the rectangle named "TopLeft" on Video1, press `Esc`. When `Esc` is pressed, the first frame of Video1 is displayed. Click and hold the left mouse button at the top left corner of rectangle "TopLeft" and drag the mouse to the bottom right corner of the rectangle. If you're unhappy with your rectangle, start to draw the rectangle again by holding the left mouse button at the top left corner of your, new, revised, rectangle. The previous rectangle will be automatically discarded. When you are happy with your rectangle, press `Esc` twice to save your rectangle and move to your next shape. 
-
->*Note*: If the image of the first frame of the video looks distorted, and the aspect ratio appears to be off, then grab the side of the window that contains your frame and correct the aspect ratio. If the first frame of your video contains the experimenter hand, or no animal(s) are visible (because the camera was turned on before the animal(s) was placed in the arena), then consider going back and [pre-process your videos appropriately](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md#tutorial-for-processing-videos-in-batch). 
-
-Once all user-defined rectangles have been drawn, any user-defined circles will be processed. The instructions for drawing circles will look like the image below on the left, and the process of drawing the a circle should look like the gif image below on the right:
-
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_circles.JPG" width="425"/> <img src="https://github.com/sgoldenlab/simba/blob/master/images/Circle_draw.gif" width="425"/>
-
-In this example, to begin to draw the circle named "Cage" on Video1, press on `Esc`. When `Esc` is pressed, the first frame of Video1 is displayed. If you have drawn any rectangles previously, then these rectangles will also be displayed on the frame. Begin by double left mouse clicking on the image where you would like the center of the circle to be. Next, double left click on the image where you would like the outer bound of the circle to be. If you are unhappy with the center of the circle, then double left mouse click on the center of the circle, and double left mouse click again at the new circle center location. Likewise, if you are unhappy with the outer bounds and the diameter of the circle, then double left mouse click on outer bounds of the circle, and then double left click again at the new circle outer bounds location. When you are happy with your circle, press `Esc` to save your circle and move to the next user-defined  shape. 
-
-Once all the circles have been drawn, any user-defined polygons will be processed. The instructions for drawing polygons will look like the image below on the left, and the process of drawing the polygon should look like the gif image below on the right:
-
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_polygons.JPG" width="425"/> <img src="https://github.com/sgoldenlab/simba/blob/master/images/Polygon_draw.gif" width="425"/>
-
-In this example, to begin to draw the polygon named "Polygon1" on Video1, press `Esc`. When `Esc` is pressed, the first frame of Video1 is displayed. If you have previously drawn any rectangles or circles, then these rectangles and/or circles will also be displayed on the frame. Click on at least three different locations in the image that defines the outer bounds of "Polygon1". SimBA does currently not allow re-definitions of the bound locations of the polygon once they have been specified. If you are unhappy with your drawn polygon, you can chose to either (i) move the entire polygon in a later step (see Step 6, just below), or **Reset** the drawings and start again (again see Step 6, just below). When you have finished your polygon, press `Esc` to save your polygon and move to the next user-defined shape (or to finish, if all user-defined shapes have been drawn).
-
-6. If you have finished the drawings for Video1, and you are not entirely happy with the drawings, you can either: (i) click on the **Reset** button next to Video1: this will delete the drawings you have made on Video1, and you can now again click on **Draw** button next to Video1 to restart your drawing as described in Step 5 above. Alternatively, you can click on **Draw** again **without** first clicking on the **Reset** button. This allows you to move the shapes in Video1 that you have previously drawn.
-
-When you click on **Draw** again, **without** first clicking on the **Reset** button, then the following instruction window will pop open (below left), and moving the shapes should look like this (below right):
-
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_move.JPG" width="425"/> <img src="https://github.com/sgoldenlab/simba/blob/master/images/Move_shapes.gif" width="425"/>
-
-To start moving the shapes that has previously been drawn, first click on the centroid belonging to the shape that you wish to move. This will initially cause the shape to disappear. Next, double left click on the new centroid location of the shape you are moving. This will display the shape in its new location. When you are happy with the locations of all of your shapes, then press on `Esc` to save the new shape locations.  
-
-7. Once all the shapes have been drawn on a single video there are two possible routes to getting the shapes drawn on all of the videos in the project. The first alternative, which is likely the more time-consuming option, is to click on each of the **Draw** buttons associated with each video, and replicate **Step 5** for all of the videos in your project. The second route, and likely the faster and more standardized option, is to replicate the shapes drawn on Video1 in all of the videos of the project, and then nudge them to the correct location in each of the videos (if the camera/arena moved *slightly* across recordings).
-
->*Note:* If the camera moved **significantly** across the different recordings in the project, the first alternative route described above is the only option to generate accurate all the ROI shapes in each video. 
-
-To replicate the ROI shapes drawn in Video1 to all of the videos in the project, click on the **Apply to all** button next to Video1. Once done, click on **Draw** for Video2. When you click on **Draw** for Video2, a window will pop open with Instructions for how to move shapes - press `Esc` to proceed. When pressing `Esc` the first frame of Video2 will be displayed. Now move the shapes so that they are in the correct locations (as described in Step 6 above), and press `Esc` to save the locations of the shapes.
-
-Repeat this step for all of the videos in the project. Once complete, close the **ROI Table** window, and navigate back to the **ROI** tab in the **Load project** window.
-
->*Note*: If you at any point want to look at, or modify, the defined ROI shapes for each of the videos, click on the `Load defined ROI table` button in the **ROI** tab under the `Load project` menu. 
-
-![](https://github.com/sgoldenlab/simba/blob/master/images/Load_ROI_table.JPG)
-
-Likewise, if you'd like to delete all the shapes you have drawn for all of the videos and start fresh with new shapes, go back and repeat the above [Part 1 - Step 3](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-1-defining-rois-in-simba).
+See [THIS](https://github.com/sgoldenlab/simba/edit/master/docs/roi_tutorial_new_2025.md) tutorial for how to draw ROIs in SimBA.
 
 # Part 2. Analyzing ROI data.
 
-1. You can now generate CSV files containing descriptive statistics for the number entries into each ROI shape, and the time spent within each ROI. SimBA allows you to generate these measures for one body-part per animal in your project. If you would like to get these measures for more than one body-part per animal in your project, then we suggest that you  run the analysis multiple times. 
-
-2. To analyze your ROI data, first click on `ANALYZE ROI DATA: AGGREGATES` in the `Analyze ROI data` sub-menu frame. The following menu will pop open:
-
-![](https://github.com/sgoldenlab/simba/blob/master/images/analyze_roi_data.png)
-
-Here, begin by selecting the number of animals (or body-parts) you wish to produce the ROI descriptive statistics for, and then click confirm. A second sub-menu will appear below named `Choose bodyparts`. This menu will contain as many dropdown menus as the number of animals (or body-parts) selected in the  `Select number of animals` menu. Each of these drop-down menus will contain the body-parts used to track the animals in pose-estimation. Select the body-parts you wish to use when calculating the ROI entry, time, and movement data.
-
-**Probability threshold**: If you can, we **strongly** recommend to pre-process all videos, and remove any segments of the videos where animals are not present in the video as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md) prior to perfroming pose-estimation and importing videos into SimBA. However, if this is not possible, we can filter out out frames where probability for the pose-estimation accuracy is low, and not use these frames when we calculate the location of the animal in relation to the ROI (i.e., useful if you have an animal leaving the frame and the pose-estimation predictions are jumping all over the place). To filter out these frames, increase the probability threshold (DEFAULT = 0.0. - i.e., all frames will be treated as the animal is present). 
-
-**Calculate distances**: This tick-box option allows you to calculate the distance (in centimeters) and velocity (in cm/s) that each animal has moved within each of your ROIs. If you run the analysis with this box ticked, SimBA will generate a time-stamped CSV file inside your project log folder named something akin to this: `ROI_movement_data_20210320143608.csv`. This file contains one row per analyzed video, animal, and ROI. If you open this CSV up after analysis, you can expect it to look something like this (click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/ROI_movement_data_20240104095238.csv) to view example file):
+Once we have [drawn the ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md), we can compute descriptive statistics based on movement of the animal(s) in relation to the ROIs 
+(for example, how much time the animals spends in teh ROIs, or how many times the animals enter the ROIs. To compute ROI statistics, click in the <kbd>ANALYZE ROI DATA: AGGREGATES</kbd> button in the `[ ROI ]` tab and you should see the 
+following pop up:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_movement_data.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_analyze_tutorial_1.webp" />
 </p>
 
+1) In the `# OF ANIMALS` dropdown, select the number of animals you want to compute ROI statistics for.
+   
+2) In the `PROBABILITY THRESHOLD` entry-box, select the minimum pose-estimation probability score (between 0 and 1) that should be considered when performing ROI analysis. Any frame body-part probability score above the entered value will be filtered out.  
+> [!CAUTION]
+> If possible, we recommend having reliable pose-estimation data in every frame. This includes pre-process all videos, and remove any segments of the videos where animals are not present in the video as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md),
+> and performing pose-estimation interpolation of missing data at data import as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-file).
 
-**Detailed ROI bout data** If checked, the SimBA ROI analysis also generates a CSV file within the `project_folder/logs` directory named something like *Detailed_ROI_bout_data_20231031141848.csv*. This file contains additional information, with exact frame numbers of when animals enter and exits user-drawn ROIs, together with the start and end times, and duration, of the ROI bouts. Every row in this file represents and entry and exit by an animal into an ROI. Within this file, each row is indexed by the (i) video name, (ii) animal name, (iii) body-part name, and (iv) ROI name. The last for columns represents the entry frame of the bout, exit frame of the bout, entry time of the bout, exit time of the bout, and duration of time bout inside the ROI in seconds. See [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/Detailed_ROI_bout_data_20231031141848.csv) file for an example of exepcted file layout. 
+3). In the `SELECT BODY-PART(S)` frame, use the dropdown menus to select the body-parts that you wish to use to infer the locations of the animals. 
 
-Click `Run` to perform the ROI analysis. 
+4). In the `DATA OPTIONS` frame, select the data that you wish to compute:
 
-Once complete, a statement will be printed in the main SimBA terminal window noting that the process is complete. The ROI descriptive statistics can be found in the `Project_folder/logs` directory in two time-stamped files. 
+ * `TOTAL ROI TIME (S)`: The total time, in seconds, that each animal spends in each defined ROI in each video.
+ * `ROI ENTRIES (COUNT): The total number of times, that each animal enters each defined ROI in each video.
+ * `FIRST ROI ENTRY TIME (S)`: The video time, in seconds, when each animal first enters each defined ROI in each video (NOTE: will be `None` if an animal never enters a defined ROI).   
+ * `LAST ROI ENTRY TIME (S)`: The video time, in seconds, when each animal last enters each defined ROI in each video (NOTE: will be `None` if an animal never enters a defined ROI).
+ * `MEAN ROI BOUT TIME (S)`: The mean length, in seconds, of each sequence the animal spends in each defined ROI in each video (NOTE: will be `None` if an animal never enters a defined ROI).
+ * `DETAILED ROI BOUT DATA (SEQUENCES)`: If checked, the SimBA ROI analysis generates a CSV file within the `project_folder/logs` directory named something like *Detailed_ROI_bout_data_20231031141848.csv*. This file contains the exact frame numbers, time stamps, and duration of each seqence when animals enter and exits each user-drawn ROIs. (NOTE: no file will be created if no animal in any video never enters an ROI)
+ * `ROI MOVEMENT (VELOCITY AND DISTANCES)`: The total distance moved, and the average velocity, of each animal in each defined ROI in each video.
 
-* One file will be named `ROI_entry_data` and contain the number of entries into the different ROIs. For an expected output ROI entry CSV file, click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/ROI_entry_data_example.csv).
+5). In the `FORMAT OPTION` frame, select how the output data should be formatted, and any addtional video meta data that should be included in the output which could be helpful for sanity checks. 
 
-* A second file, named `ROI_time_data`, contain the time spent in seconds the different ROIs. It also contains the percent of the session time spent in each of the ROIs. For an expected output ROI time CSV file, click [HERE](https://github.com/sgoldenlab/simba/blob/master/misc/ROI_time_data_example.csv).
+* `TRANSPOSE OUTPUT TABLE`: If checked, one row in the output data will represent a video. If unchecked, one row in the output data will represent a data measurment.
+* `INCLUDE FPS DATA`: If checked, the FPS used to compute the metrics of each video will be included in the output table. 
+* `INCLUDE VIDEO LENGTH DATA`: If checked, the length of each video in seconds will be included in the output table.
+* `INCLUDE INCLUDE PIXEL PER MILLIMETER DATA`: If checked, the pixel per millimeter conversion factor (used to compute distances and velocity) of each video will be included in the output table.
+
+6. Once the above is filled in, click the <kbd>RUN</kbd> button. You can foillow the progress in the main SimBA terminal.
+
+Once complete, a file will be stored in the logs folder of your SimBA project named something like `ROI_descriptive statistics_20250306162014.csv`. If you did **not** check the
+`TRANSPOSE OUTPUT TABLE` checkbox, the file will look something like [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/ROI_descriptive%20statistics_non_transposed.csv), where each row represent a specific video, ROI, animal, and measurement. If you **did** check the  `TRANSPOSE OUTPUT TABLE` checkbox, the file will look something like [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/ROI_descriptive%20statistics_transposed.csv), where each row represent a specific video
+and each column represents a specific measurment.
+
+If you did check the `DETAILED ROI BOUT DATA (SEQUENCES)` checkbox, an additional file will be crated in the SimBA project logs folder named something like `Detailed_ROI_data_20250306162014.csv` that can be expected to look something like [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/Detailed_ROI_data_20250307101923.csv). This file contains a row of information (entry and exit time, frame and entry duration) for every ROI, for every animal, and every video. It also contains columns for the animal name and body-part name for reference. 
 
 
 ### ANALYZING ROI DATA SPLIT BY TIME BINS
