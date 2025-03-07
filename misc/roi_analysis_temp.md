@@ -28,7 +28,20 @@ following pop up:
  * `DETAILED ROI BOUT DATA (SEQUENCES)`: If checked, the SimBA ROI analysis generates a CSV file within the `project_folder/logs` directory named something like *Detailed_ROI_bout_data_20231031141848.csv*. This file contains the exact frame numbers, time stamps, and duration of each seqence when animals enter and exits each user-drawn ROIs. (NOTE: no file will be created if no animal in any video never enters an ROI)  
  * `ROI MOVEMENT (VELOCITY AND DISTANCES)`: The total distance moved, and the average velocity, of each animal in each defined ROI in each video.
 
-5). In the `FORMAT OPTION` frame, select how the data should be outputed and any addtional meta data that should be included in the table. 
+5). In the `FORMAT OPTION` frame, select how the output data should be formatted, and any addtional video meta data that should be included in the output which could be helpful for sanity checks. 
+
+* `TRANSPOSE OUTPUT TABLE`: If checked, one row in the output data will represent a video. If unchecked, one row in the output data will represent a data measurment.
+* `INCLUDE FPS DATA`: If checked, the FPS used to compute the metrics of each video will be included in the output table. 
+* `INCLUDE VIDEO LENGTH DATA`: If checked, the length of each video in seconds will be included in the output table.
+* `INCLUDE INCLUDE PIXEL PER MILLIMETER DATA`: If checked, the pixel per millimeter conversion factor (used to compute distances and velocity) of each video will be included in the output table.
+
+6. Once the above is filled in, click the <kbd>RUN</kbd> button. You can foillow the progress in the main SimBA terminal.
+
+Once complete, a file will be stored in the logs folder of your SimBA project named something like `ROI_descriptive statistics_20250306162014.csv`. If you did **not** check the
+`TRANSPOSE OUTPUT TABLE` checkbox, the file will look something like [THIS](), where each row represent a specific video, ROI, animal, and measurement. If you **did** check the  `TRANSPOSE OUTPUT TABLE` checkbox, the file will look something like [THIS](), where each row represent a specific video
+and each column represents a specific measurment.
+
+If you did check the `DETAILED ROI BOUT DATA (SEQUENCES)` checkbox, an additional file will be crated in the SimBA project logs folder named something like `Detailed_ROI_data_20250306162014.csv` that can be expected to look something like [THIS](). This file contains a row of information (entry and exit time, frame and entry duration) for every ROI, for every animal, and every video. It also contains columns for the animal name and body-part name for reference. 
 
 
 
