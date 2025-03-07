@@ -17,7 +17,7 @@ See [THIS](https://github.com/sgoldenlab/simba/edit/master/docs/roi_tutorial_new
 # Part 2. Analyzing ROI data.
 
 Once we have [drawn the ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md), we can compute descriptive statistics based on movement of the animal(s) in relation to the ROIs 
-(for example, how much time the animals spends in teh ROIs, or how many times the animals enter the ROIs. To compute ROI statistics, click in the <kbd>ANALYZE ROI DATA: AGGREGATES</kbd> button in the `[ ROI ]` tab and you should see the 
+(for example, how much time the animals spends in the ROIs, or how many times the animals enter the ROIs etc). To compute ROI statistics, click in the <kbd>ANALYZE ROI DATA: AGGREGATES</kbd> button in the `[ ROI ]` tab and you should see the 
 following pop up:
 
 <p align="center">
