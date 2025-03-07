@@ -117,6 +117,8 @@ from simba.ui.pop_ups.pose_reorganizer_pop_up import PoseReorganizerPopUp
 from simba.ui.pop_ups.pup_retrieval_pop_up import PupRetrievalPopUp  # LAZY
 from simba.ui.pop_ups.quick_path_plot_pop_up import QuickLineplotPopup
 from simba.ui.pop_ups.remove_roi_features_pop_up import RemoveROIFeaturesPopUp
+from simba.ui.pop_ups.roi_aggregate_stats_popup import \
+    ROIAggregateDataAnalyzerPopUp
 from simba.ui.pop_ups.roi_analysis_pop_up import ROIAnalysisPopUp  # ## LAZY
 from simba.ui.pop_ups.roi_analysis_time_bins_pop_up import \
     ROIAnalysisTimeBinsPopUp  # ## LAZY
@@ -132,7 +134,6 @@ from simba.ui.pop_ups.spontaneous_alternation_pop_up import \
     SpontaneousAlternationPopUp  # ## LAZY
 from simba.ui.pop_ups.subset_feature_extractor_pop_up import \
     FeatureSubsetExtractorPopUp
-from simba.ui.pop_ups.roi_aggregate_stats_popup import ROIAggregateDataAnalyzerPopUp
 from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
     ThirdPartyAnnotatorAppenderPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp

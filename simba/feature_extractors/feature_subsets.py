@@ -10,18 +10,30 @@ try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+
 from itertools import combinations
 
 from simba.feature_extractors.perimeter_jit import jitted_hull
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.checks import (check_same_files_exist_in_all_directories, check_video_has_rois, check_valid_lst, check_file_exist_and_readable, check_valid_boolean, check_if_filepath_list_is_empty, check_if_headers_in_dfs_are_unique, check_same_number_of_rows_in_dfs, check_that_column_exist, check_if_dir_exists, check_all_file_names_are_represented_in_video_log, check_valid_dataframe)
-from simba.utils.enums import Formats, ROI_SETTINGS
-from simba.utils.errors import NoROIDataError, NoFilesFoundError, InvalidInputError, DuplicationError
-from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import get_fn_ext, read_df, write_df, find_files_of_filetypes_in_directory, remove_a_folder, copy_files_in_directory, remove_multiple_folders
 from simba.roi_tools.roi_utils import get_roi_dict_from_dfs
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_file_exist_and_readable, check_if_dir_exists,
+    check_if_filepath_list_is_empty, check_if_headers_in_dfs_are_unique,
+    check_same_files_exist_in_all_directories,
+    check_same_number_of_rows_in_dfs, check_that_column_exist,
+    check_valid_boolean, check_valid_dataframe, check_valid_lst,
+    check_video_has_rois)
+from simba.utils.enums import ROI_SETTINGS, Formats
+from simba.utils.errors import (DuplicationError, InvalidInputError,
+                                NoFilesFoundError, NoROIDataError)
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (copy_files_in_directory,
+                                    find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_df, remove_a_folder,
+                                    remove_multiple_folders, write_df)
 
 SHAPE_TYPE = "Shape_type"
 

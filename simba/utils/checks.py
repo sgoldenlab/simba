@@ -33,7 +33,6 @@ from simba.utils.warnings import (CorruptedFileWarning, FrameRangeWarning,
                                   InvalidValueWarning, NoDataFoundWarning)
 
 
-
 def check_file_exist_and_readable(file_path: Union[str, os.PathLike]) -> None:
     """
     Checks if a path points to a readable file.
