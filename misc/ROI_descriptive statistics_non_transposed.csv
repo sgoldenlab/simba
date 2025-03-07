@@ -1,0 +1,337 @@
+VIDEO,ANIMAL,BODY-PART,SHAPE,SHAPE TYPE,MEASUREMENT,VALUE
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_circle,circle,AVERAGE ROI VELOCITY (CM/S),8.566301668828677
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_circle,circle,FIRST ROI ENTRY TIME (S),182.63333333333333
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_circle,circle,LAST ROI ENTRY TIME (S),890.5666666666667
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_circle,circle,MEAN ROI BOUT TIME (S),0.6791666666666667
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_circle,circle,ROI ENTRIES (COUNTS),8.0
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_circle,circle,TOTAL ROI MOVEMENT (CM),27.101303497246754
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_circle,circle,TOTAL ROI TIME (S),5.433333333333334
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_polygon,polygon,AVERAGE ROI VELOCITY (CM/S),1.4993051532052022
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_polygon,polygon,FIRST ROI ENTRY TIME (S),12.3
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_polygon,polygon,LAST ROI ENTRY TIME (S),1175.1666666666667
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_polygon,polygon,MEAN ROI BOUT TIME (S),2.9958525345622116
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_polygon,polygon,ROI ENTRIES (COUNTS),217.0
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_polygon,polygon,TOTAL ROI MOVEMENT (CM),685.1131662359611
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_polygon,polygon,TOTAL ROI TIME (S),650.0999999999999
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_rectangle,rectangle,AVERAGE ROI VELOCITY (CM/S),3.0065244889923157
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_rectangle,rectangle,FIRST ROI ENTRY TIME (S),319.43333333333334
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_rectangle,rectangle,LAST ROI ENTRY TIME (S),934.1666666666666
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_rectangle,rectangle,MEAN ROI BOUT TIME (S),0.6266666666666667
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_rectangle,rectangle,ROI ENTRIES (COUNTS),5.0
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI MOVEMENT (CM),9.288943218045878
+501_MA142_Gi_CNO_0521,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI TIME (S),3.1333333333333333
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_circle,circle,AVERAGE ROI VELOCITY (CM/S),2.0899485991661173
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_circle,circle,FIRST ROI ENTRY TIME (S),740.0
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_circle,circle,LAST ROI ENTRY TIME (S),740.9
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_circle,circle,MEAN ROI BOUT TIME (S),0.3222222222222222
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_circle,circle,ROI ENTRIES (COUNTS),3.0
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_circle,circle,TOTAL ROI MOVEMENT (CM),1.0847060323644584
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_circle,circle,TOTAL ROI TIME (S),0.9666666666666666
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_polygon,polygon,AVERAGE ROI VELOCITY (CM/S),2.69933390843767
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_polygon,polygon,FIRST ROI ENTRY TIME (S),768.7666666666667
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_polygon,polygon,LAST ROI ENTRY TIME (S),768.7666666666667
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_polygon,polygon,MEAN ROI BOUT TIME (S),0.5333333333333333
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_polygon,polygon,ROI ENTRIES (COUNTS),1.0
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_polygon,polygon,TOTAL ROI MOVEMENT (CM),1.349666954218835
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_polygon,polygon,TOTAL ROI TIME (S),0.5333333333333333
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_rectangle,rectangle,AVERAGE ROI VELOCITY (CM/S),1.5154818435294732
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_rectangle,rectangle,FIRST ROI ENTRY TIME (S),18.233333333333334
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_rectangle,rectangle,LAST ROI ENTRY TIME (S),1233.6666666666667
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_rectangle,rectangle,MEAN ROI BOUT TIME (S),3.5838435374149658
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_rectangle,rectangle,ROI ENTRIES (COUNTS),196.0
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI MOVEMENT (CM),991.9277908015109
+501_MA142_Gi_DCZ_0603,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI TIME (S),702.4333333333333
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_circle,circle,AVERAGE ROI VELOCITY (CM/S),4.854212669330298
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_circle,circle,FIRST ROI ENTRY TIME (S),90.16666666666667
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_circle,circle,LAST ROI ENTRY TIME (S),1180.0666666666666
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_circle,circle,MEAN ROI BOUT TIME (S),2.074324324324324
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_circle,circle,ROI ENTRIES (COUNTS),74.0
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_circle,circle,TOTAL ROI MOVEMENT (CM),535.5049886690614
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_circle,circle,TOTAL ROI TIME (S),153.5
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,AVERAGE ROI VELOCITY (CM/S),2.561499825734031
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,FIRST ROI ENTRY TIME (S),61.2
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,LAST ROI ENTRY TIME (S),1205.4666666666667
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,MEAN ROI BOUT TIME (S),1.323076923076923
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,ROI ENTRIES (COUNTS),91.0
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,TOTAL ROI MOVEMENT (CM),222.31641440725122
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,TOTAL ROI TIME (S),120.39999999999999
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,AVERAGE ROI VELOCITY (CM/S),4.392221836979373
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,FIRST ROI ENTRY TIME (S),86.83333333333333
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,LAST ROI ENTRY TIME (S),1054.5666666666666
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,MEAN ROI BOUT TIME (S),1.4411522633744855
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,ROI ENTRIES (COUNTS),81.0
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI MOVEMENT (CM),320.98740248810486
+501_MA142_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI TIME (S),116.73333333333333
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_circle,circle,AVERAGE ROI VELOCITY (CM/S),2.3547628480901994
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_circle,circle,FIRST ROI ENTRY TIME (S),234.73333333333332
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_circle,circle,LAST ROI ENTRY TIME (S),915.7
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_circle,circle,MEAN ROI BOUT TIME (S),1.5517241379310345
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_circle,circle,ROI ENTRIES (COUNTS),29.0
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_circle,circle,TOTAL ROI MOVEMENT (CM),66.75887823067747
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_circle,circle,TOTAL ROI TIME (S),45.0
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,AVERAGE ROI VELOCITY (CM/S),1.5984811365349
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,FIRST ROI ENTRY TIME (S),16.233333333333334
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,LAST ROI ENTRY TIME (S),1204.3333333333333
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,MEAN ROI BOUT TIME (S),1.93015873015873
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,ROI ENTRIES (COUNTS),21.0
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,TOTAL ROI MOVEMENT (CM),53.883061778681196
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,TOTAL ROI TIME (S),40.53333333333333
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,AVERAGE ROI VELOCITY (CM/S),2.2840207622343187
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,FIRST ROI ENTRY TIME (S),66.53333333333333
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,LAST ROI ENTRY TIME (S),878.4666666666667
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,MEAN ROI BOUT TIME (S),0.5632478632478632
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,ROI ENTRIES (COUNTS),39.0
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI MOVEMENT (CM),38.8122326079214
+502_MA141_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI TIME (S),21.96666666666667
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_circle,circle,AVERAGE ROI VELOCITY (CM/S),2.5052616114008512
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_circle,circle,FIRST ROI ENTRY TIME (S),2.2666666666666666
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_circle,circle,LAST ROI ENTRY TIME (S),1186.4666666666667
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_circle,circle,MEAN ROI BOUT TIME (S),4.537275985663083
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_circle,circle,ROI ENTRIES (COUNTS),93.0
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_circle,circle,TOTAL ROI MOVEMENT (CM),607.9799998777803
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_circle,circle,TOTAL ROI TIME (S),421.9666666666667
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,AVERAGE ROI VELOCITY (CM/S),5.006462571999267
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,FIRST ROI ENTRY TIME (S),301.46666666666664
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,LAST ROI ENTRY TIME (S),886.0333333333333
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,MEAN ROI BOUT TIME (S),0.2833333333333333
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,ROI ENTRIES (COUNTS),2.0
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,TOTAL ROI MOVEMENT (CM),2.267297920883691
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,TOTAL ROI TIME (S),0.5666666666666667
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,AVERAGE ROI VELOCITY (CM/S),3.6528920425210396
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,FIRST ROI ENTRY TIME (S),1.5333333333333334
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,LAST ROI ENTRY TIME (S),863.4333333333333
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,MEAN ROI BOUT TIME (S),6.985185185185185
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,ROI ENTRIES (COUNTS),9.0
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI MOVEMENT (CM),80.9510780161885
+502_MA141_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI TIME (S),62.86666666666667
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_circle,circle,AVERAGE ROI VELOCITY (CM/S),2.1834523158308397
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_circle,circle,FIRST ROI ENTRY TIME (S),120.3
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_circle,circle,LAST ROI ENTRY TIME (S),1080.3
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_circle,circle,MEAN ROI BOUT TIME (S),4.979166666666667
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_circle,circle,ROI ENTRIES (COUNTS),8.0
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_circle,circle,TOTAL ROI MOVEMENT (CM),74.40108776267157
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_circle,circle,TOTAL ROI TIME (S),39.833333333333336
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_polygon,polygon,AVERAGE ROI VELOCITY (CM/S),1.3538618442664643
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_polygon,polygon,FIRST ROI ENTRY TIME (S),0.0
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_polygon,polygon,LAST ROI ENTRY TIME (S),1207.0
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_polygon,polygon,MEAN ROI BOUT TIME (S),3.281326352530541
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_polygon,polygon,ROI ENTRIES (COUNTS),191.0
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_polygon,polygon,TOTAL ROI MOVEMENT (CM),736.6198770004565
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_polygon,polygon,TOTAL ROI TIME (S),626.7333333333333
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_rectangle,rectangle,AVERAGE ROI VELOCITY (CM/S),1.4344789476395035
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_rectangle,rectangle,FIRST ROI ENTRY TIME (S),1069.8333333333333
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_rectangle,rectangle,LAST ROI ENTRY TIME (S),1076.0
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_rectangle,rectangle,MEAN ROI BOUT TIME (S),1.7444444444444445
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_rectangle,rectangle,ROI ENTRIES (COUNTS),3.0
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI MOVEMENT (CM),7.398709526054466
+502_MA141_Gi_Saline_0515,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI TIME (S),5.233333333333333
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_circle,circle,AVERAGE ROI VELOCITY (CM/S),3.1709406299035727
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_circle,circle,FIRST ROI ENTRY TIME (S),386.43333333333334
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_circle,circle,LAST ROI ENTRY TIME (S),449.6333333333333
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_circle,circle,MEAN ROI BOUT TIME (S),0.3466666666666667
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_circle,circle,ROI ENTRIES (COUNTS),5.0
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_circle,circle,TOTAL ROI MOVEMENT (CM),7.122901974264826
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_circle,circle,TOTAL ROI TIME (S),1.7333333333333334
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_polygon,polygon,AVERAGE ROI VELOCITY (CM/S),1.6929197164521508
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_polygon,polygon,FIRST ROI ENTRY TIME (S),257.8
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_polygon,polygon,LAST ROI ENTRY TIME (S),1202.0
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_polygon,polygon,MEAN ROI BOUT TIME (S),0.5807017543859649
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_polygon,polygon,ROI ENTRIES (COUNTS),19.0
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_polygon,polygon,TOTAL ROI MOVEMENT (CM),11.550270465441743
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_polygon,polygon,TOTAL ROI TIME (S),11.033333333333333
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_rectangle,rectangle,AVERAGE ROI VELOCITY (CM/S),3.106126507024806
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_rectangle,rectangle,FIRST ROI ENTRY TIME (S),289.0
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_rectangle,rectangle,LAST ROI ENTRY TIME (S),311.76666666666665
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_rectangle,rectangle,MEAN ROI BOUT TIME (S),2.1083333333333334
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_rectangle,rectangle,ROI ENTRIES (COUNTS),4.0
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI MOVEMENT (CM),23.705056578063058
+502_MA141_Gi_Saline_0517,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI TIME (S),8.433333333333334
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_circle,circle,AVERAGE ROI VELOCITY (CM/S),5.719425425355874
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_circle,circle,FIRST ROI ENTRY TIME (S),8.0
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_circle,circle,LAST ROI ENTRY TIME (S),1062.1666666666667
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_circle,circle,MEAN ROI BOUT TIME (S),1.27
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_circle,circle,ROI ENTRIES (COUNTS),10.0
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_circle,circle,TOTAL ROI MOVEMENT (CM),68.23218563191377
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_circle,circle,TOTAL ROI TIME (S),12.700000000000001
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_polygon,polygon,AVERAGE ROI VELOCITY (CM/S),1.4242363455146176
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_polygon,polygon,FIRST ROI ENTRY TIME (S),23.666666666666668
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_polygon,polygon,LAST ROI ENTRY TIME (S),1191.2
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_polygon,polygon,MEAN ROI BOUT TIME (S),4.774945533769063
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_polygon,polygon,ROI ENTRIES (COUNTS),153.0
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_polygon,polygon,TOTAL ROI MOVEMENT (CM),535.7206139179194
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_polygon,polygon,TOTAL ROI TIME (S),730.5666666666667
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_rectangle,rectangle,AVERAGE ROI VELOCITY (CM/S),3.5867883136839285
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_rectangle,rectangle,FIRST ROI ENTRY TIME (S),2.3666666666666667
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_rectangle,rectangle,LAST ROI ENTRY TIME (S),1084.3333333333333
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_rectangle,rectangle,MEAN ROI BOUT TIME (S),4.890476190476191
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_rectangle,rectangle,ROI ENTRIES (COUNTS),7.0
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI MOVEMENT (CM),70.07863274677703
+503_MA109_Gi_CNO_0514,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI TIME (S),34.233333333333334
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_circle,circle,AVERAGE ROI VELOCITY (CM/S),2.3288502023684012
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_circle,circle,FIRST ROI ENTRY TIME (S),10.866666666666667
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_circle,circle,LAST ROI ENTRY TIME (S),1134.8
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_circle,circle,MEAN ROI BOUT TIME (S),6.1455555555555526
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_circle,circle,ROI ENTRIES (COUNTS),30.0
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_circle,circle,TOTAL ROI MOVEMENT (CM),328.44860058466173
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_circle,circle,TOTAL ROI TIME (S),184.3666666666666
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,AVERAGE ROI VELOCITY (CM/S),1.751236625612455
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,FIRST ROI ENTRY TIME (S),275.3333333333333
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,LAST ROI ENTRY TIME (S),958.4
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,MEAN ROI BOUT TIME (S),1.19375
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,ROI ENTRIES (COUNTS),32.0
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,TOTAL ROI MOVEMENT (CM),51.110049237899865
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,TOTAL ROI TIME (S),38.2
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,AVERAGE ROI VELOCITY (CM/S),2.203629268738119
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,FIRST ROI ENTRY TIME (S),3.066666666666667
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,LAST ROI ENTRY TIME (S),713.0
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,MEAN ROI BOUT TIME (S),6.283333333333333
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,ROI ENTRIES (COUNTS),18.0
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI MOVEMENT (CM),162.57302555410723
+503_MA109_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI TIME (S),113.1
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_circle,circle,AVERAGE ROI VELOCITY (CM/S),1.5209411367723409
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_circle,circle,FIRST ROI ENTRY TIME (S),230.13333333333333
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_circle,circle,LAST ROI ENTRY TIME (S),913.9333333333333
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_circle,circle,MEAN ROI BOUT TIME (S),3.038461538461538
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_circle,circle,ROI ENTRIES (COUNTS),39.0
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_circle,circle,TOTAL ROI MOVEMENT (CM),205.63949456035627
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_circle,circle,TOTAL ROI TIME (S),118.49999999999997
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_polygon,polygon,AVERAGE ROI VELOCITY (CM/S),1.6248262633008965
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_polygon,polygon,FIRST ROI ENTRY TIME (S),206.26666666666668
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_polygon,polygon,LAST ROI ENTRY TIME (S),1101.4333333333334
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_polygon,polygon,MEAN ROI BOUT TIME (S),0.7598039215686275
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_polygon,polygon,ROI ENTRIES (COUNTS),34.0
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_polygon,polygon,TOTAL ROI MOVEMENT (CM),41.990923616247386
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_polygon,polygon,TOTAL ROI TIME (S),25.833333333333336
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_rectangle,rectangle,AVERAGE ROI VELOCITY (CM/S),2.8419710951690287
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_rectangle,rectangle,FIRST ROI ENTRY TIME (S),2.033333333333333
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_rectangle,rectangle,LAST ROI ENTRY TIME (S),1178.9666666666667
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_rectangle,rectangle,MEAN ROI BOUT TIME (S),10.497222222222222
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_rectangle,rectangle,ROI ENTRIES (COUNTS),24.0
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI MOVEMENT (CM),311.33569270123695
+503_MA109_Gi_CNO_0521,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI TIME (S),251.93333333333334
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_circle,circle,AVERAGE ROI VELOCITY (CM/S),
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_circle,circle,FIRST ROI ENTRY TIME (S),
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_circle,circle,LAST ROI ENTRY TIME (S),
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_circle,circle,MEAN ROI BOUT TIME (S),
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_circle,circle,ROI ENTRIES (COUNTS),0.0
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_circle,circle,TOTAL ROI MOVEMENT (CM),0.0
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_circle,circle,TOTAL ROI TIME (S),0.0
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_polygon,polygon,AVERAGE ROI VELOCITY (CM/S),1.3507124472691312
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_polygon,polygon,FIRST ROI ENTRY TIME (S),429.6666666666667
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_polygon,polygon,LAST ROI ENTRY TIME (S),483.5
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_polygon,polygon,MEAN ROI BOUT TIME (S),0.3
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_polygon,polygon,ROI ENTRIES (COUNTS),6.0
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_polygon,polygon,TOTAL ROI MOVEMENT (CM),1.4255714914090936
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_polygon,polygon,TOTAL ROI TIME (S),1.7999999999999998
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_rectangle,rectangle,AVERAGE ROI VELOCITY (CM/S),1.58406378310826
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_rectangle,rectangle,FIRST ROI ENTRY TIME (S),18.8
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_rectangle,rectangle,LAST ROI ENTRY TIME (S),1051.5
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_rectangle,rectangle,MEAN ROI BOUT TIME (S),10.046666666666667
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_rectangle,rectangle,ROI ENTRIES (COUNTS),40.0
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI MOVEMENT (CM),496.3769712844057
+503_MA109_Gi_DCZ_0603,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI TIME (S),401.8666666666667
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_circle,circle,AVERAGE ROI VELOCITY (CM/S),3.6401211843535983
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_circle,circle,FIRST ROI ENTRY TIME (S),225.86666666666667
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_circle,circle,LAST ROI ENTRY TIME (S),1108.5333333333333
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_circle,circle,MEAN ROI BOUT TIME (S),1.4391304347826086
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_circle,circle,ROI ENTRIES (COUNTS),69.0
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_circle,circle,TOTAL ROI MOVEMENT (CM),314.1855409235183
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_circle,circle,TOTAL ROI TIME (S),99.3
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,AVERAGE ROI VELOCITY (CM/S),1.972690974146387
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,FIRST ROI ENTRY TIME (S),6.5
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,LAST ROI ENTRY TIME (S),1143.9
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,MEAN ROI BOUT TIME (S),2.773049645390071
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,ROI ENTRIES (COUNTS),47.0
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,TOTAL ROI MOVEMENT (CM),154.36302643864295
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_polygon,polygon,TOTAL ROI TIME (S),130.33333333333334
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,AVERAGE ROI VELOCITY (CM/S),3.3192616612695582
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,FIRST ROI ENTRY TIME (S),102.93333333333334
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,LAST ROI ENTRY TIME (S),1138.5666666666666
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,MEAN ROI BOUT TIME (S),1.4902777777777778
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,ROI ENTRIES (COUNTS),24.0
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI MOVEMENT (CM),82.64230167257665
+503_MA109_Gi_Saline_0513,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI TIME (S),35.766666666666666
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_circle,circle,AVERAGE ROI VELOCITY (CM/S),
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_circle,circle,FIRST ROI ENTRY TIME (S),
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_circle,circle,LAST ROI ENTRY TIME (S),
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_circle,circle,MEAN ROI BOUT TIME (S),
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_circle,circle,ROI ENTRIES (COUNTS),0.0
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_circle,circle,TOTAL ROI MOVEMENT (CM),0.0
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_circle,circle,TOTAL ROI TIME (S),0.0
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_polygon,polygon,AVERAGE ROI VELOCITY (CM/S),1.2043394864007761
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_polygon,polygon,FIRST ROI ENTRY TIME (S),101.73333333333333
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_polygon,polygon,LAST ROI ENTRY TIME (S),1184.2
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_polygon,polygon,MEAN ROI BOUT TIME (S),4.616091954022988
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_polygon,polygon,ROI ENTRIES (COUNTS),116.0
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_polygon,polygon,TOTAL ROI MOVEMENT (CM),459.39334217225513
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_polygon,polygon,TOTAL ROI TIME (S),535.4666666666666
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_rectangle,rectangle,AVERAGE ROI VELOCITY (CM/S),1.0555933000996474
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_rectangle,rectangle,FIRST ROI ENTRY TIME (S),26.366666666666667
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_rectangle,rectangle,LAST ROI ENTRY TIME (S),988.8333333333334
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_rectangle,rectangle,MEAN ROI BOUT TIME (S),3.1341269841269854
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_rectangle,rectangle,ROI ENTRIES (COUNTS),84.0
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI MOVEMENT (CM),307.0203131914648
+503_MA109_Gi_Saline_0515,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI TIME (S),263.26666666666677
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_circle,circle,AVERAGE ROI VELOCITY (CM/S),2.637991194442649
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_circle,circle,FIRST ROI ENTRY TIME (S),625.9666666666667
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_circle,circle,LAST ROI ENTRY TIME (S),666.9666666666667
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_circle,circle,MEAN ROI BOUT TIME (S),3.3583333333333334
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_circle,circle,ROI ENTRIES (COUNTS),8.0
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_circle,circle,TOTAL ROI MOVEMENT (CM),49.608328004168506
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_circle,circle,TOTAL ROI TIME (S),26.866666666666667
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_polygon,polygon,AVERAGE ROI VELOCITY (CM/S),1.5022087165903728
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_polygon,polygon,FIRST ROI ENTRY TIME (S),22.033333333333335
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_polygon,polygon,LAST ROI ENTRY TIME (S),1129.9666666666667
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_polygon,polygon,MEAN ROI BOUT TIME (S),3.8674796747967477
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_polygon,polygon,ROI ENTRIES (COUNTS),41.0
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_polygon,polygon,TOTAL ROI MOVEMENT (CM),126.51803748322509
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_polygon,polygon,TOTAL ROI TIME (S),158.56666666666666
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_rectangle,rectangle,AVERAGE ROI VELOCITY (CM/S),1.4424692704490893
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_rectangle,rectangle,FIRST ROI ENTRY TIME (S),257.3666666666667
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_rectangle,rectangle,LAST ROI ENTRY TIME (S),1203.4
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_rectangle,rectangle,MEAN ROI BOUT TIME (S),3.8245614035087714
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_rectangle,rectangle,ROI ENTRIES (COUNTS),38.0
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI MOVEMENT (CM),214.51231082444923
+503_MA109_Gi_Saline_0517,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI TIME (S),145.33333333333331
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_circle,circle,AVERAGE ROI VELOCITY (CM/S),1.0212977341537124
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_circle,circle,FIRST ROI ENTRY TIME (S),48.5
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_circle,circle,LAST ROI ENTRY TIME (S),3265.5
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_circle,circle,MEAN ROI BOUT TIME (S),8.414285714285715
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_circle,circle,ROI ENTRIES (COUNTS),7.0
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_circle,circle,TOTAL ROI MOVEMENT (CM),54.97022115766739
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_circle,circle,TOTAL ROI TIME (S),58.900000000000006
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_polygon,polygon,AVERAGE ROI VELOCITY (CM/S),0.6984739455477358
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_polygon,polygon,FIRST ROI ENTRY TIME (S),22.4
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_polygon,polygon,LAST ROI ENTRY TIME (S),3513.9
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_polygon,polygon,MEAN ROI BOUT TIME (S),16.720588235294116
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_polygon,polygon,ROI ENTRIES (COUNTS),34.0
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_polygon,polygon,TOTAL ROI MOVEMENT (CM),166.01883618526517
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_polygon,polygon,TOTAL ROI TIME (S),568.5
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_rectangle,rectangle,AVERAGE ROI VELOCITY (CM/S),0.40712175872813183
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_rectangle,rectangle,FIRST ROI ENTRY TIME (S),79.6
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_rectangle,rectangle,LAST ROI ENTRY TIME (S),3297.3
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_rectangle,rectangle,MEAN ROI BOUT TIME (S),12.020192307692309
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_rectangle,rectangle,ROI ENTRIES (COUNTS),104.0
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI MOVEMENT (CM),325.8411754272329
+505_MA144_Gi_CNO_0514,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI TIME (S),1250.1000000000001
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_circle,circle,AVERAGE ROI VELOCITY (CM/S),1.992814876489495
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_circle,circle,FIRST ROI ENTRY TIME (S),23.966666666666665
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_circle,circle,LAST ROI ENTRY TIME (S),807.9333333333333
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_circle,circle,MEAN ROI BOUT TIME (S),3.5879999999999996
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_circle,circle,ROI ENTRIES (COUNTS),50.0
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_circle,circle,TOTAL ROI MOVEMENT (CM),224.78529787171652
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_circle,circle,TOTAL ROI TIME (S),179.39999999999998
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,AVERAGE ROI VELOCITY (CM/S),1.9318321336795181
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,FIRST ROI ENTRY TIME (S),341.6
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,LAST ROI ENTRY TIME (S),1161.6333333333334
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,MEAN ROI BOUT TIME (S),0.6633333333333333
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,ROI ENTRIES (COUNTS),30.0
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,TOTAL ROI MOVEMENT (CM),37.09098565479453
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_polygon,polygon,TOTAL ROI TIME (S),19.9
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,AVERAGE ROI VELOCITY (CM/S),3.6311937921504702
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,FIRST ROI ENTRY TIME (S),3.2333333333333334
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,LAST ROI ENTRY TIME (S),1095.2666666666667
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,MEAN ROI BOUT TIME (S),2.8883333333333336
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,ROI ENTRIES (COUNTS),20.0
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI MOVEMENT (CM),133.4128258485041
+505_MA144_Gi_CNO_0516,Animal_1,Center,My_rectangle,rectangle,TOTAL ROI TIME (S),57.76666666666667
