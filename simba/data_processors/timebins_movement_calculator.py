@@ -45,7 +45,8 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
                  config_path: str,
                  bin_length: Union[int, float],
                  body_parts: List[str],
-                 plots: Optional[bool] = False):
+                 plots: Optional[bool] = False,
+                 verbose: bool = True):
 
         ConfigReader.__init__(self, config_path=config_path)
         log_event(logger_name=str(self.__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()),)

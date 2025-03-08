@@ -224,6 +224,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         stdout_success(f"Loaded project {config_path}", source=self.__class__.__name__)
         simongui = Toplevel()
+        simongui.attributes("-topmost", True)
+        simongui.after(150, lambda: simongui.attributes("-topmost", False))
         simongui.minsize(1300, 800)
         simongui.wm_title("LOAD PROJECT")
         simongui.columnconfigure(0, weight=1)
@@ -295,7 +297,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         #analyze_roi_btn = SimbaButton(parent=self.roi_draw, txt="ANALYZE ROI DATA: AGGREGATES", txt_clr='green', img='shapes_small', font=Formats.FONT_REGULAR.value, cmd=ROIAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         analyze_roi_btn = SimbaButton(parent=self.roi_draw, txt="ANALYZE ROI DATA: AGGREGATES", txt_clr='green', img='shapes_small', font=Formats.FONT_REGULAR.value, cmd=ROIAggregateDataAnalyzerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
-        analyze_roi_time_bins_btn = SimbaButton(parent=self.roi_draw, txt="ANALYZE ROI DATA: TIME-BINS", txt_clr='blue', img='analyze_blue', font=Formats.FONT_REGULAR.value, cmd=ROIAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        analyze_roi_time_bins_btn = SimbaButton(parent=self.roi_draw, txt="ANALYZE ROI DATA: TIME-BINS", txt_clr='blue', img='clock', font=Formats.FONT_REGULAR.value, cmd=ROIAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
 
         self.roi_draw.grid(row=0, column=1, sticky=N)
