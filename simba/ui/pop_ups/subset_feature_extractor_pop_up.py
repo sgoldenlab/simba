@@ -3,14 +3,15 @@ __author__ = "Simon Nilsson"
 import os.path
 from tkinter import *
 from typing import Union
+
 from simba.feature_extractors.feature_subsets import FeatureSubsetsCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, FolderSelect, SimbaCheckbox)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        FolderSelect, SimbaCheckbox)
 from simba.utils.checks import check_if_dir_exists
 from simba.utils.enums import Formats, Links
 from simba.utils.errors import InvalidInputError, NoDataError
-
 
 TWO_POINT_BP_DISTANCES = 'TWO-POINT BODY-PART DISTANCES (MM)'
 WITHIN_ANIMAL_THREE_POINT_ANGLES = 'WITHIN-ANIMAL THREE-POINT BODY-PART ANGLES (DEGREES)'

@@ -17,7 +17,7 @@ See [THIS](https://github.com/sgoldenlab/simba/edit/master/docs/roi_tutorial_new
 # Part 2. Analyzing ROI data.
 
 Once we have [drawn the ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md), we can compute descriptive statistics based on movement of the animal(s) in relation to the ROIs 
-(for example, how much time the animals spends in teh ROIs, or how many times the animals enter the ROIs. To compute ROI statistics, click in the <kbd>ANALYZE ROI DATA: AGGREGATES</kbd> button in the `[ ROI ]` tab and you should see the 
+(for example, how much time the animals spends in the ROIs, or how many times the animals enter the ROIs etc). To compute ROI statistics, click in the <kbd>ANALYZE ROI DATA: AGGREGATES</kbd> button in the `[ ROI ]` tab and you should see the 
 following pop up:
 
 <p align="center">
@@ -58,20 +58,53 @@ and each column represents a specific measurment.
 
 If you did check the `DETAILED ROI BOUT DATA (SEQUENCES)` checkbox, an additional file will be crated in the SimBA project logs folder named something like `Detailed_ROI_data_20250306162014.csv` that can be expected to look something like [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/Detailed_ROI_data_20250307101923.csv). This file contains a row of information (entry and exit time, frame and entry duration) for every ROI, for every animal, and every video. It also contains columns for the animal name and body-part name for reference. 
 
+# Part 2. Analyzing ROI data by time-bin
 
-### ANALYZING ROI DATA SPLIT BY TIME BINS
+Once we have [drawn the ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md), we can compute descriptive statistics based on movement of the animal(s) in relation to the ROIs stratisfied by time-bins. 
+For example, we can anser how much time the animals spends in the ROIs, or how many times the animals enter the ROIs, within each N second bin in each video. 
 
-If you want to further calculate time-spent and the number of entries made into the user-defined ROIs within **user-specified time-bins**, 
-go ahead and click on **Time bins: Analyze ROIs** located in the *Analyze ROI* sub-menu. Clicking on this button brings up this menu:
+To compute ROI statistics by time-bin, click in the <kbd>ANALYZE ROI DATA: TIME-BINS</kbd> button in the `[ ROI ]` tab and you should see the 
+following pop up:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROIAnalysisTimeBinsPopUp.png" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_analyze_tutorial_2.webp" />
 </p>
 
-Here, select (i) how many animals/body-parts you want to calculate time-bin ROI data for, (ii) which body-parts you want to use to infer the location of the animals, and (iii)  the size of each time bin in seconds. 
-If you also want to produce data for the average velocity and distances moved within each ROI within each time bin, tick the *Compute distances moved within ROIs in each time-bin*. For an example of anticipated output of the movement/velocity analysis split by ROI and time-bin, see [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/Time_bins_0.5s_movement_results_20240330143150.csv)) file.
+1) In the `# OF ANIMALS` dropdown, select the number of animals you want to compute ROI statistics for.
 
-Once the information is filled in click the `Run` button. You can follow the progress in the SimBA main terminal window. Once the analysis is complete, the data will be saved date-time stamped CSV file the `project_folder/log` directory with names containing the size of the time-bins.
+2) In the `TIME BIN (S)` entry-box, enter the size of the time-bin in seconds. E.g., (60 for a minute, or a 15.5 for 15.5s time-bins)
+
+3) In the `PROBABILITY THRESHOLD` entry-box, select the minimum pose-estimation probability score (between 0 and 1) that should be considered when performing ROI analysis. Any frame body-part probability score above the entered value will be filtered out. Enter 0.0 to use all frames regardless of pose-estimation probability score. 
+> [!CAUTION]
+> If possible, we recommend having reliable pose-estimation data in every frame. This includes pre-process all videos, and remove any segments of the videos where animals are not present in the video as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md),
+> and performing pose-estimation interpolation of missing data at data import as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-file).
+
+4). In the `SELECT BODY-PART(S)` frame, use the dropdown menus to select the body-parts that you wish to use to infer the locations of the animals. 
+
+5). In the `DATA OPTIONS` frame, select the data that you wish to compute:
+
+ * `TOTAL ROI TIME (S)`: The total time, in seconds, that each animal spends in each defined ROI in each video in each time-bin. 
+ * `ROI ENTRIES (COUNT): The total number of times, that each animal enters each defined ROI in each video in each time-bin. 
+ * `FIRST ROI ENTRY TIME (S)`: The video time, in seconds, when each animal first enters each defined ROI in each time-bin in each video (NOTE: will be `None` if an animal never enters a defined ROI).   
+ * `LAST ROI ENTRY TIME (S)`: The video time, in seconds, when each animal last enters each defined ROI  in each time-bin in each video (NOTE: will be `None` if an animal never enters a defined ROI).
+ * `DETAILED ROI BOUT DATA (SEQUENCES)`: If checked, the SimBA ROI analysis generates a CSV file within the `project_folder/logs` directory named something like *Detailed_ROI_bout_data_20231031141848.csv*. This file contains the exact frame numbers, time stamps, and duration of each seqence when animals enter and exits each user-drawn ROIs. (NOTE: no file will be created if no animal in any video never enters an ROI)
+ * `ROI MOVEMENT (VELOCITY AND DISTANCES)`: The total distance moved, and the average velocity, of each animal in each defined ROI  in each time-bin in each video.
+
+6). In the `FORMAT OPTION` frame, select how the output data should be formatted, and any addtional video meta data that should be included in the output which could be helpful for sanity checks. 
+
+* `TRANSPOSE OUTPUT TABLE`: If checked, one row in the output data will represent a video. If unchecked, one row in the output data will represent a data measurment.
+* `INCLUDE FPS DATA`: If checked, the FPS used to compute the metrics of each video will be included in the output table. 
+* `INCLUDE VIDEO LENGTH DATA`: If checked, the length of each video in seconds will be included in the output table.
+* `INCLUDE PIXEL PER MILLIMETER DATA`: If checked, the pixel per millimeter conversion factor (used to compute distances and velocity) of each video will be included in the output table.
+* `INCLUDE TIME-BIN TIME STAMPS`:  If checked, the start time, start frame, end time, and end time of each time-bin will be included in the output table. If unchecked, the time-bins will only be represeted by single integer values running from 0 -> last time bin.
+
+7. Once the above is filled in, click the <kbd>RUN</kbd> button. You can foillow the progress in the main SimBA terminal.
+
+Once complete, a file will be stored in the logs folder of your SimBA project named something like `ROI_time_bins_140.0s_data_20250308104641.csv`. If you did **not** check the
+`TRANSPOSE OUTPUT TABLE` checkbox, the file will look something like [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/ROI_time_bins_120.0s_data_20250308110536_non_transposed.csv), where each row represent a specific video, ROI, animal, and measurement. If you **did** check the `TRANSPOSE OUTPUT TABLE` checkbox, the file will look something like [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/ROI_time_bins_120.0s_data_20250308110349_transposed.csv), where each row represent a specific video
+and each column represents a specific measurment.
+
+If you did check the `DETAILED ROI BOUT DATA (SEQUENCES)` checkbox, an additional file will be crated in the SimBA project logs folder named something like `Detailed_ROI_data_20250306162014.csv` that can be expected to look something like [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/Detailed_ROI_data_20250307101923.csv). This file contains a row of information (entry and exit time, frame and entry duration) for every ROI, for every animal, and every video. It also contains columns for the animal name and body-part name for reference. 
 
 # Part 3. Generating features from ROI data. 
 
