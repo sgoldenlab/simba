@@ -160,9 +160,7 @@ class ROIPlotMultiprocess(ConfigReader):
             data_path = os.path.join(self.outlier_corrected_dir, f'{self.video_name}.{self.file_type}')
         else:
             if not os.path.isfile(data_path):
-                raise NoFilesFoundError(
-                    msg=f"SIMBA ERROR: Could not find the file at path {data_path}. Make sure the data file exist to create ROI visualizations",
-                    source=self.__class__.__name__)
+                raise NoFilesFoundError(msg=f"SIMBA ERROR: Could not find the file at path {data_path}. Make sure the data file exist to create ROI visualizations", source=self.__class__.__name__)
             check_file_exist_and_readable(file_path=data_path)
         if save_path is None:
             save_path = os.path.join(self.project_path, Paths.ROI_ANALYSIS.value, f'{self.video_name}.mp4')

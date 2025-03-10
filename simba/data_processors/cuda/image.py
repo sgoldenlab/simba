@@ -1281,7 +1281,7 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
     circle_size_dev = cuda.to_device(circle_size)
     colors_dev = cuda.to_device(colors)
     resolution_dev = cuda.to_device(np.array([video_meta_data['width'], video_meta_data['height']]))
-
+    data = np.ascontiguousarray(data, dtype=np.int32)
     img_dev = cuda.device_array((batch_size, h, w, 3), dtype=np.int32)
     data_dev = cuda.device_array((batch_size, data.shape[1], 2), dtype=np.int32)
 

@@ -154,6 +154,7 @@ class Formats(Enum):
         FONT_HEADER = ('Poppins Regular', 13, "bold")
         FONT_REGULAR_BOLD = ('Poppins Bold', 13)
         FONT_LARGE = ('Poppins Regular', 15, "bold")
+        FONT_LARGE_ITALICS = ('Poppins Regular', 15, "italic")
         FONT_PLAYWRITE = ('Playwrite ES Deco', 8)
     elif (platform.system() == OS.WINDOWS.value):
         FONT_REGULAR = ('Poppins Regular', 8)
@@ -161,6 +162,7 @@ class Formats(Enum):
         FONT_REGULAR_BOLD = ('Poppins Bold', 8)
         FONT_HEADER = ('Poppins Regular', 10, "bold")
         FONT_LARGE = ('Poppins Regular', 13, "bold")
+        FONT_LARGE_ITALICS = ('Poppins Regular', 13, "italic")
         FONT_PLAYWRITE = ('Playwrite ES Deco', 8)
     else:
         FONT_REGULAR = ('DejaVu Sans', 8)
@@ -168,6 +170,7 @@ class Formats(Enum):
         FONT_REGULAR_BOLD = ('DejaVu Sans', 8, "bold")
         FONT_HEADER = ('DejaVu Sans', 10, "bold")
         FONT_LARGE = ('DejaVu Sans', 13, "bold")
+        FONT_LARGE_ITALICS = ('DejaVu Sans', 13, "italic")
     DLC_NETWORK_FILE_NAMES = [
         "dlc_resnet50",
         "dlc_resnet_50",

@@ -94,7 +94,7 @@ class PosePlotterMultiProcess():
             raise InvalidFilepathError(msg=f'{data_path} not not a valid file or directory path.', source=self.__class__.__name__)
         if not os.path.isfile(config_path):
             raise InvalidFilepathError(msg=f'When visualizing pose-estimation, select an input sub-directory of the project_folder/csv folder OR file in the project_folder/csv/ANY_FOLDER directory. {data_path} does not meet these requirements and therefore SimBA cant locate the project_config.ini (expected at {config_path}', source=self.__class__.__name__)
-        self.config = ConfigReader(config_path=config_path, read_video_info=False)
+        self.config = ConfigReader(config_path=config_path, read_video_info=False, create_logger=False)
         if os.path.isdir(data_path):
             files_found = find_files_of_filetypes_in_directory(directory=data_path, extensions=[f'.{self.config.file_type}'], raise_error=True)
         else:
@@ -140,7 +140,7 @@ class PosePlotterMultiProcess():
             self.temp_folder = os.path.join(self.out_dir, video_name, "temp")
             if os.path.exists(self.temp_folder):
                 self.config.remove_a_folder(self.temp_folder)
-            os.makedirs(self.temp_folder)
+            os.makedirs(self.temp_folder, exist_ok=True)
             save_video_path = os.path.join(self.out_dir, f"{video_name}.mp4")
             pose_df = read_df(file_path=pose_path, file_type=self.config.file_type, check_multiindex=True)
             video_meta_data = get_video_meta_data(video_path=video_path)
@@ -172,7 +172,7 @@ class PosePlotterMultiProcess():
             pool.terminate()
             pool.join()
             print(f"Joining {video_name} multi-processed video...")
-            concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=save_video_path, remove_splits=True, gpu=False)
+            concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=save_video_path, remove_splits=True, gpu=self.gpu)
             video_timer.stop_timer()
             stdout_success(msg=f"Pose video {video_name} complete and saved at {save_video_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
         self.config.timer.stop_timer()

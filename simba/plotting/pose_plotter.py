@@ -46,7 +46,7 @@ class PosePlotter(object):
             raise InvalidFilepathError(msg=f'{data_path} not not a valid file or directory path.', source=self.__class__.__name__)
         if not os.path.isfile(config_path):
             raise InvalidFilepathError(msg=f'When visualizing pose-estimation, select an input sub-directory of the project_folder/csv folder OR file in the project_folder/csv/ANY_FOLDER directory. {data_path} does not meet these requirements and therefore SimBA cant locate the project_config.ini (expected at {config_path}', source=self.__class__.__name__)
-        self.config = ConfigReader(config_path=config_path, read_video_info=False)
+        self.config = ConfigReader(config_path=config_path, read_video_info=False, create_logger=False)
         if os.path.isdir(data_path):
             self.files_found = find_files_of_filetypes_in_directory(directory=data_path, extensions=[f'.{self.config.file_type}'], raise_error=True)
         else:
