@@ -5,11 +5,11 @@ from typing import Union
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.roi_time_bins_analyzer import ROITimebinAnalyzer
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, SimbaButton, SimbaCheckbox, Entry_Box)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, SimbaButton, SimbaCheckbox)
 from simba.utils.checks import check_float
 from simba.utils.enums import ConfigKey, Formats, Keys, Links
-from simba.utils.errors import NoROIDataError, InvalidInputError
-
+from simba.utils.errors import InvalidInputError, NoROIDataError
 
 
 class ROIAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):

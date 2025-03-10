@@ -170,33 +170,36 @@ If clicking **YES**, SimBA will identify the ROI-based features columns inside e
 
 # Part 4. Visualizing ROI data
 
-You can now generate visualizations of the ROI data for each of the videos in your project. To generate the visualizations, click on `Visualize ROI tracking` in the `Visualize ROI` submenu of the **ROI** tab. You can use this tool to generate visualizations of the ROI and tracking data, like in these gifs:
+You can create visualizations of the ROIs together with counters displaying how much time time animals have spent in, and how many times the animals have entered, each ROI, throughout the videos. You can use this tool to generate visualizations of the ROI and tracking data, like in these gifs below,
 
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_visualization_1.gif" width="425"/> <img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_OF.gif" width="425"/>
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_visualization_1.gif" width="425"/> <img src="https://github.com/sgoldenlab/simba/blob/master/images/ROI_OF.gif" width="625"/>
 
-Clicking on this button brings up the below menu: 
-
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_viz_012023_2.png" />
-</p>
-
-The first sub-menu is called **SETTINGS**. In the *Body-part probability threshold* entry-box, fill in the minimum pose-estimation confidence required for a body-part to be plotted (a value between 0.0 and 1.0). E.g., set this value to `0.0` to plot all body-parts in all frames. Alternatively, set this value to `1.0` to plot only the body-parts that your pose-estimation tool is most condident about. 
-
-There are two checkboxes that are auto-ticked when opening the menu: (i) `Show pose-estimated location`, and (ii) `Show animal names`. To remove the "circles" representing the location of the body-parts in the video, untick the the `Show pose-estimated location` check-box. To remove the names of the animals in the video, untick the the `Show animal names` check-box. Four example outputs are shown in the GIF below. (TOP LEFT: `Show pose-estimated location` and `Show animal names` are both **ticked**. TOP RIGHT: `Show pose-estimated location` and `Show animal names` are both **un-ticked**. BOTTOM LEFT: `Show pose-estimated location` is **ticked** and `Show animal names` is **un-ticked**. BOTTOM RIGHT: `Show pose-estimated location` is **un-ticked** and  `Show animal names` is **ticked**.
+To to this, click the <kbd>VISUALIZE ROI TRACKING</kbd> in the `[ ROI ]` tab and you should see this pop-up window:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/merged_video_20230125154753.gif" />
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_visualize_popup.webp" />
 </p>
 
+1) In the ` BODY-PART PROBABILITY THRESHOLD` entry-box, select the minimum pose-estimation probability score (between 0 and 1) that should be considered when performing ROI analysis. Any frame body-part probability score above the entered value will be filtered out. Enter 0.0 to use all frames regardless of pose-estimation probability score. 
+> [!CAUTION]
+> If possible, we recommend having reliable pose-estimation data in every frame. This includes pre-process all videos, and remove any segments of the videos where animals are not present in the video as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md),
+> and performing pose-estimation interpolation of missing data at data import as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-file).
 
-Next, there is a `Multi-process (faster)` check-box. If you are on a computer with a high CPU count, you may want to take advantage of several or all of to cores to generate your videos in parallel. This way you could make hefty saves on run-time. To take advantage of many or all cores, check the `Multi-process (faster)` check-box and choose how many cores you want to use in the `CPU cores drop-down` menu. 
+2) If you want to show the pose-estimated location(s) of the animals in the video, set the `SHOW POSE ESTIMATION LOCATIONS` dropdown to True.
+> [!NOTE]
+> Setting this option to False will grey out the `KEYPOINT SIZE` and `COLOR` in the body-part menu (see below)
 
-To create a single ROI visualization video, click the **Create SINGLE ROI Video** button. Select which video you want to create in the *select Video* drop-down menu*. 
+3) `NUMBER OF CPU CORES`: This dropdown has values running from 1 to the number of CPU cores available on your computer. Higher values will produce the videos faster (but may require higher RAM). Select the number of CPU cores you wish to use to create the videos. 
 
-To create many ROI visualization videos, click the **Create ALL ROI Videos** button.
+4) In the `SELECT NUMBER OF ANIMAL(S)` frame, select the number of animals (and body-parts) that you want to visualize ROI data for. Note: The maximum number you can choose in this menu is the number of animals specified in your SimBA project.
 
-You can follow the progress in the main SimBA terminal. The ROI videos are saved in the `project_folder/frames/output/ROI_analysis` directory. 
+5) `SELECT BODY-PARTS` frame: Select the body-parts that you wish to act as proxies for the location of the animal. If you have set the `SHOW POSE ESTIMATION LOCATIONS` dropdown to True, you can also select the color, and the size, of the circles denoting the location of the animals in each frame. Note: if KEY-POINT SIZE is set to "AUTO", then SimBA will try to auto-compute the optimal size of the bosy-part location using the resolution of your video.
 
+6). To create a single ROI visualization video, select which video you want to create an ROI video for in the *select Video* drop-down menu* and click the <kbd>CREATE SINGLE VIDEO</kbd> button. 
+
+7) To create ROI visualizations for all available videos in your project, click the the <kbd>CREATE ALL ROI VIDEOS</kbd> button.
+
+You can follow the progress in the main SimBA terminal and the main opertaing system terminal from where SimBA was launched. The ROI videos are saved in the `project_folder/frames/output/ROI_analysis` directory. 
 
 # Part 5. Visualizing ROI features
 
