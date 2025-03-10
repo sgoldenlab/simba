@@ -4,19 +4,24 @@ import os
 import threading
 import time
 from tkinter import *
-from typing import Union
 from tkinter.ttk import Combobox
+from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.roi_plotter import ROIPlotter
 from simba.plotting.roi_plotter_mp import ROIPlotMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, FileSelect, SimbaButton, SimbaCheckbox, SimBALabel, SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, FileSelect, SimbaButton,
+                                        SimbaCheckbox, SimBADropDown,
+                                        SimBALabel)
 from simba.utils.checks import check_file_exist_and_readable, check_float
 from simba.utils.enums import Formats, Keys, Links, Options
-from simba.utils.read_write import find_all_videos_in_directory, find_files_of_filetypes_in_directory, str_2_bool
-from simba.utils.errors import ROICoordinatesNotFoundError, NoDataError
+from simba.utils.errors import NoDataError, ROICoordinatesNotFoundError
 from simba.utils.lookups import get_color_dict
+from simba.utils.read_write import (find_all_videos_in_directory,
+                                    find_files_of_filetypes_in_directory,
+                                    str_2_bool)
 
 BP_SIZE_OPTIONS = list(range(1, 101, 1))
 BP_SIZE_OPTIONS.insert(0, 'AUTO')

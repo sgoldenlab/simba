@@ -6,9 +6,9 @@ import threading
 import webbrowser
 from copy import copy
 from tkinter import *
-from tkinter.ttk import Combobox
 from tkinter.filedialog import askdirectory, askopenfilename
-from typing import Any, Callable, Dict, Optional, Tuple, Union, Iterable, List
+from tkinter.ttk import Combobox
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 try:
     from typing import Literal
