@@ -5,19 +5,30 @@ import os
 from typing import Dict, List, Optional, Tuple, Union
 
 import cv2
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.roi_tools.roi_aggregate_statistics_analyzer import ROIAggregateStatisticsAnalyzer
-from simba.utils.checks import (check_int, check_file_exist_and_readable, check_float, check_if_keys_exist_in_dict, check_valid_lst, check_video_and_data_frm_count_align, check_if_dir_exists, check_if_valid_rgb_tuple)
-from simba.utils.data import (create_color_palettes, detect_bouts, slice_roi_dict_for_video)
-from simba.utils.enums import Formats, Keys, Paths, TagNames, TextOptions
-from simba.utils.errors import (BodypartColumnNotFoundError, DuplicationError, NoFilesFoundError, ROICoordinatesNotFoundError, NoROIDataError)
-from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import  get_video_meta_data, read_df, read_frm_of_video
-from simba.utils.warnings import FrameRangeWarning
+from simba.roi_tools.roi_aggregate_statistics_analyzer import \
+    ROIAggregateStatisticsAnalyzer
 from simba.roi_tools.roi_utils import get_roi_dict_from_dfs
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists,
+                                check_if_keys_exist_in_dict,
+                                check_if_valid_rgb_tuple, check_int,
+                                check_valid_lst,
+                                check_video_and_data_frm_count_align)
+from simba.utils.data import (create_color_palettes, detect_bouts,
+                              slice_roi_dict_for_video)
+from simba.utils.enums import Formats, Keys, Paths, TagNames, TextOptions
+from simba.utils.errors import (BodypartColumnNotFoundError, DuplicationError,
+                                NoFilesFoundError, NoROIDataError,
+                                ROICoordinatesNotFoundError)
+from simba.utils.printing import SimbaTimer, log_event, stdout_success
+from simba.utils.read_write import (get_video_meta_data, read_df,
+                                    read_frm_of_video)
+from simba.utils.warnings import FrameRangeWarning
 
 SHOW_BODY_PARTS = 'show_body_part'
 SHOW_ANIMAL_NAMES = 'show_animal_name'
