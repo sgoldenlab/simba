@@ -150,18 +150,21 @@ class Formats(Enum):
     FONT = cv2.FONT_HERSHEY_TRIPLEX
     if (platform.system() == OS.MAC.value):
         FONT_REGULAR = ('Poppins Regular', 13)
+        FONT_REGULAR_ITALICS = ('Poppins Regular', 13, "italic")
         FONT_HEADER = ('Poppins Regular', 13, "bold")
         FONT_REGULAR_BOLD = ('Poppins Bold', 13)
         FONT_LARGE = ('Poppins Regular', 15, "bold")
         FONT_PLAYWRITE = ('Playwrite ES Deco', 8)
     elif (platform.system() == OS.WINDOWS.value):
         FONT_REGULAR = ('Poppins Regular', 8)
+        FONT_REGULAR_ITALICS = ('Poppins Regular', 8, "italic")
         FONT_REGULAR_BOLD = ('Poppins Bold', 8)
         FONT_HEADER = ('Poppins Regular', 10, "bold")
         FONT_LARGE = ('Poppins Regular', 13, "bold")
         FONT_PLAYWRITE = ('Playwrite ES Deco', 8)
     else:
         FONT_REGULAR = ('DejaVu Sans', 8)
+        FONT_REGULAR_ITALICS = ('DejaVu Sans', 8, "italic")
         FONT_REGULAR_BOLD = ('DejaVu Sans', 8, "bold")
         FONT_HEADER = ('DejaVu Sans', 10, "bold")
         FONT_LARGE = ('DejaVu Sans', 13, "bold")

@@ -14,62 +14,51 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.roi_tools.ROI_analyzer import ROIAnalyzer
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_keys_exist_in_dict, check_int,
-                                check_valid_lst,
-                                check_video_and_data_frm_count_align)
-from simba.utils.data import (create_color_palettes, detect_bouts,
-                              slice_roi_dict_for_video)
-from simba.utils.enums import Formats, Keys, Paths, TagNames, TextOptions
-from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
-                                NoFilesFoundError, ROICoordinatesNotFoundError)
-from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder,
-                                    find_core_cnt, get_fn_ext,
-                                    get_video_meta_data)
-from simba.utils.warnings import DuplicateNamesWarning
+from simba.utils.checks import (check_if_valid_rgb_tuple, check_file_exist_and_readable, check_float, check_if_keys_exist_in_dict, check_int, check_valid_lst, check_video_and_data_frm_count_align, check_valid_dict, check_if_dir_exists)
+from simba.utils.data import (create_color_palettes, detect_bouts, slice_roi_dict_for_video)
+from simba.utils.enums import Formats, Keys, Paths, TextOptions
+from simba.utils.errors import (BodypartColumnNotFoundError, NoFilesFoundError, ROICoordinatesNotFoundError, NoROIDataError, DuplicationError)
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, get_video_meta_data, read_df)
+from simba.roi_tools.roi_aggregate_statistics_analyzer import ROIAggregateStatisticsAnalyzer
+from simba.utils.warnings import DuplicateNamesWarning, FrameRangeWarning
+from simba.roi_tools.roi_utils import get_roi_dict_from_dfs
 
 pd.options.mode.chained_assignment = None
 
 SHOW_BODY_PARTS = 'show_body_part'
 SHOW_ANIMAL_NAMES = 'show_animal_name'
 STYLE_KEYS = [SHOW_BODY_PARTS, SHOW_ANIMAL_NAMES]
-CIRCLE_SIZE = "circle_size"
-FONT_SIZE = "font_size"
-SPACE_SIZE = "space_size"
 
 
-def _roi_plotter_mp(frame_range: Tuple[int, np.ndarray],
-                    data_df: pd.DataFrame,
+def _roi_plotter_mp(data: Tuple[int, np.ndarray],
                     loc_dict: dict,
                     font_size: float,
-                    circle_size: int,
-                    video_meta_data: dict,
+                    circle_sizes: list,
                     save_temp_directory: str,
-                    shape_meta_data: dict,
                     video_shape_names: list,
                     input_video_path: str,
                     body_part_dict: dict,
-                    roi_dict: Dict[str, pd.DataFrame],
-                    colors: list,
+                    roi_dfs_dict: Dict[str, pd.DataFrame],
+                    roi_dict: dict,
+                    bp_colors: list,
                     style_attr: dict,
                     animal_ids: list,
                     threshold: float):
 
-    def __insert_texts(shape_df):
+    def __insert_texts(roi_dict, img):
         for animal_name in animal_ids:
-            for _, shape in shape_df.iterrows():
-                shape_name, shape_color = shape["Name"], shape["Color BGR"]
-                cv2.putText(border_img, loc_dict[animal_name][shape_name]["timer_text"], loc_dict[animal_name][shape_name]["timer_text_loc"], TextOptions.FONT.value, font_size, shape_color, TextOptions.TEXT_THICKNESS.value)
-                cv2.putText(border_img, loc_dict[animal_name][shape_name]["entries_text"], loc_dict[animal_name][shape_name]["entries_text_loc"], TextOptions.FONT.value, font_size, shape_color, TextOptions.TEXT_THICKNESS.value)
-        return border_img
+            for shape_name, shape_data in roi_dict.items():
+                img = cv2.putText(img, loc_dict[animal_name][shape_name]["timer_text"], loc_dict[animal_name][shape_name]["timer_text_loc"], TextOptions.FONT.value, font_size, shape_data['Color BGR'], TextOptions.TEXT_THICKNESS.value)
+                img = cv2.putText(img, loc_dict[animal_name][shape_name]["entries_text"], loc_dict[animal_name][shape_name]["entries_text_loc"], TextOptions.FONT.value, font_size, shape_data['Color BGR'], TextOptions.TEXT_THICKNESS.value)
+        return img
 
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-    group_cnt, frame_range = frame_range[0], frame_range[1]
-    start_frm, current_frm, end_frm = frame_range[0], frame_range[0], frame_range[-1]
+    group_cnt, data_df = data[0], data[1]
+    df_frm_range = data_df.index.tolist()
+    start_frm, current_frm, end_frm = df_frm_range[0], df_frm_range[0], df_frm_range[-1]
     save_path = os.path.join(save_temp_directory, f"{group_cnt}.mp4")
-
+    video_meta_data = get_video_meta_data(video_path=input_video_path)
     writer = cv2.VideoWriter(save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"] * 2, video_meta_data["height"]))
     cap = cv2.VideoCapture(input_video_path)
     cap.set(1, start_frm)
@@ -77,32 +66,30 @@ def _roi_plotter_mp(frame_range: Tuple[int, np.ndarray],
     while current_frm <= end_frm:
         ret, img = cap.read()
         if ret:
-            border_img = cv2.copyMakeBorder(img, 0, 0, 0, int(video_meta_data["width"]), borderType=cv2.BORDER_CONSTANT, value=[0, 0, 0])
-            border_img = __insert_texts(roi_dict[Keys.ROI_RECTANGLES.value])
-            border_img = __insert_texts(roi_dict[Keys.ROI_CIRCLES.value])
-            border_img = __insert_texts(roi_dict[Keys.ROI_POLYGONS.value])
-
-            border_img = PlottingMixin.roi_dict_onto_img(img=border_img, roi_dict=roi_dict)
-
+            img = cv2.copyMakeBorder(img, 0, 0, 0, int(video_meta_data["width"]), borderType=cv2.BORDER_CONSTANT,value=[0, 0, 0])
+            img = __insert_texts(roi_dict, img)
+            img = PlottingMixin.roi_dict_onto_img(img=img, roi_dict=roi_dfs_dict)
             for animal_cnt, animal_name in enumerate(animal_ids):
                 if style_attr[SHOW_BODY_PARTS] or style_attr[SHOW_ANIMAL_NAMES]:
-                    bp_data = data_df.loc[current_frm, body_part_dict[animal_name]].values
-                    if threshold <= bp_data[2]:
+                    x, y, p = (data_df.loc[current_frm, body_part_dict[animal_name]].fillna(0.0).values.astype(np.int32))
+                    if threshold <= p:
                         if style_attr[SHOW_BODY_PARTS]:
-                            cv2.circle(border_img, (int(bp_data[0]), int(bp_data[1])), circle_size, colors[animal_cnt], -1)
+                            img = cv2.circle(img, (x, y), circle_sizes[animal_cnt], bp_colors[animal_cnt], -1)
                         if style_attr[SHOW_ANIMAL_NAMES]:
-                            cv2.putText(border_img, animal_name, (int(bp_data[0]), int(bp_data[1])), TextOptions.FONT.value, font_size, colors[animal_cnt], TextOptions.TEXT_THICKNESS.value)
+                            img = cv2.putText(img, animal_name, (x, y), TextOptions.FONT.value, font_size, bp_colors[animal_cnt], TextOptions.TEXT_THICKNESS.value)
 
                 for shape_name in video_shape_names:
                     timer = round(data_df.loc[current_frm, f"{animal_name}_{shape_name}_cum_sum_time"], 2)
                     entries = data_df.loc[current_frm, f"{animal_name}_{shape_name}_cum_sum_entries"]
-                    cv2.putText(border_img, str(timer), loc_dict[animal_name][shape_name]["timer_data_loc"], TextOptions.FONT.value, font_size, shape_meta_data[shape_name]["Color BGR"], TextOptions.TEXT_THICKNESS.value)
-                    cv2.putText(border_img, str(entries), loc_dict[animal_name][shape_name]["entries_data_loc"], TextOptions.FONT.value, font_size, shape_meta_data[shape_name]["Color BGR"], TextOptions.TEXT_THICKNESS.value)
-            writer.write(border_img)
+                    img = cv2.putText(img, str(timer), loc_dict[animal_name][shape_name]["timer_data_loc"], TextOptions.FONT.value, font_size, roi_dict[shape_name]["Color BGR"], TextOptions.TEXT_THICKNESS.value)
+                    img = cv2.putText(img, str(entries), loc_dict[animal_name][shape_name]["entries_data_loc"], TextOptions.FONT.value, font_size, roi_dict[shape_name]["Color BGR"], TextOptions.TEXT_THICKNESS.value)
+            writer.write(img)
             current_frm += 1
             print(f"Multi-processing video frame {current_frm} on core {group_cnt}...")
         else:
+            FrameRangeWarning(msg=f'Could not read frame {current_frm} in video {video_meta_data["video_name"]}', source=_roi_plotter_mp.__name__)
             break
+
     cap.release()
     writer.release()
     return group_cnt
@@ -148,89 +135,119 @@ class ROIPlotMultiprocess(ConfigReader):
                  body_parts: List[str],
                  style_attr: Dict[str, bool],
                  threshold: Optional[float] = 0.0,
-                 core_cnt: Optional[int] = -1):
+                 core_cnt: Optional[int] = -1,
+                 data_path: Optional[Union[str, os.PathLike]] = None,
+                 save_path: Optional[Union[str, os.PathLike]] = None,
+                 bp_colors: Optional[List[Tuple[int, int, int]]] = None,
+                 bp_sizes: Optional[List[Union[int]]] = None):
 
-        check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
-        check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1)
-        if core_cnt == -1: core_cnt = find_core_cnt()[0]
-        check_if_keys_exist_in_dict(data=style_attr, key=STYLE_KEYS, name=f'{self.__class__.__name__} style_attr')
-        check_file_exist_and_readable(file_path=video_path)
-        _, self.video_name, _ = get_fn_ext(video_path)
+        check_file_exist_and_readable(file_path=config_path)
         ConfigReader.__init__(self, config_path=config_path)
+        self.video_meta_data = get_video_meta_data(video_path=video_path)
+        self.video_name = self.video_meta_data['video_name']
+        check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
+        check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0,])
+        check_if_keys_exist_in_dict(data=style_attr, key=STYLE_KEYS, name=f'{self.__class__.__name__} style_attr')
+        check_valid_dict(x=style_attr, required_keys=tuple(STYLE_KEYS,), valid_values_dtypes=(bool,))
+        self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
         if not os.path.isfile(self.roi_coordinates_path):
             raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path)
-        self.data_path = os.path.join(self.outlier_corrected_dir, f'{self.video_name}.{self.file_type}')
-        if not os.path.isfile(self.data_path):
-            raise NoFilesFoundError( msg=f"SIMBA ERROR: Could not find the file at path {self.data_path}. Make sure the data file exist to create ROI visualizations", source=self.__class__.__name__)
+        self.read_roi_data()
+        self.sliced_roi_dict, video_shape_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=self.video_name)
+        if len(video_shape_names) == 0:
+            raise NoROIDataError(msg=f"Cannot plot ROI data for video {self.video_name}. No ROIs defined for this video.")
+        if data_path is None:
+            data_path = os.path.join(self.outlier_corrected_dir, f'{self.video_name}.{self.file_type}')
+        else:
+            if not os.path.isfile(data_path):
+                raise NoFilesFoundError(
+                    msg=f"SIMBA ERROR: Could not find the file at path {data_path}. Make sure the data file exist to create ROI visualizations",
+                    source=self.__class__.__name__)
+            check_file_exist_and_readable(file_path=data_path)
+        if save_path is None:
+            save_path = os.path.join(self.project_path, Paths.ROI_ANALYSIS.value, f'{self.video_name}.mp4')
+            if not os.path.exists(os.path.dirname(save_path)): os.makedirs(os.path.dirname(save_path))
+        else:
+            check_if_dir_exists(os.path.dirname(save_path))
+        self.save_path, self.data_path = save_path, data_path
         check_valid_lst(data=body_parts, source=f'{self.__class__.__name__} body-parts', valid_dtypes=(str,), min_len=1)
         if len(set(body_parts)) != len(body_parts):
-            raise CountError(msg=f'All body-part entries have to be unique. Got {body_parts}', source=self.__class__.__name__)
-        log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
+            raise DuplicationError(msg=f'All body-part entries have to be unique. Got {body_parts}', source=self.__class__.__name__)
         for bp in body_parts:
-            if bp not in self.body_parts_lst:
-                raise BodypartColumnNotFoundError(msg=f'The body-part {bp} is not a valid body-part in the SimBA project. Options: {self.body_parts_lst}', source=self.__class__.__name__)
-        self.roi_analyzer = ROIAnalyzer(config_path=config_path, data_path=self.data_path, detailed_bout_data=True, threshold=threshold, body_parts=body_parts)
+            if bp not in self.body_parts_lst: raise BodypartColumnNotFoundError(msg=f'The body-part {bp} is not a valid body-part in the SimBA project. Options: {self.body_parts_lst}', source=self.__class__.__name__)
+        self.roi_analyzer = ROIAggregateStatisticsAnalyzer(config_path=self.config_path, data_path=self.data_path,  detailed_bout_data=True, threshold=threshold, body_parts=body_parts)
         self.roi_analyzer.run()
-        self.roi_entries_df = self.roi_analyzer.detailed_df
-        self.data_df, self.style_attr = self.roi_analyzer.data_df, style_attr
-        self.out_parent_dir = os.path.join(self.project_path, Paths.ROI_ANALYSIS.value)
-        if not os.path.exists(self.out_parent_dir): os.makedirs(self.out_parent_dir)
-        self.video_save_path = os.path.join(self.out_parent_dir, f"{self.video_name}.mp4")
-        self.read_roi_data()
-        self.shape_columns = []
-        self.roi_dict, self.shape_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=self.video_name)
-        if len(self.shape_names) == 0:
-            raise CountError(msg=f'No drawn ROIs detected for video {self.video_name}, please draw ROIs on this video before visualizing ROIs', source=self.__class__.__name__)
+        if bp_colors is not None:
+            check_valid_lst(data=bp_colors, source=f'{self.__class__.__name__} bp_colors', valid_dtypes=(tuple,), exact_len=len(body_parts), raise_error=True)
+            _ = [check_if_valid_rgb_tuple(x) for x in bp_colors]
+            self.color_lst = bp_colors
+        else:
+            self.color_lst = create_color_palettes(self.roi_analyzer.animal_cnt, len(body_parts))[0]
+        self.bp_sizes = bp_sizes
+        self.detailed_roi_data = pd.concat(self.roi_analyzer.detailed_dfs, axis=0).reset_index(drop=True)
+        self.bp_dict = self.roi_analyzer.bp_dict
         self.animal_names = [self.find_animal_name_from_body_part_name(bp_name=x, bp_dict=self.animal_bp_dict) for x in body_parts]
+        self.data_df = read_df(file_path=self.data_path, file_type=self.file_type, usecols=self.roi_analyzer.roi_headers).fillna(0.0).reset_index(drop=True)
+        self.shape_columns = []
         for x in itertools.product(self.animal_names, self.shape_names):
             self.data_df[f"{x[0]}_{x[1]}"] = 0; self.shape_columns.append(f"{x[0]}_{x[1]}")
-
-        self.bp_dict = self.roi_analyzer.bp_dict
-        self.__insert_data()
-        self.video_path, self.core_cnt, self.threshold, self.body_parts = video_path, core_cnt, threshold, body_parts
+        self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
+        self.video_path = video_path
+        check_video_and_data_frm_count_align(video=self.video_path, data=self.data_df, name=self.video_name, raise_error=False)
         self.cap = cv2.VideoCapture(self.video_path)
-        self.video_meta_data = get_video_meta_data(self.video_path, fps_as_int=False)
-        self.temp_folder = os.path.join(self.out_parent_dir, self.video_name, "temp")
-        if os.path.exists(self.temp_folder):
-            shutil.rmtree(self.temp_folder)
+        self.threshold, self.body_parts, self.style_attr = threshold, body_parts, style_attr
+        self.roi_dict_ = get_roi_dict_from_dfs(rectangle_df=self.sliced_roi_dict[Keys.ROI_RECTANGLES.value], circle_df=self.sliced_roi_dict[Keys.ROI_CIRCLES.value], polygon_df=self.sliced_roi_dict[Keys.ROI_POLYGONS.value])
+        self.temp_folder = os.path.join(os.path.dirname(self.save_path), self.video_name, "temp")
+        if os.path.exists(self.temp_folder): shutil.rmtree(self.temp_folder)
         os.makedirs(self.temp_folder)
-        if platform.system() == "Darwin":
-            multiprocessing.set_start_method("spawn", force=True)
+        self.roi_dict_ = get_roi_dict_from_dfs(rectangle_df=self.sliced_roi_dict[Keys.ROI_RECTANGLES.value], circle_df=self.sliced_roi_dict[Keys.ROI_CIRCLES.value], polygon_df=self.sliced_roi_dict[Keys.ROI_POLYGONS.value])
+        if platform.system() == "Darwin": multiprocessing.set_start_method("spawn", force=True)
 
-    def __insert_data(self):
-        if self.roi_entries_df is not None:
-            roi_entries_dict = self.roi_entries_df[["ANIMAL", "SHAPE NAME", "START FRAME", "END FRAME"]].to_dict(orient="records")
+    def __get_circle_sizes(self):
+        optimal_circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(int(self.video_meta_data["height"]), int(self.video_meta_data["height"])), circle_frame_ratio=100)
+        if self.bp_sizes is None:
+            self.circle_sizes = [optimal_circle_size] * len(self.animal_names)
+        else:
+            self.circle_sizes = []
+            for circle_size in self.bp_sizes:
+                if not check_int(name='circle_size', value=circle_size, min_value=1, raise_error=False)[0]:
+                    self.circle_sizes.append(optimal_circle_size)
+                else:
+                    self.circle_sizes.append(int(circle_size))
+
+    def __get_roi_columns(self):
+        if self.detailed_roi_data is not None:
+            roi_entries_dict = self.detailed_roi_data[["ANIMAL", "Event", "Start_frame", "End_frame"]].to_dict(orient="records")
             for entry_dict in roi_entries_dict:
-                entry, exit = int(entry_dict["START FRAME"]), int(entry_dict["END FRAME"])
+                entry, exit = int(entry_dict["Start_frame"]), int(entry_dict["End_frame"])
                 entry_dict["frame_range"] = list(range(entry, exit + 1))
-                col_name =  f'{entry_dict["ANIMAL"]}_{entry_dict["SHAPE NAME"]}'
+                col_name =  f'{entry_dict["ANIMAL"]}_{entry_dict["Event"]}'
                 self.data_df[col_name][self.data_df.index.isin(entry_dict["frame_range"])] = 1
 
-    def __calc_text_locs(self) -> dict:
-        loc_dict = {}
-        line_spacer = TextOptions.FIRST_LINE_SPACING.value
-        txt_strs = []
-        for animal_cnt, animal_name in enumerate(self.animal_names):
-            for shape in self.shape_names:
-                txt_strs.append(animal_name + ' ' + shape + ' entries')
-        longest_text_str = max(txt_strs, key=len)
-        self.font_size, x_spacer, y_spacer = PlottingMixin().get_optimal_font_scales(text=longest_text_str, accepted_px_width=int(self.video_meta_data["width"] / 2), accepted_px_height=int(self.video_meta_data["height"] / 1), text_thickness=TextOptions.TEXT_THICKNESS.value)
-        self.circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(int(self.video_meta_data["height"]), int(self.video_meta_data["height"])), circle_frame_ratio=100)
-        for animal_cnt, animal_name in enumerate(self.animal_names):
-            loc_dict[animal_name] = {}
-            for shape in self.shape_names:
-                loc_dict[animal_name][shape] = {}
-                loc_dict[animal_name][shape]["timer_text"] = f"{shape} {animal_name} timer:"
-                loc_dict[animal_name][shape]["entries_text"] = f"{shape} {animal_name} entries:"
-                loc_dict[animal_name][shape]["timer_text_loc"] = ((self.video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + TextOptions.BORDER_BUFFER_Y.value) + y_spacer * line_spacer))
-                loc_dict[animal_name][shape]["timer_data_loc"] = (int(self.video_meta_data["width"] + x_spacer), (self.video_meta_data["height"] - (self.video_meta_data["height"] + TextOptions.BORDER_BUFFER_Y.value) + y_spacer * line_spacer))
-                line_spacer += TextOptions.LINE_SPACING.value
-                loc_dict[animal_name][shape]["entries_text_loc"] = ((self.video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + TextOptions.BORDER_BUFFER_Y.value) + y_spacer * line_spacer))
-                loc_dict[animal_name][shape]["entries_data_loc"] = (int(self.video_meta_data["width"] + x_spacer), (self.video_meta_data["height"]- (self.video_meta_data["height"] + TextOptions.BORDER_BUFFER_Y.value) + y_spacer * line_spacer))
-                line_spacer += TextOptions.LINE_SPACING.value
-        return loc_dict
+    def __get_text_locs(self) -> dict:
+         loc_dict = {}
+         txt_strs = []
+         for animal_cnt, animal_name in enumerate(self.animal_names):
+             for shape in self.shape_names:
+                 txt_strs.append(animal_name + ' ' + shape + ' entries')
+         longest_text_str = max(txt_strs, key=len)
+         self.font_size, x_spacer, y_spacer = PlottingMixin().get_optimal_font_scales(text=longest_text_str, accepted_px_width=int(self.video_meta_data["width"] / 2), accepted_px_height=int(self.video_meta_data["height"] / 15), text_thickness=TextOptions.TEXT_THICKNESS.value)
+         row_counter = TextOptions.FIRST_LINE_SPACING.value
+         for animal_cnt, animal_name in enumerate(self.animal_names):
+             loc_dict[animal_name] = {}
+             for shape in self.shape_names:
+                 loc_dict[animal_name][shape] = {}
+                 loc_dict[animal_name][shape]["timer_text"] = f"{shape} {animal_name} timer:"
+                 loc_dict[animal_name][shape]["entries_text"] = f"{shape} {animal_name} entries:"
+                 loc_dict[animal_name][shape]["timer_text_loc"] = ((self.video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + TextOptions.BORDER_BUFFER_Y.value) + y_spacer * row_counter))
+                 loc_dict[animal_name][shape]["timer_data_loc"] = (int(self.video_meta_data["width"] + x_spacer + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + TextOptions.BORDER_BUFFER_Y.value) + y_spacer * row_counter))
+                 row_counter += 1
+                 loc_dict[animal_name][shape]["entries_text_loc"] = ((self.video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + TextOptions.BORDER_BUFFER_Y.value) + y_spacer * row_counter))
+                 loc_dict[animal_name][shape]["entries_data_loc"] = (int(self.video_meta_data["width"] + x_spacer + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"]- (self.video_meta_data["height"] + TextOptions.BORDER_BUFFER_Y.value) + y_spacer * row_counter))
+                 row_counter += 1
+         return loc_dict
 
-    def __create_counters(self) -> dict:
+    def __get_counters(self) -> dict:
         cnt_dict = {}
         for animal_cnt, animal_name in enumerate(self.animal_names):
             cnt_dict[animal_name] = {}
@@ -241,7 +258,7 @@ class ROIPlotMultiprocess(ConfigReader):
                 cnt_dict[animal_name][shape]["entry_status"] = False
         return cnt_dict
 
-    def __calculate_cumulative(self):
+    def __get_cumulative_data(self):
         for animal_name in self.animal_names:
             for shape in self.shape_names:
                 self.data_df[f"{animal_name}_{shape}_cum_sum_time"] = (self.data_df[f"{animal_name}_{shape}"].cumsum() / self.video_meta_data['fps'])
@@ -270,46 +287,59 @@ class ROIPlotMultiprocess(ConfigReader):
         return bordered_img.shape[0], bordered_img.shape[1]
 
     def run(self):
-        video_timer = SimbaTimer(start=True)
-        color_lst = create_color_palettes(self.roi_analyzer.animal_cnt, len(self.body_parts))[0]
-        self.border_img_h, self.border_img_w = self.__get_bordered_img_size()
-        self.loc_dict = self.__calc_text_locs()
-        self.cnt_dict = self.__create_counters()
-        self.shape_dicts = self.__create_shape_dicts()
-        self.__calculate_cumulative()
         check_video_and_data_frm_count_align(video=self.video_path, data=self.data_df, name=self.video_name, raise_error=False)
-        frm_lst = np.arange(0, len(self.data_df) + 1)
-        frm_lst = np.array_split(frm_lst, self.core_cnt)
-        frame_range = []
-        for i in range(len(frm_lst)): frame_range.append((i, frm_lst[i]))
+        video_timer = SimbaTimer(start=True)
+        self.__get_circle_sizes()
+        self.__get_roi_columns()
+        self.border_img_h, self.border_img_w = self.__get_bordered_img_size()
+        self.loc_dict = self.__get_text_locs()
+        self.cnt_dict = self.__get_counters()
+        self.__get_cumulative_data()
+
+        data = np.array_split(self.data_df, self.core_cnt)
+        data = [(i, j) for i, j in enumerate(data)]
+        del self.data_df
         del self.roi_analyzer.logger
         print(f"Creating ROI images, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
         with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
             constants = functools.partial(_roi_plotter_mp,
-                                          data_df = self.data_df,
                                           loc_dict=self.loc_dict,
                                           font_size=self.font_size,
-                                          circle_size=self.circle_size,
-                                          video_meta_data=self.video_meta_data,
+                                          circle_sizes=self.circle_sizes,
                                           save_temp_directory=self.temp_folder,
                                           body_part_dict=self.bp_dict,
                                           input_video_path=self.video_path,
-                                          roi_dict=self.roi_dict,
+                                          roi_dfs_dict=self.roi_dict,
+                                          roi_dict = self.roi_dict_,
                                           video_shape_names=self.shape_names,
-                                          shape_meta_data=self.shape_dicts,
-                                          colors=color_lst,
+                                          bp_colors=self.color_lst,
                                           style_attr=self.style_attr,
                                           animal_ids=self.animal_names,
                                           threshold=self.threshold)
 
-            for cnt, result in enumerate(pool.imap(constants, frame_range, chunksize=self.multiprocess_chunksize)):
-                print(f'Image batch {result+1} / {self.core_cnt} complete...')
+            for cnt, batch_cnt in enumerate(pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):
+                print(f'Image batch {batch_cnt+1} / {self.core_cnt} complete...')
             print(f"Joining {self.video_name} multi-processed ROI video...")
-            concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.video_save_path, video_format="mp4")
-            video_timer.stop_timer()
+            concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.save_path, video_format="mp4", remove_splits=True)
             pool.terminate()
             pool.join()
-            stdout_success(msg=f"Video {self.video_name} created. ROI video saved at {self.video_save_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__, )
+        video_timer.stop_timer()
+        stdout_success(msg=f"Video {self.video_name} created. ROI video saved at {self.save_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__, )
+
+
+# if __name__ == "__main__":
+#
+#     test = ROIPlotMultiprocess(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#                                video_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_Saline_0513.mp4",
+#                                body_parts=['Nose'],
+#                                style_attr={'show_body_part': True, 'show_animal_name': False},
+#                                bp_sizes=[20],
+#                                bp_colors=[(155, 255, 243)])
+#     test.run()
+
+
+
+
 
 
 # if __name__ == '__main__':
