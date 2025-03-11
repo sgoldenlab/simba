@@ -206,44 +206,20 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
             self.weight_absent.grid(row=1, column=0, sticky=NW)
 
     def __checks(self):
-        check_int(
-            name="Random forest estimators", value=self.estimators_entrybox.entry_get
-        )
+        check_int(name="Random forest estimators", value=self.estimators_entrybox.entry_get)
         check_int(name="Minimum sample leaf", value=self.min_sample_leaf_eb.entry_get)
         if self.undersample_settings_dropdown.getChoices() != "None":
-            check_float(
-                name="UNDER SAMPLE RATIO",
-                value=self.under_sample_ratio_entrybox.entry_get,
-            )
+            check_float(name="UNDER SAMPLE RATIO", value=self.under_sample_ratio_entrybox.entry_get)
         if self.oversample_settings_dropdown.getChoices() != "None":
-            check_float(
-                name="OVER SAMPLE RATIO",
-                value=self.over_sample_ratio_entrybox.entry_get,
-            )
+            check_float(name="OVER SAMPLE RATIO", value=self.over_sample_ratio_entrybox.entry_get)
         if self.create_clf_importance_bars_var.get():
-            check_int(
-                name="# FEATURES",
-                value=self.n_features_bars_entry_box.entry_get,
-                min_value=1,
-            )
+            check_int(name="# FEATURES", value=self.n_features_bars_entry_box.entry_get, min_value=1)
         if self.learning_curve_var.get():
-            check_int(
-                name="LEARNING CURVE K SPLITS",
-                value=self.learning_curve_k_splits_entry_box.entry_get,
-            )
-            check_int(
-                name="LEARNING CURVE DATA SPLITS",
-                value=self.learning_curve_data_splits_entry_box.entry_get,
-            )
+            check_int(name="LEARNING CURVE K SPLITS", value=self.learning_curve_k_splits_entry_box.entry_get)
+            check_int(name="LEARNING CURVE DATA SPLITS", value=self.learning_curve_data_splits_entry_box.entry_get)
         if self.calc_shap_scores_var.get():
-            check_int(
-                name="SHAP TARGET PRESENT",
-                value=self.shap_present.entry_get,
-                min_value=1,
-            )
-            check_int(
-                name="SHAP TARGET ABSENT", value=self.shap_absent.entry_get, min_value=1
-            )
+            check_int(name="SHAP TARGET PRESENT", value=self.shap_present.entry_get, min_value=1)
+            check_int(name="SHAP TARGET ABSENT", value=self.shap_absent.entry_get, min_value=1)
 
     def __get_variables(self):
         self.algorithm = self.machine_model_dropdown.getChoices()
