@@ -132,6 +132,7 @@ class FileSelect(Frame):
                  title=None,
                  lblwidth=None,
                  file_types=None,
+                 bg_clr: Optional[str] = 'white',
                  dropdown: DropDownMenu = None,
                  initialdir: Optional[Union[str, os.PathLike]] = None, **kw):
 
@@ -145,7 +146,7 @@ class FileSelect(Frame):
         self.filePath = StringVar()
         self.lblName = Label(self, text=fileDescription, fg=str(self.color), width=str(self.lblwidth), anchor=W, font=Formats.FONT_REGULAR.value)
         self.lblName.grid(row=0, column=0, sticky=W)
-        self.entPath = Label(self, textvariable=self.filePath, relief=SUNKEN, font=Formats.FONT_REGULAR.value)
+        self.entPath = Label(self, textvariable=self.filePath, relief=SUNKEN, font=Formats.FONT_REGULAR.value, bg=bg_clr)
         self.entPath.grid(row=0, column=1)
         self.btnFind = Button(self, text=Defaults.BROWSE_FILE_BTN_TEXT.value, compound="left", image=browse_icon, relief=RAISED, command=self.setFilePath, font=Formats.FONT_REGULAR.value)
         self.btnFind.image = browse_icon
@@ -190,7 +191,7 @@ class Entry_Box(Frame):
                  status=None,
                  validation=None,
                  entry_box_width=None,
-                 value: Optional[str] = None,
+                 value: Optional[Any] = None,
                  justify: str = 'left',
                  **kw):
 
@@ -236,6 +237,7 @@ class FolderSelect(Frame):
                  color: Optional[str] = None,
                  title: Optional[str] = "",
                  lblwidth: Optional[int] = 0,
+                 bg_clr: Optional[str] = 'white',
                  initialdir: Optional[Union[str, os.PathLike]] = None,
                  **kw):
 
@@ -248,7 +250,7 @@ class FolderSelect(Frame):
         self.folderPath = StringVar()
         self.lblName = Label(self, text=folderDescription, fg=str(self.color), width=str(self.lblwidth), anchor=W, font=Formats.FONT_REGULAR.value)
         self.lblName.grid(row=0, column=0, sticky=W)
-        self.entPath = Label(self, textvariable=self.folderPath, relief=SUNKEN, font=Formats.FONT_REGULAR.value)
+        self.entPath = Label(self, textvariable=self.folderPath, relief=SUNKEN, font=Formats.FONT_REGULAR.value, bg=bg_clr)
         self.entPath.grid(row=0, column=1)
         self.btnFind = Button(self, text=Defaults.BROWSE_FOLDER_BTN_TEXT.value, compound="left", image=browse_icon, relief=RAISED, font=Formats.FONT_REGULAR.value, command=self.setFolderPath)
         self.btnFind.image = browse_icon
@@ -536,7 +538,8 @@ class SimBADropDown(Frame):
                 justify: str = 'center',
                 dropdown_width: Optional[int] = None,
                 command: Callable = None,
-                value: Optional[Any] = None):
+                value: Optional[Any] = None,
+                state: Optional[str] = None):
 
         super().__init__(master=parent)
         self.dropdown_var = StringVar()
@@ -554,6 +557,8 @@ class SimBADropDown(Frame):
         if command is not None:
             self.command = command
             self.dropdown.bind("<<ComboboxSelected>>", self.on_select)
+        if state == 'disabled':
+            self.disable()
 
     def set_value(self, value: Any):
         self.dropdown_var.set(value)

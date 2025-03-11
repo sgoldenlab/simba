@@ -10,17 +10,12 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box, FileSelect, SimbaButton,
-                                        SimbaCheckbox, hxtScrollbar)
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_int)
-from simba.utils.enums import (ConfigKey, Dtypes, Formats, Keys, Links,
-                               MLParamKeys, Options)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, FileSelect, SimbaButton, SimbaCheckbox, hxtScrollbar, SimBALabel, SimBADropDown)
+from simba.utils.checks import (check_file_exist_and_readable, check_float, check_int)
+from simba.utils.enums import (ConfigKey, Dtypes, Formats, Keys, Links, MLParamKeys, Options)
 from simba.utils.errors import InvalidHyperparametersFileError
 from simba.utils.printing import stdout_success, stdout_trash, stdout_warning
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, str_2_bool)
 
 
 class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
@@ -31,8 +26,8 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         PopUpMixin.__init__(self, title="MACHINE MODEL SETTINGS", size=(450, 800))
-        if not os.path.exists(self.configs_meta_dir):
-            os.makedirs(self.configs_meta_dir)
+        if not os.path.exists(self.configs_meta_dir): os.makedirs(self.configs_meta_dir)
+
         self.clf_options = Options.CLF_MODELS.value
         self.max_features_options = Options.CLF_MAX_FEATURES.value
         self.criterion_options = Options.CLF_CRITERION.value
@@ -41,113 +36,59 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         self.class_weighing_options = Options.CLASS_WEIGHT_OPTIONS.value
         self.train_test_sizes_options = Options.CLF_TEST_SIZE_OPTIONS.value
         self.class_weights_options = list(range(1, 11, 1))
-        load_meta_data_frm = CreateLabelFrameWithIcon(parent=self.main_frm,
-                                                      header="LOAD META-DATA",
-                                                      icon_name=Keys.DOCUMENTATION.value,
-                                                      icon_link=Links.TRAIN_ML_MODEL.value,)
+        load_meta_data_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="LOAD META-DATA",  icon_name=Keys.DOCUMENTATION.value, icon_link=Links.TRAIN_ML_MODEL.value,)
         self.select_config_file = FileSelect(load_meta_data_frm, "CONFIG PATH:")
-
         load_config_btn = SimbaButton(parent=load_meta_data_frm, txt="LOAD", img='load_blue',  txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.load_config)
-        label_link = Label(load_meta_data_frm, text="[MODEL SETTINGS TUTORIAL]", fg="blue", font=Formats.FONT_REGULAR.value)
-        label_link.bind("<Button-1>", lambda e: webbrowser.open_new("https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model"))
+        label_link = SimBALabel(parent=load_meta_data_frm, txt="[MODEL SETTINGS TUTORIAL]", txt_clr="blue", link=Links.TRAIN_ML_MODEL.value, cursor='hand2')
 
-        machine_model_frm = LabelFrame(self.main_frm,text="MACHINE MODEL ALGORITHM",font=Formats.FONT_HEADER.value)
-        self.machine_model_dropdown = DropDownMenu(machine_model_frm, "ALGORITHM: ", self.clf_options, "25")
-        self.machine_model_dropdown.setChoices(self.clf_options[0])
+        machine_model_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MACHINE MODEL ALGORITHM", icon_name='equation_small')
+        self.machine_model_dropdown = SimBADropDown(parent=machine_model_frm, dropdown_options=[self.clf_options[0]], label="ALGORITHM:", label_width=30, dropdown_width=25, value=self.clf_options[0])
 
-        self.machine_model_dropdown.popupMenu['menu'].entryconfigure(self.clf_options[1], state='disabled')
-        self.machine_model_dropdown.popupMenu['menu'].entryconfigure(self.clf_options[2], state='disabled')
+        behavior_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BEHAVIOR", icon_name='decision_tree_small')
+        self.behavior_name_dropdown = SimBADropDown(parent=behavior_frm, dropdown_options=self.clf_names, label="BEHAVIOR:", label_width=30, dropdown_width=25, value=self.clf_names[0])
 
-        behavior_frm = LabelFrame(self.main_frm, text="BEHAVIOR", font=Formats.FONT_HEADER.value)
-        self.behavior_name_dropdown = DropDownMenu(behavior_frm, "BEHAVIOR: ", self.clf_names, "25")
-        self.behavior_name_dropdown.setChoices(self.clf_names[0])
+        self.hyperparameters_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="HYPER-PARAMETERS", icon_name='settings')
+        self.estimators_entrybox = Entry_Box(self.hyperparameters_frm,"RANDOM FOREST ESTIMATORS:", "30", validation="numeric", value="2000", entry_box_width=25, justify='center')
+        self.max_features_dropdown = SimBADropDown(parent=self.hyperparameters_frm, dropdown_options=self.max_features_options, label="MAX FEATURES:", label_width=30, dropdown_width=25, value=self.max_features_options[0])
 
-        self.hyperparameters_frm = LabelFrame(self.main_frm,text="HYPER-PARAMETERS",font=Formats.FONT_HEADER.value)
-        self.estimators_entrybox = Entry_Box(self.hyperparameters_frm,"Random forest estimators:","25",validation="numeric")
-        self.estimators_entrybox.entry_set(val=2000)
-        self.max_features_dropdown = DropDownMenu(self.hyperparameters_frm, "Max features: ", self.max_features_options, "25")
-        self.max_features_dropdown.setChoices(self.max_features_options[0])
-        self.criterion_dropdown = DropDownMenu(self.hyperparameters_frm, "Criterion: ", self.criterion_options, "25")
-        self.criterion_dropdown.setChoices(self.criterion_options[0])
-        self.train_test_size_dropdown = DropDownMenu(self.hyperparameters_frm, "Test Size: ", self.train_test_sizes_options, "25")
-        self.train_test_size_dropdown.setChoices("0.2")
-        self.train_test_type_dropdown = DropDownMenu(self.hyperparameters_frm,"Train-test Split Type: ", Options.TRAIN_TEST_SPLIT.value, "25")
-        self.train_test_type_dropdown.setChoices(Options.TRAIN_TEST_SPLIT.value[0])
-        self.min_sample_leaf_eb = Entry_Box(self.hyperparameters_frm, "Minimum sample leaf", "25", validation="numeric")
-        self.min_sample_leaf_eb.entry_set(val=1)
-        self.under_sample_ratio_entrybox = Entry_Box(self.hyperparameters_frm, "UNDER-sample ratio: ", "25", status=DISABLED)
-        self.undersample_settings_dropdown = DropDownMenu(self.hyperparameters_frm,"UNDER-sample setting: ",self.under_sample_options,"25",com=lambda x: self.dropdown_switch_entry_box_state(    self.under_sample_ratio_entrybox, self.undersample_settings_dropdown))
-        self.undersample_settings_dropdown.setChoices("None")
-        self.over_sample_ratio_entrybox = Entry_Box(self.hyperparameters_frm, "OVER-sample ratio: ", "25", status=DISABLED)
-        self.oversample_settings_dropdown = DropDownMenu(self.hyperparameters_frm, "OVER-sample setting: ", self.over_sample_options, "25", com=lambda x: self.dropdown_switch_entry_box_state(     self.over_sample_ratio_entrybox, self.oversample_settings_dropdown ))
-        self.oversample_settings_dropdown.setChoices(Dtypes.NONE.value)
-        self.class_weights_dropdown = DropDownMenu(self.hyperparameters_frm,"Class-weights setting: ",self.class_weighing_options,"25",com=lambda x: self.create_class_weight_table())
-        self.class_weights_dropdown.setChoices(Dtypes.NONE.value)
+        self.criterion_dropdown = SimBADropDown(parent=self.hyperparameters_frm, dropdown_options=self.criterion_options, label="CRITERION:", label_width=30, dropdown_width=25, value=self.criterion_options[0])
+        self.train_test_size_dropdown = SimBADropDown(parent=self.hyperparameters_frm, dropdown_options=self.train_test_sizes_options, label="TEST SIZE:", label_width=30, dropdown_width=25, value=0.2)
+        self.train_test_type_dropdown = SimBADropDown(parent=self.hyperparameters_frm, dropdown_options=Options.TRAIN_TEST_SPLIT.value, label="TRAIN-TEST SPLIT TYPE:", label_width=30, dropdown_width=25, value=Options.TRAIN_TEST_SPLIT.value[0])
+        self.min_sample_leaf_eb = Entry_Box(self.hyperparameters_frm, "MINIMUM SAMPLE LEAF:", "30", validation="numeric", value=1, entry_box_width=25, justify='center')
+        self.under_sample_ratio_entrybox = Entry_Box(self.hyperparameters_frm, "UNDER SAMPLE RATIO:", "30", validation="numeric", value=1, entry_box_width=25, justify='center', status=DISABLED)
+        self.undersample_settings_dropdown = SimBADropDown(parent=self.hyperparameters_frm, dropdown_options=self.under_sample_options, label="UNDER SAMPLE SETTING:", label_width=30, dropdown_width=25, value='None', command=self.__switch_undersample_state)
 
-        self.evaluations_frm = LabelFrame(self.main_frm,text="MODEL EVALUATION SETTINGS",font=Formats.FONT_HEADER.value)
+        self.over_sample_ratio_entrybox = Entry_Box(self.hyperparameters_frm, "OVER SAMPLE RATIO:", "30", validation="numeric", entry_box_width=25, justify='center', status=DISABLED)
+        self.oversample_settings_dropdown = SimBADropDown(parent=self.hyperparameters_frm, dropdown_options=self.over_sample_options, label="OVER SAMPLE SETTING:", label_width=30, dropdown_width=25, value=Dtypes.NONE.value, command=self.__switch_oversample_state)
+        self.class_weights_dropdown = SimBADropDown(parent=self.hyperparameters_frm, dropdown_options=self.class_weighing_options, label="CLASS WEIGHTS SETTINGS:", label_width=30, dropdown_width=25, value=Dtypes.NONE.value, command=self.__create_class_weight_table)
+
+        self.evaluations_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MODEL EVALUATION SETTINGS", icon_name='magnifying')
         self.create_clf_importance_bars_var = BooleanVar()
         self.calc_shap_scores_var = BooleanVar()
         self.learning_curve_var = BooleanVar()
 
-        self.meta_data_file_cb, self.create_meta_data_file_var = SimbaCheckbox(parent=self.evaluations_frm, txt="Create model meta data file")
-        self.decision_tree_graphviz_cb, self.create_example_decision_tree_graphviz_var = SimbaCheckbox(parent=self.evaluations_frm, txt='Create Example Decision Tree (requires "graphviz")')
-        self.decision_tree_dtreeviz_cb, self.create_example_decision_tree_dtreeviz_var = SimbaCheckbox(parent=self.evaluations_frm, txt='Create Fancy Example Decision Tree (requires "dtreeviz")')
-        self.clf_report_cb, self.create_clf_report_var = SimbaCheckbox(parent=self.evaluations_frm, txt="Create Classification Report")
-        self.n_features_bars_entry_box = Entry_Box(self.evaluations_frm,"# Features: ","25", status=DISABLED,validation="numeric")
-        self.bar_graph_cb = Checkbutton(self.evaluations_frm,text="Create Features Importance Bar Graph", font=Formats.FONT_REGULAR.value,  variable=self.create_clf_importance_bars_var,command=lambda: self.enable_entrybox_from_checkbox(    check_box_var=self.create_clf_importance_bars_var,    entry_boxes=[self.n_features_bars_entry_box],))
+        self.meta_data_file_cb, self.create_meta_data_file_var = SimbaCheckbox(parent=self.evaluations_frm, txt="MODEL META DATA FILE", txt_img='analyze_blue')
+        self.decision_tree_graphviz_cb, self.create_example_decision_tree_graphviz_var = SimbaCheckbox(parent=self.evaluations_frm, txt='EXAMPLE DECISION TREE ("graphviz")', txt_img='decision_tree_blue')
+        self.decision_tree_dtreeviz_cb, self.create_example_decision_tree_dtreeviz_var = SimbaCheckbox(parent=self.evaluations_frm, txt='EXAMPLE DECISION TREE ("dtreeviz")', txt_img='decision_tree_purple')
+        self.clf_report_cb, self.create_clf_report_var = SimbaCheckbox(parent=self.evaluations_frm, txt="CLASSIFICATION REPORT", txt_img='four_squares')
+        self.n_features_bars_entry_box = Entry_Box(self.evaluations_frm,"BAR GRAPH # FEATURES: ","30", status=DISABLED,validation="numeric", value=20, entry_box_width=15)
+        self.bar_graph_cb, self.create_clf_importance_bars_var = SimbaCheckbox(parent=self.evaluations_frm, txt="FEATURE IMPORTANCE BAR GRAPH", txt_img='bar_graph_green', cmd=self.__switch_bar_graph_n_state)
+        self.feature_permutation_cb, self.feature_permutation_importance_var = SimbaCheckbox(parent=self.evaluations_frm, txt="FEATURE PERMUTATION IMPORTANCE (NOTE: INTENSIVE)", txt_img='bar_graph_blue')
+        self.learning_curve_k_splits_entry_box = Entry_Box(self.evaluations_frm, "LEARNING CURVE K SPLITS", "30", status=DISABLED, validation="numeric", value="5", entry_box_width=15)
+        self.learning_curve_data_splits_entry_box = Entry_Box(self.evaluations_frm, "LEARNING CURVE DATA SPLITS", "30", status=DISABLED, validation="numeric", value="5", entry_box_width=15)
+        self.learning_curve_cb, self.learning_curve_var = SimbaCheckbox(parent=self.evaluations_frm, txt="LEARNING CURVES (NOTE: INTENSIVE)", txt_img='line_chart_light_blue', cmd=self.__switch_learning_curve_states)
 
-        self.feature_permutation_cb, self.feature_permutation_importance_var = SimbaCheckbox(parent=self.evaluations_frm, txt="Compute Feature Permutation Importances (Note: INTENSIVE)")
+        self.create_pr_curve_cb, self.create_pr_curve_var = SimbaCheckbox(parent=self.evaluations_frm, txt="PRECISION RECALL CURVES", txt_img='line_chart_red')
+        self.partial_dependency_cb, self.partial_dependency_var = SimbaCheckbox(parent=self.evaluations_frm, txt="PARTIAL DEPENDENCIES (Note: INTENSIVE)", txt_img='dependency')
 
-        self.learning_curve_k_splits_entry_box = Entry_Box(self.evaluations_frm, "Learning Curve Shuffle K Splits", "30", status=DISABLED, validation="numeric")
-        self.learning_curve_data_splits_entry_box = Entry_Box(self.evaluations_frm, "Learning Curve Shuffle Data Splits", "30", status=DISABLED, validation="numeric" )
-        self.learning_curve_cb = Checkbutton(
-            self.evaluations_frm,
-            text="Create Learning Curves (Note: CPU intensive)",
-            font=Formats.FONT_REGULAR.value,
-            variable=self.learning_curve_var,
-            command=lambda: self.enable_entrybox_from_checkbox(
-                check_box_var=self.learning_curve_var,
-                entry_boxes=[
-                    self.learning_curve_k_splits_entry_box,
-                    self.learning_curve_data_splits_entry_box,
-                ],
-            ),
-        )
+        self.shap_present = Entry_Box( self.evaluations_frm, "SHAP TARGET PRESENT #", "30", status=DISABLED, validation="numeric", entry_box_width=15)
+        self.shap_absent = Entry_Box( self.evaluations_frm, "SHAP TARGET ABSENT #", "30", status=DISABLED, validation="numeric", entry_box_width=15)
+        self.shap_save_it_dropdown = SimBADropDown(parent=self.evaluations_frm, dropdown_options=[1, 10, 100, 1000, "ALL FRAMES"], label="SHAPE SAVE CADENCE:", label_width=30, dropdown_width=25, value="ALL FRAMES", state='disabled')
+        self.shap_multiprocess_dropdown = SimBADropDown(parent=self.evaluations_frm, dropdown_options=["TRUE", "FALSE"], label="MULTI-PROCESS SHAP VALUES:", label_width=30, dropdown_width=25, value="FALSE", state='disabled', command=self.__change_shap_cadence_options)
 
-        self.create_pr_curve_cb, self.create_pr_curve_var = SimbaCheckbox(parent=self.evaluations_frm, txt="Create Precision Recall Curves")
-        self.shap_present = Entry_Box( self.evaluations_frm, "# target present", "25", status=DISABLED, validation="numeric",)
-        self.shap_absent = Entry_Box( self.evaluations_frm, "# target absent", "25", status=DISABLED, validation="numeric",)
-        self.shap_save_it_dropdown = DropDownMenu(self.evaluations_frm,"SHAP save cadence: ",[1, 10, 100, 1000, "ALL FRAMES"],"25")
-        self.shap_save_it_dropdown.setChoices("ALL FRAMES")
-        self.shap_save_it_dropdown.disable()
-        self.shap_multiprocess_dropdown = DropDownMenu(self.evaluations_frm,"Multi-process SHAP values: ",["True", "False"],"25",com=lambda x: self.change_shap_cadence_options(x))
-        self.shap_multiprocess_dropdown.setChoices("False")
-        self.shap_multiprocess_dropdown.disable()
+        self.calculate_shap_scores_cb, self.calc_shap_scores_var = SimbaCheckbox(parent=self.evaluations_frm, txt="COMPUTE SHAP SCORES", txt_img='shap', cmd=self.__switch_shap_entry_states)
 
-
-        self.partial_dependency_cb, self.partial_dependency_var = SimbaCheckbox(parent=self.evaluations_frm, txt="Calculate partial dependencies (Note: INTENSIVE)")
-
-        self.calculate_shap_scores_cb = Checkbutton(
-            self.evaluations_frm,
-            text="Calculate SHAP scores",
-            font=Formats.FONT_REGULAR.value,
-            variable=self.calc_shap_scores_var,
-            command=lambda: [
-                self.enable_entrybox_from_checkbox(
-                    check_box_var=self.calc_shap_scores_var,
-                    entry_boxes=[self.shap_present, self.shap_absent],
-                ),
-                self.enable_dropdown_from_checkbox(
-                    check_box_var=self.calc_shap_scores_var,
-                    dropdown_menus=[
-                        self.shap_save_it_dropdown,
-                        self.shap_multiprocess_dropdown,
-                    ],
-                ),
-            ],
-        )
-        self.save_frame = LabelFrame(self.main_frm, text="SAVE", font=Formats.FONT_HEADER.value)
-
+        self.save_frame = CreateLabelFrameWithIcon(parent=self.main_frm, header="SAVE", icon_name='save_small')
         save_global_btn = SimbaButton(parent=self.save_frame, txt="SAVE SETTINGS (GLOBAL ENVIRONMENT)", txt_clr='blue', img='save_blue', font=Formats.FONT_REGULAR.value, cmd=self.save_global)
         save_meta_btn = SimbaButton(parent=self.save_frame, txt="SAVE SETTINGS (SPECIFIC MODEL)", txt_clr='green', img='save_green', font=Formats.FONT_REGULAR.value, cmd=self.save_config)
         clear_cache_btn = SimbaButton(parent=self.save_frame, txt="CLEAR CACHE", txt_clr='red', img='trash_red', font=Formats.FONT_REGULAR.value, cmd=self.clear_cache)
@@ -208,41 +149,58 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         else:
             box.set_state(DISABLED)
 
-    def change_shap_cadence_options(self, x):
-        if x == "True":
+    def __switch_undersample_state(self, value):
+        if value == 'None': self.under_sample_ratio_entrybox.set_state(DISABLED)
+        else: self.under_sample_ratio_entrybox.set_state(NORMAL)
+
+    def __switch_oversample_state(self, value):
+        if value == 'None': self.over_sample_ratio_entrybox.set_state(DISABLED)
+        else: self.over_sample_ratio_entrybox.set_state(NORMAL)
+
+    def __switch_bar_graph_n_state(self):
+        if self.create_clf_importance_bars_var.get(): self.n_features_bars_entry_box.set_state(NORMAL)
+        else: self.n_features_bars_entry_box.set_state(DISABLED)
+
+    def __switch_learning_curve_states(self):
+        if self.learning_curve_var.get():
+            self.learning_curve_k_splits_entry_box.set_state(NORMAL)
+            self.learning_curve_data_splits_entry_box.set_state(NORMAL)
+        else:
+            self.learning_curve_k_splits_entry_box.set_state(DISABLED)
+            self.learning_curve_data_splits_entry_box.set_state(DISABLED)
+
+    def __change_shap_cadence_options(self, value):
+        if str_2_bool(value):
             self.shap_save_it_dropdown.setChoices("ALL FRAMES")
             self.shap_save_it_dropdown.disable()
         else:
             self.shap_save_it_dropdown.enable()
 
-    def create_class_weight_table(self):
+    def __switch_shap_entry_states(self):
+        value = self.calc_shap_scores_var.get()
+        if value:
+            self.shap_present.set_state(NORMAL)
+            self.shap_absent.set_state(NORMAL)
+            self.shap_save_it_dropdown.enable()
+            self.shap_multiprocess_dropdown.enable()
+        else:
+            self.shap_present.set_state(DISABLED)
+            self.shap_absent.set_state(DISABLED)
+            self.shap_save_it_dropdown.disable()
+            self.shap_multiprocess_dropdown.disable()
+
+
+    def __create_class_weight_table(self, value: str):
         if hasattr(self, "class_weight_frm"):
             self.weight_present.destroy()
             self.weight_absent.destroy()
             self.class_weight_frm.destroy()
 
-        if self.class_weights_dropdown.getChoices() == "custom":
-            self.class_weight_frm = LabelFrame(
-                self.hyperparameters_frm,
-                text="CLASS WEIGHTS",
-                font=("Helvetica", 12, "bold"),
-                pady=10,
-            )
-            self.weight_present = DropDownMenu(
-                self.class_weight_frm,
-                "{} PRESENT: ".format(self.behavior_name_dropdown.getChoices()),
-                self.class_weights_options,
-                "25",
-            )
-            self.weight_present.setChoices(2)
-            self.weight_absent = DropDownMenu(
-                self.class_weight_frm,
-                "{} ABSENT: ".format(self.behavior_name_dropdown.getChoices()),
-                self.class_weights_options,
-                "25",
-            )
-            self.weight_absent.setChoices(1)
+        if value == "custom":
+            self.class_weight_frm = CreateLabelFrameWithIcon(parent=self.hyperparameters_frm, header="CLASS WEIGHTS", icon_name='weights')
 
+            self.weight_present = SimBADropDown(parent=self.class_weight_frm, dropdown_options=self.class_weights_options, label=f"{self.behavior_name_dropdown.getChoices()} PRESENT:", label_width=30, dropdown_width=25, value=2)
+            self.weight_absent = SimBADropDown(parent=self.class_weight_frm, dropdown_options=self.class_weights_options, label=f"{self.behavior_name_dropdown.getChoices()} ABSENT:", label_width=30, dropdown_width=25, value=1)
             self.class_weight_frm.grid(row=11, column=0, sticky=NW)
             self.weight_present.grid(row=0, column=0, sticky=NW)
             self.weight_absent.grid(row=1, column=0, sticky=NW)
@@ -566,14 +524,14 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
                 self.meta[MLParamKeys.CLASS_WEIGHTS.value] = Dtypes.NONE.value
             self.class_weights_dropdown.setChoices(self.meta["class_weights"])
             if self.meta[MLParamKeys.CLASS_WEIGHTS.value] == "custom":
-                self.create_class_weight_table()
+                self.__create_class_weight_table(value="custom")
                 weights = ast.literal_eval(self.meta[MLParamKeys.CLASS_CUSTOM_WEIGHTS.value])
 
                 self.weight_present.setChoices(weights[1])
                 self.weight_absent.setChoices(weights[0])
         else:
             self.class_weights_dropdown.setChoices("None")
-            self.create_class_weight_table()
+            self.__create_class_weight_table(value='None')
 
         print(f"Loaded parameters from config {config_name}...")
 
@@ -611,4 +569,4 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         ]
 
 
-#_ = MachineModelSettingsPopUp(config_path=r"C:\troubleshooting\My_project_2\project_folder\project_config.ini")
+_ = MachineModelSettingsPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
