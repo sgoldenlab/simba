@@ -545,4 +545,4 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         ]
 
 
-_ = MachineModelSettingsPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+#_ = MachineModelSettingsPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
