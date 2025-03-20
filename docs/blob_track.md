@@ -1,7 +1,6 @@
-
-
-
 > [!IMPORTANT]
+> ### ANALYSIS SPEED
+> 
 > The speed of tracking is not only determined by your available hardware (i.e., you have a GPU, how many CPU cores you have, and how much RAM memory you have available). It is also determined by the resolution of your videos and the frame-rate of the videos.
 > 
 > For example, if your video resolutions are large (1000 x 1000), but you can visually detect the animals even at smaller resolutions (640 x 640), then consider downsampling your videos before performing blob detection.
@@ -14,7 +13,21 @@
 
 #### QUICK SETTINGS
 
-**THRESHOLD**: How different the animal has to be from the background to be detected. Higher values will result in less likelihood to wrongly assume that parts the animal belong to the background, and increase the likelihood of wrongly assume that parts background belong to the animal. 
+You can use these options to set all the videos to the same values. To do this, select the values you want to use in the dropdown menu, and hit the appropriate <kbd>APPLY</kbd> button. This will update the relevant column in the `VIDEOS` table. 
+
+**THRESHOLD**: How different the animal has to be from the background to be detected. Higher values will result in less likelihood to wrongly assume that parts the animal belong to the background, and increase the likelihood of wrongly assume that parts background belong to the animal.
+
+[quick_set_threshold.webm](https://github.com/user-attachments/assets/b04b8f13-f0c7-489a-a3cd-a07b8a39dc68)
+
+**SMOOTHING TIME (S)**: If set to None, no temporal smooth of the animal tracking points are performed. If not None, then SimBA performs Savitzky-Golay smoothing across the chosen sliding temporal window. 
+
+[quicK-set_smoothing_time.webm](https://github.com/user-attachments/assets/3418e032-9dcc-4b81-8c56-d0daaae36c99)
+
+**BUFFER SIZE (PIXELS)**: If set to None, the animals detected key-points will be placed right along the hull perimeter. We may want to "buffer the animals shape a little, to capture a larger area as the animal. Set how many pixels that you wish to buffer the animals geometry with. 
+See further details below or [THIS](https://github.com/user-attachments/assets/a86a0d7b-35c6-4da7-b44c-4856d71fd861) visual example of expected results from different buffer sizes.
+
+**CLOSING KERNEL SIZE**: Controls animal shape refinement. Larger values will merge seperate parts if the images detected as the foreground together into a single entity. The larger the value, the further apart the seperate parts of the foreground is allowed to be and still be merged into a single entity. This can be helpful if
+(i) there are parts of the background/flooring/environment/arena that has the same color as the animal, or (ii) the animal color is in part same or similar as the background, or (iii) we want to make the animal more "blob" like. See the further detailes below or [THIS](https://github.com/user-attachments/assets/a86a0d7b-35c6-4da7-b44c-4856d71fd861) visual example on expected results from different closing kernel sizes.
 
 **CPU COUNT**: Choose the number of CPU cores you wish to use. Default is the maximum available on your machine. Higher values will result in faster processing but will require more RAM. If you are hitting memory related errors, try and decrease this value.
 
@@ -22,15 +35,13 @@
 
 **GPU**: Toggle "USE GPU" if available to accelerate some aspects of processing. This option is automatically disabled if NVIDEA GPU is unavailable on your machine.
 
-**BUFFER SIZE**: If set to None, the animals detected key-points will be placed right along the hull perimeter. We may want to "buffer the animals shape a little, to capture a larger area as the animal. Set how many pixels that you wish to buffer the animals geometry with.
 
-**SMOOTHING TIME**: If set to None, no temporal smooth of the animal tracking points are performed. If not None, then SimBa performs Savitzky-Golay smoothing across the chosen sliding temporal window. 
+
 
 **BACKGROUND DIRECTORY**: Choose a directory that contains background video examples of the videos. Once selected, hit the <kbd>APPLY</kbd> button. SimBA will automatically pair each background video with the videos in the table. 
 
 > [!NOTE]
-> The larger the background videos are ( higher resolution, higher FPS, longer time), the longer the processing will be. To speed up processing, it is best to have a short representative background video reference for each video to be processed. E.g., it could be videos representing the first 20-30s of the videos in the table, or copies of the videos in
-> table where the FPS has been much reduced.
+> The larger the background videos are ( higher resolution, higher FPS, longer time), the longer the processing will be. To speed up processing, it is best to have a short representative background video reference for each video to be processed. E.g., it could be videos representing the first 20-30s of the videos in the table, or copies of the videos in the table where the FPS has been much reduced.
 
 **INCLUSION ZONES**: We can provide regions-of-interest (ROI) drawings if where in the videos we want SimBA to look for the animals. If drawn, then detections that do not intersect the drawn regions will be discarded. 
 
@@ -44,8 +55,58 @@
 
 #### VIDEO TABLE
 
-This table lists all video files found inside your defined video directory, with one row per video. For each row, there is a bunch of settings, allowing you control over the methods for how the animals location are detected in each video. You can also use the `QUICK SETTINGS` and `RUN-TIME SETTINGS` windows above to batch set these values on
-all videos. 
+This table lists all video files found inside your defined video directory, with one row per video. For each row, there is a bunch of settings, allowing you control over the precis methods for how the animals location are detected in each video. You can also use the `QUICK SETTINGS` and `RUN-TIME SETTINGS` windows above to batch set these values on all videos. 
+
+> [!NOTE]
+> If all videos have been recorded in a standardized way, you will likely get away with using the `QUICK SETTINGS` frame above to bulk set the methods for all videos at once.
+
+* **BACKGROUND REFERENCE**: Select the path to a video file serving as the background reference video for the specific file.
+
+> [!NOTE]
+> Filling out the background videos indivisually row-by-row can be tedious, and it is much recommended to use the `BACKGROUND DIRECTORY` in the `RUN-TIME SETTINGS` frame above to set all of the reference video paths at once.
+
+* **THRESHOLD**: How different the animal has to be from the background to be detected. Higher values will result in fewer pixels being detected as the animal while more pixels beeing assigned to the background, while lower values will result in more pixels beeing assigned to the animal and fewer pisels beeing assigned to the background.
+
+* **INCLUSION ZONES**: If we are having movement in the videos that are **not** performed by the animal (e.g., experimenters moving around along the perimeneters of the video, light intensities changes outside of the areana), we can tell the code about which parts of the arena the animal can be detected, and remove any detection outside of these defined zones.
+To do this, click the <kbd>SET INCLUSION ZONES</kbd> button for a video, and use the ROI drawing interface to specify which areas of the image te animals can be detected. For a full tutorial for how to use this interface, see [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md) documentation. As an example, in the video below,
+I define a polygon called `MAZE` for the first video, and save it, making sure that the animal will only be detected inside the `MAZE` region of interest.
+
+> [!NOTE]
+> 1) To save time, consider specifying the inclusion zones on only one video, and duplicating these inclusion zones on the rest of the videos using the `DUPLICATE INCLUSION ZONES` dropdown menu in the `RUN-TIME SETTING` menu above.
+> 2) Only use inclusion zones if you see problems with the tracking. If you have confirmed visually that there are no problems with the tracking (which for me has been overwhelmingly the case) then no inclusion zones are required.
+
+**SMOOTHING TIME**:  If set to None, no temporal smooth of the animal tracking points are performed. If not None, then SimBA performs Savitzky-Golay smoothing of the detected animal geometry using the selected smoothing time.
+
+**BUFFER SIZE**: If set to None, the animals detected key-points will be placed right along the hull perimeter. We may want to "buffer the animals shape a little, to capture a larger area as the animal. Set how many pixels that you wish to buffer the animals geometry with. For a visual example about what "buffering" means, see below video. 
+
+[buffer_ex.webm](https://github.com/user-attachments/assets/62cca260-5ab9-41ca-9cae-5369b3dc194c)
+
+
+**CLOSE KERNAL SIZE**: Controls animal shape refinement. Larger values will merge seperate parts if the images detected as the foreground together into a single entity. The larger the value, the further apart the seperate parts of the foreground is allowed to be and still be merged into a single entity. See below video of an animal when increasingly larger kernal sizes are choosen. 
+
+[close_kernal_example.webm](https://github.com/user-attachments/assets/a86a0d7b-35c6-4da7-b44c-4856d71fd861)
+
+
+> [!NOTE]
+> In the example above, from a elevated plus maze, the borders of teh open arms are black (same color as the animal) causing the tracking to fail and split the animal into two parts of the animal gets mistaken for the background as the animal performs a head dip. YThis is solved by smoothing (or "closing") the animals geometry.
+
+**QUICK CHECK**: We can do a "quick check" if the animal can be discerned from the background reliably, using the chosed settings for each video. Hitting the <kbd>QUICK CHECK</kbd> button will remove the background and display the video frame by frame. If you can reliably see the animal in white, and teh background in black, you are good to go!
+
+
+
+
+#### EXECUTE
+
+**RUN**: Once selected, click the <kbd>RUN</kbd> button. 
+
+
+
+
+
+
+
+
+
 
 
 
