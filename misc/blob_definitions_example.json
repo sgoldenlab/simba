@@ -1,0 +1,102 @@
+{
+    "input_dir": "D:\\EPM\\sampled",
+    "output_dir": "D:\\EPM\\sampled\\data",
+    "gpu": false,
+    "core_cnt": 32,
+    "vertice_cnt": 30,
+    "close_iterations": 3,
+    "save_bg_videos": true,
+    "video_data": {
+        "1": {
+            "video_path": "D:\\EPM\\sampled\\1.mp4",
+            "threshold": 53,
+            "smoothing_time": null,
+            "buffer_size": 5,
+            "reference": "D:/EPM/sampled/bg\\1.mp4",
+            "inclusion_zones": null,
+            "window_size": null,
+            "close_kernel": [
+                3,
+                3
+            ]
+        },
+        "2": {
+            "video_path": "D:\\EPM\\sampled\\2.mp4",
+            "threshold": 53,
+            "smoothing_time": null,
+            "buffer_size": 2,
+            "reference": "D:/EPM/sampled/bg\\2.mp4",
+            "inclusion_zones": null,
+            "window_size": null,
+            "close_kernel": [
+                3,
+                3
+            ]
+        },
+        "3": {
+            "video_path": "D:\\EPM\\sampled\\3.mp4",
+            "threshold": 53,
+            "smoothing_time": null,
+            "buffer_size": 10,
+            "reference": "D:/EPM/sampled/bg\\3.mp4",
+            "inclusion_zones": null,
+            "window_size": null,
+            "close_kernel": [
+                3,
+                3
+            ]
+        },
+        "4": {
+            "video_path": "D:\\EPM\\sampled\\4.mp4",
+            "threshold": 53,
+            "smoothing_time": null,
+            "buffer_size": 14,
+            "reference": "D:/EPM/sampled/bg\\4.mp4",
+            "inclusion_zones": null,
+            "window_size": null,
+            "close_kernel": [
+                3,
+                3
+            ]
+        },
+        "5": {
+            "video_path": "D:\\EPM\\sampled\\5.mp4",
+            "threshold": 53,
+            "smoothing_time": 190,
+            "buffer_size": 15,
+            "reference": "D:/EPM/sampled/bg\\5.mp4",
+            "inclusion_zones": null,
+            "window_size": null,
+            "close_kernel": [
+                3,
+                3
+            ]
+        },
+        "6": {
+            "video_path": "D:\\EPM\\sampled\\6.mp4",
+            "threshold": 53,
+            "smoothing_time": 320,
+            "buffer_size": 30,
+            "reference": "D:/EPM/sampled/bg\\6.mp4",
+            "inclusion_zones": null,
+            "window_size": null,
+            "close_kernel": [
+                3,
+                3
+            ]
+        },
+        "7": {
+            "video_path": "D:\\EPM\\sampled\\7.mp4",
+            "threshold": 53,
+            "smoothing_time": 60,
+            "buffer_size": 6,
+            "reference": "D:/EPM/sampled/bg\\7.mp4",
+            "inclusion_zones": null,
+            "window_size": null,
+            "close_kernel": [
+                3,
+                3
+            ]
+        }
+    }
+}
