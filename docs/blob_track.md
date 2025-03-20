@@ -23,6 +23,7 @@ EXAMPLE VIDEOS.
 > where the light levels are the same as during the actual video, as the beckground video. These snippets should have the same resolution as the original video, but is ideally much shorter, and can have reduced FPS.   
 
 
+
 #### QUICK SETTINGS
 
 You can use these options to set all the videos to the same values. To do this, select the values you want to use in the dropdown menu, and hit the appropriate <kbd>APPLY</kbd> button. This will update the relevant column in the `VIDEOS` table. 
@@ -38,8 +39,9 @@ You can use these options to set all the videos to the same values. To do this, 
 **BUFFER SIZE (PIXELS)**: If set to None, the animals detected key-points will be placed right along the hull perimeter. We may want to "buffer the animals shape a little, to capture a larger area as the animal. Set how many pixels that you wish to buffer the animals geometry with. 
 See further details below or [THIS](https://github.com/user-attachments/assets/a86a0d7b-35c6-4da7-b44c-4856d71fd861) visual example of expected results from different buffer sizes.
 
-**CLOSING KERNEL SIZE (PX)**: Controls animal shape refinement. Larger values will merge seperate parts if the images detected as the foreground together into a single entity. The larger the value, the further apart the seperate parts of the foreground is allowed to be and still be merged into a single entity. This can be helpful if
-(i) there are parts of the background/flooring/environment/arena that has the same color as the animal, or (ii) the animal color is in part same or similar as the background, or (iii) we want to make the animal more "blob" like. See the further detailes below or [THIS](https://github.com/user-attachments/assets/a86a0d7b-35c6-4da7-b44c-4856d71fd861) visual example on expected results from different closing kernel sizes.
+**CLOSING KERNEL SIZE (PX)**: Controls animal shape refinement. Larger values will merge seperate parts if the images detected as the foreground together into a single entity. The larger the value, the further apart the seperate parts of the foreground is allowed to be and still be merged into a single entity. This can be helpful if (i) there are parts of the background/flooring/environment/arena that has the same color as the animal, or (ii) the animal color is in part same or similar as the background, or (iii) we want to make the animal more "blob" like. See the further detailes below or [THIS](https://github.com/user-attachments/assets/a86a0d7b-35c6-4da7-b44c-4856d71fd861) visual example on expected results from different closing kernel sizes.
+
+**OPENING KERNEL SIZE (PX)**: Controls removal of noise, Larger values will remove parts smaller parts of the detected foreground. This can be helpful if get rid of small noise related to the movement of bedding or light across the video like the below video. See the further details below or [THIS](https://github.com/user-attachments/assets/91b8b70a-a442-454c-b957-31ba5253d042) visual example on expected results when removing the noise associated with bedding materia;l using teh open kernel. 
 
 
 #### RUN-TIME SETTINGS
@@ -57,7 +59,6 @@ directory contains videos with the same file names as the videos in the table.
 **CPU COUNT**: Choose the number of CPU cores you wish to use. Default is the maximum available on your machine. Higher values will result in faster processing but will require more RAM. If you are hitting memory related errors, you can try to decrease the `CPU COUNT` value.
 
 **VERTICE COUNT**: Controls animal shape precission. For example, if set to `30`, then SimBA will output  a CSV file containing the position 30 body-part keypoints along the animals outer bounds for every frame in the video. In other words, every output tracking file will contain 30 `x` and 30 `y` columns representing the positions of 30 "body-parts" in every frame of the video. If you selected `30` in this dropdown, an example output CSV file will look like [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/example_vertice_cnt_30.csv). If you selected `60` in this dropdown, an example output CSV file will look like [THIS]().
-
 
 
 **SAVE BACKGROUND VIDEOS**: If True, then black-and-white backgroiund subtracted videos (where the foreground is white and background is black), which SimBa uses to detect the animals location, whill be saved in your chosen output directory. If False, these temporaryly stored videos are removed. Default is True. 
@@ -104,7 +105,16 @@ I define a polygon called `MAZE` for the first video, and save it, making sure t
 [close_kernal_example.webm](https://github.com/user-attachments/assets/a86a0d7b-35c6-4da7-b44c-4856d71fd861)
 
 > [!NOTE]
-> In the example above, from a elevated plus maze, the borders of teh open arms are black (same color as the animal) causing the tracking to fail and split the animal into two parts of the animal gets mistaken for the background as the animal performs a head dip. YThis is solved by smoothing (or "closing") the animals geometry.
+> In the example above, from a elevated plus maze, the borders of the open arms are black (same color as the animal) causing the tracking to fail and split the animal into two parts of the animal gets mistaken for the background as the animal performs a head dip. This is solved by smoothing (or "closing") the animals geometry.
+
+**OPEN KERNAL SIZE**: Controls removal of noise, Larger values will remove parts smaller parts of the detected foreground. This can be helpful if get rid of small noise related to the movement of bedding or light across the video like the below video.
+
+[open_kernal.webm](https://github.com/user-attachments/assets/91b8b70a-a442-454c-b957-31ba5253d042)
+
+> [!NOTE]
+> Only relecant if the light and or background changes slightly across videos. If there isn't any background noise, or the background noise is smalle nough not to be confused with the larger animal, set the OPEN KERNEL SIZE to `None. 
+
+
 
 **QUICK CHECK**: We can do a "quick check" if the animal can be discerned from the background reliably, using the chosed settings for each video. Hitting the <kbd>QUICK CHECK</kbd> button will remove the background and display the video frame by frame. If you can reliably see the animal in white, and teh background in black, you are good to go!
 
