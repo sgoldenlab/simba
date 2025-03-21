@@ -1,7 +1,13 @@
+# BLOB TRACKING 
+
+
+[header.webm](https://github.com/user-attachments/assets/f8a18ba8-76b4-473b-b001-2331192b72c1)
+
+
+
 ## INTRODUCTION
 
-Many of us use pose-estimation to track animal body-parts. However, I have noticed that in many scenorious this is not required and simpler, faster, background subtraction methods as those deployed by commercial tools (like noldus or anymaze) will suffice. These scenarious where background sutraction is sufficient is when we are tracking a single animal, and the 
-body-parts we are intrested in are along the perimeters of the animal or body parts that can be heuristiallt infered by the perimeter and movement of the animal (e.g., snout, nose, centroid, lateral sides). We don't have to train supervised models to detect these body-parts, meaning no deep leraning, no annotations, and the tracking can be donew in minutes for many body-parts. 
+Many of us use pose-estimation to track animal body-parts. However, I have noticed that in many scenorious this is not required and simpler, faster, background subtraction methods as those used by commercial tools (like [NOLDUS](https://noldus.com/ethovision-xt) or [AnyMaze](https://www.any-maze.com/) or other open-source tools (like [eZTrack](https://github.com/denisecailab/ezTrack)) will suffice. These scenarious where background sutraction is sufficient is when we are tracking a single animal, and the body-parts we are intrested in are along the perimeters of the animal or body parts that can be heuristiallt infered by the perimeter and movement of the animal (e.g., snout, nose, centroid, lateral sides). We don't have to train supervised models to detect these body-parts, meaning no deep leraning, no annotations, and the tracking can be donew in minutes for many body-parts. 
 
 EXAMPLE VIDEOS. 
 
@@ -10,14 +16,14 @@ EXAMPLE VIDEOS.
 > 
 > The speed of tracking is not only determined by your available hardware (i.e., you have a GPU, how many CPU cores you have, and how much RAM memory you have available). It is also determined by the resolution of your videos and the frame-rate of the videos.
 > 
-> For example, if your video resolutions are large (1000 x 1000), but you can visually detect the animals even at smaller resolutions (640 x 640), then consider downsampling your videos before performing blob detection.
+> For example, if your video resolutions are large (1000 x 1000), but you can visually detect the animals even at smaller resolutions (640 x 640, or even 480 x 480), then consider downsampling your videos before performing blob detection.
 > 
 > Moreover, if you have collected your videos at a higher frame-rate (say 30 fps), but you really don't need to know where the animal is every 33ms of the video, then reduce the FPS of your videos to say 10 to get a location reading every 100ms.
->
+
 > These preprocessing steps can greatly imporve the speed processing. You can perform these pre-processing steps in SimBA. See the SimBA video pre-processing documnetation [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md) or [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial_process_videos.md)
 > for how to change the resolution and frame-rate of your videos.
 >
-> #### GOOD BACKGROUND VIDEOS
+> #### WHAT ARE GOOD BACKGROUND VIDEOS
 >
 > It is possible to select the same video as thos beeing analysed as the background reference. However, this may (i) slow down processing, and (ii) fail in situations where the animal is freezing/staying still in a single location throughout the video which will cause the code to mistake the animal as beckground. Best is to use a shorter snippets of the original videos,
 > where the light levels are the same as during the actual video, as the beckground video. These snippets should have the same resolution as the original video, but is ideally much shorter, and can have reduced FPS.   
@@ -65,8 +71,10 @@ directory contains videos with the same file names as the videos in the table.
 
 **CLOSE ITERATIONS**: If `CLOSING KERNEL SIZE (PX)` isn't `None`, SimBA will smooth out the animals geometry N times. Higher iteration number will result in smoother, more "blob" like animals. Default: 3. 
 
-**DUPLICATE INCLUSION ZONES**: If we have drawn `INCLUSION ZONES` on a video, we can duplicate those inclusion zones to all othe rvideos in the project. To duplicate a videos inclusion zones to all videos in the project, choose the video in the dropdown and hit the <kbd>APPLY</kbd> button. 
+**DUPLICATE INCLUSION ZONES**: If we have drawn `INCLUSION ZONES` on a video, we can duplicate those inclusion zones to all othervideos in the project. To duplicate a videos inclusion zones to all videos in the project, choose the video in the dropdown and hit the <kbd>APPLY</kbd> button. Once duplicated on all videos, you can go ahead and modify the inclusion zones on each video. This is typically a faster way to get ROIs drawn than to drawing ROI inclusion zones on each video from scratch, as an example in the below video. 
 
+
+[duplicate_interaction_zones.webm](https://github.com/user-attachments/assets/bfcd54f8-c610-4ad1-970c-1176873950b5)
 
 
 #### VIDEO TABLE
@@ -131,7 +139,7 @@ The `EXECUTE` frame is duplicated and located both at the top right of the blob 
 #### EXECTED OUTPUT
 
 In the selected output directory, there will be s single CSV file for each of the input video. Each of these CSV files will contain one row for every frame in teh input video, and one column for each of the chosen number N of vertices (named `vertice_0_x, `vertice_0_y` ... `vertice_N_x`, `vertice_N_y`). This file will also contain 
-six columns representing the anterior, posterior, center, left and right positions of the animal geometry. These columns are named `center_x`, `center_y`,	`nose_x`, `nose_y`, `tail_x`, `tail_y`, `left_x`, `left_y`,	`right_x`, `right_y`. For an example of the expected output CSV , see [THIS]() file. 
+six columns representing the anterior, posterior, center, left and right positions of the animal geometry. These columns are named `center_x`, `center_y`,	`nose_x`, `nose_y`, `tail_x`, `tail_y`, `left_x`, `left_y`,	`right_x`, `right_y`. For an example of the expected output CSV , see [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/example_vertice_cnt_30.csv) file. 
 
 Moreover, if you set `SAVE BACKGROUND VIDEOS` to True above, this output directory will also contain the background subtracted mp4 file for each processed videos. 
 
