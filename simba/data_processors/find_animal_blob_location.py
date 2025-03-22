@@ -1,26 +1,32 @@
-import time
-
-from simba.mixins.geometry_mixin import GeometryMixin
-
 import functools
-import pandas as pd
 import multiprocessing
 import os
-from copy import copy, deepcopy
-from typing import Dict, Optional, Union, Tuple
+import time
 import traceback
+from copy import copy, deepcopy
+from typing import Dict, Optional, Tuple, Union
+
 import cv2
 import numpy as np
-from shapely.affinity import scale
-from shapely.geometry import MultiPolygon, Polygon, Point, LineString
+import pandas as pd
+from scipy.spatial import ConvexHull
 from scipy.spatial.qhull import QhullError
-from simba.utils.checks import (check_float, check_instance, check_int, check_nvidea_gpu_available, check_valid_boolean, is_img_bw)
+from shapely.affinity import scale
+from shapely.geometry import LineString, MultiPolygon, Point, Polygon
+
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.utils.checks import (check_float, check_instance, check_int,
+                                check_nvidea_gpu_available,
+                                check_valid_boolean, is_img_bw)
+from simba.utils.data import resample_geometry_vertices
 from simba.utils.enums import Defaults
 from simba.utils.errors import FFMPEGCodecGPUError, SimBAGPUError
-from simba.utils.read_write import (find_core_cnt, get_fn_ext, get_video_meta_data, read_img_batch_from_video, read_img_batch_from_video_gpu, read_frm_of_video, get_memory_usage_array)
 from simba.utils.lookups import get_available_ram
-from scipy.spatial import ConvexHull
-from simba.utils.data import resample_geometry_vertices
+from simba.utils.read_write import (find_core_cnt, get_fn_ext,
+                                    get_memory_usage_array,
+                                    get_video_meta_data, read_frm_of_video,
+                                    read_img_batch_from_video,
+                                    read_img_batch_from_video_gpu)
 
 
 def stabilize_body_parts(bp_1: np.ndarray,
