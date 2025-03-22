@@ -13,9 +13,9 @@ import numpy as np
 import pandas as pd
 from numba import jit, njit, prange, typed, types
 from scipy.interpolate import splev, splprep
-from shapely.geometry import (GeometryCollection, LineString, MultiLineString,
-                              MultiPoint, MultiPolygon, Point, Polygon)
+from shapely.geometry import (GeometryCollection, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon)
 from shapely.ops import linemerge, split, triangulate, unary_union
+from scipy.spatial.qhull import QhullError
 
 try:
     from typing_extensions import Literal
@@ -68,11 +68,12 @@ class GeometryMixin(object):
 
     @staticmethod
     def bodyparts_to_polygon(data: np.ndarray,
-                             cap_style: Optional[Literal["round", "square", "flat"]] = "round",
-                             parallel_offset: Optional[int] = 1,
-                             pixels_per_mm: Optional[Union[int, float]] = 1,
-                             simplify_tolerance: Optional[float] = 2,
-                             preserve_topology: Optional[bool] = True) -> List[Polygon]:
+                             cap_style: Literal["round", "square", "flat"] = "round",
+                             parallel_offset: int = 1,
+                             pixels_per_mm: Union[int, float] = 1,
+                             simplify_tolerance: float = 2,
+                             preserve_topology: bool = True,
+                             convex_hull: bool = True) -> List[Polygon]:
 
 
         """
@@ -93,6 +94,7 @@ class GeometryMixin(object):
         :param int pixels_per_mm: The pixels per millimeter conversion factor used for buffering. Default: 1.
         :param float simplify_tolerance: The higher this value, the smaller the number of vertices in the resulting polygon. Default 2.
         :param bool preserve_topology: If True, operation will avoid creating invalid geometries (checking for collapses, ring-intersections, etc). Default True.
+        :param bool convex_hull:  If True, creates the convex hull of the shape, which is the smallest convex polygon that encloses the shape. Default True.
         :returns: List of polygons, with one entry for every 2D input array.
 
         :example:
@@ -100,33 +102,11 @@ class GeometryMixin(object):
         >>> GeometryMixin().bodyparts_to_polygon(data=data)
         """
 
-        check_valid_array(
-            source=f"{GeometryMixin().bodyparts_to_polygon.__name__} data",
-            data=data,
-            accepted_ndims=(3,),
-            accepted_dtypes=Formats.NUMERIC_DTYPES.value,
-        )
-
-        check_str(
-            name=f"{GeometryMixin().bodyparts_to_polygon.__name__} cap style",
-            value=cap_style,
-            options=list(GeometryEnum.CAP_STYLE_MAP.value.keys()),
-        )
-        check_float(
-            name=f"{GeometryMixin().bodyparts_to_polygon.__name__} parallel_offset",
-            value=parallel_offset,
-            min_value=0,
-        )
-        check_float(
-            name=f"{GeometryMixin().bodyparts_to_polygon.__name__} pixels_per_mm",
-            value=pixels_per_mm,
-            min_value=0.01,
-        )
-        check_float(
-            name=f"{GeometryMixin().bodyparts_to_polygon.__name__} simplify_tolerance",
-            value=simplify_tolerance,
-            min_value=1,
-        )
+        check_valid_array(source=f"{GeometryMixin().bodyparts_to_polygon.__name__} data", data=data, accepted_ndims=(3,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_str(name=f"{GeometryMixin().bodyparts_to_polygon.__name__} cap style", value=cap_style, options=list(GeometryEnum.CAP_STYLE_MAP.value.keys()))
+        check_float(name=f"{GeometryMixin().bodyparts_to_polygon.__name__} parallel_offset", value=parallel_offset, min_value=0)
+        check_float(name=f"{GeometryMixin().bodyparts_to_polygon.__name__} pixels_per_mm", value=pixels_per_mm, min_value=0.01)
+        check_float( name=f"{GeometryMixin().bodyparts_to_polygon.__name__} simplify_tolerance", value=simplify_tolerance, min_value=0.1)
         results = []
 
         if parallel_offset > 0:
@@ -134,11 +114,22 @@ class GeometryMixin(object):
         else:
             buffer = 0
 
-        for i in range(data.shape[0]):
+        for cnt, i in enumerate(range(data.shape[0])):
             if not check_if_2d_array_has_min_unique_values(data=data[i], min=3):
-                results.append(Polygon([(0, 0), (0, 0), (0, 0)]))
+                geometry = Polygon([(0, 0), (0, 0), (0, 0)])
             else:
-                results.append(Polygon(LineString(data[i].tolist()).buffer(distance=buffer,cap_style=GeometryEnum.CAP_STYLE_MAP.value[cap_style]).simplify(tolerance=simplify_tolerance, preserve_topology=preserve_topology).convex_hull))
+                geometry = LineString(data[i].tolist())
+                try:
+                    geometry = Polygon(geometry).buffer(distance=buffer,cap_style=GeometryEnum.CAP_STYLE_MAP.value[cap_style]).simplify(tolerance=simplify_tolerance, preserve_topology=preserve_topology)
+                    if convex_hull or isinstance(geometry, MultiPolygon):
+                        try:
+                            geometry = geometry.convex_hull
+                        except QhullError:
+                            geometry = Polygon([(0, 0), (0, 0), (0, 0)])
+                except:
+                    geometry = Polygon([(0, 0), (0, 0), (0, 0)])
+
+            results.append(geometry)
 
         return results
 
@@ -296,10 +287,10 @@ class GeometryMixin(object):
         return shape_skeleton
 
     @staticmethod
-    def buffer_shape(shape: Union[Polygon, LineString],
+    def buffer_shape(shape: Union[Polygon, LineString, List[Union[Polygon, LineString]]],
                      size_mm: int,
                      pixels_per_mm: float,
-                     cap_style: Literal["round", "square", "flat"] = "round") -> Polygon:
+                     cap_style: Literal["round", "square", "flat"] = "round") -> Union[Polygon, List[Polygon]]:
         """
         Create a buffered shape by applying a buffer operation to the input polygon or linestring.
 
@@ -307,7 +298,7 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
-        :param Union[Polygon, LineString] shape: The input Polygon or LineString to be buffered.
+        :param Union[Polygon, LineString] shape: The input Polygon or LineString to be buffered. Or a list of Polygons or LineStrings to be buffered.
         :param int size_mm: The size of the buffer in millimeters. Use a negative value for an inward buffer.
         :param float pixels_per_mm: The conversion factor from millimeters to pixels.
         :param Literal['round', 'square', 'flat'] cap_style: The cap style for the buffer. Valid values are 'round', 'square', or 'flat'. Defaults to 'round'.
@@ -319,14 +310,22 @@ class GeometryMixin(object):
         >>> buffered_polygon = GeometryMixin().buffer_shape(shape=polygon[0], size_mm=-1, pixels_per_mm=1)
         """
 
-        check_instance(
-            source=GeometryMixin.buffer_shape.__name__,
-            instance=shape,
-            accepted_types=(LineString, Polygon),
-        )
+
+        if isinstance(shape, (Polygon, LineString)):
+            shape = [shape]
+        if isinstance(shape, list):
+            check_valid_lst(data=shape, source=f'{GeometryMixin.buffer_shape.__name__} shape', valid_dtypes=(Polygon, LineString,), min_len=1, raise_error=True)
+        else:
+            raise InvalidInputError(msg=f'shape is not a valid dtype. accepted: {Polygon, LineString}, got: {type(shape)}', source=GeometryMixin.buffer_shape.__name__)
         check_int(name="BUFFER SHAPE size_mm", value=size_mm)
         check_float(name="BUFFER SHAPE pixels_per_mm", value=pixels_per_mm, min_value=1)
-        return shape.buffer(distance=int(size_mm / pixels_per_mm), cap_style=GeometryEnum.CAP_STYLE_MAP.value[cap_style])
+        results = []
+        for i in shape:
+            results.append(i.buffer(distance=int(size_mm / pixels_per_mm), cap_style=GeometryEnum.CAP_STYLE_MAP.value[cap_style]))
+        if len(results) == 1:
+            return results[0]
+        else:
+            return results
 
     @staticmethod
     def compute_pct_shape_overlap(shapes: np.ndarray, denominator: Optional[Literal["difference", "shape_1", "shape_2"]] = "difference") -> int:
@@ -829,7 +828,7 @@ class GeometryMixin(object):
         return results
 
     @staticmethod
-    def view_shapes(shapes: List[Union[LineString, Polygon, MultiPolygon, MultiLineString]],
+    def view_shapes(shapes: List[Union[LineString, Polygon, MultiPolygon, MultiLineString, Point]],
                     bg_img: Optional[np.ndarray] = None,
                     bg_clr: Optional[Tuple[int, int, int]] = None,
                     size: Optional[int] = None,
@@ -1239,6 +1238,31 @@ class GeometryMixin(object):
             return [i for s in results for i in s]
         else:
             return results
+
+    @staticmethod
+    def multiframe_buffer_shapes(geometries: List[Union[Polygon, LineString]],
+                                 size_mm: int,
+                                 pixels_per_mm: float,
+                                 core_cnt: int = -1,
+                                 cap_style: Literal["round", "square", "flat"] = "round") -> List[Polygon]:
+
+        check_valid_lst(data=geometries, source=f'{GeometryMixin.multiframe_buffer_shapes.__name__} geometries', valid_dtypes=(Polygon, LineString,), min_len=1, raise_error=True)
+        check_int(name=f'{GeometryMixin.multiframe_buffer_shapes.__name__} size_mm', value=size_mm, min_value=1)
+        check_float(name=f'{GeometryMixin.multiframe_buffer_shapes.__name__} pixels_per_mm', value=pixels_per_mm, min_value=10e-6)
+        check_int(name=f'{GeometryMixin.multiframe_buffer_shapes.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
+        core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
+        geomety_lst = lambda lst, core_cnt: [lst[i::core_cnt] for i in range(core_cnt)]
+        results = []
+        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
+            constants = functools.partial(GeometryMixin.buffer_shape,
+                                          size_mm=size_mm,
+                                          pixels_per_mm=pixels_per_mm,
+                                          cap_style=cap_style)
+            for cnt, mp_return in enumerate(pool.imap(constants, geomety_lst, chunksize=1)):
+                results.append(mp_return)
+            pool.join()
+            pool.terminate()
+        return [l for ll in results for l in ll]
 
     def multiframe_bodyparts_to_circle(self,
                                        data: np.ndarray,
@@ -2845,7 +2869,9 @@ class GeometryMixin(object):
         return [shapes[idx] for idx in ranked]
 
     @staticmethod
-    def contours_to_geometries(contours: List[np.ndarray], force_rectangles: Optional[bool] = True) -> List[Polygon]:
+    def contours_to_geometries(contours: List[np.ndarray],
+                               force_rectangles: bool = True,
+                               convex_hull: bool = False) -> List[Polygon]:
         """
         Convert a list of contours to a list of geometries.
 
@@ -2854,6 +2880,7 @@ class GeometryMixin(object):
 
         :param List[np.ndarray] contours: List of contours represented as 2D arrays.
         :param force_rectangles: If True, then force the resulting geometries to be rectangular.
+        :param bool convex_hull:  If True, creates the convex hull of the shape, which is the smallest convex polygon that encloses the shape. Default True.
         :return: List of Shapley Polygons.
         :rtype: List[Polygon]
 
@@ -2868,11 +2895,11 @@ class GeometryMixin(object):
             check_instance(source=f"{GeometryMixin.contours_to_geometries.__name__} {i}", instance=i, accepted_types=(np.ndarray,))
         results = []
         for contour in contours:
-            #if contour.ndim == 3:
-           #     contour = contour.reshape(contour.shape[0], 2)
-            polygon = GeometryMixin.bodyparts_to_polygon(data=contour)[0]
+            polygon = GeometryMixin.bodyparts_to_polygon(data=contour, convex_hull=convex_hull)[0]
             if force_rectangles:
                 polygon = GeometryMixin.minimum_rotated_rectangle(shape=polygon)
+            if isinstance(polygon, MultiPolygon):
+                polygon = polygon.convex_hull
             results.append(polygon)
         return results
 

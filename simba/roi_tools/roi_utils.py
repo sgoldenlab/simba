@@ -238,10 +238,7 @@ def get_roi_data(roi_path: Union[str, os.PathLike], video_name: str) -> tuple:
         other_rectangles_df = in_rectangles_df[in_rectangles_df['Video'] != video_name].reset_index(drop=True)
         other_circles_df = in_circles_df[in_circles_df['Video'] != video_name].reset_index(drop=True)
         other_polygon_df = in_polygon_df[in_polygon_df['Video'] != video_name].reset_index(drop=True)
-        other_roi_dict = get_roi_dict_from_dfs(rectangle_df=other_rectangles_df,
-                                               circle_df=other_circles_df,
-                                               polygon_df=other_polygon_df,
-                                               video_name_nesting=True)
+        other_roi_dict = get_roi_dict_from_dfs(rectangle_df=other_rectangles_df, circle_df=other_circles_df, polygon_df=other_polygon_df, video_name_nesting=True)
         if len(rectangles_df) + len(circles_df) + len(polygon_df) > 0:
             roi_names = list(set(list(rectangles_df['Name'].unique()) + list(circles_df['Name'].unique()) + list(polygon_df['Name'].unique())))
             roi_dict = get_roi_dict_from_dfs(rectangle_df=rectangles_df, circle_df=circles_df, polygon_df=polygon_df, video_name_nesting=False)

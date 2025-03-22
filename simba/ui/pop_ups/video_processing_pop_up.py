@@ -1576,7 +1576,7 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         batch_start_entry = Entry_Box(parent=batch_settings_frm, fileDescription='START TIME:', labelwidth=10, entry_box_width=12)
         batch_start_btn = SimbaButton(parent=batch_settings_frm, txt='SET', img='tick', cmd=self._batch_set_val, cmd_kwargs={'text': lambda: batch_start_entry.entry_get.strip(), 'box_type': lambda: 'start'})
         batch_end_entry = Entry_Box(parent=batch_settings_frm, fileDescription='END TIME:', labelwidth=10, entry_box_width=12)
-        batch_end_btn = SimbaButton(parent=batch_settings_frm, txt='SET', img='tick', cmd=self._batch_set_val, cmd_kwargs={'text': lambda: batch_start_entry.entry_get.strip(), 'box_type': lambda: 'end'})
+        batch_end_btn = SimbaButton(parent=batch_settings_frm, txt='SET', img='tick', cmd=self._batch_set_val, cmd_kwargs={'text': lambda: batch_end_entry.entry_get.strip(), 'box_type': lambda: 'end'})
         batch_settings_frm.grid(row=0, column=0, sticky=NW)
         batch_start_entry.grid(row=0, column=0, sticky=NW)
         batch_start_btn.grid(row=0, column=1, sticky=NW)

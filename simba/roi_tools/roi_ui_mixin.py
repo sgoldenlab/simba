@@ -89,6 +89,8 @@ class ROI_mixin(ConfigReader):
             self.draw_frm_handle = ctypes.windll.user32.FindWindowW(None, DRAW_FRAME_NAME)
             ctypes.windll.user32.SetWindowPos(self.draw_frm_handle, -1, 0, 0, 0, 0, 3)
         self.img_window = Toplevel()
+        self.img_window.geometry(f"{self.video_meta['width']}x{self.video_meta['height']}")  # Set the window size
+        self.img_window.resizable(False, False)  # Disable resizing
         self.img_window.title(DRAW_FRAME_NAME)
         self.img_lbl = Label(self.img_window, name='img_lbl')
         self.img_lbl.pack()

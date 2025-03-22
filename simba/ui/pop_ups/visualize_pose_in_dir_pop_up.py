@@ -6,9 +6,7 @@ from tkinter import *
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.pose_plotter import PosePlotter
 from simba.plotting.pose_plotter_mp import PosePlotterMultiProcess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
-                                        FolderSelect, SimbaButton,
-                                        SimBADropDown, SimBALabel)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect, FolderSelect, SimbaButton, SimBADropDown, SimBALabel)
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists, check_int)
 from simba.utils.enums import Formats, Keys, Links, Options

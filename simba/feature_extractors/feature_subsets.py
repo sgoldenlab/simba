@@ -21,9 +21,7 @@ from simba.roi_tools.roi_utils import get_roi_dict_from_dfs
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_file_exist_and_readable, check_if_dir_exists,
-    check_if_filepath_list_is_empty, check_if_headers_in_dfs_are_unique,
     check_same_files_exist_in_all_directories,
-    check_same_number_of_rows_in_dfs, check_that_column_exist,
     check_valid_boolean, check_valid_dataframe, check_valid_lst,
     check_video_has_rois)
 from simba.utils.enums import ROI_SETTINGS, Formats
@@ -126,7 +124,8 @@ class FeatureSubsetsCalculator(ConfigReader, TrainModelMixin):
         self.video_names = [get_fn_ext(filepath=x)[1] for x in self.data_paths]
         for file_path in self.data_paths: check_file_exist_and_readable(file_path=file_path)
         self.temp_dir = os.path.join(self.data_dir, f"temp_data_{self.datetime}")
-        if not os.path.isdir(self.temp_dir): os.makedirs(self.temp_dir)
+        if not os.path.isdir(self.temp_dir):
+            os.makedirs(self.temp_dir)
         if (FRAME_BP_TO_ROI_CENTER in feature_families) or (FRAME_BP_INSIDE_ROI in feature_families):
             if not os.path.isfile(self.roi_coordinates_path):
                 raise NoROIDataError(msg=f'Cannot compute ROI features: The SimBA project has no ROI data defined.')
@@ -228,16 +227,17 @@ class FeatureSubsetsCalculator(ConfigReader, TrainModelMixin):
         if len(x) != len(y):
             remove_multiple_folders(folders=[self.temp_append_dir, self.temp_dir], raise_error=False)
             raise InvalidInputError(msg=f'The files at {path_x} and {path_y} do not contain the same number of rows: {len(x)} vs {len(y)}', source=self.__class__.__name__)
-        duplicated_cols = [x for x in x.columns if x in y.columns]
-        if len(duplicated_cols) > 0:
+        duplicated_x_cols = [i for i in x.columns if i in y.columns]
+        if len(duplicated_x_cols) > 0:
             remove_multiple_folders(folders=[self.temp_append_dir, self.temp_dir], raise_error=False)
-            raise DuplicationError(msg=f'Cannot append the new features to {path_y}. This file already has the following columns: {duplicated_cols}', source=self.__class__.__name__)
+            raise DuplicationError(msg=f'Cannot append the new features to {path_y}. This file already has the following columns: {duplicated_x_cols}', source=self.__class__.__name__)
 
     def __append_to_data_in_dir(self, dir: Union[str, os.PathLike]):
         temp_files = find_files_of_filetypes_in_directory(directory=self.temp_dir, extensions=[f'.{self.file_type}'], as_dict=True)
         self.temp_append_dir = os.path.join(dir, f'temp_{self.datetime}')
         os.makedirs(self.temp_append_dir)
         for file_cnt, (file_name, file_path) in enumerate(temp_files.items()):
+            print(f'Appending features to {file_name} ({file_cnt+1}/{len(list(temp_files.keys()))})')
             old_df = read_df(file_path=os.path.join(dir, f'{file_name}.{self.file_type}'), file_type=self.file_type).reset_index(drop=True)
             new_features_df = read_df(file_path=file_path, file_type=self.file_type).reset_index(drop=True)
             if self.file_checks:
@@ -302,6 +302,9 @@ class FeatureSubsetsCalculator(ConfigReader, TrainModelMixin):
                     self.__get_roi_center_distances()
                 elif feature_family == FRAME_BP_INSIDE_ROI:
                     self.__get_inside_roi()
+
+            self.results = self.results.add_suffix('_FEATURE_SUBSET')
+            self.results = self.results[sorted(self.results.columns)]
             write_df(df=self.results.fillna(-1), file_type=self.file_type, save_path=save_path)
             video_timer.stop_timer()
             print(f"Feature subsets computed for {self.video_name} complete (elapsed time {video_timer.elapsed_time_str}s)...")
@@ -318,15 +321,27 @@ class FeatureSubsetsCalculator(ConfigReader, TrainModelMixin):
         self.timer.stop_timer()
         stdout_success(msg="Feature sub-sets calculations complete!", elapsed_time=self.timer.elapsed_time_str)
 
+#
+# test = FeatureSubsetsCalculator(config_path=r"D:\Stretch\Stretch\project_folder\project_config.ini",
+#                                 feature_families=[TWO_POINT_BP_DISTANCES],
+#                                 append_to_features_extracted=True,
+#                                 file_checks=True,
+#                                 append_to_targets_inserted=True,
+#                                 save_dir=r"D:\Stretch\Stretch\project_folder\new_features")
+# test.run()
+
+
 
 # test = FeatureSubsetsCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
-#                                 feature_families=[FRAME_BP_MOVEMENT, WITHIN_ANIMAL_THREE_POINT_ANGLES],
+#                                 feature_families=[TWO_POINT_BP_DISTANCES],
 #                                 append_to_features_extracted=False,
 #                                 file_checks=False,
 #                                 append_to_targets_inserted=False,
 #                                 save_dir=r"C:\troubleshooting\mitra\project_folder\csv\new_features")
 # test.run()
-#
+
+
+
 # test = FeatureSubsetsCalculator(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
 #                                 feature_family='Frame-by-frame body-parts inside ROIs (Boolean)',
 #                                 save_dir='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/data')

@@ -633,8 +633,7 @@ class FeatureExtractionMixin(object):
         given the target body-part and the left ear, right ear, and nose coordinates of the observer.
 
         .. seealso::
-           Input left ear, right ear, and nose coordinates of the observer is returned by
-           :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.check_directionality_viable`
+           Input left ear, right ear, and nose coordinates of the observer is returned by :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.check_directionality_viable`
 
            If the target is static, consider :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.jitted_line_crosses_to_static_targets`
 
@@ -701,8 +700,7 @@ class FeatureExtractionMixin(object):
            :align: center
 
         .. note::
-           Input left ear, right ear, and nose coordinates of the observer is returned by
-           :meth:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.check_directionality_viable`
+           Input left ear, right ear, and nose coordinates of the observer is returned by :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.check_directionality_viable`
 
            If the target is moving, consider :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.jitted_line_crosses_to_nonstatic_targets`.
 
@@ -730,19 +728,9 @@ class FeatureExtractionMixin(object):
             Qh = np.sqrt(Qx * Qx + Qy * Qy)
             Nh = np.sqrt(Nx * Nx + Ny * Ny)
             if Nh < Ph and Nh < Qh and Qh < Ph:
-                results_array[frame_no] = [
-                    0,
-                    right_ear_array[frame_no][0],
-                    right_ear_array[frame_no][1],
-                    True,
-                ]
+                results_array[frame_no] = [0, right_ear_array[frame_no][0], right_ear_array[frame_no][1], True]
             elif Nh < Ph and Nh < Qh and Ph < Qh:
-                results_array[frame_no] = [
-                    1,
-                    left_ear_array[frame_no][0],
-                    left_ear_array[frame_no][1],
-                    True,
-                ]
+                results_array[frame_no] = [1, left_ear_array[frame_no][0], left_ear_array[frame_no][1], True]
             else:
                 results_array[frame_no] = [2, -1, -1, False]
 

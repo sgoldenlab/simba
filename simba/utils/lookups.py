@@ -10,6 +10,7 @@ import sys
 from multiprocessing import Lock, Value
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
+import psutil
 
 import matplotlib.font_manager
 import pandas as pd
@@ -679,7 +680,24 @@ def win_to_wsl_path(win_path: Union[str, os.PathLike]) -> str:
     return result.stdout.strip()
 
 
+def get_available_ram():
+    total = psutil.virtual_memory().total
+    available = psutil.virtual_memory().available
+    total_mb = total / (1024 ** 2)
+    available_mb = available / (1024 ** 2)
 
+    results = {}
+    results["bytes"] = total
+    results["available_bytes"] = available
+    results["megabytes"] = total_mb
+    results["available_mb"] = available_mb
+    results["gigabytes"] = total_mb / 1024
+    results["available_gb"] = available_mb / 1024
+
+    return results
+
+
+get_available_ram()
 
 
 

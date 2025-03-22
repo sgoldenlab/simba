@@ -1160,7 +1160,8 @@ def bg_subtraction_cupy(video_path: Union[str, os.PathLike],
     check_int(name=f'{bg_subtraction_cupy.__name__} threshold', value=threshold, min_value=0, max_value=255)
     timer = SimbaTimer(start=True)
     video_meta = get_video_meta_data(video_path=video_path)
-    avg_frm = cv2.resize(avg_frm, (video_meta['width'], video_meta['height']))
+    #print(avg_frm, avg_frm.shape, video_meta['width'], video_meta['height'])
+    #avg_frm = cv2.resize(avg_frm, (video_meta['width'], video_meta['height'], 3))
     batch_cnt = int(max(1, np.ceil(video_meta['frame_count'] / batch_size)))
     frm_batches = np.array_split(np.arange(0, video_meta['frame_count']), batch_cnt)
     n, w, h = video_meta['frame_count'], video_meta['width'], video_meta['height']

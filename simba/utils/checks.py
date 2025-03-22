@@ -1606,7 +1606,9 @@ def check_valid_polygon(polygon: Union[np.ndarray, Polygon], raise_error: bool =
         return True
 
 
-def is_img_bw(img: np.ndarray, raise_error: bool = True, source: Optional[str] = ''):
+def is_img_bw(img: np.ndarray,
+              raise_error: bool = True,
+              source: Optional[str] = '') -> bool:
     """
     Helper to check if an image is binarey black and white.
     """
@@ -1616,6 +1618,19 @@ def is_img_bw(img: np.ndarray, raise_error: bool = True, source: Optional[str] =
     if len(additional) > 0:
         if raise_error:
             raise InvalidInputError(msg=f'The image {source} is not a black-and-white image. Expected: [0, 255], got {additional}', source=is_img_bw.__name__)
+        else:
+            return False
+    else:
+        return True
+
+def is_img_greyscale(img: np.ndarray,
+                      raise_error: bool = True,
+                      source: Optional[str] = '') -> bool:
+
+    check_if_valid_img(data=img, source=is_img_greyscale.__name__, raise_error=False, greyscale=True)
+    if not img.ndim == 2:
+        if raise_error:
+            raise InvalidInputError(msg=f'The image {source} is not a greyscale image. Expected 2 dimensions got: {img.ndim}', source=is_img_greyscale.__name__)
         else:
             return False
     else:

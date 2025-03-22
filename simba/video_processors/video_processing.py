@@ -897,7 +897,8 @@ def remove_beginning_of_video(file_path: Union[str, os.PathLike],
     timer = SimbaTimer(start=True)
     check_file_exist_and_readable(file_path=file_path)
     video_meta_data = get_video_meta_data(video_path=file_path)
-    check_int(name="Cut time", value=time)
+    check_int(name="Cut time", value=time, min_value=1)
+    time = int(time)
     dir, file_name, ext = get_fn_ext(filepath=file_path)
     if video_meta_data['video_length_s'] <= time:
         raise InvalidInputError(msg=f"The cut time {time}s is invalid for video {file_name} with length {video_meta_data['video_length_s']}s", source=remove_beginning_of_video.__name__)
@@ -1561,7 +1562,7 @@ def video_concatenator(video_one_path: Union[str, os.PathLike],
             subprocess.run(gpu_cmd, check=True, shell=True)
         except subprocess.CalledProcessError as e:
             print(e.args)
-            FFMpegCodecWarning(msg=f'GPU concatenation for video {video_meta_data["video_name"]} failed, reverting to CPU', source=video_concatenator.__name__)
+            FFMpegCodecWarning(msg=f'GPU concatenation for videos failed, reverting to CPU', source=video_concatenator.__name__)
             subprocess.call(cpu_cmd, shell=True)
     else:
         subprocess.call(cpu_cmd, shell=True)
@@ -2699,21 +2700,13 @@ def mixed_mosaic_concatenator(
 
     check_ffmpeg_available()
     if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(
-            msg="NVIDIA GPU not available", source=mixed_mosaic_concatenator.__name__
-        )
+        raise FFMPEGCodecGPUError(msg="NVIDIA GPU not available", source=mixed_mosaic_concatenator.__name__)
     timer = SimbaTimer(start=True)
-    check_valid_lst(
-        data=video_paths, source=mixed_mosaic_concatenator.__name__, min_len=2
-    )
+    check_valid_lst(data=video_paths, source=mixed_mosaic_concatenator.__name__, min_len=2)
     dt = datetime.now().strftime("%Y%m%d%H%M%S")
-    video_meta_data = [
-        get_video_meta_data(video_path=video_path) for video_path in video_paths
-    ]
+    video_meta_data = [get_video_meta_data(video_path=video_path) for video_path in video_paths]
     max_video_length = max([x["video_length_s"] for x in video_meta_data])
-    check_if_dir_exists(
-        in_dir=os.path.dirname(save_path), source=mixed_mosaic_concatenator.__name__
-    )
+    check_if_dir_exists(in_dir=os.path.dirname(save_path), source=mixed_mosaic_concatenator.__name__)
     large_mosaic_path, video_paths = video_paths[0], video_paths[1:]
     mosaic_height = int(video_meta_data[0]["height"] / 2)
     if verbose:
@@ -3759,7 +3752,12 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
                          fg_color: Optional[Tuple[int, int, int]] = None,
                          save_path: Optional[Union[str, os.PathLike]] = None,
                          verbose: Optional[bool] = True,
-                         method: str = 'absolute') -> None:
+                         method: str = 'absolute',
+                         closing_kernel_size: Optional[Tuple[int, int]] = None,
+                         closing_iterations: int = 3,
+                         opening_kernel_size: Optional[Tuple[int, int]] = None,
+                         opening_iterations: int = 3) -> None:
+
     """
     Subtract the background from a video.
 
@@ -3821,6 +3819,15 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
         check_if_dir_exists(in_dir=os.path.dirname(save_path), source=video_bg_subtraction_mp.__name__)
     check_int(name=f'{video_bg_subtraction.__name__} threshold', value=threshold, min_value=1, max_value=255)
     check_str(name='method', value=method, options=['absolute', 'light', 'dark'], raise_error=True)
+    closing_kernel, opening_kernel = None, None
+    if closing_kernel_size is not None:
+        check_valid_tuple(x=closing_kernel_size, source=f'{video_bg_subtraction_mp.__name__} closing_kernel_size', accepted_lengths=(2,), valid_dtypes=(int,), min_integer=1)
+        check_int(name=f'{video_bg_subtraction_mp.__name__} closing iterations', value=closing_iterations, min_value=1, raise_error=True)
+        closing_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, closing_kernel_size)
+    if opening_kernel_size is not None:
+        check_valid_tuple(x=opening_kernel_size, source=f'{video_bg_subtraction_mp.__name__} opening_kernel_size', accepted_lengths=(2,), valid_dtypes=(int,), min_integer=1)
+        check_int(name=f'{video_bg_subtraction_mp.__name__} opening iterations', value=opening_iterations, min_value=1, raise_error=True)
+        opening_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, opening_kernel_size)
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
     writer = cv2.VideoWriter(save_path, fourcc, video_meta_data['fps'],(video_meta_data['width'], video_meta_data['height']))
     if avg_frm is None:
@@ -3850,16 +3857,31 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
         out_frm[mask == 0] = bg_color
         if fg_color is not None:
             out_frm[mask == 1] = fg_color
+        if opening_kernel is not None:
+            out_frm = cv2.morphologyEx(out_frm, cv2.MORPH_OPEN, opening_kernel, iterations=opening_iterations)
+        if closing_kernel is not None:
+            out_frm = cv2.morphologyEx(out_frm, cv2.MORPH_CLOSE, closing_kernel, iterations=closing_iterations)
         writer.write(out_frm)
         frm_cnt += 1
-        if verbose:
-            print(f'Background subtraction frame {frm_cnt}/{video_meta_data["frame_count"]} (Video: {video_name})')
+        if verbose:print(f'Background subtraction frame {frm_cnt}/{video_meta_data["frame_count"]} (Video: {video_name})')
 
     writer.release()
     cap.release()
     timer.stop_timer()
     if verbose:
         stdout_success(msg=f'Background subtracted from {video_name} and saved at {save_path}', elapsed_time=timer.elapsed_time)
+
+def reencode_mp4_video(file_path, codec, quality):
+    tmp_path = f"{file_path}.tmp"
+    cmd = f'ffmpeg -i "{file_path}" -c:v {codec} -crf {quality} -c:a copy "{tmp_path}" -loglevel error -stats -hide_banner -y'
+    try:
+        subprocess.run(cmd, shell=True, check=True)
+        os.replace(tmp_path, file_path)
+    except subprocess.CalledProcessError:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
+
 
 def _bg_remover_mp(frm_range: Tuple[int, np.ndarray],
                    video_path: Union[str, os.PathLike],
@@ -3870,7 +3892,11 @@ def _bg_remover_mp(frm_range: Tuple[int, np.ndarray],
                    temp_dir: Union[str, os.PathLike],
                    verbose: bool,
                    threshold: int,
-                   method: str):
+                   method: str,
+                   closing_kernel: tuple,
+                   closing_iterations: int,
+                   opening_kernel: tuple,
+                   opening_iterations: int):
 
     batch, frm_range = frm_range[0], frm_range[1]
     start_frm, current_frm, end_frm = frm_range[0], frm_range[0], frm_range[-1]
@@ -3899,6 +3925,10 @@ def _bg_remover_mp(frm_range: Tuple[int, np.ndarray],
         out_frm[mask == 0] = bg_clr
         if fg_clr is not None:
             out_frm[mask == 1] = fg_clr
+        if opening_kernel is not None:
+            out_frm = cv2.morphologyEx(out_frm, cv2.MORPH_OPEN, opening_kernel, iterations=opening_iterations)
+        if closing_kernel is not None:
+            out_frm = cv2.morphologyEx(out_frm, cv2.MORPH_CLOSE, closing_kernel, iterations=closing_iterations)
         writer.write(out_frm)
         current_frm += 1
         if verbose:
@@ -3921,7 +3951,11 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
                             verbose: bool = True,
                             gpu: bool = False,
                             threshold: Optional[int] = 50,
-                            method: str = 'absolute') -> None:
+                            method: str = 'absolute',
+                            closing_kernel_size: Optional[Tuple[int, int]] = None,
+                            closing_iterations: int = 3,
+                            opening_kernel_size: Optional[Tuple[int, int]] = None,
+                            opening_iterations: int = 3) -> None:
 
     """
     Subtract the background from a video using multiprocessing.
@@ -3977,8 +4011,7 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
     check_file_exist_and_readable(file_path=video_path)
     check_int(name=f'{video_bg_subtraction_mp.__name__} threshold', value=threshold, min_value=1, max_value=255)
     check_str(name='method', value=method, options=['absolute', 'light', 'dark'], raise_error=True)
-    if bg_video_path is None:
-        bg_video_path = deepcopy(video_path)
+    if bg_video_path is None: bg_video_path = deepcopy(video_path)
     video_meta_data = get_video_meta_data(video_path=video_path)
     dir, video_name, ext = get_fn_ext(filepath=video_path)
     if save_path is None:
@@ -3990,9 +4023,18 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
     os.makedirs(temp_dir)
     check_int(name=f'{video_bg_subtraction_mp.__name__} core_cnt', value=core_cnt, min_value=-1, max_value=find_core_cnt()[0])
     if core_cnt == -1: core_cnt = find_core_cnt()[0]
+    closing_kernel, opening_kernel = None, None
+    if closing_kernel_size is not None:
+        check_valid_tuple(x=closing_kernel_size, source=f'{video_bg_subtraction_mp.__name__} closing_kernel_size', accepted_lengths=(2,), valid_dtypes=(int,), min_integer=1)
+        check_int(name=f'{video_bg_subtraction_mp.__name__} closing iterations', value=closing_iterations, min_value=1, raise_error=True)
+        closing_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, closing_kernel_size)
+    if opening_kernel_size is not None:
+        check_valid_tuple(x=opening_kernel_size, source=f'{video_bg_subtraction_mp.__name__} opening_kernel_size', accepted_lengths=(2,), valid_dtypes=(int,), min_integer=1)
+        check_int(name=f'{video_bg_subtraction_mp.__name__} opening iterations', value=opening_iterations, min_value=1, raise_error=True)
+        opening_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, opening_kernel_size)
     if avg_frm is None:
         bg_frm = create_average_frm(video_path=bg_video_path, start_frm=bg_start_frm, end_frm=bg_end_frm, start_time=bg_start_time, end_time=bg_end_time)
-        bg_frm = bg_frm[:, :, ::-1]
+        #bg_frm = bg_frm[:, :, ::-1]
     else:
         check_if_valid_img(data=avg_frm, source=f'{video_bg_subtraction_mp.__name__} avg_frm')
         bg_frm = np.copy(avg_frm)
@@ -4011,13 +4053,18 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
                                       temp_dir=temp_dir,
                                       verbose=verbose,
                                       threshold=threshold,
-                                      method=method)
+                                      method=method,
+                                      closing_kernel=closing_kernel,
+                                      closing_iterations=closing_iterations,
+                                      opening_kernel=opening_kernel,
+                                      opening_iterations=opening_iterations)
         for cnt, result in enumerate(pool.imap(constants, frm_data, chunksize=1)):
             print(f'Frame batch {result+1} completed...')
     pool.terminate()
     pool.join()
     print(f"Joining {video_name} multi-processed video...")
     concatenate_videos_in_folder(in_folder=temp_dir, save_path=save_path, video_format=ext[1:], remove_splits=True, gpu=gpu, fps=video_meta_data['fps'])
+    #reencode_mp4_video(save_path, 'libx264', 23)
     timer.stop_timer()
     stdout_success(msg=f'Video saved at {save_path}', elapsed_time=timer.elapsed_time_str)
 

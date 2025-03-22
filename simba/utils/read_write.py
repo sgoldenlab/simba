@@ -215,13 +215,21 @@ def write_df(df: pd.DataFrame,
             df = pa.Table.from_pandas(df=df)
             if "__index_level_0__" in df.column_names:
                 df = df.remove_column(df.column_names.index("__index_level_0__"))
-            csv.write_csv(df, save_path)
+            try:
+                csv.write_csv(df, save_path)
+            except Exception as e:
+                print(e.args)
+                raise PermissionError(msg=f'Could not save file at {save_path}. Is the file being used by a different process?', source=write_df.__name__)
         else:
             try:
                 df = df.drop("scorer", axis=1, errors="ignore")
             except TypeError:
                 pass
-            df.to_csv(save_path)
+            try:
+                df.to_csv(save_path)
+            except Exception as e:
+                print(e.args)
+                raise PermissionError(msg=f'Could not save file at {save_path}. Is the file being used by a different process?', source=write_df.__name__)
     elif file_type == Formats.PARQUET.value:
         df.to_parquet(save_path)
     elif file_type == Formats.PICKLE.value:
@@ -230,14 +238,9 @@ def write_df(df: pd.DataFrame,
                 pickle.dump(df, f, protocol=pickle.HIGHEST_PROTOCOL)
         except Exception as e:
             print(e.args[0])
-            raise InvalidFileTypeError(
-                msg="Data could not be saved as a pickle.", source=write_df.__name__
-            )
+            raise InvalidFileTypeError(msg="Data could not be saved as a pickle.", source=write_df.__name__)
     else:
-        raise InvalidFileTypeError(
-            msg=f"{file_type} is not a valid filetype OPTIONS: [csv, pickle, parquet]",
-            source=write_df.__name__,
-        )
+        raise InvalidFileTypeError(msg=f"{file_type} is not a valid filetype OPTIONS: [csv, pickle, parquet]", source=write_df.__name__)
 
 
 def get_fn_ext(filepath: Union[os.PathLike, str]) -> Tuple[str, str, str]:
@@ -556,7 +559,10 @@ def concatenate_videos_in_folder(in_folder: Union[str, os.PathLike],
         if fps is None:
             returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" "{save_path}" -c copy -hide_banner -loglevel info -y')
         else:
-            returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" -r {out_fps} -c:v libx264 -c:a copy -hide_banner -loglevel info "{save_path}" -y')
+            print('sss')
+            returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" -r {out_fps} -c:v libx264 -c:a copy -movflags +faststart -hide_banner -loglevel info "{save_path}" -y')
+
+            #returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" -r {out_fps} -c:v libx264 -c:a copy -hide_banner -loglevel info "{save_path}" -y')
     while True:
         if returned != 0:
             pass
@@ -1561,18 +1567,26 @@ def read_roi_data(roi_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, pd.D
     :param Union[str, os.PathLike] roi_path: path to `ROI_definitions.h5` on disk.
     :return: 3-part Tuple of dataframes representing rectangles, circles, polygons.
     :rtype: Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]
+
     """
     check_file_exist_and_readable(file_path=roi_path)
     try:
         rectangles_df = pd.read_hdf(roi_path, key=Keys.ROI_RECTANGLES.value).dropna(how="any")
         circles_df = pd.read_hdf(roi_path, key=Keys.ROI_CIRCLES.value).dropna(how="any")
         polygon_df = pd.read_hdf(roi_path, key=Keys.ROI_POLYGONS.value)
-    except:
+    except Exception as e:
+        print(e.args)
         raise InvalidFileTypeError(msg=f"{roi_path} is not a valid SimBA ROI definitions file", source=read_roi_data.__name__)
     if "Center_XCenter_Y" in polygon_df.columns:
         polygon_df = polygon_df.drop(["Center_XCenter_Y"], axis=1)
+    if 'Center_X' not in rectangles_df.columns:
+        rectangles_df['Center_X'] = rectangles_df['topLeftX'] + int(rectangles_df['width']/2)
+    if 'Center_Y' not in rectangles_df.columns:
+        rectangles_df['Center_Y'] = rectangles_df['topLeftY'] + int(rectangles_df['height']/2)
+
     return rectangles_df, circles_df, polygon_df
 
+#read_roi_data(roi_path=r"C:\troubleshooting\mitra\project_folder\logs\measures\ROI_definitions.h5")
 
 def create_directory(path: Union[str, os.PathLike], overwrite: bool = False):
     if not os.path.exists(path):
@@ -2687,6 +2701,48 @@ def get_memory_usage_array(x: np.ndarray) -> Dict[str, float]:
     results["gigabytes"] = int(mb / 1000)
     return results
 
+def read_json(x: Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]], encoding: str = 'utf-8') -> dict:
+    """
+    Reads one or multiple JSON files from disk and returns their contents as a dictionary.
+
+    :param Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]] x: A path or list of paths to JSON files on disk.
+    :return: A dictionary with JSON data. If multiple files are provided, keys are derived from filenames.
+    :rtype: dict
+    """
+    try:
+        if isinstance(x, (str, os.PathLike)):
+            check_file_exist_and_readable(x)
+            with open(x, 'r', encoding=encoding) as file:
+                results = json.load(file)
+        elif isinstance(x, (list, tuple,)):
+            results = {}
+            for file_path in x:
+                check_file_exist_and_readable(file_path)
+                data_name = get_fn_ext(filepath=file_path)[1]
+                results[data_name] = json.load(x)
+        else:
+            raise InvalidInputError(msg='x is not a valid iterable of paths or a valid path', source=read_json.__name__)
+
+        return  results
+
+    except Exception as e:
+        raise InvalidFileTypeError(f"Unexpected error reading json: {e}", source=read_json.__name__)
+
+
+
+def save_json(data: dict, filepath: Union[str, os.PathLike], encoding: str = 'utf-8') -> None:
+    """
+    Saves a dictionary as a JSON file to the specified filepath.
+
+    :param dict data: Dictionary containing data to save.
+    :param Union[str, os.PathLike] filepath: Path where the JSON file should be saved.
+    """
+    try:
+        with open(filepath, 'w', encoding=encoding) as file:
+            json.dump(data, file, indent=4)
+    except Exception as e:
+        raise IOError(f"Error saving JSON file to {filepath}: {e}")
+
 
 def df_to_xlsx_sheet(xlsx_path: Union[str, os.PathLike],
                      df: pd.DataFrame,
@@ -2761,13 +2817,19 @@ def _read_img_batch_from_video_helper(frm_idx: np.ndarray, video_path: Union[str
         if verbose:
             print(f'Reading frame {current_frm}/{video_meta_data["frame_count"]} ({video_meta_data["video_name"]})...')
         img = cap.read()[1]
-        if greyscale or black_and_white:
-            if len(img.shape) != 2:
-                img = (0.07 * img[:, :, 2] + 0.72 * img[:, :, 1] + 0.21 * img[:, :, 0]).astype(np.uint8)
+        if img is not None:
+            if greyscale or black_and_white:
+                if len(img.shape) != 2:
+                    img = (0.07 * img[:, :, 2] + 0.72 * img[:, :, 1] + 0.21 * img[:, :, 0]).astype(np.uint8)
+                else:
+                    img = img.astype(np.uint8)
+            if black_and_white:
+                img = np.where(img > 127, 255, 0).astype(np.uint8)
+        else:
+            if greyscale or black_and_white:
+                img = np.full(shape=(video_meta_data['height'], video_meta_data['width']), fill_value=0, dtype=np.uint8)
             else:
-                img = img.astype(np.uint8)
-        if black_and_white:
-            img = np.where(img > 127, 255, 0).astype(np.uint8)
+                img = np.full(shape=(video_meta_data['height'], video_meta_data['width'], 3), fill_value=0, dtype=np.uint8)
         results[current_frm] = img
         current_frm += 1
     return results
@@ -2849,8 +2911,6 @@ def read_df_array(df: pd.DataFrame, column: str):
         return np.array(literal_eval(s))
 
     return list(df[column].apply(_col_to_arrays).values)
-
-
 
 def read_sys_env():
     env = {}

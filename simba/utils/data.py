@@ -1289,12 +1289,12 @@ def body_part_interpolator(df: pd.DataFrame,
     check_valid_dataframe(df=df, source=source, valid_dtypes=Formats.NUMERIC_DTYPES.value)
     check_str(name='method', value=method, options=('nearest', 'linear', 'quadratic'), raise_error=True)
 
-    df = df.fillna(0).clip(lower=0).astype(int)
+    df = df.fillna(0).clip(lower=0).astype(np.int32)
     for animal in animal_bp_dict:
         check_if_keys_exist_in_dict(data=animal_bp_dict[animal], key=["X_bps", "Y_bps"])
         for x_bps_name, y_bps_name in zip(animal_bp_dict[animal]["X_bps"], animal_bp_dict[animal]["Y_bps"]):
             check_that_column_exist(df=df, column_name=[x_bps_name, y_bps_name], file_name=source)
-            bp_df = df[[x_bps_name, y_bps_name]].astype(int)
+            bp_df = df[[x_bps_name, y_bps_name]].astype(np.int32)
             missing_idx = df.loc[(bp_df[x_bps_name] <= 0.0) & (bp_df[y_bps_name] <= 0.0)].index.tolist()
             if verbose:
                 print(f"Interpolating {len(missing_idx)} {x_bps_name[:-2]} body-parts for animal {animal} in {source}...")

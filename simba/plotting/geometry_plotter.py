@@ -1,7 +1,7 @@
 import functools
 import multiprocessing
 import os
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Tuple
 
 import cv2
 import numpy as np
@@ -13,69 +13,73 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_float, check_if_dir_exists,
                                 check_instance, check_int,
-                                check_iterable_length, check_valid_boolean)
+                                check_iterable_length, check_valid_boolean, check_valid_lst)
 from simba.utils.data import create_color_palettes
 from simba.utils.enums import Defaults, Formats
 from simba.utils.errors import InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder,
-                                    find_core_cnt, find_video_of_file,
-                                    get_fn_ext, get_video_meta_data)
+from simba.utils.read_write import (concatenate_videos_in_folder,find_core_cnt, find_video_of_file, get_fn_ext, get_video_meta_data)
 from simba.utils.warnings import FrameRangeWarning
+from simba.utils.lookups import get_color_dict
 
 ACCEPTED_TYPES = [Polygon, LineString, MultiPolygon, MultiLineString, Point]
 FRAME_COUNT = "frame_count"
 
-def geometry_visualizer(data: np.ndarray,
+def geometry_visualizer(data: Tuple[int, pd.DataFrame],
                         video_path: Union[str, os.PathLike],
                         video_temp_dir: Union[str, os.PathLike],
                         video_meta_data: dict,
                         thickness: int,
                         verbose: bool,
                         bg_opacity: float,
-                        palette: str,
+                        colors: list,
                         circle_size: int,
-                        shape_cnt: int):
+                        shape_opacity: float):
 
-    group = int(data[0][-1])
-    colors = create_color_palettes(no_animals=1, map_size=shape_cnt, cmaps=[palette])
-    colors = [x for xs in colors for x in xs]
-    start_frm, end_frm = data[0][-2], data[-1][-2]
+    group, idx = int(data[0]), data[1].index.tolist()
+    start_frm, end_frm = idx[0], idx[-1]
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
     video_save_path = os.path.join(video_temp_dir, f"{group}.mp4")
     video_writer = cv2.VideoWriter(video_save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"], video_meta_data["height"]))
     cap = cv2.VideoCapture(video_path)
+    batch_shapes = data[1].values.reshape(len(data[1]), -1)
     for frm_cnt, frm_id in enumerate(range(start_frm, end_frm + 1)):
         cap.set(1, int(frm_id))
         ret, img = cap.read()
         if ret:
+            img_cpy = img.copy()
             if bg_opacity != 1.0:
                 opacity = 1 - bg_opacity
                 h, w, clr = img.shape[:3]
                 opacity_image = np.ones((h, w, clr), dtype=np.uint8) * int(255 * opacity)
                 img = cv2.addWeighted(img.astype(np.uint8), 1 - opacity, opacity_image.astype(np.uint8), opacity, 0)
-            for shape_cnt, shape in enumerate(data[frm_cnt][0:-2]):
+            for shape_cnt, shape in enumerate(batch_shapes[frm_cnt]):
                 if isinstance(shape, Polygon):
-                    cv2.polylines(img, [np.array(shape.exterior.coords).astype(np.int32)], True, (colors[shape_cnt][::-1]), thickness=thickness)
+                    img_cpy = cv2.fillPoly(img_cpy, [np.array(shape.exterior.coords).astype(np.int32)], color=(colors[shape_cnt]))
                     interior_coords = [np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2)) for interior in shape.interiors]
                     for interior in interior_coords:
-                        cv2.polylines(img, [interior], isClosed=True, color=(colors[shape_cnt][::-1]), thickness=thickness)
+                        img_cpy = cv2.fillPoly(img_cpy, [interior], color=(colors[shape_cnt][::-1]))
                 elif isinstance(shape, LineString):
-                    cv2.polylines(img, [np.array(shape.coords, dtype=np.int32)], False, (colors[shape_cnt][::-1]), thickness=thickness)
+                    img_cpy = cv2.fillPoly(img_cpy, [np.array(shape.coords, dtype=np.int32)], color=(colors[shape_cnt]))
                 elif isinstance(shape, MultiPolygon):
                     for polygon_cnt, polygon in enumerate(shape.geoms):
-                        cv2.polylines(img, [np.array((polygon.convex_hull.exterior.coords), dtype=np.int32)], True, (colors[shape_cnt + polygon_cnt + 1][::-1]), thickness=thickness)
+                        img_cpy = cv2.fillPoly(img_cpy, [np.array((polygon.convex_hull.exterior.coords), dtype=np.int32)], color=(colors[shape_cnt]))
                 elif isinstance(shape, MultiLineString):
                     for line_cnt, line in enumerate(shape.geoms):
-                        cv2.polylines(img, [np.array(shape[line_cnt].coords, dtype=np.int32)], False, (colors[shape_cnt][::-1]), thickness=thickness)
+                        img_cpy = cv2.fillPoly(img_cpy,[np.array(shape[line_cnt].coords, dtype=np.int32)], color=(colors[shape_cnt]))
                 elif isinstance(shape, Point):
                     arr = np.array((shape.coords)).astype(np.int32)
                     x, y = arr[0][0], arr[0][1]
-                    cv2.circle(img,(x, y),circle_size, colors[shape_cnt][::-1], thickness)
+                    img_cpy = cv2.circle(img_cpy,(x, y), circle_size, colors[shape_cnt], thickness)
+            if shape_opacity is not None:
+                img = cv2.addWeighted(img_cpy, shape_opacity, img, 1 - shape_opacity, 0, img)
+            else:
+                img = np.copy(img_cpy)
             video_writer.write(img.astype(np.uint8))
             if verbose:
                 print(f"Creating frame {frm_id} / {video_meta_data['frame_count']} (CPU core: {group}, video name: {video_meta_data['video_name']})")
         else:
+            FrameRangeWarning(msg=f'Frame {frm_id} in video {video_meta_data["video_name"]} could not be read.')
             pass
     video_writer.release()
     cap.release()
@@ -112,7 +116,9 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
                  thickness: Optional[int] = None,
                  circle_size: Optional[int] = None,
                  bg_opacity: Optional[float] = 1,
-                 palette: Optional[str] = 'jet',
+                 shape_opacity: float = 0.3,
+                 palette: Optional[str] = None,
+                 colors: Optional[List[str]] = None,
                  verbose: Optional[bool] = True):
 
         PlottingMixin.__init__(self)
@@ -123,7 +129,9 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
         if thickness is not None:
             check_int(name="thickness", value=thickness, min_value=1)
         check_float(name="video_opacity", value=bg_opacity, min_value=0.0, max_value=1.0)
+        check_float(name="shape_opacity", value=shape_opacity, min_value=0.0, max_value=1.0)
         check_valid_boolean(value=verbose, source='verbose', raise_error=True)
+        self.color_dict = get_color_dict()
         check_int(name="CORE COUNT", value=core_cnt, min_value=-1, raise_error=True, unaccepted_vals=[0])
         self.core_cnt = core_cnt
         if core_cnt == -1 or core_cnt > find_core_cnt()[0]:
@@ -138,10 +146,17 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
             self.video_path = find_video_of_file(video_dir=self.video_dir, filename=video_name, raise_error=True)
         video_name = get_fn_ext(filepath=self.video_path)[1]
         self.video_meta_data = get_video_meta_data(video_path=self.video_path)
+        self.shape_opacity = shape_opacity
         if circle_size is None:
             circle_size = self.get_optimal_circle_size(frame_size=(self.video_meta_data['width'], self.video_meta_data['height']), circle_frame_ratio=100)
         if thickness is None:
             thickness = circle_size
+        if palette is None:
+            check_valid_lst(data=colors, source=f'{self.__class__.__name__} colors', valid_dtypes=(str, ), valid_values=list(self.color_dict.keys()), exact_len=len(geometries))
+            self.colors = [self.color_dict[x] for x in colors]
+        else:
+            colors = create_color_palettes(no_animals=1, map_size=len(geometries) + 1, cmaps=[palette])
+            self.colors = [x for xs in colors for x in xs]
         for i in range(len(geometries)):
             if len(geometries[i]) != self.video_meta_data[FRAME_COUNT]:
                 FrameRangeWarning(msg=f"Geometry {i+1} contains {len(geometries[i])} shapes but video has {self.video_meta_data[FRAME_COUNT]} frames")
@@ -160,12 +175,11 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
 
     def run(self):
         video_timer = SimbaTimer(start=True)
-        data = pd.DataFrame(np.array(self.geometries).T)
-        data, obs_per_split = self.split_and_group_df(df=data, splits=self.core_cnt, include_row_index=True, include_split_order=False)
-
-        for i in range(len(data)):
-            new_col = np.full(len(data[i]), fill_value=i).reshape(-1, 1)
-            data[i] = np.concatenate((data[i], new_col), axis=1)
+        data = pd.DataFrame(self.geometries).T
+        data = np.array_split(data, self.core_cnt)
+        data_splits = []
+        for i in range(len(data)): data_splits.append((i, data[i]))
+        del data
 
         with multiprocessing.Pool(self.core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
             constants = functools.partial(geometry_visualizer,
@@ -175,11 +189,11 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
                                           thickness=self.thickness,
                                           verbose=self.verbose,
                                           bg_opacity=self.bg_opacity,
-                                          palette=self.palette,
+                                          colors=self.colors,
                                           circle_size=self.circles_size,
-                                          shape_cnt=len(self.geometries))
-            for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
-                print(f"Section {result}/{len(data)} complete...")
+                                          shape_opacity=self.shape_opacity)
+            for cnt, result in enumerate(pool.imap(constants, data_splits, chunksize=1)):
+                print(f"Section {result}/{len(data_splits)} complete...")
             pool.terminate()
             pool.join()
 

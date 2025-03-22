@@ -19,15 +19,13 @@ from numba import float64, int64, jit, njit, prange, uint8
 from shapely.geometry import MultiPolygon, Polygon
 from skimage.metrics import structural_similarity
 
-from simba.data_processors.find_animal_blob_location import \
-    find_animal_blob_location
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_if_valid_img,
                                 check_if_valid_rgb_tuple, check_instance,
-                                check_int, check_nvidea_gpu_available,
+                                check_int, is_img_greyscale,
                                 check_str, check_valid_array,
                                 check_valid_boolean, check_valid_lst,
-                                check_valid_tuple)
+                                check_valid_tuple, is_img_bw)
 from simba.utils.enums import Defaults, Formats, GeometryEnum, Options
 from simba.utils.errors import (ArrayError, FFMPEGCodecGPUError,
                                 FrameRangeError, InvalidInputError,
@@ -117,7 +115,7 @@ class ImageMixin(object):
         return cv2.GaussianBlur(img, kernel_size, 0)
 
     @staticmethod
-    def erode( img: np.ndarray,
+    def erode(img: np.ndarray,
               kernel_size: Optional[Tuple[int, int]] = (3, 3),
               iterations: Optional[int] = 3) -> np.ndarray:
         """
@@ -132,17 +130,8 @@ class ImageMixin(object):
         """
 
         check_if_valid_img(data=img, source=ImageMixin.gaussian_blur.__name__)
-        check_instance(
-            source=ImageMixin.gaussian_blur.__name__,
-            instance=kernel_size,
-            accepted_types=(tuple,),
-        )
-        check_valid_lst(
-            data=list(kernel_size),
-            source=ImageMixin.gaussian_blur.__name__,
-            valid_dtypes=(int,),
-            exact_len=2,
-        )
+        check_instance(source=ImageMixin.gaussian_blur.__name__, instance=kernel_size, accepted_types=(tuple,))
+        check_valid_lst(data=list(kernel_size), source=ImageMixin.gaussian_blur.__name__, valid_dtypes=(int,), exact_len=2)
         check_int(name=ImageMixin.erode.__name__, value=iterations, min_value=1)
         return cv2.erode(img, np.ones((3, 3), np.uint8), iterations=3)
 
@@ -1674,6 +1663,44 @@ class ImageMixin(object):
                 results[j, i] = val
         return results
 
+    @staticmethod
+    def close(x: Union[List[np.ndarray], np.ndarray],
+              kernel: Tuple[int, int],
+              iterations: int = 3) -> Union[List[np.ndarray], np.ndarray]:
+
+        """
+        Performs morphological closing on the provided image(s). Closing is a dilation operation followed by erosion,
+        commonly used to fill small holes or gaps in an image.
+
+        :param Union[List[np.ndarray], np.ndarray] x: Input image or list of images to process. Each image must be greyscale or black-and-white.
+        :param Tuple[int, int] kernel: Tuple specifying the size of the structuring element used for the closing operation.
+        :param int iterations: Number of times the closing operation is applied. Defaults to 3.
+        :return: Processed image or list of processed images after morphological closing.
+        :rtype: Union[List[np.ndarray], np.ndarray]
+        """
+
+        imgs, results = [], []
+        if isinstance(x, np.ndarray):
+            check_if_valid_img(data=x, source=ImageMixin.close.__name__, raise_error=True)
+            if not is_img_bw(img=x) and not is_img_greyscale(img=x):
+                raise InvalidInputError(msg='The image is invalid. Greyscale or black-and-white image is requires', source=ImageMixin.close.__name__.__name__)
+            imgs.append(x)
+        elif isinstance(x, list):
+            for cnt, i in enumerate(x):
+                check_if_valid_img(data=i, source=f'{ImageMixin.close.__name__.__name__} {cnt}', raise_error=True)
+                if not is_img_bw(img=i) and not is_img_greyscale(img=i):
+                    raise InvalidInputError(msg='The image is invalid. Greyscale or black-and-white image is requires', source=ImageMixin.close.__name__.__name__)
+                imgs.append(i)
+        else:
+            raise InvalidInputError(msg=f'x is not a valid input. Require list of arrays or array, got {type(x)}',  source=ImageMixin.close.__name__.__name__)
+        check_valid_tuple(x=kernel, source=f'{ImageMixin.close.__name__} kernel', accepted_lengths=(2,), valid_dtypes=(int,), min_integer=1)
+        check_int(name=f'{ImageMixin.close.__name__} iterations', value=iterations, min_value=1, raise_error=True)
+        for img in imgs:
+            results.append(cv2.morphologyEx(img, cv2.MORPH_CLOSE, np.array(kernel), iterations=iterations))
+        if len(results) == 1:
+            return results[0]
+        else:
+            return results
 
     @staticmethod
     def find_first_non_uniform_clr_frm(video_path: Union[str, os.PathLike, cv2.VideoCapture],
@@ -1725,96 +1752,96 @@ class ImageMixin(object):
                 return frame, frame_index
         return first_frm, 0
 
-    @staticmethod
-    def get_blob_locations(video_path: Union[str, os.PathLike],
-                           batch_size: int = 3000,
-                           gpu: bool = False,
-                           verbose: bool = True,
-                           save_path: Optional[Union[str, os.PathLike]] = None,
-                           inclusion_zone: Optional[Union[Polygon, MultiPolygon]] = None,
-                           window_size: Optional[float] = None) -> Union[None, np.ndarray]:
-        """
-        Detects the location of the largest blob in each frame of a video. Processes frames in batches and optionally uses GPU for acceleration. Results can be saved to a specified path or returned as a NumPy array.
-
-        .. seealso::
-           For visualization of results, see :func:`simba.plotting.blob_plotter.BlobPlotter` and :func:`simba.mixins.plotting_mixin.PlottingMixin._plot_blobs`
-           Background subtraction can be performed using :func:`~simba.video_processors.video_processing.video_bg_subtraction_mp` or :func:`~simba.video_processors.video_processing.video_bg_subtraction`.
-
-        .. note::
-           In ``inclusion_zones`` is not None, then the largest blob will be searches for **inside** the passed vertices.
-
-        :param Union[str, os.PathLike] video_path: Path to the video file from which to extract frames. Often, a background subtracted video, which can be created with e.g., :func:`simba.video_processors.video_processing.video_bg_subtraction_mp`.
-        :param Optional[int] batch_size: Number of frames to process in each batch. Default is 3k.
-        :param Optional[bool] gpu: Whether to use GPU acceleration for processing. Default is False.
-        :param Optional[bool] verbose: Whether to print progress and status messages. Default is True.
-        :param Optional[Union[str, os.PathLike]] save_path: Path to save the results as a CSV file. If None, results are not saved.
-        :param Optional[Union[Polygon, MultiPolygon]] inclusion_zones: Optional shapely polygon, or multipolygon, restricting where to search for the largest blob. Default: None.
-        :param Optional[int] window_size: If not None, then integer representing the size multiplier of the animal geometry in previous frame. If not None, the animal geometry will only be searched for within this geometry.
-        :return: A NumPy array of shape (N, 2) where N is the number of frames, containing the X and Y coordinates of the centroid of the largest blob in each frame. If `save_path` is provided, returns None.
-        :rtype: Union[None, np.ndarray]
-
-        :example:
-        >>> x = ImageMixin.get_blob_locations(video_path=r"/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4_downsampled_bg_subtracted.mp4", gpu=True)
-        >>> y = ImageMixin.get_blob_locations(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_IOT_1_bg_subtracted.mp4", gpu=True)
-        """
-
-        timer = SimbaTimer(start=True)
-        video_meta = get_video_meta_data(video_path=video_path)
-        _, video_name, _ = get_fn_ext(filepath=video_path)
-        check_int(name=f'{ImageMixin.get_blob_locations.__name__} batch_size', value=batch_size, min_value=1)
-        if batch_size > video_meta['frame_count']: batch_size = video_meta['frame_count']
-        if save_path is not None:
-            if not os.path.isdir(os.path.basename(save_path)): raise NotDirectoryError(msg='Save path is not a valid directory', source=ImageMixin.get_blob_locations.__name__)
-        check_valid_boolean(value=gpu, source=f'{ImageMixin.get_blob_locations.__name__} gpu')
-        check_valid_boolean(value=gpu, source=f'{ImageMixin.get_blob_locations.__name__} verbose')
-        if gpu and not check_nvidea_gpu_available():
-            raise FFMPEGCodecGPUError(msg='No GPU detected, try to set GPU to False', source=ImageMixin.get_blob_locations.__name__)
-        if inclusion_zone is not None:
-            check_instance(source=f'{ImageMixin.get_blob_locations} inclusion_zone', instance=inclusion_zone, accepted_types=(MultiPolygon, Polygon,), raise_error=True)
-        if window_size is not None:
-            check_float(name='window_size', value=window_size, min_value=1.0, raise_error=True)
-        frame_ids = list(range(0, video_meta['frame_count']))
-        frame_ids = [frame_ids[i:i + batch_size] for i in range(0, len(frame_ids), batch_size)]
-        core_cnt = find_core_cnt()[0]
-        results = {}
-        if verbose:
-            print('Starting blob location detection...')
-        for frame_batch in range(len(frame_ids)):
-            start_frm, end_frm = frame_ids[frame_batch][0], frame_ids[frame_batch][-1]
-            if gpu:
-                imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=start_frm, end_frm=end_frm,  verbose=False, out_format='array', black_and_white=True)
-            else:
-                imgs = ImageMixin.read_img_batch_from_video(video_path=video_path, start_frm=start_frm, end_frm=end_frm, verbose=verbose, black_and_white=True)
-                imgs = np.stack(list(imgs.values()))
-            keys = np.arange(start_frm, end_frm+1)
-            img_dict = {}
-            for cnt, img_id in enumerate(range(start_frm, end_frm+1)):
-                img_dict[img_id] = imgs[cnt]
-            batch_results = {}
-            img_dict = [{k: img_dict[k] for k in subset} for subset in np.array_split(keys, core_cnt)]
-            del imgs
-            with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-                constants = functools.partial(find_animal_blob_location,
-                                              verbose=verbose,
-                                              video_name=video_name,
-                                              inclusion_zone=inclusion_zone)
-                for cnt, result in enumerate(pool.imap(constants, img_dict, chunksize=1)):
-                    batch_results.update(result)
-            results.update(batch_results)
-            pool.join()
-            pool.terminate()
-        results = dict(sorted(results.items()))
-        results = list(results.values())
-        results = np.stack(results, axis=0)
-        timer.stop_timer()
-        if save_path:
-            df = pd.DataFrame(results, columns=['X', 'Y'])
-            write_df(df=df, file_type=Formats.CSV.value, save_path=save_path)
-            if verbose:
-                stdout_success(f'Video {video_meta["video_name"]} blob detection complete, saved at {save_path}', elapsed_time=timer.elapsed_time_str)
-        else:
-            stdout_success(f'Video {video_meta["video_name"]} blob detection complete', elapsed_time=timer.elapsed_time_str)
-            return results.astype(np.int32)
+    # @staticmethod
+    # def get_blob_locations(video_path: Union[str, os.PathLike],
+    #                        batch_size: int = 3000,
+    #                        gpu: bool = False,
+    #                        verbose: bool = True,
+    #                        save_path: Optional[Union[str, os.PathLike]] = None,
+    #                        inclusion_zone: Optional[Union[Polygon, MultiPolygon]] = None,
+    #                        window_size: Optional[float] = None) -> Union[None, np.ndarray]:
+    #     """
+    #     Detects the location of the largest blob in each frame of a video. Processes frames in batches and optionally uses GPU for acceleration. Results can be saved to a specified path or returned as a NumPy array.
+    #
+    #     .. seealso::
+    #        For visualization of results, see :func:`simba.plotting.blob_plotter.BlobPlotter` and :func:`simba.mixins.plotting_mixin.PlottingMixin._plot_blobs`
+    #        Background subtraction can be performed using :func:`~simba.video_processors.video_processing.video_bg_subtraction_mp` or :func:`~simba.video_processors.video_processing.video_bg_subtraction`.
+    #
+    #     .. note::
+    #        In ``inclusion_zones`` is not None, then the largest blob will be searches for **inside** the passed vertices.
+    #
+    #     :param Union[str, os.PathLike] video_path: Path to the video file from which to extract frames. Often, a background subtracted video, which can be created with e.g., :func:`simba.video_processors.video_processing.video_bg_subtraction_mp`.
+    #     :param Optional[int] batch_size: Number of frames to process in each batch. Default is 3k.
+    #     :param Optional[bool] gpu: Whether to use GPU acceleration for processing. Default is False.
+    #     :param Optional[bool] verbose: Whether to print progress and status messages. Default is True.
+    #     :param Optional[Union[str, os.PathLike]] save_path: Path to save the results as a CSV file. If None, results are not saved.
+    #     :param Optional[Union[Polygon, MultiPolygon]] inclusion_zones: Optional shapely polygon, or multipolygon, restricting where to search for the largest blob. Default: None.
+    #     :param Optional[int] window_size: If not None, then integer representing the size multiplier of the animal geometry in previous frame. If not None, the animal geometry will only be searched for within this geometry.
+    #     :return: A NumPy array of shape (N, 2) where N is the number of frames, containing the X and Y coordinates of the centroid of the largest blob in each frame. If `save_path` is provided, returns None.
+    #     :rtype: Union[None, np.ndarray]
+    #
+    #     :example:
+    #     >>> x = ImageMixin.get_blob_locations(video_path=r"/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4_downsampled_bg_subtracted.mp4", gpu=True)
+    #     >>> y = ImageMixin.get_blob_locations(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_IOT_1_bg_subtracted.mp4", gpu=True)
+    #     """
+    #
+    #     timer = SimbaTimer(start=True)
+    #     video_meta = get_video_meta_data(video_path=video_path)
+    #     _, video_name, _ = get_fn_ext(filepath=video_path)
+    #     check_int(name=f'{ImageMixin.get_blob_locations.__name__} batch_size', value=batch_size, min_value=1)
+    #     if batch_size > video_meta['frame_count']: batch_size = video_meta['frame_count']
+    #     if save_path is not None:
+    #         if not os.path.isdir(os.path.basename(save_path)): raise NotDirectoryError(msg='Save path is not a valid directory', source=ImageMixin.get_blob_locations.__name__)
+    #     check_valid_boolean(value=gpu, source=f'{ImageMixin.get_blob_locations.__name__} gpu')
+    #     check_valid_boolean(value=gpu, source=f'{ImageMixin.get_blob_locations.__name__} verbose')
+    #     if gpu and not check_nvidea_gpu_available():
+    #         raise FFMPEGCodecGPUError(msg='No GPU detected, try to set GPU to False', source=ImageMixin.get_blob_locations.__name__)
+    #     if inclusion_zone is not None:
+    #         check_instance(source=f'{ImageMixin.get_blob_locations} inclusion_zone', instance=inclusion_zone, accepted_types=(MultiPolygon, Polygon,), raise_error=True)
+    #     if window_size is not None:
+    #         check_float(name='window_size', value=window_size, min_value=1.0, raise_error=True)
+    #     frame_ids = list(range(0, video_meta['frame_count']))
+    #     frame_ids = [frame_ids[i:i + batch_size] for i in range(0, len(frame_ids), batch_size)]
+    #     core_cnt = find_core_cnt()[0]
+    #     results = {}
+    #     if verbose:
+    #         print('Starting blob location detection...')
+    #     for frame_batch in range(len(frame_ids)):
+    #         start_frm, end_frm = frame_ids[frame_batch][0], frame_ids[frame_batch][-1]
+    #         if gpu:
+    #             imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=start_frm, end_frm=end_frm,  verbose=False, out_format='array', black_and_white=True)
+    #         else:
+    #             imgs = ImageMixin.read_img_batch_from_video(video_path=video_path, start_frm=start_frm, end_frm=end_frm, verbose=verbose, black_and_white=True)
+    #             imgs = np.stack(list(imgs.values()))
+    #         keys = np.arange(start_frm, end_frm+1)
+    #         img_dict = {}
+    #         for cnt, img_id in enumerate(range(start_frm, end_frm+1)):
+    #             img_dict[img_id] = imgs[cnt]
+    #         batch_results = {}
+    #         img_dict = [{k: img_dict[k] for k in subset} for subset in np.array_split(keys, core_cnt)]
+    #         del imgs
+    #         with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
+    #             constants = functools.partial(find_animal_blob_location,
+    #                                           verbose=verbose,
+    #                                           video_name=video_name,
+    #                                           inclusion_zone=inclusion_zone)
+    #             for cnt, result in enumerate(pool.imap(constants, img_dict, chunksize=1)):
+    #                 batch_results.update(result)
+    #         results.update(batch_results)
+    #         pool.join()
+    #         pool.terminate()
+    #     results = dict(sorted(results.items()))
+    #     results = list(results.values())
+    #     results = np.stack(results, axis=0)
+    #     timer.stop_timer()
+    #     if save_path:
+    #         df = pd.DataFrame(results, columns=['X', 'Y'])
+    #         write_df(df=df, file_type=Formats.CSV.value, save_path=save_path)
+    #         if verbose:
+    #             stdout_success(f'Video {video_meta["video_name"]} blob detection complete, saved at {save_path}', elapsed_time=timer.elapsed_time_str)
+    #     else:
+    #         stdout_success(f'Video {video_meta["video_name"]} blob detection complete', elapsed_time=timer.elapsed_time_str)
+    #         return results.astype(np.int32)
 
     @staticmethod
     def img_diff(x: np.ndarray,
