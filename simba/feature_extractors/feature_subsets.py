@@ -21,9 +21,8 @@ from simba.roi_tools.roi_utils import get_roi_dict_from_dfs
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_file_exist_and_readable, check_if_dir_exists,
-    check_same_files_exist_in_all_directories,
-    check_valid_boolean, check_valid_dataframe, check_valid_lst,
-    check_video_has_rois)
+    check_same_files_exist_in_all_directories, check_valid_boolean,
+    check_valid_dataframe, check_valid_lst, check_video_has_rois)
 from simba.utils.enums import ROI_SETTINGS, Formats
 from simba.utils.errors import (DuplicationError, InvalidInputError,
                                 NoFilesFoundError, NoROIDataError)

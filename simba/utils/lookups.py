@@ -10,10 +10,10 @@ import sys
 from multiprocessing import Lock, Value
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
-import psutil
 
 import matplotlib.font_manager
 import pandas as pd
+import psutil
 import pyglet
 from matplotlib import cm
 

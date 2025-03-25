@@ -13,9 +13,10 @@ import numpy as np
 import pandas as pd
 from numba import jit, njit, prange, typed, types
 from scipy.interpolate import splev, splprep
-from shapely.geometry import (GeometryCollection, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon)
-from shapely.ops import linemerge, split, triangulate, unary_union
 from scipy.spatial.qhull import QhullError
+from shapely.geometry import (GeometryCollection, LineString, MultiLineString,
+                              MultiPoint, MultiPolygon, Point, Polygon)
+from shapely.ops import linemerge, split, triangulate, unary_union
 
 try:
     from typing_extensions import Literal

@@ -22,10 +22,9 @@ from skimage.metrics import structural_similarity
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_if_valid_img,
                                 check_if_valid_rgb_tuple, check_instance,
-                                check_int, is_img_greyscale,
-                                check_str, check_valid_array,
+                                check_int, check_str, check_valid_array,
                                 check_valid_boolean, check_valid_lst,
-                                check_valid_tuple, is_img_bw)
+                                check_valid_tuple, is_img_bw, is_img_greyscale)
 from simba.utils.enums import Defaults, Formats, GeometryEnum, Options
 from simba.utils.errors import (ArrayError, FFMPEGCodecGPUError,
                                 FrameRangeError, InvalidInputError,
