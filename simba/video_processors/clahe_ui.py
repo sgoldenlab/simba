@@ -69,7 +69,7 @@ def interactive_clahe_ui(data: Union[str, os.PathLike]) -> Tuple[float, int]:
     while True:
         if cv2.getWindowProperty(WIN_NAME, cv2.WND_PROP_VISIBLE) < 1:
             cv2.destroyAllWindows()
-            break  # Exit if the window is closed
+            break
         k = cv2.waitKey(1) & 0xFF
         if k == 27:
             clip_limit = cv2.getTrackbarPos(CLIP_LIMIT, WIN_NAME) / 10.0
