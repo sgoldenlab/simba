@@ -22,7 +22,7 @@ from simba.ui.px_to_mm_ui import GetPixelsPerMillimeterInterface
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
                                         CreateToolTip, DropDownMenu, Entry_Box,
                                         FileSelect, FolderSelect, SimbaButton,
-                                        SimbaCheckbox)
+                                        SimbaCheckbox, SimBADropDown, SimBALabel)
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable,
                                 check_if_dir_exists,
@@ -46,7 +46,7 @@ from simba.utils.read_write import (
     concatenate_videos_in_folder, find_all_videos_in_directory,
     find_files_of_filetypes_in_directory, find_video_of_file, get_fn_ext,
     get_video_meta_data, seconds_to_timestamp, str_2_bool,
-    timestamp_to_seconds)
+    timestamp_to_seconds, find_core_cnt)
 from simba.utils.warnings import FrameRangeWarning
 from simba.video_processors.brightness_contrast_ui import \
     brightness_contrast_ui
@@ -71,53 +71,68 @@ from simba.video_processors.video_processing import (
     superimpose_overlay_video, superimpose_video_names,
     superimpose_video_progressbar, temporal_concatenation, upsample_fps,
     video_bg_subtraction, video_bg_subtraction_mp, video_concatenator,
-    video_to_bw, video_to_greyscale, watermark_video)
+    video_to_bw, video_to_greyscale, watermark_video, clahe_enhance_video_mp)
 
 sys.setrecursionlimit(10**7)
 
 class CLAHEPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CLAHE VIDEO CONVERSION")
-        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm,
-                                                    header="SINGLE VIDEO - Contrast Limited Adaptive Histogram Equalization",
-                                                    icon_name=Keys.DOCUMENTATION.value,
-                                                    icon_link=Links.VIDEO_TOOLS.value)
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings', icon_link=Links.VIDEO_TOOLS.value)
+        lbl = SimBALabel(parent=settings_frm, txt='For more control over CLAHE conversion, try "Interactively CLAHE enhance videos" \n in SimBA Tools->Remove color from videos.', font=Formats.FONT_REGULAR_ITALICS.value)
+        self.core_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, find_core_cnt()[0]+1)), label='CORE COUNT:', label_width=25, dropdown_width=20, value=1)
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU:', label_width=25, dropdown_width=20, value='FALSE')
+        if not check_nvidea_gpu_available():
+            self.gpu_dropdown.disable()
+
+        settings_frm.grid(row=0, column=0, sticky=NW)
+        lbl.grid(row=0, column=0, sticky=NW)
+        self.core_cnt_dropdown.grid(row=1, column=0, sticky=NW)
+        self.gpu_dropdown.grid(row=2, column=0, sticky=NW)
+
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - Contrast Limited Adaptive Histogram Equalization", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=25)
-
-
-
-        run_single_video_btn = SimbaButton(parent=single_video_frm, txt="Apply CLAHE on VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_single_video)
-
+        run_single_video_btn = SimbaButton(parent=single_video_frm, txt="Apply CLAHE on VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_single_video, width=160)
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOs - Contrast Limited Adaptive Histogram Equalization", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", lblwidth=25)
 
-        run_multiple_btn = SimbaButton(parent=multiple_videos_frm, txt="Apply CLAHE on DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_directory)
-        single_video_frm.grid(row=0, column=0, sticky=NW)
+        run_multiple_btn = SimbaButton(parent=multiple_videos_frm, txt="Apply CLAHE on DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_directory, width=160)
+        single_video_frm.grid(row=1, column=0, sticky=NW)
         self.selected_video.grid(row=0, column=0, sticky=NW)
         run_single_video_btn.grid(row=1, column=0, sticky=NW)
 
-        multiple_videos_frm.grid(row=1, column=0, sticky=NW)
+        multiple_videos_frm.grid(row=2, column=0, sticky=NW)
         self.selected_dir.grid(row=0, column=0, sticky=NW)
         run_multiple_btn.grid(row=1, column=0, sticky=NW)
+
+    def _get_settings(self):
+        self.core_cnt = int(self.core_cnt_dropdown.get_value())
+        self.gpu = str_2_bool(self.gpu_dropdown.get_value())
 
     def run_single_video(self):
         selected_video = self.selected_video.file_path
         check_file_exist_and_readable(file_path=selected_video)
-        threading.Thread(target=clahe_enhance_video(file_path=selected_video)).start()
+        self._get_settings()
+        print(f'Applying CLAHE conversion on video {selected_video}...')
+        if self.core_cnt == 1:
+            threading.Thread(target=clahe_enhance_video(file_path=selected_video)).start()
+        else:
+            threading.Thread(target=clahe_enhance_video_mp(file_path=selected_video)).start()
 
     def run_directory(self):
         timer = SimbaTimer(start=True)
         video_dir = self.selected_dir.folder_path
         check_if_dir_exists(in_dir=video_dir, source=self.__class__.__name__)
         self.video_paths = find_files_of_filetypes_in_directory(directory=video_dir, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True)
+        self._get_settings()
+        print(f'Applying CLAHE conversion on {len(self.video_paths)} videos...')
         for file_path in self.video_paths:
-            threading.Thread(target=clahe_enhance_video(file_path=file_path)).start()
+            if self.core_cnt == 1:
+                threading.Thread(target=clahe_enhance_video(file_path=file_path)).start()
+            else:
+                clahe_enhance_video_mp(file_path=file_path, gpu=self.gpu)
         timer.stop_timer()
         stdout_success(msg=f'CLAHE enhanced {len(self.video_paths)} video(s)', elapsed_time=timer.elapsed_time_str)
-
-
-#_ = CLAHEPopUp()
-
 
 class CropVideoPopUp(PopUpMixin):
     def __init__(self):
@@ -1753,19 +1768,31 @@ class InteractiveClahePopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="INTERACTIVE CLAHE")
         self.datetime = datetime.now().strftime("%Y%m%d%H%M%S")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings', icon_link=Links.VIDEO_TOOLS.value)
+        self.core_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, find_core_cnt()[0]+1)), label='CORE COUNT:', label_width=25, dropdown_width=20, value=1)
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU:', label_width=25, dropdown_width=20, value='FALSE')
+        if not check_nvidea_gpu_available():
+            self.gpu_dropdown.disable()
+
+        settings_frm.grid(row=0, column=0, sticky=NW)
+        self.core_cnt_dropdown.grid(row=0, column=0, sticky=NW)
+        self.gpu_dropdown.grid(row=1, column=0, sticky=NW)
+
+
+
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="INTERACTIVE CLAHE - SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=25)
-        run_video_btn = SimbaButton(parent=single_video_frm, txt="RUN SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_video)
+        run_video_btn = SimbaButton(parent=single_video_frm, txt="RUN SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_video, width=160)
 
 
-        single_video_frm.grid(row=0, column=0, sticky="NW")
+        single_video_frm.grid(row=1, column=0, sticky="NW")
         self.selected_video.grid(row=0, column=0, sticky="NW")
         run_video_btn.grid(row=1, column=0, sticky="NW")
 
         video_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="INTERACTIVE CLAHE - MULTIPLE VIDEOS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_dir = FolderSelect(video_dir_frm, "VIDEO DIRECTORY PATH:", lblwidth=25)
-        run_dir_btn = SimbaButton(parent=video_dir_frm, txt="RUN VIDEO DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_directory)
-        video_dir_frm.grid(row=1, column=0, sticky="NW")
+        run_dir_btn = SimbaButton(parent=video_dir_frm, txt="RUN VIDEO DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_directory, width=160)
+        video_dir_frm.grid(row=2, column=0, sticky="NW")
         self.selected_dir.grid(row=0, column=0, sticky="NW")
         run_dir_btn.grid(row=1, column=0, sticky="NW")
 
@@ -1783,15 +1810,26 @@ class InteractiveClahePopUp(PopUpMixin):
         self.clip_limit, self.tile_size = interactive_clahe_ui(data=self.video_paths[0])
         self.apply()
 
+    def _get_settings(self):
+        self.core_cnt = int(self.core_cnt_dropdown.get_value())
+        self.gpu = str_2_bool(self.gpu_dropdown.get_value())
+
     def apply(self):
         timer = SimbaTimer(start=True)
+        self._get_settings()
         for file_cnt, file_path in enumerate(self.video_paths):
             dir, video_name, ext = get_fn_ext(filepath=file_path)
             print(f'Creating CLAHE copy of {video_name}...')
             out_path = os.path.join(dir, f'{video_name}_CLAHE_CLIPLIMIT_{int(self.clip_limit)}_TILESIZE_{int(self.tile_size)}_{self.datetime}{ext}')
-            clahe_enhance_video(file_path=file_path, clip_limit=int(self.clip_limit), tile_grid_size=(int(self.tile_size), int(self.tile_size)), out_path=out_path)
+            if self.core_cnt == 1:
+                clahe_enhance_video(file_path=file_path, clip_limit=int(self.clip_limit), tile_grid_size=(int(self.tile_size), int(self.tile_size)), out_path=out_path)
+            else:
+                clahe_enhance_video_mp(file_path=file_path, clip_limit=int(self.clip_limit), tile_grid_size=(int(self.tile_size), int(self.tile_size)), out_path=out_path, gpu=self.gpu)
         timer.stop_timer()
         stdout_success(f'{len(self.video_paths)} video(s) converted.', elapsed_time=timer.elapsed_time_str)
+
+
+#_ = InteractiveClahePopUp()
 
 
 class DownsampleSingleVideoPopUp(PopUpMixin):

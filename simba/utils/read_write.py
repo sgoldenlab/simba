@@ -478,7 +478,7 @@ def remove_a_folder(folder_dir: Union[str, os.PathLike], ignore_errors: Optional
         raise PermissionError(msg=f'Could not delete directory: {folder_dir}. is the directory or its content beeing used by anothe process?', source=remove_a_folder.__name__)
 
 
-def concatenate_videos_in_folder(in_folder: Union[str, os.PathLike],
+def concatenate_videos_in_folder(in_folder: Union[str, os.PathLike, bytes],
                                  save_path: Union[str, os.PathLike],
                                  file_paths: Optional[List[Union[str, os.PathLike]]] = None,
                                  video_format: Optional[str] = "mp4",
@@ -1588,7 +1588,7 @@ def read_roi_data(roi_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, pd.D
 
 #read_roi_data(roi_path=r"C:\troubleshooting\mitra\project_folder\logs\measures\ROI_definitions.h5")
 
-def create_directory(path: Union[str, os.PathLike], overwrite: bool = False):
+def create_directory(path: Union[str, os.PathLike, bytes], overwrite: bool = False):
     if not os.path.exists(path):
         try:
             os.makedirs(path)
@@ -2121,6 +2121,30 @@ def img_stack_to_greyscale(imgs: np.ndarray):
         results[i] = vals.astype(np.uint8)
     return results
 
+
+@njit("(uint8[:, :, :, :],)", fastmath=True, parallel=True)
+def img_stack_to_bw(imgs: np.ndarray):
+    """
+    Jitted conversion of a 4D stack of color images (RGB format) to grayscale.
+
+    .. image:: _static/img/img_stack_to_greyscale.png
+       :width: 600
+       :align: center
+
+    :parameter np.ndarray imgs: A 4D array representing color images. It should have the shape (num_images, height, width, 3) where the last dimension represents the color channels (R, G, B).
+    :returns np.ndarray: A 3D array containing the grayscale versions of the input images. The shape of the output array is (num_images, height, width).
+
+    :example:
+    >>> imgs = ImageMixin().read_img_batch_from_video( video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Together_1.avi', start_frm=0, end_frm=100)
+    >>> imgs = np.stack(list(imgs.values()))
+    >>> imgs_gray = ImageMixin.img_stack_to_greyscale(imgs=imgs)
+    """
+    results = np.full((imgs.shape[0], imgs.shape[1], imgs.shape[2]), np.nan).astype(np.uint8)
+    for i in prange(imgs.shape[0]):
+        vals = (0.07 * imgs[i][:, :, 2] + 0.72 * imgs[i][:, :, 1] + 0.21 * imgs[i][:, :, 0])
+        results[i] = np.where(vals > 127, 255, 0).astype(np.uint8)
+    return results
+
 def read_img_batch_from_video_gpu(video_path: Union[str, os.PathLike],
                                   start_frm: Optional[int] = None,
                                   end_frm: Optional[int] = None,
@@ -2207,6 +2231,7 @@ def read_img_batch_from_video_gpu(video_path: Union[str, os.PathLike],
             greyscale_imgs = img_stack_to_greyscale(imgs=np.stack(list(frames.values()), axis=0)).astype(np.uint8)
             for cnt, i in enumerate(range(start_frm, end_frm)):
                 frames[i] = greyscale_imgs[cnt]
+            del greyscale_imgs
         else:
             frames = img_stack_to_greyscale(imgs=frames).astype(np.uint8)
 

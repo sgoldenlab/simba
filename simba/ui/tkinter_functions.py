@@ -134,6 +134,7 @@ class FileSelect(Frame):
                  file_types=None,
                  bg_clr: Optional[str] = 'white',
                  dropdown: DropDownMenu = None,
+                 entry_width: Optional[int] = 20,
                  initialdir: Optional[Union[str, os.PathLike]] = None, **kw):
 
         self.title, self.dropdown, self.initialdir = title, dropdown, initialdir
@@ -146,7 +147,7 @@ class FileSelect(Frame):
         self.filePath = StringVar()
         self.lblName = Label(self, text=fileDescription, fg=str(self.color), width=str(self.lblwidth), anchor=W, font=Formats.FONT_REGULAR.value)
         self.lblName.grid(row=0, column=0, sticky=W)
-        self.entPath = Label(self, textvariable=self.filePath, relief=SUNKEN, font=Formats.FONT_REGULAR.value, bg=bg_clr)
+        self.entPath = Label(self, textvariable=self.filePath, relief=SUNKEN, font=Formats.FONT_REGULAR.value, bg=bg_clr, width=entry_width)
         self.entPath.grid(row=0, column=1)
         self.btnFind = Button(self, text=Defaults.BROWSE_FILE_BTN_TEXT.value, compound="left", image=browse_icon, relief=RAISED, command=self.setFilePath, font=Formats.FONT_REGULAR.value)
         self.btnFind.image = browse_icon
@@ -170,9 +171,11 @@ class FileSelect(Frame):
                 self.filePath.set(os.path.basename(file_selected))
             else:
                 self.filePath.set(file_selected)
+            self.entPath.configure(width=len(file_selected)+10)
 
         else:
             self.filePath.set(Defaults.NO_FILE_SELECTED_TEXT.value)
+            self.entPath.configure(width=len(Defaults.NO_FILE_SELECTED_TEXT.value) + 10)
 
     @property
     def file_path(self):
@@ -238,6 +241,7 @@ class FolderSelect(Frame):
                  title: Optional[str] = "",
                  lblwidth: Optional[int] = 0,
                  bg_clr: Optional[str] = 'white',
+                 entry_width: Optional[int] = 20,
                  initialdir: Optional[Union[str, os.PathLike]] = None,
                  **kw):
 
@@ -250,7 +254,7 @@ class FolderSelect(Frame):
         self.folderPath = StringVar()
         self.lblName = Label(self, text=folderDescription, fg=str(self.color), width=str(self.lblwidth), anchor=W, font=Formats.FONT_REGULAR.value)
         self.lblName.grid(row=0, column=0, sticky=W)
-        self.entPath = Label(self, textvariable=self.folderPath, relief=SUNKEN, font=Formats.FONT_REGULAR.value, bg=bg_clr)
+        self.entPath = Label(self, textvariable=self.folderPath, relief=SUNKEN, font=Formats.FONT_REGULAR.value, bg=bg_clr, width=entry_width)
         self.entPath.grid(row=0, column=1)
         self.btnFind = Button(self, text=Defaults.BROWSE_FOLDER_BTN_TEXT.value, compound="left", image=browse_icon, relief=RAISED, font=Formats.FONT_REGULAR.value, command=self.setFolderPath)
         self.btnFind.image = browse_icon
@@ -266,8 +270,11 @@ class FolderSelect(Frame):
         folder_selected = askdirectory(title=str(self.title), parent=self.parent, initialdir=self.initialdir)
         if folder_selected:
             self.folderPath.set(folder_selected)
+            self.entPath.configure(width=len(folder_selected)+10)
         else:
             self.folderPath.set("No folder selected")
+            self.entPath.configure(width=len("No folder selected")+10)
+
 
     @property
     def folder_path(self):

@@ -4,12 +4,17 @@ from typing import Tuple, Union
 import cv2
 import numpy as np
 
-from simba.utils.checks import check_if_valid_img, check_instance
+from simba.utils.checks import check_instance
 from simba.utils.read_write import get_video_meta_data, read_frm_of_video
-from simba.utils.warnings import InValidUserInputWarning
+from simba.utils.errors import InvalidInputError
+
+WIN_NAME = 'INTERACTIVE CLAHE - HIT ESC TO RUN'
+CLIP_LIMIT = 'CLIP LIMIT'
+TILE_SIZE = 'TILE SIZE'
+SELECT_VIDEO_FRAME = 'SHOW FRAME'
 
 
-def interactive_clahe_ui(data: Union[str, os.PathLike, np.ndarray]) -> Tuple[float, int]:
+def interactive_clahe_ui(data: Union[str, os.PathLike]) -> Tuple[float, int]:
     """
     Create a user interface using OpenCV to explore and set appropriate CLAHE settings tile size and clip limit.
 
@@ -17,48 +22,64 @@ def interactive_clahe_ui(data: Union[str, os.PathLike, np.ndarray]) -> Tuple[flo
        :width: 500
        :align: center
 
-    :param Union[str, os.PathLike, np.ndarray] data: Path to a video file or a NumPy array representing an image.
+    :param Union[str, os.PathLike, np.ndarray] data: Path to a video file.
     :return Tuple[float, int]: Tuple containing the chosen clip limit and tile size.
 
     :example:
-    >>> img = cv2.imread('/Users/simon/Downloads/PXL_20240429_222923838.jpg',)
-    >>> interactive_clahe_ui(data=img)
+    >>> video = cv2.imread(r"D:\EPM\sample_2\video_1.mp4")
+    >>> interactive_clahe_ui(data=video)
     """
+    global original_img
 
     def _get_trackbar_values(v):
-        clip_limit = cv2.getTrackbarPos('Clip Limit', 'Interactive CLAHE') / 10.0
-        tile_size = cv2.getTrackbarPos('Tile Size', 'Interactive CLAHE')
+        global original_img
+        clip_limit = cv2.getTrackbarPos(CLIP_LIMIT, WIN_NAME) / 10.0
+        tile_size = cv2.getTrackbarPos(TILE_SIZE, WIN_NAME)
         if tile_size % 2 == 0: tile_size += 1
         clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(tile_size, tile_size))
         img_clahe = clahe.apply(original_img)
-        cv2.imshow('Interactive CLAHE', img_clahe)
+        cv2.imshow(WIN_NAME, img_clahe)
+
+    def _change_img(v):
+        global original_img
+        new_frm_id = cv2.getTrackbarPos(SELECT_VIDEO_FRAME, WIN_NAME)
+        original_img = read_frm_of_video(video_path=data, frame_index=new_frm_id, greyscale=True)
+        clip_limit = cv2.getTrackbarPos(CLIP_LIMIT, WIN_NAME) / 10.0
+        tile_size = cv2.getTrackbarPos(TILE_SIZE, WIN_NAME)
+        if tile_size % 2 == 0: tile_size += 1
+        clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(tile_size, tile_size))
+        img_clahe = clahe.apply(original_img)
+        cv2.imshow(WIN_NAME, img_clahe)
 
     check_instance(source=interactive_clahe_ui.__name__, instance=data, accepted_types=(np.ndarray, str))
     if isinstance(data, str):
-        _ = get_video_meta_data(video_path=data)
+        video_meta_data = get_video_meta_data(video_path=data)
         original_img = read_frm_of_video(video_path=data, frame_index=0, greyscale=True)
     else:
-        check_if_valid_img(data=data, source=interactive_clahe_ui.__name__)
-        if len(data.shape) > 2: data = cv2.cvtColor(data, cv2.COLOR_BGR2GRAY)
-        original_img = data
+        raise InvalidInputError(msg=f'data has to be a path to a video file, but got {type(data)}', source=interactive_clahe_ui.__name__)
 
     img = np.copy(original_img)
-    cv2.namedWindow('Interactive CLAHE', cv2.WINDOW_NORMAL)
-    cv2.imshow('Interactive CLAHE', img)
-    cv2.createTrackbar('Clip Limit', 'Interactive CLAHE', 10, 300, _get_trackbar_values)
-    cv2.createTrackbar('Tile Size', 'Interactive CLAHE',  8, 64,  _get_trackbar_values)
+    cv2.namedWindow(WIN_NAME, cv2.WINDOW_NORMAL)
+    cv2.resizeWindow(WIN_NAME, video_meta_data['width'], video_meta_data['height'])
+    cv2.imshow(WIN_NAME, img)
+    cv2.createTrackbar(CLIP_LIMIT, WIN_NAME, 10, 300, _get_trackbar_values)
+    cv2.createTrackbar(TILE_SIZE, WIN_NAME,  8, 64,  _get_trackbar_values)
+    cv2.createTrackbar(SELECT_VIDEO_FRAME, WIN_NAME, 0, video_meta_data['frame_count'], _change_img)
 
     while True:
+        if cv2.getWindowProperty(WIN_NAME, cv2.WND_PROP_VISIBLE) < 1:
+            cv2.destroyAllWindows()
+            break  # Exit if the window is closed
         k = cv2.waitKey(1) & 0xFF
         if k == 27:
-            clip_limit = cv2.getTrackbarPos('Clip Limit', 'Interactive CLAHE') / 10.0
-            tile_size = cv2.getTrackbarPos('Tile Size', 'Interactive CLAHE')
+            clip_limit = cv2.getTrackbarPos(CLIP_LIMIT, WIN_NAME) / 10.0
+            tile_size = cv2.getTrackbarPos(TILE_SIZE, WIN_NAME)
             if tile_size % 2 == 0: tile_size += 1
             cv2.destroyAllWindows()
             return clip_limit, tile_size
 
 
-
+#interactive_clahe_ui(data=r"D:\EPM\sample_2\video_1.mp4")
 
 # # Function to update CLAHE
 # def update_clahe(x):

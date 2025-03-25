@@ -1946,11 +1946,85 @@ class ImageMixin(object):
 
         return results
 
+    @staticmethod
+    def non_local_mean_denoising_image(img: np.ndarray,
+                                       sigma: int = 30,
+                                       template_window: float = 0.02,
+                                       search_window: float = 0.10) -> np.ndarray:
 
+        """
+        Applies Non-Local Means (NLM) denoising to a grayscale or color image using OpenCV.
 
+        .. note::
+           Pretty slow.
 
+        .. image:: _static/img/non_local_mean_denoising.webp
+           :width: 400
+           :align: center
 
+        :param np.ndarray img: Input image (grayscale or color) as a NumPy array.
+        :param int sigma: Strength of the filter. Higher values remove more noise but may blur details. Default 30.
+        :param float template_window: Size of the local patch for denoising, relative to the larger image dimension.  Must be between `1e-5` and `1.0`. Default is `0.02`.
+        :param float search_window: Size of the area where similar patches are searched, relative to the larger image dimension. Must be between `1e-5` and `1.0`. Default is `0.10`.
+        :return: Denoised image as a NumPy array with the same shape as the input.
+        :rtype: np.ndarray
+        """
 
+        check_if_valid_img(data=img, source=f'{ImageMixin.non_local_mean_denoising_image.__name__} img')
+        check_int(name=f'{ImageMixin.non_local_mean_denoising_image.__name__} sigma', value=sigma, min_value=1)
+        check_float(f'{ImageMixin.non_local_mean_denoising_image.__name__} template_window', min_value=10e-6, max_value=1.0, value=template_window)
+        check_float(f'{ImageMixin.non_local_mean_denoising_image.__name__} search_window', min_value=10e-6, max_value=1.0, value=search_window)
+        img_h, img_w = img.shape[0], img.shape[1]
+        template_window = int(max(img_h, img_w) * template_window)
+        search_window_size = int(max(img_h, img_w) * search_window)
+        if img.ndim == 2:
+            img = cv2.fastNlMeansDenoising(img, dst=None, h=sigma, templateWindowSize=template_window, searchWindowSize=search_window_size)
+        else:
+            img = cv2.fastNlMeansDenoisingColored(img, None, h=sigma, templateWindowSize=template_window, searchWindowSize=search_window_size)
+        return img
+
+    @staticmethod
+    def non_local_mean_denoising_sequence(imgs: np.ndarray,
+                                          sigma: int = 30,
+                                          img_to_denoise_idx: Optional[int] = None) -> np.ndarray:
+
+        """
+        Applies Non-Local Means (NLM) denoising to a stack of images or video frames to reduce noise, using a temporal window for multi-frame denoising.
+
+        .. note::
+           Pretty slow.
+
+        .. image:: _static/img/non_local_mean_denoising.webp
+           :width: 400
+           :align: center
+
+        .. seealso::
+           For single images, see :func:`~simba.mixins.image_mixin.ImageMixin.non_local_mean_denoising_image`
+
+        :param np.ndarray imgs: A 3D or 4D NumPy array of images or video frames.  If the input is a 3D array, it represents a single image stack (height, width, num_frames). If the input is a 4D array, it represents a batch of video frames (num_frames, height, width, num_channels).
+        :param int sigma: The filtering strength parameter. A higher value corresponds to stronger denoising  and more smoothing of the image. The default is 30.
+        :return: Denoised video or image stack.
+        :rtype: np.ndarray If input is a 3D array (grayscale), the output is a 3D array. If input is a 4D array (colored), the output is a 4D arra
+        """
+
+        check_valid_array(data=imgs, source=f'{ImageMixin.non_local_mean_denoising_sequence.__name__} imgs', accepted_ndims=(3, 4,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_axis_0=2)
+        check_int(name=f'{ImageMixin.non_local_mean_denoising_sequence.__name__} sigma', value=sigma, min_value=1)
+        if img_to_denoise_idx is None:
+            img_to_denoise_idx = int(np.floor(imgs.shape[0] / 2))
+        else:
+            check_int(name=f'{ImageMixin.non_local_mean_denoising_sequence.__name__} img_to_denoise_idx', value=img_to_denoise_idx, max_value=imgs.shape[0] - 1, min_value=0)
+        temporal_window_size = int((imgs.shape[0] / 2))
+        temporal_window_size = temporal_window_size if temporal_window_size % 2 == 1 else temporal_window_size - 1
+        if imgs.shape[0] <= 2:
+            temporal_window_size = 1
+        if imgs.ndim == 3:
+            imgs = [imgs[:, :, i] for i in range(imgs.shape[2])]
+            denoised_img = cv2.fastNlMeansDenoisingMulti(imgs, imgToDenoiseIndex=img_to_denoise_idx, temporalWindowSize=temporal_window_size, h=sigma)
+        else:
+            imgs = [imgs[i] for i in range(imgs.shape[0])]
+            denoised_img = cv2.fastNlMeansDenoisingColoredMulti(imgs, imgToDenoiseIndex=img_to_denoise_idx, temporalWindowSize=temporal_window_size, h=sigma)
+
+        return denoised_img
 
 #x = ImageMixin.get_blob_locations(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled_bg_subtracted.mp4", gpu=True)
 # imgs = ImageMixin().read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples')
