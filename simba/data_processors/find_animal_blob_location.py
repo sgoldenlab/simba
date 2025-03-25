@@ -1,44 +1,40 @@
-import time
-
-from simba.mixins.geometry_mixin import GeometryMixin
-
+import asyncio
 import functools
-import pandas as pd
-import multiprocessing
-from multiprocessing import sharedctypes
-import os
-from copy import copy, deepcopy
-from typing import Dict, Optional, Union, Tuple
-import traceback
+import gc
 import math
+import multiprocessing
+import multiprocessing as mp
+import os
+import time
+import traceback
+from concurrent.futures import ProcessPoolExecutor
+from copy import copy, deepcopy
+from multiprocessing import sharedctypes
+from typing import Dict, Optional, Tuple, Union
+
 import cv2
 import numpy as np
-import gc
-from shapely.affinity import scale
-from shapely.geometry import MultiPolygon, Polygon, Point, LineString
+import pandas as pd
+from scipy.spatial import ConvexHull
 from scipy.spatial.qhull import QhullError
-from simba.utils.checks import (check_float, check_instance, check_int, check_nvidea_gpu_available, check_valid_boolean, is_img_bw)
+from shapely.affinity import scale
+from shapely.geometry import LineString, MultiPolygon, Point, Polygon
+
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.utils.checks import (check_float, check_instance, check_int,
+                                check_nvidea_gpu_available,
+                                check_valid_boolean, is_img_bw)
+from simba.utils.data import resample_geometry_vertices
 from simba.utils.enums import Defaults
 from simba.utils.errors import FFMPEGCodecGPUError, SimBAGPUError
-from simba.utils.read_write import (find_core_cnt, get_fn_ext, get_video_meta_data, read_img_batch_from_video, read_img_batch_from_video_gpu, read_frm_of_video, get_memory_usage_array, img_stack_to_greyscale, img_stack_to_bw)
-from scipy.spatial import ConvexHull
-from simba.utils.data import resample_geometry_vertices
 from simba.utils.lookups import get_available_ram
-import asyncio
-import multiprocessing as mp
-import os
-import time
-from concurrent.futures import ProcessPoolExecutor
-from multiprocessing import sharedctypes
+from simba.utils.read_write import (find_core_cnt, get_fn_ext,
+                                    get_memory_usage_array,
+                                    get_video_meta_data, img_stack_to_bw,
+                                    img_stack_to_greyscale, read_frm_of_video,
+                                    read_img_batch_from_video,
+                                    read_img_batch_from_video_gpu)
 
-import asyncio
-import functools
-import multiprocessing as mp
-import numpy as np
-import os
-import time
-from concurrent.futures import ProcessPoolExecutor
-from multiprocessing import sharedctypes
 
 def stabilize_body_parts(bp_1: np.ndarray,
                          bp_2: np.ndarray,

@@ -22,7 +22,8 @@ from simba.ui.px_to_mm_ui import GetPixelsPerMillimeterInterface
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
                                         CreateToolTip, DropDownMenu, Entry_Box,
                                         FileSelect, FolderSelect, SimbaButton,
-                                        SimbaCheckbox, SimBADropDown, SimBALabel)
+                                        SimbaCheckbox, SimBADropDown,
+                                        SimBALabel)
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable,
                                 check_if_dir_exists,
@@ -43,10 +44,10 @@ from simba.utils.lookups import (get_color_dict, get_ffmpeg_crossfade_methods,
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
-    concatenate_videos_in_folder, find_all_videos_in_directory,
+    concatenate_videos_in_folder, find_all_videos_in_directory, find_core_cnt,
     find_files_of_filetypes_in_directory, find_video_of_file, get_fn_ext,
     get_video_meta_data, seconds_to_timestamp, str_2_bool,
-    timestamp_to_seconds, find_core_cnt)
+    timestamp_to_seconds)
 from simba.utils.warnings import FrameRangeWarning
 from simba.video_processors.brightness_contrast_ui import \
     brightness_contrast_ui
@@ -56,10 +57,10 @@ from simba.video_processors.multi_cropper import MultiCropper
 from simba.video_processors.video_processing import (
     VideoRotator, batch_convert_video_format, batch_create_frames,
     batch_video_to_greyscale, change_fps_of_multiple_videos, change_img_format,
-    change_single_video_fps, clahe_enhance_video, clip_video_in_range,
-    clip_videos_by_frame_ids, convert_to_avi, convert_to_bmp, convert_to_jpeg,
-    convert_to_mov, convert_to_mp4, convert_to_png, convert_to_tiff,
-    convert_to_webm, convert_to_webp,
+    change_single_video_fps, clahe_enhance_video, clahe_enhance_video_mp,
+    clip_video_in_range, clip_videos_by_frame_ids, convert_to_avi,
+    convert_to_bmp, convert_to_jpeg, convert_to_mov, convert_to_mp4,
+    convert_to_png, convert_to_tiff, convert_to_webm, convert_to_webp,
     convert_video_powerpoint_compatible_format, copy_img_folder,
     create_average_frm, crop_multiple_videos, crop_multiple_videos_polygons,
     crop_single_video, crop_single_video_circle, crop_single_video_polygon,
@@ -71,7 +72,7 @@ from simba.video_processors.video_processing import (
     superimpose_overlay_video, superimpose_video_names,
     superimpose_video_progressbar, temporal_concatenation, upsample_fps,
     video_bg_subtraction, video_bg_subtraction_mp, video_concatenator,
-    video_to_bw, video_to_greyscale, watermark_video, clahe_enhance_video_mp)
+    video_to_bw, video_to_greyscale, watermark_video)
 
 sys.setrecursionlimit(10**7)
 

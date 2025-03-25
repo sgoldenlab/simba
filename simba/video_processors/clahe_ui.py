@@ -5,8 +5,8 @@ import cv2
 import numpy as np
 
 from simba.utils.checks import check_instance
-from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 from simba.utils.errors import InvalidInputError
+from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 
 WIN_NAME = 'INTERACTIVE CLAHE - HIT ESC TO RUN'
 CLIP_LIMIT = 'CLIP LIMIT'
