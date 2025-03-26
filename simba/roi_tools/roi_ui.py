@@ -51,7 +51,7 @@ class ROI_ui(ROI_mixin, ConfigReader):
         self.video_meta =  get_video_meta_data(video_path=video_path, fps_as_int=False)
         self.video_ext = get_fn_ext(filepath=video_path)[2][1:]
         self.img, self.img_idx = ImageMixin.find_first_non_uniform_clr_frm(video_path=video_path)
-        self.define_ui = PopUpMixin(title="REGION OF INTEREST (ROI) SETTINGS", size=WINDOW_SIZE)
+        self.define_ui = PopUpMixin(title="REGION OF INTEREST (ROI) SETTINGS", size=WINDOW_SIZE, icon='shapes_small')
         ROI_mixin.__init__(self, video_path=video_path, config_path=config_path, img_idx=self.img_idx, main_frm=self.define_ui.root, roi_coordinates_path=self.roi_coordinates_path)
         self.other_project_video_paths = find_all_videos_in_directory(directory=self.video_dir, as_dict=True).values()
         self.other_project_video_paths = [x for x in self.other_project_video_paths if x != video_path]

@@ -35,7 +35,8 @@ class PopUpMixin(object):
                  title: str,
                  config_path: Optional[str] = None,
                  main_scrollbar: Optional[bool] = True,
-                 size: Tuple[int, int] = (960, 720)):
+                 size: Tuple[int, int] = (960, 720),
+                 icon: Optional[str] = None):
 
         self.root = Toplevel()
         self.root.minsize(size[0], size[1])
@@ -59,6 +60,9 @@ class PopUpMixin(object):
             self.menu_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname(__file__), self.menu_icons[k]["icon_path"])))
         if config_path:
             ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
+        if icon is not None:
+            if icon in list(self.menu_icons.keys()):
+                self.root.iconphoto(False, self.menu_icons[icon]["img"])
 
     def create_clf_checkboxes(self,
                               main_frm: Union[Frame, LabelFrame, Toplevel, Canvas],

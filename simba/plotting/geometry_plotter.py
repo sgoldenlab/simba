@@ -14,15 +14,13 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_float, check_if_dir_exists,
                                 check_instance, check_int,
                                 check_iterable_length, check_valid_boolean,
-                                check_valid_lst)
+                                check_valid_lst, check_str, check_if_valid_rgb_tuple)
 from simba.utils.data import create_color_palettes
 from simba.utils.enums import Defaults, Formats
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import get_color_dict
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder,
-                                    find_core_cnt, find_video_of_file,
-                                    get_fn_ext, get_video_meta_data)
+from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, find_video_of_file, get_fn_ext, get_video_meta_data)
 from simba.utils.warnings import FrameRangeWarning
 
 ACCEPTED_TYPES = [Polygon, LineString, MultiPolygon, MultiLineString, Point]
@@ -121,7 +119,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
                  bg_opacity: Optional[float] = 1,
                  shape_opacity: float = 0.3,
                  palette: Optional[str] = None,
-                 colors: Optional[List[str]] = None,
+                 colors: Optional[List[Union[str, Tuple[int, int, int]]]] = None,
                  verbose: Optional[bool] = True):
 
         PlottingMixin.__init__(self)
@@ -155,8 +153,14 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
         if thickness is None:
             thickness = circle_size
         if palette is None:
-            check_valid_lst(data=colors, source=f'{self.__class__.__name__} colors', valid_dtypes=(str, ), valid_values=list(self.color_dict.keys()), exact_len=len(geometries))
-            self.colors = [self.color_dict[x] for x in colors]
+            self.colors = []
+            check_valid_lst(data=colors, source=f'{self.__class__.__name__} colors', valid_dtypes=(str, tuple), exact_len=len(geometries))
+            for clr in colors:
+                if isinstance(clr, str):
+                    check_str(name=f'{self.__class__.__name__} colors', value=clr, options=list(self.color_dict.keys()))
+                else:
+                    check_if_valid_rgb_tuple(data=clr)
+                self.colors.append(clr)
         else:
             colors = create_color_palettes(no_animals=1, map_size=len(geometries) + 1, cmaps=[palette])
             self.colors = [x for xs in colors for x in xs]

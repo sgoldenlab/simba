@@ -43,7 +43,7 @@ def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
                                data_df: pd.DataFrame,
                                text_locations: dict,
                                font_size: float,
-                               circle_size: float,
+                               circle_size: Union[float, int],
                                save_temp_dir: str,
                                video_meta_data: dict,
                                shape_info: dict,
@@ -70,7 +70,7 @@ def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
         return img
 
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-    font = cv2.FONT_HERSHEY_COMPLEX
+    font = cv2.FONT_HERSHEY_SIMPLEX
     group_cnt, frm_range = frm_range[0], frm_range[1]
     start_frm, current_frm, end_frm = frm_range[0], frm_range[0], frm_range[-1]
     save_path = os.path.join(save_temp_dir, f"{group_cnt}.mp4")
@@ -233,7 +233,7 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
             for shape in self.shape_names:
                 txt_strs.append(animal_bp_name + ' ' + shape + ' center distance')
         longest_text_str = str(max(txt_strs, key=len))
-        self.font_size, x_spacer, y_spacer = PlottingMixin().get_optimal_font_scales(text=longest_text_str, accepted_px_width=int(self.video_meta_data["width"] / 2), accepted_px_height=int(self.video_meta_data["height"] / 15), text_thickness=TextOptions.TEXT_THICKNESS.value)
+        self.font_size, x_spacer, y_spacer = PlottingMixin().get_optimal_font_scales(text=longest_text_str, accepted_px_width=int(self.video_meta_data["width"] / 2), accepted_px_height=int(self.video_meta_data["height"] / 15), text_thickness=3)
         self.circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(int(self.video_meta_data["height"]), int(self.video_meta_data["height"])), circle_frame_ratio=100)
         for animal_cnt, animal_data in self.bp_lk.items():
             animal, animal_bp, _ = animal_data

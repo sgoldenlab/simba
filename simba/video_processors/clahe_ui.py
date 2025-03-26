@@ -7,12 +7,13 @@ import numpy as np
 from simba.utils.checks import check_instance
 from simba.utils.errors import InvalidInputError
 from simba.utils.read_write import get_video_meta_data, read_frm_of_video
+from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.enums import TextOptions
 
 WIN_NAME = 'INTERACTIVE CLAHE - HIT ESC TO RUN'
 CLIP_LIMIT = 'CLIP LIMIT'
 TILE_SIZE = 'TILE SIZE'
 SELECT_VIDEO_FRAME = 'SHOW FRAME'
-
 
 def interactive_clahe_ui(data: Union[str, os.PathLike]) -> Tuple[float, int]:
     """
@@ -29,19 +30,21 @@ def interactive_clahe_ui(data: Union[str, os.PathLike]) -> Tuple[float, int]:
     >>> video = cv2.imread(r"D:\EPM\sample_2\video_1.mp4")
     >>> interactive_clahe_ui(data=video)
     """
-    global original_img
+    global original_img, font_size, x_spacer, y_spacer, txt
 
     def _get_trackbar_values(v):
-        global original_img
+        global original_img, font_size, x_spacer, y_spacer, txt
         clip_limit = cv2.getTrackbarPos(CLIP_LIMIT, WIN_NAME) / 10.0
         tile_size = cv2.getTrackbarPos(TILE_SIZE, WIN_NAME)
         if tile_size % 2 == 0: tile_size += 1
         clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(tile_size, tile_size))
         img_clahe = clahe.apply(original_img)
+        cv2.putText(img_clahe, txt,(TextOptions.BORDER_BUFFER_X.value, TextOptions.BORDER_BUFFER_Y.value + y_spacer), TextOptions.FONT.value, font_size, (255, 255, 255), 3)
         cv2.imshow(WIN_NAME, img_clahe)
+        cv2.waitKey(100)
 
     def _change_img(v):
-        global original_img
+        global original_img, font_size, x_spacer, y_spacer, txt
         new_frm_id = cv2.getTrackbarPos(SELECT_VIDEO_FRAME, WIN_NAME)
         original_img = read_frm_of_video(video_path=data, frame_index=new_frm_id, greyscale=True)
         clip_limit = cv2.getTrackbarPos(CLIP_LIMIT, WIN_NAME) / 10.0
@@ -49,7 +52,9 @@ def interactive_clahe_ui(data: Union[str, os.PathLike]) -> Tuple[float, int]:
         if tile_size % 2 == 0: tile_size += 1
         clahe = cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=(tile_size, tile_size))
         img_clahe = clahe.apply(original_img)
+        cv2.putText(img_clahe, txt,(TextOptions.BORDER_BUFFER_X.value, TextOptions.BORDER_BUFFER_Y.value + y_spacer), TextOptions.FONT.value, font_size, (255, 255, 255), 3)
         cv2.imshow(WIN_NAME, img_clahe)
+        cv2.waitKey(100)
 
     check_instance(source=interactive_clahe_ui.__name__, instance=data, accepted_types=(np.ndarray, str))
     if isinstance(data, str):
@@ -57,8 +62,11 @@ def interactive_clahe_ui(data: Union[str, os.PathLike]) -> Tuple[float, int]:
         original_img = read_frm_of_video(video_path=data, frame_index=0, greyscale=True)
     else:
         raise InvalidInputError(msg=f'data has to be a path to a video file, but got {type(data)}', source=interactive_clahe_ui.__name__)
+    txt = 'Hit ESC to run with chosen settings'
+    font_size, x_spacer, y_spacer = PlottingMixin().get_optimal_font_scales(text=txt, accepted_px_width=int(video_meta_data["width"] / 2), accepted_px_height=int(video_meta_data["height"] / 15), text_thickness=3)
 
     img = np.copy(original_img)
+    cv2.putText(img, txt, (TextOptions.BORDER_BUFFER_X.value, TextOptions.BORDER_BUFFER_Y.value + y_spacer), TextOptions.FONT.value, font_size, (255, 255, 255), 3)
     cv2.namedWindow(WIN_NAME, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(WIN_NAME, video_meta_data['width'], video_meta_data['height'])
     cv2.imshow(WIN_NAME, img)

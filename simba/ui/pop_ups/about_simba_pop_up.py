@@ -8,7 +8,7 @@ from simba.utils.enums import Paths
 
 class AboutSimBAPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, size=(896, 507), title="ABOUT SIMBA")
+        PopUpMixin.__init__(self, size=(896, 507), title="ABOUT SIMBA", icon='SimBA_logo_3_small')
         canvas = Canvas(self.main_frm, width=896, height=507, bg="black")
         canvas.pack()
         img_path = os.path.join(os.path.dirname(simba.__file__), Paths.ABOUT_ME.value)

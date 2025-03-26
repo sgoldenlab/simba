@@ -511,7 +511,7 @@ def clahe_enhance_video_mp(file_path: Union[str, os.PathLike],
     :returns: None.
 
     :example:
-    >>> _ = clahe_enhance_video_mp(file_path: 'project_folder/videos/Video_1.mp4')
+    >>> _ = clahe_enhance_video_mp(file_path= 'project_folder/videos/Video_1.mp4')
     """
 
     video_timer = SimbaTimer(start=True)
@@ -547,16 +547,15 @@ def clahe_enhance_video_mp(file_path: Union[str, os.PathLike],
                                       tile_grid_size=tile_grid_size)
         for cnt, result in enumerate(pool.imap(constants, frm_idx, chunksize=1)):
             print(f'Batch {(result + 1)} / {core_cnt} complete...')
-        pool.terminate()
-        pool.join()
-        print(f"Joining {video_meta_data['video_name']} multiprocessed video...")
-        concatenate_videos_in_folder(in_folder=tempdir, save_path=save_path, remove_splits=True, gpu=gpu)
-        video_timer.stop_timer()
-        print(f"CLAHE video {video_meta_data['video_name']} complete (elapsed time: {video_timer.elapsed_time_str}s) ...")
+    pool.terminate()
+    pool.join()
+    print(f"Joining {video_meta_data['video_name']} multiprocessed video...")
+    concatenate_videos_in_folder(in_folder=tempdir, save_path=save_path, remove_splits=True, gpu=gpu)
+    video_timer.stop_timer()
+    print(f"CLAHE video {video_meta_data['video_name']} complete (elapsed time: {video_timer.elapsed_time_str}s) ...")
 
 
-
-
+#_ = clahe_enhance_video_mp(file_path= r"D:\EPM_4\original\1.mp4")
 
 def extract_frame_range(file_path: Union[str, os.PathLike],
                         start_frame: int,

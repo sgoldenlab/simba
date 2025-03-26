@@ -137,6 +137,7 @@ from simba.ui.pop_ups.subset_feature_extractor_pop_up import \
 from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
     ThirdPartyAnnotatorAppenderPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
+from simba.ui.pop_ups.initialize_blob_tracking_pop_up import InitializeBlobTrackerPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
     BackgroundRemoverDirectoryPopUp, BackgroundRemoverSingleVideoPopUp,
     BoxBlurPopUp, BrightnessContrastPopUp, CalculatePixelsPerMMInVideoPopUp,
@@ -816,6 +817,12 @@ class App(object):
         batch_process_menu = Menu(menu)
         menu.add_cascade(label="Process Videos", menu=batch_process_menu)
         batch_process_menu.add_command(label="Batch pre-process videos", compound="left", image=self.menu_icons["factory"]["img"], command=lambda: BatchPreProcessPopUp(), font=Formats.FONT_REGULAR.value)
+
+        blob_tracking_menu = Menu(batch_process_menu)
+        blob_tracking_menu.add_command(label="Perform blob tracking", compound="left", image=self.menu_icons["bubble"]["img"], command=InitializeBlobTrackerPopUp, font=Formats.FONT_REGULAR.value)
+        blob_tracking_menu.add_command(label="Visualize blob tracking", compound="left", image=self.menu_icons["eye"]["img"], command=None, font=Formats.FONT_REGULAR.value)
+        batch_process_menu.add_cascade(label="Blob tracking...", compound="left", image=self.menu_icons["bubble"]["img"], menu=blob_tracking_menu, font=Formats.FONT_REGULAR.value)
+
 
         video_process_menu = Menu(menu)
         fps_menu = Menu(video_process_menu)

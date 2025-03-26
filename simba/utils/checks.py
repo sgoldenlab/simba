@@ -237,34 +237,27 @@ def check_float(
     return True, msg
 
 
-def check_iterable_length(
-    source: str,
-    val: int,
-    exact_accepted_length: Optional[int] = None,
-    max: Optional[int] = np.inf,
-    min: int = 1,
-) -> None:
-
+def check_iterable_length(source: str, val: int, exact_accepted_length: Optional[int] = None, max: Optional[int] = np.inf, min: int = 1, raise_error: bool = True) -> bool:
     if (not exact_accepted_length) and (not max) and (not min):
-        raise InvalidInputError(
-            msg=f"Provide exact_accepted_length or max and min values for {source}",
-            source=check_iterable_length.__name__,
-        )
+        if raise_error:
+            raise InvalidInputError(msg=f"Provide exact_accepted_length or max and min values for {source}", source=check_iterable_length.__name__)
+        else:
+            return False
     if exact_accepted_length:
         if val != exact_accepted_length:
-            raise InvalidInputError(
-                msg=f"{source} length is {val}, expected {exact_accepted_length}",
-                source=check_iterable_length.__name__,
-            )
-
+            if raise_error:
+                raise InvalidInputError(msg=f"{source} length is {val}, expected {exact_accepted_length}", source=check_iterable_length.__name__)
+            else:
+                return False
     elif (val > max) or (val < min):
-        raise InvalidInputError(
-            msg=f"{source} value {val} does not full-fill criterion: min {min}, max{max} ",
-            source=check_iterable_length.__name__,
-        )
+        if raise_error:
+            raise InvalidInputError(msg=f"{source} value {val} does not full-fill criterion: min {min}, max{max} ", source=check_iterable_length.__name__)
+        else:
+            return False
+    return True
 
 
-def check_instance(source: str, instance: object, accepted_types: Union[Tuple[Any], Any], raise_error: Optional[bool] = True) -> None:
+def check_instance(source: str, instance: object, accepted_types: Union[Tuple[Any], Any], raise_error: bool = True) -> bool:
     """
     Check if an instance is an acceptable type.
 
@@ -280,6 +273,7 @@ def check_instance(source: str, instance: object, accepted_types: Union[Tuple[An
             raise InvalidInputError(msg=msg, source=source)
         else:
             InvalidValueWarning(msg=msg, source=source)
+    return True
 
 
 def get_fn_ext(filepath: Union[os.PathLike, str]) -> (str, str, str):
@@ -628,21 +622,12 @@ def check_if_valid_rgb_str(
         return rgb
 
 
-def check_if_valid_rgb_tuple(data: Tuple[int, int, int]) -> bool:
-    check_instance(
-        source=check_if_valid_rgb_tuple.__name__, instance=data, accepted_types=tuple
-    )
-    check_iterable_length(
-        source=check_if_valid_rgb_tuple.__name__, val=len(data), exact_accepted_length=3
-    )
+def check_if_valid_rgb_tuple(data: Tuple[int, int, int], raise_error: bool = True) -> bool:
+    check_instance(source=check_if_valid_rgb_tuple.__name__, instance=data, accepted_types=tuple, raise_error=raise_error)
+    check_iterable_length(source=check_if_valid_rgb_tuple.__name__, val=len(data), exact_accepted_length=3, raise_error=raise_error)
     for i in range(len(data)):
-        check_int(
-            name="RGB value",
-            value=data[i],
-            max_value=255,
-            min_value=0,
-            raise_error=True,
-        )
+        check_int(name="RGB value", value=data[i], max_value=255, min_value=0, raise_error=raise_error)
+    return True
 
 
 def check_if_list_contains_values(
