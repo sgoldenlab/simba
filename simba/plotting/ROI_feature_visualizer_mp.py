@@ -17,7 +17,7 @@ from simba.roi_tools.ROI_feature_analyzer import ROIFeatureCreator
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_keys_exist_in_dict, check_int,
                                 check_valid_lst,
-                                check_video_and_data_frm_count_align)
+                                check_video_and_data_frm_count_align, check_valid_boolean)
 from simba.utils.data import slice_roi_dict_for_video
 from simba.utils.enums import Formats, TextOptions
 from simba.utils.errors import (BodypartColumnNotFoundError, NoFilesFoundError,
@@ -165,7 +165,8 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
                  video_path: Union[str, os.PathLike],
                  body_parts: List[str],
                  style_attr: Dict[str, Any],
-                 core_cnt: Optional[int] = -1):
+                 core_cnt: int = -1,
+                 gpu: bool = False):
 
         check_int(name=f"{self.__class__.__name__} core_cnt",value=core_cnt,min_value=-1,max_value=find_core_cnt()[0])
         if core_cnt == -1:
@@ -174,6 +175,8 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
         check_if_keys_exist_in_dict(data=style_attr,key=STYLE_KEYS,name=f"{self.__class__.__name__} style_attr")
+        check_valid_boolean(value=[gpu], source=f"{self.__class__.__name__} gpu", raise_error=True)
+        self.gpu = gpu
         if not os.path.isfile(self.roi_coordinates_path):
             raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path)
         self.read_roi_data()
@@ -226,10 +229,10 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
         add_spacer = TextOptions.FIRST_LINE_SPACING.value
         self.loc_dict = {}
         txt_strs = []
-        for animal_cnt, animal_name in enumerate(self.animal_names):
+        for animal_cnt, animal_bp_name in enumerate(self.animal_bp_names):
             for shape in self.shape_names:
-                txt_strs.append(animal_name + ' ' + shape + ' center distance')
-        longest_text_str = max(txt_strs, key=len)
+                txt_strs.append(animal_bp_name + ' ' + shape + ' center distance')
+        longest_text_str = str(max(txt_strs, key=len))
         self.font_size, x_spacer, y_spacer = PlottingMixin().get_optimal_font_scales(text=longest_text_str, accepted_px_width=int(self.video_meta_data["width"] / 2), accepted_px_height=int(self.video_meta_data["height"] / 15), text_thickness=TextOptions.TEXT_THICKNESS.value)
         self.circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(int(self.video_meta_data["height"]), int(self.video_meta_data["height"])), circle_frame_ratio=100)
         for animal_cnt, animal_data in self.bp_lk.items():
@@ -293,7 +296,7 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
             for cnt, result in enumerate(pool.imap(constants, frame_range, chunksize=self.multiprocess_chunksize)):
                print(f"Batch core {result+1}/{self.core_cnt} complete...")
             print(f"Joining {self.video_name} multi-processed video...")
-            concatenate_videos_in_folder(in_folder=self.save_temp_dir, save_path=self.save_path, video_format="mp4", remove_splits=True)
+            concatenate_videos_in_folder(in_folder=self.save_temp_dir, save_path=self.save_path, video_format="mp4", remove_splits=True, gpu=self.gpu)
             self.timer.stop_timer()
             pool.terminate()
             pool.join()

@@ -47,6 +47,7 @@ from simba.utils.read_write import (find_video_of_file, get_fn_ext,
                                     read_config_file, read_df,
                                     read_project_path_and_file_type,
                                     read_roi_data, write_df)
+from simba.utils.warnings import DuplicateNamesWarning
 
 
 def detect_bouts(data_df: pd.DataFrame, target_lst: List[str], fps: Union[int, float]) -> pd.DataFrame:
@@ -700,29 +701,17 @@ def slice_roi_dict_for_video(data: Dict[str, pd.DataFrame], video_name: str) -> 
     :return: Tuple with (i) a dictionary of the same shape as input data, and a list of the roi names for the sliced video.
     :rtype: Tuple[Dict[str, pd.DataFrame], List[str]]
     """
-    check_if_keys_exist_in_dict(
-        data=data,
-        key=[
-            Keys.ROI_RECTANGLES.value,
-            Keys.ROI_CIRCLES.value,
-            Keys.ROI_POLYGONS.value,
-        ],
-        name=slice_roi_dict_for_video.__name__,
-    )
+    check_if_keys_exist_in_dict(data=data, key=[Keys.ROI_RECTANGLES.value, Keys.ROI_CIRCLES.value, Keys.ROI_POLYGONS.value], name=slice_roi_dict_for_video.__name__)
     new_data, shape_names = {}, []
     for k, v in data.items():
-        check_instance(
-            source=f"{slice_roi_dict_for_video.__name__} {k}",
-            instance=v,
-            accepted_types=(pd.DataFrame,),
-        )
-        check_that_column_exist(
-            df=v, column_name="Video", file_name=slice_roi_dict_for_video.__name__
-        )
-        check_that_column_exist(
-            df=v, column_name="Name", file_name=slice_roi_dict_for_video.__name__
-        )
+        check_instance(source=f"{slice_roi_dict_for_video.__name__} {k}", instance=v, accepted_types=(pd.DataFrame,))
+        check_that_column_exist(df=v, column_name="Video", file_name=slice_roi_dict_for_video.__name__)
+        check_that_column_exist(df=v, column_name="Name", file_name=slice_roi_dict_for_video.__name__)
         v = v[v["Video"] == video_name]
+        duplicate_rois = v[v.duplicated(subset=['Video', 'Name'], keep=False)]
+        if len(duplicate_rois) > 0:
+            DuplicateNamesWarning(msg=f'The ROI data contains duplicate ROI names for video {video_name} and name(s) {list(duplicate_rois["Name"])} and shape {k}. SimBA is keeping one of them, but consider re-drawing your ROIs', source=slice_roi_dict_for_video.__name__)
+            v = v.drop_duplicates(subset=['Video', 'Name'], keep='first').reset_index(drop=True)
         new_data[k] = v.reset_index(drop=True)
         shape_names.extend((list(v["Name"].unique())))
     return new_data, shape_names

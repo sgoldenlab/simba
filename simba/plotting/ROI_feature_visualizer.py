@@ -116,11 +116,12 @@ class ROIfeatureVisualizer(ConfigReader):
         add_spacer = TextOptions.FIRST_LINE_SPACING.value
         self.loc_dict = {}
         txt_strs = []
-        for animal_cnt, animal_name in enumerate(self.animal_names):
+        for animal_cnt, animal_bp_name in enumerate(self.animal_bp_names):
             for shape in self.shape_names:
-                txt_strs.append(animal_name + ' ' + shape + ' center distance')
-        longest_text_str = max(txt_strs, key=len)
-        self.font_size, self.x_scaler, self.y_scaler = PlottingMixin().get_optimal_font_scales(text=longest_text_str, accepted_px_width=int(self.video_meta_data['width'] / 3), accepted_px_height=int(self.video_meta_data['height'] / 15), text_thickness=2)
+                txt_strs.append(animal_bp_name + ' ' + shape + ' center distance')
+        longest_text_str = str(max(txt_strs, key=len))
+        self.font_size, self.x_scaler, self.y_scaler = PlottingMixin().get_optimal_font_scales(text=longest_text_str, accepted_px_width=int(self.video_meta_data['width'] / 2), accepted_px_height=int(self.video_meta_data['height'] / 15), text_thickness=2)
+        print(self.x_scaler, self.y_scaler)
         self.circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(int(self.video_meta_data['width']), int(self.video_meta_data['height'])), circle_frame_ratio=100)
         for animal_cnt, animal_data in self.bp_lk.items():
             animal, animal_bp, _ = animal_data
@@ -132,7 +133,7 @@ class ROIfeatureVisualizer(ConfigReader):
                 self.loc_dict[animal_name][shape]["in_zone_text"] = f"{shape} {animal_name} in zone"
                 self.loc_dict[animal_name][shape]["distance_text"] = f"{shape} {animal_name} distance"
                 self.loc_dict[animal_name][shape]["in_zone_text_loc"] = (int(self.video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + 10) + self.y_scaler * add_spacer))
-                self.loc_dict[animal_name][shape]["in_zone_data_loc"] = (int(self.video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value + self.x_scaler), (self.video_meta_data["height"] - (self.video_meta_data["height"] + 10) + self.y_scaler * add_spacer))
+                self.loc_dict[animal_name][shape]["in_zone_data_loc"] = (int(self.video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value + self.x_scaler), (self.video_meta_data["height"] - (self.video_meta_data["height"] + TextOptions.BORDER_BUFFER_Y.value) + self.y_scaler * add_spacer))
                 add_spacer += 1
                 self.loc_dict[animal_name][shape]["distance_text_loc"] = (int(self.video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + 10) + self.y_scaler * add_spacer))
                 self.loc_dict[animal_name][shape]["distance_data_loc"] = (int(self.video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value + self.x_scaler), (self.video_meta_data["height"] - (self.video_meta_data["height"] + 10) + self.y_scaler * add_spacer))
@@ -225,6 +226,16 @@ class ROIfeatureVisualizer(ConfigReader):
             msg=f"Feature video {self.video_name} saved in {self.save_path} directory ...",
             elapsed_time=self.timer.elapsed_time_str,
         )
+
+
+# style_attr = {'roi_centers': True, 'roi_ear_tags': True, 'directionality': True, 'directionality_style': 'lines', 'border_color': (0, 0, 0), 'pose_estimation': True, 'animal_names': True}
+# test = ROIfeatureVisualizer(config_path=r"C:\troubleshooting\roi_duplicates\project_folder\project_config.ini",
+#                             video_path=r"C:\troubleshooting\roi_duplicates\project_folder\videos\2021-12-21_15-03-57_CO_Trimmed.mp4",
+#                             style_attr=style_attr,
+#                             body_parts=['Butt/Proximal Tail']) #'Butt/Proximal Tail'
+# test.run()
+
+
 
 
 # style_attr = {'roi_centers': True, 'roi_ear_tags': True, 'directionality': True, 'directionality_style': 'lines', 'border_color': (0, 0, 0), 'pose_estimation': True, 'animal_names': True}

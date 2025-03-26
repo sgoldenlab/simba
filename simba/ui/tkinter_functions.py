@@ -20,6 +20,7 @@ from PIL import ImageTk
 
 from simba.utils.enums import Defaults, Formats
 from simba.utils.lookups import get_icons_paths
+from simba.utils.read_write import get_fn_ext
 
 MENU_ICONS = get_icons_paths()
 
@@ -167,8 +168,9 @@ class FileSelect(Frame):
             file_selected = askopenfilename(title=self.title, parent=self.parent, initialdir=self.initialdir)
         if file_selected:
             if self.dropdown is not None:
-                self.dropdown.setChoices(os.path.basename(file_selected))
-                self.filePath.set(os.path.basename(file_selected))
+                _, name, _ = get_fn_ext(filepath=file_selected)
+                self.dropdown.setChoices(name)
+                self.filePath.set(name)
             else:
                 self.filePath.set(file_selected)
             self.entPath.configure(width=len(file_selected)+10)

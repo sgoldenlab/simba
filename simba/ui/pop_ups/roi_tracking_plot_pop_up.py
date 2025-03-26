@@ -21,7 +21,7 @@ from simba.utils.errors import NoDataError, ROICoordinatesNotFoundError
 from simba.utils.lookups import get_color_dict
 from simba.utils.read_write import (find_all_videos_in_directory,
                                     find_files_of_filetypes_in_directory,
-                                    str_2_bool)
+                                    str_2_bool, get_fn_ext)
 
 BP_SIZE_OPTIONS = list(range(1, 101, 1))
 BP_SIZE_OPTIONS.insert(0, 'AUTO')
@@ -128,10 +128,12 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
             else: v.enable()
 
     def run(self, multiple: bool):
+        print(self.video_file_paths)
         if multiple:
             video_paths = [v for k, v in self.video_file_paths.items() if k in self.videos_with_rois_and_data]
         else:
-            video_paths = [self.video_file_paths[self.single_video_dropdown.getChoices()]]
+            video_name = self.single_video_dropdown.getChoices().rsplit(".", 1)[0]
+            video_paths = [self.video_file_paths[video_name]]
         for video_path in video_paths:
             self.check_if_selected_video_path_exist_in_project(video_path=video_path)
         check_float(name="Body-part probability threshold", value=self.threshold_entry_box.entry_get, min_value=0.0, max_value=1.0)
@@ -169,6 +171,9 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
                 time.sleep(3)
         #
 
+
+
+#_ = VisualizeROITrackingPopUp(config_path=r"C:\troubleshooting\roi_duplicates\project_folder\project_config.ini")
 
 
 # _ = VisualizeROITrackingPopUp(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")

@@ -80,10 +80,7 @@ class ROI_ui(ROI_mixin, ConfigReader):
         self.define_ui.root.destroy()
         self.define_ui.root.quit()
 
-# ROI_ui(config_path=None,
-#        video_path=r"C:\troubleshooting\mitra\test\501_MA142_Gi_Saline_0515.mp4",
-#        roi_coordinates_path=r"C:\troubleshooting\mitra\test\.temp\ROI_definitions.h5",
-#        video_dir=r"C:\troubleshooting\mitra\test")
+#ROI_ui(config_path=None, video_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_CNO_0514.mp4", roi_coordinates_path=r"C:\troubleshooting\mitra\test\.temp\ROI_definitions.h5", video_dir=r"C:\troubleshooting\mitra\test")
 
 # ROI_ui(config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini",
 #        video_path=r'C:\troubleshooting\mouse_open_field\project_folder\videos\Video2.mp4')

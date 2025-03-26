@@ -146,7 +146,7 @@ class ROIPlotMultiprocess(ConfigReader):
                  body_parts: List[str],
                  style_attr: Dict[str, bool],
                  threshold: Optional[float] = 0.0,
-                 core_cnt: Optional[int] = -1,
+                 core_cnt: int = -1,
                  data_path: Optional[Union[str, os.PathLike]] = None,
                  save_path: Optional[Union[str, os.PathLike]] = None,
                  bp_colors: Optional[List[Tuple[int, int, int]]] = None,
@@ -318,7 +318,7 @@ class ROIPlotMultiprocess(ConfigReader):
                                           save_temp_directory=self.temp_folder,
                                           body_part_dict=self.bp_dict,
                                           input_video_path=self.video_path,
-                                          roi_dfs_dict=self.roi_dict,
+                                          roi_dfs_dict=self.sliced_roi_dict,
                                           roi_dict = self.roi_dict_,
                                           video_shape_names=self.shape_names,
                                           bp_colors=self.color_lst,
@@ -337,15 +337,14 @@ class ROIPlotMultiprocess(ConfigReader):
 
 
 # if __name__ == "__main__":
-#
-#     test = ROIPlotMultiprocess(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
-#                                video_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_Saline_0513.mp4",
-#                                body_parts=['Nose'],
+#     test = ROIPlotMultiprocess(config_path=r"C:\troubleshooting\roi_duplicates\project_folder\project_config.ini",
+#                                video_path=r"C:\troubleshooting\roi_duplicates\project_folder\videos\2021-12-21_15-03-57_CO_Trimmed.mp4",
+#                                body_parts=['Snout'],
 #                                style_attr={'show_body_part': True, 'show_animal_name': False},
 #                                bp_sizes=[20],
 #                                bp_colors=[(155, 255, 243)])
 #     test.run()
-
+#
 
 
 

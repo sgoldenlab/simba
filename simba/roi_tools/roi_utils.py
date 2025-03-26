@@ -163,6 +163,8 @@ def set_roi_metric_sizes(roi_dict: dict, px_conversion_factor: Union[int, float]
 def get_roi_df_from_dict(roi_dict: dict, video_name_nesting: Optional[bool] = False) -> Tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     """
     Helper create DataFrames from a shape dictionary.
+
+    If nesting is True, then the roi_dict has video name, and shape name keys.
     """
     rectangles_df, circles_df, polygon_df = pd.DataFrame(columns=get_rectangle_df_headers()), pd.DataFrame(columns=get_circle_df_headers()), pd.DataFrame(columns=get_polygon_df_headers())
     if not video_name_nesting:

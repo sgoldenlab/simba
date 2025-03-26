@@ -235,7 +235,7 @@ class ROIPlotter(ConfigReader):
             if ret:
                 img = cv2.copyMakeBorder(img, 0, 0, 0, int(self.video_meta["width"]),  borderType=cv2.BORDER_CONSTANT, value=[0, 0, 0])
                 img = self.__insert_texts(self.roi_dict_, img)
-                img = PlottingMixin.roi_dict_onto_img(img=img, roi_dict=self.roi_dict)
+                img = PlottingMixin.roi_dict_onto_img(img=img, roi_dict=self.sliced_roi_dict)
                 for animal_cnt, animal_name in enumerate(self.animal_names):
                     x, y, p = (self.data_df.loc[frame_cnt, self.bp_dict[animal_name]].fillna(0.0).values.astype(np.int32))
                     if (self.threshold <= p) and self.style_attr[SHOW_BODY_PARTS]:
@@ -257,6 +257,26 @@ class ROIPlotter(ConfigReader):
         writer.release()
         video_timer.stop_timer()
         stdout_success(msg=f"Video {self.video_name} created. Video saved at {self.save_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
+
+
+# test = ROIPlotter(config_path=r"C:\troubleshooting\roi_duplicates\project_folder\project_config.ini",
+#                   video_path=r"C:\troubleshooting\roi_duplicates\project_folder\videos\2021-12-21_15-03-57_CO_Trimmed.mp4",
+#                   body_parts=['Snout'],
+#                   style_attr={'show_body_part': True, 'show_animal_name': False})
+# test.run()
+
+
+
+# if __name__ == "__main__":
+#     test = ROIPlotMultiprocess(config_path=r"C:\troubleshooting\roi_duplicates\project_folder\project_config.ini",
+#                                video_path=r"C:\troubleshooting\roi_duplicates\project_folder\videos\2021-12-21_15-03-57_CO_Trimmed.mp4",
+#                                body_parts=['Snout'],
+#                                style_attr={'show_body_part': True, 'show_animal_name': False},
+#                                bp_sizes=[20],
+#                                bp_colors=[(155, 255, 243)])
+#     test.run()
+#
+
 
 # test = ROIPlotter(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #                   video_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_Saline_0513.mp4",
