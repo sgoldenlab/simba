@@ -102,6 +102,8 @@ from simba.ui.pop_ups.fsttc_pop_up import FSTTCPopUp
 from simba.ui.pop_ups.gantt_pop_up import GanttPlotPopUp
 from simba.ui.pop_ups.heatmap_clf_pop_up import HeatmapClfPopUp
 from simba.ui.pop_ups.heatmap_location_pop_up import HeatmapLocationPopup
+from simba.ui.pop_ups.initialize_blob_tracking_pop_up import \
+    InitializeBlobTrackerPopUp
 from simba.ui.pop_ups.interpolate_pop_up import InterpolatePopUp
 from simba.ui.pop_ups.kleinberg_pop_up import KleinbergPopUp
 from simba.ui.pop_ups.make_path_plot_pop_up import MakePathPlotPopUp
@@ -137,7 +139,6 @@ from simba.ui.pop_ups.subset_feature_extractor_pop_up import \
 from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
     ThirdPartyAnnotatorAppenderPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
-from simba.ui.pop_ups.initialize_blob_tracking_pop_up import InitializeBlobTrackerPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
     BackgroundRemoverDirectoryPopUp, BackgroundRemoverSingleVideoPopUp,
     BoxBlurPopUp, BrightnessContrastPopUp, CalculatePixelsPerMMInVideoPopUp,

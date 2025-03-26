@@ -1,21 +1,24 @@
 import os
-from typing import Union, Optional, Tuple
-import numpy as np
-import cv2
-from tkinter import *
-from PIL import Image, ImageTk
 from datetime import datetime
+from tkinter import *
+from typing import Optional, Tuple, Union
 
-from simba.utils.read_write import get_video_meta_data, read_frm_of_video
-from simba.video_processors.video_processing import create_average_frm
-from simba.ui.tkinter_functions import SimbaButton, CreateLabelFrameWithIcon, Entry_Box
-from simba.utils.enums import Formats
-from simba.utils.checks import check_int, check_str, check_instance, check_if_valid_img, check_valid_tuple
-from simba.utils.errors import FrameRangeError, InvalidVideoFileError
-from shapely.geometry import Polygon, MultiPolygon
+import cv2
+import numpy as np
+from PIL import Image, ImageTk
+from shapely.geometry import MultiPolygon, Polygon
+
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.image_mixin import ImageMixin
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        SimbaButton)
+from simba.utils.checks import (check_if_valid_img, check_instance, check_int,
+                                check_str, check_valid_tuple)
+from simba.utils.enums import Formats
+from simba.utils.errors import FrameRangeError, InvalidVideoFileError
 from simba.utils.printing import SimbaTimer
+from simba.utils.read_write import get_video_meta_data, read_frm_of_video
+from simba.video_processors.video_processing import create_average_frm
 
 FRAME_NAME = 'QUICK CHECK'
 

@@ -1,17 +1,23 @@
 import os
 from typing import Union
+
 import numpy as np
 import pandas as pd
-from simba.utils.data import resample_geometry_vertices
-from simba.utils.checks import check_valid_dict, check_if_dir_exists, check_nvidea_gpu_available, check_int, check_instance
 
-from simba.video_processors.video_processing import video_bg_subtraction, video_bg_subtraction_mp
+from simba.data_processors.find_animal_blob_location import (
+    get_blob_vertices_from_video, get_left_right_points,
+    get_nose_tail_from_vertices, stabilize_body_parts)
 from simba.mixins.geometry_mixin import GeometryMixin
-from simba.utils.read_write import read_pickle, get_video_meta_data, write_df, find_core_cnt, read_json, remove_files
-from simba.data_processors.find_animal_blob_location import get_blob_vertices_from_video, get_nose_tail_from_vertices, get_left_right_points, stabilize_body_parts
+from simba.utils.checks import (check_if_dir_exists, check_instance, check_int,
+                                check_nvidea_gpu_available, check_valid_dict)
+from simba.utils.data import resample_geometry_vertices, savgol_smoother
 from simba.utils.errors import SimBAGPUError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.data import savgol_smoother
+from simba.utils.read_write import (find_core_cnt, get_video_meta_data,
+                                    read_json, read_pickle, remove_files,
+                                    write_df)
+from simba.video_processors.video_processing import (video_bg_subtraction,
+                                                     video_bg_subtraction_mp)
 
 CENTER_X = 'center_x'
 CENTER_Y = 'center_y'
