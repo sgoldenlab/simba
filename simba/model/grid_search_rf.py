@@ -87,7 +87,15 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
             print(f"MODEL {config_cnt+1} settings")
             self.print_machine_model_information(meta_dict)
             print(f"# {len(self.feature_names)} features.")
-            self.rf_clf = self.clf_define(n_estimators=meta_dict[MLParamKeys.RF_ESTIMATORS.value],  max_depth=meta_dict[MLParamKeys.RF_MAX_DEPTH.value], max_features=meta_dict[MLParamKeys.RF_MAX_FEATURES.value], n_jobs=-1, criterion=meta_dict[MLParamKeys.RF_CRITERION.value], min_samples_leaf=meta_dict[MLParamKeys.MIN_LEAF.value], bootstrap=True, verbose=1, class_weight=meta_dict[MLParamKeys.CLASS_WEIGHTS.value])
+            self.rf_clf = self.clf_define(n_estimators=meta_dict[MLParamKeys.RF_ESTIMATORS.value],
+                                          max_depth=meta_dict[MLParamKeys.RF_MAX_DEPTH.value],
+                                          max_features=meta_dict[MLParamKeys.RF_MAX_FEATURES.value],
+                                          n_jobs=-1, criterion=meta_dict[MLParamKeys.RF_CRITERION.value],
+                                          min_samples_leaf=meta_dict[MLParamKeys.MIN_LEAF.value],
+                                          bootstrap=True,
+                                          verbose=1,
+                                          class_weight=meta_dict[MLParamKeys.CLASS_WEIGHTS.value],
+                                          cuda=meta_dict[MLParamKeys.CUDA.value])
             print(f"Fitting {self.clf_name} model...")
             self.rf_clf = self.clf_fit(clf=self.rf_clf, x_df=self.x_train, y_df=self.y_train)
             if (meta_dict[MLParamKeys.PERMUTATION_IMPORTANCE.value] in Options.PERFORM_FLAGS.value):
@@ -156,6 +164,13 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
             print(f"Classifier {self.clf_name}_{config_cnt} saved in directory {self.model_dir_out} ...")
         stdout_success(msg=f"All {len(list(self.meta_dicts.keys()))} model(s) and their evaluations complete. The models/evaluation files are saved in {self.model_dir_out} directory", source=self.__class__.__name__)
 
+
+# test = GridSearchRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+# test.run()
+
+
+# test = GridSearchRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+# test.run()
 
 
 #

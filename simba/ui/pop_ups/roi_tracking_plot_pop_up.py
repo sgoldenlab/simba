@@ -53,7 +53,7 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
 
         PopUpMixin.__init__(self, title="VISUALIZE ROI TRACKING", size=(800, 500), icon='shapes_small')
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI_DATA_PLOT.value)
-        self.threshold_entry_box = Entry_Box(self.settings_frm, "BODY-PART PROBABILITY THRESHOLD:", "35", value='0.0', justify='center', entry_box_width=self.longest_animal_name_len)
+        self.threshold_entry_box = Entry_Box(self.settings_frm, "BODY-PART PROBABILITY THRESHOLD:", "35", value='0.0', justify='center', entry_box_width=35)
         self.show_pose_estimation_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW POSE-ESTIMATED LOCATIONS:', label_width=35, value='TRUE', command=self._disable_clr)
         self.show_animal_name_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL NAMES:', label_width=35, value='FALSE')
         self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt)), dropdown_width=self.longest_animal_name_len, label='NUMBER OF CPU CORES:', label_width=35, value=1)
@@ -128,7 +128,6 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
             else: v.enable()
 
     def run(self, multiple: bool):
-        print(self.video_file_paths)
         if multiple:
             video_paths = [v for k, v in self.video_file_paths.items() if k in self.videos_with_rois_and_data]
         else:

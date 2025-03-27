@@ -341,7 +341,7 @@ def CreateLabelFrameWithIcon(parent: Union[Toplevel, LabelFrame, Canvas, Frame],
                              relief: str = 'flat',
                              width: Optional[int] = None,
                              font: tuple = Formats.FONT_HEADER.value,
-                             icon_link: Optional[Union[str, None]] = None):
+                             icon_link: Optional[Union[str, None]] = LabelFrame):
 
     icon = PIL.Image.open(MENU_ICONS[icon_name]["icon_path"])
     icon = ImageTk.PhotoImage(icon)

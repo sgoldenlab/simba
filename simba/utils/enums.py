@@ -678,6 +678,7 @@ class MLParamKeys(Enum):
     SAVE_TRAIN_TEST_FRM_IDX = "save_train_test_frm_idx"
     SHAP_MULTIPROCESS = "shap_multiprocess"
     CLASSIFIER_MAP = "classifier_map"
+    CUDA = "cuda"
 
 class TestPaths(Enum):
     CRITICAL_VALUES = "../simba/assets/lookups/critical_values_05.pickle"
@@ -780,3 +781,4 @@ class ENV_VARS(Enum):
     PRINT_EMOJIS = 'PRINT_EMOJIS'
     UNSUPERVISED_INTERFACE = 'UNSUPERVISED_INTERFACE'
     NUMBA_PRECOMPILE = 'NUMBA_PRECOMPILE'
+    CUML = 'CUML'

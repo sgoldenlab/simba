@@ -128,8 +128,7 @@ def create_shap_log(rf_clf: Union[str, os.PathLike, RandomForestClassifier],
     absent_x = x[absent_idx]
     X = np.vstack([target_x, absent_x]).astype(np.float32)
     Y = np.hstack([np.ones(target_x.shape[0]), np.zeros(absent_x.shape[0])]).astype(np.int32)
-    explainer = shap.explainers.GPUTree(model=rf_clf, data=None, model_output='raw',
-                                        feature_names='tree_path_dependent')
+    explainer = shap.explainers.GPUTree(model=rf_clf, data=None, model_output='raw', feature_names='tree_path_dependent')
     shap_values = explainer.shap_values(X, check_additivity=True)
     V = pd.DataFrame(shap_values[1], columns=x_names).astype(np.float32)
     sum = V.sum(axis=1)

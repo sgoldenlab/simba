@@ -900,15 +900,16 @@ class ConfigReader(object):
         return msg
 
     def create_logger(self) -> None:
-        if self.__class__ not in logging.Logger.manager.loggerDict.keys():
-            log_config = get_log_config()
-            log_config["handlers"]["file_handler"]["filename"] = os.path.join(
-                self.logs_path, "project_log.log"
-            )
-            logging.config.dictConfig(log_config)
-            self.logger = logging.getLogger(str(self.__class__))
-        if not os.path.isfile(os.path.join(self.logs_path, "project_log.log")):
-            self.logger.info(f"Logging initiated in project {self.project_path}...")
+        try:
+            if self.__class__ not in logging.Logger.manager.loggerDict.keys():
+                log_config = get_log_config()
+                log_config["handlers"]["file_handler"]["filename"] = os.path.join(self.logs_path, "project_log.log")
+                logging.config.dictConfig(log_config)
+                self.logger = logging.getLogger(str(self.__class__))
+            if not os.path.isfile(os.path.join(self.logs_path, "project_log.log")):
+                self.logger.info(f"Logging initiated in project {self.project_path}...")
+        except:
+            self.logger = None
 
     def create_third_part_append_logger(self, path: str) -> None:
         logger = logging.getLogger()

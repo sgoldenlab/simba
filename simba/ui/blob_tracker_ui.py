@@ -51,7 +51,7 @@ class BlobTrackingUI(PopUpMixin):
         check_if_dir_exists(in_dir=output_dir, create_if_not_exist=True, source=self.__class__.__name__)
         if os.path.isdir(output_dir):
             existing_files = find_files_of_filetypes_in_directory(directory=output_dir, extensions=['.json', '.csv', '.mp4', '.pickle'], raise_error=False, raise_warning=False)
-            if len(existing_files) > 0: raise InvalidInputError(msg=f'The selected output directory {output_dir} is not empty. Select an empry output directory where to save your tracking data', source=self.__class__.__name__)
+            if len(existing_files) > 0: raise InvalidInputError(msg=f'The selected output directory {output_dir} is not empty. Select an empty output directory where to save your tracking data', source=self.__class__.__name__)
         self.gpu_available = check_nvidea_gpu_available()
         self.in_videos = find_all_videos_in_directory(directory=input_dir, as_dict=True, raise_error=True)
         self.input_dir, self.output_dir = input_dir, output_dir

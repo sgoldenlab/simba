@@ -594,9 +594,9 @@ class ROI_mixin(ConfigReader):
     def save_video_rois(self):
         self.set_btn_clrs(btn=self.save_data_btn)
         other_rectangles_df, other_circles_df, other_polygons_df = get_roi_df_from_dict(roi_dict=self.other_roi_dict, video_name_nesting=True)
-        other_rectangles_df = other_rectangles_df.merge(self.rectangles_df, on=['Video', 'Name'], how='left', indicator=True).query('_merge == "left_only"').drop(columns=['_merge']).reset_index(drop=True)
-        other_circles_df = other_circles_df.merge(self.circles_df, on=['Video', 'Name'], how='left', indicator=True).query('_merge == "left_only"').drop(columns=['_merge']).reset_index(drop=True)
-        other_polygons_df = other_polygons_df.merge(self.polygon_df, on=['Video', 'Name'], how='left', indicator=True).query('_merge == "left_only"').drop(columns=['_merge']).reset_index(drop=True)
+        # other_rectangles_df = other_rectangles_df.merge(self.rectangles_df, on=['Video', 'Name'], how='left', indicator=True).query('_merge == "left_only"').drop(columns=['_merge']).reset_index(drop=True)
+        # other_circles_df = other_circles_df.merge(self.circles_df, on=['Video', 'Name'], how='left', indicator=True).query('_merge == "left_only"').drop(columns=['_merge']).reset_index(drop=True)
+        # other_polygons_df = other_polygons_df.merge(self.polygon_df, on=['Video', 'Name'], how='left', indicator=True).query('_merge == "left_only"').drop(columns=['_merge']).reset_index(drop=True)
         out_rectangles = pd.concat([self.rectangles_df, other_rectangles_df], axis=0).reset_index(drop=True)
         out_circles = pd.concat([self.circles_df, other_circles_df], axis=0).reset_index(drop=True)
         out_polygons = pd.concat([self.polygon_df, other_polygons_df], axis=0).reset_index(drop=True)

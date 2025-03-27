@@ -239,6 +239,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         for k in self.btn_icons.keys():
             self.btn_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname(__file__), self.btn_icons[k]["icon_path"])))
 
+        simongui.iconphoto(False, self.btn_icons['SimBA_logo_3_small']["img"])
+
         tab_style = ttk.Style()
         tab_style.configure(style='Custom.TNotebook.Tab', font=Formats.FONT_REGULAR.value)
         tab_style.map('Custom.TNotebook.Tab', foreground=[('selected', 'navy')], font=[('selected', Formats.FONT_REGULAR_BOLD.value)])

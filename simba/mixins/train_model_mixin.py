@@ -1,15 +1,13 @@
 __author__ = "Simon Nilsson"
 
 import warnings
-
-#from . import cuRF
-from sklearn.ensemble import RandomForestClassifier as cuRF
-
 warnings.filterwarnings("ignore")
+import os
+from simba.mixins import cuRF
 import ast
 import concurrent
 import configparser
-import os
+
 import pickle
 import platform
 from concurrent.futures import ProcessPoolExecutor
@@ -33,8 +31,7 @@ from sklearn.feature_selection import VarianceThreshold
 from sklearn.inspection import partial_dependence, permutation_importance
 from sklearn.metrics import classification_report, precision_recall_curve
 from sklearn.model_selection import ShuffleSplit, learning_curve
-from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer,
-                                   StandardScaler)
+from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer, StandardScaler)
 from sklearn.tree import export_graphviz
 from sklearn.utils import parallel_backend
 from tabulate import tabulate
@@ -42,7 +39,8 @@ from tabulate import tabulate
 try:
     from dtreeviz.trees import dtreeviz, tree
 except:
-    import dtreeviz
+    from dtreeviz import dtreeviz
+    from dtreeviz.trees import tree
 
 import functools
 import multiprocessing
@@ -71,8 +69,7 @@ from simba.utils.data import (detect_bouts, detect_bouts_multiclass,
                               get_library_version)
 from simba.utils.enums import (OS, ConfigKey, Defaults, Dtypes, Formats,
                                Methods, MLParamKeys, Options)
-from simba.utils.errors import (ClassifierInferenceError, ColumnNotFoundError,
-                                CorruptedFileError, DataHeaderError,
+from simba.utils.errors import (ClassifierInferenceError, CorruptedFileError, DataHeaderError,
                                 FaultyTrainingSetError,
                                 FeatureNumberMismatchError, InvalidInputError,
                                 MissingColumnsError, NoDataError,
@@ -86,10 +83,12 @@ from simba.utils.read_write import (find_core_cnt, get_fn_ext,
 from simba.utils.warnings import (MissingUserInputWarning,
                                   MultiProcessingFailedWarning,
                                   NoModuleWarning, NotEnoughDataWarning,
-                                  SamplingWarning, ShapWarning)
+                                  SamplingWarning, ShapWarning, GPUToolsWarning)
 
 plt.switch_backend("agg")
 
+CUML = 'cuml'
+SKLEARN = 'sklearn'
 
 class TrainModelMixin(object):
     """Train model methods"""
@@ -393,15 +392,23 @@ class TrainModelMixin(object):
         cv = ShuffleSplit(n_splits=shuffle_splits, test_size=tt_size)
         if multiclass:
             scoring = None
-        if platform.system() == "Darwin":
+
+        if platform.system() == "Darwin" or platform.system() == "Linux":
             with parallel_backend("threading", n_jobs=-2):
-                train_sizes, train_scores, test_scores = learning_curve(estimator=rf_clf, X=x_df, y=y_df, cv=cv,
-                                                                        scoring=scoring, shuffle=False, verbose=0,
-                                                                        train_sizes=np.linspace(0.01, 1.0,
-                                                                                                dataset_splits),
+                train_sizes, train_scores, test_scores = learning_curve(estimator=rf_clf,
+                                                                        X=x_df.values,
+                                                                        y=y_df,
+                                                                        cv=cv,
+                                                                        scoring=scoring,
+                                                                        shuffle=False,
+                                                                        verbose=0,
+                                                                        train_sizes=np.linspace(0.01, 1.0, dataset_splits),
                                                                         error_score="raise")
         else:
-            train_sizes, train_scores, test_scores = learning_curve(estimator=rf_clf, X=x_df, y=y_df, cv=cv,
+            train_sizes, train_scores, test_scores = learning_curve(estimator=rf_clf,
+                                                                    X=x_df,
+                                                                    y=y_df,
+                                                                    cv=cv,
                                                                     scoring=scoring, shuffle=False, n_jobs=-1,
                                                                     verbose=0,
                                                                     train_sizes=np.linspace(0.01, 1.0, dataset_splits),
@@ -460,7 +467,7 @@ class TrainModelMixin(object):
         print("Calculating PR curves...")
         timer = SimbaTimer(start=True)
         if not multiclass:
-            p = rf_clf.predict_proba(x_df)[:, 1]
+            p = self.clf_predict_proba(clf=rf_clf,x_df=x_df, multiclass=False, model_name=clf_name, data_path=None)
             precision, recall, thresholds = precision_recall_curve(y_df, p, pos_label=1)
             pr_df = pd.DataFrame()
             pr_df["PRECISION"] = precision
@@ -524,26 +531,29 @@ class TrainModelMixin(object):
 
         print("Visualizing example decision tree using graphviz...")
         timer = SimbaTimer(start=True)
-        estimator = rf_clf.estimators_[tree_id]
-        if save_file_no != None:
-            dot_name = os.path.join(save_dir, f"{clf_name}_{save_file_no}_tree.dot")
-            file_name = os.path.join(save_dir, f"{clf_name}_{save_file_no}_tree.pdf")
+        if CUML in str(rf_clf.__module__).lower():
+            GPUToolsWarning(msg="Can't visualize trees using CUML")
         else:
-            dot_name = os.path.join(save_dir, f"{clf_name}_tree.dot")
-            file_name = os.path.join(save_dir, f"{clf_name}_tree.pdf")
-        export_graphviz(estimator,
-                        out_file=dot_name,
-                        filled=True,
-                        rounded=True,
-                        special_characters=False,
-                        impurity=False,
-                        class_names=class_names,
-                        feature_names=feature_names)
+            estimator = rf_clf.estimators_[tree_id]
+            if save_file_no != None:
+                dot_name = os.path.join(save_dir, f"{clf_name}_{save_file_no}_tree.dot")
+                file_name = os.path.join(save_dir, f"{clf_name}_{save_file_no}_tree.pdf")
+            else:
+                dot_name = os.path.join(save_dir, f"{clf_name}_tree.dot")
+                file_name = os.path.join(save_dir, f"{clf_name}_tree.pdf")
+            export_graphviz(estimator,
+                            out_file=dot_name,
+                            filled=True,
+                            rounded=True,
+                            special_characters=False,
+                            impurity=False,
+                            class_names=class_names,
+                            feature_names=feature_names)
 
-        command = f"dot {dot_name} -T pdf -o {file_name} -Gdpi=600"
-        call(command, shell=True)
-        timer.stop_timer()
-        print(f'Example tree saved at {file_name} (elapsed time: {timer.elapsed_time_str}s)')
+            command = f"dot {dot_name} -T pdf -o {file_name} -Gdpi=600"
+            call(command, shell=True)
+            timer.stop_timer()
+            print(f'Example tree saved at {file_name} (elapsed time: {timer.elapsed_time_str}s)')
 
     def cuml_rf_x_importances(self, nodes: dict, n_features: int) -> np.ndarray:
         """
@@ -752,9 +762,10 @@ class TrainModelMixin(object):
         :parameter str save_dir: Directory where to save output in csv file format.
         """
 
-        clf = tree.DecisionTreeClassifier(max_depth=5, random_state=666)
-        clf.fit(x_train, y_train)
+        print('Creating example decision tree using dtreeviz ....')
         try:
+            clf = tree.DecisionTreeClassifier(max_depth=5, random_state=666)
+            clf.fit(x_train, y_train)
             svg_tree = dtreeviz(
                 clf,
                 x_train,
@@ -770,9 +781,7 @@ class TrainModelMixin(object):
                 ticks_fontsize=8,
                 fontname="Arial",
             )
-            save_path = os.path.join(
-                save_dir, clf_name + "_fancy_decision_tree_example.svg"
-            )
+            save_path = os.path.join(save_dir, f"{clf_name}_fancy_decision_tree_example.svg")
             svg_tree.save(save_path)
         except:
             NoModuleWarning(
@@ -794,7 +803,7 @@ class TrainModelMixin(object):
         return data_arr, obs_per_split
 
     def create_shap_log(self,
-                        rf_clf: RandomForestClassifier,
+                        rf_clf: Union[RandomForestClassifier, cuRF],
                         x: Union[pd.DataFrame, np.ndarray],
                         y: Union[pd.DataFrame, pd.Series, np.ndarray],
                         x_names: List[str],
@@ -849,105 +858,108 @@ class TrainModelMixin(object):
         >>> TrainModelMixin.create_shap_log(rf_clf=rf_clf, x=x, y=y, x_names=feature_names, clf_name='test', save_it=10, cnt_present=50, cnt_absent=50, plot=True, save_dir=r'/Users/simon/Desktop/feltz')
         """
 
-        print("Calculating SHAP values (SINGLE CORE)...")
-        timer = SimbaTimer(start=True)
-        check_instance(source='create_shap_log', instance=rf_clf, accepted_types=(RandomForestClassifier,))
-        check_instance(source=f'{TrainModelMixin.create_shap_log.__name__} x', instance=x, accepted_types=(np.ndarray, pd.DataFrame))
-        check_instance(source=f'{TrainModelMixin.create_shap_log.__name__} y', instance=y, accepted_types=(np.ndarray, pd.Series, pd.DataFrame))
-        if isinstance(x, pd.DataFrame):
-            check_valid_dataframe(df=x, source=f'{TrainModelMixin.create_shap_log.__name__} x', valid_dtypes=Formats.NUMERIC_DTYPES.value)
-            x = x.values
-        else:
-            check_valid_array(data=x, source=f'{TrainModelMixin.create_shap_log.__name__} x', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
-        if isinstance(y, pd.DataFrame):
-            check_valid_dataframe(df=y, source=f'{TrainModelMixin.create_shap_log.__name__} y', valid_dtypes=Formats.NUMERIC_DTYPES.value, max_axis_1=1)
-            y = y.values
-        else:
-            if isinstance(y, pd.Series):
-                y = y.values
-            check_valid_array(data=y, source=f'{TrainModelMixin.create_shap_log.__name__} y', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
-        check_valid_lst(data=x_names, source=f'{TrainModelMixin.create_shap_log.__name__} x_names', valid_dtypes=(str,), exact_len=x.shape[1])
-        check_str(name=f'{TrainModelMixin.create_shap_log.__name__} clf_name', value=clf_name)
-        check_int(name=f'{TrainModelMixin.create_shap_log.__name__} cnt_present', value=cnt_present, min_value=1)
-        check_int(name=f'{TrainModelMixin.create_shap_log.__name__} cnt_absent', value=cnt_absent, min_value=1)
-        check_instance(source=f'{TrainModelMixin.create_shap_log.__name__} save_it', instance=save_it, accepted_types=(type(None), int))
-        if save_it is not None and save_dir is None:
-            ShapWarning(msg='Omitting save_it as save_dir is None')
-        if save_it is not None:
-            check_int(name=f'{TrainModelMixin.create_shap_log.__name__} save_it', value=save_it, min_value=1)
-        if save_it is None or save_it > x.shape[0]:
-            save_it = x.shape[0]
-        if save_file_suffix is not None:
-            check_int(name=f'{TrainModelMixin.create_shap_log.__name__} save_it', value=save_it, min_value=0)
-        check_valid_lst(data=list(x_names), valid_dtypes=(str,), exact_len=x.shape[1])
-        check_valid_boolean(value=[verbose, plot], source=f'{TrainModelMixin.create_shap_log.__name__} verbose, plot')
-        df = pd.DataFrame(np.hstack((x, y.reshape(-1, 1))), columns=x_names + [clf_name])
-        del x; del y
-        present_df, absent_df = df[df[clf_name] == 1], df[df[clf_name] == 0]
-        if len(present_df) == 0:
-            raise NoDataError(msg=f'Cannot calculate SHAP values: no target PRESENT annotations detected.', source=TrainModelMixin.create_shap_log.__name__)
-        elif len(absent_df) == 0:
-            raise NoDataError(msg=f'Cannot calculate SHAP values: no target ABSENT annotations detected.', source=TrainModelMixin.create_shap_log.__name__)
-        if len(present_df) < cnt_present:
-            NotEnoughDataWarning(msg=f"Train data contains {len(present_df)} behavior-present annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_present)}). SimBA will calculate shap scores for the {len(present_df)} behavior-present frames available", source=TrainModelMixin.create_shap_log.__name__)
-            cnt_present = len(present_df)
-        if len(absent_df) < cnt_absent:
-            NotEnoughDataWarning(msg=f"Train data contains {len(absent_df)} behavior-absent annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_absent)}). SimBA will calculate shap scores for the {len(absent_df)} behavior-absent frames available", source=TrainModelMixin.create_shap_log.__name__, )
-            cnt_absent = len(absent_df)
-        out_shap_path, out_raw_path, img_save_path, df_save_paths, summary_dfs, img = None, None, None, None, None, None
-        if save_dir is not None:
-            check_if_dir_exists(in_dir=save_dir)
-            if save_file_suffix is not None:
-                check_int(name=f'{TrainModelMixin.create_shap_log.__name__} save_file_no', value=save_file_suffix, min_value=0)
-                out_shap_path = os.path.join(save_dir, f"SHAP_values_{save_file_suffix}_{clf_name}.csv")
-                out_raw_path = os.path.join(save_dir, f"RAW_SHAP_feature_values_{save_file_suffix}_{clf_name}.csv")
-                df_save_paths = {'PRESENT': os.path.join(save_dir, f"SHAP_summary_{clf_name}_PRESENT_{save_file_suffix}.csv"), 'ABSENT': os.path.join(save_dir, f"SHAP_summary_{clf_name}_ABSENT_{save_file_suffix}.csv")}
-                img_save_path = os.path.join(save_dir, f"SHAP_summary_line_graph_{clf_name}_{save_file_suffix}.png")
+        if SKLEARN in str(rf_clf.__module__).lower():
+            print("Calculating SHAP values (SINGLE CORE)...")
+            timer = SimbaTimer(start=True)
+            check_instance(source='create_shap_log', instance=rf_clf, accepted_types=(RandomForestClassifier,))
+            check_instance(source=f'{TrainModelMixin.create_shap_log.__name__} x', instance=x, accepted_types=(np.ndarray, pd.DataFrame))
+            check_instance(source=f'{TrainModelMixin.create_shap_log.__name__} y', instance=y, accepted_types=(np.ndarray, pd.Series, pd.DataFrame))
+            if isinstance(x, pd.DataFrame):
+                check_valid_dataframe(df=x, source=f'{TrainModelMixin.create_shap_log.__name__} x', valid_dtypes=Formats.NUMERIC_DTYPES.value)
+                x = x.values
             else:
-                out_shap_path = os.path.join(save_dir, f"SHAP_values_{clf_name}.csv")
-                out_raw_path = os.path.join(save_dir, f"RAW_SHAP_feature_values_{clf_name}.csv")
-                df_save_paths = {'PRESENT': os.path.join(save_dir, f"SHAP_summary_{clf_name}_PRESENT.csv"), 'ABSENT': os.path.join(save_dir, f"SHAP_summary_{clf_name}_ABSENT.csv")}
-                img_save_path = os.path.join(save_dir, f"SHAP_summary_line_graph_{clf_name}.png")
-        shap_x = pd.concat([present_df.sample(cnt_present, replace=False), absent_df.sample(cnt_absent, replace=False)], axis=0).reset_index(drop=True)
-        shap_y = shap_x[clf_name].values.flatten()
-        shap_x = shap_x.drop([clf_name], axis=1)
-        explainer = TrainModelMixin().define_tree_explainer(clf=rf_clf)
-        expected_value = explainer.expected_value[1]
-        raw_df = pd.DataFrame(columns=x_names)
-        shap_headers = list(x_names) + ["Expected_value", "Sum", "Prediction_probability", clf_name]
-        shap_df = pd.DataFrame(columns=shap_headers)
-        for cnt, frame in enumerate(range(len(shap_x))):
-            shap_frm_timer = SimbaTimer(start=True)
-            frame_data = shap_x.iloc[[frame]]
-            frame_shap = explainer.shap_values(frame_data, check_additivity=False)[1][0].tolist()
-            frame_shap.extend((expected_value, sum(frame_shap), rf_clf.predict_proba(frame_data)[0][1], shap_y[cnt]))
-            raw_df.loc[len(raw_df)] = list(shap_x.iloc[frame])
-            shap_df.loc[len(shap_df)] = frame_shap
-            if ((cnt % save_it == 0) or (cnt == len(shap_x) - 1) and (cnt != 0) and (save_dir is not None)):
-                print(f"Saving SHAP data after {cnt} iterations...")
+                check_valid_array(data=x, source=f'{TrainModelMixin.create_shap_log.__name__} x', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+            if isinstance(y, pd.DataFrame):
+                check_valid_dataframe(df=y, source=f'{TrainModelMixin.create_shap_log.__name__} y', valid_dtypes=Formats.NUMERIC_DTYPES.value, max_axis_1=1)
+                y = y.values
+            else:
+                if isinstance(y, pd.Series):
+                    y = y.values
+                check_valid_array(data=y, source=f'{TrainModelMixin.create_shap_log.__name__} y', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+            check_valid_lst(data=x_names, source=f'{TrainModelMixin.create_shap_log.__name__} x_names', valid_dtypes=(str,), exact_len=x.shape[1])
+            check_str(name=f'{TrainModelMixin.create_shap_log.__name__} clf_name', value=clf_name)
+            check_int(name=f'{TrainModelMixin.create_shap_log.__name__} cnt_present', value=cnt_present, min_value=1)
+            check_int(name=f'{TrainModelMixin.create_shap_log.__name__} cnt_absent', value=cnt_absent, min_value=1)
+            check_instance(source=f'{TrainModelMixin.create_shap_log.__name__} save_it', instance=save_it, accepted_types=(type(None), int))
+            if save_it is not None and save_dir is None:
+                ShapWarning(msg='Omitting save_it as save_dir is None')
+            if save_it is not None:
+                check_int(name=f'{TrainModelMixin.create_shap_log.__name__} save_it', value=save_it, min_value=1)
+            if save_it is None or save_it > x.shape[0]:
+                save_it = x.shape[0]
+            if save_file_suffix is not None:
+                check_int(name=f'{TrainModelMixin.create_shap_log.__name__} save_it', value=save_it, min_value=0)
+            check_valid_lst(data=list(x_names), valid_dtypes=(str,), exact_len=x.shape[1])
+            check_valid_boolean(value=[verbose, plot], source=f'{TrainModelMixin.create_shap_log.__name__} verbose, plot')
+            df = pd.DataFrame(np.hstack((x, y.reshape(-1, 1))), columns=x_names + [clf_name])
+            del x; del y
+            present_df, absent_df = df[df[clf_name] == 1], df[df[clf_name] == 0]
+            if len(present_df) == 0:
+                raise NoDataError(msg=f'Cannot calculate SHAP values: no target PRESENT annotations detected.', source=TrainModelMixin.create_shap_log.__name__)
+            elif len(absent_df) == 0:
+                raise NoDataError(msg=f'Cannot calculate SHAP values: no target ABSENT annotations detected.', source=TrainModelMixin.create_shap_log.__name__)
+            if len(present_df) < cnt_present:
+                NotEnoughDataWarning(msg=f"Train data contains {len(present_df)} behavior-present annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_present)}). SimBA will calculate shap scores for the {len(present_df)} behavior-present frames available", source=TrainModelMixin.create_shap_log.__name__)
+                cnt_present = len(present_df)
+            if len(absent_df) < cnt_absent:
+                NotEnoughDataWarning(msg=f"Train data contains {len(absent_df)} behavior-absent annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_absent)}). SimBA will calculate shap scores for the {len(absent_df)} behavior-absent frames available", source=TrainModelMixin.create_shap_log.__name__, )
+                cnt_absent = len(absent_df)
+            out_shap_path, out_raw_path, img_save_path, df_save_paths, summary_dfs, img = None, None, None, None, None, None
+            if save_dir is not None:
+                check_if_dir_exists(in_dir=save_dir)
+                if save_file_suffix is not None:
+                    check_int(name=f'{TrainModelMixin.create_shap_log.__name__} save_file_no', value=save_file_suffix, min_value=0)
+                    out_shap_path = os.path.join(save_dir, f"SHAP_values_{save_file_suffix}_{clf_name}.csv")
+                    out_raw_path = os.path.join(save_dir, f"RAW_SHAP_feature_values_{save_file_suffix}_{clf_name}.csv")
+                    df_save_paths = {'PRESENT': os.path.join(save_dir, f"SHAP_summary_{clf_name}_PRESENT_{save_file_suffix}.csv"), 'ABSENT': os.path.join(save_dir, f"SHAP_summary_{clf_name}_ABSENT_{save_file_suffix}.csv")}
+                    img_save_path = os.path.join(save_dir, f"SHAP_summary_line_graph_{clf_name}_{save_file_suffix}.png")
+                else:
+                    out_shap_path = os.path.join(save_dir, f"SHAP_values_{clf_name}.csv")
+                    out_raw_path = os.path.join(save_dir, f"RAW_SHAP_feature_values_{clf_name}.csv")
+                    df_save_paths = {'PRESENT': os.path.join(save_dir, f"SHAP_summary_{clf_name}_PRESENT.csv"), 'ABSENT': os.path.join(save_dir, f"SHAP_summary_{clf_name}_ABSENT.csv")}
+                    img_save_path = os.path.join(save_dir, f"SHAP_summary_line_graph_{clf_name}.png")
+            shap_x = pd.concat([present_df.sample(cnt_present, replace=False), absent_df.sample(cnt_absent, replace=False)], axis=0).reset_index(drop=True)
+            shap_y = shap_x[clf_name].values.flatten()
+            shap_x = shap_x.drop([clf_name], axis=1)
+            explainer = TrainModelMixin().define_tree_explainer(clf=rf_clf)
+            expected_value = explainer.expected_value[1]
+            raw_df = pd.DataFrame(columns=x_names)
+            shap_headers = list(x_names) + ["Expected_value", "Sum", "Prediction_probability", clf_name]
+            shap_df = pd.DataFrame(columns=shap_headers)
+            for cnt, frame in enumerate(range(len(shap_x))):
+                shap_frm_timer = SimbaTimer(start=True)
+                frame_data = shap_x.iloc[[frame]]
+                frame_shap = explainer.shap_values(frame_data, check_additivity=False)[1][0].tolist()
+                frame_shap.extend((expected_value, sum(frame_shap), rf_clf.predict_proba(frame_data)[0][1], shap_y[cnt]))
+                raw_df.loc[len(raw_df)] = list(shap_x.iloc[frame])
+                shap_df.loc[len(shap_df)] = frame_shap
+                if ((cnt % save_it == 0) or (cnt == len(shap_x) - 1) and (cnt != 0) and (save_dir is not None)):
+                    print(f"Saving SHAP data after {cnt} iterations...")
+                    shap_df.to_csv(out_shap_path)
+                    raw_df.to_csv(out_raw_path)
+                shap_frm_timer.stop_timer()
+                print(f"SHAP frame: {cnt + 1} / {len(shap_x)}, elapsed time: {shap_frm_timer.elapsed_time_str}...")
+            if plot:
+                shap_computer = ShapAggregateStatisticsCalculator(classifier_name=clf_name,
+                                                                  shap_df=shap_df,
+                                                                  shap_baseline_value=int(expected_value * 100),
+                                                                  save_dir=None)
+                summary_dfs, img = shap_computer.run()
+                if save_dir is not None:
+                    summary_dfs['PRESENT'].to_csv(df_save_paths['PRESENT'])
+                    summary_dfs['ABSENT'].to_csv(df_save_paths['ABSENT'])
+                    cv2.imwrite(img_save_path, img)
+
+            timer.stop_timer()
+            if save_dir is not None and verbose:
                 shap_df.to_csv(out_shap_path)
                 raw_df.to_csv(out_raw_path)
-            shap_frm_timer.stop_timer()
-            print(f"SHAP frame: {cnt + 1} / {len(shap_x)}, elapsed time: {shap_frm_timer.elapsed_time_str}...")
-        if plot:
-            shap_computer = ShapAggregateStatisticsCalculator(classifier_name=clf_name,
-                                                              shap_df=shap_df,
-                                                              shap_baseline_value=int(expected_value * 100),
-                                                              save_dir=None)
-            summary_dfs, img = shap_computer.run()
-            if save_dir is not None:
-                summary_dfs['PRESENT'].to_csv(df_save_paths['PRESENT'])
-                summary_dfs['ABSENT'].to_csv(df_save_paths['ABSENT'])
-                cv2.imwrite(img_save_path, img)
+                stdout_success(msg=f"SHAP calculations complete! Results saved at {out_shap_path} and {out_raw_path}", elapsed_time=timer.elapsed_time_str, source=TrainModelMixin.create_shap_log.__name__)
 
-        timer.stop_timer()
-        if save_dir is not None and verbose:
-            shap_df.to_csv(out_shap_path)
-            raw_df.to_csv(out_raw_path)
-            stdout_success(msg=f"SHAP calculations complete! Results saved at {out_shap_path} and {out_raw_path}", elapsed_time=timer.elapsed_time_str, source=TrainModelMixin.create_shap_log.__name__)
-
-        if not save_dir:
-            return shap_df, raw_df, summary_dfs, img
+            if not save_dir:
+                return shap_df, raw_df, summary_dfs, img
+        else:
+            GPUToolsWarning(msg=f'Cannot compute SHAP scores using cuml random forest model. To compute SHAP scores, turn off cuda. Alternatively, for GPU solution, see simba/data_processors/cuda/create_shap_log.create_shap_log')
 
     def print_machine_model_information(self, model_dict: dict) -> None:
         """
@@ -957,22 +969,8 @@ class TrainModelMixin(object):
 
         """
 
-        table_view = [
-            ["Model name", model_dict[MLParamKeys.CLASSIFIER_NAME.value]],
-            ["Ensemble method", "RF"],
-            ["Estimators (trees)", model_dict[MLParamKeys.RF_ESTIMATORS.value]],
-            ["Max features", model_dict[MLParamKeys.RF_MAX_FEATURES.value]],
-            [
-                "Under sampling setting",
-                model_dict[MLParamKeys.UNDERSAMPLE_SETTING.value],
-            ],
-            ["Under sampling ratio", model_dict[MLParamKeys.UNDERSAMPLE_RATIO.value]],
-            ["Over sampling setting", model_dict[MLParamKeys.OVERSAMPLE_SETTING.value]],
-            ["Over sampling ratio", model_dict[MLParamKeys.OVERSAMPLE_RATIO.value]],
-            ["criterion", model_dict[MLParamKeys.RF_CRITERION.value]],
-            ["Min sample leaf", model_dict[MLParamKeys.MIN_LEAF.value]],
-        ]
-        table = tabulate(table_view, ["Setting", "value"], tablefmt="grid")
+        table_view = [[key, model_dict[key]] for key in model_dict]
+        table = tabulate(table_view, headers=["SETTING", "VALUE"], tablefmt="grid")
         print(f"{table} {Defaults.STR_SPLIT_DELIMITER.value}TABLE")
 
     def create_meta_data_csv_training_one_model(self, meta_data_lst: list, clf_name: str,
@@ -1447,20 +1445,17 @@ class TrainModelMixin(object):
                                           class_weight=class_weight)
 
         else:
-            if cuRF is not None:
-                if max_depth is None:
-                    max_depth = 50
+            if CUML in str(cuRF.__module__).lower():
+                if max_depth is None or max_depth > 32:
+                    max_depth = 32
                 return cuRF(n_estimators=n_estimators,
-                            split_criterion=criterion,
                             bootstrap=bootstrap,
                             max_depth=max_depth,
                             max_features=max_features,
                             min_samples_leaf=min_samples_leaf,
-                            verbose=6)
+                            verbose=True)
             else:
-                raise SimBAModuleNotFoundError(
-                    msg='SimBA could not find the cuml library for GPU machine learning algorithms.',
-                    source=self.__class__.__name__)
+                raise SimBAModuleNotFoundError(msg='SimBA could not find the cuml library for GPU machine learning algorithms. Set CUML to False in the SimBA model parameters, or import CUML environment variable using `export CUML=True`', source=self.__class__.__name__)
 
     def clf_fit(self,
                 clf: Union[RandomForestClassifier, cuRF],
@@ -1783,97 +1778,100 @@ class TrainModelMixin(object):
         >>> y = pd.Series(np.random.randint(0, 2, (9000,)))
         """
 
-        timer = SimbaTimer(start=True)
-        check_instance(source=f'{TrainModelMixin.create_shap_log_mp.__name__} rf_clf', instance=rf_clf, accepted_types=(RandomForestClassifier,))
-        check_instance(source=f'{TrainModelMixin.create_shap_log_mp.__name__} x', instance=x, accepted_types=(np.ndarray, pd.DataFrame))
-        check_instance(source=f'{TrainModelMixin.create_shap_log_mp.__name__} y', instance=y, accepted_types=(np.ndarray, pd.Series, pd.DataFrame))
-        if isinstance(x, pd.DataFrame):
-            check_valid_dataframe(df=x, source=f'{TrainModelMixin.create_shap_log_mp.__name__} x', valid_dtypes=Formats.NUMERIC_DTYPES.value)
-            x = x.values
-        else:
-            check_valid_array(data=x, source=f'{TrainModelMixin.create_shap_log_mp.__name__} x', accepted_ndims=(2,),  accepted_dtypes=Formats.NUMERIC_DTYPES.value)
-        if isinstance(y, pd.DataFrame):
-            check_valid_dataframe(df=y, source=f'{TrainModelMixin.create_shap_log_mp.__name__} y', valid_dtypes=Formats.NUMERIC_DTYPES.value, max_axis_1=1)
-            y = y.values
-        else:
-            if isinstance(y, pd.Series):
-                y = y.values
-            check_valid_array(data=y, source=f'{TrainModelMixin.create_shap_log_mp.__name__} y', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
-        check_valid_lst(data=x_names, source=f'{TrainModelMixin.create_shap_log_mp.__name__} x_names', valid_dtypes=(str,), exact_len=x.shape[1])
-        check_str(name=f'{TrainModelMixin.create_shap_log_mp.__name__} clf_name', value=clf_name)
-        check_int(name=f'{TrainModelMixin.create_shap_log_mp.__name__} cnt_present', value=cnt_present, min_value=1)
-        check_int(name=f'{TrainModelMixin.create_shap_log_mp.__name__} cnt_absent', value=cnt_absent, min_value=1)
-        check_int(name=f'{TrainModelMixin.create_shap_log_mp.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
-        check_int(name=f'{TrainModelMixin.create_shap_log_mp.__name__} chunk_size', value=chunk_size, min_value=1)
-        check_valid_boolean(value=[verbose, plot], source=f'{TrainModelMixin.create_shap_log_mp.__name__} verbose, plot')
-        core_cnt = [find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt][0]
-        df = pd.DataFrame(np.hstack((x, y.reshape(-1, 1))), columns=x_names + [clf_name])
-        del x; del y
-        present_df, absent_df = df[df[clf_name] == 1], df[df[clf_name] == 0]
-        if len(present_df) == 0:
-            raise NoDataError(msg=f'Cannot calculate SHAP values: no target PRESENT annotations detected.', source=TrainModelMixin.create_shap_log_mp.__name__)
-        elif len(absent_df) == 0:
-            raise NoDataError(msg=f'Cannot calculate SHAP values: no target ABSENT annotations detected.', source=TrainModelMixin.create_shap_log_mp.__name__)
-        if len(present_df) < cnt_present:
-            NotEnoughDataWarning(msg=f"Train data contains {len(present_df)} behavior-present annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_present)}). SimBA will calculate shap scores for the {len(present_df)} behavior-present frames available", source=TrainModelMixin.create_shap_log_mp.__name__)
-            cnt_present = len(present_df)
-        if len(absent_df) < cnt_absent:
-            NotEnoughDataWarning(msg=f"Train data contains {len(absent_df)} behavior-absent annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_absent)}). SimBA will calculate shap scores for the {len(absent_df)} behavior-absent frames available", source=TrainModelMixin.create_shap_log_mp.__name__)
-            cnt_absent = len(absent_df)
-        shap_data = pd.concat([present_df.sample(cnt_present, replace=False), absent_df.sample(cnt_absent, replace=False)], axis=0).reset_index(drop=True)
-        batch_cnt = max(1, int(np.ceil(len(shap_data) / chunk_size)))
-        shap_data = np.array_split(shap_data, batch_cnt)
-        shap_data = [(x, y) for x, y in enumerate(shap_data)]
-        explainer = TrainModelMixin().define_tree_explainer(clf=rf_clf)
-        expected_value = explainer.expected_value[1]
-        shap_results, shap_raw = [], []
-        print(f"Computing {cnt_present + cnt_absent} SHAP values. Follow progress in OS terminal... (CORES: {core_cnt}, CHUNK SIZE: {chunk_size})")
-        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
-            constants = functools.partial(TrainModelMixin._create_shap_mp_helper, explainer=explainer, clf_name=clf_name, verbose=verbose)
-            for cnt, result in enumerate(pool.imap(constants, shap_data, chunksize=1)):
-                proba = TrainModelMixin().clf_predict_proba(clf=rf_clf, x_df=shap_data[result[1]][1].drop(clf_name, axis=1), model_name=clf_name).reshape(-1, 1)
-                shap_sum = np.sum(result[0], axis=1).reshape(-1, 1)
-                batch_shap_results = np.hstack((result[0], np.full((result[0].shape[0]), expected_value).reshape(-1, 1), shap_sum + expected_value, proba, shap_data[result[1]][1][clf_name].values.reshape(-1, 1))).astype(np.float32)
-                shap_results.append(batch_shap_results)
-                shap_raw.append(shap_data[result[1]][1].drop(clf_name, axis=1))
-                if verbose:
-                    print(f"Completed SHAP care batch (Batch {result[1] + 1}/{len(shap_data)}).")
-
-        pool.terminate(); pool.join()
-        shap_df = pd.DataFrame(data=np.row_stack(shap_results), columns=list(x_names) + ["Expected_value", "Sum", "Prediction_probability", clf_name])
-        raw_df = pd.DataFrame(data=np.row_stack(shap_raw), columns=list(x_names))
-        out_shap_path, out_raw_path, img_save_path, df_save_paths, summary_dfs, img = None, None, None, None, None, None
-        if save_dir is not None:
-            check_if_dir_exists(in_dir=save_dir)
-            if save_file_suffix is not None:
-                check_int(name=f'{TrainModelMixin.create_shap_log_mp.__name__} save_file_no', value=save_file_suffix, min_value=0)
-                out_shap_path = os.path.join(save_dir, f"SHAP_values_{save_file_suffix}_{clf_name}.csv")
-                out_raw_path = os.path.join(save_dir, f"RAW_SHAP_feature_values_{save_file_suffix}_{clf_name}.csv")
-                df_save_paths = {'PRESENT': os.path.join(save_dir, f"SHAP_summary_{clf_name}_PRESENT_{save_file_suffix}.csv"), 'ABSENT': os.path.join(save_dir, f"SHAP_summary_{clf_name}_ABSENT_{save_file_suffix}.csv")}
-                img_save_path = os.path.join(save_dir, f"SHAP_summary_line_graph_{clf_name}_{save_file_suffix}.png")
+        if SKLEARN in str(rf_clf.__module__).lower():
+            timer = SimbaTimer(start=True)
+            check_instance(source=f'{TrainModelMixin.create_shap_log_mp.__name__} rf_clf', instance=rf_clf, accepted_types=(RandomForestClassifier,))
+            check_instance(source=f'{TrainModelMixin.create_shap_log_mp.__name__} x', instance=x, accepted_types=(np.ndarray, pd.DataFrame))
+            check_instance(source=f'{TrainModelMixin.create_shap_log_mp.__name__} y', instance=y, accepted_types=(np.ndarray, pd.Series, pd.DataFrame))
+            if isinstance(x, pd.DataFrame):
+                check_valid_dataframe(df=x, source=f'{TrainModelMixin.create_shap_log_mp.__name__} x', valid_dtypes=Formats.NUMERIC_DTYPES.value)
+                x = x.values
             else:
-                out_shap_path = os.path.join(save_dir, f"SHAP_values_{clf_name}.csv")
-                out_raw_path = os.path.join(save_dir, f"RAW_SHAP_feature_values_{clf_name}.csv")
-                df_save_paths = {'PRESENT': os.path.join(save_dir, f"SHAP_summary_{clf_name}_PRESENT.csv"), 'ABSENT': os.path.join(save_dir, f"SHAP_summary_{clf_name}_ABSENT.csv")}
-                img_save_path = os.path.join(save_dir, f"SHAP_summary_line_graph_{clf_name}.png")
+                check_valid_array(data=x, source=f'{TrainModelMixin.create_shap_log_mp.__name__} x', accepted_ndims=(2,),  accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+            if isinstance(y, pd.DataFrame):
+                check_valid_dataframe(df=y, source=f'{TrainModelMixin.create_shap_log_mp.__name__} y', valid_dtypes=Formats.NUMERIC_DTYPES.value, max_axis_1=1)
+                y = y.values
+            else:
+                if isinstance(y, pd.Series):
+                    y = y.values
+                check_valid_array(data=y, source=f'{TrainModelMixin.create_shap_log_mp.__name__} y', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+            check_valid_lst(data=x_names, source=f'{TrainModelMixin.create_shap_log_mp.__name__} x_names', valid_dtypes=(str,), exact_len=x.shape[1])
+            check_str(name=f'{TrainModelMixin.create_shap_log_mp.__name__} clf_name', value=clf_name)
+            check_int(name=f'{TrainModelMixin.create_shap_log_mp.__name__} cnt_present', value=cnt_present, min_value=1)
+            check_int(name=f'{TrainModelMixin.create_shap_log_mp.__name__} cnt_absent', value=cnt_absent, min_value=1)
+            check_int(name=f'{TrainModelMixin.create_shap_log_mp.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
+            check_int(name=f'{TrainModelMixin.create_shap_log_mp.__name__} chunk_size', value=chunk_size, min_value=1)
+            check_valid_boolean(value=[verbose, plot], source=f'{TrainModelMixin.create_shap_log_mp.__name__} verbose, plot')
+            core_cnt = [find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt][0]
+            df = pd.DataFrame(np.hstack((x, y.reshape(-1, 1))), columns=x_names + [clf_name])
+            del x; del y
+            present_df, absent_df = df[df[clf_name] == 1], df[df[clf_name] == 0]
+            if len(present_df) == 0:
+                raise NoDataError(msg=f'Cannot calculate SHAP values: no target PRESENT annotations detected.', source=TrainModelMixin.create_shap_log_mp.__name__)
+            elif len(absent_df) == 0:
+                raise NoDataError(msg=f'Cannot calculate SHAP values: no target ABSENT annotations detected.', source=TrainModelMixin.create_shap_log_mp.__name__)
+            if len(present_df) < cnt_present:
+                NotEnoughDataWarning(msg=f"Train data contains {len(present_df)} behavior-present annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_present)}). SimBA will calculate shap scores for the {len(present_df)} behavior-present frames available", source=TrainModelMixin.create_shap_log_mp.__name__)
+                cnt_present = len(present_df)
+            if len(absent_df) < cnt_absent:
+                NotEnoughDataWarning(msg=f"Train data contains {len(absent_df)} behavior-absent annotations. This is less the number of frames you specified to calculate shap values for ({str(cnt_absent)}). SimBA will calculate shap scores for the {len(absent_df)} behavior-absent frames available", source=TrainModelMixin.create_shap_log_mp.__name__)
+                cnt_absent = len(absent_df)
+            shap_data = pd.concat([present_df.sample(cnt_present, replace=False), absent_df.sample(cnt_absent, replace=False)], axis=0).reset_index(drop=True)
+            batch_cnt = max(1, int(np.ceil(len(shap_data) / chunk_size)))
+            shap_data = np.array_split(shap_data, batch_cnt)
+            shap_data = [(x, y) for x, y in enumerate(shap_data)]
+            explainer = TrainModelMixin().define_tree_explainer(clf=rf_clf)
+            expected_value = explainer.expected_value[1]
+            shap_results, shap_raw = [], []
+            print(f"Computing {cnt_present + cnt_absent} SHAP values. Follow progress in OS terminal... (CORES: {core_cnt}, CHUNK SIZE: {chunk_size})")
+            with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
+                constants = functools.partial(TrainModelMixin._create_shap_mp_helper, explainer=explainer, clf_name=clf_name, verbose=verbose)
+                for cnt, result in enumerate(pool.imap(constants, shap_data, chunksize=1)):
+                    proba = TrainModelMixin().clf_predict_proba(clf=rf_clf, x_df=shap_data[result[1]][1].drop(clf_name, axis=1), model_name=clf_name).reshape(-1, 1)
+                    shap_sum = np.sum(result[0], axis=1).reshape(-1, 1)
+                    batch_shap_results = np.hstack((result[0], np.full((result[0].shape[0]), expected_value).reshape(-1, 1), shap_sum + expected_value, proba, shap_data[result[1]][1][clf_name].values.reshape(-1, 1))).astype(np.float32)
+                    shap_results.append(batch_shap_results)
+                    shap_raw.append(shap_data[result[1]][1].drop(clf_name, axis=1))
+                    if verbose:
+                        print(f"Completed SHAP care batch (Batch {result[1] + 1}/{len(shap_data)}).")
 
-            shap_df.to_csv(out_shap_path); raw_df.to_csv(out_raw_path)
-        if plot:
-            shap_computer = ShapAggregateStatisticsCalculator(classifier_name=clf_name,
-                                                              shap_df=shap_df,
-                                                              shap_baseline_value=int(expected_value * 100),
-                                                              save_dir=None)
-            summary_dfs, img = shap_computer.run()
+            pool.terminate(); pool.join()
+            shap_df = pd.DataFrame(data=np.row_stack(shap_results), columns=list(x_names) + ["Expected_value", "Sum", "Prediction_probability", clf_name])
+            raw_df = pd.DataFrame(data=np.row_stack(shap_raw), columns=list(x_names))
+            out_shap_path, out_raw_path, img_save_path, df_save_paths, summary_dfs, img = None, None, None, None, None, None
             if save_dir is not None:
-                summary_dfs['PRESENT'].to_csv(df_save_paths['PRESENT'])
-                summary_dfs['ABSENT'].to_csv(df_save_paths['ABSENT'])
-                cv2.imwrite(img_save_path, img)
+                check_if_dir_exists(in_dir=save_dir)
+                if save_file_suffix is not None:
+                    check_int(name=f'{TrainModelMixin.create_shap_log_mp.__name__} save_file_no', value=save_file_suffix, min_value=0)
+                    out_shap_path = os.path.join(save_dir, f"SHAP_values_{save_file_suffix}_{clf_name}.csv")
+                    out_raw_path = os.path.join(save_dir, f"RAW_SHAP_feature_values_{save_file_suffix}_{clf_name}.csv")
+                    df_save_paths = {'PRESENT': os.path.join(save_dir, f"SHAP_summary_{clf_name}_PRESENT_{save_file_suffix}.csv"), 'ABSENT': os.path.join(save_dir, f"SHAP_summary_{clf_name}_ABSENT_{save_file_suffix}.csv")}
+                    img_save_path = os.path.join(save_dir, f"SHAP_summary_line_graph_{clf_name}_{save_file_suffix}.png")
+                else:
+                    out_shap_path = os.path.join(save_dir, f"SHAP_values_{clf_name}.csv")
+                    out_raw_path = os.path.join(save_dir, f"RAW_SHAP_feature_values_{clf_name}.csv")
+                    df_save_paths = {'PRESENT': os.path.join(save_dir, f"SHAP_summary_{clf_name}_PRESENT.csv"), 'ABSENT': os.path.join(save_dir, f"SHAP_summary_{clf_name}_ABSENT.csv")}
+                    img_save_path = os.path.join(save_dir, f"SHAP_summary_line_graph_{clf_name}.png")
 
-        timer.stop_timer()
-        if save_dir and verbose:
-            stdout_success(msg=f'SHAP data saved in {save_dir}', source=TrainModelMixin.create_shap_log_mp.__name__, elapsed_time=timer.elapsed_time_str)
-        if not save_dir:
-            return shap_df, raw_df, summary_dfs, img
+                shap_df.to_csv(out_shap_path); raw_df.to_csv(out_raw_path)
+            if plot:
+                shap_computer = ShapAggregateStatisticsCalculator(classifier_name=clf_name,
+                                                                  shap_df=shap_df,
+                                                                  shap_baseline_value=int(expected_value * 100),
+                                                                  save_dir=None)
+                summary_dfs, img = shap_computer.run()
+                if save_dir is not None:
+                    summary_dfs['PRESENT'].to_csv(df_save_paths['PRESENT'])
+                    summary_dfs['ABSENT'].to_csv(df_save_paths['ABSENT'])
+                    cv2.imwrite(img_save_path, img)
+
+            timer.stop_timer()
+            if save_dir and verbose:
+                stdout_success(msg=f'SHAP data saved in {save_dir}', source=TrainModelMixin.create_shap_log_mp.__name__, elapsed_time=timer.elapsed_time_str)
+            if not save_dir:
+                return shap_df, raw_df, summary_dfs, img
+        else:
+            GPUToolsWarning(msg=f'Cannot compute SHAP scores using cuml random forest model. To compute SHAP scores, turn off cuda. Alternatively, for GPU solution, see simba/data_processors/cuda/create_shap_log.create_shap_log')
 
     def check_df_dataset_integrity(self, df: pd.DataFrame, file_name: str, logs_path: Union[str, os.PathLike]) -> None:
         """
@@ -2196,6 +2194,11 @@ class TrainModelMixin(object):
                 errors.append(check_if_valid_input(name="SAVE TRAIN AND TEST FRAME INDEXES", input=meta_dict[MLParamKeys.SAVE_TRAIN_TEST_FRM_IDX.value], options=Options.RUN_OPTIONS_FLAGS.value, raise_error=False)[1])
             else:
                 meta_dict[MLParamKeys.SAVE_TRAIN_TEST_FRM_IDX.value] = False
+
+            if MLParamKeys.CUDA.value in meta_dict.keys():
+                errors.append(check_if_valid_input(MLParamKeys.CUDA.value, input=meta_dict[MLParamKeys.CUDA.value], options=Options.RUN_OPTIONS_FLAGS.value, raise_error=False)[1])
+            else:
+                meta_dict[MLParamKeys.CUDA.value] = False
 
             errors = [x for x in errors if x != ""]
             if errors:
@@ -2524,6 +2527,12 @@ class TrainModelMixin(object):
             raise NoDataError(msg=f"All feature columns show a variance below the {variance_threshold} threshold. Thus, no data remain for analysis.", source=TrainModelMixin.find_low_variance_fields.__name__)
         return low_variance_fields
 
+
+
+
+
+# trainer = TrainModelMixin()
+# trainer.clf_define(cuda=True)
 
 # from simba.utils.read_write import read_simba_meta_files
 # test = TrainModelMixin()
