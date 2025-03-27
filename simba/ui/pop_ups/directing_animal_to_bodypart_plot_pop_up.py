@@ -20,7 +20,7 @@ from simba.utils.read_write import get_file_name_info_in_directory
 class DirectingAnimalToBodyPartVisualizerPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
         ConfigReader.__init__(self, config_path=config_path)
-        PopUpMixin.__init__(self, title="CREATE ANIMAL DIRECTION TO BODY PART VIDEOS")
+        PopUpMixin.__init__(self, title="CREATE ANIMAL DIRECTION TO BODY PART VIDEOS", icon='eye')
         self.color_lst = list(self.colors_dict.keys())
         self.color_lst.insert(0, "Random")
         self.size_lst = list(range(1, 11))

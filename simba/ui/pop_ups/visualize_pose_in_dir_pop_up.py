@@ -36,7 +36,7 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
     """
     def __init__(self):
 
-        PopUpMixin.__init__(self, title="VISUALIZE POSE ESTIMATION DATA", size=(800, 800))
+        PopUpMixin.__init__(self, title="VISUALIZE POSE ESTIMATION DATA", size=(800, 800), icon='pose')
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.keypoint_size_dropdown = SimBADropDown(parent=self.settings_frm, label='KEY-POINT SIZES', label_width=30, dropdown_width=20, value=AUTO, command=None, dropdown_options=KEYPOINT_SIZES)
         self.video_slice_dropdown = SimBADropDown(parent=self.settings_frm, label="VIDEO SECTION (SECONDS):", label_width=30, dropdown_width=20, value=ENTIRE_VIDEOS, command=None, dropdown_options=VIDEO_LENGTHS)

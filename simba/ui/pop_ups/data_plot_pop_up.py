@@ -19,7 +19,7 @@ from simba.utils.read_write import get_file_name_info_in_directory
 class DataPlotterPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
 
-        PopUpMixin.__init__(self, title="CREATE DATA PLOTS")
+        PopUpMixin.__init__(self, title="CREATE DATA PLOTS", icon='data_table')
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         self.color_lst = list(self.colors_dict.keys())
         self.data_path = os.path.join(self.project_path, Paths.OUTLIER_CORRECTED.value)

@@ -63,7 +63,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
         self.distance_mm = read_config_entry(self.config, ConfigKey.FRAME_SETTINGS.value, ConfigKey.DISTANCE_MM.value, Dtypes.FLOAT.value,0.00)
         self.video_paths = find_files_of_filetypes_in_directory(directory=self.video_dir, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True, as_dict=True)
         self.max_char_vid_name = len(max(self.video_paths.keys(), key=len))
-        PopUpMixin.__init__(self, title="VIDEO INFO", size=(1550, 800))
+        PopUpMixin.__init__(self, title="VIDEO INFO", size=(1550, 800), icon='video')
         self.TABLE_COL_WIDTHS = ["5", self.max_char_vid_name + 5, "18", "18", "18", "18", "18", "18"]
 
 

@@ -35,7 +35,7 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
             raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path, source=self.__class__.__name__)
         if len(self.machine_results_paths) == 0:
             raise NoDataError(f'Cannot compute ROI by classifier data: No data exist in {self.machine_results_dir} directory.', source=self.__class__.__name__)
-        PopUpMixin.__init__(self, title="CLASSIFICATIONS BY ROI")
+        PopUpMixin.__init__(self, title="CLASSIFICATIONS BY ROI", icon='shapes_small')
         self.read_roi_data()
         roi_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT ROIs", icon_name='roi')
         roi_frm.grid(row=0, column=0, sticky=NW)

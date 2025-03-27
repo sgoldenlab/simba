@@ -28,7 +28,7 @@ class ROIVideoTable(ConfigReader, PopUpMixin):
                  config_path: Union[str, os.PathLike]):
 
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False, create_logger=False)
-        PopUpMixin.__init__(self, title="PROJECT VIDEOS: ROI TABLE", size=(720, 960))
+        PopUpMixin.__init__(self, title="PROJECT VIDEOS: ROI TABLE", size=(720, 960), icon='data_table')
         self.video_dict = find_all_videos_in_directory(directory=self.video_dir, as_dict=True, raise_error=False)
         if len(list(self.video_dict.keys())) == 0:
             raise NoFilesFoundError(msg=f'Cannot draw ROIs: the {self.video_dir} directory does not contain any video files.', source=self.__class__.__name__)

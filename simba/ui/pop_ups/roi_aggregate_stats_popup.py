@@ -27,7 +27,7 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         if len(self.outlier_corrected_paths) == 0:
             raise NoROIDataError(msg=f'No data found in {self.outlier_corrected_dir} directory. Create data before analyzing ROI time data', source=self.__class__.__name__)
 
-        PopUpMixin.__init__(self, title="ROI AGGREGATE STATISTICS ANALYSIS")
+        PopUpMixin.__init__(self, title="ROI AGGREGATE STATISTICS ANALYSIS", icon='data_table')
         self.config_path = config_path
         self.animal_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMAL(S)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI_DATA_ANALYSIS.value)
         self.animal_cnt_dropdown = DropDownMenu(self.animal_cnt_frm, "# OF ANIMALS", list(range(1, self.animal_cnt + 1)), labelwidth=20)

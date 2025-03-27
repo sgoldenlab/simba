@@ -52,7 +52,7 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
         self.max_video_name_len = len(max(self.video_list, key=len))
         self.directing_viable = NORMAL if self.check_directionality_viable()[0] else DISABLED
         self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
-        PopUpMixin.__init__(self, title="VISUALIZE ROI FEATURES")
+        PopUpMixin.__init__(self, title="VISUALIZE ROI FEATURES", icon='shapes_small')
         FeatureExtractionMixin.__init__(self, config_path=self.config_path)
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings', icon_link=Links.ROI_FEATURES_PLOT.value)
         self.threshold_entry_box = Entry_Box(self.settings_frm, "PROBABILITY THRESHOLD:", "25", value=0.0, entry_box_width=15)

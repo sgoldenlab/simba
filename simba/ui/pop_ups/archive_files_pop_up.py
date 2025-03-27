@@ -13,7 +13,7 @@ from simba.utils.read_write import archive_processed_files
 
 class ArchiveProcessedFilesPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
-        PopUpMixin.__init__(self, title="ARCHIVE PROCESSED FILES")
+        PopUpMixin.__init__(self, title="ARCHIVE PROCESSED FILES", icon='archive')
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         archive_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header='ARCHIVE PROCESSED FILES', icon_name=Keys.DOCUMENTATION.value, icon_link=Links.SCENARIO_4.value)
         self.archive_eb = Entry_Box(archive_frm, "ARCHIVE DIRECTORY NAME:", "25")

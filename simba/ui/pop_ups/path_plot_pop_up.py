@@ -30,7 +30,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.files_found = list(set(list(self.machine_results_files.keys()) + list(self.outlier_corrected_files.keys())))
         if len(self.files_found) == 0:
             raise NoFilesFoundError(msg=f'No data files found inside the {self.outlier_corrected_dir} or the {self.machine_results_dir} directory', source=self.__class__.__name__)
-        PopUpMixin.__init__(self, title="CREATE PATH PLOTS", size=(550, 850))
+        PopUpMixin.__init__(self, title="CREATE PATH PLOTS", size=(550, 850), icon='path_2')
         self.resolution_options = deepcopy(self.resolutions)
         self.resolution_options.insert(0, "As input")
         self.bg_clr_options = deepcopy(list(self.colors_dict.keys()))

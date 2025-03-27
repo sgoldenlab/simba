@@ -31,7 +31,7 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
 
     def __init__(self, config_path: Union[str, os.PathLike]):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
-        PopUpMixin.__init__(self, title="MACHINE MODEL SETTINGS", size=(450, 800))
+        PopUpMixin.__init__(self, title="MACHINE MODEL SETTINGS", size=(450, 800), icon='equation_small')
         if not os.path.exists(self.configs_meta_dir): os.makedirs(self.configs_meta_dir)
 
         self.clf_options = Options.CLF_MODELS.value

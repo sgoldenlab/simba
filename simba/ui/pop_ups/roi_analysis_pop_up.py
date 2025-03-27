@@ -19,7 +19,7 @@ class ROIAnalysisPopUp(ConfigReader, PopUpMixin):
     """
     def __init__(self, config_path: Union[str, os.PathLike]):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
-        PopUpMixin.__init__(self, title="ROI ANALYSIS", size=(400, 400))
+        PopUpMixin.__init__(self, title="ROI ANALYSIS", size=(400, 400), icon='shapes_small')
         self.animal_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMALS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI_DATA_ANALYSIS.value)
         self.animal_cnt_dropdown = DropDownMenu(self.animal_cnt_frm, "# of animals", list(range(1, self.animal_cnt + 1)), labelwidth=20)
         self.animal_cnt_dropdown.setChoices(1)

@@ -36,8 +36,7 @@ from simba.roi_tools.roi_utils import (change_roi_dict_video_name,
                                        get_vertices_hexagon,
                                        get_video_roi_data_from_dict,
                                        set_roi_metric_sizes)
-from simba.sandbox.roi_tkinter.interactive_roi_modifier_tkinter import \
-    InteractiveROIModifier
+from simba.roi_tools.interactive_roi_modifier_tkinter import InteractiveROIModifier
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, SimbaButton, SimBALabel,
                                         get_menu_icons)

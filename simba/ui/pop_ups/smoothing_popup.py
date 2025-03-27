@@ -24,7 +24,7 @@ class SmoothingPopUp(PopUpMixin, ConfigReader):
     >>> SmoothingPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
     """
     def __init__(self, config_path: Union[str, os.PathLike]):
-        PopUpMixin.__init__(self, title="SMOOTH POSE-ESTIMATION DATA")
+        PopUpMixin.__init__(self, title="SMOOTH POSE-ESTIMATION DATA", icon='smooth')
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         self.config_path = config_path
 

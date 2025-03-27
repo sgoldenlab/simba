@@ -56,7 +56,7 @@ class SpontaneousAlternationPopUp(ConfigReader, PopUpMixin):
             directory=self.video_dir, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value
         )
         self.video_names = [get_fn_ext(x)[1] for x in video_files]
-        PopUpMixin.__init__(self, title="SPONTANEOUS ALTERNATION CALCULATOR")
+        PopUpMixin.__init__(self, title="SPONTANEOUS ALTERNATION CALCULATOR", icon='t')
         self.config_path = config_path
         self.arm_dict = self.create_dropdown_frame(
             main_frm=self.main_frm,

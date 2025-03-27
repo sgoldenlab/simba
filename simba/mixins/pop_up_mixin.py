@@ -61,8 +61,11 @@ class PopUpMixin(object):
         if config_path:
             ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         if icon is not None:
-            if icon in list(self.menu_icons.keys()):
-                self.root.iconphoto(False, self.menu_icons[icon]["img"])
+            try:
+                if icon in list(self.menu_icons.keys()):
+                    self.root.iconphoto(False, self.menu_icons[icon]["img"])
+            except:
+                pass
 
     def create_clf_checkboxes(self,
                               main_frm: Union[Frame, LabelFrame, Toplevel, Canvas],

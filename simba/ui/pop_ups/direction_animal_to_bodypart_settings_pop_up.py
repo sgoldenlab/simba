@@ -17,7 +17,7 @@ from simba.utils.printing import stdout_success
 
 class DirectionAnimalToBodyPartSettingsPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
-        PopUpMixin.__init__(self, title="ANIMAL To BODY PART SETTINGS")
+        PopUpMixin.__init__(self, title="ANIMAL To BODY PART SETTINGS", icon='eye')
         ConfigReader.__init__(self, config_path=config_path)
         self.animal_bps = {}
         for animal_name, animal_data in self.animal_bp_dict.items():

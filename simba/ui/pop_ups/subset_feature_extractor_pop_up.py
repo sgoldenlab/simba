@@ -45,7 +45,7 @@ class FeatureSubsetExtractorPopUp(PopUpMixin, ConfigReader):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         if len(self.outlier_corrected_paths) == 0:
             raise NoDataError(msg=f'Cannot append feature subsets: No data found in {self.outlier_corrected_dir} directory.', source=self.__class__.__name__)
-        PopUpMixin.__init__(self, title="EXTRACT FEATURE SUBSETS", size=(500, 500))
+        PopUpMixin.__init__(self, title="EXTRACT FEATURE SUBSETS", size=(500, 500), icon='features')
         self.save_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CHOOSE SAVE DIRECTORY", icon_name="save", icon_link=Links.FEATURE_SUBSETS.value)
         self.save_dir = FolderSelect(self.save_frm, "SAVE DIRECTORY:", lblwidth=20)
         self.save_frm.grid(row=0, column=0, sticky=NW)

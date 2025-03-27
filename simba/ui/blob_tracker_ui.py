@@ -55,7 +55,7 @@ class BlobTrackingUI(PopUpMixin):
         self.gpu_available = check_nvidea_gpu_available()
         self.in_videos = find_all_videos_in_directory(directory=input_dir, as_dict=True, raise_error=True)
         self.input_dir, self.output_dir = input_dir, output_dir
-        PopUpMixin.__init__(self, title="BLOB TRACKING", size=(2400, 600))
+        PopUpMixin.__init__(self, title="BLOB TRACKING", size=(2400, 600), icon='bubble')
         self.len_max_char = max(len(max(list(self.in_videos.keys()), key=len)), 25)
         self.core_cnt = find_core_cnt()[0]
         self.get_quick_settings()

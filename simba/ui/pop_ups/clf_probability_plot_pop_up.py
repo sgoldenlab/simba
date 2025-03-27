@@ -41,7 +41,7 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
         self.max_y_lst.insert(0, "auto")
         self.files_found_dict = get_file_name_info_in_directory(directory=self.machine_results_dir, file_type=self.file_type)
         check_if_filepath_list_is_empty(filepaths=list(self.files_found_dict.keys()), error_msg=f"Cannot visualize probabilities, no data in {self.machine_results_dir} directory")
-        PopUpMixin.__init__(self, title="CREATE CLASSIFICATION PROBABILITY PLOTS")
+        PopUpMixin.__init__(self, title="CREATE CLASSIFICATION PROBABILITY PLOTS", icon='probability')
 
         self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VISUALIZE_CLF_PROBABILITIES.value)
         self.resolution_dropdown = DropDownMenu(self.style_settings_frm, "Resolution:", self.resolutions, "16")

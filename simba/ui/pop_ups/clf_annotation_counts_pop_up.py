@@ -17,7 +17,7 @@ class ClfAnnotationCountPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         self.config_path = config_path
-        PopUpMixin.__init__(self, title='COUNT NUMBER OF ANNOTATIONS IN SIMBA PROJECT', config_path=config_path)
+        PopUpMixin.__init__(self, title='COUNT NUMBER OF ANNOTATIONS IN SIMBA PROJECT', config_path=config_path, icon='abacus')
         if len(self.clf_names) == 0:
             raise CountError(msg=f'No classifier names associated with SimBA project {config_path}', source=self.__class__.__name__)
         if len(self.target_file_paths) == 0:

@@ -15,7 +15,7 @@ from simba.utils.read_write import read_df
 class BooleanConditionalSlicerPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
-        PopUpMixin.__init__(self, title="CONDITIONAL BOOLEAN AGGREGATE STATISTICS", size=(600, 400))
+        PopUpMixin.__init__(self, title="CONDITIONAL BOOLEAN AGGREGATE STATISTICS", size=(600, 400), icon='boolean')
         self.rule_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONDITIONAL RULES #", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.AGGREGATE_BOOL_STATS.value,)
         self.rule_cnt_dropdown = DropDownMenu(self.rule_cnt_frm,"# RULES:",list(range(2, 21)),"25",com=self.create_rules_frames)
         self.rule_cnt_dropdown.setChoices(2)

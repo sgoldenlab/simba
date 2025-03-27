@@ -13,7 +13,7 @@ from simba.utils.lookups import get_color_dict
 
 class MakePathPlotPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="CREATE SIMPLE PATH PLOT", size=(500, 300))
+        PopUpMixin.__init__(self, title="CREATE SIMPLE PATH PLOT", size=(500, 300), icon='path_2')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.video_path = FileSelect(settings_frm, "VIDEO PATH: ", lblwidth="30", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         self.body_part = Entry_Box(settings_frm, "BODY PART: ", "30")

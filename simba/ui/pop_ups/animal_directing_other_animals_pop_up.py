@@ -24,7 +24,7 @@ class AnimalDirectingAnimalPopUp(ConfigReader, PopUpMixin):
             raise AnimalNumberError(msg=f"Directionality between animals require at least two animals. The SimBA project is set to use {self.animal_cnt} animal.", source=self.__class__.__name__,)
         if len(self.outlier_corrected_paths) == 0:
             raise NoFilesFoundError(msg=f"No data files found in {self.outlier_corrected_dir}.", source=self.__class__.__name__)
-        PopUpMixin.__init__(self, title="ANALYZE DIRECTIONALITY BETWEEN ANIMALS", size=(400, 400))
+        PopUpMixin.__init__(self, title="ANALYZE DIRECTIONALITY BETWEEN ANIMALS", size=(400, 400), icon='direction')
         self.settings_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="OUTPUT FORMATS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DIRECTING_ANIMALS_PLOTS.value)
 
         boolean_tables_cb, self.boolean_tables_var = SimbaCheckbox(parent=self.settings_frm, txt="CREATE BOOLEAN TABLES", txt_img='table')

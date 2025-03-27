@@ -20,7 +20,7 @@ class AppendROIFeaturesByAnimalPopUp(ConfigReader, PopUpMixin):
         if not os.path.isfile(self.roi_coordinates_path):
             ROIWarning(msg=f"SIMBA ERROR: No ROIs have been defined. Please define ROIs before appending ROI-based features (no data file found at path {self.roi_coordinates_path})", source=self.__class__.__name__,)
 
-        PopUpMixin.__init__(self, title="APPEND ROI FEATURES: BY ANIMALS", size=(400, 400))
+        PopUpMixin.__init__(self, title="APPEND ROI FEATURES: BY ANIMALS", size=(400, 400), icon='shapes_small')
         self.animal_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMALS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI_FEATURES.value)
         self.animal_cnt_dropdown = DropDownMenu(self.animal_cnt_frm, "# of animals", list(range(1, self.animal_cnt + 1)), labelwidth=20)
         self.animal_cnt_dropdown.setChoices(1)

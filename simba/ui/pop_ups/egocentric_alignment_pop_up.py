@@ -26,7 +26,7 @@ class EgocentricAlignPopUp(ConfigReader, PopUpMixin):
     def __init__(self,
                  config_path: Union[str, os.PathLike]):
 
-        PopUpMixin.__init__(self, title="EGOCENTRIC ALIGN VIDEO AND POSE")
+        PopUpMixin.__init__(self, title="EGOCENTRIC ALIGN VIDEO AND POSE", icon='egocentric')
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False, create_logger=False)
         self.clr_dict = get_color_dict()
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)

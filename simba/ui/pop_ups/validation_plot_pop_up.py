@@ -23,7 +23,7 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
                  config_path: Union[str, os.PathLike],
                  simba_main_frm: object):
 
-        PopUpMixin.__init__(self, title="CREATE VALIDATION VIDEO")
+        PopUpMixin.__init__(self, title="CREATE VALIDATION VIDEO", icon='tick')
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         self.feature_file_path = simba_main_frm.csvfile.file_path
         self.model_path = simba_main_frm.modelfile.file_path

@@ -14,7 +14,7 @@ from simba.utils.errors import (NoChoosenClassifierError,
 
 class ClfDescriptiveStatsPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
-        PopUpMixin.__init__( self, title="ANALYZE CLASSIFICATIONS: DESCRIPTIVE STATISTICS", size=(400, 500))
+        PopUpMixin.__init__( self, title="ANALYZE CLASSIFICATIONS: DESCRIPTIVE STATISTICS", size=(400, 500), icon='line_chart_red')
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         measures_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MEASUREMENTS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ANALYZE_ML_RESULTS.value)
         clf_frm = LabelFrame( self.main_frm, text="CLASSIFIERS", font=Formats.FONT_HEADER.value, fg="black")

@@ -581,7 +581,7 @@ class ConvertVideoPopUp(PopUpMixin):
 
 class ExtractSpecificFramesPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="EXTRACT DEFINED FRAME RANGE FROM VIDEO")
+        PopUpMixin.__init__(self, title="EXTRACT DEFINED FRAME RANGE FROM VIDEO", icon='frames')
         self.video_file_selected = FileSelect(self.main_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=15)
         select_frames_frm = LabelFrame(self.main_frm, text="FRAME RANGE TO BE EXTRACTED", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         self.start_frm = Entry_Box(select_frames_frm, "START FRAME:", "15", validation='numeric')
@@ -616,7 +616,7 @@ class ExtractSpecificFramesPopUp(PopUpMixin):
 
 class ExtractAllFramesPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="EXTRACT ALL FRAMES")
+        PopUpMixin.__init__(self, title="EXTRACT ALL FRAMES", icon='frames')
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm,header="SINGLE VIDEO",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.VIDEO_TOOLS.value)
         video_path = FileSelect( single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         single_video_btn = SimbaButton(parent=single_video_frm, txt="Extract Frames (Single video)", img='rocket', font=Formats.FONT_REGULAR.value, cmd=extract_frames_single_video, cmd_kwargs={'file_path': lambda:video_path.file_path, 'save_dir': None})
@@ -635,7 +635,7 @@ class ExtractAllFramesPopUp(PopUpMixin):
 class MultiCropPopUp(PopUpMixin):
     def __init__(self):
 
-        PopUpMixin.__init__(self, title="MULTI-CROP", size=(500, 300))
+        PopUpMixin.__init__(self, title="MULTI-CROP", size=(500, 300), icon='crop')
         self.input_folder = FolderSelect(self.main_frm, "INPUT VIDEO FOLDER: ", lblwidth=25)
         self.output_folder = FolderSelect(self.main_frm, "OUTPUT FOLDER: ", lblwidth=25)
         video_options = Options.ALL_VIDEO_FORMAT_OPTIONS_2.value
@@ -672,7 +672,7 @@ class MultiCropPopUp(PopUpMixin):
 
 class ChangeFpsSingleVideoPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="CHANGE FRAME RATE: SINGLE VIDEO", size=(500, 300))
+        PopUpMixin.__init__(self, title="CHANGE FRAME RATE: SINGLE VIDEO", size=(500, 300), icon='fps')
         self.video_path = FileSelect(self.main_frm, "VIDEO PATH:", title="Select a video file", lblwidth=15, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         self.new_fps_dropdown = DropDownMenu(self.main_frm, "NEW FPS:", list(range(1, 101, 1)), labelwidth=15)
         self.new_fps_dropdown.setChoices(15)
@@ -696,7 +696,7 @@ class ChangeFpsSingleVideoPopUp(PopUpMixin):
 
 class ChangeFpsMultipleVideosPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="CHANGE FRAME RATE: MULTIPLE VIDEO", size=(500, 300))
+        PopUpMixin.__init__(self, title="CHANGE FRAME RATE: MULTIPLE VIDEO", size=(500, 300), icon='fps')
         self.directory_path = FolderSelect(self.main_frm, "VIDEO DIRECTORY PATH:", title="Select folder with videos: ", lblwidth="25")
         self.new_fps_dropdown = DropDownMenu(self.main_frm, "NEW FPS:", list(range(1, 101, 1)), labelwidth=25)
         self.new_fps_dropdown.setChoices(15)
@@ -738,7 +738,7 @@ class ExtractSEQFramesPopUp(PopUpMixin):
 
 class MergeFrames2VideoPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="MERGE IMAGE DIRECTORY INTO VIDEO")
+        PopUpMixin.__init__(self, title="MERGE IMAGE DIRECTORY INTO VIDEO", icon='video')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.folder_path = FolderSelect(settings_frm, "IMAGE DIRECTORY: ", title="Select directory with frames: ", lblwidth=25)
         self.video_fps_dropdown = DropDownMenu(settings_frm, "VIDEO FPS:", list(range(1, 101, 1)), labelwidth=25)
@@ -775,7 +775,7 @@ class MergeFrames2VideoPopUp(PopUpMixin):
 
 class CreateGIFPopUP(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="CREATE GIF FROM VIDEO", size=(600, 400))
+        PopUpMixin.__init__(self, title="CREATE GIF FROM VIDEO", size=(600, 400), icon='gif')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(settings_frm, "VIDEO PATH: ", title="Select a video file", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=40)
         self.start_time_entry_box = Entry_Box(settings_frm, "START TIME (s):", "40", validation="numeric")
@@ -842,7 +842,7 @@ class CalculatePixelsPerMMInVideoPopUp(PopUpMixin):
        :loop:
     """
     def __init__(self):
-        PopUpMixin.__init__(self, title="CALCULATE PIXELS PER MILLIMETER IN VIDEO", size=(550, 550))
+        PopUpMixin.__init__(self, title="CALCULATE PIXELS PER MILLIMETER IN VIDEO", size=(550, 550), icon='distance')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.video_path = FileSelect(settings_frm, "Select a video file: ",  title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=30)
         self.known_distance = Entry_Box(settings_frm, "Known real-life metric distance (mm): ", "30", validation="numeric")
@@ -863,7 +863,7 @@ class CalculatePixelsPerMMInVideoPopUp(PopUpMixin):
 
 class ConcatenatingVideosPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="CONCATENATE TWO VIDEOS", size=(600, 300))
+        PopUpMixin.__init__(self, title="CONCATENATE TWO VIDEOS", size=(600, 300), icon='concat_videos')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.video_path_1 = FileSelect(settings_frm, "FIRST VIDEO PATH: ", title="Select a video file", lblwidth=35, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         self.video_path_2 = FileSelect(settings_frm, "SECOND VIDEO PATH: ", title="Select a video file", lblwidth=35, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -908,7 +908,7 @@ class ConcatenatingVideosPopUp(PopUpMixin):
 
 class ConcatenatorPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Optional[Union[str, os.PathLike]] = None):
-        PopUpMixin.__init__(self, title="MERGE (CONCATENATE) VIDEOS")
+        PopUpMixin.__init__(self, title="MERGE (CONCATENATE) VIDEOS", icon='concat_videos')
         self.config_path = config_path
         self.select_video_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEOS #", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CONCAT_VIDEOS.value)
         self.select_video_cnt_dropdown = DropDownMenu( self.select_video_cnt_frm, "VIDEOS #", list(range(2, 21)), "15")
@@ -1139,7 +1139,7 @@ class VideoTemporalJoinPopUp(PopUpMixin):
 
 class ImportFrameDirectoryPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
-        PopUpMixin.__init__(self, title="IMPORT FRAME DIRECTORY")
+        PopUpMixin.__init__(self, title="IMPORT FRAME DIRECTORY", icon='import')
         ConfigReader.__init__(self, config_path=config_path)
         self.frame_folder = FolderSelect(self.main_frm, "FRAME DIRECTORY:", title="Select the main directory with frame folders")
         import_btn  = SimbaButton(parent=self.main_frm, txt="IMPORT FRAMES", img='import', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run)
@@ -1175,7 +1175,7 @@ class ExtractAnnotationFramesPopUp(PopUpMixin, ConfigReader):
         for file_path in self.target_file_paths:
             self.video_dict[get_fn_ext(filepath=file_path)[1]] = file_path
 
-        PopUpMixin.__init__(self, config_path=config_path, title="EXTRACT ANNOTATED FRAMES")
+        PopUpMixin.__init__(self, config_path=config_path, title="EXTRACT ANNOTATED FRAMES", icon='frames')
         self.clf_frame = LabelFrame(self.main_frm, text="CHOOSE CLASSIFIERS", font=Formats.FONT_HEADER.value, pady=5, padx=5)
         self.create_clf_checkboxes(main_frm=self.clf_frame, clfs=self.clf_names)
         self.choose_video_frm = LabelFrame(self.main_frm, text="CHOOSE VIDEOS", font=Formats.FONT_HEADER.value, pady=5, padx=5)
@@ -1358,7 +1358,7 @@ class ConvertROIDefinitionsPopUp(PopUpMixin):
 
 class CropVideoCirclesPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="CROP SINGLE VIDEO (CIRCLES)")
+        PopUpMixin.__init__(self, title="CROP SINGLE VIDEO (CIRCLES)", icon='circle_small')
         crop_video_lbl_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="Crop Video (CIRCLES)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CIRCLE_CROP.value)
         selected_video = FileSelect(crop_video_lbl_frm, "Video path", title="Select a video file", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         button_crop_video_single = SimbaButton(parent=crop_video_lbl_frm, txt="CROP VIDEO", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=crop_single_video_circle, cmd_kwargs={'file_path': lambda:selected_video.file_path})
@@ -1380,7 +1380,7 @@ class CropVideoCirclesPopUp(PopUpMixin):
 
 class CropVideoPolygonsPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="CROP SINGLE VIDEO (POLYGONS)")
+        PopUpMixin.__init__(self, title="CROP SINGLE VIDEO (POLYGONS)", icon='polygon')
         crop_video_lbl_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="Crop Video (POLYGONS)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CIRCLE_CROP.value)
         selected_video = FileSelect( crop_video_lbl_frm, "Video path", title="Select a video file", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
 
@@ -1835,7 +1835,7 @@ class InteractiveClahePopUp(PopUpMixin):
 
 class DownsampleSingleVideoPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self,title="DOWN-SAMPLE SINGLE VIDEO RESOLUTION")
+        PopUpMixin.__init__(self,title="DOWN-SAMPLE SINGLE VIDEO RESOLUTION", icon='minus')
         choose_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DOWNSAMPLE.value)
         self.video_path_selected = FileSelect(choose_video_frm, "VIDEO PATH: ", title="Select a video file", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         choose_video_frm.grid(row=0, column=0, sticky=NW)
@@ -1901,7 +1901,7 @@ class DownsampleSingleVideoPopUp(PopUpMixin):
 
 class DownsampleMultipleVideosPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self,title="DOWN-SAMPLE MULTIPLE VIDEO RESOLUTION")
+        PopUpMixin.__init__(self,title="DOWN-SAMPLE MULTIPLE VIDEO RESOLUTION", icon='minus')
         choose_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DOWNSAMPLE.value)
 
         self.video_dir_selected = FolderSelect(choose_video_frm, "VIDEO DIRECTORY:",title="Select Folder with videos", lblwidth=20)
@@ -2314,7 +2314,7 @@ class Convert2MOVPopUp(PopUpMixin):
 
 class SuperimposeWatermarkPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="WATERMARK VIDEOS")
+        PopUpMixin.__init__(self, title="WATERMARK VIDEOS", icon='watermark_green')
         self.LOCATIONS = {'TOP LEFT': 'top_left', 'TOP RIGHT': 'top_right', 'BOTTOM LEFT': 'bottom_left', 'BOTTOM RIGHT': 'bottom_right', 'CENTER': 'center'}
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         opacities = [round(x, 1) for x in list(np.arange(0.1, 1.1, 0.1))]
@@ -2379,7 +2379,7 @@ class SuperimposeWatermarkPopUp(PopUpMixin):
 
 class SuperimposeTimerPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="SUPER-IMPOSE TIME ON VIDEOS")
+        PopUpMixin.__init__(self, title="SUPER-IMPOSE TIME ON VIDEOS", icon='superimpose')
         self.LOCATIONS = {'TOP LEFT': 'top_left', 'TOP RIGHT': 'top_right', 'TOP MIDDLE': 'top_middle', 'BOTTOM LEFT': 'bottom_left', 'BOTTOM RIGHT': 'bottom_right', 'BOTTOM MIDDLE': 'bottom_middle'}
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.color_dict = get_color_dict()
@@ -2459,7 +2459,7 @@ class SuperimposeTimerPopUp(PopUpMixin):
 
 class SuperimposeProgressBarPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="SUPER-IMPOSE PROGRESS BAR ON VIDEOS")
+        PopUpMixin.__init__(self, title="SUPER-IMPOSE PROGRESS BAR ON VIDEOS", icon='superimpose')
         self.LOCATIONS = {'TOP': 'top', 'BOTTOM': 'bottom'}
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.color_dict = get_color_dict()
@@ -2519,7 +2519,7 @@ class SuperimposeProgressBarPopUp(PopUpMixin):
 
 class SuperimposeVideoPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="SUPER-IMPOSE VIDEO ON VIDEO")
+        PopUpMixin.__init__(self, title="SUPER-IMPOSE VIDEO ON VIDEO", icon='superimpose')
         self.LOCATIONS = {'TOP LEFT': 'top_left', 'TOP RIGHT': 'top_right', 'BOTTOM LEFT': 'bottom_left', 'BOTTOM RIGHT': 'bottom_right', 'CENTER': 'center'}
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         opacities = [round(x, 1) for x in list(np.arange(0.1, 1.1, 0.1))]
@@ -2565,7 +2565,7 @@ class SuperimposeVideoPopUp(PopUpMixin):
 
 class SuperimposeVideoNamesPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="SUPER-IMPOSE VIDEO NAMES ON VIDEOS")
+        PopUpMixin.__init__(self, title="SUPER-IMPOSE VIDEO NAMES ON VIDEOS", icon='superimpose')
         self.LOCATIONS = {'TOP LEFT': 'top_left', 'TOP RIGHT': 'top_right', 'TOP MIDDLE': 'top_middle', 'BOTTOM LEFT': 'bottom_left', 'BOTTOM RIGHT': 'bottom_right', 'BOTTOM MIDDLE': 'bottom_middle'}
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.color_dict = get_color_dict()
@@ -2642,7 +2642,7 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
 
 class SuperimposeTextPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="SUPER-IMPOSE TEXT ON VIDEOS")
+        PopUpMixin.__init__(self, title="SUPER-IMPOSE TEXT ON VIDEOS", icon='superimpose')
         self.LOCATIONS = {'TOP LEFT': 'top_left', 'TOP RIGHT': 'top_right', 'TOP MIDDLE': 'top_middle', 'BOTTOM LEFT': 'bottom_left', 'BOTTOM RIGHT': 'bottom_right', 'BOTTOM MIDDLE': 'bottom_middle'}
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.color_dict = get_color_dict()
@@ -2725,7 +2725,7 @@ class SuperimposeTextPopUp(PopUpMixin):
 
 class BoxBlurPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="BOX BLUR VIDEOS")
+        PopUpMixin.__init__(self, title="BOX BLUR VIDEOS", icon='smooth')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         blur_lvl = [round(x, 2) for x in list(np.arange(0.05, 1.0, 0.05))]
         self.blur_lvl_dropdown = DropDownMenu(settings_frm, "BLUR LEVEL:", blur_lvl, labelwidth=25)
@@ -2757,7 +2757,7 @@ class BoxBlurPopUp(PopUpMixin):
 
 class BackgroundRemoverSingleVideoPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="REMOVE BACKGROUND IN A VIDEO")
+        PopUpMixin.__init__(self, title="REMOVE BACKGROUND IN A VIDEO", icon='black_and_white')
         self.clr_dict = get_color_dict()
         self.foreground_clr_options = list(self.clr_dict.keys())
         self.foreground_clr_options.append('Original')
@@ -2864,7 +2864,7 @@ class BackgroundRemoverSingleVideoPopUp(PopUpMixin):
 
 class BackgroundRemoverDirectoryPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="REMOVE BACKGROUNDS IN MULTIPLE VIDEOS")
+        PopUpMixin.__init__(self, title="REMOVE BACKGROUNDS IN MULTIPLE VIDEOS", icon='black_and_white')
         self.clr_dict = get_color_dict()
         self.foreground_clr_options = list(self.clr_dict.keys())
         self.foreground_clr_options.append('Original')
@@ -2978,7 +2978,7 @@ class BackgroundRemoverDirectoryPopUp(PopUpMixin):
 
 class RotateVideoSetDegreesPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="ROTATE VIDEOS")
+        PopUpMixin.__init__(self, title="ROTATE VIDEOS", icon='rotate')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.degrees_dropdown = DropDownMenu(settings_frm, "CLOCKWISE DEGREES:", list(range(1, 360, 1)), labelwidth=25)
         self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY (%):", list(range(10, 110, 10)), labelwidth=25)
@@ -3030,7 +3030,7 @@ class RotateVideoSetDegreesPopUp(PopUpMixin):
 
 class FlipVideosPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="FLIP VIDEOS")
+        PopUpMixin.__init__(self, title="FLIP VIDEOS", icon='flip_green')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.horizontal_dropdown = DropDownMenu(settings_frm, "HORIZONTAL FLIP:", ['TRUE', 'FALSE'], labelwidth=25)
         self.vertical_dropdown = DropDownMenu(settings_frm, "VERTICAL FLIP:", ['TRUE', 'FALSE'], labelwidth=25)
@@ -3087,7 +3087,7 @@ class FlipVideosPopUp(PopUpMixin):
 
 class UpsampleVideosPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="UPSAMPLE VIDEOS USING INTERPOLATION (WARNING: LONG RUN-TIMES)")
+        PopUpMixin.__init__(self, title="UPSAMPLE VIDEOS USING INTERPOLATION (WARNING: LONG RUN-TIMES)", icon='sample')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.fps_dropdown = DropDownMenu(settings_frm, "NEW FRAME-RATE (FPS):", list(range(1, 500)), labelwidth=25)
         self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY (%):", list(range(10, 110, 10)), labelwidth=25)
@@ -3133,7 +3133,7 @@ class UpsampleVideosPopUp(PopUpMixin):
 
 class ReverseVideoPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="REVERSE VIDEOS")
+        PopUpMixin.__init__(self, title="REVERSE VIDEOS", icon='reverse_blue')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.MP4_CODEC_LK = {'HEVC (H.265)': 'libx265', 'H.264 (AVC)': 'libx264', 'VP9': 'vp9'}
         self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
@@ -3183,7 +3183,7 @@ class ReverseVideoPopUp(PopUpMixin):
 
 class Convert2BlackWhitePopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="CONVERT VIDEOS TO BLACK AND WHITE (NOTE: NOT GRAYSCALE)")
+        PopUpMixin.__init__(self, title="CONVERT VIDEOS TO BLACK AND WHITE (NOTE: NOT GRAYSCALE)", icon='black_and_white')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         threshold = [round(x, 2) for x in list(np.arange(0.01, 1.01, 0.01))]
         self.threshold_dropdown = DropDownMenu(settings_frm, "BLACK THRESHOLD:", threshold, labelwidth=25)
@@ -3229,7 +3229,7 @@ class Convert2BlackWhitePopUp(PopUpMixin):
 
 class CreateAverageFramePopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="CREATE AVERAGE VIDEO FRAME")
+        PopUpMixin.__init__(self, title="CREATE AVERAGE VIDEO FRAME", icon='average')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.save_dir = FolderSelect(settings_frm, "AVERAGE FRAME SAVE DIRECTORY:", title="Select a video directory", lblwidth=25)
         self.section_start_time_eb = Entry_Box(settings_frm, "SAMPLE START TIME:", "25")
@@ -3297,7 +3297,7 @@ class CreateAverageFramePopUp(PopUpMixin):
 
 class ManualTemporalJoinPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="MANUAL TEMPORAL JOIN VIDEOS")
+        PopUpMixin.__init__(self, title="MANUAL TEMPORAL JOIN VIDEOS", icon='join_purple')
         video_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="NUMBER OF VIDEOS TO JOIN", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.video_cnt_dropdown = DropDownMenu(video_cnt_frm, "NUMBER OF VIDEOS:", list(range(2, 101, 1)), labelwidth=25)
         self.select_video_cnt_btn = SimbaButton(parent=video_cnt_frm, txt='SELECT', img='tick', cmd=self.select)
@@ -3355,7 +3355,7 @@ class ManualTemporalJoinPopUp(PopUpMixin):
 
 class CrossfadeVideosPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="CROSS-FADE VIDEOS")
+        PopUpMixin.__init__(self, title="CROSS-FADE VIDEOS", icon='crossfade')
         crossfade_methods = get_ffmpeg_crossfade_methods()
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="NUMBER OF VIDEOS TO JOIN", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.video_path_1 = FileSelect(settings_frm, f"VIDEO PATH 1:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])

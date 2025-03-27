@@ -20,7 +20,7 @@ from simba.utils.read_write import find_core_cnt
 class ThirdPartyAnnotatorAppenderPopUp(PopUpMixin, ConfigReader):
     def __init__(self,
                  config_path: Union[str, os.PathLike]):
-        PopUpMixin.__init__(self, title="APPEND THIRD-PARTY ANNOTATIONS")
+        PopUpMixin.__init__(self, title="APPEND THIRD-PARTY ANNOTATIONS", icon='draw')
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         apps_lst = Options.THIRD_PARTY_ANNOTATION_APPS_OPTIONS.value
         warnings_lst = Options.THIRD_PARTY_ANNOTATION_ERROR_OPTIONS.value

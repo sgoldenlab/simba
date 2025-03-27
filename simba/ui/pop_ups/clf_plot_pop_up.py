@@ -26,7 +26,7 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
     """
 
     def __init__(self, config_path: Union[str, os.PathLike]):
-        PopUpMixin.__init__(self, title="VISUALIZE CLASSIFICATION (SKLEARN) RESULTS")
+        PopUpMixin.__init__(self, title="VISUALIZE CLASSIFICATION (SKLEARN) RESULTS", icon='photos')
         ConfigReader.__init__(self, config_path=config_path)
         self.video_lst = find_all_videos_in_directory(directory=self.video_dir)
         self.use_default_font_settings_val = BooleanVar(value=True)

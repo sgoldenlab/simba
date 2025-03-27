@@ -28,7 +28,7 @@ class ClassifierValidationPopUp(PopUpMixin, ConfigReader):
         self.files_found_dict = get_file_name_info_in_directory(directory=self.machine_results_dir, file_type=self.file_type)
         if len(list(self.files_found_dict.keys())) == 0:
             raise NoDataError(msg=f'No data found in the {self.machine_results_dir} directory. This is required for creating validation clips.', source=self.__class__.__name__)
-        PopUpMixin.__init__(self, title="SIMBA CLASSIFIER VALIDATION CLIPS")
+        PopUpMixin.__init__(self, title="SIMBA CLASSIFIER VALIDATION CLIPS", icon='tick')
         color_names = list(self.colors_dict.keys())
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm,header="SETTINGS",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.CLF_VALIDATION.value)
         self.seconds_entry = Entry_Box(self.settings_frm, "SECONDS PADDING: ", "20", validation="numeric")

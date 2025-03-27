@@ -51,7 +51,7 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         self.longest_animal_name_len = len(max(self.multi_animal_id_list, key=len)) + 5
 
 
-        PopUpMixin.__init__(self, title="VISUALIZE ROI TRACKING", size=(800, 500))
+        PopUpMixin.__init__(self, title="VISUALIZE ROI TRACKING", size=(800, 500), icon='shapes_small')
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI_DATA_PLOT.value)
         self.threshold_entry_box = Entry_Box(self.settings_frm, "BODY-PART PROBABILITY THRESHOLD:", "35", value='0.0', justify='center', entry_box_width=self.longest_animal_name_len)
         self.show_pose_estimation_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW POSE-ESTIMATED LOCATIONS:', label_width=35, value='TRUE', command=self._disable_clr)
