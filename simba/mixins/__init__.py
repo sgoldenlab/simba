@@ -1,6 +1,6 @@
 from simba.utils.data import get_library_version
-from simba.utils.read_write import read_sys_env
 from simba.utils.enums import ENV_VARS
+from simba.utils.read_write import read_sys_env
 from simba.utils.warnings import VersionWarning
 
 ENV = read_sys_env()
