@@ -2,10 +2,9 @@ import ctypes
 import math
 import os
 import platform
-from copy import copy
+from copy import copy, deepcopy
 from tkinter import *
 from typing import Optional, Union
-from copy import deepcopy
 
 import cv2
 import numpy as np
