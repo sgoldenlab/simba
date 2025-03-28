@@ -53,6 +53,8 @@ If you are training multiple models, open each of the CSV files in the project_f
 
 ![image](https://github.com/user-attachments/assets/d2302531-876c-44e6-8e17-d1919e75d74d)
 
+**6)** Train your models in SimBA from your config files by clicking the green or blue <kbd>TRAIN SINGLE MODEL</kbd> or <kbd>TRAIN MULTIPLE MODELS</kbd> buttons in the [TRAIN MACHINE MODEL] tab as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model). The models should now be trained on the GPU and you should see significant speed up for the training part (NOTE: the evaluation parts, e.g., learning curves, PR curves, feature importance calculations etc, might not be as quick.)
+
 > [!CAUTION]
 > The paths in WSL Ubuntu vs Microsoft Windows are slightly different. For example, a project created in Windows at path ``C:\my_projects\project_folder`` becomes  ``/mnt/c/my_projects/project_folder`` when accessed through WSL Ubuntu. You may have to update them in the `project_config.ini` if shifting between environments (I'm looking to automate this).
 >
@@ -62,5 +64,5 @@ If you are training multiple models, open each of the CSV files in the project_f
 >
 > Getting SHAP values from GPU models is not supported. However, SHAP values from CPU models can be computed on the GPU at greatly improved run-times as documented [HERE](https://simba-uw-tf-dev.readthedocs.io/en/latest/nb/shap_log_3.html) os using code [HERE](https://github.com/sgoldenlab/simba/blob/master/simba/data_processors/cuda/create_shap_log.py).
 
-
+**6)** Train your models in SimBA from your config files by clicking the green or blue <kbd>TRAIN SINGLE MODEL</kbd> or <kbd>TRAIN MULTIPLE MODELS</kbd> buttons in the [TRAIN MACHINE MODEL] tab as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-7-train-machine-model). The models should now be trained on the GPU and you should see significant speed up for the training part (NOTE: the evaluation parts, e.g., learning curves, PR curves, feature importance calculations etc)
 
