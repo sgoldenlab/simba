@@ -2917,26 +2917,34 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
     return results
 
 
+
 def read_df_array(df: pd.DataFrame, column: str):
     """
-    Convert string representations of arrays in a DataFrame column to list of numpy arrays.
+    Convert string representations of 2D arrays in a DataFrame column to actual numpy arrays.
 
-    :param pd.DataFrame df: The DataFrame containing the column to be processed.
-    :param str column: The name of the column in the DataFrame that contains string representations of arrays.
-    :returns: A list of numpy arrays, each corresponding to an entry in the specified column. Each array is created by evaluating the string in the DataFrame colum
+    :param pd.DataFrame df: The DataFrame containing the column.
+    :param str column: The name of the column with string representations of 2D arrays.
+    :returns: A list of numpy arrays, each corresponding to an entry in the specified column.
     :rtype: List[np.ndarray]
     """
 
-    check_str(name=column, value=column)
-    check_valid_dataframe(df=df, source=read_df_array.__name__, required_fields=[column])
-
     def _col_to_arrays(s):
-        s = s.replace('\n', '')
-        s = s.replace(' ', ',')
-        return np.array(literal_eval(s))
+        # Remove newline characters and normalize spaces
+        s = ' '.join(s.split())
 
-    return list(df[column].apply(_col_to_arrays).values)
+        # Fix missing commas between sublists: "[1 2][3 4]" → "[1, 2], [3, 4]"
+        s = s.replace('][', '], [')
 
+        # Replace spaces inside brackets with commas: "[1 2]" → "[1, 2]"
+        s = s.replace('[ ', '[').replace(' ]', ']').replace(' ', ', ')
+
+        try:
+            return np.array(literal_eval(s))  # Convert string to actual NumPy array
+        except (SyntaxError, ValueError):
+            raise ValueError(f"Invalid array format in column '{column}': {s}")
+
+    df[column] = df[column].apply(_col_to_arrays)  # Convert in-place
+    return df
 def read_sys_env():
     env = {}
     env[ENV_VARS.PRINT_EMOJIS.value] = str_2_bool(os.getenv(ENV_VARS.PRINT_EMOJIS.value, "True"))

@@ -5,6 +5,7 @@ import platform
 from copy import copy
 from tkinter import *
 from typing import Optional, Union
+from copy import deepcopy
 
 import cv2
 import numpy as np
@@ -348,7 +349,7 @@ class ROI_mixin(ConfigReader):
         self.set_status_bar_panel(text="IN ROI MOVE MODE. MODIFY ROI'S BY DRAGGING EAR TAGS. CLICK ESC OCH CLICK SETTINGS WINDOW TO EXIT MOVE MODE", fg="darkred")
         self.click_event, self.got_attributes = BooleanVar(value=False), False
         self.root = parent_frame
-        self.interactive_modifier = InteractiveROIModifier(img_window=self.img_window, original_img=self.read_img(frame_idx=self.img_idx), roi_dict=self.roi_dict, settings=self.settings)
+        self.interactive_modifier = InteractiveROIModifier(img_window=self.img_window, original_img=self.read_img(frame_idx=self.img_idx), roi_dict=deepcopy(self.roi_dict), settings=self.settings)
         self.root.bind("<Button-1>", on_click); self.root.bind("<Escape>", on_click); self.img_window.bind("<Escape>", on_click)
         self.root.wait_variable(self.click_event)
 

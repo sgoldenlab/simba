@@ -41,7 +41,8 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data, read_df,
                                     read_frm_of_video, read_video_info)
-from simba.utils.warnings import NoDataFoundWarning
+import ast
+
 
 
 class PlottingMixin(object):
@@ -1505,6 +1506,7 @@ class PlottingMixin(object):
         for _, row in rectangles.iterrows():
             rectangle_line_type = [4 if row['Thickness'] == 1 else line_type][0]
             tag_size = [row['Ear_tag_size'] if circle_size is None else circle_size][0]
+            if isinstance(row["Color BGR"], str): row["Color BGR"] = ast.literal_eval(row["Color BGR"])
             img = cv2.rectangle(img, (int(row["topLeftX"]), int(row["topLeftY"])), (int(row["Bottom_right_X"]), int(row["Bottom_right_Y"])), row["Color BGR"], int(row["Thickness"]), lineType=rectangle_line_type)
             if show_center:
                 img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), tag_size, row["Color BGR"], -1)
@@ -1537,6 +1539,7 @@ class PlottingMixin(object):
         for _, row in circles.iterrows():
             circle_line_type = [4 if row['Thickness'] == 1 else line_type][0]
             tag_size = [row['Ear_tag_size'] if circle_size is None else circle_size][0]
+            if isinstance(row["Color BGR"], str): row["Color BGR"] = ast.literal_eval(row["Color BGR"])
             img = cv2.circle(img, (int(row["centerX"]), int(row["centerY"])), row["radius"], row["Color BGR"], int(row["Thickness"]), lineType=circle_line_type)
             if show_center:
                 img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), tag_size, row["Color BGR"], -1, lineType=circle_line_type)
@@ -1569,6 +1572,7 @@ class PlottingMixin(object):
         for _, row in polygons.iterrows():
             polygon_line_type = [4 if row['Thickness'] == 1 else line_type][0]
             tag_size = [row['Ear_tag_size'] if circle_size is None else circle_size][0]
+            if isinstance(row["Color BGR"], str): row["Color BGR"] = ast.literal_eval(row["Color BGR"])
             img = cv2.polylines( img, [row["vertices"].astype(int)], True, row["Color BGR"], thickness=int(row["Thickness"]), lineType=polygon_line_type)
             if show_center:
                 img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), tag_size, row["Color BGR"], polygon_line_type)
