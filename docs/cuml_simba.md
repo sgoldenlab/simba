@@ -13,7 +13,7 @@
 >
 > Use SImBA version at or above ``2.9.4``.
 
-**2)** Install the cuml-cu12 (which is not present in the standard simba requirements.txt. After activating the SimBA python 3.10 environment created in step 1 type:
+**2)** Install the cuml-cu12 (which is not present in the standard simba requirements.txt). TO do this, after activating the SimBA python 3.10 environment created in step 1 type:
 
 ```
 pip install cuml-cu12==24.12.0
