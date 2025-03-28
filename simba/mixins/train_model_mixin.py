@@ -1,13 +1,12 @@
 __author__ = "Simon Nilsson"
 
 import warnings
+
 warnings.filterwarnings("ignore")
-import os
-from simba.mixins import cuRF
 import ast
 import concurrent
 import configparser
-
+import os
 import pickle
 import platform
 from concurrent.futures import ProcessPoolExecutor
@@ -31,10 +30,13 @@ from sklearn.feature_selection import VarianceThreshold
 from sklearn.inspection import partial_dependence, permutation_importance
 from sklearn.metrics import classification_report, precision_recall_curve
 from sklearn.model_selection import ShuffleSplit, learning_curve
-from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer, StandardScaler)
+from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer,
+                                   StandardScaler)
 from sklearn.tree import export_graphviz
 from sklearn.utils import parallel_backend
 from tabulate import tabulate
+
+from simba.mixins import cuRF
 
 try:
     from dtreeviz.trees import dtreeviz, tree
@@ -69,8 +71,8 @@ from simba.utils.data import (detect_bouts, detect_bouts_multiclass,
                               get_library_version)
 from simba.utils.enums import (OS, ConfigKey, Defaults, Dtypes, Formats,
                                Methods, MLParamKeys, Options)
-from simba.utils.errors import (ClassifierInferenceError, CorruptedFileError, DataHeaderError,
-                                FaultyTrainingSetError,
+from simba.utils.errors import (ClassifierInferenceError, CorruptedFileError,
+                                DataHeaderError, FaultyTrainingSetError,
                                 FeatureNumberMismatchError, InvalidInputError,
                                 MissingColumnsError, NoDataError,
                                 SamplingError, SimBAModuleNotFoundError)
@@ -80,10 +82,10 @@ from simba.utils.read_write import (find_core_cnt, get_fn_ext,
                                     get_memory_usage_of_df, get_pkg_version,
                                     read_config_entry, read_df, read_meta_file,
                                     str_2_bool)
-from simba.utils.warnings import (MissingUserInputWarning,
+from simba.utils.warnings import (GPUToolsWarning, MissingUserInputWarning,
                                   MultiProcessingFailedWarning,
                                   NoModuleWarning, NotEnoughDataWarning,
-                                  SamplingWarning, ShapWarning, GPUToolsWarning)
+                                  SamplingWarning, ShapWarning)
 
 plt.switch_backend("agg")
 
