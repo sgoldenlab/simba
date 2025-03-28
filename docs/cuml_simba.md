@@ -1,7 +1,9 @@
 
 
 
-####
+### TRAIN RANDOM FOREST MODELS ON GPU IN SIMBA
+
+
 **1)** In Linux, be in a python **3.10** environment with SimBA installed. you can create a SimBA python 3.0 environment as documented [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md).
 
 >[!NOTE]  
@@ -34,7 +36,7 @@ Set you global machine learning paramaters as usual in SimBA as documented [HERE
 
 **5)**
 
-##### TRAINING A SINGLE MODEL
+#### TRAINING A SINGLE MODEL
 If you are training from the global environment, open the `project_config.ini` file and add one parameter to the [create ensemble settings] section. Add:
 
   ``cuda = True``
@@ -46,15 +48,19 @@ If you are training from the global environment, open the `project_config.ini` f
 and save the file. 
 
 
-##### TRAINING MULTPLE MODELS
+#### TRAINING MULTPLE MODELS
 If you are training multiple models, open each of the CSV files in the project_folder/configs and add one header named ``cuda`` and set the value to TRUE, as in the screengrab below:
 
 ![image](https://github.com/user-attachments/assets/d2302531-876c-44e6-8e17-d1919e75d74d)
 
-> [!NOTE]  
-> Microsoft Windows WSL environment should work.
+> [!CAUTION]
+> The paths in WSL Ubuntu vs Microsoft Windows are slightly different. For example, a project created in Windows at path ``C:\my_projects\project_folder`` becomes  ``/mnt/c/my_projects/project_folder`` when accessed through WSL Ubuntu. You may have to update them in the `project_config.ini` if shifting between environments (I'm looking to automate this).
 >
-
+> Although training on the GPU can be [much quicker](https://developer.nvidia.com/blog/accelerating-random-forests-up-to-45x-using-cuml/), there are some non-functional drawbacks:
+>
+> Getting feature importances (gini/entropy) from GPU models is much slower an on the CPU.
+>
+> Getting SHAP values from GPU models is not supported. However, SHAP values from CPU models can be computed on the GPU at greatly improved run-times as documented [HERE](https://simba-uw-tf-dev.readthedocs.io/en/latest/nb/shap_log_3.html) os using code [HERE](https://github.com/sgoldenlab/simba/blob/master/simba/data_processors/cuda/create_shap_log.py).
 
 
 
