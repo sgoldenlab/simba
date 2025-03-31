@@ -257,7 +257,7 @@ def check_iterable_length(source: str, val: int, exact_accepted_length: Optional
     return True
 
 
-def check_instance(source: str, instance: object, accepted_types: Union[Tuple[Any], Any], raise_error: bool = True) -> bool:
+def check_instance(source: str, instance: object, accepted_types: Union[Tuple[Any], Any], raise_error: bool = True, warning: bool = True) -> bool:
     """
     Check if an instance is an acceptable type.
 
@@ -272,7 +272,9 @@ def check_instance(source: str, instance: object, accepted_types: Union[Tuple[An
         if raise_error:
             raise InvalidInputError(msg=msg, source=source)
         else:
-            InvalidValueWarning(msg=msg, source=source)
+            if warning:
+                InvalidValueWarning(msg=msg, source=source)
+            return False
     return True
 
 

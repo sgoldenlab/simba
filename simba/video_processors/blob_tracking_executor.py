@@ -94,7 +94,7 @@ class BlobTrackingExecutor():
             self.vertice_col_names.append(f"vertice_{i}_x"); self.vertice_col_names.append(f"vertice_{i}_y")
 
     def run(self):
-        self._remove_bgs()
+        #self._remove_bgs()
         self._find_blobs()
         self.timer.stop_timer()
         stdout_success(msg=f'Animal tracking complete. Results save din directory {self.data[OUT_DIR]}', elapsed_time=self.timer.elapsed_time_str)
@@ -198,6 +198,13 @@ class BlobTrackingExecutor():
         if not self.save_bg_videos:
             remove_files(file_paths=self.bg_video_paths, raise_error=False)
         print(f'Blob tracking COMPLETE: data saved at {self.save_dir}, (elapsed time: {blob_timer.elapsed_time_str}s')
+
+
+# DATA_PATH = r"D:\EPM_4\data\blob_definitions.pickle"
+# tracker = BlobTrackingExecutor(data=DATA_PATH)
+# tracker.run()
+
+
 
 # #DATA_PATH = r"/mnt/d/open_field_3/sample/.temp/blob_definitions.h5"
 # #DATA_PATH = r"D:\open_field_3\sample\blob_data\blob_definitions.json"

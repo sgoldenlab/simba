@@ -3851,18 +3851,23 @@ class GeometryMixin(object):
         widths, lengths, areas, centers, max_length, max_width, max_area, min_length, min_width, min_area = [], [], [], [], -np.inf, -np.inf, -np.inf, np.inf, np.inf, np.inf
         if isinstance(shapes, Polygon):
             shapes = [shapes]
+        check_valid_lst(data=shapes, source=f'{GeometryMixin.get_shape_statistics.__name__} shapes', valid_dtypes=(Polygon,), min_len=1)
         for shape in shapes:
             shape_cords = list(zip(*shape.exterior.coords.xy))
             mbr_lengths = [LineString((shape_cords[i], shape_cords[i + 1])).length for i in range(len(shape_cords) - 1)]
-            width, length = min(mbr_lengths), max(mbr_lengths)
-            area = width * length
-            min_length, max_length = min(min_length, length), max(max_length, length)
-            min_width, max_width = min(min_width, width), max(max_width, width)
-            min_area, max_area = min(min_area, area), max(max_area, area)
-            lengths.append(length)
-            widths.append(width)
-            areas.append(area)
-            centers.append(list(np.array(shape.centroid.coords)[0].astype(np.int32)))
+            if len(mbr_lengths) > 0:
+                width, length = min(mbr_lengths), max(mbr_lengths)
+                area = width * length
+                min_length, max_length = min(min_length, length), max(max_length, length)
+                min_width, max_width = min(min_width, width), max(max_width, width)
+                min_area, max_area = min(min_area, area), max(max_area, area)
+                lengths.append(length)
+                widths.append(width)
+                areas.append(area)
+                centers.append(list(np.array(shape.centroid.coords)[0].astype(np.int32)))
+            else:
+                pass
+
 
         return {'lengths': lengths, 'widths': widths, 'areas': areas, 'centers': centers, 'max_length': max_length, 'min_length': min_length, 'min_width': min_width, 'max_width': max_width, 'min_area': min_area, 'max_area': max_area}
 

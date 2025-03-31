@@ -7,11 +7,15 @@ import re
 import struct
 import subprocess
 import sys
+from datetime import datetime
 from multiprocessing import Lock, Value
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
+import tkinter as tk
+from copy import deepcopy
 
 import matplotlib.font_manager
+import numpy as np
 import pandas as pd
 import psutil
 import pyglet
@@ -697,9 +701,51 @@ def get_available_ram():
     return results
 
 
-get_available_ram()
+def get_current_time():
+    return datetime.now().strftime("%H:%M:%S")
 
 
+def get_display_resolution() -> Tuple[int, int]:
+    """ Helper to get main monitor / display resolution"""
+    root = tk.Tk()
+    root.withdraw()
+    width = root.winfo_screenwidth()
+    height = root.winfo_screenheight()
+    root.destroy()
+    return (width, height)
+
+
+def get_img_resize_info(img_size: Tuple[int ,int],
+                        display_resolution: Tuple[int, int],
+                        max_height_ratio: float = 0.5,
+                        max_width_ratio: float = 0.5) -> Tuple[int, int, float, float]:
+    """
+    Resize dimensions and scale factor an image while maintaining the aspect ratio so it fits within the
+    maximum allowed dimensions and does not exceed the display resolution.
+    """
+
+    max_width = int(display_resolution[0] * max_width_ratio)
+    max_height = int(display_resolution[1] * max_height_ratio)
+    if img_size[0] <= max_width and img_size[1] <= max_height:
+        return img_size[0], img_size[1], 1, 1
+    width_ratio = max_width / img_size[0]
+    height_ratio = max_height / img_size[1]
+    downscale_factor = min(width_ratio, height_ratio)
+    upscale_factor = 1 / downscale_factor
+    new_width = int(img_size[0] * downscale_factor)
+    new_height = int(img_size[1] * downscale_factor)
+    return new_width, new_height, downscale_factor, upscale_factor
+
+
+
+
+#get_display_resolution()
+
+#
+# display_resolution = get_display_resolution()
+# img_size = (3000, 600)
+# _get_img_resize_info(img_size=img_size, display_resolution=display_resolution)
+#
 
 #
 # def rao_spacing_critical_values():

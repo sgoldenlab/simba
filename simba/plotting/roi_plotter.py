@@ -130,6 +130,12 @@ class ROIPlotter(ConfigReader):
         else:
             self.color_lst = create_color_palettes(self.roi_analyzer.animal_cnt, len(body_parts))[0]
         self.bp_sizes = bp_sizes
+        try:
+            self.detailed_roi_data = pd.concat(self.roi_analyzer.detailed_dfs, axis=0).reset_index(drop=True)
+        except ValueError:
+            self.detailed_roi_data = None
+
+
         self.detailed_roi_data = pd.concat(self.roi_analyzer.detailed_dfs, axis=0).reset_index(drop=True)
         self.bp_dict = self.roi_analyzer.bp_dict
         self.animal_names = [self.find_animal_name_from_body_part_name(bp_name=x, bp_dict=self.animal_bp_dict) for x in body_parts]

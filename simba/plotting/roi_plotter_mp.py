@@ -193,7 +193,10 @@ class ROIPlotMultiprocess(ConfigReader):
         else:
             self.color_lst = create_color_palettes(self.roi_analyzer.animal_cnt, len(body_parts))[0]
         self.bp_sizes = bp_sizes
-        self.detailed_roi_data = pd.concat(self.roi_analyzer.detailed_dfs, axis=0).reset_index(drop=True)
+        try:
+            self.detailed_roi_data = pd.concat(self.roi_analyzer.detailed_dfs, axis=0).reset_index(drop=True)
+        except ValueError:
+            self.detailed_roi_data = None
         self.bp_dict = self.roi_analyzer.bp_dict
         self.animal_names = [self.find_animal_name_from_body_part_name(bp_name=x, bp_dict=self.animal_bp_dict) for x in body_parts]
         self.data_df = read_df(file_path=self.data_path, file_type=self.file_type, usecols=self.roi_analyzer.roi_headers).fillna(0.0).reset_index(drop=True)
@@ -335,6 +338,14 @@ class ROIPlotMultiprocess(ConfigReader):
         video_timer.stop_timer()
         stdout_success(msg=f"Video {self.video_name} created. ROI video saved at {self.save_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__, )
 
+
+#
+# if __name__ == "__main__":
+#     test = ROIPlotMultiprocess(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#                                video_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_Saline_0513.mp4",
+#                                body_parts=['Nose'],
+#                                style_attr={'show_body_part': True, 'show_animal_name': False})
+#     test.run()
 
 # if __name__ == "__main__":
 #     test = ROIPlotMultiprocess(config_path=r"C:\troubleshooting\roi_duplicates\project_folder\project_config.ini",

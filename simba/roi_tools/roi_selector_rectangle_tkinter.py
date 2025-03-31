@@ -125,4 +125,3 @@ class ROISelector:
 #
 # _ = ROISelector(img_window=root)
 # root.mainloop()
-

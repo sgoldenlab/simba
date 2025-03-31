@@ -139,6 +139,7 @@ from simba.ui.pop_ups.subset_feature_extractor_pop_up import \
 from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
     ThirdPartyAnnotatorAppenderPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
+from simba.ui.pop_ups.blob_visualizer_pop_up import BlobVisualizerPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
     BackgroundRemoverDirectoryPopUp, BackgroundRemoverSingleVideoPopUp,
     BoxBlurPopUp, BrightnessContrastPopUp, CalculatePixelsPerMMInVideoPopUp,
@@ -165,7 +166,7 @@ from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         FileSelect, SimbaButton, SimBALabel,
-                                        hxtScrollbar)
+                                        hxtScrollbar, on_mouse_scroll)
 from simba.ui.video_info_ui import VideoInfoTable
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_int)
@@ -822,8 +823,8 @@ class App(object):
         batch_process_menu.add_command(label="Batch pre-process videos", compound="left", image=self.menu_icons["factory"]["img"], command=lambda: BatchPreProcessPopUp(), font=Formats.FONT_REGULAR.value)
 
         blob_tracking_menu = Menu(batch_process_menu)
-        blob_tracking_menu.add_command(label="Perform blob tracking", compound="left", image=self.menu_icons["bubble"]["img"], command=InitializeBlobTrackerPopUp, font=Formats.FONT_REGULAR.value)
-        blob_tracking_menu.add_command(label="Visualize blob tracking", compound="left", image=self.menu_icons["eye"]["img"], command=None, font=Formats.FONT_REGULAR.value)
+        blob_tracking_menu.add_command(label="Perform blob tracking", compound="left", image=self.menu_icons["bubble_green"]["img"], command=InitializeBlobTrackerPopUp, font=Formats.FONT_REGULAR.value)
+        blob_tracking_menu.add_command(label="Visualize blob tracking", compound="left", image=self.menu_icons["bubble_pink"]["img"], command=BlobVisualizerPopUp, font=Formats.FONT_REGULAR.value)
         batch_process_menu.add_cascade(label="Blob tracking...", compound="left", image=self.menu_icons["bubble"]["img"], menu=blob_tracking_menu, font=Formats.FONT_REGULAR.value)
 
 

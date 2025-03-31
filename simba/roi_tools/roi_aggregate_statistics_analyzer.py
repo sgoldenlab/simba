@@ -187,6 +187,7 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
                     p_arr = self.data_df[bp_cols[2]].values.astype(np.float32)
                     below_threshold_idx = np.argwhere(p_arr < self.threshold)
                     bp_arr = self.data_df[[bp_cols[0], bp_cols[1]]].values.astype(np.float32)
+
                     for roi_cnt, (roi_name, roi_data) in enumerate(self.sliced_roi_dict.items()):
                         if roi_data[SHAPE_TYPE] == ROI_SETTINGS.RECTANGLE.value:
                             roi_coords = np.array([[roi_data['topLeftX'], roi_data['topLeftY']], [roi_data['Bottom_right_X'], roi_data['Bottom_right_Y']]])

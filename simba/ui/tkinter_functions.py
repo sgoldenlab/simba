@@ -3,6 +3,7 @@ __author__ = "Simon Nilsson"
 import os.path
 import platform
 import threading
+import tkinter
 import webbrowser
 from copy import copy
 from tkinter import *
@@ -50,6 +51,14 @@ def onFrameConfigure(canvas):
     canvas.configure(scrollregion=canvas.bbox("all"))
 
 
+def on_mouse_scroll(event, canvas):
+    if event.delta:
+        canvas.yview_scroll(-1 * (event.delta // 120), "units")
+    elif event.num == 4:
+        canvas.yview_scroll(-1, "units")
+    elif event.num == 5:
+        canvas.yview_scroll(1, "units")
+
 def hxtScrollbar(master):
     """
     Create canvas.
@@ -59,13 +68,7 @@ def hxtScrollbar(master):
     Bind the frame to the canvas
     """
     bg = master.cget("background")
-    acanvas = Canvas(
-        master,
-        borderwidth=0,
-        background=bg,
-        width=master.winfo_width(),
-        height=master.winfo_reqheight(),
-    )
+    acanvas = Canvas(master, borderwidth=0, background=bg, width=master.winfo_width(), height=master.winfo_reqheight())
     frame = Frame(acanvas, background=bg)
     vsb = Scrollbar(master, orient="vertical", command=acanvas.yview)
     vsb2 = Scrollbar(master, orient="horizontal", command=acanvas.xview)

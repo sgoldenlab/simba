@@ -20,3 +20,4 @@ Tutorials
    tutorials_rst/installation
    tutorials_rst/create_user_defined_pose_config
    tutorials_rst/tools
+   tutorials_rst/blob_tracking

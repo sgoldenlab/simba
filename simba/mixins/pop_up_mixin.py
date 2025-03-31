@@ -10,7 +10,7 @@ from PIL import ImageTk
 
 from simba.mixins.config_reader import ConfigReader
 from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
-                                        SimbaButton, hxtScrollbar)
+                                        SimbaButton, hxtScrollbar, on_mouse_scroll)
 from simba.utils.checks import (check_float, check_instance, check_int,
                                 check_valid_lst)
 from simba.utils.enums import Formats, Options
@@ -47,6 +47,9 @@ class PopUpMixin(object):
         else:
             self.main_frm = Canvas(self.root)
         self.main_frm.pack(fill="both", expand=True)
+        # self.main_frm.bind("<MouseWheel>", lambda event: on_mouse_scroll(event, self.main_frm))
+        # self.main_frm.bind("<Button-4>", lambda event: on_mouse_scroll(event, self.main_frm))
+        # self.main_frm.bind("<Button-5>", lambda event: on_mouse_scroll(event, self.main_frm))
         self.palette_options = Options.PALETTE_OPTIONS.value
         self.resolutions = Options.RESOLUTION_OPTIONS.value
         self.shading_options = Options.HEATMAP_SHADING_OPTIONS.value
@@ -66,6 +69,7 @@ class PopUpMixin(object):
                     self.root.iconphoto(False, self.menu_icons[icon]["img"])
             except:
                 pass
+
 
     def create_clf_checkboxes(self,
                               main_frm: Union[Frame, LabelFrame, Toplevel, Canvas],
