@@ -1,5 +1,5 @@
 ############
-BLOB TRACKING
+Blob tracking
 ############
 
 .. raw:: html
@@ -206,4 +206,4 @@ In the selected output directory, there will be:
 
 2. Background subtracted MP4 files (if ``SAVE BACKGROUND VIDEOS`` is True)
 
-3. A ``blob_definitions.json`` file containing the settings used to process each video file
+3. A ``blob_definitions.pickle`` file containing the settings used to process each video file
