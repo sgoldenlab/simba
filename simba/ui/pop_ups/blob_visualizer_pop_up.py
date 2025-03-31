@@ -1,11 +1,14 @@
-from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, SimBADropDown, FolderSelect
-from simba.utils.read_write import find_core_cnt
-from simba.utils.checks import check_if_dir_exists
-import numpy as np
-from simba.utils.lookups import get_color_dict
 from tkinter import *
+
+import numpy as np
+
+from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.blob_visualizer import BlobVisualizer
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FolderSelect,
+                                        SimBADropDown)
+from simba.utils.checks import check_if_dir_exists
+from simba.utils.lookups import get_color_dict
+from simba.utils.read_write import find_core_cnt
 
 OPACITY_OPTIONS = list(np.round(np.arange(0.1, 1.1, 0.1), 2))
 CIRCLE_SIZES = list(np.round(np.arange(1, 21, 1), 2))

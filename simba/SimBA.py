@@ -68,6 +68,7 @@ from simba.ui.pop_ups.append_roi_features_bodypart_pop_up import \
     AppendROIFeaturesByBodyPartPopUp
 from simba.ui.pop_ups.archive_files_pop_up import ArchiveProcessedFilesPopUp
 from simba.ui.pop_ups.batch_preprocess_pop_up import BatchPreProcessPopUp
+from simba.ui.pop_ups.blob_visualizer_pop_up import BlobVisualizerPopUp
 from simba.ui.pop_ups.boolean_conditional_slicer_pup_up import \
     BooleanConditionalSlicerPopUp
 from simba.ui.pop_ups.check_videos_seekable_pop_up import \
@@ -139,7 +140,6 @@ from simba.ui.pop_ups.subset_feature_extractor_pop_up import \
 from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
     ThirdPartyAnnotatorAppenderPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
-from simba.ui.pop_ups.blob_visualizer_pop_up import BlobVisualizerPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
     BackgroundRemoverDirectoryPopUp, BackgroundRemoverSingleVideoPopUp,
     BoxBlurPopUp, BrightnessContrastPopUp, CalculatePixelsPerMMInVideoPopUp,

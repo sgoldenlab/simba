@@ -15,7 +15,8 @@ from shapely.geometry import Polygon
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.roi_tools.interactive_roi_modifier_tkinter import InteractiveROIModifier
+from simba.roi_tools.interactive_roi_modifier_tkinter import \
+    InteractiveROIModifier
 from simba.roi_tools.roi_selector_circle_tkinter import ROISelectorCircle
 from simba.roi_tools.roi_selector_polygon_tkinter import ROISelectorPolygon
 from simba.roi_tools.roi_selector_rectangle_tkinter import ROISelector
@@ -45,11 +46,11 @@ from simba.utils.checks import (check_file_exist_and_readable, check_int,
 from simba.utils.enums import OS, ROI_SETTINGS, Formats, Keys
 from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 NoROIDataError)
-from simba.utils.lookups import get_color_dict, get_display_resolution, get_img_resize_info
+from simba.utils.lookups import (get_color_dict, get_display_resolution,
+                                 get_img_resize_info)
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 from simba.utils.warnings import DuplicateNamesWarning
-
 
 MAX_DRAW_UI_DISPLAY_RATIO = (0.75, 0.5) # W, H
 
