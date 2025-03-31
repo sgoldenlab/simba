@@ -24,6 +24,8 @@ try:
 except:
     from typing_extensions import Literal
 
+import ast
+
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
@@ -41,8 +43,6 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data, read_df,
                                     read_frm_of_video, read_video_info)
-import ast
-
 
 
 class PlottingMixin(object):
