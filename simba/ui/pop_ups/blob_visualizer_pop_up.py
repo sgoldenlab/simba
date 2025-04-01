@@ -22,7 +22,7 @@ class BlobVisualizerPopUp(PopUpMixin):
         PopUpMixin.__init__(self, title="VISUALIZE BLOB TRACKING", icon='bubble_pink')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings', icon_link=None)
         self.core_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, find_core_cnt()[0] + 1)), label="CPU CORE COUNT:", label_width=30, dropdown_width=20, value=find_core_cnt()[0])
-        self.shape_opacity_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=OPACITY_OPTIONS, label="SHAPE OPACITY:", label_width=30, dropdown_width=20, value=0.3)
+        self.shape_opacity_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=OPACITY_OPTIONS, label="SHAPE OPACITY:", label_width=30, dropdown_width=20, value=0.7)
         self.bg_opacity_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=OPACITY_OPTIONS, label="BACKGROUND OPACITY:", label_width=30, dropdown_width=20, value=1.0)
         self.keypoint_sizes_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=CIRCLE_SIZES, label="KEY-POINT SIZES:", label_width=30, dropdown_width=20, value=CIRCLE_SIZES[0])
         self.hull_clr_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=clr_names, label="HULL COLOR:", label_width=30, dropdown_width=20, value='Pink')

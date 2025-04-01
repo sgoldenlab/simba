@@ -2860,8 +2860,8 @@ def _read_img_batch_from_video_helper(frm_idx: np.ndarray, video_path: Union[str
     return results
 
 def read_img_batch_from_video(video_path: Union[str, os.PathLike],
-                              start_frm: int,
-                              end_frm: int,
+                              start_frm: Optional[int] = None,
+                              end_frm: Optional[int] = None,
                               greyscale: bool = False,
                               black_and_white: bool = False,
                               core_cnt: int = -1,
@@ -2893,8 +2893,14 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
             multiprocessing.set_start_method("fork", force=True)
     check_file_exist_and_readable(file_path=video_path)
     video_meta_data = get_video_meta_data(video_path=video_path)
-    check_int(name=read_img_batch_from_video.__name__,value=start_frm, min_value=0,max_value=video_meta_data["frame_count"])
-    check_int(name=read_img_batch_from_video.__name__, value=end_frm, min_value=start_frm+1, max_value=video_meta_data["frame_count"])
+    if start_frm is not None:
+        check_int(name=read_img_batch_from_video.__name__,value=start_frm, min_value=0,max_value=video_meta_data["frame_count"])
+    else:
+        start_frm = 0
+    if end_frm is not None:
+        check_int(name=read_img_batch_from_video.__name__, value=end_frm, min_value=start_frm+1, max_value=video_meta_data["frame_count"])
+    else:
+        end_frm = video_meta_data["frame_count"] -1
     check_int(name=read_img_batch_from_video.__name__, value=core_cnt, min_value=-1)
     check_valid_boolean(value=[greyscale, black_and_white], source=f'{read_img_batch_from_video.__name__} greyscale black_and_white')
     if core_cnt < 0:

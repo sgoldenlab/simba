@@ -9,7 +9,8 @@ import platform
 import shutil
 import subprocess
 import time
-from copy import copy, deepcopy
+import gc
+from copy import deepcopy
 from datetime import datetime
 from tkinter import *
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -4140,6 +4141,7 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
             print(f'Frame batch {result+1} completed...')
     pool.terminate()
     pool.join()
+    gc.collect()
     print(f"Joining {video_name} multi-processed video...")
     concatenate_videos_in_folder(in_folder=temp_dir, save_path=save_path, video_format=ext[1:], remove_splits=True, gpu=gpu, fps=video_meta_data['fps'])
     #reencode_mp4_video(save_path, 'libx264', 23)

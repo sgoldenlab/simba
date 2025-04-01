@@ -1,16 +1,11 @@
-import asyncio
 import functools
 import gc
-import math
 import multiprocessing
-import multiprocessing as mp
 import os
 import time
-import traceback
-from concurrent.futures import ProcessPoolExecutor
 from copy import copy, deepcopy
-from multiprocessing import sharedctypes
 from typing import Dict, Optional, Tuple, Union
+from scipy.spatial.distance import cdist
 
 import cv2
 import numpy as np
@@ -18,7 +13,7 @@ import pandas as pd
 from scipy.spatial import ConvexHull
 from scipy.spatial.qhull import QhullError
 from shapely.affinity import scale
-from shapely.geometry import LineString, MultiPolygon, Point, Polygon
+from shapely.geometry import MultiPolygon, Polygon
 
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.utils.checks import (check_float, check_instance, check_int,
@@ -30,8 +25,7 @@ from simba.utils.errors import FFMPEGCodecGPUError, SimBAGPUError
 from simba.utils.lookups import get_available_ram
 from simba.utils.read_write import (find_core_cnt, get_fn_ext,
                                     get_memory_usage_array,
-                                    get_video_meta_data, img_stack_to_bw,
-                                    img_stack_to_greyscale, read_frm_of_video,
+                                    get_video_meta_data, img_stack_to_bw, read_frm_of_video,
                                     read_img_batch_from_video,
                                     read_img_batch_from_video_gpu)
 
@@ -67,11 +61,9 @@ def stabilize_body_parts(bp_1: np.ndarray,
         nose_jump = np.linalg.norm(stable_nose[i] - stable_nose[i - 1])
         tail_jump = np.linalg.norm(stable_tail[i] - stable_tail[i - 1])
         if nose_jump > max_jump_distance:
-            stable_nose[i] = stable_nose[i - 1] + (stable_nose[i] - stable_nose[i - 1]) * (
-                        max_jump_distance / nose_jump)
+            stable_nose[i] = stable_nose[i - 1] + (stable_nose[i] - stable_nose[i - 1]) * (max_jump_distance / nose_jump)
         if tail_jump > max_jump_distance:
-            stable_tail[i] = stable_tail[i - 1] + (stable_tail[i] - stable_tail[i - 1]) * (
-                        max_jump_distance / tail_jump)
+            stable_tail[i] = stable_tail[i - 1] + (stable_tail[i] - stable_tail[i - 1]) * (max_jump_distance / tail_jump)
 
     return stable_nose, stable_tail
 
@@ -91,31 +83,40 @@ def get_hull_from_vertices(vertices: np.ndarray) -> Tuple[bool, np.ndarray]:
             pass
     return False, np.full((vertices.shape[0], 2), fill_value=0, dtype=np.int32)
 
+def get_nose_tail_from_vertices(vertices: np.ndarray, smooth_factor=5):
+    T, N, _ = vertices.shape
+    anterior = np.full((T, 2), -1, dtype=np.float32)
+    posterior = np.full((T, 2), -1, dtype=np.float32)
 
-def get_nose_tail_from_vertices(vertices: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
-    noses, tails = [], []
-    for v in vertices:
-        true_hull, hull_points = get_hull_from_vertices(v)
-        if true_hull:
-            centroid = np.mean(hull_points, axis=0)
-            distances = np.linalg.norm(hull_points - centroid, axis=1)
-            farthest_point_index = np.argmax(distances)
-            farthest_point = hull_points[farthest_point_index]
+    centroids = np.mean(vertices, axis=1)  # Compute centroids (T, 2)
+    cumulative_motion = centroids - centroids[0]
+    pairwise_dists = np.array([cdist(frame, frame) for frame in vertices])
+    max_indices = np.array([np.unravel_index(np.argmax(dists), dists.shape) for dists in pairwise_dists])
 
-            delta = farthest_point - centroid
-            angle = np.arctan2(delta[1], delta[0])
+    # Initialize head and tail based on first frame
+    first_farthest_pts = vertices[0][max_indices[0]]
+    anterior[0], posterior[0] = first_farthest_pts
+    head_history = [anterior[0]]
 
-            projections = np.dot(hull_points - centroid, np.array([np.cos(angle), np.sin(angle)]))
-            nose = hull_points[np.argmax(projections)]
-            tail = hull_points[np.argmin(projections)]
-        else:
-            nose = np.array([0, 0])
-            tail = np.array([0, 0])
+    for idx in range(1, T):
+        farthest_two_pts = vertices[idx][max_indices[idx]]
+        motion_vector = cumulative_motion[idx]
+        projections = np.dot(farthest_two_pts - centroids[idx], motion_vector)
+        head_idx = np.argmax(projections)
+        tail_idx = 1 - head_idx
+        candidate_head = farthest_two_pts[head_idx]
+        candidate_tail = farthest_two_pts[tail_idx]
 
-        noses.append(nose)
-        tails.append(tail)
 
-    return np.array(noses), np.array(tails)
+        anterior[idx] = candidate_head
+        posterior[idx] = candidate_tail
+        head_history.append(candidate_head)
+
+        if len(head_history) > smooth_factor:
+            head_history.pop(0)
+
+    return anterior, posterior
+
 
 
 def get_left_right_points(hull_vertices: np.ndarray,
@@ -288,6 +289,7 @@ def get_blob_vertices_from_video(video_path: Union[str, os.PathLike],
         constants = functools.partial(get_blob_vertices_from_imgs, verbose=verbose, video_name=video_name, inclusion_zone=inclusion_zone, convex_hull=convex_hull, vertice_cnt=vertice_cnt)
         for frame_batch in range(len(frame_ids)):
             print(f"Processing frame batch {frame_batch + 1}/{len(frame_ids)} (Video: {video_meta['video_name']}, batch_size: {batch_size}, available_ram: {available_ram})")
+            time.sleep(3)
             start_frm, end_frm = frame_ids[frame_batch][0], frame_ids[frame_batch][-1]
             if gpu:
                 imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=start_frm, end_frm=end_frm, verbose=False, greyscale=False, black_and_white=False, out_format='dict')
@@ -301,6 +303,7 @@ def get_blob_vertices_from_video(video_path: Union[str, os.PathLike],
 
     pool.join()
     pool.terminate()
+    gc.collect()
     results = dict(sorted(results.items()))
 
     return np.stack(list(results.values()), axis=0).astype(np.int32)

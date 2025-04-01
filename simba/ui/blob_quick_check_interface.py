@@ -105,7 +105,7 @@ class BlobQuickChecker():
         self.last_frm_btn.grid(row=0, column=6, sticky=NW, pady=10)
         self.img_window.protocol("WM_DELETE_WINDOW", self._close)
 
-        #self.img_window.mainloop()
+        self.img_window.mainloop()
 
     def draw_img(self, img: np.ndarray):
         self.pil_image = Image.fromarray(img)

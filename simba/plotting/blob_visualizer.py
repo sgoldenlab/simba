@@ -81,8 +81,9 @@ class BlobVisualizer():
         self.colors = [x for x in [self.hull, self.anterior, self.posterior, self.center, self.left, self.right] if x is not None]
 
     def run(self):
-        print(f'Running blob visualization {get_current_time()}...')
+        print(f'Running blob visualization for {len(list(self.data_paths.keys()))} video(s) (start time: {get_current_time()})...')
         for file_name, file_path in self.data_paths.items():
+            print(f'Running blob visualization for video {file_name}...')
             geometries = []
             video_path = self.video_paths[file_name]
             df = read_df(file_path=file_path, file_type='csv')

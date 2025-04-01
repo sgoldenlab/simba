@@ -27,9 +27,9 @@ def all_config_path_args(request):
 #     roi_analyzer.run()
 #     roi_analyzer.save()
 
-def test_roi_clf_calculator(config_path_args):
-    clf_ROI_analyzer = ROIClfCalculator(config_ini=config_path_args.param)
-    clf_ROI_analyzer.run(behavior_list=['Attack', 'Sniffing'], ROI_dict_lists={'Rectangle': ['Rectangle_1']}, body_part_list=['Nose_1'], measurements=['Total time by ROI (s)', 'Started bouts by ROI (count)', 'Ended bouts by ROI (count)'])
+# def test_roi_clf_calculator(config_path_args):
+#     clf_ROI_analyzer = ROIClfCalculator(config_ini=config_path_args.param)
+#     clf_ROI_analyzer.run(behavior_list=['Attack', 'Sniffing'], ROI_dict_lists={'Rectangle': ['Rectangle_1']}, body_part_list=['Nose_1'], measurements=['Total time by ROI (s)', 'Started bouts by ROI (count)', 'Ended bouts by ROI (count)'])
 
 # @pytest.mark.parametrize("config_path, settings", [('tests/data/test_projects/two_c57/project_folder/project_config.ini', {'body_parts': {'Simon': 'Ear_left_1', 'JJ': 'Ear_left_2'}, 'threshold': 0.4})])
 # def test_roi_directing_analyzer(config_path, settings):

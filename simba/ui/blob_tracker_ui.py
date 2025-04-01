@@ -65,7 +65,7 @@ class BlobTrackingUI(PopUpMixin):
         self.get_status_bar()
         self.roi_inclusion_store = os.path.join(self.output_dir, 'inclusion_definitions.h5')
         self.out_path = os.path.join(self.output_dir, 'blob_definitions.pickle')
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def get_quick_settings(self):
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
@@ -100,7 +100,7 @@ class BlobTrackingUI(PopUpMixin):
         self.use_gpu_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU:", label_width=30, dropdown_width=10, value='FALSE')
         if not self.gpu_available: self.use_gpu_dropdown.disable()
         else: self.use_gpu_dropdown.set_value(value='TRUE')
-        self.core_cnt_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(range(1, self.core_cnt+1)), label="CPU CORE COUNT:", label_width=30, dropdown_width=10, value=self.core_cnt)
+        self.core_cnt_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(range(1, self.core_cnt+1)), label="CPU CORE COUNT:", label_width=30, dropdown_width=10, value=int(self.core_cnt / 2))
 
         self.vertice_cnt_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(range(10, 501)), label="VERTICE COUNT:", label_width=30, dropdown_width=10, value=30)
         self.save_videos_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=['TRUE', 'FALSE'], label="SAVE BACKGROUND VIDEOS:", label_width=30, dropdown_width=10, value='TRUE')

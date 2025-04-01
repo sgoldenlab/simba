@@ -94,7 +94,7 @@ class BlobTrackingExecutor():
             self.vertice_col_names.append(f"vertice_{i}_x"); self.vertice_col_names.append(f"vertice_{i}_y")
 
     def run(self):
-        #self._remove_bgs()
+        self._remove_bgs()
         self._find_blobs()
         self.timer.stop_timer()
         stdout_success(msg=f'Animal tracking complete. Results save din directory {self.data[OUT_DIR]}', elapsed_time=self.timer.elapsed_time_str)
@@ -157,6 +157,7 @@ class BlobTrackingExecutor():
             video_meta = get_video_meta_data(video_path=video_data['video_path'])
             temp_video_path = os.path.join(self.save_dir, f'{video_name}.mp4')
             save_path = os.path.join(self.data[OUT_DIR], f'{video_meta["video_name"]}.csv')
+            self.core_cnt = 16
             vertices = get_blob_vertices_from_video(video_path=temp_video_path,
                                                     gpu=self.gpu,
                                                     verbose=True,
@@ -200,7 +201,7 @@ class BlobTrackingExecutor():
         print(f'Blob tracking COMPLETE: data saved at {self.save_dir}, (elapsed time: {blob_timer.elapsed_time_str}s')
 
 
-# DATA_PATH = r"D:\EPM_4\data\blob_definitions.pickle"
+# DATA_PATH = r"D:\FST_SIDE\out\blob_definitions.pickle"
 # tracker = BlobTrackingExecutor(data=DATA_PATH)
 # tracker.run()
 
