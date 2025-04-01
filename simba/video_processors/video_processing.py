@@ -2,6 +2,7 @@ __author__ = "Simon Nilsson"
 
 
 import functools
+import gc
 import glob
 import multiprocessing
 import os
@@ -9,7 +10,6 @@ import platform
 import shutil
 import subprocess
 import time
-import gc
 from copy import deepcopy
 from datetime import datetime
 from tkinter import *
