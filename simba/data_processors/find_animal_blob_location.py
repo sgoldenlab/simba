@@ -5,12 +5,12 @@ import os
 import time
 from copy import copy, deepcopy
 from typing import Dict, Optional, Tuple, Union
-from scipy.spatial.distance import cdist
 
 import cv2
 import numpy as np
 import pandas as pd
 from scipy.spatial import ConvexHull
+from scipy.spatial.distance import cdist
 from scipy.spatial.qhull import QhullError
 from shapely.affinity import scale
 from shapely.geometry import MultiPolygon, Polygon
@@ -25,7 +25,8 @@ from simba.utils.errors import FFMPEGCodecGPUError, SimBAGPUError
 from simba.utils.lookups import get_available_ram
 from simba.utils.read_write import (find_core_cnt, get_fn_ext,
                                     get_memory_usage_array,
-                                    get_video_meta_data, img_stack_to_bw, read_frm_of_video,
+                                    get_video_meta_data, img_stack_to_bw,
+                                    read_frm_of_video,
                                     read_img_batch_from_video,
                                     read_img_batch_from_video_gpu)
 
