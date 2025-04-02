@@ -201,9 +201,9 @@ class BlobTrackingExecutor():
         print(f'Blob tracking COMPLETE: data saved at {self.save_dir}, (elapsed time: {blob_timer.elapsed_time_str}s')
 
 
-DATA_PATH = r"D:\FST_SIDE\out\blob_definitions.pickle"
-tracker = BlobTrackingExecutor(data=DATA_PATH)
-tracker.run()
+# DATA_PATH = r"D:\FST_SIDE\out\blob_definitions.pickle"
+# tracker = BlobTrackingExecutor(data=DATA_PATH)
+# tracker.run()
 
 
 
