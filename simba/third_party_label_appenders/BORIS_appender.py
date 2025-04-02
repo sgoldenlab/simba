@@ -49,7 +49,10 @@ class BorisAppender(ConfigReader):
     .. [1] `Behavioral Observation Research Interactive Software (BORIS) user guide <https://boris.readthedocs.io/en/latest/#>`__.
     """
 
-    def __init__(self, config_path: Union[str, os.PathLike], data_dir: Union[str, os.PathLike]):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 data_dir: Union[str, os.PathLike]):
+
         super().__init__(config_path=config_path)
         check_if_dir_exists(data_dir)
         self.boris_dir = data_dir
@@ -61,18 +64,16 @@ class BorisAppender(ConfigReader):
 
     def __check_non_overlapping_annotations(self, annotation_df):
         shifted_annotations = deepcopy(annotation_df)
-        print(shifted_annotations)
         shifted_annotations["START"] = annotation_df["START"].shift(-1)
         shifted_annotations = shifted_annotations.head(-1)
-        print(shifted_annotations)
         error_rows = shifted_annotations.query("START < STOP")
-
         if len(error_rows) > 0:
             raise ThirdPartyAnnotationOverlapError(video_name=self.file_name, clf_name=self.clf_name)
 
 
     def run(self):
         boris_annotation_dict = read_boris_annotation_files(data_paths=self.boris_files_found, video_info_df=self.video_info_df, orient='index')
+        print(boris_annotation_dict)
         for file_cnt, file_path in enumerate(self.feature_file_paths):
             self.file_name = get_fn_ext(filepath=file_path)[1]
             self.video_timer = SimbaTimer(start=True)
@@ -82,7 +83,9 @@ class BorisAppender(ConfigReader):
             else:
                 video_annot = boris_annotation_dict[self.file_name]
             data_df = read_df(file_path, self.file_type)
+            print(data_df)
             video_annot = video_annot.fillna(len(data_df))
+            print(data_df)
             for clf_name in self.clf_names:
                 self.clf_name = clf_name
                 data_df[clf_name] = 0
@@ -115,10 +118,9 @@ class BorisAppender(ConfigReader):
 #                      data_dir=r"C:\troubleshooting\boris_test_2\project_folder\boris_files")
 # test.run()
 #
-
-# test = BorisAppender(config_path=r"C:\troubleshooting\boris_test\project_folder\project_config.ini",
-#                      data_dir=r"C:\troubleshooting\boris_test\project_folder\boris_files")
-# #test.create_boris_master_file()
+#
+# test = BorisAppender(config_path=r"C:\troubleshooting\snake\project_folder\project_config.ini",
+#                      data_dir=r"C:\troubleshooting\snake\project_folder\boris")
 # test.run()
 
 #

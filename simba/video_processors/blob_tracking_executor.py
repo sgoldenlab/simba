@@ -181,8 +181,8 @@ class BlobTrackingExecutor():
                 centers = GeometryMixin.get_center(shape=geometries).astype(np.int32)
                 results[CENTER_X], results[CENTER_Y] = centers[:, 0], centers[:, 1]
             if self.rostrocaudal or self.mediolateral:
-                nose, tail = get_nose_tail_from_vertices(vertices=vertices)
-                nose, tail = stabilize_body_parts(bp_1=nose, bp_2=tail, center_positions=centers)
+                nose, tail = get_nose_tail_from_vertices(vertices=vertices, fps=video_meta['fps'], smooth_factor=1.0)
+                #nose, tail = stabilize_body_parts(bp_1=nose, bp_2=tail, center_positions=centers)
                 results[NOSE_X], results[NOSE_Y] = nose[:, 0], nose[:, 1]
                 results[TAIL_X], results[TAIL_Y] = tail[:, 0], tail[:, 1]
             if self.mediolateral:
@@ -201,9 +201,9 @@ class BlobTrackingExecutor():
         print(f'Blob tracking COMPLETE: data saved at {self.save_dir}, (elapsed time: {blob_timer.elapsed_time_str}s')
 
 
-# DATA_PATH = r"D:\FST_SIDE\out\blob_definitions.pickle"
-# tracker = BlobTrackingExecutor(data=DATA_PATH)
-# tracker.run()
+DATA_PATH = r"D:\FST_SIDE\out\blob_definitions.pickle"
+tracker = BlobTrackingExecutor(data=DATA_PATH)
+tracker.run()
 
 
 

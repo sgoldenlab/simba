@@ -83,37 +83,68 @@ def get_hull_from_vertices(vertices: np.ndarray) -> Tuple[bool, np.ndarray]:
             pass
     return False, np.full((vertices.shape[0], 2), fill_value=0, dtype=np.int32)
 
-def get_nose_tail_from_vertices(vertices: np.ndarray, smooth_factor=5):
+def get_nose_tail_from_vertices(vertices: np.ndarray,
+                                fps: float = 10,
+                                smooth_factor = 0.5,
+                                jump_threshold = 0.75):
+
+    def calculate_bearing(head, tail):
+        delta_y = tail[1] - head[1]
+        delta_x = tail[0] - head[0]
+        return np.arctan2(delta_y, delta_x)
+
+    smooth_factor = max(2, int(fps * smooth_factor))
     T, N, _ = vertices.shape
     anterior = np.full((T, 2), -1, dtype=np.float32)
     posterior = np.full((T, 2), -1, dtype=np.float32)
 
-    centroids = np.mean(vertices, axis=1)  # Compute centroids (T, 2)
+    centroids = np.mean(vertices, axis=1)
     cumulative_motion = centroids - centroids[0]
+
     pairwise_dists = np.array([cdist(frame, frame) for frame in vertices])
     max_indices = np.array([np.unravel_index(np.argmax(dists), dists.shape) for dists in pairwise_dists])
 
-    # Initialize head and tail based on first frame
     first_farthest_pts = vertices[0][max_indices[0]]
     anterior[0], posterior[0] = first_farthest_pts
     head_history = [anterior[0]]
+
+    previous_head = anterior[0]
+    previous_tail = posterior[0]
+
+    mean_distances = []
 
     for idx in range(1, T):
         farthest_two_pts = vertices[idx][max_indices[idx]]
         motion_vector = cumulative_motion[idx]
         projections = np.dot(farthest_two_pts - centroids[idx], motion_vector)
+
         head_idx = np.argmax(projections)
         tail_idx = 1 - head_idx
         candidate_head = farthest_two_pts[head_idx]
         candidate_tail = farthest_two_pts[tail_idx]
 
+        distance = np.linalg.norm(candidate_head - candidate_tail)
+        mean_distances.append(distance)
 
-        anterior[idx] = candidate_head
-        posterior[idx] = candidate_tail
+        if len(mean_distances) > smooth_factor:
+            mean_distances.pop(0)
+
+        mean_distance = np.mean(mean_distances)
+
+        if np.linalg.norm(candidate_head - previous_head) > jump_threshold * mean_distance or np.linalg.norm(candidate_tail - previous_tail) > jump_threshold * mean_distance:
+            candidate_head, candidate_tail = candidate_tail, candidate_head
+
+        bearing = calculate_bearing(candidate_head, candidate_tail)
+
+        if np.dot(np.array([candidate_tail[0] - candidate_head[0], candidate_tail[1] - candidate_head[1]]), np.array([np.cos(bearing), np.sin(bearing)])) < 0:
+            candidate_head, candidate_tail = candidate_tail, candidate_head
+
+        anterior[idx], posterior[idx] = candidate_head, candidate_tail
         head_history.append(candidate_head)
 
         if len(head_history) > smooth_factor:
             head_history.pop(0)
+        previous_head, previous_tail = candidate_head, candidate_tail
 
     return anterior, posterior
 

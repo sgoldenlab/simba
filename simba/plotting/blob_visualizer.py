@@ -141,8 +141,8 @@ class BlobVisualizer():
 #visualizer = BlobVisualizer(data_path=r'D:\EPM_3\out', video_path=r'D:\EPM_3', save_dir=r"D:\EPM_3\out_videos")
 
 # visualizer = BlobVisualizer(data_path=r'D:\FST_SIDE\out', video_path=r'D:\FST_SIDE', save_dir=r"D:\FST_SIDE\videos")
-#
-# #visualizer = BlobVisualizer(data_path=r'D:\EPM\data', video_path=r'D:\EPM\sampled', save_dir=r"D:\EPM\videos_out")
+# #
+# # #visualizer = BlobVisualizer(data_path=r'D:\EPM\data', video_path=r'D:\EPM\sampled', save_dir=r"D:\EPM\videos_out")
 # visualizer.run()
 
 # visualizer = BlobVisualizer(data_path=r'D:\OF_7\data', video_path=r'D:\OF_7\original', save_dir=r'D:\OF_7\out_videos')

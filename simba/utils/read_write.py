@@ -2452,20 +2452,16 @@ def read_boris_file(file_path: Union[str, os.PathLike],
         expected_headers = [TIME, MEDIA_FILE_PATH, BEHAVIOR, STATUS]
         if not OBSERVATION_ID in boris_df.columns:
             if raise_error:
-                raise InvalidFileTypeError(msg=f'{file_path} is not a valid BORIS file',
-                                           source=read_boris_file.__name__)
+                raise InvalidFileTypeError(msg=f'{file_path} is not a valid BORIS file', source=read_boris_file.__name__)
             else:
-                ThirdPartyAnnotationsInvalidFileFormatWarning(annotation_app="BORIS", file_path=file_path,
-                                                              source=read_boris_file.__name__, log_status=log_setting)
+                ThirdPartyAnnotationsInvalidFileFormatWarning(annotation_app="BORIS", file_path=file_path, source=read_boris_file.__name__, log_status=log_setting)
                 return {}
         start_idx = boris_df[boris_df[OBSERVATION_ID] == TIME].index.values
         if len(start_idx) != 1:
             if raise_error:
-                raise InvalidFileTypeError(msg=f'{file_path} is not a valid BORIS file',
-                                           source=read_boris_file.__name__)
+                raise InvalidFileTypeError(msg=f'{file_path} is not a valid BORIS file', source=read_boris_file.__name__)
             else:
-                ThirdPartyAnnotationsInvalidFileFormatWarning(annotation_app="BORIS", file_path=file_path,
-                                                              source=read_boris_file.__name__, log_status=log_setting)
+                ThirdPartyAnnotationsInvalidFileFormatWarning(annotation_app="BORIS", file_path=file_path, source=read_boris_file.__name__, log_status=log_setting)
                 return {}
         df = pd.read_csv(file_path, skiprows=range(0, int(start_idx + 1)))
     else:
@@ -2488,13 +2484,9 @@ def read_boris_file(file_path: Union[str, os.PathLike],
         FPS = _find_cap_insensitive_name(target=FPS, values=list(df.columns))
         if not FPS in df.columns:
             if raise_error:
-                raise FrameRangeError(
-                    f'The annotations are in seconds and FPS was not passed. FPS could also not be read from the BORIS file',
-                    source=read_boris_file.__name__)
+                raise FrameRangeError(f'The annotations are in seconds and FPS was not passed. FPS could also not be read from the BORIS file', source=read_boris_file.__name__)
             else:
-                FrameRangeWarning(
-                    msg=f'The annotations are in seconds and FPS was not passed. FPS could also not be read from the BORIS file',
-                    source=read_boris_file.__name__)
+                FrameRangeWarning(msg=f'The annotations are in seconds and FPS was not passed. FPS could also not be read from the BORIS file', source=read_boris_file.__name__)
                 ThirdPartyAnnotationsInvalidFileFormatWarning(annotation_app="BORIS", file_path=file_path, source=read_boris_file.__name__, log_status=log_setting)
                 return {}
         if len(media_file_names_in_file) == 1:
@@ -2509,8 +2501,10 @@ def read_boris_file(file_path: Union[str, os.PathLike],
                 fps.append(float(fps_value))
     if FRAME_INDEX is not None:
         expected_headers.append(FRAME_INDEX)
+    print(df)
     df = df[expected_headers]
     results = {}
+    print(df)
     for video_cnt, video_file_name in enumerate(media_file_names_in_file):
         video_name = get_fn_ext(filepath=video_file_name)[1]
         results[video_name] = {}
@@ -2524,20 +2518,15 @@ def read_boris_file(file_path: Union[str, os.PathLike],
         for clf in video_df['BEHAVIOR'].unique():
             video_clf_df = video_df[video_df['BEHAVIOR'] == clf].reset_index(drop=True)
             if orient == 'index':
-                start_clf, stop_clf = video_clf_df[video_clf_df[EVENT] == START].reset_index(drop=True), video_clf_df[
-                    video_clf_df[EVENT] == STOP].reset_index(drop=True)
+                start_clf, stop_clf = video_clf_df[video_clf_df[EVENT] == START].reset_index(drop=True), video_clf_df[video_clf_df[EVENT] == STOP].reset_index(drop=True)
                 start_clf = start_clf.rename(columns={FRAME: START}).drop([EVENT, 'BEHAVIOR'], axis=1)
                 stop_clf = stop_clf.rename(columns={FRAME: STOP}).drop([EVENT], axis=1)
                 if len(start_clf) != len(stop_clf):
                     if raise_error:
-                        raise FrameRangeError(
-                            f'In file {file_path}, the number of start events ({len(start_clf)}) and stop events ({len(stop_clf)}) for behavior {clf} and video {video_name} is not equal',
-                            source=read_boris_file.__name__)
+                        raise FrameRangeError(f'In file {file_path}, the number of start events ({len(start_clf)}) and stop events ({len(stop_clf)}) for behavior {clf} and video {video_name} is not equal', source=read_boris_file.__name__)
                     else:
-                        FrameRangeWarning(
-                            msg=f'In file {file_path}, the number of start events ({len(start_clf)}) and stop events ({len(stop_clf)}) for behavior {clf} and video {video_name} is not equal',
-                            source=read_boris_file.__name__)
-                        return results
+                        FrameRangeWarning( msg=f'In file {file_path}, the number of start events ({len(start_clf)}) and stop events ({len(stop_clf)}) for behavior {clf} and video {video_name} is not equal', source=read_boris_file.__name__)
+                        continue
                 video_clf_df = pd.concat([start_clf, stop_clf], axis=1)[['BEHAVIOR', START, STOP]]
             results[video_name][clf] = video_clf_df
     if save_path is None:

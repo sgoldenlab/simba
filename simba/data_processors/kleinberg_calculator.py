@@ -57,6 +57,8 @@ class KleinbergCalculator(ConfigReader):
            2019.
     .. [3] Bordes et al., Automatically annotated motion tracking identifies a distinct social behavioral profile
            following chronic social defeat stress, `bioRxiv`, 2022.
+    .. [4] Chanthongdee et al., Comprehensive ethological analysis of fear expression in rats using DeepLabCut and SimBA machine learning model.
+           Front. Behav. Neurosci. https://doi.org/10.3389/fnbeh.2024.1440601
     """
 
     def __init__(self,

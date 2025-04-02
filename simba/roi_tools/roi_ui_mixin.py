@@ -52,7 +52,7 @@ from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 from simba.utils.warnings import DuplicateNamesWarning
 
-MAX_DRAW_UI_DISPLAY_RATIO = (0.75, 0.5) # W, H
+MAX_DRAW_UI_DISPLAY_RATIO = (0.5, 0.75) # W, H
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"
 SHAPE_TYPE = 'Shape_type'

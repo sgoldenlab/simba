@@ -131,7 +131,7 @@ def get_video_slic(video_path: Union[str, os.PathLike],
 
 
 if __name__=='__main__':
-    video_path = r"C:\troubleshooting\mitra\project_folder\videos\FRR_gq_Saline_0626.mp4"
+    video_path = r"D:\EPM_2\EPM_1.mp4"
     get_video_slic(video_path=video_path, save_path=r"C:\Users\sroni\OneDrive\Desktop\test.mp4")
 
 #

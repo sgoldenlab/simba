@@ -1900,6 +1900,50 @@ class ImageMixin(object):
             return False
 
     @staticmethod
+    @jit(nopython=True)
+    def resize_img_stack(imgs: np.ndarray,
+                         scale_factor: float = 0.5) -> np.ndarray:
+        """
+        Resizes a stack of images by applying a scaling factor to each image in the stack. Uses bilinear interpolation.
+
+        .. note::
+           Pass gresyscale images.
+
+        :param np.ndarray imgs: 3D numpy array of shape (N, H, W). All images are expected to have the same shape.
+        :param float scale_factor: A float that determines the scaling factor for resizing each image. A value of 0.5 will reduce the size by  half.
+        :return: A 3D numpy array of the resized images, with shape (N, Nh, Nw), where Nh and Nw are the new height and width calculated by applying the `scale_factor` to the original height and width.
+        :rtype: np.ndarray
+
+        :example:
+        >>> VIDEO_PATH = r"D:\EPM_2\EPM_1.mp4"
+        >>> img = read_img_batch_from_video(video_path=VIDEO_PATH, greyscale=True, start_frm=0, end_frm=15, core_cnt=1)
+        >>> imgs = np.stack(list(img.values()))
+        >>> resized_img = resize_img_stack(imgs=imgs)
+        """
+
+        Nh, Nw = int(imgs.shape[1] * scale_factor), int(imgs.shape[2] * scale_factor)
+        results = np.empty((imgs.shape[0], Nh, Nw), dtype=imgs.dtype)
+        for t in prange(imgs.shape[0]):
+            for i in range(Nh):
+                for j in range(Nw):
+                    orig_x = min(int(j / scale_factor), imgs.shape[2] - 1)
+                    orig_y = min(int(i / scale_factor), imgs.shape[1] - 1)
+                    if orig_x + 1 < imgs.shape[2] and orig_y + 1 < imgs.shape[1]:
+                        dx = (j / scale_factor) - orig_x
+                        dy = (i / scale_factor) - orig_y
+                        top_left = imgs[t, orig_y, orig_x]
+                        top_right = imgs[t, orig_y, orig_x + 1]
+                        bottom_left = imgs[t, orig_y + 1, orig_x]
+                        bottom_right = imgs[t, orig_y + 1, orig_x + 1]
+                        top = top_left + dx * (top_right - top_left)
+                        bottom = bottom_left + dx * (bottom_right - bottom_left)
+                        results[t, i, j] = top + dy * (bottom - top)
+                    else:
+                        results[t, i, j] = imgs[t, orig_y, orig_x]
+        return results
+
+
+    @staticmethod
     def resize_img_dict(imgs: Dict[str, np.ndarray],
                         size: Union[Literal['min', 'max'], Tuple[int, int]],
                         interpolation: Optional[int] = cv2.INTER_LINEAR) -> Dict[str, np.ndarray]:
