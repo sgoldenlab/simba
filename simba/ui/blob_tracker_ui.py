@@ -106,7 +106,7 @@ class BlobTrackingUI(PopUpMixin):
         self.save_videos_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=['TRUE', 'FALSE'], label="SAVE BACKGROUND VIDEOS:", label_width=30, dropdown_width=10, value='TRUE')
         self.close_iterations_dropdown_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(range(1, 20)), label="GAP FILLING ITERATIONS:", label_width=30, dropdown_width=10, value=3)
         self.open_iterations_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(range(1, 20)), label="NOISE REMOVAL ITERATIONS:", label_width=30, dropdown_width=10, value=3)
-        self.duplicate_inclusion_zones_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(self.in_videos.keys()), label="DUPLICATE INCLUSION ZONES:", label_width=30, dropdown_width=10, value=list(self.in_videos.keys())[0])
+        self.duplicate_inclusion_zones_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(self.in_videos.keys()), label="DUPLICATE INCLUSION ZONES:", label_width=30, dropdown_width=self.len_max_char, value=list(self.in_videos.keys())[0])
         self.duplicate_inclusion_zones_btn = SimbaButton(parent=self.run_time_settings_frm, txt='APPLY', img='tick', cmd=self._duplicate_inclusion_zones, cmd_kwargs={'video_name': lambda: self.duplicate_inclusion_zones_dropdown.getChoices()})
         self.run_time_settings_frm.grid(row=0, column=1, sticky=NW)
 

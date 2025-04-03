@@ -1,8 +1,13 @@
-BLOB TRACKING
+Blob (contour) tracking
 ============
 
 .. video:: https://github.com/user-attachments/assets/f8a18ba8-76b4-473b-b001-2331192b72c1
-   :width: 800
+   :width: 800px
+   :autoplay:
+   :loop:
+
+.. video:: https://github.com/sgoldenlab/simba/blob/master/images/EPM_2_V2_cropped.mp4
+   :width: 800px
    :autoplay:
    :loop:
 
@@ -29,6 +34,11 @@ The speed of tracking through background subtraction is not only determined by y
 
 It is also determined by the resolution of your videos and the frame-rate of the videos. The higher the resolution, and the higher the frame-rate, the longer it will take.
 
+.. video:: https://github.com/user-attachments/assets/b04b8f13-f0c7-489a-a3cd-a07b8a39dc68
+   :width: 800px
+   :autoplay:
+   :loop:
+
 For example, if your video resolutions are large (1000 x 1000), but you can visually detect the animals even at smaller resolutions (640 x 640, or even 480 x 480), then consider down sampling your videos before performing blob detection.
 
 Also, if you have collected your videos at a relatively higher frame-rate (say 30 fps), but you really don't need to know where the animal is every 33ms of the video, then reduce the FPS of your videos to say 10 to get a location reading every 100ms.
@@ -44,6 +54,12 @@ When performing animal tracking through background subtraction, for every video 
 
 1. One which is the "background reference"
 2. One which is the video we are interested in tracking the movement of the animal
+
+.. video:: https://github.com/user-attachments/assets/3418e032-9dcc-4b81-8c56-d0daaae36c99
+   :width: 800px
+   :autoplay:
+   :loop:
+
 
 It is possible to select the same video as that being analyzed as the background reference video. However, note that this:
 
@@ -62,12 +78,14 @@ After starting SimBA click on ``Process Videos`` in the main toolbar, and go to 
 .. image:: img/blob_tracking/blob_tracking_0.webp
    :width: 800
    :align: center
+   :alt: Blob tracking menu option in SimBA
 
 Next, you should see the following pop-up menu. Next to the ``INPUT VIDEO DIRECTORY`` entry-box, click :kbd:`BROWSE` and select the directory which contains your videos. Next to the ``SAVE DATA DIRECTORY`` entry-box, click :kbd:`BROWSE` and select the directory where you want to save your tracking data.
 
 .. image:: img/blob_tracking/blob_tracking_1.webp
    :width: 800
    :align: center
+   :alt: Input and output directory selection in SimBA
 
 .. note::
    For the ``SAVE DATA DIRECTORY``, select an empty directory.
@@ -77,6 +95,7 @@ Next, hit the :kbd:`RUN` button, and the below pop-up should show, which lists a
 .. image:: img/blob_tracking/blob_tracking_2.webp
    :width: 800
    :align: center
+   :alt: Video list and settings interface in SimBA
 
 The Blob Tracking Menu
 ------------------
@@ -96,7 +115,7 @@ We will go through what they all mean below.
 
 Generally, a value between 20-70 should do the trick.
 
-.. video:: https://github.com/user-attachments/assets/b04b8f13-f0c7-489a-a3cd-a07b8a39dc68
+.. video:: https://github.com/user-attachments/assets/62cca260-5ab9-41ca-9cae-5369b3dc194c
    :width: 800px
    :autoplay:
    :loop:
@@ -105,7 +124,7 @@ Generally, a value between 20-70 should do the trick.
 
 If set to, for example, 0.5, then SimBA performs Savitzky-Golay smoothing across the chosen, sliding, temporal window (500ms, or 0.5s in this case).
 
-.. video:: https://github.com/user-attachments/assets/3418e032-9dcc-4b81-8c56-d0daaae36c99
+.. video:: https://github.com/user-attachments/assets/a86a0d7b-35c6-4da7-b44c-4856d71fd861
    :width: 800px
    :autoplay:
    :loop:
@@ -116,7 +135,7 @@ We may want to buffer the animals shape a little, to capture a larger area as be
 
 See further information below, or this visual example of expected results from when applying different buffer sizes:
 
-.. video:: https://github.com/user-attachments/assets/62cca260-5ab9-41ca-9cae-5369b3dc194c
+.. video:: https://github.com/user-attachments/assets/91b8b70a-a442-454c-b957-31ba5253d042
    :width: 800px
    :autoplay:
    :loop:
@@ -135,7 +154,7 @@ Generally, a value between 0-3 should do the trick.
 
 For further details on ``GAP FILL FILTER SIZE``, see below, or see this visual example on expected results from different closing kernel sizes:
 
-.. video:: https://github.com/user-attachments/assets/a86a0d7b-35c6-4da7-b44c-4856d71fd861
+.. video:: https://github.com/user-attachments/assets/2fcb2aae-0c27-472e-8d29-b80e7306a6ad
    :width: 800px
    :autoplay:
    :loop:
@@ -146,7 +165,7 @@ This can be helpful if get rid of small noise related to the movement of bedding
 
 For further details on ``NOISE REMOVAL FILTER SIZE``, see below, or this visual example on expected results when removing the noise associated with bedding material using the noise removal filter:
 
-.. video:: https://github.com/user-attachments/assets/91b8b70a-a442-454c-b957-31ba5253d042
+.. video:: https://github.com/user-attachments/assets/9e498c6d-cf2c-4084-ba42-2582305421bd
    :width: 800px
    :autoplay:
    :loop:
@@ -164,7 +183,7 @@ Choose a directory by clicking :kbd:`BROWSE` that contains background video exam
 
 SimBA will automatically pair each background video with the videos in the table.
 
-.. video:: https://github.com/user-attachments/assets/2fcb2aae-0c27-472e-8d29-b80e7306a6ad
+.. video:: https://github.com/user-attachments/assets/bfcd54f8-76e-4fb7-ab50-fec64ad803be
    :width: 800px
    :autoplay:
    :loop:
@@ -214,11 +233,6 @@ This is typically a faster way to get inclusion zones drawn, than manually drawi
 
 Note: to date, I haven't found much use for ``INCLUSION ZONES``, and have been able to find the animals reliably without it.
 
-.. video:: https://github.com/user-attachments/assets/bfcd54f8-c610-4ad1-970c-1176873950b5
-   :width: 800px
-   :autoplay:
-   :loop:
-
 Video Table
 ~~~~~~~~~
 
@@ -247,11 +261,6 @@ To do this, click the :kbd:`SET INCLUSION ZONES` button for a video, and use the
 
 For a full tutorial for how to use this interface, see `THIS <https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md>`_ documentation. As an example, in the video below, I define a polygon called ``MAZE`` for the first video, and save it, making sure that the animal will only be detected inside the ``MAZE`` region of interest.
 
-.. video:: https://github.com/user-attachments/assets/9e498c6d-cf2c-4084-ba42-2582305421bd
-   :width: 800px
-   :autoplay:
-   :loop:
-
 .. note::
    1. To save time, consider specifying the inclusion zones on only one video, and duplicating these inclusion zones on the rest of the videos using the ``DUPLICATE INCLUSION ZONES`` dropdown menu in the ``RUN-TIME SETTING`` menu above.
    2. Only use inclusion zones if you see problems with the tracking. If you have confirmed visually that there are no problems with the tracking (which for me has been overwhelmingly the case) then no inclusion zones are required. We can use ``QUICK CHECK`` (described below) to get an idea of how the tracking looks like.
@@ -260,19 +269,9 @@ For a full tutorial for how to use this interface, see `THIS <https://github.com
 
 **BUFFER SIZE**: If set to None, the animals detected key-points will be placed right along the hull perimeter. We may want to "buffer" the animals shape a little, to capture a larger area as the animal. Set how many pixels that you wish to buffer the animals geometry with. For a visual example about what "buffering" means, see below video:
 
-.. video:: https://github.com/user-attachments/assets/62cca260-5ab9-41ca-9cae-5369b3dc194c
-   :width: 800px
-   :autoplay:
-   :loop:
-
 **GAP FILL SIZE (%)**: Controls animal shape refinement. Larger values will merge separate parts if the images detected as the foreground together into a single entity.
 
 The larger the value, the further apart the separate parts of the foreground is allowed to be and still be merged into a single entity. See below video of an animal when increasingly larger kernel sizes are chosen:
-
-.. video:: https://github.com/user-attachments/assets/a86a0d7b-35c6-4da7-b44c-4856d71fd861
-   :width: 800px
-   :autoplay:
-   :loop:
 
 .. note::
    In the example above, from an elevated plus maze, the borders of the open arms are black (same color as the animal) causing the tracking to fail and split the animal into two parts of the animal gets mistaken for the background as the animal performs a head dip. This is solved by smoothing (or "closing") the animals geometry.
@@ -280,11 +279,6 @@ The larger the value, the further apart the separate parts of the foreground is 
 **NOISE FILL SIZE (%)**: Controls removal of noise. Larger values will remove parts smaller parts of the detected foreground.
 
 This can be helpful to get rid of small noise related to the movement of bedding or light across the video like the below video:
-
-.. video:: https://github.com/user-attachments/assets/91b8b70a-a442-454c-b957-31ba5253d042
-   :width: 800px
-   :autoplay:
-   :loop:
 
 .. note::
    Only relevant if the light and or background changes slightly across videos. If there isn't any background noise, or the background noise is small enough not to be confused with the larger animal, set the NOISE FILL SIZE to ``None``.
@@ -294,11 +288,6 @@ This can be helpful to get rid of small noise related to the movement of bedding
 Hitting the :kbd:`QUICK CHECK` button will remove the background, and show a pop-up window with the video which you scan scroll through, frame-by-frame.
 
 If you can reliably see the animal in white, and the background in black, you are good to go!
-
-.. video:: https://github.com/user-attachments/assets/b83dfef6-746e-4fb7-ab50-fec64ad803be
-   :width: 800px
-   :autoplay:
-   :loop:
 
 Execute
 ~~~~~~
@@ -323,3 +312,9 @@ This file will also contain six columns representing the anterior, posterior, ce
 Moreover, if you had set ``SAVE BACKGROUND VIDEOS`` to True in ``RUN-TIME SETTINGS`` frame, this directory will also contain the background subtracted mp4 file for each processed videos.
 
 Lastly, this directory will contain a ``.pickle`` file, named ``blob_definitions.pickle``, which contains the settings which you used to process each of the video files, that will look something like `THIS <https://github.com/sgoldenlab/simba/blob/master/misc/blob_definitions_example.json>`_.
+
+
+Next steps
+~~~~~~~~~~~~
+
+TODO: Visualize the tracking.
