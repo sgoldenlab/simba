@@ -27,6 +27,14 @@ pip install simba-uw-tf-dev
 ```
 For detailed installation instructions, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md)
 
+
+## Apr-03-2025: Blob (contour) tracking in SimBA
+
+For documentation, see [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/blob_track.md) tutorial on GitHub or [THIS](https://simba-uw-tf-dev.readthedocs.io/en/latest/tutorials_rst/blob_tracking.html) tutorial in the documentation. 
+<p align="center">
+  <img src="https://github.com/sgoldenlab/simba/blob/master/images/blob_tracking_example.gif" width="650" alt="Demo GIF">
+</p>
+
 ## Feb-11-2025: SimBA ROI interface update
 
 <p align="center">
