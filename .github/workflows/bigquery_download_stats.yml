@@ -1,3 +1,4 @@
+
 name: Get BigQuery Download Stats
 
 on:
@@ -23,7 +24,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install google-cloud-bigquery pandas
-
       - name: Run BigQuery query
         env:
           GOOGLE_APPLICATION_CREDENTIALS_CONTENT: ${{ secrets.GCP_CREDENTIALS }}
@@ -33,27 +33,16 @@ jobs:
         run: |
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Actions"
-
-      - name: Ensure Git repository is initialized
+      - name: Commit and push CSV to 'download_stats' branch
         run: |
-          git status || git init  # Initialize Git if not already initialized
-
-      - name: Create a new branch and commit only CSV file
-        run: |
-          git checkout -b download_stats  # Create and switch to the 'download_stats' branch
-
-          # Remove all files except the CSV file
-          find . -type f ! -name 'bigquery_download_stats.csv' -exec rm -f {} \;
-
-          # Add only the CSV file
+          # Create a new branch for the download stats
+          git checkout -b download_stats
+          # Add the CSV file
           git add misc/bigquery_download_stats.csv
-
           # Commit the change
           git commit -m "Add BigQuery download stats CSV"
-
           # Push the changes to the 'download_stats' branch
           git push origin download_stats
-
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Used for pushing changes to the repo
 
