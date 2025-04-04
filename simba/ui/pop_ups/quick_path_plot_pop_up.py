@@ -6,12 +6,14 @@ from typing import Union
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.ez_path_plot import EzPathPlot
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, SimBADropDown, SimBALabel
-from simba.utils.checks import (check_file_exist_and_readable, check_if_valid_rgb_tuple, check_int, check_str)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
+                                        SimBADropDown, SimBALabel)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_valid_rgb_tuple, check_int, check_str)
 from simba.utils.enums import Formats
 from simba.utils.errors import NoFilesFoundError
 from simba.utils.lookups import get_color_dict
-from simba.utils.read_write import (get_fn_ext, read_video_info)
+from simba.utils.read_write import get_fn_ext, read_video_info
 
 
 class QuickLineplotPopup(PopUpMixin, ConfigReader):
