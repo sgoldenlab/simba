@@ -34,12 +34,15 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Actions"
 
-      - name: Commit and push CSV to 'download_stats' branch
+      - name: Commit and push only CSV to 'download_stats' branch
         run: |
           # Create a new branch for the download stats
           git checkout -b download_stats
 
-          # Add the CSV file
+          # Remove all files except the CSV file
+          find . -type f ! -name 'bigquery_download_stats.csv' -exec rm -f {} \;
+
+          # Add only the CSV file
           git add misc/bigquery_download_stats.csv
 
           # Commit the change
