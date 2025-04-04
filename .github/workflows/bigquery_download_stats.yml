@@ -29,6 +29,11 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS_CONTENT: ${{ secrets.GCP_CREDENTIALS }}
         run: python misc/bigquery_download_stats.py
 
+      - name: Configure Git user
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Actions"
+
       - name: Commit and push CSV to 'download_stats' branch
         run: |
           # Create a new branch for the download stats
