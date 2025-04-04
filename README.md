@@ -12,6 +12,7 @@
 
 [![Downloads](https://pepy.tech/badge/simba-uw-tf-dev/month)](https://pepy.tech/project/simba-uw-tf-dev)
 [![Downloads](https://pepy.tech/badge/simba-uw-tf-dev)](https://pepy.tech/project/simba-uw-tf-dev)
+[![Live Stats](https://img.shields.io/website?url=https%3A%2F%2Fsronilsson.github.io%2Fdownload_stats%2F&up_message=online&down_message=offline&label=download%20statistics%20dashboard)](https://sronilsson.github.io/download_stats/)
 
 **Manuscript: [Simple Behavioral Analysis (SimBA) as a platform for explainable machine learning in behavioral neuroscience](https://www.nature.com/articles/s41593-024-01649-9)**
 **Pre-print: [Simple Behavioral Analysis (SimBA) – an open source toolkit for computer classification of complex social behaviors in experimental animals](https://www.biorxiv.org/content/10.1101/2020.04.19.049452v2)**
@@ -245,6 +246,8 @@ Below is a link to download trained  behavior classification models to apply it 
 ### Golden Lab webpage
 - [Sam Golden Lab UW](https://goldenneurolab.com/) 🧪🧫🐁
 
+### Downloads
+- [Downloads statistics dashboard](https://sronilsson.github.io/download_stats/)
 
 
 ## License 📃
