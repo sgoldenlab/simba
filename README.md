@@ -232,7 +232,6 @@ Below is a link to download trained  behavior classification models to apply it 
 ### Docker images
 - [Docker hub](https://hub.docker.com/repositories/goldenlab)
 
-
 ### SimBA visualization examples
 - [YouTube playlist](https://www.youtube.com/playlist?list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl) 📺
 
@@ -245,6 +244,7 @@ Below is a link to download trained  behavior classification models to apply it 
 ### Golden Lab webpage
 - [Sam Golden Lab UW](https://goldenneurolab.com/) 🧪🧫🐁
 
+### Download statistics
 
 
 ## License 📃
@@ -270,7 +270,7 @@ If you find **any** part of the code or data useful for your own work, please ci
 [![Foo](https://github.com/sgoldenlab/simba/blob/master/images/cos_center_logo_small.original.png)](https://osf.io/d69jt/)
 
 ## Contributors 🤼
-- [Simon Nilsson](https://github.com/sronilsson)
+- [Simon Nilsson](https://sronilsson.netlify.app/)
 - [Jia Jie Choong](https://github.com/inoejj)
 - [Sophia Hwang](https://github.com/sophihwang26)
 

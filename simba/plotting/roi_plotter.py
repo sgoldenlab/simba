@@ -101,8 +101,8 @@ class ROIPlotter(ConfigReader):
         if not os.path.isfile(self.roi_coordinates_path):
             raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path)
         self.read_roi_data()
-        self.sliced_roi_dict, video_shape_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=self.video_name)
-        if len(video_shape_names) == 0:
+        self.sliced_roi_dict, self.shape_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=self.video_name)
+        if len(self.shape_names) == 0:
             raise NoROIDataError(msg=f"Cannot plot ROI data for video {self.video_name}. No ROIs defined for this video.")
         if data_path is None:
             data_path = os.path.join(self.outlier_corrected_dir, f'{self.video_name}.{self.file_type}')
@@ -263,6 +263,15 @@ class ROIPlotter(ConfigReader):
         writer.release()
         video_timer.stop_timer()
         stdout_success(msg=f"Video {self.video_name} created. Video saved at {self.save_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
+
+
+
+# if __name__ == "__main__":
+#     test = ROIPlotter(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#                                video_path=r"C:\troubleshooting\mitra\project_folder\videos\502_MA141_Gi_Saline_0517.mp4",
+#                                body_parts=['Nose'],
+#                                style_attr={'show_body_part': True, 'show_animal_name': False})
+#     test.run()
 
 
 # test = ROIPlotter(config_path=r"C:\troubleshooting\roi_duplicates\project_folder\project_config.ini",

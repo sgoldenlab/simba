@@ -90,6 +90,8 @@ def _roi_plotter_mp(data: Tuple[int, np.ndarray],
                             img = cv2.putText(img, animal_name, (x, y), TextOptions.FONT.value, font_size, bp_colors[animal_cnt], TextOptions.TEXT_THICKNESS.value)
 
                 for shape_name in video_shape_names:
+                    print(loc_dict[animal_name].keys(), shape_name)
+                    print(roi_dict.keys())
                     timer = round(data_df.loc[current_frm, f"{animal_name}_{shape_name}_cum_sum_time"], 2)
                     entries = data_df.loc[current_frm, f"{animal_name}_{shape_name}_cum_sum_entries"]
                     img = cv2.putText(img, str(timer), loc_dict[animal_name][shape_name]["timer_data_loc"], TextOptions.FONT.value, font_size, roi_dict[shape_name]["Color BGR"], TextOptions.TEXT_THICKNESS.value)
@@ -164,8 +166,8 @@ class ROIPlotMultiprocess(ConfigReader):
         if not os.path.isfile(self.roi_coordinates_path):
             raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path)
         self.read_roi_data()
-        self.sliced_roi_dict, video_shape_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=self.video_name)
-        if len(video_shape_names) == 0:
+        self.sliced_roi_dict, self.shape_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=self.video_name)
+        if len(self.shape_names) == 0:
             raise NoROIDataError(msg=f"Cannot plot ROI data for video {self.video_name}. No ROIs defined for this video.")
         if data_path is None:
             data_path = os.path.join(self.outlier_corrected_dir, f'{self.video_name}.{self.file_type}')
@@ -313,6 +315,8 @@ class ROIPlotMultiprocess(ConfigReader):
         del self.data_df
         del self.roi_analyzer.logger
         print(f"Creating ROI images, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
+        print(self.roi_dict_.keys())
+        print(self.shape_names)
         with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
             constants = functools.partial(_roi_plotter_mp,
                                           loc_dict=self.loc_dict,
@@ -339,10 +343,10 @@ class ROIPlotMultiprocess(ConfigReader):
         stdout_success(msg=f"Video {self.video_name} created. ROI video saved at {self.save_path}", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__, )
 
 
-#
+
 # if __name__ == "__main__":
 #     test = ROIPlotMultiprocess(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
-#                                video_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_Saline_0513.mp4",
+#                                video_path=r"C:\troubleshooting\mitra\project_folder\videos\502_MA141_Gi_Saline_0517.mp4",
 #                                body_parts=['Nose'],
 #                                style_attr={'show_body_part': True, 'show_animal_name': False})
 #     test.run()

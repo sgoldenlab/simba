@@ -43,24 +43,30 @@ That said, I have used the original videos as the background reference videos ma
 
 After starting SimBA click on `Process Videos` in the main toolbar, and go to `Blob tracking` -> `Perform blob tracking` as in the screengrab below:
 
-.. image:: img/blob_tracking/blob_tracking_0.webp
-  :width: 800
-  :align: center
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/docs/tutorials_rst/img/blob_tracking/blob_tracking_0.webp" />
+</p>
+
 
 Next, you should see the following pop-up menu. Next to the `INPUT VIDEO DIRECTORY` entry-box, click <kbd>BROWSE</kbd> and select the directory which contains your videos. Next to the `SAVE DATA DIRECTORY` entry-box, click <kbd>BROWSE</kbd> and select the directory where you want to save your tracking data.
 
-.. image:: img/blob_tracking/blob_tracking_1.webp
-  :width: 800
-  :align: center
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/docs/tutorials_rst/img/blob_tracking/blob_tracking_1.webp" />
+</p>
+
 
 > [!NOTE]
 > For the `SAVE DATA DIRECTORY`, select an empty directory. 
 
 Next, hit the <kbd>RUN</kbd> button, and the below pop-up should show, which lists all the videos in the choosen `INPUT IDEO DIRECTORY`. We will go through each section of this pop-up below. 
 
-.. image:: img/blob_tracking/blob_tracking_2.webp
-  :width: 800
-  :align: center
+
+<p align="center">
+<img src="https://github.com/sgoldenlab/simba/blob/master/docs/tutorials_rst/img/blob_tracking/blob_tracking_2.webp" />
+</p>
+
 
 ### THE BLOB TRACKING MENU
 
