@@ -6,61 +6,42 @@ from typing import Union
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.ez_path_plot import EzPathPlot
-from simba.ui.tkinter_functions import DropDownMenu
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_valid_rgb_tuple, check_int, check_str)
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, SimBADropDown, SimBALabel
+from simba.utils.checks import (check_file_exist_and_readable, check_if_valid_rgb_tuple, check_int, check_str)
 from simba.utils.enums import Formats
 from simba.utils.errors import NoFilesFoundError
 from simba.utils.lookups import get_color_dict
-from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
-                                    read_video_info)
+from simba.utils.read_write import (get_fn_ext, read_video_info)
 
 
 class QuickLineplotPopup(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: Union[str, os.PathLike]):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike]):
         """
         :example:
         >>> _ = QuickLineplotPopup(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
         """
 
         check_file_exist_and_readable(file_path=config_path)
-        PopUpMixin.__init__(self, title="SIMPLE LINE PLOT", icon='path_2')
         ConfigReader.__init__(self, config_path=config_path)
         if len(self.outlier_corrected_paths) == 0:
-            raise NoFilesFoundError(
-                msg=f"No data found in the {self.outlier_corrected_paths} directory. Place files in this directory to create quick path plots."
-            )
-        self.video_filepaths = {
-            get_fn_ext(filepath=i)[1]: i for i in self.outlier_corrected_paths
-        }
-        settings_frm = LabelFrame(self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value)
+            raise NoFilesFoundError(msg=f"No data found in the {self.outlier_corrected_paths} directory. Place files in this directory to create quick path plots.", source=self.__class__.__name__)
+        PopUpMixin.__init__(self, title="SIMPLE LINE PLOT", icon='path_2')
+        self.video_filepaths = {get_fn_ext(filepath=i)[1]: i for i in self.outlier_corrected_paths}
         color_lst = list(get_color_dict().keys())
-        self.video_dropdown = DropDownMenu(
-            settings_frm, "VIDEO: ", list(self.video_filepaths.keys()), "18"
-        )
-        self.video_dropdown.setChoices(list(self.video_filepaths.keys())[0])
-        self.bp_dropdown = DropDownMenu(
-            settings_frm, "BODY-PART: ", self.body_parts_lst, "18"
-        )
-        self.bp_dropdown.setChoices(self.body_parts_lst[0])
-        self.background_color = DropDownMenu(
-            settings_frm, "BACKGROUND COLOR: ", color_lst, "18"
-        )
-        self.background_color.setChoices(choice="White")
-        self.line_color = DropDownMenu(settings_frm, "LINE COLOR: ", color_lst, "18")
-        self.line_color.setChoices(choice="Red")
-        self.line_thickness = DropDownMenu(
-            settings_frm, "LINE THICKNESS: ", list(range(1, 11)), "18"
-        )
-        self.line_thickness.setChoices(choice=1)
-        self.circle_size = DropDownMenu(
-            settings_frm, "CIRCLE SIZE: ", list(range(1, 11)), "18"
-        )
-        self.circle_size.setChoices(choice=5)
-        self.last_frm_only_dropdown = DropDownMenu(
-            settings_frm, "LAST FRAME ONLY: ", ["TRUE", "FALSE"], "18"
-        )
-        self.last_frm_only_dropdown.setChoices("FALSE")
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header='SETTINGS', icon_name='settings')
+        video_names = list(self.video_filepaths.keys())
+        video_name_max_len = max(len(s) for s in video_names)
+
+        self.video_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=video_names, label='VIDEO: ', label_width=25, dropdown_width=video_name_max_len, value=video_names[0])
+        self.bp_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=self.body_parts_lst, label='BODY-PART: ', label_width=25, dropdown_width=video_name_max_len, value=self.body_parts_lst[0])
+        self.background_color = SimBADropDown(parent=settings_frm, dropdown_options=color_lst, label="BACKGROUND COLOR: ", label_width=25, dropdown_width=video_name_max_len, value="White")
+        self.line_color = SimBADropDown(parent=settings_frm, dropdown_options=color_lst, label="LINE COLOR: ", label_width=25, dropdown_width=video_name_max_len, value="Red")
+        self.line_thickness = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 11)), label="LINE THICKNESS: ", label_width=25, dropdown_width=video_name_max_len, value=1)
+        self.circle_size = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 11)), label="CIRCLE SIZE: ", label_width=25, dropdown_width=video_name_max_len, value=5)
+        self.last_frm_only_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=["TRUE", "FALSE"], label="LAST FRAME ONLY: ", label_width=25, dropdown_width=video_name_max_len, value='FALSE')
+        self.inst_lbl = SimBALabel(parent=settings_frm, txt="NOTE: For more complex path plots, faster, \n see 'CREATE PATH PLOTS' under the [VISUALIZATIONS] tab", txt_clr='green')
+
         settings_frm.grid(row=0, sticky=W)
         self.video_dropdown.grid(row=0, sticky=W)
         self.bp_dropdown.grid(row=2, sticky=W)
@@ -69,12 +50,7 @@ class QuickLineplotPopup(PopUpMixin, ConfigReader):
         self.line_thickness.grid(row=5, sticky=W)
         self.circle_size.grid(row=6, sticky=W)
         self.last_frm_only_dropdown.grid(row=7, sticky=W)
-        Label(
-            settings_frm,
-            fg="green",
-            font=Formats.FONT_REGULAR.value,
-            text=" NOTE: For more complex path plots, faster, \n see 'CREATE PATH PLOTS' under the [VISUALIZATIONS] tab",
-        ).grid(row=8, sticky=W)
+        self.inst_lbl.grid(row=8, sticky=W)
         self.create_run_frm(run_function=self.run)
         self.main_frm.mainloop()
 
@@ -129,5 +105,7 @@ class QuickLineplotPopup(PopUpMixin, ConfigReader):
         threading.Thread(target=plotter.run).start()
 
 
+
+# _ = QuickLineplotPopup(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
 # _ = QuickLineplotPopup(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 # _ = QuickLineplotPopup(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
