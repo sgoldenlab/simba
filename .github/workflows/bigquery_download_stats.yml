@@ -36,7 +36,7 @@ jobs:
 
       - name: Checkout to the correct branch
         run: |
-          git checkout main  # Make sure we're on the main branch or any valid branch
+          git checkout master  # Ensure we are working with the master branch
 
       - name: Commit and push only CSV to 'download_stats' branch
         run: |
