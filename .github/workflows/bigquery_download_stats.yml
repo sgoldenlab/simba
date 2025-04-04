@@ -34,14 +34,13 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Actions"
 
-      - name: Checkout to the correct branch
+      - name: Ensure Git repository is initialized
         run: |
-          git checkout master  # Ensure we are working with the master branch
+          git status || git init  # Initialize Git if not already initialized
 
-      - name: Commit and push only CSV to 'download_stats' branch
+      - name: Create a new branch and commit only CSV file
         run: |
-          # Create a new branch for the download stats
-          git checkout -b download_stats
+          git checkout -b download_stats  # Create and switch to the 'download_stats' branch
 
           # Remove all files except the CSV file
           find . -type f ! -name 'bigquery_download_stats.csv' -exec rm -f {} \;
