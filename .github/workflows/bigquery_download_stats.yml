@@ -7,9 +7,11 @@ jobs:
   query:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout repository (shallow)
         uses: actions/checkout@v3
-
+        with:
+          fetch-depth: 1  # Only checkout the latest commit to speed things up
+          
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
