@@ -1,4 +1,4 @@
-name: Run BigQuery Job
+name: Get BigQuery Download Stats
 
 on:
   workflow_dispatch:
