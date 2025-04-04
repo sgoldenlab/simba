@@ -34,6 +34,10 @@ jobs:
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Actions"
 
+      - name: Checkout to the correct branch
+        run: |
+          git checkout main  # Make sure we're on the main branch or any valid branch
+
       - name: Commit and push only CSV to 'download_stats' branch
         run: |
           # Create a new branch for the download stats
@@ -43,7 +47,7 @@ jobs:
           find . -type f ! -name 'bigquery_download_stats.csv' -exec rm -f {} \;
 
           # Add only the CSV file
-          git add bigquery_download_stats.csv
+          git add misc/bigquery_download_stats.csv
 
           # Commit the change
           git commit -m "Add BigQuery download stats CSV"
