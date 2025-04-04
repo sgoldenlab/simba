@@ -25,7 +25,7 @@ jobs:
       - name: Run BigQuery query
         env:
           GOOGLE_APPLICATION_CREDENTIALS_CONTENT: ${{ secrets.GCP_CREDENTIALS }}
-        run: python misc/bigquery_query.py
+        run: python misc/bigquery_download_stats.py
 
       - name: Upload CSV artifact
         uses: actions/upload-artifact@v4
