@@ -48,9 +48,10 @@ jobs:
         # Move the CSV report to the misc directory
         mv /tmp/github_issues_report.csv misc/github_issues_report.csv
 
-        # Configure Git
+        # Configure Git with authentication using GITHUB_TOKEN
         git config user.name "github-actions"
         git config user.email "github-actions@github.com"
+        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
         # Add, commit, and push changes
         git add misc/github_issues_report.csv
