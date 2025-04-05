@@ -15,10 +15,11 @@ jobs:
       with:
         ref: 'download_stats'  # Checkout the download_stats branch
 
-    - name: Set up Python
+    - name: Set up Python 3.6.15
       uses: actions/setup-python@v3
       with:
-        python-version: '3.6.13'
+        python-version: '3.6.15'  # Specify Python 3.6.15
+        architecture: 'x64'  # Specify architecture if needed
 
     - name: Install dependencies
       run: |
@@ -45,4 +46,3 @@ jobs:
         git add misc/github_issues_report.csv
         git commit -m "Update daily issues report"
         git push origin download_stats  # Push changes to the download_stats branch
-
