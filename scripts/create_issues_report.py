@@ -7,11 +7,11 @@ from zipfile import ZipFile
 
 # === CONFIG ===
 REPO = "sgoldenlab/simba"  # Repo: sgoldenlab/simba
-GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")  # Get the GitHub token from environment variables
+GITHUB_TOKEN = os.getenv("MY_GITHUB_TOKEN")  # Get the GitHub token from environment variables
 PER_PAGE = 100
 HEADERS = {"Accept": "application/vnd.github+json"}
 if GITHUB_TOKEN:
-    HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
+    HEADERS["Authorization"] = f"token {MY_GITHUB_TOKEN}"
 
 # === PAGINATION HANDLER ===
 def fetch_paginated(url, params=None):
