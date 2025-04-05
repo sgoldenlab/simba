@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    - name: Checkout master branch
       uses: actions/checkout@v3
       with:
-        ref: 'download_stats'  # Checkout the download_stats branch
+        ref: 'master'  # Checkout the master branch where the workflow is located
 
     - name: Verify current branch
       run: |
@@ -41,7 +41,7 @@ jobs:
       run: |
         ls -l /home/runner/work/simba/simba/misc/github_issues_report.csv
 
-    - name: Commit CSV file to download_stats branch
+    - name: Commit CSV file to master branch
       run: |
         mkdir -p misc  # Create misc directory if it doesn't exist
 
@@ -66,6 +66,6 @@ jobs:
         # Use the built-in GITHUB_TOKEN for authentication
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
-        # Commit and push changes
+        # Commit and push changes to master branch
         git commit -m "Update daily issues report"
-        git push origin download_stats  # Push changes to the download_stats branch
+        git push origin master  # Push changes to the master branch
