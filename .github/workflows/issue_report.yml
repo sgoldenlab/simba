@@ -2,7 +2,6 @@ name: Daily GitHub Issue Report
 
 on:
   schedule:
-    - cron: '30 6 * * *'  # Cron time in UTC (6:30 AM UTC)
   workflow_dispatch:  # Allows manual trigger
 
 jobs:
