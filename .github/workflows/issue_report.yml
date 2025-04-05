@@ -26,6 +26,11 @@ jobs:
         python -m pip install --upgrade pip
         pip install pandas requests  # Install pandas and requests
 
+    - name: List files in the repository
+      run: |
+        # List files to make sure we're in the right directory
+        ls -R /home/runner/work/simba/simba/
+
     - name: Fetch GitHub issues and generate report
       run: |
         python scripts/create_issues_report.py  # Run your Python script to generate the report
