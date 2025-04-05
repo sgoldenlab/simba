@@ -1,17 +1,20 @@
 import requests
-import pandas as pd
+import json
 import time
-from concurrent.futures import ThreadPoolExecutor
 import os
-from zipfile import ZipFile
+from pathlib import Path
+import pandas as pd
+from concurrent.futures import ThreadPoolExecutor
 
 # === CONFIG ===
-REPO = "sgoldenlab/simba"  # Repo: sgoldenlab/simba
-GITHUB_TOKEN = os.getenv("MY_GITHUB_TOKEN")  # Get the GitHub token from environment variables
+REPO = "sgoldenlab/simba"  # e.g. "microsoft/vscode"
+GITHUB_TOKEN = os.getenv('GITHUB_TOKEN')  # Get token from environment variables
 PER_PAGE = 100
-HEADERS = {"Accept": "application/vnd.github+json"}
+HEADERS = {
+    "Accept": "application/vnd.github+json"
+}
 if GITHUB_TOKEN:
-    HEADERS["Authorization"] = f"token {MY_GITHUB_TOKEN}"
+    HEADERS["Authorization"] = f"token {GITHUB_TOKEN}"
 
 # === PAGINATION HANDLER ===
 def fetch_paginated(url, params=None):
@@ -84,15 +87,12 @@ def get_issues_dataframe():
         })
 
     df = pd.DataFrame(data)
+    return df
 
-    # Save DataFrame to CSV
-    df.to_csv("/tmp/github_issues_report.csv", index=False)
+# === RUN SCRIPT ===
+df_issues = get_issues_dataframe()
+print(df_issues.head())
 
-    # Zip the CSV file
-    with ZipFile("/tmp/github_issues_report.zip", 'w') as zipf:
-        zipf.write("/tmp/github_issues_report.csv", os.path.basename("/tmp/github_issues_report.csv"))
-
-    print("CSV and Zip file generated successfully!")
-
-if __name__ == "__main__":
-    get_issues_dataframe()
+# Save to file
+output_path = '/home/runner/work/simba/simba/misc/github_issues_report.csv'
+df_issues.to_csv(output_path, index=False)
