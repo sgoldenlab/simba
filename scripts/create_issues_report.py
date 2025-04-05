@@ -91,7 +91,8 @@ def get_issues_dataframe():
 
 # === RUN SCRIPT ===
 df_issues = get_issues_dataframe()
-print(df_issues.head())
+print(df_issues)
+print(len(df_issues))
 
 # Save to file
 output_path = '/home/runner/work/simba/simba/misc/github_issues_report.csv'
