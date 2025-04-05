@@ -1,0 +1,346 @@
+,issue_id,author,title,commenter_usernames,comment_count,unique_commenter_count,link,issue_post_date,last_comment_date
+0,423,lgries-lt,Lining up various data sources,"['lgries-lt', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/423,2025-04-01T21:40:20Z,2025-04-02T20:31:29Z
+1,422,lgries-lt,Importing single Boris annotation with other annotations done in SimBA,"['lgries-lt', 'sronilsson']",20,2,https://github.com/sgoldenlab/simba/issues/422,2025-04-01T17:26:09Z,2025-04-01T19:09:59Z
+2,421,teola15,Simba Video Parameters File Error,"['sronilsson', 'teola15']",22,2,https://github.com/sgoldenlab/simba/issues/421,2025-03-30T18:32:41Z,2025-04-03T23:36:58Z
+3,420,wallawhitecoat,H5/CSV SLEAP Import Error,"['sronilsson', 'wallawhitecoat']",5,2,https://github.com/sgoldenlab/simba/issues/420,2025-03-28T21:14:40Z,2025-03-31T23:48:02Z
+4,419,teola15,"Enlarged ROI ""Define Shape"" Window","['sronilsson', 'teola15']",41,2,https://github.com/sgoldenlab/simba/issues/419,2025-03-27T23:11:32Z,2025-03-28T21:58:56Z
+5,418,teola15,Multiple ROIs,"['sronilsson', 'teola15']",22,2,https://github.com/sgoldenlab/simba/issues/418,2025-03-25T22:13:29Z,2025-03-27T23:07:31Z
+6,417,julieqian,SimBA installation,"['julieqian', 'sronilsson']",3,2,https://github.com/sgoldenlab/simba/issues/417,2025-03-25T03:44:45Z,2025-03-25T19:15:28Z
+7,416,blaingvt,SimBA Object Based Analysis,"['blaingvt', 'sronilsson']",5,2,https://github.com/sgoldenlab/simba/issues/416,2025-03-17T16:44:37Z,2025-03-31T13:00:48Z
+8,415,stowers1195,ROI drawing: Ear tag not placed at mouse cursor,"['sronilsson', 'stowers1195', 'teola15']",22,3,https://github.com/sgoldenlab/simba/issues/415,2025-03-13T00:37:57Z,2025-03-25T20:07:20Z
+9,414,blaingvt,Simba ROI time to first zone entry,"['blaingvt', 'sronilsson']",6,2,https://github.com/sgoldenlab/simba/issues/414,2025-03-04T21:43:53Z,2025-03-17T15:31:26Z
+10,413,Enricocloud,ROI WARNINGS,"['Enricocloud', 'sronilsson']",10,2,https://github.com/sgoldenlab/simba/issues/413,2025-03-04T09:55:32Z,2025-03-06T12:10:31Z
+11,412,hdsliu,Low accuracy when reusing models,"['hdsliu', 'sronilsson']",43,2,https://github.com/sgoldenlab/simba/issues/412,2025-02-26T00:19:52Z,2025-03-18T14:08:51Z
+12,411,blaingvt,SimBA crashing when saving ROIs,"['blaingvt', 'sronilsson']",5,2,https://github.com/sgoldenlab/simba/issues/411,2025-02-07T15:45:36Z,2025-02-10T16:06:00Z
+13,410,rfkova,Update citation information,"['rfkova', 'sronilsson']",3,2,https://github.com/sgoldenlab/simba/issues/410,2025-02-05T21:56:24Z,2025-02-06T13:34:12Z
+14,409,aurquieta,Append ROI data,"['aurquieta', 'sronilsson']",7,2,https://github.com/sgoldenlab/simba/issues/409,2025-02-03T23:22:55Z,2025-02-04T17:21:09Z
+15,408,JuneAMeans,SLEAP csv import error for multiple identities,"['JuneAMeans', 'sronilsson']",6,2,https://github.com/sgoldenlab/simba/issues/408,2025-01-24T18:52:26Z,2025-01-29T18:03:08Z
+16,407,Bioinfo-Rafael,simba does not start,"['Bioinfo-Rafael', 'sronilsson']",5,2,https://github.com/sgoldenlab/simba/issues/407,2025-01-22T17:29:47Z,2025-01-23T12:30:44Z
+17,406,DavidBarriere,Need to design ROIs recursively on a project with >1000 video,"['DavidBarriere', 'sronilsson']",20,2,https://github.com/sgoldenlab/simba/issues/406,2025-01-18T11:38:50Z,2025-01-21T23:11:30Z
+18,405,tlancaster6,Discrepency between aggregated movement data and ROI movement data,"['sronilsson', 'tlancaster6']",8,2,https://github.com/sgoldenlab/simba/issues/405,2025-01-17T17:58:11Z,2025-01-21T23:22:29Z
+19,404,gxkjj,About the heatmap error,"['gxkjj', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/404,2024-12-19T02:02:48Z,2024-12-21T02:46:57Z
+20,403,bancroftg,Starting with Classifiers,"['DanaeNikol', 'goodwinnastacia', 'sronilsson']",5,4,https://github.com/sgoldenlab/simba/issues/403,2024-11-26T17:31:00Z,2025-01-12T18:06:29Z
+21,402,DanieleRomeo,SIMBA STRING ERROR: read_video_info video_name should be an string,"['DanieleRomeo', 'sronilsson']",5,2,https://github.com/sgoldenlab/simba/issues/402,2024-11-19T09:43:39Z,2024-11-21T14:02:29Z
+22,401,xktz89,Poor classification results despite copying annotations from successfully trained models,['sronilsson'],2,2,https://github.com/sgoldenlab/simba/issues/401,2024-11-18T20:01:16Z,2024-11-19T13:40:52Z
+23,400,xktz89,SIMBA MISSING PROJECT CONFIG ENTRY ERROR using agg_clf_results,['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/400,2024-10-29T13:46:31Z,2024-10-29T14:15:25Z
+24,399,GKNM995,Attribute error when I try to validate a model on a single video,"['GKNM995', 'sronilsson']",3,2,https://github.com/sgoldenlab/simba/issues/399,2024-10-29T00:10:58Z,2024-10-30T01:24:08Z
+25,398,GKNM995,Trouble calculating SHAP scores,"['GKNM995', 'sronilsson']",17,2,https://github.com/sgoldenlab/simba/issues/398,2024-10-17T03:26:20Z,2024-10-26T09:07:35Z
+26,397,Kglasp,Detailed ROI data folder being created with no .csv file contained,"['Kglasp', 'sronilsson']",8,2,https://github.com/sgoldenlab/simba/issues/397,2024-10-09T21:00:02Z,2024-10-10T10:41:59Z
+27,396,bancroftg,Directionality for ROIs,"['Enricocloud', 'bancroftg', 'sronilsson']",17,3,https://github.com/sgoldenlab/simba/issues/396,2024-10-09T19:49:00Z,2025-04-04T13:08:40Z
+28,395,gxkjj,"when i start training,some error notice.","['gxkjj', 'sronilsson']",8,2,https://github.com/sgoldenlab/simba/issues/395,2024-10-08T07:02:41Z,2024-11-12T11:28:08Z
+29,394,Monica9577,Problem appending ROI features to body parts,"['Monica9577', 'sronilsson']",9,2,https://github.com/sgoldenlab/simba/issues/394,2024-10-02T09:44:02Z,2024-10-11T03:37:38Z
+30,393,bancroftg,Simba install issue: No module named 'dtreeviz',"['bancroftg', 'sronilsson']",13,2,https://github.com/sgoldenlab/simba/issues/393,2024-09-25T15:00:53Z,2024-09-25T16:54:37Z
+31,392,emmafkeppler,AttributeError: 'SLEAPImporterSLP' object has no attribute 'cap',"['emmafkeppler', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/392,2024-09-21T00:46:22Z,2024-09-25T00:10:38Z
+32,391,Monica9577,Importing BORIS annotations,"['Monica9577', 'sronilsson']",18,2,https://github.com/sgoldenlab/simba/issues/391,2024-09-16T07:05:20Z,2024-09-20T07:06:46Z
+33,390,GKNM995,Trouble importing BORIS annotations,"['GKNM995', 'sronilsson']",14,2,https://github.com/sgoldenlab/simba/issues/390,2024-09-13T06:17:29Z,2024-09-22T20:30:40Z
+34,389,sara-xinyue-liang,"""Node array"" Error when trying to run the simba classifiers trained on another computer. ","['sara-xinyue-liang', 'sronilsson']",3,2,https://github.com/sgoldenlab/simba/issues/389,2024-09-09T14:07:28Z,2024-09-12T19:45:43Z
+35,388,djg9324,Training Multiple Behaviors? And Mistake in Labeling ,[],0,1,https://github.com/sgoldenlab/simba/issues/388,2024-09-06T13:19:47Z,
+36,387,bancroftg,ROI show shape info,"['bancroftg', 'sronilsson']",6,2,https://github.com/sgoldenlab/simba/issues/387,2024-09-05T19:36:20Z,2024-09-09T18:23:40Z
+37,386,ltaxi,"Extracting Features ""numba.core.errors.UnsupportedRewriteError: Failed in nopython mode pipeline (step: convert to parfors) Only constant step size of 1 is supported for prange""","['ltaxi', 'sronilsson']",4,2,https://github.com/sgoldenlab/simba/issues/386,2024-08-29T13:59:52Z,2024-08-29T14:45:12Z
+38,385,sara-xinyue-liang,Attribute error during training,"['sara-xinyue-liang', 'sronilsson']",4,2,https://github.com/sgoldenlab/simba/issues/385,2024-08-28T21:51:26Z,2024-08-29T18:08:56Z
+39,384,djg9324,Cannot load tracking files,"['djg9324', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/384,2024-08-28T19:03:45Z,2024-09-06T13:16:50Z
+40,383,sara-xinyue-liang,"Error in ""Import MARS Annotation"" ","['sara-xinyue-liang', 'sronilsson']",12,2,https://github.com/sgoldenlab/simba/issues/383,2024-08-27T19:15:15Z,2024-08-28T21:04:46Z
+41,382,kjmartin44,No Behaviors Marked as None?,"['kjmartin44', 'sronilsson']",49,2,https://github.com/sgoldenlab/simba/issues/382,2024-08-22T18:56:47Z,2024-10-01T16:20:19Z
+42,381,fidelDLC,Question about CSV files,"['fidelDLC', 'sronilsson']",6,2,https://github.com/sgoldenlab/simba/issues/381,2024-08-22T01:58:51Z,2024-08-27T00:34:38Z
+43,380,gxkjj,"When I import the DLC data, it gives an error","['gxkjj', 'sronilsson']",3,2,https://github.com/sgoldenlab/simba/issues/380,2024-08-14T00:28:32Z,2024-08-15T11:41:17Z
+44,379,leahsalinsky,Error when installing Simba on Python 3.10,"['leahsalinsky', 'sronilsson']",30,2,https://github.com/sgoldenlab/simba/issues/379,2024-08-13T19:20:57Z,2024-08-21T23:38:54Z
+45,378,hdsliu,ROI Analysis missing columns after update. ,"['hdsliu', 'sronilsson']",7,2,https://github.com/sgoldenlab/simba/issues/378,2024-08-05T20:00:32Z,2024-08-06T14:53:51Z
+46,377,ATAICwillbebest,Installation of simba error,['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/377,2024-07-31T16:12:23Z,2024-07-31T16:17:45Z
+47,376,KaiserArndt2,Import DLC data button missing,"['KaiserArndt2', 'sronilsson']",7,2,https://github.com/sgoldenlab/simba/issues/376,2024-07-30T16:10:52Z,2024-08-01T15:59:36Z
+48,375,KaiserArndt2,Simba not running after install,"['KaiserArndt2', 'sronilsson', 'tknopfel']",21,3,https://github.com/sgoldenlab/simba/issues/375,2024-07-23T16:38:34Z,2024-07-30T00:09:45Z
+49,374,MBRINLE1,Video Parameters Opening Black Frames,"['MBRINLE1', 'sronilsson']",14,2,https://github.com/sgoldenlab/simba/issues/374,2024-07-22T13:59:26Z,2024-08-04T19:40:28Z
+50,373,wallawhitecoat,Plotly Interface is not available,"['sronilsson', 'wallawhitecoat']",3,2,https://github.com/sgoldenlab/simba/issues/373,2024-07-17T15:46:55Z,2024-07-17T16:12:09Z
+51,372,SnowySnowySnowy,New to simba - installation not working on Mac M2 Max,"['SnowySnowySnowy', 'sara-xinyue-liang', 'sronilsson']",40,3,https://github.com/sgoldenlab/simba/issues/372,2024-07-16T21:31:03Z,2024-09-05T22:55:27Z
+52,371,hdsliu,Remapping keyboard shortcuts for behavior annotation. ,"['hdsliu', 'sronilsson']",9,2,https://github.com/sgoldenlab/simba/issues/371,2024-07-16T19:28:23Z,2024-08-05T23:09:55Z
+53,370,SnowySnowySnowy,Should preprocessed videos be those used in SLEAP?,['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/370,2024-07-15T16:56:21Z,2024-07-15T17:53:44Z
+54,369,qarden,Determination of classifier thresholds,['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/369,2024-07-10T14:18:29Z,2024-07-10T15:49:28Z
+55,368,GKNM995,Trouble installing simba,"['GKNM995', 'sronilsson']",26,2,https://github.com/sgoldenlab/simba/issues/368,2024-06-28T20:56:03Z,2024-08-13T20:36:00Z
+56,367,wallawhitecoat,Using Random forest behavioral classifiers from OSF repository ,"['goodwinnastacia', 'sronilsson', 'wallawhitecoat']",26,3,https://github.com/sgoldenlab/simba/issues/367,2024-06-10T23:03:32Z,2024-08-08T22:29:43Z
+57,366,lpereiras17,How to remove video from behavioral annotation dataset,['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/366,2024-06-09T12:56:47Z,2024-06-09T15:05:53Z
+58,365,wallawhitecoat,SIMBA VALUE ERROR- Issue Importing H5 and slp tracking data ,"['sronilsson', 'wallawhitecoat']",10,2,https://github.com/sgoldenlab/simba/issues/365,2024-05-30T16:04:17Z,2024-06-06T23:31:26Z
+59,364,AndyWeasley2004,Undersample still results serious imbalance,"['AndyWeasley2004', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/364,2024-05-28T21:17:11Z,2024-05-29T17:10:32Z
+60,363,breannashi,Analyze ROI data not working for multiple videos,"['breannashi', 'sronilsson']",13,2,https://github.com/sgoldenlab/simba/issues/363,2024-05-28T17:35:34Z,2024-05-29T23:57:46Z
+61,362,breannashi,Unable to add ROIs Ubuntu,"['breannashi', 'sronilsson']",3,2,https://github.com/sgoldenlab/simba/issues/362,2024-05-16T19:00:09Z,2024-05-17T16:53:12Z
+62,361,NSGregory,Certain filename patterns prevent importing SLEAP H5 files,"['NSGregory', 'sronilsson']",10,2,https://github.com/sgoldenlab/simba/issues/361,2024-05-15T21:42:08Z,2024-05-20T14:55:16Z
+63,360,AndyWeasley2004,SHAP Multiprocessing Failed,"['AndyWeasley2004', 'sronilsson']",4,2,https://github.com/sgoldenlab/simba/issues/360,2024-05-09T21:09:50Z,2024-05-09T23:57:35Z
+64,359,AndyWeasley2004,SHAP visualization failed,"['AndyWeasley2004', 'sronilsson']",7,2,https://github.com/sgoldenlab/simba/issues/359,2024-05-08T17:36:26Z,2024-05-09T20:35:40Z
+65,358,Monica9577,Problem analyzing ROI data Aggregates,"['Monica9577', 'sronilsson']",26,2,https://github.com/sgoldenlab/simba/issues/358,2024-04-26T10:06:28Z,2024-05-10T22:05:13Z
+66,357,fidelDLC,labelling behavior,"['fidelDLC', 'sronilsson']",22,2,https://github.com/sgoldenlab/simba/issues/357,2024-04-17T21:53:05Z,2024-04-30T22:14:24Z
+67,356,idawettergren,Segementation fault when creating a new project,"['idawettergren', 'sronilsson']",9,2,https://github.com/sgoldenlab/simba/issues/356,2024-04-17T11:54:12Z,2024-04-26T11:38:58Z
+68,355,Jsn-zhang,SIMBA Crashing on V 1.89.4 when using GPU to Downsample Videos,['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/355,2024-04-16T00:15:00Z,2024-04-16T00:26:42Z
+69,354,beepboop174,Error when creating Validation video [out#0/mp4 @ 00000294EB792500] ,"['beepboop174', 'sronilsson']",22,2,https://github.com/sgoldenlab/simba/issues/354,2024-04-04T09:03:19Z,2024-04-12T15:41:29Z
+70,353,MohamedAlyEbraheemZahran,SIMBA INDEX WARNING: Some frames appears to be missing in the dataframe,"['MohamedAlyEbraheemZahran', 'sronilsson']",22,2,https://github.com/sgoldenlab/simba/issues/353,2024-03-22T00:31:13Z,2024-03-23T16:33:59Z
+71,351,xktz89,"""Feature number mismatch error"" when analyzing new videos with a machine model ","['sronilsson', 'xktz89']",3,2,https://github.com/sgoldenlab/simba/issues/351,2024-03-20T21:21:39Z,2024-03-22T17:13:37Z
+72,349,Monica9577,Spontaneous alternation test,"['Monica9577', 'sronilsson']",24,2,https://github.com/sgoldenlab/simba/issues/349,2024-03-19T11:55:11Z,2024-04-26T13:47:13Z
+73,348,heiley8181,Unable to Start Simba GUI,"['heiley8181', 'sronilsson']",31,2,https://github.com/sgoldenlab/simba/issues/348,2024-03-19T07:43:33Z,2024-05-30T09:26:09Z
+74,347,DanaeNikol,ROI analysis feature extraction ,"['DanaeNikol', 'sronilsson']",28,2,https://github.com/sgoldenlab/simba/issues/347,2024-03-12T10:59:03Z,2024-03-19T11:10:19Z
+75,346,drish-soneja,Error during user defined Project Configuration for custom multi-animal tracking,"['drish-soneja', 'sronilsson']",11,2,https://github.com/sgoldenlab/simba/issues/346,2024-03-04T17:33:49Z,2024-03-08T23:20:07Z
+76,339,Maroca5,outliers correction ,"['Maroca5', 'sronilsson']",29,2,https://github.com/sgoldenlab/simba/issues/339,2024-02-29T16:31:50Z,2024-02-29T22:42:59Z
+77,338,Monica9577,Error in model evaluation,"['Monica9577', 'sronilsson']",5,2,https://github.com/sgoldenlab/simba/issues/338,2024-02-24T18:25:15Z,2024-02-28T01:17:11Z
+78,337,DanaeNikol,ROI analysis - not possible ROI definition,"['DanaeNikol', 'sronilsson']",9,2,https://github.com/sgoldenlab/simba/issues/337,2024-02-24T14:04:54Z,2024-03-01T14:43:34Z
+79,336,DanaeNikol,Outlier Correction - Location,"['DanaeNikol', 'sronilsson']",6,2,https://github.com/sgoldenlab/simba/issues/336,2024-02-22T13:24:49Z,2024-02-26T09:58:54Z
+80,335,Monica9577,Selective ROI request,"['Monica9577', 'sronilsson']",5,2,https://github.com/sgoldenlab/simba/issues/335,2024-02-22T00:38:03Z,2024-02-24T20:36:12Z
+81,334,Monica9577,error when in creating animal direction to body part videos,"['Monica9577', 'sronilsson']",3,2,https://github.com/sgoldenlab/simba/issues/334,2024-02-21T16:48:33Z,2024-02-24T00:45:47Z
+82,333,Monica9577,Impossible to create 2 animal trackplots,"['Monica9577', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/333,2024-02-21T13:10:33Z,2024-02-24T00:59:44Z
+83,332,Monica9577,Impossible to create ROI analysis,"['Monica9577', 'sronilsson']",6,2,https://github.com/sgoldenlab/simba/issues/332,2024-02-21T01:16:26Z,2024-02-21T04:39:50Z
+84,331,Monica9577,Creation configuration project problem,"['Monica9577', 'phildong', 'sronilsson']",9,3,https://github.com/sgoldenlab/simba/issues/331,2024-02-15T21:51:44Z,2024-02-19T16:57:39Z
+85,328,rjd55,MetaKeys ImportError,"['rjd55', 'sronilsson']",3,2,https://github.com/sgoldenlab/simba/issues/328,2024-02-06T21:01:43Z,2024-02-08T13:44:44Z
+86,327,olivialaw,Analyze Machine Predictions: Aggregate for Three Animals,['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/327,2024-02-06T01:11:37Z,2024-02-06T15:34:29Z
+87,323,rnrpereira,Can´t pickle_thread.RLocj objects error while Creating Location Heatmaps,"['rnrpereira', 'sronilsson']",5,2,https://github.com/sgoldenlab/simba/issues/323,2024-01-24T22:41:39Z,2024-01-26T20:46:42Z
+88,320,yampants,Identify Behavior Screen Opens as Blank,"['sronilsson', 'yampants']",3,2,https://github.com/sgoldenlab/simba/issues/320,2024-01-22T17:53:25Z,2024-01-26T02:30:15Z
+89,319,charliev99,reciprocal directionality between animals #2,"['charliev99', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/319,2024-01-19T19:09:07Z,2024-01-22T19:47:03Z
+90,318,filos93,reciprocal directionality between animals,"['filos93', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/318,2024-01-17T14:02:35Z,2024-01-17T16:59:48Z
+91,316,ZelikowskyLab,moved body points,"['ZelikowskyLab', 'sronilsson']",3,2,https://github.com/sgoldenlab/simba/issues/316,2023-12-19T22:57:32Z,2023-12-21T17:54:58Z
+92,309,IsabelleSajonia,Path plots,"['IsabelleSajonia', 'sronilsson']",4,2,https://github.com/sgoldenlab/simba/issues/309,2023-11-28T21:55:28Z,2023-11-29T20:31:40Z
+93,307,IsabelleSajonia,Total distance traveled and velocity,"['IsabelleSajonia', 'sronilsson']",6,2,https://github.com/sgoldenlab/simba/issues/307,2023-11-03T19:43:47Z,2023-11-07T18:30:50Z
+94,306,IsabelleSajonia,Error when correcting outliers,"['IsabelleSajonia', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/306,2023-11-02T21:31:07Z,2023-11-03T14:04:28Z
+95,305,neurorie,Visualising ROI not working,"['neurorie', 'sronilsson']",3,2,https://github.com/sgoldenlab/simba/issues/305,2023-11-02T09:14:58Z,2023-11-02T17:58:04Z
+96,303,linab8,Outlier correction - movement,"['linab8', 'sronilsson']",23,2,https://github.com/sgoldenlab/simba/issues/303,2023-10-27T17:23:12Z,2023-10-29T18:59:32Z
+97,302,linab8,I can't extract frames,"['linab8', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/302,2023-10-24T16:44:37Z,2023-10-24T16:49:54Z
+98,300,linab8,Stopped while assigning IDs to two animals,"['linab8', 'sronilsson']",6,2,https://github.com/sgoldenlab/simba/issues/300,2023-10-21T15:40:56Z,2023-10-24T16:39:39Z
+99,299,DorianBattivelli,Distance visualisation,"['DorianBattivelli', 'sronilsson']",34,2,https://github.com/sgoldenlab/simba/issues/299,2023-10-20T15:39:47Z,2023-10-23T07:56:46Z
+100,298,rfkova,Validate Model on Single Video selection is bugged in current version,"['rfkova', 'sronilsson']",70,2,https://github.com/sgoldenlab/simba/issues/298,2023-10-20T06:00:47Z,2024-04-04T17:02:05Z
+101,297,Chantal-Wi,SIMBA VIDEO PARAMETERS FILE ERROR,['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/297,2023-10-17T12:21:38Z,2023-10-17T14:40:43Z
+102,296,neurorie,ROI analysis video quality,"['neurorie', 'sronilsson']",10,2,https://github.com/sgoldenlab/simba/issues/296,2023-10-17T11:37:20Z,2023-10-20T14:56:32Z
+103,295,FarahnazYF,Analysing wrong bodypart,"['FarahnazYF', 'sronilsson']",6,2,https://github.com/sgoldenlab/simba/issues/295,2023-10-15T13:00:53Z,2023-10-15T20:18:38Z
+104,294,nschapp,File in Outlier_Movement__Location Folder Not Found for Analysis,"['glinnes12', 'nschapp', 'sronilsson']",24,3,https://github.com/sgoldenlab/simba/issues/294,2023-10-12T13:14:22Z,2024-02-20T13:04:12Z
+105,293,mrnels19,Include Timestamp for Each Behavioral Bout,"['mrnels19', 'sronilsson']",4,2,https://github.com/sgoldenlab/simba/issues/293,2023-10-10T21:39:41Z,2023-10-11T13:25:49Z
+106,292,filos93,superimpose frame count on video,"['filos93', 'sronilsson']",10,2,https://github.com/sgoldenlab/simba/issues/292,2023-10-09T16:18:11Z,2023-10-11T16:31:09Z
+107,291,filos93,info on linked events regarding multiple animals occurring in ROI,"['filos93', 'sronilsson']",11,2,https://github.com/sgoldenlab/simba/issues/291,2023-10-04T07:50:23Z,2023-10-09T16:00:44Z
+108,290,filos93,no ROI_features_summary csv file created,"['filos93', 'sronilsson']",3,2,https://github.com/sgoldenlab/simba/issues/290,2023-10-03T16:32:18Z,2023-10-04T07:03:34Z
+109,289,mrnels19,Documents in model_evaluations Folder,['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/289,2023-10-02T00:22:00Z,2023-10-02T11:36:15Z
+110,287,DanieleRomeo,Analyse cleaning behavior in coral reef,"['DanieleRomeo', 'sronilsson']",24,2,https://github.com/sgoldenlab/simba/issues/287,2023-09-26T08:36:14Z,2024-04-18T06:02:09Z
+111,286,DorianBattivelli,Missing one animal tracking,"['DorianBattivelli', 'sronilsson']",8,2,https://github.com/sgoldenlab/simba/issues/286,2023-09-22T13:46:40Z,2023-09-25T11:32:33Z
+112,285,neurorie,Successful but then empty CSV upon analysing ROI data,"['neurorie', 'sronilsson']",9,2,https://github.com/sgoldenlab/simba/issues/285,2023-09-08T15:30:50Z,2023-09-11T16:57:11Z
+113,284,IsabelleSajonia,Issues importing sleap data,"['IsabelleSajonia', 'sronilsson']",36,2,https://github.com/sgoldenlab/simba/issues/284,2023-08-30T19:05:32Z,2023-09-01T20:12:05Z
+114,283,lxspedeza,Question about body parts,['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/283,2023-08-22T08:53:23Z,2023-08-22T13:58:12Z
+115,282,florianduclot,Inaccurate FPS extracted from video in Batch Process videos,"['florianduclot', 'sronilsson']",9,2,https://github.com/sgoldenlab/simba/issues/282,2023-08-18T22:48:51Z,2023-08-23T17:32:40Z
+116,281,DorianBattivelli,Customize outlier correction,"['DorianBattivelli', 'sronilsson']",10,2,https://github.com/sgoldenlab/simba/issues/281,2023-08-15T12:37:33Z,2023-09-05T13:50:56Z
+117,280,alisabak,"""Create path plot"" tool not working","['alisabak', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/280,2023-08-09T14:26:26Z,2023-08-11T09:55:00Z
+118,279,DorianBattivelli,ROIs H5 file convertion ,"['DorianBattivelli', 'sronilsson']",5,2,https://github.com/sgoldenlab/simba/issues/279,2023-08-09T13:15:33Z,2023-08-10T13:16:31Z
+119,278,nsusic,Unsupervised Learning Missing In Anaconda Installation,"['nsusic', 'sronilsson']",5,2,https://github.com/sgoldenlab/simba/issues/278,2023-08-02T17:59:48Z,2023-08-16T12:38:14Z
+120,277,ZelikowskyLab,Mice switching IDs every few frames,"['ZelikowskyLab', 'sronilsson']",13,2,https://github.com/sgoldenlab/simba/issues/277,2023-07-27T20:03:13Z,2023-10-23T03:40:07Z
+121,276,13281306705,SIMBA FEATURE NUMBER MISMATCH ERROR,"['13281306705', 'sronilsson']",4,2,https://github.com/sgoldenlab/simba/issues/276,2023-07-23T17:39:44Z,2023-07-23T18:17:45Z
+122,275,Gfernandezv,SIMBA COMPLETE: ROI definitions saved for video: {self.file_name}  🚀,"['Gfernandezv', 'sronilsson']",6,2,https://github.com/sgoldenlab/simba/issues/275,2023-07-22T17:41:47Z,2023-07-23T18:16:04Z
+123,274,rfkova,I have two models and I need to combine them.... also... leads on CLI implementation?,"['rfkova', 'sronilsson']",59,2,https://github.com/sgoldenlab/simba/issues/274,2023-07-21T00:35:50Z,2023-10-26T20:38:15Z
+124,273,briki1234,Error message while trying to train a classifier refer to the memory,"['briki1234', 'sronilsson']",17,2,https://github.com/sgoldenlab/simba/issues/273,2023-07-11T08:46:42Z,2023-07-13T19:56:10Z
+125,272,DorianBattivelli,issue with 1 fps video processing,"['DorianBattivelli', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/272,2023-07-03T12:34:07Z,2023-07-03T13:00:08Z
+126,271,DorianBattivelli,I faile to install SimBA on MacOS Ventura 13.4.1,"['DorianBattivelli', 'sronilsson']",29,2,https://github.com/sgoldenlab/simba/issues/271,2023-07-03T09:34:38Z,2023-07-05T12:36:57Z
+127,270,BarakMalul,Do non-classified frames affects the training model?,"['BarakMalul', 'sronilsson']",9,2,https://github.com/sgoldenlab/simba/issues/270,2023-06-26T07:43:11Z,2023-07-01T13:37:01Z
+128,269,DorianBattivelli,Impossible_to_draw_ROI,"['DorianBattivelli', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/269,2023-06-22T10:33:32Z,2023-06-22T11:32:30Z
+129,268,nsusic,Existing Annotations Do Not Appear in GUI After Pseudo-Labeling or When Continuing Existing Annotations ,"['nsusic', 'sronilsson']",12,2,https://github.com/sgoldenlab/simba/issues/268,2023-06-20T13:54:41Z,2023-06-23T17:38:53Z
+130,267,BarakMalul,Problem in training the model,"['BarakMalul', 'sronilsson']",14,2,https://github.com/sgoldenlab/simba/issues/267,2023-06-17T21:19:21Z,2023-06-18T20:39:13Z
+131,266,alisabak,"""Visualise pose-estimation"" tool not working","['alisabak', 'sronilsson']",5,2,https://github.com/sgoldenlab/simba/issues/266,2023-06-15T14:54:27Z,2023-06-20T07:57:53Z
+132,265,sahilsingh2402,Behavioral Classifier for Flies: How to Label Data,"['sahilsingh2402', 'sronilsson']",4,2,https://github.com/sgoldenlab/simba/issues/265,2023-06-15T08:15:00Z,2023-09-10T19:54:42Z
+133,264,BarakMalul,Files are not created.,"['BarakMalul', 'sronilsson']",14,2,https://github.com/sgoldenlab/simba/issues/264,2023-06-10T15:39:01Z,2023-06-12T14:01:00Z
+134,263,bdy2530,Cannot install on Apple Silicon M1,"['Siriz23', 'ligeralde', 'sronilsson']",16,4,https://github.com/sgoldenlab/simba/issues/263,2023-05-25T20:32:34Z,2024-03-01T02:08:28Z
+135,261,DorianBattivelli,Path plots artefeacts,"['DorianBattivelli', 'sronilsson']",67,2,https://github.com/sgoldenlab/simba/issues/261,2023-05-18T15:02:16Z,2023-08-14T14:20:09Z
+136,260,fon215,Existing model not making correct predictions on new videos,"['fon215', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/260,2023-05-17T18:18:28Z,2023-05-17T22:31:42Z
+137,259,DorianBattivelli,Issue with polygon ROI,"['DorianBattivelli', 'sronilsson']",4,2,https://github.com/sgoldenlab/simba/issues/259,2023-05-14T11:11:00Z,2023-05-14T15:52:46Z
+138,258,Lucas97223,Dispersion of body parts when they are hidden when training classifiers,[],0,1,https://github.com/sgoldenlab/simba/issues/258,2023-05-12T13:09:39Z,
+139,257,Sere-98,"Using simba with 4 mice, 8 bodyparts","['Sere-98', 'sronilsson']",4,2,https://github.com/sgoldenlab/simba/issues/257,2023-05-10T11:31:37Z,2023-05-12T08:32:05Z
+140,250,urimons,Outlier correction doesn't respond,"['Chantal-Wi', 'sronilsson', 'urimons']",8,3,https://github.com/sgoldenlab/simba/issues/250,2023-05-06T14:25:06Z,2023-10-12T10:02:51Z
+141,249,DorianBattivelli,Impossible to analyse ROI with 1 FPS video,"['DorianBattivelli', 'sronilsson']",17,2,https://github.com/sgoldenlab/simba/issues/249,2023-05-05T11:33:24Z,2023-05-05T16:11:55Z
+142,248,florianduclot,`KeyError` when training multiple models from meta files using custom weights,"['florianduclot', 'sronilsson']",4,2,https://github.com/sgoldenlab/simba/issues/248,2023-04-29T16:03:33Z,2023-05-16T11:55:43Z
+143,247,gemajpg,Can't create a simba / plotly dataset,[],0,1,https://github.com/sgoldenlab/simba/issues/247,2023-04-15T11:23:41Z,
+144,246,gemajpg,Problem training single model (global enviroment),"['gemajpg', 'sronilsson']",9,2,https://github.com/sgoldenlab/simba/issues/246,2023-04-08T12:46:55Z,2023-04-10T15:09:44Z
+145,245,florianduclot,Dependency incompatibility in 1.55.1 in NEW conda env,"['florianduclot', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/245,2023-04-06T14:22:11Z,2023-04-06T15:04:46Z
+146,244,anacastropsico,Erro: Fatal Python error: PyEval_RestoreThread: NULL tstate,"['anacastropsico', 'lxspedeza', 'sronilsson']",9,3,https://github.com/sgoldenlab/simba/issues/244,2023-04-04T23:11:31Z,2023-10-02T15:43:38Z
+147,243,gemajpg,Unable to import h5 file from DLC,"['gemajpg', 'sronilsson']",16,2,https://github.com/sgoldenlab/simba/issues/243,2023-04-03T17:39:00Z,2023-04-06T14:51:54Z
+148,242,mrnels19,Unable to Create Project with Updated Version of SimBA,"['florianduclot', 'gemajpg', 'mrnels19', 'sronilsson']",42,4,https://github.com/sgoldenlab/simba/issues/242,2023-03-28T17:54:53Z,2023-05-10T21:57:52Z
+149,241,herbertzhengwu,Reorder Nodes using SLEAP Skeleton as input,"['herbertzhengwu', 'samaralsanti', 'sronilsson']",7,3,https://github.com/sgoldenlab/simba/issues/241,2023-03-28T14:27:41Z,2024-06-24T17:22:29Z
+150,240,klxxxx,No “tracking” option in the simba tool.,"['klxxxx', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/240,2023-03-27T08:46:42Z,2023-03-29T07:06:10Z
+151,238,Lucas97223,ROI analysis for multiple body parts in features extracted,"['Lucas97223', 'sronilsson']",9,2,https://github.com/sgoldenlab/simba/issues/238,2023-03-23T12:09:43Z,2023-03-31T13:00:33Z
+152,237,ayakab0619,question about pseudo labelling,"['ayakab0619', 'sronilsson']",3,2,https://github.com/sgoldenlab/simba/issues/237,2023-03-13T09:45:28Z,2023-03-14T10:55:37Z
+153,236,Lucas97223,Impossible to extract features in Multi Animal Tracking,"['Lucas97223', 'sronilsson']",27,2,https://github.com/sgoldenlab/simba/issues/236,2023-03-08T16:30:52Z,2023-03-16T11:42:06Z
+154,235,kylethieringer,Model Training Error,"['kylethieringer', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/235,2023-03-02T06:32:58Z,2023-03-02T15:01:08Z
+155,234,neuronerd17,"""ImportError: DLL load failed"" after install (on Windows 11)","['neuronerd17', 'sronilsson']",10,2,https://github.com/sgoldenlab/simba/issues/234,2023-02-15T04:27:01Z,2023-02-22T00:10:54Z
+156,232,mrnels19,Plotly Visualization Questions,"['mrnels19', 'sronilsson']",4,2,https://github.com/sgoldenlab/simba/issues/232,2023-01-23T21:49:25Z,2023-01-31T06:53:43Z
+157,230,mrnels19,Unable to Load Dash,['mrnels19'],1,1,https://github.com/sgoldenlab/simba/issues/230,2023-01-20T03:40:10Z,2023-01-20T03:48:17Z
+158,229,urimons,How to improve f1-score?,"['sronilsson', 'urimons']",8,2,https://github.com/sgoldenlab/simba/issues/229,2023-01-15T08:49:18Z,2023-01-18T13:52:04Z
+159,228,CodyScholtens,importing .SLP files to SIMBA fails to cycle or open the window for identifying animals,[],0,1,https://github.com/sgoldenlab/simba/issues/228,2023-01-15T05:16:03Z,
+160,227,colinyong,How to Interpret the Classification Report,"['colinyong', 'sronilsson']",3,2,https://github.com/sgoldenlab/simba/issues/227,2023-01-13T16:30:44Z,2023-01-18T11:11:33Z
+161,226,mrnels19,Inaccurate sklearn Results,"['mrnels19', 'sronilsson']",6,2,https://github.com/sgoldenlab/simba/issues/226,2023-01-06T06:04:39Z,2023-01-13T15:58:53Z
+162,225,mrnels19,Error when Generating Project Config and Importing Videos,"['mrnels19', 'sronilsson']",3,2,https://github.com/sgoldenlab/simba/issues/225,2023-01-03T03:46:01Z,2023-01-03T20:08:53Z
+163,224,mrnels19,Unable to Create Pose Config,"['mrnels19', 'sronilsson']",4,2,https://github.com/sgoldenlab/simba/issues/224,2023-01-03T03:27:02Z,2023-01-05T02:39:02Z
+164,223,urimons,Problem with sklearn visualization ,"['sronilsson', 'urimons']",3,2,https://github.com/sgoldenlab/simba/issues/223,2022-12-14T08:07:12Z,2022-12-14T15:27:35Z
+165,222,Destiny-123,Analyze ROI with specific time frame,['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/222,2022-12-09T01:08:46Z,2022-12-09T01:22:24Z
+166,221,anacastropsico,Problens with simba (ROIS),"['anacastropsico', 'sronilsson']",38,2,https://github.com/sgoldenlab/simba/issues/221,2022-11-30T21:05:38Z,2022-12-02T01:03:53Z
+167,215,colinyong,questions about behaviour labeling ,['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/215,2022-11-10T14:11:26Z,2022-11-10T16:39:06Z
+168,214,chongtianyifa,do not rotate the video during Sklearn Visualization,"['chongtianyifa', 'sronilsson']",5,2,https://github.com/sgoldenlab/simba/issues/214,2022-11-09T07:24:19Z,2022-11-10T00:42:09Z
+169,213,Toshea111,Anchored ROI Request,"['Toshea111', 'sronilsson']",35,2,https://github.com/sgoldenlab/simba/issues/213,2022-11-07T17:34:56Z,2023-01-18T15:51:06Z
+170,212,urimons,Plot threshold is taking too long,"['sronilsson', 'urimons']",5,2,https://github.com/sgoldenlab/simba/issues/212,2022-09-18T14:25:51Z,2022-09-29T19:56:13Z
+171,211,suntzuisafterU,XGBoost available as a model but not fully implemented,"['sronilsson', 'suntzuisafterU']",2,2,https://github.com/sgoldenlab/simba/issues/211,2022-09-12T19:39:35Z,2022-09-13T02:43:09Z
+172,210,DorianBattivelli,Impossible to import h5 elipse data from DLC,"['DorianBattivelli', 'sronilsson']",19,2,https://github.com/sgoldenlab/simba/issues/210,2022-09-06T12:09:07Z,2022-09-07T00:46:47Z
+173,209,DorianBattivelli,Unreliable ROI quantification,"['DorianBattivelli', 'sronilsson']",32,2,https://github.com/sgoldenlab/simba/issues/209,2022-08-22T14:02:05Z,2022-08-26T02:12:51Z
+174,208,carson2stoker,ParseError during Project Config,"['carson2stoker', 'sronilsson']",12,2,https://github.com/sgoldenlab/simba/issues/208,2022-08-13T22:28:44Z,2022-08-16T20:21:32Z
+175,207,carson2stoker,Dependency Conflicts During Installation,"['carson2stoker', 'sronilsson']",5,2,https://github.com/sgoldenlab/simba/issues/207,2022-08-12T19:03:12Z,2022-08-13T17:08:28Z
+176,206,n-zeng,Issue while analyzing machine-results,['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/206,2022-08-12T17:37:50Z,2022-08-14T14:33:09Z
+177,205,carson2stoker,Create pose config Issues,"['carson2stoker', 'sronilsson']",4,2,https://github.com/sgoldenlab/simba/issues/205,2022-08-10T19:43:14Z,2022-08-12T17:16:58Z
+178,204,Gfernandezv,Help with behavior labeling.,['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/204,2022-08-06T23:18:44Z,2022-08-07T11:23:12Z
+179,203,DorianBattivelli,Issue with distance analysis. ,['sronilsson'],2,2,https://github.com/sgoldenlab/simba/issues/203,2022-08-05T17:47:58Z,2022-08-05T17:55:20Z
+180,202,DorianBattivelli,Mismatch in ROI data analysis.,"['DorianBattivelli', 'sronilsson']",22,2,https://github.com/sgoldenlab/simba/issues/202,2022-07-26T11:15:01Z,2022-08-01T19:24:30Z
+181,201,fon215,Error during train machine model step/need help understanding hyperparameters,"['fon215', 'sronilsson']",11,2,https://github.com/sgoldenlab/simba/issues/201,2022-07-21T02:09:05Z,2022-07-21T15:34:00Z
+182,200,raewanyk,OpenCV can't read video stream from file error when trying to get pixels/mm in video parameters,"['raewanyk', 'sronilsson']",19,2,https://github.com/sgoldenlab/simba/issues/200,2022-07-15T19:04:50Z,2022-07-18T16:17:10Z
+183,199,n-zeng,Machine Model Training Issue,"['n-zeng', 'sronilsson']",13,2,https://github.com/sgoldenlab/simba/issues/199,2022-07-14T19:08:19Z,2022-07-14T23:12:47Z
+184,198,n-zeng,Error in terminal while training models.,"['n-zeng', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/198,2022-07-13T16:00:07Z,2022-07-14T13:46:13Z
+185,197,fon215,Error opening file during feature extraction,"['fon215', 'sronilsson']",3,2,https://github.com/sgoldenlab/simba/issues/197,2022-07-12T21:22:18Z,2022-07-12T23:35:22Z
+186,196,yufang1039,Crash when opening simba through command line,"['sronilsson', 'yufang1039']",12,2,https://github.com/sgoldenlab/simba/issues/196,2022-07-11T21:17:34Z,2022-07-13T00:04:24Z
+187,195,fon215,Overflow error in extracting features step in pipeline,"['fon215', 'sronilsson']",6,2,https://github.com/sgoldenlab/simba/issues/195,2022-07-09T00:33:11Z,2022-07-09T20:14:41Z
+188,194,fon215,Error while trying to generate new project,"['fon215', 'sronilsson']",15,2,https://github.com/sgoldenlab/simba/issues/194,2022-07-07T17:48:20Z,2022-07-08T01:43:20Z
+189,193,fon215,Error during outlier correction step,"['fon215', 'sronilsson']",9,2,https://github.com/sgoldenlab/simba/issues/193,2022-07-07T00:13:26Z,2022-07-07T17:14:46Z
+190,192,florianduclot,Fail to start SimBA due to incorrect splash image name,"['florianduclot', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/192,2022-07-06T14:10:25Z,2022-07-06T15:36:00Z
+191,191,autumnca,"pickle.UnpicklingError: invalid load key, ','. When Running Model","['autumnca', 'sronilsson']",21,2,https://github.com/sgoldenlab/simba/issues/191,2022-06-30T14:16:02Z,2022-07-09T01:13:55Z
+192,188,autumnca,Mismatched Columns Error with SLEAP Tracking File,"['autumnca', 'neugun', 'sronilsson']",4,3,https://github.com/sgoldenlab/simba/issues/188,2022-06-17T13:25:38Z,2023-05-17T16:29:56Z
+193,187,autumnca,Issue with scikit-learn when installing SimBA,"['autumnca', 'sronilsson']",7,2,https://github.com/sgoldenlab/simba/issues/187,2022-06-14T17:50:03Z,2022-06-15T13:52:32Z
+194,186,fon215,Error installing and opening SimBA,"['fon215', 'sronilsson']",5,2,https://github.com/sgoldenlab/simba/issues/186,2022-06-03T16:23:04Z,2022-06-03T23:31:24Z
+195,185,carlitomu,Builing a model with few frames containing the behavior of interest,['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/185,2022-05-31T08:06:04Z,2022-05-31T20:59:14Z
+196,184,rfkova,"Problems importing SLP files - predictions can be imported, project files cannot","['rfkova', 'sronilsson']",5,2,https://github.com/sgoldenlab/simba/issues/184,2022-05-27T20:38:44Z,2022-06-29T21:55:06Z
+197,181,slin02,Training Machine Model TypeError: 'numpy.float64' object cannot be interpreted as an integer,"['slin02', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/181,2022-05-23T16:54:02Z,2022-05-23T19:26:09Z
+198,179,carlitomu,ROI ,"['carlitomu', 'sronilsson']",15,2,https://github.com/sgoldenlab/simba/issues/179,2022-05-11T18:06:33Z,2022-05-20T12:50:52Z
+199,178,vsedwick,Seeking guidance for importing Ethovision Behavior annotations,"['sronilsson', 'vsedwick']",18,2,https://github.com/sgoldenlab/simba/issues/178,2022-04-25T07:14:30Z,2022-10-11T12:26:24Z
+200,177,ZZysh,Seeking help for some parameter setting,"['ZZysh', 'sronilsson']",7,2,https://github.com/sgoldenlab/simba/issues/177,2022-04-21T08:01:19Z,2022-04-22T12:11:11Z
+201,176,florianduclot,Absolute path is not always used in `process_videos_automation_linux.py`,"['florianduclot', 'sronilsson']",3,2,https://github.com/sgoldenlab/simba/issues/176,2022-04-15T16:17:46Z,2022-04-15T22:26:27Z
+202,175,gabrieltofani,Error when analysing ROI ,"['gabrieltofani', 'sgoldenlab']",8,2,https://github.com/sgoldenlab/simba/issues/175,2022-03-30T13:33:45Z,2022-03-30T14:15:12Z
+203,174,urimons,Outlier correction error,"['sgoldenlab', 'urimons']",4,2,https://github.com/sgoldenlab/simba/issues/174,2022-03-29T11:33:55Z,2022-03-30T15:10:14Z
+204,173,jmaicas,Extract frames does not seem to work,"['jmaicas', 'sgoldenlab']",3,2,https://github.com/sgoldenlab/simba/issues/173,2022-03-24T14:02:49Z,2022-03-24T15:13:19Z
+205,172,jmaicas,Importing 0 multi-animal DLC h5 files in Ubuntu,"['jmaicas', 'sgoldenlab']",7,2,https://github.com/sgoldenlab/simba/issues/172,2022-03-23T16:12:55Z,2022-03-24T12:58:23Z
+206,171,A-Telfer,Linux/docker support,"['A-Telfer', 'sgoldenlab']",7,2,https://github.com/sgoldenlab/simba/issues/171,2022-03-22T18:42:20Z,2022-03-31T17:46:13Z
+207,170,carlitomu,Kleinberg behavior classification doesn't analyze the whole csv,"['carlitomu', 'sgoldenlab', 'sronilsson']",11,3,https://github.com/sgoldenlab/simba/issues/170,2022-03-14T14:44:06Z,2022-03-21T20:42:11Z
+208,167,tyyin12,Simba installation error: cannot import name 'run',['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/167,2022-03-09T12:11:12Z,2022-03-09T13:47:12Z
+209,165,frankiechang123,Error in validating model on single video,"['frankiechang123', 'sronilsson', 'urimons']",19,3,https://github.com/sgoldenlab/simba/issues/165,2022-02-04T05:20:53Z,2022-04-14T05:36:52Z
+210,164,CorinneAKelly,Error after starting simba: unable to load classification from database,"['CorinneAKelly', 'KonradDanielewski', 'sgoldenlab']",7,3,https://github.com/sgoldenlab/simba/issues/164,2022-01-28T21:21:02Z,2022-03-10T16:29:34Z
+211,163,KonradDanielewski,3D data processing,"['KonradDanielewski', 'sgoldenlab']",3,2,https://github.com/sgoldenlab/simba/issues/163,2022-01-19T09:19:01Z,2022-01-21T13:01:40Z
+212,160,holfordt,Issue importing APT tracking data,"['holfordt', 'sronilsson']",6,2,https://github.com/sgoldenlab/simba/issues/160,2022-01-05T17:34:13Z,2022-01-06T18:40:19Z
+213,159,AnnabelPerry,SimBA stalls while processing a file for movement outliers,"['AnnabelPerry', 'sgoldenlab', 'sronilsson']",7,3,https://github.com/sgoldenlab/simba/issues/159,2022-01-02T02:11:10Z,2022-02-19T01:41:00Z
+214,158,catubc,Using simba to make pairwise classifier in 3 (or more) animal cohorts,"['catubc', 'sronilsson']",8,2,https://github.com/sgoldenlab/simba/issues/158,2021-12-24T12:57:41Z,2021-12-24T17:21:06Z
+215,157,catubc,Docs link broken,['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/157,2021-12-24T10:52:26Z,2021-12-24T12:33:15Z
+216,156,AnnabelPerry,simba command fails after installation,"['AnnabelPerry', 'catubc', 'sronilsson']",3,3,https://github.com/sgoldenlab/simba/issues/156,2021-12-20T16:39:56Z,2021-12-24T11:06:09Z
+217,155,catubc,Duplication of animal from SLEAP .slp or .csv file,"['catubc', 'sronilsson']",34,2,https://github.com/sgoldenlab/simba/issues/155,2021-12-20T12:05:35Z,2021-12-24T12:27:04Z
+218,154,catubc,wxpython linux install fails; wxMediaCtrl was explicitly requested but not found,"['catubc', 'sronilsson']",13,2,https://github.com/sgoldenlab/simba/issues/154,2021-12-20T09:06:46Z,2021-12-20T10:49:45Z
+219,153,DorianBattivelli,Impossible to resume ROI drawing,"['DorianBattivelli', 'sronilsson']",3,2,https://github.com/sgoldenlab/simba/issues/153,2021-12-16T04:28:31Z,2021-12-19T21:07:56Z
+220,152,yana-yuhai,ModuleNotFoundError when trying to open Plotly,"['sronilsson', 'yana-yuhai']",2,2,https://github.com/sgoldenlab/simba/issues/152,2021-12-10T20:54:04Z,2021-12-13T20:27:35Z
+221,151,yana-yuhai,Issue with video_info.csv an validating the model. ,"['sronilsson', 'yana-yuhai']",2,2,https://github.com/sgoldenlab/simba/issues/151,2021-12-09T16:00:44Z,2021-12-09T17:49:43Z
+222,150,Marcelobot,Error while trying to import h5 files - again (!),"['Marcelobot', 'sronilsson']",6,2,https://github.com/sgoldenlab/simba/issues/150,2021-12-08T19:48:55Z,2021-12-08T20:36:52Z
+223,149,Marcelobot,Issue while importing h5 files..,"['Marcelobot', 'sronilsson']",5,2,https://github.com/sgoldenlab/simba/issues/149,2021-11-27T17:06:27Z,2021-12-08T19:26:04Z
+224,148,yana-yuhai,Multi-Animal DLC Import Error,"['sronilsson', 'yana-yuhai']",24,2,https://github.com/sgoldenlab/simba/issues/148,2021-11-19T19:17:14Z,2021-12-03T18:40:02Z
+225,147,bendichter,NWB support,['inoejj'],1,2,https://github.com/sgoldenlab/simba/issues/147,2021-11-14T21:29:16Z,2021-11-15T18:25:47Z
+226,146,jverpeut,SLEAP data import,"['catubc', 'jverpeut', 'sgoldenlab']",4,3,https://github.com/sgoldenlab/simba/issues/146,2021-11-12T23:55:57Z,2021-12-27T18:00:36Z
+227,145,NickBardjis,File -> Exit Doesn't work,['inoejj'],1,2,https://github.com/sgoldenlab/simba/issues/145,2021-11-09T21:02:03Z,2021-11-09T22:11:55Z
+228,144,elenael97,Question about creating a behavioural classifier,['goodwinnastacia'],1,2,https://github.com/sgoldenlab/simba/issues/144,2021-10-21T15:00:07Z,2021-10-21T18:37:38Z
+229,143,carlitomu,"H5 - how to import tracking type ""ellipse""?","['carlitomu', 'sgoldenlab']",6,2,https://github.com/sgoldenlab/simba/issues/143,2021-10-21T14:06:44Z,2021-10-22T14:11:26Z
+230,142,NickBardjis,Visual Indication of Click Location On Plot Not Appearing,[],0,1,https://github.com/sgoldenlab/simba/issues/142,2021-10-15T20:12:24Z,
+231,137,Marcelobot,Labeling Freezing Behavior,['sgoldenlab'],1,2,https://github.com/sgoldenlab/simba/issues/137,2021-10-12T17:40:24Z,2021-10-14T00:58:02Z
+232,136,NickBardjis,Too Many Labels Makes Save Button Inaccessible,"['NickBardjis', 'inoejj', 'sgoldenlab']",10,3,https://github.com/sgoldenlab/simba/issues/136,2021-10-01T14:00:51Z,2021-10-06T22:11:50Z
+233,135,Marcelobot,Error while trying to set video parameters,['sgoldenlab'],1,2,https://github.com/sgoldenlab/simba/issues/135,2021-09-21T14:30:34Z,2021-09-22T11:18:05Z
+234,134,quirinkrabi,Cannot install Simba with TF due to dependency conflicts,"['quirinkrabi', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/134,2021-09-17T10:11:42Z,2021-09-17T11:35:45Z
+235,133,MasahiroMorsihita,Unable to install due to error,['sgoldenlab'],1,2,https://github.com/sgoldenlab/simba/issues/133,2021-09-17T04:49:15Z,2021-09-17T11:33:48Z
+236,132,Marcelobot,Attribute error while trying to calculate video parameters in SimBA,"['Marcelobot', 'sgoldenlab']",9,2,https://github.com/sgoldenlab/simba/issues/132,2021-09-11T17:01:19Z,2021-09-14T11:42:14Z
+237,128,Marcelobot,Missmatch/Confusion about Videoparameters,"['Marcelobot', 'inoejj', 'sronilsson']",7,3,https://github.com/sgoldenlab/simba/issues/128,2021-08-24T17:47:49Z,2021-09-11T16:52:37Z
+238,127,Marcelobot,"""Conflicting dependencies"" while Simba Installation","['Marcelobot', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/127,2021-08-17T22:18:47Z,2021-08-23T09:15:43Z
+239,126,RobertoEnrique,"""Traceback"" error when opening SimBA in the terminal after installing","['RobertoEnrique', 'sgoldenlab', 'sronilsson']",12,3,https://github.com/sgoldenlab/simba/issues/126,2021-08-12T20:54:40Z,2021-08-24T22:52:07Z
+240,125,Marcelobot,Error while Trying to import frames..,['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/125,2021-07-28T18:54:47Z,2021-07-29T01:42:10Z
+241,124,aXcELLcore,Instalation error because of conflicting dependencies,"['aXcELLcore', 'sgoldenlab', 'sronilsson']",5,3,https://github.com/sgoldenlab/simba/issues/124,2021-07-17T05:52:58Z,2021-07-21T15:57:49Z
+242,123,CorinneAKelly,Error running SimBA for the first time: ModuleNotFoundError: No module named 'deeplabcut',"['CorinneAKelly', 'inoejj']",4,2,https://github.com/sgoldenlab/simba/issues/123,2021-07-12T19:28:55Z,2021-07-12T19:53:27Z
+243,122,florianduclot,Trailing slash removed from path,"['florianduclot', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/122,2021-07-11T20:58:54Z,2021-07-13T01:00:41Z
+244,121,smidm,"features Sum_probabilities, Mean_probabilities, Low_prob_detections_x are all zero (SLEAP import)","['inoejj', 'smidm', 'sronilsson']",3,3,https://github.com/sgoldenlab/simba/issues/121,2021-07-11T05:53:41Z,2021-07-19T11:07:30Z
+245,120,joseph-yclam,Editing GUI Not Reflected When Running App,"['inoejj', 'joseph-yclam']",3,2,https://github.com/sgoldenlab/simba/issues/120,2021-06-10T21:29:38Z,2021-06-14T20:35:07Z
+246,119,carlitomu,pose configuration without bodypart's name and picture on MacOS,"['carlitomu', 'inoejj', 'sgoldenlab']",4,3,https://github.com/sgoldenlab/simba/issues/119,2021-06-09T15:46:11Z,2021-06-09T19:50:49Z
+247,116,Virginia9733,Could it be possible to run SimBA on google Colab?,"['Virginia9733', 'inoejj', 'sgoldenlab']",4,3,https://github.com/sgoldenlab/simba/issues/116,2021-06-05T11:31:55Z,2021-06-14T20:42:16Z
+248,115,Soengzaak,error when I started to train the model,"['Soengzaak', 'sgoldenlab']",3,2,https://github.com/sgoldenlab/simba/issues/115,2021-06-03T02:29:31Z,2021-06-04T02:13:33Z
+249,114,Soengzaak,"Erorr on ""Extract the flames""","['Soengzaak', 'inoejj']",2,2,https://github.com/sgoldenlab/simba/issues/114,2021-06-01T14:51:56Z,2021-06-03T01:44:34Z
+250,113,Soengzaak,NameError: name 'deeplabcut' is not defined,"['Soengzaak', 'sgoldenlab']",4,2,https://github.com/sgoldenlab/simba/issues/113,2021-05-28T12:31:58Z,2021-06-01T14:45:19Z
+251,110,joseph-yclam,No module found despite the file being found in the correct directory,"['joseph-yclam', 'sgoldenlab']",3,2,https://github.com/sgoldenlab/simba/issues/110,2021-05-24T02:10:45Z,2021-05-25T22:24:20Z
+252,109,charithaomprakash,Tkinter Issue - Blank SimBA GUI,"['cameronotto', 'charithaomprakash', 'inoejj', 'sgoldenlab']",19,4,https://github.com/sgoldenlab/simba/issues/109,2021-05-10T08:15:43Z,2021-06-29T21:28:35Z
+253,108,sinal23,error when trying to upload the H5 file from my DLC files ,"['DorianBattivelli', 'sgoldenlab', 'sinal23']",12,3,https://github.com/sgoldenlab/simba/issues/108,2021-04-26T18:15:38Z,2021-04-29T03:36:17Z
+254,107,DorianBattivelli,Issue to measure distance,"['DorianBattivelli', 'sgoldenlab']",9,2,https://github.com/sgoldenlab/simba/issues/107,2021-04-26T11:22:21Z,2021-05-03T17:52:36Z
+255,106,DorianBattivelli,Issue when defining identities,"['DorianBattivelli', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/106,2021-04-24T11:32:15Z,2021-04-24T19:58:22Z
+256,105,DorianBattivelli,Heat maps for each individual.,"['DorianBattivelli', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/105,2021-04-23T23:49:00Z,2021-04-24T08:54:21Z
+257,104,DorianBattivelli,Outlier correction - error,"['DorianBattivelli', 'sgoldenlab']",13,2,https://github.com/sgoldenlab/simba/issues/104,2021-04-23T16:45:50Z,2021-04-23T22:20:55Z
+258,103,turtlelover426,Is simba compatible with Drosophila?,['sgoldenlab'],1,2,https://github.com/sgoldenlab/simba/issues/103,2021-04-18T19:39:17Z,2021-04-19T13:41:51Z
+259,102,neurowookie,Importing Boris Data,"['neurowookie', 'sgoldenlab']",5,2,https://github.com/sgoldenlab/simba/issues/102,2021-04-13T11:56:33Z,2021-04-15T15:59:14Z
+260,97,smidm,can't run SimBA from repo: missing files,"['inoejj', 'smidm']",7,2,https://github.com/sgoldenlab/simba/issues/97,2021-03-19T15:57:42Z,2021-03-22T18:43:35Z
+261,96,smidm,provide package build files (setup.py),[],0,1,https://github.com/sgoldenlab/simba/issues/96,2021-03-19T15:08:17Z,
+262,93,Wutaijing9,behavior annotation with mat file,['sgoldenlab'],1,2,https://github.com/sgoldenlab/simba/issues/93,2021-02-26T12:40:27Z,2021-02-26T14:24:01Z
+263,92,Wutaijing9,ROI data analysis,['sgoldenlab'],2,2,https://github.com/sgoldenlab/simba/issues/92,2021-02-26T12:09:04Z,2021-02-27T21:22:18Z
+264,91,Wutaijing9, ROI data analysis ,[],0,1,https://github.com/sgoldenlab/simba/issues/91,2021-02-26T12:00:38Z,
+265,90,Shehrrykid,SimBA for SPRGT,"['Shehrrykid', 'sgoldenlab']",3,2,https://github.com/sgoldenlab/simba/issues/90,2021-02-17T12:50:35Z,2021-03-03T12:49:16Z
+266,89,AyusoAa,Sklearn visualizations of single videos,"['AyusoAa', 'sgoldenlab', 'sronilsson']",5,3,https://github.com/sgoldenlab/simba/issues/89,2021-02-05T08:40:40Z,2021-03-01T10:08:58Z
+267,87,catubc,Simple-use case,['sgoldenlab'],1,2,https://github.com/sgoldenlab/simba/issues/87,2021-02-02T16:15:21Z,2021-02-03T06:43:29Z
+268,86,filos93,Data plot and wrong body parts selection,"['filos93', 'sgoldenlab', 'sronilsson']",13,3,https://github.com/sgoldenlab/simba/issues/86,2021-01-18T11:23:53Z,2021-01-18T23:21:17Z
+269,85,filos93,ROI visualization font size,"['filos93', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/85,2021-01-18T10:58:23Z,2021-01-18T13:19:36Z
+270,84,Wutaijing9,failed to install simba in linux,"['Wutaijing9', 'sgoldenlab', 'sronilsson']",7,3,https://github.com/sgoldenlab/simba/issues/84,2021-01-08T03:17:10Z,2021-01-11T18:00:03Z
+271,83,Qasimster,Whenever i extract frame rates from a video dataset folder to a train_1 folder. After extracting frame rates the folder is empty where as pycharm shows it has been done successfully. Any one aware of this issue? My code,"['Qasimster', 'sgoldenlab', 'sronilsson']",7,3,https://github.com/sgoldenlab/simba/issues/83,2021-01-07T11:53:55Z,2021-01-07T15:58:29Z
+272,81,Yating-L,There are frames are not classified as containing the behavior event when the probability are above threshold,"['Yating-L', 'sgoldenlab', 'sronilsson']",9,3,https://github.com/sgoldenlab/simba/issues/81,2020-11-25T22:54:42Z,2020-12-02T21:51:29Z
+273,80,mauricev,dependency conflict with scikit-learning,['sronilsson'],1,2,https://github.com/sgoldenlab/simba/issues/80,2020-11-18T20:38:15Z,2020-11-19T07:29:27Z
+274,78,MattKDawson,SLEAP File Import Error,"['MattKDawson', 'Sunday77', 'sgoldenlab', 'smidm']",5,4,https://github.com/sgoldenlab/simba/issues/78,2020-11-04T05:36:28Z,2021-03-12T18:07:41Z
+275,77,benlansdell,Unable to run RF model. KeyError: Mouse_1_note_to_tail on 'Run RF Model',"['benlansdell', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/77,2020-11-03T13:33:38Z,2020-11-04T14:07:46Z
+276,76,Yating-L,I got a KeyError when run RF model after I updated to 1.2.29.,"['Yating-L', 'sgoldenlab']",6,2,https://github.com/sgoldenlab/simba/issues/76,2020-10-23T16:02:22Z,2020-10-23T18:23:06Z
+277,75,Yating-L,Evaluation reports will be overwrite when run train model twice,"['Yating-L', 'sgoldenlab']",3,2,https://github.com/sgoldenlab/simba/issues/75,2020-10-21T23:16:02Z,2020-10-23T12:53:00Z
+278,74,filos93,issue with feature extraction,"['filos93', 'sgoldenlab', 'sronilsson']",9,3,https://github.com/sgoldenlab/simba/issues/74,2020-10-21T17:29:14Z,2020-10-26T12:56:01Z
+279,73,seanpaulbradley,"Fix for ""Scaled_movement_M1_M2"" errors in single animal projects","['seanpaulbradley', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/73,2020-10-16T18:31:48Z,2020-10-19T16:09:51Z
+280,72,MattKDawson,SLEAP File Import: Issues & Questions,"['MattKDawson', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/72,2020-10-14T16:20:35Z,2020-10-18T23:19:46Z
+281,71,MattKDawson,Tkinter Issue - Blank SimBA GUI,"['MattKDawson', 'sgoldenlab']",8,2,https://github.com/sgoldenlab/simba/issues/71,2020-10-08T22:23:41Z,2020-10-09T16:12:30Z
+282,70,MattKDawson,DLL Error When Attempting to Run SimBA,"['MattKDawson', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/70,2020-10-03T04:41:42Z,2020-10-04T01:56:57Z
+283,69,shinhs0506,Question on behaviour analysis,['sgoldenlab'],1,2,https://github.com/sgoldenlab/simba/issues/69,2020-09-28T17:18:10Z,2020-09-28T20:40:54Z
+284,67,blogeman,Outlier Correction length mismatch,"['adamz10', 'blogeman', 'sgoldenlab']",20,3,https://github.com/sgoldenlab/simba/issues/67,2020-09-16T15:57:41Z,2021-03-15T19:46:56Z
+285,66,ahabchopra,Multi-Animal DLC Import Error,"['ahabchopra', 'sgoldenlab', 'sronilsson', 'yana-yuhai']",24,4,https://github.com/sgoldenlab/simba/issues/66,2020-09-07T18:07:28Z,2021-11-19T19:15:58Z
+286,65,JIUthor,Outlier Correction to ROI error,"['JIUthor', 'sgoldenlab']",4,2,https://github.com/sgoldenlab/simba/issues/65,2020-09-03T12:28:40Z,2020-09-17T23:08:13Z
+287,64,ahabchopra,Error with Generate / Save csv on Label Behavior Page,"['ahabchopra', 'sgoldenlab']",9,2,https://github.com/sgoldenlab/simba/issues/64,2020-08-28T05:48:48Z,2020-08-29T14:21:41Z
+288,63,flyegg,Conflict dependencies,"['flyegg', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/63,2020-08-21T08:49:37Z,2020-09-04T02:37:48Z
+289,62,flyegg,Successfully installed Simba but cannot run Simba,['benjaws'],1,2,https://github.com/sgoldenlab/simba/issues/62,2020-08-21T00:15:14Z,2020-11-17T16:13:03Z
+290,61,jevillacres,Questions on behavioral analysis,"['jevillacres', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/61,2020-08-19T23:49:19Z,2020-08-20T17:50:12Z
+291,60,DJang11,Extract Features,['sgoldenlab'],1,2,https://github.com/sgoldenlab/simba/issues/60,2020-08-13T18:16:48Z,2020-08-14T01:27:23Z
+292,59,blogeman,ROI that changes with every frame,"['blogeman', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/59,2020-08-10T16:29:59Z,2020-08-11T13:54:05Z
+293,58,neugun,extract_features error: input is less than 2-dimensional since it has the same x coordinate\n\n while executing,"['neugun', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/58,2020-08-07T08:39:41Z,2020-08-08T01:38:24Z
+294,57,DorianBattivelli,Problem of switching identities. ,"['DorianBattivelli', 'sgoldenlab']",3,2,https://github.com/sgoldenlab/simba/issues/57,2020-08-06T10:57:25Z,2020-08-07T15:20:44Z
+295,56,lucytian828,Error in Extract Features Rolling Filter,"['lucytian828', 'sgoldenlab']",4,2,https://github.com/sgoldenlab/simba/issues/56,2020-07-30T13:10:01Z,2020-07-31T19:25:51Z
+296,55,kylecnewton,Simba 1.2 Error annotating/labeling behaviors in larval zebrafish,"['kylecnewton', 'sgoldenlab']",23,2,https://github.com/sgoldenlab/simba/issues/55,2020-07-29T18:36:20Z,2020-08-10T19:44:28Z
+297,54,DorianBattivelli,Issue importing .slp files. ,"['DorianBattivelli', 'sgoldenlab']",17,2,https://github.com/sgoldenlab/simba/issues/54,2020-07-27T15:32:54Z,2020-07-28T18:21:19Z
+298,53,LJ-lab,error importing SLEAP .slp file,"['LJ-lab', 'sgoldenlab', 'smidm']",31,3,https://github.com/sgoldenlab/simba/issues/53,2020-07-27T12:02:56Z,2021-03-12T17:08:25Z
+299,52,DorianBattivelli,Issue during features extraction.,"['DorianBattivelli', 'sgoldenlab']",46,2,https://github.com/sgoldenlab/simba/issues/52,2020-07-24T13:41:08Z,2020-07-27T05:39:52Z
+300,51,neugun, name 'deeplabcut' is not defined,"['neugun', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/51,2020-07-24T09:12:59Z,2020-07-26T09:34:16Z
+301,50,DorianBattivelli,Issue for ROI analyze. ,"['DorianBattivelli', 'sgoldenlab']",17,2,https://github.com/sgoldenlab/simba/issues/50,2020-07-23T16:11:05Z,2020-07-24T00:54:03Z
+302,49,amchagas,Add Simba to Open Neuroscience,['sgoldenlab'],1,2,https://github.com/sgoldenlab/simba/issues/49,2020-07-23T11:48:06Z,2020-07-23T15:38:43Z
+303,48,emmonseb,Issue with graphviz not being recognized,"['emmonseb', 'sgoldenlab']",5,2,https://github.com/sgoldenlab/simba/issues/48,2020-07-22T22:20:17Z,2020-07-23T00:00:39Z
+304,47,akaye,Pointer to folder with dlc files,"['akaye', 'emmonseb', 'sgoldenlab']",11,3,https://github.com/sgoldenlab/simba/issues/47,2020-07-21T20:44:35Z,2020-07-22T22:20:02Z
+305,46,DorianBattivelli,Impossible to set video parameters.,"['DorianBattivelli', 'sgoldenlab']",4,2,https://github.com/sgoldenlab/simba/issues/46,2020-07-20T14:24:14Z,2020-07-20T18:24:12Z
+306,45,DorianBattivelli,Issue when uploading bx.h5 files. ,"['DorianBattivelli', 'sgoldenlab']",6,2,https://github.com/sgoldenlab/simba/issues/45,2020-07-18T17:38:27Z,2020-07-19T15:05:07Z
+307,44,DorianBattivelli,Issue when loading .h5 files. Fuzzy instructions. ,"['DorianBattivelli', 'sgoldenlab']",3,2,https://github.com/sgoldenlab/simba/issues/44,2020-07-10T08:36:12Z,2020-07-10T18:53:09Z
+308,43,franciscamachado,Issue when importing DLC .H5 file,"['franciscamachado', 'sgoldenlab']",3,2,https://github.com/sgoldenlab/simba/issues/43,2020-07-07T15:05:22Z,2020-07-22T15:00:50Z
+309,42,2909ft,Issue when extracting features,"['2909ft', 'sronilsson']",2,2,https://github.com/sgoldenlab/simba/issues/42,2020-07-02T14:41:51Z,2020-07-02T16:20:14Z
+310,41,jacobk14,Unable to open simba gui,"['akh8zm', 'sgoldenlab']",3,3,https://github.com/sgoldenlab/simba/issues/41,2020-06-29T19:34:26Z,2020-07-23T19:38:51Z
+311,40,asacson,Cannot extract frames,"['asacson', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/40,2020-06-29T18:28:01Z,2020-07-01T04:14:52Z
+312,39,EvenGu,Path not working on MacOS,['sgoldenlab'],1,2,https://github.com/sgoldenlab/simba/issues/39,2020-06-27T07:59:22Z,2020-06-27T17:57:34Z
+313,38,akh8zm,Conflicting Dependencies + Failure to Run,"['akh8zm', 'sgoldenlab']",5,2,https://github.com/sgoldenlab/simba/issues/38,2020-06-26T00:31:08Z,2020-06-26T18:48:03Z
+314,37,DorianBattivelli,Impossible to run simba on Mac os,"['DorianBattivelli', 'sgoldenlab']",3,2,https://github.com/sgoldenlab/simba/issues/37,2020-06-13T21:20:30Z,2020-06-17T02:26:51Z
+315,35,Pinh13,Simba Create Project,"['Pinh13', 'inoejj', 'sronilsson']",7,3,https://github.com/sgoldenlab/simba/issues/35,2020-06-09T15:58:22Z,2020-06-10T16:54:52Z
+316,34,singhsaluja,Running Simba as singularity container on HPC cluster,"['MMathisLab', 'sgoldenlab']",2,3,https://github.com/sgoldenlab/simba/issues/34,2020-05-25T19:19:04Z,2020-06-05T19:07:51Z
+317,33,adamltyson,Simba installation issue on Win10,"['MMathisLab', 'adamltyson', 'inoejj', 'sgoldenlab']",10,4,https://github.com/sgoldenlab/simba/issues/33,2020-05-13T10:22:10Z,2020-06-05T22:20:27Z
+318,31,Ejdrup,Remove restriction on osf.io repository,['sgoldenlab'],1,2,https://github.com/sgoldenlab/simba/issues/31,2020-05-01T13:12:04Z,2020-05-01T14:21:56Z
+319,30,Ejdrup,Automatically track frames annotated for each labeling session,"['Ejdrup', 'inoejj', 'sgoldenlab']",4,3,https://github.com/sgoldenlab/simba/issues/30,2020-05-01T13:05:30Z,2020-05-01T19:48:41Z
+320,29,Ejdrup,Labeling session reloading at wrong frame,['Ejdrup'],1,1,https://github.com/sgoldenlab/simba/issues/29,2020-05-01T12:57:56Z,2020-05-01T13:03:43Z
+321,28,Ejdrup,Error during Outlier correction,"['Ejdrup', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/28,2020-04-30T20:59:32Z,2020-04-30T21:13:00Z
+322,27,Ejdrup,Error when extecuting SimBA.py,"['Ejdrup', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/27,2020-04-27T12:44:50Z,2020-04-27T15:05:26Z
+323,26,Ejdrup,Incompatabilities when installing SimBA with TF in fresh conda env.,['Ejdrup'],1,1,https://github.com/sgoldenlab/simba/issues/26,2020-04-27T10:31:11Z,2020-04-27T10:57:16Z
+324,25,2909ft,Problem with Analyse ROI Data,"['2909ft', 'sgoldenlab']",25,2,https://github.com/sgoldenlab/simba/issues/25,2020-04-25T21:18:05Z,2020-04-29T13:10:26Z
+325,24,JensBlack,Report: Upper Limit in Memory with pandas [MemoryError],"['JensBlack', 'inoejj', 'sgoldenlab']",5,3,https://github.com/sgoldenlab/simba/issues/24,2020-04-10T08:59:34Z,2020-04-16T00:59:07Z
+326,23,JensBlack,Error in Train model,"['JensBlack', 'benjaws', 'benlansdell']",5,3,https://github.com/sgoldenlab/simba/issues/23,2020-04-07T11:23:09Z,2020-11-17T16:09:33Z
+327,22,JensBlack,Error in generateFeatureImportanceBarGraph,"['JensBlack', 'sgoldenlab']",3,2,https://github.com/sgoldenlab/simba/issues/22,2020-04-07T10:46:50Z,2020-04-08T07:59:47Z
+328,21,JensBlack,Feature: Validate Settings Input before training start,[],0,1,https://github.com/sgoldenlab/simba/issues/21,2020-04-07T07:06:45Z,
+329,20,JensBlack,RuntimeError: main thread is not in main loop,['inoejj'],1,2,https://github.com/sgoldenlab/simba/issues/20,2020-04-06T11:55:58Z,2020-04-06T19:26:00Z
+330,19,JensBlack,Feature: Additional models after Project Creation,['sgoldenlab'],2,2,https://github.com/sgoldenlab/simba/issues/19,2020-04-06T11:33:20Z,2020-04-17T06:07:08Z
+331,18,JensBlack,Feature: Skip outlier correction,"['JensBlack', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/18,2020-04-03T13:12:08Z,2020-04-09T12:35:15Z
+332,17,JensBlack,Error in Outlier correction,['JensBlack'],1,1,https://github.com/sgoldenlab/simba/issues/17,2020-04-03T12:30:09Z,2020-04-03T12:39:20Z
+333,16,JensBlack,Pose Configuration: Window sizing bug,"['JensBlack', 'sgoldenlab']",3,2,https://github.com/sgoldenlab/simba/issues/16,2020-03-25T09:19:15Z,2020-03-26T10:20:30Z
+334,15,bmi-lsym,Movie filename mismatch in csv files: a bug and a fix,['sgoldenlab'],1,2,https://github.com/sgoldenlab/simba/issues/15,2020-03-19T23:23:08Z,2020-03-20T00:40:09Z
+335,14,onurserce,'Append ROI data to features' is not functioning,"['inoejj', 'onurserce', 'sgoldenlab']",5,3,https://github.com/sgoldenlab/simba/issues/14,2020-03-19T20:54:03Z,2020-03-20T17:17:45Z
+336,13,onurserce,ROI module not working,"['onurserce', 'sgoldenlab']",5,2,https://github.com/sgoldenlab/simba/issues/13,2020-03-19T14:41:34Z,2020-03-19T19:36:43Z
+337,12,bmi-lsym,Installation of the version 1.1,"['JensBlack', 'bmi-lsym', 'sgoldenlab']",3,3,https://github.com/sgoldenlab/simba/issues/12,2020-03-17T19:56:03Z,2020-03-25T09:09:16Z
+338,11,dlhagger,Install Issue Shapely,"['dlhagger', 'sgoldenlab']",2,2,https://github.com/sgoldenlab/simba/issues/11,2020-03-09T20:22:37Z,2020-03-10T14:32:23Z
+339,9,DanePatey,Installation help,"['DanePatey', 'sgoldenlab']",6,2,https://github.com/sgoldenlab/simba/issues/9,2020-02-26T17:28:29Z,2020-03-18T17:38:28Z
+340,8,2909ft,Frames input folder files empty,"['2909ft', 'Qasimster', 'inoejj', 'sgoldenlab', 'sronilsson']",26,5,https://github.com/sgoldenlab/simba/issues/8,2020-01-28T10:46:57Z,2021-01-07T11:53:10Z
+341,7,eventhorizonzero,install issue/question,"['eventhorizonzero', 'inoejj', 'sgoldenlab']",4,3,https://github.com/sgoldenlab/simba/issues/7,2020-01-24T12:31:06Z,2020-01-26T18:59:34Z
+342,6,2909ft,ROI feature?,"['2909ft', 'sgoldenlab']",7,2,https://github.com/sgoldenlab/simba/issues/6,2020-01-22T17:32:29Z,2020-03-05T19:28:16Z
+343,5,rkoot,portability,['sgoldenlab'],1,2,https://github.com/sgoldenlab/simba/issues/5,2020-01-20T12:02:29Z,2020-01-21T03:46:41Z
+344,4,PolarBean,3d-coordinates,['sgoldenlab'],1,2,https://github.com/sgoldenlab/simba/issues/4,2020-01-12T02:16:08Z,2020-01-13T18:08:15Z
