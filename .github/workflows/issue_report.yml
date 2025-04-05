@@ -31,7 +31,7 @@ jobs:
 
     - name: List files in the repository
       run: |
-        ls -R /home/runner/work/simba/simba/
+        ls -R /home/runner/work/simba/simba/  # Confirm if the file exists in the correct path
 
     - name: Fetch GitHub issues and generate report
       run: |
@@ -40,17 +40,20 @@ jobs:
     - name: Commit CSV file to download_stats branch
       run: |
         mkdir -p misc  # Create misc directory if it doesn't exist
-        
+
         # Ensure the report is placed in the correct location
-        output_path='/home/runner/work/simba/simba/misc/github_issues_report.csv'
+        output_path='misc/github_issues_report.csv'
 
         # Check if the file exists before attempting to remove it
         if [ -f "$output_path" ]; then
           rm -f "$output_path"  # Remove the existing CSV report if it exists
         fi
 
-        # Add the newly generated CSV file to Git (ensure the file is correctly added)
-        git add "$output_path"
+        # Move the new CSV file to the misc directory (if it's not already there)
+        cp /home/runner/work/simba/simba/misc/github_issues_report.csv $output_path
+
+        # Add the file to Git
+        git add $output_path
 
         # Configure Git with authentication using GITHUB_TOKEN
         git config user.name "github-actions"
@@ -59,6 +62,6 @@ jobs:
         # Use the built-in GITHUB_TOKEN for authentication
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
-        # Add, commit, and push changes
+        # Commit and push changes
         git commit -m "Update daily issues report"
         git push origin download_stats  # Push changes to the download_stats branch
