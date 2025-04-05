@@ -12,6 +12,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+      with:
+        ref: 'download_stats'  # Checkout the download_stats branch
 
     - name: Set up Python
       uses: actions/setup-python@v3
@@ -25,10 +27,22 @@ jobs:
 
     - name: Fetch GitHub issues and generate report
       run: |
-        python scripts/create_issues_report.py
+        python scripts/create_issues_report.py  # Run your Python script to generate the report
 
-    - name: Upload CSV artifact
-      uses: actions/upload-artifact@v3  # Explicitly use v3
-      with:
-        name: github-issues-report
-        path: /tmp/github_issues_report.csv  # Path to the generated CSV
+    - name: Commit CSV file to download_stats branch
+      run: |
+        # Create the misc directory if it doesn't exist
+        mkdir -p misc
+
+        # Move the CSV report to the misc directory
+        mv /tmp/github_issues_report.csv misc/github_issues_report.csv
+
+        # Configure Git
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+
+        # Add, commit, and push changes
+        git add misc/github_issues_report.csv
+        git commit -m "Update daily issues report"
+        git push origin download_stats  # Push changes to the download_stats branch
+
