@@ -1,0 +1,35 @@
+name: Daily GitHub Issue Report
+
+on:
+  schedule:
+    # This triggers the action to run daily at 2:30 AM EST (UTC 6:30 AM)
+    - cron: '30 6 * * *'  # Cron time in UTC (2:30 AM EST is 6:30 AM UTC)
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.9'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt  # Ensure requirements.txt exists
+
+    - name: Fetch GitHub issues and generate report
+      run: |
+        python scripts/create_issues_report.py
+
+    - name: Upload CSV artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: github-issues-report
+        path: /tmp/github_issues_report.csv  # Path to the generated CSV
