@@ -15,11 +15,11 @@ jobs:
       with:
         ref: 'download_stats'  # Checkout the download_stats branch
 
-    - name: Set up Python 3.6.15
+    - name: Set up Python 3.10
       uses: actions/setup-python@v3
       with:
-        python-version: '3.6.15'  # Specify Python 3.6.15
-        architecture: 'x64'  # Specify architecture if needed
+        python-version: '3.10'  # Specify Python 3.10
+        architecture: 'x64'  # Specify architecture
 
     - name: Install dependencies
       run: |
