@@ -40,9 +40,11 @@ jobs:
     - name: Commit CSV file to download_stats branch
       run: |
         mkdir -p misc  # Create misc directory if it doesn't exist
+        # Remove the existing CSV report (if it exists) before moving the new one
+        rm -f misc/github_issues_report.csv  # Force remove the old file
 
-        # Overwrite the existing CSV report in misc directory
-        mv -f /home/runner/work/simba/simba/misc/github_issues_report.csv misc/github_issues_report.csv
+        # Move the new CSV report to the misc directory
+        mv /home/runner/work/simba/simba/misc/github_issues_report.csv misc/github_issues_report.csv
 
         # Configure Git with authentication using GITHUB_TOKEN
         git config user.name "github-actions"
@@ -51,6 +53,10 @@ jobs:
         # Use the built-in GITHUB_TOKEN for authentication
         git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
 
+        # Add, commit, and push changes
+        git add misc/github_issues_report.csv
+        git commit -m "Update daily issues report"
+        git push origin download_stats  # Push changes to the download_stats branch
         # Add, commit, and push changes
         git add misc/github_issues_report.csv
         git commit -m "Update daily issues report"
