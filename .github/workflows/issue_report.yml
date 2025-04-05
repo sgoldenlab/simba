@@ -29,7 +29,7 @@ jobs:
         python scripts/create_issues_report.py
 
     - name: Upload CSV artifact
-      uses: actions/upload-artifact@v2  # Use v2 instead of v3
+      uses: actions/upload-artifact@v2  # Change to v2
       with:
         name: github-issues-report
         path: /tmp/github_issues_report.csv  # Path to the generated CSV
