@@ -28,7 +28,7 @@ jobs:
         python scripts/create_issues_report.py
 
     - name: Upload CSV artifact
-      uses: actions/upload-artifact@f34b8d8b44b163c4fc9e2e3a2ee105ac3a6b86ff  # Use a specific commit hash for v2
+      uses: actions/upload-artifact@v3  # Explicitly use v3
       with:
         name: github-issues-report
         path: /tmp/github_issues_report.csv  # Path to the generated CSV
