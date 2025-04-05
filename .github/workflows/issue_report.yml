@@ -40,7 +40,9 @@ jobs:
     - name: Commit CSV file to download_stats branch
       run: |
         mkdir -p misc  # Create misc directory if it doesn't exist
-        mv /home/runner/work/simba/simba/misc/github_issues_report.csv misc/github_issues_report.csv
+
+        # Overwrite the existing CSV report in misc directory
+        mv -f /home/runner/work/simba/simba/misc/github_issues_report.csv misc/github_issues_report.csv
 
         # Configure Git with authentication using GITHUB_TOKEN
         git config user.name "github-actions"
