@@ -2,7 +2,6 @@ name: Daily GitHub Issue Report
 
 on:
   schedule:
-    # This triggers the action to run daily at 2:30 AM EST (UTC 6:30 AM)
     - cron: '30 6 * * *'  # Cron time in UTC (2:30 AM EST is 6:30 AM UTC)
   workflow_dispatch:  # Allows manual trigger
 
@@ -29,7 +28,7 @@ jobs:
         python scripts/create_issues_report.py
 
     - name: Upload CSV artifact
-      uses: actions/upload-artifact@v2  # Change to v2
+      uses: actions/upload-artifact@v2  # Ensure you use v2 for upload-artifact
       with:
         name: github-issues-report
         path: /tmp/github_issues_report.csv  # Path to the generated CSV
