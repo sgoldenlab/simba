@@ -24,7 +24,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt  # Ensure requirements.txt exists
+        pip install pandas requests  # Install pandas and requests
 
     - name: Fetch GitHub issues and generate report
       run: |
