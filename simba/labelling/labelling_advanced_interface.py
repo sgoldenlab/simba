@@ -5,7 +5,9 @@ from subprocess import PIPE, Popen
 from tkinter import *
 from tkinter import filedialog
 from typing import Optional, Union
+
 import matplotlib
+
 matplotlib.use('agg')
 
 
