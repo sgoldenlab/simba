@@ -1258,7 +1258,6 @@ class PlottingMixin(object):
                 return str(round(x / x_lbl_divisor, 2))
             else:
                 return str(x)
-
         fig = go.Figure()
         clr_dict = get_color_dict()
         if y_max == -1:
@@ -1317,14 +1316,17 @@ class PlottingMixin(object):
                 showlegend=False,
             )
 
+
         if bg_clr is not None:
             fig.update_layout(plot_bgcolor=bg_clr)
         img_bytes = fig.to_image(format="png")
         img = PIL.Image.open(io.BytesIO(img_bytes))
         img = np.array(img)
+
         if save_path is not None:
             cv2.imwrite(save_path, img)
             stdout_success(msg=f"Line plot saved at {save_path}")
+
         else:
             return img
 

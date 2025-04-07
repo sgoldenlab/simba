@@ -5,6 +5,8 @@ from subprocess import PIPE, Popen
 from tkinter import *
 from tkinter import filedialog
 from typing import Dict, Optional, Union
+import matplotlib
+matplotlib.use('agg')
 
 import cv2
 import pandas as pd
@@ -31,7 +33,7 @@ from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import (get_all_clf_names, get_fn_ext,
                                     get_video_meta_data, read_config_entry,
                                     read_df, read_frm_of_video, write_df)
-from simba.utils.warnings import FrameRangeWarning
+
 
 PLAY_VIDEO_SCRIPT_PATH = os.path.join(os.path.dirname(simba.__file__), "labelling/play_annotation_video.py")
 PADDING = 5

@@ -557,9 +557,8 @@ def concatenate_videos_in_folder(in_folder: Union[str, os.PathLike, bytes],
             #returned = os.system(f'ffmpeg -hwaccel cuda -hwaccel_output_format cuda -c:v h264_cuvid -f concat -safe 0 -i "{temp_txt_path}" -vf scale_cuda=1280:720,format=nv12 -r {out_fps} -c:v h264_nvenc -c:a copy -hide_banner -loglevel info "{save_path}" -y')
     else:
         if fps is None:
-            returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" "{save_path}" -c copy -hide_banner -loglevel info -y')
+            returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" "{save_path}" -c copy -hide_banner -loglevel debug -y')
         else:
-            print('sss')
             returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" -r {out_fps} -c:v libx264 -c:a copy -movflags +faststart -hide_banner -loglevel info "{save_path}" -y')
 
             #returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" -r {out_fps} -c:v libx264 -c:a copy -hide_banner -loglevel info "{save_path}" -y')
@@ -818,7 +817,7 @@ def read_img(img_path: Union[str, os.PathLike],
 def find_video_of_file(video_dir: Union[str, os.PathLike],
                        filename: str,
                        raise_error: Optional[bool] = False,
-                       warning: Optional[bool] = True) -> Union[str, os.PathLike]:
+                       warning: Optional[bool] = True) -> Union[str, os.PathLike, None]:
     """
     Helper to find the video file with the SimBA project that represents a known data file path.
 
@@ -2947,3 +2946,7 @@ def read_sys_env():
     env[ENV_VARS.NUMBA_PRECOMPILE.value] = str_2_bool(os.getenv(ENV_VARS.NUMBA_PRECOMPILE.value, "False"))
     env[ENV_VARS.CUML.value] = str_2_bool(os.getenv(ENV_VARS.CUML.value, "False"))
     return env
+
+
+
+#concatenate_videos_in_folder(in_folder=r'C:\troubleshooting\RAT_NOR\project_folder\frames\output\path_plots\03152021_NOB_IOT_8', save_path=r"C:\troubleshooting\RAT_NOR\project_folder\frames\output\path_plots\new.mp4", remove_splits=False)

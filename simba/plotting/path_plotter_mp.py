@@ -13,24 +13,52 @@ import numpy as np
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_keys_exist_in_dict, check_instance,
-                                check_int, check_that_column_exist,
-                                check_valid_lst)
+                                check_if_keys_exist_in_dict, check_instance, check_str, check_if_valid_rgb_tuple, check_video_and_data_frm_count_align, check_that_column_exist,
+                                check_valid_lst, check_valid_boolean,check_if_string_value_is_valid_video_timestamp, check_that_hhmmss_start_is_before_end, check_all_file_names_are_represented_in_video_log, check_valid_dataframe)
 from simba.utils.data import (find_frame_numbers_from_time_stamp,
                               slice_roi_dict_for_video)
 from simba.utils.enums import Formats, TagNames
-from simba.utils.errors import FrameRangeError, NoSpecifiedOutputError
+from simba.utils.errors import FrameRangeError, NoSpecifiedOutputError, InvalidVideoFileError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, find_video_of_file,
                                     get_fn_ext, get_video_meta_data, read_df,
-                                    read_frm_of_video, remove_a_folder)
+                                    read_frm_of_video, remove_a_folder, create_directory)
 from simba.utils.warnings import ROIWarning
 
 
-def path_plot_mp(frm_rng: np.ndarray,
-                 data: np.array,
-                 colors: List[Tuple],
+STYLE_WIDTH = "width"
+STYLE_HEIGHT = "height"
+STYLE_LINE_WIDTH = "line width"
+STYLE_FONT_SIZE = "font size"
+STYLE_FONT_THICKNESS = "font thickness"
+STYLE_CIRCLE_SIZE = "circle size"
+STYLE_MAX_LINES = "max lines"
+STYLE_BG = 'bg'
+STYLE_BG_OPACITY = 'bg_opacity'
+COLOR = 'color'
+SIZE = 'size'
+START_TIME = 'start_time'
+END_TIME = 'end_time'
+BODY_PART = 'body_part'
+AUTO = 'AUTO'
+ANIMAL_NAME = 'animal_name'
+
+STYLE_KEYS = [
+    STYLE_WIDTH,
+    STYLE_HEIGHT,
+    STYLE_LINE_WIDTH,
+    STYLE_FONT_SIZE,
+    STYLE_FONT_THICKNESS,
+    STYLE_CIRCLE_SIZE,
+    STYLE_MAX_LINES,
+    STYLE_BG,
+    STYLE_BG_OPACITY
+]
+
+def path_plot_mp(data: np.ndarray,
+                 line_data: np.array,
+                 colors: list,
                  video_setting: bool,
                  frame_setting: bool,
                  video_save_dir: str,
@@ -39,42 +67,34 @@ def path_plot_mp(frm_rng: np.ndarray,
                  style_attr: dict,
                  roi: Union[dict, None],
                  animal_names: Union[None, List[str]],
-                 fps: int,
-                 clf_attr: dict,
-                 input_style_attr: dict,
-                 video_path: Optional[Union[str, os.PathLike]] = None):
+                 fps: Union[int, float],
+                 clf_attr: dict):
 
-    batch_id, frm_rng = frm_rng[0], frm_rng[1]
+    batch_id, frm_cnt_rng, frm_id_rng = data[0], data[1], data[2]
     if video_setting:
-        fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         video_save_path = os.path.join(video_save_dir, f"{batch_id}.mp4")
-        video_writer = cv2.VideoWriter(video_save_path, fourcc, fps, (style_attr["width"], style_attr["height"]))
-
-    if input_style_attr is not None:
-        if (isinstance(input_style_attr["bg color"], dict)) and (input_style_attr["bg color"]["type"]) == "moving":
-            check_file_exist_and_readable(file_path=video_path)
-            video_cap = cv2.VideoCapture(video_path)
-
-    bg_clr = style_attr["bg color"]
-    for frame_id in frm_rng:
-        if (isinstance(style_attr["bg color"], dict)) and (style_attr["bg color"]["type"]) == "moving":
-            bg_clr = read_frm_of_video(video_path=video_cap, opacity=style_attr["bg color"]["opacity"], frame_index=frame_id)
-        plot_arrs = [x[:frame_id, :] for x in data]
-
+        FOURCC = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
+        video_writer = cv2.VideoWriter(video_save_path, FOURCC, int(fps), (style_attr[STYLE_WIDTH], style_attr[STYLE_HEIGHT]))
+    for frm_cnt, frm_id in zip(frm_cnt_rng, frm_id_rng):
+        if isinstance(style_attr[STYLE_BG], str):
+            bg = read_frm_of_video(video_path=style_attr[STYLE_BG], opacity=style_attr[STYLE_BG_OPACITY], frame_index=frm_id)
+        else:
+            bg = deepcopy(style_attr[STYLE_BG])
+        plot_arrs = [x[:frm_cnt, :] for x in line_data]
         clf_attr_cpy = deepcopy(clf_attr)
         if clf_attr is not None:
-            for k, v in clf_attr.items(): clf_attr_cpy[k]["clfs"][frame_id + 1 :] = 0
+            for k, v in clf_attr.items(): clf_attr_cpy[k]["clfs"][frm_id + 1 :] = 0
 
         img = PlottingMixin.make_path_plot(data=plot_arrs,
                                            colors=colors,
-                                           width=style_attr["width"],
-                                           height=style_attr["height"],
-                                           max_lines=style_attr["max lines"],
-                                           bg_clr=bg_clr,
-                                           circle_size=style_attr["circle size"],
-                                           font_size=style_attr["font size"],
-                                           font_thickness=style_attr["font thickness"],
-                                           line_width=style_attr["line width"],
+                                           width=style_attr[STYLE_WIDTH],
+                                           height=style_attr[STYLE_HEIGHT],
+                                           max_lines=style_attr[STYLE_MAX_LINES],
+                                           bg_clr=bg,
+                                           circle_size=style_attr[STYLE_CIRCLE_SIZE],
+                                           font_size=style_attr[STYLE_FONT_SIZE],
+                                           font_thickness=style_attr[STYLE_FONT_THICKNESS],
+                                           line_width=style_attr[STYLE_LINE_WIDTH],
                                            animal_names=animal_names,
                                            clf_attr=clf_attr_cpy,
                                            save_path=None)
@@ -82,11 +102,11 @@ def path_plot_mp(frm_rng: np.ndarray,
             img = PlottingMixin.roi_dict_onto_img(img=img, roi_dict=roi, show_tags=False, show_center=False)
 
         if video_setting:
-            video_writer.write(np.uint8(img))
+            video_writer.write(img)
         if frame_setting:
-            frm_name = os.path.join(frame_folder_dir, f"{frame_id}.png")
+            frm_name = os.path.join(frame_folder_dir, f"{frm_id}.png")
             cv2.imwrite(frm_name, np.uint8(img))
-        print(f"Path frame created: {frame_id}, Video: {video_name}, Processing core: {batch_id}")
+        print(f"Path frame created: {frm_id}, Video: {video_name}, Processing core: {batch_id}")
     if video_setting:
         video_writer.release()
     return batch_id
@@ -134,199 +154,259 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
 
     def __init__(self,
                  config_path: Union[str, os.PathLike],
-                 files_found: List[str],
-                 frame_setting: Optional[bool] = False,
-                 video_setting: Optional[bool] = False,
-                 last_frame: Optional[bool] = True,
-                 cores: Optional[int] = -1,
-                 print_animal_names: Optional[bool] = False,
-                 input_style_attr: Optional[Dict] = None,
-                 animal_attr: Dict[int, Any] = None,
-                 clf_attr: Optional[Dict[int, List[str]]] = None,
-                 slicing: Optional[Dict[str, str]] = None,
-                 roi: Optional[bool] = False):
+                 data_paths: List[Union[str, os.PathLike]],
+                 animal_attr: dict,
+                 style_attr: Optional[Union[Dict[str, Any], None]] = None,
+                 clf_attr: Optional[dict] = None,
+                 frame_setting: bool = False,
+                 video_setting: bool = False,
+                 last_frame: bool = False,
+                 print_animal_names: bool = True,
+                 slicing: Optional[Dict] = None,
+                 core_cnt: int = -1,
+                 roi: bool = False):
 
-        if platform.system() == "Darwin":
-            multiprocessing.set_start_method("spawn", force=True)
+        log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
         if (not frame_setting) and (not video_setting) and (not last_frame):
             raise NoSpecifiedOutputError(msg="SIMBA ERROR: Please choice to create path frames and/or video path plots", source=self.__class__.__name__)
-        check_valid_lst(data=files_found, source=self.__class__.__name__, valid_dtypes=(str,))
-
-        check_int(name=f"{self.__class__.__name__} core_cnt", value=cores, min_value=-1, max_value=find_core_cnt()[0])
-        if cores == -1:
-            cores = find_core_cnt()[0]
-
+        check_valid_lst(data=data_paths, source=self.__class__.__name__, valid_dtypes=(str,), min_len=1)
+        _ = [check_file_exist_and_readable(x) for x in data_paths]
+        check_file_exist_and_readable(file_path=config_path)
+        if style_attr is not None:
+            check_if_keys_exist_in_dict(data=style_attr, key=STYLE_KEYS, name=f'{self.__class__.__name__} style_attr')
+        check_valid_boolean(value=[frame_setting, video_setting, last_frame,print_animal_names, roi], source=self.__class__.__name__)
+        if slicing is not None:
+            check_if_keys_exist_in_dict(data=slicing, key=[START_TIME, END_TIME], name=f'{self.__class__.__name__} slicing')
+            check_if_string_value_is_valid_video_timestamp(value=slicing[START_TIME], name="Video slicing START TIME")
+            check_if_string_value_is_valid_video_timestamp(value=slicing[END_TIME], name="Video slicing END TIME")
+            check_that_hhmmss_start_is_before_end(start_time=slicing[START_TIME], end_time=slicing[END_TIME], name="SLICE TIME STAMPS")
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
         if roi:
+            check_file_exist_and_readable(file_path=self.roi_coordinates_path)
             self.read_roi_data()
-        log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
-        (self.video_setting, self.frame_setting, self.input_style_attr, self.files_found, self.animal_attr, self.input_clf_attr, self.last_frame, self.cores, self.roi) = (video_setting, frame_setting, input_style_attr, files_found, animal_attr, clf_attr, last_frame, cores, roi)
-        self.print_animal_names, self.clf_attr, self.slicing = (print_animal_names, clf_attr, slicing)
-        if not os.path.exists(self.path_plot_dir):
-            os.makedirs(self.path_plot_dir)
-        print(f"Processing {len(self.files_found)} videos...")
+        if not video_setting and not frame_setting and not last_frame:
+            raise NoSpecifiedOutputError(msg='Video, last frame, and frame are all False', source=self.__class__.__name__)
+        self.clf_names = None
+        if clf_attr is not None:
+            check_instance(source=f'{self.__class__.__name__} clf_attr', instance=clf_attr, accepted_types=(dict,))
+            for k, v in clf_attr.items():
+                check_if_keys_exist_in_dict(data=v, key=[COLOR, SIZE], name=f'{self.__class__.__name__} clf_attr')
+            self.clf_names = list(clf_attr.keys())
+        self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
+        if not os.path.exists(self.path_plot_dir): os.makedirs(self.path_plot_dir)
+        self.video_setting, self.frame_setting, self.style_attr, self.data_paths, self.animal_attr, self.clf_attr, self.last_frame, self.roi = video_setting, frame_setting, style_attr, data_paths, animal_attr, clf_attr, last_frame, roi
+        self.print_animal_names, self.slicing = print_animal_names, slicing
+        self.bp_data, self.data_cols, self.animal_names, self.colors = self.__get_bp_data()
+        self.animal_names = None if not self.print_animal_names else self.animal_names
+        self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
 
-    def __get_styles(self):
-        self.style_attr = {}
-        if self.input_style_attr is not None:
-            self.style_attr["bg color"] = self.input_style_attr["bg color"]
-            if self.input_style_attr["max lines"] == "entire video":
-                self.style_attr["max lines"] = len(self.data_df)
+    def __get_bp_data(self):
+        bp_data, data_cols, animal_names, colors = {}, [], [], [],
+        for cnt, (k, v) in enumerate(self.animal_attr.items()):
+            check_if_keys_exist_in_dict(data=v, key=[COLOR, BODY_PART], name=f'{self.__class__.__name__} animal_attr')
+            check_str(name=f'animal {k} body_part', value=v[BODY_PART], options=self.body_parts_lst)
+            check_if_valid_rgb_tuple(data=v[COLOR], raise_error=True)
+            name = self.find_animal_name_from_body_part_name(bp_name=v[BODY_PART], bp_dict=self.animal_bp_dict)
+            bp_data[cnt] = {ANIMAL_NAME: name, 'x': f'{v[BODY_PART]}_x', 'y': f'{v[BODY_PART]}_y', 'p': f'{v[BODY_PART]}_p', COLOR: v[COLOR]}
+            data_cols.extend([f'{v[BODY_PART]}_x', f'{v[BODY_PART]}_y'])
+            animal_names.append(name)
+            colors.append(v[COLOR])
+        return bp_data, data_cols, animal_names, colors
+
+
+    def __get_styles(self, style_attr):
+        video_styles = {}
+        optimal_font_size, _, _ = PlottingMixin().get_optimal_font_scales(text='MY LONG TEXT STRING', accepted_px_width=int(self.video_info["Resolution_width"] / 10), accepted_px_height=int(self.video_info["Resolution_width"] / 10))
+        optimal_circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(int(self.video_info["Resolution_width"]), int(self.video_info["Resolution_height"])), circle_frame_ratio=100)
+        video_styles[STYLE_WIDTH] = int(self.video_info["Resolution_width"].values[0]) if style_attr[STYLE_WIDTH] == None else int(style_attr[STYLE_WIDTH])
+        video_styles[STYLE_HEIGHT] = int(self.video_info["Resolution_height"].values[0]) if style_attr[STYLE_HEIGHT] == None else int(style_attr[STYLE_HEIGHT])
+        video_styles[STYLE_CIRCLE_SIZE] = optimal_circle_size if style_attr[STYLE_CIRCLE_SIZE] == None else int(style_attr[STYLE_CIRCLE_SIZE])
+        video_styles[STYLE_LINE_WIDTH] = 2 if style_attr[STYLE_LINE_WIDTH] == None else int(style_attr[STYLE_LINE_WIDTH])
+        video_styles[STYLE_FONT_THICKNESS] = 2 if style_attr[STYLE_FONT_THICKNESS] == None else int(style_attr[STYLE_FONT_THICKNESS])
+        video_styles[STYLE_FONT_SIZE] = optimal_font_size if style_attr[STYLE_FONT_SIZE] == None else int(style_attr[STYLE_FONT_SIZE])
+        video_styles[STYLE_MAX_LINES] = len(self.data_df) if style_attr[STYLE_MAX_LINES] == None else int(self.fps * int(style_attr[STYLE_MAX_LINES]))
+        video_styles[STYLE_BG_OPACITY] = None if style_attr[STYLE_BG_OPACITY] == None else float(style_attr[STYLE_BG_OPACITY])
+        if isinstance(self.style_attr[STYLE_BG], tuple):
+            video_styles[STYLE_BG] = self.style_attr[STYLE_BG]
+        if isinstance(self.style_attr[STYLE_BG], (str, int)):
+            video_path = find_video_of_file(video_dir=self.video_dir, filename=self.video_name, raise_error=False, warning=True)
+            if video_path is None:
+                raise InvalidVideoFileError(msg=f'Could not find video in expected location. If using frame or video as background, make sure the data file {self.video_name} is represented in the {self.video_dir} directory', source=self.__class__.__name__)
+            if isinstance(self.style_attr[STYLE_BG], (int,)):
+                video_styles[STYLE_BG] = read_frm_of_video(video_path=video_path, frame_index=self.style_attr[STYLE_BG], opacity=video_styles[STYLE_BG_OPACITY])
             else:
-                self.style_attr["max lines"] = max(1, int(int(self.input_style_attr["max lines"] / 1000) * (int(self.video_info["fps"].values[0]))))
-            self.style_attr["font thickness"] = self.input_style_attr["font thickness"]
-            self.style_attr["line width"] = self.input_style_attr["line width"]
-            self.style_attr["font size"] = self.input_style_attr["font size"]
-            self.style_attr["circle size"] = self.input_style_attr["circle size"]
-            self.style_attr["print_animal_names"] = self.print_animal_names
-            if self.input_style_attr["width"] == "As input":
-                self.style_attr["width"], self.style_attr["height"] = int(self.video_info["Resolution_width"].values[0]), int(self.video_info["Resolution_height"].values[0])
-            else:
-                pass
-        else:
-            font_size, _, _ = PlottingMixin().get_optimal_font_scales(text='MY LONG TEXT STRING', accepted_px_width=int(self.video_info["Resolution_width"] / 10), accepted_px_height=int(self.video_info["Resolution_width"] / 10))
-            circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(int(self.video_info["Resolution_width"]), int(self.video_info["Resolution_height"])), circle_frame_ratio=100)
-            self.style_attr["width"] = int(self.video_info["Resolution_width"].values[0])
-            self.style_attr["height"] = int(self.video_info["Resolution_height"].values[0])
-            self.style_attr["circle size"] = circle_size
-            self.style_attr["font size"] = font_size
-            self.style_attr["bg color"] = self.color_dict["White"]
-            self.style_attr["print_animal_names"] = self.print_animal_names
-            self.style_attr["max lines"] = len(self.data_df)
-            self.style_attr["font thickness"] = 2
-            self.style_attr["line width"] = 2
+                if self.slicing is None:
+                    check_video_and_data_frm_count_align(video=video_path, data=self.data_df, name=self.video_name, raise_error=False)
+                video_styles[STYLE_BG] = video_path
+        return video_styles
+
 
     def run(self):
-        for file_cnt, file_path in enumerate(self.files_found):
+        check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
+        print(f"Processing path plots for {len(self.data_paths)} video(s)...")
+        for file_cnt, file_path in enumerate(self.data_paths):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(file_path)
             self.video_info, _, self.fps = self.read_video_info(video_name=self.video_name)
-            self.data_df = read_df(file_path, self.file_type)
-            line_data, colors, animal_names = [], [], []
-            for k, v in self.animal_attr.items():
-                check_if_keys_exist_in_dict(data=v, key=["bp", "color"], name=f"animal attr {k}")
-                line_data.append(
-                    self.data_df[[f'{v["bp"]}_x', f'{v["bp"]}_y']].values.astype(np.int64))
-                colors.append(v["color"])
-                if self.print_animal_names:
-                    animal_names.append(self.find_animal_name_from_body_part_name(bp_name=v["bp"], bp_dict=self.animal_bp_dict))
-            if not self.print_animal_names:
-                animal_names = None
-            if self.slicing:
-                check_if_keys_exist_in_dict(data=self.slicing, key=["start_time", "end_time"], name="slicing")
-                frm_numbers = find_frame_numbers_from_time_stamp(start_time=self.slicing["start_time"], end_time=self.slicing["end_time"], fps=self.fps)
-                if len(set(frm_numbers) - set(self.data_df.index)) > 0:
-                    raise FrameRangeError(msg=f'The chosen time-period ({self.slicing["start_time"]} - {self.slicing["end_time"]}) does not exist in {self.video_name}.', source=self.__class__.__name__,)
-                for i in range(len(line_data)):
-                    line_data[i] = line_data[i][frm_numbers, :]
-            self.__get_styles()
-
-            self.temp_folder = os.path.join(self.path_plot_dir, self.video_name, "temp")
-            self.save_frame_folder_dir = os.path.join(self.path_plot_dir, self.video_name)
-
-            if self.frame_setting:
-                if os.path.exists(self.save_frame_folder_dir):
-                    remove_a_folder(self.save_frame_folder_dir)
-                os.makedirs(self.save_frame_folder_dir)
-
-            if self.video_setting:
-                self.video_folder = os.path.join(self.path_plot_dir, self.video_name)
-                if os.path.exists(self.temp_folder):
-                    remove_a_folder(self.temp_folder)
-                    remove_a_folder(self.video_folder)
-                os.makedirs(self.temp_folder)
-                self.save_video_path = os.path.join(self.path_plot_dir, f"{self.video_name}.mp4")
-
+            self.in_df = read_df(file_path, self.file_type)
+            check_valid_dataframe(df=self.in_df, source=file_path, valid_dtypes=Formats.NUMERIC_DTYPES.value, required_fields=self.data_cols)
             if self.clf_attr is not None:
-                self.clf_attr_appended = {}
-                check_instance(source=self.__class__.__name__, instance=self.clf_attr, accepted_types=(dict,))
-                for k, v in self.clf_attr.items():
-                    check_if_keys_exist_in_dict(data=v, key=["color", "size"], name=f"clf_attr {k}")
-                    check_that_column_exist(df=self.data_df, column_name=k, file_name=file_path)
-                    self.clf_attr_appended[k] = self.clf_attr[k]
-                    self.clf_attr_appended[k]["clfs"] = self.data_df[k].values.astype(np.int8)
-                    self.clf_attr_appended[k]["positions"] = self.data_df[[self.animal_attr[0]["bp"] + "_x", self.animal_attr[0]["bp"] + "_y",]].values.astype(np.int64)
-                self.clf_attr = deepcopy(self.clf_attr_appended)
-                del self.clf_attr_appended
-
-            bg_clr = self.style_attr["bg color"]
-            self.video_path = None
-            if isinstance(self.style_attr["bg color"], dict):
-                self.video_path = find_video_of_file(video_dir=self.video_dir, filename=self.video_name, raise_error=True)
-                if "frame_index" in self.style_attr["bg color"].keys():
-                    check_int(name="Static frame index", value=self.style_attr["bg color"]["frame_index"], min_value=0)
-                    frame_index = self.style_attr["bg color"]["frame_index"]
-                else:
-                    video_meta_data = get_video_meta_data(video_path=self.video_path)
-                    frame_index = video_meta_data["frame_count"] - 1
-                bg_clr = read_frm_of_video(video_path=self.video_path,opacity=self.style_attr["bg color"]["opacity"],frame_index=frame_index)
-
+                check_valid_dataframe(df=self.in_df, source=file_path, valid_dtypes=Formats.NUMERIC_DTYPES.value, required_fields=self.clf_names)
+            self.save_frm_dir = None
+            if self.slicing:
+                frm_numbers = find_frame_numbers_from_time_stamp(start_time=self.slicing[START_TIME], end_time=self.slicing[END_TIME], fps=self.fps)
+                if len(set(frm_numbers) - set(self.in_df.index)) > 0:
+                    raise FrameRangeError(msg=f'The chosen time-period ({self.slicing[START_TIME]} - {self.slicing[END_TIME]}) does not exist in {self.video_name}.', source=self.__class__.__name__)
+                self.in_df = self.in_df.loc[frm_numbers]
+            else:
+                frm_numbers = list(range(0, len(self.in_df)))
+            self.data_df = self.in_df[self.data_cols]
+            video_styles = self.__get_styles(self.style_attr)
+            if self.video_setting:
+                self.video_save_path = os.path.join(self.path_plot_dir, f"{self.video_name}.mp4")
+                self.writer = cv2.VideoWriter(self.video_save_path, self.fourcc, self.fps, (video_styles[STYLE_WIDTH], video_styles[STYLE_HEIGHT]))
+                self.video_temp_dir = os.path.join(self.path_plot_dir, self.video_name)
+                create_directory(path=self.video_temp_dir, overwrite=True)
+            if self.frame_setting:
+                self.save_frm_dir = os.path.join(self.path_plot_dir, self.video_name)
+                create_directory(path=self.save_frm_dir, overwrite=True)
             video_rois, video_roi_names = None, None
             if self.roi:
-                video_rois, roi_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=self.video_name)
-                if len(roi_names) == 0:
-                    video_rois, video_roi_names = None, None
+                video_rois, video_roi_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=self.video_name)
+                if len(video_roi_names) == 0:
                     ROIWarning(msg=f'NO ROI data found for video {self.video_name}. Skipping ROI plotting for this video.')
+            if self.clf_attr is not None:
+                clf_attr = {}
+                for k, v in self.clf_attr.items():
+                    check_that_column_exist(df=self.in_df, column_name=k, file_name=file_path)
+                    clf_attr[k] = {COLOR: v[COLOR], SIZE: v[SIZE], 'clfs': self.in_df[k].values.astype(np.int8), 'positions': self.data_df[[self.bp_data[0]['x'], self.bp_data[0]['y']]].values}
+            else:
+                clf_attr = None
 
-
+            line_data = []
+            for k, v in self.bp_data.items():
+                line_data.append(self.data_df[[v['x'], v['y']]].values)
 
             if self.last_frame:
                 last_frame_save_path = os.path.join(self.path_plot_dir, f"{self.video_name}_final_frame.png")
+                if isinstance(video_styles[STYLE_BG], str):
+                    bg = read_frm_of_video(video_path=video_styles[STYLE_BG], opacity=video_styles[STYLE_BG_OPACITY], frame_index=len(self.data_df)-1)
+                else:
+                    bg = deepcopy(video_styles[STYLE_BG])
                 last_frm = PlottingMixin.make_path_plot(data=line_data,
-                                                        colors=colors,
-                                                        width=self.style_attr["width"],
-                                                        height=self.style_attr["height"],
-                                                        max_lines=self.style_attr["max lines"],
-                                                        bg_clr=bg_clr,
-                                                        circle_size=self.style_attr["circle size"],
-                                                        font_size=self.style_attr["font size"],
-                                                        font_thickness=self.style_attr["font thickness"],
-                                                        line_width=self.style_attr["line width"],
-                                                        animal_names=animal_names,
-                                                        clf_attr=self.clf_attr,
+                                                        colors=self.colors,
+                                                        width=video_styles[STYLE_WIDTH],
+                                                        height=video_styles[STYLE_HEIGHT],
+                                                        max_lines=video_styles[STYLE_MAX_LINES],
+                                                        bg_clr=bg,
+                                                        circle_size=video_styles[STYLE_CIRCLE_SIZE],
+                                                        font_size=video_styles[STYLE_FONT_SIZE],
+                                                        font_thickness=video_styles[STYLE_FONT_THICKNESS],
+                                                        line_width=video_styles[STYLE_LINE_WIDTH],
+                                                        animal_names=self.animal_names,
+                                                        clf_attr=clf_attr,
                                                         save_path=None)
-
                 if video_rois is not None:
                     last_frm = PlottingMixin.roi_dict_onto_img(img=last_frm, roi_dict=video_rois, show_tags=False, show_center=False)
                 cv2.imwrite(filename=last_frame_save_path, img=last_frm)
                 stdout_success(msg=f'Last path plot frame saved at {last_frame_save_path}')
-
             if self.video_setting or self.frame_setting:
-                frm_range = np.arange(1, line_data[0].shape[0])
-                frm_range = np.array_split(frm_range, self.cores)
-                frm_range = [(cnt, x) for cnt, x in enumerate(frm_range)]
-                print(f"Creating path plots, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.cores})...")
-                with multiprocessing.Pool(self.cores, maxtasksperchild=self.maxtasksperchild) as pool:
+                frm_cnt_range = np.arange(1, line_data[0].shape[0])
+                frm_cnt_range = np.array_split(frm_cnt_range, self.core_cnt)
+                frm_id_range = np.array_split(frm_numbers, self.core_cnt)
+                frm_range = [(cnt, x, y) for cnt, (x, y) in enumerate(zip(frm_cnt_range, frm_id_range))]
+                print(f"Creating path plots, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
+                with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
                     constants = functools.partial(path_plot_mp,
-                                                  data=line_data,
-                                                  colors=colors,
+                                                  line_data=line_data,
+                                                  colors=self.colors,
                                                   video_setting=self.video_setting,
                                                   video_name=self.video_name,
                                                   frame_setting=self.frame_setting,
-                                                  video_save_dir=self.temp_folder,
-                                                  frame_folder_dir=self.save_frame_folder_dir,
-                                                  style_attr=self.style_attr,
-                                                  animal_names=animal_names,
+                                                  video_save_dir=self.video_temp_dir,
+                                                  frame_folder_dir=self.save_frm_dir,
+                                                  style_attr=video_styles,
+                                                  clf_attr=clf_attr,
+                                                  animal_names=self.animal_names,
                                                   fps=self.fps,
-                                                  roi=video_rois,
-                                                  clf_attr=self.clf_attr,
-                                                  input_style_attr=self.input_style_attr,
-                                                  video_path=self.video_path)
-                    for cnt, result in enumerate(
-                        pool.imap(constants, frm_range, chunksize=self.multiprocess_chunksize)):
-                        print(f"Path batch {result+1}/{self.cores} complete...")
-                    pool.terminate()
-                    pool.join()
+                                                  roi=video_rois)
+                    for cnt, result in enumerate(pool.imap(constants, frm_range, chunksize=self.multiprocess_chunksize)):
+                        print(f"Path batch {result+1}/{self.core_cnt} complete...")
+                pool.terminate()
+                pool.join()
 
                 if self.video_setting:
-                    print(f"Joining {self.video_name} multiprocessed video...")
-                    concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.save_video_path)
+                    print(f"Joining {self.video_name} multi-processed video...")
+                    print(self.video_temp_dir, self.video_save_path)
+                    concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.video_save_path, remove_splits=False)
                 video_timer.stop_timer()
                 print(f"Path plot video {self.video_name} complete (elapsed time: {video_timer.elapsed_time_str}s) ...")
 
         self.timer.stop_timer()
-        stdout_success(msg=f"Path plot visualizations for {len(self.files_found)} videos created in {self.path_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+        stdout_success(msg=f"Path plot visualizations for {len(self.data_paths)} video(s) created in {self.path_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+
+
+#
+# if __name__ == "__main__":
+#     style_attr = {STYLE_WIDTH: None,
+#                   STYLE_HEIGHT: None,
+#                   STYLE_LINE_WIDTH: 5,
+#                   STYLE_FONT_SIZE: 5,
+#                   STYLE_FONT_THICKNESS: 2,
+#                   STYLE_CIRCLE_SIZE: 5,
+#                   STYLE_BG: 'video',
+#                   STYLE_BG_OPACITY: 100,
+#                   STYLE_MAX_LINES: None}
+#
+#     animal_attr = {0: {'body_part': 'Snout', 'color': (255, 0, 0)}, 1: {'body_part': 'Front Paw R', 'color': (0, 0, 255)}}  #['Ear_right_1', 'Red'], 1: ['Ear_right_2', 'Green']}
+#     #clf_attr = {'Rearing': {'color': (155, 1, 10), 'size': 30}}
+#     clf_attr = None
+#     test = PathPlotterMulticore(config_path=r"C:\troubleshooting\open_field_below\project_folder\project_config.ini",
+#                                  frame_setting=False,
+#                                  video_setting=True,
+#                                  last_frame=True,
+#                                  slicing={'start_time': '00:00:00', 'end_time': '00:00:05'},#{'start_time': '00:00:00', 'end_time': '00:00:05'}, #{'start_time': '00:00:00', 'end_time': '00:00:50'}, #{'start_time': '00:00:00', 'end_time': '00:00:01'},, #{'start_time': '00:00:00', 'end_time': '00:00:01'}, #{'start_time': '00:00:00', 'end_time': '00:00:01'},
+#                                  style_attr=style_attr,
+#                                  animal_attr=animal_attr,
+#                                  clf_attr=clf_attr,
+#                                  print_animal_names=False,
+#                                  core_cnt=1,
+#                                  roi=True,
+#                                  data_paths=[r"C:\troubleshooting\open_field_below\project_folder\csv\outlier_corrected_movement_location\raw_clip1.csv"])
+#     test.run()
+#
+
+
+
+# if __name__ == "__main__":
+#     style_attr = {STYLE_WIDTH: None,
+#                   STYLE_HEIGHT: None,
+#                   STYLE_LINE_WIDTH: 5,
+#                   STYLE_FONT_SIZE: 5,
+#                   STYLE_FONT_THICKNESS: 2,
+#                   STYLE_CIRCLE_SIZE: 5,
+#                   STYLE_BG: 'video',
+#                   STYLE_BG_OPACITY: 100,
+#                   STYLE_MAX_LINES: None}
+#
+#     animal_attr = {0: {'body_part': 'Ear_right', 'color': (255, 0, 0)}, 1: {'body_part': 'Center', 'color': (0, 0, 255)}}  #['Ear_right_1', 'Red'], 1: ['Ear_right_2', 'Green']}
+#     clf_attr = {'Rearing': {'color': (155, 1, 10), 'size': 30}}
+#     test = PathPlotterMulticore(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini",
+#                                  frame_setting=False,
+#                                  video_setting=True,
+#                                  last_frame=False,
+#                                  slicing={'start_time': '00:00:00', 'end_time': '00:00:05'},#{'start_time': '00:00:00', 'end_time': '00:00:05'}, #{'start_time': '00:00:00', 'end_time': '00:00:50'}, #{'start_time': '00:00:00', 'end_time': '00:00:01'},, #{'start_time': '00:00:00', 'end_time': '00:00:01'}, #{'start_time': '00:00:00', 'end_time': '00:00:01'},
+#                                  style_attr=style_attr,
+#                                  animal_attr=animal_attr,
+#                                  clf_attr=clf_attr,
+#                                  print_animal_names=False,
+#                                  core_cnt=-1,
+#                                  roi=True,
+#                                  data_paths=[r"C:\troubleshooting\RAT_NOR\project_folder\csv\machine_results\03152021_NOB_IOT_8.csv"])
+#     test.run()
+
+
 
 
 # animal_attr = {0: {'bp': 'Ear_right', 'color': (255, 0, 0)}, 1: {'bp': 'Tail_base', 'color': (0, 0, 255)}}  #['Ear_right_1', 'Red'], 1: ['Ear_right_2', 'Green']}

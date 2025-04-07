@@ -136,6 +136,7 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
     def run(self):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.files_found)
         for file_cnt, file_path in enumerate(self.files_found):
+            print(file_path)
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(file_path)
             video_info, self.px_per_mm, self.fps = self.read_video_info(video_name=self.video_name)
