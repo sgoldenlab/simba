@@ -1,0 +1,70 @@
+name: Daily GitHub Issue Report
+
+on:
+  schedule:
+  workflow_dispatch:  # Allows manual trigger
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout master branch
+      uses: actions/checkout@v3
+      with:
+        ref: 'master'  # Checkout the master branch where the workflow is located
+
+    - name: Verify current branch
+      run: |
+        git branch
+
+    - name: Set up Python 3.10
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pandas requests  # Install required dependencies
+
+    - name: List files in the repository
+      run: |
+        ls -R /home/runner/work/simba/simba/  # Confirm repo structure
+
+    - name: Fetch GitHub issues and generate report
+      run: |
+        python /home/runner/work/simba/simba/scripts/create_issues_report.py  # Ensure the path is correct
+
+    - name: Verify if the report file exists
+      run: |
+        ls -l /home/runner/work/simba/simba/misc/github_issues_report.csv
+
+    - name: Commit CSV file to master branch
+      run: |
+        mkdir -p misc  # Create misc directory if it doesn't exist
+
+        # Ensure the report is placed in the correct location
+        output_path='misc/github_issues_report.csv'
+
+        # Check if the file exists before attempting to remove it
+        if [ -f "$output_path" ]; then
+          rm -f "$output_path"  # Remove the existing CSV report if it exists
+        fi
+
+        # Move the new CSV file to the misc directory (if it's not already there)
+        cp /home/runner/work/simba/simba/misc/github_issues_report.csv $output_path
+
+        # Add the file to Git
+        git add $output_path
+
+        # Configure Git with authentication using GITHUB_TOKEN
+        git config user.name "github-actions"
+        git config user.email "github-actions@github.com"
+
+        # Use the built-in GITHUB_TOKEN for authentication
+        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+        # Commit and push changes to master branch
+        git commit -m "Update daily issues report"
+        git push origin master  # Push changes to the master branch
