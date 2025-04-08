@@ -148,6 +148,12 @@ class Formats(Enum):
     H5 = "h5"
     ROOT_WINDOW_SIZE = "750x750"
     FONT = cv2.FONT_HERSHEY_TRIPLEX
+    BUTTON_WIDTH_XS = 75
+    BUTTON_WIDTH_S = 100
+    BUTTON_WIDTH_L = 275
+    BUTTON_WIDTH_XL = 300
+    BUTTON_WIDTH_XXL = 325
+    LABELFRAME_GREY = '#DCDCDC'
     if (platform.system() == OS.MAC.value):
         FONT_REGULAR = ('Poppins Regular', 13)
         FONT_REGULAR_ITALICS = ('Poppins Regular', 13, "italic")

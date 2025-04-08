@@ -343,21 +343,27 @@ def CreateLabelFrameWithIcon(parent: Union[Toplevel, LabelFrame, Canvas, Frame],
                              pady: Optional[int] = None,
                              relief: str = 'flat',
                              width: Optional[int] = None,
+                             bg: Optional[str] = None,
                              font: tuple = Formats.FONT_HEADER.value,
                              icon_link: Optional[Union[str, None]] = LabelFrame):
 
     icon = PIL.Image.open(MENU_ICONS[icon_name]["icon_path"])
     icon = ImageTk.PhotoImage(icon)
-    frm = Frame(parent)
-    label_text = Label(frm, text=header, font=font)
+
+    frm = Frame(parent, bg=bg)  # <- Apply bg here
+    label_text = Label(frm, text=header, font=font, bg=bg)  # <- And here
     label_text.grid(row=0, column=0)
-    label_image = Label(frm, image=icon)
+
+    label_image = Label(frm, image=icon, bg=bg)  # <- And here
     label_image.image = icon
     if icon_link:
         label_image.bind("<Button-1>", lambda e: callback(icon_link))
     label_image.grid(row=0, column=1)
-    return LabelFrame(parent, labelwidget=frm)
 
+    lbl_frm = LabelFrame(parent, labelwidget=frm, relief=relief, width=width, padx=padx or 0, pady=pady or 0)
+    if bg is not None:
+        lbl_frm.configure(bg=bg)
+    return lbl_frm
 
 def callback(url):
     webbrowser.open_new(url)
@@ -473,7 +479,6 @@ def SimbaButton(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
         btn.config(width=width)
     if height is not None:
         btn.config(height=height)
-
     if not enabled:
         btn.config(state=DISABLED)
 

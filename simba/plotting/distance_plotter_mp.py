@@ -120,7 +120,7 @@ class DistancePlotterMultiCore(ConfigReader, PlottingMixin):
         video_setting: bool,
         final_img: bool,
         style_attr: Dict[str, int],
-        line_attr: Dict[int, list],
+        line_attr: List[List[str]],
         core_cnt: Optional[int] = -1,
     ):
 

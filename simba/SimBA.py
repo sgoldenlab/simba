@@ -275,69 +275,62 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         import_frm = LabelFrame(tab2)
         import_frm.grid(row=0, column=0, sticky=NW)
 
-        further_methods_frm = CreateLabelFrameWithIcon(parent=import_frm, header="FURTHER METHODS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ADDITIONAL_IMPORTS.value)
-        extract_frm_btn = SimbaButton(parent=further_methods_frm, txt="EXTRACT FRAMES FOR ALL VIDEOS IN SIMBA PROJECT", txt_clr='blue', compound='right', img='image', font=Formats.FONT_REGULAR.value, cmd=extract_frames_from_all_videos_in_directory, cmd_kwargs={'config_path': lambda:self.config_path, 'directory': lambda:self.video_dir})
-        import_frm_dir_btn = SimbaButton(parent=further_methods_frm, txt="IMPORT FRAMES DIRECTORY TO SIMBA PROJECT", txt_clr='blue', compound='right', img='import', font=Formats.FONT_REGULAR.value, cmd=ImportFrameDirectoryPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        add_clf_btn = SimbaButton(parent=further_methods_frm, txt="ADD CLASSIFIER TO SIMBA PROJECT", txt_clr='blue', compound='right', img='plus', font=Formats.FONT_REGULAR.value, cmd=AddClfPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        remove_clf_btn = SimbaButton(parent=further_methods_frm, txt="REMOVE CLASSIFIER FROM SIMBA PROJECT", txt_clr='blue', compound='right', img='trash', font=Formats.FONT_REGULAR.value, cmd=RemoveAClassifierPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        archive_files_btn = SimbaButton(parent=further_methods_frm, txt="ARCHIVE PROCESSED FILES IN SIMBA PROJECT", txt_clr='blue', compound='right', img='archive', font=Formats.FONT_REGULAR.value, cmd=ArchiveProcessedFilesPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        reverse_btn = SimbaButton(parent=further_methods_frm, txt="REVERSE TRACKING IDENTITIES IN SIMBA PROJECT", txt_clr='blue', compound='right', img='reverse_blue', font=Formats.FONT_REGULAR.value, cmd=None)
-        interpolate_btn = SimbaButton(parent=further_methods_frm, txt="INTERPOLATE POSE IN SIMBA PROJECT", txt_clr='blue', compound='right', img='line_chart_blue', font=Formats.FONT_REGULAR.value, cmd=InterpolatePopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        smooth_btn = SimbaButton(parent=further_methods_frm, txt="SMOOTH POSE IN SIMBA PROJECT", txt_clr='blue', compound='right', img='wand_blue', font=Formats.FONT_REGULAR.value, cmd=SmoothingPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        egocentric_align_btn = SimbaButton(parent=further_methods_frm, txt="EGOCENTRICALLY ALIGN POSE AND VIDEO", txt_clr='blue', compound='right', img='mouse_small', font=Formats.FONT_REGULAR.value, cmd=EgocentricAlignPopUp, cmd_kwargs={'config_path': lambda: self.config_path})
+        further_methods_frm = CreateLabelFrameWithIcon(parent=import_frm, header="FURTHER METHODS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ADDITIONAL_IMPORTS.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
+        extract_frm_btn = SimbaButton(parent=further_methods_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="EXTRACT FRAMES FOR ALL VIDEOS IN SIMBA PROJECT", txt_clr='blue', compound='right', img='image', font=Formats.FONT_REGULAR.value, cmd=extract_frames_from_all_videos_in_directory, cmd_kwargs={'config_path': lambda:self.config_path, 'directory': lambda:self.video_dir})
+        import_frm_dir_btn = SimbaButton(parent=further_methods_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="IMPORT FRAMES DIRECTORY TO SIMBA PROJECT", txt_clr='blue', compound='right', img='import', font=Formats.FONT_REGULAR.value, cmd=ImportFrameDirectoryPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        add_clf_btn = SimbaButton(parent=further_methods_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="ADD CLASSIFIER TO SIMBA PROJECT", txt_clr='blue', compound='right', img='plus', font=Formats.FONT_REGULAR.value, cmd=AddClfPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        remove_clf_btn = SimbaButton(parent=further_methods_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="REMOVE CLASSIFIER FROM SIMBA PROJECT", txt_clr='blue', compound='right', img='trash', font=Formats.FONT_REGULAR.value, cmd=RemoveAClassifierPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        archive_files_btn = SimbaButton(parent=further_methods_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="ARCHIVE PROCESSED FILES IN SIMBA PROJECT", txt_clr='blue', compound='right', img='archive', font=Formats.FONT_REGULAR.value, cmd=ArchiveProcessedFilesPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        reverse_btn = SimbaButton(parent=further_methods_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="REVERSE TRACKING IDENTITIES IN SIMBA PROJECT", txt_clr='blue', compound='right', img='reverse_blue', font=Formats.FONT_REGULAR.value, cmd=None)
+        interpolate_btn = SimbaButton(parent=further_methods_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="INTERPOLATE POSE IN SIMBA PROJECT", txt_clr='blue', compound='right', img='line_chart_blue', font=Formats.FONT_REGULAR.value, cmd=InterpolatePopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        smooth_btn = SimbaButton(parent=further_methods_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="SMOOTH POSE IN SIMBA PROJECT", txt_clr='blue', compound='right', img='wand_blue', font=Formats.FONT_REGULAR.value, cmd=SmoothingPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        egocentric_align_btn = SimbaButton(parent=further_methods_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="EGOCENTRICALLY ALIGN POSE AND VIDEO", txt_clr='blue', compound='right', img='mouse_small', font=Formats.FONT_REGULAR.value, cmd=EgocentricAlignPopUp, cmd_kwargs={'config_path': lambda: self.config_path})
 
         label_setscale = CreateLabelFrameWithIcon(parent=tab3, header="VIDEO PARAMETERS (FPS, RESOLUTION, PPX/MM ....)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_PARAMETERS.value)
         self.distance_in_mm_eb = Entry_Box(label_setscale, "KNOWN DISTANCE (MILLIMETERS)", "35", validation="numeric")
         button_setdistanceinmm = SimbaButton(parent=label_setscale, txt="AUTO-POPULATE", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.set_distance_mm)
 
         button_setscale = SimbaButton(parent=label_setscale, txt="CONFIGURE VIDEO PARAMETERS", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.create_video_info_table, img='calipher')
-        self.new_ROI_frm = CreateLabelFrameWithIcon(parent=tab6, header="SIMBA ROI INTERFACE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI.value)
-        self.start_new_ROI = SimbaButton(parent=self.new_ROI_frm, txt="DEFINE ROIs", txt_clr='green', font=Formats.FONT_REGULAR.value, img='roi', cmd=ROIVideoTable, cmd_kwargs={'config_path': lambda:self.config_path})
+        self.new_ROI_frm = CreateLabelFrameWithIcon(parent=tab6, header="SIMBA ROI INTERFACE", icon_name='shapes_small', icon_link=Links.ROI.value, bg='#DCDCDC', padx=5)
+        self.start_new_ROI = SimbaButton(parent=self.new_ROI_frm, width=Formats.BUTTON_WIDTH_L.value, txt="DEFINE ROIs", txt_clr='green', font=Formats.FONT_REGULAR.value, img='roi', cmd=ROIVideoTable, cmd_kwargs={'config_path': lambda:self.config_path})
 
-        self.delete_all_ROIs = SimbaButton(parent=self.new_ROI_frm, txt="DELETE ALL ROI DEFINITIONS", txt_clr='red', font=Formats.FONT_REGULAR.value, img='trash', cmd=delete_all_rois_pop_up, cmd_kwargs={'config_path': lambda:self.config_path})
-        self.new_ROI_frm.grid(row=0, sticky=NW)
+        self.delete_all_ROIs = SimbaButton(parent=self.new_ROI_frm, width=Formats.BUTTON_WIDTH_L.value, txt="DELETE ALL ROI DEFINITIONS", txt_clr='red', font=Formats.FONT_REGULAR.value, img='trash', cmd=delete_all_rois_pop_up, cmd_kwargs={'config_path': lambda:self.config_path})
+        self.new_ROI_frm.grid(row=0, sticky=NW, padx=10)
         self.start_new_ROI.grid(row=0, sticky=NW)
         self.delete_all_ROIs.grid(row=1, column=0, sticky=NW)
 
-        self.roi_draw = LabelFrame(tab6, text="ANALYZE ROI DATA", font=Formats.FONT_HEADER.value)
-        #analyze_roi_btn = SimbaButton(parent=self.roi_draw, txt="ANALYZE ROI DATA: AGGREGATES", txt_clr='green', img='shapes_small', font=Formats.FONT_REGULAR.value, cmd=ROIAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        analyze_roi_btn = SimbaButton(parent=self.roi_draw, txt="ANALYZE ROI DATA: AGGREGATES", txt_clr='green', img='shapes_small', font=Formats.FONT_REGULAR.value, cmd=ROIAggregateDataAnalyzerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        self.roi_draw = CreateLabelFrameWithIcon(parent=tab6, header="ANALYZE ROI DATA", icon_name='magnifying', icon_link=Links.ROI.value, bg='#DCDCDC', padx=5)
+        analyze_roi_btn = SimbaButton(parent=self.roi_draw, width=Formats.BUTTON_WIDTH_L.value, txt="ANALYZE ROI DATA: AGGREGATES", txt_clr='green', img='shapes_small', font=Formats.FONT_REGULAR.value, cmd=ROIAggregateDataAnalyzerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
-        analyze_roi_time_bins_btn = SimbaButton(parent=self.roi_draw, txt="ANALYZE ROI DATA: TIME-BINS", txt_clr='blue', img='clock', font=Formats.FONT_REGULAR.value, cmd=ROIAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-
-
-        self.roi_draw.grid(row=0, column=1, sticky=N)
+        analyze_roi_time_bins_btn = SimbaButton(parent=self.roi_draw, width=Formats.BUTTON_WIDTH_L.value, txt="ANALYZE ROI DATA: TIME-BINS", txt_clr='blue', img='clock', font=Formats.FONT_REGULAR.value, cmd=ROIAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        self.roi_draw.grid(row=0, column=1, sticky=N, padx=10)
         analyze_roi_btn.grid(row=0, sticky="NW")
         analyze_roi_time_bins_btn.grid(row=1, sticky="NW")
 
-        self.roi_draw1 = LabelFrame(tab6, text="VISUALIZE ROI DATA", font=Formats.FONT_HEADER.value)
-
-        visualizeROI = SimbaButton(parent=self.roi_draw1, txt="VISUALIZE ROI TRACKING", txt_clr='green', img='visualize_green', font=Formats.FONT_REGULAR.value, cmd=VisualizeROITrackingPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        visualizeROIfeature = SimbaButton(parent=self.roi_draw1, txt="VISUALIZE ROI FEATURES", txt_clr='blue', img='visualize_blue', font=Formats.FONT_REGULAR.value, cmd=VisualizeROIFeaturesPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        self.roi_draw1 = CreateLabelFrameWithIcon(parent=tab6, header="VISUALIZE ROI DATA", icon_name='eye', icon_link=Links.ROI.value, bg='#DCDCDC', padx=5)
+        visualizeROI = SimbaButton(parent=self.roi_draw1, width=Formats.BUTTON_WIDTH_L.value, txt="VISUALIZE ROI TRACKING", txt_clr='green', img='visualize_green', font=Formats.FONT_REGULAR.value, cmd=VisualizeROITrackingPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        visualizeROIfeature = SimbaButton(parent=self.roi_draw1, width=Formats.BUTTON_WIDTH_L.value, txt="VISUALIZE ROI FEATURES", txt_clr='blue', img='visualize_blue', font=Formats.FONT_REGULAR.value, cmd=VisualizeROIFeaturesPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
         ##organize
-        self.roi_draw1.grid(row=0, column=2, sticky=N)
+        self.roi_draw1.grid(row=0, column=2, sticky=N, padx=10)
         visualizeROI.grid(row=0, sticky="NW")
         visualizeROIfeature.grid(row=1, sticky="NW")
 
-        processmovementdupLabel = LabelFrame( tab6, text="OTHER ANALYSES / VISUALIZATIONS", font=Formats.FONT_HEADER.value)
-        analyze_distances_velocity_btn = SimbaButton(parent=processmovementdupLabel, txt="ANALYZE DISTANCES / VELOCITY: AGGREGATES", img='metrics_green', txt_clr='green', font=Formats.FONT_REGULAR.value, cmd=MovementAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        analyze_distances_velocity_timebins_btn = SimbaButton(parent=processmovementdupLabel, txt="ANALYZE DISTANCES / VELOCITY: TIME-BINS", img='metrics_blue',  txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=MovementAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        heatmaps_location_button = SimbaButton(parent=processmovementdupLabel, txt="CREATE LOCATION HEATMAPS", txt_clr='red', img='heatmap', font=Formats.FONT_REGULAR.value, cmd=HeatmapLocationPopup, cmd_kwargs={'config_path': lambda:self.config_path})
-        button_lineplot = SimbaButton(parent=processmovementdupLabel, txt="CREATE PATH PLOTS", txt_clr='orange', img='path', font=Formats.FONT_REGULAR.value, cmd=QuickLineplotPopup, cmd_kwargs={'config_path': lambda:self.config_path})
+        processmovementdupLabel = CreateLabelFrameWithIcon(parent=tab6, header="OTHER ANALYSES / VISUALIZATIONS", icon_name='list', icon_link=Links.ROI.value, bg='#DCDCDC', padx=5)
+        analyze_distances_velocity_btn = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_L.value, txt="ANALYZE DISTANCES / VELOCITY: AGGREGATES", img='metrics_green', txt_clr='green', font=Formats.FONT_REGULAR.value, cmd=MovementAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        analyze_distances_velocity_timebins_btn = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_L.value, txt="ANALYZE DISTANCES / VELOCITY: TIME-BINS", img='metrics_blue', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=MovementAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        heatmaps_location_button = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_L.value, txt="CREATE LOCATION HEATMAPS", txt_clr='red', img='heatmap', font=Formats.FONT_REGULAR.value, cmd=HeatmapLocationPopup, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_lineplot = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_L.value, txt="CREATE PATH PLOTS", txt_clr='orange', img='path', font=Formats.FONT_REGULAR.value, cmd=QuickLineplotPopup, cmd_kwargs={'config_path': lambda:self.config_path})
 
-        button_analyzeDirection = SimbaButton(parent=processmovementdupLabel, txt="ANALYZE DIRECTIONALITY BETWEEN ANIMALS", img='direction', txt_clr='pink', font=Formats.FONT_REGULAR.value, cmd=AnimalDirectingAnimalPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        button_visualizeDirection = SimbaButton(parent=processmovementdupLabel, txt="VISUALIZE DIRECTIONALITY BETWEEN ANIMALS", img='direction', txt_clr='brown', font=Formats.FONT_REGULAR.value, cmd=DirectingOtherAnimalsVisualizerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        button_analyzeDirection_bp = SimbaButton(parent=processmovementdupLabel, txt="ANALYZE DIRECTIONALITY BETWEEN BODY PARTS", img='direction', txt_clr='purple', font=Formats.FONT_REGULAR.value, cmd=DirectionAnimalToBodyPartSettingsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        button_visualizeDirection_bp = SimbaButton(parent=processmovementdupLabel, txt="VISUALIZE DIRECTIONALITY BETWEEN BODY PARTS", img='direction', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=DirectingAnimalToBodyPartVisualizerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_analyzeDirection = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_L.value, txt="ANALYZE DIRECTIONALITY BETWEEN ANIMALS", img='direction', txt_clr='pink', font=Formats.FONT_REGULAR.value, cmd=AnimalDirectingAnimalPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_visualizeDirection = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_L.value, txt="VISUALIZE DIRECTIONALITY BETWEEN ANIMALS", img='direction', txt_clr='brown', font=Formats.FONT_REGULAR.value, cmd=DirectingOtherAnimalsVisualizerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_analyzeDirection_bp = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_L.value, txt="ANALYZE DIRECTIONALITY BETWEEN BODY PARTS", img='direction', txt_clr='purple', font=Formats.FONT_REGULAR.value, cmd=DirectionAnimalToBodyPartSettingsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_visualizeDirection_bp = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_L.value, txt="VISUALIZE DIRECTIONALITY BETWEEN BODY PARTS", img='direction', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=DirectingAnimalToBodyPartVisualizerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
-        btn_agg_boolean_conditional_statistics = SimbaButton(parent=processmovementdupLabel, txt="AGGREGATE BOOLEAN CONDITIONAL STATISTICS", img='details', txt_clr='grey', font=Formats.FONT_REGULAR.value, cmd=BooleanConditionalSlicerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        spontaneous_alternation_pop_up_btn = SimbaButton(parent=processmovementdupLabel, txt="SPONTANEOUS ALTERNATION", img='t', txt_clr='navy', font=Formats.FONT_REGULAR.value, cmd=SpontaneousAlternationPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        #roi_stats_btn = SimbaButton(parent=processmovementdupLabel, txt="ROI AGGREGATE STATISTICS", img='shapes_small', txt_clr='green', font=Formats.FONT_REGULAR.value, cmd=ROIAggregateDataAnalyzerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        btn_agg_boolean_conditional_statistics = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_L.value, txt="AGGREGATE BOOLEAN CONDITIONAL STATISTICS", img='details', txt_clr='grey', font=Formats.FONT_REGULAR.value, cmd=BooleanConditionalSlicerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        spontaneous_alternation_pop_up_btn = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_L.value, txt="SPONTANEOUS ALTERNATION", img='t', txt_clr='navy', font=Formats.FONT_REGULAR.value, cmd=SpontaneousAlternationPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
-
-
-        processmovementdupLabel.grid(row=0, column=3, sticky=NW)
+        processmovementdupLabel.grid(row=0, column=3, sticky=NW, padx=10)
         analyze_distances_velocity_btn.grid(row=0, sticky=NW)
         heatmaps_location_button.grid(row=1, sticky=NW)
         analyze_distances_velocity_timebins_btn.grid(row=2, sticky=NW)
@@ -348,17 +341,16 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_visualizeDirection_bp.grid(row=7, sticky=NW)
         btn_agg_boolean_conditional_statistics.grid(row=8, sticky=NW)
         spontaneous_alternation_pop_up_btn.grid(row=9, sticky=NW)
-        #roi_stats_btn.grid(row=10, sticky=NW)
 
-        label_outliercorrection = CreateLabelFrameWithIcon(parent=tab4, header="OUTLIER CORRECTION", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.OUTLIERS_DOC.value)
-        button_settings_outlier = SimbaButton(parent=label_outliercorrection, txt="SETTINGS", txt_clr='blue', img='settings', font=Formats.FONT_REGULAR.value, cmd=OutlierSettingsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        label_outliercorrection = CreateLabelFrameWithIcon(parent=tab4, header="OUTLIER CORRECTION", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.OUTLIERS_DOC.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
+        button_settings_outlier = SimbaButton(parent=label_outliercorrection, width=Formats.BUTTON_WIDTH_L.value, txt="SETTINGS", txt_clr='blue', img='settings', font=Formats.FONT_REGULAR.value, cmd=OutlierSettingsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
-        button_outliercorrection = SimbaButton(parent=label_outliercorrection, txt="RUN OUTLIER CORRECTION", txt_clr='green', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.correct_outlier, thread=False)
-        button_skipOC = SimbaButton(parent=label_outliercorrection, txt="SKIP OUTLIER CORRECTION (CAUTION)", txt_clr='red', img='skip_2', font=Formats.FONT_REGULAR.value, cmd=self.initiate_skip_outlier_correction, thread=True)
+        button_outliercorrection = SimbaButton(parent=label_outliercorrection, width=Formats.BUTTON_WIDTH_L.value, txt="RUN OUTLIER CORRECTION", txt_clr='green', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.correct_outlier, thread=False)
+        button_skipOC = SimbaButton(parent=label_outliercorrection, width=Formats.BUTTON_WIDTH_L.value, txt="SKIP OUTLIER CORRECTION (CAUTION)", txt_clr='red', img='skip_2', font=Formats.FONT_REGULAR.value, cmd=self.initiate_skip_outlier_correction, thread=True)
 
         label_extractfeatures = CreateLabelFrameWithIcon(parent=tab5, header="EXTRACT FEATURES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.EXTRACT_FEATURES.value)
 
-        button_extractfeatures = SimbaButton(parent=label_extractfeatures, txt="EXTRACT FEATURES", txt_clr='blue', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run_feature_extraction, thread=True)
+        button_extractfeatures = SimbaButton(parent=label_extractfeatures, txt="EXTRACT FEATURES", width=Formats.BUTTON_WIDTH_XL.value, txt_clr='blue', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run_feature_extraction, thread=True)
 
         def activate(box, *args):
             for entry in args:
@@ -373,28 +365,28 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         self.user_defined_var = BooleanVar(value=False)
         userscript = Checkbutton(labelframe_usrdef, text="Apply user-defined feature extraction script", font=Formats.FONT_REGULAR.value, variable=self.user_defined_var, command=lambda: activate(self.user_defined_var, self.scriptfile.btnFind))
 
-        roi_feature_frm = CreateLabelFrameWithIcon(parent=tab5, header="APPEND ROI FEATURES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.APPEND_ROI_FEATURES.value)
+        roi_feature_frm = CreateLabelFrameWithIcon(parent=tab5, header="APPEND ROI FEATURES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.APPEND_ROI_FEATURES.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
 
-        append_roi_features_by_animal = SimbaButton(parent=roi_feature_frm, txt="APPEND ROI DATA TO FEATURES: BY ANIMAL (CAUTION)", txt_clr='red', img='join_red', font=Formats.FONT_REGULAR.value, cmd=AppendROIFeaturesByAnimalPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=True)
-        append_roi_features_by_body_part = SimbaButton(parent=roi_feature_frm, txt="APPEND ROI DATA TO FEATURES: BY BODY-PARTS (CAUTION)", img='join_yellow', txt_clr='orange', font=Formats.FONT_REGULAR.value, cmd=AppendROIFeaturesByBodyPartPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
-        remove_roi_features_from_feature_set = SimbaButton(parent=roi_feature_frm, txt="REMOVE ROI FEATURES FROM FEATURE SET", txt_clr='darkred', img='trash', font=Formats.FONT_REGULAR.value, cmd=RemoveROIFeaturesPopUp, cmd_kwargs={'config_path': lambda:self.config_path, 'dataset': lambda:'features_extracted'}, thread=False)
+        append_roi_features_by_animal = SimbaButton(parent=roi_feature_frm, width=Formats.BUTTON_WIDTH_XXL.value, txt="APPEND ROI DATA TO FEATURES: BY ANIMAL (CAUTION)", txt_clr='red', img='join_red', font=Formats.FONT_REGULAR.value, cmd=AppendROIFeaturesByAnimalPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=True)
+        append_roi_features_by_body_part = SimbaButton(parent=roi_feature_frm, width=Formats.BUTTON_WIDTH_XXL.value, txt="APPEND ROI DATA TO FEATURES: BY BODY-PARTS (CAUTION)", img='join_yellow', txt_clr='orange', font=Formats.FONT_REGULAR.value, cmd=AppendROIFeaturesByBodyPartPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
+        remove_roi_features_from_feature_set = SimbaButton(parent=roi_feature_frm, width=Formats.BUTTON_WIDTH_XXL.value, txt="REMOVE ROI FEATURES FROM FEATURE SET", txt_clr='darkred', img='trash', font=Formats.FONT_REGULAR.value, cmd=RemoveROIFeaturesPopUp, cmd_kwargs={'config_path': lambda:self.config_path, 'dataset': lambda:'features_extracted'}, thread=False)
 
 
-        feature_tools_frm = LabelFrame(tab5, text="FEATURE TOOLS", pady=5, font=Formats.FONT_HEADER.value)
-        compute_feature_subset_btn = SimbaButton(parent=feature_tools_frm, txt="CALCULATE FEATURE SUBSETS", txt_clr='blue', img='subset_blue', font=Formats.FONT_REGULAR.value, cmd=FeatureSubsetExtractorPopUp, cmd_kwargs={'config_path': lambda: self.config_path}, thread=False)
+        feature_tools_frm = LabelFrame(tab5, text="FEATURE TOOLS", pady=5, font=Formats.FONT_HEADER.value, bg=Formats.LABELFRAME_GREY.value, padx=5)
+        compute_feature_subset_btn = SimbaButton(parent=feature_tools_frm, width=Formats.BUTTON_WIDTH_XXL.value, txt="CALCULATE FEATURE SUBSETS", txt_clr='blue', img='subset_blue', font=Formats.FONT_REGULAR.value, cmd=FeatureSubsetExtractorPopUp, cmd_kwargs={'config_path': lambda: self.config_path}, thread=False)
 
-        label_behavior_frm = CreateLabelFrameWithIcon(parent=tab7, header="LABEL BEHAVIOR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.LABEL_BEHAVIOR.value)
-        select_video_btn_new = SimbaButton(parent=label_behavior_frm, txt="Select video (create new video annotation)", img='label_blue', txt_clr='navy', cmd=select_labelling_video, cmd_kwargs={'config_path': lambda :self.config_path, 'threshold_dict': lambda: None, 'setting': lambda: "from_scratch", 'continuing': lambda: False}, thread=False)
-        select_video_btn_continue = SimbaButton(parent=label_behavior_frm, txt="Select video (continue existing video annotation)", img='label_yellow', txt_clr='darkgoldenrod', cmd=select_labelling_video, cmd_kwargs={'config_path': lambda: self.config_path, 'threshold_dict': lambda:None, 'setting': lambda: None, 'continuing': lambda:True}, thread=False)
+        label_behavior_frm = CreateLabelFrameWithIcon(parent=tab7, header="LABEL BEHAVIOR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.LABEL_BEHAVIOR.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
+        select_video_btn_new = SimbaButton(parent=label_behavior_frm, width=Formats.BUTTON_WIDTH_XXL.value, txt="Select video (create NEW video annotation)", img='label_blue', txt_clr='navy', cmd=select_labelling_video, cmd_kwargs={'config_path': lambda :self.config_path, 'threshold_dict': lambda: None, 'setting': lambda: "from_scratch", 'continuing': lambda: False}, thread=False)
+        select_video_btn_continue = SimbaButton(parent=label_behavior_frm, width=Formats.BUTTON_WIDTH_XXL.value, txt="Select video (CONTINUE existing video annotation)", img='label_yellow', txt_clr='darkgoldenrod', cmd=select_labelling_video, cmd_kwargs={'config_path': lambda: self.config_path, 'threshold_dict': lambda:None, 'setting': lambda: None, 'continuing': lambda:True}, thread=False)
 
-        label_thirdpartyann = CreateLabelFrameWithIcon(parent=tab7, header="IMPORT THIRD-PARTY BEHAVIOR ANNOTATIONS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.THIRD_PARTY_ANNOTATION.value)
-        button_importmars = SimbaButton(parent=label_thirdpartyann, txt="Import MARS Annotation (select folder with .annot files)", txt_clr="blue", cmd=self.importMARS, thread=False)
-        button_importboris = SimbaButton(parent=label_thirdpartyann, txt="Import BORIS Annotation (select folder with .csv files)", txt_clr="green", cmd=self.importBoris, thread=False)
-        button_importsolomon = SimbaButton(parent=label_thirdpartyann, txt="Import SOLOMON Annotation (select folder with .csv files", txt_clr="purple", cmd=self.importSolomon, thread=False)
+        label_thirdpartyann = CreateLabelFrameWithIcon(parent=tab7, header="IMPORT THIRD-PARTY BEHAVIOR ANNOTATIONS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.THIRD_PARTY_ANNOTATION.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
+        button_importmars = SimbaButton(parent=label_thirdpartyann, width=Formats.BUTTON_WIDTH_XS.value, txt="Import MARS Annotation (select folder with .annot files)", txt_clr="blue", cmd=self.importMARS, thread=False, font=Formats.FONT_REGULAR.value)
+        button_importboris = SimbaButton(parent=label_thirdpartyann, width=Formats.BUTTON_WIDTH_XS.value, txt="Import BORIS Annotation (select folder with .csv files)", txt_clr="green", cmd=self.importBoris, thread=False, font=Formats.FONT_REGULAR.value)
+        button_importsolomon = SimbaButton(parent=label_thirdpartyann, width=Formats.BUTTON_WIDTH_XS.value, txt="Import SOLOMON Annotation (select folder with .csv files", txt_clr="purple", cmd=self.importSolomon, thread=False, font=Formats.FONT_REGULAR.value)
 
-        button_importethovision = SimbaButton(parent=label_thirdpartyann, txt="Import ETHOVISION Annotation (select folder with .xls/xlsx files)", txt_clr="blue", cmd=self.import_ethovision, thread=False)
-        button_importdeepethogram = SimbaButton(parent=label_thirdpartyann, txt="Import DEEPETHOGRAM Annotation (select folder with .csv files)", txt_clr="green", cmd=self.import_deepethogram, thread=False)
-        import_observer_btn = SimbaButton(parent=label_thirdpartyann, txt="Import NOLDUS OBSERVER Annotation (select folder with .xls/xlsx files)", txt_clr="purple", cmd=self.import_noldus_observer, thread=False)
+        button_importethovision = SimbaButton(parent=label_thirdpartyann, width=Formats.BUTTON_WIDTH_XS.value, txt="Import ETHOVISION Annotation (select folder with .xls/xlsx files)", txt_clr="blue", cmd=self.import_ethovision, thread=False, font=Formats.FONT_REGULAR.value)
+        button_importdeepethogram = SimbaButton(parent=label_thirdpartyann, width=Formats.BUTTON_WIDTH_XS.value, txt="Import DEEPETHOGRAM Annotation (select folder with .csv files)", txt_clr="green", cmd=self.import_deepethogram, thread=False, font=Formats.FONT_REGULAR.value)
+        import_observer_btn = SimbaButton(parent=label_thirdpartyann, width=Formats.BUTTON_WIDTH_XS.value, txt="Import NOLDUS OBSERVER Annotation (select folder with .xls/xlsx files)", txt_clr="purple", cmd=self.import_noldus_observer, thread=False, font=Formats.FONT_REGULAR.value)
 
 
         label_pseudo = CreateLabelFrameWithIcon(parent=tab7,header="PSEUDO-LABELLING",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.PSEUDO_LBL.value)
@@ -408,85 +400,84 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             plabel_threshold[count].grid(row=count + 2, sticky=W)
 
         pseudo_lbl_btn = SimbaButton(parent=label_pseudo, txt="Correct labels", cmd=select_labelling_video, cmd_kwargs={'config_path': lambda:self.config_path, 'threshold_dict': lambda:dict(zip(self.clf_names, plabel_threshold)), 'setting': lambda:'pseudo', 'continuing': lambda:False, 'video_file_path': lambda:pLabel_framedir.file_path}, thread=False)
-        label_adv_label = CreateLabelFrameWithIcon(parent=tab7, header="ADVANCED LABEL BEHAVIOR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ADVANCED_LBL.value)
+        label_adv_label = CreateLabelFrameWithIcon(parent=tab7, header="ADVANCED LABEL BEHAVIOR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ADVANCED_LBL.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
 
-        label_adv_note_1 = SimBALabel(parent=label_adv_label, txt="Note: you will have to specify the presence of *both* behavior and non-behavior on your own.", font=Formats.FONT_REGULAR.value)
-        label_adv_note_2 = SimBALabel(parent=label_adv_label, txt="Click here more information on how to use the SimBA labelling interface.", txt_clr='blue', cursor='hand2', font=Formats.FONT_REGULAR.value, link=Links.ADVANCED_LBL.value)
+        label_adv_note_1 = SimBALabel(parent=label_adv_label, txt="Note: you will have to specify the presence of *both* behavior and non-behavior on your own.", font=Formats.FONT_REGULAR.value, bg_clr=Formats.LABELFRAME_GREY.value)
+        label_adv_note_2 = SimBALabel(parent=label_adv_label, txt="Click here more information on how to use the SimBA labelling interface.", txt_clr='blue', cursor='hand2', font=Formats.FONT_REGULAR.value, link=Links.ADVANCED_LBL.value,bg_clr=Formats.LABELFRAME_GREY.value)
 
-        adv_label_btn_new = SimbaButton(parent=label_adv_label, txt="Select video (create new video annotation)", cmd=select_labelling_video_advanced, cmd_kwargs={'config_path': lambda:self.config_path, 'continuing': lambda:False}, thread=False)
-        adv_label_btn_continue = SimbaButton(parent=label_adv_label, txt="Select video (continue existing video annotation)", cmd=select_labelling_video_advanced, cmd_kwargs={'config_path': lambda:self.config_path, 'continuing': lambda:True}, thread=False)
+        adv_label_btn_new = SimbaButton(parent=label_adv_label, width=Formats.BUTTON_WIDTH_XS.value, txt="Select video (create NEW video annotation)", cmd=select_labelling_video_advanced, cmd_kwargs={'config_path': lambda:self.config_path, 'continuing': lambda:False}, thread=False)
+        adv_label_btn_continue = SimbaButton(parent=label_adv_label, width=Formats.BUTTON_WIDTH_XS.value, txt="Select video (CONTINUE existing video annotation)", cmd=select_labelling_video_advanced, cmd_kwargs={'config_path': lambda:self.config_path, 'continuing': lambda:True}, thread=False)
 
-        targeted_clip_annotator_frm = CreateLabelFrameWithIcon(parent=tab7,header="TARGETED CLIP ANNOTATOR",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.ADVANCED_LBL.value)
-
-        targeted_clip_annotator_note = SimBALabel(parent=targeted_clip_annotator_frm, txt="A bout annotator that creates annotated clips from videos associated with ML results.", txt_clr='blue', cursor='hand2', font=Formats.FONT_REGULAR.value, link=Links.ADVANCED_LBL.value)
+        targeted_clip_annotator_frm = CreateLabelFrameWithIcon(parent=tab7,header="TARGETED CLIP ANNOTATOR",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.ADVANCED_LBL.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
+        targeted_clip_annotator_note = SimBALabel(parent=targeted_clip_annotator_frm, txt="A bout annotator that creates annotated clips from videos associated with ML results.", txt_clr='blue', cursor='hand2', font=Formats.FONT_REGULAR.value, link=Links.ADVANCED_LBL.value, bg_clr=Formats.LABELFRAME_GREY.value)
         targeted_clip_annotator_btn = SimbaButton(parent=targeted_clip_annotator_frm, txt="Select video", cmd=select_labelling_video_targeted_clips, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
 
-        lbl_tools_frm = LabelFrame(tab7, text="LABELLING TOOLS", font=Formats.FONT_HEADER.value, fg="black")
-        visualize_annotation_img_btn = SimbaButton(parent=lbl_tools_frm, txt="Visualize annotations", cmd=ExtractAnnotationFramesPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
-        third_party_annotations_btn = SimbaButton(parent=lbl_tools_frm, txt="Append third-party annotations", txt_clr='purple', cmd=ThirdPartyAnnotatorAppenderPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
-        remove_roi_features_from_annotation_set = SimbaButton(parent=lbl_tools_frm, txt="Remove ROI features from label set", txt_clr='darkred', cmd=RemoveROIFeaturesPopUp, cmd_kwargs={'config_path': lambda:self.config_path, 'dataset': lambda:'targets_inserted'}, thread=False)
-        compute_annotation_statistics = SimbaButton(parent=lbl_tools_frm, txt="Count annotations in project", txt_clr='orange', cmd=ClfAnnotationCountPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
+        lbl_tools_frm = CreateLabelFrameWithIcon(parent=tab7, header="LABELLING TOOLS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ADVANCED_LBL.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
+        visualize_annotation_img_btn = SimbaButton(parent=lbl_tools_frm, width=Formats.BUTTON_WIDTH_XS.value, txt="VISUALIZE ANNOTATIONS", cmd=ExtractAnnotationFramesPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
+        third_party_annotations_btn = SimbaButton(parent=lbl_tools_frm, width=Formats.BUTTON_WIDTH_XS.value, txt="APPEND THIRD-PARTY ANNOTATIONS", txt_clr='purple', cmd=ThirdPartyAnnotatorAppenderPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
+        remove_roi_features_from_annotation_set = SimbaButton(parent=lbl_tools_frm, width=Formats.BUTTON_WIDTH_XS.value, txt="REMOVE ROI FEATURES FROM LABEL SET", txt_clr='darkred', cmd=RemoveROIFeaturesPopUp, cmd_kwargs={'config_path': lambda:self.config_path, 'dataset': lambda:'targets_inserted'}, thread=False)
+        compute_annotation_statistics = SimbaButton(parent=lbl_tools_frm, width=Formats.BUTTON_WIDTH_XS.value, txt="COUNT ANNOTATIONS IN PROJECT", txt_clr='orange', cmd=ClfAnnotationCountPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
 
 
 
-        label_trainmachinemodel = CreateLabelFrameWithIcon(parent=tab8, header="TRAIN MACHINE MODELS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.TRAIN_ML_MODEL.value)
+        label_trainmachinemodel = CreateLabelFrameWithIcon(parent=tab8, header="TRAIN MACHINE MODELS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.TRAIN_ML_MODEL.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
 
 
-        button_trainmachinesettings = SimbaButton(parent=label_trainmachinemodel, txt="SETTINGS", img='settings', txt_clr='darkorange', cmd=self.trainmachinemodelsetting, thread=False)
-        button_trainmachinemodel = SimbaButton(parent=label_trainmachinemodel, txt="TRAIN SINGLE MODEL (GLOBAL ENVIRONMENT)", img='one_blue', txt_clr='blue', cmd=self.train_single_model, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
+        button_trainmachinesettings = SimbaButton(parent=label_trainmachinemodel, width=Formats.BUTTON_WIDTH_XXL.value, txt="SETTINGS", img='settings', txt_clr='darkorange', cmd=self.trainmachinemodelsetting, thread=False)
+        button_trainmachinemodel = SimbaButton(parent=label_trainmachinemodel, width=Formats.BUTTON_WIDTH_XXL.value, txt="TRAIN SINGLE MODEL (GLOBAL ENVIRONMENT)", img='one_blue', txt_clr='blue', cmd=self.train_single_model, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
 
-        button_train_multimodel = SimbaButton(parent=label_trainmachinemodel, txt="TRAIN MULTIPLE MODELS (ONE FOR EACH SAVED SETTING)", img='multiple_green', txt_clr='green', cmd=self.train_multiple_models_from_meta, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
+        button_train_multimodel = SimbaButton(parent=label_trainmachinemodel, width=Formats.BUTTON_WIDTH_XXL.value, txt="TRAIN MULTIPLE MODELS (ONE FOR EACH SAVED SETTING)", img='multiple_green', txt_clr='green', cmd=self.train_multiple_models_from_meta, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
 
-        label_model_validation = CreateLabelFrameWithIcon( parent=tab9, header="VALIDATE MODEL ON SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.OUT_OF_SAMPLE_VALIDATION.value)
+        label_model_validation = CreateLabelFrameWithIcon( parent=tab9, header="VALIDATE MODEL ON SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.OUT_OF_SAMPLE_VALIDATION.value, padx=5, pady=5)
         self.csvfile = FileSelect(label_model_validation,"SELECT DATA FEATURE FILE",color="blue",lblwidth=30,file_types=[("SimBA CSV", "*.csv"), ("SimBA PARQUET", "*.parquet")],initialdir=os.path.join(    self.project_path, Paths.FEATURES_EXTRACTED_DIR.value))
         self.modelfile = FileSelect(label_model_validation,"SELECT MODEL FILE",color="blue",lblwidth=30,initialdir=self.project_path)
 
-        button_runvalidmodel = SimbaButton(parent=label_model_validation, txt="RUN MODEL", txt_clr='blue', img='rocket', cmd=self.validate_model_first_step, thread=True)
-        button_generateplot = SimbaButton(parent=label_model_validation, txt="INTERACTIVE PROBABILITY PLOT",  img='interactive_blue', txt_clr='blue', cmd=self.launch_interactive_plot, thread=False)
+        button_runvalidmodel = SimbaButton(parent=label_model_validation, width=Formats.BUTTON_WIDTH_XL.value, txt="RUN MODEL", txt_clr='blue', img='rocket', cmd=self.validate_model_first_step, thread=True)
+        button_generateplot = SimbaButton(parent=label_model_validation, width=Formats.BUTTON_WIDTH_XL.value, txt="INTERACTIVE PROBABILITY PLOT",  img='interactive_blue', txt_clr='blue', cmd=self.launch_interactive_plot, thread=False)
 
         self.dis_threshold = Entry_Box(label_model_validation, "DISCRIMINATION THRESHOLD (0.0-1.0):", "35")
         self.min_behaviorbout = Entry_Box(label_model_validation,"MINIMUM BOUT LENGTH (MS):","35",validation="numeric")
-        button_validate_model = SimbaButton(parent=label_model_validation, txt="CREATE VALIDATION VIDEO", txt_clr='blue', img='visualize_blue', cmd=ValidationVideoPopUp, cmd_kwargs={'config_path': lambda:config_path, 'simba_main_frm': lambda:self})
+        button_validate_model = SimbaButton(parent=label_model_validation, width=Formats.BUTTON_WIDTH_XL.value, txt="CREATE VALIDATION VIDEO", txt_clr='blue', img='visualize_blue', cmd=ValidationVideoPopUp, cmd_kwargs={'config_path': lambda:config_path, 'simba_main_frm': lambda:self})
 
-        label_runmachinemodel = CreateLabelFrameWithIcon(parent=tab9,header="RUN MACHINE MODEL",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.SCENARIO_2.value)
+        label_runmachinemodel = CreateLabelFrameWithIcon(parent=tab9,header="RUN MACHINE MODEL",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.SCENARIO_2.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
 
-        button_run_rfmodelsettings = SimbaButton(parent=label_runmachinemodel, txt="MODEL SETTINGS", txt_clr='green', img='settings', cmd=SetMachineModelParameters, cmd_kwargs={'config_path': lambda:config_path})
-        button_runmachinemodel = SimbaButton(parent=label_runmachinemodel, txt="RUN MODELS", txt_clr='green', img='clf', cmd=self.runrfmodel, thread=True)
+        button_run_rfmodelsettings = SimbaButton(parent=label_runmachinemodel, width=Formats.BUTTON_WIDTH_XL.value, txt="MODEL SETTINGS", txt_clr='green', img='settings', cmd=SetMachineModelParameters, cmd_kwargs={'config_path': lambda:config_path})
+        button_runmachinemodel = SimbaButton(parent=label_runmachinemodel, width=Formats.BUTTON_WIDTH_XL.value, txt="RUN MODELS", txt_clr='green', img='clf', cmd=self.runrfmodel, thread=True)
 
-        kleinberg_button = SimbaButton(parent=label_runmachinemodel, txt="KLEINBERG SMOOTHING", txt_clr='green', img='feather_green', cmd=KleinbergPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        fsttc_button = SimbaButton(parent=label_runmachinemodel, txt="FSTTC", txt_clr='green', img='tile_green', cmd=FSTTCPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        kleinberg_button = SimbaButton(parent=label_runmachinemodel, width=Formats.BUTTON_WIDTH_XL.value, txt="KLEINBERG SMOOTHING", txt_clr='green', img='feather_green', cmd=KleinbergPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        fsttc_button = SimbaButton(parent=label_runmachinemodel, width=Formats.BUTTON_WIDTH_XL.value, txt="FSTTC", txt_clr='green', img='tile_green', cmd=FSTTCPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
-        mutual_exclusivity = SimbaButton(parent=label_runmachinemodel, txt="MUTUAL EXCLUSIVITY CORRECTION", img='seperate_green', txt_clr='green', cmd=MutualExclusivityPupUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        mutual_exclusivity = SimbaButton(parent=label_runmachinemodel, width=Formats.BUTTON_WIDTH_XL.value, txt="MUTUAL EXCLUSIVITY CORRECTION", img='seperate_green', txt_clr='green', cmd=MutualExclusivityPupUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
-        label_machineresults = CreateLabelFrameWithIcon( parent=tab9, header="ANALYZE MACHINE RESULTS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ANALYZE_ML_RESULTS.value)
+        label_machineresults = CreateLabelFrameWithIcon( parent=tab9, header="ANALYZE MACHINE RESULTS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ANALYZE_ML_RESULTS.value, bg=Formats.LABELFRAME_GREY.value, pady=5, padx=5)
 
 
-        button_process_datalog = SimbaButton(parent=label_machineresults, txt="ANALYZE MACHINE PREDICTIONS: AGGREGATES", img='metrics_blue', txt_clr='blue', cmd=ClfDescriptiveStatsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        button_process_movement = SimbaButton(parent=label_machineresults, txt="ANALYZE DISTANCES/VELOCITY: AGGREGATES", img='metrics_blue', txt_clr='blue', cmd=MovementAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        button_movebins = SimbaButton(parent=label_machineresults, txt="ANALYZE DISTANCES/VELOCITY: TIME BINS", txt_clr='blue', img='metrics_blue', cmd=MovementAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        button_classifierbins = SimbaButton(parent=label_machineresults, txt="ANALYZE MACHINE PREDICTIONS: TIME-BINS", txt_clr='blue', img='metrics_blue', cmd=TimeBinsClfPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        button_classifier_ROI = SimbaButton(parent=label_machineresults, txt="ANALYZE MACHINE PREDICTION: BY ROI", txt_clr='blue', img='metrics_blue', cmd=ClfByROIPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        button_severity = SimbaButton(parent=label_machineresults, txt="ANALYZE MACHINE PREDICTION: BY SEVERITY", txt_clr='blue', img='metrics_blue', cmd=AnalyzeSeverityPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_process_datalog = SimbaButton(parent=label_machineresults, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE MACHINE PREDICTIONS: AGGREGATES", img='metrics_blue', txt_clr='blue', cmd=ClfDescriptiveStatsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_process_movement = SimbaButton(parent=label_machineresults, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE DISTANCES/VELOCITY: AGGREGATES", img='metrics_blue', txt_clr='blue', cmd=MovementAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_movebins = SimbaButton(parent=label_machineresults, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE DISTANCES/VELOCITY: TIME BINS", txt_clr='blue', img='metrics_blue', cmd=MovementAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_classifierbins = SimbaButton(parent=label_machineresults, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE MACHINE PREDICTIONS: TIME-BINS", txt_clr='blue', img='metrics_blue', cmd=TimeBinsClfPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_classifier_ROI = SimbaButton(parent=label_machineresults, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE MACHINE PREDICTION: BY ROI", txt_clr='blue', img='metrics_blue', cmd=ClfByROIPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_severity = SimbaButton(parent=label_machineresults, width=Formats.BUTTON_WIDTH_XL.value, txt="ANALYZE MACHINE PREDICTION: BY SEVERITY", txt_clr='blue', img='metrics_blue', cmd=AnalyzeSeverityPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
-        visualization_frm = CreateLabelFrameWithIcon(parent=tab10, header="DATA VISUALIZATIONS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VISUALIZATION.value)
-        sklearn_visualization_btn = SimbaButton(parent=visualization_frm, txt="VISUALIZE CLASSIFICATIONS", img='split', txt_clr='black', cmd=SklearnVisualizationPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        visualization_frm = CreateLabelFrameWithIcon(parent=tab10, header="DATA VISUALIZATIONS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VISUALIZATION.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
+        sklearn_visualization_btn = SimbaButton(parent=visualization_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="VISUALIZE CLASSIFICATIONS", img='split', txt_clr='black', cmd=SklearnVisualizationPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         sklearn_visualization_btn.grid(row=0, column=0, sticky=NW)
-        gantt_visualization_btn = SimbaButton(parent=visualization_frm, txt="VISUALIZE GANTT", img='bar_graph_blue', txt_clr='blue', cmd=GanttPlotPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        gantt_visualization_btn = SimbaButton(parent=visualization_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="VISUALIZE GANTT", img='bar_graph_blue', txt_clr='blue', cmd=GanttPlotPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         gantt_visualization_btn.grid(row=1, column=0, sticky=NW)
-        probability_visualization_btn = SimbaButton(parent=visualization_frm, txt="VISUALIZE PROBABILITIES", img='dice_green', txt_clr='green', cmd=VisualizeClassificationProbabilityPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        probability_visualization_btn = SimbaButton(parent=visualization_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="VISUALIZE PROBABILITIES", img='dice_green', txt_clr='green', cmd=VisualizeClassificationProbabilityPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         probability_visualization_btn.grid(row=2, column=0, sticky=NW)
-        path_visualization_btn = SimbaButton(parent=visualization_frm, txt="VISUALIZE PATHS", img='path', txt_clr='orange', cmd=PathPlotPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        path_visualization_btn = SimbaButton(parent=visualization_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="VISUALIZE PATHS", img='path', txt_clr='navy', cmd=PathPlotPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         path_visualization_btn.grid(row=3, column=0, sticky=NW)
-        distance_visualization_btn = SimbaButton(parent=visualization_frm, txt="VISUALIZE DISTANCES", img='distance_red', txt_clr='red', cmd=DistancePlotterPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        distance_visualization_btn = SimbaButton(parent=visualization_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="VISUALIZE DISTANCES", img='distance_red', txt_clr='red', cmd=DistancePlotterPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         distance_visualization_btn.grid(row=4, column=0, sticky=NW)
-        heatmap_clf_visualization_btn = SimbaButton(parent=visualization_frm, txt="VISUALIZE CLASSIFICATION HEATMAPS", img='heatmap', txt_clr='pink', cmd=HeatmapClfPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        heatmap_clf_visualization_btn = SimbaButton(parent=visualization_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="VISUALIZE CLASSIFICATION HEATMAPS", img='heatmap', txt_clr='green', cmd=HeatmapClfPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         heatmap_clf_visualization_btn.grid(row=5, column=0, sticky=NW)
         #data_plot_visualization_btn = SimbaButton(parent=visualization_frm, txt="VISUALIZE DATA PLOTS", img='metrics', txt_clr='purple', cmd=Nne, cmd_kwargs={'config_path': lambda:self.config_path})
-        data_plot_visualization_btn = SimbaButton(parent=visualization_frm, txt="VISUALIZE DATA PLOTS", img='metrics', txt_clr='purple', cmd=DataPlotterPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        data_plot_visualization_btn = SimbaButton(parent=visualization_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="VISUALIZE DATA PLOTS", img='metrics', txt_clr='purple', cmd=DataPlotterPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
 
         data_plot_visualization_btn.grid(row=6, column=0, sticky=NW)
-        clf_validation_btn = SimbaButton(parent=visualization_frm, txt="CLASSIFIER VALIDATION CLIPS", txt_clr='blue', img='check_blue', cmd=ClassifierValidationPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        clf_validation_btn = SimbaButton(parent=visualization_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="CLASSIFIER VALIDATION CLIPS", txt_clr='blue', img='check_blue', cmd=ClassifierValidationPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         clf_validation_btn.grid(row=7, column=0, sticky=NW)
         merge_frm = CreateLabelFrameWithIcon(parent=tab10, header="MERGE FRAMES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CONCAT_VIDEOS.value)
         merge_frm_btn = SimbaButton(parent=merge_frm, txt="MERGE FRAMES", img='merge', txt_clr='black', cmd=ConcatenatorPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
@@ -516,7 +507,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         anchored_roi_analysis_btn = SimbaButton(parent=lbl_addon, txt="Animal-anchored ROI analysis", txt_clr='orange', cmd=BoundaryMenus, cmd_kwargs={'config_path': lambda:self.config_path})
         ImportVideosFrame(parent_frm=import_frm, config_path=config_path, idx_row=0, idx_column=0)
         ImportPoseFrame(parent_frm=import_frm, idx_row=1, idx_column=0, config_path=config_path)
-        further_methods_frm.grid(row=0, column=1, sticky=NW, pady=5, padx=5)
+        further_methods_frm.grid(row=0, column=1, sticky=NW, pady=10, padx=10)
         extract_frm_btn.grid(row=1, column=0, sticky=NW)
         import_frm_dir_btn.grid(row=2, column=0, sticky=NW)
         add_clf_btn.grid(row=3, column=0, sticky=NW)
@@ -532,7 +523,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_setdistanceinmm.grid(row=0, column=1, sticky=NW)
         button_setscale.grid(row=1, column=0, sticky=NW)
 
-        label_outliercorrection.grid(row=0, sticky=W)
+        label_outliercorrection.grid(row=0, sticky=W, padx=10, pady=10)
         button_settings_outlier.grid(row=0, sticky=W)
         button_outliercorrection.grid(row=1, sticky=W)
         button_skipOC.grid(row=2, sticky=W, pady=5)
@@ -543,15 +534,15 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         userscript.grid(row=1, column=0, sticky=NW)
         self.scriptfile.grid(row=2, column=0, sticky=NW)
 
-        roi_feature_frm.grid(row=1, column=0, sticky=NW)
+        roi_feature_frm.grid(row=1, column=0, sticky=NW, padx=10, pady=10)
         append_roi_features_by_animal.grid(row=0, column=0, sticky=NW)
         append_roi_features_by_body_part.grid(row=1, column=0, sticky=NW)
         remove_roi_features_from_feature_set.grid(row=2, column=0, sticky=NW)
 
-        feature_tools_frm.grid(row=2, column=0, sticky=NW)
+        feature_tools_frm.grid(row=2, column=0, sticky=NW, padx=10, pady=10)
         compute_feature_subset_btn.grid(row=0, column=0, sticky=NW)
 
-        label_behavior_frm.grid(row=5, sticky=W)
+        label_behavior_frm.grid(row=5, sticky=W, padx=10, pady=10)
         select_video_btn_new.grid(row=0, sticky=W)
         select_video_btn_continue.grid(row=1, sticky=W)
 
@@ -563,17 +554,17 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         plabelframe_threshold.grid(row=4, sticky=W)
         pseudo_lbl_btn.grid(row=5, sticky=W)
 
-        label_adv_label.grid(row=7, column=0, sticky=NW)
+        label_adv_label.grid(row=7, column=0, sticky=NW, padx=10, pady=10)
         label_adv_note_1.grid(row=0, column=0, sticky=NW)
         label_adv_note_2.grid(row=1, column=0, sticky=NW)
         adv_label_btn_new.grid(row=3, column=0, sticky=NW)
         adv_label_btn_continue.grid(row=4, column=0, sticky=NW)
 
-        targeted_clip_annotator_frm.grid(row=8, column=0, sticky=NW)
+        targeted_clip_annotator_frm.grid(row=8, column=0, sticky=NW, padx=10, pady=10)
         targeted_clip_annotator_note.grid(row=0, column=0, sticky=NW)
         targeted_clip_annotator_btn.grid(row=1, column=0, sticky=NW)
 
-        label_thirdpartyann.grid(row=9, sticky=W)
+        label_thirdpartyann.grid(row=9, sticky=W, padx=10, pady=10)
         button_importmars.grid(row=0, column=0, sticky=NW)
         button_importboris.grid(row=1, column=0, sticky=NW)
         button_importsolomon.grid(row=2, column=0, sticky=NW)
@@ -581,18 +572,18 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_importdeepethogram.grid(row=1, column=1, sticky=NW)
         import_observer_btn.grid(row=2, column=1, sticky=NW)
 
-        lbl_tools_frm.grid(row=10, column=0, sticky=NW)
+        lbl_tools_frm.grid(row=10, column=0, sticky=NW, padx=10, pady=10)
         visualize_annotation_img_btn.grid(row=0, column=0, sticky=NW)
         third_party_annotations_btn.grid(row=0, column=1, sticky=NW)
         remove_roi_features_from_annotation_set.grid(row=1, column=0, sticky=NW)
         compute_annotation_statistics.grid(row=1, column=1, sticky=NW)
 
-        label_trainmachinemodel.grid(row=6, sticky=W)
+        label_trainmachinemodel.grid(row=6, sticky=W, padx=10, pady=10)
         button_trainmachinesettings.grid(row=0, column=0, sticky=NW, padx=5)
         button_trainmachinemodel.grid(row=1, column=0, sticky=NW, padx=5)
         button_train_multimodel.grid(row=2, column=0, sticky=NW, padx=5)
 
-        label_model_validation.grid(row=7, sticky=W, pady=5)
+        label_model_validation.grid(row=7, sticky=W, pady=10)
         self.csvfile.grid(row=0, sticky=W)
         self.modelfile.grid(row=1, sticky=W)
         button_runvalidmodel.grid(row=2, sticky=W)
@@ -601,14 +592,14 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         self.min_behaviorbout.grid(row=5, sticky=W)
         button_validate_model.grid(row=6, sticky=W)
 
-        label_runmachinemodel.grid(row=8, sticky=NW)
+        label_runmachinemodel.grid(row=8, sticky=NW, padx=10, pady=10)
         button_run_rfmodelsettings.grid(row=0, sticky=NW)
         button_runmachinemodel.grid(row=1, sticky=NW)
         kleinberg_button.grid(row=2, sticky=NW)
         fsttc_button.grid(row=3, sticky=NW)
         mutual_exclusivity.grid(row=4, sticky=NW)
 
-        label_machineresults.grid(row=9, sticky=W, pady=5)
+        label_machineresults.grid(row=9, sticky=W, padx=10, pady=10)
         button_process_datalog.grid(row=2, column=0, sticky=W, padx=3)
         button_process_movement.grid(row=2, column=1, sticky=W, padx=3)
         button_movebins.grid(row=3, column=1, sticky=W, padx=3)
@@ -616,7 +607,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_classifier_ROI.grid(row=4, column=0, sticky=W, padx=3)
         button_severity.grid(row=4, column=1, sticky=W, padx=3)
 
-        visualization_frm.grid(row=11, column=0, sticky=W + N, padx=5)
+        visualization_frm.grid(row=11, column=0, sticky=W + N, padx=10, pady=10)
         merge_frm.grid(row=11, column=2, sticky=W + N, padx=5)
         merge_frm_btn.grid(row=0, sticky=NW, padx=5)
 
@@ -949,10 +940,12 @@ class App(object):
         links_menu.add_command(label="Download weights", compound="left", image=self.menu_icons["dumbbell"]["img"], command=lambda: webbrowser.open_new(str(r"https://osf.io/sr3ck/")), font=Formats.FONT_REGULAR.value)
         links_menu.add_command(label="Download data/classifiers", compound="left", image=self.menu_icons["osf"]["img"], command=lambda: webbrowser.open_new(str(r"https://osf.io/kwge8/")), font=Formats.FONT_REGULAR.value)
         links_menu.add_command(label="Ex. feature list", compound='left', image=self.menu_icons["documentation"]["img"], command=lambda: webbrowser.open_new(str(r"https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv")), font=Formats.FONT_REGULAR.value)
-        links_menu.add_command(label="SimBA github", compound="left", image=self.menu_icons["github"]["img"], command=lambda: webbrowser.open_new(str(r"https://github.com/sgoldenlab/simba")), font=Formats.FONT_REGULAR.value)
-        links_menu.add_command(label="Gitter Chatroom", compound="left", image=self.menu_icons["gitter"]["img"], command=lambda: webbrowser.open_new(str(r"https://gitter.im/SimBA-Resource/community")), font=Formats.FONT_REGULAR.value)
+        links_menu.add_command(label="SimBA Github", compound="left", image=self.menu_icons["github"]["img"], command=lambda: webbrowser.open_new(str(r"https://github.com/sgoldenlab/simba")), font=Formats.FONT_REGULAR.value)
+        links_menu.add_command(label="SimBA Gitter Support Chatroom", compound="left", image=self.menu_icons["gitter"]["img"], command=lambda: webbrowser.open_new(str(r"https://gitter.im/SimBA-Resource/community")), font=Formats.FONT_REGULAR.value)
         links_menu.add_command(label="Install FFmpeg", compound="left", image=self.menu_icons["ffmpeg"]["img"],  command=lambda: webbrowser.open_new(str(r"https://m.wikihow.com/Install-FFmpeg-on-Windows")), font=Formats.FONT_REGULAR.value)
         links_menu.add_command(label="SimBA API", compound="left", image=self.menu_icons["api"]["img"], command=lambda: webbrowser.open_new(str(r"https://simba-uw-tf-dev.readthedocs.io/")), font=Formats.FONT_REGULAR.value)
+        links_menu.add_command(label="SimBA usage statistics", compound="left", image=self.menu_icons["line_chart_light_blue"]["img"], command=lambda: webbrowser.open_new(str(r"https://sronilsson.github.io/download_stats/")), font=Formats.FONT_REGULAR.value)
+        links_menu.add_command(label="SimBA developer contact", compound="left", image=self.menu_icons["developer"]["img"], command=lambda: webbrowser.open_new(str(r"https://sronilsson.netlify.app/")), font=Formats.FONT_REGULAR.value)
         help_menu.add_cascade(label="Links", menu=links_menu, compound="left", image=self.menu_icons["link"]["img"], font=Formats.FONT_REGULAR.value)
         help_menu.add_command(label="About", compound="left", image=self.menu_icons["about"]["img"], command=AboutSimBAPopUp, font=Formats.FONT_REGULAR.value)
 
