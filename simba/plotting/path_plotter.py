@@ -11,16 +11,20 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
-    check_if_keys_exist_in_dict,
-    check_if_string_value_is_valid_video_timestamp, check_instance,
-    check_that_column_exist, check_that_hhmmss_start_is_before_end,
-    check_valid_lst, check_file_exist_and_readable, check_valid_boolean, check_str, check_if_valid_rgb_tuple, check_valid_dataframe, check_video_and_data_frm_count_align)
+    check_file_exist_and_readable, check_if_keys_exist_in_dict,
+    check_if_string_value_is_valid_video_timestamp, check_if_valid_rgb_tuple,
+    check_instance, check_str, check_that_column_exist,
+    check_that_hhmmss_start_is_before_end, check_valid_boolean,
+    check_valid_dataframe, check_valid_lst,
+    check_video_and_data_frm_count_align)
 from simba.utils.data import (find_frame_numbers_from_time_stamp,
                               slice_roi_dict_for_video)
 from simba.utils.enums import Formats, TagNames
-from simba.utils.errors import FrameRangeError, NoSpecifiedOutputError, InvalidVideoFileError
+from simba.utils.errors import (FrameRangeError, InvalidVideoFileError,
+                                NoSpecifiedOutputError)
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (find_video_of_file, get_fn_ext, read_df, read_frm_of_video, remove_a_folder)
+from simba.utils.read_write import (find_video_of_file, get_fn_ext, read_df,
+                                    read_frm_of_video, remove_a_folder)
 from simba.utils.warnings import ROIWarning
 
 STYLE_WIDTH = "width"

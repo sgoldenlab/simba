@@ -7,9 +7,13 @@ from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.plotting.probability_plot_creator import TresholdPlotCreatorSingleProcess
-from simba.plotting.probability_plot_creator_mp import TresholdPlotCreatorMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, SimbaButton, SimbaCheckbox, SimBADropDown)
+from simba.plotting.probability_plot_creator import \
+    TresholdPlotCreatorSingleProcess
+from simba.plotting.probability_plot_creator_mp import \
+    TresholdPlotCreatorMultiprocess
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, SimbaButton, SimbaCheckbox,
+                                        SimBADropDown)
 from simba.utils.checks import check_int
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.lookups import get_color_dict
