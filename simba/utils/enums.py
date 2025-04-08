@@ -155,6 +155,7 @@ class Formats(Enum):
     BUTTON_WIDTH_XXL = 325
     LABELFRAME_GREY = '#DCDCDC'
     if (platform.system() == OS.MAC.value):
+        FONT_SMALL = ('Poppins Regular', 10)
         FONT_REGULAR = ('Poppins Regular', 13)
         FONT_REGULAR_ITALICS = ('Poppins Regular', 13, "italic")
         FONT_HEADER = ('Poppins Regular', 13, "bold")
@@ -163,6 +164,7 @@ class Formats(Enum):
         FONT_LARGE_ITALICS = ('Poppins Regular', 15, "italic")
         FONT_PLAYWRITE = ('Playwrite ES Deco', 8)
     elif (platform.system() == OS.WINDOWS.value):
+        FONT_SMALL = ('Poppins Regular', 6)
         FONT_REGULAR = ('Poppins Regular', 8)
         FONT_REGULAR_ITALICS = ('Poppins Regular', 8, "italic")
         FONT_REGULAR_BOLD = ('Poppins Bold', 8)
@@ -171,6 +173,7 @@ class Formats(Enum):
         FONT_LARGE_ITALICS = ('Poppins Regular', 13, "italic")
         FONT_PLAYWRITE = ('Playwrite ES Deco', 8)
     else:
+        FONT_SMALL = ('DejaVu Sans', 6)
         FONT_REGULAR = ('DejaVu Sans', 8)
         FONT_REGULAR_ITALICS = ('DejaVu Sans', 8, "italic")
         FONT_REGULAR_BOLD = ('DejaVu Sans', 8, "bold")

@@ -18,7 +18,7 @@ from simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up import \
     CreateUserDefinedPoseConfigurationPopUp
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, FolderSelect, SimbaButton,
-                                        hxtScrollbar)
+                                        hxtScrollbar, SimBADropDown)
 from simba.utils.checks import check_if_dir_exists, check_str
 from simba.utils.config_creator import ProjectConfigCreator
 from simba.utils.enums import Formats, Keys, Links, Methods, Options, Paths
@@ -51,6 +51,8 @@ class ProjectCreatorPopUp(PopUpMixin):
         self.btn_icons = get_icons_paths()
         for k in self.btn_icons.keys():
             self.btn_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname("__file__"), self.btn_icons[k]["icon_path"])))
+        self.main_frm.iconphoto(False, self.btn_icons['settings']['img'])
+
         self.create_project_tab = ttk.Frame(parent_tab)
         self.import_videos_tab = ttk.Frame(parent_tab)
         self.import_data_tab = ttk.Frame(parent_tab)
@@ -60,26 +62,20 @@ class ProjectCreatorPopUp(PopUpMixin):
         parent_tab.add(self.import_videos_tab, text=f'{"[ Import videos ]": ^20s}', compound="left", image=self.btn_icons["video"]["img"])
         parent_tab.add(self.import_data_tab, text=f'{"[ Import tracking data ]": ^20s}', compound="left", image=self.btn_icons["pose"]["img"])
         parent_tab.add( self.extract_frms_tab, text=f'{"[ Extract frames ]": ^20s}', compound="left", image=self.btn_icons["frames"]["img"])
-
         parent_tab.grid(row=0, column=0, sticky=NW)
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.create_project_tab, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CREATE_PROJECT.value)
-        self.general_settings_frm = LabelFrame(self.settings_frm, text="GENERAL PROJECT SETTINGS", fg="black", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        self.general_settings_frm = CreateLabelFrameWithIcon(parent=self.settings_frm, header="GENERAL PROJECT SETTINGS", icon_name='settings', icon_link=Links.CREATE_PROJECT.value, padx=5, pady=5, relief='solid')
+        self.project_dir_select = FolderSelect(self.general_settings_frm, "PROJECT DIRECTORY:", lblwidth=35, entry_width=35, font=Formats.FONT_REGULAR.value)
+        self.project_name_eb = Entry_Box(self.general_settings_frm, "PROJECT NAME:", labelwidth=35, entry_box_width=35)
+        self.file_type_dropdown = SimBADropDown(parent=self.general_settings_frm, dropdown_options=Options.WORKFLOW_FILE_TYPE_OPTIONS.value, label='WORKFLOW FILE TYPE:', label_width=35, dropdown_width=35, value=Options.WORKFLOW_FILE_TYPE_OPTIONS.value[0])
 
-        self.project_dir_select = FolderSelect(self.general_settings_frm, "Project directory:", lblwidth="25")
-        self.project_name_eb = Entry_Box(self.general_settings_frm, "Project name:", labelwidth="25")
-        self.file_type_dropdown = DropDownMenu(self.general_settings_frm, "Workflow file type:", Options.WORKFLOW_FILE_TYPE_OPTIONS.value, "25")
-        self.file_type_dropdown.setChoices(choice=Options.WORKFLOW_FILE_TYPE_OPTIONS.value[0])
-
-        self.clf_name_entries = []
-        self.ml_settings_frm = LabelFrame(self.settings_frm, text="MACHINE LEARNING SETTINGS", font=Formats.FONT_HEADER.value, padx=5, pady=5)
-        self.clf_cnt = Entry_Box(self.ml_settings_frm, "Number of classifiers (behaviors): ", "30", validation="numeric")
-
-        add_clf_btn = SimbaButton(parent=self.ml_settings_frm, txt="<Add predictive classifier(s)>", txt_clr='blue', img='add_on', cmd=self.create_entry_boxes_from_entrybox, cmd_kwargs={'count': lambda: self.clf_cnt.entry_get, 'parent': lambda: self.ml_settings_frm, 'current_entries': lambda: self.clf_name_entries})
-
-        self.animal_settings_frm = LabelFrame(self.settings_frm, text="ANIMAL SETTINGS", font=Formats.FONT_HEADER.value)
-        self.tracking_type_dropdown = DropDownMenu(self.animal_settings_frm, "Type of Tracking", Options.TRACKING_TYPE_OPTIONS.value, "25", com=self.update_body_part_dropdown)
-        self.tracking_type_dropdown.setChoices(Options.TRACKING_TYPE_OPTIONS.value[0])
+        self.clf_entry_boxes = []
+        self.ml_settings_frm = CreateLabelFrameWithIcon(parent=self.create_project_tab, header="MACHINE LEARNING SETTINGS", icon_name='forest', icon_link=Links.CREATE_PROJECT.value, font=Formats.FONT_HEADER.value, padx=5, pady=5, relief='solid')
+        self.clf_cnt_dropdown = SimBADropDown(parent=self.ml_settings_frm, dropdown_options=list(range(1, 26)), label='NUMBER OF CLASSIFIERS (BEHAVIORS)', label_width=35, dropdown_width=35, value=1, command=self.__create_entry_boxes)
+        self.__create_entry_boxes(cnt=1)
+        self.animal_settings_frm = CreateLabelFrameWithIcon(parent=self.create_project_tab, header="ANIMAL SETTINGS", icon_name='pose', icon_link=Links.CREATE_PROJECT.value, font=Formats.FONT_HEADER.value, padx=5, pady=5, relief='solid')
+        self.tracking_type_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=Options.TRACKING_TYPE_OPTIONS.value, label='TYPE OF TRACKING', label_width=35, dropdown_width=35, value=Options.TRACKING_TYPE_OPTIONS.value[0], command=self.update_body_part_dropdown)
 
         project_animal_cnt_path = os.path.join(os.path.dirname(simba.__file__), Paths.SIMBA_NO_ANIMALS_PATH.value)
         self.animal_count_lst = list(pd.read_csv(project_animal_cnt_path, header=None)[0])
@@ -95,6 +91,7 @@ class ProjectCreatorPopUp(PopUpMixin):
                                      and x not in self.three_dim_tracking_options]
         for k in self.bp_lu.keys():
             self.bp_lu[k]["img"] = ImageTk.PhotoImage(file=os.path.join(os.path.dirname("__file__"), self.bp_lu[k]["img_path"]))
+
         self.classical_tracking_option_dict = {k: self.bp_lu[k] for k in self.classical_tracking_options}
         self.multi_tracking_option_dict = {k: self.bp_lu[k] for k in self.multi_tracking_options}
         self.classical_tracking_options.append(Methods.CREATE_POSE_CONFIG.value)
@@ -103,26 +100,24 @@ class ProjectCreatorPopUp(PopUpMixin):
         self.classical_tracking_options.extend(self.user_defined_options)
         self.multi_tracking_options.extend(self.user_defined_options)
         self.three_dim_tracking_options.extend(self.user_defined_options)
-        self.selected_tracking_dropdown = DropDownMenu(self.animal_settings_frm, "Body-part config", Options.CLASSICAL_TRACKING_OPTIONS.value, "25", com=self.update_img)
-        self.selected_tracking_dropdown.setChoices(self.classical_tracking_options[0])
+
+        self.selected_tracking_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=Options.CLASSICAL_TRACKING_OPTIONS.value, label='BODY-PART CONFIGURATION: ', label_width=35, dropdown_width=35, value=self.classical_tracking_options[0], command=self.update_img)
         self.img_lbl = Label(self.animal_settings_frm, image=self.bp_lu[self.classical_tracking_options[0]]["img"], font=Formats.FONT_REGULAR.value)
-
         reset_btn = SimbaButton(parent=self.animal_settings_frm, txt="RESET USER DEFINED POSE-CONFIGS", txt_clr='red', img='clean', cmd=PoseResetterPopUp)
-        run_frm = Frame(master=self.settings_frm)
 
+        run_frm = CreateLabelFrameWithIcon(parent=self.create_project_tab, header="CREATE PROJECT CONFIG", icon_name='create', icon_link=Links.CREATE_PROJECT.value)
         create_project_btn = SimbaButton(parent=run_frm, txt="CREATE PROJECT CONFIG", txt_clr='navy', img='create', font=Formats.FONT_HEADER.value, cmd=self.run)
 
         self.settings_frm.grid(row=0, column=0, sticky=NW)
-        self.general_settings_frm.grid(row=0, column=0, sticky=NW)
+        self.general_settings_frm.grid(row=0, column=0, sticky=NW, pady=5)
         self.project_dir_select.grid(row=0, column=0, sticky=NW)
         self.project_name_eb.grid(row=1, column=0, sticky=NW)
         self.file_type_dropdown.grid(row=2, column=0, sticky=NW)
 
-        self.ml_settings_frm.grid(row=1, column=0, sticky=NW)
-        self.clf_cnt.grid(row=0, column=0, sticky=NW)
-        add_clf_btn.grid(row=1, column=0, sticky=NW)
+        self.ml_settings_frm.grid(row=1, column=0, sticky=NW, pady=5)
+        self.clf_cnt_dropdown.grid(row=0, column=0, sticky=NW)
 
-        self.animal_settings_frm.grid(row=2, column=0, sticky=NW)
+        self.animal_settings_frm.grid(row=2, column=0, sticky=NW, pady=5)
         self.tracking_type_dropdown.grid(row=0, column=0, sticky=NW)
         self.selected_tracking_dropdown.grid(row=1, column=0, sticky=NW)
         self.img_lbl.grid(row=2, column=0, sticky=NW)
@@ -142,19 +137,25 @@ class ProjectCreatorPopUp(PopUpMixin):
         self.update_body_part_dropdown(Methods.CLASSIC_TRACKING.value)
         self.main_frm.mainloop()
 
+    def __create_entry_boxes(self, cnt):
+        for entry in self.clf_entry_boxes:
+            entry.destroy()
+        self.clf_entry_boxes = []
+        for clf_cnt in range(int(cnt)):
+            entry = Entry_Box(parent=self.ml_settings_frm, fileDescription=f'CLASSIFIER NAME {clf_cnt + 1}: ', labelwidth=35, entry_box_width=35)
+            entry.grid(row=clf_cnt + 2, column=0, sticky=NW)
+            self.clf_entry_boxes.append(entry)
+
     def update_body_part_dropdown(self, selected_value):
         self.selected_tracking_dropdown.destroy()
         if selected_value == Methods.MULTI_TRACKING.value:
-            self.selected_tracking_dropdown = DropDownMenu(self.animal_settings_frm, "Body-part config", self.multi_tracking_options, "25", com=self.update_img)
-            self.selected_tracking_dropdown.setChoices(self.multi_tracking_options[0])
+            self.selected_tracking_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=self.multi_tracking_options, label='BODY-PART CONFIGURATION: ', label_width=35, dropdown_width=35, value=self.multi_tracking_options[0], command=self.update_img)
             self.selected_tracking_dropdown.grid(row=1, column=0, sticky=NW)
         elif selected_value == Methods.CLASSIC_TRACKING.value:
-            self.selected_tracking_dropdown = DropDownMenu(self.animal_settings_frm, "Body-part config", self.classical_tracking_options, "25", com=self.update_img)
-            self.selected_tracking_dropdown.setChoices(self.classical_tracking_options[0])
+            self.selected_tracking_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=self.classical_tracking_options, label='BODY-PART CONFIGURATION: ', label_width=35, dropdown_width=35, value=self.classical_tracking_options[0], command=self.update_img)
             self.selected_tracking_dropdown.grid(row=1, column=0, sticky=NW)
         elif selected_value == Methods.THREE_D_TRACKING.value:
-            self.selected_tracking_dropdown = DropDownMenu(self.animal_settings_frm, "Body-part config", self.three_dim_tracking_options,    "25",   com=self.update_img)
-            self.selected_tracking_dropdown.setChoices(self.three_dim_tracking_options[0])
+            self.selected_tracking_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=self.three_dim_tracking_options, label='BODY-PART CONFIGURATION: ', label_width=35, dropdown_width=35, value=self.three_dim_tracking_options[0], command=self.update_img)
             self.selected_tracking_dropdown.grid(row=1, column=0, sticky=NW)
         self.update_img(self.selected_tracking_dropdown.getChoices())
 
@@ -176,13 +177,10 @@ class ProjectCreatorPopUp(PopUpMixin):
         project_name = self.project_name_eb.entry_get
         check_str(name="PROJECT NAME", value=project_name, allow_blank=False)
         target_list = []
-        for number, entry_box in enumerate(self.clf_name_entries):
-            target_list.append(entry_box.entry_get.strip())
-        if len(list(set(target_list))) != len(self.clf_name_entries):
+        for number, entry_box in enumerate(self.clf_entry_boxes): target_list.append(entry_box.entry_get.strip())
+        if len(list(set(target_list))) != len(self.clf_entry_boxes):
             raise DuplicationError(msg="All classifier names have to be unique")
-
         selected_config = self.selected_tracking_dropdown.getChoices()
-
         if selected_config in self.bp_config_codes.keys():
             config_code = self.bp_config_codes[selected_config]
         else:
@@ -205,5 +203,5 @@ class ProjectCreatorPopUp(PopUpMixin):
         self.config_path = config_creator.config_path
         ImportPoseFrame(parent_frm=self.import_data_tab, idx_row=0, idx_column=0, config_path=self.config_path)
         ImportVideosFrame(parent_frm=self.import_videos_tab, config_path=self.config_path, idx_row=0, idx_column=0)
-
+#
 #ProjectCreatorPopUp()

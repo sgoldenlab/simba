@@ -196,6 +196,7 @@ class Entry_Box(Frame):
                  parent=None,
                  fileDescription="",
                  labelwidth="",
+                 label_bg_clr: Optional[str] = None,
                  status=None,
                  validation=None,
                  entry_box_width=None,
@@ -209,7 +210,7 @@ class Entry_Box(Frame):
         self.labelname = fileDescription
         Frame.__init__(self, master=parent, **kw)
         self.filePath = StringVar()
-        self.lblName = Label(self, text=fileDescription, width=labelwidth, anchor=W, font=Formats.FONT_REGULAR.value)
+        self.lblName = Label(self, text=fileDescription, width=labelwidth, anchor=W, font=Formats.FONT_REGULAR.value, bg=label_bg_clr)
         self.lblName.grid(row=0, column=0)
         if not entry_box_width:
             self.entPath = Entry(self, textvariable=self.filePath, state=self.status,  validate="key", validatecommand=self.validation_methods.get(validation, None), font=Formats.FONT_REGULAR.value, justify=justify)
@@ -243,6 +244,8 @@ class FolderSelect(Frame):
                  parent: Union[Frame, LabelFrame, Canvas, Toplevel],
                  folderDescription: Optional[str] = "",
                  color: Optional[str] = None,
+                 label_bg_clr: Optional[str] = None,
+                 font: Tuple = Formats.FONT_REGULAR.value,
                  title: Optional[str] = "",
                  lblwidth: Optional[int] = 0,
                  bg_clr: Optional[str] = 'white',
@@ -255,15 +258,15 @@ class FolderSelect(Frame):
         self.lblwidth = lblwidth if lblwidth is not None else 0
         self.parent = parent
         Frame.__init__(self, master=parent, **kw)
-        browse_icon = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS["browse"]["icon_path"]))
+        browse_icon = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS["browse_small"]["icon_path"]))
         self.folderPath = StringVar()
-        self.lblName = Label(self, text=folderDescription, fg=str(self.color), width=str(self.lblwidth), anchor=W, font=Formats.FONT_REGULAR.value)
-        self.lblName.grid(row=0, column=0, sticky=W)
-        self.entPath = Label(self, textvariable=self.folderPath, relief=SUNKEN, font=Formats.FONT_REGULAR.value, bg=bg_clr, width=entry_width)
-        self.entPath.grid(row=0, column=1)
-        self.btnFind = Button(self, text=Defaults.BROWSE_FOLDER_BTN_TEXT.value, compound="left", image=browse_icon, relief=RAISED, font=Formats.FONT_REGULAR.value, command=self.setFolderPath)
+        self.lblName = Label(self, text=folderDescription, fg=str(self.color), width=str(self.lblwidth), anchor=W, font=font, bg=label_bg_clr)
+        self.lblName.grid(row=0, column=0, sticky=NW)
+        self.entPath = Label(self, textvariable=self.folderPath, relief=SUNKEN, font=font, bg=bg_clr, width=entry_width)
+        self.entPath.grid(row=0, column=1, sticky=NW)
+        self.btnFind = Button(self, text=Defaults.BROWSE_FOLDER_BTN_TEXT.value, compound="left", image=browse_icon, relief=RAISED, font=font, command=self.setFolderPath)
         self.btnFind.image = browse_icon
-        self.btnFind.grid(row=0, column=2)
+        self.btnFind.grid(row=0, column=2, sticky=NW)
         self.folderPath.set("No folder selected")
 
     def setFolderPath(self):
@@ -551,6 +554,7 @@ class SimBADropDown(Frame):
                 label: Optional[str] = None,
                 label_width: Optional[int] = None,
                 label_font: tuple = Formats.FONT_REGULAR.value,
+                label_bg_clr: Optional[str] = None,
                 dropdown_font_size: Optional[int] = None,
                 justify: str = 'center',
                 dropdown_width: Optional[int] = None,
@@ -560,7 +564,7 @@ class SimBADropDown(Frame):
 
         super().__init__(master=parent)
         self.dropdown_var = StringVar()
-        self.dropdown_lbl = Label(self, text=label, width=label_width, anchor="w", font=label_font)
+        self.dropdown_lbl = Label(self, text=label, width=label_width, anchor="w", font=label_font, bg=label_bg_clr)
         self.dropdown_lbl.grid(row=0, column=0)
         self.dropdown_options = dropdown_options
         self.command = command

@@ -673,15 +673,15 @@ class MultiCropPopUp(PopUpMixin):
 class ChangeFpsSingleVideoPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="CHANGE FRAME RATE: SINGLE VIDEO", size=(500, 300), icon='fps')
-        self.video_path = FileSelect(self.main_frm, "VIDEO PATH:", title="Select a video file", lblwidth=15, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
-        self.new_fps_dropdown = DropDownMenu(self.main_frm, "NEW FPS:", list(range(1, 101, 1)), labelwidth=15)
-        self.new_fps_dropdown.setChoices(15)
-        gpu_cb, self.gpu_var = SimbaCheckbox(parent=self.main_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header='SETTINGS', icon_name='settings')
+        self.video_path = FileSelect(settings_frm, "VIDEO PATH:", title="Select a video file", lblwidth=15, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.new_fps_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 101, 1)), label='NEW FPS: ', label_width=15, dropdown_width=20, value=15)
+        gpu_cb, self.gpu_var = SimbaCheckbox(parent=settings_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+        settings_frm.grid(row=0, column=0, sticky=NW)
         self.video_path.grid(row=0, sticky=NW)
         self.new_fps_dropdown.grid(row=1, sticky=NW)
         gpu_cb.grid(row=2, sticky=NW)
         self.create_run_frm(run_function=self.run)
-        #self.main_frm.mainloop()
 
     def run(self):
         video_path = self.video_path.file_path
@@ -693,14 +693,15 @@ class ChangeFpsSingleVideoPopUp(PopUpMixin):
             FrameRangeWarning(msg=f'For video {video_name}, the new FPS ({new_fps}) is higher or the same as the original FPS ({video_meta_data["fps"]})', source=self.__class__.__name__)
         threading.Thread(change_single_video_fps(file_path=video_path, fps=new_fps, gpu=gpu)).start()
 
-
 class ChangeFpsMultipleVideosPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="CHANGE FRAME RATE: MULTIPLE VIDEO", size=(500, 300), icon='fps')
-        self.directory_path = FolderSelect(self.main_frm, "VIDEO DIRECTORY PATH:", title="Select folder with videos: ", lblwidth="25")
-        self.new_fps_dropdown = DropDownMenu(self.main_frm, "NEW FPS:", list(range(1, 101, 1)), labelwidth=25)
-        self.new_fps_dropdown.setChoices(15)
-        gpu_cb, self.gpu_var = SimbaCheckbox(parent=self.main_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header='SETTINGS', icon_name='settings')
+        self.directory_path = FolderSelect(settings_frm, "VIDEO DIRECTORY PATH:", title="Select folder with videos: ", lblwidth="25")
+
+        self.new_fps_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 101, 1)), label='NEW FPS: ', label_width=25, dropdown_width=20, value=15)
+        gpu_cb, self.gpu_var = SimbaCheckbox(parent=settings_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+        settings_frm.grid(row=0, column=0, sticky=NW)
         self.directory_path.grid(row=0, sticky=NW)
         self.new_fps_dropdown.grid(row=1, sticky=NW)
         gpu_cb.grid(row=2, sticky=NW)
