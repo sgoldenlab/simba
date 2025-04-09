@@ -148,12 +148,8 @@ class Formats(Enum):
     H5 = "h5"
     ROOT_WINDOW_SIZE = "750x750"
     FONT = cv2.FONT_HERSHEY_TRIPLEX
-    BUTTON_WIDTH_XS = 75
-    BUTTON_WIDTH_S = 100
-    BUTTON_WIDTH_L = 275
-    BUTTON_WIDTH_XL = 300
-    BUTTON_WIDTH_XXL = 325
     LABELFRAME_GREY = '#DCDCDC'
+    BTN_HOVER_CLR = '#d1e0e0'
     if (platform.system() == OS.MAC.value):
         FONT_SMALL = ('Poppins Regular', 10)
         FONT_REGULAR = ('Poppins Regular', 13)
@@ -163,6 +159,11 @@ class Formats(Enum):
         FONT_LARGE = ('Poppins Regular', 15, "bold")
         FONT_LARGE_ITALICS = ('Poppins Regular', 15, "italic")
         FONT_PLAYWRITE = ('Playwrite ES Deco', 8)
+        BUTTON_WIDTH_XS = 105
+        BUTTON_WIDTH_S = 135
+        BUTTON_WIDTH_L = 310
+        BUTTON_WIDTH_XL = 370
+        BUTTON_WIDTH_XXL = 380
     elif (platform.system() == OS.WINDOWS.value):
         FONT_SMALL = ('Poppins Regular', 6)
         FONT_REGULAR = ('Poppins Regular', 8)
@@ -172,6 +173,11 @@ class Formats(Enum):
         FONT_LARGE = ('Poppins Regular', 13, "bold")
         FONT_LARGE_ITALICS = ('Poppins Regular', 13, "italic")
         FONT_PLAYWRITE = ('Playwrite ES Deco', 8)
+        BUTTON_WIDTH_XS = 75
+        BUTTON_WIDTH_S = 100
+        BUTTON_WIDTH_L = 275
+        BUTTON_WIDTH_XL = 300
+        BUTTON_WIDTH_XXL = 325
     else:
         FONT_SMALL = ('DejaVu Sans', 6)
         FONT_REGULAR = ('DejaVu Sans', 8)
@@ -180,6 +186,11 @@ class Formats(Enum):
         FONT_HEADER = ('DejaVu Sans', 10, "bold")
         FONT_LARGE = ('DejaVu Sans', 13, "bold")
         FONT_LARGE_ITALICS = ('DejaVu Sans', 13, "italic")
+        BUTTON_WIDTH_XS = 105
+        BUTTON_WIDTH_S = 135
+        BUTTON_WIDTH_L = 310
+        BUTTON_WIDTH_XL = 340
+        BUTTON_WIDTH_XXL = 360
     DLC_NETWORK_FILE_NAMES = [
         "dlc_resnet50",
         "dlc_resnet_50",

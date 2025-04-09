@@ -21,8 +21,7 @@ from simba.pose_importers.sleap_csv_importer import SLEAPImporterCSV
 from simba.pose_importers.sleap_h5_importer import SLEAPImporterH5
 from simba.pose_importers.sleap_slp_importer import SLEAPImporterSLP
 from simba.pose_importers.trk_importer import TRKImporter
-from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
-                                        FolderSelect)
+from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect, FolderSelect, SimBADropDown, CreateLabelFrameWithIcon)
 from simba.utils.checks import check_instance, check_int, check_str
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Options
 from simba.utils.errors import InvalidInputError
@@ -71,14 +70,13 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
         check_int(name=f'{self.__class__.__name__} idx_row', value=idx_row, min_value=0)
         check_int(name=f'{self.__class__.__name__} idx_column', value=idx_column, min_value=0)
 
-        self.import_tracking_frm = LabelFrame(parent_frm, text="IMPORT TRACKING DATA", font=Formats.FONT_HEADER.value, fg="black")
+        self.import_tracking_frm = CreateLabelFrameWithIcon(parent=parent_frm, header="IMPORT TRACKING DATA", relief='solid', icon_name='pose')
         self.import_tracking_frm.grid(row=0, column=0, sticky=NW)
         if config_path is None:
             Label(self.import_tracking_frm, text="Please CREATE PROJECT CONFIG before importing tracking data \n", font=Formats.FONT_REGULAR.value).grid(row=0, column=0, sticky=NW)
         else:
             ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
-            self.data_type_dropdown = DropDownMenu(self.import_tracking_frm, "DATA TYPE:", Options.IMPORT_TYPE_OPTIONS.value, labelwidth=25, com=self.create_import_menu)
-            self.data_type_dropdown.setChoices(Options.IMPORT_TYPE_OPTIONS.value[0])
+            self.data_type_dropdown = SimBADropDown(parent=self.import_tracking_frm, dropdown_options=Options.IMPORT_TYPE_OPTIONS.value, label="DATA TYPE: ", label_width=25, command=self.create_import_menu, dropdown_width=25, value=Options.IMPORT_TYPE_OPTIONS.value[0])
             self.data_type_dropdown.grid(row=0, column=0, sticky=NW)
 
             self.create_import_menu(data_type_choice=Options.IMPORT_TYPE_OPTIONS.value[0])
@@ -212,16 +210,15 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
         self.choice_frm = Frame(self.import_tracking_frm)
         self.choice_frm.grid(row=1, column=0, sticky=NW)
         self.animal_name_entry_boxes = None
-        self.interpolation_frm = LabelFrame(self.choice_frm, text="INTERPOLATION METHOD", pady=5, padx=5,font=Formats.FONT_HEADER.value)
-        self.interpolation_dropdown = DropDownMenu(self.interpolation_frm, "Interpolation method: ", Options.INTERPOLATION_OPTIONS_W_NONE.value, "25")
-        self.interpolation_dropdown.setChoices(Options.INTERPOLATION_OPTIONS_W_NONE.value[0])
+
+        self.interpolation_frm = CreateLabelFrameWithIcon(parent=self.choice_frm, header="INTERPOLATION METHOD", pady=5, padx=5,font=Formats.FONT_HEADER.value, icon_name='fill', relief='groove')
+        self.interpolation_dropdown = SimBADropDown(parent=self.interpolation_frm, dropdown_options=Options.INTERPOLATION_OPTIONS_W_NONE.value, label='INTERPOLATION METHOD: ', label_width=25, dropdown_width=35, value=Options.INTERPOLATION_OPTIONS_W_NONE.value[0])
         self.interpolation_frm.grid(row=0, column=0, sticky=NW)
         self.interpolation_dropdown.grid(row=0, column=0, sticky=NW)
 
-        self.smoothing_frm = LabelFrame(self.choice_frm, text="SMOOTHING METHOD", font=Formats.FONT_HEADER.value, pady=5, padx=5)
-        self.smoothing_dropdown = DropDownMenu(self.smoothing_frm, "Smoothing", Options.SMOOTHING_OPTIONS_W_NONE.value, "25", com=self.__show_smoothing_entry_box_from_dropdown)
-        self.smoothing_dropdown.setChoices(Options.SMOOTHING_OPTIONS_W_NONE.value[0])
-        self.smoothing_time_eb = Entry_Box(self.smoothing_frm, "Smoothing period (milliseconds):", labelwidth="25", width=10,  validation="numeric")
+        self.smoothing_frm = CreateLabelFrameWithIcon(parent=self.choice_frm, header="SMOOTHING METHOD", pady=5, padx=5, font=Formats.FONT_HEADER.value, icon_name='smooth', relief='groove')
+        self.smoothing_dropdown = SimBADropDown(parent=self.smoothing_frm, dropdown_options=Options.SMOOTHING_OPTIONS_W_NONE.value, label='SMOOTHING: ', label_width=25, dropdown_width=35, value=Options.SMOOTHING_OPTIONS_W_NONE.value[0], command=self.__show_smoothing_entry_box_from_dropdown)
+        self.smoothing_time_eb = Entry_Box(self.smoothing_frm, "SMOOTHING PERIOD (MS):", labelwidth=30,  validation="numeric", entry_box_width=10)
         self.smoothing_frm.grid(row=1, column=0, sticky=NW)
         self.smoothing_dropdown.grid(row=0, column=0, sticky=NW)
 

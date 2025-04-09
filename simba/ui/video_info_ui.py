@@ -89,7 +89,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
             self.videos[video_name]["video_height_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=height, entry_box_width=20, justify='center', validation='numeric')
             self.videos[video_name]["video_known_distance_eb"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=distance, entry_box_width=20, justify='center')
             #self.videos[video_name]["find_dist_btn"] = Button(self.video_frm, text="CALCULATE DISTANCE", fg="black", command=lambda k=video_name: self._initate_find_distance(k))
-            self.videos[video_name]["find_dist_btn"] = SimbaButton(parent=self.video_frm, txt="CALCULATE DISTANCE", txt_clr='black', img='calipher', font=Formats.FONT_HEADER.value, cmd=lambda k=video_name: self._initate_find_distance(k))
+            self.videos[video_name]["find_dist_btn"] = SimbaButton(parent=self.video_frm, txt="CALCULATE DISTANCE", txt_clr='black', img='calipher', font=Formats.FONT_HEADER.value, cmd=lambda k=video_name: self._initate_find_distance(k), hover_font=Formats.FONT_HEADER.value)
             self.videos[video_name]["video_px_per_mm"] = Entry_Box(parent=self.video_frm, fileDescription='', labelwidth=0, value=pixels_per_mm, entry_box_width=20, justify='center')
             self.videos[video_name]["video_idx_lbl"].grid(row=cnt+2, column=0, sticky=NW)
             self.videos[video_name]["video_name_lbl"].grid(row=cnt+2, column=1, sticky=NW)

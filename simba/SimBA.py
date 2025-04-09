@@ -286,37 +286,37 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         smooth_btn = SimbaButton(parent=further_methods_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="SMOOTH POSE IN SIMBA PROJECT", txt_clr='blue', compound='right', img='wand_blue', font=Formats.FONT_REGULAR.value, cmd=SmoothingPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         egocentric_align_btn = SimbaButton(parent=further_methods_frm, width=Formats.BUTTON_WIDTH_XL.value, txt="EGOCENTRICALLY ALIGN POSE AND VIDEO", txt_clr='blue', compound='right', img='mouse_small', font=Formats.FONT_REGULAR.value, cmd=EgocentricAlignPopUp, cmd_kwargs={'config_path': lambda: self.config_path})
 
-        label_setscale = CreateLabelFrameWithIcon(parent=tab3, header="VIDEO PARAMETERS (FPS, RESOLUTION, PPX/MM ....)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_PARAMETERS.value)
-        self.distance_in_mm_eb = Entry_Box(label_setscale, "KNOWN DISTANCE (MILLIMETERS)", "35", validation="numeric")
+        label_setscale = CreateLabelFrameWithIcon(parent=tab3, header="VIDEO PARAMETERS (FPS, RESOLUTION, PPX/MM ....)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_PARAMETERS.value, padx=10, pady=10, relief='solid')
+        self.distance_in_mm_eb = Entry_Box(label_setscale, "KNOWN DISTANCE (MILLIMETERS): ",  labelwidth=35, validation="numeric", entry_box_width=35)
         button_setdistanceinmm = SimbaButton(parent=label_setscale, txt="AUTO-POPULATE", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.set_distance_mm)
 
         button_setscale = SimbaButton(parent=label_setscale, txt="CONFIGURE VIDEO PARAMETERS", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.create_video_info_table, img='calipher')
-        self.new_ROI_frm = CreateLabelFrameWithIcon(parent=tab6, header="SIMBA ROI INTERFACE", icon_name='shapes_small', icon_link=Links.ROI.value, bg='#DCDCDC', padx=5)
+        self.new_ROI_frm = CreateLabelFrameWithIcon(parent=tab6, header="SIMBA ROI INTERFACE", icon_name='shapes_small', icon_link=Links.ROI.value, bg='#DCDCDC', padx=5, pady=5)
         self.start_new_ROI = SimbaButton(parent=self.new_ROI_frm, width=Formats.BUTTON_WIDTH_L.value, txt="DEFINE ROIs", txt_clr='green', font=Formats.FONT_REGULAR.value, img='roi', cmd=ROIVideoTable, cmd_kwargs={'config_path': lambda:self.config_path})
 
         self.delete_all_ROIs = SimbaButton(parent=self.new_ROI_frm, width=Formats.BUTTON_WIDTH_L.value, txt="DELETE ALL ROI DEFINITIONS", txt_clr='red', font=Formats.FONT_REGULAR.value, img='trash', cmd=delete_all_rois_pop_up, cmd_kwargs={'config_path': lambda:self.config_path})
-        self.new_ROI_frm.grid(row=0, sticky=NW, padx=10)
+        self.new_ROI_frm.grid(row=0, sticky=NW, padx=10, pady=10)
         self.start_new_ROI.grid(row=0, sticky=NW)
         self.delete_all_ROIs.grid(row=1, column=0, sticky=NW)
 
-        self.roi_draw = CreateLabelFrameWithIcon(parent=tab6, header="ANALYZE ROI DATA", icon_name='magnifying', icon_link=Links.ROI.value, bg='#DCDCDC', padx=5)
+        self.roi_draw = CreateLabelFrameWithIcon(parent=tab6, header="ANALYZE ROI DATA", icon_name='magnifying', icon_link=Links.ROI.value, bg='#DCDCDC', padx=5, pady=5)
         analyze_roi_btn = SimbaButton(parent=self.roi_draw, width=Formats.BUTTON_WIDTH_L.value, txt="ANALYZE ROI DATA: AGGREGATES", txt_clr='green', img='shapes_small', font=Formats.FONT_REGULAR.value, cmd=ROIAggregateDataAnalyzerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
         analyze_roi_time_bins_btn = SimbaButton(parent=self.roi_draw, width=Formats.BUTTON_WIDTH_L.value, txt="ANALYZE ROI DATA: TIME-BINS", txt_clr='blue', img='clock', font=Formats.FONT_REGULAR.value, cmd=ROIAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
-        self.roi_draw.grid(row=0, column=1, sticky=N, padx=10)
+        self.roi_draw.grid(row=0, column=1, sticky=N, padx=10, pady=10)
         analyze_roi_btn.grid(row=0, sticky="NW")
         analyze_roi_time_bins_btn.grid(row=1, sticky="NW")
 
-        self.roi_draw1 = CreateLabelFrameWithIcon(parent=tab6, header="VISUALIZE ROI DATA", icon_name='eye', icon_link=Links.ROI.value, bg='#DCDCDC', padx=5)
+        self.roi_draw1 = CreateLabelFrameWithIcon(parent=tab6, header="VISUALIZE ROI DATA", icon_name='eye', icon_link=Links.ROI.value, bg='#DCDCDC', padx=5, pady=5)
         visualizeROI = SimbaButton(parent=self.roi_draw1, width=Formats.BUTTON_WIDTH_L.value, txt="VISUALIZE ROI TRACKING", txt_clr='green', img='visualize_green', font=Formats.FONT_REGULAR.value, cmd=VisualizeROITrackingPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         visualizeROIfeature = SimbaButton(parent=self.roi_draw1, width=Formats.BUTTON_WIDTH_L.value, txt="VISUALIZE ROI FEATURES", txt_clr='blue', img='visualize_blue', font=Formats.FONT_REGULAR.value, cmd=VisualizeROIFeaturesPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
         ##organize
-        self.roi_draw1.grid(row=0, column=2, sticky=N, padx=10)
+        self.roi_draw1.grid(row=0, column=2, sticky=N, padx=10, pady=10)
         visualizeROI.grid(row=0, sticky="NW")
         visualizeROIfeature.grid(row=1, sticky="NW")
 
-        processmovementdupLabel = CreateLabelFrameWithIcon(parent=tab6, header="OTHER ANALYSES / VISUALIZATIONS", icon_name='list', icon_link=Links.ROI.value, bg='#DCDCDC', padx=5)
+        processmovementdupLabel = CreateLabelFrameWithIcon(parent=tab6, header="OTHER ANALYSES / VISUALIZATIONS", icon_name='list', icon_link=Links.ROI.value, bg='#DCDCDC', padx=5, pady=5)
         analyze_distances_velocity_btn = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_L.value, txt="ANALYZE DISTANCES / VELOCITY: AGGREGATES", img='metrics_green', txt_clr='green', font=Formats.FONT_REGULAR.value, cmd=MovementAnalysisPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         analyze_distances_velocity_timebins_btn = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_L.value, txt="ANALYZE DISTANCES / VELOCITY: TIME-BINS", img='metrics_blue', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=MovementAnalysisTimeBinsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         heatmaps_location_button = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_L.value, txt="CREATE LOCATION HEATMAPS", txt_clr='red', img='heatmap', font=Formats.FONT_REGULAR.value, cmd=HeatmapLocationPopup, cmd_kwargs={'config_path': lambda:self.config_path})
@@ -330,7 +330,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         btn_agg_boolean_conditional_statistics = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_L.value, txt="AGGREGATE BOOLEAN CONDITIONAL STATISTICS", img='details', txt_clr='grey', font=Formats.FONT_REGULAR.value, cmd=BooleanConditionalSlicerPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         spontaneous_alternation_pop_up_btn = SimbaButton(parent=processmovementdupLabel, width=Formats.BUTTON_WIDTH_L.value, txt="SPONTANEOUS ALTERNATION", img='t', txt_clr='navy', font=Formats.FONT_REGULAR.value, cmd=SpontaneousAlternationPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
-        processmovementdupLabel.grid(row=0, column=3, sticky=NW, padx=10)
+        processmovementdupLabel.grid(row=0, column=3, sticky=NW, padx=10, pady=10)
         analyze_distances_velocity_btn.grid(row=0, sticky=NW)
         heatmaps_location_button.grid(row=1, sticky=NW)
         analyze_distances_velocity_timebins_btn.grid(row=2, sticky=NW)
@@ -518,7 +518,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         smooth_btn.grid(row=8, column=0, sticky=NW)
         egocentric_align_btn.grid(row=9, column=0, sticky=NW)
 
-        label_setscale.grid(row=0, sticky=NW, pady=5, padx=5)
+        label_setscale.grid(row=0, sticky=NW, pady=20, padx=20)
         self.distance_in_mm_eb.grid(row=0, column=0, sticky=NW)
         button_setdistanceinmm.grid(row=0, column=1, sticky=NW)
         button_setscale.grid(row=1, column=0, sticky=NW)
@@ -977,7 +977,7 @@ class App(object):
         y_sb.config(command=self.txt.yview)
         self.txt.config(state=DISABLED, font=Formats.FONT_REGULAR.value)
 
-        clear_txt_btn = SimbaButton(parent=self.frame, txt=" CLEAR", txt_clr='blue', img='clean', cmd=self.clean_txt, font=Formats.FONT_HEADER.value)
+        clear_txt_btn = SimbaButton(parent=self.frame, txt=" CLEAR", txt_clr='blue', img='clean', cmd=self.clean_txt, font=Formats.FONT_HEADER.value, anchor='center', hover_font=Formats.FONT_HEADER.value)
         clear_txt_btn.pack(side=BOTTOM, fill=X)
         sys.stdout = StdRedirector(self.txt)
 

@@ -5,14 +5,11 @@ from typing import Optional, Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (DropDownMenu, FileSelect, FolderSelect,
-                                        SimbaButton, SimbaCheckbox)
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists, check_instance, check_int)
+from simba.ui.tkinter_functions import (DropDownMenu, FileSelect, FolderSelect, SimbaButton, SimbaCheckbox, CreateLabelFrameWithIcon, SimBADropDown)
+from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists, check_instance, check_int)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import InvalidInputError
-from simba.utils.read_write import (copy_multiple_videos_to_project,
-                                    copy_single_video_to_project)
+from simba.utils.read_write import (copy_multiple_videos_to_project, copy_single_video_to_project)
 
 
 class ImportVideosFrame(PopUpMixin, ConfigReader):
@@ -48,23 +45,22 @@ class ImportVideosFrame(PopUpMixin, ConfigReader):
         check_int(name=f'{ImportVideosFrame} idx_row', value=idx_row, min_value=0)
         check_int(name=f'{ImportVideosFrame} idx_column', value=idx_column, min_value=0)
 
-        import_videos_frm = LabelFrame(parent_frm, text="IMPORT VIDEOS", fg="black", font=Formats.FONT_HEADER.value)
+        import_videos_frm = CreateLabelFrameWithIcon(parent=parent_frm, header="IMPORT VIDEOS", icon_name='import', relief='solid', padx=5, pady=5)
         if config_path is None:
             Label(import_videos_frm, text="Please CREATE PROJECT CONFIG before importing VIDEOS \n", font=Formats.FONT_REGULAR.value).grid(row=0, column=0, sticky=NW)
             import_videos_frm.grid(row=0, column=0, sticky=NW)
         else:
             ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
-            import_multiple_videos_frm = LabelFrame(import_videos_frm, text="IMPORT MULTIPLE VIDEOS", font=Formats.FONT_HEADER.value)
-            self.video_directory_select = FolderSelect(import_multiple_videos_frm, "VIDEO DIRECTORY: ", lblwidth=25)
-            self.video_type = DropDownMenu(import_multiple_videos_frm, "VIDEO FILE FORMAT: ", Options.VIDEO_FORMAT_OPTIONS.value, "25")
-            self.video_type.setChoices(Options.VIDEO_FORMAT_OPTIONS.value[0])
+            import_multiple_videos_frm = CreateLabelFrameWithIcon(parent=import_videos_frm, header="IMPORT MULTIPLE VIDEOS", icon_name='stack')
+            self.video_directory_select = FolderSelect(import_multiple_videos_frm, "VIDEO DIRECTORY: ", lblwidth=25, entry_width=25)
 
+            self.video_type = SimBADropDown(parent=import_multiple_videos_frm, dropdown_options=Options.VIDEO_FORMAT_OPTIONS.value, label="VIDEO FILE FORMAT: ", label_width=25, dropdown_width=25, value=Options.VIDEO_FORMAT_OPTIONS.value[0])
             import_multiple_btn = SimbaButton(parent=import_multiple_videos_frm, txt="Import MULTIPLE videos", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.__run_video_import, cmd_kwargs={"multiple_videos": lambda: True})
 
             multiple_videos_symlink_cb, self.multiple_videos_symlink_var = SimbaCheckbox(parent=import_multiple_videos_frm, txt="Import SYMLINKS", txt_img='link')
 
-            import_single_frm = LabelFrame(import_videos_frm, text="IMPORT SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5)
-            self.video_file_select = FileSelect(import_single_frm, "VIDEO PATH: ", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+            import_single_frm = CreateLabelFrameWithIcon(parent=import_videos_frm, header="IMPORT SINGLE VIDEO", icon_name='video')
+            self.video_file_select = FileSelect(import_single_frm, "VIDEO PATH: ", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], entry_width=25)
             import_single_btn = SimbaButton(parent=import_single_frm, txt="Import SINGLE video", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.__run_video_import, cmd_kwargs={"multiple_videos": lambda: False})
             single_video_symlink_cb, self.single_video_symlink_var = SimbaCheckbox(parent=import_single_frm, txt="Import SYMLINKS", txt_img='link')
 

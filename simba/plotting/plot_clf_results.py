@@ -16,13 +16,13 @@ from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_keys_exist_in_dict, check_int,
                                 check_valid_boolean,
-                                check_video_and_data_frm_count_align)
+                                check_video_and_data_frm_count_align, check_that_column_exist)
 from simba.utils.data import create_color_palette
 from simba.utils.enums import ConfigKey, Dtypes, Formats, TagNames, TextOptions
-from simba.utils.errors import NoSpecifiedOutputError
+from simba.utils.errors import NoSpecifiedOutputError, InvalidInputError, NoDataError
 from simba.utils.printing import log_event, stdout_success
-from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
-                                    read_config_entry, read_df)
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_config_entry, read_df, find_all_videos_in_project)
+from simba.utils.warnings import FrameRangeWarning
 
 CIRCLE_SCALE = 'circle_scale'
 FONT_SIZE = 'font_size'
@@ -31,6 +31,7 @@ TEXT_THICKNESS = 'text_thickness'
 TEXT_SETTING_KEYS = ['circle_scale', 'font_size', 'spacing_scale', 'text_thickness']
 CENTER_BP_TXT = ['centroid', 'center']
 
+FOURCC = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
 
 class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin):
     """
@@ -69,161 +70,143 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
 
     def __init__(self,
                  config_path: Union[str, os.PathLike],
-                 video_setting: Optional[bool] = True,
-                 frame_setting: Optional[bool] = False,
-                 text_settings: Optional[Union[Dict[str, float], bool]] = False,
-                 video_file_path: Optional[List] = None,
-                 palette: Optional[str] = 'Set1',
-                 rotate: Optional[bool] = False,
-                 print_timers: Optional[bool] = True):
+                 video_setting: bool = True,
+                 frame_setting: bool = False,
+                 video_paths: Optional[Union[List[Union[str, os.PathLike]], Union[str, os.PathLike]]] = None,
+                 palette: str = 'Set1',
+                 rotate: bool = False,
+                 animal_names: bool = False,
+                 show_pose: bool = True,
+                 font_size: Optional[Union[int, float]] = None,
+                 space_size: Optional[Union[int, float]] = None,
+                 text_opacity: Optional[Union[int, float]] = None,
+                 text_thickness: Optional[Union[int, float]] = None,
+                 circle_size: Optional[Union[int, float]] = None,
+                 print_timers: bool = True):
 
         ConfigReader.__init__(self, config_path=config_path)
         TrainModelMixin.__init__(self)
         PlottingMixin.__init__(self)
         log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
-        if not isinstance(text_settings, (bool)) and text_settings != None:
-            check_if_keys_exist_in_dict(data=text_settings, key=TEXT_SETTING_KEYS)
-        for i in [video_setting, frame_setting, rotate, print_timers]:
+        for i in [video_setting, frame_setting, rotate, print_timers, animal_names, show_pose]:
             check_valid_boolean(value=i, source=self.__class__.__name__, raise_error=True)
         if (not video_setting) and (not frame_setting):
             raise NoSpecifiedOutputError(msg="Please choose to create a video and/or frames. SimBA found that you ticked neither video and/or frames", source=self.__class__.__name__)
-        self.video_file_path, self.print_timers, self.text_settings = (video_file_path, print_timers, text_settings)
-        self.video_setting, self.frame_setting = video_setting, frame_setting
-        if video_file_path is not None:
-            check_file_exist_and_readable(os.path.join(self.video_dir, video_file_path))
+        if font_size is not None: check_float(name=f'{self.__class__.__name__} font_size', value=font_size, min_value=0.1)
+        if space_size is not None: check_float(name=f'{self.__class__.__name__} space_size', value=space_size, min_value=0.1)
+        if text_thickness is not None: check_float(name=f'{self.__class__.__name__} text_thickness', value=text_thickness, min_value=0.1)
+        if circle_size is not None: check_float(name=f'{self.__class__.__name__} text_thickness', value=circle_size, min_value=0.1)
+        if circle_size is not None: check_float(name=f'{self.__class__.__name__} text_thickness', value=circle_size, min_value=0.1)
+        if text_opacity is not None: check_float(name=f'{self.__class__.__name__} text_opacity', value=text_opacity, min_value=0.1)
+
+        self.video_paths, self.print_timers = video_paths, print_timers
+        if self.video_paths is None:
+            self.video_paths = find_all_videos_in_project(videos_dir=self.video_dir)
+            if len(self.video_paths) == 0:
+                raise NoDataError(msg=f'Cannot create classification videos. No videos exist in {self.video_dir} directory', source=self.__class__.__name__)
+        self.video_setting, self.frame_setting, self.rotate, self.text_opacity = video_setting, frame_setting, rotate, text_opacity
+        self.circle_size, self.font_size, self.animal_names = circle_size, font_size, animal_names
+        self.text_thickness, self.space_size, self.show_pose = text_thickness, space_size, show_pose
+        self.pose_threshold = read_config_entry(self.config, ConfigKey.THRESHOLD_SETTINGS.value, ConfigKey.SKLEARN_BP_PROB_THRESH.value, Dtypes.FLOAT.value, 0.00)
         if not os.path.exists(self.sklearn_plot_dir):
             os.makedirs(self.sklearn_plot_dir)
-        self.pose_threshold = read_config_entry(self.config, ConfigKey.THRESHOLD_SETTINGS.value, ConfigKey.SKLEARN_BP_PROB_THRESH.value, Dtypes.FLOAT.value, 0.00)
         self.clr_lst = create_color_palette(pallete_name=palette, increments=self.clf_cnt)
-        self.files_found = glob.glob(self.machine_results_dir + "/*." + self.file_type)
-        self.model_dict = self.get_model_info(self.config, self.clf_cnt)
-        self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-        self.rotate = rotate
-        self.a = np.deg2rad(90)
-        print(f"Processing {str(len(self.files_found))} videos...")
+        if isinstance(self.video_paths, str): self.video_paths = [video_paths]
+        elif isinstance(self.video_paths, list): self.video_paths = video_paths
+        else:
+            raise InvalidInputError(msg=f'video_paths has to be a path of a list of paths. Got {type(video_paths)}', source=self.__class__.__name__)
+        for video_path in self.video_paths:
+            video_name = get_fn_ext(filepath=video_path)[1]
+            data_path = os.path.join(self.machine_results_dir, f'{video_name}.{self.file_type}')
+            if not os.path.isfile(data_path): raise NoDataError(msg=f'Cannot create classification videos for {video_name}. Expected classification data at location {data_path} but file does not exist', source=self.__class__.__name__)
+
 
     def __get_print_settings(self):
-        if (self.text_settings is False) or (self.text_settings is None):
-            img_width, img_height = self.video_meta_data["width"], self.video_meta_data["height"]
-            longest_str = max(['TIMERS:', 'ENSEMBLE PREDICTION:'] + self.clf_names, key=len)
-            self.font_size, _, self.spacing_scale = self.get_optimal_font_scales(text=longest_str, accepted_px_width=int(img_width / 3), accepted_px_height=int(img_width / 10), text_thickness=2)
-            self.circle_scale = self.get_optimal_circle_size(frame_size=(img_width, img_height), circle_frame_ratio=100)
-            self.text_thickness = TextOptions.TEXT_THICKNESS.value
-        else:
-            check_float(name="TEXT SIZE", value=self.text_settings[FONT_SIZE])
-            check_int(name="SPACE SIZE", value=self.text_settings[SPACE_SCALE])
-            check_int(name="TEXT THICKNESS", value=self.text_settings[TEXT_THICKNESS])
-            check_int(name="CIRCLE SIZE", value=self.text_settings[CIRCLE_SCALE])
-            self.font_size = float(self.text_settings[FONT_SIZE])
-            self.spacing_scale = int(self.text_settings[SPACE_SCALE])
-            self.text_thickness = int(self.text_settings[TEXT_THICKNESS])
-            self.circle_scale = int(self.text_settings[CIRCLE_SCALE])
+        self.video_text_thickness = TextOptions.TEXT_THICKNESS.value if self.text_thickness is None else int(max(self.text_thickness, 1))
+        longest_str = str(max(['TIMERS:', 'ENSEMBLE PREDICTION:'] + self.clf_names, key=len))
+        optimal_font_size, _, optimal_spacing_scale = self.get_optimal_font_scales(text=longest_str, accepted_px_width=int(self.video_meta_data["width"] / 3), accepted_px_height=int(self.video_meta_data["height"] / 10), text_thickness=self.video_text_thickness)
+        optimal_circle_size = self.get_optimal_circle_size(frame_size=(self.video_meta_data["width"], self.video_meta_data["height"]), circle_frame_ratio=100)
+        self.video_circle_size = optimal_circle_size if self.circle_size is None else int(self.circle_size)
+        self.video_font_size = optimal_font_size if self.font_size is None else self.font_size
+        self.video_space_size = optimal_spacing_scale if self.space_size is None else int(max(self.space_size, 1))
+        self.video_text_opacity = 0.8 if self.text_opacity is None else float(self.text_opacity)
 
-    def create_visualizations(self):
-        _, self.video_name, _ = get_fn_ext(self.file_path)
-        self.data_df = read_df(self.file_path, self.file_type).reset_index(drop=True).fillna(0)
-        self.video_settings, _, self.fps = self.read_video_info(video_name=self.video_name)
-        self.video_path = self.find_video_of_file(self.video_dir, self.video_name)
-        self.cap = cv2.VideoCapture(self.video_path)
-        self.save_path = os.path.join(self.sklearn_plot_dir, self.video_name + ".mp4")
-        self.video_meta_data = get_video_meta_data(self.video_path)
-        height, width = deepcopy(self.video_meta_data["height"]), deepcopy(self.video_meta_data["width"])
-        if self.frame_setting:
-            self.video_frame_dir = os.path.join(self.sklearn_plot_dir, self.video_name)
-            if not os.path.exists(self.video_frame_dir):
-                os.makedirs(self.video_frame_dir)
-        if self.rotate:
-            self.video_meta_data["height"], self.video_meta_data["width"] = (width, height)
-        self.writer = cv2.VideoWriter(self.save_path, self.fourcc, self.fps, (self.video_meta_data["width"], self.video_meta_data["height"]))
-        self.__get_print_settings()
-        self.video_model_dict = deepcopy(self.model_dict)
-        for model in self.video_model_dict:
-            self.video_model_dict[model]["time"] = 0
-        check_video_and_data_frm_count_align(video=self.cap, data=self.data_df, name=self.video_name, raise_error=False)
+    def run(self):
+        for video_cnt, video_path in enumerate(self.video_paths):
+            _, self.video_name, _ = get_fn_ext(video_path)
+            self.data_path = os.path.join(self.machine_results_dir, f'{self.video_name}.{self.file_type}')
+            self.data_df = read_df(self.data_path, self.file_type).reset_index(drop=True).fillna(0)
+            if self.show_pose: check_that_column_exist(df=self.data_df, column_name=self.bp_col_names, file_name=self.data_path)
+            self.video_meta_data = get_video_meta_data(video_path=video_path)
+            height, width = deepcopy(self.video_meta_data["height"]), deepcopy(self.video_meta_data["width"])
+            self.save_path = os.path.join(self.sklearn_plot_dir, f"{self.video_name}.mp4")
+            if self.frame_setting:
+                self.video_frame_dir = os.path.join(self.sklearn_plot_dir, self.video_name)
+                if not os.path.exists(self.video_frame_dir): os.makedirs(self.video_frame_dir)
+            if self.rotate:
+                self.video_meta_data["height"], self.video_meta_data["width"] = (width, height)
+            self.clf_timers = {k: 0 for k in self.clf_names}
+            check_video_and_data_frm_count_align(video=video_path, data=self.data_df, name=self.video_name, raise_error=False)
+            check_that_column_exist(df=self.data_df, column_name=list(self.clf_timers.keys()), file_name=self.data_path)
+            self.writer = cv2.VideoWriter(self.save_path, FOURCC, self.video_meta_data['fps'], (self.video_meta_data["width"], self.video_meta_data["height"]))
+            self.__get_print_settings()
+            self.cap = cv2.VideoCapture(video_path)
 
-        row_n = 0
-        while self.cap.isOpened():
-            ret, self.frame = self.cap.read()
-            try:
+            frm_idx = 0
+            while self.cap.isOpened():
+                ret, self.frame = self.cap.read()
                 if ret:
-                    self.id_flag_cords = {}
                     for animal_name, animal_data in self.animal_bp_dict.items():
-                        animal_clr = animal_data["colors"]
-                        ID_flag = False
-                        for bp_no in range(len(animal_data["X_bps"])):
-                            bp_clr = animal_clr[bp_no]
-                            x_bp, y_bp = (animal_data["X_bps"][bp_no], animal_data["Y_bps"][bp_no])
-                            p_bp = x_bp[:-2] + "_p"
-                            bp_cords = self.data_df.loc[row_n, [x_bp, y_bp, p_bp]]
-                            if bp_cords[p_bp] > self.pose_threshold:
-                                cv2.circle(self.frame, (int(bp_cords[x_bp]), int(bp_cords[y_bp])), 0, bp_clr, self.circle_scale)
-                                if ("centroid" in x_bp.lower()) or ("center" in x_bp.lower()):
-                                    self.id_flag_cords[animal_name] = (int(bp_cords[x_bp]), int(bp_cords[y_bp]))
-                                    ID_flag = True
-                        if not ID_flag:
-                            self.id_flag_cords[animal_name] = (int(bp_cords[x_bp]), int(bp_cords[y_bp]))
-
-                    for animal_name, animal_cords in self.id_flag_cords.items():
-                        cv2.putText(self.frame, animal_name, animal_cords, self.font, self.font_size, self.animal_bp_dict[animal_name]["colors"][0], self.text_thickness)
+                        animal_clrs = animal_data["colors"]
+                        if self.show_pose:
+                            for bp_no in range(len(animal_data["X_bps"])):
+                                x_bp, y_bp, p_bp = (animal_data["X_bps"][bp_no], animal_data["Y_bps"][bp_no], animal_data["P_bps"][bp_no])
+                                bp_cords = self.data_df.loc[frm_idx, [x_bp, y_bp, p_bp]]
+                                if bp_cords[p_bp] >= self.pose_threshold:
+                                    self.frame = cv2.circle(self.frame, (int(bp_cords[x_bp]), int(bp_cords[y_bp])), self.video_circle_size, animal_clrs[bp_no], -1)
+                        if self.animal_names:
+                            x_bp, y_bp, p_bp = (animal_data["X_bps"][0], animal_data["Y_bps"][0], animal_data["P_bps"][0])
+                            bp_cords = self.data_df.loc[frm_idx, [x_bp, y_bp, p_bp]]
+                            cv2.putText(self.frame, animal_name, (int(bp_cords[x_bp]), int(bp_cords[y_bp])), self.font, self.video_font_size, self.animal_bp_dict[animal_name]["colors"][0], self.video_text_thickness)
                     if self.rotate:
                         self.frame = np.array(Image.fromarray(self.frame).rotate(90, Image.BICUBIC, expand=True))
                     if self.print_timers:
-                        self.frame = PlottingMixin().put_text(img=self.frame, text="TIMERS:", pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.spacing_scale)), font_size=self.font_size, font_thickness=self.text_thickness, font=self.font)
+                        self.frame = PlottingMixin().put_text(img=self.frame, text="TIMERS:", pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.video_space_size)), font_size=self.video_font_size, font_thickness=self.video_text_thickness, font=self.font, text_bg_alpha=self.video_text_opacity)
                     self.add_spacer = 2
-                    for model_no, model_info in self.video_model_dict.items():
-                        frame_results = self.data_df.loc[row_n, model_info["model_name"]]
-                        self.video_model_dict[model_no]["frame_results"] = frame_results
-                        self.video_model_dict[model_no]["time"] += (frame_results / self.fps)
+                    for clf_name, clf_time in self.clf_timers.items():
+                        frame_results = self.data_df.loc[frm_idx, clf_name]
+                        self.clf_timers[clf_name] += (frame_results / self.video_meta_data['fps'])
                         if self.print_timers:
-                            self.frame = PlottingMixin().put_text(img=self.frame, text=model_info["model_name"] + " " + str(round(self.video_model_dict[model_no]["time"], 2)), pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.spacing_scale * self.add_spacer)), font_size=self.font_size, font_thickness=self.text_thickness, font=self.font)
+                            self.frame = PlottingMixin().put_text(img=self.frame, text=f"{clf_name} {round(self.clf_timers[clf_name], 2)}", pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.video_space_size * self.add_spacer)), font_size=self.video_font_size, font_thickness=self.video_text_thickness, font=self.font, text_bg_alpha=self.video_text_opacity)
                             self.add_spacer += 1
-                    self.frame = PlottingMixin().put_text(img=self.frame, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.spacing_scale * self.add_spacer)), font_size=self.font_size, font_thickness=self.text_thickness, font=self.font)
+                    self.frame = PlottingMixin().put_text(img=self.frame, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.video_space_size * self.add_spacer)), font_size=self.video_font_size, font_thickness=self.video_text_thickness, font=self.font, text_bg_alpha=self.video_text_opacity)
                     self.add_spacer += 1
-                    for model_cnt, model_info in self.video_model_dict.items():
-                        if self.video_model_dict[model_cnt]["frame_results"] == 1:
-                            self.frame = PlottingMixin().put_text(img=self.frame, text=model_info["model_name"], pos=(TextOptions.BORDER_BUFFER_Y.value, (self.video_meta_data["height"] - self.video_meta_data["height"]) + self.spacing_scale * self.add_spacer), font_size=self.font_size, font_thickness=self.text_thickness, font=self.font, text_color=TextOptions.COLOR.value)
+                    for clf_name, clf_time in self.clf_timers.items():
+                        if self.data_df.loc[frm_idx, clf_name] == 1:
+                            self.frame = PlottingMixin().put_text(img=self.frame, text=clf_name, pos=(TextOptions.BORDER_BUFFER_Y.value, (self.video_meta_data["height"] - self.video_meta_data["height"]) + self.video_space_size * self.add_spacer), font_size=self.video_font_size, font_thickness=self.video_text_thickness, font=self.font, text_color=TextOptions.COLOR.value, text_bg_alpha=self.video_text_opacity)
                             self.add_spacer += 1
                     if self.video_setting:
-                        self.writer.write(self.frame)
+                        self.writer.write(self.frame.astype(np.uint8))
                     if self.frame_setting:
-                        frame_save_name = os.path.join(self.video_frame_dir, str(row_n) + ".png")
+                        frame_save_name = os.path.join(self.video_frame_dir, f"{frm_idx}.png")
                         cv2.imwrite(frame_save_name, self.frame)
-                    print(f'Frame: {row_n} / {self.video_meta_data["frame_count"]}. Video: {self.video_name} ({self.file_cnt + 1}/{len(self.files_found)})')
-                    row_n += 1
+                    frm_idx += 1
+                    print(f'Frame: {frm_idx} / {self.video_meta_data["frame_count"]}. Video: {self.video_name} ({video_cnt + 1}/{len(self.video_paths)})')
                 else:
-                    print(f"Video {self.video_name} saved...")
-                    self.cap.release()
-                    self.writer.release()
-            except KeyError as e:
-                print(e.args, e)
-                print("SIMBA INDEX WARNING: Some frames appears to be missing in the dataframe and could not be created")
-                print(f"Video {self.video_name} saved...")
-                self.cap.release()
-                self.writer.release()
-
-    def run(self):
-        if self.video_file_path is None:
-            for file_cnt, file_path in enumerate(self.files_found):
-                self.file_cnt, self.file_path = file_cnt, file_path
-                self.create_visualizations()
-        else:
-            self.file_cnt, file_path = 0, self.video_file_path
-            _, file_name, _ = get_fn_ext(file_path)
-            self.file_path = os.path.join(self.machine_results_dir, file_name + f".{self.file_type}")
-            self.files_found = [self.file_path]
-            check_file_exist_and_readable(self.file_path)
-            self.create_visualizations()
+                    FrameRangeWarning(msg=f'Could not read frame {frm_idx} in video {video_path}. Stoping video creation.')
+                    break
+            print(f"Video {self.video_name} saved at {self.save_path}...")
+            self.cap.release()
+            self.writer.release()
 
         self.timer.stop_timer()
-        stdout_success(msg=f"All visualizations created in {self.sklearn_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+        stdout_success(msg=f"{len(self.video_paths)} visualization(s) created in {self.sklearn_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
-
-# text_settings = {'circle_scale': 5, 'font_size': 5, 'spacing_scale': 2, 'text_thickness': 10}
-# test = PlotSklearnResultsSingleCore(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
-#                                       video_setting=True,
-#                                       frame_setting=False,
-#                                       video_file_path='Together_1.avi',
-#                                       print_timers=True,
-#                                       text_settings=None,
-#                                       rotate=False)
+# test = PlotSklearnResultsSingleCore(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini",
+#                                     video_setting=True,
+#                                     frame_setting=False,
+#                                     video_paths=r"C:\troubleshooting\RAT_NOR\project_folder\videos\03152021_NOB_IOT_8.mp4",
+#                                     print_timers=True,
+#                                     rotate=True,
+#                                     animal_names=True)
 # test.run()

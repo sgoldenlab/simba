@@ -128,69 +128,6 @@ class DropDownMenu(Frame):
         self.popupMenu.configure(state="disable")
 
 
-class FileSelect(Frame):
-    def __init__(self,
-                 parent=None,
-                 fileDescription="",
-                 color=None,
-                 title=None,
-                 lblwidth=None,
-                 file_types=None,
-                 bg_clr: Optional[str] = 'white',
-                 dropdown: DropDownMenu = None,
-                 entry_width: Optional[int] = 20,
-                 initialdir: Optional[Union[str, os.PathLike]] = None, **kw):
-
-        self.title, self.dropdown, self.initialdir = title, dropdown, initialdir
-        self.file_type = file_types
-        self.color = color if color is not None else "black"
-        self.lblwidth = lblwidth if lblwidth is not None else 0
-        self.parent = parent
-        Frame.__init__(self, master=parent, **kw)
-        browse_icon = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS["browse"]["icon_path"]))
-        self.filePath = StringVar()
-        self.lblName = Label(self, text=fileDescription, fg=str(self.color), width=str(self.lblwidth), anchor=W, font=Formats.FONT_REGULAR.value)
-        self.lblName.grid(row=0, column=0, sticky=W)
-        self.entPath = Label(self, textvariable=self.filePath, relief=SUNKEN, font=Formats.FONT_REGULAR.value, bg=bg_clr, width=entry_width)
-        self.entPath.grid(row=0, column=1)
-        self.btnFind = Button(self, text=Defaults.BROWSE_FILE_BTN_TEXT.value, compound="left", image=browse_icon, relief=RAISED, command=self.setFilePath, font=Formats.FONT_REGULAR.value)
-        self.btnFind.image = browse_icon
-        self.btnFind.grid(row=0, column=2)
-        self.filePath.set(Defaults.NO_FILE_SELECTED_TEXT.value)
-
-    def setFilePath(self):
-        if self.initialdir is not None:
-            if not os.path.isdir(self.initialdir):
-                self.initialdir = None
-            else:
-                pass
-
-        if self.file_type:
-            file_selected = askopenfilename(title=self.title, parent=self.parent, filetypes=self.file_type, initialdir=self.initialdir)
-        else:
-            file_selected = askopenfilename(title=self.title, parent=self.parent, initialdir=self.initialdir)
-        if file_selected:
-            if self.dropdown is not None:
-                _, name, _ = get_fn_ext(filepath=file_selected)
-                self.dropdown.setChoices(name)
-                self.filePath.set(name)
-            else:
-                self.filePath.set(file_selected)
-            self.entPath.configure(width=len(file_selected)+10)
-
-        else:
-            self.filePath.set(Defaults.NO_FILE_SELECTED_TEXT.value)
-            self.entPath.configure(width=len(Defaults.NO_FILE_SELECTED_TEXT.value) + 10)
-
-    @property
-    def file_path(self):
-        return self.filePath.get()
-
-    def set_state(self, setstatus):
-        self.entPath.config(state=setstatus)
-        self.btnFind["state"] = setstatus
-
-
 class Entry_Box(Frame):
     def __init__(self,
                  parent=None,
@@ -434,8 +371,10 @@ class TwoOptionQuestionPopUp(object):
 def SimbaButton(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                 txt: str,
                 txt_clr: Optional[str] = 'black',
-                bg_clr: Optional[str] = None,
+                bg_clr: Optional[str] = '#f0f0f0',
                 active_bg_clr: Optional[str] = None,
+                hover_bg_clr: Optional[str] = Formats.BTN_HOVER_CLR.value,
+                hover_font: Optional[Tuple] = Formats.FONT_REGULAR_BOLD.value,
                 font: Optional[Tuple] = Formats.FONT_REGULAR.value,
                 width: Optional[int] = None,
                 height: Optional[int] = None,
@@ -444,7 +383,13 @@ def SimbaButton(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                 cmd: Optional[Callable] = None,
                 cmd_kwargs: Optional[Dict[Any, Any]] = None,
                 enabled: Optional[bool] = True,
+                anchor: str = 'w',
                 thread: Optional[bool] = False) -> Button:
+    def on_enter(e):
+        e.widget.config(bg=hover_bg_clr, font=hover_font)
+
+    def on_leave(e):
+        e.widget.config(bg=bg_clr, font=font)
 
     if isinstance(img, str):
         img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS[img]["icon_path"]))
@@ -474,6 +419,7 @@ def SimbaButton(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                  activebackground=active_bg_clr,
                  font=font,
                  bg=bg_clr,
+                 anchor=anchor,
                  command=command)
 
     if img is not None:
@@ -484,6 +430,10 @@ def SimbaButton(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
         btn.config(height=height)
     if not enabled:
         btn.config(state=DISABLED)
+
+    if hover_bg_clr is not None:
+        btn.bind("<Enter>", on_enter)
+        btn.bind("<Leave>", on_leave)
 
     return btn
 
@@ -630,6 +580,74 @@ class DropDownMenu(Frame):
         self.popupMenu.configure(state="normal")
     def disable(self):
         self.popupMenu.configure(state="disable")
+
+
+
+class FileSelect(Frame):
+    def __init__(self,
+                 parent=None,
+                 fileDescription="",
+                 color=None,
+                 title=None,
+                 lblwidth=None,
+                 file_types=None,
+                 bg_clr: Optional[str] = 'white',
+                 dropdown: Union[DropDownMenu, SimBADropDown] = None,
+                 entry_width: Optional[int] = 20,
+                 initialdir: Optional[Union[str, os.PathLike]] = None,
+                 initial_path: Optional[Union[str, os.PathLike]] = None, **kw):
+
+        self.title, self.dropdown, self.initialdir = title, dropdown, initialdir
+        self.file_type = file_types
+        self.color = color if color is not None else "black"
+        self.lblwidth = lblwidth if lblwidth is not None else 0
+        self.parent = parent
+        Frame.__init__(self, master=parent, **kw)
+        browse_icon = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS["browse"]["icon_path"]))
+        self.filePath = StringVar()
+        self.lblName = Label(self, text=fileDescription, fg=str(self.color), width=str(self.lblwidth), anchor=W, font=Formats.FONT_REGULAR.value)
+        self.lblName.grid(row=0, column=0, sticky=W)
+        self.entPath = Label(self, textvariable=self.filePath, relief=SUNKEN, font=Formats.FONT_REGULAR.value, bg=bg_clr, width=entry_width)
+        self.entPath.grid(row=0, column=1)
+        self.btnFind = Button(self, text=Defaults.BROWSE_FILE_BTN_TEXT.value, compound="left", image=browse_icon, relief=RAISED, command=self.setFilePath, font=Formats.FONT_REGULAR.value)
+        self.btnFind.image = browse_icon
+        self.btnFind.grid(row=0, column=2)
+        self.filePath.set(Defaults.NO_FILE_SELECTED_TEXT.value)
+        if initial_path is not None:
+            self.filePath.set(initial_path)
+
+
+    def setFilePath(self):
+        if self.initialdir is not None:
+            if not os.path.isdir(self.initialdir):
+                self.initialdir = None
+            else:
+                pass
+
+        if self.file_type:
+            file_selected = askopenfilename(title=self.title, parent=self.parent, filetypes=self.file_type, initialdir=self.initialdir)
+        else:
+            file_selected = askopenfilename(title=self.title, parent=self.parent, initialdir=self.initialdir)
+        if file_selected:
+            if self.dropdown is not None:
+                _, name, _ = get_fn_ext(filepath=file_selected)
+                self.dropdown.setChoices(name)
+                self.filePath.set(name)
+            else:
+                self.filePath.set(file_selected)
+            self.entPath.configure(width=len(file_selected)+10)
+
+        else:
+            self.filePath.set(Defaults.NO_FILE_SELECTED_TEXT.value)
+            self.entPath.configure(width=len(Defaults.NO_FILE_SELECTED_TEXT.value) + 10)
+
+    @property
+    def file_path(self):
+        return self.filePath.get()
+
+    def set_state(self, setstatus):
+        self.entPath.config(state=setstatus)
+        self.btnFind["state"] = setstatus
 
 
 
