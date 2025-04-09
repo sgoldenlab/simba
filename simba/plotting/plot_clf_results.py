@@ -15,13 +15,16 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_keys_exist_in_dict, check_int,
-                                check_valid_boolean,
-                                check_video_and_data_frm_count_align, check_that_column_exist)
+                                check_that_column_exist, check_valid_boolean,
+                                check_video_and_data_frm_count_align)
 from simba.utils.data import create_color_palette
 from simba.utils.enums import ConfigKey, Dtypes, Formats, TagNames, TextOptions
-from simba.utils.errors import NoSpecifiedOutputError, InvalidInputError, NoDataError
+from simba.utils.errors import (InvalidInputError, NoDataError,
+                                NoSpecifiedOutputError)
 from simba.utils.printing import log_event, stdout_success
-from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_config_entry, read_df, find_all_videos_in_project)
+from simba.utils.read_write import (find_all_videos_in_project, get_fn_ext,
+                                    get_video_meta_data, read_config_entry,
+                                    read_df)
 from simba.utils.warnings import FrameRangeWarning
 
 CIRCLE_SCALE = 'circle_scale'

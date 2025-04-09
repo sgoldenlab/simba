@@ -21,7 +21,9 @@ from simba.pose_importers.sleap_csv_importer import SLEAPImporterCSV
 from simba.pose_importers.sleap_h5_importer import SLEAPImporterH5
 from simba.pose_importers.sleap_slp_importer import SLEAPImporterSLP
 from simba.pose_importers.trk_importer import TRKImporter
-from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect, FolderSelect, SimBADropDown, CreateLabelFrameWithIcon)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, FileSelect, FolderSelect,
+                                        SimBADropDown)
 from simba.utils.checks import check_instance, check_int, check_str
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Options
 from simba.utils.errors import InvalidInputError

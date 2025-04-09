@@ -5,7 +5,7 @@ import multiprocessing
 import os
 import platform
 from copy import deepcopy
-from typing import Dict, Optional, Tuple, Union, List
+from typing import Dict, List, Optional, Tuple, Union
 
 import cv2
 import numpy as np
@@ -14,14 +14,23 @@ import pandas as pd
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.checks import (check_float, check_valid_boolean, check_that_column_exist, check_video_and_data_frm_count_align, check_int, check_nvidea_gpu_available)
+from simba.utils.checks import (check_float, check_int,
+                                check_nvidea_gpu_available,
+                                check_that_column_exist, check_valid_boolean,
+                                check_video_and_data_frm_count_align)
 from simba.utils.data import create_color_palette
 from simba.utils.enums import ConfigKey, Dtypes, TagNames, TextOptions
-from simba.utils.errors import NoSpecifiedOutputError, NoDataError, InvalidInputError
+from simba.utils.errors import (InvalidInputError, NoDataError,
+                                NoSpecifiedOutputError)
 from simba.utils.lookups import get_current_time
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder, find_all_videos_in_project, find_core_cnt, get_fn_ext, get_video_meta_data, read_config_entry, read_df, create_directory)
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    create_directory,
+                                    find_all_videos_in_project, find_core_cnt,
+                                    get_fn_ext, get_video_meta_data,
+                                    read_config_entry, read_df)
 from simba.utils.warnings import FrameRangeWarning
+
 
 def _multiprocess_sklearn_video(data: pd.DataFrame,
                                 bp_dict: dict,
