@@ -330,16 +330,19 @@ class PlottingMixin(object):
         )
 
     def make_gantt_plot(self,
-                        data_df: pd.DataFrame,
                         bouts_df: pd.DataFrame,
                         clf_names: List[str],
+                        palette: List[Tuple[int, int, int]],
                         fps: int,
-                        style_attr: dict,
+                        x_length: int,
                         video_name: str,
+                        width: int = 640,
+                        height: int = 480,
+                        font_size: int = 8,
+                        font_rotation: int = 45,
                         save_path: Optional[str] = None) -> Union[None, np.ndarray]:
 
         video_timer = SimbaTimer(start=True)
-        colours = get_named_colors()
         colour_tuple_x = list(np.arange(3.5, 203.5, 5))
         fig, ax = plt.subplots()
         for i, event in enumerate(bouts_df.groupby("Event")):
@@ -347,16 +350,16 @@ class PlottingMixin(object):
                 if event[0] == x:
                     ix = clf_names.index(x)
                     data_event = event[1][["Start_time", "Bout_time"]]
-                    ax.broken_barh(data_event.values, (colour_tuple_x[ix], 3), facecolors=colours[ix])
+                    ax.broken_barh(data_event.values, (colour_tuple_x[ix], 3), facecolors=palette[ix])
 
-        x_ticks_locs = x_lbls = np.round(np.linspace(0, len(data_df) / fps, 6))
+        x_ticks_locs = x_lbls = np.round(np.linspace(0, x_length / fps, 6))
         ax.set_xticks(x_ticks_locs)
         ax.set_xticklabels(x_lbls)
         ax.set_ylim(0, colour_tuple_x[len(clf_names)])
         ax.set_yticks(np.arange(5, 5 * len(clf_names) + 1, 5))
-        ax.set_yticklabels(clf_names, rotation=style_attr["font rotation"])
-        ax.tick_params(axis="both", labelsize=style_attr["font size"])
-        plt.xlabel("Session (s)", fontsize=style_attr["font size"] + 3)
+        ax.set_yticklabels(clf_names, rotation=font_rotation)
+        ax.tick_params(axis="both", labelsize=font_size)
+        plt.xlabel("SESSION TIME (S)", fontsize=font_size + 3)
         ax.yaxis.grid(True)
         buffer_ = io.BytesIO()
         plt.savefig(buffer_, format="png")
@@ -364,7 +367,7 @@ class PlottingMixin(object):
         image = PIL.Image.open(buffer_)
         ar = np.asarray(image)
         open_cv_image = cv2.cvtColor(ar, cv2.COLOR_RGB2BGR)
-        open_cv_image = cv2.resize(open_cv_image, (style_attr["width"], style_attr["height"]))
+        open_cv_image = cv2.resize(open_cv_image, (width, height))
         frame = np.uint8(open_cv_image)
         buffer_.close()
         plt.close('all')

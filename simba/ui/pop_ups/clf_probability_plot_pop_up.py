@@ -143,5 +143,5 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
 
 
 
-#_ = VisualizeClassificationProbabilityPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+_ = VisualizeClassificationProbabilityPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
 #_ = VisualizeClassificationProbabilityPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Two_animals_16bps/project_folder/project_config.ini')
