@@ -15,14 +15,14 @@ from simba.utils.checks import check_float, check_nvidea_gpu_available
 from simba.utils.enums import Formats, Links, Options
 from simba.utils.errors import NoFilesFoundError, NoSpecifiedOutputError
 from simba.utils.read_write import find_all_videos_in_directory, find_video_of_file, str_2_bool
+from simba.utils.lookups import get_color_dict
 
 AUTO = 'AUTO'
-TEXT_SIZE_OPTIONS = list(range(1, 36))
+TEXT_SIZE_OPTIONS = list(range(1, 101))
 TEXT_SIZE_OPTIONS.insert(0, 'AUTO')
 
 OPACITY_OPTIONS = list(np.arange(0.1, 1.1, 0.1))
 OPACITY_OPTIONS = [round(x, 1) for x in OPACITY_OPTIONS]
-OPACITY_OPTIONS.insert(0, 'AUTO')
 
 class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
 
@@ -41,6 +41,8 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
             raise NoFilesFoundError(msg=f'Cannot create classification videos: No data files found in {self.machine_results_dir} directory', source=self.__class__.__name__)
         self.max_len = max(len(s) for s in self.video_lst)
         gpu_available = check_nvidea_gpu_available()
+        self.clr_dict = get_color_dict()
+        pose_palettes = Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value
 
         PopUpMixin.__init__(self, title="VISUALIZE CLASSIFICATION (SKLEARN) RESULTS", icon='photos')
         bp_threshold_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BODY-PART VISUALIZATION THRESHOLD", icon_name='threshold', icon_link=Links.SKLEARN_PLOTS.value, padx=5, pady=5, relief='solid')
@@ -57,7 +59,10 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.text_spacing_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=TEXT_SIZE_OPTIONS, label='TEXT SPACING: ', label_width=40, dropdown_width=15, value='AUTO')
         self.text_thickness_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=TEXT_SIZE_OPTIONS, label='TEXT THICKNESS: ', label_width=40, dropdown_width=15, value='AUTO')
         self.circle_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=TEXT_SIZE_OPTIONS, label='CIRCLE SIZE: ', label_width=40, dropdown_width=15, value='AUTO')
-        self.text_opacity_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=OPACITY_OPTIONS, label='TEXT OPACITY: ', label_width=40, dropdown_width=15, value='AUTO')
+        self.text_opacity_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=OPACITY_OPTIONS, label='TEXT OPACITY: ', label_width=40, dropdown_width=15, value=0.8)
+        self.text_clr_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(self.clr_dict.keys()), label='TEXT COLOR: ', label_width=40, dropdown_width=15, value='White')
+        self.bg_clr_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(self.clr_dict.keys()), label='TEXT BACKGROUND COLOR: ', label_width=40, dropdown_width=15, value='Black')
+        self.tracking_clr_palette_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=pose_palettes, label='TRACKING COLOR PALETTE: ', label_width=40, dropdown_width=15, value='Set1')
 
         self.style_settings_frm.grid(row=1, column=0, sticky=NW)
         self.text_size_dropdown.grid(row=0, column=0, sticky=NW)
@@ -65,6 +70,9 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.text_thickness_dropdown.grid(row=2, column=0, sticky=NW)
         self.circle_size_dropdown.grid(row=3, column=0, sticky=NW)
         self.text_opacity_dropdown.grid(row=4, column=0, sticky=NW)
+        self.text_clr_dropdown.grid(row=5, column=0, sticky=NW)
+        self.bg_clr_dropdown.grid(row=6, column=0, sticky=NW)
+        self.tracking_clr_palette_dropdown.grid(row=7, column=0, sticky=NW)
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VISUALIZATION SETTINGS",  icon_name='eye', icon_link=Links.SKLEARN_PLOTS.value, padx=5,  pady=5, relief='solid')
         self.multiprocess_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt+1)), label='CPU CORES: ', label_width=40, dropdown_width=15, value=int(self.cpu_cnt/2))
@@ -122,7 +130,10 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         circle_size = float(self.circle_size_dropdown.get_value())  if self.circle_size_dropdown.get_value() != AUTO else None
         space_size = float(self.text_spacing_dropdown.get_value()) if self.text_spacing_dropdown.get_value() != AUTO else None
         text_thickness = float(self.text_thickness_dropdown.get_value()) if self.text_thickness_dropdown.get_value() != AUTO else None
-        text_opacity = float(self.text_opacity_dropdown.get_value()) if self.text_opacity_dropdown.get_value() != AUTO else None
+        text_opacity = float(self.text_opacity_dropdown.get_value())
+        text_clr = self.clr_dict[self.text_clr_dropdown.get_value()]
+        text_bg_clr = self.clr_dict[self.bg_clr_dropdown.get_value()]
+        pose_palette = self.tracking_clr_palette_dropdown.get_value()
         show_pose, show_animal_names = self.show_pose_var.get(), self.show_animal_names_var.get()
         gpu = str_2_bool(self.gpu_dropdown.get_value())
         core_cnt = int(self.multiprocess_dropdown.get_value())
@@ -149,7 +160,10 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
                                                    circle_size=circle_size,
                                                    show_pose=show_pose,
                                                    animal_names=show_animal_names,
-                                                   text_opacity=text_opacity)
+                                                   text_opacity=text_opacity,
+                                                   text_clr=text_clr,
+                                                   text_bg_clr=text_bg_clr,
+                                                   pose_palette=pose_palette)
 
         else:
             plotter = PlotSklearnResultsMultiProcess(config_path=self.config_path,
@@ -166,7 +180,10 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
                                                      show_pose=show_pose,
                                                      animal_names=show_animal_names,
                                                      text_opacity=text_opacity,
-                                                     gpu=gpu)
+                                                     text_clr=text_clr,
+                                                     text_bg_clr=text_bg_clr,
+                                                     gpu=gpu,
+                                                     pose_palette=pose_palette)
 
         plotter.run()
 

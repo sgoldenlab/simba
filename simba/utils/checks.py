@@ -624,11 +624,16 @@ def check_if_valid_rgb_str(
         return rgb
 
 
-def check_if_valid_rgb_tuple(data: Tuple[int, int, int], raise_error: bool = True) -> bool:
+def check_if_valid_rgb_tuple(data: Tuple[int, int, int],
+                             raise_error: bool = True,
+                             source: Optional[str] = None) -> bool:
     check_instance(source=check_if_valid_rgb_tuple.__name__, instance=data, accepted_types=tuple, raise_error=raise_error)
     check_iterable_length(source=check_if_valid_rgb_tuple.__name__, val=len(data), exact_accepted_length=3, raise_error=raise_error)
     for i in range(len(data)):
-        check_int(name="RGB value", value=data[i], max_value=255, min_value=0, raise_error=raise_error)
+        if source is None:
+            check_int(name="RGB value", value=data[i], max_value=255, min_value=0, raise_error=raise_error)
+        else:
+            check_int(name=f"RGB value {source}", value=data[i], max_value=255, min_value=0, raise_error=raise_error)
     return True
 
 

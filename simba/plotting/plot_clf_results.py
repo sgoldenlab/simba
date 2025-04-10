@@ -4,7 +4,7 @@ __author__ = "Simon Nilsson"
 import glob
 import os
 from copy import deepcopy
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, Tuple
 
 import cv2
 import numpy as np
@@ -13,12 +13,9 @@ from PIL import Image
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_keys_exist_in_dict, check_int,
-                                check_valid_boolean,
-                                check_video_and_data_frm_count_align, check_that_column_exist)
+from simba.utils.checks import (check_float, check_if_valid_rgb_tuple, check_valid_boolean, check_video_and_data_frm_count_align, check_that_column_exist, check_str)
 from simba.utils.data import create_color_palette
-from simba.utils.enums import ConfigKey, Dtypes, Formats, TagNames, TextOptions
+from simba.utils.enums import ConfigKey, Dtypes, Formats, TagNames, TextOptions, Options
 from simba.utils.errors import NoSpecifiedOutputError, InvalidInputError, NoDataError
 from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_config_entry, read_df, find_all_videos_in_project)
@@ -73,7 +70,6 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
                  video_setting: bool = True,
                  frame_setting: bool = False,
                  video_paths: Optional[Union[List[Union[str, os.PathLike]], Union[str, os.PathLike]]] = None,
-                 palette: str = 'Set1',
                  rotate: bool = False,
                  animal_names: bool = False,
                  show_pose: bool = True,
@@ -82,7 +78,10 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
                  text_opacity: Optional[Union[int, float]] = None,
                  text_thickness: Optional[Union[int, float]] = None,
                  circle_size: Optional[Union[int, float]] = None,
-                 print_timers: bool = True):
+                 pose_palette: Optional[str] = 'Set1',
+                 print_timers: bool = True,
+                 text_clr: Tuple[int, int,int] = (255, 255, 255),
+                 text_bg_clr: Tuple[int, int,int] = (0, 0, 0)):
 
         ConfigReader.__init__(self, config_path=config_path)
         TrainModelMixin.__init__(self)
@@ -98,7 +97,9 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
         if circle_size is not None: check_float(name=f'{self.__class__.__name__} text_thickness', value=circle_size, min_value=0.1)
         if circle_size is not None: check_float(name=f'{self.__class__.__name__} text_thickness', value=circle_size, min_value=0.1)
         if text_opacity is not None: check_float(name=f'{self.__class__.__name__} text_opacity', value=text_opacity, min_value=0.1)
-
+        check_if_valid_rgb_tuple(data=text_bg_clr, source=f'{self.__class__.__name__} text_bg_clr')
+        check_if_valid_rgb_tuple(data=text_clr, source=f'{self.__class__.__name__} text_clr')
+        self.text_color, self.text_bg_color = text_clr, text_bg_clr
         self.video_paths, self.print_timers = video_paths, print_timers
         if self.video_paths is None:
             self.video_paths = find_all_videos_in_project(videos_dir=self.video_dir)
@@ -110,7 +111,9 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
         self.pose_threshold = read_config_entry(self.config, ConfigKey.THRESHOLD_SETTINGS.value, ConfigKey.SKLEARN_BP_PROB_THRESH.value, Dtypes.FLOAT.value, 0.00)
         if not os.path.exists(self.sklearn_plot_dir):
             os.makedirs(self.sklearn_plot_dir)
-        self.clr_lst = create_color_palette(pallete_name=palette, increments=self.clf_cnt)
+        pose_palettes = Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value
+        check_str(name=f'{self.__class__.__name__} pose_palette', value=pose_palette, options=pose_palettes)
+        self.clr_lst = create_color_palette(pallete_name=pose_palette, increments=len(self.body_parts_lst)+1)
         if isinstance(self.video_paths, str): self.video_paths = [video_paths]
         elif isinstance(self.video_paths, list): self.video_paths = video_paths
         else:
@@ -156,30 +159,31 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
             while self.cap.isOpened():
                 ret, self.frame = self.cap.read()
                 if ret:
+                    clr_cnt = 0
                     for animal_name, animal_data in self.animal_bp_dict.items():
-                        animal_clrs = animal_data["colors"]
                         if self.show_pose:
-                            for bp_no in range(len(animal_data["X_bps"])):
-                                x_bp, y_bp, p_bp = (animal_data["X_bps"][bp_no], animal_data["Y_bps"][bp_no], animal_data["P_bps"][bp_no])
+                            for bp_num in range(len(animal_data["X_bps"])):
+                                x_bp, y_bp, p_bp = (animal_data["X_bps"][bp_num], animal_data["Y_bps"][bp_num], animal_data["P_bps"][bp_num])
                                 bp_cords = self.data_df.loc[frm_idx, [x_bp, y_bp, p_bp]]
                                 if bp_cords[p_bp] >= self.pose_threshold:
-                                    self.frame = cv2.circle(self.frame, (int(bp_cords[x_bp]), int(bp_cords[y_bp])), self.video_circle_size, animal_clrs[bp_no], -1)
+                                    self.frame = cv2.circle(self.frame, (int(bp_cords[x_bp]), int(bp_cords[y_bp])), self.video_circle_size, self.clr_lst[clr_cnt], -1)
+                                clr_cnt+=1
                         if self.animal_names:
                             x_bp, y_bp, p_bp = (animal_data["X_bps"][0], animal_data["Y_bps"][0], animal_data["P_bps"][0])
                             bp_cords = self.data_df.loc[frm_idx, [x_bp, y_bp, p_bp]]
-                            cv2.putText(self.frame, animal_name, (int(bp_cords[x_bp]), int(bp_cords[y_bp])), self.font, self.video_font_size, self.animal_bp_dict[animal_name]["colors"][0], self.video_text_thickness)
+                            cv2.putText(self.frame, animal_name, (int(bp_cords[x_bp]), int(bp_cords[y_bp])), self.font, self.video_font_size, self.clr_lst[0], self.video_text_thickness)
                     if self.rotate:
                         self.frame = np.array(Image.fromarray(self.frame).rotate(90, Image.BICUBIC, expand=True))
                     if self.print_timers:
-                        self.frame = PlottingMixin().put_text(img=self.frame, text="TIMERS:", pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.video_space_size)), font_size=self.video_font_size, font_thickness=self.video_text_thickness, font=self.font, text_bg_alpha=self.video_text_opacity)
+                        self.frame = PlottingMixin().put_text(img=self.frame, text="TIMERS:", pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.video_space_size)), font_size=self.video_font_size, font_thickness=self.video_text_thickness, font=self.font, text_bg_alpha=self.video_text_opacity, text_color_bg=self.text_bg_color, text_color=self.text_color)
                     self.add_spacer = 2
                     for clf_name, clf_time in self.clf_timers.items():
                         frame_results = self.data_df.loc[frm_idx, clf_name]
                         self.clf_timers[clf_name] += (frame_results / self.video_meta_data['fps'])
                         if self.print_timers:
-                            self.frame = PlottingMixin().put_text(img=self.frame, text=f"{clf_name} {round(self.clf_timers[clf_name], 2)}", pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.video_space_size * self.add_spacer)), font_size=self.video_font_size, font_thickness=self.video_text_thickness, font=self.font, text_bg_alpha=self.video_text_opacity)
+                            self.frame = PlottingMixin().put_text(img=self.frame, text=f"{clf_name} {round(self.clf_timers[clf_name], 2)}", pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.video_space_size * self.add_spacer)), font_size=self.video_font_size, font_thickness=self.video_text_thickness, font=self.font, text_bg_alpha=self.video_text_opacity, text_color_bg=self.text_bg_color, text_color=self.text_color)
                             self.add_spacer += 1
-                    self.frame = PlottingMixin().put_text(img=self.frame, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.video_space_size * self.add_spacer)), font_size=self.video_font_size, font_thickness=self.video_text_thickness, font=self.font, text_bg_alpha=self.video_text_opacity)
+                    self.frame = PlottingMixin().put_text(img=self.frame, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.video_space_size * self.add_spacer)), font_size=self.video_font_size, font_thickness=self.video_text_thickness, font=self.font, text_bg_alpha=self.video_text_opacity, text_color_bg=self.text_bg_color, text_color=self.text_color)
                     self.add_spacer += 1
                     for clf_name, clf_time in self.clf_timers.items():
                         if self.data_df.loc[frm_idx, clf_name] == 1:
