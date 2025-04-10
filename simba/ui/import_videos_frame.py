@@ -5,11 +5,15 @@ from typing import Optional, Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (DropDownMenu, FileSelect, FolderSelect, SimbaButton, SimbaCheckbox, CreateLabelFrameWithIcon, SimBADropDown)
-from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists, check_instance, check_int)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        FileSelect, FolderSelect, SimbaButton,
+                                        SimbaCheckbox, SimBADropDown)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists, check_instance, check_int)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import InvalidInputError
-from simba.utils.read_write import (copy_multiple_videos_to_project, copy_single_video_to_project)
+from simba.utils.read_write import (copy_multiple_videos_to_project,
+                                    copy_single_video_to_project)
 
 
 class ImportVideosFrame(PopUpMixin, ConfigReader):
