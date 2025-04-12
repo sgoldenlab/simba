@@ -4,13 +4,13 @@ import os.path
 import platform
 import threading
 import tkinter
+import tkinter as tk
 import webbrowser
 from copy import copy
 from tkinter import *
 from tkinter.filedialog import askdirectory, askopenfilename
 from tkinter.ttk import Combobox
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
-import tkinter as tk
 
 try:
     from typing import Literal
