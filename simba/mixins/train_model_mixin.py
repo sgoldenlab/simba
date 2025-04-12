@@ -1153,7 +1153,10 @@ class TrainModelMixin(object):
 
         return clf
 
-    def bout_train_test_splitter(self, x_df: pd.DataFrame, y_df: pd.Series, test_size: float ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
+    def bout_train_test_splitter(self,
+                                 x_df: pd.DataFrame,
+                                 y_df: pd.DataFrame,
+                                 test_size: float ) -> Tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
         """
         Helper to split train and test based on annotated `bouts`.
 
@@ -1174,45 +1177,26 @@ class TrainModelMixin(object):
         """
 
         print("Using bout sampling...")
-
         def find_bouts(s: pd.Series, type: str):
             test_bouts_frames, train_bouts_frames = [], []
-            bouts = detect_bouts(
-                pd.DataFrame(s), target_lst=pd.DataFrame(s).columns, fps=-1
-            )
+            bouts = detect_bouts(pd.DataFrame(s), target_lst=pd.DataFrame(s).columns, fps=1)
             print(f"{str(len(bouts))} {type} bouts found...")
-            bouts = list(
-                bouts.apply(
-                    lambda x: list(
-                        range(int(x["Start_frame"]), int(x["End_frame"]) + 1)
-                    ),
-                    1,
-                ).values
-            )
-            test_bouts_idx = np.random.choice(
-                np.arange(0, len(bouts)), int(len(bouts) * test_size)
-            )
-            train_bouts_idx = np.array(
-                [x for x in list(range(len(bouts))) if x not in test_bouts_idx]
-            )
+            bouts = list(bouts.apply(lambda x: list(range(int(x["Start_frame"]), int(x["End_frame"]) + 1)),1).values)
+            test_bouts_idx = np.random.choice(np.arange(0, len(bouts)), int(len(bouts) * test_size))
+            train_bouts_idx = np.array([x for x in list(range(len(bouts))) if x not in test_bouts_idx])
             for i in range(0, len(bouts)):
                 if i in test_bouts_idx:
                     test_bouts_frames.append(bouts[i])
                 if i in train_bouts_idx:
                     train_bouts_frames.append(bouts[i])
-            return [i for s in test_bouts_frames for i in s], [
-                i for s in train_bouts_frames for i in s
-            ]
+            return [i for s in test_bouts_frames for i in s], [i for s in train_bouts_frames for i in s]
 
-        test_bouts_frames, train_bouts_frames = find_bouts(
-            s=y_df, type="behavior present"
-        )
-        test_nonbouts_frames, train_nonbouts_frames = find_bouts(
-            s=np.logical_xor(y_df, 1).astype(int), type="behavior absent"
-        )
+        test_bouts_frames, train_bouts_frames = find_bouts(s=y_df, type="behavior present")
+        test_nonbouts_frames, train_nonbouts_frames = find_bouts(s=np.logical_xor(y_df, 1).astype(int), type="behavior absent")
         x_train = x_df[x_df.index.isin(train_bouts_frames + train_nonbouts_frames)]
         x_test = x_df[x_df.index.isin(test_bouts_frames + test_nonbouts_frames)]
         y_train = y_df[y_df.index.isin(train_bouts_frames + train_nonbouts_frames)]
+        print(y_df)
         y_test = y_df[y_df.index.isin(test_bouts_frames + test_nonbouts_frames)]
 
         return x_train, x_test, y_train, y_test
@@ -1293,15 +1277,9 @@ class TrainModelMixin(object):
 
         if len(y_df.unique()) == 1:
             if y_df.unique()[0] == 0:
-                raise FaultyTrainingSetError(
-                    msg=f"All training annotations for classifier {str(y_df.name)} is labelled as ABSENT. A classifier has be be trained with both behavior PRESENT and ABSENT ANNOTATIONS.",
-                    source=self.__class__.__name__,
-                )
+                raise FaultyTrainingSetError(msg=f"All training annotations for classifier {str(y_df.name)} is labelled as ABSENT. A classifier has be be trained with both behavior PRESENT and ABSENT ANNOTATIONS.", source=self.__class__.__name__)
             if y_df.unique()[0] == 1:
-                raise FaultyTrainingSetError(
-                    msg=f"All training annotations for classifier {str(y_df.name)} is labelled as PRESENT. A classifier has be be trained with both behavior PRESENT and ABSENT ANNOTATIONS.",
-                    source=self.__class__.__name__,
-                )
+                raise FaultyTrainingSetError(msg=f"All training annotations for classifier {str(y_df.name)} is labelled as PRESENT. A classifier has be be trained with both behavior PRESENT and ABSENT ANNOTATIONS.", source=self.__class__.__name__)
 
     def partial_dependence_calculator(self,
                                       clf: RandomForestClassifier,

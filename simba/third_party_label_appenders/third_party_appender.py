@@ -124,7 +124,7 @@ class ThirdPartyLabelAppender(ConfigReader):
         overlaps_idx = check_stop_events_prior_to_start_events(df=df)
         if overlaps_idx:
             if (self.error_settings[Methods.THIRD_PARTY_EVENT_OVERLAP.value] == Methods.WARNING.value):
-                ThirdPartyAnnotationOverlapWarning(video_name=self.video_name, clf_name=clf_name, log_status=log)
+                ThirdPartyAnnotationOverlapWarning(video_name=self.video_name, clf_name=clf_name, log_status=self.log)
                 df = df.drop(index=overlaps_idx).reset_index(drop=True)
             elif (self.error_settings[Methods.THIRD_PARTY_EVENT_OVERLAP.value] == Methods.ERROR.value):
                 raise ThirdPartyAnnotationOverlapError(video_name=self.video_name, clf_name=clf_name)
@@ -168,11 +168,11 @@ class ThirdPartyLabelAppender(ConfigReader):
                 clf_annot = annot_df[(annot_df[BEHAVIOR] == clf)].reset_index(drop=True)
                 if len(clf_annot) == 0:
                     if self.error_settings[Methods.ZERO_THIRD_PARTY_VIDEO_BEHAVIOR_ANNOTATIONS.value] == Methods.WARNING.value:
-                        ThirdPartyAnnotationsMissingAnnotationsWarning(video_name=self.video_name, clf_names=self.clf_names,log_status=self.log)
+                        ThirdPartyAnnotationsMissingAnnotationsWarning(video_name=self.video_name, clf_names=clf, log_status=self.log)
                         out_df[clf] = 0
                         continue
                     elif self.error_settings[Methods.ZERO_THIRD_PARTY_VIDEO_BEHAVIOR_ANNOTATIONS.value] == Methods.ERROR.value:
-                        raise ThirdPartyAnnotationsMissingAnnotationsError(video_name=self.video_name, clf_names=self.clf_names)
+                        raise ThirdPartyAnnotationsMissingAnnotationsError(video_name=self.video_name, clf_names=clf)
                 clf_annot = self.__check_annotation_clf_df_integrity(df=clf_annot)
                 annot_idx = list(clf_annot.apply(lambda x: list(range(int(x["START"]), int(x["STOP"]) + 1)), 1))
                 annot_idx = [x for xs in annot_idx for x in xs]
@@ -190,6 +190,28 @@ class ThirdPartyLabelAppender(ConfigReader):
             print(f"Saved {self.annotation_app} annotations for video {self.video_name}...")
         self.timer.stop_timer()
         stdout_success(msg=f"{self.annotation_app} annotations appended to dataset and saved in {self.targets_folder} directory", elapsed_time=self.timer.elapsed_time_str)
+
+
+
+
+# log = True
+# error_settings = {'INVALID annotations file data format': 'ERROR',
+#                   'ADDITIONAL third-party behavior detected': 'NONE',
+#                   'Annotations EVENT COUNT conflict': 'WARNING',
+#                   'Annotations OVERLAP inaccuracy': 'WARNING',
+#                   'ZERO third-party video behavior annotations found': 'WARNING',
+#                   'Annotations and pose FRAME COUNT conflict': 'WARNING',
+#                   'Annotations data file NOT FOUND': 'WARNING'}
+#
+# test = ThirdPartyLabelAppender(config_path=r"C:\troubleshooting\boris_test_3\project_folder\project_config.ini",
+#                                data_dir=r"C:\troubleshooting\boris_test_3\project_folder\boris_files",
+#                                app='BORIS',
+#                                file_format='.csv',
+#                                error_settings=error_settings,
+#                                log=log)
+# test.run()
+#
+#
 
 
 

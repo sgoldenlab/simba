@@ -31,7 +31,7 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
 
     def __init__(self, config_path: Union[str, os.PathLike]):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
-        PopUpMixin.__init__(self, title="MACHINE MODEL SETTINGS", size=(450, 800), icon='equation_small')
+        PopUpMixin.__init__(self, title="MACHINE MODEL SETTINGS", size=(50, 800), icon='equation_small')
         if not os.path.exists(self.configs_meta_dir): os.makedirs(self.configs_meta_dir)
 
         self.clf_options = Options.CLF_MODELS.value
@@ -61,10 +61,10 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         self.train_test_size_dropdown = SimBADropDown(parent=self.hyperparameters_frm, dropdown_options=self.train_test_sizes_options, label="TEST SIZE:", label_width=30, dropdown_width=25, value=0.2)
         self.train_test_type_dropdown = SimBADropDown(parent=self.hyperparameters_frm, dropdown_options=Options.TRAIN_TEST_SPLIT.value, label="TRAIN-TEST SPLIT TYPE:", label_width=30, dropdown_width=25, value=Options.TRAIN_TEST_SPLIT.value[0])
         self.min_sample_leaf_eb = Entry_Box(self.hyperparameters_frm, "MINIMUM SAMPLE LEAF:", "30", validation="numeric", value=1, entry_box_width=25, justify='center')
-        self.under_sample_ratio_entrybox = Entry_Box(self.hyperparameters_frm, "UNDER SAMPLE RATIO:", "30", validation="numeric", value=1, entry_box_width=25, justify='center', status=DISABLED)
+        self.under_sample_ratio_entrybox = Entry_Box(self.hyperparameters_frm, "UNDER SAMPLE RATIO:", "30", value=1.0, entry_box_width=25, justify='center', status=DISABLED)
         self.undersample_settings_dropdown = SimBADropDown(parent=self.hyperparameters_frm, dropdown_options=self.under_sample_options, label="UNDER SAMPLE SETTING:", label_width=30, dropdown_width=25, value='None', command=self.__switch_undersample_state)
 
-        self.over_sample_ratio_entrybox = Entry_Box(self.hyperparameters_frm, "OVER SAMPLE RATIO:", "30", validation="numeric", entry_box_width=25, justify='center', status=DISABLED)
+        self.over_sample_ratio_entrybox = Entry_Box(self.hyperparameters_frm, "OVER SAMPLE RATIO:", "30", entry_box_width=25, justify='center', status=DISABLED, value=1.0)
         self.oversample_settings_dropdown = SimBADropDown(parent=self.hyperparameters_frm, dropdown_options=self.over_sample_options, label="OVER SAMPLE SETTING:", label_width=30, dropdown_width=25, value=Dtypes.NONE.value, command=self.__switch_oversample_state)
         self.class_weights_dropdown = SimBADropDown(parent=self.hyperparameters_frm, dropdown_options=self.class_weighing_options, label="CLASS WEIGHTS SETTINGS:", label_width=30, dropdown_width=25, value=Dtypes.NONE.value, command=self.__create_class_weight_table)
 
@@ -215,9 +215,9 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         check_int(name="Random forest estimators", value=self.estimators_entrybox.entry_get)
         check_int(name="Minimum sample leaf", value=self.min_sample_leaf_eb.entry_get)
         if self.undersample_settings_dropdown.getChoices() != "None":
-            check_float(name="UNDER SAMPLE RATIO", value=self.under_sample_ratio_entrybox.entry_get)
+            check_float(name="UNDER SAMPLE RATIO", value=self.under_sample_ratio_entrybox.entry_get, min_value=10e-6)
         if self.oversample_settings_dropdown.getChoices() != "None":
-            check_float(name="OVER SAMPLE RATIO", value=self.over_sample_ratio_entrybox.entry_get)
+            check_float(name="OVER SAMPLE RATIO", value=self.over_sample_ratio_entrybox.entry_get, min_value=10e-6)
         if self.create_clf_importance_bars_var.get():
             check_int(name="# FEATURES", value=self.n_features_bars_entry_box.entry_get, min_value=1)
         if self.learning_curve_var.get():

@@ -10,6 +10,7 @@ from tkinter import *
 from tkinter.filedialog import askdirectory, askopenfilename
 from tkinter.ttk import Combobox
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
+import tkinter as tk
 
 try:
     from typing import Literal
@@ -60,33 +61,53 @@ def on_mouse_scroll(event, canvas):
         canvas.yview_scroll(1, "units")
 
 def hxtScrollbar(master):
-    """
-    Create canvas.
-    Create a frame and put it in the canvas.
-    Create two scrollbar and insert command of canvas x and y view
-    Use canvas to create a window, where window = frame
-    Bind the frame to the canvas
-    """
-    bg = master.cget("background")
-    acanvas = Canvas(master, borderwidth=0, background=bg, width=master.winfo_width(), height=master.winfo_reqheight())
-    frame = Frame(acanvas, background=bg)
-    vsb = Scrollbar(master, orient="vertical", command=acanvas.yview)
-    vsb2 = Scrollbar(master, orient="horizontal", command=acanvas.xview)
-    acanvas.configure(yscrollcommand=vsb.set)
-    acanvas.configure(xscrollcommand=vsb2.set)
-    vsb.pack(side=RIGHT, fill="y")
-    vsb2.pack(side=BOTTOM, fill="x")
-    acanvas.pack(side=LEFT, fill=BOTH, expand=True)
+    canvas = tk.Canvas(master, borderwidth=0, bg="#f0f0f0", relief="flat")
+    frame = tk.Frame(canvas, bg="#f0f0f0", bd=0)
 
-    acanvas.create_window((10, 10), window=frame, anchor="nw")
+    vsb = tk.Scrollbar(master, orient="vertical", command=canvas.yview, bg="#cccccc", width=20)
+    hsb = tk.Scrollbar(master, orient="horizontal", command=canvas.xview, bg="#cccccc")
 
-    # bind the frame to the canvas
-    acanvas.bind("<Configure>", lambda event, canvas=acanvas: onFrameConfigure(acanvas))
-    acanvas.bind("<Enter>", lambda event: bindToMousewheel(event, acanvas))
-    acanvas.bind("<Leave>", lambda event: unbindToMousewheel(event, acanvas))
-    acanvas.update()
+    canvas.configure(yscrollcommand=vsb.set, xscrollcommand=hsb.set)
+
+    canvas.pack(side="left", fill="both", expand=True, padx=0, pady=0)
+    vsb.pack(side="right", fill="y", padx=(0, 0))
+    hsb.pack(side="bottom", fill="x", pady=(0, 0))
+
+    canvas.create_window((0, 0), window=frame, anchor="nw")
+
+    def on_frame_configure(event):
+        canvas.configure(scrollregion=canvas.bbox("all"))
+
+    frame.bind("<Configure>", on_frame_configure)
+
+    def _on_mousewheel(event):
+        canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
+
+    def _on_key(event):
+        if event.keysym == "Up":
+            canvas.yview_scroll(-1, "units")
+        elif event.keysym == "Down":
+            canvas.yview_scroll(1, "units")
+        elif event.keysym == "Page_Up":
+            canvas.yview_scroll(-1, "pages")
+        elif event.keysym == "Page_Down":
+            canvas.yview_scroll(1, "pages")
+
+    # Focus & bindings when mouse enters
+    def _on_enter(_):
+        frame.focus_set()
+        frame.bind_all("<MouseWheel>", _on_mousewheel)
+        frame.bind_all("<Key>", _on_key)
+
+    # Clean up when mouse leaves
+    def _on_leave(_):
+        frame.unbind_all("<MouseWheel>")
+        frame.unbind_all("<Key>")
+
+    frame.bind("<Enter>", _on_enter)
+    frame.bind("<Leave>", _on_leave)
+
     return frame
-
 
 def form_validator_is_numeric(inStr, acttyp):
     if acttyp == "1":  # insert

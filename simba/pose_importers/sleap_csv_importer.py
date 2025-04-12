@@ -16,10 +16,9 @@ from simba.utils.checks import (check_if_dir_exists,
                                 check_str, check_that_column_exist,
                                 check_valid_lst)
 from simba.utils.enums import Methods, TagNames
-from simba.utils.errors import AnimalNumberError, CountError, NoFilesFoundError
+from simba.utils.errors import AnimalNumberError, CountError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (clean_sleap_file_name,
-                                    find_all_videos_in_project,
+from simba.utils.read_write import (clean_sleap_file_name,find_all_videos_in_project,
                                     find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data, write_df)
 
@@ -105,7 +104,7 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
                 idx[TRACK] = 'track_0'; data_unique_tracks = ['track_0']
 
             idx[TRACK] = idx[TRACK].fillna(data_unique_tracks[0])
-            idx[TRACK] = idx[TRACK].str.replace(r"[^\d.]+", "", regex=True).astype(int)
+            idx[TRACK] = idx[TRACK].astype(str).str.replace(r"[^\d.]+", "", regex=True).astype(int)
 
             data_df = data_df.iloc[:, 2:].fillna(0)
             if self.animal_cnt > 1:
@@ -115,9 +114,8 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
                 self.data_df = data_df.set_index([idx]).sort_index()
                 self.data_df.columns = np.arange(len(self.data_df.columns))
                 self.data_df = self.data_df.reindex(range(0, self.data_df.index[-1] + 1), fill_value=0)
-
             if len(self.bp_headers) != len(self.data_df.columns):
-                raise CountError(msg=f"SimBA project expects {len(self.bp_headers)} data columns, but your SLEAP data file {video_name} contains {len(self.data_df.columns)} columns.", source=self.__class__.__name__)
+                raise CountError(msg=f"The SimBA project expects {len(self.bp_headers)} data columns, but your SLEAP data file at {video_data['DATA']} contains {len(self.data_df.columns)} columns.", source=self.__class__.__name__)
             self.data_df.columns = self.bp_headers
             self.out_df = deepcopy(self.data_df)
 
@@ -139,15 +137,15 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
         self.timer.stop_timer()
         stdout_success(msg=f"{len(list(self.data_and_videos_lk.keys()))} file(s) imported to the SimBA project {self.input_csv_dir}", source=self.__class__.__name__)
 
-#
-# test = SLEAPImporterCSV(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini",
-#                  data_folder=r'D:\troubleshooting\mitra\raw_tracking_data',
-#                  id_lst=['Track_0'],
+
+# test = SLEAPImporterCSV(config_path=r"C:\troubleshooting\SLP_TEST0525\project_folder\project_config.ini",
+#                  data_folder=r'C:\troubleshooting\SLP_TEST0525\data_csv',
+#                  id_lst=['Animal_1', 'Animal_2', 'Animal_3', 'Animal_4'],
 #                  interpolation_settings={'type': 'body-parts', 'method': 'linear'},
 #                  smoothing_settings = {'time_window': 500, 'method': 'gaussian'})
 # test.run()
 #
-#
+
 
 
 #

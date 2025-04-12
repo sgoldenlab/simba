@@ -130,7 +130,7 @@ class PoseImporterMixin(object):
 
     def insert_animal_names(self):
         for animal_cnt, animal_data in self.id_cords.items():
-            cv2.putText(self.new_frame, animal_data["name"], animal_data["cord"], cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255), 3)
+            cv2.putText(self.new_frame, animal_data["name"], animal_data["cord"], cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255), 2)
 
     def multianimal_identification(self):
         cv2.destroyAllWindows()
@@ -145,9 +145,9 @@ class PoseImporterMixin(object):
                 self.img_bp_cords[animal_name].append(tuple(self.data_df.loc[self.frame_no, [x_name, y_name]].values.astype(int)))
         self.insert_all_bodyparts_into_img(img=self.img_overlay, body_parts=self.img_bp_cords)
         side_img = np.ones((int(self.video_info["height"] / 2), self.video_info["width"], 3))
-        cv2.putText(side_img, f"Current video: {self.video_name}", (10, self.scalers["space"]), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255), 3)
+        cv2.putText(side_img, f"Current video: {self.video_name}", (10, self.scalers["space"]), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255), 2)
         cv2.putText(side_img, "Can you assign identities based on the displayed frame ?", (10, int(self.scalers["space"] * (self.add_spacer * 2))), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 255), 2)
-        cv2.putText(side_img, 'Press "x" to display new, random, frame', (10, int(self.scalers["space"] * (self.add_spacer * 3))), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 0), 3)
+        cv2.putText(side_img, 'Press "x" to display new, random, frame', (10, int(self.scalers["space"] * (self.add_spacer * 3))), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (255, 255, 0), 2)
         cv2.putText(side_img, 'Press "c" to continue to start assigning identities using this frame', (10, int(self.scalers["space"] * (self.add_spacer * 4))), cv2.FONT_HERSHEY_SIMPLEX, self.scalers["font"], (0, 255, 0), 2)
         self.img_concat = np.uint8(np.concatenate((self.img_overlay, side_img), axis=0))
         cv2.imshow("Define animal IDs", self.img_concat)
@@ -226,10 +226,7 @@ class PoseImporterMixin(object):
     def find_closest_animals(self):
         self.animal_order = {}
         for animal_number, animal_click_data in self.id_cords.items():
-            animal_name, animal_cord = (
-                animal_click_data["name"],
-                animal_click_data["cord"],
-            )
+            animal_name, animal_cord = (animal_click_data["name"], animal_click_data["cord"])
             closest_animal = {}
             closest_animal["animal_name"] = None
             closest_animal["body_part_name"] = None
@@ -238,19 +235,14 @@ class PoseImporterMixin(object):
                 animal_bp_names_x = self.animal_bp_dict[other_animal_name]["X_bps"]
                 animal_bp_names_y = self.animal_bp_dict[other_animal_name]["Y_bps"]
                 for x_col, y_col in zip(animal_bp_names_x, animal_bp_names_y):
-                    bp_location = (
-                        int(self.all_frame_data[x_col]),
-                        int(self.all_frame_data[y_col]),
-                    )
-                    distance = np.sqrt(
-                        (animal_cord[0] - bp_location[0]) ** 2
-                        + (animal_cord[1] - bp_location[1]) ** 2
-                    )
+                    bp_location = (int(self.all_frame_data[x_col]), int(self.all_frame_data[y_col]))
+                    distance = np.sqrt((animal_cord[0] - bp_location[0]) ** 2 + (animal_cord[1] - bp_location[1]) ** 2)
                     if distance < closest_animal["distance"]:
                         closest_animal["animal_name"] = other_animal_name
                         closest_animal["body_part_name"] = (x_col, y_col)
                         closest_animal["distance"] = distance
             self.animal_order[animal_number] = closest_animal
+            print(self.animal_order)
         self.check_intergity_of_chosen_animal_order()
         self.organize_results()
         self.reinsert_multi_idx_columns()
@@ -290,20 +282,11 @@ class PoseImporterMixin(object):
         return df
 
     def check_intergity_of_chosen_animal_order(self):
-        for click_key_combination in itertools.combinations(
-            list(self.animal_order.keys()), 2
-        ):
+        for click_key_combination in itertools.combinations(list(self.animal_order.keys()), 2):
             click_n, click_n1 = click_key_combination[0], click_key_combination[1]
-            animal_1, animal_2 = (
-                self.animal_order[click_n]["animal_name"],
-                self.animal_order[click_n1]["animal_name"],
-            )
+            animal_1, animal_2 = (self.animal_order[click_n]["animal_name"], self.animal_order[click_n1]["animal_name"])
             if animal_1 == animal_2:
-                raise InvalidInputError(
-                    msg=f"The animal most proximal to click number {str(click_n)} is animal named {animal_1}. The animal most proximal to click number {str(click_n1)} is also animal {animal_2}."
-                    "Please indicate which animal is which using a video frame where the animals are clearly separated",
-                    source=self.__class__.__name__,
-                )
+                raise InvalidInputError(msg=f"The animal most proximal to click number {str(click_n)} is animal named {animal_1}. The animal most proximal to click number {str(click_n1)} is also animal {animal_2}. Please indicate which animal is which using a video frame where the animals are clearly separated", source=self.__class__.__name__,)
 
     def intertwine_probability_cols(self, data: pd.DataFrame) -> pd.DataFrame:
         results = pd.DataFrame()

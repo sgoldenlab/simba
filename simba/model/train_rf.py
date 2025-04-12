@@ -246,6 +246,11 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
         stdout_success(msg=f"Evaluation files are in {self.eval_out_path} folders", source=self.__class__.__name__)
 
 
+
+# test = TrainRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+# test.run()
+# test.save()
+
 # test = TrainRandomForestClassifier(config_path=r"/mnt/c/troubleshooting/mitra/project_folder/project_config.ini")
 # test.run()
 # test.save()

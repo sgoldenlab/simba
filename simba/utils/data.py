@@ -72,22 +72,14 @@ def detect_bouts(data_df: pd.DataFrame, target_lst: List[str], fps: Union[int, f
     >>> 2  'Sniffing'   3.47          3.83          104        114            0.37
     """
 
-    boutsList, nameList, startTimeList, endTimeList, startFrameLst, endFrameList = (
-        [],
-        [],
-        [],
-        [],
-        [],
-        [],
-    )
+    boutsList, nameList, startTimeList, endTimeList, startFrameLst, endFrameList = [[] for _ in range(6)]
+    data_df = data_df.reset_index(drop=True)
     for target_name in target_lst:
         groupDf = pd.DataFrame()
         v = (data_df[target_name] != data_df[target_name].shift()).cumsum()
         u = data_df.groupby(v)[target_name].agg(["all", "count"])
         m = u["all"] & u["count"].ge(1)
-        groupDf["groups"] = data_df.groupby(v).apply(
-            lambda x: (x.index[0], x.index[-1])
-        )[m]
+        groupDf["groups"] = data_df.groupby(v).apply(lambda x: (x.index[0], x.index[-1]))[m]
         for _, row in groupDf.iterrows():
             bout = list(row["groups"])
             bout_time = ((bout[-1] - bout[0]) + 1) / fps
@@ -103,7 +95,7 @@ def detect_bouts(data_df: pd.DataFrame, target_lst: List[str], fps: Union[int, f
             startFrameLst.append(bout_start_frm)
 
     startFrameLst = [x - 1 for x in startFrameLst]
-    return pd.DataFrame(
+    results = pd.DataFrame(
         list(
             zip(
                 nameList,
@@ -123,6 +115,7 @@ def detect_bouts(data_df: pd.DataFrame, target_lst: List[str], fps: Union[int, f
             "Bout_time",
         ],
     )
+    return results
 
 
 def detect_bouts_multiclass(data: pd.DataFrame, target: str, fps: int = 1, classifier_map: Dict[int, str] = None) -> pd.DataFrame:

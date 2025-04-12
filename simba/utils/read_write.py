@@ -2500,10 +2500,8 @@ def read_boris_file(file_path: Union[str, os.PathLike],
                 fps.append(float(fps_value))
     if FRAME_INDEX is not None:
         expected_headers.append(FRAME_INDEX)
-    print(df)
     df = df[expected_headers]
     results = {}
-    print(df)
     for video_cnt, video_file_name in enumerate(media_file_names_in_file):
         video_name = get_fn_ext(filepath=video_file_name)[1]
         results[video_name] = {}

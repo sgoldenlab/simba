@@ -52,7 +52,8 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
         if (meta_dict[MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value] == Methods.SPLIT_TYPE_FRAMES.value):
             self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.x_df, self.y_df, test_size=meta_dict["train_test_size"])
         elif (meta_dict[MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value] == Methods.SPLIT_TYPE_BOUTS.value):
-            self.x_train, self.x_test, self.y_train, self.y_test = (self.bout_train_test_splitter(x_df=self.x_df, y_df=self.y_df, test_size=meta_dict["train_test_size"]))
+            self.x_train, self.x_test, self.y_train, self.y_test = (self.bout_train_test_splitter(x_df=self.x_df.reset_index(drop=True), y_df=self.y_df.reset_index(drop=True), test_size=meta_dict["train_test_size"]))
+            print(self.y_test)
         else:
             raise InvalidInputError(msg=f"{meta_dict[MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value]} is not recognized as a valid SPLIT TYPE (OPTIONS: FRAMES, BOUTS).", source=self.__class__.__name__)
         if (meta_dict[MLParamKeys.UNDERSAMPLE_SETTING.value].lower() == Methods.RANDOM_UNDERSAMPLE.value):
@@ -97,6 +98,7 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                                           class_weight=meta_dict[MLParamKeys.CLASS_WEIGHTS.value],
                                           cuda=meta_dict[MLParamKeys.CUDA.value])
             print(f"Fitting {self.clf_name} model...")
+
             self.rf_clf = self.clf_fit(clf=self.rf_clf, x_df=self.x_train, y_df=self.y_train)
             if (meta_dict[MLParamKeys.PERMUTATION_IMPORTANCE.value] in Options.PERFORM_FLAGS.value):
                 self.calc_permutation_importance(x_test=self.x_test,
@@ -163,6 +165,10 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
             self.save_rf_model(self.rf_clf, self.clf_name, self.model_dir_out, save_file_no=config_cnt)
             print(f"Classifier {self.clf_name}_{config_cnt} saved in directory {self.model_dir_out} ...")
         stdout_success(msg=f"All {len(list(self.meta_dicts.keys()))} model(s) and their evaluations complete. The models/evaluation files are saved in {self.model_dir_out} directory", source=self.__class__.__name__)
+
+#
+# test = GridSearchRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+# test.run()
 
 
 # test = GridSearchRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
