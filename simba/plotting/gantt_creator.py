@@ -9,14 +9,16 @@ import numpy as np
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_file_exist_and_readable, check_int, check_valid_lst, check_valid_dataframe, check_str)
-from simba.utils.data import detect_bouts, create_color_palette
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_file_exist_and_readable, check_int, check_str, check_valid_dataframe,
+    check_valid_lst)
+from simba.utils.data import create_color_palette, detect_bouts
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.lookups import get_named_colors
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
-
 
 STYLE_WIDTH = 'width'
 STYLE_HEIGHT = 'height'

@@ -8,11 +8,13 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.gantt_creator import GanttCreatorSingleProcess
 from simba.plotting.gantt_creator_mp import GanttCreatorMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, SimbaButton, SimbaCheckbox, SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        SimbaButton, SimbaCheckbox,
+                                        SimBADropDown)
 from simba.utils.checks import check_if_filepath_list_is_empty, check_int
-from simba.utils.enums import Formats, Keys, Links, Paths, Options
-from simba.utils.read_write import find_files_of_filetypes_in_directory
+from simba.utils.enums import Formats, Keys, Links, Options, Paths
 from simba.utils.errors import NoSpecifiedOutputError
+from simba.utils.read_write import find_files_of_filetypes_in_directory
 
 
 class GanttPlotPopUp(PopUpMixin, ConfigReader):
