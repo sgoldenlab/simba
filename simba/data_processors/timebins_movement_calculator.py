@@ -9,16 +9,14 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.mixins.feature_extraction_supplement_mixin import \
-    FeatureExtractionSupplemental
+from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log, check_float,
-    check_if_filepath_list_is_empty, check_int)
+from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_float, check_if_filepath_list_is_empty, check_valid_lst, check_valid_boolean, check_that_column_exist)
 from simba.utils.enums import TagNames
-from simba.utils.errors import FrameRangeError
+from simba.utils.errors import FrameRangeError, NoDataError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import get_fn_ext, read_df
+from simba.utils.read_write import get_fn_ext, read_df, create_directory
+from simba.mixins.plotting_mixin import PlottingMixin
 
 
 class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
@@ -42,16 +40,28 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
     """
 
     def __init__(self,
-                 config_path: str,
+                 config_path: Union[str, os.PathLike],
                  bin_length: Union[int, float],
                  body_parts: List[str],
+                 file_paths: Optional[List[Union[str, os.PathLike]]] = None,
                  plots: Optional[bool] = False,
                  verbose: bool = True):
 
         ConfigReader.__init__(self, config_path=config_path)
         log_event(logger_name=str(self.__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()),)
-        self.bin_length, self.plots = bin_length, plots
-        check_float(name="TIME BIN", value=bin_length, min_value=10e-6)
+        check_float(name=f"{self.__class__.__name__} TIME BIN", value=bin_length, min_value=10e-6)
+        check_valid_lst(data=body_parts, source=f'{self.__class__.__name__} file_paths', min_len=1, valid_dtypes=(str,), valid_values=self.body_parts_lst)
+
+        if file_paths is not None:
+            check_valid_lst(data=file_paths, source=f'{self.__class__.__name__} file_paths', min_len=1, valid_dtypes=(str,))
+            self.file_paths = file_paths
+        else:
+            if len(self.outlier_corrected_paths) == 0:
+                raise NoDataError(msg=f'No data files found in {self.outlier_corrected_dir}', source=self.__class__.__name__)
+            self.file_paths = self.outlier_corrected_paths
+        check_valid_boolean(value=[plots], source=f'{self.__class__.__name__} plots', raise_error=True)
+        check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose', raise_error=True)
+
         self.col_headers, self.bp_dict = [], {}
         for bp_cnt, bp in enumerate(body_parts):
             self.col_headers.extend((f"{bp}_x", f"{bp}_y"))
@@ -59,60 +69,43 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
             self.bp_dict[bp_cnt] = {animal_name: [f"{bp}_x", f"{bp}_y"]}
         check_if_filepath_list_is_empty(filepaths=self.outlier_corrected_paths, error_msg=f"SIMBA ERROR: Cannot analyze movement in time-bins, data directory {self.outlier_corrected_dir} is empty.",)
         self.animal_combinations = list(itertools.combinations(self.animal_bp_dict, 2))
+        self.bin_length, self.plots = bin_length, plots
         print(f"Processing {len(self.outlier_corrected_paths)} video(s)...")
 
     def __create_plots(self):
         timer = SimbaTimer(start=True)
         print("Creating time-bin movement plots...")
         plots_dir = os.path.join( self.project_path, "logs", f"time_bin_movement_plots_{self.datetime}")
-        if not os.path.exists(plots_dir):
-            os.makedirs(plots_dir)
+        create_directory(path=plots_dir, overwrite=True)
         for video_name in self.results["VIDEO"].unique():
-            video_df = self.results.loc[
-                (self.results["VIDEO"] == video_name)
-                & (self.results["MEASUREMENT"] == "Movement (cm)")
-            ]
+            video_df = self.results.loc[(self.results["VIDEO"] == video_name) & (self.results["MEASUREMENT"] == "Movement (cm)")]
             video_df["TIME BIN #"] = video_df["TIME BIN #"].astype(int)
             for body_part in video_df["BODY-PART"].unique():
-                body_part_df = (
-                    video_df[video_df["BODY-PART"] == body_part]
-                    .reset_index(drop=True)
-                    .sort_values(by=["TIME BIN #"])
-                )
-                body_part_df[f"Time bin # (bin length {self.bin_length}s)"] = (
-                    body_part_df["TIME BIN #"]
-                )
+                body_part_df = (video_df[video_df["BODY-PART"] == body_part] .reset_index(drop=True) .sort_values(by=["TIME BIN #"]))
+                body_part_df[f"Time bin # (bin length {self.bin_length}s)"] = (body_part_df["TIME BIN #"])
                 body_part_df["VALUE"] = body_part_df["VALUE"].astype(float)
-                _ = PlottingMixin.line_plot(
-                    df=body_part_df,
-                    x=f"Time bin # (bin length {self.bin_length}s)",
-                    y="VALUE",
-                    y_label="Distance (cm)",
-                    save_path=os.path.join(plots_dir, f"{video_name}_{body_part}.png"),
-                )
+                _ = PlottingMixin.line_plot(df=body_part_df, x=f"Time bin # (bin length {self.bin_length}s)", y="VALUE", y_label="Distance (cm)", save_path=os.path.join(plots_dir, f"{video_name}_{body_part}.png"))
         timer.stop_timer()
-        stdout_success(
-            msg=f"Time bin movement plots saved in {plots_dir}",
-            elapsed_time=timer.elapsed_time_str,
-            source=self.__class__.__name__,
-        )
+        stdout_success(msg=f"Time bin movement plots saved in {plots_dir}", elapsed_time=timer.elapsed_time_str, source=self.__class__.__name__)
 
     def run(self):
         video_dict, self.out_df_lst = {}, []
         self.movement_dict = {}
         self.save_path = os.path.join( self.project_path, "logs", f"Time_bins_{self.bin_length}s_movement_results_{self.datetime}.csv")
-        check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.outlier_corrected_paths)
-        for file_cnt, file_path in enumerate(self.outlier_corrected_paths):
+        check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.file_paths)
+        for file_cnt, file_path in enumerate(self.file_paths):
             video_timer = SimbaTimer(start=True)
             _, video_name, _ = get_fn_ext(file_path)
-            print(f"Processing time-bin movements for video {video_name} ({str(file_cnt+1)}/{str(len(self.outlier_corrected_paths))})...")
+            print(f"Processing time-bin movements ({self.bin_length}s) for video {video_name} ({str(file_cnt+1)}/{str(len(self.outlier_corrected_paths))})...")
             video_dict[video_name] = {}
             video_settings, px_per_mm, fps = self.read_video_info(video_name=video_name)
             fps, self.movement_cols, self.velocity_cols = int(fps), set(), set()
             bin_length_frames = int(fps * self.bin_length)
             if bin_length_frames == 0:
                 raise FrameRangeError(msg=f"The specified time-bin length of {self.bin_length} is TOO SHORT for video {video_name} which has a specified FPS of {fps}. This results in time bins that are LESS THAN a single frame.", source=self.__class__.__name__,)
-            self.data_df = read_df(file_path, self.file_type, usecols=self.col_headers)
+            self.data_df = read_df(file_path, self.file_type)
+            check_that_column_exist(df=self.data_df, column_name=self.col_headers, file_name=file_path)
+            self.data_df = self.data_df[self.col_headers]
             self.data_df = self.create_shifted_df(df=self.data_df)
             results = []
             for animal_data in self.bp_dict.values():
@@ -153,8 +146,16 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
         self.results.set_index("VIDEO").to_csv(self.save_path)
         self.timer.stop_timer()
         stdout_success(msg=f"Movement time-bins results saved at {self.save_path}", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
-        if self.plots:
-            self.__create_plots()
+        if self.plots: self.__create_plots()
+
+
+
+# test = TimeBinsMovementCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#                           body_parts=['Nose'], #['Simon CENTER OF GRAVITY', 'JJ CENTER OF GRAVITY', 'Animal_1 CENTER OF GRAVITY']
+#                           bin_length=10, plots=True)
+# test.run()
+# test.save()
+
 
 
 # test = TimeBinsMovementCalculator(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini",

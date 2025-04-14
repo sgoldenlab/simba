@@ -100,12 +100,12 @@ def hxtScrollbar(master):
         frame.bind_all("<Key>", _on_key)
 
     # Clean up when mouse leaves
-    def _on_leave(_):
-        frame.unbind_all("<MouseWheel>")
-        frame.unbind_all("<Key>")
+    # def _on_leave(_):
+    #     frame.unbind_all("<MouseWheel>")
+    #     frame.unbind_all("<Key>")
 
     frame.bind("<Enter>", _on_enter)
-    frame.bind("<Leave>", _on_leave)
+    #frame.bind("<Leave>", _on_leave)
 
     return frame
 

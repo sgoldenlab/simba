@@ -9,17 +9,37 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log,
-    check_file_exist_and_readable, check_if_dir_exists, check_valid_dataframe,
-    check_valid_lst, check_valid_tuple)
+from simba.utils.checks import ( check_all_file_names_are_represented_in_video_log, check_file_exist_and_readable, check_if_dir_exists, check_valid_dataframe, check_valid_lst, check_valid_tuple)
 from simba.utils.data import detect_bouts
-from simba.utils.errors import InvalidInputError, NoROIDataError
+from simba.utils.errors import InvalidInputError, NoROIDataError, NoDataError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
+from simba.roi_tools.roi_utils import get_roi_dict_from_dfs
 from simba.utils.warnings import ROIWarning
+from simba.utils.data import slice_roi_dict_for_video
+from simba.utils.enums import ROI_SETTINGS
 
-MEASURES = ('TOTAL BEHAVIOR TIME IN ROI (S)', 'STARTED BEHAVIOR BOUTS IN ROI (COUNT)', 'ENDED BEHAVIOR BOUTS IN ROI (COUNT)')
+TOTAL_TIME = 'TOTAL BEHAVIOR TIME IN ROI (S)'
+START_COUNTS = 'STARTED BEHAVIOR BOUTS IN ROI (COUNT)'
+ENDED_COUNTS = 'ENDED BEHAVIOR BOUTS IN ROI (COUNT)'
+SHAPE_TYPE = 'Shape_type'
+VERTICES = 'vertices'
+
+BR_TAG = 'Bottom right tag'
+B_TAG = 'Bottom tag'
+T_TAG = 'Top tag'
+C_TAG = 'Center tag'
+BL_TAG = 'Bottom left tag'
+TR_TAG = 'Top right tag'
+TL_TAG = 'Top left tag'
+R_TAG = 'Right tag'
+L_TAG = 'Left tag'
+BR_X = "Bottom_right_X"
+BR_Y = "Bottom_right_Y"
+TL_X = 'topLeftX'
+TL_Y = "topLeftY"
+CENTER_X, CENTER_Y = "Center_X", "Center_Y"
+
 
 class ROIClfCalculator(ConfigReader):
     """
@@ -50,37 +70,41 @@ class ROIClfCalculator(ConfigReader):
                  data_paths: Optional[List[Union[str, os.PathLike]]] = None,
                  clf_names: Optional[List[str]] = None,
                  roi_names: Optional[List[str]] = None,
-                 measures: List[str] = ['TOTAL BEHAVIOR TIME IN ROI (S)', 'STARTED BEHAVIOR BOUTS IN ROI (COUNT)', 'ENDED BEHAVIOR BOUTS IN ROI (COUNT)']):
+                 clf_time: bool = True,
+                 started_bout_cnt: bool = True,
+                 ended_bout_cnt: bool = True):
 
-        check_file_exist_and_readable(file_path=config_path)
+
+        if not any([clf_time, started_bout_cnt, ended_bout_cnt]):
+            raise InvalidInputError(msg='clf_time, started_bout_cnt, ended_bout_cnt are all False. Set at least one measure to True', source=self.__class__.__name__)
         ConfigReader.__init__(self, config_path=config_path)
+        if not os.path.isfile(self.roi_coordinates_path):
+            raise NoROIDataError(msg=f'No ROI data found. Expected at path {self.roi_coordinates_path}. Create ROI data before computing ROI classification data stratisfied by ROI.', source=self.__class__.__name__)
         self.read_roi_data()
-        if data_paths is None:
-            data_paths = self.machine_results_paths
-        check_valid_lst(data=data_paths, source=f'{self.__class__.__name__} data_paths', valid_dtypes=(str,), min_len=1)
-        if clf_names is not None:
-            check_valid_lst(data=clf_names, source=f'{self.__class__.__name__} clf_names', min_len=1, valid_dtypes=(str,))
-            self.clf_names = clf_names
-        if roi_names is not None:
-            check_valid_lst(data=roi_names, source=f'{self.__class__.__name__} roi_names', min_len=1, valid_dtypes=(str,))
-            self.roi_names = roi_names
-        else:
-            self.roi_names = self.shape_names
-        unaccepted_measures = [x for x in measures if x not in MEASURES]
-        check_valid_lst(data=measures, source=f'{self.__class__.__name__} measures', min_len=1, valid_dtypes=(str,))
-        if len(unaccepted_measures) > 0:
-            raise InvalidInputError(msg=f'{unaccepted_measures} are invalid measure options. Accepted: {MEASURES}', source=self.__class__.__name__)
-        check_valid_lst(data=bp_names, source=f'{self.__class__.__name__} bp_names', min_len=1, valid_dtypes=(str,))
-        unaccepted_bps = [x for x in bp_names if x not in self.body_parts_lst]
-        if len(unaccepted_bps) > 0:
-            raise InvalidInputError(msg=f'{unaccepted_bps} are invalid body-part options. Accepted: {self.body_parts_lst}', source=self.__class__.__name__)
+        check_valid_lst(data=bp_names, source=f'{self.__class__.__name__} bp_names', min_len=1, valid_dtypes=(str,), valid_values=self.body_parts_lst)
         if save_path is None:
             self.save_path = os.path.join(self.logs_path, f"Classification_time_by_ROI_{self.datetime}.csv")
         else:
             check_if_dir_exists(os.path.dirname(save_path))
             self.save_path = save_path
-        self.bp_names, self.measures = bp_names, measures
+        if data_paths is None:
+            if len(self.machine_results_paths) == 0:
+                NoROIDataError(msg=f'Cannot compute classification by ROI data. No classification data found in {self.machine_results_dir} directory', source=self.__class__.__name__)
+            data_paths = self.machine_results_paths
+        else:
+            check_valid_lst(data=data_paths, source=f'{self.__class__.__name__} data_paths', valid_dtypes=(str,), min_len=1)
+            for i in data_paths: check_file_exist_and_readable(file_path=i)
         self.data_paths = data_paths
+        if clf_names is not None:
+            check_valid_lst(data=clf_names, source=f'{self.__class__.__name__} clf_names', min_len=1, valid_dtypes=(str,), valid_values=self.clf_names)
+            self.clf_names = clf_names
+        if roi_names is not None:
+            check_valid_lst(data=roi_names, source=f'{self.__class__.__name__} roi_names', min_len=1, valid_dtypes=(str,), valid_values=self.shape_names)
+            self.roi_names = roi_names
+        else:
+            self.roi_names = self.shape_names
+        self.bp_names, self.clf_time, self.started_bout_cnt, self.ended_bout_cnt = bp_names, clf_time, started_bout_cnt,ended_bout_cnt
+
         self.bp_cols = []
         for bp_name in self.bp_names: self.bp_cols.append([f"{bp_name}_x", f"{bp_name}_y", f"{bp_name}_p"])
         self.required_fields = [i for ii in self.bp_cols for i in ii] + list(self.clf_names)
@@ -95,53 +119,59 @@ class ROIClfCalculator(ConfigReader):
             print(f'Analyzing classification ROI data for video {video_name} (File {cnt+1}/{len(self.data_paths)})...')
             _, _, self.fps = self.read_video_info(video_name=video_name)
             results[video_name] = {}
-            video_rectangles = self.rectangles_df[self.rectangles_df['Video'] == video_name]
-            video_circles = self.circles_df[self.circles_df['Video'] == video_name]
-            video_polygons = self.polygon_df[self.circles_df['Video'] == video_name]
-            if len(video_rectangles) + len(video_circles) + len(video_polygons) == 0:
-                ROIWarning(msg=f'Skipping video {video_name}: No drawn ROIs found for video {video_name}', source=self.__class__.__name__)
+            video_rois, video_roi_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=video_name)
+            if len(video_roi_names) == 0:
+                ROIWarning(msg=f'Skipping video {video_name}: No ROIs found for video {video_name}', source=self.__class__.__name__)
                 continue
-            else:
-                data_df = read_df(file_path=data_path, file_type=self.file_type)
-                check_valid_dataframe(df=data_df, source=f'{data_path}', required_fields=self.required_fields)
-                data_df = data_df[self.required_fields]
-                for (bp_x, bp_y, bp_p) in self.bp_cols:
-                    bp_name = bp_x[:-2]
-                    bp_arr = data_df[[bp_x, bp_y]].values.astype(np.int32)
-                    results[video_name][bp_name] = {}
-                    for idx, rectangle in video_rectangles.iterrows():
-                        roi_coords = np.array([rectangle[['topLeftX', 'topLeftY']].values, rectangle[['Bottom_right_X', 'Bottom_right_Y']].values]).astype(np.int32)
-                        results[video_name][bp_name][rectangle['Name']] = FeatureExtractionMixin.framewise_inside_rectangle_roi(bp_location=bp_arr, roi_coords=roi_coords)
-                    for idx, circle in video_circles.iterrows():
-                        circle_center = np.array(circle[['Center_X', 'Center_Y']].values).astype(np.int32)
-                        results[video_name][bp_name][circle['Name']] = FeatureExtractionMixin.is_inside_circle(bp=bp_arr, roi_center=circle_center, roi_radius=circle['radius'])
-                    for idx, polygon in video_polygons.iterrows():
-                        vertices = polygon['vertices'].astype(np.int32)
-                        results[video_name][bp_name][polygon['Name']] = FeatureExtractionMixin.framewise_inside_polygon_roi(bp_location=bp_arr, roi_coords=vertices)
+            input_video_rois = get_roi_dict_from_dfs(rectangle_df=video_rois['rectangles'], circle_df=video_rois['circleDf'], polygon_df=video_rois['polygons'])
+            video_rois = {k: v for k, v in input_video_rois.items() if k in self.roi_names}
+            if len(list(video_rois.keys())) == 0:
+                ROIWarning(msg=f'Skipping video {video_name}: No ROIs found for video {video_name}. The video has the ROIs {list(input_video_rois.keys())} but analysis is to be performed on ROIs {self.roi_names}', source=self.__class__.__name__)
+                continue
+            data_df = read_df(file_path=data_path, file_type=self.file_type)
+            check_valid_dataframe(df=data_df, source=f'{data_path}', required_fields=self.required_fields)
+            data_df = data_df[self.required_fields]
+            for (bp_x, bp_y, bp_p) in self.bp_cols:
+                bp_name = bp_x[:-2]
+                bp_arr = data_df[[bp_x, bp_y]].values.astype(np.int32)
+                results[video_name][bp_name] = {}
+                for roi_name, roi_data in video_rois.items():
+                    if roi_data[SHAPE_TYPE] == ROI_SETTINGS.RECTANGLE.value:
+                        roi_coords = np.array([[roi_data[TL_X], roi_data[TL_Y]], [roi_data[BR_X], roi_data[BR_Y]]]) #, roi_data[['Bottom_right_X', 'Bottom_right_Y']].values]).astype(np.int32)
+                        results[video_name][bp_name][roi_name] = FeatureExtractionMixin.framewise_inside_rectangle_roi(bp_location=bp_arr, roi_coords=roi_coords)
+                    elif roi_data[SHAPE_TYPE] == ROI_SETTINGS.CIRCLE.value:
+                        circle_center = np.array([roi_data[CENTER_X], roi_data[CENTER_Y]]).astype(np.int32)
+                        results[video_name][bp_name][roi_name] = FeatureExtractionMixin.is_inside_circle(bp=bp_arr, roi_center=circle_center, roi_radius=roi_data['radius'])
+                        pass
+                    elif roi_data[SHAPE_TYPE] == ROI_SETTINGS.POLYGON.value:
+                        vertices = roi_data[VERTICES].astype(np.int32)
+                        results[video_name][bp_name][roi_name] = FeatureExtractionMixin.framewise_inside_polygon_roi(bp_location=bp_arr, roi_coords=vertices)
+            for clf_name in self.clf_names:
+                clf_data = data_df[clf_name].values
+                for bp_name, bp_data in results[video_name].items():
+                    for roi_name, roi_data in results[video_name][bp_name].items():
+                        field_name = f'{clf_name}_{bp_name}_{roi_name}'
+                        data_df[field_name] = 0
+                        roi_clf_idx = np.where((roi_data == 1) & (clf_data == 1))[0]
+                        data_df[field_name].iloc[roi_clf_idx] = 1
+                        bouts = detect_bouts(data_df=data_df, target_lst=[field_name], fps=int(self.fps))
+                        total_time = float(bouts['Bout_time'].sum())
+                        start_frames, end_frames = list(bouts["Start_frame"]), list(bouts["End_frame"])
+                        roi_clf_start_cnt = float(len([x for x in start_frames if x in roi_clf_idx]))
+                        roi_clf_end_cnt = float(len([x for x in start_frames if x in roi_clf_idx]))
+                        if self.clf_time:
+                            self.results_df.loc[len(self.results_df)] = [video_name, clf_name, roi_name, bp_name, TOTAL_TIME, total_time]
+                        if self.started_bout_cnt:
+                            self.results_df.loc[len(self.results_df)] = [video_name, clf_name, roi_name, bp_name, START_COUNTS, roi_clf_start_cnt]
+                        if self.ended_bout_cnt:
+                            self.results_df.loc[len(self.results_df)] = [video_name, clf_name, roi_name, bp_name, ENDED_COUNTS, roi_clf_end_cnt]
 
-                for clf_name in self.clf_names:
-                    clf_data = data_df[clf_name].values
-                    for bp_name, bp_data in results[video_name].items():
-                        for roi_name, roi_data in results[video_name][bp_name].items():
-                            field_name = f'{clf_name}_{bp_name}_{roi_name}'
-                            data_df[field_name] = 0
-                            roi_clf_idx = np.where((roi_data == 1) & (clf_data == 1))[0]
-                            data_df[field_name].iloc[roi_clf_idx] = 1
-                            bouts = detect_bouts(data_df=data_df, target_lst=[field_name], fps=int(self.fps))
-                            total_time = bouts['Bout_time'].sum()
-                            start_frames, end_frames = list(bouts["Start_frame"]), list(bouts["End_frame"])
-                            roi_clf_start_cnt = len([x for x in start_frames if x in roi_clf_idx])
-                            roi_clf_end_cnt = len([x for x in start_frames if x in roi_clf_idx])
-                            self.results_df.loc[len(self.results_df)] = [video_name, clf_name, roi_name, bp_name, 'TOTAL BEHAVIOR TIME IN ROI (S)', total_time]
-                            self.results_df.loc[len(self.results_df)] = [video_name, clf_name, roi_name, bp_name, 'STARTED BEHAVIOR BOUTS IN ROI (COUNT)', roi_clf_start_cnt]
-                            self.results_df.loc[len(self.results_df)] = [video_name, clf_name, roi_name, bp_name, 'ENDED BEHAVIOR BOUTS IN ROI (COUNT)', roi_clf_end_cnt]
-                video_timer.stop_timer()
-                print(f'Video {video_name} complete (elapsed time {video_timer.elapsed_time_str}s) ...')
+            video_timer.stop_timer()
+            print(f'Video {video_name} classifier by ROI analysis complete {len(video_rois)} ROI(s) complete ({cnt+1}/{len(self.data_paths)}) (elapsed time {video_timer.elapsed_time_str}s) ...')
     def save(self):
         if len(self.results_df) == 0:
             raise NoROIDataError(f'No ROI drawings detected for the {len(self.data_paths)} video file(s). No data is saved.', source=self.__class__.__name__)
         else:
-            self.results_df = self.results_df[self.results_df['MEASURE'].isin(self.measures)].set_index('VIDEO')
             self.results_df = self.results_df.sort_values(by=['VIDEO', 'CLASSIFIER', 'ROI', 'BODY-PART', 'MEASURE'])
             self.results_df['VALUE'] = self.results_df['VALUE'].round(4)
             self.results_df.to_csv(self.save_path)
@@ -149,9 +179,14 @@ class ROIClfCalculator(ConfigReader):
             stdout_success(msg=f"Classification by ROI data for {len(self.data_paths)} video(s) saved in {self.save_path}.", elapsed_time=self.timer.elapsed_time_str)
 
 
-# analyzer = ROIClfCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", bp_names=['Nose'], clf_names=['straub_tail'], measures=['TOTAL BEHAVIOR TIME IN ROI (S)'])
+#
+# analyzer = ROIClfCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", bp_names=['Nose'], clf_names=['straub_tail'], roi_names=['RECTANGLE', 'CIRCLE', 'POLYGON'])
 # analyzer.run()
 # analyzer.save()
+
+# analyzer = ROIClfCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", bp_names=['Nose'], clf_names=['straub_tail'], measures=['TOTAL BEHAVIOR TIME IN ROI (S)'])
+# analyzer.run()
+#
 
 
 #clf_ROI_analyzer = clf_within_ROI(config_ini="/Users/simon/Desktop/troubleshooting/train_model_project/project_folder/project_config.ini")

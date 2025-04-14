@@ -207,7 +207,9 @@ class PopUpMixin(object):
                        title: Optional[str] = "RUN",
                        btn_txt_clr: Optional[str] = "black",
                        idx: Optional[int] = None,
-                       btn_icon_name: Optional[str] = 'rocket') -> None:
+                       btn_icon_name: Optional[str] = 'rocket',
+                       padx: int = 0,
+                       pady: int = 0) -> None:
 
         """
         Create a label frame with a single button with a specified callback.
@@ -227,7 +229,7 @@ class PopUpMixin(object):
         if idx is None:
             self.run_frm.grid(row=self.children_cnt_main() + 1, column=0, sticky=NW)
         else:
-            self.run_frm.grid(row=idx, column=0, sticky=NW)
+            self.run_frm.grid(row=idx, column=0, sticky=NW, padx=padx, pady=pady)
         self.run_btn.grid(row=0, column=0, sticky=NW)
 
     def create_choose_number_of_body_parts_frm(self, project_body_parts: List[str], run_function: object, title: str = "SELECT NUMBER OF BODY-PARTS", dropdown_lbl: str = "# of body-parts"):

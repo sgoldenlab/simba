@@ -223,7 +223,7 @@ class ROI_mixin(ConfigReader):
                              parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                              row_idx: int):
 
-        self.change_attr_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="VIDEO AND FRAME INFORMATION", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='info')
+        self.change_attr_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="VIDEO AND FRAME INFORMATION", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='info', relief='solid')
         self.video_name_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'VIDEO NAME: {self.video_meta["video_name"]}')
         self.video_fps_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'FPS: {self.video_meta["fps"]}')
         self.video_frame_id_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'DISPLAY FRAME #: {self.img_idx}')
@@ -248,7 +248,7 @@ class ROI_mixin(ConfigReader):
                              parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                              row_idx: int):
 
-        self.select_img_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="CHANGE IMAGE", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='frames')
+        self.select_img_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="CHANGE IMAGE", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='frames', relief='solid')
         self.forward_1s_btn = SimbaButton(parent=self.select_img_panel, txt="+1s", img='plus_green_2', font=Formats.FONT_REGULAR.value, txt_clr='darkgreen', cmd=self.change_img, cmd_kwargs={'stride': int(self.video_meta['fps'])})
         self.backwards_1s_btn = SimbaButton(parent=self.select_img_panel, txt="-1s", img='minus_blue_2', font=Formats.FONT_REGULAR.value, txt_clr='darkblue', cmd=self.change_img, cmd_kwargs={'stride': -int(self.video_meta['fps'])})
         self.custom_seconds_entry = Entry_Box(parent=self.select_img_panel, fileDescription='CUSTOM SECONDS:', labelwidth=18, validation='numeric', entry_box_width=4)
@@ -269,7 +269,7 @@ class ROI_mixin(ConfigReader):
                                     parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                                     row_idx: int):
 
-        self.select_shape_type_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SET NEW SHAPE", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='shapes_large')
+        self.select_shape_type_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SET NEW SHAPE", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='shapes_large', relief='solid')
         self.rectangle_button = SimbaButton(parent=self.select_shape_type_panel, txt='RECTANGLE', txt_clr='black', font=Formats.FONT_REGULAR.value, img='rectangle_1_large', cmd=self.set_selected_shape_type, cmd_kwargs={'shape_type': lambda: RECTANGLE})
         self.circle_button = SimbaButton(parent=self.select_shape_type_panel, txt='CIRCLE', txt_clr='black', font=Formats.FONT_REGULAR.value, img='circle_large', cmd=self.set_selected_shape_type, cmd_kwargs={'shape_type': lambda: CIRCLE})
         self.polygon_button = SimbaButton(parent=self.select_shape_type_panel, txt='POLYGON', txt_clr='black', font=Formats.FONT_REGULAR.value, img='polygon_large', cmd=self.set_selected_shape_type, cmd_kwargs={'shape_type': lambda: POLYGON})
@@ -282,7 +282,7 @@ class ROI_mixin(ConfigReader):
                              parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                              row_idx: int):
 
-        self.shape_attr_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE ATTRIBUTES", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='attributes_large')
+        self.shape_attr_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE ATTRIBUTES", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='attributes_large', relief='solid')
         self.thickness_dropdown = DropDownMenu(self.shape_attr_panel, "SHAPE THICKNESS: ", ROI_SETTINGS.SHAPE_THICKNESS_OPTIONS.value, 17)
         self.thickness_dropdown.setChoices(5)
         self.color_dropdown = DropDownMenu(self.shape_attr_panel, "SHAPE COLOR: ", list(self.color_option_dict.keys()), 17)
@@ -298,7 +298,7 @@ class ROI_mixin(ConfigReader):
                              parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                              row_idx: int):
 
-        self.shape_name_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE NAME", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='label_large')
+        self.shape_name_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE NAME", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='label_large', relief='solid')
         self.shape_name_eb = Entry_Box(parent=self.shape_name_panel, fileDescription="SHAPE NAME: ", labelwidth=15, entry_box_width=55)
         self.shape_name_panel.grid(row=row_idx, sticky=W, pady=10)
         self.shape_name_eb.grid(row=0, column=0, sticky=W, pady=10)
@@ -307,7 +307,7 @@ class ROI_mixin(ConfigReader):
                            parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                            row_idx: int):
 
-        self.save_roi_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SAVE ROI DRAWINGS", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='save_large')
+        self.save_roi_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SAVE ROI DRAWINGS", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='save_large', relief='solid')
         self.save_data_btn = SimbaButton(parent=self.save_roi_panel, txt="SAVE VIDEO ROI DATA", img='save_large', txt_clr='black', cmd=self.save_video_rois)
         self.save_roi_panel.grid(row=row_idx, sticky=W, pady=10)
         self.save_data_btn.grid(row=0, column=0, sticky=W, pady=10, padx=(0, 10))
@@ -318,7 +318,7 @@ class ROI_mixin(ConfigReader):
                            row_idx: int,
                            top_level: Toplevel):
 
-        self.interact_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE INTERACTION", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='interaction_large')
+        self.interact_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE INTERACTION", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='interaction_large', relief='solid')
         self.move_shape_btn = SimbaButton(parent=self.interact_panel, txt="MOVE SHAPE", img='move_large', txt_clr='black', cmd=self.move_shapes, cmd_kwargs={'parent_frame': lambda : top_level})
         self.shape_info_btn = SimbaButton(parent=self.interact_panel, txt="SHOW SHAPE INFO", img='info_large', txt_clr='black', enabled=True, cmd=self.show_shape_info)
         self.interact_panel.grid(row=row_idx, sticky=W, pady=10)
@@ -338,7 +338,7 @@ class ROI_mixin(ConfigReader):
                        row_idx: int,
                        top_level: Union[Frame, Canvas, LabelFrame, Toplevel]):
 
-        self.draw_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="DRAW", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='palette_large')
+        self.draw_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="DRAW", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='palette_large', relief='solid')
         self.draw_btn = SimbaButton(parent=self.draw_panel, txt='DRAW', img='brush_large', txt_clr='black', cmd=self.draw, cmd_kwargs={'parent_frame': top_level})
         self.delete_all_btn = SimbaButton(parent=self.draw_panel, txt='DELETE ALL', img='delete_large_red', txt_clr='black', cmd=self.delete_all)
         self.roi_dropdown = DropDownMenu(self.draw_panel, "ROI: ", self.roi_names, 5)
@@ -359,7 +359,7 @@ class ROI_mixin(ConfigReader):
                                           parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
                                           row_idx: int):
 
-        self.shapes_from_other_video_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="APPLY SHAPES FROM DIFFERENT VIDEO", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='duplicate_2_large')
+        self.shapes_from_other_video_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="APPLY SHAPES FROM DIFFERENT VIDEO", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='duplicate_2_large', relief='solid')
         self.other_videos_dropdown = DropDownMenu(self.shapes_from_other_video_panel, "FROM VIDEO: ", self.other_video_names_w_rois, 15)
         self.other_videos_dropdown.setChoices(self.other_video_names_w_rois[0])
         self.apply_other_video_btn = SimbaButton(parent=self.shapes_from_other_video_panel, txt="APPLY", img='tick_large', txt_clr='black', enabled=True, cmd=self.apply_different_video, cmd_kwargs={'video_name': lambda: self.other_videos_dropdown.getChoices()})

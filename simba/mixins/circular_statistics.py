@@ -1302,14 +1302,13 @@ class CircularStatisticsMixin(object):
 
             A2 = 4 * Cov_xy - 3 * Mz * Mz - Mzz
             A1 = Var_z * Mz + 4.0 * Cov_xy * Mz - Mxz * Mxz - Myz * Myz
-            A0 = (
-                Mxz * (Mxz * Myy - Myz * Mxy)
-                + Myz * (Myz * Mxx - Mxz * Mxy)
-                - Var_z * Cov_xy
-            )
+            A0 = (Mxz * (Mxz * Myy - Myz * Mxy) + Myz * (Myz * Mxx - Mxz * Mxy) - Var_z * Cov_xy)
             A22 = A2 + A2
 
             Y, X = A0, 0.0
+            if A1 == 0:
+                continue
+
             for j in range(max_iterations):
                 Dy = A1 + X * (A22 + 16.0 * (X**2))
                 xnew = X - Y / Dy

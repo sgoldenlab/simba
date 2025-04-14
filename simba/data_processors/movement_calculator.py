@@ -8,12 +8,11 @@ import pandas as pd
 from simba.feature_extractors.perimeter_jit import jitted_centroid
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.mixins.feature_extraction_supplement_mixin import \
-    FeatureExtractionSupplemental
-from simba.utils.checks import (check_if_filepath_list_is_empty,
-                                check_that_column_exist)
+from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
+from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_that_column_exist, check_valid_lst, check_float)
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
+from simba.utils.errors import NoDataError
 
 
 class MovementCalculator(ConfigReader, FeatureExtractionMixin):
@@ -44,12 +43,17 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
 
         ConfigReader.__init__(self, config_path=config_path)
         FeatureExtractionMixin.__init__(self)
-        self.save_path = os.path.join(self.logs_path, "Movement_log_{}.csv".format(self.datetime))
-        self.file_paths, self.body_parts, self.threshold = (file_paths, body_parts, threshold)
-        if not self.file_paths:
-            check_if_filepath_list_is_empty(filepaths=self.outlier_corrected_paths, error_msg=f"SIMBA ERROR: Cannot process movement. ZERO data files found in the {self.outlier_corrected_dir} directory.")
+        if file_paths is not None:
+            check_valid_lst(data=file_paths, source=f'{self.__class__.__name__} file_paths', min_len=1, valid_dtypes=(str,))
+            self.file_paths = file_paths
+        else:
+            if len(self.outlier_corrected_paths) == 0:
+                raise NoDataError(msg=f'No data files found in {self.outlier_corrected_dir}', source=self.__class__.__name__)
             self.file_paths = self.outlier_corrected_paths
-        print(f"Processing {len(self.file_paths)} video(s)...")
+        self.save_path = os.path.join(self.logs_path, f"Movement_log_{self.datetime}.csv")
+        check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
+        check_valid_lst(data=body_parts, source=f'{self.__class__.__name__} file_paths', min_len=1, valid_dtypes=(str,), valid_values=self.body_parts_lst)
+        self.body_parts, self.threshold, self.body_parts = file_paths, threshold, body_parts
 
     def __find_body_part_columns(self):
         self.body_parts_dict, self.bp_list = {}, []
@@ -62,6 +66,7 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
                 pass
 
     def run(self):
+        check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.file_paths)
         self.results = pd.DataFrame(columns=["VIDEO", "ANIMAL", "BODY-PART", "MEASURE", "VALUE"])
         self.movement_dfs = {}
         for file_cnt, file_path in enumerate(self.file_paths):
@@ -82,7 +87,6 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
                     distance, velocity = FeatureExtractionSupplemental.distance_and_velocity(x=animal_df.values, fps=self.fps, pixels_per_mm=self.px_per_mm, centimeters=True)
                     self.results.loc[len(self.results)] = [video_name, animal_data["ANIMAL NAME"], animal_data["BODY-PART"], "Distance (cm)", distance]
                     self.results.loc[len(self.results)] = [ video_name, animal_data["ANIMAL NAME"], animal_data["BODY-PART"], "Velocity (cm/s)", velocity]
-
             else:
                 for animal in self.body_parts:
                     animal_name = animal.split("CENTER OF GRAVITY")[0].strip()
@@ -98,6 +102,16 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
         self.results.set_index("VIDEO").to_csv(self.save_path)
         self.timer.stop_timer()
         stdout_success(msg=f"Movement log saved in {self.save_path}", elapsed_time=self.timer.elapsed_time_str)
+
+
+
+# test = MovementCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#                           body_parts=['Animal_1 CENTER OF GRAVITY', 'Nose'], #['Simon CENTER OF GRAVITY', 'JJ CENTER OF GRAVITY', 'Animal_1 CENTER OF GRAVITY']
+#                           threshold=0.00)
+# test.run()
+# test.save()
+
+
 
 
 # test = MovementCalculator(config_path=r"C:\troubleshooting\ROI_movement_test\project_folder\project_config.ini",
