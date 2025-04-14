@@ -11,7 +11,8 @@ from simba.plotting.probability_plot_creator import \
     TresholdPlotCreatorSingleProcess
 from simba.plotting.probability_plot_creator_mp import \
     TresholdPlotCreatorMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaButton, SimbaCheckbox, SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaButton,
+                                        SimbaCheckbox, SimBADropDown)
 from simba.utils.enums import Formats, Links
 from simba.utils.lookups import get_color_dict
 from simba.utils.read_write import (check_if_filepath_list_is_empty,

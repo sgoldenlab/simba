@@ -8,7 +8,8 @@ from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaButton,
                                         SimbaCheckbox)
 from simba.utils.enums import Formats, Keys, Links, Options
-from simba.utils.errors import (NoChoosenClassifierError, NoChoosenMeasurementError, NoDataError)
+from simba.utils.errors import (NoChoosenClassifierError,
+                                NoChoosenMeasurementError, NoDataError)
 
 
 class ClfDescriptiveStatsPopUp(PopUpMixin, ConfigReader):

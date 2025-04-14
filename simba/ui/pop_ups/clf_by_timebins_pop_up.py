@@ -8,10 +8,12 @@ from typing import Union
 from simba.data_processors.timebins_clf_calculator import TimeBinsClfCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, SimbaButton, SimbaCheckbox)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        SimbaButton, SimbaCheckbox)
 from simba.utils.checks import check_int
 from simba.utils.enums import Formats, Keys, Links, Options
-from simba.utils.errors import (NoChoosenClassifierError, NoChoosenMeasurementError, NoDataError)
+from simba.utils.errors import (NoChoosenClassifierError,
+                                NoChoosenMeasurementError, NoDataError)
 
 
 class TimeBinsClfPopUp(PopUpMixin, ConfigReader):
