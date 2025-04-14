@@ -8,7 +8,9 @@ from typing import Union
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.clf_validator import ClassifierValidationClips
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, SimbaButton, SimbaCheckbox, SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, SimbaButton, SimbaCheckbox,
+                                        SimBADropDown)
 from simba.utils.checks import check_int
 from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.errors import NoDataError

@@ -8,11 +8,14 @@ import pandas as pd
 from simba.feature_extractors.perimeter_jit import jitted_centroid
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_that_column_exist, check_valid_lst, check_float)
+from simba.mixins.feature_extraction_supplement_mixin import \
+    FeatureExtractionSupplemental
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log, check_float,
+    check_that_column_exist, check_valid_lst)
+from simba.utils.errors import NoDataError
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
-from simba.utils.errors import NoDataError
 
 
 class MovementCalculator(ConfigReader, FeatureExtractionMixin):

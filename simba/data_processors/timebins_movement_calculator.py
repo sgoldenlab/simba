@@ -9,14 +9,17 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
+from simba.mixins.feature_extraction_supplement_mixin import \
+    FeatureExtractionSupplemental
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_float, check_if_filepath_list_is_empty, check_valid_lst, check_valid_boolean, check_that_column_exist)
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log, check_float,
+    check_if_filepath_list_is_empty, check_that_column_exist,
+    check_valid_boolean, check_valid_lst)
 from simba.utils.enums import TagNames
 from simba.utils.errors import FrameRangeError, NoDataError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import get_fn_ext, read_df, create_directory
-from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.read_write import create_directory, get_fn_ext, read_df
 
 
 class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):

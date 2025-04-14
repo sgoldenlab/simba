@@ -9,15 +9,17 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.utils.checks import ( check_all_file_names_are_represented_in_video_log, check_file_exist_and_readable, check_if_dir_exists, check_valid_dataframe, check_valid_lst, check_valid_tuple)
-from simba.utils.data import detect_bouts
-from simba.utils.errors import InvalidInputError, NoROIDataError, NoDataError
+from simba.roi_tools.roi_utils import get_roi_dict_from_dfs
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_file_exist_and_readable, check_if_dir_exists, check_valid_dataframe,
+    check_valid_lst, check_valid_tuple)
+from simba.utils.data import detect_bouts, slice_roi_dict_for_video
+from simba.utils.enums import ROI_SETTINGS
+from simba.utils.errors import InvalidInputError, NoDataError, NoROIDataError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df
-from simba.roi_tools.roi_utils import get_roi_dict_from_dfs
 from simba.utils.warnings import ROIWarning
-from simba.utils.data import slice_roi_dict_for_video
-from simba.utils.enums import ROI_SETTINGS
 
 TOTAL_TIME = 'TOTAL BEHAVIOR TIME IN ROI (S)'
 START_COUNTS = 'STARTED BEHAVIOR BOUTS IN ROI (COUNT)'
