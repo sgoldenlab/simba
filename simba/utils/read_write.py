@@ -2185,6 +2185,8 @@ def read_img_batch_from_video_gpu(video_path: Union[str, os.PathLike],
         end_frm = end_frm + 1
     else:
         end_frm = video_meta_data["frame_count"] + 1
+    if end_frm < start_frm:
+        raise FrameRangeError(msg=f'The end frame ({end_frm}) has to be after of the same as the start frame ({start_frm})', source=read_img_batch_from_video_gpu.__name__)
 
     start_time, end_time = start_frm / video_meta_data["fps"], end_frm / video_meta_data["fps"]
     duration = end_time - start_time
@@ -2453,6 +2455,7 @@ def read_boris_file(file_path: Union[str, os.PathLike],
             if raise_error:
                 raise InvalidFileTypeError(msg=f'{file_path} is not a valid BORIS file', source=read_boris_file.__name__)
             else:
+
                 ThirdPartyAnnotationsInvalidFileFormatWarning(annotation_app="BORIS", file_path=file_path, source=read_boris_file.__name__, log_status=log_setting)
                 return {}
         start_idx = boris_df[boris_df[OBSERVATION_ID] == TIME].index.values
@@ -2493,6 +2496,7 @@ def read_boris_file(file_path: Union[str, os.PathLike],
             check_float(name='fps', value=fps, min_value=10e-6, raise_error=True)
             fps = [float(fps)]
         else:
+            print(media_file_names_in_file)
             fps_lst = df[FPS].iloc[0].split(';')
             fps = []
             for fps_value in fps_lst:
@@ -2531,7 +2535,9 @@ def read_boris_file(file_path: Union[str, os.PathLike],
     else:
         write_pickle(data=results, save_path=save_path)
 
-
+# files = find_files_of_filetypes_in_directory(directory=r"C:\Users\sroni\Downloads\boris_files\boris_files", extensions=['.csv'])
+# for file in files:
+#     read_boris_file(file_path=file)
 
 def img_stack_to_video(x: np.ndarray,
                        save_path: Union[str, os.PathLike],

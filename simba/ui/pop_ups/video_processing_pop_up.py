@@ -2128,48 +2128,48 @@ class Convert2PNGPopUp(PopUpMixin):
         file_path = self.selected_file_dir.file_path
         check_file_exist_and_readable(file_path)
         _ = convert_to_png(path=file_path, verbose=True)
-
 class Convert2MP4PopUp(PopUpMixin):
     """
     :example:
     >>> Convert2MP4PopUp()
     """
     def __init__(self):
-        super().__init__(title="CONVERT VIDEOS TO MP4")
-        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.MP4_CODEC_LK = {'HEVC (H.265)': 'libx265', 'H.264 (AVC)': 'libx264', 'VP9': 'vp9', 'GPU (h264_cuvid)': 'h264_cuvid', 'Guranteed powerpoint compatible': 'powerpoint'}
+
+        self.MP4_CODEC_LK = {'HEVC (H.265)': 'libx265', 'H.264 (AVC)': 'libx264', 'VP9': 'vp9', 'GPU (h264_cuvid)': 'h264_cuvid', 'Guaranteed powerpoint compatible': 'powerpoint'}
         self.cpu_codec_qualities = list(range(10, 110, 10))
         self.gpu_codec_qualities = ['Low', 'Medium', 'High']
-        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY:", self.cpu_codec_qualities, labelwidth=25)
-        self.quality_dropdown.setChoices(60)
-        self.codec_dropdown = DropDownMenu(settings_frm, "COMPRESSION CODEC:", list(self.MP4_CODEC_LK.keys()), labelwidth=25, com=self.update_quality_dropdown)
-        self.codec_dropdown.setChoices('H.264 (AVC)')
-        settings_frm.grid(row=0, column=0, sticky=NW)
+        super().__init__(title="CONVERT VIDEOS TO MP4", icon='mp4')
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5, relief='solid')
+
+        self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=self.cpu_codec_qualities, label="OUTPUT VIDEO QUALITY:", label_width=30, dropdown_width=40, value=60)
+        self.codec_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.MP4_CODEC_LK.keys()), label="COMPRESSION CODEC:", label_width=30, dropdown_width=40, value='H.264 (AVC)', command=self.update_quality_dropdown)
+        settings_frm.grid(row=0, column=0, sticky=NW, padx=10, pady=10)
         self.quality_dropdown.grid(row=0, column=0, sticky=NW)
         self.codec_dropdown.grid(row=1, column=0, sticky=NW)
 
-        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
-        single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=False))
-        single_video_frm.grid(row=1, column=0, sticky=NW)
+        single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name='video', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5, relief='solid')
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=30, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+
+        single_video_run = SimbaButton(parent=single_video_frm, txt="RUN - SINGLE VIDEO", img='rocket', cmd=self.run, cmd_kwargs={'multiple': False})
+
+        single_video_frm.grid(row=1, column=0, sticky=NW, padx=10, pady=10)
         self.selected_video.grid(row=0, column=0, sticky=NW)
         single_video_run.grid(row=1, column=0, sticky=NW)
 
-        multiple_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO DIRECTORY", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video_dir = FolderSelect(multiple_video_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
-        multiple_video_run = Button(multiple_video_frm, text="RUN - VIDEO DIRECTORY", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=True))
-        multiple_video_frm.grid(row=2, column=0, sticky=NW)
-        self.selected_video_dir.grid(row=0, column=0, sticky=NW)
+        multiple_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO DIRECTORY", icon_name='stack', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5, relief='solid')
+        self.selected_video_dir = FolderSelect(multiple_video_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=30)
+
+        multiple_video_run = SimbaButton(parent=multiple_video_frm, txt="RUN - VIDEO DIRECTORY", img='rocket', cmd=self.run, cmd_kwargs={'multiple': True})
+        multiple_video_frm.grid(row=2, column=0, sticky=NW, padx=10, pady=10)
         multiple_video_run.grid(row=1, column=0, sticky=NW)
+        self.selected_video_dir.grid(row=0, column=0, sticky=NW)
         self.main_frm.mainloop()
 
     def update_quality_dropdown(self, k):
-        self.quality_dropdown.popupMenu['menu'].delete(0, 'end')
         if k == 'GPU (h264_cuvid)': option_lst = self.gpu_codec_qualities
         else: option_lst = self.cpu_codec_qualities
-        for option in option_lst:
-            self.quality_dropdown.popupMenu['menu'].add_command(label=option, command=lambda value=option: self.quality_dropdown.dropdownvar.set(value))
-        self.quality_dropdown.setChoices(option_lst[0])
+        self.quality_dropdown.dropdown['values'] = option_lst
+        self.quality_dropdown.dropdown.set(option_lst[0])
 
     def run(self, multiple: bool):
         if not multiple:
@@ -2181,6 +2181,11 @@ class Convert2MP4PopUp(PopUpMixin):
         codec = self.MP4_CODEC_LK[self.codec_dropdown.getChoices()]
         quality = self.quality_dropdown.getChoices()
         threading.Thread(target=convert_to_mp4(path=video_path, codec=codec, quality=quality))
+
+
+
+
+
 
 class Convert2AVIPopUp(PopUpMixin):
     """

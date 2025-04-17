@@ -32,22 +32,27 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_keys_exist_in_dict,
                                 check_if_valid_rgb_tuple, check_int,
                                 check_valid_extension, check_valid_tuple,
-                                check_video_and_data_frm_count_align)
+                                check_video_and_data_frm_count_align, check_valid_boolean)
 from simba.utils.data import plug_holes_shortest_bout
 from simba.utils.enums import TextOptions
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_fn_ext,
                                     get_video_meta_data, read_df, read_pickle,
-                                    write_df)
+                                    write_df, create_directory)
 
 
 def _validation_video_mp(data: pd.DataFrame,
                         bp_dict: dict,
                         video_save_dir: str,
-                        settings: dict,
                         video_path: str,
-                        video_meta_data: dict,
+                        text_thickness: int,
+                        text_opacity: float,
+                        font_size: int,
+                        text_spacing: int,
+                        circle_size: int,
+                        show_pose: bool,
+                        show_animal_names: bool,
                         gantt_setting: Union[int, None],
                         final_gantt: Optional[np.ndarray],
                         clf_data: np.ndarray,
@@ -104,9 +109,10 @@ def _validation_video_mp(data: pd.DataFrame,
     dpi = plt.rcParams["figure.dpi"]
     fourcc, font = cv2.VideoWriter_fourcc(*"mp4v"), cv2.FONT_HERSHEY_DUPLEX
     cap = cv2.VideoCapture(video_path)
-    group = data["group"].iloc[0]
-    start_frm, current_frm, end_frm = data.index[0], data.index[0], data.index[-1]
-    video_save_path = os.path.join(video_save_dir, f"{group}.mp4")
+    video_meta_data = get_video_meta_data(video_path=video_path)
+    batch_id, batch_data = data[0], data[1]
+    start_frm, current_frm, end_frm = batch_data.index[0], batch_data.index[0], batch_data.index[-1]
+    video_save_path = os.path.join(video_save_dir, f"{batch_id}.mp4")
     if gantt_setting is not None:
         video_size = (int(video_meta_data["width"] + final_gantt.shape[1]), int(video_meta_data["height"]))
         writer = cv2.VideoWriter(video_save_path, fourcc, video_meta_data["fps"], video_size)
@@ -118,27 +124,27 @@ def _validation_video_mp(data: pd.DataFrame,
         clf_frm_cnt = np.sum(clf_data[0:current_frm])
         ret, img = cap.read()
         if ret:
-            if settings["pose"]:
+            if show_pose:
                 for animal_cnt, (animal_name, animal_data) in enumerate(bp_dict.items()):
                     for bp_cnt, bp in enumerate(range(len(animal_data["X_bps"]))):
                         x_header, y_header = (animal_data["X_bps"][bp], animal_data["Y_bps"][bp])
-                        animal_cords = tuple(data.loc[current_frm, [x_header, y_header]])
-                        cv2.circle(img, (int(animal_cords[0]), int(animal_cords[1])), settings["styles"]["circle size"], clrs[animal_cnt][bp_cnt], -1)
-            if settings["animal_names"]:
+                        animal_cords = tuple(batch_data.loc[current_frm, [x_header, y_header]])
+                        cv2.circle(img, (int(animal_cords[0]), int(animal_cords[1])), circle_size, clrs[animal_cnt][bp_cnt], -1)
+            if show_animal_names:
                 for animal_cnt, (animal_name, animal_data) in enumerate(bp_dict.items()):
                     x_header, y_header = (animal_data["X_bps"][0], animal_data["Y_bps"][0],)
-                    animal_cords = tuple(data.loc[current_frm, [x_header, y_header]])
-                    cv2.putText(img, animal_name, (int(animal_cords[0]), int(animal_cords[1])), font, settings["styles"]["font size"], clrs[animal_cnt][0], TextOptions.TEXT_THICKNESS.value)
+                    animal_cords = tuple(batch_data.loc[current_frm, [x_header, y_header]])
+                    cv2.putText(img, animal_name, (int(animal_cords[0]), int(animal_cords[1])), font, font_size, clrs[animal_cnt][0], text_thickness)
 
             target_timer = round((1 / video_meta_data["fps"]) * clf_frm_cnt, 2)
-            img = _put_text(img=img, text="BEHAVIOR TIMER:", pos=(TextOptions.BORDER_BUFFER_Y.value, settings["styles"]["space_scale"]), font_size=settings["styles"]["font size"], font_thickness=TextOptions.TEXT_THICKNESS.value)
+            img = _put_text(img=img, text="BEHAVIOR TIMER:", pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value)
             addSpacer = 2
-            img = _put_text(img=img, text=f"{clf_name} {target_timer}s", pos=(TextOptions.BORDER_BUFFER_Y.value, settings["styles"]["space_scale"] * addSpacer), font_size=settings["styles"]["font size"], font_thickness=TextOptions.TEXT_THICKNESS.value)
+            img = _put_text(img=img, text=f"{clf_name} {target_timer}s", pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing * addSpacer), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_bg_alpha=text_opacity)
             addSpacer += 1
-            img = _put_text(img=img, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, settings["styles"]["space_scale"] * addSpacer), font_size=settings["styles"]["font size"], font_thickness=TextOptions.TEXT_THICKNESS.value)
+            img = _put_text(img=img, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing * addSpacer), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_bg_alpha=text_opacity)
             addSpacer += 1
             if clf_data[current_frm] == 1:
-                img = _put_text(img=img, text=clf_name, pos=(TextOptions.BORDER_BUFFER_Y.value, settings["styles"]["space_scale"] * addSpacer), font_size=settings["styles"]["font size"], font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=TextOptions.COLOR.value)
+                img = _put_text(img=img, text=clf_name, pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing * addSpacer), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=TextOptions.COLOR.value, text_bg_alpha=text_opacity)
             addSpacer += 1
             if gantt_setting == 1:
                 img = np.concatenate((img, final_gantt), axis=1)
@@ -148,10 +154,10 @@ def _validation_video_mp(data: pd.DataFrame,
             img = cv2.resize(img, video_size, interpolation=cv2.INTER_LINEAR)
             writer.write(np.uint8(img))
             current_frm += 1
-            print(f"Multi-processing video frame {current_frm} on core {group}...")
+            print(f"Multi-processing video frame {current_frm} on core {batch_id}...")
     cap.release()
     writer.release()
-    return group
+    return batch_id
 
 
 class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelMixin):
@@ -185,113 +191,130 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
 
     def __init__(self,
                  config_path: Union[str, os.PathLike],
-                 feature_file_path: Union[str, os.PathLike],
+                 feature_path: Union[str, os.PathLike],
                  model_path: Union[str, os.PathLike],
-                 settings: Dict[str, Any],
-                 cores: Optional[int] = -1,
-                 discrimination_threshold: Optional[float] = 0.0,
-                 shortest_bout: Optional[int] = 0,
-                 create_gantt: Optional[Union[int, None]] = None):
+                 show_pose: bool = True,
+                 show_animal_names: bool = False,
+                 font_size: Optional[bool] = None,
+                 circle_size: Optional[int] = None,
+                 text_spacing: Optional[int] = None,
+                 text_thickness: Optional[int] = None,
+                 text_opacity: Optional[float] = None,
+                 discrimination_threshold: float = 0.0,
+                 shortest_bout: int = 0.0,
+                 core_cnt: int = -1,
+                 create_gantt: Optional[Union[None, int]] = None):
+
 
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
         TrainModelMixin.__init__(self)
-        check_int(name=f"{self.__class__.__name__} shortest_bout", value=shortest_bout, min_value=0)
-        check_float(name=f"{self.__class__.__name__} discrimination_threshold", value=discrimination_threshold, min_value=0, max_value=1.0)
-        check_int(name=f"{self.__class__.__name__} cores", value=shortest_bout, min_value=-1)
-        check_file_exist_and_readable(file_path=feature_file_path)
+        check_file_exist_and_readable(file_path=config_path)
+        check_file_exist_and_readable(file_path=feature_path)
         check_file_exist_and_readable(file_path=model_path)
-        check_if_keys_exist_in_dict(data=settings, key=["pose", "animal_names", "styles"], name=f"{self.__class__.__name__} settings",)
-        if (cores > find_core_cnt()[0]) or (cores == -1):
-            cores = find_core_cnt()[0]
+        check_valid_boolean(value=[show_pose], source=f'{self.__class__.__name__} show_pose', raise_error=True)
+        check_valid_boolean(value=[show_animal_names], source=f'{self.__class__.__name__} show_animal_names', raise_error=True)
+        check_int(name=f"{self.__class__.__name__} core_cnt", value=core_cnt, min_value=-1, unaccepted_vals=[0])
+        if font_size is not None: check_int(name=f'{self.__class__.__name__} font_size', value=font_size)
+        if circle_size is not None: check_int(name=f'{self.__class__.__name__} circle_size', value=circle_size)
+        if text_spacing is not None: check_int(name=f'{self.__class__.__name__} text_spacing', value=text_spacing)
+        if text_opacity is not None: check_float(name=f'{self.__class__.__name__} text_opacity', value=text_opacity, min_value=0.1)
+        if text_thickness is not None: check_float(name=f'{self.__class__.__name__} text_thickness', value=text_thickness, min_value=0.1)
+        check_float(name=f"{self.__class__.__name__} discrimination_threshold", value=discrimination_threshold, min_value=0, max_value=1.0)
+        check_int(name=f"{self.__class__.__name__} shortest_bout", value=shortest_bout, min_value=0)
         if create_gantt is not None:
             check_int(name=f"{self.__class__.__name__} create gantt", value=create_gantt, max_value=2, min_value=1)
-        _, self.feature_filename, feature_ext = get_fn_ext(feature_file_path)
-        _, self.model_filename, model_ext = get_fn_ext(model_path)
-        check_valid_extension(path=feature_file_path, accepted_extensions=[self.file_type])
-        check_valid_extension(path=model_path, accepted_extensions=["sav"])
         if not os.path.exists(self.single_validation_video_save_dir):
             os.makedirs(self.single_validation_video_save_dir)
-        if not os.path.exists(self.clf_data_validation_dir):
-            os.makedirs(self.clf_data_validation_dir)
-        _, _, self.fps = self.read_video_info(video_name=self.feature_filename)
-        self.clf_name = os.path.basename(model_path).replace(".sav", "")
+        _, self.feature_filename, ext = get_fn_ext(feature_path)
         self.video_path = self.find_video_of_file(self.video_dir, self.feature_filename)
-        self.clf_data_save_path = os.path.join(self.clf_data_validation_dir, self.feature_filename + ".csv")
         self.video_meta_data = get_video_meta_data(video_path=self.video_path)
-        self.clf = read_pickle(data_path=model_path)
-        self.data_df = read_df(file_path=feature_file_path, file_type=self.file_type)
+        self.clf_name, self.feature_file_path = (os.path.basename(model_path).replace(".sav", ""), feature_path)
+        self.vid_output_path = os.path.join(self.single_validation_video_save_dir, f"{self.feature_filename} {self.clf_name}.mp4")
+        self.clf_data_save_path = os.path.join(self.clf_data_validation_dir, f"{self.feature_filename }.csv")
+        self.show_pose, self.show_animal_names = show_pose, show_animal_names
+        self.font_size, self.circle_size, self.text_spacing = font_size, circle_size, text_spacing
+        self.text_opacity, self.text_thickness = text_opacity, text_thickness
+        self.clf = read_pickle(data_path=model_path, verbose=True)
+        self.data_df = read_df(feature_path, self.file_type)
         self.x_df = self.drop_bp_cords(df=self.data_df)
-        self.temp_dir = os.path.join(self.single_validation_video_save_dir, "temp")
-        self.video_save_path = os.path.join(self.single_validation_video_save_dir, self.feature_filename + ".mp4")
-        if os.path.exists(self.temp_dir):
-            shutil.rmtree(path=self.temp_dir)
-        os.makedirs(self.temp_dir)
-        (self.discrimination_threshold, self.cores, self.shortest_bout, self.create_gantt, self.settings, self.feature_file_path) = (discrimination_threshold, cores, shortest_bout, create_gantt, settings, feature_file_path)
+        self.discrimination_threshold, self.shortest_bout, self.create_gantt = float(discrimination_threshold), shortest_bout, create_gantt
         check_video_and_data_frm_count_align(video=self.video_path, data=self.data_df, name=self.feature_filename, raise_error=False)
-
-
+        self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
+        self.temp_dir = os.path.join(self.single_validation_video_save_dir, "temp")
+        self.video_save_path = os.path.join(self.single_validation_video_save_dir, f"{self.feature_filename}.mp4")
+        create_directory(path=self.temp_dir, overwrite=True)
         if platform.system() == "Darwin":
             multiprocessing.set_start_method("spawn", force=True)
 
-
-    def __index_df_for_multiprocessing(self, data: List[np.ndarray]) -> List[np.ndarray]:
-        for cnt, df in enumerate(data):
-            df["group"] = cnt
-        return data
+    def _get_styles(self):
+        self.video_text_thickness = TextOptions.TEXT_THICKNESS.value if self.text_thickness is None else int(max(self.text_thickness, 1))
+        longest_str = str(max(['TIMERS:', 'ENSEMBLE PREDICTION:'] + self.clf_names, key=len))
+        optimal_font_size, _, optimal_spacing_scale = self.get_optimal_font_scales(text=longest_str, accepted_px_width=int(self.video_meta_data["width"] / 3), accepted_px_height=int(self.video_meta_data["height"] / 10), text_thickness=self.video_text_thickness)
+        optimal_circle_size = self.get_optimal_circle_size(frame_size=(self.video_meta_data["width"], self.video_meta_data["height"]), circle_frame_ratio=100)
+        self.video_circle_size = optimal_circle_size if self.circle_size is None else int(self.circle_size)
+        self.video_font_size = optimal_font_size if self.font_size is None else self.font_size
+        self.video_space_size = optimal_spacing_scale if self.text_spacing is None else int(max(self.text_spacing, 1))
+        self.video_text_opacity = 0.8 if self.text_opacity is None else float(self.text_opacity)
 
     def run(self):
         self.prob_col_name = f"Probability_{self.clf_name}"
         self.data_df[self.prob_col_name] = self.clf_predict_proba(clf=self.clf, x_df=self.x_df, model_name=self.clf_name, data_path=self.feature_file_path)
         self.data_df[self.clf_name] = np.where(self.data_df[self.prob_col_name] > self.discrimination_threshold, 1, 0)
         if self.shortest_bout > 1:
-            self.data_df = plug_holes_shortest_bout(data_df=self.data_df, clf_name=self.clf_name, fps=self.fps, shortest_bout=self.shortest_bout)
+            self.data_df = plug_holes_shortest_bout(data_df=self.data_df, clf_name=self.clf_name, fps=self.video_meta_data['fps'], shortest_bout=self.shortest_bout)
         _ = write_df(df=self.data_df, file_type=self.file_type, save_path=self.clf_data_save_path)
         print(f"Predictions created for video {self.feature_filename}...")
         if self.create_gantt is not None:
-            self.bouts_df = self.get_bouts_for_gantt(data_df=self.data_df, clf_name=self.clf_name, fps=self.fps)
-            self.final_gantt_img = self.create_gantt_img(self.bouts_df,self.clf_name,len(self.data_df),self.fps,"Behavior gantt chart (entire session)")
+            self.bouts_df = self.get_bouts_for_gantt(data_df=self.data_df, clf_name=self.clf_name, fps=self.video_meta_data['fps'])
+            self.final_gantt_img = self.create_gantt_img(self.bouts_df,self.clf_name,len(self.data_df), self.video_meta_data['fps'],"Behavior gantt chart (entire session)")
             self.final_gantt_img = self.resize_gantt(self.final_gantt_img, self.video_meta_data["height"])
         else:
             self.bouts_df, self.final_gantt_img = None, None
+        self._get_styles()
 
-        if self.settings["styles"] is None:
-            self.settings["styles"] = {}
-            longest_str = max(['ENSEMBLE PREDICTION', 'BEHAVIOR TIMER:', self.clf_name], key=len)
-            font_size, x_shift, y_shift = self.get_optimal_font_scales(text=longest_str, accepted_px_height=int(self.video_meta_data["height"] / 8), accepted_px_width=int(self.video_meta_data["width"] / 2))
-            circle_size = self.get_optimal_circle_size(frame_size=(int(self.video_meta_data["height"]), int(self.video_meta_data["width"])), circle_frame_ratio=100)
-            self.settings["styles"]["font size"] = font_size
-            self.settings["styles"]["space_scale"] = y_shift
-            self.settings["styles"]["circle size"] = circle_size
+
         self.data_df = self.data_df.head(min(len(self.data_df), self.video_meta_data["frame_count"]))
-        data = np.array_split(self.data_df, self.cores)
-        frm_per_core = data[0].shape[0]
-        data = self.__index_df_for_multiprocessing(data=data)
-        with multiprocessing.Pool(self.cores, maxtasksperchild=self.maxtasksperchild) as pool:
+        data = np.array_split(self.data_df, self.core_cnt)
+        data = [(i, j) for i, j in enumerate(data)]
 
+        with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
             constants = functools.partial(_validation_video_mp,
                                           bp_dict=self.animal_bp_dict,
                                           video_save_dir=self.temp_dir,
-                                          settings=self.settings,
-                                          video_meta_data=self.video_meta_data,
+                                          text_thickness=self.video_text_thickness,
+                                          text_opacity=self.video_text_opacity,
+                                          font_size=self.video_font_size,
+                                          text_spacing=self.video_space_size,
+                                          circle_size=self.video_circle_size,
                                           video_path=self.video_path,
+                                          show_pose=self.show_pose,
+                                          show_animal_names=self.show_animal_names,
                                           gantt_setting=self.create_gantt,
                                           final_gantt=self.final_gantt_img,
                                           clf_data=self.data_df[self.clf_name].values,
                                           clrs=self.clr_lst,
                                           clf_name=self.clf_name,
                                           bouts_df=self.bouts_df)
-
-
-
-            print("Creating video...")
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):
-                print(f"Image {int(frm_per_core * (cnt + 1))}/{len(self.data_df)}, Video {self.feature_filename}...")
+                print(f"Image batch {result} complete, Video {self.feature_filename}...")
         pool.terminate()
         pool.join()
         concatenate_videos_in_folder(in_folder=self.temp_dir, save_path=self.video_save_path)
         self.timer.stop_timer()
         stdout_success(msg=f"Video complete, saved at {self.video_save_path}", elapsed_time=self.timer.elapsed_time_str)
+
+
+# if __name__ == "__main__":
+#     test = ValidateModelOneVideoMultiprocess(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini",
+#                                              feature_path=r"D:\troubleshooting\mitra\project_folder\csv\features_extracted\592_MA147_CNO1_0515.csv",
+#                                              model_path=r"C:\troubleshooting\mitra\models\generated_models\grroming_undersample_2_1000\grooming.sav",
+#                                              create_gantt=2,
+#                                              show_pose=True,
+#                                              show_animal_names=True,
+#                                              core_cnt=5)
+#     test.run()
+
 
 #
 # if __name__ == "__main__":

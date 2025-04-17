@@ -122,6 +122,16 @@ class BlobVisualizer():
             # cv2.waitKey(5000)
 
 
+
+# visualizer = BlobVisualizer(data_path=r'D:\troubleshooting\netholabs\original_videos\whiskers\results',
+#                             video_path=r'D:\troubleshooting\netholabs\original_videos\whiskers',
+#                             save_dir=r"D:\troubleshooting\netholabs\original_videos\whiskers\out_video",
+#                             core_cnt=15,
+#                             posterior=None,
+#                             left=None,
+#                             right=None)
+# visualizer.run()
+
 # visualizer = BlobVisualizer(data_path=r'D:\EPM_4\data', video_path=r'D:\EPM_4\original', save_dir=r"D:\EPM_4\out_videos")
 # visualizer.run()
 

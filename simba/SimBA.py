@@ -62,10 +62,8 @@ from simba.ui.machine_model_settings_ui import MachineModelSettingsPopUp
 from simba.ui.pop_ups.about_simba_pop_up import AboutSimBAPopUp
 from simba.ui.pop_ups.animal_directing_other_animals_pop_up import \
     AnimalDirectingAnimalPopUp
-from simba.ui.pop_ups.append_roi_features_animals_pop_up import \
-    AppendROIFeaturesByAnimalPopUp
-from simba.ui.pop_ups.append_roi_features_bodypart_pop_up import \
-    AppendROIFeaturesByBodyPartPopUp
+from simba.ui.pop_ups.append_roi_features_animals_pop_up import AppendROIFeaturesByAnimalPopUp
+from simba.ui.pop_ups.append_roi_features_bodypart_pop_up import AppendROIFeaturesByBodyPartPopUp
 from simba.ui.pop_ups.archive_files_pop_up import ArchiveProcessedFilesPopUp
 from simba.ui.pop_ups.batch_preprocess_pop_up import BatchPreProcessPopUp
 from simba.ui.pop_ups.blob_visualizer_pop_up import BlobVisualizerPopUp
@@ -428,16 +426,20 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
         button_train_multimodel = SimbaButton(parent=label_trainmachinemodel, width=Formats.BUTTON_WIDTH_XXL.value, txt="TRAIN MULTIPLE MODELS (ONE FOR EACH SAVED SETTING)", img='multiple_green', txt_clr='green', cmd=self.train_multiple_models_from_meta, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
 
-        label_model_validation = CreateLabelFrameWithIcon( parent=tab9, header="VALIDATE MODEL ON SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.OUT_OF_SAMPLE_VALIDATION.value, padx=5, pady=5)
-        self.csvfile = FileSelect(label_model_validation,"SELECT DATA FEATURE FILE",color="blue",lblwidth=30,file_types=[("SimBA CSV", "*.csv"), ("SimBA PARQUET", "*.parquet")],initialdir=os.path.join(    self.project_path, Paths.FEATURES_EXTRACTED_DIR.value))
-        self.modelfile = FileSelect(label_model_validation,"SELECT MODEL FILE",color="blue",lblwidth=30,initialdir=self.project_path)
+        label_model_validation = CreateLabelFrameWithIcon( parent=tab9, header="VALIDATE MODEL ON SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.OUT_OF_SAMPLE_VALIDATION.value, padx=5, pady=5, relief='solid')
+        self.csvfile = FileSelect(label_model_validation,fileDescription="SELECT DATA FEATURE FILE PATH", color="blue",lblwidth=40,file_types=[("SimBA CSV", "*.csv"), ("SimBA PARQUET", "*.parquet")], initialdir=os.path.join(self.project_path, Paths.FEATURES_EXTRACTED_DIR.value))
+        self.modelfile = FileSelect(label_model_validation,fileDescription="SELECT MODEL FILE PATH", color="blue", lblwidth=40, initialdir=self.project_path)
 
         button_runvalidmodel = SimbaButton(parent=label_model_validation, width=Formats.BUTTON_WIDTH_XL.value, txt="RUN MODEL", txt_clr='blue', img='rocket', cmd=self.validate_model_first_step, thread=True)
         button_generateplot = SimbaButton(parent=label_model_validation, width=Formats.BUTTON_WIDTH_XL.value, txt="INTERACTIVE PROBABILITY PLOT",  img='interactive_blue', txt_clr='blue', cmd=self.launch_interactive_plot, thread=False)
 
-        self.dis_threshold = Entry_Box(label_model_validation, "DISCRIMINATION THRESHOLD (0.0-1.0):", "35")
-        self.min_behaviorbout = Entry_Box(label_model_validation,"MINIMUM BOUT LENGTH (MS):","35",validation="numeric")
-        button_validate_model = SimbaButton(parent=label_model_validation, width=Formats.BUTTON_WIDTH_XL.value, txt="CREATE VALIDATION VIDEO", txt_clr='blue', img='visualize_blue', cmd=ValidationVideoPopUp, cmd_kwargs={'config_path': lambda:config_path, 'simba_main_frm': lambda:self})
+        self.dis_threshold = Entry_Box(label_model_validation, "DISCRIMINATION THRESHOLD (0.0-1.0):", labelwidth=40, entry_box_width=30)
+        self.min_behaviorbout = Entry_Box(label_model_validation,"MINIMUM BOUT LENGTH (MS):",labelwidth=40, validation="numeric", entry_box_width=30)
+        button_validate_model = SimbaButton(parent=label_model_validation, width=Formats.BUTTON_WIDTH_XL.value, txt="CREATE VALIDATION VIDEO", txt_clr='blue', img='visualize_blue', cmd=ValidationVideoPopUp, cmd_kwargs={'config_path': lambda: config_path,
+                                                                                                                                                                                                                           'feature_path': lambda: self.csvfile.file_path,
+                                                                                                                                                                                                                           'model_path': lambda: self.modelfile.file_path,
+                                                                                                                                                                                                                           'discrimination_threshold': lambda: self.dis_threshold.entry_get,
+                                                                                                                                                                                                                           'shortest_bout': lambda: self.min_behaviorbout.entry_get})
 
         label_runmachinemodel = CreateLabelFrameWithIcon(parent=tab9,header="RUN MACHINE MODEL",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.SCENARIO_2.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
 
@@ -583,7 +585,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_trainmachinemodel.grid(row=1, column=0, sticky=NW, padx=5)
         button_train_multimodel.grid(row=2, column=0, sticky=NW, padx=5)
 
-        label_model_validation.grid(row=7, sticky=W, pady=10)
+        label_model_validation.grid(row=7, sticky=W, pady=10, padx=10)
         self.csvfile.grid(row=0, sticky=W)
         self.modelfile.grid(row=1, sticky=W)
         button_runvalidmodel.grid(row=2, sticky=W)

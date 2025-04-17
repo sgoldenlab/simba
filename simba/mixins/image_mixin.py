@@ -223,9 +223,7 @@ class ImageMixin(object):
             img_2 = ImageMixin().canny_edge_detection(img=img_2)
         img_1_contours = ImageMixin().find_contours(img=img_1, mode=mode, method=method)
         img_2_contours = ImageMixin().find_contours(img=img_2, mode=mode, method=method)
-        return cv2.matchShapes(
-            img_1_contours[0], img_2_contours[0], cv2.CONTOURS_MATCH_I1, 0.0
-        )
+        return cv2.matchShapes(img_1_contours[0], img_2_contours[0], cv2.CONTOURS_MATCH_I1, 0.0)
 
     @staticmethod
     def slice_shapes_in_img(img: Union[np.ndarray, Tuple[cv2.VideoCapture, int]], geometries: List[Union[Polygon, np.ndarray]]) -> List[np.ndarray]:
@@ -325,10 +323,14 @@ class ImageMixin(object):
         Canny edge detection is an edge detection algorithm that uses gradient values to identify sharp changes in intensity
         in an image, which correspond to edges.
 
+        .. note::
+           High sensitivity: threshold_1 = 10 threshold_2 = 60
+           Ultra-high sensitivity: threshold_1 = 5 threshold_2 = 40
+
         :param np.ndarray img: A 2D or 3D NumPy array representing the input image. If the image has 3 channels (RGB or BGR), it will be converted to grayscale.
         :param Optional[int] threshold_1: The lower threshold value for the Canny edge detection. Default is 30.
         :param Optional[int] threshold_2: The upper threshold value for the Canny edge detection. Default is 200.
-        :param Optional[int] aperture_size: The aperture size for the Sobel operator used during edge detection. It must be an odd number between 3 and 7. Default is 3.
+        :param Optional[int] aperture_size: The aperture size for the Sobel operator used during edge detection. It must be an odd number between 3 and 7. Default is 3. Larger values reduce sensitivity to fine details.
         :param Optional[bool] l2_gradient:  If set to True, the L2 norm is used to calculate the gradient magnitude. If False, the L1 norm is used. Default is False.
         :return: A NumPy array representing the detected edges in the image.
         :rtype: np.ndarray
@@ -394,8 +396,8 @@ class ImageMixin(object):
     @staticmethod
     def find_contours(img: np.ndarray,
                       mode: Optional[Literal["all", "exterior"]] = "all",
-                      method: Optional[Literal["simple", "none", "l1", "kcos"]] = "simple",
-                      ) -> np.ndarray:
+                      method: Optional[Literal["simple", "none", "l1", "kcos"]] = "simple") -> np.ndarray:
+
         """
         Find contours in an image.
 

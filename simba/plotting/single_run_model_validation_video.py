@@ -6,7 +6,7 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 import os
 import warnings
-from typing import Any, Dict, Optional, Union
+from typing import Optional, Union
 
 import cv2
 import matplotlib.pyplot as plt
@@ -15,14 +15,11 @@ import numpy as np
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_keys_exist_in_dict, check_int,
-                                check_video_and_data_frm_count_align)
+from simba.utils.checks import (check_file_exist_and_readable, check_float, check_if_keys_exist_in_dict, check_int, check_video_and_data_frm_count_align, check_valid_boolean)
 from simba.utils.data import plug_holes_shortest_bout
 from simba.utils.enums import Formats, TagNames, TextOptions
 from simba.utils.printing import log_event, stdout_success
-from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_df,
-                                    read_pickle, write_df)
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_df, read_pickle, write_df)
 
 plt.interactive(True)
 plt.ioff()
@@ -61,9 +58,15 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
 
     def __init__(self,
                  config_path: Union[str, os.PathLike],
-                 feature_file_path: Union[str, os.PathLike],
+                 feature_path: Union[str, os.PathLike],
                  model_path: Union[str, os.PathLike],
-                 settings: Dict[str, Any],
+                 show_pose: bool = True,
+                 show_animal_names: bool = False,
+                 font_size: Optional[bool] = None,
+                 circle_size: Optional[int] = None,
+                 text_spacing: Optional[int] = None,
+                 text_thickness: Optional[int] = None,
+                 text_opacity: Optional[float] = None,
                  discrimination_threshold: Optional[float] = 0.0,
                  shortest_bout: Optional[int] = 0.0,
                  create_gantt: Optional[Union[None, int]] = None):
@@ -72,43 +75,61 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
         PlottingMixin.__init__(self)
         TrainModelMixin.__init__(self)
         log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
-        check_int(name=f"{self.__class__.__name__} shortest_bout", value=shortest_bout, min_value=0)
-        check_float(name=f"{self.__class__.__name__} discrimination_threshold", value=discrimination_threshold, min_value=0, max_value=1.0)
-        check_int(name=f"{self.__class__.__name__} cores", value=shortest_bout, min_value=-1)
-        check_int(name=f"{self.__class__.__name__} cores", value=shortest_bout, min_value=-1)
-        check_file_exist_and_readable(file_path=feature_file_path)
+        check_file_exist_and_readable(file_path=config_path)
+        check_file_exist_and_readable(file_path=feature_path)
         check_file_exist_and_readable(file_path=model_path)
-        check_if_keys_exist_in_dict(data=settings, key=["pose", "animal_names", "styles"], name=f"{self.__class__.__name__} settings")
+        check_valid_boolean(value=[show_pose], source=f'{self.__class__.__name__} show_pose', raise_error=True)
+        check_valid_boolean(value=[show_animal_names], source=f'{self.__class__.__name__} show_animal_names', raise_error=True)
+        if font_size is not None: check_int(name=f'{self.__class__.__name__} font_size', value=font_size)
+        if circle_size is not None: check_int(name=f'{self.__class__.__name__} circle_size', value=circle_size)
+        if text_spacing is not None: check_int(name=f'{self.__class__.__name__} text_spacing', value=text_spacing)
+        if text_opacity is not None: check_float(name=f'{self.__class__.__name__} text_opacity', value=text_opacity, min_value=0.1)
+        if text_thickness is not None: check_float(name=f'{self.__class__.__name__} text_thickness', value=text_thickness, min_value=0.1)
+        check_float(name=f"{self.__class__.__name__} discrimination_threshold", value=discrimination_threshold, min_value=0, max_value=1.0)
+        check_int(name=f"{self.__class__.__name__} shortest_bout", value=shortest_bout, min_value=0)
         if create_gantt is not None:
             check_int(name=f"{self.__class__.__name__} create gantt", value=create_gantt, max_value=2, min_value=1)
-        _, self.feature_filename, ext = get_fn_ext(feature_file_path)
         if not os.path.exists(self.single_validation_video_save_dir):
             os.makedirs(self.single_validation_video_save_dir)
-        _, _, self.fps = self.read_video_info(video_name=self.feature_filename)
+        _, self.feature_filename, ext = get_fn_ext(feature_path)
         self.video_path = self.find_video_of_file(self.video_dir, self.feature_filename)
         self.video_meta_data = get_video_meta_data(video_path=self.video_path)
-        self.clf_name, self.feature_file_path = (os.path.basename(model_path).replace(".sav", ""), feature_file_path)
+        self.clf_name, self.feature_file_path = (os.path.basename(model_path).replace(".sav", ""), feature_path)
         self.vid_output_path = os.path.join(self.single_validation_video_save_dir, f"{self.feature_filename} {self.clf_name}.mp4")
-        self.clf_data_save_path = os.path.join(self.clf_data_validation_dir, self.feature_filename + ".csv")
+        self.clf_data_save_path = os.path.join(self.clf_data_validation_dir, f"{self.feature_filename }.csv")
+        self.show_pose, self.show_animal_names = show_pose, show_animal_names
+        self.font_size, self.circle_size, self.text_spacing = font_size, circle_size, text_spacing
+        self.text_opacity, self.text_thickness = text_opacity, text_thickness
         self.clf = read_pickle(data_path=model_path, verbose=True)
-        self.data_df = read_df(feature_file_path, self.file_type)
+        self.data_df = read_df(feature_path, self.file_type)
+        self.feature_path =  feature_path
         self.x_df = self.drop_bp_cords(df=self.data_df)
-        (self.discrimination_threshold, self.shortest_bout, self.create_gantt, self.settings) = (float(discrimination_threshold), shortest_bout, create_gantt, settings)
+        self.discrimination_threshold, self.shortest_bout, self.create_gantt = float(discrimination_threshold), shortest_bout, create_gantt
         check_video_and_data_frm_count_align(video=self.video_path, data=self.data_df, name=self.feature_filename, raise_error=False)
+
+    def _get_styles(self):
+        self.video_text_thickness = TextOptions.TEXT_THICKNESS.value if self.text_thickness is None else int(max(self.text_thickness, 1))
+        longest_str = str(max(['TIMERS:', 'ENSEMBLE PREDICTION:'] + self.clf_names, key=len))
+        optimal_font_size, _, optimal_spacing_scale = self.get_optimal_font_scales(text=longest_str, accepted_px_width=int(self.video_meta_data["width"] / 3), accepted_px_height=int(self.video_meta_data["height"] / 10), text_thickness=self.video_text_thickness)
+        optimal_circle_size = self.get_optimal_circle_size(frame_size=(self.video_meta_data["width"], self.video_meta_data["height"]), circle_frame_ratio=100)
+        self.video_circle_size = optimal_circle_size if self.circle_size is None else int(self.circle_size)
+        self.video_font_size = optimal_font_size if self.font_size is None else self.font_size
+        self.video_space_size = optimal_spacing_scale if self.text_spacing is None else int(max(self.text_spacing, 1))
+        self.video_text_opacity = 0.8 if self.text_opacity is None else float(self.text_opacity)
 
     def run(self):
         self.prob_col_name = f"Probability_{self.clf_name}"
-        self.data_df[self.prob_col_name] = self.clf_predict_proba(clf=self.clf, x_df=self.x_df, model_name=self.clf_name, data_path=self.feature_file_path)
+        self.data_df[self.prob_col_name] = self.clf_predict_proba(clf=self.clf, x_df=self.x_df, model_name=self.clf_name, data_path=self.feature_path)
         self.data_df[self.clf_name] = np.where(self.data_df[self.prob_col_name] > self.discrimination_threshold, 1, 0)
         if self.shortest_bout > 1:
-            self.data_df = plug_holes_shortest_bout(data_df=self.data_df, clf_name=self.clf_name, fps=self.fps, shortest_bout=self.shortest_bout)
+            self.data_df = plug_holes_shortest_bout(data_df=self.data_df, clf_name=self.clf_name, fps=self.video_meta_data['fps'], shortest_bout=self.shortest_bout)
         _ = write_df(df=self.data_df, file_type=self.file_type, save_path=self.clf_data_save_path)
-        print(f"Predictions created for video {self.feature_filename}...")
+        print(f"Behavior predictions created for model {self.clf_name} and video {self.feature_filename}...")
         cap = cv2.VideoCapture(self.video_path)
         fourcc, font = cv2.VideoWriter_fourcc(*"mp4v"), cv2.FONT_HERSHEY_COMPLEX
         if self.create_gantt is not None:
-            self.bouts_df = self.get_bouts_for_gantt(data_df=self.data_df, clf_name=self.clf_name, fps=self.fps)
-            self.final_gantt_img = self.create_gantt_img(self.bouts_df, self.clf_name, len(self.data_df), self.fps, "Behavior gantt chart (entire session)")
+            self.bouts_df = self.get_bouts_for_gantt(data_df=self.data_df, clf_name=self.clf_name, fps=self.video_meta_data['fps'])
+            self.final_gantt_img = self.create_gantt_img(bouts_df=self.bouts_df, clf_name=self.clf_name, image_index=len(self.data_df), fps=self.video_meta_data['fps'], gantt_img_title=f"Behavior gantt chart (entire session, length (s): {self.video_meta_data['video_length_s']}, frames: {self.video_meta_data['frame_count']})")
             self.final_gantt_img = self.resize_gantt(self.final_gantt_img, self.video_meta_data["height"])
             video_size = (int(self.video_meta_data["width"] + self.final_gantt_img.shape[1]), int(self.video_meta_data["height"]))
             writer = cv2.VideoWriter(self.vid_output_path, fourcc, self.video_meta_data["fps"], video_size)
@@ -116,47 +137,39 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
             video_size = (int(self.video_meta_data["width"]), int(self.video_meta_data["height"]))
             writer = cv2.VideoWriter(self.vid_output_path, fourcc, self.video_meta_data["fps"], video_size)
 
-        if self.settings["styles"] is None:
-            self.settings["styles"] = {}
-            longest_str = max(['ENSEMBLE PREDICTION', 'BEHAVIOR TIMER:', self.clf_name], key=len)
-            font_size, x_shift, y_shift = self.get_optimal_font_scales(text=longest_str, accepted_px_height=int(self.video_meta_data["height"] / 10), accepted_px_width=int(self.video_meta_data["width"] / 2))
-            circle_size = self.get_optimal_circle_size(frame_size=(int(self.video_meta_data["height"]), int(self.video_meta_data["width"])), circle_frame_ratio=80)
-            self.settings["styles"]["font size"] = font_size
-            self.settings["styles"]["space_scale"] = y_shift
-            self.settings["styles"]["circle size"] = circle_size
-
+        self._get_styles()
         self.data_df = self.data_df.head(min(len(self.data_df), self.video_meta_data["frame_count"]))
         frm_cnt, clf_frm_cnt = 0, 0
-        print("Creating video...")
+        print(f"Creating single core validation visualization for video {self.video_meta_data['video_name']} and classifier {self.clf_name}...")
         while (cap.isOpened()) and (frm_cnt < len(self.data_df)):
             ret, frame = cap.read()
             clf_val = int(self.data_df.loc[frm_cnt, self.clf_name])
             clf_frm_cnt += clf_val
-            if self.settings["pose"]:
+            if self.show_pose:
                 for animal_cnt, (animal_name, animal_data) in enumerate(self.animal_bp_dict.items()):
                     for bp_cnt, bp in enumerate(range(len(animal_data["X_bps"]))):
                         x_header, y_header = (animal_data["X_bps"][bp], animal_data["Y_bps"][bp])
                         animal_cords = tuple(self.data_df.loc[self.data_df.index[frm_cnt], [x_header, y_header]])
-                        cv2.circle(frame, (int(animal_cords[0]), int(animal_cords[1])), 0, self.clr_lst[animal_cnt][bp_cnt], self.settings["styles"]["circle size"])
-            if self.settings["animal_names"]:
+                        cv2.circle(frame, (int(animal_cords[0]), int(animal_cords[1])), self.video_circle_size, self.clr_lst[animal_cnt][bp_cnt], -1)
+            if self.show_animal_names:
                 for animal_cnt, (animal_name, animal_data) in enumerate(self.animal_bp_dict.items()):
                     x_header, y_header = ( animal_data["X_bps"][0], animal_data["Y_bps"][0])
                     animal_cords = tuple(self.data_df.loc[self.data_df.index[frm_cnt], [x_header, y_header]])
-                    cv2.putText(frame, animal_name, (int(animal_cords[0]), int(animal_cords[1])), self.font, self.settings["styles"]["font size"], self.clr_lst[animal_cnt][0], 1)
-            target_timer = round((1 / self.fps) * clf_frm_cnt, 2)
-            frame = PlottingMixin().put_text(img=frame, text="TIMER:", pos=(TextOptions.BORDER_BUFFER_Y.value, self.settings["styles"]["space_scale"]), font_size=self.settings["styles"]["font size"], font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=(255, 255, 255))
+                    cv2.putText(frame, animal_name, (int(animal_cords[0]), int(animal_cords[1])), self.font, self.video_font_size, self.clr_lst[animal_cnt][0], self.video_text_thickness)
+            target_timer = round((1 / self.video_meta_data['fps']) * clf_frm_cnt, 2)
+            frame = PlottingMixin().put_text(img=frame, text="TIMER:", pos=(TextOptions.BORDER_BUFFER_Y.value, self.video_space_size), font_size=self.video_font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=(255, 255, 255))
             addSpacer = 2
-            frame = PlottingMixin().put_text(img=frame, text=(f"{self.clf_name} {target_timer}s"), pos=(TextOptions.BORDER_BUFFER_Y.value, self.settings["styles"]["space_scale"] * addSpacer), font_size=self.settings["styles"]["font size"], font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=(255, 255, 255))
+            frame = PlottingMixin().put_text(img=frame, text=(f"{self.clf_name} {target_timer}s"), pos=(TextOptions.BORDER_BUFFER_Y.value, self.video_space_size * addSpacer), font_size=self.video_font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=(255, 255, 255))
             addSpacer += 1
-            frame = PlottingMixin().put_text(img=frame, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, self.settings["styles"]["space_scale"] * addSpacer), font_size=self.settings["styles"]["font size"], font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=(255, 255, 255))
+            frame = PlottingMixin().put_text(img=frame, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, self.video_space_size * addSpacer), font_size=self.video_font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=(255, 255, 255))
             addSpacer += 2
             if clf_val == 1:
-                frame = PlottingMixin().put_text(img=frame, text=self.clf_name, pos=(TextOptions.BORDER_BUFFER_Y.value, self.settings["styles"]["space_scale"] * addSpacer), font_size=self.settings["styles"]["font size"], font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=TextOptions.COLOR.value)
+                frame = PlottingMixin().put_text(img=frame, text=self.clf_name, pos=(TextOptions.BORDER_BUFFER_Y.value, self.video_space_size * addSpacer), font_size=self.video_font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=TextOptions.COLOR.value)
                 addSpacer += 1
             if self.create_gantt == 1:
                 frame = np.concatenate((frame, self.final_gantt_img), axis=1)
             elif self.create_gantt == 2:
-                gantt_img = self.create_gantt_img(self.bouts_df, self.clf_name, frm_cnt, self.fps, "Behavior gantt chart")
+                gantt_img = self.create_gantt_img(bouts_df=self.bouts_df, clf_name=self.clf_name, image_index=len(self.data_df), fps=self.video_meta_data['fps'], gantt_img_title=f"Behavior gantt chart: {self.clf_name}")
                 gantt_img = self.resize_gantt(gantt_img, self.video_meta_data["height"])
                 frame = np.concatenate((frame, gantt_img), axis=1)
             frame = cv2.resize(frame, video_size, interpolation=cv2.INTER_LINEAR)
@@ -168,6 +181,25 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
         writer.release()
         self.timer.stop_timer()
         stdout_success(msg=f"Validation video saved at {self.vid_output_path}", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+
+
+# test = ValidateModelOneVideo(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini",
+#                              feature_path=r"D:\troubleshooting\mitra\project_folder\csv\features_extracted\592_MA147_CNO1_0515.csv",
+#                              model_path=r"C:\troubleshooting\mitra\models\generated_models\grroming_undersample_2_1000\grooming.sav",
+#                              create_gantt=1,
+#                              show_pose=True,
+#                              show_animal_names=True)
+# test.run()
+# ValidationVideoPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#                      feature_path=r"C:\troubleshooting\mitra\project_folder\csv\features_extracted\501_MA142_Gi_CNO_0521.csv",
+#                      model_path=r"C:\troubleshooting\mitra\models\generated_models\grroming_undersample_2_1000\grooming.sav",
+#                      discrimination_threshold=0.4,
+#                      shortest_bout=500)
+
+
+
+
+
 
 
 # test = ValidateModelOneVideo(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/project_config.ini',

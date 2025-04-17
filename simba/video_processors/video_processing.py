@@ -4799,6 +4799,45 @@ def crop_video(video_path: Union[str, os.PathLike],
         stdout_success(msg=f'Cropped video saved at {save_path}', elapsed_time=timer.elapsed_time_str)
 
 
+def split_mosaic(video_path: Union[str, os.PathLike],
+                 tile_size: Tuple[int, int],
+                 save_dir: Union[str, os.PathLike],
+                 verbose: bool = True):
+    """
+    Helper to split a mosaic video into its constituent parts.
+
+    :param Union[str, os.PathLike] video_path: The path to the input video file to crop. Can be a string or path-like object.
+    :param Tuple[int, int] tile_size: A tuple (tile_width, tile_height) indicating the size of each tile in pixels. The width and height must evenly divide the dimensions of the video.
+    :param Union[str, os.PathLike] save_dir: Directory to save the output tile videos. Will be created if it does not exist.
+    :param bool verbose: If True, prints progress information and status messages during processing.
+
+    :example:
+    >>> split_mosaic(video_path=r"3.mp4", tile_size=(1280, 720), save_dir=r"3_cropped")
+
+    """
+    timer = SimbaTimer(start=True)
+    check_file_exist_and_readable(file_path=video_path)
+    check_valid_tuple(x=tile_size, source=f'{split_mosaic.__name__} tile_size', accepted_lengths=(2,), valid_dtypes=(int,), min_integer=1)
+    check_if_dir_exists(in_dir=save_dir, source=f'{split_mosaic.__name__} save_dir', create_if_not_exist=True)
+    video_meta = get_video_meta_data(video_path=video_path)
+    tile_w, tile_h = tile_size
+    cnt_tiles_x = video_meta['width'] // tile_w
+    cnt_tiles_y = video_meta['height'] // tile_h
+    for i in range(cnt_tiles_y):
+        for j in range(cnt_tiles_x):
+            if verbose:
+                print(f'Creating tile ({i}, {j})...')
+            x, y = j * tile_w, i * tile_h
+            output_path = os.path.join(save_dir, f"tile_{i}_{j}.mp4")
+            cmd = f'ffmpeg -i "{video_path}" -filter:v "crop={tile_w}:{tile_h}:{x}:{y}" -c:v {Formats.BATCH_CODEC.value} -crf 10 -c:a copy "{output_path}" -hide_banner -loglevel error -stats -y'
+            subprocess.call(cmd, shell=True)
+    timer.stop_timer()
+    if verbose:
+        stdout_success(msg=f'Tile data saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
+
+
+
+
 
 # video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped_gantt.mp4',
 #                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped.mp4',

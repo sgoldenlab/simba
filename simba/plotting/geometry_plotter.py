@@ -58,10 +58,13 @@ def geometry_visualizer(data: Tuple[int, pd.DataFrame],
                 img = cv2.addWeighted(img.astype(np.uint8), 1 - opacity, opacity_image.astype(np.uint8), opacity, 0)
             for shape_cnt, shape in enumerate(batch_shapes[frm_cnt]):
                 if isinstance(shape, Polygon):
-                    img_cpy = cv2.fillPoly(img_cpy, [np.array(shape.exterior.coords).astype(np.int32)], color=(colors[shape_cnt]))
-                    interior_coords = [np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2)) for interior in shape.interiors]
-                    for interior in interior_coords:
-                        img_cpy = cv2.fillPoly(img_cpy, [interior], color=(colors[shape_cnt][::-1]))
+                    if shape.area > 34705:
+                        img_cpy = cv2.fillPoly(img_cpy, [np.array(shape.exterior.coords).astype(np.int32)], color=(colors[shape_cnt]))
+                        interior_coords = [np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2)) for interior in shape.interiors]
+                        for interior in interior_coords:
+                            img_cpy = cv2.fillPoly(img_cpy, [interior], color=(colors[shape_cnt][::-1]))
+                    else:
+                        continue
                 elif isinstance(shape, LineString):
                     img_cpy = cv2.fillPoly(img_cpy, [np.array(shape.coords, dtype=np.int32)], color=(colors[shape_cnt]))
                 elif isinstance(shape, MultiPolygon):
@@ -151,7 +154,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
         self.video_meta_data = get_video_meta_data(video_path=self.video_path)
         self.shape_opacity = shape_opacity
         if circle_size is None:
-            circle_size = self.get_optimal_circle_size(frame_size=(self.video_meta_data['width'], self.video_meta_data['height']), circle_frame_ratio=100)
+            circle_size = self.get_optimal_circle_size(frame_size=(self.video_meta_data['width'], self.video_meta_data['height']), circle_frame_ratio=50)
         if thickness is None:
             thickness = circle_size
         if palette is None:

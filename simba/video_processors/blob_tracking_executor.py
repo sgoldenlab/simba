@@ -103,10 +103,13 @@ class BlobTrackingExecutor():
         df = pd.DataFrame(arr.reshape(arr.shape[0], -1))
         df = df.fillna(0).clip(lower=0).astype(np.int32)
         for c in df.columns:
-            bp_df = df[[c]].astype(np.int32)
-            missing_idx = df.loc[(bp_df[c] <= 0.0)].index.tolist()
-            bp_df.loc[missing_idx, [c]] = np.nan
-            bp_df[c] = bp_df[c].interpolate(method='nearest', axis=0).ffill().bfill()
+            bp_df = df[[c]].astype(np.float32)
+            missing_idx = bp_df[bp_df[c] <= 0.0].index
+            bp_df.loc[missing_idx, c] = np.nan
+            if bp_df[c].notna().sum() >= 2:
+                bp_df[c] = bp_df[c].interpolate(method='nearest', axis=0).ffill().bfill()
+            else:
+                bp_df[c] = bp_df[c].fillna(0)
             df.update(bp_df)
         return df.values.reshape(arr.shape).astype(np.int32)
 
@@ -157,7 +160,9 @@ class BlobTrackingExecutor():
             video_meta = get_video_meta_data(video_path=video_data['video_path'])
             temp_video_path = os.path.join(self.save_dir, f'{video_name}.mp4')
             save_path = os.path.join(self.data[OUT_DIR], f'{video_meta["video_name"]}.csv')
-            self.core_cnt = 16
+            if os.path.isfile(save_path):
+                continue
+            self.core_cnt = 10
             vertices = get_blob_vertices_from_video(video_path=temp_video_path,
                                                     gpu=self.gpu,
                                                     verbose=True,
@@ -167,6 +172,7 @@ class BlobTrackingExecutor():
                                                     window_size=video_data['window_size'],
                                                     convex_hull=False,
                                                     vertice_cnt=self.vertice_cnt)
+
             vertices = self._interpolate_vertices(arr=vertices)
             results = pd.DataFrame()
             if video_data['buffer_size'] is not None:
@@ -201,7 +207,8 @@ class BlobTrackingExecutor():
         print(f'Blob tracking COMPLETE: data saved at {self.save_dir}, (elapsed time: {blob_timer.elapsed_time_str}s')
 
 
-# DATA_PATH = r"D:\FST_SIDE\out\blob_definitions.pickle"
+
+# DATA_PATH = r"D:\troubleshooting\netholabs\original_videos\whiskers\results\blob_definitions.pickle"
 # tracker = BlobTrackingExecutor(data=DATA_PATH)
 # tracker.run()
 

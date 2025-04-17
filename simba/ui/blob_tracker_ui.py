@@ -68,8 +68,8 @@ class BlobTrackingUI(PopUpMixin):
         #self.main_frm.mainloop()
 
     def get_quick_settings(self):
-        self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
-        self.quick_settings_frm = CreateLabelFrameWithIcon(parent=self.settings_frm, header="QUICK SETTINGS", icon_name='clock', padx=15, pady=15)
+        self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings', padx=15, pady=15)
+        self.quick_settings_frm = CreateLabelFrameWithIcon(parent=self.settings_frm, header="QUICK SETTINGS", icon_name='clock', padx=15, pady=15, relief='solid')
         self.quick_setting_threshold_dropdown = SimBADropDown(parent=self.quick_settings_frm, dropdown_options=list(range(1, 101)), label="THRESHOLD:", label_width=30, dropdown_width=10, value=DEFAULT_THRESHOLD)
         self.quick_setting_threshold_btn = SimbaButton(parent=self.quick_settings_frm, txt='APPLY', img='tick',cmd=self._set_threshold, cmd_kwargs={'threshold': lambda: self.quick_setting_threshold_dropdown.getChoices()})
         self.set_smoothing_time_dropdown = SimBADropDown(parent=self.quick_settings_frm, dropdown_options=SMOOTHING_TIMES, label="SMOOTHING TIME (S):", label_width=30, dropdown_width=10, value=SMOOTHING_TIMES[0])
@@ -94,7 +94,7 @@ class BlobTrackingUI(PopUpMixin):
         self.opening_kernal_size_dropdown.grid(row=6, column=0, sticky=NW)
         self.opening_kernel_btn.grid(row=6, column=1, sticky=NW)
 
-        self.run_time_settings_frm = CreateLabelFrameWithIcon(parent=self.settings_frm, header="RUN-TIME SETTINGS", icon_name='run')
+        self.run_time_settings_frm = CreateLabelFrameWithIcon(parent=self.settings_frm, header="RUN-TIME SETTINGS", icon_name='run', padx=15, pady=15, relief='solid')
         self.bg_dir = FolderSelect(parent=self.run_time_settings_frm, folderDescription='BACKGROUND DIRECTORY:', lblwidth=30, initialdir=self.input_dir)
         self.bg_dir_apply = SimbaButton(parent=self.run_time_settings_frm, txt='APPLY', img='tick',  cmd=self._apply_bg_dir, cmd_kwargs={'bg_dir': lambda: self.bg_dir.folder_path})
         self.use_gpu_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU:", label_width=30, dropdown_width=10, value='FALSE')
@@ -120,7 +120,7 @@ class BlobTrackingUI(PopUpMixin):
         self.open_iterations_dropdown.grid(row=6, column=0, sticky=NW)
         self.duplicate_inclusion_zones_dropdown.grid(row=7, column=0, sticky=NW)
         self.duplicate_inclusion_zones_btn.grid(row=7, column=1, sticky=NW)
-        self.execute_frm = CreateLabelFrameWithIcon(parent=self.settings_frm, header="EXECUTE", icon_name='rocket', padx=15, pady=15)
+        self.execute_frm = CreateLabelFrameWithIcon(parent=self.settings_frm, header="EXECUTE", icon_name='rocket', padx=15, pady=15, relief='solid')
         self.run_btn = SimbaButton(parent=self.execute_frm, txt='RUN', img='rocket', cmd=self._initialize_run)
         self.remove_inclusion_zones_btn = SimbaButton(parent=self.execute_frm, txt='REMOVE INCLUSION ZONES', img='trash', cmd=self._delete_inclusion_zone_data, cmd_kwargs=None, txt_clr='darkblue')
         self.execute_frm.grid(row=0, column=2, sticky=NW)
@@ -129,7 +129,7 @@ class BlobTrackingUI(PopUpMixin):
 
     def get_main_table(self):
         self.headings = {}
-        self.videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEOS", icon_name='video', pady=5, padx=15)
+        self.videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEOS", icon_name='video', pady=5, padx=15, relief='solid')
         self.headings['video_name'] = SimBALabel(parent=self.videos_frm, txt='VIDEO NAME', width=self.len_max_char, font=Formats.FONT_HEADER.value)
         self.headings['bg_path'] = SimBALabel(parent=self.videos_frm, txt='BACKGROUND REFERENCE', width=25, font=Formats.FONT_HEADER.value)
         self.headings['threshold'] = SimBALabel(parent=self.videos_frm, txt='THRESHOLD', width=15, font=Formats.FONT_HEADER.value)
@@ -167,7 +167,7 @@ class BlobTrackingUI(PopUpMixin):
             self.videos[video_name]['quick_check_btn'].grid(row=video_cnt + 1, column=8, sticky=NW)
 
     def get_execute_btns(self):
-        self.execute_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="EXECUTE", icon_name='rocket')
+        self.execute_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="EXECUTE", icon_name='rocket', padx=15, pady=15, relief='solid')
         self.run_btn = SimbaButton(parent=self.execute_frm, txt='RUN', img='rocket', cmd=self._initialize_run)
         self.remove_inclusion_zones_btn = SimbaButton(parent=self.execute_frm, txt='REMOVE INCLUSION ZONES', img='trash', cmd=self._delete_inclusion_zone_data, cmd_kwargs=None, txt_clr='darkblue')
         self.execute_frm.grid(row=2, column=0, sticky=NW)
@@ -389,11 +389,11 @@ class BlobTrackingUI(PopUpMixin):
         remove_files(file_paths=[self.roi_inclusion_store], raise_error=False)
         out['video_data'] = video_out
         write_pickle(data=out, save_path=self.out_path)
-        self.set_status_bar_panel(text=f'Starting blob detection, follow progress in OS terminal...({datetime.now().strftime("%H:%M:%S")})', fg='blue')
-        executor = BlobTrackingExecutor(data=self.out_path)
-        executor.run()
+        # self.set_status_bar_panel(text=f'Starting blob detection, follow progress in OS terminal...({datetime.now().strftime("%H:%M:%S")})', fg='blue')
+        # executor = BlobTrackingExecutor(data=self.out_path)
+        # executor.run()
 
-# _ = BlobTrackingUI(input_dir=r'D:\EPM_4', output_dir=r'D:\EPM_4\data')
+#_ = BlobTrackingUI(input_dir=r'D:\troubleshooting\netholabs\original_videos\whiskers', output_dir=r'D:\troubleshooting\netholabs\original_videos\whiskers\results')
 
 #_ = BlobTrackingUI(input_dir=r'D:\water_maze', output_dir=r'D:\water_maze\data')
 

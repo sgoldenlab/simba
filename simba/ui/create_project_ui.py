@@ -42,6 +42,7 @@ class ProjectCreatorPopUp(PopUpMixin):
     """
 
     def __init__(self):
+
         self.main_frm = Toplevel()
         self.main_frm.minsize(750, 800)
         self.main_frm.wm_title("PROJECT CONFIGURATION")

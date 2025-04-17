@@ -490,6 +490,7 @@ def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                bg_clr: Optional[str] = None,
                font: tuple = Formats.FONT_REGULAR.value,
                relief: str = FLAT,
+               justify: Optional[str] = None,
                link: Optional[str] = None,
                width: Optional[int] = None,
                cursor: Optional[str] = None):
@@ -499,6 +500,7 @@ def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                 font=font,
                 fg=txt_clr,
                 bg=bg_clr,
+                justify=justify,
                 relief=relief,
                 cursor=cursor)
 

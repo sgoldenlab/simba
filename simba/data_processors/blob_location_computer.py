@@ -131,7 +131,8 @@ class BlobLocationComputer(object):
 
 
 
-
+# x = BlobLocationComputer(data_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled.mp4", multiprocessing=True, gpu=True, batch_size=2000, save_dir=r"C:\troubleshooting\RAT_NOR\project_folder\csv\blob_positions", smoothing='Savitzky Golay')
+# x.run()
 
 
 

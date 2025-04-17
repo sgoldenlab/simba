@@ -1045,12 +1045,9 @@ class FeatureExtractionMixin(object):
         for i in prange(bp_1.shape[0]):
             frm_bp1_x, frm_bp1_y = bp_1[i, 0], bp_1[i, 1]
             frm_bp2_x, frm_bp2_y = bp_2[i, 0], bp_2[i, 1]
-            axis_0_diff = abs(frm_bp1_x - frm_bp2_x)
-            axis_1_diff = abs(frm_bp1_y - frm_bp2_y)
-            x_dist_percentile = int(axis_0_diff * percentile)
-            y_dist_percentile = int(axis_1_diff * percentile)
-            new_x = min(frm_bp1_x, frm_bp2_x) + x_dist_percentile
-            new_y = min(frm_bp1_y, frm_bp2_y) + y_dist_percentile
+            new_x = frm_bp1_x + percentile * (frm_bp2_x - frm_bp1_x)
+            new_y = frm_bp1_y + percentile * (frm_bp2_y - frm_bp1_y)
             result[i, 0] = new_x
             result[i, 1] = new_y
+
         return result

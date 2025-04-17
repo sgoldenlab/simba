@@ -1659,3 +1659,22 @@ def check_same_files_exist_in_all_directories(dirs: List[Union[str, os.PathLike]
             raise NoFilesFoundError( msg=f"Files of type '{file_type}' do not match across directories: {dirs}.",  source=check_same_files_exist_in_all_directories.__name__)
         return False
     return True
+
+
+
+def check_valid_img_path(path: Union[str, os.PathLike], raise_error: bool = True):
+    check_file_exist_and_readable(path)
+    try:
+        _ = cv2.imread(path)
+    except Exception as e:
+        if raise_error:
+            print(e.args)
+            raise InvalidInputError(msg=f'{path} could not be read as a valid image file', source=check_valid_img_path.__name__)
+        else:
+            return False
+    return True
+
+
+
+
+
