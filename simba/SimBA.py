@@ -62,8 +62,10 @@ from simba.ui.machine_model_settings_ui import MachineModelSettingsPopUp
 from simba.ui.pop_ups.about_simba_pop_up import AboutSimBAPopUp
 from simba.ui.pop_ups.animal_directing_other_animals_pop_up import \
     AnimalDirectingAnimalPopUp
-from simba.ui.pop_ups.append_roi_features_animals_pop_up import AppendROIFeaturesByAnimalPopUp
-from simba.ui.pop_ups.append_roi_features_bodypart_pop_up import AppendROIFeaturesByBodyPartPopUp
+from simba.ui.pop_ups.append_roi_features_animals_pop_up import \
+    AppendROIFeaturesByAnimalPopUp
+from simba.ui.pop_ups.append_roi_features_bodypart_pop_up import \
+    AppendROIFeaturesByBodyPartPopUp
 from simba.ui.pop_ups.archive_files_pop_up import ArchiveProcessedFilesPopUp
 from simba.ui.pop_ups.batch_preprocess_pop_up import BatchPreProcessPopUp
 from simba.ui.pop_ups.blob_visualizer_pop_up import BlobVisualizerPopUp
