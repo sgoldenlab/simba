@@ -1,10 +1,13 @@
 from tkinter import *
 from typing import Optional
+
 from simba.mixins.pop_up_mixin import PopUpMixin
 #from simba.ui.create_project_ui.ProjectCreatorPopUp
-from simba.ui.tkinter_functions import (Entry_Box, FileSelect, SimbaButton, SimBALabel, CreateLabelFrameWithIcon)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        FileSelect, SimbaButton, SimBALabel)
 from simba.ui.user_defined_pose_creator import PoseConfigCreator
-from simba.utils.checks import (check_file_exist_and_readable, check_int, check_str, check_valid_img_path)
+from simba.utils.checks import (check_file_exist_and_readable, check_int,
+                                check_str, check_valid_img_path)
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import DuplicationError, InvalidInputError
 from simba.utils.printing import stdout_success
