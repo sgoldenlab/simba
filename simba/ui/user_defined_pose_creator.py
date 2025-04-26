@@ -52,9 +52,10 @@ class PoseConfigCreator(PlottingMixin):
         for bp_name in bp_list:
             if "," in bp_name: raise InvalidInputError(msg=f'Commas are not allowed in body-part names. A comma was found in body-part name: {bp_name}.', source=self.__class__.__name__)
         bp_list = [x.strip() for x in bp_list]
-        check_valid_lst(data=animal_id_int_list, source=f'{self.__class__.__name__} animal_id_int_list', valid_dtypes=(int,), min_len=len(bp_list), raise_error=True)
-        if animal_cnt != len(list(set(animal_id_int_list))):
-            raise InvalidInputError(msg=f'The number of animals (no_animals) is set to {animal_cnt}, but the number of unique IDs (animal_id_int_list) is set to {len(list(set(animal_id_int_list)))}.', source=self.__class__.__name__)
+        if animal_cnt > 1:
+            check_valid_lst(data=animal_id_int_list, source=f'{self.__class__.__name__} animal_id_int_list', valid_dtypes=(int,), min_len=len(bp_list), raise_error=True)
+            if animal_cnt != len(list(set(animal_id_int_list))):
+                raise InvalidInputError(msg=f'The number of animals (no_animals) is set to {animal_cnt}, but the number of unique IDs (animal_id_int_list) is set to {len(list(set(animal_id_int_list)))}.', source=self.__class__.__name__)
         self.pose_name, self.img_path, self.animal_cnt = pose_name, img_path, animal_cnt
         self.bp_list, self.animal_id_int_list = bp_list, animal_id_int_list
 
@@ -63,7 +64,7 @@ class PoseConfigCreator(PlottingMixin):
         self.img_h, self.img_w= int(self.img.shape[0]), int(self.img.shape[1])
         if self.img_w < 800:
             self.img = imutils.resize(self.img, width=800).astype(np.uint8)
-            self.img_height, self.img_width = int(self.img.bp_list[0]), int(self.img.shape[1])
+            self.img_h, self.img_w = int(self.img.shape[0]), int(self.img.shape[1])
 
         self.circle_scale = self.get_optimal_circle_size(frame_size=(self.img_h, self.img_w), circle_frame_ratio=50)
         self.font_size, self.x_scale, self.y_scale = self.get_optimal_font_scales(text='Left click on body part XXXXXXXXXXWWW',accepted_px_width=self.img_w, accepted_px_height=int(self.img_h/10), text_thickness=4)

@@ -208,7 +208,7 @@ class BlobTrackingExecutor():
 
 
 
-# DATA_PATH = r"D:\troubleshooting\netholabs\original_videos\whiskers\results\blob_definitions.pickle"
+# DATA_PATH = r"D:\weights\bg_remove\results\blob_definitions.pickle"
 # tracker = BlobTrackingExecutor(data=DATA_PATH)
 # tracker.run()
 

@@ -159,6 +159,8 @@ class Entry_Box(Frame):
                  validation=None,
                  entry_box_width=None,
                  value: Optional[Any] = None,
+                 label_font: tuple = Formats.FONT_REGULAR.value,
+                 entry_font: tuple = Formats.FONT_REGULAR.value,
                  justify: str = 'left',
                  **kw):
 
@@ -168,12 +170,12 @@ class Entry_Box(Frame):
         self.labelname = fileDescription
         Frame.__init__(self, master=parent, **kw)
         self.filePath = StringVar()
-        self.lblName = Label(self, text=fileDescription, width=labelwidth, anchor=W, font=Formats.FONT_REGULAR.value, bg=label_bg_clr)
+        self.lblName = Label(self, text=fileDescription, width=labelwidth, anchor=W, font=label_font, bg=label_bg_clr)
         self.lblName.grid(row=0, column=0)
         if not entry_box_width:
-            self.entPath = Entry(self, textvariable=self.filePath, state=self.status,  validate="key", validatecommand=self.validation_methods.get(validation, None), font=Formats.FONT_REGULAR.value, justify=justify)
+            self.entPath = Entry(self, textvariable=self.filePath, state=self.status,  validate="key", validatecommand=self.validation_methods.get(validation, None), font=entry_font, justify=justify)
         else:
-            self.entPath = Entry(self, textvariable=self.filePath, state=self.status, width=entry_box_width, validate="key", font=Formats.FONT_REGULAR.value, justify=justify, validatecommand=self.validation_methods.get(validation, None))
+            self.entPath = Entry(self, textvariable=self.filePath, state=self.status, width=entry_box_width, validate="key", font=entry_font, justify=justify, validatecommand=self.validation_methods.get(validation, None))
         self.entPath.grid(row=0, column=1)
         if value is not None:
             self.entry_set(val=value)
@@ -261,20 +263,12 @@ class ToolTip(object):
         if self.tipwindow or not self.text:
             return
         x, y, cx, cy = self.widget.bbox("insert")
-        x = x + self.widget.winfo_rootx() + 57
-        y = y + cy + self.widget.winfo_rooty() + 27
+        x = x + self.widget.winfo_rootx() + 20
+        y = y + cy + self.widget.winfo_rooty() + 20
         self.tipwindow = tw = Toplevel(self.widget)
         tw.wm_overrideredirect(1)
         tw.wm_geometry("+%d+%d" % (x, y))
-        label = Label(
-            tw,
-            text=self.text,
-            justify=LEFT,
-            background="#ffffe0",
-            relief=SOLID,
-            borderwidth=1,
-            font=("tahoma", "8", "normal"),
-        )
+        label = Label(tw, text=self.text, justify=LEFT, background="#ffffe0", relief=SOLID, borderwidth=1, font=Formats.FONT_REGULAR.value)
         label.pack(ipadx=1)
 
     def hidetip(self):
@@ -286,7 +280,6 @@ class ToolTip(object):
 
 def CreateToolTip(widget, text):
     toolTip = ToolTip(widget)
-
     def enter(event):
         toolTip.showtip(text)
 
@@ -302,7 +295,7 @@ def CreateLabelFrameWithIcon(parent: Union[Toplevel, LabelFrame, Canvas, Frame],
                              icon_name: str,
                              padx: Optional[int] = None,
                              pady: Optional[int] = None,
-                             relief: str = 'flat',
+                             relief: str = 'solid',
                              width: Optional[int] = None,
                              bg: Optional[str] = None,
                              font: tuple = Formats.FONT_HEADER.value,
@@ -405,7 +398,8 @@ def SimbaButton(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                 cmd_kwargs: Optional[Dict[Any, Any]] = None,
                 enabled: Optional[bool] = True,
                 anchor: str = 'w',
-                thread: Optional[bool] = False) -> Button:
+                thread: Optional[bool] = False,
+                tooltip_txt: Optional[str] = None) -> Button:
     def on_enter(e):
         e.widget.config(bg=hover_bg_clr, font=hover_font)
 
@@ -456,6 +450,9 @@ def SimbaButton(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
         btn.bind("<Enter>", on_enter)
         btn.bind("<Leave>", on_leave)
 
+    if tooltip_txt is not None:
+        CreateToolTip(widget=btn, text=tooltip_txt)
+
     return btn
 
 
@@ -463,6 +460,7 @@ def SimbaCheckbox(parent: Union[Frame, Toplevel, LabelFrame, Canvas],
                   txt: str,
                   txt_clr: Optional[str] = 'black',
                   txt_img: Optional[str] = None,
+
                   txt_img_location: Literal['left', 'right', 'top', 'bottom'] = RIGHT,
                   font: Optional[Tuple[str, str, int]] = Formats.FONT_REGULAR.value,
                   val: Optional[bool] = False,
@@ -473,7 +471,6 @@ def SimbaCheckbox(parent: Union[Frame, Toplevel, LabelFrame, Canvas],
     if val: var.set(True)
     if isinstance(txt_img, str):
         txt_img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS[txt_img]["icon_path"]))
-
     if cmd is None:
         cb = Checkbutton(master=parent, font=font, fg=txt_clr, image=txt_img, text=txt, compound=txt_img_location, variable=var)
     else:
@@ -617,6 +614,7 @@ class FileSelect(Frame):
                  bg_clr: Optional[str] = 'white',
                  dropdown: Union[DropDownMenu, SimBADropDown] = None,
                  entry_width: Optional[int] = 20,
+                 status: Optional[str] = None,
                  initialdir: Optional[Union[str, os.PathLike]] = None,
                  initial_path: Optional[Union[str, os.PathLike]] = None, **kw):
 
@@ -638,6 +636,8 @@ class FileSelect(Frame):
         self.filePath.set(Defaults.NO_FILE_SELECTED_TEXT.value)
         if initial_path is not None:
             self.filePath.set(initial_path)
+        if status is not None:
+            self.set_state(setstatus=status)
 
 
     def setFilePath(self):

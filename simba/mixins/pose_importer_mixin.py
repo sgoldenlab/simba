@@ -101,8 +101,7 @@ class PoseImporterMixin(object):
                 data_file_names = [filename_cleaning_func(x) for x in data_file_names]
             video_idx = [i for i, x in enumerate(video_names) if x in data_file_names]
             if len(video_idx) == 0:
-                raise NoFilesFoundError(
-                    msg=f"SimBA could not locate a video file in your SimBA project for data file {data_file_name}", source=self.__class__.__name__)
+                raise NoFilesFoundError(msg=f"SimBA could not locate a video file in your SimBA project for data file {data_file_name}", source=self.__class__.__name__)
             _, video_name, _ = get_fn_ext(video_paths[video_idx[0]])
             results[video_name] = {"DATA": data_path, "VIDEO": video_paths[video_idx[0]]}
         return results

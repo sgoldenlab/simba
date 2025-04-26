@@ -389,11 +389,11 @@ class BlobTrackingUI(PopUpMixin):
         remove_files(file_paths=[self.roi_inclusion_store], raise_error=False)
         out['video_data'] = video_out
         write_pickle(data=out, save_path=self.out_path)
-        # self.set_status_bar_panel(text=f'Starting blob detection, follow progress in OS terminal...({datetime.now().strftime("%H:%M:%S")})', fg='blue')
-        # executor = BlobTrackingExecutor(data=self.out_path)
-        # executor.run()
+        self.set_status_bar_panel(text=f'Starting blob detection, follow progress in OS terminal...({datetime.now().strftime("%H:%M:%S")})', fg='blue')
+        executor = BlobTrackingExecutor(data=self.out_path)
+        executor.run()
 
-#_ = BlobTrackingUI(input_dir=r'D:\troubleshooting\netholabs\original_videos\whiskers', output_dir=r'D:\troubleshooting\netholabs\original_videos\whiskers\results')
+#_ = BlobTrackingUI(input_dir=r'D:\weights\2025-04-17_17-17-14\bg_removal', output_dir=r'D:\weights\2025-04-17_17-17-14\bg_removal\results')
 
 #_ = BlobTrackingUI(input_dir=r'D:\water_maze', output_dir=r'D:\water_maze\data')
 

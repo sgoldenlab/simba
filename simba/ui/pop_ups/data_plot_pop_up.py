@@ -9,108 +9,91 @@ from typing import Union
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.data_plotter import DataPlotter
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        SimbaButton, SimbaCheckbox)
-from simba.utils.enums import Formats, Keys, Links, Paths
-from simba.utils.errors import InvalidInputError
-from simba.utils.read_write import get_file_name_info_in_directory
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, SimbaButton, SimbaCheckbox, SimBADropDown)
+from simba.utils.enums import Formats, Keys, Links
+from simba.utils.errors import InvalidInputError, NoFilesFoundError
+from simba.utils.read_write import get_fn_ext
 
+
+DECIMALS_OPTIONS = list(range(0, 11))
+THICKNESS_OPTIONS = list(range(0, 11))
 
 class DataPlotterPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: Union[str, os.PathLike]):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike]):
 
-        PopUpMixin.__init__(self, title="CREATE DATA PLOTS", icon='data_table')
+
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
-        self.color_lst = list(self.colors_dict.keys())
-        self.data_path = os.path.join(self.project_path, Paths.OUTLIER_CORRECTED.value)
-        self.files_found_dict = get_file_name_info_in_directory(directory=self.data_path, file_type=self.file_type)
+
         self.animal_cnt_options = list(range(1, self.animal_cnt + 1))
-        self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DATA_TABLES.value,)
-        self.rounding_decimals_options = list(range(0, 11))
-        self.font_thickness_options = list(range(1, 11))
-        self.resolution_dropdown = DropDownMenu(self.style_settings_frm, "RESOLUTION:", self.resolutions, "22")
-        self.rounding_decimals_dropdown = DropDownMenu(self.style_settings_frm, "DECIMAL ACCURACY:", self.rounding_decimals_options, "22")
-        self.background_color_dropdown = DropDownMenu(self.style_settings_frm, "BACKGROUND COLOR: ", self.color_lst, "22")
-        self.font_color_dropdown = DropDownMenu(self.style_settings_frm, "HEADER COLOR: ", self.color_lst, "22")
-        self.font_thickness_dropdown = DropDownMenu(self.style_settings_frm, "FONT THICKNESS: ", self.font_thickness_options, "22")
+        if len(self.outlier_corrected_paths) == 0:
+            raise NoFilesFoundError(msg=f'Cannot create data plots: No data files found in {self.outlier_corrected_dir} directory.', source=self.__class__.__name__)
+        self.file_paths_dict = {get_fn_ext(x)[1]: x for x in self.outlier_corrected_paths}
+        PopUpMixin.__init__(self, title="CREATE DATA PLOTS", icon='data_table')
+        self.color_lst = list(self.colors_dict.keys())
 
-        self.background_color_dropdown.setChoices(choice="White")
-        self.font_color_dropdown.setChoices(choice="Black")
-        self.resolution_dropdown.setChoices(self.resolutions[1])
-        self.rounding_decimals_dropdown.setChoices(2)
-        self.font_thickness_dropdown.setChoices(1)
-
-        self.body_parts_frm = LabelFrame(self.main_frm, text="CHOOSE BODY-PARTS", font=Formats.FONT_HEADER.value, pady=5, padx=5)
-        self.number_of_animals_dropdown = DropDownMenu( self.body_parts_frm, "# Animals:", self.animal_cnt_options, "16", com=self.__populate_body_parts_menu,)
-        self.number_of_animals_dropdown.setChoices(self.animal_cnt_options[0])
-        self.__populate_body_parts_menu(self.animal_cnt_options[0])
-
-        self.settings_frm = LabelFrame( self.main_frm, text="VISUALIZATION SETTINGS", font=Formats.FONT_HEADER.value, pady=5, padx=5,)
-
-        data_frames_cb, self.data_frames_var = SimbaCheckbox(parent=self.settings_frm, txt="CREATE FRAMES", txt_img='frames', val=False)
-        data_videos_cb, self.data_videos_var = SimbaCheckbox(parent=self.settings_frm, txt="CREATE VIDEOS", txt_img='video', val=False)
-
-        self.run_frm = LabelFrame( self.main_frm, text="RUN", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
-        self.run_single_video_frm = LabelFrame(self.run_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
-
-        self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="Create single video", font=Formats.FONT_REGULAR.value, cmd=self.__create_data_plots, cmd_kwargs={'multiple_videos': False})
-        self.single_video_dropdown = DropDownMenu(self.run_single_video_frm, "Video:", list(self.files_found_dict.keys()), "12")
-        self.single_video_dropdown.setChoices(list(self.files_found_dict.keys())[0])
-        self.run_multiple_videos = LabelFrame(self.run_frm, text="MULTIPLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black",)
-        self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt="Create multiple videos ({} video(s) found)".format(str(len(list(self.files_found_dict.keys())))), font=Formats.FONT_REGULAR.value, cmd=self.__create_data_plots, cmd_kwargs={'multiple_videos': True})
-        self.style_settings_frm.grid(row=0, sticky=NW)
+        self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DATA_TABLES.value, pady=5, padx=5, relief='solid')
+        self.resolution_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.resolutions, label='RESOLUTION:', label_width=30, dropdown_width=20, value=self.resolutions[1])
+        self.rounding_decimals_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=DECIMALS_OPTIONS, label='DECIMAL ACCURACY:', label_width=30, dropdown_width=20, value=2)
+        self.background_color_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.color_lst, label='BACKGROUND COLOR:', label_width=30, dropdown_width=20, value="White")
+        self.font_color_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.color_lst, label='HEADER COLOR:', label_width=30, dropdown_width=20, value="Black")
+        self.font_thickness_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=THICKNESS_OPTIONS, label='FONT THICKNESS: ', label_width=30, dropdown_width=20, value=1)
+        self.style_settings_frm.grid(row=0, sticky=NW, pady=10, padx=10)
         self.resolution_dropdown.grid(row=0, sticky=NW)
         self.rounding_decimals_dropdown.grid(row=1, sticky=NW)
         self.background_color_dropdown.grid(row=2, sticky=NW)
         self.font_color_dropdown.grid(row=3, sticky=NW)
         self.font_thickness_dropdown.grid(row=4, sticky=NW)
 
-        self.body_parts_frm.grid(row=1, sticky=NW)
-        self.number_of_animals_dropdown.grid(row=0, sticky=NW)
 
-        self.settings_frm.grid(row=2, sticky=NW)
-        data_frames_cb.grid(row=0, sticky=NW)
-        data_videos_cb.grid(row=1, sticky=NW)
+        self.body_parts_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CHOOSE BODY-PARTS", icon_name='pose', pady=5, padx=5, relief='solid')
+        self.number_of_animals_dropdown = SimBADropDown(parent=self.body_parts_frm, dropdown_options=THICKNESS_OPTIONS, label='# ANIMALS: ', label_width=30, dropdown_width=20, value=1, command=self._create_bp_menu)
+        self.body_parts_frm.grid(row=1, column=0, sticky=NW, pady=10, padx=10)
+        self.number_of_animals_dropdown.grid(row=0, column=0, sticky=NW)
+        self._create_bp_menu(x=1)
 
-        self.run_frm.grid(row=3, sticky=NW)
-        self.run_single_video_frm.grid(row=0, sticky=NW)
-        self.run_single_video_btn.grid(row=0, sticky=NW)
+        self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VISUALIZATION SETTINGS", icon_name='eye', pady=5, padx=5, relief='solid')
+        data_frames_cb, self.data_frames_var = SimbaCheckbox(parent=self.settings_frm, txt="CREATE FRAMES", txt_img='frames', val=False)
+        data_videos_cb, self.data_videos_var = SimbaCheckbox(parent=self.settings_frm, txt="CREATE VIDEOS", txt_img='video', val=False)
+
+        self.settings_frm.grid(row=2, column=0, sticky=NW, pady=10, padx=10)
+        data_frames_cb.grid(row=0, column=0, sticky=NW)
+        data_videos_cb.grid(row=1, column=0, sticky=NW)
+
+        self.run_single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name='video', pady=5, padx=5, relief='solid')
+        self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, img='rocket', txt="CREATE SINGLE VIDEO", font=Formats.FONT_REGULAR.value, cmd=self._run, cmd_kwargs={'multiple': False})
+        self.single_video_dropdown = SimBADropDown(parent=self.run_single_video_frm, dropdown_options=list(self.file_paths_dict.keys()), label='VIDEO: ', label_width=30, dropdown_width=20, value=list(self.file_paths_dict.keys())[0])
+
+        self.run_single_video_frm.grid(row=3, column=0, sticky=NW, pady=10, padx=10)
+        self.run_single_video_btn.grid(row=0, column=0, sticky=NW)
         self.single_video_dropdown.grid(row=0, column=1, sticky=NW)
-        self.run_multiple_videos.grid(row=1, sticky=NW)
-        self.run_multiple_video_btn.grid(row=0, sticky=NW)
+
+
+        self.run_multiple_videos = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS", icon_name='stack', pady=5, padx=5, relief='solid')
+        self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, img='rocket', txt=f"CREATE MULTIPLE VIDEOS ({len(self.outlier_corrected_paths)} video(s) found)", font=Formats.FONT_REGULAR.value, cmd=self._run, cmd_kwargs={'multiple': True})
+
+        self.run_multiple_videos.grid(row=4, column=0, sticky=NW, pady=10, padx=10)
+        self.run_multiple_video_btn.grid(row=0, column=0, sticky=NW)
 
         self.main_frm.mainloop()
 
-    def __populate_body_parts_menu(self, choice):
+    def _create_bp_menu(self, x):
         if hasattr(self, "bp_dropdowns"):
             for k, v in self.bp_dropdowns.items():
                 self.bp_dropdowns[k].destroy()
                 self.bp_colors[k].destroy()
         self.bp_dropdowns, self.bp_colors = {}, {}
         for animal_cnt in range(int(self.number_of_animals_dropdown.getChoices())):
-            self.bp_dropdowns[animal_cnt] = DropDownMenu(
-                self.body_parts_frm,
-                "Body-part {}:".format(str(animal_cnt + 1)),
-                self.body_parts_lst,
-                "16",
-            )
-            self.bp_dropdowns[animal_cnt].setChoices(self.body_parts_lst[animal_cnt])
+            self.bp_dropdowns[animal_cnt] = SimBADropDown(parent=self.body_parts_frm, dropdown_options=THICKNESS_OPTIONS, label=f"BODY-PART {animal_cnt+1}:", label_width=30, dropdown_width=20, value=self.body_parts_lst[animal_cnt])
+            self.bp_colors[animal_cnt] = SimBADropDown(parent=self.body_parts_frm, dropdown_options=self.color_lst, label=f"", label_width=2, dropdown_width=20, value=self.color_lst[animal_cnt])
             self.bp_dropdowns[animal_cnt].grid(row=animal_cnt + 1, column=0, sticky=NW)
-
-            self.bp_colors[animal_cnt] = DropDownMenu(
-                self.body_parts_frm, "", self.color_lst, "2"
-            )
-            self.bp_colors[animal_cnt].setChoices(self.color_lst[animal_cnt])
             self.bp_colors[animal_cnt].grid(row=animal_cnt + 1, column=1, sticky=NW)
 
-    def __create_data_plots(self, multiple_videos: bool):
-
-        if multiple_videos:
-            data_paths = list(self.files_found_dict.values())
+    def _run(self, multiple: bool):
+        if multiple:
+            data_paths = self.outlier_corrected_paths
         else:
-            data_paths = [
-                self.files_found_dict[self.single_video_dropdown.getChoices()]
-            ]
+            data_paths = [self.file_paths_dict[self.single_video_dropdown.getChoices()]]
 
         width = int(self.resolution_dropdown.getChoices().split("×")[0])
         height = int(self.resolution_dropdown.getChoices().split("×")[1])
@@ -119,30 +102,23 @@ class DataPlotterPopUp(PopUpMixin, ConfigReader):
             body_part_attr.append([v.getChoices(), self.bp_colors[k].getChoices()])
         selected_bps = [x[0] for x in body_part_attr]
         if len(list(set(selected_bps))) != len(body_part_attr):
-            raise InvalidInputError(
-                msg=f"Please choose unique only body-parts for plotting. Got {len(body_part_attr)} body-parts but only {len(list(set(selected_bps)))} unique",
-                source=DataPlotterPopUp.__class__.__name__,
-            )
-        style_attr = {
-            "bg_color": self.background_color_dropdown.getChoices(),
-            "header_color": self.font_color_dropdown.getChoices(),
-            "font_thickness": int(self.font_thickness_dropdown.getChoices()),
-            "size": (int(width), int(height)),
-            "data_accuracy": int(self.rounding_decimals_dropdown.getChoices()),
-        }
+            raise InvalidInputError(msg=f"Please choose unique only body-parts for plotting. Got {len(body_part_attr)} body-parts but only {len(list(set(selected_bps)))} unique", source=DataPlotterPopUp.__class__.__name__)
 
-        print(data_paths)
-        data_plotter = DataPlotter(
-            config_path=self.config_path,
-            body_part_attr=body_part_attr,
-            data_paths=data_paths,
-            style_attr=style_attr,
-            frame_setting=self.data_frames_var.get(),
-            video_setting=self.data_videos_var.get(),
-        )
+        style_attr = {"bg_color": self.background_color_dropdown.getChoices(),
+                      "header_color": self.font_color_dropdown.getChoices(),
+                      "font_thickness": int(self.font_thickness_dropdown.getChoices()),
+                      "size": (int(width), int(height)),
+                      "data_accuracy": int(self.rounding_decimals_dropdown.getChoices())}
+
+        data_plotter = DataPlotter(config_path=self.config_path,
+                                   body_part_attr=body_part_attr,
+                                   data_paths=data_paths,
+                                   style_attr=style_attr,
+                                   frame_setting=self.data_frames_var.get(),
+                                   video_setting=self.data_videos_var.get())
 
         _ = data_plotter.run()
 
 
-# _ = DataPlotterPopUp(config_path=r'C:\troubleshooting\RAT_NOR\project_folder\project_config.ini')
+#_ = DataPlotterPopUp(config_path=r'C:\troubleshooting\RAT_NOR\project_folder\project_config.ini')
 # _ = DataPlotterPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

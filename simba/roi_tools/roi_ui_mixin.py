@@ -101,9 +101,10 @@ class ROI_mixin(ConfigReader):
             ConfigReader.__init__(self, config_path=config_path, read_video_info=False, create_logger=False)
             check_file_exist_and_readable(file_path=config_path)
             _, self.px_per_mm, _ = self.read_video_info(video_name=self.video_meta['video_name'], video_info_df_path=self.video_info_path)
+        else:
+            self.px_per_mm = 1
         if roi_coordinates_path is not None:
             self.roi_coordinates_path = roi_coordinates_path
-            self.px_per_mm = 1
         self.img_center = (int(self.display_img_width / 2), int(self.display_img_height / 2))
         self.video_path = video_path
         self.img_idx = img_idx

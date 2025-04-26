@@ -8,7 +8,7 @@ from simba.mixins.geometry_mixin import GeometryMixin
 from simba.plotting.geometry_plotter import GeometryPlotter
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists, check_int,
-                                check_valid_boolean, check_valid_dataframe)
+                                check_valid_boolean, check_valid_dataframe, check_float)
 from simba.utils.errors import FrameRangeError
 from simba.utils.read_write import (find_core_cnt, get_fn_ext,
                                     get_video_meta_data)
@@ -27,6 +27,7 @@ class YOLOVisualizer():
                  save_dir: Union[str, os.PathLike],
                  palette: Optional[str] = 'Set1',
                  core_cnt: Optional[int] = -1,
+                 threshold: float = 0.0,
                  thickness: Optional[int] = None,
                  verbose: Optional[bool] = False):
 
@@ -41,7 +42,7 @@ class YOLOVisualizer():
           :loop:
           :autoplay:
 
-        :param Union[str, os.PathLike] data_path: Path to YOLO results CSV resylts. Produced by :func:`simba.bounding_box_tools.yolo.model.inference_yolo`
+        :param Union[str, os.PathLike] data_path: Path to YOLO results CSV results. Produced by :func:`simba.bounding_box_tools.yolo.model.inference_yolo`
         :param Union[str, os.PathLike] video_path: Path to the video from which the data was produced.
         :param Union[str, os.PathLike] save_dir: Directory where to save the video results.
         :param Optional[str] palette: Color palette from where to draw the colors for the bounding polygons/boxes. Default: `Set1`.
@@ -58,6 +59,7 @@ class YOLOVisualizer():
         self.data_path, self.video_path = data_path, video_path
         self.video_name = get_fn_ext(filepath=data_path)[1]
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
+        check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
         self.core_cnt = core_cnt
         if core_cnt == -1 or core_cnt > find_core_cnt()[0]:
             self.core_cnt = find_core_cnt()[0]
@@ -66,6 +68,7 @@ class YOLOVisualizer():
         check_if_dir_exists(in_dir=save_dir)
         check_valid_boolean(value=[verbose], source=self.__class__.__name__, raise_error=True)
         self.save_dir, self.verbose, self.palette, self.thickness = save_dir, verbose, palette, thickness
+        self.threshold = threshold
 
     def run(self):
         data_df = pd.read_csv(self.data_path, index_col=0)
@@ -83,11 +86,26 @@ class YOLOVisualizer():
             missing_frms = [x for x in np.arange(0, df_frm_cnt) if x not in cls_df[FRAME].values]
             missing_df = pd.DataFrame(missing_frms, columns=[FRAME])
             missing_df[CLASS_ID], missing_df[CLASS_NAME], missing_df[CONFIDENCE] = class_id, cls, 0
-            for cord_col in ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']: missing_df[cord_col] = 0
+            for cord_col in CORD_FIELDS: missing_df[cord_col] = 0
             cls_df = pd.concat([cls_df, missing_df], axis=0).sort_values(by=[FRAME])
+            cls_df.loc[cls_df[CONFIDENCE] < self.threshold, CORD_FIELDS] = -1
             cls_arr = cls_df[CORD_FIELDS].values
             cls_arr = cls_arr.reshape(cls_arr.shape[0], 4, 2)
             geometries.append(GeometryMixin().multiframe_bodyparts_to_polygon(data=cls_arr, video_name=self.video_name, core_cnt=self.core_cnt, verbose=self.verbose))
-        plotter = GeometryPlotter(geometries=geometries, video_name=self.video_path, core_cnt=self.core_cnt,
-                                  save_dir=self.save_dir, verbose=self.verbose, palette=self.palette, thickness=self.thickness)
+        plotter = GeometryPlotter(geometries=geometries,
+                                  video_name=self.video_path,
+                                  core_cnt=self.core_cnt,
+                                  save_dir=self.save_dir,
+                                  verbose=self.verbose,
+                                  colors=[(0, 255, 255)],
+                                  thickness=self.thickness,
+                                  shape_opacity=0.6)
         plotter.run()
+
+
+#
+# test = YOLOVisualizer(data_path=r"/mnt/d/netholabs/yolo_test/results/2025-04-17_17-05-07.csv",
+#                       video_path=r"/mnt/d/netholabs/out/2025-04-17_17-05-07.mp4",
+#                       save_dir=r"/mnt/d/netholabs/yolo_test/yolo_videos",
+#                       threshold=0.64)
+# test.run()

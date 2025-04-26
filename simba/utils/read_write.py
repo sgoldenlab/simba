@@ -54,7 +54,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_str, check_valid_array,
                                 check_valid_boolean, check_valid_dataframe,
                                 check_valid_lst, check_valid_url, is_img_bw,
-                                is_video_color)
+                                is_video_color, check_ffmpeg_available)
 from simba.utils.enums import (ENV_VARS, ConfigKey, Defaults, Dtypes, Formats,
                                Keys, Links, Options, Paths)
 from simba.utils.errors import (DataHeaderError, DuplicationError,
@@ -64,7 +64,7 @@ from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 InvalidInputError, InvalidVideoFileError,
                                 MissingProjectConfigEntryError, NoDataError,
                                 NoFilesFoundError, NotDirectoryError,
-                                ParametersFileError, PermissionError)
+                                ParametersFileError, PermissionError, FFMPEGNotFoundError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.warnings import (
     FileExistWarning, FrameRangeWarning, InvalidValueWarning,
@@ -431,6 +431,9 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture], f
     """
     Read video metadata (fps, resolution, frame cnt etc.) from video file (e.g., mp4).
 
+    .. seealso::
+       To use FFmpeg instead of OpenCV, see :func:`simba.utils.read_write.get_video_info_ffmpeg`.
+
     :param str video_path: Path to a video file.
     :param bool fps_as_int: If True, force video fps to int through floor rounding, else float. Default = True.
     :return: The video metadata in dict format with parameter (e.g., ``fps``)  as keys.
@@ -468,6 +471,55 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture], f
     video_data["video_length_s"] = int(video_data["frame_count"] / video_data["fps"])
     return video_data
 
+
+def get_video_info_ffmpeg(video_path: Union[str, os.PathLike]) -> Dict[str, Any]:
+    """
+    Extracts metadata information from a video file using FFmpeg's ffprobe.
+
+    .. note::
+       FFMpeg based metadata extraction seems preferable over OpenCV with data in .h264 format.
+
+    .. seealso::
+       To use OpenCV instead of FFmpeg, see :func:`simba.utils.read_write.get_video_meta_data`
+
+    :param Union[str, os.PathLike] video_path: The file path to the video for which metadata is to be extracted.
+    :return: A dictionary containing video metadata:
+    :rtype: Dict[str, Any]
+    """
+    if not check_ffmpeg_available(raise_error=False):
+        raise FFMPEGNotFoundError(msg=f'Cannot get video meta data from video using FFMPEG: FFMPEG not found on computer.', source=get_video_info_ffmpeg.__name__)
+    check_file_exist_and_readable(file_path=video_path)
+    video_name = get_fn_ext(filepath=video_path)[1]
+    cmd = ["ffprobe", "-v", "error", "-select_streams", "v:0", "-count_frames", "-show_entries", "stream=width,height,r_frame_rate,nb_read_frames,duration,pix_fmt", "-of", "json", video_path]
+    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+    data = json.loads(result.stdout)
+    try:
+        stream = data['streams'][0]
+        width = int(stream['width'])
+        height = int(stream['height'])
+        num, denom = map(int, stream['r_frame_rate'].split('/'))
+        fps = num / denom
+        frame_count = int(stream.get('nb_read_frames', 0))
+        duration = float(data.get('format', {}).get('duration', 0))
+        if duration == 0 and frame_count and fps:
+            duration = frame_count / fps
+        pix_fmt = stream.get('pix_fmt', '')
+        resolution_str = str(f'{width} x {height}')
+
+        if 'gray' in pix_fmt: color_format = 'grey'
+        else: color_format = 'rgb'
+        return {"video_name": video_name,
+                "width": width,
+                "height": height,
+                "fps": fps,
+                "frame_count": frame_count,
+                "duration_sec": duration,
+                "color_format": color_format,
+                'resolution_str': resolution_str}
+
+    except (KeyError, IndexError, ValueError) as e:
+        print(e.args)
+        raise InvalidVideoFileError(msg=f'Cannot use FFMPEG to extract video meta data for video {video_name}, try OpenCV?', source=get_video_info_ffmpeg.__name__)
 
 def remove_a_folder(folder_dir: Union[str, os.PathLike], ignore_errors: Optional[bool] = True) -> None:
     """Helper to remove a directory"""
@@ -728,9 +780,15 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
     """
 
     check_instance(source=read_frm_of_video.__name__, instance=video_path, accepted_types=(str, cv2.VideoCapture))
+    if use_ffmpeg:
+        if not isinstance(video_path, str):
+            raise InvalidInputError(msg='If using FFmpeg for video meta data extraction, pass data path rather than cv2.VideoCapture', source=read_frm_of_video.__name__)
     if type(video_path) == str:
         check_file_exist_and_readable(file_path=video_path)
-        video_meta_data = get_video_meta_data(video_path=video_path)
+        if not use_ffmpeg:
+            video_meta_data = get_video_meta_data(video_path=video_path)
+        else:
+            video_meta_data = get_video_info_ffmpeg(video_path=video_path)
     else:
         video_meta_data = {"frame_count": int(video_path.get(cv2.CAP_PROP_FRAME_COUNT)),
                            "fps": video_path.get(cv2.CAP_PROP_FPS),

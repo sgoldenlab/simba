@@ -381,15 +381,17 @@ def check_if_dir_exists(in_dir: Union[str, os.PathLike],
         return True
 
 
-def check_that_column_exist(
-    df: pd.DataFrame, column_name: Union[str, os.PathLike, List[str]], file_name: str
-) -> None:
+def check_that_column_exist(df: pd.DataFrame,
+                            column_name: Union[str, os.PathLike, List[str]],
+                            file_name: str,
+                            raise_error: bool = True) -> Union[None, bool]:
     """
     Check if single named field or a list of fields exist within a dataframe.
 
     :param pd.DataFrame df:
     :param str column_name: Name or names of field(s).
     :param str file_name: Path of ``df`` on disk.
+    :param bool raise_error: If True, raise error if column doesnt exist. If False, returns bool.
     :raise ColumnNotFoundError: The ``column_name`` does not exist within ``df``.
     """
 
@@ -397,7 +399,11 @@ def check_that_column_exist(
         column_name = [column_name]
     for column in column_name:
         if column not in df.columns:
-            raise ColumnNotFoundError(column_name=column, file_name=file_name, source=check_that_column_exist.__name__)
+            if raise_error:
+                raise ColumnNotFoundError(column_name=column, file_name=file_name, source=check_that_column_exist.__name__)
+            else:
+                return False
+    return True
 
 
 def check_if_valid_input(
@@ -1450,12 +1456,12 @@ def check_if_video_corrupted(video: Union[str, os.PathLike, cv2.VideoCapture],
 def check_valid_dict(x: dict,
                      valid_key_dtypes: Optional[Tuple[Any]] = None,
                      valid_values_dtypes: Optional[Tuple[Any]] = None,
+                     valid_keys: Optional[Union[Tuple[Any], List[Any]]] = None,
                      max_len_keys: Optional[int] = None,
                      min_len_keys: Optional[int] = None,
                      required_keys: Optional[Tuple[Any, ...]] = None,
                      max_value: Optional[Union[float, int]] = None,
                      min_value: Optional[Union[float, int]] = None):
-
 
     check_instance(source=check_valid_dict.__name__, instance=x, accepted_types=(dict,))
     if valid_key_dtypes is not None:
@@ -1494,6 +1500,15 @@ def check_valid_dict(x: dict,
             if isinstance(v, (float, int)):
                 if v < min_value:
                     raise InvalidInputError(msg=f'The required key {k} has value {v} which is less than the minimum allowed: {min_value}.', source=check_valid_dict.__name__)
+    if valid_keys is not None:
+        if not isinstance(valid_keys, (tuple, list)):
+            raise InvalidInputError(msg=f'{check_valid_dict.__name__} valid_keys has to tuple, got {type(valid_keys)}.')
+        invalid_keys = [i for i in x.keys() if i not in valid_keys]
+        if len(invalid_keys) > 0:
+            raise InvalidInputError(msg=f'The dictionary has keys that are invalid ({invalid_keys}). Accepted, valid keys are: {valid_keys}.', source=check_valid_dict.__name__)
+
+
+
 
 def is_video_color(video: Union[str, os.PathLike, cv2.VideoCapture]) -> bool:
     """

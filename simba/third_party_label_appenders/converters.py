@@ -36,8 +36,9 @@ from simba.utils.read_write import (copy_files_to_directory,
                                     find_files_of_filetypes_in_directory,
                                     find_video_of_file, get_fn_ext,
                                     get_video_meta_data, read_df,
-                                    read_frm_of_video, read_pickle,
-                                    read_roi_data, write_pickle)
+                                    read_frm_of_video,
+                                    read_roi_data, write_pickle,
+                                    create_directory, read_json)
 
 # def geometry_to_rle(geometry: Union[np.ndarray, Polygon], img_size: Tuple[int, int]):
 #     """
@@ -638,11 +639,11 @@ def split_yolo_train_test_val(data_dir: Union[str, os.PathLike],
         raise InvalidInputError(msg=f'Split has to add up to 1. Got: {np.round(np.sum(split), 2)}',  source=split_yolo_train_test_val.__name__)
     check_valid_boolean(value=[verbose], source=split_yolo_train_test_val.__name__)
     labels_dir, img_dir = os.path.join(data_dir, 'labels'), os.path.join(data_dir, 'images')
-    check_if_dir_exists(in_dir=labels_dir);
+    check_if_dir_exists(in_dir=labels_dir)
     check_if_dir_exists(in_dir=img_dir)
-    map_path = os.path.join(data_dir, 'map.pickle')
+    map_path = os.path.join(data_dir, 'map.json')
     check_file_exist_and_readable(file_path=map_path)
-    map_dict = read_pickle(data_path=map_path, verbose=verbose)
+    map_dict = read_json(x=map_path)
     yolo_yaml_path = os.path.join(save_dir, 'map.yaml')
     img_paths = np.array(
         sorted(find_files_of_filetypes_in_directory(directory=img_dir, extensions=['.png'], raise_error=True)))
@@ -813,10 +814,10 @@ def yolo_obb_data_to_bounding_box(center_x: float, center_y: float, width: float
         check_float(name=yolo_obb_data_to_bounding_box.__name__, value=value)
     angle_rad = np.deg2rad(angle)
     half_width, half_height = width / 2, height / 2
-    corners = np.array([[-half_width, -half_height],  # Top-left
-                        [half_width, -half_height],  # Top-right
-                        [half_width, half_height],  # Bottom-right
-                        [-half_width, half_height]])  # Bottom-left
+    corners = np.array([[-half_width, -half_height],  # tl
+                        [half_width, -half_height],  # tr
+                        [half_width, half_height],  # br
+                        [-half_width, half_height]])  # bl
     rotation_matrix = np.array([[np.cos(angle_rad), -np.sin(angle_rad)],
                                 [np.sin(angle_rad), np.cos(angle_rad)]])
     box = np.dot(corners, rotation_matrix) + [center_x, center_y]
@@ -855,6 +856,88 @@ def labelme_to_img_dir(labelme_dir: Union[str, os.PathLike],
         cv2.imwrite(filename=save_path, img=img)
     timer.stop_timer()
     stdout_success(msg=f'{len(annotation_paths)} images saved in {img_dir}.', elapsed_time=timer.elapsed_time_str)
+
+
+def labelme_to_yolo(labelme_dir: Union[str, os.PathLike],
+                    save_dir: Union[str, os.PathLike],
+                    obb: bool = False,
+                    verbose: bool = True) -> None:
+    """
+    Convert LabelMe annotations in json to YOLO format and save the corresponding images and labels in txt format.
+
+    .. note::
+       For more information on the LabelMe annotation tool, see the `LabelMe GitHub repository <https://github.com/wkentaro/labelme>`_.
+       The LabemLe Json files **has too** contain a `imageData` key holding the image as a b64 string.
+
+    .. seealso::
+       To split YOLO data into train, test, and validation sets (expected by e.g., UltraLytics), see :func:`simba.third_party_label_appenders.converters.split_yolo_train_test_val`.
+
+    :param Union[str, os.PathLike labelme_dir: Path to the directory containing LabelMe annotation `.json` files.
+    :param Union[str, os.PathLike save_dir: Directory where the YOLO-format images and labels will be saved. Will create 'images/', 'labels/', and 'map.json' inside this directory.
+    :param bool obb: If True, saves annotations as oriented bounding boxes (8 coordinates). If False, uses standard YOLO format (x_center, y_center, width, height)
+    :param bool verbose: If True, prints progress messages during conversion.
+
+
+    :example:
+    >>> LABELME_DIR = r'D:/annotations'
+    >>> SAVE_DIR = r"D:/yolo_data"
+    >>> labelme_to_yolo(labelme_dir=LABELME_DIR, save_dir=SAVE_DIR)
+    """
+
+    timer = SimbaTimer(start=True)
+    check_if_dir_exists(in_dir=os.path.dirname(save_dir), source=f'{labelme_to_yolo.__name__} save_dir', raise_error=True)
+    check_if_dir_exists(in_dir=labelme_dir, source=f'{labelme_to_yolo.__name__} labelme_dir', raise_error=True)
+    labelme_file_paths = find_files_of_filetypes_in_directory(directory=labelme_dir, extensions=['.json'], raise_error=True)
+    save_img_dir = os.path.join(save_dir, 'images')
+    save_labels_dir = os.path.join(save_dir, 'labels')
+    map_path = os.path.join(save_dir, 'map.json')
+    create_directory(path=save_img_dir, overwrite=True)
+    create_directory(path=save_labels_dir, overwrite=True)
+    check_valid_boolean(value=[verbose], source=f'{labelme_to_yolo.__name__} verbose', raise_error=True)
+    check_valid_boolean(value=[obb], source=f'{labelme_to_yolo.__name__} obb', raise_error=True)
+    labels = {}
+    for file_cnt, file_path in enumerate(labelme_file_paths):
+        if verbose: print(f'Labelme to YOLO file {file_cnt+1}/{len(labelme_file_paths)}...')
+        with open(file_path) as f: annot_data = json.load(f)
+        check_if_keys_exist_in_dict(data=annot_data, key=['shapes', 'imageData', 'imagePath'], name=file_path)
+        img_name = get_fn_ext(filepath=annot_data['imagePath'])[1]
+        img = b64_to_arr(annot_data['imageData'])
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img_h, img_w = img.shape[:2]
+        label_save_path = os.path.join(save_labels_dir, f'{img_name}.txt')
+        img_save_path = os.path.join(save_img_dir, f'{img_name}.png')
+        roi_str = ''
+        for bp_data in annot_data['shapes']:
+            check_if_keys_exist_in_dict(data=bp_data, key=['label', 'points', 'shape_type'], name=file_path)
+            if bp_data['shape_type'] == 'rectangle':
+                if bp_data['label'] not in labels.keys():
+                    label_id = len(labels.keys())
+                    labels[bp_data['label']] = len(labels.keys())
+                else:
+                    label_id = labels[bp_data['label']]
+                x1, y1 = bp_data['points'][0]
+                x2, y2 = bp_data['points'][1]
+                x_min, x_max = sorted([x1, x2])
+                y_min, y_max = sorted([y1, y2])
+                if not obb:
+                    w = (x_max - x_min) / img_w
+                    h = (y_max - y_min) / img_h
+                    x_center = (x_min + (x_max - x_min) / 2) / img_w
+                    y_center = (y_min + (y_max - y_min) / 2) / img_h
+                    roi_str += ' '.join([f"{label_id}", str(x_center), str(y_center), str(w), str(h) + '\n'])
+                else:
+                    top_left = (x_min / img_w, y_min / img_h)
+                    top_right = (x_max / img_w, y_min / img_h)
+                    bottom_right = (x_max / img_w, y_max / img_h)
+                    bottom_left = (x_min / img_w, y_max / img_h)
+                    roi_str += ' '.join([f"{label_id}", str(top_left[0]), str(top_left[1]), str(top_right[0]), str(top_right[1]), str(bottom_right[0]), str(bottom_right[1]), str(bottom_left[0]), str(bottom_left[1]) + '\n'])
+        with open(label_save_path, mode='wt', encoding='utf-8') as f:
+            f.write(roi_str)
+        cv2.imwrite(img_save_path, img)
+    with open(map_path, 'w') as f:
+        json.dump(labels, f, indent=4)
+    timer.stop_timer()
+    if verbose: stdout_success(msg=f'Labelme to YOLO conversion complete. Data saved in directory {save_dir}.', elapsed_time=timer.elapsed_time_str)
 
 
 #labelme_to_img_dir(img_dir=r"C:\troubleshooting\coco_data\labels\train_images", labelme_dir=r'C:\troubleshooting\coco_data\labels\train_')

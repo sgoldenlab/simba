@@ -126,6 +126,7 @@ def inference_yolo(weights_path: Union[str, os.PathLike],
                 boxes = np.array(video_prediction.obb.data.cpu()).astype(np.float32)
             else:
                 boxes = np.array(video_prediction.boxes.data.cpu()).astype(np.float32)
+                print(boxes)
             for c in list(class_dict.keys()):
                 cls_data = boxes[np.argwhere(boxes[:, -1] == c)]
                 if cls_data.shape[0] == 0:
@@ -165,6 +166,19 @@ def inference_yolo(weights_path: Union[str, os.PathLike],
 #          project_path=r"/mnt/c/troubleshooting/coco_data/mdl",
 #          batch=16, epochs=100)
 
+
+
+# fit_yolo(initial_weights=r"/mnt/c/troubleshooting/coco_data/weights/yolov8n.pt",
+#          model_yaml=r"/mnt/d/netholabs/yolo_test/yolo_train/map.yaml",
+#          save_path=r"/mnt/d/netholabs/yolo_test/yolo_mdl", epochs=150, batch=24)
+
+
+
+# inference_yolo(weights_path=r"/mnt/d/netholabs/yolo_test/yolo_mdl/train10/weights/best.pt",
+#                video_path=r"/mnt/d/netholabs/out/2025-04-17_17-05-07.mp4",
+#                save_dir=r"/mnt/d/netholabs/yolo_test/results",
+#                verbose=True,
+#                gpu=False)
 
 # inference_yolo(weights=r"/mnt/c/troubleshooting/coco_data/mdl/train8/weights/best.pt",
 #                video_path=r"/mnt/c/troubleshooting/mitra/project_folder/videos/FRR_gq_Saline_0624.mp4",

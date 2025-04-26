@@ -12,7 +12,7 @@ from copy import deepcopy
 from datetime import datetime
 from multiprocessing import Lock, Value
 from pathlib import Path
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Tuple, Union, Optional
 
 import matplotlib.font_manager
 import numpy as np
@@ -562,6 +562,7 @@ def video_quality_to_preset_lookup() -> Dict[str, str]:
 def get_labelling_img_kbd_bindings() -> dict:
     """
     Returns dictionary of tkinter keyboard bindings.
+
     .. note::
         Change ``kbd`` values to change keyboard shortcuts. For example:
 
@@ -584,6 +585,9 @@ def get_labelling_img_kbd_bindings() -> dict:
          'frame+1_keep_choices': # MOVE FORWARD 1 FRAME AND KEEP ANNOTATION SELECTIONS OF THE CURRENT FRAME
              {'label': 'Ctrl + a = +1 frame and keep choices',
               'kbd': "<Control-a>"},
+         'frame-1_keep_choices':  # MOVE BACKWARDS 1 FRAME AND KEEP ANNOTATION SELECTIONS OF THE CURRENT FRAME
+             {'label': 'Ctrl + q = -1 frame and keep choices',
+              'kbd': "<Control-q>"},
          'print_annotation_statistic': # PRINT ANNOTATION STATISTICS
              {'label': 'Ctrl + p = Show annotation statistics',
               'kbd': "<Control-p>"},
@@ -716,14 +720,23 @@ def get_display_resolution() -> Tuple[int, int]:
 
 
 def get_img_resize_info(img_size: Tuple[int ,int],
-                        display_resolution: Tuple[int, int],
+                        display_resolution: Optional[Tuple[int, int]] = None,
                         max_height_ratio: float = 0.5,
                         max_width_ratio: float = 0.5) -> Tuple[int, int, float, float]:
     """
-    Resize dimensions and scale factor an image while maintaining the aspect ratio so it fits within the
-    maximum allowed dimensions and does not exceed the display resolution.
+    Calculates the new dimensions and scaling factors needed to resize an image while preserving its
+    aspect ratio so that it fits within a given portion of the display resolution.
+
+    :param Tuple[int, int] img_size : The original size of the image as (width, height).
+    :param Optional[Tuple[int, int]] display_resolution: Optional resolution of the display as (width, height). If none, then grabs the resolution of the main monitor.
+    :param float max_height_ratio: The maximum allowed height of the image as a fraction of the display height (default is 0.5).
+    :param float max_width_ratio: The maximum allowed width of the image as a fraction of the display width (default is 0.5).
+    :returns: Length 4 tuple with resized width, resized height, downscale factor, and upscale factor
+    :rtype: Tuple[int, int, float, float]
     """
 
+    if display_resolution is None:
+        display_resolution = get_display_resolution()
     max_width = int(display_resolution[0] * max_width_ratio)
     max_height = int(display_resolution[1] * max_height_ratio)
     if img_size[0] <= max_width and img_size[1] <= max_height:
@@ -736,10 +749,6 @@ def get_img_resize_info(img_size: Tuple[int ,int],
     new_height = int(img_size[1] * downscale_factor)
     return new_width, new_height, downscale_factor, upscale_factor
 
-
-
-
-#get_display_resolution()
 
 #
 # display_resolution = get_display_resolution()

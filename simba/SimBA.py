@@ -27,25 +27,19 @@ from PIL import ImageTk
 
 from simba.bounding_box_tools.boundary_menus import BoundaryMenus
 from simba.cue_light_tools.cue_light_menues import CueLightAnalyzerMenu
-from simba.labelling.labelling_advanced_interface import \
-    select_labelling_video_advanced
+from simba.labelling.labelling_advanced_interface import select_labelling_video_advanced
 from simba.labelling.labelling_interface import select_labelling_video
-from simba.labelling.targeted_annotations_clips import \
-    select_labelling_video_targeted_clips
+from simba.labelling.targeted_annotations_clips import select_labelling_video_targeted_clips
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.model.grid_search_rf import GridSearchRandomForestClassifier
 from simba.model.inference_batch import InferenceBatch
 from simba.model.inference_validation import InferenceValidation
 from simba.model.train_rf import TrainRandomForestClassifier
-from simba.outlier_tools.outlier_corrector_location import \
-    OutlierCorrecterLocation
-from simba.outlier_tools.outlier_corrector_movement import \
-    OutlierCorrecterMovement
-from simba.outlier_tools.skip_outlier_correction import \
-    OutlierCorrectionSkipper
-from simba.plotting.interactive_probability_grapher import \
-    InteractiveProbabilityGrapher
+from simba.outlier_tools.outlier_corrector_location import OutlierCorrecterLocation
+from simba.outlier_tools.outlier_corrector_movement import OutlierCorrecterMovement
+from simba.outlier_tools.skip_outlier_correction import OutlierCorrectionSkipper
+from simba.plotting.interactive_probability_grapher import InteractiveProbabilityGrapher
 from simba.third_party_label_appenders.BENTO_appender import BentoAppender
 from simba.third_party_label_appenders.BORIS_appender import BorisAppender
 from simba.third_party_label_appenders.deepethogram_importer import \
@@ -58,6 +52,7 @@ from simba.third_party_label_appenders.solomon_importer import SolomonImporter
 from simba.ui.create_project_ui import ProjectCreatorPopUp
 from simba.ui.import_pose_frame import ImportPoseFrame
 from simba.ui.import_videos_frame import ImportVideosFrame
+from simba.ui.pop_ups.single_video_to_frames_popup import SingleVideo2FramesPopUp
 from simba.ui.machine_model_settings_ui import MachineModelSettingsPopUp
 from simba.ui.pop_ups.about_simba_pop_up import AboutSimBAPopUp
 from simba.ui.pop_ups.animal_directing_other_animals_pop_up import \
@@ -67,6 +62,7 @@ from simba.ui.pop_ups.append_roi_features_bodypart_pop_up import AppendROIFeatur
 from simba.ui.pop_ups.archive_files_pop_up import ArchiveProcessedFilesPopUp
 from simba.ui.pop_ups.batch_preprocess_pop_up import BatchPreProcessPopUp
 from simba.ui.pop_ups.blob_visualizer_pop_up import BlobVisualizerPopUp
+from simba.ui.pop_ups.select_video_for_labelling_popup import SelectLabellingVideoPupUp
 from simba.ui.pop_ups.boolean_conditional_slicer_pup_up import \
     BooleanConditionalSlicerPopUp
 from simba.ui.pop_ups.check_videos_seekable_pop_up import \
@@ -77,8 +73,8 @@ from simba.ui.pop_ups.clf_annotation_counts_pop_up import \
     ClfAnnotationCountPopUp
 from simba.ui.pop_ups.clf_by_roi_pop_up import ClfByROIPopUp
 from simba.ui.pop_ups.clf_by_timebins_pop_up import TimeBinsClfPopUp
-from simba.ui.pop_ups.clf_descriptive_statistics_pop_up import \
-    ClfDescriptiveStatsPopUp
+from simba.ui.pop_ups.clf_descriptive_statistics_pop_up import ClfDescriptiveStatsPopUp
+from simba.ui.pop_ups.select_video_for_pseudo_labelling_popup import SelectPseudoLabellingVideoPupUp
 from simba.ui.pop_ups.clf_plot_pop_up import SklearnVisualizationPopUp
 from simba.ui.pop_ups.clf_probability_plot_pop_up import \
     VisualizeClassificationProbabilityPopUp
@@ -103,6 +99,7 @@ from simba.ui.pop_ups.heatmap_clf_pop_up import HeatmapClfPopUp
 from simba.ui.pop_ups.heatmap_location_pop_up import HeatmapLocationPopup
 from simba.ui.pop_ups.initialize_blob_tracking_pop_up import \
     InitializeBlobTrackerPopUp
+from simba.ui.pop_ups.multiple_videos_to_frames_popup import MultipleVideos2FramesPopUp
 from simba.ui.pop_ups.interpolate_pop_up import InterpolatePopUp
 from simba.ui.pop_ups.kleinberg_pop_up import KleinbergPopUp
 from simba.ui.pop_ups.make_path_plot_pop_up import MakePathPlotPopUp
@@ -164,7 +161,7 @@ from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         FileSelect, SimbaButton, SimBALabel,
-                                        hxtScrollbar, on_mouse_scroll)
+                                        hxtScrollbar, SimbaCheckbox)
 from simba.ui.video_info_ui import VideoInfoTable
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_int)
@@ -193,7 +190,7 @@ class LoadProjectPopUp(object):
         self.main_frm.minsize(300, 200)
         self.main_frm.wm_title("Load SimBA project (project_config.ini file)")
         self.load_project_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="LOAD SIMBA PROJECT_CONFIG.INI", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.LOAD_PROJECT.value)
-        self.selected_file = FileSelect(self.load_project_frm, "Select file: ", title="Select project_config.ini file", file_types=[("SimBA Project .ini", "*.ini")])
+        self.selected_file = FileSelect(self.load_project_frm, "SELECT SIMBA CONFIG FILE: ", title="Select project_config.ini file", file_types=[("SimBA Project .ini", "*.ini")], lblwidth=30)
 
         load_project_btn = SimbaButton(parent=self.load_project_frm, txt="LOAD PROJECT", txt_clr='blue', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.launch_project)
         self.load_project_frm.grid(row=0, sticky=NW)
@@ -346,22 +343,19 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_outliercorrection = SimbaButton(parent=label_outliercorrection, width=Formats.BUTTON_WIDTH_L.value, txt="RUN OUTLIER CORRECTION", txt_clr='green', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.correct_outlier, thread=False)
         button_skipOC = SimbaButton(parent=label_outliercorrection, width=Formats.BUTTON_WIDTH_L.value, txt="SKIP OUTLIER CORRECTION (CAUTION)", txt_clr='red', img='skip_2', font=Formats.FONT_REGULAR.value, cmd=self.initiate_skip_outlier_correction, thread=True)
 
-        label_extractfeatures = CreateLabelFrameWithIcon(parent=tab5, header="EXTRACT FEATURES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.EXTRACT_FEATURES.value)
+        def activate():
+            if self.user_defined_var.get(): self.scriptfile.set_state(setstatus=NORMAL)
+            else: self.scriptfile.set_state(setstatus=DISABLED)
 
-        button_extractfeatures = SimbaButton(parent=label_extractfeatures, txt="EXTRACT FEATURES", width=Formats.BUTTON_WIDTH_XL.value, txt_clr='blue', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run_feature_extraction, thread=True)
+        extract_features_frm = CreateLabelFrameWithIcon(parent=tab5, header="EXTRACT FEATURES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.EXTRACT_FEATURES.value, relief='solid')
+        userscript, self.user_defined_var = SimbaCheckbox(parent=extract_features_frm, txt="APPLY USER DEFINED FEATURE EXTRACTION SCRIPT", font=Formats.FONT_REGULAR.value, val=False, state=NORMAL, cmd= activate)
+        self.scriptfile = FileSelect(extract_features_frm, "SCRIPT PATH:", file_types=[("Python .py file", "*.py")], lblwidth=25, status=DISABLED)
+        button_extractfeatures = SimbaButton(parent=extract_features_frm, txt="EXTRACT FEATURES", width=Formats.BUTTON_WIDTH_XL.value, txt_clr='blue', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run_feature_extraction, thread=True)
 
-        def activate(box, *args):
-            for entry in args:
-                if box.get() == 0:
-                    entry.configure(state="disabled")
-                elif box.get() == 1:
-                    entry.configure(state="normal")
-
-        labelframe_usrdef = LabelFrame(label_extractfeatures)
-        self.scriptfile = FileSelect(labelframe_usrdef, "SCRIPT PATH:", file_types=[("Python .py file", "*.py")])
-        self.scriptfile.btnFind.configure(state="disabled")
-        self.user_defined_var = BooleanVar(value=False)
-        userscript = Checkbutton(labelframe_usrdef, text="Apply user-defined feature extraction script", font=Formats.FONT_REGULAR.value, variable=self.user_defined_var, command=lambda: activate(self.user_defined_var, self.scriptfile.btnFind))
+        extract_features_frm.grid(row=0, column=0, sticky=NSEW, padx=10, pady=10)
+        userscript.grid(row=0, column=0, sticky=NW)
+        self.scriptfile.grid(row=1, column=0, sticky=NW)
+        button_extractfeatures.grid(row=2, column=0, sticky=NW)
 
         roi_feature_frm = CreateLabelFrameWithIcon(parent=tab5, header="APPEND ROI FEATURES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.APPEND_ROI_FEATURES.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
 
@@ -374,8 +368,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         compute_feature_subset_btn = SimbaButton(parent=feature_tools_frm, width=Formats.BUTTON_WIDTH_XXL.value, txt="CALCULATE FEATURE SUBSETS", txt_clr='blue', img='subset_blue', font=Formats.FONT_REGULAR.value, cmd=FeatureSubsetExtractorPopUp, cmd_kwargs={'config_path': lambda: self.config_path}, thread=False)
 
         label_behavior_frm = CreateLabelFrameWithIcon(parent=tab7, header="LABEL BEHAVIOR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.LABEL_BEHAVIOR.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
-        select_video_btn_new = SimbaButton(parent=label_behavior_frm, width=Formats.BUTTON_WIDTH_XXL.value, txt="Select video (create NEW video annotation)", img='label_blue', txt_clr='navy', cmd=select_labelling_video, cmd_kwargs={'config_path': lambda :self.config_path, 'threshold_dict': lambda: None, 'setting': lambda: "from_scratch", 'continuing': lambda: False}, thread=False)
-        select_video_btn_continue = SimbaButton(parent=label_behavior_frm, width=Formats.BUTTON_WIDTH_XXL.value, txt="Select video (CONTINUE existing video annotation)", img='label_yellow', txt_clr='darkgoldenrod', cmd=select_labelling_video, cmd_kwargs={'config_path': lambda: self.config_path, 'threshold_dict': lambda:None, 'setting': lambda: None, 'continuing': lambda:True}, thread=False)
+        select_video_btn_new = SimbaButton(parent=label_behavior_frm, width=Formats.BUTTON_WIDTH_XXL.value, txt="Select video (create NEW video annotation)", img='label_blue', txt_clr='navy', cmd=SelectLabellingVideoPupUp, cmd_kwargs={'config_path': lambda :self.config_path, 'continuing': lambda: False}, thread=False)
+        select_video_btn_continue = SimbaButton(parent=label_behavior_frm, width=Formats.BUTTON_WIDTH_XXL.value, txt="Select video (CONTINUE existing video annotation)", img='label_yellow', txt_clr='darkgoldenrod', cmd=SelectLabellingVideoPupUp, cmd_kwargs={'config_path': lambda: self.config_path,'continuing': lambda: True}, thread=False)
 
         label_thirdpartyann = CreateLabelFrameWithIcon(parent=tab7, header="IMPORT THIRD-PARTY BEHAVIOR ANNOTATIONS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.THIRD_PARTY_ANNOTATION.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
         button_importmars = SimbaButton(parent=label_thirdpartyann, width=Formats.BUTTON_WIDTH_XS.value, txt="Import MARS Annotation (select folder with .annot files)", txt_clr="blue", cmd=self.importMARS, thread=False, font=Formats.FONT_REGULAR.value)
@@ -387,17 +381,9 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         import_observer_btn = SimbaButton(parent=label_thirdpartyann, width=Formats.BUTTON_WIDTH_XS.value, txt="Import NOLDUS OBSERVER Annotation (select folder with .xls/xlsx files)", txt_clr="purple", cmd=self.import_noldus_observer, thread=False, font=Formats.FONT_REGULAR.value)
 
 
-        label_pseudo = CreateLabelFrameWithIcon(parent=tab7,header="PSEUDO-LABELLING",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.PSEUDO_LBL.value)
-        pseudo_intructions_lbl_1 = SimBALabel(parent=label_pseudo, txt="Note: SimBA pseudo-labelling require initial machine predictions", font=Formats.FONT_REGULAR.value)
-        pseudo_intructions_lbl_2 = SimBALabel(parent=label_pseudo, txt="Click here more information on how to use the SimBA pseudo-labelling interface.", txt_clr='blue', cursor="hand2", font=Formats.FONT_REGULAR.value, link=Links.LABEL_BEHAVIOR.value)
-        pLabel_framedir = FileSelect(label_pseudo, "Video Path", lblwidth="10")
-        plabelframe_threshold = LabelFrame(label_pseudo, text="Threshold", pady=5, padx=5, font=Formats.FONT_HEADER.value)
-        plabel_threshold = [0] * len(self.clf_names)
-        for count, i in enumerate(list(self.clf_names)):
-            plabel_threshold[count] = Entry_Box(plabelframe_threshold, str(i), "20")
-            plabel_threshold[count].grid(row=count + 2, sticky=W)
+        label_pseudo = CreateLabelFrameWithIcon(parent=tab7,header="PSEUDO-LABELLING", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.PSEUDO_LBL.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
+        pseudo_lbelling_btn = SimbaButton(parent=label_pseudo, width=Formats.BUTTON_WIDTH_XXL.value, txt="PSEUDO-LABEL VIDEO", img='label_blue', txt_clr='navy', cmd=SelectPseudoLabellingVideoPupUp, cmd_kwargs={'config_path': lambda :self.config_path}, thread=False)
 
-        pseudo_lbl_btn = SimbaButton(parent=label_pseudo, txt="Correct labels", cmd=select_labelling_video, cmd_kwargs={'config_path': lambda:self.config_path, 'threshold_dict': lambda:dict(zip(self.clf_names, plabel_threshold)), 'setting': lambda:'pseudo', 'continuing': lambda:False, 'video_file_path': lambda:pLabel_framedir.file_path}, thread=False)
         label_adv_label = CreateLabelFrameWithIcon(parent=tab7, header="ADVANCED LABEL BEHAVIOR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ADVANCED_LBL.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
 
         label_adv_note_1 = SimBALabel(parent=label_adv_label, txt="Note: you will have to specify the presence of *both* behavior and non-behavior on your own.", font=Formats.FONT_REGULAR.value, bg_clr=Formats.LABELFRAME_GREY.value)
@@ -530,11 +516,6 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_outliercorrection.grid(row=1, sticky=W)
         button_skipOC.grid(row=2, sticky=W, pady=5)
 
-        label_extractfeatures.grid(row=0, column=0, sticky=NW)
-        button_extractfeatures.grid(row=1, column=0, sticky=NW)
-        labelframe_usrdef.grid(row=0, column=0, sticky=NW, pady=15)
-        userscript.grid(row=1, column=0, sticky=NW)
-        self.scriptfile.grid(row=2, column=0, sticky=NW)
 
         roi_feature_frm.grid(row=1, column=0, sticky=NW, padx=10, pady=10)
         append_roi_features_by_animal.grid(row=0, column=0, sticky=NW)
@@ -548,13 +529,8 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         select_video_btn_new.grid(row=0, sticky=W)
         select_video_btn_continue.grid(row=1, sticky=W)
 
-        label_pseudo.grid(row=6, sticky=W, pady=10)
-
-        pLabel_framedir.grid(row=0, sticky=W)
-        pseudo_intructions_lbl_1.grid(row=1, sticky=W)
-        pseudo_intructions_lbl_2.grid(row=2, sticky=W)
-        plabelframe_threshold.grid(row=4, sticky=W)
-        pseudo_lbl_btn.grid(row=5, sticky=W)
+        label_pseudo.grid(row=6, sticky=W, padx=10, pady=10)
+        pseudo_lbelling_btn.grid(row=0, column=0, sticky=W, pady=10)
 
         label_adv_label.grid(row=7, column=0, sticky=NW, padx=10, pady=10)
         label_adv_note_1.grid(row=0, column=0, sticky=NW)
@@ -890,9 +866,10 @@ class App(object):
         video_process_menu.add_cascade(label="Down-sample video...", compound="left", image=self.menu_icons["sample"]["img"], menu=downsample_video_menu, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_cascade(label="Drop body-parts from tracking data", compound="left", image=self.menu_icons["trash"]["img"], command=DropTrackingDataPopUp, font=Formats.FONT_REGULAR.value)
         extract_frames_menu = Menu(video_process_menu, font=Formats.FONT_REGULAR.value)
-        extract_frames_menu.add_command(label="Extract defined frames", command=ExtractSpecificFramesPopUp, font=Formats.FONT_REGULAR.value)
-        extract_frames_menu.add_command(label="Extract frames", command=ExtractAllFramesPopUp, font=Formats.FONT_REGULAR.value)
-        extract_frames_menu.add_command(label="Extract frames from seq files", command=ExtractSEQFramesPopUp, font=Formats.FONT_REGULAR.value)
+        extract_frames_menu.add_command(label="Extract defined frames", command=ExtractSpecificFramesPopUp, font=Formats.FONT_REGULAR.value, image=self.menu_icons["frames"]["img"], compound="left")
+        extract_frames_menu.add_command(label="Extract frames from single video", command=SingleVideo2FramesPopUp, font=Formats.FONT_REGULAR.value, image=self.menu_icons["video"]["img"], compound="left")
+        extract_frames_menu.add_command(label="Extract frames from multiple video", command=MultipleVideos2FramesPopUp, font=Formats.FONT_REGULAR.value, image=self.menu_icons["stack"]["img"], compound="left")
+        extract_frames_menu.add_command(label="Extract frames from seq files", command=ExtractSEQFramesPopUp, font=Formats.FONT_REGULAR.value, image=self.menu_icons["fire"]["img"], compound="left")
         video_process_menu.add_cascade(label="Extract frames...", compound="left", image=self.menu_icons["frames"]["img"], menu=extract_frames_menu, font=Formats.FONT_REGULAR.value)
 
         video_process_menu.add_command(label="Create GIFs", compound="left", image=self.menu_icons["gif"]["img"], command=CreateGIFPopUP, font=Formats.FONT_REGULAR.value)

@@ -168,5 +168,6 @@ class ROISelector(object):
             return True
 
 
-# img_selector = ROISelector(path=r"C:\troubleshooting\mitra\test\503_MA109_Gi_CNO_0521.mp4", clr=(0, 255, 0), thickness=2, destroy=False)
+# img_selector = ROISelector(path=r"D:\weights\2025-04-17_17-17-14\cropped_slowed_output.mp4", clr=(0, 255, 0), thickness=2, destroy=False)
 # img_selector.run()
+# print(img_selector.top_right_tag, img_selector.width, img_selector.height)

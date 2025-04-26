@@ -327,10 +327,10 @@ class Options(Enum):
     SMOOTHING_OPTIONS_W_NONE = ["None", "Gaussian", "Savitzky Golay"]
     VIDEO_FORMAT_OPTIONS = ["mp4", "avi"]
     ALL_VIDEO_FORMAT_OPTIONS = (".avi", ".mp4", ".mov", ".flv", ".m4v", ".webm", ".h264")
-    ALL_VIDEO_FORMAT_OPTIONS_2 = ("avi", "mp4", "mov", "flv", "m4v", "webm")
+    ALL_VIDEO_FORMAT_OPTIONS_2 = ("avi", "mp4", "mov", "flv", "m4v", "webm", "h264")
     ALL_IMAGE_FORMAT_OPTIONS = (".bmp", ".png", ".jpeg", ".jpg", ".webp")
     ALL_IMAGE_FORMAT_STR_OPTIONS = ".bmp .png .jpeg .jpg"
-    ALL_VIDEO_FORMAT_STR_OPTIONS = ".avi .mp4 .mov .flv .m4v .webm"
+    ALL_VIDEO_FORMAT_STR_OPTIONS = ".avi .mp4 .mov .flv .m4v .webm .h264"
     WORKFLOW_FILE_TYPE_OPTIONS = ["csv", "parquet"]
     WORKFLOW_FILE_TYPE_STR_OPTIONS = ".csv .parquet"
     TRACKING_TYPE_OPTIONS = ["Classic tracking", "Multi tracking", "3D tracking"]
