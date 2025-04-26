@@ -1,15 +1,17 @@
 __author__ = "Simon Nilsson"
 
+import math
 import os
+from copy import deepcopy
 from subprocess import PIPE, Popen
 from tkinter import *
-import math
 from tkinter import filedialog
-from typing import Dict, Optional, Union, Tuple, List, Any
-from copy import deepcopy
-from tabulate import tabulate
-from PIL import Image, ImageTk
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 import matplotlib
+from PIL import Image, ImageTk
+from tabulate import tabulate
+
 matplotlib.use('agg')
 import cv2
 import pandas as pd
@@ -21,15 +23,24 @@ except ImportError:
 
 import simba
 from simba.mixins.config_reader import ConfigReader
-from simba.ui.tkinter_functions import Entry_Box, CreateLabelFrameWithIcon, SimbaButton, SimBALabel
-from simba.utils.checks import (check_file_exist_and_readable, check_int,  check_that_column_exist, check_valid_boolean, check_valid_dataframe, check_valid_dict, check_video_and_data_frm_count_align)
-from simba.utils.enums import TagNames, Formats
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        SimbaButton, SimbaCheckbox, SimBALabel)
+from simba.utils.checks import (check_file_exist_and_readable, check_int,
+                                check_that_column_exist, check_valid_boolean,
+                                check_valid_dataframe, check_valid_dict,
+                                check_video_and_data_frm_count_align)
+from simba.utils.enums import Formats, TagNames
 from simba.utils.errors import FrameRangeError, NoDataError, NoFilesFoundError
-from simba.utils.warnings import DataHeaderWarning
-from simba.utils.lookups import (get_labelling_img_kbd_bindings, get_labelling_video_kbd_bindings, get_display_resolution, get_current_time, get_img_resize_info)
+from simba.utils.lookups import (get_current_time, get_display_resolution,
+                                 get_img_resize_info,
+                                 get_labelling_img_kbd_bindings,
+                                 get_labelling_video_kbd_bindings)
 from simba.utils.printing import log_event, stdout_success
-from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_config_entry, read_df, read_frm_of_video, write_df, read_config_file)
-from simba.ui.tkinter_functions import SimbaCheckbox
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
+                                    read_config_entry, read_config_file,
+                                    read_df, read_frm_of_video, write_df)
+from simba.utils.warnings import DataHeaderWarning
+
 PLAY_VIDEO_SCRIPT_PATH = os.path.join(os.path.dirname(simba.__file__), "labelling/play_annotation_video.py")
 PADDING = 5
 

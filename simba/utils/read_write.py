@@ -44,7 +44,8 @@ from shapely.geometry import (LineString, MultiLineString, MultiPolygon, Point,
                               Polygon)
 
 import simba
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
+from simba.utils.checks import (check_ffmpeg_available,
+                                check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_filepath_list_is_empty,
                                 check_if_keys_exist_in_dict,
@@ -54,17 +55,17 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_str, check_valid_array,
                                 check_valid_boolean, check_valid_dataframe,
                                 check_valid_lst, check_valid_url, is_img_bw,
-                                is_video_color, check_ffmpeg_available)
+                                is_video_color)
 from simba.utils.enums import (ENV_VARS, ConfigKey, Defaults, Dtypes, Formats,
                                Keys, Links, Options, Paths)
 from simba.utils.errors import (DataHeaderError, DuplicationError,
-                                FFMPEGCodecGPUError, FileExistError,
-                                FrameRangeError, IntegerError,
+                                FFMPEGCodecGPUError, FFMPEGNotFoundError,
+                                FileExistError, FrameRangeError, IntegerError,
                                 InvalidFilepathError, InvalidFileTypeError,
                                 InvalidInputError, InvalidVideoFileError,
                                 MissingProjectConfigEntryError, NoDataError,
                                 NoFilesFoundError, NotDirectoryError,
-                                ParametersFileError, PermissionError, FFMPEGNotFoundError)
+                                ParametersFileError, PermissionError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.warnings import (
     FileExistWarning, FrameRangeWarning, InvalidValueWarning,
