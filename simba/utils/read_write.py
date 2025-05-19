@@ -1638,10 +1638,16 @@ def read_roi_data(roi_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, pd.D
     if "Center_XCenter_Y" in polygon_df.columns:
         polygon_df = polygon_df.drop(["Center_XCenter_Y"], axis=1)
     if 'Center_X' not in rectangles_df.columns:
-        rectangles_df['Center_X'] = rectangles_df['topLeftX'] + int(rectangles_df['width']/2)
+        if len(rectangles_df) > 0:
+            rectangles_df['Center_X'] = rectangles_df['topLeftX'] + int(rectangles_df['width']/2)
+        else:
+            rectangles_df['Center_X'] = pd.Series(dtype='int')
     if 'Center_Y' not in rectangles_df.columns:
-        rectangles_df['Center_Y'] = rectangles_df['topLeftY'] + int(rectangles_df['height']/2)
-
+        if len(rectangles_df) > 0:
+            rectangles_df['Center_Y'] = rectangles_df['topLeftY'] + int(rectangles_df['height']/2)
+        else:
+            rectangles_df['Center_Y'] = pd.Series(dtype='int')
+    #circles_df['Video'] = circles_df['Video'].replace('Trial     1_dSLR1_sample_A1_na', '501_MA142_Gi_Saline_0513')
     return rectangles_df, circles_df, polygon_df
 
 #read_roi_data(roi_path=r"C:\troubleshooting\mitra\project_folder\logs\measures\ROI_definitions.h5")

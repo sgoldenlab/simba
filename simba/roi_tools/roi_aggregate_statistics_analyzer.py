@@ -11,15 +11,10 @@ from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.feature_extraction_supplement_mixin import \
     FeatureExtractionSupplemental
 from simba.roi_tools.roi_utils import get_roi_dict_from_dfs
-from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log,
-    check_file_exist_and_readable, check_float, check_if_dir_exists, check_str,
-    check_that_column_exist, check_valid_array, check_valid_boolean,
-    check_valid_dataframe, check_valid_lst)
+from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_file_exist_and_readable, check_float, check_if_dir_exists, check_that_column_exist, check_valid_boolean, check_valid_lst)
 from simba.utils.data import detect_bouts, slice_roi_dict_for_video
-from simba.utils.enums import ROI_SETTINGS, Formats, Keys
-from simba.utils.errors import (CountError, MissingColumnsError,
-                                ROICoordinatesNotFoundError)
+from simba.utils.enums import ROI_SETTINGS, Keys
+from simba.utils.errors import (CountError, ROICoordinatesNotFoundError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_data_paths, read_df
 from simba.utils.warnings import NoDataFoundWarning
@@ -187,12 +182,11 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
                     p_arr = self.data_df[bp_cols[2]].values.astype(np.float32)
                     below_threshold_idx = np.argwhere(p_arr < self.threshold)
                     bp_arr = self.data_df[[bp_cols[0], bp_cols[1]]].values.astype(np.float32)
-
                     for roi_cnt, (roi_name, roi_data) in enumerate(self.sliced_roi_dict.items()):
-                        if roi_data[SHAPE_TYPE] == ROI_SETTINGS.RECTANGLE.value:
+                        if roi_data[SHAPE_TYPE].lower() == ROI_SETTINGS.RECTANGLE.value.lower():
                             roi_coords = np.array([[roi_data['topLeftX'], roi_data['topLeftY']], [roi_data['Bottom_right_X'], roi_data['Bottom_right_Y']]])
                             r = FeatureExtractionMixin.framewise_inside_rectangle_roi(bp_location=bp_arr, roi_coords=roi_coords)
-                        elif roi_data[SHAPE_TYPE] == ROI_SETTINGS.CIRCLE.value:
+                        elif roi_data[SHAPE_TYPE].lower() == ROI_SETTINGS.CIRCLE.value.lower():
                             circle_center = np.array([roi_data['Center_X'], roi_data['Center_Y']]).astype(np.int32)
                             r = FeatureExtractionMixin.is_inside_circle(bp=bp_arr, roi_center=circle_center, roi_radius=roi_data['radius'])
                         else:

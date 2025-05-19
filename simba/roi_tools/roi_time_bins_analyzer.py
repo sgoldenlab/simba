@@ -20,6 +20,9 @@ from simba.utils.errors import (CountError, FrameRangeError,
                                 ROICoordinatesNotFoundError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_data_paths, read_df
+from simba.utils.data import slice_roi_dict_for_video
+from simba.utils.warnings import ROIWarning
+
 
 SHAPE_TYPE = "Shape_type"
 TOTAL_ROI_TIME = 'TOTAL ROI TIME (S)'
@@ -151,7 +154,6 @@ class ROITimebinAnalyzer(ConfigReader):
             self.results = self.results[self.results[MEASUREMENT] != VIDEO_LENGTH]
         if not self.include_px_per_mm:
             self.results = self.results[self.results[MEASUREMENT] != PIX_PER_MM]
-        print(self.include_time_stamps)
         if not self.include_time_stamps:
             self.results = self.results.drop(['TIME-BIN START TIME (S)', 'TIME-BIN END TIME (S)', 'TIME-BIN START FRAME (#)', 'TIME-BIN END FRAME (#)'], axis=1)
         self.results = self.results.sort_values(by=["VIDEO", "ANIMAL", "BODY-PART", "SHAPE", "TIME-BIN #", "MEASUREMENT"]).reset_index(drop=True)
@@ -185,20 +187,24 @@ class ROITimebinAnalyzer(ConfigReader):
             print(f"Analysing ROI data for video {video_name}... (Video {file_cnt + 1}/{len(self.data_paths)})")
             _, px_per_mm, fps = self.read_video_info(video_name=video_name)
             video_df = self.detailed_df[self.detailed_df['VIDEO'] == video_name].reset_index(drop=True)
+            _, video_shape_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=video_name)
+            if len(video_shape_names) == 0:
+                ROIWarning(msg=f'Video {video_name} has no drawn ROIs. Skipping video ROI time-bin analysis.', source=self.__class__.__name__)
             frames_per_bin = int(fps * self.bin_size)
             if frames_per_bin == 0:
                 raise FrameRangeError(msg=f"The specified time-bin length of {self.bin_size} is TOO SHORT for video {video_name} which has a specified FPS of {fps}. This combination produces time bins that are LESS THAN a single frame.", source=self.__class__.__name__)
             video_frms = list(range(0, len(read_df(file_path=file_path, file_type=self.file_type))))
             video_length = len(video_frms) / fps
             frame_bins = [video_frms[i: i + (frames_per_bin)] for i in range(0, len(video_frms), frames_per_bin)]
-            for animal_name, roi_name in list(itertools.product(self.bp_dict.keys(), self.roi_names)):
+
+            for animal_name, roi_name in list(itertools.product(self.bp_dict.keys(), video_shape_names)):
                 bp_name = self.bp_lk[animal_name]
                 video_roi_animal_df = video_df.loc[(video_df["Event"] == roi_name) & (video_df["ANIMAL"] == animal_name)]
                 entry_frms = list(video_roi_animal_df['Start_frame'])
                 inside_roi_frm_idx = [list(range(x, y)) for x, y in zip(list(video_roi_animal_df['Start_frame'].astype(int)), list(video_roi_animal_df["End_frame"].astype(int) + 1))]
                 inside_roi_frm_idx = [i for s in inside_roi_frm_idx for i in s]
                 for bin_cnt, bin_frms in enumerate(frame_bins):
-                    print(f"Analysing time-bin {bin_cnt+1} (bin: {bin_cnt+1}/{len(frame_bins)}, roi: {roi_name}, animal: {animal_name}, video: {file_cnt + 1}/{len(self.data_paths)})")
+                    print(f"Analysing time-bin {bin_cnt+1} (bin: {bin_cnt+1}/{len(frame_bins)}, roi: {roi_name}, animal: {animal_name}, video: {file_cnt + 1}/{len(self.data_paths)}, video name: {video_name})")
                     bin_start_time, bin_end_time = bin_frms[0] / fps, bin_frms[-1] / fps
                     bin_start_frm, bin_end_frm = bin_frms[0], bin_frms[-1]
                     frms_inside_roi_in_timebin_idx = [x for x in inside_roi_frm_idx if x in bin_frms]
@@ -243,7 +249,7 @@ class ROITimebinAnalyzer(ConfigReader):
         stdout_success(f'ROI statistics saved at {self.save_path}', elapsed_time=self.timer.elapsed_time_str)
 
 
-# test = ROITimebinAnalyzer(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", bin_size=61, body_parts=['Nose'], detailed_bout_data=True, calculate_distances=True, transpose=True)
+# test = ROITimebinAnalyzer(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", bin_size=61, body_parts=['Nose'], detailed_bout_data=True, calculate_distances=True, transpose=False)
 # test.run()
 # test.save()
 #

@@ -228,12 +228,11 @@ class ConfigReader(object):
             self.polygon_df = self.polygon_df.dropna(how="any")
             self.shape_names = list(itertools.chain(self.rectangles_df["Name"].unique(), self.polygon_df["Name"].unique(), self.circles_df["Name"].unique()))
             self.roi_names = deepcopy(self.shape_names)
-            self.roi_dict = {
-                Keys.ROI_RECTANGLES.value: self.rectangles_df,
-                Keys.ROI_CIRCLES.value: self.circles_df,
-                Keys.ROI_POLYGONS.value: self.polygon_df,
-            }
+            self.roi_dict = {Keys.ROI_RECTANGLES.value: self.rectangles_df, Keys.ROI_CIRCLES.value: self.circles_df, Keys.ROI_POLYGONS.value: self.polygon_df}
             self.roi_types_names_lst = set()
+
+            #self.roi_dict[Keys.ROI_CIRCLES.value]['Video'] = self.roi_dict[Keys.ROI_CIRCLES.value]['Video'].replace('Trial     1_dSLR1_sample_A1_na', '501_MA142_Gi_Saline_0513')
+
             for idx, r in self.roi_dict[Keys.ROI_RECTANGLES.value].iterrows():
                 self.roi_types_names_lst.add(f'Rectangle: {r["Name"]}')
             for idx, r in self.roi_dict[Keys.ROI_CIRCLES.value].iterrows():
@@ -243,38 +242,18 @@ class ConfigReader(object):
             self.roi_types_names_lst = list(self.roi_types_names_lst)
             for shape_type, shape_data in self.roi_dict.items():
                 if shape_type == Keys.ROI_CIRCLES.value:
-                    self.roi_dict[Keys.ROI_CIRCLES.value]["Center_X"] = self.roi_dict[
-                        Keys.ROI_CIRCLES.value
-                    ]["centerX"]
-                    self.roi_dict[Keys.ROI_CIRCLES.value]["Center_Y"] = self.roi_dict[
-                        Keys.ROI_CIRCLES.value
-                    ]["centerY"]
+                    self.roi_dict[Keys.ROI_CIRCLES.value]["Center_X"] = self.roi_dict[Keys.ROI_CIRCLES.value]["centerX"]
+                    self.roi_dict[Keys.ROI_CIRCLES.value]["Center_Y"] = self.roi_dict[Keys.ROI_CIRCLES.value]["centerY"]
                 elif shape_type == Keys.ROI_RECTANGLES.value:
-                    self.roi_dict[Keys.ROI_RECTANGLES.value][
-                        "Center_X"
-                    ] = self.roi_dict[Keys.ROI_RECTANGLES.value]["Bottom_right_X"] - (
-                        self.roi_dict[Keys.ROI_RECTANGLES.value]["width"] / 2
-                    )
-                    self.roi_dict[Keys.ROI_RECTANGLES.value][
-                        "Center_Y"
-                    ] = self.roi_dict[Keys.ROI_RECTANGLES.value]["Bottom_right_Y"] - (
-                        self.roi_dict[Keys.ROI_RECTANGLES.value]["height"] / 2
-                    )
+                    self.roi_dict[Keys.ROI_RECTANGLES.value]["Center_X"] = self.roi_dict[Keys.ROI_RECTANGLES.value]["Bottom_right_X"] - (self.roi_dict[Keys.ROI_RECTANGLES.value]["width"] / 2)
+                    self.roi_dict[Keys.ROI_RECTANGLES.value]["Center_Y"] = self.roi_dict[Keys.ROI_RECTANGLES.value]["Bottom_right_Y"] - (self.roi_dict[Keys.ROI_RECTANGLES.value]["height"] / 2)
                 elif shape_type == Keys.ROI_POLYGONS.value:
                     try:
-                        self.roi_dict[Keys.ROI_POLYGONS.value]["Center_X"] = (
-                            self.roi_dict[Keys.ROI_POLYGONS.value]["Center_X"]
-                        )
-                        self.roi_dict[Keys.ROI_POLYGONS.value]["Center_Y"] = (
-                            self.roi_dict[Keys.ROI_POLYGONS.value]["Center_Y"]
-                        )
+                        self.roi_dict[Keys.ROI_POLYGONS.value]["Center_X"] = (self.roi_dict[Keys.ROI_POLYGONS.value]["Center_X"])
+                        self.roi_dict[Keys.ROI_POLYGONS.value]["Center_Y"] = (self.roi_dict[Keys.ROI_POLYGONS.value]["Center_Y"])
                     except KeyError:
                         pass
-            self.video_names_w_rois = set(
-                list(self.rectangles_df["Video"])
-                + list(self.circles_df["Video"])
-                + list(self.polygon_df["Video"])
-            )
+            self.video_names_w_rois = set(list(self.rectangles_df["Video"]) + list(self.circles_df["Video"]) + list(self.polygon_df["Video"]))
 
     def get_all_clf_names(self) -> List[str]:
         """
