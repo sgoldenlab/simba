@@ -13,7 +13,8 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         SimbaButton, SimbaCheckbox,
                                         SimBADropDown)
 from simba.utils.enums import Formats, Keys, Links
-from simba.utils.errors import InvalidInputError, NoFilesFoundError, DuplicationError
+from simba.utils.errors import (DuplicationError, InvalidInputError,
+                                NoFilesFoundError)
 from simba.utils.read_write import get_fn_ext
 
 DECIMALS_OPTIONS = list(range(0, 11))
