@@ -32,13 +32,12 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import InvalidInputError, NoFilesFoundError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (copy_files_to_directory,
+from simba.utils.read_write import (copy_files_to_directory, create_directory,
                                     find_files_of_filetypes_in_directory,
                                     find_video_of_file, get_fn_ext,
                                     get_video_meta_data, read_df,
-                                    read_frm_of_video,
-                                    read_roi_data, write_pickle,
-                                    create_directory, read_json)
+                                    read_frm_of_video, read_json,
+                                    read_roi_data, write_pickle)
 
 # def geometry_to_rle(geometry: Union[np.ndarray, Polygon], img_size: Tuple[int, int]):
 #     """

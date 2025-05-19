@@ -1,21 +1,27 @@
-from typing import Union, Optional, Dict
+from typing import Dict, Optional, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
-import os
-import cv2
 
+import functools
+import multiprocessing
+import os
+
+import cv2
 import numpy as np
 from PIL import Image
-from simba.utils.read_write import get_video_meta_data, read_img_batch_from_video_gpu, read_img_batch_from_video, find_core_cnt
-from simba.utils.checks import check_if_dir_exists, check_valid_boolean, check_int, check_str, check_nvidea_gpu_available
+
+from simba.utils.checks import (check_if_dir_exists, check_int,
+                                check_nvidea_gpu_available, check_str,
+                                check_valid_boolean)
 from simba.utils.errors import SimBAGPUError
 from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_core_cnt, get_video_meta_data,
+                                    read_img_batch_from_video,
+                                    read_img_batch_from_video_gpu)
 
-
-import multiprocessing
-import functools
 JPEG, PNG = 'jpeg', 'png'
 
 def _video_to_frms_helper(img_batch: Dict[int, np.ndarray],

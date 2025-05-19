@@ -12,7 +12,7 @@ from copy import deepcopy
 from datetime import datetime
 from multiprocessing import Lock, Value
 from pathlib import Path
-from typing import Dict, List, Tuple, Union, Optional
+from typing import Dict, List, Optional, Tuple, Union
 
 import matplotlib.font_manager
 import numpy as np

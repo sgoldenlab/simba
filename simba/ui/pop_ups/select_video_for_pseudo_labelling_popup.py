@@ -1,14 +1,18 @@
 import os
-from typing import Union
 from tkinter import *
+from typing import Union
+
 from simba.labelling.standard_labeller import LabellingInterface
-from simba.utils.checks import check_file_exist_and_readable, check_float, check_valid_dataframe
-from simba.utils.enums import Options, Formats, Links
-from simba.utils.read_write import get_video_meta_data, read_df
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, FileSelect, Entry_Box, SimBALabel
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        FileSelect, SimBALabel)
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_valid_dataframe)
+from simba.utils.enums import Formats, Links, Options
 from simba.utils.errors import NoDataError, NoFilesFoundError
+from simba.utils.read_write import get_video_meta_data, read_df
+
 
 class SelectPseudoLabellingVideoPupUp(ConfigReader, PopUpMixin):
 
