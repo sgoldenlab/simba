@@ -11,10 +11,13 @@ from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.feature_extraction_supplement_mixin import \
     FeatureExtractionSupplemental
 from simba.roi_tools.roi_utils import get_roi_dict_from_dfs
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_file_exist_and_readable, check_float, check_if_dir_exists, check_that_column_exist, check_valid_boolean, check_valid_lst)
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_file_exist_and_readable, check_float, check_if_dir_exists,
+    check_that_column_exist, check_valid_boolean, check_valid_lst)
 from simba.utils.data import detect_bouts, slice_roi_dict_for_video
 from simba.utils.enums import ROI_SETTINGS, Keys
-from simba.utils.errors import (CountError, ROICoordinatesNotFoundError)
+from simba.utils.errors import CountError, ROICoordinatesNotFoundError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_data_paths, read_df
 from simba.utils.warnings import NoDataFoundWarning
