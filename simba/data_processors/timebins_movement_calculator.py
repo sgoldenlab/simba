@@ -64,16 +64,17 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
             self.file_paths = self.outlier_corrected_paths
         check_valid_boolean(value=[plots], source=f'{self.__class__.__name__} plots', raise_error=True)
         check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose', raise_error=True)
+        self.verbose = verbose
 
         self.col_headers, self.bp_dict = [], {}
         for bp_cnt, bp in enumerate(body_parts):
             self.col_headers.extend((f"{bp}_x", f"{bp}_y"))
             animal_name = self.find_animal_name_from_body_part_name(bp_name=bp, bp_dict=self.animal_bp_dict)
             self.bp_dict[bp_cnt] = {animal_name: [f"{bp}_x", f"{bp}_y"]}
-        check_if_filepath_list_is_empty(filepaths=self.outlier_corrected_paths, error_msg=f"SIMBA ERROR: Cannot analyze movement in time-bins, data directory {self.outlier_corrected_dir} is empty.",)
         self.animal_combinations = list(itertools.combinations(self.animal_bp_dict, 2))
         self.bin_length, self.plots = bin_length, plots
-        print(f"Processing {len(self.outlier_corrected_paths)} video(s)...")
+        if verbose:
+            print(f"Processing {len(self.file_paths)} video(s) for time-bins movement data...")
 
     def __create_plots(self):
         timer = SimbaTimer(start=True)
@@ -99,7 +100,8 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
         for file_cnt, file_path in enumerate(self.file_paths):
             video_timer = SimbaTimer(start=True)
             _, video_name, _ = get_fn_ext(file_path)
-            print(f"Processing time-bin movements ({self.bin_length}s) for video {video_name} ({str(file_cnt+1)}/{str(len(self.outlier_corrected_paths))})...")
+            if self.verbose:
+                print(f"Processing time-bin movements ({self.bin_length}s) for video {video_name} ({str(file_cnt+1)}/{str(len(self.file_paths))})...")
             video_dict[video_name] = {}
             video_settings, px_per_mm, fps = self.read_video_info(video_name=video_name)
             fps, self.movement_cols, self.velocity_cols = int(fps), set(), set()
@@ -118,31 +120,14 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
                 self.movement_dict[video_name] = movement_data
                 movement_df_lists = [movement_data[i : i + bin_length_frames] for i in range(0, movement_data.shape[0], bin_length_frames)]
                 for bin, movement_df in enumerate(movement_df_lists):
-                    movement, velocity = (FeatureExtractionSupplemental.distance_and_velocity(x=movement_df["VALUE"].values, fps=fps, pixels_per_mm=1, centimeters=False))
-                    results.append(
-                        {
-                            "VIDEO": video_name,
-                            "TIME BIN #": bin,
-                            "ANIMAL": name,
-                            "BODY-PART": bps[0][:-2],
-                            "MEASUREMENT": "Movement (cm)",
-                            "VALUE": round(movement, 4),
-                        }
-                    )
-                    results.append(
-                        {
-                            "VIDEO": video_name,
-                            "TIME BIN #": bin,
-                            "ANIMAL": name,
-                            "BODY-PART": bps[0][:-2],
-                            "MEASUREMENT": "Velocity (cm/s)",
-                            "VALUE": round(velocity, 4),
-                        }
-                    )
+                    movement, velocity = (FeatureExtractionSupplemental.distance_and_velocity(x=movement_df["VALUE"].values, fps=fps, pixels_per_mm=px_per_mm, centimeters=False))
+                    results.append({"VIDEO": video_name,"TIME BIN #": bin,"ANIMAL": name,"BODY-PART": bps[0][:-2],"MEASUREMENT": "Movement (cm)","VALUE": round(movement, 4)})
+                    results.append({"VIDEO": video_name,"TIME BIN #": bin,"ANIMAL": name,"BODY-PART": bps[0][:-2],"MEASUREMENT": "Velocity (cm/s)","VALUE": round(velocity, 4)})
             results = pd.DataFrame(results).reset_index(drop=True)
             self.out_df_lst.append(results)
             video_timer.stop_timer()
-            print(f"Video {video_name} complete (elapsed time: {video_timer.elapsed_time_str}s)...")
+            if self.verbose:
+                print(f"Time-bin movement calculations for video {video_name} complete (elapsed time: {video_timer.elapsed_time_str}s)...")
 
     def save(self):
         self.results = pd.concat(self.out_df_lst, axis=0).sort_values(by=["VIDEO", "TIME BIN #", "MEASUREMENT", "ANIMAL"])[["VIDEO", "TIME BIN #", "ANIMAL", "BODY-PART", "MEASUREMENT", "VALUE"]]

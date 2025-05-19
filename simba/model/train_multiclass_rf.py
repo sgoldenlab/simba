@@ -259,15 +259,15 @@ class TrainMultiClassRandomForestClassifier(ConfigReader, TrainModelMixin):
                                      save_dir=self.eval_out_path)
 
             else:
-                self.create_shap_log_mp(rf_clf=self.rf_clf,
-                                        x=self.x_train,
-                                        y=self.y_train,
-                                        x_names=list(self.feature_names),
-                                        clf_name=self.clf_name,
-                                        cnt_present=self.shap_target_present_cnt,
-                                        cnt_absent=self.shap_target_absent_cnt,
-                                        save_dir=self.eval_out_path,
-                                        plot=shap_plot)
+                self.create_shap_log_concurrent_mp(rf_clf=self.rf_clf,
+                                                   x=self.x_train,
+                                                   y=self.y_train,
+                                                   x_names=list(self.feature_names),
+                                                   clf_name=self.clf_name,
+                                                   cnt_present=self.shap_target_present_cnt,
+                                                   cnt_absent=self.shap_target_absent_cnt,
+                                                   save_dir=self.eval_out_path,
+                                                   plot=shap_plot)
 
             if self.compute_partial_dependency in Options.PERFORM_FLAGS.value:
                 self.partial_dependence_calculator(

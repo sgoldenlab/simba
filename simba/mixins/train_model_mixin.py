@@ -932,10 +932,10 @@ class TrainModelMixin(object):
                 shap_frm_timer = SimbaTimer(start=True)
                 frame_data = shap_x.iloc[[frame]]
                 frame_shap = explainer.shap_values(frame_data, check_additivity=False)[1][0].tolist()
-                frame_shap.extend((expected_value, sum(frame_shap), rf_clf.predict_proba(frame_data)[0][1], shap_y[cnt]))
+                frame_shap.extend((expected_value, sum(frame_shap) + expected_value, rf_clf.predict_proba(frame_data)[0][1], shap_y[cnt]))
                 raw_df.loc[len(raw_df)] = list(shap_x.iloc[frame])
                 shap_df.loc[len(shap_df)] = frame_shap
-                if ((cnt % save_it == 0) or (cnt == len(shap_x) - 1) and (cnt != 0) and (save_dir is not None)):
+                if ((cnt % save_it == 0) or (cnt == len(shap_x) - 1)) and (cnt != 0) and (save_dir is not None):
                     print(f"Saving SHAP data after {cnt} iterations...")
                     shap_df.to_csv(out_shap_path)
                     raw_df.to_csv(out_raw_path)
@@ -1696,7 +1696,7 @@ class TrainModelMixin(object):
     def _create_shap_mp_helper(data: Tuple[int, pd.DataFrame],
                                explainer: shap.TreeExplainer,
                                clf_name: str,
-                               verbose: bool) -> Tuple[pd.DataFrame, int]:
+                               verbose: bool) -> Tuple[np.ndarray, int]:
 
         if verbose:
             print(f'Processing SHAP core batch {data[0] + 1}... ({len(data[1])} observations)')
@@ -2567,7 +2567,7 @@ class TrainModelMixin(object):
         :example:
         >>> CONFIG_PATH = r"C:\troubleshooting\mitra\project_folder\project_config.ini"
         >>> RF_PATH = r"C:\troubleshooting\mitra\models\validations\straub_tail_5_new\straub_tail_5.sav"
-        >>> DATA_PATH = 'r"C:\troubleshooting\mitra\project_folder\csv\targets_inserted\new_straub\appended\501_MA142_Gi_CNO_0514.csv
+        >>> DATA_PATH = r"C:\troubleshooting\mitra\project_folder\csv\targets_inserted\new_straub\appended\501_MA142_Gi_CNO_0514.csv"
         >>> config = ConfigReader(config_path=CONFIG_PATH)
         >>> df = read_df(file_path=DATA_PATH, file_type='csv')
         >>> y = df['straub_tail']
@@ -2636,8 +2636,8 @@ class TrainModelMixin(object):
                     batch_x, batch_y = shap_data[batch_id][1].drop(clf_name, axis=1), shap_data[batch_id][1][clf_name].values.reshape(-1, 1)
                     batch_shap_sum = np.sum(batch_shap, axis=1).reshape(-1, 1)
                     expected_arr = np.full((batch_shap.shape[0]), expected_value).reshape(-1, 1)
-                    batch_proba = TrainModelMixin().clf_predict_proba(clf=rf_clf, x_df=batch_x,model_name=clf_name).reshape(-1, 1)
-                    batch_shap_results = np.hstack((batch_x, expected_arr, batch_shap_sum + expected_value, batch_proba, batch_y)).astype(np.float32)
+                    batch_proba = TrainModelMixin().clf_predict_proba(clf=rf_clf, x_df=batch_x, model_name=clf_name).reshape(-1, 1)
+                    batch_shap_results = np.hstack((batch_shap, expected_arr, batch_shap_sum + expected_value, batch_proba, batch_y)).astype(np.float32)
                     shap_results.append(batch_shap_results)
                     shap_raw.append(batch_x)
                     if verbose: print(f"Completed SHAP care batch (Batch {batch_id + 1 + 1}/{len(shap_data)})...")
@@ -2671,6 +2671,20 @@ class TrainModelMixin(object):
                 return shap_df, raw_df, summary_dfs, img
         else:
             GPUToolsWarning(msg=f'Cannot compute SHAP scores using cuml random forest model. To compute SHAP scores, turn off cuda. Alternatively, for GPU solution, see simba.data_processors.cuda.create_shap_log.create_shap_log')
+
+
+# if __name__ == "__main__":
+#     #from simba.mixins.train_model_mixin import TrainModelMixin
+#     x_cols = list(pd.read_csv(r"C:\projects\simba\simba\tests\data\sample_data\shap_test.csv", index_col=0).columns)
+#     x = pd.DataFrame(np.random.randint(0, 500, (9000, len(x_cols))), columns=x_cols)
+#     y = pd.Series(np.random.randint(0, 2, (9000,)))
+#     rf_clf = TrainModelMixin().clf_define(n_estimators=100)
+#     rf_clf = TrainModelMixin().clf_fit(clf=rf_clf, x_df=x, y_df=y)
+#     feature_names = [str(x) for x in list(x.columns)]
+#     TrainModelMixin().create_shap_log(rf_clf=rf_clf, x=x, y=y, x_names=feature_names, clf_name='test', save_it=None, cnt_present=5, cnt_absent=5, plot=True, save_dir=r'C:\Users\sroni\OneDrive\Desktop\shap_test')
+#     TrainModelMixin().create_shap_log_concurrent_mp(rf_clf=rf_clf, x=x, y=y, x_names=feature_names, clf_name='test', cnt_present=100, cnt_absent=100, plot=True, save_dir=r'C:\Users\sroni\OneDrive\Desktop\shap_test', core_cnt=5)
+#     TrainModelMixin().create_shap_log_mp(rf_clf=rf_clf, x=x, y=y, x_names=feature_names, clf_name='test', cnt_present=100, cnt_absent=100, plot=True, save_dir=r'C:\Users\sroni\OneDrive\Desktop\shap_test', core_cnt=5)
+#
 
 # trainer = TrainModelMixin()
 # trainer.clf_define(cuda=True)

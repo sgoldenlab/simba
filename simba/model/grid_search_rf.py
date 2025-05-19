@@ -147,16 +147,16 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                                              save_it=save_n,
                                              save_dir=self.model_dir_out)
                     else:
-                        self.create_shap_log_mp(rf_clf=self.rf_clf,
-                                                x=self.x_train,
-                                                y=self.y_train,
-                                                x_names=list(self.feature_names),
-                                                clf_name=self.clf_name,
-                                                cnt_present=meta_dict[MLParamKeys.SHAP_PRESENT.value],
-                                                cnt_absent=meta_dict[MLParamKeys.SHAP_ABSENT.value],
-                                                save_dir=self.model_dir_out,
-                                                save_file_suffix=config_cnt,
-                                                plot=shap_plot)
+                        self.create_shap_log_concurrent_mp(rf_clf=self.rf_clf,
+                                                           x=self.x_train,
+                                                           y=self.y_train,
+                                                           x_names=list(self.feature_names),
+                                                           clf_name=self.clf_name,
+                                                           cnt_present=meta_dict[MLParamKeys.SHAP_PRESENT.value],
+                                                           cnt_absent=meta_dict[MLParamKeys.SHAP_ABSENT.value],
+                                                           save_dir=self.model_dir_out,
+                                                           save_file_suffix=config_cnt,
+                                                           plot=shap_plot)
 
             if MLParamKeys.PARTIAL_DEPENDENCY.value in meta_dict.keys():
                 if (meta_dict[MLParamKeys.PARTIAL_DEPENDENCY.value] in Options.PERFORM_FLAGS.value):

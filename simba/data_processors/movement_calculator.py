@@ -71,14 +71,12 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
     def run(self):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.file_paths)
         self.results = pd.DataFrame(columns=["VIDEO", "ANIMAL", "BODY-PART", "MEASURE", "VALUE"])
-        self.movement_dfs = {}
         for file_cnt, file_path in enumerate(self.file_paths):
             self.__find_body_part_columns()
             _, video_name, _ = get_fn_ext(file_path)
             print(f"Analysing {video_name}... (Video {file_cnt+1}/{len(self.file_paths)})")
             self.data_df = read_df(file_path=file_path, file_type=self.file_type)
             self.video_info, self.px_per_mm, self.fps = self.read_video_info(video_name=video_name)
-            self.movement_dfs[video_name] = pd.DataFrame()
             if self.bp_list:
                 check_that_column_exist(df=self.data_df, column_name=self.bp_list, file_name=file_path)
                 self.data_df = self.data_df[self.bp_list]
@@ -100,6 +98,7 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
                     distance, velocity = FeatureExtractionSupplemental.distance_and_velocity(x=df.values, fps=self.fps, pixels_per_mm=self.px_per_mm, centimeters=True)
                     self.results.loc[len(self.results)] = [video_name, animal_name, "GRAVITY CENTER", "Distance (cm)", distance]
                     self.results.loc[len(self.results)] = [video_name, animal_name, "GRAVITY CENTER", "Velocity (cm/s)", velocity]
+
 
     def save(self):
         self.results.set_index("VIDEO").to_csv(self.save_path)

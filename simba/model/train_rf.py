@@ -188,15 +188,15 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
                                          save_it=shap_save_n,
                                          save_dir=self.eval_out_path)
                 else:
-                    self.create_shap_log_mp(rf_clf=self.rf_clf,
-                                            x=self.x_train,
-                                            y=self.y_train,
-                                            x_names=list(self.feature_names),
-                                            clf_name=self.clf_name,
-                                            cnt_present=shap_target_present_cnt,
-                                            cnt_absent=shap_target_absent_cnt,
-                                            save_dir=self.eval_out_path,
-                                            plot=shap_plot)
+                    self.create_shap_log_concurrent_mp(rf_clf=self.rf_clf,
+                                                       x=self.x_train,
+                                                       y=self.y_train,
+                                                       x_names=list(self.feature_names),
+                                                       clf_name=self.clf_name,
+                                                       cnt_present=shap_target_present_cnt,
+                                                       cnt_absent=shap_target_absent_cnt,
+                                                       save_dir=self.eval_out_path,
+                                                       plot=shap_plot)
 
             if compute_partial_dependency in Options.PERFORM_FLAGS.value:
                 self.partial_dependence_calculator(clf=self.rf_clf, x_df=self.x_train, clf_name=self.clf_name, save_dir=self.eval_out_path)
