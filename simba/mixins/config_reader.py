@@ -105,6 +105,7 @@ class ConfigReader(object):
         self.path_plot_dir = os.path.join(self.project_path, Paths.PATH_PLOT_DIR.value)
         self.shap_logs_path = os.path.join(self.project_path, Paths.SHAP_LOGS.value)
         self.video_info_path = os.path.join(self.project_path, Paths.VIDEO_INFO.value)
+        self.cue_lights_data_dir = os.path.join(self.project_path, Paths.CUE_LIGHTS_PATH.value)
         self.frames_output_dir = os.path.join(
             self.project_path, Paths.FRAMES_OUTPUT_DIR.value
         )

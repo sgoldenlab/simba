@@ -47,10 +47,12 @@ def slice_rectangle_from_img(img: np.ndarray,
 
 def _get_intensity_scores_in_rois(frm_list: List[int],
                                   video_rois: dict,
-                                  video_path: str):
+                                  video_path: str,
+                                  verbose: bool):
     results = {}
     for frm_idx in range(frm_list[0], frm_list[-1]+1):
-        print(f'Analyzing frame {frm_idx}...')
+        if verbose:
+            print(f'Analyzing frame {frm_idx}...')
         img = read_frm_of_video(video_path=video_path, frame_index=frm_idx)
         for _, rectangle in video_rois[Keys.ROI_RECTANGLES.value].iterrows():
             if rectangle["Name"] not in results.keys(): results[rectangle["Name"]] = {}
@@ -78,17 +80,20 @@ def _get_intensity_scores_in_rois(frm_list: List[int],
                 results[polygon["Name"]][frm_idx] = np.average(roi_image)
         for _, circle in video_rois[Keys.ROI_CIRCLES.value].iterrows():
             if circle["Name"] not in results.keys(): results[circle["Name"]] = {}
-            roi_img = img[circle["centerY"] : (circle["centerY"] + 2 * circle["radius"]), circle["centerX"] : (circle["centerX"] + 2 * circle["radius"])]
-            mask = np.zeros(roi_img.shape[:2], np.uint8)
-            circle_img = cv2.circle(mask, (circle["centerX"], circle["centerY"]), circle["radius"], (255, 255, 255), thickness=-1)
-            dst = cv2.bitwise_and(roi_img, roi_img, mask=circle_img)
-            bg = np.ones_like(roi_img, np.uint8)
-            cv2.bitwise_not(bg, bg, mask=mask)
-            roi_image = bg + dst
+            c_x, c_y, r = int(circle["centerX"]), int(circle["centerY"]), circle["radius"]
+            roi_image = img[c_y - r: c_y + r, c_x - r: c_x + r].copy()
+            mask = np.zeros(roi_image.shape[:2], dtype=np.uint8)
+            cv2.circle(mask, (r, r), r, 255, thickness=-1)
+            if len(roi_image.shape) == 2:
+                roi_image = cv2.bitwise_and(roi_image, roi_image, mask=mask)
+            else:
+                mask_3ch = cv2.merge([mask] * roi_image.shape[2])
+                roi_image = cv2.bitwise_and(roi_image, mask_3ch)
             if roi_image.ndim == 3:
                 results[circle["Name"]][frm_idx] = np.average(np.linalg.norm(roi_image, axis=2)) / np.sqrt(3)
             else:
                 results[circle["Name"]][frm_idx] = np.average(roi_image)
+
     return results
 
 
@@ -115,7 +120,8 @@ class CueLightAnalyzer(ConfigReader):
                  cue_light_names: List[str],
                  save_dir: Union[str, os.PathLike] = None,
                  core_cnt: int = -1,
-                 detailed_data: bool = False):
+                 detailed_data: bool = False,
+                 verbose: bool = True):
 
 
         ConfigReader.__init__(self, config_path=config_path, read_video_info=True)
@@ -123,10 +129,11 @@ class CueLightAnalyzer(ConfigReader):
         check_valid_lst(data=cue_light_names, source=self.__class__.__name__, valid_dtypes=(str,), min_len=1, raise_error=True)
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
         check_valid_boolean(value=detailed_data, source=f'{self.__class__.__name__} detailed_data', raise_error=True)
+        check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose', raise_error=True)
         self.data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=[f'.{self.file_type}'], raise_error=True, as_dict=True)
         self.read_roi_data()
         self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
-        self.cue_light_names, self.detailed_data = cue_light_names, detailed_data
+        self.cue_light_names, self.detailed_data, self.verbose = cue_light_names, detailed_data, verbose
         if save_dir is None:
             self.save_dir = self.cue_lights_data_dir
         else:
@@ -136,6 +143,9 @@ class CueLightAnalyzer(ConfigReader):
 
     def _get_kmeans(self,
                     intensities: Dict[str, Dict[int, int]]):
+        kmeans_timer = SimbaTimer(start=True)
+        if self.verbose:
+            print(f'Performing kmeans for {len(self.cue_light_names)} cue-lights for video {self.video_name}...')
         results = {}
         for cue_light_name, cue_light_data in intensities.items():
             cue_light_data = dict(sorted(cue_light_data.items()))
@@ -146,6 +156,9 @@ class CueLightAnalyzer(ConfigReader):
                 labels = 1 - labels
                 centroids = centroids[::-1]
             results[cue_light_name] = {'labels': labels, 'intensities': cue_light_data, 'centroids': centroids}
+        kmeans_timer.stop_timer()
+        if self.verbose:
+            print(f'Kmeans for {len(self.cue_light_names)} cue-lights for video {self.video_name} complete (elapsed time: {kmeans_timer.elapsed_time}s)')
         return results
 
 
@@ -191,14 +204,15 @@ class CueLightAnalyzer(ConfigReader):
             with multiprocessing.Pool(self.core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
                 constants = functools.partial(_get_intensity_scores_in_rois,
                                               video_rois=video_roi_dict,
-                                              video_path=self.video_path)
+                                              video_path=self.video_path,
+                                              verbose=self.verbose)
                 for cnt, result in enumerate(pool.imap(constants, self.frame_chunks, chunksize=self.multiprocess_chunksize)):
                     for key, subdict in result.items():
                         if key in self.intensities:self.intensities[key].update(subdict)
                         else: self.intensities[key] = subdict
-                        print(f'Batch {int(np.ceil(cnt + 1 / self.core_cnt))} complete...')
-            pool.terminate()
-            pool.join()
+                        if self.verbose:
+                            print(f'Batch {int(np.ceil(cnt + 1 / self.core_cnt))} complete...')
+            pool.terminate(); pool.join()
             kmeans = self._get_kmeans(intensities=self.intensities)
             self.data_df = self._append_light_data(data_df=self.data_df, kmeans_data=kmeans)
             self.data_df = self._remove_outlier_events(data_df=self.data_df)
@@ -217,9 +231,9 @@ class CueLightAnalyzer(ConfigReader):
 # if __name__ == "__main__":
 #     test = CueLightAnalyzer(config_path=r"C:\troubleshooting\cue_light\t1\project_folder\project_config.ini",
 #                             data_dir=r'C:\troubleshooting\cue_light\t1\project_folder\csv\outlier_corrected_movement_location',
-#                             cue_light_names=['cl'],
+#                             cue_light_names=['cl', 'cl2'],
 #                             save_dir=r'C:\troubleshooting\cue_light\t1\project_folder\csv\cue_lights',
-#                             core_cnt=23,
+#                             core_cnt=18,
 #                             detailed_data=True)
 #     test.run()
 

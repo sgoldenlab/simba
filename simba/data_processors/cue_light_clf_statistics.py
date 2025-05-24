@@ -30,10 +30,13 @@ class CueLightClfAnalyzer(ConfigReader):
        `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.
 
     :example:
-    >>> cue_light_clf_analyzer = CueLightClfAnalyzer(config_path='MyProjectConfig', pre_window=1000, post_window=1000, cue_light_names=['Cue_light'], clf_list=['Attack'])
-    >>> cue_light_clf_analyzer.analyze_clf()
-    >>> cue_light_clf_analyzer.organize_results()
-    >>> cue_light_clf_analyzer.save_data()
+    >>> test = CueLightClfAnalyzer(config_path=r"C:\troubleshooting\cue_light\t1\project_folder\project_config.ini",
+    >>>                            pre_window=1,
+    >>>                            post_window=1,
+    >>>                            cue_light_names=['cl'],
+    >>>                            clf_names=['freeze'])
+    >>> test.run()
+    >>> test.save()
     """
 
     def __init__(self,
@@ -65,10 +68,10 @@ class CueLightClfAnalyzer(ConfigReader):
 
     def run(self):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=list(self.cue_light_paths.values()))
-
-
         self.results = pd.DataFrame(columns=['VIDEO', 'CUE LIGHT', 'CLASSIFIER', 'CUE LIGHT BOUT START TIME', 'CUE LIGHT BOUT END TIME', 'CUE LIGHT BOUT START FRAME', 'CUE LIGHT BOUT END FRAME', ' CUE LIGHT BOUT BEHAVIOR PRESENT (S)', 'CUE LIGHT BOUT BEHAVIOR ABSENT (S)', f'PRE CUE LIGHT BOUT ({self.pre_window}s) PRESENT (S)', f'PRE CUE LIGHT BOUT ({self.pre_window}s) ABSENT (S)', f'POST CUE LIGHT BOUT ({self.pre_window}s) PRESENT (S)', f'POST CUE LIGHT BOUT ({self.pre_window}s) ABSENT (S)'])
+        print('Running cue-light classifier statistics...')
         for file_cnt, (video_name, cue_light_data_path) in enumerate(self.cue_light_paths.items()):
+            print(f'Analyzing {video_name}...')
             machine_results_path = self.machine_results_paths[video_name]
             ml_df = read_df(machine_results_path, self.file_type)
             cue_light_df = read_df(cue_light_data_path, self.file_type)
@@ -114,5 +117,3 @@ class CueLightClfAnalyzer(ConfigReader):
 #                            clf_names=['freeze'])
 # test.run()
 # test.save()
-# test.organize_results()
-# test.save_data()

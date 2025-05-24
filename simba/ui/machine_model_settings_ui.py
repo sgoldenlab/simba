@@ -147,7 +147,7 @@ class MachineModelSettingsPopUp(PopUpMixin, ConfigReader):
         save_meta_btn.grid(row=1, column=0, sticky=NW)
         clear_cache_btn.grid(row=2, column=0, sticky=NW)
 
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def dropdown_switch_entry_box_state(self, box, dropdown):
         if dropdown.getChoices() != "None":

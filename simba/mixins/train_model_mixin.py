@@ -2676,14 +2676,14 @@ class TrainModelMixin(object):
 # if __name__ == "__main__":
 #     #from simba.mixins.train_model_mixin import TrainModelMixin
 #     x_cols = list(pd.read_csv(r"C:\projects\simba\simba\tests\data\sample_data\shap_test.csv", index_col=0).columns)
-#     x = pd.DataFrame(np.random.randint(0, 500, (9000, len(x_cols))), columns=x_cols)
-#     y = pd.Series(np.random.randint(0, 2, (9000,)))
-#     rf_clf = TrainModelMixin().clf_define(n_estimators=100)
+#     x = pd.DataFrame(np.random.randint(0, 500, (1000000, len(x_cols))), columns=x_cols)
+#     y = pd.Series(np.random.randint(0, 2, (1000000,)))
+#     rf_clf = TrainModelMixin().clf_define(n_estimators=1000)
 #     rf_clf = TrainModelMixin().clf_fit(clf=rf_clf, x_df=x, y_df=y)
 #     feature_names = [str(x) for x in list(x.columns)]
-#     TrainModelMixin().create_shap_log(rf_clf=rf_clf, x=x, y=y, x_names=feature_names, clf_name='test', save_it=None, cnt_present=5, cnt_absent=5, plot=True, save_dir=r'C:\Users\sroni\OneDrive\Desktop\shap_test')
-#     TrainModelMixin().create_shap_log_concurrent_mp(rf_clf=rf_clf, x=x, y=y, x_names=feature_names, clf_name='test', cnt_present=100, cnt_absent=100, plot=True, save_dir=r'C:\Users\sroni\OneDrive\Desktop\shap_test', core_cnt=5)
-#     TrainModelMixin().create_shap_log_mp(rf_clf=rf_clf, x=x, y=y, x_names=feature_names, clf_name='test', cnt_present=100, cnt_absent=100, plot=True, save_dir=r'C:\Users\sroni\OneDrive\Desktop\shap_test', core_cnt=5)
+#     TrainModelMixin().create_shap_log(rf_clf=rf_clf, x=x, y=y, x_names=feature_names, clf_name='test', save_it=None, cnt_present=400, cnt_absent=400, plot=True, save_dir=r'C:\Users\sroni\OneDrive\Desktop\shap_test')
+#     #TrainModelMixin().create_shap_log_concurrent_mp(rf_clf=rf_clf, x=x, y=y, x_names=feature_names, clf_name='test', cnt_present=100, cnt_absent=100, plot=True, save_dir=r'C:\Users\sroni\OneDrive\Desktop\shap_test', core_cnt=5)
+#     #TrainModelMixin().create_shap_log_mp(rf_clf=rf_clf, x=x, y=y, x_names=feature_names, clf_name='test', cnt_present=100, cnt_absent=100, plot=True, save_dir=r'C:\Users\sroni\OneDrive\Desktop\shap_test', core_cnt=5)
 #
 
 # trainer = TrainModelMixin()

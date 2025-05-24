@@ -26,7 +26,8 @@ import PIL.Image
 from PIL import ImageTk
 
 from simba.bounding_box_tools.boundary_menus import BoundaryMenus
-from simba.cue_light_tools.cue_light_menues import CueLightAnalyzerMenu
+from simba.ui.pop_ups.cue_light_main_popup import CueLightMainPopUp
+
 from simba.labelling.labelling_advanced_interface import \
     select_labelling_video_advanced
 from simba.labelling.labelling_interface import select_labelling_video
@@ -497,15 +498,16 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         self.groups_file = FileSelect(plotlyInterface, "SimBA Groups file (CSV)", title="Select groups file (csv)")
         button_open_plotly_interface = Button(plotlyInterface, text="Open SimBA / Plotly dataset", font=Formats.FONT_REGULAR.value, fg="black", command=lambda: [self.open_plotly_interface("http://127.0.0.1:8050")])
 
-        lbl_addon = LabelFrame(tab11, text="SimBA Expansions", pady=5, padx=5, font=Formats.FONT_HEADER.value, fg="black")
+
+        lbl_addon = CreateLabelFrameWithIcon(parent=tab11, header="SimBA EXPANSIONS", icon_name='plus_green_2')
         #button_bel = SimbaButton(parent=lbl_addon, txt="Pup retrieval - Analysis Protocol 1", txt_clr='blue', cmd=None, cmd_kwargs={'config_path': lambda:self.config_path})
-        button_bel = SimbaButton(parent=lbl_addon, txt="Pup retrieval - Analysis Protocol 1", txt_clr='blue', cmd=PupRetrievalPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
+        button_bel = SimbaButton(parent=lbl_addon, txt="PUP RETRIEVAL - ANALYSIS PROTOCOL 1", txt_clr='blue', cmd=PupRetrievalPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         #cue_light_analyser_btn = SimbaButton(parent=lbl_addon, txt="Cue light analysis", txt_clr='red', cmd=None, cmd_kwargs={'config_path': lambda:self.config_path})
-        cue_light_analyser_btn = SimbaButton(parent=lbl_addon, txt="Cue light analysis", txt_clr='red', cmd=CueLightAnalyzerMenu, cmd_kwargs={'config_path': lambda:self.config_path})
+        cue_light_analyser_btn = SimbaButton(parent=lbl_addon, txt="CUE LIGHT ANALYSIS", txt_clr='red', img='light_bulb', cmd=CueLightMainPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
 
 
-        anchored_roi_analysis_btn = SimbaButton(parent=lbl_addon, txt="Animal-anchored ROI analysis", txt_clr='orange', cmd=BoundaryMenus, cmd_kwargs={'config_path': lambda:self.config_path})
+        anchored_roi_analysis_btn = SimbaButton(parent=lbl_addon, txt="ANIMAL-ANCHORED ROIs", txt_clr='orange', cmd=BoundaryMenus, cmd_kwargs={'config_path': lambda:self.config_path})
         ImportVideosFrame(parent_frm=import_frm, config_path=config_path, idx_row=0, idx_column=0)
         ImportPoseFrame(parent_frm=import_frm, idx_row=1, idx_column=0, config_path=config_path)
         further_methods_frm.grid(row=0, column=1, sticky=NW, pady=10, padx=10)
@@ -608,7 +610,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         self.groups_file.grid(row=12, sticky=W)
         button_open_plotly_interface.grid(row=13, sticky=W)
 
-        lbl_addon.grid(row=15, sticky=W)
+        lbl_addon.grid(row=0, sticky=W)
         button_bel.grid(row=0, sticky=W)
         cue_light_analyser_btn.grid(row=1, sticky=NW)
         anchored_roi_analysis_btn.grid(row=2, sticky=NW)

@@ -66,6 +66,7 @@ class Paths(Enum):
     CLF_DATA_VALIDATION_DIR = Path("csv/validation/")
     TEST_PATH = "/Users/simon/Desktop/envs/simba_dev/simba/"
     BLOB_POSITION_PATH = Path("csv/output/blob_positions/")
+    CUE_LIGHTS_PATH = Path("csv/cue_lights/")
     SINGLE_CLF_VALIDATION = Path("frames/output/validation/")
     INPUT_FRAMES_DIR = Path("frames/input/")
     ICON_ASSETS = Path("assets/icons/")
@@ -81,12 +82,8 @@ class Paths(Enum):
     DIRECTING_BETWEEN_ANIMAL_BODY_PART_OUTPUT_PATH = Path("frames/output/Body_part_directing_animals/")
     BP_NAMES = Path("logs/measures/pose_configs/bp_names/project_bp_names.csv")
     SIMBA_BP_CONFIG_PATH = Path("pose_configurations/bp_names/bp_names.csv")
-    SIMBA_SHAP_CATEGORIES_PATH = Path(
-        "assets/shap/feature_categories/shap_feature_categories.csv"
-    )
-    SIMBA_FEATURE_EXTRACTION_COL_NAMES_PATH = Path(
-        "assets/lookups/feature_extraction_headers.csv"
-    )
+    SIMBA_SHAP_CATEGORIES_PATH = Path("assets/shap/feature_categories/shap_feature_categories.csv")
+    SIMBA_FEATURE_EXTRACTION_COL_NAMES_PATH = Path("assets/lookups/feature_extraction_headers.csv")
     SIMBA_NO_ANIMALS_PATH = Path("pose_configurations/no_animals/no_animals.csv")
     SIMBA_SHAP_IMG_PATH = Path("assets/shap/")
     SCHEMATICS = Path("pose_configurations/schematics/")

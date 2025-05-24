@@ -33,7 +33,8 @@ def _plot_cue_light_data(frm_idxs: list,
                          video_save_dir: str,
                          circle_size: int,
                          roi_dict: dict,
-                         video_path: str):
+                         video_path: str,
+                         verbose: bool):
 
     batch_id, frame_rng = frm_idxs[0], frm_idxs[1]
     start_frm, end_frm, current_frm = frame_rng[0], frame_rng[-1], frame_rng[0]
@@ -78,13 +79,15 @@ def _plot_cue_light_data(frm_idxs: list,
                 y_shift_counts += 1
                 img = PlottingMixin().put_text(img=img, text=f"{name} TIME OFF (S):", pos=(int(video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value), int(y_shift*y_shift_counts)), font_size=font_size, font_thickness=2, text_color_bg=(0, 0, 0), text_color=color)
                 img = PlottingMixin().put_text(img=img, text=str(off_duration), pos=(int(video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value + x_shift), int(y_shift*y_shift_counts)), font_size=font_size, font_thickness=2, text_color_bg=(0, 0, 0), text_color=color)
+                y_shift_counts += 1
 
         if video_setting:
             video_writer.write(np.uint8(img))
         if frame_setting:
             frame_save_path = os.path.join(frames_save_dir,f"{current_frm}.png")
             cv2.imwrite(frame_save_path, current_frm)
-        print(f"Cue light frame complete: {current_frm} / {video_meta_data['frame_count']}. Video: {video_meta_data['video_name']} ")
+        if verbose:
+            print(f"Cue light frame complete: {current_frm} / {video_meta_data['frame_count']}. Video: {video_meta_data['video_name']} ")
         current_frm += 1
     if video_setting:
         video_writer.release()
@@ -118,12 +121,14 @@ class CueLightVisualizer(ConfigReader):
                  frame_setting: bool = False,
                  video_setting: bool = True,
                  core_cnt: int = -1,
-                 show_pose: bool = True):
+                 show_pose: bool = True,
+                 verbose: bool = True):
 
         ConfigReader.__init__(self, config_path=config_path)
         check_valid_boolean(value=[frame_setting], source=f'{self.__class__.__name__} frame_setting', raise_error=True)
         check_valid_boolean(value=[video_setting], source=f'{self.__class__.__name__} video_setting', raise_error=True)
         check_valid_boolean(value=[show_pose], source=f'{self.__class__.__name__} show_pose', raise_error=True)
+        check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose', raise_error=True)
         check_valid_lst(data=cue_light_names, source=self.__class__.__name__, valid_dtypes=(str,), min_len=1, raise_error=True)
         check_file_exist_and_readable(file_path=video_path)
         check_file_exist_and_readable(file_path=data_path)
@@ -138,7 +143,7 @@ class CueLightVisualizer(ConfigReader):
         self.font_size, self.x_shift, self.y_shift = PlottingMixin().get_optimal_font_scales(text='ONE LONG ARSE STRING FOR YA', accepted_px_height=int(self.video_meta_data['height']/2), accepted_px_width=int(self.video_meta_data['width']/2))
         self.circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(self.video_meta_data['width'], self.video_meta_data['height']), circle_frame_ratio=60)
         self.read_roi_data()
-        self.video_setting, self.frame_setting, self.data_path, self.show_pose = video_setting, frame_setting, data_path, show_pose
+        self.video_setting, self.frame_setting, self.data_path, self.show_pose, self.verbose = video_setting, frame_setting, data_path, show_pose, verbose
         self.video_save_dir = os.path.join(self.frames_output_dir, 'cue_lights')
         self.frames_save_dir = os.path.join(self.frames_output_dir, 'cue_lights')
         self.video_roi_dict, roi_names, video_roi_cnt = slice_roi_dict_from_attribute(data=self.roi_dict, shape_names=self.cue_light_names, video_names=[self.video_name])
@@ -176,9 +181,11 @@ class CueLightVisualizer(ConfigReader):
                                           y_shift=self.y_shift,
                                           roi_dict=self.video_roi_dict,
                                           video_path=self.video_path,
-                                          bp_names=self.body_parts_lst)
+                                          bp_names=self.body_parts_lst,
+                                          verbose=self.verbose)
             for cnt, result in enumerate(pool.imap(constants, self.frame_chunks, chunksize=self.multiprocess_chunksize)):
-                print(f'Batch {result+1/self.core_cnt} complete...')
+                if self.verbose:
+                    print(f'Batch {int(result+1/self.core_cnt)} complete...')
             pool.terminate()
             pool.join()
         self.timer.stop_timer()

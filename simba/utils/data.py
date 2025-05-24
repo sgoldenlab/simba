@@ -40,7 +40,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
                                 InvalidFileTypeError, InvalidInputError,
-                                NoFilesFoundError, SimBAModuleNotFoundError)
+                                NoFilesFoundError, SimBAModuleNotFoundError, NoROIDataError)
 from simba.utils.printing import stdout_success, stdout_warning
 from simba.utils.read_write import (find_video_of_file, get_fn_ext,
                                     get_video_meta_data, read_config_entry,
@@ -708,6 +708,43 @@ def slice_roi_dict_for_video(data: Dict[str, pd.DataFrame], video_name: str) -> 
         new_data[k] = v.reset_index(drop=True)
         shape_names.extend((list(v["Name"].unique())))
     return new_data, shape_names
+
+
+def slice_roi_dict_from_attribute(data: Dict[str, pd.DataFrame],
+                                  shape_names: List[str] = None,
+                                  video_names: List[str] = None) -> Tuple[Dict[str, pd.DataFrame], List[str], int]:
+    """
+    Filters ROI (Region of Interest) shape data based on provided shape names and/or video names.
+
+
+    :param Dict[str, pd.DataFrame] data: A dictionary where keys are shape type strings (e.g., 'Rectangles', 'Circles', 'Polygons'), and values are pandas DataFrames containing at least 'Name' and 'Video' columns. Obtained from ConfigReader.read_roi_data.
+    :param Union[str, List[str]] shape_names: A string or list of strings specifying ROI names to retain. If None, all names are kept.
+    :param Union[str, List[str]] video_names: A string or list of strings specifying video names to retain. If None, all videos are kept.
+    :return: A dictionary of filtered DataFrames, one per shape type, with the index reset, the names of the ROIs, and the number of shapes returned.
+    :rtype: Tuple[Dict[str, pd.DataFrame], List[str], int]
+    """
+
+    check_if_keys_exist_in_dict(data=data, key=[Keys.ROI_RECTANGLES.value, Keys.ROI_CIRCLES.value, Keys.ROI_POLYGONS.value], name=slice_roi_dict_from_attribute.__name__)
+    if shape_names is None and video_names is None:
+        raise NoROIDataError(msg='Please pass shapes names and/or video names', source=slice_roi_dict_from_attribute.__name__)
+    if shape_names is not None:
+        check_valid_lst(data=shape_names, source=f'{slice_roi_dict_from_attribute.__name__} shape_names', valid_dtypes=(str,), min_len=1, raise_error=True)
+    if video_names is not None:
+        check_valid_lst(data=video_names, source=f'{slice_roi_dict_from_attribute.__name__} video_names', valid_dtypes=(str,), min_len=1, raise_error=True)
+    filtered_data, roi_names = {}, []
+    for shape_type, df in data.items():
+        check_instance(source=f"{slice_roi_dict_from_attribute.__name__} {shape_type}", instance=df, accepted_types=(pd.DataFrame,))
+        check_valid_dataframe(df=df, source=f'{slice_roi_dict_from_attribute.__name__} shape_type', required_fields=['Video', 'Name'])
+        if shape_names is not None:
+            df = df[df['Name'].isin(shape_names)]
+        if video_names is not None:
+            df = df[df['Video'].isin(video_names)]
+        filtered_data[shape_type] = df.reset_index(drop=True)
+        roi_names.extend((list(df["Name"].unique())))
+    shape_cnt = len(filtered_data[Keys.ROI_RECTANGLES.value]) + len(filtered_data[Keys.ROI_CIRCLES.value]) + len(filtered_data[Keys.ROI_POLYGONS.value])
+    return filtered_data, roi_names, shape_cnt
+
+
 
 
 def freedman_diaconis(data: np.ndarray) -> Tuple[float, int]:
