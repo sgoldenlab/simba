@@ -22,7 +22,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_keys_exist_in_dict,
                                 check_if_valid_rgb_tuple, check_int,
                                 check_valid_dict, check_valid_lst,
-                                check_video_and_data_frm_count_align)
+                                check_video_and_data_frm_count_align, check_valid_boolean)
 from simba.utils.data import (create_color_palettes, detect_bouts,
                               slice_roi_dict_for_video)
 from simba.utils.enums import Formats, Keys, Paths, TextOptions
@@ -90,8 +90,6 @@ def _roi_plotter_mp(data: Tuple[int, np.ndarray],
                             img = cv2.putText(img, animal_name, (x, y), TextOptions.FONT.value, font_size, bp_colors[animal_cnt], TextOptions.TEXT_THICKNESS.value)
 
                 for shape_name in video_shape_names:
-                    print(loc_dict[animal_name].keys(), shape_name)
-                    print(roi_dict.keys())
                     timer = round(data_df.loc[current_frm, f"{animal_name}_{shape_name}_cum_sum_time"], 2)
                     entries = data_df.loc[current_frm, f"{animal_name}_{shape_name}_cum_sum_entries"]
                     img = cv2.putText(img, str(timer), loc_dict[animal_name][shape_name]["timer_data_loc"], TextOptions.FONT.value, font_size, roi_dict[shape_name]["Color BGR"], TextOptions.TEXT_THICKNESS.value)
@@ -152,7 +150,8 @@ class ROIPlotMultiprocess(ConfigReader):
                  data_path: Optional[Union[str, os.PathLike]] = None,
                  save_path: Optional[Union[str, os.PathLike]] = None,
                  bp_colors: Optional[List[Tuple[int, int, int]]] = None,
-                 bp_sizes: Optional[List[Union[int]]] = None):
+                 bp_sizes: Optional[List[Union[int]]] = None,
+                 gpu: bool = False):
 
         check_file_exist_and_readable(file_path=config_path)
         ConfigReader.__init__(self, config_path=config_path)

@@ -72,7 +72,7 @@ class CueLightVisulizerPopUp(ConfigReader, PopUpMixin):
         self.select_video_frm.grid(row=1, column=0, sticky=NW)
         self.select_video_dropdown.grid(row=0, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self):
         show_pose = str_2_bool(self.pose_dropdown.get_value())

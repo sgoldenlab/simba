@@ -134,6 +134,7 @@ class CueLightAnalyzer(ConfigReader):
         self.read_roi_data()
         self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
         self.cue_light_names, self.detailed_data, self.verbose = cue_light_names, detailed_data, verbose
+        self.detailed_df_lst = []
         if save_dir is None:
             self.save_dir = self.cue_lights_data_dir
         else:
@@ -169,7 +170,6 @@ class CueLightAnalyzer(ConfigReader):
         return data_df.fillna(0)
 
     def _remove_outlier_events(self, data_df: pd.DataFrame, time_threshold: float = 0.03):
-        self.detailed_df_lst = []
         for shape_name in self.cue_light_names:
             que_light_bouts = detect_bouts(data_df=data_df, target_lst=[f'{shape_name}'], fps=self.fps)
             que_light_negative_outliers = que_light_bouts[que_light_bouts["Bout_time"] <= time_threshold]

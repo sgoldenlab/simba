@@ -22,7 +22,7 @@ class ClfDescriptiveStatsPopUp(PopUpMixin, ConfigReader):
         measures_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MEASUREMENTS", icon_name='ruler', icon_link=Links.ANALYZE_ML_RESULTS.value, padx=5, pady=5, relief='solid')
 
         first_occurance_cb, self.first_occurance_var = SimbaCheckbox(parent=measures_frm, txt="First occurrence (s)", txt_img='one', val=True)
-        event_count_cb, self.event_count_var = SimbaCheckbox(parent=measures_frm, txt="First occurrence (s)", txt_img='abacus', val=True)
+        event_count_cb, self.event_count_var = SimbaCheckbox(parent=measures_frm, txt="Event (bout) count", txt_img='abacus', val=True)
         total_event_duration_cb, self.total_event_duration_var = SimbaCheckbox(parent=measures_frm, txt="Total event duration (s)", txt_img='stopwatch', val=True)
         mean_event_duration_cb, self.mean_event_duration_var = SimbaCheckbox(parent=measures_frm, txt="Mean event duration (s)", txt_img='average', val=False)
         median_event_duration_cb, self.median_event_duration_var = SimbaCheckbox(parent=measures_frm, txt="Median event duration (s)", txt_img='average_2', val=False)
