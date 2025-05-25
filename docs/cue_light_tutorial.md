@@ -87,13 +87,30 @@ Finally, if you selected `COMPUTE DETAILED CUE LIGHT BOUT DATA`, there will be a
 
 Finally, in the `SELECT VIDEO` frame, use the dropdown to select the video which you want to visualize. Once selected, click the <kbd>RUN</kbd> button. You can follow the progress in the main SimBA terminal and the terminal window from where you launched SimBA. See below for an example of expected output:
 
+https://github.com/user-attachments/assets/441989a3-300c-407d-9582-cf5900e04cdd
+
 [!NOTE]
 > To visualize the ROI data, SimBA uses the ROI analysis data computet in Part 1. If your cue light ROIs changes, please re-do Part 1 before visualizing the cue-light data. 
 
 
 # Part 4. Analyzing movement at cue light states. 
 
-Next, we may want to analyze movements (distances moved, velocities, and time spend in different parts of the environment) in and around the times the cue light(s) are on. To do this we click on `Analyze cue light movements` which will bring up a up pop-up menu looking like the window to the right (indicated with a red rectangle) accepting different user-defined settings: 
+Next, we may want to analyze movements (distances moved and velocities) in and around the times the cue light(s) are on. To do this we click on <kbd>ANALYZE CUE LIGHT MOVEMENT</kbd> which will bring up a pop-up menu looking like below:
+
+![cue_light_6](https://github.com/user-attachments/assets/f1cf4e35-bd80-4362-97f3-d233b80f2121)
+
+`SELECT BODY-PART`: Select the body-part that you want to use to proxy the animals location to calculate the movement and velocity. 
+
+`PRE CUE LIGHT WINDOW (S)`: We may not just want to calculate the movement and velocity when the cue-lights(s) are ON, but we may also want to calculate the movement and velocity in a control period immediately **BEFORE** each cue-light come ON. To do this, set the pre-cue light period in seconds here (.e.g., enter `10` to calculate the movement and velocity in each 10s window preceeding each cue light onset). If you do not want this data, enter `0` in this entry box or leave this entry box blank. 
+
+`POST CUE LIGHT WINDOW (S)`: We may not just want to calculate the movement and velocity when the cue-lights(s) are ON, but we may also want to calculate the movement and velocity in a control period immediately **AFTER** each cue-light turns OFF. To do this, set the post-cue light period in seconds here (.e.g., enter `10` to calculate the movement and velocity in each 10s window proceeding each cue light offset). If you do not want this data, enter `0` in this entry box or leave this entry box blank. 
+
+Once selected, click the <kbd>RUN</kbd> button. You can follow the progress in the main SimBA terminal and the terminal window from where you launched SimBA. 
+
+
+
+
+
 
 
 <p align="center">
