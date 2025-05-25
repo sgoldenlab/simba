@@ -28,62 +28,72 @@ Specifically, when working cue lights in SimBA, begin by (i) [Importing your vid
 
 # Part 1. Defining cue light ROIs in SimBA.
 
-1) SimBA uses ROIs to locate your cue light(s) in the image and to compute their states. To define the locations of the cue lights, [load your project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-2-load-project-1) and head to the [ROI] tab. Next, click on `Define ROIs`. A pop up will be displayed listing all the videos in your project. In this tutorial, I am working with a SimBA project which contains a single video. I click on `Draw` next to the video to define my ROIs:
+1) SimBA uses ROIs to locate your cue light(s) in the image and to compute their states. To define the locations of the cue lights, [load your project](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#part-2-load-project-1) and head to the [ROI] tab. Next, click on `Define ROIs`. A pop up will be displayed listing all the videos in your project. In this tutorial, I am working with a SimBA project which contains a single video. As in the video below, I click on `Draw` next to the video to define my ROI cue lights, I draw a single rectangular ROI called `MY_CUE_LIGHT` in coral color, and click to save my ROI data.  
 
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/cue_light_1.png" />
-</p>
+https://github.com/user-attachments/assets/8ac1d59a-910e-4126-a6c6-655ff885aa79
 
-2) A new window pops up that allows you to define your regions of interest. In my video, I have a single cue light (an operant house-light) . I am also intrested in where in the environment my animal spends time in relation the the cue light state. I therefore draw **three** rectangular regions using the SimBA ROI interface, representing (i) the left side of the box, (ii) the right side of the box, and (iii) the houselight. To learn how to use the SimBA ROI interface, click [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md).
+[!NOTE]
+> There are no restrictions for which shape an ROI region (including the cue lights) can have. In the example above I drew a rectangle, but it could also be a circle or a polygon. 
 
-Note I: There are no restrictions for which shape an ROI region (including the cue lights) can have. I choosed three rectangles, but they can also be defined as circles or polygons. 
+> Also, there are no restrictions for how many cue lights you have. Draw however many ROIs as there are cue lights.
 
-Note II: There are no restrictions for how many cue lights you have. Define an ROI for each cue light of interest.
-
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/cue_light_2.png" />
-</p>
+> For a detailed tutorial for how to use the ROI interface, see [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md) documentation. 
 
 # Part 2. Analyzing cue light(s) states. 
 
-To begin analyzing your cue light data, head to the right-most tab in the SimBA interface called [Add-ons] and click on `Cue-light analysis`. 
+1. To begin analyzing your cue light data, head to the right-most tab in the SimBA interface called [Add-ons] and click on `CUE LIGHT ANALYSIS`, button, which brings up the following pop-up:
 
-To begin analysing 
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/cue_light_4.png" />
-</p>
+![cue_light_2](https://github.com/user-attachments/assets/9155e4c9-915e-4147-a007-85e0d9e6b662)
 
-Once clicked, a window will pop open looking something like the below gif. Using this interface, we will tell SimBA which of our ROIs are cue lights, and analyse animal movements and classifications around cue lights onsets and offsets. We will also visualize the cue light data to validate and a sanity check that the onsets and offsets of the cue light(s) are accurately captured by SimBA. 
 
-To begin, we use the `Define cue lights` menu and select `1` in the `# Cue lights` drop-down to indicate that we have one cue light in our video(s). Once done, a single dropdown menu will appear asking us for the name of the single cue light. I use this dropdown menu to say that the cue light is names `Cue light`. 
+2. In this interface, we begin, on the left-hand side, to select how many cue-lights we have. Once we have selected how many cue lights we have, we select the names of cue lights in the appropriate dropdown:
 
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/cue_light_1.gif" />
-</p>
+In my case, I have only drawn one ROI (named `MY_CUE_LIGHT`) so I don't have many options. However, should you have more ROIs, then those options will be displayed in the appropriate dropdowns:
 
-Next, I go ahead and click the `Analyze cue light data` button, which will start the analysis and extract the times when the cue light(s) are on and off in all frames of all videos in the project. You can follow the progress in the SimBA main terminal window. Once complete, a new file is creates inside the `project_folder/csv/cue_lights` directory within your SimBA project. If you open up one of these files, you will see columns named after your cue lights right towards the end of the file, filled with ones and zeros. Each row represents a frame of your data, a `1` indicated that the cue light is ON, and a `0` indicated that the cue light is OFF. 
+![cue_light_3](https://github.com/user-attachments/assets/978fd9f6-6236-4127-9420-33b67dcb57e5)
 
-> Note: To analyze the cue-light states on standard computers at acceptable runtimes, SimBA uses [kmeans](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.KMeans.html) and python [multi-processing](https://docs.python.org/3/library/multiprocessing.html). Should you happen to see any `MemoryErrors`, or analyses that are *not* completed in an acceptable time, please reach out to us by opening a [GitHib issue](https://github.com/sgoldenlab/simba/issues) or chat to us on [Gitter](https://gitter.im/SimBA-Resource/community). 
+
+3. Next, I go ahead and click the `ANALYZE CUE LIGHT DATA` button. We will need to do this step before doing any other process (e.g., visualization, movement, or classification analysis). This process will look at each of your video files and find when the cue-light is ON or OFF and save this data inside your SimBA project. Once a click this button, I should see one more pop-up giving me some option on how I want to calculate these values:
+
+![cue_light_4](https://github.com/user-attachments/assets/ceb8de21-5bdf-4c8b-a518-2edef26d0792)
+
+`COMPUTE DETAILED CUE LIGHT BOUT DATA`: If set to `TRUE`, SimBA will create a CSV inside the `porject/folder/logs` directory named something like `cue_light_details_20250525112722.csv` that lists each time-stamp, in each video, where each cue light is ON (including duration in seconds, start time, end time, start frame, end frame). 
+
+`CPU CORE COUNT`: How many CPU cores you want to use to compute the cue light ON and OFF times. The more CPU cores the faster the processing will be, but it will require more memory RAM available. If you hit errors related to memory, try decreasing the number of CPU cores. The maximal number is the number of CPU cores available on your machine. 
+
+`VERBOSE`: If True, then prints out progress (such frame is currently being analyzed etc) in the terminal window from where you launched SimBA. 
+
+Once set, click the <kbd>RUN</kbd> button. You can follow the progress in the main SimBA terminal and the terminal window from where you launched SimBA. Once complete, SimBA will save once CSV file for each of your CSV files in the `project_folder/csv/outlier_corrected_movement_location` directory inside the `project_folder\csv\cue_lights` directory. 
+
+Each of these files will have two additional columns for each of your cue lights. One column will be named after your cue-light, and populated with either `0` or `1`, representing if the cue light is OFF (`0`) or ON (`1`) on each of the frames of the video. A second collumn will be named after your cue light with the `_INTENSITY` suffix. This is te luminosity of the cue light in each of the frames of the video. For an example of the expected output, see [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/cue_light_example.csv) CSV file.  
+
+Finally, if you selected `COMPUTE DETAILED CUE LIGHT BOUT DATA`, there will be a CSV file inside the `porject/folder/logs` directory that list each episode that each cue light was on in each video. In my case (a single short video with one cue light), it can be expected to look like [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/cue_light_details_20250525112722.csv)
 
 # Part 3. Visualizing cue light states.
 
-As a further sanity check before analysing larger video batches, we'd want to visualize the results of the preceding step to confirm that SimBA has accurately captured the onsets and offsets of the cue lights. We have to option to generate compressed video files or individual images. I choose to generate a compressed video, and click `Visualize cue light data`. Once clicked, you can follow the progress in the main SimBA terminal.
+**Once Part 2 is completed**, we'd want to visualize the results of the preceding step to confirm that SimBA has accurately captured the onsets and offsets of the cue lights. We go ahead and click on <kbd>VISUALIZE CUE LIGHT DATA</kbd> and the following pop-up - showing options for how to generate the visualizations - pop up: 
 
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/cue_light_5.png" />
-</p>
+![cue_light_5](https://github.com/user-attachments/assets/86666782-6f4b-41ca-bfe3-29f9273482d6)
 
-> Note: Reading and writing images and videos to disc is computationally costly on standard computers. I recommend generating video confirmations on a sub-set of videos to gauge accuracy and troubleshooting. 
+`SHOW POSE`: If set to True, SimBA will show the pose-estimated body-part locations of the animal(s) together with data on if the cue light(s) are ON or OFF. 
 
-Once complete, one video file for each of your input data files will be saved inside the `project_folder/frames/output/cue_lighs` directory of your SimBA project. In the videos, the numbers to the right of the video will tell you (i) the current status of each hoselight (ON vs OFF), (ii) the onset count, (iii) the total ON time in seconds, and the total OFF time in seconds, as in the gif example below:
+`CPU CORE COUNT`: How many CPU cores you want to use to create the visualization. The more CPU cores the faster the processing will be, but it will require more memory RAM available. If you hit errors related to memory, try decreasing the number of CPU cores. The maximal number is the number of CPU cores available on your machine. 
 
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/example_cue_light.gif" />
-</p>
+`CREATE VIDEO`: If True, SimBA will create a video displaying when the cue light(s) are ON, OFF, how long the cue light(s) have ON, and how many times the cue light(s) have turned ON. Videos will be saved in the `project_folder\frames\output\cue_lights` directory of your SimBA project. 
+
+`CREATE INDIVIDUAL FRAMES`: If True, SimBA will create a directory for the video with each frame saved as a seperate `.png` file. Frames will be saved in a subdirectory of the `project_folder\frames\output\cue_lights` directory named according to your video. 
+
+`VERBOSE`: If True, then prints out progress (such frame is currently being analyzed etc) in the terminal window from where you launched SimBA. 
+
+Finally, in the `SELECT VIDEO` frame, use the dropdown to select the video which you want to visualize. Once selected, click the <kbd>RUN</kbd> button. You can follow the progress in the main SimBA terminal and the terminal window from where you launched SimBA. See below for an example of expected output:
+
+[!NOTE]
+> To visualize the ROI data, SimBA uses the ROI analysis data computet in Part 1. If your cue light ROIs changes, please re-do Part 1 before visualizing the cue-light data. 
+
 
 # Part 4. Analyzing movement at cue light states. 
 
-Next, we want to analyze movements (distances moved, velocities, and time spend in different parts of the environment) in and around the times the cue light(s) are on. To do this we click on `Analyze cue light movements` which will bring up a up pop-up menu looking like the window to the right (indicated with a red rectangle) accepting different user-defined settings: 
+Next, we may want to analyze movements (distances moved, velocities, and time spend in different parts of the environment) in and around the times the cue light(s) are on. To do this we click on `Analyze cue light movements` which will bring up a up pop-up menu looking like the window to the right (indicated with a red rectangle) accepting different user-defined settings: 
 
 
 <p align="center">
