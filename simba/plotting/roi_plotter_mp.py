@@ -22,7 +22,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_keys_exist_in_dict,
                                 check_if_valid_rgb_tuple, check_int,
                                 check_valid_dict, check_valid_lst,
-                                check_video_and_data_frm_count_align, check_valid_boolean)
+                                check_video_and_data_frm_count_align, check_valid_boolean, check_nvidea_gpu_available)
 from simba.utils.data import (create_color_palettes, detect_bouts,
                               slice_roi_dict_for_video)
 from simba.utils.enums import Formats, Keys, Paths, TextOptions
@@ -33,7 +33,7 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_video_meta_data,
                                     read_df)
-from simba.utils.warnings import DuplicateNamesWarning, FrameRangeWarning
+from simba.utils.warnings import DuplicateNamesWarning, FrameRangeWarning, GPUToolsWarning
 
 pd.options.mode.chained_assignment = None
 
@@ -161,6 +161,10 @@ class ROIPlotMultiprocess(ConfigReader):
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0,])
         check_if_keys_exist_in_dict(data=style_attr, key=STYLE_KEYS, name=f'{self.__class__.__name__} style_attr')
         check_valid_dict(x=style_attr, required_keys=tuple(STYLE_KEYS,), valid_values_dtypes=(bool,))
+        check_valid_boolean(value=[gpu], source=f'{self.__class__.__name__} gpu', raise_error=True)
+        if gpu and not check_nvidea_gpu_available():
+            GPUToolsWarning(msg='GPU not detected but GPU set to True - skipping GPU use.')
+            gpu = False
         self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
         if not os.path.isfile(self.roi_coordinates_path):
             raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path)
@@ -208,7 +212,7 @@ class ROIPlotMultiprocess(ConfigReader):
         self.video_path = video_path
         check_video_and_data_frm_count_align(video=self.video_path, data=self.data_df, name=self.video_name, raise_error=False)
         self.cap = cv2.VideoCapture(self.video_path)
-        self.threshold, self.body_parts, self.style_attr = threshold, body_parts, style_attr
+        self.threshold, self.body_parts, self.style_attr, self.gpu = threshold, body_parts, style_attr, gpu
         self.roi_dict_ = get_roi_dict_from_dfs(rectangle_df=self.sliced_roi_dict[Keys.ROI_RECTANGLES.value], circle_df=self.sliced_roi_dict[Keys.ROI_CIRCLES.value], polygon_df=self.sliced_roi_dict[Keys.ROI_POLYGONS.value])
         self.temp_folder = os.path.join(os.path.dirname(self.save_path), self.video_name, "temp")
         if os.path.exists(self.temp_folder): shutil.rmtree(self.temp_folder)
@@ -314,8 +318,6 @@ class ROIPlotMultiprocess(ConfigReader):
         del self.data_df
         del self.roi_analyzer.logger
         print(f"Creating ROI images, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
-        print(self.roi_dict_.keys())
-        print(self.shape_names)
         with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
             constants = functools.partial(_roi_plotter_mp,
                                           loc_dict=self.loc_dict,
@@ -335,7 +337,7 @@ class ROIPlotMultiprocess(ConfigReader):
             for cnt, batch_cnt in enumerate(pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):
                 print(f'Image batch {batch_cnt+1} / {self.core_cnt} complete...')
             print(f"Joining {self.video_name} multi-processed ROI video...")
-            concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.save_path, video_format="mp4", remove_splits=True)
+            concatenate_videos_in_folder(in_folder=self.temp_folder, save_path=self.save_path, video_format="mp4", remove_splits=True, gpu=self.gpu)
             pool.terminate()
             pool.join()
         video_timer.stop_timer()

@@ -25,7 +25,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_filepath_list_is_empty, check_str,
                                 check_valid_boolean, check_valid_dataframe,
-                                check_valid_lst)
+                                check_valid_lst, check_nvidea_gpu_available)
 from simba.utils.enums import ConfigKey, Defaults, Dtypes, Formats, Keys, Paths
 from simba.utils.errors import (BodypartColumnNotFoundError, DataHeaderError,
                                 DuplicationError, InvalidInputError,
@@ -140,6 +140,7 @@ class ConfigReader(object):
             data_type=Dtypes.STR.value,
             default_value=Dtypes.NONE.value,
         )
+        self.gpu_available = check_nvidea_gpu_available()
         self.clf_cnt = self.read_config_entry(self.config, ConfigKey.SML_SETTINGS.value, ConfigKey.TARGET_CNT.value, Dtypes.INT.value)
         self.clf_names = get_all_clf_names(config=self.config, target_cnt=self.clf_cnt)
         self.feature_file_paths = glob.glob(self.features_dir + f"/*.{self.file_type}")

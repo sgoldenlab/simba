@@ -966,6 +966,7 @@ def check_valid_lst(data: list,
                     valid_values: Optional[List[Any]] = None,
                     min_len: Optional[int] = 1,
                     max_len: Optional[int] = None,
+                    min_value: Optional[float] = None,
                     exact_len: Optional[int] = None,
                     raise_error: Optional[bool] = True) -> bool:
     """
@@ -1054,6 +1055,16 @@ def check_valid_lst(data: list,
                     )
                 else:
                     return False
+
+        if min_value != None:
+            check_float(name=check_valid_lst.__name__, value=min_value)
+            invalids = [x for x in data if x < min_value]
+            if len(invalids) > 0:
+                if raise_error:
+                    raise InvalidInputError(msg=f"Invalid list entries. Found {invalids}, minimum accepted value: {min_value}", source=source)
+                else:
+                    return False
+
     return True
 
 

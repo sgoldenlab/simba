@@ -49,7 +49,7 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
             raise NoDataError(msg=f'No ROIs found for the videos represented in the {self.video_dir} and data represented in the {self.outlier_corrected_dir} directory. Draw ROIs for these videos before visualizing the data.')
         self.clr_dict = get_color_dict()
         self.longest_animal_name_len = len(max(self.multi_animal_id_list, key=len)) + 5
-
+        gpu_state = NORMAL if self.gpu_available else DISABLED
 
         PopUpMixin.__init__(self, title="VISUALIZE ROI TRACKING", size=(800, 500), icon='shapes_small')
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI_DATA_PLOT.value)
@@ -57,12 +57,14 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         self.show_pose_estimation_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW POSE-ESTIMATED LOCATIONS:', label_width=35, value='TRUE', command=self._disable_clr)
         self.show_animal_name_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL NAMES:', label_width=35, value='FALSE')
         self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt)), dropdown_width=self.longest_animal_name_len, label='NUMBER OF CPU CORES:', label_width=35, value=1)
+        self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='USE GPU:', label_width=35, value='FALSE', state=gpu_state)
 
         self.settings_frm.grid(row=0, column=0, sticky=NW)
         self.threshold_entry_box.grid(row=0, column=0, sticky=NW)
         self.show_pose_estimation_dropdown.grid(row=2, column=0, sticky=NW)
         self.show_animal_name_dropdown.grid(row=3, column=0, sticky=NW)
         self.core_cnt_dropdown.grid(row=4, column=0, sticky=NW)
+        #self.gpu_dropdown.grid(row=5, column=0, sticky=NW)
 
         self.body_parts_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMAL(S)", icon_name='pose', icon_link=Links.ROI_DATA_PLOT.value)
         self.animal_cnt_dropdown = SimBADropDown(parent=self.body_parts_frm, dropdown_options=list(range(1, self.animal_cnt + 1)), dropdown_width=self.longest_animal_name_len, label="NUMBER OF ANIMALS:", label_width=35, value=1, command=self.__create_animal_bp_table)
@@ -138,6 +140,7 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         check_float(name="Body-part probability threshold", value=self.threshold_entry_box.entry_get, min_value=0.0, max_value=1.0)
         show_pose = str_2_bool(self.show_pose_estimation_dropdown.get_value())
         show_names = str_2_bool(self.show_animal_name_dropdown.get_value())
+        gpu = str_2_bool(self.gpu_dropdown.get_value())
         core_cnt = int(self.core_cnt_dropdown.get_value())
         style_attr = {"show_body_part": show_pose, "show_animal_name": show_names}
         body_parts = [v.get_value() for k, v in self.bp_dropdown_dict.items()]
@@ -165,11 +168,14 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
                                                   body_parts=body_parts,
                                                   bp_colors=bp_clrs,
                                                   bp_sizes=bp_sizes,
-                                                  core_cnt=core_cnt)
+                                                  core_cnt=core_cnt,
+                                                  gpu=gpu)
                 roi_plotter.run()
                 time.sleep(3)
         #
 
+
+#_ = VisualizeROITrackingPopUp(config_path=r"C:\troubleshooting\roi_entries\project_folder\project_config.ini")
 
 
 #_ = VisualizeROITrackingPopUp(config_path=r"C:\troubleshooting\roi_duplicates\project_folder\project_config.ini")

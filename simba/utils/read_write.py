@@ -159,9 +159,7 @@ def read_df(file_path: Union[str, os.PathLike],
 
         except Exception as e:
             print(e, e.args)
-            raise InvalidFileTypeError(
-                msg=f"{file_path} is not a valid CSV file", source=read_df.__name__
-            )
+            raise InvalidFileTypeError(msg=f"{file_path} is not a valid CSV file", source=read_df.__name__)
         if remove_columns:
             df = df[df.columns[~df.columns.isin(remove_columns)]]
         if usecols:
@@ -612,7 +610,8 @@ def concatenate_videos_in_folder(in_folder: Union[str, os.PathLike, bytes],
         if fps is None:
             returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" "{save_path}" -c copy -hide_banner -loglevel info -y')
         else:
-            returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" -r {out_fps} -c:v libx264 -c:a copy -movflags +faststart -hide_banner -loglevel info "{save_path}" -y')
+            #returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" -r {out_fps} -c:v libx264 -c:a copy -movflags +faststart -hide_banner -loglevel info "{save_path}" -y')
+            returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" -r {out_fps} -c:v libx264 -crf 28 -preset veryfast -threads 12 -c:a copy -movflags +faststart -hide_banner -loglevel info "{save_path}" -y')
 
             #returned = os.system(f'ffmpeg -f concat -safe 0 -i "{temp_txt_path}" -r {out_fps} -c:v libx264 -c:a copy -hide_banner -loglevel info "{save_path}" -y')
     while True:
@@ -2110,15 +2109,25 @@ def copy_files_to_directory(file_paths: List[Union[str, os.PathLike]],
     return destinations
 
 
-def seconds_to_timestamp(seconds: int) -> str:
+def seconds_to_timestamp(seconds: Union[int, float, List[Union[int, float]]]) -> Union[str, List[str]]:
     """
-    Convert an integer number representing seconds to a HH:MM:SS format.
+    Convert an integer number representing seconds, or a list of integers representing seconds, to a HH:MM:SS format.
     """
-    check_int(name=f"{seconds_to_timestamp.__name__} seconds", value=seconds, min_value=0)
-    hours = int(seconds / 3600)
-    minutes = int((seconds % 3600) / 60)
-    seconds = int(seconds % 60)
-    return "{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds)
+    if isinstance(seconds, (int, float)):
+        check_float(name=f"{seconds_to_timestamp.__name__} seconds", value=seconds, min_value=0)
+        data = [seconds]
+    elif isinstance(seconds, list):
+        check_valid_lst(data=seconds, source=f"{seconds_to_timestamp.__name__} seconds", valid_dtypes=(int, float), min_len=1)
+        data = seconds
+    else:
+        raise InvalidInputError(msg=f'Got {type(seconds)} for seconds. Only list or float or integer accepted.', source=seconds_to_timestamp.__name__)
+    results = []
+    for i in data:
+        hours = int(i / 3600)
+        minutes = int((i % 3600) / 60)
+        seconds = int(i % 60)
+        results.append("{:02d}:{:02d}:{:02d}".format(hours, minutes, seconds))
+    return results[0] if len(data) == 1 else results
 
 
 def read_data_paths(path: Union[str, os.PathLike, None],
