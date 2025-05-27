@@ -40,7 +40,7 @@ Using the above settings, my command line command will read:
 python light_dark_box_analyzer.py --data_dir "C:\projects\light_dark_box\data" --save_path "C:\projects\light_dark_box\light_dark_data.csv" --body_part center --fps 29.97 --threshold 0.01 --minimum_episode_duration 1
 ```
 
-I often put this text string together in some notepad or other texteditor document, and later copy-paste it to the termina. 
+I often put this text string together in some notepad or other texteditor document, and later copy-paste it to the terminal window (as in example video below).  
 
 ### STEP 3 - RUN THE COMMAND.
 
