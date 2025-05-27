@@ -40,7 +40,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Options
 from simba.utils.errors import (BodypartColumnNotFoundError, CountError,
                                 InvalidFileTypeError, InvalidInputError,
-                                NoFilesFoundError, SimBAModuleNotFoundError, NoROIDataError)
+                                NoFilesFoundError, NoROIDataError,
+                                SimBAModuleNotFoundError)
 from simba.utils.printing import stdout_success, stdout_warning
 from simba.utils.read_write import (find_video_of_file, get_fn_ext,
                                     get_video_meta_data, read_config_entry,

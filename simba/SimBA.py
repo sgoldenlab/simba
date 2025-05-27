@@ -26,8 +26,6 @@ import PIL.Image
 from PIL import ImageTk
 
 from simba.bounding_box_tools.boundary_menus import BoundaryMenus
-from simba.ui.pop_ups.cue_light_main_popup import CueLightMainPopUp
-
 from simba.labelling.labelling_advanced_interface import \
     select_labelling_video_advanced
 from simba.labelling.labelling_interface import select_labelling_video
@@ -89,6 +87,7 @@ from simba.ui.pop_ups.clf_validation_plot_pop_up import \
     ClassifierValidationPopUp
 from simba.ui.pop_ups.csv_2_parquet_pop_up import (Csv2ParquetPopUp,
                                                    Parquet2CsvPopUp)
+from simba.ui.pop_ups.cue_light_main_popup import CueLightMainPopUp
 from simba.ui.pop_ups.data_plot_pop_up import \
     DataPlotterPopUp  # ######### LAZY
 from simba.ui.pop_ups.delete_all_rois_pop_up import delete_all_rois_pop_up

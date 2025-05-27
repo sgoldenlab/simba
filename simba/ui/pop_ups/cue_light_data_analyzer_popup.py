@@ -1,15 +1,17 @@
 import os
-from typing import List, Union, Optional
 from tkinter import *
-from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import check_valid_lst, check_if_dir_exists
-from simba.utils.errors import NoROIDataError, NoFilesFoundError
-from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, SimBADropDown
-from simba.utils.read_write import find_files_of_filetypes_in_directory, str_2_bool
-from simba.utils.enums import Links
+from typing import List, Optional, Union
 
 from simba.data_processors.cue_light_analyzer import CueLightAnalyzer
+from simba.mixins.config_reader import ConfigReader
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, SimBADropDown
+from simba.utils.checks import check_if_dir_exists, check_valid_lst
+from simba.utils.enums import Links
+from simba.utils.errors import NoFilesFoundError, NoROIDataError
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    str_2_bool)
+
 
 class CueLightDataAnalyzerPopUp(ConfigReader, PopUpMixin):
 

@@ -1,16 +1,18 @@
 import os
-from typing import List, Union, Optional
 from tkinter import *
-from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import check_valid_lst, check_if_dir_exists
-from simba.utils.errors import NoROIDataError
-from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, SimBADropDown, FileSelect
-from simba.utils.read_write import find_files_of_filetypes_in_directory, str_2_bool
-from simba.utils.enums import Links, Options
-from simba.utils.errors import NoFilesFoundError
+from typing import List, Optional, Union
 
+from simba.mixins.config_reader import ConfigReader
+from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.cue_light_visualizer import CueLightVisualizer
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
+                                        SimBADropDown)
+from simba.utils.checks import check_if_dir_exists, check_valid_lst
+from simba.utils.enums import Links, Options
+from simba.utils.errors import NoFilesFoundError, NoROIDataError
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    str_2_bool)
+
 
 class CueLightVisulizerPopUp(ConfigReader, PopUpMixin):
 
