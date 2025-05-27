@@ -32,7 +32,7 @@ To run the file above, we need to formulate a command line text string specifyin
 
 **threshold**: If the pose-estimation probability value for the specified body-part falls below this value, animal assumed to be in the dark box. If above or at this value, animal is assumed to be in the light box. The value should be between 0 and 1. In my example below I will use `0.01`.
 
-**minimum_episode_duration**: Sometimes we may get a spurruious frame or two when the probability of the specified bosy-part is high or low, leading to odd observations of the animal visiting the ligh- or dark box for a few milliseconds. We want to remove these spurruious observations. This value represents the shortest allowed duration that the animal can visit a compartment in seconds. n my example below I will use `1` for one second. 
+**minimum_episode_duration**: Sometimes we may get a spurious frame or two when the probability of the specified body-part is errorously high or low, leading to odd observations of the animal visiting the ligh- or dark box for a shor duration, like a few milliseconds. We want to remove these spurious observations. This value represents the shortest allowed duration that the animal can visit a compartment in seconds. In my example below I will use `1` for one second. 
 
 Using the above settings, my command line command will read:
 
