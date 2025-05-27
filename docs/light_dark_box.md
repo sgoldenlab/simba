@@ -12,8 +12,6 @@
 
 ![image](https://github.com/user-attachments/assets/46304438-4eb6-4de0-8f5e-4c57b60e2a99)
 
-
-
 **2.** Copy this file (or paste the content of this file into an empty file named `light_dark_box_analyzer.py`) to an accessable location on your computer. For example, I have copied this file to location `C:\projects\light_dark_box\light_dark_box_analyzer.py` for writing this documentation.  
 
 ### STEP 2 - FORMULATE A COMMAND
@@ -53,6 +51,17 @@ conda activate simba
 **3.** Copy paste the command from the end of **STEP 2** inside the teminal window. You can follow the progress in the terminal window. 
 
 In the below video, you can see my completing these three things to analyze 15 DeppLabCut pose-estimation files:
+
+
+https://github.com/user-attachments/assets/583f4d75-09dc-4249-9ea3-80a871faf74d
+
+The results are saved in a single CSV file at location "C:\projects\light_dark_box\light_dark_data.csv" indexed according to video name where each row is a episode in the ligh or dark compartment together with information of episode start time, end time, duration, start frame and end frame etc. For a small expected output example, see [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/light_dark_data.csv) file.
+
+
+
+
+
+
 
 
 
