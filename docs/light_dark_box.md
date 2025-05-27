@@ -4,7 +4,11 @@
 ## GENERAL REQUREMENTS 
 
 >[!NOTE]
->This analysis does **NOT** require the creation of a SimBA project. For data, all that is needed is a directory containing CSV files presenting pose-estimation data from DeepLabCut. The CSV files are expected to be in [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/light_dark_box_expected_input.csv) format. However, we do need to install SimBA as docuemnted [HERE](https://github.com/sgoldenlab/simba/edit/master/docs/installation_new.md) or [HERE](https://simba-uw-tf-dev.readthedocs.io/en/latest/pip_installation.html).
+>This analysis does **NOT** require the creation of a SimBA project. For data, all that is needed is a directory containing CSV files presenting pose-estimation data from DeepLabCut. The CSV files are expected to be in [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/light_dark_box_expected_input.csv) format.
+>
+>However, we do need to install SimBA as documented [HERE](https://github.com/sgoldenlab/simba/edit/master/docs/installation_new.md) or [HERE](https://simba-uw-tf-dev.readthedocs.io/en/latest/pip_installation.html).
+>
+>Make sure you have SimBA version 3.1.7 or later. 
 
 ### STEP 1 - GET THE REQUIRED PYTHON FILE
 
