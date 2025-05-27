@@ -21,8 +21,10 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_keys_exist_in_dict,
                                 check_if_valid_rgb_tuple, check_int,
-                                check_valid_dict, check_valid_lst,
-                                check_video_and_data_frm_count_align, check_valid_boolean, check_nvidea_gpu_available)
+                                check_nvidea_gpu_available,
+                                check_valid_boolean, check_valid_dict,
+                                check_valid_lst,
+                                check_video_and_data_frm_count_align)
 from simba.utils.data import (create_color_palettes, detect_bouts,
                               slice_roi_dict_for_video)
 from simba.utils.enums import Formats, Keys, Paths, TextOptions
@@ -33,7 +35,8 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_video_meta_data,
                                     read_df)
-from simba.utils.warnings import DuplicateNamesWarning, FrameRangeWarning, GPUToolsWarning
+from simba.utils.warnings import (DuplicateNamesWarning, FrameRangeWarning,
+                                  GPUToolsWarning)
 
 pd.options.mode.chained_assignment = None
 
