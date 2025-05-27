@@ -17,11 +17,14 @@
 
 ### STEP 2 - FORMULATE A COMMAND
 
-To run the file above, we need to formulate a command line text string specifying how we want the command to run. This inlcudes things like where our deeplabcut data is saved, where we want to save the output, the frame rate of out videos, and a few other things detaile below:
+To run the file above, we need to formulate a command line text string specifying how we want the python .py file to run. This inlcudes things like where our deeplabcut data is saved, where we want to save the output, the frame rate of out videos, and a few other things detaile below:
 
-`data_dir`: The path to the directory containing CSV files presenting pose-estimation data from DeepLabCut. In my example this is `C:\projects\light_dark_box\data`
+`data_dir`: The path to the directory containing CSV files presenting pose-estimation data from DeepLabCut. In my example this is `C:\projects\light_dark_box\data`.
 
-`save_path`: The path to the directory containing CSV files presenting pose-estimation data from DeepLabCut.
+`save_path`: The location where we wan to store th CSV data results. In my example it is `C:\projects\light_dark_box\light_dark_data.csv`.
+
+`body_part`: The name of the body-part for which we want to use to proxy the animals absent or presence from the light- and dar-box. 
+
 
 
 
