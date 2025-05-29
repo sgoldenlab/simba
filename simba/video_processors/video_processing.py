@@ -1515,57 +1515,78 @@ def crop_multiple_videos(directory_path: Union[str, os.PathLike], output_path: U
     timer.stop_timer()
     stdout_success(msg=f"{str(len(video_paths))} videos cropped and saved in {directory_path} directory", elapsed_time=timer.elapsed_time_str, source=crop_multiple_videos.__name__,)
 
+
 def frames_to_movie(directory: Union[str, os.PathLike],
                     fps: int,
-                    quality: int,
+                    quality: int = 60,
                     out_format: Optional[Literal['mp4', 'avi', 'webm']] = 'mp4',
                     gpu: Optional[bool] = False) -> None:
     """
-    Merge all image files in a folder to a mp4 video file. Video file is stored in the same directory as the
-    input directory sub-folder.
+    Merge all image files in a folder to a video file. Video is stored in the same directory as the input folder.
 
-    .. note::
-       The Image files have to have ordered numerical names e.g., ``1.png``, ``2.png`` etc...
+    Image files must be numerically named (e.g., 1.png, 2.png, ...).
 
-    :param str directory: Directory containing the images.
-    :param int fps: The frame rate of the output video.
-    :param int quality: Integer representing quatlity of the output video: 10, 20, 30.. 100. Higher values gives larger videos at higher quality. Higher values may negatively affect runtime.
-    :param Optional[Literal['mp4', 'avi', 'webm', 'mov']] out_format: The format of the output video: 'mp4', 'avi', 'webm', or 'mov'. Default: mp4.
-    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
-    :results: None. The video is stored in the same directory as the frames, named after the directory.
-
-    :example:
-    >>> frames_to_movie(directory='/Users/simon/Desktop/blah', fps=60, quality=60, out_format='mp4')
+    :param directory: Directory containing the images.
+    :param fps: Frame rate of the output video.
+    :param quality: Integer (1–100) representing output video quality. Higher = better quality + bigger size.
+    :param out_format: Format of the output video. One of: 'mp4', 'avi', 'webm'. Default is 'mp4'.
+    :param gpu: If True, use NVIDIA GPU codecs (if available). Default is False.
+    :return: None. Video is saved to disk.
     """
 
+    import tempfile
+    import re
     def natural_sort_key(s):
-        return [int(part) if part.isdigit() else part for part in s.split('/')]
+        return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', os.path.basename(s))]
 
     timer = SimbaTimer(start=True)
     check_ffmpeg_available(raise_error=True)
+
     if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None", source=frames_to_movie.__name__)
+        raise FFMPEGCodecGPUError(
+            msg="NVIDIA GPU not available (as evaluated by nvidia-smi returning None)",
+            source=frames_to_movie.__name__)
+
     check_if_dir_exists(in_dir=directory, source=frames_to_movie.__name__)
     check_str(name='out_format', value=out_format, options=['mp4', 'avi', 'webm'])
     check_int(name="FPS", value=fps, min_value=1)
     check_int(name="quality", value=quality, min_value=1)
+
+    # Select codec
     if out_format == 'webm':
         codec = 'libvpx-vp9'
     elif out_format == 'avi':
         codec = 'mpeg4'
     else:
         codec = 'libx264'
+
     crf_lk = percent_to_crf_lookup()
     crf = crf_lk[str(quality)]
+
     save_path = os.path.join(os.path.dirname(directory), f"{os.path.basename(directory)}.{out_format}")
-    img_paths = find_files_of_filetypes_in_directory(directory=directory, extensions=Options.ALL_IMAGE_FORMAT_OPTIONS.value, raise_error=True)
+
+    img_paths = find_files_of_filetypes_in_directory(
+        directory=directory,
+        extensions=Options.ALL_IMAGE_FORMAT_OPTIONS.value,
+        raise_error=True
+    )
     sorted_filepaths = sorted(img_paths, key=natural_sort_key)
     _, start_id, _ = get_fn_ext(filepath=sorted_filepaths[0])
-    if not gpu:
-        cmd = f'ffmpeg -framerate {fps} -start_number {start_id} -pattern_type glob -i "{directory}/*.png" -c:v {codec} -crf {crf} "{save_path}" -loglevel error -stats -hide_banner -y'
+
+    with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.txt') as tf:
+        for path in sorted_filepaths:
+            safe_path = path.replace('\\', '/')
+            tf.write("file '{}'\n".format(safe_path))
+        list_path = tf.name
+
+    if gpu:
+        cmd = f'ffmpeg -f concat -safe 0 -r {fps} -i "{list_path}" -c:v {codec} -crf {crf} "{save_path}" -loglevel error -stats -hide_banner -y'
     else:
-        cmd = f'ffmpeg -framerate {fps} -start_number {start_id} -pattern_type glob -i "$(ls -v {directory}/*.png)" -c:v h264_nvenc -crf {crf} "{save_path}" -loglevel error -stats -hide_banner -y'
+        cmd = f'ffmpeg -f concat -safe 0 -r {fps} -i "{list_path}" -c:v h264_nvenc -crf {crf} "{save_path}" -loglevel error -stats -hide_banner -y'
+
     subprocess.call(cmd, shell=True)
+
+    os.remove(list_path)
     timer.stop_timer()
     stdout_success(msg=f"Video created at {save_path}", source=frames_to_movie.__name__, elapsed_time=timer.elapsed_time_str)
 

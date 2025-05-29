@@ -1,7 +1,6 @@
 import os
-from typing import Union
+from typing import Union, Optional
 import numpy as np
-import pandas as pd
 from simba.utils.read_write import find_files_of_filetypes_in_directory, write_df, seconds_to_timestamp
 from simba.utils.printing import SimbaTimer
 from simba.utils.checks import check_str, check_if_dir_exists, check_valid_dataframe, check_float
@@ -18,6 +17,9 @@ OUT_COL_NAMES= ['VIDEO', 'BODY-PART', 'EVENT', 'START TIME (S)', 'END TIME (S)',
 class LightDarkBoxAnalyzer():
     """
     Perform light–dark box analysis using DeepLabCut pose estimation data.
+
+    .. note::
+       If the specified body-part is detected below the specified threshold, then the animal is the dark-box. Otherwise its in the light-box.
 
     This class analyzes animal transitions between light and dark compartments  in a light–dark box behavioral test based on the availability of pose-estimation data. It assumes that if pose-estimation for a specified body part is available,
     the animal is in the light box; otherwise, the animal is in the dark box. It detects bouts (continuous time segments) for each condition and saves the bout-level data to a CSV file.
@@ -39,14 +41,15 @@ class LightDarkBoxAnalyzer():
 
     def __init__(self,
                  data_dir: Union[str, os.PathLike],
-                 save_path: Union[str, os.PathLike],
                  body_part: str,
                  fps: Union[int, float],
                  threshold: float = 0.01,
-                 minimum_episode_duration: float = 10e-16):
+                 minimum_episode_duration: float = 10e-16,
+                 save_path: Optional[Union[str, os.PathLike]] = None):
 
         self.data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=['.csv'], raise_error=True, as_dict=True)
-        check_if_dir_exists(in_dir=os.path.dirname(save_path))
+        if save_path is not None:
+            check_if_dir_exists(in_dir=os.path.dirname(save_path))
         check_str(name=f'{self.__class__.__name__} body_part', value=body_part)
         check_float(name=f'{self.__class__.__name__} fps', value=fps, min_value=10e-6)
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
@@ -77,17 +80,16 @@ class LightDarkBoxAnalyzer():
         self.results = []
         for file_cnt, (file_name, file_path) in enumerate(self.data_paths.items()):
             video_timer = SimbaTimer(start=True)
-            data_df = pd.read_csv(file_path).reset_index(drop=True).iloc[:, 1:]
-            headers = data_df.iloc[0].unique()
+            self.data_df = pd.read_csv(file_path).reset_index(drop=True).iloc[:, 1:]
+            headers = self.data_df.iloc[0].unique()
             cols = np.array([np.array([f'{x}_x', f'{x}_y', f'{x}_p']) for x in headers]).flatten()
-            data_df = data_df.iloc[2:].reset_index(drop=True).apply(pd.to_numeric, errors='coerce').fillna(0)
-            data_df.columns = cols
-            check_valid_dataframe(df=data_df, valid_dtypes=Formats.NUMERIC_DTYPES.value, required_fields=self.bp_cols)
-            data_df[self.bp_cols[2]] = (data_df[self.bp_cols[2]] >= self.threshold).astype(int)
-            #data_df[self.bp_cols[2]] = data_df[self.bp_cols[2]].notna().astype(int)
-            light_bouts = detect_bouts(data_df=data_df, target_lst=[self.bp_cols[2]], fps=self.fps)
-            data_df[self.bp_cols[2]] = 1 - data_df[self.bp_cols[2]]
-            dark_bouts = detect_bouts(data_df=data_df, target_lst=[self.bp_cols[2]], fps=self.fps)
+            self.data_df = self.data_df.iloc[2:].reset_index(drop=True).apply(pd.to_numeric, errors='coerce').fillna(0)
+            self.data_df.columns = cols
+            check_valid_dataframe(df=self.data_df, valid_dtypes=Formats.NUMERIC_DTYPES.value, required_fields=self.bp_cols)
+            self.data_df[self.bp_cols[2]] = (self.data_df[self.bp_cols[2]] >= self.threshold).astype(int)
+            light_bouts = detect_bouts(data_df=self.data_df, target_lst=[self.bp_cols[2]], fps=self.fps)
+            self.data_df[self.bp_cols[2]] = 1 - self.data_df[self.bp_cols[2]]
+            dark_bouts = detect_bouts(data_df=self.data_df, target_lst=[self.bp_cols[2]], fps=self.fps)
             dark_bouts.columns, light_bouts.columns = COLUMN_NAMES, COLUMN_NAMES
             light_bouts['EVENT'], dark_bouts['EVENT'] = 'LIGHT BOX', 'DARK BOX'
             light_bouts['BODY-PART'], dark_bouts['BODY-PART'] = self.body_part, self.body_part
@@ -95,17 +97,15 @@ class LightDarkBoxAnalyzer():
             light_bouts, dark_bouts = light_bouts[OUT_COL_NAMES], dark_bouts[OUT_COL_NAMES]
             out = pd.concat([light_bouts, dark_bouts], axis=0).reset_index(drop=True).sort_values(by=['VIDEO', 'START TIME (S)']).reset_index(drop=True)
             out = self._remove_outliers(df=out)
-
-
-
             self.results.append(out)
             video_timer.stop_timer()
             print(f'Light-dark analysis complete video {file_name} ({file_cnt+1}/{self.file_cnt})... (elapsed time: {video_timer.elapsed_time_str}s)')
+        self.results = pd.concat(self.results, axis=0)
+        self.results = self.results.sort_values(by=['VIDEO', 'START TIME (S)']).reset_index(drop=True)
+
 
     def save(self):
-        out_df = pd.concat(self.results, axis=0)
-        out_df = out_df.sort_values(by=['VIDEO', 'START TIME (S)']).reset_index(drop=True)
-        write_df(df=out_df, file_type='csv', save_path=self.save_path)
+        write_df(df=self.results, file_type='csv', save_path=self.save_path)
         print(f'COMPLETE: Light-dark box data for {self.file_cnt} video(s) saved at {self.save_path}')
 
 

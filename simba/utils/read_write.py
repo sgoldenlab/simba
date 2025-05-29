@@ -1914,7 +1914,7 @@ def fetch_pip_data(pip_url: str = Links.SIMBA_PIP_URL.value) -> Union[Tuple[Dict
         return None, None
 
 
-def write_pickle(data: Dict[str, Any], save_path: Union[str, os.PathLike]) -> None:
+def write_pickle(data: Dict[Any, Any], save_path: Union[str, os.PathLike]) -> None:
     """
     Write a single object as pickle.
 
@@ -3017,6 +3017,28 @@ def read_df_array(df: pd.DataFrame, column: str):
 
     df[column] = df[column].apply(_col_to_arrays)  # Convert in-place
     return df
+
+def read_sleap_csv(file_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, list, list]:
+    """
+    Reads and validates a SLEAP-exported CSV file containing tracking data.
+
+    :param  Union[str, os.PathLike] file_path: Path to the SLEAP CSV file.
+    :returns: Tuple with (i) The validated and cleaned DataFrame, (ii) A list of unique body part names, (iii) A flattened list of coordinate column names for each body part (e.g., ['nose.x', 'nose.y', ...]).
+    :rtype: Tuple[pd.DataFrame, list, list]
+    """
+    REQUIRED_COLUMNS = ['track', 'frame_idx', 'instance.score']
+    check_file_exist_and_readable(file_path=file_path)
+    data_df = pd.read_csv(file_path)
+    check_valid_dataframe(df=data_df, source=read_sleap_csv.__name__, required_fields=REQUIRED_COLUMNS)
+    check_valid_dataframe(df=data_df.drop(REQUIRED_COLUMNS[0], axis=1), source=read_sleap_csv.__name__, valid_dtypes=Formats.NUMERIC_DTYPES.value)
+    data_df[REQUIRED_COLUMNS[0]] = data_df[REQUIRED_COLUMNS[0]].astype(str).str.replace(r"[^\d.]+", "", regex=True).astype(int)
+    headers = list(data_df.drop(REQUIRED_COLUMNS, axis=1).columns)
+    bp_names = np.unique([x.split('.', 1)[0] for x in headers])
+    bp_headers = [(f'{x}.x', f'{x}.y') for x in bp_names]
+
+    return data_df, bp_names, [i for t in bp_headers for i in t]
+
+
 def read_sys_env():
     env = {}
     env[ENV_VARS.PRINT_EMOJIS.value] = str_2_bool(os.getenv(ENV_VARS.PRINT_EMOJIS.value, "True"))

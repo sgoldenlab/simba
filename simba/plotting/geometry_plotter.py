@@ -58,13 +58,10 @@ def geometry_visualizer(data: Tuple[int, pd.DataFrame],
                 img = cv2.addWeighted(img.astype(np.uint8), 1 - opacity, opacity_image.astype(np.uint8), opacity, 0)
             for shape_cnt, shape in enumerate(batch_shapes[frm_cnt]):
                 if isinstance(shape, Polygon):
-                    if shape.area > 34705:
-                        img_cpy = cv2.fillPoly(img_cpy, [np.array(shape.exterior.coords).astype(np.int32)], color=(colors[shape_cnt]))
-                        interior_coords = [np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2)) for interior in shape.interiors]
-                        for interior in interior_coords:
-                            img_cpy = cv2.fillPoly(img_cpy, [interior], color=(colors[shape_cnt][::-1]))
-                    else:
-                        continue
+                    img_cpy = cv2.fillPoly(img_cpy, [np.array(shape.exterior.coords).astype(np.int32)], color=(colors[shape_cnt]))
+                    interior_coords = [np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2)) for interior in shape.interiors]
+                    for interior in interior_coords:
+                        img_cpy = cv2.fillPoly(img_cpy, [interior], color=(colors[shape_cnt][::-1]))
                 elif isinstance(shape, LineString):
                     img_cpy = cv2.fillPoly(img_cpy, [np.array(shape.coords, dtype=np.int32)], color=(colors[shape_cnt]))
                 elif isinstance(shape, MultiPolygon):
@@ -213,3 +210,23 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
         concatenate_videos_in_folder(in_folder=self.temp_dir, save_path=self.save_path, remove_splits=True)
         video_timer.stop_timer()
         stdout_success(msg=f"Geometry video {self.save_path} complete!", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
+
+
+
+# if __name__ == '__main__':
+#     from simba.utils.read_write import read_pickle
+#     VIDEO_PATH = r"D:\ares\data\termite_2\termite.mp4"
+#     DATA_PATH = r"D:\ares\data\termite_2\termite_2_geometries.pickle"
+#     data = read_pickle(data_path=DATA_PATH)
+#
+#     get_video_meta_data(video_path=VIDEO_PATH)
+#
+#     geos = []
+#
+#     for k, v in data.items():
+#         geos.append(list(v.values()))
+#         #geos.append([subdict[i] for subdict in data.values()])
+#
+#     plotter = GeometryPlotter(geometries=geos, video_name=VIDEO_PATH, save_dir=r"D:\ares\data\termite_2\video", palette='Set1', core_cnt=32, bg_opacity=1)
+#     plotter.run()
+#     #max_frm = 9000

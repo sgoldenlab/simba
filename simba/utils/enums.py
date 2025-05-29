@@ -240,6 +240,7 @@ class Options(Enum):
         "gnuplot2",
         "RdBu",
         "winter",
+        "coolwarm"
     ]
     PALETTE_OPTIONS_CATEGORICAL = [
         "Pastel1",

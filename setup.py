@@ -29,7 +29,7 @@ with open(GPU_REQUIREMENTS_PATH, "r") as f:
 # Setup configuration
 setuptools.setup(
     name="simba_uw_tf_dev",
-    version="3.1.6",
+    version="3.1.7",
     author="Simon Nilsson, Jia Jie Choong, Sophia Hwang",
     author_email="sronilsson@gmail.com",
     description="Toolkit for computer classification and analysis of behaviors in experimental animals",
@@ -38,7 +38,8 @@ setuptools.setup(
     url="https://github.com/sgoldenlab/simba",
     install_requires=requirements,
     extras_require={'arm': [arm_requirements], "gpu": [gpu_requirements]},
-    license='GNU General Public License v3 (GPLv3)',
+    license='Modified BSD 3-Clause License',
+    license_files=('LICENSE',),
     packages=setuptools.find_packages(exclude=["*.tests",
                                                "*.tests.*",
                                                "tests.*",
@@ -53,7 +54,6 @@ setuptools.setup(
     include_package_data=True,
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
         "Operating System :: OS Independent",
     ],
     entry_points={'console_scripts':['simba=simba.SimBA:main'],}

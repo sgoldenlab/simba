@@ -19,6 +19,7 @@ from simba.utils.checks import (check_float, check_if_dir_exists,
                                 check_valid_lst, check_valid_tuple)
 from simba.utils.data import create_color_palette, find_ranked_colors, get_mode
 from simba.utils.errors import CountError, InvalidInputError
+from simba.utils.enums import Formats
 
 
 class NetworkMixin(object):
@@ -65,7 +66,7 @@ class NetworkMixin(object):
         for k, v in data.items():
             check_instance(source=NetworkMixin.create_graph.__name__, instance=k,accepted_types=tuple)
             check_iterable_length(source=f"{NetworkMixin.create_graph.__name__} {k}", val=len(k), exact_accepted_length=2)
-            check_instance(source=f"{NetworkMixin.create_graph.__name__} {v}", instance=v, accepted_types=(float, int))
+            check_instance(source=f"{NetworkMixin.create_graph.__name__} {v}", instance=v, accepted_types=Formats.NUMERIC_DTYPES.value)
 
         G = nx.Graph()
         for node_names in data.keys():
@@ -325,7 +326,8 @@ class NetworkMixin(object):
                   palette: Optional[Union[str, Dict[str, str]]] = "magma",
                   node_shape: Optional[Literal['dot', 'ellipse', 'circle']] = 'dot',
                   smooth_type: Optional[Literal['dynamic', 'continuous', 'discrete', 'diagonalCross', 'straightCross', 'horizontal', 'vertical', 'curvedCW', 'curvedCCW', 'cubicBezier']] = 'dynamic',
-                  img_size: Optional[Tuple[int, int]] = (500, 500)) -> Union[None, Network]:
+                  img_size: Optional[Tuple[int, int]] = (500, 500),
+                  seed: Optional[int] = None) -> Union[None, Network]:
 
         """
         Visualizes a network graph using the vis.js library and saves the result as an HTML file.
@@ -337,9 +339,6 @@ class NetworkMixin(object):
         .. raw:: html
 
            <iframe src="../../docs/_static/img/network_ex.html" width="100%" height="600px" frameborder="0"></iframe>
-
-
-
 
         .. note::
            Multi-networks created by ``simba.mixins.network_mixin.create_multigraph`` can be a little messy to look at. Instead,
@@ -389,7 +388,10 @@ class NetworkMixin(object):
         if not multi_graph:
             network_graph = Network(f"{img_size[0]}px", f"{img_size[1]}px")
             network_graph.set_edge_smooth(smooth_type)
-            network_graph.force_atlas_2based()
+            if seed is not None:
+                pos = nx.circular_layout(graph, 0.4)
+            else:
+                network_graph.force_atlas_2based()
             for node_cnt, node_name in enumerate(graph):
                 if isinstance(node_size, dict):
                     node_node_size = node_size[node_name]
@@ -399,9 +401,18 @@ class NetworkMixin(object):
                     node_clr = palette[node_name]
                 else:
                     node_clr = clrs[node_cnt]
-                network_graph.add_node(n_id=node_name, shape=node_shape, color=node_clr, size=node_node_size)
+                if seed is not None:
+                    network_graph.add_node(n_id=node_name, shape=node_shape, color=node_clr, size=node_node_size, label=f'Animal {node_name+1}', x=pos[node_name][0] * img_size[0], y=pos[node_name][1] * img_size[1], font={'color': 'white'})
+                else:
+                    network_graph.add_node(n_id=node_name,
+                                           shape=node_shape,
+                                           color=node_clr,
+                                           size=node_node_size,
+                                           label=f'Animal {node_name+1}', font={'color': 'white'})
+
+            network_graph.toggle_physics(False)
             for source, target, edge_attrs in graph.edges(data=True):
-                network_graph.add_edge(source, target, value=edge_attrs["weight"])
+                network_graph.add_edge(source, target, value=float(edge_attrs["weight"] +5))
             if save_path is not None:
                 network_graph.save_graph(save_path)
             return network_graph
@@ -409,22 +420,13 @@ class NetworkMixin(object):
         else:
             results = {}
             edge_labels = list(set(data["label"] for _, _, data in graph.edges(data=True)))
-            check_valid_lst(source=f"{NetworkMixin.multigraph_page_rank.__name__} edge_labels", data=edge_labels,
-                            min_len=1)
+            check_valid_lst(source=f"{NetworkMixin.multigraph_page_rank.__name__} edge_labels", data=edge_labels, min_len=1)
             for edge_label in edge_labels:
                 network_graph = Network(f"{img_size[0]}px", f"{img_size[1]}px")
                 network_graph.set_edge_smooth(smooth_type)
                 network_graph.force_atlas_2based()
                 graph_save_path = os.path.join(save_path, f"{edge_label}.html")
-                filtered_graph = nx.Graph(
-                    graph.edge_subgraph(
-                        [
-                            (u, v, k)
-                            for u, v, k, data in graph.edges(keys=True, data=True)
-                            if data.get("label") == edge_label
-                        ]
-                    )
-                )
+                filtered_graph = nx.Graph(graph.edge_subgraph([(u, v, k) for u, v, k, data in graph.edges(keys=True, data=True) if data.get("label") == edge_label]))
                 for node_cnt, node_name in enumerate(filtered_graph):
                     if isinstance(node_size, dict):
                         node_node_size = node_size[node_name]

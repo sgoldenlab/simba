@@ -446,6 +446,31 @@ class Statistics(FeatureExtractionMixin):
         return (f, significance_bool)
 
     @staticmethod
+    @njit("(float32[:], )")
+    def sliding_cumulative_mean(x: np.ndarray):
+
+        """
+        Compute a sliding cumulative mean over a 1D
+
+        :param np.ndarray x: A 1D NumPy array of type float32
+        :return: A 1D float32 array of the same shape as `x`, containing the cumulative mean at each index, ignoring NaNs.
+        :rtype: np.ndarray
+        """
+
+        results = np.empty(x.shape[0], dtype=np.float32)
+        total, count = 0.0, 0
+        for i in prange(x.shape[0]):
+            val = x[i]
+            if not np.isnan(val):
+                total += val
+                count += 1
+            if count > 0:
+                results[i] = total / count
+            else:
+                results[i] = np.nan
+        return results
+
+    @staticmethod
     #@njit("(float32[:], float64[:], float64)", cache=True)
     #@jit(nopython=True, cache=True)
     @dynamic_numba_decorator(dtypes="(float32[:], float64[:], float64)", cache=True, fastmath=False)

@@ -1058,10 +1058,11 @@ def slp_to_df_convert(
     return data_df
 
 
-def find_ranked_colors(data: Dict[str, float],
+def find_ranked_colors(data: Dict[Any, float],
                        palette: str,
-                       as_hex: Optional[bool] = False,
-                       reverse: Optional[bool] = True) -> Dict[str, Union[Tuple[int], str]]:
+                       as_hex: bool = False,
+                       as_rgb_ratio: bool = False,
+                       reverse: bool = True) -> Dict[str, Union[Tuple[int], str]]:
     """
     Find ranked colors for a given data dictionary values based on a specified color palette.
 
@@ -1084,8 +1085,8 @@ def find_ranked_colors(data: Dict[str, float],
         raise InvalidInputError(msg=f"{palette} is not a valid palette. Options {Options.PALETTE_OPTIONS.value}", source=find_ranked_colors.__name__)
     check_instance(source=find_ranked_colors.__name__, instance=data, accepted_types=dict)
     for k, v in data.items():
-        check_str(name=k, value=k); check_float(name=v, value=v)
-    clrs = create_color_palette(pallete_name=palette, increments=len(list(data.keys())) - 1, as_hex=as_hex)
+        check_float(name=v, value=v)
+    clrs = create_color_palette(pallete_name=palette, increments=len(list(data.keys())) - 1, as_hex=as_hex, as_rgb_ratio=as_rgb_ratio)
     ranks, results = deepcopy(data), {}
     ranks = {key: rank for rank, key in enumerate(sorted(ranks, key=ranks.get, reverse=reverse), 1)}
     for k, v in ranks.items():

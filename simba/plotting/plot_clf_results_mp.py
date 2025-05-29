@@ -67,7 +67,6 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
         video_save_path = os.path.join(video_save_dir, f"{batch}.mp4")
         video_writer = cv2.VideoWriter(video_save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"], video_meta_data["height"]))
     cap.set(1, start_frm)
-    print(text_bg_clr, text_color)
     while current_frm < end_frm:
         ret, img = cap.read()
         if ret:

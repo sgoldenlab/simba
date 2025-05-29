@@ -254,3 +254,12 @@ Plotting methods
    :members:
    :show-inheritance:
 
+
+Light-/Dark-box plotting
+-----------------------------------
+
+.. automodule:: simba.plotting.light_dark_box.LightDarkBoxPlotter
+   :members:
+   :show-inheritance:
+
+
