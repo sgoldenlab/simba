@@ -1,14 +1,19 @@
-import os
-from typing import Union, Optional
-import numpy as np
-from simba.utils.read_write import find_files_of_filetypes_in_directory, write_df, seconds_to_timestamp
-from simba.utils.printing import SimbaTimer
-from simba.utils.checks import check_str, check_if_dir_exists, check_valid_dataframe, check_float
-from simba.utils.enums import Formats
-from simba.utils.data import detect_bouts
-from itertools import groupby
 import argparse
+import os
+from itertools import groupby
+from typing import Optional, Union
+
+import numpy as np
 import pandas as pd
+
+from simba.utils.checks import (check_float, check_if_dir_exists, check_str,
+                                check_valid_dataframe)
+from simba.utils.data import detect_bouts
+from simba.utils.enums import Formats
+from simba.utils.printing import SimbaTimer
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    seconds_to_timestamp, write_df)
+
 pd.options.mode.chained_assignment = None
 
 COLUMN_NAMES = ['EVENT', 'START TIME (S)', 'END TIME (S)', 'START FRAME', 'END FRAME', 'DURATION (S)']

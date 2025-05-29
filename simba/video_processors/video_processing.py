@@ -1534,8 +1534,8 @@ def frames_to_movie(directory: Union[str, os.PathLike],
     :return: None. Video is saved to disk.
     """
 
-    import tempfile
     import re
+    import tempfile
     def natural_sort_key(s):
         return [int(text) if text.isdigit() else text.lower() for text in re.split(r'(\d+)', os.path.basename(s))]
 

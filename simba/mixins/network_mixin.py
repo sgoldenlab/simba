@@ -18,8 +18,8 @@ from simba.utils.checks import (check_float, check_if_dir_exists,
                                 check_valid_array, check_valid_hex_color,
                                 check_valid_lst, check_valid_tuple)
 from simba.utils.data import create_color_palette, find_ranked_colors, get_mode
-from simba.utils.errors import CountError, InvalidInputError
 from simba.utils.enums import Formats
+from simba.utils.errors import CountError, InvalidInputError
 
 
 class NetworkMixin(object):
