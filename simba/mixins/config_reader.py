@@ -23,9 +23,10 @@ except:
 
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
-                                check_if_filepath_list_is_empty, check_str,
+                                check_if_filepath_list_is_empty,
+                                check_nvidea_gpu_available, check_str,
                                 check_valid_boolean, check_valid_dataframe,
-                                check_valid_lst, check_nvidea_gpu_available)
+                                check_valid_lst)
 from simba.utils.enums import ConfigKey, Defaults, Dtypes, Formats, Keys, Paths
 from simba.utils.errors import (BodypartColumnNotFoundError, DataHeaderError,
                                 DuplicationError, InvalidInputError,
