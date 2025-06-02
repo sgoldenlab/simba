@@ -21,7 +21,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 get_fn_ext)
 from simba.utils.data import df_smoother, savgol_smoother
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import get_video_meta_data, find_core_cnt
+from simba.utils.read_write import find_core_cnt, get_video_meta_data
 
 
 def fit_yolo(initial_weights: Union[str, os.PathLike],
