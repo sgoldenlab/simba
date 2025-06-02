@@ -68,7 +68,7 @@ The results are saved in a single CSV file at location "C:\projects\light_dark_b
 
 ### STEP 1 - GET THE REQUIRED PYTHON FILE
 
-**1.** Locate the `light_dark_box_plotter.py` script. It is located [HERE](https://github.com/sgoldenlab/simba/blob/master/simba/plotting\light_dark_box_plotter.py). It could also be found at path `simba.plotting.light_dark_box_plotter.LightDarkBoxPlotter` in the github repository. If you already have a SimBA environment installed on your computer, you can locate the file by (i) typing `pip show simba-uw-tf-dev` in your SimBA environment, (ii) enter the path that is shown (as in the screengrab below) into a file explorer, and navigate to the `simba/plotting/light_dark_box_plotter` inside that shown directory.
+**1.** Locate the `light_dark_box_plotter.py` script. It is located [HERE](https://github.com/sgoldenlab/simba/blob/master/simba/plotting/light_dark_box_plotter.py). It could also be found at path `simba.plotting.light_dark_box_plotter.LightDarkBoxPlotter` in the github repository. If you already have a SimBA environment installed on your computer, you can locate the file by (i) typing `pip show simba-uw-tf-dev` in your SimBA environment, (ii) enter the path that is shown (as in the screengrab below) into a file explorer, and navigate to the `simba/plotting/light_dark_box_plotter` inside that shown directory.
 
 **2.** Copy this file (or paste the content of this file into an empty file named `light_dark_box_plotter.py`) to an accessible location on your computer. For example, I have copied this file to location `C:\projects\light_dark_box\light_dark_box_plotter.py` for writing this documentation.  
 
