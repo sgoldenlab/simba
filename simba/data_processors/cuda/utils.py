@@ -233,3 +233,6 @@ def _cuda_abs_energy(x):
         squared[j] = x[j] ** 2
     m = _cuda_sum(squared[0: x.shape[0] - 1])
     return math.sqrt(m)
+
+
+_is_cuda_available()

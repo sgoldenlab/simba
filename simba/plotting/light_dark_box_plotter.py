@@ -2,18 +2,19 @@ import os
 import numpy as np
 import pandas as pd
 import cv2
+from copy import copy
+import argparse
+import functools
+import multiprocessing
 
 from simba.data_processors.light_dark_box_analyzer import LightDarkBoxAnalyzer
 from simba.utils.checks import check_if_dir_exists, check_float, check_str, check_video_and_data_frm_count_align
 from simba.utils.read_write import find_files_of_filetypes_in_directory, get_video_meta_data, concatenate_videos_in_folder
-from simba.utils.enums import Options, Defaults, Formats
+from simba.utils.enums import Options, Defaults, Formats, TextOptions
 from typing import Union, Tuple
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.errors import NoDataError
 from simba.utils.printing import stdout_success, SimbaTimer
-
-import functools
-import multiprocessing
 
 
 def _light_dark_box_visualizer(pose_data: pd.DataFrame,
@@ -22,7 +23,9 @@ def _light_dark_box_visualizer(pose_data: pd.DataFrame,
                                video_path: str,
                                circle_size: Union[int, float],
                                txt_shift: Tuple[int, int],
-                               font_size: Union[int, float]):
+                               font_size: Union[int, float],
+                               body_part: str,
+                               threshold: float):
 
 
     group, idx = int(pose_data[0]), pose_data[1].index.tolist()
@@ -36,16 +39,30 @@ def _light_dark_box_visualizer(pose_data: pd.DataFrame,
     light_data['FRAME LIST'] = light_data.apply(lambda row: list(range(row['START FRAME'], row['END FRAME'] + 1)), axis=1)
     light_box_frm_lst = [f for s in light_data['FRAME LIST'] for f in s]
     for frm_cnt, frm_id in enumerate(range(start_frm, end_frm + 1)):
+        line_counter, img_text_shift = 1, copy(txt_shift)
         cap.set(1, int(frm_id))
         ret, img = cap.read()
-        x, y, p = pose_data[1].loc[frm_id].values.astype(np.int32)
+        x, y, p = pose_data[1].loc[frm_id].values
         if frm_id in light_box_frm_lst:
             img = cv2.circle(img, (int(x), int(y)), circle_size, (0, 0, 255), -1)
-            img = PlottingMixin().put_text(img=img, text='ZONE: LIGHT BOX', pos=txt_shift, font_size=font_size, text_color=(0, 255, 255), text_bg_alpha=0.8)
+            img = PlottingMixin().put_text(img=img, text='ZONE: LIGHT BOX', pos=(TextOptions.BORDER_BUFFER_Y.value, int(line_counter * txt_shift[1])), font_size=font_size, text_color=(0, 255, 255), text_bg_alpha=0.8)
+            line_counter += 1
+            img_text_shift = (TextOptions.BORDER_BUFFER_Y.value, int(txt_shift[1] * line_counter))
+            img = PlottingMixin().put_text(img=img, text=f'BODY-PART PROBABILITY: {round(p, 4)}', pos=img_text_shift, font_size=font_size, text_color=(0, 255, 255), text_bg_alpha=0.8)
         else:
-            img = PlottingMixin().put_text(img=img, text='ZONE: DARK BOX', pos=txt_shift, font_size=font_size, text_color=(255, 255, 255), text_bg_alpha=0.8)
+            img = PlottingMixin().put_text(img=img, text='ZONE: DARK BOX', pos=(TextOptions.BORDER_BUFFER_Y.value, int(line_counter * txt_shift[1])), font_size=font_size, text_color=(255, 255, 255), text_bg_alpha=0.8)
+            line_counter += 1
+            img_text_shift = (TextOptions.BORDER_BUFFER_Y.value, int(txt_shift[1] * line_counter))
+            img = PlottingMixin().put_text(img=img, text=f'BODY-PART PROBABILITY: {round(p, 4)}', pos=img_text_shift, font_size=font_size, text_color=(255, 255, 255), text_bg_alpha=0.8)
+        line_counter += 1
+        img_text_shift = (TextOptions.BORDER_BUFFER_Y.value, int(txt_shift[1] * line_counter))
+        img = PlottingMixin().put_text(img=img, text=f'BODY-PART: {body_part}', pos=img_text_shift, font_size=font_size, text_color=(255, 255, 255), text_bg_alpha=0.8)
+        line_counter += 1
+        img_text_shift = (TextOptions.BORDER_BUFFER_Y.value, int(txt_shift[1] * line_counter))
+        img = PlottingMixin().put_text(img=img, text=f'THRESHOLD: {threshold}', pos=img_text_shift, font_size=font_size, text_color=(255, 255, 255), text_bg_alpha=0.8)
         video_writer.write(img.astype(np.uint8))
         print(f"Multi-processing video frame {frm_id} on core {group}...")
+        #break
 
     cap.release()
     video_writer.release()
@@ -68,7 +85,7 @@ class LightDarkBoxPlotter():
        :loop:
 
     :param (str or os.PathLike) data_dir: Directory containing pose estimation CSV files.
-    :param (str or os.PathLike) video_dir: Directory containing video files corresponding to CSVs.
+    :param (str or os.PathLike) video_dir: Directory containing video files corresponding with the names of the CSVs in ``data_dir``.
     :param (str or os.PathLike) save_dir: Output directory to save the resulting annotated videos.
     :param (str) body_part: The name of the body part used to determine position and behavior.
     :param (int or float) fps : Frames per second of the videos (used for timing episodes).
@@ -90,6 +107,7 @@ class LightDarkBoxPlotter():
         check_if_dir_exists(in_dir=data_dir, source=f'{self.__class__.__name__} data_dir', raise_error=True)
         check_if_dir_exists(in_dir=video_dir, source=f'{self.__class__.__name__} video_dir', raise_error=True)
         check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir', raise_error=True)
+        print(data_dir)
         self.data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=['.csv'], raise_error=True, as_dict=True)
         self.video_paths = find_files_of_filetypes_in_directory(directory=video_dir, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True, as_dict=True)
         missing_videos = [x for x in self.data_paths.keys() if x not in self.video_paths.keys()]
@@ -112,6 +130,7 @@ class LightDarkBoxPlotter():
             analyzer.run()
             behavior_data = analyzer.results[analyzer.results['VIDEO'] == file_name].reset_index(drop=True)
             pose_data = analyzer.data_df[analyzer.bp_cols]
+            pose_data[f'{self.body_part}_p'] = analyzer.bp_p
             check_video_and_data_frm_count_align(video=self.video_paths[file_name], data=pose_data, name=file_name, raise_error=True)
             pose_data = np.array_split(pose_data, self.core_cnt)
             pose_data = [(c, x) for c, x in enumerate(pose_data)]
@@ -120,7 +139,7 @@ class LightDarkBoxPlotter():
             if not os.path.isdir(self.temp_dir): os.makedirs(self.temp_dir)
             video_meta = get_video_meta_data(video_path=self.video_paths[file_name])
             circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(video_meta['width'], video_meta['height']), circle_frame_ratio=50)
-            font_size, x_shift, y_shift = PlottingMixin().get_optimal_font_scales(text='LONG ARSE STRING', accepted_px_width=int(video_meta['width']/3), accepted_px_height=int(video_meta['height']/3))
+            font_size, x_shift, y_shift = PlottingMixin().get_optimal_font_scales(text='LONG ARSE STRING BODY-PART', accepted_px_width=int(video_meta['width']/2), accepted_px_height=int(video_meta['height']/2))
             with multiprocessing.Pool(self.core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
                 constants = functools.partial(_light_dark_box_visualizer,
                                               light_data=behavior_data,
@@ -128,7 +147,9 @@ class LightDarkBoxPlotter():
                                               video_temp_dir=self.temp_dir,
                                               circle_size=circle_size,
                                               txt_shift=(x_shift, y_shift),
-                                              font_size=font_size)
+                                              font_size=font_size,
+                                              body_part=self.body_part,
+                                              threshold=self.threshold)
                 for cnt, result in enumerate(pool.imap(constants, pose_data, chunksize=1)):
                     print(f"Section {result}/{len(pose_data)} complete...")
             pool.terminate()
@@ -141,16 +162,30 @@ class LightDarkBoxPlotter():
         stdout_success(msg=f"{len(self.video_paths)} videos saved in {self.save_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
 
-if __name__ == '__main__':
-    d = LightDarkBoxPlotter(data_dir=r'D:\light_dark_box\project_folder\csv\input_csv\test',
-                            video_dir=r'D:\light_dark_box\project_folder\videos',
-                            fps=30,
-                            body_part='center',
-                            minimum_episode_duration=1,
-                            core_cnt=23,
-                            save_dir=r"D:\light_dark_box\project_folder\videos\light_dark",
-                            threshold=0.2)
-    d.run()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data_dir', type=str, required=True, help='Path to directory containing DeepLabCut CSV files.')
+    parser.add_argument('--video_dir', type=str, required=True, help='Directory containing video files corresponding with the names of the CSVs in data_dir.')
+    parser.add_argument('--save_dir', type=str, required=True, help='Directory where to save the output videos.')
+    parser.add_argument('--fps', type=float, required=True, help='Frames per second (int or float)')
+    parser.add_argument('--body_part', type=str, required=True, help='Name of the body part to use for determining visibility (e.g., "snout", "center").')
+    parser.add_argument('--threshold', type=float, required=True, help='Deeplabcut probability value. If below this value, animal is in dark box. If above, animal is in light box', default=0.1)
+    parser.add_argument('--minimum_episode_duration', type=float, required=True, help='The shortest allowed visit to either the dark or the light box. Used to remove spurrious errors in the DLC tracking.', default=1)
+    parser.add_argument('--core_cnt', type=int, required=True, help='The number of CPU cores to use. The higher the faster. -1 denotes all avaliable cores', default=-1)
+    args = parser.parse_args()
+
+    visualizer = LightDarkBoxPlotter(data_dir=args.data_dir,
+                                    video_dir=args.video_dir,
+                                    save_dir=args.save_dir,
+                                    fps=args.fps,
+                                    body_part=args.body_part,
+                                    threshold=args.threshold,
+                                    minimum_episode_duration=args.minimum_episode_duration,
+                                    core_cnt=args.core_cnt)
+
+    visualizer.run()
+
+
 
 
 

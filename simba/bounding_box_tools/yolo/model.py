@@ -21,7 +21,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 get_fn_ext)
 from simba.utils.data import df_smoother, savgol_smoother
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import get_video_meta_data
+from simba.utils.read_write import get_video_meta_data, find_core_cnt
 
 
 def fit_yolo(initial_weights: Union[str, os.PathLike],
@@ -29,7 +29,8 @@ def fit_yolo(initial_weights: Union[str, os.PathLike],
              save_path: Union[str, os.PathLike],
              epochs: Optional[int] = 25,
              batch: Optional[Union[int, float]] = 16,
-             plots: Optional[bool] = True):
+             plots: Optional[bool] = True,
+             workers: int = 12):
     """
     Trains a YOLO model using specified initial weights and a configuration YAML file.
 
@@ -54,8 +55,9 @@ def fit_yolo(initial_weights: Union[str, os.PathLike],
     check_file_exist_and_readable(file_path=model_yaml)
     check_if_dir_exists(in_dir=save_path)
     check_int(name='epochs', value=epochs, min_value=1)
+    check_int(name='workers', value=workers, min_value=1, max_value=find_core_cnt()[0])
     model = YOLO(initial_weights)
-    model.train(data=model_yaml, epochs=epochs, project=save_path, batch=batch, plots=plots)
+    model.train(data=model_yaml, epochs=epochs, project=save_path, batch=batch, plots=plots, workers=workers)
 
 def inference_yolo(weights_path: Union[str, os.PathLike],
                    video_path: Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]],
@@ -108,7 +110,6 @@ def inference_yolo(weights_path: Union[str, os.PathLike],
     if smoothing_method is not None:
         check_str(name=f'{inference_yolo.__name__} smoothing', value=smoothing_method, options=SMOOTHING_METHODS)
         check_float(name=f'{inference_yolo.__name__} smoothing_time_window', value=smoothing_time_window, min_value=10e-6)
-    timer = SimbaTimer(start=True)
     torch.set_num_threads(8)
     model = YOLO(weights_path, verbose=verbose)
     if gpu:
@@ -116,6 +117,7 @@ def inference_yolo(weights_path: Union[str, os.PathLike],
         model.to('cuda')
     class_dict = model.names
     results = {}
+    timer = SimbaTimer(start=True)
     for path in video_path:
         _, video_name, _ = get_fn_ext(filepath=path)
         video_meta_data = get_video_meta_data(video_path=path)
@@ -126,7 +128,6 @@ def inference_yolo(weights_path: Union[str, os.PathLike],
                 boxes = np.array(video_prediction.obb.data.cpu()).astype(np.float32)
             else:
                 boxes = np.array(video_prediction.boxes.data.cpu()).astype(np.float32)
-                print(boxes)
             for c in list(class_dict.keys()):
                 cls_data = boxes[np.argwhere(boxes[:, -1] == c)]
                 if cls_data.shape[0] == 0:
@@ -160,6 +161,9 @@ def inference_yolo(weights_path: Union[str, os.PathLike],
         if verbose:
             stdout_success(f'YOLO results saved in {save_dir} directory', elapsed_time=timer.elapsed_time_str)
 
+
+# fit_yolo(initial_weights=r"/mnt/d/yolo_weights/yolov8n.pt",
+#          model_yaml=r"/mnt/d/netholabs/imgs/yolo_train_test_val/map.yaml", save_path=r"/mnt/d/netholabs/imgs/yolo_mdl", batch=32, epochs=100)
 
 # fit_yolo(initial_weights=r"/mnt/c/troubleshooting/coco_data/weights/yolov8n-obb.pt",
 #          model_yaml=r"/mnt/c/troubleshooting/coco_data/model.yaml",

@@ -66,17 +66,20 @@ class CueLightClfAnalyzerPopUp(ConfigReader, PopUpMixin):
 
 
     def run(self):
-        pre_window = self.pre_window_eb.entry_get
-        post_window = self.post_window_eb.entry_get
-        check_int(name='PRE CUE LIGHT WINDOW (S): ', value=pre_window, min_value=0, raise_error=True)
-        check_int(name='POST CUE LIGHT WINDOW (S): ', value=post_window, min_value=0, raise_error=True)
+        pre_window = self.pre_window_eb.entry_get.strip()
+        post_window = self.post_window_eb.entry_get.strip()
+        check_int(name='PRE CUE LIGHT WINDOW (S): ', value=pre_window, min_value=0, raise_error=False)
+        check_int(name='POST CUE LIGHT WINDOW (S): ', value=post_window, min_value=0, raise_error=False)
         clf_names = [x for x in self.clf_vars.keys() if self.clf_vars[x].get()]
         if len(clf_names) == 0:
             raise NoDataError(msg='Zero classifiers checked. Check at least one classifier.', source=self.__class__.__name__)
-
-        analyzer = CueLightClfAnalyzer(config_path=self.config_path, cue_light_names=self.cue_light_names, clf_names=clf_names)
+        analyzer = CueLightClfAnalyzer(config_path=self.config_path,
+                                       cue_light_names=self.cue_light_names,
+                                       clf_names=clf_names,
+                                       pre_window=int(pre_window),
+                                       post_window=int(post_window))
         analyzer.run()
         analyzer.save()
 
 
-#CueLightClfAnalyzerPopUp(config_path=r"C:\troubleshooting\cue_light\t1\project_folder\project_config.ini", cue_light_names=['cl'])
+#CueLightClfAnalyzerPopUp(config_path=r"C:\troubleshooting\cue_light\t1\project_folder\project_config.ini", cue_light_names=['MY_CUE_LIGHT'])

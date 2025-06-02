@@ -644,10 +644,8 @@ def split_yolo_train_test_val(data_dir: Union[str, os.PathLike],
     check_file_exist_and_readable(file_path=map_path)
     map_dict = read_json(x=map_path)
     yolo_yaml_path = os.path.join(save_dir, 'map.yaml')
-    img_paths = np.array(
-        sorted(find_files_of_filetypes_in_directory(directory=img_dir, extensions=['.png'], raise_error=True)))
-    lbls_paths = np.array(
-        sorted(find_files_of_filetypes_in_directory(directory=labels_dir, extensions=['.txt'], raise_error=True)))
+    img_paths = np.array(sorted(find_files_of_filetypes_in_directory(directory=img_dir, extensions=['.png'], raise_error=True)))
+    lbls_paths = np.array(sorted(find_files_of_filetypes_in_directory(directory=labels_dir, extensions=['.txt'], raise_error=True)))
     img_names = np.array([get_fn_ext(filepath=x)[1] for x in img_paths])
     lbl_names = np.array([get_fn_ext(filepath=x)[1] for x in lbls_paths])
     missing_imgs = [x for x in img_names if x not in lbl_names]
@@ -662,16 +660,13 @@ def split_yolo_train_test_val(data_dir: Union[str, os.PathLike],
         np.ceil(len(img_names) * split[1])), int(np.ceil(len(img_names) * split[2]))
     lbl_idx = np.arange(0, len(img_names))
     np.random.shuffle(lbl_idx)
-    train_idx, test_idx, val_idx = lbl_idx[:train_cnt], lbl_idx[train_cnt:train_cnt + test_cnt], lbl_idx[
-                                                                                                 train_cnt + test_cnt:train_cnt + test_cnt + val_cnt]
+    train_idx, test_idx, val_idx = lbl_idx[:train_cnt], lbl_idx[train_cnt:train_cnt + test_cnt], lbl_idx[train_cnt + test_cnt:train_cnt + test_cnt + val_cnt]
     train_img_paths, test_img_paths, val_img_paths = img_paths[train_idx], img_paths[test_idx], img_paths[val_idx]
     train_lbl_paths, test_lbl_paths, val_lbl_paths = lbls_paths[train_idx], lbls_paths[test_idx], lbls_paths[val_idx]
-
     create_yolo_yaml(path=save_dir, train_path=train_img_dir, val_path=val_img_dir, test_path=test_img_dir, names=map_dict, save_path=yolo_yaml_path)
     copy_files_to_directory(file_paths=list(train_img_paths), dir=train_img_dir, verbose=verbose)
     copy_files_to_directory(file_paths=list(test_img_paths), dir=test_img_dir, verbose=verbose)
     copy_files_to_directory(file_paths=list(val_img_paths), dir=val_img_dir, verbose=verbose)
-
     copy_files_to_directory(file_paths=list(train_lbl_paths), dir=train_lbl_dir, verbose=verbose)
     copy_files_to_directory(file_paths=list(test_lbl_paths), dir=test_lbl_dir, verbose=verbose)
     copy_files_to_directory(file_paths=list(val_lbl_paths), dir=val_lbl_dir, verbose=verbose)
@@ -938,6 +933,10 @@ def labelme_to_yolo(labelme_dir: Union[str, os.PathLike],
     timer.stop_timer()
     if verbose: stdout_success(msg=f'Labelme to YOLO conversion complete. Data saved in directory {save_dir}.', elapsed_time=timer.elapsed_time_str)
 
+
+
+#labelme_to_yolo(labelme_dir=r'D:\netholabs\imgs\labels_labelme', save_dir=r'D:\netholabs\imgs\labels_yolo', obb=False, verbose=True)
+#split_yolo_train_test_val(data_dir=r'D:\netholabs\imgs\labels_yolo', save_dir=r"D:\netholabs\imgs\yolo_train_test_val", verbose=True)
 
 #labelme_to_img_dir(img_dir=r"C:\troubleshooting\coco_data\labels\train_images", labelme_dir=r'C:\troubleshooting\coco_data\labels\train_')
 

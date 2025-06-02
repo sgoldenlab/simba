@@ -117,7 +117,7 @@ class CueLightClfAnalyzer(ConfigReader):
 # test = CueLightClfAnalyzer(config_path=r"C:\troubleshooting\cue_light\t1\project_folder\project_config.ini",
 #                            pre_window=1,
 #                            post_window=1,
-#                            cue_light_names=['cl'],
+#                            cue_light_names=['MY_CUE_LIGHT'],
 #                            clf_names=['freeze'])
 # test.run()
 # test.save()

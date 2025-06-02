@@ -86,6 +86,7 @@ class LightDarkBoxAnalyzer():
             self.data_df = self.data_df.iloc[2:].reset_index(drop=True).apply(pd.to_numeric, errors='coerce').fillna(0)
             self.data_df.columns = cols
             check_valid_dataframe(df=self.data_df, valid_dtypes=Formats.NUMERIC_DTYPES.value, required_fields=self.bp_cols)
+            self.bp_p = self.data_df[self.bp_cols[2]]
             self.data_df[self.bp_cols[2]] = (self.data_df[self.bp_cols[2]] >= self.threshold).astype(int)
             light_bouts = detect_bouts(data_df=self.data_df, target_lst=[self.bp_cols[2]], fps=self.fps)
             self.data_df[self.bp_cols[2]] = 1 - self.data_df[self.bp_cols[2]]
