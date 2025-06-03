@@ -189,3 +189,12 @@ Data GPU methods
    :undoc-members:
    :show-inheritance:
 
+
+Light-dark box analysis
+----------------------------------------------
+
+.. automodule:: simba.data_processors.light_dark_box_analyzer
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

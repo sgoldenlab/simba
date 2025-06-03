@@ -78,7 +78,6 @@ class LightDarkBoxPlotter():
     .. seealso::
        For light/dark box data analysis, see :func:`simba.data_processors.light_dark_box_analyzer.LightDarkBoxAnalyzer`.
 
-
     .. video:: _static/img/LightDarkBoxPlotter.webm
        :width: 800
        :autoplay:
@@ -92,6 +91,10 @@ class LightDarkBoxPlotter():
     :param (float) threshold: Threshold value for light/dark classification (between 0.0 and 1.0).
     :param (float) minimum_episode_duration : Minimum duration (in seconds) for an episode to be considered valid.
     :param (int) core_cnt: Number of CPU cores to use for parallel processing. If -1, uses all available cores.
+
+    :references:
+       .. [1] Shonka, Sophia, and Michael J Hylin. “Younger Is Better But Only for Males: Social Behavioral Development Following Juvenile Traumatic Brain Injury to the Prefrontal Cortex,” n.d.
+
     """
 
     def __init__(self,

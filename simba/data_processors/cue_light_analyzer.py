@@ -112,6 +112,11 @@ class CueLightAnalyzer(ConfigReader):
     .. note::
        `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.
 
+    References
+    ----------
+    .. [1] López-Moraga, Alba, Laura Luyten, and Tom Beckers. “Generalization and Extinction of Platform-Mediated Avoidance in Male and Female Rats.”
+           Scientific Reports 15, no. 1 (March 21, 2025): 9730. https://doi.org/10.1038/s41598-025-94265-x.
+
     :example:
     >>> cue_light_analyzer = CueLightAnalyzer(config_path='MyProjectConfig', in_dir='project_folder/csv/outlier_corrected_movement_location', cue_light_names=['Cue_light'])
     >>> cue_light_analyzer.run()

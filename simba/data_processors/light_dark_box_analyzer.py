@@ -41,6 +41,9 @@ class LightDarkBoxAnalyzer():
     >>> analyzer = LightDarkBoxAnalyzer(data_dir='D:\light_dark_box\project_folder\csv\input_csv\test', save_path="C:\troubleshooting\two_black_animals_14bp\light_dark_ex\light_dark_data.csv", body_part='nose', fps=29)
     >>> analyzer.run()
     >>> analyzer.save()
+
+    :references:
+       .. [1] For discussion about the development, see - `GitHub issue 446 <https://github.com/sgoldenlab/simba/issues/446#issuecomment-2930692735>`_.
     """
 
 

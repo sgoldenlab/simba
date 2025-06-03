@@ -162,6 +162,14 @@ def inference_yolo(weights_path: Union[str, os.PathLike],
             stdout_success(f'YOLO results saved in {save_dir} directory', elapsed_time=timer.elapsed_time_str)
 
 
+
+
+fit_yolo(initial_weights=r"/mnt/d/yolo_weights/yolo11n-pose.pt",
+         model_yaml=r"/mnt/d/netholabs/imgs_vcat/batch_1/batch_1/yolo_annotations/map.yaml",
+         save_path=r"/mnt/d/netholabs/imgs_vcat/batch_1/batch_1/yolo_mdl", batch=32, epochs=100)
+
+
+
 # fit_yolo(initial_weights=r"/mnt/d/yolo_weights/yolov8n.pt",
 #          model_yaml=r"/mnt/d/netholabs/imgs/yolo_train_test_val/map.yaml", save_path=r"/mnt/d/netholabs/imgs/yolo_mdl", batch=32, epochs=100)
 
