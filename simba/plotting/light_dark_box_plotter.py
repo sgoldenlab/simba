@@ -1,20 +1,24 @@
-import os
-import numpy as np
-import pandas as pd
-import cv2
-from copy import copy
 import argparse
 import functools
 import multiprocessing
+import os
+from copy import copy
+from typing import Tuple, Union
+
+import cv2
+import numpy as np
+import pandas as pd
 
 from simba.data_processors.light_dark_box_analyzer import LightDarkBoxAnalyzer
-from simba.utils.checks import check_if_dir_exists, check_float, check_str, check_video_and_data_frm_count_align
-from simba.utils.read_write import find_files_of_filetypes_in_directory, get_video_meta_data, concatenate_videos_in_folder
-from simba.utils.enums import Options, Defaults, Formats, TextOptions
-from typing import Union, Tuple
 from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.checks import (check_float, check_if_dir_exists, check_str,
+                                check_video_and_data_frm_count_align)
+from simba.utils.enums import Defaults, Formats, Options, TextOptions
 from simba.utils.errors import NoDataError
-from simba.utils.printing import stdout_success, SimbaTimer
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    find_files_of_filetypes_in_directory,
+                                    get_video_meta_data)
 
 
 def _light_dark_box_visualizer(pose_data: pd.DataFrame,
