@@ -7,72 +7,110 @@ import numpy as np
 from simba.utils.checks import check_if_valid_img, check_instance
 from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 from simba.utils.warnings import InValidUserInputWarning
-
-
-def brightness_contrast_ui(data: Union[str, os.PathLike, np.ndarray]) -> Tuple[float, float]:
+class BrightnessContrastUI:
     """
-    Create a user interface using OpenCV to explore and change the brightness and contrast of a video.
+     Create a user interface using OpenCV to explore and change the brightness and contrast of a video.
 
-    .. note::
-       Adapted from `geeksforgeeks <https://www.geeksforgeeks.org/changing-the-contrast-and-brightness-of-an-image-using-python-opencv/>`_.
+     .. note::
+        Adapted from `geeksforgeeks <https://www.geeksforgeeks.org/changing-the-contrast-and-brightness-of-an-image-using-python-opencv/>`_.
 
-    .. image:: _static/img/brightness_contrast_ui.gif
-       :width: 700
-       :align: center
+     .. image:: _static/img/brightness_contrast_ui.gif
+        :width: 700
+        :align: center
 
-    :param Union[str, os.PathLike] video_path: Path to the video file or an image in numpy array format.
-    :return Tuple: The scaled brightness and scaled contrast values on scale -1 to +1 and 0-2 respectively, suitable for FFmpeg conversion
+     :param Union[str, os.PathLike] video_path: Path to the video file or an image in numpy array format.
+     :return Tuple: The scaled brightness and scaled contrast values on scale -1 to +1 and 0-2 respectively, suitable for FFmpeg conversion
 
-    :example I:
-    >>> brightness_contrast_ui(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/frames/output/ROI_features/2022-06-20_NOB_DOT_4.mp4')
+     :example I:
+     >>> brightness_contrast_ui(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/frames/output/ROI_features/2022-06-20_NOB_DOT_4.mp4')
 
-    :example II:
-    >>> img = cv2.imread('/Users/simon/Downloads/PXL_20240429_222923838.jpg')
-    >>> brightness_contrast_ui(data=img)
+     :example II:
+     >>> img = cv2.imread('/Users/simon/Downloads/PXL_20240429_222923838.jpg')
+     >>> brightness_contrast_ui(data=img)
 
-    """
-    def _get_trackbar_values(v):
-        brightness = cv2.getTrackbarPos('Brightness', 'Contrast / Brightness')
-        contrast = cv2.getTrackbarPos('Contrast', 'Contrast / Brightness')
-        brightness = int((brightness - 0) * (255 - (-255)) / (510 - 0) + (-255))
-        contrast = int((contrast - 0) * (127 - (-127)) / (254 - 0) + (-127))
-        if brightness != 0:
-            if brightness > 0:
-                shadow, max = brightness, 255
-            else:
-                shadow, max = 0, 255 + brightness
-            cal = cv2.addWeighted(original_img, (max - shadow) / 255, original_img, 0, shadow)
+     """
+
+    def __init__(self, data: Union[str, os.PathLike, np.ndarray]):
+        self.WINDOW_NAME = "CONTRAST / BRIGHTNESS: HIT ESC TO CONTINUE"
+        self.BRIGHTNESS = 'BRIGHTNESS'
+        self.CONTRAST = 'CONTRAST'
+        self.last_values = {self.BRIGHTNESS: 255, self.CONTRAST: 127}
+        self._trackbars_created = False
+
+        check_instance(source=self.__class__.__name__, instance=data, accepted_types=(np.ndarray, str))
+        if isinstance(data, str):
+            _ = get_video_meta_data(video_path=data)
+            self.original_img = read_frm_of_video(video_path=data, frame_index=0)
         else:
-            cal = original_img
-        if contrast != 0:
-            Alpha = float(131 * (contrast + 127)) / (127 * (131 - contrast))
-            Gamma = 127 * (1 - Alpha)
-            cal = cv2.addWeighted(cal, Alpha, cal, 0, Gamma)
-        img = np.copy(cal)
-        cv2.imshow('Contrast / Brightness', img)
+            check_if_valid_img(data=data, source=self.__class__.__name__)
+            self.original_img = data
 
-    check_instance(source=brightness_contrast_ui.__name__, instance=data, accepted_types=(np.ndarray, str))
-    if isinstance(data, str):
-        _ = get_video_meta_data(video_path=data)
-        original_img = read_frm_of_video(video_path=data, frame_index=0)
-    else:
-        check_if_valid_img(data=data, source=brightness_contrast_ui.__name__)
-        original_img = data
-    img = np.copy(original_img)
-    cv2.namedWindow('Contrast / Brightness', cv2.WINDOW_NORMAL)
-    cv2.imshow('Contrast / Brightness', img)
-    cv2.createTrackbar('Brightness', 'Contrast / Brightness', 255, 2 * 255, _get_trackbar_values)
-    cv2.createTrackbar('Contrast', 'Contrast / Brightness',  127, 2 * 127,  _get_trackbar_values)
-    while True:
-        k = cv2.waitKey(1) & 0xFF
-        if k == 27:
-            brightness = cv2.getTrackbarPos('Brightness', 'Contrast / Brightness')
-            contrast = cv2.getTrackbarPos('Contrast', 'Contrast / Brightness')
-            scaled_brightness = ((brightness - 0) / (510 - 0)) * (1 - -1) + -1
-            scaled_contrast= ((contrast - 0) / (254 - 0)) * (2 - 0) + 0
-            if scaled_contrast == 0.0 and scaled_brightness == 0.0:
-                InValidUserInputWarning(msg=f'Both the selected brightness and contrast are the same as in the input video. Select different values.')
-            else:
+    def _on_trackbar_change(self, _):
+        if not self._trackbars_created:
+            return
+
+        if cv2.getWindowProperty(self.WINDOW_NAME, cv2.WND_PROP_VISIBLE) < 1:
+            return
+
+        try:
+            brightness_raw = cv2.getTrackbarPos(self.BRIGHTNESS, self.WINDOW_NAME)
+            contrast_raw = cv2.getTrackbarPos(self.CONTRAST, self.WINDOW_NAME)
+        except cv2.error:
+            return
+
+        if (brightness_raw == self.last_values[self.BRIGHTNESS] and
+                contrast_raw == self.last_values[self.CONTRAST]):
+            return
+
+        self.last_values[self.BRIGHTNESS] = brightness_raw
+        self.last_values[self.CONTRAST] = contrast_raw
+
+        # Convert raw trackbar positions to ffmpeg-like brightness and contrast
+        brightness = (brightness_raw - 255) / 255.0  # Scale to [-1, 1]
+        contrast = contrast_raw / 127.0  # Scale to [0, 2]
+
+        # Apply eq filter-like brightness/contrast: new_img = (img - 128)*contrast + 128 + brightness*255
+        img_float = self.original_img.astype(np.float32)
+        buf = (img_float - 128) * contrast + 128 + brightness * 255
+        buf = np.clip(buf, 0, 255).astype(np.uint8)
+
+        cv2.imshow(self.WINDOW_NAME, buf)
+
+    def _create_window_and_trackbars(self):
+        cv2.namedWindow(self.WINDOW_NAME, cv2.WINDOW_NORMAL)
+        cv2.imshow(self.WINDOW_NAME, self.original_img)
+        cv2.createTrackbar(self.BRIGHTNESS, self.WINDOW_NAME, self.last_values[self.BRIGHTNESS], 510, self._on_trackbar_change)
+        cv2.createTrackbar(self.CONTRAST, self.WINDOW_NAME, self.last_values[self.CONTRAST], 254, self._on_trackbar_change)
+        self._trackbars_created = True
+
+    def run(self) -> Tuple[float, float]:
+        self._trackbars_created = False
+        self._create_window_and_trackbars()
+
+        while True:
+            if cv2.getWindowProperty(self.WINDOW_NAME, cv2.WND_PROP_VISIBLE) < 1:
                 cv2.destroyAllWindows()
-                return scaled_brightness, scaled_contrast
+                raise InValidUserInputWarning("Window was closed before selecting values.", source=self.__class__.__name__)
 
+            k = cv2.waitKey(10) & 0xFF
+            if k == 27:
+                try:
+                    brightness_raw = cv2.getTrackbarPos(self.BRIGHTNESS, self.WINDOW_NAME)
+                    contrast_raw = cv2.getTrackbarPos(self.CONTRAST, self.WINDOW_NAME)
+                except cv2.error:
+                    continue
+
+                cv2.destroyAllWindows()
+
+                scaled_brightness = (brightness_raw - 255) / 255.0 # [-1, 1]
+                scaled_contrast = contrast_raw / 127.0              # [0, 2]
+
+                if scaled_brightness == 0.0 and scaled_contrast == 1.0:
+                    InValidUserInputWarning("Both the selected brightness and contrast are default. Select different values.", source=self.__class__.__name__)
+                else:
+                    return scaled_brightness, scaled_contrast
+
+#ui = BrightnessContrastUI(data=r"/mnt/c/Users/sroni/OneDrive/Desktop/light_dark_box_eq_20250603150339.mp4")
+#ui.run()
+# ui = BrightnessContrastUI(data=r"D:\brightness_contrast\F1_2.mp4")
+# ui.run()

@@ -13,15 +13,13 @@ import pandas as pd
 import torch
 from ultralytics import YOLO
 
-from simba.third_party_label_appenders.converters import \
-    yolo_obb_data_to_bounding_box
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_dir_exists, check_int, check_str,
-                                check_valid_boolean, check_valid_lst,
-                                get_fn_ext)
+from simba.third_party_label_appenders.converters import yolo_obb_data_to_bounding_box
+from simba.utils.checks import (check_file_exist_and_readable, check_float, check_if_dir_exists, check_int, check_str, check_valid_boolean, check_valid_lst, get_fn_ext, check_valid_tuple)
 from simba.utils.data import df_smoother, savgol_smoother
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import find_core_cnt, get_video_meta_data
+from simba.utils.errors import SimBAGPUError
+from simba.data_processors.cuda.utils import _is_cuda_available
 
 
 def fit_yolo(initial_weights: Union[str, os.PathLike],
@@ -152,7 +150,8 @@ def inference_yolo(weights_path: Union[str, os.PathLike],
             results[video_name].update(smoothened)
     timer.stop_timer()
     if not save_dir:
-        stdout_success(f'YOLO results created', elapsed_time=timer.elapsed_time_str)
+        if verbose:
+            stdout_success(f'YOLO results created', elapsed_time=timer.elapsed_time_str)
         return results
     else:
         for k, v in results.items():
@@ -161,12 +160,150 @@ def inference_yolo(weights_path: Union[str, os.PathLike],
         if verbose:
             stdout_success(f'YOLO results saved in {save_dir} directory', elapsed_time=timer.elapsed_time_str)
 
+def inference_yolo_pose(weights_path: Union[str, os.PathLike],
+                        video_path: Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]],
+                        keypoint_names: Tuple[str, ...],
+                        verbose: Optional[bool] = False,
+                        save_dir: Optional[Union[str, os.PathLike]] = None,
+                        gpu: Optional[bool] = False,
+                        batch_size: Optional[int] = 4,
+                        torch_threads: int = 8,
+                        half_precision: bool = True,
+                        stream: bool = False,
+                        threshold: float = 0.7,
+                        max_tracks: Optional[int] = 2):
+
+    OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
+    if isinstance(video_path, list):
+        check_valid_lst(data=video_path, source=f'{inference_yolo.__name__} video_path', valid_dtypes=(str, np.str_,), min_len=1)
+    elif isinstance(video_path, str):
+        check_file_exist_and_readable(file_path=video_path)
+        video_path = [video_path]
+    for i in video_path:
+        _ = get_video_meta_data(video_path=i)
+    check_file_exist_and_readable(file_path=weights_path)
+    check_valid_boolean(value=[gpu, verbose], source=inference_yolo.__name__)
+    check_int(name=f'{inference_yolo.__name__} batch_size', value=batch_size, min_value=1)
+    check_float(name=f'{inference_yolo.__name__} threshold', value=threshold, min_value=10e-6, max_value=1.0)
+    check_valid_tuple(x=keypoint_names, source=f'{inference_yolo.__name__} keypoint_names', min_integer=1, valid_dtypes=(str,))
+    if max_tracks is not None:
+        check_int(name=f'{inference_yolo.__name__} max_tracks', value=max_tracks, min_value=1)
+    if save_dir is not None:
+        check_if_dir_exists(in_dir=save_dir, source=f'{inference_yolo.__name__} save_dir')
+    keypoint_col_names = [f'{i}_{s}'.upper() for i in keypoint_names for s in ['x', 'y', 'p']]
+    OUT_COLS.extend(keypoint_col_names)
+    torch.set_num_threads(torch_threads)
+    model = YOLO(weights_path, verbose=verbose)
+    results = {}
+    if gpu:
+        model.export(format='engine')
+        model.to('cuda')
+    class_dict = model.names
+    timer = SimbaTimer(start=True)
+    for path in video_path:
+        _, video_name, _ = get_fn_ext(filepath=path)
+        _ = get_video_meta_data(video_path=path)
+        video_out = []
+        video_predictions = model.predict(source=path, half=half_precision, batch=batch_size, stream=stream)
+        for frm_cnt, video_prediction in enumerate(video_predictions):
+            if video_prediction.obb is not None:
+                boxes = np.array(video_prediction.obb.data.cpu()).astype(np.float32)
+            else:
+                boxes = np.array(video_prediction.boxes.data.cpu()).astype(np.float32)
+            keypoints = np.array(video_prediction.keypoints.data.cpu()).astype(np.float32)
+            for c in list(class_dict.keys()):
+                cls_idx = np.argwhere(boxes[:, -1] == c).flatten()
+                cls_boxes, cls_keypoints = boxes[cls_idx], keypoints[cls_idx]
+                if cls_boxes.shape[0] == 0:
+                    bbox = np.array([frm_cnt, c, class_dict[c], -1, -1, -1, -1, -1, -1, -1, -1, -1])
+                    bbox = np.append(bbox, [-1] * len(keypoint_col_names))
+                    video_out.append(bbox)
+                else:
+                    cls_boxes = cls_boxes.reshape(-1, 6)[cls_boxes.reshape(-1, 6)[:, 4] > threshold]
+                    if cls_boxes.shape[0] == 0:
+                        bbox = np.array([frm_cnt, c, class_dict[c], -1, -1, -1, -1, -1, -1, -1, -1, -1])
+                        bbox = np.append(bbox, [-1] * len(keypoint_col_names))
+                        video_out.append(bbox)
+                    else:
+                        if max_tracks is not None:
+                            cls_idx = np.argsort(cls_boxes[:, 4])[::-1]
+                            cls_boxes = cls_boxes[cls_idx][:max_tracks, :]
+                            cls_keypoints = cls_keypoints[cls_idx][:max_tracks, :]
+                        for i in range(cls_boxes.shape[0]):
+                            box = np.array([cls_boxes[i][0], cls_boxes[i][1], cls_boxes[i][2], cls_boxes[i][1], cls_boxes[i][2], cls_boxes[i][3], cls_boxes[i][0], cls_boxes[i][3]]).astype(np.int32)
+                            bbox = np.array([frm_cnt, cls_boxes[i][-1], class_dict[cls_boxes[i][-1]], cls_boxes[i][-2]] + list(box))
+                            bbox = np.append(bbox, cls_keypoints[i].flatten())
+                            video_out.append(bbox)
+        results[video_name] = pd.DataFrame(video_out, columns=OUT_COLS)
+    timer.stop_timer()
+    if not save_dir:
+        if verbose:
+            stdout_success(f'YOLO results created', elapsed_time=timer.elapsed_time_str)
+        return results
+    else:
+        for k, v in results.items():
+            save_path = os.path.join(save_dir, f'{k}.csv')
+            v.to_csv(save_path)
+    if verbose:
+        stdout_success(f'YOLO results saved in {save_dir} directory', elapsed_time=timer.elapsed_time_str)
+
+def load_yolo_model(weights_path: Union[str, os.PathLike],
+                    verbose: bool = True,
+                    format: Optional[str] = None,
+                    device: Union[Literal['cpu'], int] = 0):
+
+    """
+    Load a YOLO model.
+
+    :param Union[str, os.PathLike] weights_path: Path to model weights (.pt, .engine, etc).
+    :param bool verbose: Whether to print loading info.
+    :param Optional[str] format: Export format, one of VALID_FORMATS or None to skip export.
+    :param Union[Literal['cpu'], int]  device: Device to load model on. 'cpu', int GPU index.
+
+    :example:
+    >>> load_yolo_model(weights_path=r"/mnt/c/troubleshooting/coco_data/mdl/train8/weights/best.pt", format="onnx", device=0)
+    """
+
+    VALID_FORMATS = ["onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite"]
+    check_file_exist_and_readable(file_path=weights_path)
+    check_valid_boolean(value=verbose, source=f'{load_yolo_model.__name__} verbose', raise_error=True)
+    if format is not None: check_str(name=f'{load_yolo_model.__name__} format', value=format.lower(), options=VALID_FORMATS, raise_error=True)
+    if isinstance(device, str):
+        check_str(name=f'{load_yolo_model.__name__} format', value=device.lower(), options=['cpu'], raise_error=True)
+    else:
+        check_int(name=f'{load_yolo_model.__name__} device', value=device, min_value=0, raise_error=True)
+        gpu_available, gpus = _is_cuda_available()
+        if not gpu_available:
+            raise SimBAGPUError(msg=f'No GPU detected but device {device} passed', source=load_yolo_model.__name__)
+        if device not in list(gpus.keys()):
+            raise SimBAGPUError(msg=f'Unaccepted GPU device {device} passed. Accepted: {list(gpus.keys())}', source=load_yolo_model.__name__)
+
+    model = YOLO(weights_path, verbose=verbose, device=device)
+    if format is not None: model.export(format=format)
+
+    return model
 
 
 
-fit_yolo(initial_weights=r"/mnt/d/yolo_weights/yolo11n-pose.pt",
-         model_yaml=r"/mnt/d/netholabs/imgs_vcat/batch_1/batch_1/yolo_annotations/map.yaml",
-         save_path=r"/mnt/d/netholabs/imgs_vcat/batch_1/batch_1/yolo_mdl", batch=32, epochs=100)
+
+
+
+
+#fit_yolo(initial_weights=r"/mnt/d/yolo_weights/yolo11n-pose.pt", model_yaml=r"/mnt/d/netholabs/yolo_data_1/map.yaml", save_path=r"/mnt/d/netholabs/yolo_mdls_1", batch=32, epochs=100)
+
+# video_path = "/mnt/d/netholabs/videos/2025-04-17_17-09-28.h264"
+# #video_path = "/mnt/d/netholabs/videos_/2025-05-27_20-59-48.mp4"
+#
+# inference_yolo_pose(weights_path=r"/mnt/d/netholabs/yolo_mdls_1/train/weights/best.pt",
+#                     video_path=video_path,
+#                     save_dir=r"/mnt/d/netholabs/yolo_test/results",
+#                     verbose=True,
+#                     gpu=True,
+#                     keypoint_names=('nose', 'ear_left', 'ear_right', 'lateral_left', 'center', 'lateral_right', 'tail_base'),
+#                     batch_size=64)
+
+
+
 
 
 

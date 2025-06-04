@@ -685,6 +685,8 @@ def get_model_names():
 def win_to_wsl_path(win_path: Union[str, os.PathLike]) -> str:
     """Helper to convert a windows path name, to a WSL path name"""
     result = subprocess.run(["wsl.exe", "wslpath", win_path], capture_output=True, text=True)
+    if result.returncode != 0:
+        raise RuntimeError(f"WSL path conversion failed: {result.stderr}")
     return result.stdout.strip()
 
 

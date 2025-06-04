@@ -95,6 +95,12 @@ class PathPlotterSingleCore(ConfigReader, PlottingMixin):
     >>> style_attr = {'width': 'As input', 'height': 'As input', 'line width': 5, 'font size': 5, 'font thickness': 2, 'circle size': 5, 'bg color': 'White', 'max lines': 100, 'animal_names': True}
     >>> animal_attr = {0: ['Ear_right_1', 'Red']}
     >>> path_plotter = PathPlotterSingleCore(config_path=r'MyConfigPath', frame_setting=False, video_setting=True, style_attr=style_attr, animal_attr=animal_attr, files_found=['project_folder/csv/machine_results/MyVideo.csv'], print_animal_names=True).run()
+
+    :references:
+       .. [1] Boorman, Damien C., Simran K. Rehal, Maryam Fazili, and Loren J. Martin. “Sex and Strain Differences in Analgesic and Hyperlocomotor Effects of Morphine and μ‐Opioid Receptor Expression in Mice.” Journal of Neuroscience Research 103, no. 4 (April 2025): e70039. https://doi.org/10.1002/jnr.70039.
+
+
+
     """
 
     def __init__(self,

@@ -49,8 +49,7 @@ from simba.utils.read_write import (
     get_video_meta_data, seconds_to_timestamp, str_2_bool,
     timestamp_to_seconds)
 from simba.utils.warnings import FrameRangeWarning
-from simba.video_processors.brightness_contrast_ui import \
-    brightness_contrast_ui
+from simba.video_processors.brightness_contrast_ui import BrightnessContrastUI
 from simba.video_processors.clahe_ui import interactive_clahe_ui
 from simba.video_processors.extract_seqframes import extract_seq_frames
 from simba.video_processors.multi_cropper import MultiCropper
@@ -1725,11 +1724,13 @@ class BrightnessContrastPopUp(PopUpMixin):
         video_dir_frm.grid(row=2, column=0, sticky="NW")
         self.selected_dir.grid(row=0, column=0, sticky="NW")
         run_dir_btn.grid(row=1, column=0, sticky="NW")
+        #self.main_frm.mainloop()
 
     def run_video(self):
         video_path = self.selected_video.file_path
         check_file_exist_and_readable(file_path=video_path)
-        self.brightness, self.contrast = brightness_contrast_ui(data=video_path)
+        ui = BrightnessContrastUI(data=video_path)
+        self.brightness, self.contrast = ui.run()
         self.video_paths = [video_path]
         self.apply()
 
@@ -1737,7 +1738,8 @@ class BrightnessContrastPopUp(PopUpMixin):
         video_dir = self.selected_dir.folder_path
         check_if_dir_exists(in_dir=video_dir, source=self.__class__.__name__)
         self.video_paths = find_files_of_filetypes_in_directory(directory=video_dir, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True)
-        self.brightness, self.contrast = brightness_contrast_ui(data=self.video_paths[0])
+        ui = BrightnessContrastUI(data=self.video_paths[0])
+        self.brightness, self.contrast = ui.run()
         self.apply()
 
     def apply(self):
@@ -1751,14 +1753,14 @@ class BrightnessContrastPopUp(PopUpMixin):
             if not gpu:
                 cmd = f'ffmpeg -i "{file_path}" -vf "eq=brightness={self.brightness}:contrast={self.contrast}" -loglevel error -stats "{out_path}" -y'
             else:
-                cmd = f'ffmpeg -i -hwaccel auto "{file_path}" -vf "eq=brightness={self.brightness}:contrast={self.contrast}" -c:v h264_nvenc -loglevel error -stats "{out_path}" -y'
+                cmd = f'ffmpeg -hwaccel auto -i "{file_path}" -vf "eq=brightness={self.brightness}:contrast={self.contrast}" -c:v h264_nvenc -loglevel error -stats "{out_path}" -y'
+                #cmd = f'ffmpeg -i -hwaccel auto "{file_path}" -vf "eq=brightness={self.brightness}:contrast={self.contrast}" -c:v h264_nvenc -loglevel error -stats "{out_path}" -y'
             subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
             video_timer.stop_timer()
             stdout_success(msg=f'Video {out_path} complete!', elapsed_time=video_timer.elapsed_time_str)
         timer.stop_timer()
         stdout_success(f'{len(self.video_paths)} video(s) converted.', elapsed_time=timer.elapsed_time_str)
 
-#BrightnessContrastPopUp()
 
 class InteractiveClahePopUp(PopUpMixin):
     """
@@ -3415,7 +3417,7 @@ class CrossfadeVideosPopUp(PopUpMixin):
                                               quality=quality)).start()
 
 #CrossfadeVideosPopUp()
-
+#_ = BrightnessContrastPopUp()
 # FlipVideosPopUp()
 
 # ClipMultipleVideosByFrameNumbers
