@@ -2,11 +2,12 @@ import base64
 import io
 import itertools
 import json
-import random
 import os
+import random
+from copy import copy, deepcopy
 from datetime import datetime
 from typing import Any, Dict, Iterable, Optional, Tuple, Union
-from copy import deepcopy, copy
+
 import pandas as pd
 from PIL import Image
 
@@ -38,7 +39,7 @@ from simba.utils.read_write import (copy_files_to_directory, create_directory,
                                     find_video_of_file, get_fn_ext,
                                     get_video_meta_data, read_df,
                                     read_frm_of_video, read_json,
-                                    read_roi_data, write_pickle, save_json)
+                                    read_roi_data, save_json, write_pickle)
 
 # def geometry_to_rle(geometry: Union[np.ndarray, Polygon], img_size: Tuple[int, int]):
 #     """
