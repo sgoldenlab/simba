@@ -31,14 +31,14 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_array, check_valid_boolean,
                                 check_valid_dict, check_valid_tuple)
 from simba.utils.enums import Formats, Options
-from simba.utils.errors import InvalidInputError, NoFilesFoundError
+from simba.utils.errors import InvalidInputError, NoFilesFoundError, FaultyTrainingSetError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (copy_files_to_directory, create_directory,
                                     find_files_of_filetypes_in_directory,
                                     find_video_of_file, get_fn_ext,
                                     get_video_meta_data, read_df,
                                     read_frm_of_video, read_json,
-                                    read_roi_data, write_pickle, save_json)
+                                    read_roi_data, write_pickle, save_json, read_img)
 
 # def geometry_to_rle(geometry: Union[np.ndarray, Polygon], img_size: Tuple[int, int]):
 #     """
@@ -1004,6 +1004,9 @@ def coco_keypoints_to_yolo(coco_path: Union[str, os.PathLike],
     """
     Convert COCO Keypoints version 1.0 data format into a YOLO keypoints training set.
 
+    .. note::
+       COCO keypoint files can be created using `https://www.cvat.ai/ <https://www.cvat.ai/>`__.
+
     :param Union[str, os.PathLike] coco_path: Path to coco keypoints 1.0 file in json format.
     :param Union[str, os.PathLike] img_dir: Directory holding img files representing the annotated entries in the ``coco_path``.
     :param Union[str, os.PathLike] save_dir: Directory where to save the yolo formatted data.
@@ -1119,10 +1122,12 @@ def coco_keypoints_to_yolo(coco_path: Union[str, os.PathLike],
 def merge_coco_keypoints_files(data_dir: Union[str, os.PathLike],
                                save_path: Union[str, os.PathLike]):
     """
-    Merges multiple COCO-format keypoints JSON files into a single file.
+    Merges multiple annotation COCO-format keypoint JSON files into a single file.
 
     .. note::
        Image and annotation entries are appended after adjusting their `id` fields to be unique.
+
+       These files can be created using `https://www.cvat.ai/ <https://www.cvat.ai/>`__.
 
     :param Union[str, os.PathLike] data_dir: Directory containing multiple COCO keypoints `.json` files to merge.
     :param Union[str, os.PathLike] save_path: File path to save the merged COCO keypoints JSON.

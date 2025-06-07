@@ -97,8 +97,7 @@ class LightDarkBoxPlotter():
     :param (int) core_cnt: Number of CPU cores to use for parallel processing. If -1, uses all available cores.
 
     :references:
-       .. [1] Shonka, Sophia, and Michael J Hylin. “Younger Is Better But Only for Males: Social Behavioral Development Following Juvenile Traumatic Brain Injury to the Prefrontal Cortex,” n.d.
-
+       .. [1] For discussion about the development, see - `GitHub issue 446 <https://github.com/sgoldenlab/simba/issues/446#issuecomment-2930692735>`_.
     """
 
     def __init__(self,

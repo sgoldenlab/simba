@@ -36,6 +36,11 @@ class BooleanConditionalCalculator(ConfigReader):
     >>> conditional_bool_rule_calculator = BooleanConditionalCalculator(rules=rules, config_path='/Users/simon/Desktop/envs/troubleshooting/two_animals_16bp_032023/project_folder/project_config.ini')
     >>> conditional_bool_rule_calculator.run()
     >>> conditional_bool_rule_calculator.save()
+
+
+    :references:
+       .. [1] Shonka, Sophia, and Michael J Hylin. “Younger Is Better But Only for Males: Social Behavioral Development Following Juvenile Traumatic Brain Injury to the Prefrontal Cortex,” n.d.
+
     """
 
     def __init__(self,

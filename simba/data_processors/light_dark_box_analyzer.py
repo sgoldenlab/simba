@@ -11,8 +11,7 @@ from simba.utils.checks import (check_float, check_if_dir_exists, check_str,
 from simba.utils.data import detect_bouts
 from simba.utils.enums import Formats
 from simba.utils.printing import SimbaTimer
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    seconds_to_timestamp, write_df)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, seconds_to_timestamp, write_df)
 
 pd.options.mode.chained_assignment = None
 
@@ -65,7 +64,6 @@ class LightDarkBoxAnalyzer():
         self.bp_cols = [f'{body_part}_x', f'{body_part}_y', f'{body_part}_p']
         self.save_path, self.body_part, self.fps, self.threshold, self.min_dur = save_path, body_part, fps, threshold, minimum_episode_duration
         self.file_cnt = len(list(self.data_paths.keys()))
-
 
     def _remove_outliers(self, df: pd.DataFrame):
         outlier_sequences = [g for g in (list(map(lambda x: x[1], grp)) for _, grp in groupby(enumerate(df.index[df['DURATION (S)'] < self.min_dur]), lambda x: x[0] - x[1]))]
