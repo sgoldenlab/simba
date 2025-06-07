@@ -1,21 +1,26 @@
+import functools
+import multiprocessing
 import os
-from typing import Optional, Union, Tuple
+from typing import Optional, Tuple, Union
 
+import cv2
 import numpy as np
 import pandas as pd
-import multiprocessing
-import functools
-import cv2
 
 from simba.mixins.geometry_mixin import GeometryMixin
-from simba.plotting.geometry_plotter import GeometryPlotter
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import (check_file_exist_and_readable, check_float, check_if_dir_exists, check_int, check_valid_boolean, check_valid_dataframe, check_valid_tuple)
-from simba.utils.errors import FrameRangeError, CountError
-from simba.utils.read_write import (find_core_cnt, get_fn_ext, get_video_meta_data, read_frm_of_video, create_directory, concatenate_videos_in_folder)
+from simba.plotting.geometry_plotter import GeometryPlotter
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists, check_int,
+                                check_valid_boolean, check_valid_dataframe,
+                                check_valid_tuple)
 from simba.utils.data import create_color_palette
 from simba.utils.enums import Options
-
+from simba.utils.errors import CountError, FrameRangeError
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    create_directory, find_core_cnt,
+                                    get_fn_ext, get_video_meta_data,
+                                    read_frm_of_video)
 
 FRAME = 'FRAME'
 CLASS_ID = 'CLASS_ID'

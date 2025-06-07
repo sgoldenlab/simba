@@ -1,13 +1,19 @@
 import os
-import pandas as pd
-from typing import Dict, List, Optional, Tuple, Union, Literal
-from simba.utils.checks import (check_file_exist_and_readable, check_float, check_if_dir_exists, check_int, check_str, check_valid_boolean, check_valid_lst, get_fn_ext, check_valid_tuple, check_valid_array)
+from typing import Dict, List, Literal, Optional, Tuple, Union
+
 import numpy as np
+import pandas as pd
 import torch
-from simba.utils.read_write import get_video_meta_data
+
+from simba.bounding_box_tools.yolo.utils import (filter_yolo_keypoint_data,
+                                                 load_yolo_model)
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists, check_int, check_str,
+                                check_valid_array, check_valid_boolean,
+                                check_valid_lst, check_valid_tuple, get_fn_ext)
 from simba.utils.errors import CountError
-from simba.bounding_box_tools.yolo.utils import load_yolo_model, filter_yolo_keypoint_data
 from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_video_meta_data
 
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4', 'TRACK']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']

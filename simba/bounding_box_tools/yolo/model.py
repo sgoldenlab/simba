@@ -13,14 +13,19 @@ import pandas as pd
 import torch
 from ultralytics import YOLO
 
-from simba.third_party_label_appenders.converters import yolo_obb_data_to_bounding_box
-from simba.utils.checks import (check_file_exist_and_readable, check_float, check_if_dir_exists, check_int, check_str, check_valid_boolean, check_valid_lst, get_fn_ext, check_valid_tuple, check_valid_array)
+from simba.data_processors.cuda.utils import _is_cuda_available
+from simba.third_party_label_appenders.converters import \
+    yolo_obb_data_to_bounding_box
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists, check_int, check_str,
+                                check_valid_array, check_valid_boolean,
+                                check_valid_lst, check_valid_tuple, get_fn_ext)
 from simba.utils.data import df_smoother, savgol_smoother
+from simba.utils.enums import Formats
+from simba.utils.errors import InvalidInputError, SimBAGPUError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import find_core_cnt, get_video_meta_data
-from simba.utils.errors import SimBAGPUError, InvalidInputError
-from simba.data_processors.cuda.utils import _is_cuda_available
-from simba.utils.enums import Formats
+
 
 def inference_yolo_pose_tracks(weights_path: Union[str, os.PathLike],
                                video_path: Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]],
