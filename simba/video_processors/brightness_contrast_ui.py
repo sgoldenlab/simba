@@ -7,6 +7,8 @@ import numpy as np
 from simba.utils.checks import check_if_valid_img, check_instance
 from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 from simba.utils.warnings import InValidUserInputWarning
+
+
 class BrightnessContrastUI:
     """
      Create a user interface using OpenCV to explore and change the brightness and contrast of a video.
