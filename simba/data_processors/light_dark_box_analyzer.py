@@ -11,7 +11,8 @@ from simba.utils.checks import (check_float, check_if_dir_exists, check_str,
 from simba.utils.data import detect_bouts
 from simba.utils.enums import Formats
 from simba.utils.printing import SimbaTimer
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, seconds_to_timestamp, write_df)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    seconds_to_timestamp, write_df)
 
 pd.options.mode.chained_assignment = None
 
