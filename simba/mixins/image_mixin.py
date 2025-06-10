@@ -305,9 +305,7 @@ class ImageMixin(object):
             x, y, w, h = cv2.boundingRect(shape)
             roi_img = img[y : y + h, x : x + w].copy()
             mask = np.zeros_like(roi_img, np.uint8)
-            cv2.drawContours(
-                mask, [shape - (x, y)], -1, (255, 255, 255), -1, cv2.LINE_AA
-            )
+            cv2.drawContours(mask, [shape - (x, y)], -1, (255, 255, 255), -1, cv2.LINE_AA)
             result.append(cv2.bitwise_and(roi_img, mask))
         return result
 
@@ -1202,23 +1200,32 @@ class ImageMixin(object):
         return results
 
     @staticmethod
-    def _slice_shapes_in_imgs_array_helper(data: Tuple[np.ndarray, np.ndarray]) -> List[np.ndarray]:
+    def _slice_shapes_in_imgs_array_helper(data: Tuple[int, int, np.ndarray, Polygon],
+                                           verbose: bool,
+                                           bg_color: Tuple[int, int, int]) -> Dict[int, np.ndarray]:
         """
         Private multiprocess helper called from ``simba.mixins.image_mixin.ImageMixins.slice_shapes_in_imgs()`` to slice shapes from
         an array of images.
         """
-        img, in_shapes = data[0], data[1]
-        shapes, results = [], []
-        for shape in in_shapes:
-            shape = np.array(shape.exterior.coords).astype(np.int64)
-            shape[shape < 0] = 0
-            shapes.append(shape)
-        for shape_cnt, shape in enumerate(shapes):
-            x, y, w, h = cv2.boundingRect(shape)
-            roi_img = img[y : y + h, x : x + w].copy()
-            mask = np.zeros_like(roi_img, np.uint8)
-            cv2.drawContours(mask, [shape - (x, y)], -1, (255, 255, 255), -1, cv2.LINE_AA)
-            results.append(cv2.bitwise_and(roi_img, mask))
+        results = {}
+        for obs in data:
+            batch_id, img_idx, img, shape = obs
+            if verbose:
+                print(f"Processing frame {img_idx}... (batch: {batch_id})")
+            if shape.is_empty or not shape.is_valid:
+                results[img_idx] = None
+            else:
+                roi = np.array(shape.exterior.coords).astype(np.int64)
+                roi[roi < 0] = 0
+                x, y, w, h = cv2.boundingRect(roi)
+                roi_img = img[y : y + h, x : x + w].copy()
+                mask = np.zeros_like(roi_img, np.uint8)
+                if any(dim == 0 for dim in mask.shape):
+                    results[img_idx] = None
+                else:
+                    cv2.drawContours(mask, [roi - (x, y)], -1, bg_color, -1, cv2.LINE_AA)
+                    result = cv2.bitwise_and(roi_img, mask)
+                    results[img_idx] = result
         return results
 
     @staticmethod
@@ -1243,10 +1250,26 @@ class ImageMixin(object):
 
         check_instance(source=ImageMixin.pad_img_stack.__name__, instance=image_dict,accepted_types=(dict,))
         check_int(name=f"{ImageMixin.pad_img_stack.__name__} pad_value", value=pad_value, max_value=255, min_value=0)
-        max_height = max(image.shape[0] for image in image_dict.values())
-        max_width = max(image.shape[1] for image in image_dict.values())
+        max_height = max(image.shape[0] for image in image_dict.values() if image is not None)
+        max_width = max(image.shape[1] for image in image_dict.values() if image is not None)
+        valid_images = [img for img in image_dict.values() if img is not None]
+        if not valid_images:
+            raise InvalidInputError(msg="No valid images found in `image_dict`.")
+        first_valid = valid_images[0]
+        has_channels = first_valid.ndim == 3
+        for img in valid_images:
+            if has_channels != (img.ndim == 3):
+                raise ValueError("Inconsistent image dimensions: mix of grayscale and color images.")
+        channels = first_valid.shape[2] if has_channels else None
         padded_images = {}
         for key, image in image_dict.items():
+            if image is None:
+                if has_channels:
+                    empty_image = np.full((max_height, max_width, channels), pad_value, dtype=np.uint8)
+                else:
+                    empty_image = np.full((max_height, max_width), pad_value, dtype=np.uint8)
+                padded_images[key] = empty_image
+                continue
             check_if_valid_img(data=image, source=ImageMixin.pad_img_stack.__name__, raise_error=True)
             pad_height = max_height - image.shape[0]
             pad_width = max_width - image.shape[1]
@@ -1285,7 +1308,7 @@ class ImageMixin(object):
             img_sizes.add(v.shape)
         if len(list(img_sizes)) > 1:
             imgs = ImageMixin.pad_img_stack(imgs)
-        imgs = np.stack(imgs.values())
+        imgs = np.stack(list(imgs.values()))
         fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         writer = cv2.VideoWriter(save_path, fourcc, fps, (imgs[0].shape[1], imgs[0].shape[0]))
         for i in range(imgs.shape[0]):
@@ -1297,27 +1320,34 @@ class ImageMixin(object):
         stdout_success(msg=f"Video {save_path} complete", elapsed_time=timer.elapsed_time_str)
 
     @staticmethod
-    def _slice_shapes_in_video_file_helper(data: np.ndarray,
+    def _slice_shapes_in_video_file_helper(data: List[Tuple[int, Polygon]],
                                            video_path: Union[str, os.PathLike],
                                            bg_color: Tuple[int, int, int],
                                            verbose: bool):
 
         cap = cv2.VideoCapture(video_path)
-        start_frm, current_frm, end_frm = data[0][0], data[0][0], data[-1][0]
+        batch_id, start_frm, current_frm, end_frm = data[0][0], data[0][1], data[0][1], data[-1][1]
         cap.set(1, start_frm)
         results = {}
         idx_cnt = 0
         while current_frm <= end_frm:
             if verbose:
-                print(f"Processing frame {current_frm}...")
-            img = cap.read(current_frm)[1].astype(np.uint8)
-            shape = np.array(data[idx_cnt][1].exterior.coords).astype(np.int64)
-            shape[shape < 0] = 0
-            x, y, w, h = cv2.boundingRect(shape)
-            roi_img = img[y : y + h, x : x + w].copy()
-            mask = np.zeros_like(roi_img, np.uint8)
-            cv2.drawContours(mask, [shape - (x, y)], -1, (255, 255, 255), -1, cv2.LINE_AA)
-            results[current_frm] = cv2.bitwise_and(roi_img, mask).astype(np.uint8)
+                print(f"Processing frame {current_frm}... (batch: {batch_id})")
+            img = read_frm_of_video(video_path=cap, frame_index=current_frm)
+            shape = data[idx_cnt][2]
+            if shape.is_empty or not shape.is_valid:
+                results[current_frm] = None
+            else:
+                shape = np.array(shape.exterior.coords).astype(np.int64)
+                shape[shape < 0] = 0
+                x, y, w, h = cv2.boundingRect(shape)
+                roi_img = img[y : y + h, x : x + w].copy()
+                mask = np.zeros_like(roi_img, np.uint8)
+                if any(dim == 0 for dim in mask.shape):
+                    results[current_frm] = None
+                else:
+                    cv2.drawContours(mask, [shape - (x, y)], -1, bg_color, -1, cv2.LINE_AA)
+                    results[current_frm] = cv2.bitwise_and(roi_img, mask).astype(np.uint8)
             current_frm += 1
             idx_cnt += 1
         return results
@@ -1393,19 +1423,22 @@ class ImageMixin(object):
             video_meta_data = get_video_meta_data(video_path=imgs)
             if shapes.shape[0] != video_meta_data["frame_count"]:
                 raise ArrayError( msg=f'The image array ({video_meta_data["frame_count"]}) and shapes array ({shapes.shape[0]}) have unequal length.', source=ImageMixin().slice_shapes_in_imgs.__name__)
-
         if isinstance(imgs, np.ndarray):
-            result_lst = []
+            results = []
+            shapes = [(img_idx, img, shape) for img_idx, (img, shape) in enumerate(zip(imgs, shapes))]
+            k, m = divmod(len(shapes), core_cnt)
+            shapes = [[(i, *tup) for tup in shapes[i * k + min(i, m):(i + 1) * k + min(i + 1, m)]] for i in range(core_cnt)]
             with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-                for cnt, result in enumerate(
-                    pool.imap(self._slice_shapes_in_imgs_array_helper, zip(imgs, shapes), chunksize=1)):
-                    result_lst.append(result)
-            results = {}
-            for cnt, i in enumerate(result_lst):
-                results[cnt] = i[0]
+                constants = functools.partial(self._slice_shapes_in_imgs_array_helper, bg_color=bg_color, verbose=verbose)
+                for cnt, result in enumerate(pool.imap(constants, shapes, chunksize=1)):
+                    results.append(result)
+            results = dict(ChainMap(*results))
+
         else:
             results = []
-            shapes = np.array_split(np.column_stack((np.arange(len(shapes)), shapes)), core_cnt)
+            shapes = [(img_idx, shape) for img_idx, shape in enumerate(shapes)]
+            k, m = divmod(len(shapes), core_cnt)
+            shapes = [[(i, *tup) for tup in shapes[i * k + min(i, m):(i + 1) * k + min(i + 1, m)]] for i in range(core_cnt)]
             with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
                 constants = functools.partial( self._slice_shapes_in_video_file_helper, video_path=imgs, bg_color=bg_color, verbose=verbose)
                 for cnt, result in enumerate(pool.imap(constants, shapes, chunksize=1)):
@@ -1413,6 +1446,7 @@ class ImageMixin(object):
                 results = dict(ChainMap(*results))
         pool.join()
         pool.terminate()
+        results = dict(sorted(results.items(), key=lambda item: int(item[0])))
         timer.stop_timer()
         stdout_success(msg="Geometry image slicing complete.", elapsed_time=timer.elapsed_time_str, source=self.__class__.__name__)
         return results
@@ -2070,6 +2104,19 @@ class ImageMixin(object):
             denoised_img = cv2.fastNlMeansDenoisingColoredMulti(imgs, imgToDenoiseIndex=img_to_denoise_idx, temporalWindowSize=temporal_window_size, h=sigma)
 
         return denoised_img
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #x = ImageMixin.get_blob_locations(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled_bg_subtracted.mp4", gpu=True)
 # imgs = ImageMixin().read_all_img_in_dir(dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/examples')

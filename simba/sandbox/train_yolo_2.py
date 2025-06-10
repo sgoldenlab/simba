@@ -3,7 +3,7 @@ import os
 import numpy as np
 
 from simba.bounding_box_tools.yolo.model import fit_yolo, inference_yolo
-from simba.bounding_box_tools.yolo.visualize import YOLOVisualizer
+from simba.bounding_box_tools.yolo.yolo_visualize import YOLOVisualizer
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.third_party_label_appenders.converters import (
     geometries_to_yolo, simba_rois_to_yolo, split_yolo_train_test_val)

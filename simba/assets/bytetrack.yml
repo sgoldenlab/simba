@@ -1,0 +1,9 @@
+tracker_type: bytetrack
+track_thresh: 0.4         # Lowered to catch more detections
+match_thresh: 0.8
+track_high_thresh: 0.3    # Slightly more permissive
+track_low_thresh: 0.1
+track_buffer: 30
+mot20: False              # Disable stricter matching
+fuse_score: True
+new_track_thresh: 0.2     # Slightly lower to improve new ID creation

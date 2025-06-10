@@ -7,14 +7,13 @@ import multiprocessing
 import functools
 import cv2
 
-from simba.mixins.geometry_mixin import GeometryMixin
-from simba.plotting.geometry_plotter import GeometryPlotter
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float, check_if_dir_exists, check_int, check_valid_boolean, check_valid_dataframe, check_valid_tuple)
 from simba.utils.errors import FrameRangeError, CountError
 from simba.utils.read_write import (find_core_cnt, get_fn_ext, get_video_meta_data, read_frm_of_video, create_directory, concatenate_videos_in_folder)
 from simba.utils.data import create_color_palette
-from simba.utils.enums import Options
+from simba.utils.enums import Options, Defaults
+from simba.utils.printing import SimbaTimer, stdout_success
 
 
 FRAME = 'FRAME'
@@ -60,10 +59,31 @@ def _yolo_keypoint_visualizer(frm_ids: np.ndarray,
         current_frm += 1
     cap.release()
     video_writer.release()
+    return batch_id
 
 
 class YOLOPoseVisualizer():
     """
+    Visualizes YOLO-based keypoint pose estimation data on video frames and creates an annotated output video.
+
+    This class takes keypoint data (CSV) and overlays it onto the corresponding video using color-coded keypoints
+    and optional filtering. The result is saved as a new annotated video, and supports multicore parallel rendering
+    for efficient processing of long videos.
+
+    .. seelalso::
+       To create YOLO pose data, see `:func:~simba.bounding_box_tools.yolo.yolo_pose_inference.YOLOPoseInference`
+
+    :param Union[str, os.PathLike] data_path: Path to the CSV file containing keypoint data (output from YOLO pose inference).
+    :param Union[str, os.PathLike] video_path: Path to the original input video to overlay keypoints on.
+    :param Union[str, os.PathLike] save_dir: Directory to save the resulting annotated video.
+    :param Optional[Union[str, Tuple[str, ...]]] palettes: Name of the color palette(s) to use for drawing keypoints. Can be a string or a tuple of strings (e.g., 'Set1', ('Set1', 'Dark2')). Defaults to 'Set1'.
+    :param Optional[int] core_cnt: Number of CPU cores to use for parallel rendering. Defaults to -1 (use all available cores).
+    :param float threshold: Confidence threshold for visualizing keypoints. Only keypoints with confidence >= threshold are drawn. Defaults to 0.0.
+    :param Optional[int] thickness: Thickness of lines connecting keypoints. If None, determined automatically. Defaults to None.
+    :param Optional[int] circle_size: Radius of the circles drawn for keypoints. If None, determined automatically based on frame size. Defaults to None.
+    :param Optional[bool] verbose: If True, enables logging and progress messages. Defaults to False.
+
+
     :example:
     >>> video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
     >>> data_path = "/mnt/c/troubleshooting/mitra/yolo_pose/501_MA142_Gi_CNO_0521.csv"
@@ -127,11 +147,12 @@ class YOLOPoseVisualizer():
 
 
     def run(self):
+        video_timer = SimbaTimer(start=True)
         if self.video_meta_data['frame_count'] != self.df_frm_cnt:
             raise FrameRangeError(msg=f'The bounding boxes contain data for {self.df_frm_cnt} frames, while the video is {self.video_meta_data["frame_count"]} frames', source=self.__class__.__name__)
         frm_batches = np.array_split(np.array(list(range(0, self.df_frm_cnt))), self.core_cnt)
         frm_batches = [(i, j) for i, j in enumerate(frm_batches)]
-        with multiprocessing.Pool(self.core_cnt, maxtasksperchild=1000) as pool:
+        with multiprocessing.Pool(self.core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
             constants = functools.partial(_yolo_keypoint_visualizer,
                                           data=self.data_df,
                                           threshold=self.threshold,
@@ -141,11 +162,13 @@ class YOLOPoseVisualizer():
                                           thickness=self.thickness,
                                           palettes=self.palettes)
             for cnt, result in enumerate(pool.imap(constants, frm_batches, chunksize=1)):
-                pass
-
-        concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.save_path, gpu=False)
+                print(f'Video batch {result+1}/{self.core_cnt} complete...')
         pool.terminate()
         pool.join()
+        video_timer.stop_timer()
+        concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.save_path, gpu=True)
+
+        stdout_success(msg=f'YOLO pose video saved at {self.save_path}', source=self.__class__.__name__, elapsed_time=video_timer.elapsed_time_str)
 
 
 # if __name__ == "__main__":
@@ -156,12 +179,14 @@ class YOLOPoseVisualizer():
 #
 #     kp_vis.run()
 
-video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
-data_path = "/mnt/c/troubleshooting/mitra/yolo_pose/501_MA142_Gi_CNO_0521.csv"
-kp_vis = YOLOPoseVisualizer(data_path=data_path,
-                            video_path=video_path,
-                            save_dir='/mnt/c/troubleshooting/mitra/yolo_pose/',
-                            core_cnt=18)
-
-
-kp_vis.run()
+#video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
+# video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-50-23.mp4"
+# data_path = r"/mnt/d/netholabs/yolo_videos_out/2025-05-28_19-50-23.csv"
+# save_dir = r'/mnt/d/netholabs/yolo_videos_out'
+# kp_vis = YOLOPoseVisualizer(data_path=data_path,
+#                             video_path=video_path,
+#                             save_dir=save_dir,
+#                             core_cnt=18)
+#
+#
+# kp_vis.run()

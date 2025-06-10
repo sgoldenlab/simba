@@ -798,6 +798,11 @@ def slice_imgs(video_path: Union[str, os.PathLike],
        :class: simba-table
        :header-rows: 1
 
+
+    .. seealso::
+       For multicore CPU method, see :func:`simba.mixins.image_mixin.ImageMixin.slice_shapes_in_img`
+       For single core method, see :func:`simba.mixins.image_mixin.ImageMixin.slice_shapes_in_imgs`
+
     :param Union[str, os.PathLike] video_path: Path to the video file.
     :param np.ndarray shapes: A NumPy array of shape `(n, m, 2)` where `n` is the number of frames. Each frame contains 4 (x, y) or one points representing the bounding shapes (e.g., rectangles edges) or centroid and radius (if circles) to slice from each frame.
     :param Optional[int] batch_size: Optional; default is 500. The number of frames to process in each batch for memory efficiency. Larger batches are faster but use more memory.
