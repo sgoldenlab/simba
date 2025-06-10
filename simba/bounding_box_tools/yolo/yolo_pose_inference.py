@@ -1,17 +1,24 @@
+import argparse
 import os
 import sys
-import argparse
+
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
-from typing import List, Optional, Tuple, Union
-from typing import Literal
+from typing import List, Literal, Optional, Tuple, Union
+
 import numpy as np
 import pandas as pd
 import torch
-from simba.utils.checks import (check_file_exist_and_readable, check_float, check_if_dir_exists, check_int, check_valid_boolean, check_valid_lst, get_fn_ext, check_valid_tuple, check_str, check_valid_array)
+
+from simba.bounding_box_tools.yolo.utils import (_get_undetected_obs,
+                                                 filter_yolo_keypoint_data,
+                                                 load_yolo_model, yolo_predict)
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists, check_int, check_str,
+                                check_valid_array, check_valid_boolean,
+                                check_valid_lst, check_valid_tuple, get_fn_ext)
+from simba.utils.errors import CountError, InvalidFileTypeError
 from simba.utils.printing import SimbaTimer
 from simba.utils.read_write import get_video_meta_data
-from simba.bounding_box_tools.yolo.utils import filter_yolo_keypoint_data, load_yolo_model, yolo_predict, _get_undetected_obs
-from simba.utils.errors import CountError, InvalidFileTypeError
 
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
