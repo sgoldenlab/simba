@@ -14,8 +14,11 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.statistics_mixin import Statistics
 from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_if_filepath_list_is_empty)
-from simba.utils.read_write import (SimbaTimer, get_fn_ext, read_df,stdout_success, write_df)
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_if_filepath_list_is_empty)
+from simba.utils.read_write import (SimbaTimer, get_fn_ext, read_df,
+                                    stdout_success, write_df)
 
 NOSE = 'nose'
 LEFT_SIDE = 'left_side'

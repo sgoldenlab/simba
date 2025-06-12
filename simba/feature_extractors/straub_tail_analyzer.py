@@ -19,13 +19,17 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.image_mixin import ImageMixin
 from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_float, check_int, check_valid_array, check_valid_dataframe)
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log, check_float, check_int,
+    check_valid_array, check_valid_dataframe)
 from simba.utils.enums import Defaults, Formats
 from simba.utils.printing import SimbaTimer
 from simba.utils.read_write import (find_core_cnt,
                                     find_files_of_filetypes_in_directory,
-                                    find_video_of_file, get_fn_ext, read_df,read_video_info,
-                                    write_df)
+                                    find_video_of_file, get_fn_ext, read_df,
+                                    read_video_info, write_df)
+
+
 class StraubTailAnalyzer(ConfigReader):
     """
     Class using background removed - egocentrically rotated - videos, to featurize tail behavior for downstream straub tail classification.

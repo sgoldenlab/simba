@@ -66,13 +66,11 @@ from simba.utils.warnings import (CropWarning, FFMpegCodecWarning,
                                   FileExistWarning, FrameRangeWarning,
                                   GPUToolsWarning, InValidUserInputWarning,
                                   SameInputAndOutputWarning)
+from simba.video_processors.async_frame_reader import AsyncVideoFrameReader
 from simba.video_processors.extract_frames import video_to_frames
 from simba.video_processors.roi_selector import ROISelector
 from simba.video_processors.roi_selector_circle import ROISelectorCircle
 from simba.video_processors.roi_selector_polygon import ROISelectorPolygon
-from simba.video_processors.async_frame_reader import AsyncVideoFrameReader
-
-
 
 MAX_FRM_SIZE = 1080, 650
 

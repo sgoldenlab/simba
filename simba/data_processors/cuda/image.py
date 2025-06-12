@@ -5,6 +5,7 @@ __email__ = "sronilsson@gmail.com"
 import math
 import os
 from typing import Optional, Tuple, Union
+
 try:
     from typing import Literal
 except:
@@ -24,8 +25,8 @@ import numpy as np
 from numba import cuda
 from numba.core.errors import NumbaPerformanceWarning
 
-from simba.data_processors.cuda.utils import (_cuda_luminance_pixel_to_grey, _cuda_mse, _is_cuda_available)
-from simba.video_processors.async_frame_reader import AsyncVideoFrameReader, get_async_frame_batch
+from simba.data_processors.cuda.utils import (_cuda_luminance_pixel_to_grey,
+                                              _cuda_mse, _is_cuda_available)
 from simba.mixins.image_mixin import ImageMixin
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
@@ -44,9 +45,12 @@ from simba.utils.errors import (FFMPEGCodecGPUError, FrameRangeError,
                                 InvalidInputError, SimBAGPUError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
-    check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
+    check_if_hhmmss_timestamp_is_valid_part_of_video,
+    concatenate_videos_in_folder, create_directory, get_fn_ext,
     get_memory_usage_array, get_video_meta_data, read_df,
-    read_img_batch_from_video_gpu, create_directory, concatenate_videos_in_folder, read_img_batch_from_video)
+    read_img_batch_from_video, read_img_batch_from_video_gpu)
+from simba.video_processors.async_frame_reader import (AsyncVideoFrameReader,
+                                                       get_async_frame_batch)
 
 warnings.simplefilter('ignore', category=NumbaPerformanceWarning)
 
