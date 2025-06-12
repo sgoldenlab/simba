@@ -64,3 +64,10 @@ Egocentrically rotate videos
 .. automodule:: simba.video_processors.egocentric_video_rotator
    :members:
    :show-inheritance:
+
+Asynchronous frame reader
+------------------------------------------------
+
+.. automodule:: simba.video_processors.async_frame_reader
+   :members:
+   :show-inheritance:

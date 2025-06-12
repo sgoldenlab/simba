@@ -5,7 +5,6 @@ __email__ = "sronilsson@gmail.com"
 import math
 import os
 from typing import Optional, Tuple, Union
-
 try:
     from typing import Literal
 except:
@@ -25,8 +24,8 @@ import numpy as np
 from numba import cuda
 from numba.core.errors import NumbaPerformanceWarning
 
-from simba.data_processors.cuda.utils import (_cuda_luminance_pixel_to_grey,
-                                              _cuda_mse, _is_cuda_available)
+from simba.data_processors.cuda.utils import (_cuda_luminance_pixel_to_grey, _cuda_mse, _is_cuda_available)
+from simba.video_processors.async_frame_reader import AsyncVideoFrameReader, get_async_frame_batch
 from simba.mixins.image_mixin import ImageMixin
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
@@ -47,7 +46,7 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
     get_memory_usage_array, get_video_meta_data, read_df,
-    read_img_batch_from_video_gpu)
+    read_img_batch_from_video_gpu, create_directory, concatenate_videos_in_folder, read_img_batch_from_video)
 
 warnings.simplefilter('ignore', category=NumbaPerformanceWarning)
 
@@ -714,11 +713,7 @@ def _cuda_is_inside_polygon(x, y, polygon_vertices):
     p1x, p1y = polygon_vertices[0]
     for j in range(n + 1):
         p2x, p2y = polygon_vertices[j % n]
-        if (
-                (y > min(p1y, p2y))
-                and (y <= max(p1y, p2y))
-                and (x <= max(p1x, p2x))
-        ):
+        if ((y > min(p1y, p2y)) and (y <= max(p1y, p2y)) and (x <= max(p1x, p2x))):
             if p1y != p2y:
                 xints = (y - p1y) * (p2x - p1x) / (p2y - p1y) + p1x
             if p1x == p2x or x <= xints:
@@ -779,8 +774,9 @@ def _cuda_create_circle_masks(shapes, imgs):
 
 def slice_imgs(video_path: Union[str, os.PathLike],
                shapes: np.ndarray,
-               batch_size: Optional[int] = 1000,
-               verbose: Optional[bool] = True):
+               batch_size: int = 1000,
+               verbose: bool = True,
+               save_dir: Optional[Union[str, os.PathLike]] = None):
 
     """
     Slice frames from a video based on given shape coordinates (rectangles or circles) and return the cropped regions using GPU acceleration.
@@ -831,40 +827,52 @@ def slice_imgs(video_path: Union[str, os.PathLike],
     """
     THREADS_PER_BLOCK = (32, 32, 1)
 
-    video_meta_data = get_video_meta_data(video_path=video_path)
+    video_meta_data = get_video_meta_data(video_path=video_path, fps_as_int=False)
     video_meta_data['frame_count'] = shapes.shape[0]
     n, w, h = video_meta_data['frame_count'], video_meta_data['width'], video_meta_data['height']
     is_color = ImageMixin.is_video_color(video=video_path)
-    timer = SimbaTimer(start=True)
-    if is_color:
-        results = np.zeros((n, h, w, 3), dtype=np.uint8)
+    timer, save_temp_dir, results, video_out_path = SimbaTimer(start=True), None, None, None
+    if save_dir is None:
+        results = np.zeros((n, h, w, 3), dtype=np.uint8) if is_color else np.zeros((n, h, w), dtype=np.uint8)
     else:
-        results = np.zeros((n, h, w), dtype=np.uint8)
-    for start_img_idx in range(0, n, batch_size):
-        end_img_idx = start_img_idx + batch_size
-        if end_img_idx > video_meta_data['frame_count']:
-            end_img_idx = video_meta_data['frame_count']
-        if verbose:
-            print(f'Processing images {start_img_idx} to {end_img_idx} (of {n})...')
-        batch_n = end_img_idx - start_img_idx
-        batch_imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=start_img_idx, end_frm=end_img_idx)
-        batch_imgs = np.stack(list(batch_imgs.values()), axis=0)
+        save_temp_dir = os.path.join(save_dir, f'temp_{video_meta_data["video_name"]}')
+        create_directory(path=save_temp_dir, overwrite=True)
+        video_out_path = os.path.join(save_dir, f'{video_meta_data["video_name"]}.mp4')
+    frm_reader = AsyncVideoFrameReader(video_path=video_path, batch_size=batch_size, verbose=True, max_que_size=2)
+    frm_reader.start()
+    grid_x = math.ceil(w / THREADS_PER_BLOCK[0])
+    grid_y = math.ceil(h / THREADS_PER_BLOCK[1])
+
+    for batch_cnt in range(frm_reader.batch_cnt):
+        start_img_idx, end_img_idx, batch_imgs = get_async_frame_batch(batch_reader=frm_reader, timeout=10)
+        if verbose: print(f'Processing images {start_img_idx} - {end_img_idx} (of {n}; batch count: {batch_cnt+1}/{frm_reader.batch_cnt})...')
+        if save_dir is not None:
+            batch_save_path = os.path.join(save_temp_dir, f'{batch_cnt}.mp4')
         batch_shapes = shapes[start_img_idx:end_img_idx].astype(np.int32)
         x_dev = cuda.to_device(batch_shapes)
         batch_img_dev = cuda.to_device(batch_imgs)
-        grid_x = math.ceil(w / THREADS_PER_BLOCK[0])
-        grid_y = math.ceil(h / THREADS_PER_BLOCK[1])
-        grid_z = math.ceil(batch_n / THREADS_PER_BLOCK[2])
+        grid_z = math.ceil(batch_imgs.shape[0] / THREADS_PER_BLOCK[2])
         bpg = (grid_x, grid_y, grid_z)
         if batch_shapes.shape[1] == 3:
             _cuda_create_circle_masks[bpg, THREADS_PER_BLOCK](x_dev, batch_img_dev)
         else:
             _cuda_create_rectangle_masks[bpg, THREADS_PER_BLOCK](x_dev, batch_img_dev)
-        results[start_img_idx: end_img_idx] = batch_img_dev.copy_to_host()
+        if save_dir is None:
+            results[start_img_idx: end_img_idx] = batch_img_dev.copy_to_host()
+        else:
+            results = {k: v for k, v in enumerate(batch_img_dev.copy_to_host())}
+            ImageMixin().img_stack_to_video(imgs=results, fps=video_meta_data['fps'], save_path=batch_save_path, verbose=False)
+    frm_reader.kill()
     timer.stop_timer()
-    if verbose:
-        stdout_success(msg='Shapes sliced in video.', elapsed_time=timer.elapsed_time_str)
-    return results
+    if save_dir:
+        concatenate_videos_in_folder(in_folder=save_temp_dir, save_path=video_out_path, remove_splits=True, gpu=True)
+        if verbose:
+            stdout_success(msg=f'Shapes sliced in video saved at {video_out_path}.', elapsed_time=timer.elapsed_time_str)
+        return None
+    else:
+        if verbose:
+            stdout_success(msg='Shapes sliced in video.', elapsed_time=timer.elapsed_time_str)
+        return results
 
 
 @cuda.jit()
@@ -961,14 +969,15 @@ def rotate_img_stack_cupy(imgs: np.ndarray,
 def rotate_video_cupy(video_path: Union[str, os.PathLike],
                       save_path: Optional[Union[str, os.PathLike]] = None,
                       rotation_degrees: Optional[float] = 180,
-                      batch_cnt: Optional[int] = 1) -> None:
+                      batch_size: Optional[int] = None,
+                      verbose: Optional[bool] = True) -> None:
     """
     Rotates a video by a specified angle using GPU acceleration and CuPy for image processing.
 
     :param Union[str, os.PathLike] video_path: Path to the input video file.
     :param Optional[Union[str, os.PathLike]] save_path: Path to save the rotated video. If None, saves the video in the same directory as the input with '_rotated_<rotation_degrees>' appended to the filename.
     :param nptional[float] rotation_degrees:  Degrees to rotate the video. Must be between 1 and 359 degrees. Default is 180.
-    :param Optional[int] batch_cnt: Number of batches to split the video frames into for processing. Higher values reduce memory usage. Default is 1.
+    :param Optional[int] batch_size: The number of frames to process in each batch. Deafults to None meaning all images will be processed in a single batch.
     :returns: None.
 
     :example:
@@ -978,25 +987,32 @@ def rotate_video_cupy(video_path: Union[str, os.PathLike],
 
     timer = SimbaTimer(start=True)
     check_int(name=f'{rotate_img_stack_cupy.__name__} rotation', value=rotation_degrees, min_value=1, max_value=359)
-    check_int(name=f'{rotate_img_stack_cupy.__name__} batch_cnt', value=batch_cnt, min_value=1)
+    check_valid_boolean(source=f'{rotate_img_stack_cupy.__name__} verbose', value=verbose)
     if save_path is None:
         video_dir, video_name, _ = get_fn_ext(filepath=video_path)
         save_path = os.path.join(video_dir, f'{video_name}_rotated_{rotation_degrees}.mp4')
     video_meta_data = get_video_meta_data(video_path=video_path)
+    if batch_size is not None:
+        check_int(name=f'{rotate_img_stack_cupy.__name__} batch_size', value=batch_size, min_value=1)
+    else:
+        batch_size = video_meta_data['frame_count']
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
     is_clr = ImageMixin.is_video_color(video=video_path)
-    frm_ranges = np.arange(0, video_meta_data['frame_count'])
-    frm_ranges = np.array_split(frm_ranges, batch_cnt)
-    for frm_batch, frm_range in enumerate(frm_ranges):
-        imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=frm_range[0], end_frm=frm_range[-1])
-        imgs = np.stack(np.array(list(imgs.values())), axis=0)
-        imgs = rotate_img_stack_cupy(imgs=imgs, rotation_degrees=rotation_degrees)
-        if frm_batch == 0:
+    frm_reader = AsyncVideoFrameReader(video_path=video_path, batch_size=batch_size, max_que_size=3, verbose=False)
+    frm_reader.start()
+    for batch_cnt in range(frm_reader.batch_cnt):
+        start_idx, end_idx, imgs = get_async_frame_batch(batch_reader=frm_reader, timeout=10)
+        if verbose:
+            print(f'Rotating frames {start_idx}-{end_idx}... (of {video_meta_data["frame_count"]}, video: {video_meta_data["video_name"]})')
+        imgs = rotate_img_stack_cupy(imgs=imgs, rotation_degrees=rotation_degrees, batch_size=batch_size)
+        if batch_cnt == 0:
             writer = cv2.VideoWriter(save_path, fourcc, video_meta_data['fps'], (imgs.shape[2], imgs.shape[1]), isColor=is_clr)
         for img in imgs: writer.write(img)
     writer.release()
     timer.stop_timer()
-    stdout_success(f'Rotated video saved at {save_path}', source=rotate_video_cupy.__name__)
+    frm_reader.kill()
+    if verbose:
+        stdout_success(f'Rotated video saved at {save_path}', source=rotate_video_cupy.__name__)
 
 
 @cuda.jit()
@@ -1244,6 +1260,15 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
     .. seealso::
        For CPU based methods, see :func:`~simba.plotting.path_plotter.PathPlotterSingleCore` and :func:`~simba.plotting.path_plotter_mp.PathPlotterMulticore`.
 
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/pose_plotter.csv
+       :widths: 10, 90
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
     :param Union[str, os.PathLike, np.ndarray] data: Path to a CSV file with pose-estimation data or a 3d numpy array (n_images, n_bodyparts, 2) with pose-estimated locations.
     :param Union[str, os.PathLike] video_path: Path to a video file where the ``data`` has been pose-estimated.
     :param Union[str, os.PathLike] save_path: Location where to store the output visualization.
@@ -1251,10 +1276,10 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
     :param int batch_size: The number of frames to process concurrently on the GPU. Default: 1500. Increase of host and device RAM allows it to improve runtime. Decrease if you hit memory errors.
 
     :example:
-    >>> DATA_PATH = "/mnt/c/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/501_MA142_Gi_CNO_0514.csv"
-    >>> VIDEO_PATH = "/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0514.mp4"
+    >>> DATA_PATH = "/mnt/c/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/501_MA142_Gi_CNO_0521.csv"
+    >>> VIDEO_PATH = "/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
     >>> SAVE_PATH = "/mnt/c/troubleshooting/mitra/project_folder/frames/output/pose_ex/test.mp4"
-    >>> pose_plotter(data=DATA_PATH, video_path=VIDEO_PATH, save_path=SAVE_PATH, circle_size=10)
+    >>> pose_plotter(data=DATA_PATH, video_path=VIDEO_PATH, save_path=SAVE_PATH, circle_size=10, batch_size=1000)
     """
 
     THREADS_PER_BLOCK = (32, 32, 1)
@@ -1268,21 +1293,19 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
         check_valid_array(data=data, source=pose_plotter.__name__, accepted_ndims=(3,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
 
     check_int(name=f'{pose_plotter.__name__} batch_size', value=batch_size, min_value=1)
-    check_int(name=f'{pose_plotter.__name__} circle_size', value=circle_size, min_value=1)
     check_valid_boolean(value=[verbose], source=f'{pose_plotter.__name__} verbose')
     video_meta_data = get_video_meta_data(video_path=video_path)
     n, w, h = video_meta_data['frame_count'], video_meta_data['width'], video_meta_data['height']
     check_if_dir_exists(in_dir=os.path.dirname(save_path))
     if data.shape[0] != video_meta_data['frame_count']:
         raise FrameRangeError(msg=f'The data contains {data.shape[0]} frames while the video contains {video_meta_data["frame_count"]} frames')
-
     if circle_size is None:
         circle_size = np.array([PlottingMixin().get_optimal_circle_size(frame_size=(w, h))]).astype(np.int32)
     else:
+        check_int(name=f'{pose_plotter.__name__} circle_size', value=circle_size, min_value=1)
         circle_size = np.array([circle_size]).astype(np.int32)
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
     video_writer = cv2.VideoWriter(save_path, fourcc, video_meta_data['fps'], (w, h))
-
     colors = np.array(create_color_palette(pallete_name=colors, increments=data[0].shape[0])).astype(np.int32)
     circle_size_dev = cuda.to_device(circle_size)
     colors_dev = cuda.to_device(colors)
@@ -1290,37 +1313,74 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
     data = np.ascontiguousarray(data, dtype=np.int32)
     img_dev = cuda.device_array((batch_size, h, w, 3), dtype=np.int32)
     data_dev = cuda.device_array((batch_size, data.shape[1], 2), dtype=np.int32)
-
     total_timer = SimbaTimer(start=True)
-    for batch_cnt, l in enumerate(range(0, data.shape[0], batch_size)):
-        r = min(data.shape[0], l + batch_size - 1)
-        if verbose: print(f'Processing frames {l}-{r} of {data.shape[0]} frames (video: {video_meta_data["video_name"]})...')
-        batch_data = data[l:r + 1]
-        batch_n = batch_data.shape[0]
-        if verbose: print(f'Reading frames {l}-{r}...')
-        batch_frms = read_img_batch_from_video_gpu(video_path=video_path, start_frm=l, end_frm=r, out_format='array').astype(np.int32)
-        if verbose: print(f'Moving frames {l}-{r} to device...')
-        img_dev[:batch_n].copy_to_device(batch_frms[:batch_n])
+    frm_reader = AsyncVideoFrameReader(video_path=video_path, batch_size=batch_size, max_que_size=3, verbose=False)
+    frm_reader.start()
+    for batch_cnt in range(frm_reader.batch_cnt):
+        start_img_idx, end_img_idx, batch_frms = get_async_frame_batch(batch_reader=frm_reader, timeout=10)
+        if verbose: print(f'Processing images {start_img_idx} - {end_img_idx} (of {n}; batch count: {batch_cnt+1}/{frm_reader.batch_cnt})...')
+        batch_data = data[start_img_idx:end_img_idx + 1]
+        batch_n = batch_frms.shape[0]
+        if verbose: print(f'Moving frames {start_img_idx}-{end_img_idx} to device...')
+        img_dev[:batch_n].copy_to_device(batch_frms[:batch_n].astype(np.int32))
         data_dev[:batch_n] = cuda.to_device(batch_data[:batch_n])
         del batch_frms; del batch_data
-
-        grid_x = math.ceil(batch_n / THREADS_PER_BLOCK[0])
-        grid_z = math.ceil(batch_n / THREADS_PER_BLOCK[2])
-        bpg = (grid_x, grid_z)
-        if verbose: print(f'Creating frames {l}-{r} ...')
+        bpg = (math.ceil(batch_n / THREADS_PER_BLOCK[0]), math.ceil(batch_n / THREADS_PER_BLOCK[2]))
+        if verbose: print(f'Creating frames {start_img_idx}-{end_img_idx} ...')
         _pose_plot_kernel[bpg, THREADS_PER_BLOCK](img_dev, data_dev, circle_size_dev, resolution_dev, colors_dev)
-        if verbose: print(f'Moving frames to host {l}-{r} ...')
+        if verbose: print(f'Moving frames to host {start_img_idx}-{end_img_idx} ...')
         batch_frms = img_dev.copy_to_host()
-        if verbose: print(f'Writing frames to host {l}-{r} ...')
+        if verbose: print(f'Writing frames to host {start_img_idx}-{end_img_idx} ...')
         for img_idx in range(0, batch_n):
             video_writer.write(batch_frms[img_idx].astype(np.uint8))
-
     video_writer.release()
     total_timer.stop_timer()
+    frm_reader.kill()
     if verbose:
         stdout_success(msg=f'Pose-estimation video saved at {save_path}.', elapsed_time=total_timer.elapsed_time_str)
 
+# DATA_PATH = "/mnt/c/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/501_MA142_Gi_CNO_0521.csv"
+# VIDEO_PATH = "/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
+# SAVE_PATH = "/mnt/c/troubleshooting/mitra/project_folder/frames/output/pose_ex/test.mp4"
+# pose_plotter(data=DATA_PATH, video_path=VIDEO_PATH, save_path=SAVE_PATH, circle_size=10, batch_size=1000)
+# # VIDEO_PATH = "/mnt/c/troubleshooting/mitra/project_folder/frames/output/pose_ex/test.mp4"
+# # SAVE_PATH = "/mnt/c/troubleshooting/mitra/project_folder/frames/output/pose_ex/test_ROTATED.mp4"
+# #
+# # rotate_video_cupy(video_path=VIDEO_PATH, save_path=SAVE_PATH, batch_size=1000)
+#
+# #"C:\troubleshooting\mitra\project_folder\csv\outlier_corrected_movement_location\501_MA142_Gi_CNO_0521.csv"
+# pose_plotter(data=DATA_PATH, video_path=VIDEO_PATH, save_path=SAVE_PATH, circle_size=10, batch_size=1000)
 
+
+
+
+
+
+
+# from simba.mixins.geometry_mixin import GeometryMixin
+#
+# video_path = "/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/03152021_NOB_IOT_8.mp4"
+# data_path = "/mnt/c/troubleshooting/RAT_NOR/project_folder/csv/outlier_corrected_movement_location/03152021_NOB_IOT_8.csv"
+# save_dir = '/mnt/d/netholabs/yolo_videos/input/mp4_20250606083508'
+#
+# get_video_meta_data(video_path)
+#
+# nose_arr = read_df(file_path=data_path, file_type='csv', usecols=['Nose_x', 'Nose_y', 'Tail_base_x', 'Tail_base_y', 'Lat_left_x', 'Lat_left_y', 'Lat_right_x', 'Lat_right_y']).values.reshape(-1, 4, 2).astype(np.int32) ## READ THE BODY-PART THAT DEFINES THE HULL AND CONVERT TO ARRAY
+#
+# polygons = GeometryMixin().multiframe_bodyparts_to_polygon(data=nose_arr, parallel_offset=60) ## CONVERT THE BODY-PART TO POLYGONS WITH A LITTLE BUFFER
+# polygons = GeometryMixin().multiframe_minimum_rotated_rectangle(shapes=polygons) # CONVERT THE POLYGONS TO RECTANGLES (I.E., WITH 4 UNIQUE POINTS).
+# polygon_lst = [] # GET THE POINTS OF THE RECTANGLES
+# for i in polygons: polygon_lst.append(np.array(i.exterior.coords))
+# polygons = np.stack(polygon_lst, axis=0)
+# sliced_imgs = slice_imgs(video_path=video_path, shapes=polygons, batch_size=500, save_dir=save_dir) #SLICE THE RECTANGLES IN THE VIDEO.
+
+#sliced_imgs =  {k: v for k, v in enumerate(sliced_imgs)}
+
+#ImageMixin().img_stack_to_video(imgs=sliced_imgs, fps=29.97, save_path=r'/mnt/d/netholabs/yolo_videos/input/mp4_20250606083508/stacked.mp4')
+
+#get_video_meta_data("/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/03152021_NOB_IOT_8.mp4")
+# cv2.imshow('asdasdas', sliced_imgs[500])
+# cv2.waitKey(0)
 
 # DATA_PATH = "/mnt/c/troubleshooting/RAT_NOR/project_folder/csv/outlier_corrected_movement_location/03152021_NOB_IOT_8.csv"
 # VIDEO_PATH = "/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/03152021_NOB_IOT_8.mp4"

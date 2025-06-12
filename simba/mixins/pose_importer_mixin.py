@@ -241,7 +241,6 @@ class PoseImporterMixin(object):
                         closest_animal["body_part_name"] = (x_col, y_col)
                         closest_animal["distance"] = distance
             self.animal_order[animal_number] = closest_animal
-            print(self.animal_order)
         self.check_intergity_of_chosen_animal_order()
         self.organize_results()
         self.reinsert_multi_idx_columns()
@@ -335,21 +334,19 @@ class PoseImporterMixin(object):
 
     @staticmethod
     @jit(nopython=True)
-    def transpose_multi_animal_table(
-        data: np.array, idx: np.array, animal_cnt: int
-    ) -> np.array:
-        results = np.full((np.max(idx[:, 1]), data.shape[1] * animal_cnt), 0.0)
-        for i in prange(np.max(idx[:, 1])):
+    def transpose_multi_animal_table(data: np.array, idx: np.array, animal_cnt: int) -> np.array:
+        unique_tracks = np.unique(idx[:, 0]).flatten()
+        unique_tracks = np.sort(unique_tracks)
+        unique_tracks = unique_tracks[0:animal_cnt]
+        results = np.full((np.max(idx[:, 1]+1), data.shape[1] * animal_cnt), 0.0)
+        for i in prange(np.max(idx[:, 1])+1):
             for j in prange(animal_cnt):
-                data_idx = np.argwhere((idx[:, 0] == j) & (idx[:, 1] == i)).flatten()
+                data_idx = np.argwhere((idx[:, 0] == unique_tracks[j]) & (idx[:, 1] == i)).flatten()
                 if len(data_idx) == 1:
                     animal_frm_data = data[data_idx[0]]
                 else:
                     animal_frm_data = np.full((data.shape[1]), 0.0)
-                results[i][
-                    j * animal_frm_data.shape[0] : j * animal_frm_data.shape[0]
-                    + animal_frm_data.shape[0]
-                ] = animal_frm_data
+                results[i][j * animal_frm_data.shape[0] : j * animal_frm_data.shape[0] + animal_frm_data.shape[0]] = animal_frm_data
         return results
 
     def read_apt_trk_file(self, file_path: str):

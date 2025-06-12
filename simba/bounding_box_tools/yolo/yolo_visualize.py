@@ -34,7 +34,7 @@ class YOLOVisualizer():
         """
         Visualize the results of YOLO model.
 
-        .. seelalso::
+        .. seealso::
            :func:`simba.bounding_box_tools.yolo.model.inference_yolo`
 
         .. video:: _static/img/YOLOVisualizer.webm

@@ -14,12 +14,8 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.statistics_mixin import Statistics
 from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
-from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log,
-    check_if_filepath_list_is_empty)
-from simba.utils.read_write import (SimbaTimer, get_fn_ext, read_df,
-                                    read_frm_of_video, stdout_success,
-                                    write_df)
+from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_if_filepath_list_is_empty)
+from simba.utils.read_write import (SimbaTimer, get_fn_ext, read_df,stdout_success, write_df)
 
 NOSE = 'nose'
 LEFT_SIDE = 'left_side'
@@ -35,6 +31,19 @@ TIME_WINDOWS = np.array([0.25, 0.5, 1.0, 2.0])
 
 class MitraFeatureExtractor(ConfigReader,
                             AbstractFeatureExtraction):
+
+
+    """
+    Feature extractor used for grooming and rearing classifications. A subset is of created features are further used for straub-tail classifications.
+
+    :param Union[str, os.PathLike] config_path: Path to SimBA project_config.ini.
+    :return: None. Featurized pose-estimation data is saved in the simba project `project_folder/csv/features_extracted` directory.
+
+    References
+    ----------
+    .. [1] Lazaro et al., Brainwide Genetic Capture for Conscious State Transitions, `biorxiv`, doi: https://doi.org/10.1101/2025.03.28.646066
+    """
+
     def __init__(self,
                  config_path: Union[str, os.PathLike]):
 

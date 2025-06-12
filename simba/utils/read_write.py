@@ -2249,7 +2249,7 @@ def read_img_batch_from_video_gpu(video_path: Union[str, os.PathLike],
     """
 
     check_file_exist_and_readable(file_path=video_path)
-    video_meta_data = get_video_meta_data(video_path=video_path)
+    video_meta_data = get_video_meta_data(video_path=video_path, fps_as_int=False)
     if start_frm is not None:
         check_int(name=read_img_batch_from_video_gpu.__name__, value=start_frm, min_value=0, max_value=video_meta_data["frame_count"])
     else:
@@ -3046,7 +3046,6 @@ def read_sys_env():
     env[ENV_VARS.NUMBA_PRECOMPILE.value] = str_2_bool(os.getenv(ENV_VARS.NUMBA_PRECOMPILE.value, "False"))
     env[ENV_VARS.CUML.value] = str_2_bool(os.getenv(ENV_VARS.CUML.value, "False"))
     return env
-
 
 
 #concatenate_videos_in_folder(in_folder=r'C:\troubleshooting\RAT_NOR\project_folder\frames\output\path_plots\03152021_NOB_IOT_8', save_path=r"C:\troubleshooting\RAT_NOR\project_folder\frames\output\path_plots\new.mp4", remove_splits=False)

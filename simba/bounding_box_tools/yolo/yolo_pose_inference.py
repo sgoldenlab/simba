@@ -18,10 +18,6 @@ COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 NEAREST = 'nearest'
 
 
-
-
-
-
 class YOLOPoseInference():
 
     """
@@ -168,21 +164,21 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     inference.run()
 
 
-video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
-video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-46-56.mp4"
-video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-50-23.mp4"
-
-save_dir = r'/mnt/d/netholabs/yolo_videos_out'
-i = YOLOPoseInference(weights_path=r"/mnt/d/netholabs/yolo_mdls_1/train/weights/best.pt",
-                        video_path=video_path,
-                        save_dir=save_dir,
-                        verbose=True,
-                        device=0,
-                        format='onnx',
-                        stream=True,
-                        keypoint_names=('nose', 'ear_left', 'ear_right', 'lateral_left', 'center', 'lateral_right', 'tail_base'),
-                        batch_size=32,
-                        imgsz=320,
-                        interpolate=True,
-                         threshold=0.8)
-#i.run()
+# video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
+# video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-46-56.mp4"
+# video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-50-23.mp4"
+#
+# save_dir = r'/mnt/d/netholabs/yolo_videos_out'
+# i = YOLOPoseInference(weights_path=r"/mnt/d/netholabs/yolo_mdls_1/train/weights/best.pt",
+#                         video_path=video_path,
+#                         save_dir=save_dir,
+#                         verbose=True,
+#                         device=0,
+#                         format='onnx',
+#                         stream=True,
+#                         keypoint_names=('nose', 'ear_left', 'ear_right', 'lateral_left', 'center', 'lateral_right', 'tail_base'),
+#                         batch_size=32,
+#                         imgsz=320,
+#                         interpolate=True,
+#                         threshold=0.8)
+# #i.run()

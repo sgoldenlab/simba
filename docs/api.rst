@@ -171,7 +171,7 @@ Methods for drawing, defining, and analyzing tracking data in relation to ROIs
 
    simba.roi_tools
 
-Default feature extraction wrappers
+Feature extraction wrappers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 "Standard" feature extraction methods for input pose-estimation data. These methods are used by the "out-of-the-box" pre-defined pose-estimation schemas

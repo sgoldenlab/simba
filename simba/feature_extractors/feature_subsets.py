@@ -16,6 +16,7 @@ from itertools import combinations
 from simba.feature_extractors.perimeter_jit import jitted_hull
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.roi_tools.roi_utils import get_roi_dict_from_dfs
 from simba.utils.checks import (
@@ -33,7 +34,6 @@ from simba.utils.read_write import (copy_files_in_directory,
                                     remove_multiple_folders, write_df)
 
 SHAPE_TYPE = "Shape_type"
-
 TWO_POINT_BP_DISTANCES = 'TWO-POINT BODY-PART DISTANCES (MM)'
 WITHIN_ANIMAL_THREE_POINT_ANGLES = 'WITHIN-ANIMAL THREE-POINT BODY-PART ANGLES (DEGREES)'
 WITHIN_ANIMAL_THREE_POINT_HULL = "WITHIN-ANIMAL THREE-POINT CONVEX HULL PERIMETERS (MM)"
@@ -43,6 +43,10 @@ ANIMAL_CONVEX_HULL_AREA = "ENTIRE ANIMAL CONVEX HULL AREA (MM2)"
 FRAME_BP_MOVEMENT = "FRAME-BY-FRAME BODY-PART MOVEMENTS (MM)"
 FRAME_BP_TO_ROI_CENTER = "FRAME-BY-FRAME BODY-PART DISTANCES TO ROI CENTERS (MM)"
 FRAME_BP_INSIDE_ROI = "FRAME-BY-FRAME BODY-PARTS INSIDE ROIS (BOOLEAN)"
+ARENA_EDGE = "BODY-PART DISTANCES TO VIDEO FRAME EDGE (MM)"
+
+
+
 
 FEATURE_FAMILIES = [TWO_POINT_BP_DISTANCES,
                     WITHIN_ANIMAL_THREE_POINT_ANGLES,
@@ -52,7 +56,8 @@ FEATURE_FAMILIES = [TWO_POINT_BP_DISTANCES,
                     ANIMAL_CONVEX_HULL_AREA,
                     FRAME_BP_MOVEMENT,
                     FRAME_BP_TO_ROI_CENTER,
-                    FRAME_BP_INSIDE_ROI]
+                    FRAME_BP_INSIDE_ROI,
+                    ARENA_EDGE]
 
 
 class FeatureSubsetsCalculator(ConfigReader, TrainModelMixin):
@@ -202,6 +207,16 @@ class FeatureSubsetsCalculator(ConfigReader, TrainModelMixin):
                     distance = FeatureExtractionMixin.framewise_euclidean_distance_roi(location_1=bp_arr, location_2=center_point, px_per_mm=self.px_per_mm)
                     self.results[f"{animal} {bp} to {roi_name} center distance (mm)"] = distance
 
+    def __get_distances_to_frm_edge(self):
+        for animal, animal_bps in self.animal_bps.items():
+            for bp in animal_bps:
+                check_valid_dataframe(df=self.data_df, source=self.file_path, required_fields=[f"{bp}_x", f"{bp}_y"])
+                bp_arr = self.data_df[[f"{bp}_x", f"{bp}_y"]].values.astype(np.float32)
+                distance = FeatureExtractionSupplemental().border_distances(data=bp_arr, pixels_per_mm=self.px_per_mm, img_resolution=np.array([self.video_width, self.video_height], dtype=np.int32), time_window=1, fps=1)
+                self.results[f"{animal} {bp} to left video edge distance (mm)"] = distance[:, 0]
+                self.results[f"{animal} {bp} to right video edge distance (mm)"] = distance[:, 1]
+                self.results[f"{animal} {bp} to top video edge distance (mm)"] = distance[:, 2]
+                self.results[f"{animal} {bp} to bottom video edge distance (mm)"] = distance[:, 3]
 
     def __get_inside_roi(self):
         for animal, animal_bps in self.animal_bps.items():
@@ -279,7 +294,8 @@ class FeatureSubsetsCalculator(ConfigReader, TrainModelMixin):
             save_path = os.path.join(self.temp_dir, f'{self.video_name}.{self.file_type}')
             self.results = pd.DataFrame()
             print(f'Analyzing video {self.video_name}... ({file_cnt+1}/{len(self.data_paths)})')
-            _, self.px_per_mm, self.fps = self.read_video_info(video_name=self.video_name)
+            self.video_info, self.px_per_mm, self.fps = self.read_video_info(video_name=self.video_name)
+            self.video_width, self.video_height = self.video_info['Resolution_width'].values[0], self.video_info['Resolution_height'].values[0]
             self.data_df = read_df(file_path=file_path, file_type=self.file_type)
             for family_cnt, feature_family in enumerate(self.feature_families):
                 print(f"Analyzing {self.video_name} and {feature_family} (Video {file_cnt + 1}/{len(self.outlier_corrected_paths)}, Family {family_cnt + 1}/{len(self.feature_families)})...")
@@ -301,6 +317,8 @@ class FeatureSubsetsCalculator(ConfigReader, TrainModelMixin):
                     self.__get_roi_center_distances()
                 elif feature_family == FRAME_BP_INSIDE_ROI:
                     self.__get_inside_roi()
+                elif feature_family == ARENA_EDGE:
+                    self.__get_distances_to_frm_edge()
 
             self.results = self.results.add_suffix('_FEATURE_SUBSET')
             self.results = self.results[sorted(self.results.columns)]
@@ -319,6 +337,17 @@ class FeatureSubsetsCalculator(ConfigReader, TrainModelMixin):
         remove_a_folder(folder_dir=self.temp_dir, ignore_errors=False)
         self.timer.stop_timer()
         stdout_success(msg="Feature sub-sets calculations complete!", elapsed_time=self.timer.elapsed_time_str)
+
+
+
+
+# test = FeatureSubsetsCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#                                 feature_families=[ARENA_EDGE],
+#                                 append_to_features_extracted=False,
+#                                 file_checks=True,
+#                                 append_to_targets_inserted=False,
+#                                 save_dir=r"C:\troubleshooting\mitra\project_folder\csv\feature_subset")
+# test.run()
 
 #
 # test = FeatureSubsetsCalculator(config_path=r"D:\Stretch\Stretch\project_folder\project_config.ini",

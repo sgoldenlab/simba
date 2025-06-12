@@ -78,3 +78,18 @@ Jitted methods for convex-hull related calculations
    :show-inheritance:
    :undoc-members:
 
+Rearing and grooming feature extraction wrapper
+-----------------------------------------------
+
+.. autoclass:: simba.feature_extractors.mitra_feature_extractor.MitraFeatureExtractor
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Straub tail feature extraction wrapper
+-----------------------------------------------
+
+.. autoclass:: simba.feature_extractors.straub_tail_analyzer.StraubTailAnalyzer
+   :members:
+   :show-inheritance:
+   :undoc-members:

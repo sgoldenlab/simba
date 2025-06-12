@@ -103,10 +103,8 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
                 raise AnimalNumberError(msg=f'The SLEAP CSV file {video_data["DATA"]} contains data for {len(data_unique_tracks)} tracks (found tracks: {data_unique_tracks}). The SimBA project config says the SimBA project expects data for {self.animal_cnt} animals.')
             if len(data_unique_tracks) == 1:
                 idx[TRACK] = 'track_0'; data_unique_tracks = ['track_0']
-
             idx[TRACK] = idx[TRACK].fillna(data_unique_tracks[0])
             idx[TRACK] = idx[TRACK].astype(str).str.replace(r"[^\d.]+", "", regex=True).astype(int)
-
             data_df = data_df.iloc[:, 2:].fillna(0)
             if self.animal_cnt > 1:
                 self.data_df = pd.DataFrame(self.transpose_multi_animal_table(data=data_df.values, idx=idx.values, animal_cnt=self.animal_cnt))
@@ -119,7 +117,6 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
                 raise CountError(msg=f"The SimBA project expects {len(self.bp_headers)} data columns, but your SLEAP data file at {video_data['DATA']} contains {len(self.data_df.columns)} columns.", source=self.__class__.__name__)
             self.data_df.columns = self.bp_headers
             self.out_df = deepcopy(self.data_df)
-
             if self.animal_cnt > 1:
                 self.initialize_multi_animal_ui(animal_bp_dict=self.animal_bp_dict,
                                                 video_info=get_video_meta_data(video_data["VIDEO"]),
@@ -139,6 +136,15 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
         stdout_success(msg=f"{len(list(self.data_and_videos_lk.keys()))} file(s) imported to the SimBA project {self.input_csv_dir}", source=self.__class__.__name__)
 
 
+
+# test = SLEAPImporterCSV(config_path=r"D:\troubleshooting\two_animals_sleap\project_folder\project_config.ini",
+#                  data_folder=r'D:\troubleshooting\two_animals_sleap\import_data',
+#                  id_lst=['Animal_1', 'Animal_2'],
+#                  interpolation_settings=None,
+#                  smoothing_settings = None)
+# test.run()
+
+
 # test = SLEAPImporterCSV(config_path=r"C:\troubleshooting\SLP_TEST0525\project_folder\project_config.ini",
 #                  data_folder=r'C:\troubleshooting\SLP_TEST0525\data_csv',
 #                  id_lst=['Animal_1', 'Animal_2', 'Animal_3', 'Animal_4'],
@@ -156,7 +162,7 @@ class SLEAPImporterCSV(ConfigReader, PoseImporterMixin):
 #                  interpolation_settings={'type': 'animals', 'method': 'linear'},
 #                  smoothing_settings = {'time_window': 500, 'method': 'gaussian'})
 # test.run()
-#
+# #
 
 
 

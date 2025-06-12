@@ -70,6 +70,9 @@ from simba.video_processors.extract_frames import video_to_frames
 from simba.video_processors.roi_selector import ROISelector
 from simba.video_processors.roi_selector_circle import ROISelectorCircle
 from simba.video_processors.roi_selector_polygon import ROISelectorPolygon
+from simba.video_processors.async_frame_reader import AsyncVideoFrameReader
+
+
 
 MAX_FRM_SIZE = 1080, 650
 
@@ -4857,6 +4860,14 @@ def split_mosaic(video_path: Union[str, os.PathLike],
         stdout_success(msg=f'Tile data saved in {save_dir}', elapsed_time=timer.elapsed_time_str)
 
 
+def get_async_frame_batch(batch_reader: AsyncVideoFrameReader, timeout: int = 10) -> Tuple[int, int, np.ndarray]:
+    check_int(name=f'{get_async_frame_batch.__name__} timeout', min_value=0, raise_error=True, value=timeout)
+    check_instance(source=f'{get_async_frame_batch.__name__} batch_reader', instance=batch_reader, accepted_types=(AsyncVideoFrameReader,), raise_error=True)
+    x = batch_reader.frame_queue.get(timeout=timeout)
+    if isinstance(x, Exception):
+        raise x
+    else:
+        return x
 
 
 

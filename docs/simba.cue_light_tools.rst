@@ -1,42 +1,30 @@
-Analyze
+Cue light analyzer
 ---------------------------------------------------
 
-.. automodule:: simba.cue_light_tools.cue_light_analyzer
+.. autoclass:: simba.data_processors.cue_light_analyzer.CueLightAnalyzer
    :members:
    :show-inheritance:
 
-CLF Statistics
+Cue light classification statistics
 ----------------------------------------------------------
 
-.. automodule:: simba.cue_light_tools.cue_light_clf_statistics
+.. autoclass:: simba.data_processors.cue_light_clf_statistics.CueLightClfAnalyzer
    :members:
    :show-inheritance:
 
-GUI
--------------------------------------------------
 
-.. automodule:: simba.cue_light_tools.cue_light_menues
-   :members:
-   :show-inheritance:
-
-Movement statistics
+Cue light movement statistics
 ---------------------------------------------------------------
 
-.. automodule:: simba.cue_light_tools.cue_light_movement_statistics
+.. autoclass:: simba.data_processors.cue_light_movement_statistics.CueLightMovementAnalyzer
    :members:
    :show-inheritance:
 
-Tools
-------------------------------------------------
 
-.. automodule:: simba.cue_light_tools.cue_light_tools
-   :members:
-   :show-inheritance:
-
-Visualize
+Cue light plotting
 -----------------------------------------------------
 
-.. automodule:: simba.cue_light_tools.cue_light_visualizer
+.. autoclass:: simba.plotting.cue_light_visualizer.CueLightVisualizer
    :members:
    :show-inheritance:
 

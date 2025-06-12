@@ -1317,7 +1317,8 @@ class ImageMixin(object):
             writer.write(imgs[i])
         writer.release()
         timer.stop_timer()
-        stdout_success(msg=f"Video {save_path} complete", elapsed_time=timer.elapsed_time_str)
+        if verbose:
+            stdout_success(msg=f"Video {save_path} complete", elapsed_time=timer.elapsed_time_str)
 
     @staticmethod
     def _slice_shapes_in_video_file_helper(data: List[Tuple[int, Polygon]],
@@ -1926,7 +1927,7 @@ class ImageMixin(object):
         :rtype: bool
         """
 
-        frm = ImageMixin.find_first_non_uniform_clr_frm(video_path=video)
+        frm, frm_idx = ImageMixin.find_first_non_uniform_clr_frm(video_path=video)
         if frm.ndim > 2:
             if frm.shape[2] != 1:
                 return True

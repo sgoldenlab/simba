@@ -1,21 +1,54 @@
 YOLO methods
 ===============================
 
-Model
+Utilities
 -----------------------------------------------------------------------
 
-.. automodule:: simba.bounding_box_tools.yolo.model.fit_yolo
-   :members:
-   :show-inheritance:
-
-.. automodule:: simba.bounding_box_tools.yolo.model.inference_yolo
+.. automodule:: simba.bounding_box_tools.yolo.utils
    :members:
    :show-inheritance:
 
 
-Visualize
+Bounding-box inference
 -----------------------------------------------------------------------
 
-.. automodule:: simba.bounding_box_tools.yolo.visualize.YOLOVisualizer
+.. autoclass:: simba.bounding_box_tools.yolo.yolo_inference.YoloInference
+   :members:
+   :show-inheritance:
+
+Pose-estimation inference
+-----------------------------------------------------------------------
+
+.. autoclass:: simba.bounding_box_tools.yolo.yolo_pose_inference.YOLOPoseInference
+   :members:
+   :show-inheritance:
+
+
+Pose-estimation track inference
+-----------------------------------------------------------------------
+
+.. autoclass:: simba.bounding_box_tools.yolo.yolo_pose_track_inference.YOLOPoseTrackInference
+   :members:
+   :show-inheritance:
+
+Pose-estimation track plotting
+-----------------------------------------------------------------------
+
+.. autoclass:: simba.bounding_box_tools.yolo.yolo_pose_track_visualizer.YOLOPoseTrackVisualizer
+   :members:
+   :show-inheritance:
+
+
+Pose-estimation plotting
+-----------------------------------------------------------------------
+
+.. autoclass:: simba.bounding_box_tools.yolo.yolo_pose_visualizer.YOLOPoseVisualizer
+   :members:
+   :show-inheritance:
+
+Bounding box plotting
+-----------------------------------------------------------------------
+
+.. autoclass:: simba.bounding_box_tools.yolo.yolo_visualize.YOLOVisualizer
    :members:
    :show-inheritance:

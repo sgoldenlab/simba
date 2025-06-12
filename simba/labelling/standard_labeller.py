@@ -413,15 +413,15 @@ class LabellingInterface(ConfigReader):
                     print(f"{target} ABSENT in frames {frame[0]} to {frame[1]}")
 
 
-# test = select_labelling_video(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+# test = LabellingInterface(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #                               threshold_dict=None, #threshold_dict={'Attack': 0.4}
 #                               setting='from_scratch',
 #                               continuing=False)
 
 # _ = LabellingInterface(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
-#                        file_path=r"C:\troubleshooting\mitra\project_folder\videos\F0_gq_Saline_0620.mp4",
-#                        thresholds={'straub_tail': 0.5},
-#                        continuing=True)
+#                        file_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_CNO_0521.mp4",
+#                        thresholds=None,
+#                        continuing=False)
 
 #
 # import threading

@@ -70,7 +70,7 @@ class YOLOPoseVisualizer():
     and optional filtering. The result is saved as a new annotated video, and supports multicore parallel rendering
     for efficient processing of long videos.
 
-    .. seelalso::
+    .. seealso::
        To create YOLO pose data, see `:func:~simba.bounding_box_tools.yolo.yolo_pose_inference.YOLOPoseInference`
 
     :param Union[str, os.PathLike] data_path: Path to the CSV file containing keypoint data (output from YOLO pose inference).
