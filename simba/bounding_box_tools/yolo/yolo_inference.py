@@ -13,12 +13,18 @@ import numpy as np
 import pandas as pd
 import torch
 
-from simba.third_party_label_appenders.converters import yolo_obb_data_to_bounding_box
-from simba.utils.checks import (check_file_exist_and_readable, check_float, check_if_dir_exists, check_int, check_str, check_valid_boolean, check_valid_lst, get_fn_ext, check_valid_tuple, check_valid_array)
+from simba.bounding_box_tools.yolo.utils import (_get_undetected_obs,
+                                                 check_valid_device,
+                                                 load_yolo_model, yolo_predict)
+from simba.third_party_label_appenders.converters import \
+    yolo_obb_data_to_bounding_box
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists, check_int, check_str,
+                                check_valid_array, check_valid_boolean,
+                                check_valid_lst, check_valid_tuple, get_fn_ext)
 from simba.utils.data import df_smoother, savgol_smoother
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import find_core_cnt, get_video_meta_data
-from simba.bounding_box_tools.yolo.utils import load_yolo_model, yolo_predict, check_valid_device, _get_undetected_obs
 
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
