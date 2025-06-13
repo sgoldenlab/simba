@@ -16,7 +16,8 @@ from itertools import combinations
 from simba.feature_extractors.perimeter_jit import jitted_hull
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
+from simba.mixins.feature_extraction_supplement_mixin import \
+    FeatureExtractionSupplemental
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.roi_tools.roi_utils import get_roi_dict_from_dfs
 from simba.utils.checks import (
