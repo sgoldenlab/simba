@@ -2951,7 +2951,7 @@ class GeometryMixin(object):
            :width: 600
            :align: center
 
-        :param  List[Polygon] geometries: List of input polygons to be adjusted.
+        :param  List[Polygon] geometries: List of :obj:`shapely.geometry.Polygon` objects which locations are to be adjusted.
         :param Tuple[int, int] shift: Tuple specifying the shift distances in the x and y-axis. Interpreted as pixels if ``pixels_per_mm`` is None. Else interpreted as millimeter.
         :param float pixels_per_mm: Pixel per millimeter conversion factor.
         :param Optional[Tuple[int, int]] minimum: Minimim allowed coordinates of Polygon points on x and y axes. Default: (0,0).

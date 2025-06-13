@@ -156,6 +156,10 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
     >>> input_clf_attr = {0: ['Attack', 'Black', 'Size: 30'], 1: ['Sniffing', 'Red', 'Size: 30']}
     >>> path_plotter = PathPlotterMulticore(config_path=r'MyConfigPath', frame_setting=False, video_setting=True, style_attr=style_attr, animal_attr=animal_attr, files_found=['project_folder/csv/machine_results/MyVideo.csv'], cores=5, clf_attr=clf_attr, print_animal_names=True)
     >>> path_plotter.run()
+
+    References
+    ----------
+    .. [1] Battivelli, Dorian, Lucas Boldrini, Mohit Jaiswal, Pradnya Patil, Sofia Torchia, Elizabeth Engelen, Luca Spagnoletti, Sarah Kaspar, and Cornelius T. Gross. “Induction of Territorial Dominance and Subordination Behaviors in Laboratory Mice.” Scientific Reports 14, no. 1 (November 19, 2024): 28655. https://doi.org/10.1038/s41598-024-75545-4.
     """
 
     def __init__(self,

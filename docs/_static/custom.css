@@ -1,3 +1,19 @@
+/* Load the font */
+@font-face {
+    font-family: 'Poppins';
+    src: url('./fonts/Poppins-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Apply globally */
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+
+
+
 .simba-table {
     /* Add your CSS rules here */
     border: 1px solid #ddd;

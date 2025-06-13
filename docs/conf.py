@@ -37,8 +37,6 @@ extensions = ['sphinx.ext.napoleon',
 #mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
 mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
 
-
-intersphinx_mapping = {'python': ('https://docs.python.org/3', None)}
 html_favicon = "../simba/assets/icons/readthedocs_logo.png"
 html_logo = "../simba/assets/icons/readthedocs_logo.png"
 latex_engine = 'xelatex'
@@ -71,3 +69,9 @@ html_js_files = [
     "https://www.googletagmanager.com/gtag/js?id=G-PEKR9R5J47",
     "custom.js"
 ]
+
+
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3', None),
+    'shapely': ('https://shapely.readthedocs.io/en/stable/', None),
+}
