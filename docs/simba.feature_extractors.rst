@@ -93,3 +93,30 @@ Straub tail feature extraction wrapper
    :members:
    :show-inheritance:
    :undoc-members:
+
+Mexican cave fish feature extraction wrapper
+-----------------------------------------------
+
+.. autoclass:: simba.feature_extractors.cave_fish_featurizer.CaveFishFeaturizer
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Rat social behavior feature extraction wrapper
+-----------------------------------------------
+
+.. autoclass:: simba.feature_extractors.rat_social_featurizer.RatSocialFeaturizer
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Gerbil single body-part feature extraction wrapper
+-----------------------------------------------
+
+.. autoclass:: simba.feature_extractors.gerbil_featurizer.GerbilFeaturizer
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+
+

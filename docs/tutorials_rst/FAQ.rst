@@ -1,4 +1,4 @@
-Friendly Asked Questions (FAQ)
+❔Friendly Asked Questions (FAQ)
 ==============================
 
 Please search the `SimBA issues tracker <https://github.com/sgoldenlab/simba/issues>`__, or search the `Gitter chat channel <https://gitter.im/SimBA-Resource/community>`__ for more questions and answers. If that does not help, reach out to us by posting a new issue or write to us on Gitter.

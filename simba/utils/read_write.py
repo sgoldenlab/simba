@@ -764,6 +764,11 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
     """
     Reads single image from video file.
 
+    .. seealso::
+       To read a batch of images with GPU acceleration, see :func:`simba.utils.read_write.read_img_batch_from_video_gpu`.
+       To read a batch of videos using multicore CPU acceleration, see :func:`simba.utils.read_write.read_img_batch_from_video`.
+       To read frames batches asynchrnously, see :func:`simba.video_processors.async_frame_reader.AsyncVideoFrameReader`.
+
     :param Union[str, os.PathLike] video_path: Path to video file, or cv2.VideoCapture object.
     :param int frame_index: The frame of video to return. Default: 1. Note, if frame index -1 is passed, the last frame of the video is read in.
     :param Optional[int] opacity: Value between 0 and 100 or None. If float value, returns image with opacity. 100 fully opaque. 0.0 fully transparant.

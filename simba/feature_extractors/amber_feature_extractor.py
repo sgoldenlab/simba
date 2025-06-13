@@ -105,8 +105,7 @@ class AmberFeatureExtractor(ConfigReader, FeatureExtractionMixin):
 
     References
     ----------
-    .. [1] Lapp H et al., Automated maternal behavior during early life in rodents (AMBER) pipeline, Sci. Rep.,
-           2023.
+       .. [1] Lapp, Hannah E., Melissa G. Salazar, and Frances A. Champagne. “Automated Maternal Behavior during Early Life in Rodents (AMBER) Pipeline.” Scientific Reports 13, no. 1 (October 25, 2023): 18277. https://doi.org/10.1038/s41598-023-45495-4.
     """
 
     def __init__(self, config_path: str):

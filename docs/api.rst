@@ -1,11 +1,17 @@
-API Reference
+📖 API Reference
 =============
 
-Geometry transformations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This section provides a categorized reference of SimBA's modules and methods, grouped by their functionality such as feature extraction, plotting, transformation, and modeling.
 
-Methods to perform geometry transformation of pose-estimation data. This includes creating bounding boxes, line objects, polygons, circles etc. from pose-estimated body-parts
-and recording environment and computing metric representations of the relationships between created shapes or their attributes (sizes, distances, overlaps, intersection, etc.)
+.. contents::
+   :local:
+   :depth: 2
+
+
+|:triangular_ruler:| **Geometry transformations**
+--------------------------------------------------
+
+Transform pose-estimated body-part coordinates into geometric shapes (bounding boxes, polygons, circles), and compute spatial relationships like distance and intersection.
 
 .. toctree::
    :maxdepth: 4
@@ -13,21 +19,21 @@ and recording environment and computing metric representations of the relationsh
    simba.geometry_mixin
 
 
-Circular transformations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+|:repeat:| **Circular transformations**
+--------------------------------------------------
 
-Unlike linear data, circular data wrap around in a circular or periodic manner such as two measurements of e.g., 360 vs. 1 are more similar than two measurements of 1 vs. 3. Thus, the
-minimum and maximum values are connected, forming a closed loop, and we therefore need specialized statistical methods.These methods have support for multiple animals and base radial directions derived from two or three body-parts.
+Statistical operations for circular data like head direction. Wraparound-aware, multi-animal capable, and based on body-part derived base angles.
 
 .. toctree::
    :maxdepth: 4
 
    simba.circular_statistics
 
-Statistics transformations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Statistics methods used for feature extraction, drift assessment, distance computations, distribution comparisons in sliding and static windows.
+|:bar_chart:| **Statistics transformations**
+--------------------------------------------------
+
+Compute statistical features, drift, distances, and distribution comparisons in sliding or static time windows.
 
 .. toctree::
    :maxdepth: 4
@@ -35,10 +41,10 @@ Statistics methods used for feature extraction, drift assessment, distance compu
    simba.statistics_mixin
 
 
-Image transformations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+|:frame_with_picture:| **Image transformations**
+--------------------------------------------------
 
-Methods to slice and compute attributes of images from tracking data and comparing those image attributes across sequential images.
+Slice frames and extract visual information from tracking data; compare image features across time.
 
 .. toctree::
    :maxdepth: 5
@@ -46,10 +52,10 @@ Methods to slice and compute attributes of images from tracking data and compari
    simba.image_transformations
 
 
-Time-series transformations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+|:clock1:| **Time-series transformations**
+--------------------------------------------------
 
-Time-series methods focused on signal complexity in sliding windows.
+Analyze time-series complexity using sliding window methods.
 
 .. toctree::
    :maxdepth: 5
@@ -57,20 +63,21 @@ Time-series methods focused on signal complexity in sliding windows.
    simba.timeseries
 
 
-Network transformations
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+|:link:| **Network transformations**
+--------------------------------------------------
 
-Methods for creating and analyze time-dependent graphs from pose-estimation data.
+Build and analyze graphs derived from pose-estimation time-series data.
 
 .. toctree::
    :maxdepth: 5
 
    simba.networks
 
-Feature extraction methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Feature extraction methods used by "default" feature extraction wrappers. These methods are used by the "out-of-the-box" pre-defined pose-estimation schemas and compute - mainly - movement, distances and size features.
+|:straight_ruler:| **Feature extraction mixins**
+--------------------------------------------------
+
+Core low-level feature methods used in SimBA’s default extraction pipelines.
 
 .. toctree::
    :maxdepth: 4
@@ -78,104 +85,10 @@ Feature extraction methods used by "default" feature extraction wrappers. These 
    simba.feature_extraction_mixins
 
 
-Video processing tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+|:pencil:| **Feature extraction wrappers**
+--------------------------------------------------
 
-Methods for processing videos (e.g., pre- or processing functions that typically depend on ffmpeg or opencv).
-
-.. toctree::
-   :maxdepth: 5
-
-   simba.video_processing
-
-
-Plotting / visualization tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Methods for visualizing behavior, tracking, and transformed data based on animal tracking.
-
-.. toctree::
-   :maxdepth: 5
-
-   simba.plotting
-
-Outlier correction tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Methods for removing outliers based on heuristic rules of movement and location of pose-estimated body-parts
-
-.. toctree::
-   :maxdepth: 5
-
-   simba.outlier_tools
-
-
-Data processing tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Methods for manipulating and transforming classification data, image data, and animal tracking data
-
-.. toctree::
-   :maxdepth: 1
-
-   simba.data_processors
-
-
-Unsupervised methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Methods for unsupervised learning in SimBA
-
-.. toctree::
-   :maxdepth: 2
-
-   simba.unsupervised
-
-Labelling tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-SimBA methods and interfaces for annotating images for behavioral states.
-
-.. toctree::
-   :maxdepth: 2
-
-   simba.labelling
-
-Third-party label append
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-SimBA methods for appending annotation data from dedicated annotation software to pose-estimation data.
-
-.. toctree::
-   :maxdepth: 1
-
-   simba.third_party_label_appenders
-
-SimBA utilities
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Helper functions for lookups, terminal printing, argument validity checks, reading and writing to disk, warning / error handling, and helpers for executing functions through CLI
-
-.. toctree::
-   :maxdepth: 1
-
-   simba.utils
-
-Region-of-interest (ROI) tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Methods for drawing, defining, and analyzing tracking data in relation to ROIs
-
-.. toctree::
-   :maxdepth: 3
-
-   simba.roi_tools
-
-Feature extraction wrappers
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-"Standard" feature extraction methods for input pose-estimation data. These methods are used by the "out-of-the-box" pre-defined pose-estimation schemas
-and compute - mainly - movement, distances and size features.
+Pre-configured "out-of-the-box" feature extraction modules for common pose-estimation schemas.
 
 .. toctree::
    :maxdepth: 1
@@ -183,10 +96,98 @@ and compute - mainly - movement, distances and size features.
    simba.feature_extractors
 
 
-Pose-estimation tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+|:video_camera:| **Video processing tools**
+--------------------------------------------------
 
-Methods to import and manipulate pose-estimation data
+Video processing tools using OpenCV and FFmpeg.
+
+.. toctree::
+   :maxdepth: 5
+
+   simba.video_processing
+
+
+|:art:| **Plotting and visualization tools**
+--------------------------------------------------
+
+Visualize behavioral data and pose-tracking outputs.
+
+.. toctree::
+   :maxdepth: 5
+
+   simba.plotting
+
+
+|:warning:| **Outlier correction**
+--------------------------------------------------
+
+Heuristic-based filtering of body-part tracking outliers.
+
+.. toctree::
+   :maxdepth: 5
+
+   simba.outlier_tools
+
+
+|:wrench:| **Data processing tools**
+--------------------------------------------------
+
+Transform classification, tracking, and image data.
+
+.. toctree::
+   :maxdepth: 1
+
+   simba.data_processors
+
+
+|:crystal_ball:| **Unsupervised learning**
+--------------------------------------------------
+
+Clustering and dimensionality reduction methods for behavioral analysis.
+
+.. toctree::
+   :maxdepth: 2
+
+   simba.unsupervised
+
+
+|:label:| **Labeling tools**
+--------------------------------------------------
+
+SimBA tools for annotating behavioral events.
+
+.. toctree::
+   :maxdepth: 2
+
+   simba.labelling
+
+
+|:inbox_tray:| **Third-party label appenders**
+--------------------------------------------------
+
+Append labels from external annotation tools to pose-estimation outputs.
+
+.. toctree::
+   :maxdepth: 1
+
+   simba.third_party_label_appenders
+
+
+|:gear:| **Utilities**
+--------------------------------------------------
+
+Helper methods for logging, CLI execution, argument checks, warnings, and I/O.
+
+.. toctree::
+   :maxdepth: 1
+
+   simba.utils
+
+
+|:package:| **Pose-estimation import tools**
+--------------------------------------------------
+
+Parse, load, and process pose-estimation data from common formats.
 
 .. toctree::
    :maxdepth: 1
@@ -194,10 +195,10 @@ Methods to import and manipulate pose-estimation data
    simba.pose_importers
 
 
-UI tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+|:desktop_computer:| **User Interface (UI) tools**
+--------------------------------------------------
 
-Methods for SimBA graphical interfaces
+SimBA's GUI components and window-based interaction logic.
 
 .. toctree::
    :maxdepth: 1
@@ -205,10 +206,23 @@ Methods for SimBA graphical interfaces
    simba.ui
 
 
-Bounding-box tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+|:world_map:| **ROI tools**
+--------------------------------------------------
 
-Methods for analyzing animal interactions through `overlapping bounding boxes <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`_.
+Define and analyze regions-of-interest (ROIs) in relation to tracking data.
+
+.. toctree::
+   :maxdepth: 3
+
+   simba.roi_tools
+
+
+|:package:| **Bounding-box tools**
+--------------------------------------------------
+
+Detect animal interactions via overlapping bounding boxes.
+
+See tutorial: `Cue-light tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`_
 
 .. toctree::
    :maxdepth: 2
@@ -217,10 +231,10 @@ Methods for analyzing animal interactions through `overlapping bounding boxes <h
    simba.yolo
 
 
-Model tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+|:robot_face:| **Model tools**
+--------------------------------------------------
 
-Methods for creating behavior models
+Create, train, and manage behavior classifiers in SimBA.
 
 .. toctree::
    :maxdepth: 4
@@ -228,11 +242,10 @@ Methods for creating behavior models
    simba.model_mixin
 
 
+|:wrench:| **Config reader**
+--------------------------------------------------
 
-Config reader methods
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Methods for reading SimBA project config and associated project data
+Parse SimBA config files and access project-specific metadata.
 
 .. toctree::
    :maxdepth: 2
@@ -240,13 +253,14 @@ Methods for reading SimBA project config and associated project data
    simba.config_reader
 
 
-Cue-light tools
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+|:bulb:| **Cue-light tools**
+--------------------------------------------------
 
-Methods for analyzing animal behaviours associated with `cue-light states through <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`_.
+Link animal behavior to cue-light on/off states.
+
+See tutorial: `Cue-light tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`_
 
 .. toctree::
    :maxdepth: 2
 
    simba.cue_light_tools
-
