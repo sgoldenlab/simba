@@ -23,3 +23,4 @@ For up-to-date and additional tutorials, see markdown content on the `SimBA GitH
    tutorials_rst/create_user_defined_pose_config
    tutorials_rst/tools
    tutorials_rst/blob_tracking
+   simba.env
