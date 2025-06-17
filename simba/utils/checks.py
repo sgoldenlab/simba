@@ -7,6 +7,7 @@ import re
 import subprocess
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union
+
 try:
     from typing import Literal
 except:
@@ -23,6 +24,7 @@ import pandas as pd
 import trafaret as t
 from shapely.geometry import Polygon
 
+from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.enums import Formats, Keys, Options, UMAPParam
 from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 CorruptedFileError, CountError,
@@ -32,10 +34,9 @@ from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 MissingColumnsError, NoDataError,
                                 NoFilesFoundError, NoROIDataError,
                                 NotDirectoryError, ParametersFileError,
-                                StringError, SimBAGPUError)
+                                SimBAGPUError, StringError)
 from simba.utils.warnings import (CorruptedFileWarning, FrameRangeWarning,
                                   InvalidValueWarning, NoDataFoundWarning)
-from simba.data_processors.cuda.utils import _is_cuda_available
 
 
 def check_file_exist_and_readable(file_path: Union[str, os.PathLike]) -> None:

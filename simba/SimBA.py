@@ -98,6 +98,9 @@ from simba.ui.pop_ups.directing_other_animals_plot_pop_up import \
 from simba.ui.pop_ups.direction_animal_to_bodypart_settings_pop_up import \
     DirectionAnimalToBodyPartSettingsPopUp
 from simba.ui.pop_ups.distance_plot_pop_up import DistancePlotterPopUp
+from simba.ui.pop_ups.dlc_annotations_to_labelme_popup import \
+    DLCAnnotations2LabelMePopUp
+from simba.ui.pop_ups.dlc_to_yolo_keypoints_popup import DLCYoloKeypointsPopUp
 from simba.ui.pop_ups.egocentric_alignment_pop_up import EgocentricAlignPopUp
 from simba.ui.pop_ups.fsttc_pop_up import FSTTCPopUp
 from simba.ui.pop_ups.gantt_pop_up import GanttPlotPopUp
@@ -107,6 +110,8 @@ from simba.ui.pop_ups.initialize_blob_tracking_pop_up import \
     InitializeBlobTrackerPopUp
 from simba.ui.pop_ups.interpolate_pop_up import InterpolatePopUp
 from simba.ui.pop_ups.kleinberg_pop_up import KleinbergPopUp
+from simba.ui.pop_ups.labelme_dir_to_csv_popup import LabelmeDirectory2CSVPopUp
+from simba.ui.pop_ups.labelme_to_imgs_popup import Labelme2ImgsPopUp
 from simba.ui.pop_ups.make_path_plot_pop_up import MakePathPlotPopUp
 from simba.ui.pop_ups.movement_analysis_pop_up import \
     MovementAnalysisPopUp  # ## LAZY
@@ -122,7 +127,8 @@ from simba.ui.pop_ups.pose_reorganizer_pop_up import PoseReorganizerPopUp
 from simba.ui.pop_ups.pup_retrieval_pop_up import PupRetrievalPopUp  # LAZY
 from simba.ui.pop_ups.quick_path_plot_pop_up import QuickLineplotPopup
 from simba.ui.pop_ups.remove_roi_features_pop_up import RemoveROIFeaturesPopUp
-from simba.ui.pop_ups.roi_aggregate_stats_popup import ROIAggregateDataAnalyzerPopUp
+from simba.ui.pop_ups.roi_aggregate_stats_popup import \
+    ROIAggregateDataAnalyzerPopUp
 from simba.ui.pop_ups.roi_analysis_pop_up import ROIAnalysisPopUp  # ## LAZY
 from simba.ui.pop_ups.roi_analysis_time_bins_pop_up import \
     ROIAnalysisTimeBinsPopUp  # ## LAZY
@@ -137,6 +143,9 @@ from simba.ui.pop_ups.select_video_for_pseudo_labelling_popup import \
 from simba.ui.pop_ups.set_machine_model_parameters_pop_up import \
     SetMachineModelParameters
 from simba.ui.pop_ups.severity_analysis_pop_up import AnalyzeSeverityPopUp
+from simba.ui.pop_ups.simba_rois_to_yolo_pop_up import SimBAROIs2YOLOPopUp
+from simba.ui.pop_ups.simba_to_yolo_keypoints_popup import \
+    SimBA2YoloKeypointsPopUp
 from simba.ui.pop_ups.single_video_to_frames_popup import \
     SingleVideo2FramesPopUp
 from simba.ui.pop_ups.smoothing_popup import SmoothingPopUp
@@ -144,15 +153,9 @@ from simba.ui.pop_ups.spontaneous_alternation_pop_up import \
     SpontaneousAlternationPopUp  # ## LAZY
 from simba.ui.pop_ups.subset_feature_extractor_pop_up import \
     FeatureSubsetExtractorPopUp
-from simba.ui.pop_ups.dlc_annotations_to_labelme_popup import DLCAnnotations2LabelMePopUp
-from simba.ui.pop_ups.labelme_dir_to_csv_popup import LabelmeDirectory2CSVPopUp
-from simba.ui.pop_ups.labelme_to_imgs_popup import Labelme2ImgsPopUp
 from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
     ThirdPartyAnnotatorAppenderPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
-from simba.ui.pop_ups.simba_rois_to_yolo_pop_up import SimBAROIs2YOLOPopUp
-from simba.ui.pop_ups.simba_to_yolo_keypoints_popup import SimBA2YoloKeypointsPopUp
-from simba.ui.pop_ups.dlc_to_yolo_keypoints_popup import DLCYoloKeypointsPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
     BackgroundRemoverDirectoryPopUp, BackgroundRemoverSingleVideoPopUp,
     BoxBlurPopUp, BrightnessContrastPopUp, CalculatePixelsPerMMInVideoPopUp,

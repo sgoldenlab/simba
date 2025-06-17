@@ -2,13 +2,18 @@ __author__ = "Simon Nilsson"
 
 import threading
 from tkinter import *
+
 import numpy as np
 import pandas as pd
+
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimBADropDown, FolderSelect, FileSelect)
-from simba.utils.read_write import str_2_bool, recursive_file_search
-from simba.third_party_label_appenders.converters import dlc_to_yolo_keypoints, get_yolo_keypoint_flip_idx, get_yolo_keypoint_bp_id_idx
+from simba.third_party_label_appenders.converters import (
+    dlc_to_yolo_keypoints, get_yolo_keypoint_bp_id_idx,
+    get_yolo_keypoint_flip_idx)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
+                                        FolderSelect, SimBADropDown)
 from simba.utils.checks import check_if_dir_exists
+from simba.utils.read_write import recursive_file_search, str_2_bool
 
 TRAIN_SIZE_OPTIONS = np.arange(10, 110, 10)
 SAMPLE_SIZE_OPTIONS = list(np.arange(50, 650, 50))
