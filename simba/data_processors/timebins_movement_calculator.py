@@ -80,7 +80,7 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
         timer = SimbaTimer(start=True)
         print("Creating time-bin movement plots...")
         plots_dir = os.path.join( self.project_path, "logs", f"time_bin_movement_plots_{self.datetime}")
-        create_directory(path=plots_dir, overwrite=True)
+        create_directory(paths=plots_dir, overwrite=True)
         for video_name in self.results["VIDEO"].unique():
             video_df = self.results.loc[(self.results["VIDEO"] == video_name) & (self.results["MEASUREMENT"] == "Movement (cm)")]
             video_df["TIME BIN #"] = video_df["TIME BIN #"].astype(int)

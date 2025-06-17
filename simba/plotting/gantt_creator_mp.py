@@ -158,9 +158,9 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
             self.temp_folder = os.path.join(self.gantt_plot_dir, self.video_name, "temp")
             self.save_frame_folder_dir = os.path.join(self.gantt_plot_dir, self.video_name)
             if self.frame_setting:
-                create_directory(path=self.save_frame_folder_dir, overwrite=True)
+                create_directory(paths=self.save_frame_folder_dir, overwrite=True)
             if self.video_setting:
-                create_directory(path=self.temp_folder)
+                create_directory(paths=self.temp_folder)
                 self.save_video_path = os.path.join(self.gantt_plot_dir, f"{self.video_name}.mp4")
 
             if self.last_frm_setting:

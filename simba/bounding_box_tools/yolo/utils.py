@@ -14,25 +14,10 @@ import numpy as np
 from ultralytics import YOLO
 
 from simba.data_processors.cuda.utils import _is_cuda_available
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_dir_exists, check_if_valid_img,
-                                check_instance, check_int, check_str,
-                                check_valid_array, check_valid_boolean)
+from simba.utils.checks import (check_file_exist_and_readable, check_float, check_if_dir_exists, check_if_valid_img, check_instance, check_int, check_str, check_valid_array, check_valid_boolean, check_valid_device)
 from simba.utils.enums import Formats
 from simba.utils.errors import InvalidInputError, SimBAGPUError
 from simba.utils.read_write import find_core_cnt, get_video_meta_data
-
-
-def check_valid_device(device: Union[Literal['cpu'], int]):
-    if isinstance(device, str):
-        check_str(name=f'{load_yolo_model.__name__} format', value=device.lower(), options=['cpu'], raise_error=True)
-    else:
-        check_int(name=f'{load_yolo_model.__name__} device', value=device, min_value=0, raise_error=True)
-        gpu_available, gpus = _is_cuda_available()
-        if not gpu_available:
-            raise SimBAGPUError(msg=f'No GPU detected but device {device} passed', source=load_yolo_model.__name__)
-        if device not in list(gpus.keys()):
-            raise SimBAGPUError(msg=f'Unaccepted GPU device {device} passed. Accepted: {list(gpus.keys())}', source=load_yolo_model.__name__)
 
 
 
@@ -209,8 +194,29 @@ def yolo_predict(model: YOLO,
                          device=device,
                          conf=threshold,
                          max_det=max_detections,
-                         verbose=verbose)
+                         verbose=verbose,
+                         imgsz=imgsz)
+
+
+
+
+
+#fit_yolo(weights_path="D:\yolo_weights\yolov8n.pt", model_yaml=r"C:\troubleshooting\RAT_NOR\project_folder\yolo\map.yaml", save_path=r"C:\troubleshooting\RAT_NOR\project_folder\yolo\mdl", batch=36, epochs=250)
+
+
+
+fit_yolo(weights_path=r"D:\yolo_weights\yolo11n-pose.pt", model_yaml=r"D:\rat_resident_intruder\yolo_1\map.yaml", save_path=r"D:\rat_resident_intruder\yolo_1\mdl", batch=36, epochs=250)
+
+
+#fit_yolo(weights_path="/mnt/d/yolo_weights/yolo11n-pose.pt", model_yaml="/mnt/d/mouse_operant_data/yolo/map.yaml", save_path="/mnt/d/mouse_operant_data/yolo/mdl/", batch=36, epochs=250)
+
+
+#fit_yolo(weights_path="/mnt/d/yolo_weights/yolo11n-pose.pt", model_yaml="/mnt/d/TS_DLC/yolo_kpt/map.yml", save_path="/mnt/d/TS_DLC/yolo_kpt/mdl", batch=32, epochs=100)
 
 
 #fit_yolo(weights_path="/mnt/d/yolo_weights/yolo11n-pose.pt", model_yaml="/mnt/d/ares/data/termite_2/yolo/map.yaml", save_path="/mnt/d/ares/data/termite_2/yolo/mdl", batch=32, epochs=1)
 #fit_yolo(weights_path="/mnt/d/yolo_weights/yolo11n-pose.pt", model_yaml="/mnt/d/ares/data/ant/yolo/map.yaml", save_path="/mnt/d/ares/data/ant/yolo/mdl", batch=18, epochs=100, workers=12)
+
+
+
+#fit_yolo(weights_path="/mnt/d/yolo_weights/yolo11n-pose.pt", model_yaml="/mnt/d/rat_resident_intruder/yolo/map.yaml", save_path="/mnt/d/rat_resident_intruder/yolo/mdl", batch=18, epochs=100, workers=12)

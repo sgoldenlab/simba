@@ -536,7 +536,7 @@ def clahe_enhance_video_mp(file_path: Union[str, os.PathLike],
     if (platform.system() == "Darwin") and (multiprocessing.get_start_method() is None):
         multiprocessing.set_start_method("spawn", force=False)
     tempdir = os.path.join(os.path.dirname(save_path), 'temp', file_name)
-    create_directory(path=tempdir, overwrite=True)
+    create_directory(paths=tempdir, overwrite=True)
     core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
     frm_idx = list(range(0, video_meta_data['frame_count']))
     frm_idx = np.array_split(frm_idx, core_cnt)

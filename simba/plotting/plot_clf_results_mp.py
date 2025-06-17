@@ -245,10 +245,10 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
             if self.video_setting:
                 self.video_save_path = os.path.join(self.sklearn_plot_dir, f"{self.video_name}.mp4")
                 self.video_temp_dir = os.path.join(self.sklearn_plot_dir, self.video_name, "temp")
-                create_directory(path=self.video_temp_dir, overwrite=True)
+                create_directory(paths=self.video_temp_dir, overwrite=True)
             if self.frame_setting:
                 self.video_frame_dir = os.path.join(self.sklearn_plot_dir, self.video_name)
-                create_directory(path=self.video_temp_dir, overwrite=True)
+                create_directory(paths=self.video_temp_dir, overwrite=True)
             if self.rotate:
                 self.video_meta_data["height"], self.video_meta_data["width"] = (width, height)
             check_video_and_data_frm_count_align(video=video_path, data=self.data_df, name=self.video_name, raise_error=False)

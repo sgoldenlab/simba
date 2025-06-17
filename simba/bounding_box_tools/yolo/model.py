@@ -77,6 +77,9 @@ def inference_yolo_pose_tracks(weights_path: Union[str, os.PathLike],
 
 
 
+
+#fit_yolo(initial_weights=r"/mnt/d/yolo_weights/yolo11n-pose.pt", model_yaml=r"/mnt/d/netholabs/yolo_data_1/map.yaml", save_path=r"/mnt/d/netholabs/yolo_mdls_1", batch=32, epochs=100)
+
 # VIDEO_PATH = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-46-56.mp4"
 # BOTSORT_PATH = "/mnt/c/projects/simba/simba/simba/assets/botsort.yml"
 # inference_yolo_pose_tracks(weights_path=r"/mnt/d/netholabs/yolo_mdls_1/train/weights/best.pt",

@@ -148,7 +148,7 @@ class YOLOPoseVisualizer():
         self.threshold, self.circle_size, self.thickness = threshold, circle_size, thickness
         self.video_temp_dir = os.path.join(self.save_dir, self.video_name, "temp")
         self.save_path = os.path.join(self.save_dir, f'{self.video_name}.mp4')
-        create_directory(path=self.video_temp_dir)
+        create_directory(paths=self.video_temp_dir)
 
 
     def run(self):
@@ -184,14 +184,14 @@ class YOLOPoseVisualizer():
 #
 #     kp_vis.run()
 
-#video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
-# video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-50-23.mp4"
-# data_path = r"/mnt/d/netholabs/yolo_videos_out/2025-05-28_19-50-23.csv"
-# save_dir = r'/mnt/d/netholabs/yolo_videos_out'
-# kp_vis = YOLOPoseVisualizer(data_path=data_path,
-#                             video_path=video_path,
-#                             save_dir=save_dir,
-#                             core_cnt=18)
-#
-#
-# kp_vis.run()
+video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
+video_path = "/mnt/c/troubleshooting/mitra/project_folder/videos/502_MA141_Gi_CNO_0514.mp4"
+data_path = r"/mnt/c/troubleshooting/mitra/yolo/results/502_MA141_Gi_CNO_0514.csv"
+save_dir = r'/mnt/c/troubleshooting/mitra/yolo/results/'
+kp_vis = YOLOPoseVisualizer(data_path=data_path,
+                            video_path=video_path,
+                            save_dir=save_dir,
+                            core_cnt=18)
+
+
+kp_vis.run()

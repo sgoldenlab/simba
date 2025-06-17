@@ -160,11 +160,11 @@ class CueLightVisualizer(ConfigReader):
         frames_dir, video_temp_dir = None, None
         if self.frame_setting:
             frames_dir = os.path.join(self.frames_save_dir, self.video_name)
-            create_directory(path=frames_dir, overwrite=True)
+            create_directory(paths=frames_dir, overwrite=True)
         if self.video_setting:
             self.save_video_path = os.path.join(self.video_save_dir, f"{self.video_name}.mp4")
             video_temp_dir = os.path.join(self.video_save_dir, 'temp')
-            create_directory(path=video_temp_dir, overwrite=True)
+            create_directory(paths=video_temp_dir, overwrite=True)
         self.frm_lst = list(range(0, self.video_meta_data["frame_count"], 1))
         self.frame_chunks = np.array_split(self.frm_lst, self.core_cnt)
         self.frame_chunks = [(x, j) for x, j in enumerate(self.frame_chunks)]

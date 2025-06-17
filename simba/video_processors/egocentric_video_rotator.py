@@ -145,10 +145,10 @@ class EgocentricVideoRotator():
         video_timer = SimbaTimer(start=True)
         temp_dir = os.path.join(self.save_dir, 'temp')
         if not os.path.isdir(temp_dir):
-            create_directory(path=temp_dir)
+            create_directory(paths=temp_dir)
         else:
             remove_a_folder(folder_dir=temp_dir)
-            create_directory(path=temp_dir)
+            create_directory(paths=temp_dir)
         frm_list = np.arange(0, self.video_meta_data['frame_count'])
         frm_list = np.array_split(frm_list, self.core_cnt)
         frm_list = [(cnt, x) for cnt, x in enumerate(frm_list)]

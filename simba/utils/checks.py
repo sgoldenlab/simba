@@ -7,6 +7,10 @@ import re
 import subprocess
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Type, Union
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 
 try:
     import cupy as cp
@@ -28,9 +32,10 @@ from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 MissingColumnsError, NoDataError,
                                 NoFilesFoundError, NoROIDataError,
                                 NotDirectoryError, ParametersFileError,
-                                StringError)
+                                StringError, SimBAGPUError)
 from simba.utils.warnings import (CorruptedFileWarning, FrameRangeWarning,
                                   InvalidValueWarning, NoDataFoundWarning)
+from simba.data_processors.cuda.utils import _is_cuda_available
 
 
 def check_file_exist_and_readable(file_path: Union[str, os.PathLike]) -> None:
@@ -1699,6 +1704,42 @@ def check_valid_img_path(path: Union[str, os.PathLike], raise_error: bool = True
         else:
             return False
     return True
+
+
+
+
+def check_valid_device(device: Union[Literal['cpu'], int], raise_error: bool = True) -> bool:
+    """
+    Validate a compute device specification, ensuring it is either 'cpu' or a valid GPU index.
+
+    :param device: The device to validate. Should be the string 'cpu' for CPU usage, or an integer representing a CUDA device index (e.g., 0 for 'cuda:0').
+    :param raise_error: If True, raises `InvalidInputError` or `SimBAGPUError` when the device is invalid. If False, returns `False` instead of raising errors. Default True.
+    """
+    source = check_valid_device.__name__
+    if isinstance(device, str):
+        valid, msg = check_str(name=f'{source} format', value=device.lower(), options=['cpu'], raise_error=False)
+        if not valid:
+            if raise_error:
+                raise InvalidInputError(msg=msg, source=source)
+            return False
+        return True
+
+    valid, msg = check_int(name=f'{source} device', value=device, min_value=0, raise_error=False)
+    if not valid:
+        if raise_error:
+            raise InvalidInputError(msg=msg, source=source)
+        return False
+
+    gpu_available, gpus = _is_cuda_available()
+    if not gpu_available:
+        if raise_error:
+            raise SimBAGPUError(msg=f'No GPU detected but device {device} passed', source=source)
+        return False
+
+    if device not in gpus:
+        if raise_error:
+            raise SimBAGPUError(msg=f'Unaccepted GPU device {device} passed. Accepted: {list(gpus.keys())}', source=source)
+        return False
 
 
 

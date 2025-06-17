@@ -840,7 +840,7 @@ def slice_imgs(video_path: Union[str, os.PathLike],
         results = np.zeros((n, h, w, 3), dtype=np.uint8) if is_color else np.zeros((n, h, w), dtype=np.uint8)
     else:
         save_temp_dir = os.path.join(save_dir, f'temp_{video_meta_data["video_name"]}')
-        create_directory(path=save_temp_dir, overwrite=True)
+        create_directory(paths=save_temp_dir, overwrite=True)
         video_out_path = os.path.join(save_dir, f'{video_meta_data["video_name"]}.mp4')
     frm_reader = AsyncVideoFrameReader(video_path=video_path, batch_size=batch_size, verbose=True, max_que_size=2)
     frm_reader.start()

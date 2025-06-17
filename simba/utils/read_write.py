@@ -1656,22 +1656,35 @@ def read_roi_data(roi_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, pd.D
 
 #read_roi_data(roi_path=r"C:\troubleshooting\mitra\project_folder\logs\measures\ROI_definitions.h5")
 
-def create_directory(path: Union[str, os.PathLike, bytes], overwrite: bool = False):
-    if not os.path.exists(path):
-        try:
-            os.makedirs(path)
-        except FileExistsError:
-            raise PermissionError(msg=f'SimBA is not allowed to create the directory {path}.', source=create_directory.__name__)
+def create_directory(paths: Union[str, os.PathLike, bytes, List[str], Tuple[str]], overwrite: bool = False) -> None:
+
+    """
+    Create one or multiple directories.
+
+    :param Union[str, os.PathLike, bytes, List[str], Tuple[str]] paths: A single path or a list/tuple of paths to create. Each path must be a non-empty string.
+    :param overwrite: If True and the directory already exists, it will be deleted and recreated. If False, the existing directory will be preserved.
+    :return: None
+    """
+
+    if isinstance(paths, (list, tuple)):
+        for i in paths:
+            check_str(name=f'{create_directory.__name__} paths', value=i, allow_blank=False, raise_error=True)
     else:
-        if not overwrite:
-            pass
-        else:
+        check_str(name=f'{create_directory.__name__} paths', value=paths, allow_blank=False, raise_error=True)
+        paths = [paths]
+    for path in paths:
+        path = os.path.abspath(path)
+        if not os.path.exists(path):
+            try:
+                os.makedirs(path)
+            except Exception as e:
+                raise PermissionError(f'SimBA is not allowed to create the directory {path} ({e})')
+        elif overwrite:
             try:
                 remove_a_folder(folder_dir=path)
                 os.makedirs(path)
-            except FileExistsError:
-                raise PermissionError(msg=f'SimBA is not allowed to create the directory {path}.', source=create_directory.__name__)
-
+            except Exception as e:
+                raise PermissionError(f'SimBA is not allowed to overwrite the directory {path} ({e})')
 
 
 def find_max_vertices_coordinates(shapes: List[Union[Polygon, LineString, MultiPolygon, Point]], buffer: Optional[int] = None) -> Tuple[int, int]:
@@ -3042,6 +3055,56 @@ def read_sleap_csv(file_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, li
     bp_headers = [(f'{x}.x', f'{x}.y') for x in bp_names]
 
     return data_df, bp_names, [i for t in bp_headers for i in t]
+
+
+
+
+def recursive_file_search(directory: Union[str, os.PathLike],
+                          substrings: Union[str, List[str]],
+                          extensions: Union[str, List[str]],
+                          case_sensitive: bool = False,
+                          raise_error: bool = True) -> List[str]:
+    """
+    Recursively search for files in a directory and all subdirectories that:
+    - Contain any of the given substrings in their filename
+    - Have one of the specified file extensions
+
+    :param directory: Directory to start the search from.
+    :param substrings: A substring or list of substrings to match in filenames.
+    :param extensions: A file extension or list of allowed extensions (with or without dot).
+    :param case_sensitive: If True, substring match is case-sensitive. Default False.
+    :param raise_error: If True, raise an error if no matches are found.
+    :return: List of matching file paths.
+    """
+
+    check_if_dir_exists(in_dir=directory)
+    if isinstance(substrings, str):
+        substrings = [substrings]
+    check_valid_lst(data=substrings, valid_dtypes=(str,), min_len=1, raise_error=True)
+
+    if isinstance(extensions, str):
+        extensions = [extensions]
+    check_valid_lst(data=extensions, valid_dtypes=(str,), min_len=1, raise_error=True)
+
+    check_valid_boolean(value=case_sensitive, source=f'{recursive_file_search.__name__} case_sensitive', raise_error=True)
+
+    extensions = [ext.lower().lstrip('.') for ext in extensions]
+    if not case_sensitive:
+        substrings = [s.lower() for s in substrings]
+
+    results = []
+    for root, _, files in os.walk(directory):
+        for f in files:
+            name, ext = os.path.splitext(f)
+            ext = ext.lstrip('.').lower()
+            match_substr = any(s in f if case_sensitive else s in f.lower() for s in substrings)
+            if ext in extensions and match_substr:
+                results.append(os.path.join(root, f))
+
+    if not results and raise_error:
+        raise NoFilesFoundError(msg=f'No files with extensions {extensions} and substrings {substrings} found in {directory}', source=recursive_file_search.__name__)
+
+    return results
 
 
 def read_sys_env():

@@ -244,7 +244,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
         self.temp_dir = os.path.join(self.single_validation_video_save_dir, "temp")
         self.video_save_path = os.path.join(self.single_validation_video_save_dir, f"{self.feature_filename}.mp4")
-        create_directory(path=self.temp_dir, overwrite=True)
+        create_directory(paths=self.temp_dir, overwrite=True)
         if platform.system() == "Darwin":
             multiprocessing.set_start_method("spawn", force=True)
 

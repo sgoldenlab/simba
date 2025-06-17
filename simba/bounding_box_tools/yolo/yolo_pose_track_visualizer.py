@@ -144,7 +144,7 @@ class YOLOPoseTrackVisualizer():
         self.threshold, self.circle_size, self.thickness = threshold, circle_size, thickness
         self.video_temp_dir = os.path.join(self.save_dir, self.video_name, "temp")
         self.save_path = os.path.join(self.save_dir, f'{self.video_name}.mp4')
-        create_directory(path=self.video_temp_dir)
+        create_directory(paths=self.video_temp_dir)
 
 
     def run(self):

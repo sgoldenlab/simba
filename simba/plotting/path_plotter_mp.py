@@ -277,10 +277,10 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
                 self.video_save_path = os.path.join(self.path_plot_dir, f"{self.video_name}.mp4")
                 self.writer = cv2.VideoWriter(self.video_save_path, self.fourcc, self.fps, (video_styles[STYLE_WIDTH], video_styles[STYLE_HEIGHT]))
                 self.video_temp_dir = os.path.join(self.path_plot_dir, self.video_name)
-                create_directory(path=self.video_temp_dir, overwrite=True)
+                create_directory(paths=self.video_temp_dir, overwrite=True)
             if self.frame_setting:
                 self.save_frm_dir = os.path.join(self.path_plot_dir, self.video_name)
-                create_directory(path=self.save_frm_dir, overwrite=True)
+                create_directory(paths=self.save_frm_dir, overwrite=True)
             video_rois, video_roi_names = None, None
             if self.roi:
                 video_rois, video_roi_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=self.video_name)

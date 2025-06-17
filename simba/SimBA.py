@@ -122,8 +122,7 @@ from simba.ui.pop_ups.pose_reorganizer_pop_up import PoseReorganizerPopUp
 from simba.ui.pop_ups.pup_retrieval_pop_up import PupRetrievalPopUp  # LAZY
 from simba.ui.pop_ups.quick_path_plot_pop_up import QuickLineplotPopup
 from simba.ui.pop_ups.remove_roi_features_pop_up import RemoveROIFeaturesPopUp
-from simba.ui.pop_ups.roi_aggregate_stats_popup import \
-    ROIAggregateDataAnalyzerPopUp
+from simba.ui.pop_ups.roi_aggregate_stats_popup import ROIAggregateDataAnalyzerPopUp
 from simba.ui.pop_ups.roi_analysis_pop_up import ROIAnalysisPopUp  # ## LAZY
 from simba.ui.pop_ups.roi_analysis_time_bins_pop_up import \
     ROIAnalysisTimeBinsPopUp  # ## LAZY
@@ -145,9 +144,15 @@ from simba.ui.pop_ups.spontaneous_alternation_pop_up import \
     SpontaneousAlternationPopUp  # ## LAZY
 from simba.ui.pop_ups.subset_feature_extractor_pop_up import \
     FeatureSubsetExtractorPopUp
+from simba.ui.pop_ups.dlc_annotations_to_labelme_popup import DLCAnnotations2LabelMePopUp
+from simba.ui.pop_ups.labelme_dir_to_csv_popup import LabelmeDirectory2CSVPopUp
+from simba.ui.pop_ups.labelme_to_imgs_popup import Labelme2ImgsPopUp
 from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
     ThirdPartyAnnotatorAppenderPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
+from simba.ui.pop_ups.simba_rois_to_yolo_pop_up import SimBAROIs2YOLOPopUp
+from simba.ui.pop_ups.simba_to_yolo_keypoints_popup import SimBA2YoloKeypointsPopUp
+from simba.ui.pop_ups.dlc_to_yolo_keypoints_popup import DLCYoloKeypointsPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
     BackgroundRemoverDirectoryPopUp, BackgroundRemoverSingleVideoPopUp,
     BoxBlurPopUp, BrightnessContrastPopUp, CalculatePixelsPerMMInVideoPopUp,
@@ -866,10 +871,16 @@ class App(object):
         concatenate_menu.add_command(label="Concatenate multiple videos", compound="left", image=self.menu_icons["concat_videos"]["img"], command=lambda: ConcatenatorPopUp(config_path=None), font=Formats.FONT_REGULAR.value)
         video_process_menu.add_cascade(label="Concatenate (stack) videos...", compound="left", image=self.menu_icons["concat"]["img"], menu=concatenate_menu, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Convert ROI definitions", compound="left", image=self.menu_icons["roi"]["img"], command=lambda: ConvertROIDefinitionsPopUp(), font=Formats.FONT_REGULAR.value)
+
         convert_data_menu = Menu(video_process_menu)
         convert_data_menu.add_command(label="Convert CSV to parquet", compound="left", image=self.menu_icons["parquet"]["img"], command=Csv2ParquetPopUp, font=Formats.FONT_REGULAR.value)
-        convert_data_menu.add_command(label="Convert parquet o CSV", compound="left", image=self.menu_icons["csv_grey"]["img"], command=Parquet2CsvPopUp, font=Formats.FONT_REGULAR.value)
-
+        convert_data_menu.add_command(label="Convert parquet to CSV", compound="left", image=self.menu_icons["csv_grey"]["img"], command=Parquet2CsvPopUp, font=Formats.FONT_REGULAR.value)
+        convert_data_menu.add_command(label="Convert DLC annotations to Labelme", compound="left", image=self.menu_icons["labelme"]["img"], command=DLCAnnotations2LabelMePopUp, font=Formats.FONT_REGULAR.value)
+        convert_data_menu.add_command(label="Convert Labelme to CSV", compound="left", image=self.menu_icons["labelme_2"]["img"], command=LabelmeDirectory2CSVPopUp, font=Formats.FONT_REGULAR.value)
+        convert_data_menu.add_command(label="Convert SimBA ROI to YOLO", compound="left", image=self.menu_icons["shapes_small_2"]["img"], command=SimBAROIs2YOLOPopUp, font=Formats.FONT_REGULAR.value)
+        convert_data_menu.add_command(label="Convert SimBA to YOLO pose", compound="left", image=self.menu_icons["ultralytics_1"]["img"], command=SimBA2YoloKeypointsPopUp, font=Formats.FONT_REGULAR.value)
+        convert_data_menu.add_command(label="DLC to YOLO pose", compound="left", image=self.menu_icons["ultralytics_1"]["img"], command=DLCYoloKeypointsPopUp, font=Formats.FONT_REGULAR.value)
+        convert_data_menu.add_command(label="Convert Labelme to images", compound="left", image=self.menu_icons["labelme_3"]["img"], command=Labelme2ImgsPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_cascade(label="Convert working file type...", compound="left", image=self.menu_icons["change"]["img"], menu=convert_data_menu, font=Formats.FONT_REGULAR.value)
 
         video_process_menu.add_command(label="Create path plot", compound="left", image=self.menu_icons["path"]["img"], command=MakePathPlotPopUp, font=Formats.FONT_REGULAR.value)
