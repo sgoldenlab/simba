@@ -1,13 +1,16 @@
 __author__ = "Simon Nilsson"
 
 from tkinter import *
-import numpy as np
-from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimBADropDown, FolderSelect)
-from simba.utils.read_write import str_2_bool
-from simba.utils.checks import check_if_dir_exists
 
-from simba.third_party_label_appenders.transform.dlc_to_labelme import DLC2Labelme
+import numpy as np
+
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.third_party_label_appenders.transform.dlc_to_labelme import \
+    DLC2Labelme
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FolderSelect,
+                                        SimBADropDown)
+from simba.utils.checks import check_if_dir_exists
+from simba.utils.read_write import str_2_bool
 
 
 class DLC2LabelmePopUp(PopUpMixin):

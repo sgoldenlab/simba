@@ -1,16 +1,21 @@
 import json
 import os
 from typing import Any, Dict, Optional, Union
+
 import pandas as pd
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 
-from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists, check_valid_boolean, check_instance)
-from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (get_fn_ext, read_img, recursive_file_search)
 from simba.third_party_label_appenders.transform.utils import arr_to_b64
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists, check_instance,
+                                check_valid_boolean)
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import get_fn_ext, read_img, recursive_file_search
+
 
 class DLC2Labelme():
 

@@ -2,12 +2,14 @@ import os
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 from typing import Optional, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 
 import numpy as np
+
 try:
     from ultralytics import YOLO
 except ModuleNotFoundError:

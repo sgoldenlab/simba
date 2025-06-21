@@ -1,8 +1,9 @@
 import os
 import random
 from typing import Dict, Optional, Tuple, Union
-import pandas as pd
+
 import numpy as np
+import pandas as pd
 
 try:
     from typing import Literal
@@ -10,14 +11,20 @@ except:
     from typing_extensions import Literal
 
 import cv2
-from simba.utils.checks import (check_float, check_if_dir_exists, check_int, check_valid_boolean, check_valid_dataframe, check_valid_tuple, check_str)
-from simba.utils.enums import Options
-from simba.utils.errors import (InvalidInputError, NoFilesFoundError)
-from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (create_directory, find_files_of_filetypes_in_directory, get_video_meta_data, read_frm_of_video)
-from simba.bounding_box_tools.yolo.utils import keypoint_array_to_yolo_annotation_str
-from simba.third_party_label_appenders.transform.utils import create_yolo_keypoint_yaml, get_yolo_keypoint_flip_idx
 
+from simba.bounding_box_tools.yolo.utils import \
+    keypoint_array_to_yolo_annotation_str
+from simba.third_party_label_appenders.transform.utils import (
+    create_yolo_keypoint_yaml, get_yolo_keypoint_flip_idx)
+from simba.utils.checks import (check_float, check_if_dir_exists, check_int,
+                                check_str, check_valid_boolean,
+                                check_valid_dataframe, check_valid_tuple)
+from simba.utils.enums import Options
+from simba.utils.errors import InvalidInputError, NoFilesFoundError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (create_directory,
+                                    find_files_of_filetypes_in_directory,
+                                    get_video_meta_data, read_frm_of_video)
 
 
 class Sleap2Yolo:

@@ -1,7 +1,8 @@
 import os
 import random
-from typing import Optional, Union
 from datetime import datetime
+from typing import Optional, Union
+
 try:
     from typing import Literal
 except:
@@ -13,13 +14,17 @@ from shapely.geometry import Polygon
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
-from simba.utils.checks import check_float, check_if_dir_exists, check_int, check_valid_boolean
+from simba.third_party_label_appenders.transform.utils import \
+    create_yolo_keypoint_yaml
+from simba.utils.checks import (check_float, check_if_dir_exists, check_int,
+                                check_valid_boolean)
 from simba.utils.enums import Formats, Options
-from simba.utils.errors import NoFilesFoundError, InvalidInputError
+from simba.utils.errors import InvalidInputError, NoFilesFoundError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import  create_directory, find_files_of_filetypes_in_directory, find_video_of_file, get_video_meta_data, read_frm_of_video, read_roi_data
-from simba.third_party_label_appenders.transform.utils import create_yolo_keypoint_yaml
-
+from simba.utils.read_write import (create_directory,
+                                    find_files_of_filetypes_in_directory,
+                                    find_video_of_file, get_video_meta_data,
+                                    read_frm_of_video, read_roi_data)
 
 
 class SimBAROI2Yolo:

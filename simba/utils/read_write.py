@@ -22,6 +22,7 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+
 import h5py
 from PIL import Image
 
@@ -50,12 +51,12 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_if_filepath_list_is_empty,
                                 check_if_keys_exist_in_dict,
                                 check_if_string_value_is_valid_video_timestamp,
-                                check_if_valid_rgb_tuple, check_instance,
-                                check_int, check_nvidea_gpu_available,
-                                check_str, check_valid_array,
-                                check_valid_boolean, check_valid_dataframe,
-                                check_valid_lst, check_valid_url, is_img_bw,
-                                is_video_color, check_if_valid_img)
+                                check_if_valid_img, check_if_valid_rgb_tuple,
+                                check_instance, check_int,
+                                check_nvidea_gpu_available, check_str,
+                                check_valid_array, check_valid_boolean,
+                                check_valid_dataframe, check_valid_lst,
+                                check_valid_url, is_img_bw, is_video_color)
 from simba.utils.enums import (ENV_VARS, ConfigKey, Defaults, Dtypes, Formats,
                                Keys, Links, Options, Paths)
 from simba.utils.errors import (DataHeaderError, DuplicationError,
