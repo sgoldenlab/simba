@@ -2,16 +2,16 @@ import os
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 from typing import Optional, Union
-
-import torch
-
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 
 import numpy as np
-from ultralytics import YOLO
+try:
+    from ultralytics import YOLO
+except ModuleNotFoundError:
+    YOLO = None
 
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.checks import (check_file_exist_and_readable, check_float, check_if_dir_exists, check_if_valid_img, check_instance, check_int, check_str, check_valid_array, check_valid_boolean, check_valid_device)
@@ -51,6 +51,9 @@ def fit_yolo(weights_path: Union[str, os.PathLike],
 
     """
     VALID_FORMATS = ["onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite"]
+
+    os.environ['TORCH_HOME'] = r"D:\troubleshooting\netholabs\whisker_examples"
+
 
     if not _is_cuda_available()[0]:
         raise SimBAGPUError(msg='No GPU detected.', source=fit_yolo.__name__)
@@ -198,14 +201,84 @@ def yolo_predict(model: YOLO,
                          imgsz=imgsz)
 
 
+def keypoint_array_to_yolo_annotation_str(x: np.ndarray,
+                                          img_h: int,
+                                          img_w: int,
+                                          padding: Optional[float] = None) -> str:
+    """
+    Convert a set of keypoints into a YOLO-format annotation string that includes the normalized bounding box and keypoints.
 
+    [x_center y_center width height x1 y1 v1 x2 y2 v2 ... xn yn vn]
+
+    :param np.ndarray x: Array of keypoints with shape (N, 3), where each row contains (x, y, visibility).
+    :param int img_h: Height of the image.
+    :param int img_w: Width of the image.
+    :param Optional[float] padding: Optional padding factor (between 0.0 and 1.0) to expand the bounding box around the keypoints.
+    :return: YOLO string representation of the pose-estimation data including bounding box and keypoints.
+    :rtype: str
+
+    :example:
+    >>> x = np.array([[100, 200, 2], [150, 250, 2], [120, 240, 1]])
+    >>> keypoint_array_to_yolo_annotation_str(x=x, img_h=480, img_w=640)
+    """
+    check_valid_array(data=x, source=f'{keypoint_array_to_yolo_annotation_str.__name__} x', accepted_ndims=(2,), accepted_axis_1_shape=[2, 3], accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_axis_0=1)
+    check_int(name=f'{keypoint_array_to_yolo_annotation_str.__name__} img_h', value=img_h, min_value=1, raise_error=True)
+    check_int(name=f'{keypoint_array_to_yolo_annotation_str.__name__} img_w', value=img_w, min_value=1, raise_error=True)
+    if x.shape[1] == 3:
+        check_valid_array(data=x[:, 2].flatten(), source=f'{keypoint_array_to_yolo_annotation_str.__name__} x visability flag', accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_axis_0=1, accepted_values=[0, 1, 2])
+
+    img_h, img_w, x = int(img_h), int(img_w), x.astype(np.float32)
+    if padding is not None:
+        check_float(name=f'{keypoint_array_to_yolo_annotation_str.__name__} padding', value=padding, max_value=1.0, min_value=0.0, raise_error=True)
+        padding = float(padding)
+
+    padding = 0.0 if padding is None else padding
+    instance_str = ''
+    x[np.all(x[:, 0:2] == 0.0, axis=1)] = np.nan
+    x_coords, y_coords = x[:, 0], x[:, 1]
+    min_x, max_x = np.nanmin(x_coords), np.nanmax(x_coords)
+    min_y, max_y = np.nanmin(y_coords), np.nanmax(y_coords)
+    pad_w, pad_h = padding * img_w, padding * img_h
+    min_x, max_x = max(min_x - pad_w / 2, 0), min(max_x + pad_w / 2, img_w)
+    min_y, max_y = max(min_y - pad_h / 2, 0), min(max_y + pad_h / 2, img_h)
+    bbox_w, bbox_h = max_x - min_x, max_y - min_y
+    x_center, y_center = min_x + bbox_w / 2, min_y + bbox_h / 2
+    x_center /= img_w
+    y_center /= img_h
+    bbox_w /= img_w
+    bbox_h /= img_h
+    x_center = np.clip(x_center, 0.0, 1.0)
+    y_center = np.clip(y_center, 0.0, 1.0)
+    bbox_w = np.clip(bbox_w, 0.0, 1.0)
+    bbox_h = np.clip(bbox_h, 0.0, 1.0)
+    x[:, 0] /= img_w
+    x[:, 1] /= img_h
+    x[:, 0:2] = np.clip(x[:, 0:2], 0.0, 1.0)
+    instance_str += f"{x_center:.6f} {y_center:.6f} {bbox_w:.6f} {bbox_h:.6f} "
+    x = np.nan_to_num(x, nan=0.0)
+    for kp in x:
+        instance_str += f"{kp[0]:.6f} {kp[1]:.6f} {int(kp[2])} "
+    return instance_str.strip() + '\n'
+
+
+
+#fit_yolo(weights_path="D:\yolo_weights\yolo11n-pose.pt", model_yaml=r"D:\rat_resident_intruder\yolo_3\map.yaml", save_path=r"D:\rat_resident_intruder\yolo_3\mdl", batch=12, epochs=100)
+
+
+
+
+#fit_yolo(weights_path="D:\yolo_weights\yolo11n-pose.pt", model_yaml=r"D:\troubleshooting\dlc_h5_multianimal_to_yolo\yolo\map.yaml", save_path=r"D:\troubleshooting\dlc_h5_multianimal_to_yolo\yolo\mdl", batch=36, epochs=250)
+
+
+#fit_yolo(weights_path="D:\yolo_weights\yolo11n-pose.pt", model_yaml=r"D:\troubleshooting\dlc_h5_multianimal_to_yolo\yolo\map.yaml", save_path=r"D:\troubleshooting\dlc_h5_multianimal_to_yolo\yolo\mdl", batch=36, epochs=250)
 
 
 #fit_yolo(weights_path="D:\yolo_weights\yolov8n.pt", model_yaml=r"C:\troubleshooting\RAT_NOR\project_folder\yolo\map.yaml", save_path=r"C:\troubleshooting\RAT_NOR\project_folder\yolo\mdl", batch=36, epochs=250)
 
 
+# fit_yolo(weights_path=r"C:\Users\sroni\Downloads\yolo11n (1).pt", model_yaml=r"D:\troubleshooting\two_animals_sleap\import_data\yolo\map.yaml", save_path=r"D:\troubleshooting\two_animals_sleap\import_data\yolo\mdl", batch=36, epochs=250)
 
-fit_yolo(weights_path=r"D:\yolo_weights\yolo11n-pose.pt", model_yaml=r"D:\rat_resident_intruder\yolo_1\map.yaml", save_path=r"D:\rat_resident_intruder\yolo_1\mdl", batch=36, epochs=250)
+#fit_yolo(weights_path=r"D:\yolo_weights\yolo11n-pose.pt", model_yaml=r"D:\rat_resident_intruder\yolo_1\map.yaml", save_path=r"D:\rat_resident_intruder\yolo_1\mdl", batch=36, epochs=250)
 
 
 #fit_yolo(weights_path="/mnt/d/yolo_weights/yolo11n-pose.pt", model_yaml="/mnt/d/mouse_operant_data/yolo/map.yaml", save_path="/mnt/d/mouse_operant_data/yolo/mdl/", batch=36, epochs=250)

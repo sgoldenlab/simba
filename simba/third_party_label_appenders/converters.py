@@ -25,6 +25,7 @@ from shapely.geometry import Polygon
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.image_mixin import ImageMixin
+from simba.mixins.pose_importer_mixin import PoseImporterMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
                                 check_if_keys_exist_in_dict,
@@ -32,7 +33,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_array, check_valid_boolean,
                                 check_valid_dataframe, check_valid_dict,
                                 check_valid_tuple, check_instance, check_video_and_data_frm_count_align, check_valid_lst)
-from simba.utils.warnings import NoDataFoundWarning
+from simba.utils.warnings import NoDataFoundWarning, FrameRangeWarning
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import (FaultyTrainingSetError, InvalidInputError,
                                 NoFilesFoundError)
@@ -1046,7 +1047,7 @@ def create_yolo_keypoint_yaml(path: Union[str, os.PathLike],
     yaml.add_representer(InlineList, represent_inline_list)
     for p in [path, train_path, val_path]:
         check_if_dir_exists(in_dir=p, source=create_yolo_keypoint_yaml.__name__)
-    check_valid_dict(x=names, valid_key_dtypes=(int,), valid_values_dtypes=(str,), min_len_keys=1)
+    check_valid_dict(x=names, valid_key_dtypes=(int,), valid_values_dtypes=(str,), min_len_keys=1, source=create_yolo_keypoint_yaml.__name__)
     unique_paths = list({path, train_path, val_path})
     if len(unique_paths) < 3:
         raise InvalidInputError('The passed paths have to be unique.', source=create_yolo_keypoint_yaml.__name__)
@@ -1262,7 +1263,6 @@ def merge_coco_keypoints_files(data_dir: Union[str, os.PathLike],
     save_json(data=results, filepath=save_path)
     stdout_success(msg=f'COCO keypoints file saved at {save_path}', source=merge_coco_keypoints_files.__name__)
 
-
 def sleap_to_yolo_keypoints(data_dir: Union[str, os.PathLike],
                             video_dir: Union[str, os.PathLike],
                             save_dir: Union[str, os.PathLike],
@@ -1270,8 +1270,9 @@ def sleap_to_yolo_keypoints(data_dir: Union[str, os.PathLike],
                             verbose: bool = True,
                             instance_threshold: float = 0,
                             train_size: float = 0.7,
-                            flip_idx: Tuple[int, ...] = (0, 1, 2, 3),
-                            map_dict: Dict[str, int] = {0: 'termite'},
+                            flip_idx: Tuple[int, ...] = None,
+                            names: Tuple[str, ...] = None,
+                            greyscale: bool = False,
                             padding: float = 0.00):
 
     """
@@ -1293,11 +1294,7 @@ def sleap_to_yolo_keypoints(data_dir: Union[str, os.PathLike],
     :return: None. Results saved in ``save_dir``.
 
     :example:
-    >>> sleap_to_yolo_keypoints(data_dir=r'C:\troubleshooting\sleap_import_two_tracks\data_csv',
-    >>> video_dir=r'C:\troubleshooting\sleap_import_two_tracks\project_folder\videos',
-    >>> frms_cnt=1,
-    >>> instance_threshold=0.7,
-    >>> save_dir=r"C:\troubleshooting\yolo_animal\slp_csv_to_yolo_kp")
+    >>> sleap_to_yolo_keypoints(data_dir=r'D:\ares\data\ant\sleap_csv', video_dir=r'D:\ares\data\ant\sleap_video', frms_cnt=550, train_size=0.8, instance_threshold=0.9, save_dir=r"D:\ares\data\ant\yolo")
 
     """
 
@@ -1309,12 +1306,13 @@ def sleap_to_yolo_keypoints(data_dir: Union[str, os.PathLike],
     img_dir, lbl_dir = os.path.join(save_dir, 'images'), os.path.join(save_dir, 'labels')
     img_train_dir, img_val_dir = os.path.join(save_dir, 'images', 'train'), os.path.join(save_dir, 'images', 'val')
     lbl_train_dir, lb_val_dir = os.path.join(save_dir, 'labels', 'train'), os.path.join(save_dir, 'labels', 'val')
-    check_valid_tuple(x=flip_idx, source=sleap_to_yolo_keypoints.__name__, valid_dtypes=(int,), minimum_length=1)
+    if flip_idx is not None: check_valid_tuple(x=flip_idx, source=f'{sleap_to_yolo_keypoints.__name__} flip_idx', valid_dtypes=(int,), minimum_length=1)
+    if names is not None: check_valid_tuple(x=names, source=f'{sleap_to_yolo_keypoints.__name__} names', valid_dtypes=(str,), minimum_length=1)
     create_directory(paths=img_train_dir); create_directory(paths=img_val_dir)
     create_directory(paths=lbl_train_dir); create_directory(paths=lb_val_dir)
     check_float(name=f'{sleap_to_yolo_keypoints.__name__} instance_threshold', min_value=0.0, max_value=1.0, raise_error=True, value=instance_threshold)
-    check_valid_dict(x=map_dict, valid_key_dtypes=(int,), valid_values_dtypes=(str,), min_len_keys=1)
     check_valid_boolean(value=verbose, source=f'{sleap_to_yolo_keypoints.__name__} verbose', raise_error=True)
+    check_valid_boolean(value=greyscale, source=f'{sleap_to_yolo_keypoints.__name__} greyscale', raise_error=True)
     check_float(name=f'{sleap_to_yolo_keypoints.__name__} train_size', value=train_size, max_value=0.99, min_value=0.1)
     check_float(name=f'{sleap_to_yolo_keypoints.__name__} padding', value=padding, max_value=1.0, min_value=0.0, raise_error=True)
 
@@ -1326,60 +1324,81 @@ def sleap_to_yolo_keypoints(data_dir: Union[str, os.PathLike],
         raise NoFilesFoundError(msg=f'Video(s) {missing_video_paths} could not be found in {video_dir} directory', source=sleap_to_yolo_keypoints.__name__)
     if len(missing_data_paths) > 0:
         raise NoFilesFoundError(msg=f'CSV data for {missing_data_paths} could not be found in {data_dir} directory', source=sleap_to_yolo_keypoints.__name__)
-    data_files_cnt = len(list(data_paths.keys()))
-    instance_shapes = []
+
+    dfs = []
     for file_cnt, (file_name, file_path) in enumerate(data_paths.items()):
-        video_meta_data = get_video_meta_data(video_path=video_paths[file_name])
         df = pd.read_csv(filepath_or_buffer=file_path)
         check_valid_dataframe(df=df, source=sleap_to_yolo_keypoints.__name__, required_fields=['track', 'frame_idx', 'instance.score'])
         df = df if instance_threshold is None else df[df['instance.score'] >= instance_threshold]
         cord_cols, frame_idx = df.drop(['track', 'frame_idx', 'instance.score'], axis=1), df['frame_idx']
         selected_frms = random.sample(list(frame_idx.unique()), frms_cnt) if frms_cnt is not None else list(frame_idx.unique())
-        train_idx = random.sample(selected_frms, int(len(selected_frms) * train_size))
-        img_w, img_h = video_meta_data['width'], video_meta_data['height']
-        for frm_cnt, frm_id in enumerate(selected_frms):
-            if verbose:
-                print(f'Processing frame {frm_id}... (frame: {frm_cnt+1}/{len(selected_frms)}, video: {file_name} {file_cnt+1}/{data_files_cnt})...')
-            img = read_frm_of_video(video_path=video_paths[file_name], frame_index=frm_id)
-            if frm_id in train_idx:
-                img_save_path, lbl_save_path = os.path.join(img_dir, 'train', f'{file_name}_{frm_id}.png'), os.path.join(lbl_dir, 'train', f'{file_name}_{frm_id}.txt')
-            else:
-                img_save_path, lbl_save_path = os.path.join(img_dir, 'val', f'{file_name}_{frm_id}.png'), os.path.join(lbl_dir, 'val', f'{file_name}_{frm_id}.txt')
-            frm_kps = df[df['frame_idx'] == frm_id][cord_cols.columns]
-            frm_kps = frm_kps.values.reshape(len(frm_kps), -1, 3)
-            frm_kps[:, :, 2] = 2
-            img_lbl = ''
-            for instance in frm_kps:
-                instance_str = '0 '
-                keypoints = instance.copy()
-                x_coords, y_coords = keypoints[:, 0], keypoints[:, 1]
-                min_x, max_x = x_coords.min(), x_coords.max()
-                min_y, max_y = y_coords.min(), y_coords.max()
-                pad_w, pad_h = padding * img_w, padding * img_h
-                min_x, max_x = max(min_x - pad_w / 2, 0), min(max_x + pad_w / 2, img_w)
-                min_y, max_y = max(min_y - pad_h / 2, 0), min(max_y + pad_h / 2, img_h)
-                bbox_w, bbox_h = max_x - min_x, max_y - min_y
-                x_center, y_center = min_x + bbox_w / 2, min_y + bbox_h / 2
-                x_center /= img_w
-                y_center /= img_h
-                bbox_w /= img_w
-                bbox_h /= img_h
-                x_center = np.clip(x_center, 0.0, 1.0)
-                y_center = np.clip(y_center, 0.0, 1.0)
-                bbox_w = np.clip(bbox_w, 0.0, 1.0)
-                bbox_h = np.clip(bbox_h, 0.0, 1.0)
-                keypoints[:, 0] /= img_w
-                keypoints[:, 1] /= img_h
-                keypoints[:, 0:2] = np.clip( keypoints[:, 0:2], 0.0, 1.0)
-                instance_str += f"{x_center:.6f} {y_center:.6f} {bbox_w:.6f} {bbox_h:.6f} "
-                for kp in keypoints:
-                    instance_str += f"{kp[0]:.6f} {kp[1]:.6f} {int(kp[2])} "
-                img_lbl += instance_str.strip() + '\n'
-            with open(lbl_save_path, mode='wt', encoding='utf-8') as f:
-                f.write(img_lbl)
-            cv2.imwrite(img_save_path, img)
-    if len(list(set(instance_shapes))) > 1:
-        raise InvalidInputError(msg=f'The data contains more than one shapes: {set(instance_shapes)}', source=sleap_to_yolo_keypoints.__name__)
+        df = df[df['frame_idx'].isin(selected_frms)]
+        df['video'] = video_paths[file_name]
+        dfs.append(df)
+
+    dfs = pd.concat(dfs, axis=0)
+    unique_tracks_lk = {v: k for k, v in enumerate(dfs['track'].unique())}
+    if names is not None:
+        check_valid_tuple(x=names, source=f'{sleap_to_yolo_keypoints.__name__} names', valid_dtypes=(str,), accepted_lengths=(len(list(unique_tracks_lk.keys())),))
+    else:
+        names = [f'animal_{k+1}' for k in range(len(list(unique_tracks_lk.keys())),)]
+    map_dict = {k: v for k, v in enumerate(names)}
+    dfs['id'] = dfs['frame_idx'].astype(str) + dfs['video'].astype(str)
+    train_idx = random.sample(list(dfs['id'].unique()), int(len(dfs['frame_idx'].unique()) * train_size))
+    for frm_cnt, frm_id in enumerate(dfs['id'].unique()):
+        frm_data = dfs[dfs['id'] == frm_id]
+        video_path = list(frm_data['video'])[0]
+        frm_idx = list(frm_data['frame_idx'])[0]
+        video_meta = get_video_meta_data(video_path=video_path)
+        if verbose:
+            print(f'Processing frame: {frm_cnt+1}/{len(dfs)} ...')
+        img = read_frm_of_video(video_path=video_path, frame_index=frm_idx, greyscale=greyscale)
+        img_h, img_w = img.shape[0], img.shape[1]
+        if list(frm_data['id'])[0] in train_idx:
+            img_save_path = os.path.join(img_dir, 'train', f'{video_meta["video_name"]}_{frm_idx}.png')
+            lbl_save_path = os.path.join(lbl_dir, 'train', f'{video_meta["video_name"]}_{frm_idx}.txt')
+        else:
+            img_save_path  = os.path.join(img_dir, 'val', f'{video_meta["video_name"]}_{frm_idx}.png')
+            lbl_save_path = os.path.join(lbl_dir, 'val', f'{video_meta["video_name"]}_{frm_idx}.txt')
+        img_lbl = ''
+        for track_cnt, (_, track_data) in enumerate(frm_data.iterrows()):
+            track_id, keypoints = unique_tracks_lk[track_data['track']], track_data.drop(['track', 'frame_idx', 'instance.score', 'video', 'id']),
+            keypoints = keypoints.values.reshape(-1, 3)
+            if frms_cnt == 0 and track_cnt == 0:
+                if flip_idx is not None and keypoints.shape[0] != len(flip_idx):
+                    raise InvalidInputError(msg=f'The SLEAP data contains data for {keypoints.shape[0]} body-parts, but passed flip_idx suggests {len(flip_idx)} body-parts', source=sleap_to_yolo_keypoints.__name__)
+                else:
+                    flip_idx = list(range(0, keypoints.shape[0]))
+            keypoints[keypoints[:, 2] != 0.0, 2] = 2
+            instance_str = f'{track_id} '
+            x_coords, y_coords = keypoints[:, 0], keypoints[:, 1]
+            min_x, max_x = np.nanmin(x_coords), np.nanmax(x_coords)
+            min_y, max_y = np.nanmin(y_coords), np.nanmax(y_coords)
+            pad_w, pad_h = padding * img_w, padding * img_h
+            min_x, max_x = max(min_x - pad_w / 2, 0), min(max_x + pad_w / 2, img_w)
+            min_y, max_y = max(min_y - pad_h / 2, 0), min(max_y + pad_h / 2, img_h)
+            bbox_w, bbox_h = max_x - min_x, max_y - min_y
+            x_center, y_center = min_x + bbox_w / 2, min_y + bbox_h / 2
+            x_center /= img_w
+            y_center /= img_h
+            bbox_w /= img_w
+            bbox_h /= img_h
+            x_center = np.clip(x_center, 0.0, 1.0)
+            y_center = np.clip(y_center, 0.0, 1.0)
+            bbox_w = np.clip(bbox_w, 0.0, 1.0)
+            bbox_h = np.clip(bbox_h, 0.0, 1.0)
+            keypoints[:, 0] /= img_w
+            keypoints[:, 1] /= img_h
+            keypoints[:, 0:2] = np.clip( keypoints[:, 0:2], 0.0, 1.0)
+            instance_str += f"{x_center:.6f} {y_center:.6f} {bbox_w:.6f} {bbox_h:.6f} "
+            for kp in keypoints:
+                instance_str += f"{kp[0]:.6f} {kp[1]:.6f} {int(kp[2])} "
+            img_lbl += instance_str.strip() + '\n'
+        with open(lbl_save_path, mode='wt', encoding='utf-8') as f:
+            f.write(img_lbl)
+        cv2.imwrite(img_save_path, img)
+
+
     create_yolo_keypoint_yaml(path=save_dir, train_path=img_train_dir, val_path=img_val_dir, names=map_dict, save_path=map_path, kpt_shape=(len(flip_idx), 3), flip_idx=flip_idx)
     timer.stop_timer()
     stdout_success(msg=f'YOLO formated data saved in {save_dir} directory', source=sleap_to_yolo_keypoints.__name__, elapsed_time=timer.elapsed_time_str)
@@ -1578,6 +1597,142 @@ def dlc_to_yolo_keypoints(dlc_dir: Union[str, os.PathLike],
     stdout_success(msg=f'YOLO formated data saved in {save_dir} directory', source=dlc_to_yolo_keypoints.__name__, elapsed_time=timer.elapsed_time_str)
 
 
+
+def dlc_multi_animal_h5_to_yolo_keypoints(data_dir: Union[str, os.PathLike],
+                                          video_dir: Union[str, os.PathLike],
+                                          save_dir: Union[str, os.PathLike],
+                                          frms_cnt: Optional[int] = None,
+                                          verbose: bool = True,
+                                          threshold: float = 0,
+                                          train_size: float = 0.7,
+                                          flip_idx: Tuple[int, ...] = None,
+                                          names: Tuple[str, ...] = None,
+                                          greyscale: bool = False,
+                                          padding: float = 0.00):
+
+    """
+    Convert SLEAP pose estimation CSV data and corresponding videos into YOLO keypoint dataset format.
+
+    .. note::
+       This converts SLEAP **inference** data to YOLO keypoints (not SLEAP annotations).
+
+    :param Union[str, os.PathLike] data_dir: Directory path containing DLC-generated H5 files with inferred keypoints.
+    :param Union[str, os.PathLike] video_dir: Directory path containing corresponding videos from which frames are to be extracted.
+    :param Union[str, os.PathLike] save_dir: Output directory where YOLO-formatted images, labels, and map YAML file will be saved. Subdirectories `images/train`, `images/val`, `labels/train`, `labels/val` will be created.
+    :param Optional[int] frms_cnt: Number of frames to randomly sample from each video for conversion. If None, all frames are used.
+    :param float instance_threshold: Minimum confidence score threshold to filter out low-confidence pose instances. Only instances with `instance.score` >= this threshold are used.
+    :param float train_size: Proportion of frames randomly assigned to the training dataset. Value must be between 0.1 and 0.99. Default: 0.7.
+    :param bool verbose: If True, prints progress. Default: True.
+    :param Tuple[int, ...] flip_idx: Tuple of keypoint indices used for horizontal flip augmentation during training. The tuple defines the order of keypoints after flipping.
+    :param Dict[str, int] map_dict: Dictionary mapping class indices to class names. Used for creating the YAML class names mapping file.
+    :param float padding: Fractional padding to add around the bounding boxes (relative to image dimensions). Helps to slightly enlarge bounding boxes by this percentage. Default 0.05. E.g., Useful when all body-parts are along animal length.
+    :return: None. Results saved in ``save_dir``.
+
+    :example:
+    >>> dlc_multi_animal_h5_to_yolo_keypoints(data_dir=r'D:\troubleshooting\dlc_h5_multianimal_to_yolo\data', video_dir=r'D:\troubleshooting\dlc_h5_multianimal_to_yolo\videos', save_dir=r'D:\troubleshooting\dlc_h5_multianimal_to_yolo\yolo')
+
+    """
+    timer = SimbaTimer(start=True)
+    data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=['.h5', '.H5'], as_dict=True, raise_error=True)
+    video_paths = find_files_of_filetypes_in_directory(directory=video_dir, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, as_dict=True, raise_error=True)
+    check_if_dir_exists(in_dir=save_dir)
+    img_dir, lbl_dir = os.path.join(save_dir, 'images'), os.path.join(save_dir, 'labels')
+    img_train_dir, img_val_dir = os.path.join(save_dir, 'images', 'train'), os.path.join(save_dir, 'images', 'val')
+    lbl_train_dir, lb_val_dir = os.path.join(save_dir, 'labels', 'train'), os.path.join(save_dir, 'labels', 'val')
+    if flip_idx is not None: check_valid_tuple(x=flip_idx, source=f'{dlc_multi_animal_h5_to_yolo_keypoints.__name__} flip_idx', valid_dtypes=(int,), minimum_length=1)
+    if names is not None: check_valid_tuple(x=names, source=f'{dlc_multi_animal_h5_to_yolo_keypoints.__name__} names', valid_dtypes=(str,), minimum_length=1)
+    create_directory(paths=img_train_dir); create_directory(paths=img_val_dir)
+    create_directory(paths=lbl_train_dir); create_directory(paths=lb_val_dir)
+    check_float(name=f'{dlc_multi_animal_h5_to_yolo_keypoints.__name__} threshold', min_value=0.0, max_value=1.0, raise_error=True, value=threshold)
+    check_valid_boolean(value=verbose, source=f'{dlc_multi_animal_h5_to_yolo_keypoints.__name__} verbose', raise_error=True)
+    check_valid_boolean(value=greyscale, source=f'{dlc_multi_animal_h5_to_yolo_keypoints.__name__} greyscale', raise_error=True)
+    check_float(name=f'{dlc_multi_animal_h5_to_yolo_keypoints.__name__} train_size', value=train_size, max_value=0.99, min_value=0.1)
+    check_float(name=f'{dlc_multi_animal_h5_to_yolo_keypoints.__name__} padding', value=padding, max_value=1.0, min_value=0.0, raise_error=True)
+    data_and_videos_lk = PoseImporterMixin().link_video_paths_to_data_paths(data_paths=list(data_paths.values()), video_paths=list(video_paths.values()), str_splits=Formats.DLC_NETWORK_FILE_NAMES.value)
+    map_path, animal_names = os.path.join(save_dir, 'map.yaml'), names
+
+    if frms_cnt is not None:
+        check_int(name=f'{dlc_multi_animal_h5_to_yolo_keypoints.__name__} frms_cnt', value=frms_cnt, min_value=1, raise_error=True)
+
+    dfs = []
+    for cnt, (video_name, video_data) in enumerate(data_and_videos_lk.items()):
+        data = pd.read_hdf(video_data["DATA"], header=[0, 1, 2, 3]).replace([np.inf, -np.inf], np.nan).fillna(-1)
+        new_cols = [(x[1], x[2], x[3]) for x in list(data.columns)]
+        if cnt == 0 and animal_names is None:
+            animal_names = list(dict.fromkeys([x[1] for x in list(data.columns)]))
+        data.columns = new_cols
+        p_data = data[[x for x in data.columns if 'likelihood' in x]]
+        data = data.iloc[(p_data[(p_data > threshold).all(axis=1)].index)]
+        data['frm_idx'] = data.index
+        data['video'] = video_data['VIDEO']
+        selected_frms = random.sample(list(data['frm_idx'].unique()), frms_cnt) if frms_cnt is not None else list(data['frm_idx'].unique())
+        data = data[data['frm_idx'].isin(selected_frms)]
+        dfs.append(data)
+
+    dfs = pd.concat(dfs, axis=0)
+    dfs['id'] = dfs['frm_idx'].astype(str) + dfs['video'].astype(str)
+    train_idx = random.sample(list(dfs['id'].unique()), int(len(dfs['frm_idx'].unique()) * train_size))
+    map_dict = {k: v for k, v in enumerate(animal_names)}
+    id_dict = {v: k for k, v in enumerate(animal_names)}
+
+    for frm_cnt, frm_id in enumerate(dfs['id'].unique()):
+        frm_data = dfs[dfs['id'] == frm_id]
+        video_path = list(frm_data['video'])[0]
+        frm_idx = list(frm_data['frm_idx'])[0]
+        video_meta = get_video_meta_data(video_path=video_path)
+        if verbose:
+            print(f'Processing frame: {frm_cnt + 1}/{len(dfs)} ...')
+        if frm_idx > video_meta['frame_count']:
+            FrameRangeWarning(msg=f'Frame {frm_idx} could not be read from video {video_path}. The video {video_meta["video_name"]} has {video_meta["frame_count"]} frames', source=dlc_multi_animal_h5_to_yolo_keypoints.__name__)
+            continue
+        img = read_frm_of_video(video_path=video_path, frame_index=frm_idx, greyscale=greyscale)
+        img_h, img_w = img.shape[0], img.shape[1]
+        if list(frm_data['id'])[0] in train_idx:
+            img_save_path = os.path.join(img_dir, 'train', f'{video_meta["video_name"]}_{frm_idx}.png')
+            lbl_save_path = os.path.join(lbl_dir, 'train', f'{video_meta["video_name"]}_{frm_idx}.txt')
+        else:
+            img_save_path  = os.path.join(img_dir, 'val', f'{video_meta["video_name"]}_{frm_idx}.png')
+            lbl_save_path = os.path.join(lbl_dir, 'val', f'{video_meta["video_name"]}_{frm_idx}.txt')
+        img_lbl = ''
+        frm_data = frm_data.drop(['video', 'id', 'frm_idx'], axis=1).T.iloc[:, 0]
+        for track_cnt, animal_name in enumerate(animal_names):
+            keypoints = frm_data.T[[idx[0] == animal_name for idx in frm_data.index]].values.reshape(-1, 3)
+            keypoints[keypoints[:, 2] != 0.0, 2] = 2
+            if frm_cnt == 0 and track_cnt == 0:
+                if flip_idx is not None and keypoints.shape[0] != len(flip_idx):
+                    raise InvalidInputError(msg=f'The SLEAP data contains data for {keypoints.shape[0]} body-parts, but passed flip_idx suggests {len(flip_idx)} body-parts.', source=dlc_multi_animal_h5_to_yolo_keypoints.__name__)
+                elif flip_idx is None:
+                    flip_idx = tuple(list(range(0, keypoints.shape[0])))
+            instance_str = f'{id_dict[animal_name]} '
+            x_coords, y_coords = keypoints[:, 0], keypoints[:, 1]
+            min_x, max_x = np.nanmin(x_coords), np.nanmax(x_coords)
+            min_y, max_y = np.nanmin(y_coords), np.nanmax(y_coords)
+            pad_w, pad_h = padding * img_w, padding * img_h
+            min_x, max_x = max(min_x - pad_w / 2, 0), min(max_x + pad_w / 2, img_w)
+            min_y, max_y = max(min_y - pad_h / 2, 0), min(max_y + pad_h / 2, img_h)
+            bbox_w, bbox_h = max_x - min_x, max_y - min_y
+            x_center, y_center = min_x + bbox_w / 2, min_y + bbox_h / 2
+            x_center /= img_w
+            y_center /= img_h
+            bbox_w /= img_w
+            bbox_h /= img_h
+            x_center = np.clip(x_center, 0.0, 1.0)
+            y_center = np.clip(y_center, 0.0, 1.0)
+            bbox_w = np.clip(bbox_w, 0.0, 1.0)
+            bbox_h = np.clip(bbox_h, 0.0, 1.0)
+            keypoints[:, 0] /= img_w
+            keypoints[:, 1] /= img_h
+            keypoints[:, 0:2] = np.clip(keypoints[:, 0:2], 0.0, 1.0)
+            instance_str += f"{x_center:.6f} {y_center:.6f} {bbox_w:.6f} {bbox_h:.6f} "
+            for kp in keypoints:
+                instance_str += f"{kp[0]:.6f} {kp[1]:.6f} {int(kp[2])} "
+            img_lbl += instance_str.strip() + '\n'
+        with open(lbl_save_path, mode='wt', encoding='utf-8') as f:
+            f.write(img_lbl)
+        cv2.imwrite(img_save_path, img)
+    create_yolo_keypoint_yaml(path=save_dir, train_path=img_train_dir, val_path=img_val_dir, names=map_dict, save_path=map_path, kpt_shape=(len(flip_idx), 3), flip_idx=flip_idx)
+    timer.stop_timer()
+    stdout_success(msg=f'YOLO formated data saved in {save_dir} directory', source=dlc_multi_animal_h5_to_yolo_keypoints.__name__, elapsed_time=timer.elapsed_time_str)
 
 def simba_to_yolo_keypoints(config_path: Union[str, os.PathLike],
                             save_dir: Union[str, os.PathLike],

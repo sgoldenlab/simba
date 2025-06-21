@@ -54,7 +54,9 @@ class ROIClfCalculator(ConfigReader):
     :param Optional[List[Union[str, os.PathLike]]] data_paths: Optional list of data files to analyze. If None, then all file sin the ``machine_results`` directory is analyzed.
     :param Optional[List[str]] clf_names: Optional List of classifiers to analyze. If None, then all classifiers in SimBA project are analyzed.
     :param Optional[List[str]] roi_names: Optional list of ROI names to analyze. If None, then all ROI names are analyzed.
-    :param Tuple[str] measures: Tuple of measures to include. Options: 'TOTAL BEHAVIOR TIME IN ROI (S)', 'STARTED BEHAVIOR BOUTS IN ROI (COUNT)', 'ENDED BEHAVIOR BOUTS IN ROI (COUNT)'.
+    :param bool clf_time: If True, computes aggregate time of each classifier in each ROI. Deafult True.
+    :param bool started_bout_cnt: If True, computes started bout counts of each classifier in each ROI. Deafult True.
+    :param bool ended_bout_cnt: If True, computes ended bout counts of each classifier in each ROI. Deafult True.
 
     .. note:
        'GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results`__.

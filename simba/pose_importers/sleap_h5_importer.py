@@ -108,16 +108,15 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
                 for track_ind in range(n_tracks):
                     for node_ind in range(n_nodes):
                         for xyp in range(3):
-                            #print(tracks[frame_ind])
                             if xyp == 0 or xyp == 1:
                                 data = tracks[frame_ind, node_ind, xyp, track_ind]
                             else:
                                 data = point_scores[frame_ind, node_ind, track_ind]
-
                             csv_row.append(f"{data:.3f}")
                 csv_rows.append(" ".join(csv_row))
             csv_rows = "\n".join(csv_rows)
             self.data_df = pd.read_csv(io.StringIO(csv_rows), delim_whitespace=True, header=None).fillna(0)
+
             if len(self.data_df.columns) != len(self.bp_headers):
                 raise BodypartColumnNotFoundError(
                     msg=f'The number of body-parts in data file {video_data["DATA"]} do not match the number of body-parts in your SimBA project. '

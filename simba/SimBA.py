@@ -145,14 +145,18 @@ from simba.ui.pop_ups.spontaneous_alternation_pop_up import \
 from simba.ui.pop_ups.subset_feature_extractor_pop_up import \
     FeatureSubsetExtractorPopUp
 from simba.ui.pop_ups.dlc_annotations_to_labelme_popup import DLCAnnotations2LabelMePopUp
-from simba.ui.pop_ups.labelme_dir_to_csv_popup import LabelmeDirectory2CSVPopUp
+from simba.ui.pop_ups.labelme_to_df_popup import Labelme2DataFramePopUp
 from simba.ui.pop_ups.labelme_to_imgs_popup import Labelme2ImgsPopUp
 from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
     ThirdPartyAnnotatorAppenderPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
 from simba.ui.pop_ups.simba_rois_to_yolo_pop_up import SimBAROIs2YOLOPopUp
 from simba.ui.pop_ups.simba_to_yolo_keypoints_popup import SimBA2YoloKeypointsPopUp
+from simba.ui.pop_ups.dlc_h5_inference_to_yolo_popup import DLCH5Inference2YoloPopUp
 from simba.ui.pop_ups.dlc_to_yolo_keypoints_popup import DLCYoloKeypointsPopUp
+from simba.ui.pop_ups.sleap_csv_predictions_to_yolo_popup import SLEAPcsvInference2Yolo
+from simba.ui.pop_ups.sleap_h5_inference_to_yolo_popup import SLEAPH5Inference2YoloPopUp
+from simba.ui.pop_ups.dlc_to_labelme_popup import DLC2LabelmePopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
     BackgroundRemoverDirectoryPopUp, BackgroundRemoverSingleVideoPopUp,
     BoxBlurPopUp, BrightnessContrastPopUp, CalculatePixelsPerMMInVideoPopUp,
@@ -872,17 +876,24 @@ class App(object):
         video_process_menu.add_cascade(label="Concatenate (stack) videos...", compound="left", image=self.menu_icons["concat"]["img"], menu=concatenate_menu, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Convert ROI definitions", compound="left", image=self.menu_icons["roi"]["img"], command=lambda: ConvertROIDefinitionsPopUp(), font=Formats.FONT_REGULAR.value)
 
+        convert_pose_file_format_menu = Menu(video_process_menu)
+        convert_pose_file_format_menu.add_command(label="DLC annotations -> Labelme", compound="left", image=self.menu_icons["dlc_2"]["img"], command=DLC2LabelmePopUp, font=Formats.FONT_REGULAR.value)
+        convert_pose_file_format_menu.add_command(label="DLC annotations -> YOLO pose-estimation annotations", compound="left", image=self.menu_icons["dlc_2"]["img"], command=DLCYoloKeypointsPopUp, font=Formats.FONT_REGULAR.value)
+        convert_pose_file_format_menu.add_command(label="DLC H5 inference -> YOLO pose-estimation annotations", compound="left", image=self.menu_icons["dlc_2"]["img"], command=DLCH5Inference2YoloPopUp, font=Formats.FONT_REGULAR.value)
+        convert_pose_file_format_menu.add_command(label="SLEAP CSV inference -> YOLO pose-estimation annotations", compound="left", image=self.menu_icons["sleap_small"]["img"], command=SLEAPcsvInference2Yolo, font=Formats.FONT_REGULAR.value)
+        convert_pose_file_format_menu.add_command(label="SLEAP H5 inference -> YOLO pose-estimation annotations", compound="left", image=self.menu_icons["sleap_small"]["img"], command=SLEAPH5Inference2YoloPopUp, font=Formats.FONT_REGULAR.value)
+        convert_pose_file_format_menu.add_command(label="SimBA ROI -> YOLO bounding-boxes", compound="left", image=self.menu_icons["SimBA_logo_3_small"]["img"], command=SimBAROIs2YOLOPopUp, font=Formats.FONT_REGULAR.value)
+        convert_pose_file_format_menu.add_command(label="SimBA -> YOLO pose-estimation", compound="left", image=self.menu_icons["SimBA_logo_3_small"]["img"], command=SimBA2YoloKeypointsPopUp, font=Formats.FONT_REGULAR.value)
+        convert_pose_file_format_menu.add_command(label="Labelme -> Images", compound="left", image=self.menu_icons["labelme"]["img"], command=Labelme2ImgsPopUp, font=Formats.FONT_REGULAR.value)
+        convert_pose_file_format_menu.add_command(label="Labelme -> CSV", compound="left", image=self.menu_icons["labelme"]["img"], command=Labelme2DataFramePopUp, font=Formats.FONT_REGULAR.value)
+
+
+        video_process_menu.add_cascade(label="Convert tracking data formats...", compound="left", image=self.menu_icons["pose"]["img"], menu=convert_pose_file_format_menu, font=Formats.FONT_REGULAR.value)
+
         convert_data_menu = Menu(video_process_menu)
         convert_data_menu.add_command(label="Convert CSV to parquet", compound="left", image=self.menu_icons["parquet"]["img"], command=Csv2ParquetPopUp, font=Formats.FONT_REGULAR.value)
         convert_data_menu.add_command(label="Convert parquet to CSV", compound="left", image=self.menu_icons["csv_grey"]["img"], command=Parquet2CsvPopUp, font=Formats.FONT_REGULAR.value)
-        convert_data_menu.add_command(label="Convert DLC annotations to Labelme", compound="left", image=self.menu_icons["labelme"]["img"], command=DLCAnnotations2LabelMePopUp, font=Formats.FONT_REGULAR.value)
-        convert_data_menu.add_command(label="Convert Labelme to CSV", compound="left", image=self.menu_icons["labelme_2"]["img"], command=LabelmeDirectory2CSVPopUp, font=Formats.FONT_REGULAR.value)
-        convert_data_menu.add_command(label="Convert SimBA ROI to YOLO", compound="left", image=self.menu_icons["shapes_small_2"]["img"], command=SimBAROIs2YOLOPopUp, font=Formats.FONT_REGULAR.value)
-        convert_data_menu.add_command(label="Convert SimBA to YOLO pose", compound="left", image=self.menu_icons["ultralytics_1"]["img"], command=SimBA2YoloKeypointsPopUp, font=Formats.FONT_REGULAR.value)
-        convert_data_menu.add_command(label="DLC to YOLO pose", compound="left", image=self.menu_icons["ultralytics_1"]["img"], command=DLCYoloKeypointsPopUp, font=Formats.FONT_REGULAR.value)
-        convert_data_menu.add_command(label="Convert Labelme to images", compound="left", image=self.menu_icons["labelme_3"]["img"], command=Labelme2ImgsPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_cascade(label="Convert working file type...", compound="left", image=self.menu_icons["change"]["img"], menu=convert_data_menu, font=Formats.FONT_REGULAR.value)
-
         video_process_menu.add_command(label="Create path plot", compound="left", image=self.menu_icons["path"]["img"], command=MakePathPlotPopUp, font=Formats.FONT_REGULAR.value)
 
         downsample_video_menu = Menu(video_process_menu)

@@ -1,0 +1,373 @@
+from typing import Iterable, Union, Optional, Tuple, Dict, List
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
+
+import numpy as np
+import base64
+import cv2
+import io
+import os
+from PIL import Image
+import yaml
+from copy import deepcopy
+from collections import Counter
+
+from simba.utils.checks import check_if_valid_img, check_valid_array, check_valid_tuple, check_int, check_if_dir_exists, check_valid_dict, check_if_keys_exist_in_dict, check_valid_lst
+from simba.utils.errors import InvalidInputError
+from simba.utils.enums import Formats
+from simba.utils.read_write import save_json, read_json, find_files_of_filetypes_in_directory
+from simba.utils.printing import stdout_success, SimbaTimer
+from simba.utils.warnings import DuplicateNamesWarning
+
+
+def arr_to_b64(x: np.ndarray) -> str:
+    """
+    Helper to convert image in array format to an image in byte string format
+    """
+
+    check_if_valid_img(data=x, source=f'{arr_to_b64.__name__} x')
+    _, buffer = cv2.imencode('.jpg', x)
+    return base64.b64encode(buffer).decode("utf-8")
+
+
+
+def b64_to_arr(img_b64) -> np.ndarray:
+    """
+    Helper to convert byte string (e.g., created by `labelme <https://github.com/wkentaro/labelme>`__.) to image in numpy array format
+
+    """
+    f = io.BytesIO()
+    f.write(base64.b64decode(img_b64))
+    img_arr = np.array(Image.open(f))
+    return img_arr
+
+
+def scale_pose_img_sizes(pose_data: np.ndarray,
+                         imgs: Iterable[Union[np.ndarray, str]],
+                         size: Union[Literal['min', 'max'], Tuple[int, int]],
+                         interpolation: Optional[int] = cv2.INTER_CUBIC ) -> Tuple[np.ndarray, Iterable[Union[np.ndarray, str]]]:
+
+    """
+    Resizes images and scales corresponding pose-estimation data to match the new image sizes.
+
+    .. image:: _static/img/scale_pose_img_sizes.webp
+       :width: 400
+       :align: center
+
+    :param pose_data: 3d MxNxR array of pose-estimation data where N is number of images, N the number of body-parts in each frame and R represents x,y coordinates of the body-parts.
+    :param imgs: Iteralble of images of same size as pose_data M dimension. Can be byte string representation of images, or images as arrays.
+    :param size: The target size for the resizing operation. It can be: - `'min'`: Resize all images to the smallest height and width found among the input images. - `'max'`: Resize all images to the largest height and width found among the imgs.
+    :param interpolation: Interpolation method to use for resizing. This can be one of OpenCV's interpolation methods.
+    :return: The converted pose_data and converted images to align with the new size.
+    :rtype: Tuple[np.ndarray, Iterable[Union[np.ndarray, str]]]
+
+    :example:
+    >>> df = labelme_to_df(labelme_dir=r'C:\troubleshooting\coco_data\labels\test_read', greyscale=False, pad=False, normalize=False)
+    >>> imgs = list(df['image'])
+    >>> pose_data = df.drop(['image', 'image_name'], axis=1)
+    >>> pose_data_arr = pose_data.values.reshape(len(pose_data), int(len(pose_data.columns) / 2), 2).astype(np.float32)
+    >>> new_pose, new_imgs = scale_pose_img_sizes(pose_data=pose_data_arr, imgs=imgs, size=(700, 3000))
+
+    """
+    check_valid_array(data=pose_data, source=scale_pose_img_sizes.__name__, accepted_ndims=(3,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_axis_0=1)
+    if pose_data.shape[0] != len(imgs):
+        raise InvalidInputError(f'The number of images {len(imgs)} and the number of pose-estimated data points {pose_data.shape[0]} do not align.', source=scale_pose_img_sizes.__name__)
+    if size == 'min':
+        target_h, target_w = np.inf, np.inf
+        for v in imgs:
+            if isinstance(v, str):
+                v = b64_to_arr(v)
+            target_h, target_w = min(v.shape[0], target_h), min(v.shape[1], target_w)
+    elif size == 'max':
+        target_h, target_w = -np.inf, -np.inf
+        for v in imgs:
+            if isinstance(v, str):
+                v = b64_to_arr(v)
+            target_h, target_w = max(v.shape[0], target_h), max(v.shape[1], target_w)
+    elif isinstance(size, tuple):
+        check_valid_tuple(x=size, accepted_lengths=(2,), valid_dtypes=(int,))
+        check_int(name=scale_pose_img_sizes.__name__, value=size[0], min_value=1)
+        check_int(name=scale_pose_img_sizes.__name__, value=size[1], min_value=1)
+        target_h, target_w = size[0], size[1]
+    else:
+        raise InvalidInputError(msg=f'{size} is not a valid size argument.', source=scale_pose_img_sizes.__name__)
+    img_results = []
+    pose_results = np.zeros_like(pose_data)
+    for img_idx in range(pose_data.shape[0]):
+        if isinstance(imgs[img_idx], str):
+            img = b64_to_arr(imgs[img_idx])
+        else:
+            img = imgs[img_idx]
+        original_h, original_w = img.shape[0:2]
+        scaling_factor_w, scaling_factor_h = target_w / original_w, target_h / original_h
+        img = cv2.resize(img, dsize=(target_w, target_h), fx=0, fy=0, interpolation=interpolation)
+        if isinstance(imgs[img_idx], str):
+            img = arr_to_b64(img)
+        img_results.append(img)
+        for bp_cnt in range(pose_data[img_idx].shape[0]):
+            new_bp_x, new_bp_y = pose_data[img_idx][bp_cnt][0] * scaling_factor_w, pose_data[img_idx][bp_cnt][1] * scaling_factor_h
+            pose_results[img_idx][bp_cnt] = np.array([new_bp_x, new_bp_y])
+    # out_img = img_results[0]
+    # original_image = _b64_to_arr(imgs[0])
+    # for i in range(pose_results[0].shape[0]):
+    #     new_bp_loc = pose_results[0][i].astype(np.int32)
+    #     old_bp_loc = pose_data[0][i].astype(np.int32)
+    #     out_img = cv2.circle(out_img, (new_bp_loc[0], new_bp_loc[1]), 10, (0, 0, 255), -1)
+    #     original_image = cv2.circle(original_image, (old_bp_loc[0], old_bp_loc[1]), 5, (0, 0, 255), -1)
+    # cv2.imshow('asdasdasd', out_img)
+    # cv2.imshow('fdghfgth', original_image)
+    # cv2.waitKey(120000)
+
+    return (pose_results, img_results)
+
+
+def normalize_img_dict(img_dict: Dict[str, np.ndarray]) -> Dict[str, np.ndarray]:
+    """
+    Normalize a dictionary of grayscale or RGB images by standardizing pixel intensities.
+
+    :param Dict[str, np.ndarray] img_dict: Dictionary of image arrays with string keys. Each image must be a 2D or 3D NumPy array.
+    :return: Dictionary of normalized image arrays, with the same keys as the input.
+    :rtype: Dict[str, np.ndarray]
+    """
+
+    img_ndims = set()
+    for img in img_dict.values():
+        check_if_valid_img(data=img, source=normalize_img_dict.__name__, raise_error=True)
+        img_ndims.add(img.ndim)
+    if len(img_ndims) > 1:
+        raise InvalidInputError(msg=f'Images in dictionary have to all be either color OR greyscale. Got {img_ndims} dimensions.', source=normalize_img_dict.__name__)
+
+    results = {}
+    if list(img_ndims)[0] == 2:
+        all_pixels = np.concatenate([img.ravel() for img in img_dict.values()])
+        mean = np.mean(all_pixels)
+        std = np.std(all_pixels)
+        for img_name, img in img_dict.items():
+            v = (img - mean) / std
+            v_rescaled = np.clip((v * 64) + 128, 0, 255)
+            results[img_name] = v_rescaled.astype(np.uint8)
+    else:
+        r, g, b = [], [], []
+        for img in img_dict.values():
+            r.append(np.mean(img[:, :, 0]))
+            g.append(np.mean(img[:, :, 1]))
+            b.append(np.mean(img[:, :, 2]))
+        r_mean, r_std = np.mean(r), np.std(r)
+        g_mean, g_std = np.mean(g), np.std(g)
+        b_mean, b_std = np.mean(b), np.std(b)
+        for img_name, img in img_dict.items():
+            r = (img[:, :, 0] - r_mean) / r_std
+            g = (img[:, :, 1] - g_mean) / g_std
+            b = (img[:, :, 2] - b_mean) / b_std
+            r = np.clip((r * 64) + 128, 0, 255)  # Scale and shift
+            g = np.clip((g * 64) + 128, 0, 255)  # Scale and shift
+            b = np.clip((b * 64) + 128, 0, 255)  # Scale and shift
+            results[img_name] = np.stack([r, g, b], axis=-1).astype(np.uint8)
+
+    return results
+
+
+def create_yolo_keypoint_yaml(path: Union[str, os.PathLike],
+                              train_path: Union[str, os.PathLike],
+                              val_path: Union[str, os.PathLike],
+                              names: Dict[int, str],
+                              kpt_shape: Optional[Tuple[int, int]] = None,
+                              flip_idx: Optional[Tuple[int, ...]] = None,
+                              save_path: Optional[Union[str, os.PathLike]] = None,
+                              use_wsl_paths: bool = False) -> Union[None, dict]:
+    """
+    Given a set of paths to directories, create a model.yaml file for yolo pose model training though ultralytics wrappers.
+
+    .. seealso::
+       Used by :func:`simba.sandbox.coco_keypoints_to_yolo.coco_keypoints_to_yolo`
+
+    :param Union[str, os.PathLike] path: Parent directory holding both an images and a labels directory.
+    :param Union[str, os.PathLike] train_path: Directory holding training images. For example, if C:\troubleshooting\coco_data\images\train is passed, then a C:\troubleshooting\coco_data\labels\train is expected.
+    :param Union[str, os.PathLike] val_path: Directory holding validation images. For example, if C:\troubleshooting\coco_data\images\test is passed, then a C:\troubleshooting\coco_data\labels\test is expected.
+    :param Union[str, os.PathLike] test_path: Directory holding test images. For example, if C:\troubleshooting\coco_data\images\validation is passed, then a C:\troubleshooting\coco_data\labels\validation is expected.
+    :param Dict[str, int] names: Dictionary mapping pairing object names to object integer identifiers. E.g., {'OBJECT 1': 0, 'OBJECT 2`: 2}
+    :param Optional[Tuple[int, ...]] flip_idx: Optional tuple of integers representing keypoint switch indexes if image is flipped horizontally.  Only pass if pose-estimation data.
+    :param  Optional[Tuple[int, int]] kpt_shape: Optional tuple of integers representing the shape of each animals keypoints, e.g., (6, 3). Only pass if pose-estimation data.
+    :param Union[str, os.PathLike] save_path: Optional location where to save the yolo model yaml file. If None, then the dict is returned.
+    :param bool use_wsl_paths: If True, use Windows WSL paths (e.g., `/mnt/...`) in the config file.
+    :return None:
+    """
+
+    class InlineList(list):
+        pass
+
+    def represent_inline_list(dumper, data):
+        return dumper.represent_sequence('tag:yaml.org,2002:seq', data, flow_style=True)
+
+    yaml.add_representer(InlineList, represent_inline_list)
+    for p in [path, train_path, val_path]:
+        check_if_dir_exists(in_dir=p, source=create_yolo_keypoint_yaml.__name__)
+    check_valid_dict(x=names, valid_key_dtypes=(int,), valid_values_dtypes=(str,), min_len_keys=1, source=create_yolo_keypoint_yaml.__name__)
+    unique_paths = list({path, train_path, val_path})
+    if len(unique_paths) < 3:
+        raise InvalidInputError('The passed paths have to be unique.', source=create_yolo_keypoint_yaml.__name__)
+    if save_path is not None:
+        check_if_dir_exists(in_dir=os.path.dirname(save_path), source=f'{create_yolo_keypoint_yaml.__name__} save_path')
+        if save_path in [path, train_path, val_path]:
+            raise InvalidInputError('The save path cannot be the same as the other passed directories.', source=f'{create_yolo_keypoint_yaml.__name__} save_path')
+
+    if flip_idx is not None: check_valid_tuple(x=flip_idx, source=create_yolo_keypoint_yaml.__name__, valid_dtypes=(int,))
+    if kpt_shape is not None: check_valid_tuple(x=kpt_shape, source=create_yolo_keypoint_yaml.__name__, valid_dtypes=(int,), accepted_lengths=(2,))
+
+    train_path = os.path.relpath(train_path, path)
+    val_path = os.path.relpath(val_path, path)
+
+    data = {'path': path,
+            'train': train_path,  # train images (relative to 'path')
+            'val': val_path,
+            'kpt_shape': InlineList(list(kpt_shape)) if kpt_shape is not None else None,
+            'flip_idx': InlineList(list(flip_idx)) if flip_idx is not None else None,
+            'names': names}
+
+    if kpt_shape is None: data.pop('kpt_shape', None)
+    if flip_idx is None: data.pop('flip_idx', None)
+
+    if save_path is not None:
+        with open(save_path, 'w') as f:
+            yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+    else:
+        return data
+
+def get_yolo_keypoint_flip_idx(x: List[str]) -> Tuple[int, ...]:
+    """
+    Given a list of body-parts, create a ``flip_index`` YOLO yaml entry.
+
+    .. important::
+       Only works if the left and right bosy-parts have the substrings ``left`` and ``right`` (case-insensitive).
+
+
+    :param List[str] x: List of the names of the body-parts. If several animals, then just a list of names for the body-parts for one animal.
+    :return: The flip_idx required by the YOLO model yaml file. E.g., [1, 0, 2, 3, 4]
+    :rtype: Tuple[int, ...]
+    """
+
+    LEFT, RIGHT = 'left', 'right'
+    check_valid_lst(data=x, source=f'{get_yolo_keypoint_flip_idx.__name__} x', valid_dtypes=(str,), min_len=1)
+    x = [i.lower().strip() for i in x]
+    x_left_idx = [i for i, val in enumerate(x) if LEFT in val]
+    x_right_idx = [i for i, val in enumerate(x) if RIGHT in val]
+    results = []
+    for idx in range(len(x)):
+        if idx in x_left_idx:
+            target_str = x[idx].replace(LEFT, RIGHT)
+            if target_str in x:
+                target_idx = x.index(target_str)
+            else:
+                target_idx = idx
+        elif idx in x_right_idx:
+            target_str = x[idx].replace(RIGHT, LEFT)
+            if target_str in x:
+                target_idx = x.index(target_str)
+            else:
+                target_idx = idx
+        else:
+            target_idx = idx
+        results.append(target_idx)
+    return tuple(results)
+
+def get_yolo_keypoint_bp_id_idx(animal_bp_dict: Dict[str, Dict[str, List[str]]]) -> Dict[int, List[int]]:
+    """
+    Helper to create a dictionary holding the indexes for each animals body-parts. USed for transforming data for creating a YOLO training set.
+
+    :param animal_bp_dict: Dictionaru of animal body-parts. Can be created by :func:`simba.mixins.config_reader.ConfigReader.create_body_part_dictionary`.
+    :return: Dictionary where the key is the animal name, and the values are the indexes of the columns belonging to each animal.
+    :rtype: Dict[int, List[int]
+    """
+
+
+    check_valid_dict(x=animal_bp_dict, valid_key_dtypes=(str,), valid_values_dtypes=(dict,))
+    bp_id_idx, bp_cnt = {}, 0
+    for animal_cnt, (animal_name, animal_bp_data) in enumerate(animal_bp_dict.items()):
+        bp_id_idx[animal_cnt] = list(range(bp_cnt, bp_cnt + len(animal_bp_data['X_bps'])))
+        bp_cnt += max(bp_id_idx[animal_cnt]) + 1
+    return bp_id_idx
+
+
+
+def merge_coco_keypoints_files(data_dir: Union[str, os.PathLike],
+                               save_path: Union[str, os.PathLike]):
+    """
+    Merges multiple annotation COCO-format keypoint JSON files into a single file.
+
+    .. note::
+       Image and annotation entries are appended after adjusting their `id` fields to be unique.
+
+       COCO-format keypoint JSON files can be created using `https://www.cvat.ai/ <https://www.cvat.ai/>`__.
+
+    .. seealso::
+       To convert COCO-format keypoint JSON to YOLO training set, see :func:`simba.third_party_label_appenders.transform.coco_keypoints_to_yolo.COCOKeypoints2Yolo`
+
+    :param Union[str, os.PathLike] data_dir: Directory containing multiple COCO keypoints `.json` files to merge.
+    :param Union[str, os.PathLike] save_path: File path to save the merged COCO keypoints JSON.
+    :return: None. Results are saved in ``save_path``.
+
+    :example:
+    >>> DATA_DIR = r'D:\cvat_annotations\frames\coco_keypoints_1\TEST'
+    >>> SAVE_PATH = r"D:\cvat_annotations\frames\coco_keypoints_1\TEST\merged.json"
+    >>> merge_coco_keypoints_files(data_dir=DATA_DIR, save_path=SAVE_PATH)
+
+    """
+
+    timer = SimbaTimer(start=True)
+    data_files = find_files_of_filetypes_in_directory(directory=data_dir, extensions=['.json'], raise_error=True, raise_warning=False, as_dict=True)
+    if os.path.isdir(save_path):
+        raise InvalidInputError(msg=f'save_path has to be a filepath, not a directory.', source=f'{merge_coco_keypoints_files.__name__} save_path')
+    check_if_dir_exists(in_dir=os.path.dirname(save_path))
+    results, max_image_id, max_annotation_id = None, 0, 0
+    data_file_cnt, img_names = len(data_files), []
+    if data_file_cnt == 1:
+        raise InvalidInputError(msg=f'Only 1 JSON file found in {data_dir} directory. Cannot merge a single file.', source=merge_coco_keypoints_files.__name__)
+
+    for file_cnt, (file_name, file_path) in enumerate(data_files.items()):
+        print(f'Processing {file_cnt + 1}/{data_file_cnt} ({file_name})...')
+        coco_data = read_json(file_path)
+        check_if_keys_exist_in_dict(data=coco_data, key=['licenses', 'info', 'categories', 'images', 'annotations'], name=file_name)
+        if file_cnt == 0:
+            results = deepcopy(coco_data)
+            max_image_id = max((img['id'] for img in results['images']), default=0)
+            max_annotation_id = max((ann['id'] for ann in results['annotations']), default=0)
+            for img in coco_data['images']:
+                img_names.append(img['file_name'])
+        else:
+            if coco_data.get('licenses'):
+                for lic in coco_data['licenses']:
+                    if lic not in results['licenses']:
+                        results['licenses'].append(lic)
+
+            if coco_data.get('categories'):
+                for cat in coco_data['categories']:
+                    if cat not in results['categories']:
+                        results['categories'].append(cat)
+
+            id_mapping = {}
+            new_images = []
+            for img in coco_data['images']:
+                new_id = img['id'] + max_image_id + 1
+                id_mapping[img['id']] = new_id
+                img['id'] = new_id
+                new_images.append(img)
+                img_names.append(img['file_name'])
+            results['images'].extend(new_images)
+            new_annotations = []
+            for ann in coco_data['annotations']:
+                ann['id'] += max_annotation_id + 1
+                ann['image_id'] = id_mapping.get(ann['image_id'], ann['image_id'])
+                new_annotations.append(ann)
+            results['annotations'].extend(new_annotations)
+            max_image_id = max((img['id'] for img in results['images']), default=max_image_id)
+            max_annotation_id = max((ann['id'] for ann in results['annotations']), default=max_annotation_id)
+
+    duplicates = [item for item, count in Counter(img_names).items() if count > 1]
+    if len(duplicates) > 0:
+        DuplicateNamesWarning(msg=f'{len(duplicates)} annotated file names have the same name: {duplicates}', source=merge_coco_keypoints_files.__name__)
+
+    timer.stop_timer()
+    save_json(data=results, filepath=save_path)
+    stdout_success(msg=f'Merged COCO key-points file (from {data_file_cnt} input files) saved at {save_path}', source=merge_coco_keypoints_files.__name__, elapsed_time=timer.elapsed_time_str)

@@ -74,7 +74,7 @@ class PoseImporterMixin(object):
                                        data_paths: List[str],
                                        video_paths: List[str],
                                        str_splits: Optional[List[str]] = None,
-                                       filename_cleaning_func: Optional[object] = None) -> Dict[str, str]:
+                                       filename_cleaning_func: Optional[object] = None) -> Dict[str, Dict[str, str]]:
         """
         Given a list of paths to video files and a separate list of paths to data files, create a dictionary
         pairing each video file to a datafile based on the file names of the video and data file.

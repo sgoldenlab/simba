@@ -1324,10 +1324,7 @@ def check_valid_tuple(x: tuple,
                       min_integer: Optional[int] = None):
 
     if not isinstance(x, (tuple)):
-        raise InvalidInputError(
-            msg=f"{check_valid_tuple.__name__} {source} is not a valid tuple",
-            source=source,
-        )
+        raise InvalidInputError(msg=f"{check_valid_tuple.__name__} {source} is not a valid tuple, got: {type(x)}", source=source,)
     if accepted_lengths is not None:
         if len(x) not in accepted_lengths:
             raise InvalidInputError(
@@ -1471,57 +1468,60 @@ def check_if_video_corrupted(video: Union[str, os.PathLike, cv2.VideoCapture],
 
 def check_valid_dict(x: dict,
                      valid_key_dtypes: Optional[Tuple[Any]] = None,
-                     valid_values_dtypes: Optional[Tuple[Any]] = None,
+                     valid_values_dtypes: Optional[Tuple[Any, ...]] = None,
                      valid_keys: Optional[Union[Tuple[Any], List[Any]]] = None,
                      max_len_keys: Optional[int] = None,
                      min_len_keys: Optional[int] = None,
                      required_keys: Optional[Tuple[Any, ...]] = None,
                      max_value: Optional[Union[float, int]] = None,
-                     min_value: Optional[Union[float, int]] = None):
+                     min_value: Optional[Union[float, int]] = None,
+                     source: Optional[str] = None):
 
+
+    source = check_valid_dict.__name__ if source is None else source
     check_instance(source=check_valid_dict.__name__, instance=x, accepted_types=(dict,))
     if valid_key_dtypes is not None:
         for i in list(x.keys()):
             if not isinstance(i, valid_key_dtypes):
-                raise InvalidInputError(msg=f'{type(i)} is not a valid key DTYPE. Valid: {valid_key_dtypes}', source=check_valid_dict.__name__)
+                raise InvalidInputError(msg=f'{type(i)} is not a valid key DTYPE. Valid: {valid_key_dtypes}', source=source)
     if valid_values_dtypes is not None:
         for i in list(x.values()):
             if not isinstance(i, valid_values_dtypes):
-                raise InvalidInputError(msg=f'{type(i)} is not a valid value DTYPE. Valid: {valid_values_dtypes}', source=check_valid_dict.__name__)
+                raise InvalidInputError(msg=f'{type(i)} is not a valid value DTYPE. Valid: {valid_values_dtypes}', source=source)
     if max_len_keys is not None:
         check_int(name=f'{check_valid_dict.__name__} max_len_keys', min_value=1, value=max_len_keys)
         key_cnt = len(list(x.keys()))
         if key_cnt > max_len_keys:
-            raise InvalidInputError(msg=f'Dictionary have {key_cnt} keys. Maximum allowed: {max_len_keys}', source=check_valid_dict.__name__)
+            raise InvalidInputError(msg=f'Dictionary have {key_cnt} keys. Maximum allowed: {max_len_keys}', source=source)
     if min_len_keys is not None:
         check_int(name=f'{check_valid_dict.__name__} min_len_keys', min_value=1, value=min_len_keys)
         key_cnt = len(list(x.keys()))
         if key_cnt < min_len_keys:
-            raise InvalidInputError(msg=f'Dictionary have {key_cnt} keys. Minimum allowed: {min_len_keys}', source=check_valid_dict.__name__)
+            raise InvalidInputError(msg=f'Dictionary have {key_cnt} keys. Minimum allowed: {min_len_keys}', source=source)
     if required_keys is not None:
         for i in list(required_keys):
             if i not in list(x.keys()):
-                raise InvalidInputError(msg=f'The required key {i} does not exist in the dictionary. Existing keys: {list(x.keys())}', source=check_valid_dict.__name__)
+                raise InvalidInputError(msg=f'The required key {i} does not exist in the dictionary. Existing keys: {list(x.keys())}', source=source)
     if max_value is not None:
         if not isinstance(max_value, (float, int)):
             raise InvalidInputError(msg=f'{check_valid_dict.__name__} max_value has to be a float or integer, got {type(max_value)}.')
         for k, v in x.items():
             if isinstance(v, (float, int)):
                 if v > max_value:
-                    raise InvalidInputError(msg=f'The required key {k} has value {v} which is above the max allowed: {max_value}.', source=check_valid_dict.__name__)
+                    raise InvalidInputError(msg=f'The required key {k} has value {v} which is above the max allowed: {max_value}.', source=source)
     if min_value is not None:
         if not isinstance(min_value, (float, int)):
             raise InvalidInputError(msg=f'{check_valid_dict.__name__} max_value has to be a float or integer, got {type(min_value)}.')
         for k, v in x.items():
             if isinstance(v, (float, int)):
                 if v < min_value:
-                    raise InvalidInputError(msg=f'The required key {k} has value {v} which is less than the minimum allowed: {min_value}.', source=check_valid_dict.__name__)
+                    raise InvalidInputError(msg=f'The required key {k} has value {v} which is less than the minimum allowed: {min_value}.', source=source)
     if valid_keys is not None:
         if not isinstance(valid_keys, (tuple, list)):
             raise InvalidInputError(msg=f'{check_valid_dict.__name__} valid_keys has to tuple, got {type(valid_keys)}.')
         invalid_keys = [i for i in x.keys() if i not in valid_keys]
         if len(invalid_keys) > 0:
-            raise InvalidInputError(msg=f'The dictionary has keys that are invalid ({invalid_keys}). Accepted, valid keys are: {valid_keys}.', source=check_valid_dict.__name__)
+            raise InvalidInputError(msg=f'The dictionary has keys that are invalid ({invalid_keys}). Accepted, valid keys are: {valid_keys}.', source=source)
 
 
 

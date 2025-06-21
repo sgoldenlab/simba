@@ -22,7 +22,7 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
-
+import h5py
 from PIL import Image
 
 try:
@@ -55,7 +55,7 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_str, check_valid_array,
                                 check_valid_boolean, check_valid_dataframe,
                                 check_valid_lst, check_valid_url, is_img_bw,
-                                is_video_color)
+                                is_video_color, check_if_valid_img)
 from simba.utils.enums import (ENV_VARS, ConfigKey, Defaults, Dtypes, Formats,
                                Keys, Links, Options, Paths)
 from simba.utils.errors import (DataHeaderError, DuplicationError,
@@ -3060,51 +3060,100 @@ def read_sleap_csv(file_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, li
 
 
 def recursive_file_search(directory: Union[str, os.PathLike],
-                          substrings: Union[str, List[str]],
                           extensions: Union[str, List[str]],
                           case_sensitive: bool = False,
-                          raise_error: bool = True) -> List[str]:
+                          substrings: Optional[Union[str, List[str]]] = None,
+                          raise_error: bool = True,
+                          as_dict: bool = False) -> Union[List[str], Dict[str, str]]:
     """
     Recursively search for files in a directory and all subdirectories that:
     - Contain any of the given substrings in their filename
     - Have one of the specified file extensions
 
     :param directory: Directory to start the search from.
-    :param substrings: A substring or list of substrings to match in filenames.
+    :param substrings: A substring or list of substrings to match in filenames. If None, all files with the specified extensions will be returned.
     :param extensions: A file extension or list of allowed extensions (with or without dot).
     :param case_sensitive: If True, substring match is case-sensitive. Default False.
     :param raise_error: If True, raise an error if no matches are found.
+    :param as_dict: If True, return a dictionary where rge file names ar ekeys and filepaths ar the values.
     :return: List of matching file paths.
     """
 
     check_if_dir_exists(in_dir=directory)
-    if isinstance(substrings, str):
-        substrings = [substrings]
-    check_valid_lst(data=substrings, valid_dtypes=(str,), min_len=1, raise_error=True)
+    if substrings is not None:
+        if isinstance(substrings, str):
+            substrings = [substrings]
+        check_valid_lst(data=substrings, valid_dtypes=(str,), min_len=1, raise_error=True)
 
-    if isinstance(extensions, str):
-        extensions = [extensions]
-    check_valid_lst(data=extensions, valid_dtypes=(str,), min_len=1, raise_error=True)
-
+    if isinstance(extensions, str): extensions = [extensions]
+    if isinstance(extensions, (tuple,)): extensions = list(extensions)
+    check_valid_lst(data=extensions, valid_dtypes=(str,), min_len=1, raise_error=True, source=f'{recursive_file_search.__name__} extensions')
     check_valid_boolean(value=case_sensitive, source=f'{recursive_file_search.__name__} case_sensitive', raise_error=True)
+    check_valid_boolean(value=raise_error, source=f'{recursive_file_search.__name__} raise_error', raise_error=True)
+    check_valid_boolean(value=as_dict, source=f'{recursive_file_search.__name__} as_dict', raise_error=True)
 
     extensions = [ext.lower().lstrip('.') for ext in extensions]
-    if not case_sensitive:
+    if not case_sensitive and substrings is not None:
         substrings = [s.lower() for s in substrings]
 
     results = []
     for root, _, files in os.walk(directory):
         for f in files:
-            name, ext = os.path.splitext(f)
+            _, name, ext = get_fn_ext(filepath=f)
             ext = ext.lstrip('.').lower()
-            match_substr = any(s in f if case_sensitive else s in f.lower() for s in substrings)
-            if ext in extensions and match_substr:
-                results.append(os.path.join(root, f))
+            if ext in extensions:
+                if substrings is not None:
+                    match_substr = any(s in f if case_sensitive else s in f.lower() for s in substrings)
+                else:
+                    match_substr = True
+                if ext in extensions and match_substr:
+                    results.append(os.path.join(root, f))
 
     if not results and raise_error:
         raise NoFilesFoundError(msg=f'No files with extensions {extensions} and substrings {substrings} found in {directory}', source=recursive_file_search.__name__)
 
+    if as_dict:
+        results = {get_fn_ext(filepath=x)[1]: x for x in results}
+
     return results
+
+
+def read_sleap_h5(file_path: Union[str, os.PathLike]) -> pd.DataFrame:
+    """
+     Helper to read in SLEAP H5 file in format expected by SimBA
+     """
+
+    EXPECTED_KEYS = ["tracks", "point_scores", "node_names", "track_names"]
+    check_file_exist_and_readable(file_path=file_path)
+    with h5py.File(file_path, "r") as f:
+        missing_keys = [x for x in EXPECTED_KEYS if not x in list(f.keys())]
+        if missing_keys:
+            raise InvalidFileTypeError(msg=f'{file_path} is not a valid SLEAP H5 file. Missing expected keys: {missing_keys}')
+        tracks = f["tracks"][:].T
+        point_scores = f["point_scores"][:].T
+
+    csv_rows = []
+    n_frames, n_nodes, _, n_tracks = tracks.shape
+    for frame_ind in range(n_frames):
+        csv_row = []
+        for track_ind in range(n_tracks):
+            for node_ind in range(n_nodes):
+                for xyp in range(3):
+                    if xyp == 0 or xyp == 1:
+                        data = tracks[frame_ind, node_ind, xyp, track_ind]
+                    else:
+                        data = point_scores[frame_ind, node_ind, track_ind]
+                    csv_row.append(f"{data:.3f}")
+        csv_rows.append(" ".join(csv_row))
+    csv_rows = "\n".join(csv_rows)
+    data_df = pd.read_csv(io.StringIO(csv_rows), delim_whitespace=True, header=None).fillna(0)
+    return data_df
+
+def img_array_to_clahe(img: np.ndarray) -> np.ndarray:
+    check_if_valid_img(data=img, source=img_array_to_clahe.__name__, raise_error=True)
+    if len(img.shape) > 2:
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    return cv2.createCLAHE(clipLimit=2, tileGridSize=(16, 16)).apply(img)
 
 
 def read_sys_env():
