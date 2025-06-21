@@ -2,11 +2,14 @@ __author__ = "Simon Nilsson"
 
 import threading
 from tkinter import *
+
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimBADropDown, FolderSelect)
+from simba.third_party_label_appenders.converters import labelme_to_df
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FolderSelect,
+                                        SimBADropDown)
 from simba.utils.checks import check_if_dir_exists
 from simba.utils.read_write import str_2_bool
-from simba.third_party_label_appenders.converters import labelme_to_df
+
 
 class LabelmeDirectory2CSVPopUp(PopUpMixin):
 

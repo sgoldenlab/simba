@@ -7,10 +7,12 @@ from tkinter import *
 import numpy as np
 
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimBADropDown, FolderSelect, FileSelect)
-from simba.utils.checks import check_if_dir_exists, check_file_exist_and_readable
-from simba.utils.read_write import str_2_bool
 from simba.third_party_label_appenders.converters import simba_rois_to_yolo
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
+                                        FolderSelect, SimBADropDown)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists)
+from simba.utils.read_write import str_2_bool
 
 from simba.third_party_label_appenders.transform.simba_roi_to_yolo import SimBAROI2Yolo
 
