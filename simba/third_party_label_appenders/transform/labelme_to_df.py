@@ -1,7 +1,8 @@
 import json
 import os
-from typing import Optional, Union, Tuple
 from datetime import datetime
+from typing import Optional, Tuple, Union
+
 import pandas as pd
 
 try:
@@ -10,11 +11,17 @@ except:
     from typing_extensions import Literal
 
 import numpy as np
-from simba.utils.checks import check_if_dir_exists, check_if_keys_exist_in_dict, check_str, check_valid_boolean, check_valid_tuple
-from simba.utils.read_write import find_files_of_filetypes_in_directory, img_array_to_clahe
-from simba.third_party_label_appenders.transform.utils import arr_to_b64, b64_to_arr, scale_pose_img_sizes, normalize_img_dict
-from simba.utils.printing import SimbaTimer, stdout_success
+
 from simba.mixins.image_mixin import ImageMixin
+from simba.third_party_label_appenders.transform.utils import (
+    arr_to_b64, b64_to_arr, normalize_img_dict, scale_pose_img_sizes)
+from simba.utils.checks import (check_if_dir_exists,
+                                check_if_keys_exist_in_dict, check_str,
+                                check_valid_boolean, check_valid_tuple)
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    img_array_to_clahe)
+
 
 class LabelMe2DataFrame:
     """

@@ -1,0 +1,7 @@
+path: D:\cvat_annotations\frames\yolo
+train: images\train
+val: images\val
+kpt_shape: [9, 3]
+flip_idx: [0, 2, 1, 3, 5, 4, 6, 7, 8]
+names:
+  0: mouse

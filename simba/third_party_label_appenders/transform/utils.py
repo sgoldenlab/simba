@@ -1,24 +1,31 @@
-from typing import Iterable, Union, Optional, Tuple, Dict, List
+from typing import Dict, Iterable, List, Optional, Tuple, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 
-import numpy as np
 import base64
-import cv2
 import io
 import os
-from PIL import Image
-import yaml
-from copy import deepcopy
 from collections import Counter
+from copy import deepcopy
 
-from simba.utils.checks import check_if_valid_img, check_valid_array, check_valid_tuple, check_int, check_if_dir_exists, check_valid_dict, check_if_keys_exist_in_dict, check_valid_lst
-from simba.utils.errors import InvalidInputError
+import cv2
+import numpy as np
+import yaml
+from PIL import Image
+
+from simba.utils.checks import (check_if_dir_exists,
+                                check_if_keys_exist_in_dict,
+                                check_if_valid_img, check_int,
+                                check_valid_array, check_valid_dict,
+                                check_valid_lst, check_valid_tuple)
 from simba.utils.enums import Formats
-from simba.utils.read_write import save_json, read_json, find_files_of_filetypes_in_directory
-from simba.utils.printing import stdout_success, SimbaTimer
+from simba.utils.errors import InvalidInputError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    read_json, save_json)
 from simba.utils.warnings import DuplicateNamesWarning
 
 
