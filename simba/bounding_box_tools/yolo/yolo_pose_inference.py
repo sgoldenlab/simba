@@ -13,8 +13,9 @@ from simba.bounding_box_tools.yolo.utils import (_get_undetected_obs,
                                                  filter_yolo_keypoint_data,
                                                  load_yolo_model, yolo_predict)
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_dir_exists, check_int, check_valid_boolean,
-                                check_valid_lst, check_valid_tuple, get_fn_ext)
+                                check_if_dir_exists, check_int,
+                                check_valid_boolean, check_valid_lst,
+                                check_valid_tuple, get_fn_ext)
 from simba.utils.errors import CountError, InvalidFileTypeError
 from simba.utils.printing import SimbaTimer
 from simba.utils.read_write import get_video_meta_data

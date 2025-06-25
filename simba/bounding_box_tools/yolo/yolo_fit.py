@@ -1,8 +1,10 @@
 import os
 import sys
+
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
-from typing import Optional, Union
 import argparse
+from typing import Optional, Union
+
 try:
     from typing import Literal
 except:
@@ -13,14 +15,15 @@ try:
 except ModuleNotFoundError:
     YOLO = None
 
+from simba.bounding_box_tools.yolo.utils import load_yolo_model
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists, check_int, check_str, check_valid_boolean,
-                                check_valid_device)
+                                check_if_dir_exists, check_int, check_str,
+                                check_valid_boolean, check_valid_device)
 from simba.utils.enums import Options
 from simba.utils.errors import SimBAGPUError
 from simba.utils.read_write import find_core_cnt
-from simba.bounding_box_tools.yolo.utils import load_yolo_model
+
 
 class FitYolo():
 

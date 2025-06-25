@@ -1,11 +1,15 @@
 from tkinter import *
+
 import numpy as np
 
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FolderSelect, SimBADropDown)
+from simba.third_party_label_appenders.transform.labelme_to_yolo import \
+    LabelmeBoundingBoxes2YoloBoundingBoxes
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FolderSelect,
+                                        SimBADropDown)
 from simba.utils.checks import check_if_dir_exists
-from simba.utils.read_write import str_2_bool, find_files_of_filetypes_in_directory
-from simba.third_party_label_appenders.transform.labelme_to_yolo import LabelmeBoundingBoxes2YoloBoundingBoxes
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    str_2_bool)
 
 TRAIN_SIZE_OPTIONS = list(np.arange(10, 110, 10))
 

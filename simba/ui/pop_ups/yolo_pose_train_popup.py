@@ -1,10 +1,12 @@
 from tkinter import *
-from simba.mixins.pop_up_mixin import PopUpMixin
+
 from simba.data_processors.cuda.utils import _is_cuda_available
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FolderSelect, SimBADropDown, FileSelect)
-from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
-from simba.utils.read_write import get_pkg_version, find_core_cnt
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
+                                        FolderSelect, SimBADropDown)
 from simba.utils.enums import Options
+from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
+from simba.utils.read_write import find_core_cnt, get_pkg_version
 
 ULTRALYTICS = 'ultralytics'
 EPOCH_OPTIONS = list(range(100, 1750, 250))
