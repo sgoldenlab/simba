@@ -4,6 +4,7 @@ __email__ = "sronilsson@gmail.com"
 
 import math
 import os
+import time
 from typing import Optional, Tuple, Union
 
 try:
@@ -1264,7 +1265,6 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
     .. seealso::
        For CPU based methods, see :func:`~simba.plotting.path_plotter.PathPlotterSingleCore` and :func:`~simba.plotting.path_plotter_mp.PathPlotterMulticore`.
 
-
     .. csv-table::
        :header: EXPECTED RUNTIMES
        :file: ../../../docs/tables/pose_plotter.csv
@@ -1277,7 +1277,7 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
     :param Union[str, os.PathLike] video_path: Path to a video file where the ``data`` has been pose-estimated.
     :param Union[str, os.PathLike] save_path: Location where to store the output visualization.
     :param Optional[int] circle_size: The size of the circles representing the location of the pose-estimated locations. If None, the optimal size will be inferred as a 100th of the max(resultion_w, h).
-    :param int batch_size: The number of frames to process concurrently on the GPU. Default: 1500. Increase of host and device RAM allows it to improve runtime. Decrease if you hit memory errors.
+    :param int batch_size: The number of frames to process concurrently on the GPU. Default: 750. Increase of host and device RAM allows it to improve runtime. Decrease if you hit memory errors.
 
     :example:
     >>> DATA_PATH = "/mnt/c/troubleshooting/mitra/project_folder/csv/outlier_corrected_movement_location/501_MA142_Gi_CNO_0521.csv"
@@ -1317,12 +1317,13 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
     data = np.ascontiguousarray(data, dtype=np.int32)
     img_dev = cuda.device_array((batch_size, h, w, 3), dtype=np.int32)
     data_dev = cuda.device_array((batch_size, data.shape[1], 2), dtype=np.int32)
-    total_timer = SimbaTimer(start=True)
+    total_timer, video_start_time = SimbaTimer(start=True), time.time()
     frm_reader = AsyncVideoFrameReader(video_path=video_path, batch_size=batch_size, max_que_size=3, verbose=False)
     frm_reader.start()
     for batch_cnt in range(frm_reader.batch_cnt):
         start_img_idx, end_img_idx, batch_frms = get_async_frame_batch(batch_reader=frm_reader, timeout=10)
-        if verbose: print(f'Processing images {start_img_idx} - {end_img_idx} (of {n}; batch count: {batch_cnt+1}/{frm_reader.batch_cnt})...')
+        video_elapsed_time = str(round(time.time() - video_start_time, 4)) + 's'
+        if verbose: print(f'Processing images {start_img_idx} - {end_img_idx} (of {n}; batch count: {batch_cnt+1}/{frm_reader.batch_cnt}, video: {video_meta_data["video_name"]}, elapsed video processing time: {video_elapsed_time})...')
         batch_data = data[start_img_idx:end_img_idx + 1]
         batch_n = batch_frms.shape[0]
         if verbose: print(f'Moving frames {start_img_idx}-{end_img_idx} to device...')

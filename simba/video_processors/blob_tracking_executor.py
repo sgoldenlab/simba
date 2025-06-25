@@ -162,7 +162,6 @@ class BlobTrackingExecutor():
             save_path = os.path.join(self.data[OUT_DIR], f'{video_meta["video_name"]}.csv')
             if os.path.isfile(save_path):
                 continue
-            self.core_cnt = 10
             vertices = get_blob_vertices_from_video(video_path=temp_video_path,
                                                     gpu=self.gpu,
                                                     verbose=True,

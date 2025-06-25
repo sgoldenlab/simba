@@ -32,6 +32,7 @@ Visualizations
    nb/probability_plots
    nb/hatmap_location_plotter
    nb/heatmap_clf
+   nb/pose_plotter_gpu
 
 Geometry- and image-related calculators
 -------------------

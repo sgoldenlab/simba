@@ -393,7 +393,7 @@ class BlobTrackingUI(PopUpMixin):
         executor = BlobTrackingExecutor(data=self.out_path)
         executor.run()
 
-#_ = BlobTrackingUI(input_dir=r'C:\troubleshooting\RAT_NOR\project_folder\videos', output_dir=r'C:\troubleshooting\RAT_NOR\project_folder\videos\blob_results')
+#_ = BlobTrackingUI(input_dir=r'C:\troubleshooting\blob_track_tester\videos', output_dir=r'C:\troubleshooting\blob_track_tester\results')
 
 #_ = BlobTrackingUI(input_dir=r'D:\water_maze', output_dir=r'D:\water_maze\data')
 

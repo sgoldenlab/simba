@@ -684,8 +684,7 @@ class BatchProcessFrame(PopUpMixin):
         )
 
 
-# test = BatchProcessFrame(input_dir=r'C:\Users\sroni\OneDrive\Desktop',
-#                          output_dir=r"C:\Users\sroni\OneDrive\Desktop\edited")
+# test = BatchProcessFrame(input_dir=r'C:\Users\sroni\OneDrive\Desktop', output_dir=r"C:\Users\sroni\OneDrive\Desktop\edited")
 # test.create_main_window()
 # test.create_video_table_headings()
 # test.create_video_rows()
