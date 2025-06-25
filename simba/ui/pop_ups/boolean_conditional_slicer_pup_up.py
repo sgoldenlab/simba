@@ -13,6 +13,11 @@ from simba.utils.read_write import read_df
 
 
 class BooleanConditionalSlicerPopUp(PopUpMixin, ConfigReader):
+
+    """
+    :example:
+    >>> roi_featurizer = BooleanConditionalSlicerPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
+    """
     def __init__(self, config_path: str):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         PopUpMixin.__init__(self, title="CONDITIONAL BOOLEAN AGGREGATE STATISTICS", size=(600, 400), icon='boolean')
@@ -101,5 +106,5 @@ class BooleanConditionalSlicerPopUp(PopUpMixin, ConfigReader):
         boolean_calculator.save()
 
 
-# roi_featurizer = BooleanConditionalSlicerPopUp(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
+#roi_featurizer = BooleanConditionalSlicerPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
 # roi_featurizer = BooleanConditionalSlicerPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

@@ -1222,9 +1222,10 @@ def check_video_has_rois(roi_dict: Dict[str, pd.DataFrame],
 
 def check_if_df_field_is_boolean(df: pd.DataFrame,
                                  field: str,
-                                 raise_error: Optional[bool] = True,
+                                 raise_error: bool = True,
                                  bool_values: Optional[Tuple[Any]] = (0, 1),
                                  df_name: Optional[str] = ''):
+
     """Helper to check if a dataframe field is a boolean value"""
     check_instance(source=f'{check_if_df_field_is_boolean.__name__} df', instance=df, accepted_types=(pd.DataFrame,))
     check_str(name=f"{check_if_df_field_is_boolean.__name__} field", value=field)
@@ -1232,10 +1233,7 @@ def check_if_df_field_is_boolean(df: pd.DataFrame,
     additional = list((set(list(df[field])) - set(bool_values)))
     if len(additional) > 0:
         if raise_error:
-            raise CountError(
-                msg=f"Field {field} not a boolean in {df_name}. Found values {additional}. Accepted: {bool_values}",
-                source=check_if_df_field_is_boolean.__name__,
-            )
+            raise CountError(msg=f"Field {field} not a boolean in {df_name}. Found values {additional}. Accepted: {bool_values}", source=check_if_df_field_is_boolean.__name__)
         else:
             return False
     return True
