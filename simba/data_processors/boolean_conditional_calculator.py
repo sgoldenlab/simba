@@ -6,12 +6,17 @@ import numpy as np
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_if_df_field_is_boolean, check_instance, check_if_dir_exists, check_valid_dict, check_valid_boolean, check_valid_dataframe)
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_if_df_field_is_boolean, check_if_dir_exists, check_instance,
+    check_valid_boolean, check_valid_dataframe, check_valid_dict)
 from simba.utils.data import detect_bouts
-from simba.utils.errors import NoDataError
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.read_write import (get_fn_ext, read_df, read_video_info, str_2_bool, find_files_of_filetypes_in_directory)
 from simba.utils.enums import Formats
+from simba.utils.errors import NoDataError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_df, read_video_info,
+                                    str_2_bool)
 
 
 class BooleanConditionalCalculator(ConfigReader):
