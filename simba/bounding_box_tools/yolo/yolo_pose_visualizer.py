@@ -153,8 +153,8 @@ class YOLOPoseVisualizer():
 
     def run(self):
         video_timer = SimbaTimer(start=True)
-        if self.video_meta_data['frame_count'] != self.df_frm_cnt:
-            raise FrameRangeError(msg=f'The bounding boxes contain data for {self.df_frm_cnt} frames, while the video is {self.video_meta_data["frame_count"]} frames', source=self.__class__.__name__)
+        # if self.video_meta_data['frame_count'] != self.df_frm_cnt:
+        #     raise FrameRangeError(msg=f'The bounding boxes contain data for {self.df_frm_cnt} frames, while the video is {self.video_meta_data["frame_count"]} frames', source=self.__class__.__name__)
         frm_batches = np.array_split(np.array(list(range(0, self.df_frm_cnt))), self.core_cnt)
         frm_batches = [(i, j) for i, j in enumerate(frm_batches)]
         with multiprocessing.Pool(self.core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
@@ -184,14 +184,31 @@ class YOLOPoseVisualizer():
 #
 #     kp_vis.run()
 
-video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
-video_path = "/mnt/c/troubleshooting/mitra/project_folder/videos/502_MA141_Gi_CNO_0514.mp4"
-data_path = r"/mnt/c/troubleshooting/mitra/yolo/results/502_MA141_Gi_CNO_0514.csv"
-save_dir = r'/mnt/c/troubleshooting/mitra/yolo/results/'
-kp_vis = YOLOPoseVisualizer(data_path=data_path,
-                            video_path=video_path,
-                            save_dir=save_dir,
-                            core_cnt=18)
+
+# if __name__ == "__main__":
+#     from simba.utils.read_write import find_files_of_filetypes_in_directory
+#
+#     video_paths = find_files_of_filetypes_in_directory(directory=r'D:\cvat_annotations\videos', extensions=['.mp4'], as_dict=True)
+#     data_paths = find_files_of_filetypes_in_directory(directory=r'D:\cvat_annotations\frames\data_results_yolo11m', extensions=['.csv'], as_dict=True)
+#     save_dir = r'D:\cvat_annotations\frames\video_results_yolo11m'
+#
+#     for video_name, video_path in video_paths.items():
+#         data_path = data_paths[video_name]
+#         kp_vis = YOLOPoseVisualizer(data_path=data_path,
+#                                     video_path=video_path,
+#                                     save_dir=save_dir,
+#                                     core_cnt=18)
+#         kp_vis.run()
 
 
-kp_vis.run()
+# video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
+# video_path = "/mnt/c/troubleshooting/mitra/project_folder/videos/502_MA141_Gi_CNO_0514.mp4"
+# data_path = r"/mnt/c/troubleshooting/mitra/yolo/results/502_MA141_Gi_CNO_0514.csv"
+# save_dir = r'/mnt/c/troubleshooting/mitra/yolo/results/'
+# kp_vis = YOLOPoseVisualizer(data_path=data_path,
+#                             video_path=video_path,
+#                             save_dir=save_dir,
+#                             core_cnt=18)
+#
+#
+# kp_vis.run()

@@ -1,5 +1,6 @@
 import json
 import os
+import random
 from typing import Union
 
 try:
@@ -8,12 +9,14 @@ except:
     from typing_extensions import Literal
 
 import cv2
-from simba.utils.checks import check_if_dir_exists, check_if_keys_exist_in_dict, check_valid_boolean
+from simba.utils.checks import check_if_dir_exists, check_if_keys_exist_in_dict, check_valid_boolean, check_float
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (create_directory, find_files_of_filetypes_in_directory, get_fn_ext)
+from simba.utils.read_write import (create_directory, find_files_of_filetypes_in_directory, get_fn_ext, img_array_to_clahe)
 from simba.third_party_label_appenders.transform.utils import b64_to_arr
+from simba.mixins.image_mixin import ImageMixin
+from simba.utils.warnings import ROIWarning
 
-class Labelme2Yolo:
+class LabelmeBoundingBoxes2YoloBoundingBoxes:
     """
     Convert LabelMe annotations in json to YOLO format and save the corresponding images and labels in txt format.
 
@@ -34,9 +37,10 @@ class Labelme2Yolo:
 
 
     :example:
-    >>> LABELME_DIR = r'D:/annotations'
-    >>> SAVE_DIR = r"D:/yolo_data"
-    >>> Labelme2Yolo(labelme_dir=LABELME_DIR, save_dir=SAVE_DIR).run()
+    >>> LABELME_DIR = r'D:\platea\ts_annotations'
+    >>> SAVE_DIR = r"D:\platea\yolo"
+    >>> runner = LabelmeBoundingBoxes2YoloBoundingBoxes(labelme_dir=LABELME_DIR, save_dir=SAVE_DIR)
+    >>> runner.run()
     """
 
 
@@ -44,22 +48,30 @@ class Labelme2Yolo:
                  labelme_dir: Union[str, os.PathLike],
                  save_dir: Union[str, os.PathLike],
                  obb: bool = False,
-                 verbose: bool = True) -> None:
+                 verbose: bool = True,
+                 clahe: bool = False,
+                 train_size: float = 0.7,
+                 greyscale: bool = False) -> None:
 
 
         check_if_dir_exists(in_dir=os.path.dirname(save_dir), source=f'{self.__class__.__name__} save_dir', raise_error=True)
         check_if_dir_exists(in_dir=labelme_dir, source=f'{self.__class__.__name__} labelme_dir', raise_error=True)
         self.labelme_file_paths = find_files_of_filetypes_in_directory(directory=labelme_dir, extensions=['.json'], raise_error=True)
-        self.save_img_dir = os.path.join(save_dir, 'images')
-        self.save_labels_dir = os.path.join(save_dir, 'labels')
         self.map_path = os.path.join(save_dir, 'map.json')
-        create_directory(paths=self.save_img_dir, overwrite=True)
-        create_directory(paths=self.save_labels_dir, overwrite=True)
+        self.img_dir, self.lbl_dir = os.path.join(save_dir, 'images'), os.path.join(save_dir, 'labels')
+        self.img_train_dir, self.img_val_dir = os.path.join(self.img_dir, 'train'), os.path.join(self.img_dir, 'val')
+        self.lbl_train_dir, self.lbl_val_dir = os.path.join(self.lbl_dir, 'train'), os.path.join(self.lbl_dir, 'val')
+        create_directory(paths=[self.img_train_dir, self.img_val_dir, self.lbl_train_dir, self.lbl_val_dir], overwrite=False)
         check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose', raise_error=True)
         check_valid_boolean(value=[obb], source=f'{self.__class__.__name__} obb', raise_error=True)
+        check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} clahe', raise_error=True)
+        check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} greyscale', raise_error=True)
+        check_float(name=f'{self.__class__.__name__} train_size', value=train_size, min_value=0.0, max_value=1.0)
         self.obb, self.verbose, self.save_dir = obb, verbose, save_dir
+        self.clahe, self.greyscale, self.train_size = clahe, greyscale, train_size
 
     def run(self):
+        train_idx = random.sample(range(0, len(self.labelme_file_paths)), int(len(self.labelme_file_paths)*self.train_size))
         timer = SimbaTimer(start=True)
         labels = {}
         for file_cnt, file_path in enumerate(self.labelme_file_paths):
@@ -69,10 +81,20 @@ class Labelme2Yolo:
             check_if_keys_exist_in_dict(data=annot_data, key=['shapes', 'imageData', 'imagePath'], name=file_path)
             img_name = get_fn_ext(filepath=annot_data['imagePath'])[1]
             img = b64_to_arr(annot_data['imageData'])
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            cv2.imshow('asdasdas', img)
+            if img.ndim == 3:
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            if self.greyscale:
+                img = ImageMixin.img_to_greyscale(img=img)
+            if self.clahe:
+                img = img_array_to_clahe(img=img)
             img_h, img_w = img.shape[:2]
-            label_save_path = os.path.join(self.save_labels_dir, f'{img_name}.txt')
-            img_save_path = os.path.join(self.save_img_dir, f'{img_name}.png')
+            if file_cnt in train_idx:
+                label_save_path = os.path.join(self.lbl_train_dir, f'{img_name}.txt')
+                img_save_path = os.path.join(self.img_train_dir, f'{img_name}.png')
+            else:
+                label_save_path = os.path.join(self.lbl_val_dir, f'{img_name}.txt')
+                img_save_path = os.path.join(self.img_val_dir, f'{img_name}.png')
             roi_str = ''
             for bp_data in annot_data['shapes']:
                 check_if_keys_exist_in_dict(data=bp_data, key=['label', 'points', 'shape_type'], name=file_path)
@@ -86,6 +108,7 @@ class Labelme2Yolo:
                     x2, y2 = bp_data['points'][1]
                     x_min, x_max = sorted([x1, x2])
                     y_min, y_max = sorted([y1, y2])
+                    print(self.obb)
                     if not self.obb:
                         w = (x_max - x_min) / img_w
                         h = (y_max - y_min) / img_h
@@ -97,10 +120,9 @@ class Labelme2Yolo:
                         top_right = (x_max / img_w, y_min / img_h)
                         bottom_right = (x_max / img_w, y_max / img_h)
                         bottom_left = (x_min / img_w, y_max / img_h)
-                        roi_str += ' '.join(
-                            [f"{label_id}", str(top_left[0]), str(top_left[1]), str(top_right[0]), str(top_right[1]),
-                             str(bottom_right[0]), str(bottom_right[1]), str(bottom_left[0]),
-                             str(bottom_left[1]) + '\n'])
+                        roi_str += ' '.join([f"{label_id}", str(top_left[0]), str(top_left[1]), str(top_right[0]), str(top_right[1]), str(bottom_right[0]), str(bottom_right[1]), str(bottom_left[0]), str(bottom_left[1]) + '\n'])
+                else:
+                    ROIWarning(msg=f'Only Labelme shape type rectangle recognized for YOLO bounding box transformation. Got {bp_data["shape_type"]}. Skipping annotation...', source=self.__class__.__name__)
             with open(label_save_path, mode='wt', encoding='utf-8') as f:
                 f.write(roi_str)
             cv2.imwrite(img_save_path, img)
@@ -110,6 +132,9 @@ class Labelme2Yolo:
         if self.verbose: stdout_success(msg=f'Labelme to YOLO conversion complete. Data saved in directory {self.save_dir}.', elapsed_time=timer.elapsed_time_str)
 
 
-
+# LABELME_DIR = r'D:\platea\ts_annotations'
+# SAVE_DIR = r"D:\platea\yolo"
+# runner = LabelmeBoundingBoxes2YoloBoundingBoxes(labelme_dir=LABELME_DIR, save_dir=SAVE_DIR)
+# runner.run()
 
 

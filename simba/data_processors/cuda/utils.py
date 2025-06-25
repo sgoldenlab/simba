@@ -235,4 +235,4 @@ def _cuda_abs_energy(x):
     return math.sqrt(m)
 
 
-_is_cuda_available()
+#_is_cuda_available()

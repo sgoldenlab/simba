@@ -410,6 +410,8 @@ class Options(Enum):
                  cv2.FONT_HERSHEY_SCRIPT_SIMPLEX,
                  cv2.FONT_HERSHEY_SCRIPT_COMPLEX]
 
+    VALID_YOLO_FORMATS = ["onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite", "torch"]
+
 
 class TextOptions(Enum):
     FIRST_LINE_SPACING = (
@@ -623,6 +625,11 @@ class Links(Enum):
     COUNT_ANNOTATIONS_OUTSIDE_PROJECT = "https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-project-annotation-counts"
     CIRCLE_CROP = "https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#circle-crop"
     SIMBA_PIP_URL = 'https://pypi.org/pypi/simba-uw-tf-dev/json'
+    YOLO_11_WEIGHTS = {'yolo11n-pose': "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11n-pose.pt",
+                       'yolo11s-pose': "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11s-pose.pt",
+                       'yolo11m-pose': "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11s-pose.pt",
+                       'yolo11l-pose': "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11l-pose.pt",
+                       'yolo11x-pose': "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11x-pose.pt"}
 
 class Labelling(Enum):
     PADDING = 5

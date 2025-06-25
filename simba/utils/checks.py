@@ -39,7 +39,7 @@ from simba.utils.warnings import (CorruptedFileWarning, FrameRangeWarning,
                                   InvalidValueWarning, NoDataFoundWarning)
 
 
-def check_file_exist_and_readable(file_path: Union[str, os.PathLike]) -> None:
+def check_file_exist_and_readable(file_path: Union[str, os.PathLike], raise_error: bool = True) -> bool:
     """
     Checks if a path points to a readable file.
 
@@ -47,26 +47,24 @@ def check_file_exist_and_readable(file_path: Union[str, os.PathLike]) -> None:
     :raise NoFilesFoundError: The file does not exist.
     :raise CorruptedFileError: The file can not be read or is zero byte size.
     """
-    check_instance(
-        source="FILE PATH", instance=file_path, accepted_types=(str, os.PathLike)
-    )
+    check_instance(source="FILE PATH", instance=file_path, accepted_types=(str, os.PathLike))
     if not os.path.isfile(file_path):
-        raise NoFilesFoundError(
-            msg=f"{file_path} is not a valid file path",
-            source=check_file_exist_and_readable.__name__,
-        )
+        if raise_error:
+            raise NoFilesFoundError(msg=f"{file_path} is not a valid file path", source=check_file_exist_and_readable.__name__)
+        else:
+            return False
     elif not os.access(file_path, os.R_OK):
-        raise CorruptedFileError(
-            msg=f"{file_path} is not readable",
-            source=check_file_exist_and_readable.__name__,
-        )
+        if raise_error:
+            raise CorruptedFileError(msg=f"{file_path} is not readable", source=check_file_exist_and_readable.__name__)
+        else:
+            return False
     elif os.stat(file_path).st_size == 0:
-        raise CorruptedFileError(
-            msg=f"{file_path} is 0 bytes and contains no data.",
-            source=check_file_exist_and_readable.__name__,
-        )
+        if raise_error:
+            raise CorruptedFileError(msg=f"{file_path} is 0 bytes and contains no data.", source=check_file_exist_and_readable.__name__)
+        else:
+            return False
     else:
-        pass
+        return True
 
 
 def check_int(name: str,

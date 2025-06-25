@@ -157,6 +157,9 @@ from simba.ui.pop_ups.dlc_to_yolo_keypoints_popup import DLCYoloKeypointsPopUp
 from simba.ui.pop_ups.sleap_csv_predictions_to_yolo_popup import SLEAPcsvInference2Yolo
 from simba.ui.pop_ups.sleap_h5_inference_to_yolo_popup import SLEAPH5Inference2YoloPopUp
 from simba.ui.pop_ups.dlc_to_labelme_popup import DLC2LabelmePopUp
+from simba.ui.pop_ups.coco_keypoints_to_yolo_popup import COCOKeypoints2YOLOkeypointsPopUp
+from simba.ui.pop_ups.labelme_bbox_to_yolo_bbox_popup import LabelmeBbox2YoloBboxPopUp
+from simba.ui.pop_ups.sleap_annotations_to_yolo_popup import SLEAPAnnotations2YoloPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
     BackgroundRemoverDirectoryPopUp, BackgroundRemoverSingleVideoPopUp,
     BoxBlurPopUp, BrightnessContrastPopUp, CalculatePixelsPerMMInVideoPopUp,
@@ -877,17 +880,18 @@ class App(object):
         video_process_menu.add_command(label="Convert ROI definitions", compound="left", image=self.menu_icons["roi"]["img"], command=lambda: ConvertROIDefinitionsPopUp(), font=Formats.FONT_REGULAR.value)
 
         convert_pose_file_format_menu = Menu(video_process_menu)
-        convert_pose_file_format_menu.add_command(label="DLC annotations -> Labelme", compound="left", image=self.menu_icons["dlc_2"]["img"], command=DLC2LabelmePopUp, font=Formats.FONT_REGULAR.value)
+        convert_pose_file_format_menu.add_command(label="COCO key-points -> YOLO key-points", compound="left", image=self.menu_icons["coco_small"]["img"], command=COCOKeypoints2YOLOkeypointsPopUp, font=Formats.FONT_REGULAR.value)
+        convert_pose_file_format_menu.add_command(label="DLC annotations -> Labelme key-points", compound="left", image=self.menu_icons["dlc_2"]["img"], command=DLC2LabelmePopUp, font=Formats.FONT_REGULAR.value)
         convert_pose_file_format_menu.add_command(label="DLC annotations -> YOLO pose-estimation annotations", compound="left", image=self.menu_icons["dlc_2"]["img"], command=DLCYoloKeypointsPopUp, font=Formats.FONT_REGULAR.value)
         convert_pose_file_format_menu.add_command(label="DLC H5 inference -> YOLO pose-estimation annotations", compound="left", image=self.menu_icons["dlc_2"]["img"], command=DLCH5Inference2YoloPopUp, font=Formats.FONT_REGULAR.value)
         convert_pose_file_format_menu.add_command(label="SLEAP CSV inference -> YOLO pose-estimation annotations", compound="left", image=self.menu_icons["sleap_small"]["img"], command=SLEAPcsvInference2Yolo, font=Formats.FONT_REGULAR.value)
         convert_pose_file_format_menu.add_command(label="SLEAP H5 inference -> YOLO pose-estimation annotations", compound="left", image=self.menu_icons["sleap_small"]["img"], command=SLEAPH5Inference2YoloPopUp, font=Formats.FONT_REGULAR.value)
-        convert_pose_file_format_menu.add_command(label="SimBA ROI -> YOLO bounding-boxes", compound="left", image=self.menu_icons["SimBA_logo_3_small"]["img"], command=SimBAROIs2YOLOPopUp, font=Formats.FONT_REGULAR.value)
-        convert_pose_file_format_menu.add_command(label="SimBA -> YOLO pose-estimation", compound="left", image=self.menu_icons["SimBA_logo_3_small"]["img"], command=SimBA2YoloKeypointsPopUp, font=Formats.FONT_REGULAR.value)
-        convert_pose_file_format_menu.add_command(label="Labelme -> Images", compound="left", image=self.menu_icons["labelme"]["img"], command=Labelme2ImgsPopUp, font=Formats.FONT_REGULAR.value)
-        convert_pose_file_format_menu.add_command(label="Labelme -> CSV", compound="left", image=self.menu_icons["labelme"]["img"], command=Labelme2DataFramePopUp, font=Formats.FONT_REGULAR.value)
-
-
+        convert_pose_file_format_menu.add_command(label="SLEAP SLP annotations -> YOLO pose-estimation annotations", compound="left", image=self.menu_icons["sleap_small"]["img"], command=SLEAPAnnotations2YoloPopUp, font=Formats.FONT_REGULAR.value)
+        convert_pose_file_format_menu.add_command(label="SimBA ROI -> YOLO bounding-box annotations", compound="left", image=self.menu_icons["SimBA_logo_3_small"]["img"], command=SimBAROIs2YOLOPopUp, font=Formats.FONT_REGULAR.value)
+        convert_pose_file_format_menu.add_command(label="SimBA -> YOLO pose-estimation annotations", compound="left", image=self.menu_icons["SimBA_logo_3_small"]["img"], command=SimBA2YoloKeypointsPopUp, font=Formats.FONT_REGULAR.value)
+        convert_pose_file_format_menu.add_command(label="Labelme key-points -> Images", compound="left", image=self.menu_icons["labelme"]["img"], command=Labelme2ImgsPopUp, font=Formats.FONT_REGULAR.value)
+        convert_pose_file_format_menu.add_command(label="Labelme key-points -> CSV", compound="left", image=self.menu_icons["labelme"]["img"], command=Labelme2DataFramePopUp, font=Formats.FONT_REGULAR.value)
+        convert_pose_file_format_menu.add_command(label="Labelme bounding-boxes -> YOLO bounding-box annotations", compound="left", image=self.menu_icons["labelme"]["img"], command=LabelmeBbox2YoloBboxPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_cascade(label="Convert tracking data formats...", compound="left", image=self.menu_icons["pose"]["img"], menu=convert_pose_file_format_menu, font=Formats.FONT_REGULAR.value)
 
         convert_data_menu = Menu(video_process_menu)
@@ -961,6 +965,12 @@ class App(object):
         links_menu.add_command(label="SimBA API", compound="left", image=self.menu_icons["api"]["img"], command=lambda: webbrowser.open_new(str(r"https://simba-uw-tf-dev.readthedocs.io/")), font=Formats.FONT_REGULAR.value)
         links_menu.add_command(label="SimBA usage statistics", compound="left", image=self.menu_icons["line_chart_light_blue"]["img"], command=lambda: webbrowser.open_new(str(r"https://sronilsson.github.io/download_stats/")), font=Formats.FONT_REGULAR.value)
         links_menu.add_command(label="SimBA developer contact", compound="left", image=self.menu_icons["developer"]["img"], command=lambda: webbrowser.open_new(str(r"https://sronilsson.netlify.app/")), font=Formats.FONT_REGULAR.value)
+        yolo_links = Menu(menu)
+        for mdl_name, mdl_link in Links.YOLO_11_WEIGHTS.value.items():
+            yolo_links.add_command(label=mdl_name, compound="left", image=self.menu_icons["ultralytics_2"]["img"], command=lambda: webbrowser.open_new(str({mdl_link})), font=Formats.FONT_REGULAR.value)
+
+        links_menu.add_cascade(label="YOLO weights...", compound="left", image=self.menu_icons["ultralytics_2"]["img"], menu=yolo_links, font=Formats.FONT_REGULAR.value)
+
         help_menu.add_cascade(label="Links", menu=links_menu, compound="left", image=self.menu_icons["link"]["img"], font=Formats.FONT_REGULAR.value)
         help_menu.add_command(label="About", compound="left", image=self.menu_icons["about"]["img"], command=AboutSimBAPopUp, font=Formats.FONT_REGULAR.value)
 

@@ -45,6 +45,10 @@ class COCOKeypoints2Yolo:
     :example:
     >>> runner = COCOKeypoints2Yolo(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\s1\annotations\s1.json", img_dir=r"D:\cvat_annotations\frames\simon", save_dir=r"D:\cvat_annotations\frames\yolo_keypoints", clahe=True)
     >>> runner.run()
+
+    :example II:
+    >>> runner = COCOKeypoints2Yolo(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\merged.json", img_dir=r"D:\cvat_annotations\frames", save_dir=r"D:\cvat_annotations\frames\yolo", clahe=False)
+    >>> runner.run()
     """
 
     def __init__(self,
@@ -98,7 +102,7 @@ class COCOKeypoints2Yolo:
             check_if_keys_exist_in_dict(data=img_data, key=['width', 'height', 'file_name', 'id'], name=self.coco_path)
             _, img_name, ext = get_fn_ext(filepath=img_data['file_name'])
             if self.verbose:
-                print(f'Processing annotation {cnt + 1}/{self.img_cnt} ({img_name})...')
+                print(f'Processing annotation {cnt + 1}/{self.img_cnt} from COCO to YOLO ({img_name})...')
             if not img_name in self.img_file_paths.keys():
                 raise NoFilesFoundError(msg=f'The file {img_name} could not be found in the {self.img_dir} directory', source=self.__class__.__name__)
             img = read_img(img_path=self.img_file_paths[img_name], greyscale=self.greyscale, clahe=self.clahe)
@@ -114,14 +118,15 @@ class COCOKeypoints2Yolo:
                 check_if_keys_exist_in_dict(data=img_annotation, key=['bbox', 'keypoints', 'id', 'image_id', 'category_id'], name=self.coco_path)
                 x1, y1 = img_annotation['bbox'][0], img_annotation['bbox'][1]
                 w, h = img_annotation['bbox'][2], img_annotation['bbox'][3]
-                x_center = (x1 + (w / 2)) / img_data['width']
-                y_center = (y1 + (h / 2)) / img_data['height']
-                w = img_annotation['bbox'][2] / img_data['width']
-                h = img_annotation['bbox'][3] / img_data['height']
+                x_center = np.clip((x1 + (w / 2)) / img_data['width'], 0, 1)
+                y_center = np.clip((y1 + (h / 2)) / img_data['height'], 0, 1)
+                w = np.clip(w / img_data['width'], 0, 1)
+                h = np.clip(h / img_data['height'], 0, 1)
                 roi_str += ' '.join([f"{self.map_id_lk[img_annotation['category_id']]}", str(x_center), str(y_center), str(w), str(h), ' '])
                 kps = np.array(img_annotation['keypoints']).reshape(-1, 3).astype(np.int32)
                 x, y, v = kps[:, 0], kps[:, 1], kps[:, 2]
-                x, y = x / img_data['width'], y / img_data['height']
+                x = np.clip(x / img_data['width'], 0, 1)
+                y = np.clip(y / img_data['height'], 0, 1)
                 shapes.append(x.shape[0])
                 kps = list(np.column_stack((x, y, v)).flatten())
                 roi_str += ' '.join(str(x) for x in kps) + '\n'
@@ -144,6 +149,11 @@ class COCOKeypoints2Yolo:
         create_yolo_keypoint_yaml(path=self.save_dir, train_path=self.train_img_dir, val_path=self.val_img_dir, names=self.map_dict, save_path=self.map_path, kpt_shape=(int(shapes[0]), 3), flip_idx=self.flip_idx)
         timer.stop_timer()
         if self.verbose: stdout_success(msg=f'COCO keypoints to YOLO conversion complete. Data saved in directory {self.save_dir}.', elapsed_time=timer.elapsed_time_str)
+
+
+
+# runner = COCOKeypoints2Yolo(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\merged.json", img_dir=r"D:\cvat_annotations\frames", save_dir=r"D:\cvat_annotations\frames\yolo", clahe=False)
+# runner.run()
 
 
 # runner = COCOKeypoints2Yolo(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\s1\annotations\s1.json", img_dir=r"D:\cvat_annotations\frames\simon", save_dir=r"D:\cvat_annotations\frames\yolo_keypoints", clahe=True)

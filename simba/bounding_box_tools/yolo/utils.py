@@ -19,7 +19,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_instance, check_int, check_str,
                                 check_valid_array, check_valid_boolean,
                                 check_valid_device)
-from simba.utils.enums import Formats
+from simba.utils.enums import Formats, Options
 from simba.utils.errors import InvalidInputError, SimBAGPUError
 from simba.utils.read_write import find_core_cnt, get_video_meta_data
 
@@ -51,12 +51,7 @@ def fit_yolo(weights_path: Union[str, os.PathLike],
 
     :example:
     >>> fit_yolo(initial_weights=r"C:\troubleshooting\coco_data\weights\yolov8n-obb.pt", data=r"C:\troubleshooting\coco_data\model.yaml", save_path=r"C:\troubleshooting\coco_data\mdl", batch=16)
-
     """
-    VALID_FORMATS = ["onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite"]
-
-    os.environ['TORCH_HOME'] = r"D:\troubleshooting\netholabs\whisker_examples"
-
 
     if not _is_cuda_available()[0]:
         raise SimBAGPUError(msg='No GPU detected.', source=fit_yolo.__name__)
@@ -65,7 +60,7 @@ def fit_yolo(weights_path: Union[str, os.PathLike],
     check_valid_boolean(value=verbose, source=f'{fit_yolo.__name__} verbose', raise_error=True)
     check_valid_boolean(value=plots, source=f'{fit_yolo.__name__} plots', raise_error=True)
     check_if_dir_exists(in_dir=save_path)
-    if format is not None: check_str(name=f'{fit_yolo.__name__} format', value=format.lower(), options=VALID_FORMATS, raise_error=True)
+    if format is not None: check_str(name=f'{fit_yolo.__name__} format', value=format.lower(), options=Options.VALID_YOLO_FORMATS.value, raise_error=True)
     check_int(name=f'{fit_yolo.__name__} epochs', value=epochs, min_value=1)
     check_int(name=f'{fit_yolo.__name__} imgsz', value=imgsz, min_value=1)
     check_int(name=f'{fit_yolo.__name__} workers', value=workers, min_value=-1, unaccepted_vals=[0], max_value=find_core_cnt()[0])
@@ -92,10 +87,10 @@ def load_yolo_model(weights_path: Union[str, os.PathLike],
     >>> load_yolo_model(weights_path=r"/mnt/c/troubleshooting/coco_data/mdl/train8/weights/best.pt", format="onnx", device=0)
     """
 
-    VALID_FORMATS = ["onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite"]
+
     check_file_exist_and_readable(file_path=weights_path)
     check_valid_boolean(value=verbose, source=f'{load_yolo_model.__name__} verbose', raise_error=True)
-    if format is not None: check_str(name=f'{load_yolo_model.__name__} format', value=format.lower(), options=VALID_FORMATS, raise_error=True)
+    if format is not None: check_str(name=f'{load_yolo_model.__name__} format', value=format.lower(), options=Options.VALID_YOLO_FORMATS.value, raise_error=True)
     check_valid_device(device=device)
     model = YOLO(weights_path, verbose=verbose)
     model.to(device=device)

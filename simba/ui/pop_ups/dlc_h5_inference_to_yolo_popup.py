@@ -14,7 +14,7 @@ from simba.third_party_label_appenders.transform.dlc_ma_h5_to_yolo import MADLCH
 from simba.third_party_label_appenders.transform.utils import get_yolo_keypoint_flip_idx
 
 
-TRAIN_SIZE_OPTIONS = np.arange(10, 110, 10)
+TRAIN_SIZE_OPTIONS = list(np.arange(10, 110, 10))
 SAMPLE_SIZE_OPTIONS = list(np.arange(50, 650, 50))
 
 PADDING_OPTIONS = list(np.round(np.arange(0.01, 10.05, 0.05),2).astype(str))

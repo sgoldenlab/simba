@@ -371,3 +371,8 @@ def merge_coco_keypoints_files(data_dir: Union[str, os.PathLike],
     timer.stop_timer()
     save_json(data=results, filepath=save_path)
     stdout_success(msg=f'Merged COCO key-points file (from {data_file_cnt} input files) saved at {save_path}', source=merge_coco_keypoints_files.__name__, elapsed_time=timer.elapsed_time_str)
+
+
+
+
+#merge_coco_keypoints_files(data_dir=r'D:\cvat_annotations\frames\coco_keypoints_1', save_path=r"D:\cvat_annotations\frames\merged.json")

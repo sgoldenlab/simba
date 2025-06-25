@@ -13,8 +13,7 @@ from simba.bounding_box_tools.yolo.utils import (_get_undetected_obs,
                                                  filter_yolo_keypoint_data,
                                                  load_yolo_model, yolo_predict)
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_dir_exists, check_int, check_str,
-                                check_valid_array, check_valid_boolean,
+                                check_if_dir_exists, check_int, check_valid_boolean,
                                 check_valid_lst, check_valid_tuple, get_fn_ext)
 from simba.utils.errors import CountError, InvalidFileTypeError
 from simba.utils.printing import SimbaTimer
@@ -142,15 +141,13 @@ class YOLOPoseInference():
             for k, v in results.items():
                 save_path = os.path.join(self.save_dir, f'{k}.csv')
                 v.to_csv(save_path)
-                if self.verbose:
-                    print(f'YOLO results saved in {self.save_dir} directory', timer.elapsed_time_str)
-                    return None
-                return None
+            if self.verbose:
+                print(f'YOLO results saved in {self.save_dir} directory', timer.elapsed_time_str)
             return None
 
 
 if __name__ == "__main__" and not hasattr(sys, 'ps1'):
-    parser = argparse.ArgumentParser(description="Perform YOLO-based keypoint pose estimation on videos.")
+    parser = argparse.ArgumentParser(description="Perform YOLO-based keypoint pose estimation inference on videos.")
     parser.add_argument('--weights_path', type=str, required=True, help='Path to the trained YOLO model weights (e.g., "best.pt").')
     parser.add_argument('--video_path', type=str, nargs='+', required=True, help='One or more paths to video files to process.')
     parser.add_argument('--keypoint_names', type=str, nargs='+', required=True, help='List of keypoint names, e.g., nose left_ear right_ear.')
@@ -190,6 +187,35 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     inference.run()
 
 
+
+
+# weights_path = r"D:\cvat_annotations\frames\yolo\mdl\train13\weights\best.pt"
+# #video_path = r"D:\cvat_annotations\videos\s1.mp4"
+# save_dir= r"D:\cvat_annotations\frames\data_results_yolo11m"
+#
+# from simba.utils.read_write import find_files_of_filetypes_in_directory
+#
+# video_paths = find_files_of_filetypes_in_directory(directory=r'D:\cvat_annotations\videos', extensions=['.mp4'])
+#
+# keypoint_names = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
+#
+#
+# i = YOLOPoseInference(weights_path=weights_path,
+#                         video_path=video_paths,
+#                         save_dir=save_dir,
+#                         verbose=True,
+#                         device=0,
+#                         format='onnx',
+#                         stream=True,
+#                         keypoint_names=keypoint_names,
+#                         batch_size=200,
+#                         imgsz=640,
+#                         interpolate=True,
+#                         threshold=0.5,
+#                         max_tracks=2)
+# i.run()
+
+
 # video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
 # video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-46-56.mp4"
 # video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-50-23.mp4"
@@ -206,24 +232,24 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 
 
 
-weights_path = "/mnt/c/troubleshooting/mitra/yolo/mdl/train3/weights/best.pt"
-video_path = "/mnt/c/troubleshooting/mitra/project_folder/videos/502_MA141_Gi_CNO_0514.mp4"
-save_dir="/mnt/c/troubleshooting/mitra/yolo/results"
-
-
-keypoint_names = ('Left_ear', 'Right_ear', 'Nose', 'Left_side', 'Right_side', 'Tail_base', 'Center', 'Tail_center', 'Tail_tip')
-
-
-i = YOLOPoseInference(weights_path=weights_path,
-                        video_path=video_path,
-                        save_dir=save_dir,
-                        verbose=True,
-                        device=0,
-                        format='onnx',
-                        stream=True,
-                        keypoint_names=keypoint_names,
-                        batch_size=32,
-                        imgsz=320,
-                        interpolate=True,
-                        threshold=0.8)
-i.run()
+# weights_path = "/mnt/c/troubleshooting/mitra/yolo/mdl/train3/weights/best.pt"
+# video_path = "/mnt/c/troubleshooting/mitra/project_folder/videos/502_MA141_Gi_CNO_0514.mp4"
+# save_dir="/mnt/c/troubleshooting/mitra/yolo/results"
+#
+#
+# keypoint_names = ('Left_ear', 'Right_ear', 'Nose', 'Left_side', 'Right_side', 'Tail_base', 'Center', 'Tail_center', 'Tail_tip')
+#
+#
+# i = YOLOPoseInference(weights_path=weights_path,
+#                         video_path=video_path,
+#                         save_dir=save_dir,
+#                         verbose=True,
+#                         device=0,
+#                         format='onnx',
+#                         stream=True,
+#                         keypoint_names=keypoint_names,
+#                         batch_size=32,
+#                         imgsz=320,
+#                         interpolate=True,
+#                         threshold=0.8)
+# i.run()
