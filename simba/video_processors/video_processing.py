@@ -3953,7 +3953,10 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
             diff = np.abs(avg_frm.astype(np.int16) - frm.astype(np.int16)).astype(np.uint8)
         else:
             diff = cv2.absdiff(frm, avg_frm)
-        gray_diff = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
+        if len(diff.shape) != 2:
+            gray_diff = (0.07 * diff[:, :, 2] + 0.72 * diff[:, :, 1] + 0.21 * diff[:, :, 0]).astype(np.uint8)
+        else:
+            gray_diff = diff
         mask = np.where(gray_diff > threshold, 1, 0).astype(np.uint8)
         out_frm[mask == 0] = bg_color
         if fg_color is not None:
@@ -4021,7 +4024,10 @@ def _bg_remover_mp(frm_range: Tuple[int, np.ndarray],
             diff = np.abs(bg_frm.astype(np.int16) - frm.astype(np.int16)).astype(np.uint8)
         else:
             diff = cv2.absdiff(frm, bg_frm)
-        gray_diff = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
+        if len(diff.shape) != 2:
+            gray_diff = (0.07 * diff[:, :, 2] + 0.72 * diff[:, :, 1] + 0.21 * diff[:, :, 0]).astype(np.uint8)
+        else:
+            gray_diff = diff
         mask = np.where(gray_diff > threshold, 1, 0).astype(np.uint8)
         out_frm[mask == 0] = bg_clr
         if fg_clr is not None:

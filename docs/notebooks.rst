@@ -1,7 +1,11 @@
 📚 Notebooks
 =============
 
-General processing
+Assortment of examples to execute SimBA commands through custom code outside the code aimed at speeding up processing
+and surface additional functionalities.
+
+
+⚙️ General processing
 -------------------
 .. toctree::
    :maxdepth: 1
@@ -17,7 +21,7 @@ General processing
    nb/kleinberg_gridsearch
    nb/train_models
 
-Visualizations
+📊 Visualizations
 -------------------
 .. toctree::
    :maxdepth: 1
@@ -34,7 +38,7 @@ Visualizations
    nb/heatmap_clf
    nb/pose_plotter_gpu
 
-Geometry- and image-related calculators
+📐 Geometry- and image-related calculators
 -------------------
 Some example operations pertaining to working with animals and environments as geometries.
 
@@ -53,7 +57,7 @@ Some example operations pertaining to working with animals and environments as g
    nb/bg_remove
    nb/egocentric_align
 
-Miscellaneous
+🧰 Miscellaneous
 -------------------
 .. toctree::
    :maxdepth: 1
