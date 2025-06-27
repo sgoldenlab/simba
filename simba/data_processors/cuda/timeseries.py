@@ -1,11 +1,15 @@
+import math
 from time import perf_counter
 from typing import Optional
-import math
+
 import numpy as np
 from numba import cuda, float64
 
-from simba.data_processors.cuda.utils import (_cuda_mean, _cuda_std, _euclid_dist_2d, _is_cuda_available, _cuda_nanvariance, _cuda_diff)
-from simba.utils.checks import check_float, check_valid_array, check_int
+from simba.data_processors.cuda.utils import (_cuda_diff, _cuda_mean,
+                                              _cuda_nanvariance, _cuda_std,
+                                              _euclid_dist_2d,
+                                              _is_cuda_available)
+from simba.utils.checks import check_float, check_int, check_valid_array
 from simba.utils.enums import Formats
 from simba.utils.errors import SimBAGPUError
 
