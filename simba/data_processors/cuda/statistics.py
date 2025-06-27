@@ -5,6 +5,7 @@ __email__ = "sronilsson@gmail.com"
 import math
 from itertools import combinations
 from typing import Optional, Tuple
+
 try:
     from typing import Literal
 except:
@@ -19,22 +20,23 @@ from simba.utils.warnings import GPUToolsWarning
 
 try:
     import cupy as cp
-    from cupyx.scipy.spatial.distance import cdist
-    from cuml.metrics.cluster.silhouette_score import cython_silhouette_score
     from cuml.metrics.cluster.adjusted_rand_index import adjusted_rand_score
+    from cuml.metrics.cluster.silhouette_score import cython_silhouette_score
+    from cupyx.scipy.spatial.distance import cdist
 except:
     GPUToolsWarning(msg='GPU tools not detected, reverting to CPU')
     import numpy as cp
     from scipy.spatial.distance import cdist
-    from sklearn.metrics import silhouette_score as cython_silhouette_score
     from sklearn.metrics import adjusted_rand_score
+    from sklearn.metrics import silhouette_score as cython_silhouette_score
 
 try:
    from cuml.cluster import KMeans
 except:
     from sklearn.cluster import KMeans
 
-from simba.utils.checks import check_int, check_valid_array, check_valid_tuple, check_str
+from simba.utils.checks import (check_int, check_str, check_valid_array,
+                                check_valid_tuple)
 from simba.utils.enums import Formats
 
 THREADS_PER_BLOCK = 256

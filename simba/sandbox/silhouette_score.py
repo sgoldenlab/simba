@@ -1,25 +1,27 @@
 import time
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 
 import numpy as np
+
 from simba.utils.warnings import GPUToolsWarning
 
 try:
     import cupy as cp
-    from cupyx.scipy.spatial.distance import cdist
     from cuml.metrics.cluster.silhouette_score import cython_silhouette_score
+    from cupyx.scipy.spatial.distance import cdist
 except:
     GPUToolsWarning(msg='GPU tools not detected, reverting to CPU')
     import numpy as cp
     from scipy.spatial.distance import cdist
     from sklearn.metrics import silhouette_score as cython_silhouette_score
 
-
 from simba.utils.checks import check_str, check_valid_array
 from simba.utils.enums import Formats
+
 
 def euclid_cdist_gpu(X, Y=None):
     Y = X if Y is None else Y
@@ -100,13 +102,16 @@ def silhouette_score(x: np.ndarray, y: np.ndarray) -> float:
     return np.mean(results)
 
 from sklearn.datasets import make_blobs
+
 start = time.time()
 
 x, y = make_blobs(n_samples=50000, n_features=20, centers=5, cluster_std=10, center_box=(-1, 1))
 score_gpu = silhouette_score_gpu(x=x, y=y)
 print(time.time() - start)
 
-from sklearn.metrics import silhouette_score as sklearn_silhouette # SKLEARN ALTERNATIVE
+from sklearn.metrics import \
+    silhouette_score as sklearn_silhouette  # SKLEARN ALTERNATIVE
+
 start = time.time()
 score_sklearn = sklearn_silhouette(x, y)
 print(time.time() - start)

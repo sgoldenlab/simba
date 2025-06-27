@@ -1,14 +1,18 @@
 
 from tkinter import *
+
+from simba.bounding_box_tools.yolo.yolo_fit import FitYolo
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect, FolderSelect, SimBADropDown)
+from simba.third_party_label_appenders.transform.utils import \
+    check_valid_yolo_map
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
+                                        FolderSelect, SimBADropDown)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists)
 from simba.utils.enums import Options
 from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
 from simba.utils.read_write import find_core_cnt, get_pkg_version, str_2_bool
-from simba.utils.checks import check_if_dir_exists, check_file_exist_and_readable
-from simba.bounding_box_tools.yolo.yolo_fit import FitYolo
-from simba.third_party_label_appenders.transform.utils import check_valid_yolo_map
 
 ULTRALYTICS = 'ultralytics'
 EPOCH_OPTIONS = list(range(100, 5750, 250))
