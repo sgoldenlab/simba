@@ -4149,8 +4149,8 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
     frm_list = np.array_split(list(range(0, video_meta_data['frame_count'])), core_cnt)
     frm_data = []
 
-    if (platform.system() == "Darwin") and (multiprocessing.get_start_method() is None):
-        multiprocessing.set_start_method("spawn", force=False)
+    if platform.system() == "Darwin":
+        multiprocessing.set_start_method("spawn", force=True)
 
     for c, i in enumerate(frm_list):
         frm_data.append((c, i))

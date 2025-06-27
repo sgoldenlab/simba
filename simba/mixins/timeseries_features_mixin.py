@@ -72,7 +72,7 @@ class TimeseriesFeatureMixin(object):
     @staticmethod
     #@njit("(float32[:],)")
     @dynamic_numba_decorator(dtypes="(float32[:],)", cache=True, fastmath=False)
-    def hjort_parameters(data: np.ndarray) -> Tuple[float, float, float]:
+    def hjort_parameters(data: np.ndarray) -> Tuple[np.float64, np.float64, np.float64]:
         """
         Jitted compute of Hjorth parameters for a given time series data. Hjorth parameters describe
         mobility, complexity, and activity of a time series.
