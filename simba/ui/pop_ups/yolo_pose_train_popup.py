@@ -1,18 +1,20 @@
-from tkinter import *
 
+from tkinter import *
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
-                                        FolderSelect, SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect, FolderSelect, SimBADropDown)
 from simba.utils.enums import Options
 from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
-from simba.utils.read_write import find_core_cnt, get_pkg_version
+from simba.utils.read_write import find_core_cnt, get_pkg_version, str_2_bool
+from simba.utils.checks import check_if_dir_exists, check_file_exist_and_readable
+from simba.bounding_box_tools.yolo.yolo_fit import FitYolo
+from simba.third_party_label_appenders.transform.utils import check_valid_yolo_map
 
 ULTRALYTICS = 'ultralytics'
-EPOCH_OPTIONS = list(range(100, 1750, 250))
+EPOCH_OPTIONS = list(range(100, 5750, 250))
 IMG_SIZE_OPTIONS = [256, 320, 416, 480, 512, 640, 720, 768, 960, 1280]
 CORE_CNT_OPTIONS = list(range(1, find_core_cnt()[0]))
-
+BATCH_SIZE_OPTIONS =  [2, 4, 8, 16, 32, 64, 128]
 devices = ['CPU']
 
 class YOLOPoseTrainPopUP(PopUpMixin):
@@ -32,12 +34,13 @@ class YOLOPoseTrainPopUP(PopUpMixin):
         self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, entry_width=45)
         self.weights_path = FileSelect(parent=settings_frm, fileDescription='INITIAL WEIGHT FILE (.PT):', lblwidth=35, entry_width=45)
 
-        self.epochs_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=EPOCH_OPTIONS, label="EPOCHS: ", label_width=35, dropdown_width=40, value=100)
+        self.epochs_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=EPOCH_OPTIONS, label="EPOCHS: ", label_width=35, dropdown_width=40, value=500)
+        self.batch_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=BATCH_SIZE_OPTIONS, label="BATCH SIZE: ", label_width=35, dropdown_width=40, value=16)
         self.plots_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="PLOTS:", label_width=35, dropdown_width=40, value='TRUE')
         self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE:", label_width=35, dropdown_width=40, value='TRUE')
         self.workers_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=CORE_CNT_OPTIONS, label="CPU WORKERS:", label_width=35, dropdown_width=40, value=int(max(CORE_CNT_OPTIONS)/2))
         self.format_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=Options.VALID_YOLO_FORMATS.value, label="FORMAT:", label_width=35, dropdown_width=40, value='onnx')
-        self.img_size = SimBADropDown(parent=settings_frm, dropdown_options=IMG_SIZE_OPTIONS, label="IMAGE SIZE:", label_width=35, dropdown_width=40, value=480)
+        self.img_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=IMG_SIZE_OPTIONS, label="IMAGE SIZE:", label_width=35, dropdown_width=40, value=480)
         self.devices_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=devices, label="DEVICE:", label_width=35, dropdown_width=40, value=devices[1])
 
         settings_frm.grid(row=0, column=0, sticky=NW)
@@ -45,11 +48,13 @@ class YOLOPoseTrainPopUP(PopUpMixin):
         self.weights_path.grid(row=1, column=0, sticky=NW)
         self.save_dir.grid(row=2, column=0, sticky=NW)
         self.epochs_dropdown.grid(row=3, column=0, sticky=NW)
-        self.plots_dropdown.grid(row=4, column=0, sticky=NW)
-        self.verbose_dropdown.grid(row=5, column=0, sticky=NW)
-        self.workers_dropdown.grid(row=6, column=0, sticky=NW)
-        self.format_dropdown.grid(row=7, column=0, sticky=NW)
-        self.devices_dropdown.grid(row=8, column=0, sticky=NW)
+        self.img_size_dropdown.grid(row=4, column=0, sticky=NW)
+        self.batch_dropdown.grid(row=5, column=0, sticky=NW)
+        self.plots_dropdown.grid(row=6, column=0, sticky=NW)
+        self.verbose_dropdown.grid(row=7, column=0, sticky=NW)
+        self.workers_dropdown.grid(row=8, column=0, sticky=NW)
+        self.format_dropdown.grid(row=9, column=0, sticky=NW)
+        self.devices_dropdown.grid(row=10, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
         self.main_frm.mainloop()
 
@@ -57,13 +62,22 @@ class YOLOPoseTrainPopUP(PopUpMixin):
     def run(self):
         yolo_map_path = self.yolo_map_path.file_path
         weights_path = self.weights_path.file_path
+        save_dir = self.save_dir.folder_path
+        plots = str_2_bool(self.plots_dropdown.get_value())
+        verbose = str_2_bool(self.verbose_dropdown.get_value())
+        epochs = int(self.epochs_dropdown.get_value())
+        workers = int(self.workers_dropdown.get_value())
+        batch_size = int(self.batch_dropdown.get_value())
+        device = self.devices_dropdown.get_value()
+        device = 'cpu' if device == 'CPU' else int(device.split(':', 1)[0])
+        format = self.format_dropdown.get_value()
+        imgsz = int(self.img_size_dropdown.get_value())
 
-        coco_file_path = self.save_dir.folder_path
-
-
-
-
-        pass
-
+        check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} SAVE DIRECTORY')
+        check_file_exist_and_readable(file_path=weights_path, raise_error=True)
+        check_file_exist_and_readable(file_path=yolo_map_path, raise_error=True)
+        check_valid_yolo_map(yolo_map=yolo_map_path)
+        runner = FitYolo(weights_path=weights_path, model_yaml=yolo_map_path, save_path=save_dir, epochs=epochs, batch=batch_size, plots=plots, format=format, device=device, verbose=verbose, workers=workers, imgsz=imgsz)
+        runner.run()
 
 #YOLOPoseTrainPopUP()

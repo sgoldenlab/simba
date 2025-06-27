@@ -20,8 +20,8 @@ from simba.utils.checks import (check_if_dir_exists,
                                 check_if_keys_exist_in_dict,
                                 check_if_valid_img, check_int,
                                 check_valid_array, check_valid_dict,
-                                check_valid_lst, check_valid_tuple)
-from simba.utils.enums import Formats
+                                check_valid_lst, check_valid_tuple, check_file_exist_and_readable)
+from simba.utils.enums import Formats, Options
 from simba.utils.errors import InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
@@ -380,6 +380,28 @@ def merge_coco_keypoints_files(data_dir: Union[str, os.PathLike],
     stdout_success(msg=f'Merged COCO key-points file (from {data_file_cnt} input files) saved at {save_path}', source=merge_coco_keypoints_files.__name__, elapsed_time=timer.elapsed_time_str)
 
 
+def check_valid_yolo_map(yolo_map: Union[str, os.PathLike]) -> None:
+    """
+    Helper to surface check if yaml path leads to a valid yolo map file for pose-estimation.
+    """
 
+    REQUIRED_KEYS = ['path', 'train', 'val', 'kpt_shape', 'flip_idx', 'names']
+    check_file_exist_and_readable(file_path=yolo_map, raise_error=True)
+    with open(yolo_map, "r") as f: yolo_map = yaml.safe_load(f)
+    check_if_keys_exist_in_dict(data=yolo_map, key=REQUIRED_KEYS)
 
-#merge_coco_keypoints_files(data_dir=r'D:\cvat_annotations\frames\coco_keypoints_1', save_path=r"D:\cvat_annotations\frames\merged.json")
+    path = yolo_map['path']
+    img_train_dir = str(os.path.join(yolo_map['path'], yolo_map['train']))
+    img_val_dir = str(os.path.join(yolo_map['path'], yolo_map['val']))
+    lbl_train_dir = os.path.join(yolo_map['path'], 'labels', 'train')
+    lbl_val_dir = os.path.join(yolo_map['path'], 'labels', 'val')
+
+    check_if_dir_exists(in_dir=path, source=f'{yolo_map} path', raise_error=True)
+    check_if_dir_exists(in_dir=img_train_dir, source=f'{img_train_dir} yolo_map {yolo_map}', raise_error=True)
+    check_if_dir_exists(in_dir=img_val_dir, source=f'{img_val_dir} yolo_map {yolo_map}',raise_error=True)
+    check_if_dir_exists(in_dir=lbl_train_dir, source=f'{lbl_train_dir} yolo_map {yolo_map}', raise_error=True)
+    check_if_dir_exists(in_dir=lbl_val_dir, source=f'{img_val_dir} yolo_map {yolo_map}', raise_error=True)
+    _ = find_files_of_filetypes_in_directory(directory=img_train_dir, extensions=Options.ALL_IMAGE_FORMAT_OPTIONS.value, raise_error=True)
+    _ = find_files_of_filetypes_in_directory(directory=img_val_dir, extensions=Options.ALL_IMAGE_FORMAT_OPTIONS.value, raise_error=True)
+    _ = find_files_of_filetypes_in_directory(directory=lbl_train_dir, extensions=['.txt'], raise_error=True)
+    _ = find_files_of_filetypes_in_directory(directory=lbl_val_dir, extensions=['.txt'], raise_error=True)

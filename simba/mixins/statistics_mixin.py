@@ -4070,6 +4070,11 @@ class Statistics(FeatureExtractionMixin):
         """
         Compute the silhouette score for the given dataset and labels.
 
+
+        .. seealso::
+           For GPU implementation, see :func:`simba.data_processors.cuda.statistics.silhouette_score_gpu`
+
+
         :param np.ndarray x: The dataset as a 2D NumPy array of shape (n_samples, n_features).
         :param np.ndarray y: Cluster labels for each data point as a 1D NumPy array of shape (n_samples,).
         :returns: The average silhouette score for the dataset.
@@ -4351,6 +4356,8 @@ class Statistics(FeatureExtractionMixin):
         .. note::
            Modified from `scikit-learn <https://github.com/scikit-learn/scikit-learn/blob/8721245511de2f225ff5f9aa5f5fadce663cd4a3/sklearn/metrics/cluster/_supervised.py#L353>`_
 
+        .. seealso::
+           For GPU call, see :func:`simba.data_processors.cuda.statistics.adjusted_rand_gpu`
 
         :param np.ndarray x: 1D array representing the labels of the first model.
         :param np.ndarray y: 1D array representing the labels of the second model.
@@ -4375,7 +4382,7 @@ class Statistics(FeatureExtractionMixin):
             data=y,
             source=Statistics.adjusted_rand.__name__,
             accepted_ndims=(1,),
-            accepted_dtypes=(np.int64, np.int32, int),
+            accepted_dtypes=(np.int64, np.int32, np.integer),
             accepted_shapes=[(x.shape[0],)],
         )
         return adjusted_rand_score(labels_true=x, labels_pred=y)
@@ -5300,8 +5307,6 @@ class Statistics(FeatureExtractionMixin):
         results['P-VALUE'] = results['P-VALUE'].round(8)
 
         return results
-
-
 
     @staticmethod
     def pairwise_tukeyhsd_scipy(data: np.ndarray,

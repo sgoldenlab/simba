@@ -5,6 +5,10 @@ __email__ = "sronilsson@gmail.com"
 import math
 from itertools import combinations
 from typing import Optional, Tuple
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 
 import numpy as np
 from numba import cuda
@@ -16,17 +20,21 @@ from simba.utils.warnings import GPUToolsWarning
 try:
     import cupy as cp
     from cupyx.scipy.spatial.distance import cdist
+    from cuml.metrics.cluster.silhouette_score import cython_silhouette_score
+    from cuml.metrics.cluster.adjusted_rand_index import adjusted_rand_score
 except:
     GPUToolsWarning(msg='GPU tools not detected, reverting to CPU')
     import numpy as cp
     from scipy.spatial.distance import cdist
+    from sklearn.metrics import silhouette_score as cython_silhouette_score
+    from sklearn.metrics import adjusted_rand_score
 
 try:
    from cuml.cluster import KMeans
 except:
     from sklearn.cluster import KMeans
 
-from simba.utils.checks import check_int, check_valid_array, check_valid_tuple
+from simba.utils.checks import check_int, check_valid_array, check_valid_tuple, check_str
 from simba.utils.enums import Formats
 
 THREADS_PER_BLOCK = 256
@@ -286,7 +294,28 @@ def sliding_mean(x: np.ndarray, time_window: float, sample_rate: int) -> np.ndar
     results = results.copy_to_host()
     return results
 
+def silhouette_score_gpu(x: np.ndarray,
+                         y: np.ndarray,
+                         metric: Literal["cityblock", "cosine", "euclidean", "l1", "l2", "manhattan", "sqeuclidean"] =  'euclidean') -> float:
+    """
+    Compute the Silhouette Score for clustering assignments on GPU using a specified distance metric.
 
+    :param np.ndarray x: Feature matrix of shape (n_samples, n_features) containing numeric data.
+    :param np.ndarray y: Cluster labels array of shape (n_samples,) with numeric labels.
+    :param Literal["cityblock", "cosine", "euclidean", "l1", "l2", "manhattan", "sqeuclidean"] metric:  Distance metric to use (default='euclidean'). Must be one of: "cityblock", "cosine", "euclidean", "l1", "l2", "manhattan", or "sqeuclidean".
+    :return: Mean silhouette score as a float.
+    :rtype: float
+
+    :example:
+    >>> x, y = make_blobs(n_samples=50000, n_features=20, centers=5, cluster_std=10, center_box=(-1, 1))
+    >>> score_gpu = silhouette_score_gpu(x=x, y=y)
+    """
+    VALID_METRICS = ["cityblock", "cosine", "euclidean", "l1", "l2", "manhattan", "sqeuclidean"]
+    check_str(name=f'{silhouette_score_gpu.__name__} metric', value=metric, options=VALID_METRICS)
+    check_valid_array(data=x, source=f'{silhouette_score_gpu.__name__} x', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=y, source=f'{silhouette_score_gpu.__name__} y', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=[x.shape[0]])
+    x = cython_silhouette_score(X=x, labels=y, metric=metric)
+    return x
 
 
 @cuda.jit
@@ -581,6 +610,48 @@ def dunn_index(x: np.ndarray, y: np.ndarray) -> float:
         inter_deltas[j, i] = min_inter_dist
     v = cp.min(inter_deltas) / cp.max(intra_deltas)
     return v.get()
+
+
+def adjusted_rand_gpu(x: np.ndarray, y: np.ndarray) -> float:
+    """
+    Calculate the Adjusted Rand Index (ARI) between two clusterings.
+
+    The Adjusted Rand Index (ARI) is a measure of the similarity between two clusterings. It considers all pairs of samples and counts pairs that are assigned to the same or different clusters in both the true and predicted clusterings.
+
+    The ARI is defined as:
+
+    .. math::
+       ARI = \\frac{TP + TN}{TP + FP + FN + TN}
+
+    where:
+        - :math:`TP` (True Positive) is the number of pairs of elements that are in the same cluster in both x and y,
+        - :math:`FP` (False Positive) is the number of pairs of elements that are in the same cluster in y but not in x,
+        - :math:`FN` (False Negative) is the number of pairs of elements that are in the same cluster in x but not in y,
+        - :math:`TN` (True Negative) is the number of pairs of elements that are in different clusters in both x and y.
+
+    The ARI value ranges from -1 to 1. A value of 1 indicates perfect clustering agreement, 0 indicates random clustering, and negative values indicate disagreement between the clusterings.
+
+    .. note::
+       Modified from `scikit-learn <https://github.com/scikit-learn/scikit-learn/blob/8721245511de2f225ff5f9aa5f5fadce663cd4a3/sklearn/metrics/cluster/_supervised.py#L353>`_
+
+    .. seealso::
+       For CPU call, see :func:`simba.mixins.statistics_mixin.Statistics.adjusted_rand`.
+
+
+    :param np.ndarray x: 1D array representing the labels of the first model.
+    :param np.ndarray y: 1D array representing the labels of the second model.
+    :return: A value of 1 indicates perfect clustering agreement, a value of 0 indicates random clustering, and negative values indicate disagreement between the clusterings.
+    :rtype: float
+
+    :example:
+    >>> x = np.random.randint(low=0, high=55, size=100000000)
+    >>> y = np.random.randint(low=0, high=55, size=100000000)
+    >>> adjusted_rand_gpu(x=x, y=y)
+    """
+
+    check_valid_array(data=x, source=f'{adjusted_rand_gpu.__name__} x', accepted_ndims=(1,), accepted_dtypes=Formats.INTEGER_DTYPES.value, min_axis_0=1)
+    check_valid_array(data=y, source=f'{adjusted_rand_gpu.__name__} y', accepted_ndims=(1,), accepted_dtypes=Formats.INTEGER_DTYPES.value, accepted_shapes=[(x.shape[0],)])
+    return adjusted_rand_score(x, y)
 
 def davis_bouldin(x: np.ndarray,
                   y: np.ndarray) -> float:

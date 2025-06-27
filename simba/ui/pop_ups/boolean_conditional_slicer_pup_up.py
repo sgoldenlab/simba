@@ -20,15 +20,15 @@ class BooleanConditionalSlicerPopUp(PopUpMixin, ConfigReader):
     """
     def __init__(self, config_path: str):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
+        check_if_filepath_list_is_empty(filepaths=self.feature_file_paths, error_msg=f"No data found in {self.features_dir}, cannot compute Boolean conditional statistics without data!")
         PopUpMixin.__init__(self, title="CONDITIONAL BOOLEAN AGGREGATE STATISTICS", size=(600, 400), icon='boolean')
         self.rule_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONDITIONAL RULES #", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.AGGREGATE_BOOL_STATS.value,)
         self.rule_cnt_dropdown = DropDownMenu(self.rule_cnt_frm,"# RULES:",list(range(2, 21)),"25",com=self.create_rules_frames)
         self.rule_cnt_dropdown.setChoices(2)
         self.rule_cnt_frm.grid(row=0, column=0, sticky="NW")
         self.rule_cnt_dropdown.grid(row=0, column=0, sticky="NW")
-
         self.create_run_frm(run_function=self.run)
-        check_if_filepath_list_is_empty(filepaths=self.feature_file_paths, error_msg=f"No data found in {self.features_dir}")
+
         data_df = read_df(file_path=self.feature_file_paths[0], file_type=self.file_type)
         self.bool_cols = data_df.columns[data_df.apply(self._is_bool)]
         if len(self.bool_cols) < 2:

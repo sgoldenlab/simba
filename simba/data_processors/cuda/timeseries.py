@@ -1,17 +1,16 @@
 from time import perf_counter
 from typing import Optional
-
+import math
 import numpy as np
-from numba import cuda
+from numba import cuda, float64
 
-from simba.data_processors.cuda.utils import (_cuda_mean, _cuda_std,
-                                              _euclid_dist_2d,
-                                              _is_cuda_available)
-from simba.utils.checks import check_float, check_valid_array
+from simba.data_processors.cuda.utils import (_cuda_mean, _cuda_std, _euclid_dist_2d, _is_cuda_available, _cuda_nanvariance, _cuda_diff)
+from simba.utils.checks import check_float, check_valid_array, check_int
 from simba.utils.enums import Formats
 from simba.utils.errors import SimBAGPUError
 
 THREADS_PER_BLOCK = 1024
+MAX_HJORTH_WINDOW = 512
 
 @cuda.jit(device=True)
 def _count_at_threshold(x: np.ndarray, inverse: int, threshold: float):
@@ -261,3 +260,77 @@ def sliding_linearity_index_cuda(x: np.ndarray,
     results = cuda.device_array(shape=x.shape[0], dtype=np.float16)
     _sliding_linearity_index_kernel[bpg, THREADS_PER_BLOCK](x_dev, time_window_frames_dev, results)
     return results.copy_to_host()
+
+
+@cuda.jit
+def _sliding_hjort_parameters_kernel(x, y, results):
+    r_idx, y_idx = cuda.grid(2)
+    if r_idx >= x.shape[0] or y_idx >= y.shape[0]:
+        return
+
+    win_size = y[y_idx]
+    l_idx = int(r_idx - win_size + 1)
+    if l_idx < 0:
+        return
+
+    x_win = cuda.local.array(MAX_HJORTH_WINDOW, dtype=float64)
+    dx = cuda.local.array(MAX_HJORTH_WINDOW, dtype=float64)
+    ddx = cuda.local.array(MAX_HJORTH_WINDOW, dtype=float64)
+
+    N = win_size
+    for i in range(N):
+        x_win[i] = x[l_idx + i]
+
+    _cuda_diff(x, l_idx, r_idx + 1, dx)
+    _cuda_diff(dx, 0, N, ddx)
+
+    activity = _cuda_nanvariance(x_win, N)
+    dx_var = _cuda_nanvariance(dx, N)
+    ddx_var = _cuda_nanvariance(ddx, N)
+
+    if activity == 0 or dx_var == 0:
+        return
+
+    mobility = math.sqrt(dx_var / activity)
+    complexity = math.sqrt(ddx_var / dx_var) / mobility
+
+    results[0, r_idx, y_idx] = mobility
+    results[1, r_idx, y_idx] = complexity
+    results[2, r_idx, y_idx] = activity
+
+
+def sliding_hjort_parameters_gpu(data: np.ndarray, window_sizes: np.ndarray, sample_rate: int) -> np.ndarray:
+    """
+    Compute Hjorth parameters over sliding windows on the GPU.
+
+    .. seelalso::
+       For CPU implementation, see :`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.hjort_parameters`
+
+    :param np.ndarray data: 1D numeric array of signal data.
+    :param np.ndarray window_sizes: 1D numeric array of window sizes (in seconds).
+    :param int sample_rate: Sampling rate of the data (samples per second).
+    :returns: 3D array of shape (3, len(data), len(window_sizes)) containing Hjorth parameters computed for each data point and window size.
+    :rtype: np.ndarray
+
+    :example:
+    >>> x = np.random.randint(0, 500, (10,)).astype(np.float32)
+    >>> window_sizes = np.array([1.0, 0.5]).astype(np.float64)
+    >>> sample_rate = 10
+    >>> H = sliding_hjort_parameters_gpu(data=x, window_sizes=window_sizes, sample_rate=sample_rate)
+    """
+
+    THREADS_PER_BLOCK = (32, 16)
+    check_valid_array(data=data, source=f'{sliding_hjort_parameters_gpu.__name__} data', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_axis_0=1)
+    check_valid_array(data=window_sizes, source=f'{sliding_hjort_parameters_gpu.__name__} window_sizes', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_int(name=f'{sliding_hjort_parameters_gpu.__name__} sample_rate', value=sample_rate)
+    data = np.ascontiguousarray(data).astype(np.float64)
+    results = np.full((3, data.shape[0], window_sizes.shape[0]), -1.0)
+    window_sizes = np.ceil(window_sizes * sample_rate).astype(np.float64)
+    data_dev = cuda.to_device(data)
+    window_sizes_dev = cuda.to_device(window_sizes)
+    results_dev = cuda.to_device(results)
+    grid_x = (data.shape[0] + THREADS_PER_BLOCK[0] -1) // THREADS_PER_BLOCK[0]
+    grid_y = (window_sizes.shape[0] + THREADS_PER_BLOCK[1] -1) // THREADS_PER_BLOCK[1]
+    bpg = (grid_x, grid_y)
+    _sliding_hjort_parameters_kernel[bpg, THREADS_PER_BLOCK](data_dev, window_sizes_dev, results_dev)
+    return results_dev.copy_to_host()

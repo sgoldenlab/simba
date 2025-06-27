@@ -225,6 +225,9 @@ def get_blob_vertices_from_imgs(imgs: Dict[int, np.ndarray],
             else: print(f'Finding animal in frame {frm_idx} ({video_name})...')
         is_img_bw(img=img, raise_error=True, source=f'{get_blob_vertices_from_imgs.__name__} {frm_idx}')
         contours = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[1]
+        if contours is None:
+            results[frm_idx] = np.full(shape=(vertice_cnt, 2), fill_value=np.nan, dtype=np.float32)
+            continue
         contours = [cnt.reshape(1, -1, 2) for cnt in contours if len(cnt) >= 3]
         geometries = GeometryMixin().contours_to_geometries(contours=contours, force_rectangles=False, convex_hull=convex_hull)
         geometries = [g for g in geometries if g.is_valid]
@@ -327,9 +330,11 @@ def get_blob_vertices_from_video(video_path: Union[str, os.PathLike],
                 imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=start_frm, end_frm=end_frm, verbose=False, greyscale=False, black_and_white=False, out_format='dict')
             else:
                 imgs = read_img_batch_from_video(video_path=video_path, start_frm=start_frm, end_frm=end_frm, verbose=False, black_and_white=False, greyscale=False, core_cnt=core_cnt)
-            imgs = img_stack_to_bw(imgs=np.stack(list(imgs.values()), axis=0))
+            imgs = np.ascontiguousarray(img_stack_to_bw(imgs=np.stack(list(imgs.values()), axis=0)))
             imgs = {key: imgs[i] for i, key in enumerate(np.arange(start_frm, end_frm + 1) )}
-            imgs = [dict(subset) for subset in np.array_split(list(imgs.items()), core_cnt)]
+            #imgs = [dict(chunk) for chunk in np.array_split(list(imgs.items()), core_cnt, axis=0).tolist()]
+            imgs = [dict(list(imgs.items())[i::core_cnt]) for i in range(core_cnt)]
+            #imgs = [dict(subset) for subset in np.array_split(list(imgs.items()), core_cnt)]
             for cnt, result in enumerate(pool.map(constants, imgs, chunksize=1)):
                 results.update(result)
 

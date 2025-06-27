@@ -235,4 +235,63 @@ def _cuda_abs_energy(x):
     return math.sqrt(m)
 
 
+@cuda.jit(device=True)
+def _cuda_nanmean(x, N) -> float:
+    """
+    Compute the mean of `x` ignoring NaN values.
+
+    :param np.ndarray x: Input array of length N.
+    :param int N: Number of elements in `x` to consider.
+    :return: Mean of non-NaN elements in `x`. Returns 0.0 if no valid elements found.
+    """
+
+    s, count = 0.0, 0
+    for i in range(N):
+        if not math.isnan(x[i]):
+            s += x[i]
+            count += 1
+    if count == 0:
+        return 0.0
+    return s / count
+
+@cuda.jit(device=True)
+def _cuda_nanvariance(x, N) -> float:
+    """
+    Compute the variance of `x` ignoring NaN values using the unbiased estimator.
+
+    :param np.ndarray x: Input array of length N.
+    :param int N: Number of elements in `x` to consider. Note this is
+    :return: Variance of non-NaN elements in `x`. Returns 0.0 if count <= 1.
+    """
+
+    mean = _cuda_nanmean(x, N)
+    num, count = 0.0, 0
+    for i in range(N):
+        if not math.isnan(x[i]):
+            diff = x[i] - mean
+            num += diff * diff
+            count += 1
+    if count <= 1:
+        return 0.0
+    return num / (count - 1)
+
+@cuda.jit(device=True)
+def _cuda_diff(x, start, end, diff):
+    """
+    Compute first-order differences of a slice of `x` and store in `diff`.
+
+    :param np.ndarray x: Input array.
+    :param int start: Start index (inclusive) of the slice
+    :param int start: End index (exclusive) of the slice.
+    :param np.ndarray diff: Output array to store differences of x[start:end].
+
+    :example:
+    >>> diff = cuda.local.array(shape=512, dtype=float64)  # pre-allocated local array
+    >>> cuda_diff(x, 0, 5, diff)
+    """
+    for i in range(end - start):
+        diff[i] = math.nan
+    for j in range(start + 1, end):
+        diff[j - start] = x[j] - x[j - 1]
+
 #_is_cuda_available()

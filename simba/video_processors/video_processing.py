@@ -3917,17 +3917,17 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
     if save_path is None:
         save_path = os.path.join(dir, f'{video_name}_bg_subtracted{ext}')
     else:
-        check_if_dir_exists(in_dir=os.path.dirname(save_path), source=video_bg_subtraction_mp.__name__)
+        check_if_dir_exists(in_dir=os.path.dirname(save_path), source=video_bg_subtraction.__name__)
     check_int(name=f'{video_bg_subtraction.__name__} threshold', value=threshold, min_value=1, max_value=255)
     check_str(name='method', value=method, options=['absolute', 'light', 'dark'], raise_error=True)
     closing_kernel, opening_kernel = None, None
     if closing_kernel_size is not None:
-        check_valid_tuple(x=closing_kernel_size, source=f'{video_bg_subtraction_mp.__name__} closing_kernel_size', accepted_lengths=(2,), valid_dtypes=(int,), min_integer=1)
-        check_int(name=f'{video_bg_subtraction_mp.__name__} closing iterations', value=closing_iterations, min_value=1, raise_error=True)
+        check_valid_tuple(x=closing_kernel_size, source=f'{video_bg_subtraction.__name__} closing_kernel_size', accepted_lengths=(2,), valid_dtypes=(int,), min_integer=1)
+        check_int(name=f'{video_bg_subtraction.__name__} closing iterations', value=closing_iterations, min_value=1, raise_error=True)
         closing_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, closing_kernel_size)
     if opening_kernel_size is not None:
-        check_valid_tuple(x=opening_kernel_size, source=f'{video_bg_subtraction_mp.__name__} opening_kernel_size', accepted_lengths=(2,), valid_dtypes=(int,), min_integer=1)
-        check_int(name=f'{video_bg_subtraction_mp.__name__} opening iterations', value=opening_iterations, min_value=1, raise_error=True)
+        check_valid_tuple(x=opening_kernel_size, source=f'{video_bg_subtraction.__name__} opening_kernel_size', accepted_lengths=(2,), valid_dtypes=(int,), min_integer=1)
+        check_int(name=f'{video_bg_subtraction.__name__} opening iterations', value=opening_iterations, min_value=1, raise_error=True)
         opening_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, opening_kernel_size)
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
     writer = cv2.VideoWriter(save_path, fourcc, video_meta_data['fps'],(video_meta_data['width'], video_meta_data['height']))
@@ -4148,6 +4148,10 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
     bg_frm = cv2.resize(bg_frm, (video_meta_data['width'], video_meta_data['height']))
     frm_list = np.array_split(list(range(0, video_meta_data['frame_count'])), core_cnt)
     frm_data = []
+
+    if (platform.system() == "Darwin") and (multiprocessing.get_start_method() is None):
+        multiprocessing.set_start_method("spawn", force=False)
+
     for c, i in enumerate(frm_list):
         frm_data.append((c, i))
     with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:

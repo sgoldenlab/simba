@@ -660,16 +660,16 @@ class GeometryMixin(object):
             if isinstance(shape, type(None)):
                 return np.array([None])
             else:
-                return np.array(shape.centroid)
+                return np.array([shape.centroid.x, shape.centroid.y])
         else:
             results = np.full((len(shape), 2), np.nan)
-            check_valid_lst(data=shape, source=GeometryMixin.get_center.__name__,
-                            valid_dtypes=(MultiPolygon, LineString, Polygon, type(None)), min_len=1)
+            check_valid_lst(data=shape, source=GeometryMixin.get_center.__name__, valid_dtypes=(MultiPolygon, LineString, Polygon, type(None)), min_len=1)
             for i in range(len(shape)):
                 if shape[i] is None:
                     results[i] = None
                 else:
-                    results[i] = np.array(shape[i].centroid)
+                    results[i] = np.array([shape[i].centroid.x, shape[i].centroid.y])
+                    #results[i] = np.array(shape[i].centroid)
             return results
 
     @staticmethod

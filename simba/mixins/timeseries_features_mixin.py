@@ -119,7 +119,7 @@ class TimeseriesFeatureMixin(object):
         sliding windows of varying sizes applied to the input data array.
 
         .. seealso::
-           :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.hjort_parameters`
+           For single pass, see :func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.hjort_parameters`
 
         :param np.ndarray data: Input data array.
         :param np.ndarray window_sizes: Array of window sizes (in seconds).
@@ -131,9 +131,7 @@ class TimeseriesFeatureMixin(object):
         results = np.full((3, data.shape[0], window_sizes.shape[0]), -1.0)
         for i in range(window_sizes.shape[0]):
             window_size = int(window_sizes[i] * sample_rate)
-            for l, r in zip(
-                prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)
-            ):
+            for l, r in zip(prange(0, data.shape[0] + 1), prange(window_size, data.shape[0] + 1)):
                 sample = data[l:r]
                 dx = np.diff(np.ascontiguousarray(sample))
                 ddx = np.diff(np.ascontiguousarray(dx))
