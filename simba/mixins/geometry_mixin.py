@@ -3896,11 +3896,11 @@ class GeometryMixin(object):
         return results
 
     @staticmethod
-    def get_shape_statistics(shapes: Union[List[Polygon], Polygon]) -> Dict[str, Any]:
+    def get_shape_statistics(shapes: Union[List[Polygon], Polygon, np.ndarray]) -> Dict[str, Any]:
         """
         Calculate the lengths and widths of the minimum bounding rectangles of polygons.
 
-        :param Union[List[Polygon], Polygon] shapes: A single Polygon or a list of Polygons for which the MBR dimensions are calculated. Each polygon is assumed to be a valid shapely Polygon object. If a single Polygon is provided, it is internally converted to a list
+        :param Union[List[Polygon], Polygon] shapes: A single Polygon, a list of Polygons, or 3d array of vertices, for which the MBR dimensions are calculated.
         :return: A dictionary containing:
                  - 'lengths': A list of the lengths of the MBR for each polygon.
                  - 'widths': A list of the widths of the MBR for each polygon.
@@ -3913,8 +3913,10 @@ class GeometryMixin(object):
         widths, lengths, areas, centers, max_length, max_width, max_area, min_length, min_width, min_area = [], [], [], [], -np.inf, -np.inf, -np.inf, np.inf, np.inf, np.inf
         if isinstance(shapes, Polygon):
             shapes = [shapes]
-        check_valid_lst(data=shapes, source=f'{GeometryMixin.get_shape_statistics.__name__} shapes',
-                        valid_dtypes=(Polygon,), min_len=1)
+        elif isinstance(shapes, np.ndarray):
+            check_valid_array(data=shapes, source=f'{GeometryMixin.get_shape_statistics.__name__} shapes', accepted_ndims=(3,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+            shapes = GeometryMixin().bodyparts_to_polygon(data=shapes)
+        check_valid_lst(data=shapes, source=f'{GeometryMixin.get_shape_statistics.__name__} shapes', valid_dtypes=(Polygon,), min_len=1)
         for shape in shapes:
             shape_cords = list(zip(*shape.exterior.coords.xy))
             mbr_lengths = [LineString((shape_cords[i], shape_cords[i + 1])).length for i in range(len(shape_cords) - 1)]
@@ -4104,6 +4106,21 @@ class GeometryMixin(object):
                 results.append(np.array(splev(u, tck)).T)
         return results
 
+# video_path = "/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/03152021_NOB_IOT_8.mp4"
+# data_path = "/mnt/c/troubleshooting/RAT_NOR/project_folder/csv/outlier_corrected_movement_location/03152021_NOB_IOT_8.csv"
+# save_dir = '/mnt/d/netholabs/yolo_videos/input/mp4_20250606083508'
+#
+# #get_video_meta_data(video_path)
+#
+# nose_arr = read_df(file_path=data_path, file_type='csv', usecols=['Nose_x', 'Nose_y', 'Tail_base_x', 'Tail_base_y', 'Lat_left_x', 'Lat_left_y', 'Lat_right_x', 'Lat_right_y']).values.reshape(-1, 4, 2).astype(np.int32) ## READ THE BODY-PART THAT DEFINES THE HULL AND CONVERT TO ARRAY
+#
+# polygons = GeometryMixin().multiframe_bodyparts_to_polygon(data=nose_arr, parallel_offset=60) ## CONVERT THE BODY-PART TO POLYGONS WITH A LITTLE BUFFER
+# polygons = GeometryMixin().multiframe_minimum_rotated_rectangle(shapes=polygons) # CONVERT THE POLYGONS TO RECTANGLES (I.E., WITH 4 UNIQUE POINTS).
+# polygon_lst = [] # GET THE POINTS OF THE RECTANGLES
+# for i in polygons: polygon_lst.append(np.array(i.exterior.coords))
+# polygons = np.stack(polygon_lst, axis=0)
+#
+# shapes = GeometryMixin().get_shape_statistics(shapes=polygons)
 # if __name__ == "__main__":
 #     data_path = r"C:\troubleshooting\two_black_animals_14bp\project_folder\csv\outlier_corrected_movement_location\Together_1.csv" # PATH TO A DATA FILE
 #     array_1 = read_df(file_path=data_path, file_type='csv', usecols=['Nose_1_x', 'Nose_1_y', 'Tail_base_1_x', 'Tail_base_1_y', 'Lat_left_1_x', 'Lat_left_1_y', 'Lat_right_1_x', 'Lat_right_1_y', 'Ear_left_1_x', 'Ear_left_1_y', 'Ear_right_1_x', 'Ear_right_1_y']).values.reshape(-1, 6, 2)[0:150]## READ THE BODY-PART THAT DEFINES THE HULL AND CONVERT TO ARRAY

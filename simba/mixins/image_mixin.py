@@ -596,9 +596,9 @@ class ImageMixin(object):
         if len(img) > 2:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         if not invert:
-            return cv2.threshold(img, lower_thresh, upper_thresh, cv2.THRESH_BINARY)[1]
+            return np.ascontiguousarray(cv2.threshold(img, lower_thresh, upper_thresh, cv2.THRESH_BINARY)[1])
         else:
-            return ~cv2.threshold(img, lower_thresh, upper_thresh, cv2.THRESH_BINARY)[1]
+            return np.ascontiguousarray(~cv2.threshold(img, lower_thresh, upper_thresh, cv2.THRESH_BINARY)[1])
 
     @staticmethod
     @jit(nopython=True)

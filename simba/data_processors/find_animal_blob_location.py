@@ -4,7 +4,8 @@ import multiprocessing
 import os
 import time
 from copy import copy, deepcopy
-from typing import Dict, Optional, Tuple, Union
+from typing import Dict, Optional, Tuple, Union, List
+import platform
 
 import cv2
 import numpy as np
@@ -15,6 +16,7 @@ from scipy.spatial.qhull import QhullError
 from shapely.affinity import scale
 from shapely.geometry import MultiPolygon, Polygon
 
+from simba.mixins.image_mixin import ImageMixin
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.utils.checks import (check_float, check_instance, check_int,
                                 check_nvidea_gpu_available,
@@ -25,7 +27,7 @@ from simba.utils.errors import FFMPEGCodecGPUError, SimBAGPUError
 from simba.utils.lookups import get_available_ram
 from simba.utils.read_write import (find_core_cnt, get_fn_ext,
                                     get_memory_usage_array,
-                                    get_video_meta_data, img_stack_to_bw,
+                                    get_video_meta_data, img_stack_to_bw, img_to_bw,
                                     read_frm_of_video,
                                     read_img_batch_from_video,
                                     read_img_batch_from_video_gpu)
@@ -179,7 +181,8 @@ def get_left_right_points(hull_vertices: np.ndarray,
 
 
 
-def get_blob_vertices_from_imgs(imgs: Dict[int, np.ndarray],
+def get_blob_vertices_from_imgs(frm_idxs: Tuple[int, List[int]],
+                                video_path: Union[str, os.PathLike],
                                 verbose: bool = False,
                                 video_name: Optional[str] = None,
                                 inclusion_zone: Optional[Union[Polygon, MultiPolygon,]] = None,
@@ -218,12 +221,14 @@ def get_blob_vertices_from_imgs(imgs: Dict[int, np.ndarray],
     if window_size is not None:
         check_float(name='window_size', value=window_size, min_value=1.0, raise_error=True)
     check_int(name=f'{get_blob_vertices_from_imgs.__name__} vertice_cnt', value=vertice_cnt, min_value=3, raise_error=True)
+    video_meta_data = get_video_meta_data(video_path=video_path)
     results, prior_window = {}, None
-    for frm_idx, img in imgs.items():
+    for frm_idx in frm_idxs[1]:
         if verbose:
-            if video_name is None: print(f'Finding animal in frame {frm_idx}...')
-            else: print(f'Finding animal in frame {frm_idx} ({video_name})...')
-        is_img_bw(img=img, raise_error=True, source=f'{get_blob_vertices_from_imgs.__name__} {frm_idx}')
+            if video_name is None: print(f'Finding animal in frame {frm_idx} (core batch: {frm_idxs[0]})...')
+            else: print(f'Finding animal in frame {frm_idx} ({video_name}, core batch: {frm_idxs[0]})...')
+        img = read_frm_of_video(video_path=video_path, frame_index=frm_idx)
+        img = img_to_bw(img=img)
         contours = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[1]
         if contours is None:
             results[frm_idx] = np.full(shape=(vertice_cnt, 2), fill_value=np.nan, dtype=np.float32)
@@ -318,26 +323,15 @@ def get_blob_vertices_from_video(video_path: Union[str, os.PathLike],
     frame_ids = list(range(0, video_meta['frame_count']))
     frame_ids = [frame_ids[i:i + batch_size] for i in range(0, len(frame_ids), batch_size)]
     results = {}
+    frame_ids = [(i, j) for i, j in enumerate(frame_ids)]
     if verbose:
         print(f'Starting animal location detection for video {video_meta["video_name"]}...')
+    if platform.system() == "Darwin":
+        multiprocessing.set_start_method("spawn", force=True)
     with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-        constants = functools.partial(get_blob_vertices_from_imgs, verbose=verbose, video_name=video_name, inclusion_zone=inclusion_zone, convex_hull=convex_hull, vertice_cnt=vertice_cnt)
-        for frame_batch in range(len(frame_ids)):
-            print(f"Processing frame batch {frame_batch + 1}/{len(frame_ids)} (Video: {video_meta['video_name']}, batch_size: {batch_size}, available_ram: {available_ram})")
-            time.sleep(3)
-            start_frm, end_frm = frame_ids[frame_batch][0], frame_ids[frame_batch][-1]
-            if gpu:
-                imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=start_frm, end_frm=end_frm, verbose=False, greyscale=False, black_and_white=False, out_format='dict')
-            else:
-                imgs = read_img_batch_from_video(video_path=video_path, start_frm=start_frm, end_frm=end_frm, verbose=False, black_and_white=False, greyscale=False, core_cnt=core_cnt)
-            imgs = np.ascontiguousarray(img_stack_to_bw(imgs=np.stack(list(imgs.values()), axis=0)))
-            imgs = {key: imgs[i] for i, key in enumerate(np.arange(start_frm, end_frm + 1) )}
-            #imgs = [dict(chunk) for chunk in np.array_split(list(imgs.items()), core_cnt, axis=0).tolist()]
-            imgs = [dict(list(imgs.items())[i::core_cnt]) for i in range(core_cnt)]
-            #imgs = [dict(subset) for subset in np.array_split(list(imgs.items()), core_cnt)]
-            for cnt, result in enumerate(pool.map(constants, imgs, chunksize=1)):
-                results.update(result)
-
+        constants = functools.partial(get_blob_vertices_from_imgs, verbose=verbose, video_name=video_name, inclusion_zone=inclusion_zone, convex_hull=convex_hull, vertice_cnt=vertice_cnt, video_path=video_path)
+        for cnt, result in enumerate(pool.map(constants, frame_ids, chunksize=1)):
+            results.update(result)
     pool.join()
     pool.terminate()
     gc.collect()
@@ -348,16 +342,17 @@ def get_blob_vertices_from_video(video_path: Union[str, os.PathLike],
 
 
 
-# video_path = r"D:\EPM\large_sample\out\2025-02-24 08-25-56.mp4"
+# video_path = r"C:\troubleshooting\blob_track_tester\results\F13_sal_380.mp4"
 #
 # #video_path = r"D:\open_field_3\sample\1.mp4"
 #
 #
 # if __name__ == "__main__":
-#     new_start = time.time()
-#     y = get_blob_vertices_from_video(video_path=video_path, gpu=True, verbose=True, batch_size=None)
-#     new_time = time.time() - new_start
-#     print(new_time)
+#     y = get_blob_vertices_from_video(video_path=video_path, gpu=False, verbose=True, batch_size=100, core_cnt=12)
+#     print(y)
+
+
+
 #loop = asyncio.get_event_loop()
 #loop.run_until_complete(get_blob_vertices_from_video(video_path=r"D:\open_field_3\sample\1.mp4", gpu=True, verbose=False))
 

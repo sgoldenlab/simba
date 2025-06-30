@@ -2217,14 +2217,14 @@ def img_stack_to_greyscale(imgs: np.ndarray):
 @njit("(uint8[:, :, :, :],)", fastmath=True, parallel=True)
 def img_stack_to_bw(imgs: np.ndarray):
     """
-    Jitted conversion of a 4D stack of color images (RGB format) to grayscale.
+    Jitted conversion of a 4D stack of color images (RGB format) to black and white.
 
     .. image:: _static/img/img_stack_to_greyscale.png
        :width: 600
        :align: center
 
     :parameter np.ndarray imgs: A 4D array representing color images. It should have the shape (num_images, height, width, 3) where the last dimension represents the color channels (R, G, B).
-    :returns np.ndarray: A 3D array containing the grayscale versions of the input images. The shape of the output array is (num_images, height, width).
+    :returns np.ndarray: A 3D array containing the black and white versions of the input images. The shape of the output array is (num_images, height, width).
 
     :example:
     >>> imgs = ImageMixin().read_img_batch_from_video( video_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/videos/Together_1.avi', start_frm=0, end_frm=100)
@@ -2236,6 +2236,29 @@ def img_stack_to_bw(imgs: np.ndarray):
         vals = (0.07 * imgs[i][:, :, 2] + 0.72 * imgs[i][:, :, 1] + 0.21 * imgs[i][:, :, 0])
         results[i] = np.where(vals > 127, 255, 0).astype(np.uint8)
     return results
+
+@njit(fastmath=True)
+def img_to_bw(img: np.ndarray) -> np.ndarray:
+    """
+    Jitted conversion of a single image (grayscale or RGB) to black and white.
+
+    :param img: A 2D grayscale image (H, W) or 3D RGB image (H, W, 3), dtype uint8.
+    :return: A 2D binary black and white image with values 0 or 255.
+    """
+    if img.ndim == 2:
+        h, w = img.shape
+        result = np.empty((h, w), dtype=np.uint8)
+        for i in range(h):
+            for j in range(w):
+                result[i, j] = 255 if img[i, j] > 127 else 0
+    else:
+        h, w, _ = img.shape
+        result = np.empty((h, w), dtype=np.uint8)
+        for i in range(h):
+            for j in range(w):
+                val = 0.07 * img[i, j, 2] + 0.72 * img[i, j, 1] + 0.21 * img[i, j, 0]
+                result[i, j] = 255 if val > 127 else 0
+    return result
 
 def read_img_batch_from_video_gpu(video_path: Union[str, os.PathLike],
                                   start_frm: Optional[int] = None,

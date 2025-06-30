@@ -98,8 +98,9 @@ class BlobTrackingUI(PopUpMixin):
         self.bg_dir = FolderSelect(parent=self.run_time_settings_frm, folderDescription='BACKGROUND DIRECTORY:', lblwidth=30, initialdir=self.input_dir)
         self.bg_dir_apply = SimbaButton(parent=self.run_time_settings_frm, txt='APPLY', img='tick',  cmd=self._apply_bg_dir, cmd_kwargs={'bg_dir': lambda: self.bg_dir.folder_path})
         self.use_gpu_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU:", label_width=30, dropdown_width=10, value='FALSE')
-        if not self.gpu_available: self.use_gpu_dropdown.disable()
-        else: self.use_gpu_dropdown.set_value(value='TRUE')
+        #if not self.gpu_available: self.use_gpu_dropdown.disable()
+        #else: self.use_gpu_dropdown.set_value(value='TRUE')
+        self.use_gpu_dropdown.disable()
         self.core_cnt_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(range(1, self.core_cnt+1)), label="CPU CORE COUNT:", label_width=30, dropdown_width=10, value=int(self.core_cnt / 2))
 
         self.vertice_cnt_dropdown = SimBADropDown(parent=self.run_time_settings_frm, dropdown_options=list(range(10, 501)), label="VERTICE COUNT:", label_width=30, dropdown_width=10, value=30)

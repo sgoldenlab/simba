@@ -831,7 +831,6 @@ def slice_imgs(video_path: Union[str, os.PathLike],
     >>> sliced_imgs = slice_imgs(video_path=video_path, shapes=nose_arr) #SLICE THE CIRCLE IN THE VIDEO.
     """
     THREADS_PER_BLOCK = (32, 32, 1)
-
     video_meta_data = get_video_meta_data(video_path=video_path, fps_as_int=False)
     video_meta_data['frame_count'] = shapes.shape[0]
     n, w, h = video_meta_data['frame_count'], video_meta_data['width'], video_meta_data['height']
