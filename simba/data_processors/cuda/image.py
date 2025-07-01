@@ -858,6 +858,23 @@ def slice_imgs(video_path: Union[str, os.PathLike],
        :width: 900
        :loop:
 
+    .. video:: _static/img/slice_imgs_gpu.webm
+       :width: 800
+       :autoplay:
+       :loop:
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/slice_imgs.csv
+       :widths: 10, 90
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    .. note::
+       For CPU multicore implementation, see :func:`simba.mixins.image_mixin.ImageMixin.slice_shapes_in_imgs`.
+       For single core process, see :func:`simba.mixins.image_mixin.ImageMixin.slice_shapes_in_img`
+
     :example I:
     Example 1: Mask video using circular regions derived from body part center positions
     >>> video_path = "/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/03152021_NOB_IOT_8.mp4"
