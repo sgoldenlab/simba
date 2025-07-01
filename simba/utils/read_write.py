@@ -69,8 +69,8 @@ from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 ParametersFileError, PermissionError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.warnings import (
-    FileExistWarning, FrameRangeWarning, InvalidValueWarning,
-    NoFileFoundWarning, ThirdPartyAnnotationsInvalidFileFormatWarning, GPUToolsWarning)
+    FileExistWarning, FrameRangeWarning, GPUToolsWarning, InvalidValueWarning,
+    NoFileFoundWarning, ThirdPartyAnnotationsInvalidFileFormatWarning)
 
 SIMBA_DIR = os.path.dirname(simba.__file__)
 
