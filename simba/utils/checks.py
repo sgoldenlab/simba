@@ -944,14 +944,11 @@ def check_valid_array(data: np.ndarray,
                 msg=f"Array not of acceptable shape. Found  {data.shape[0]} rows, minimum accepted: {min_axis_0}, {source}",
                 source=check_valid_array.__name__,
             )
-    if max_axis_1 is not None:
+    if max_axis_1 is not None and data.ndim > 1:
         check_int(name=f"{source} max_axis_1", value=max_axis_1)
         if data.shape[1] > max_axis_1:
-            raise ArrayError(
-                msg=f"Array not of acceptable shape. Found  {data.shape[1]} columns, maximum columns accepted: {max_axis_1}, {source}",
-                source=check_valid_array.__name__,
-            )
-    if min_axis_1 is not None:
+            raise ArrayError(msg=f"Array not of acceptable shape. Found  {data.shape[1]} columns, maximum columns accepted: {max_axis_1}, {source}", source=check_valid_array.__name__)
+    if min_axis_1 is not None and data.ndim > 1:
         check_int(name=f"{source} min_axis_1", value=min_axis_1)
         if data.shape[1] < min_axis_1:
             raise ArrayError(

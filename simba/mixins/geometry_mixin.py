@@ -247,14 +247,11 @@ class GeometryMixin(object):
         >>> polygon = GeometryMixin().bodyparts_to_circle(data=data, parallel_offset=10, pixels_per_mm=4)
         """
 
-        check_valid_array(data=data, accepted_ndims=([1, 2, ]), accepted_dtypes=Formats.NUMERIC_DTYPES.value,
-                          max_axis_1=2)
-        check_float(name=f"{GeometryMixin.bodyparts_to_circle.__name__} parallel_offset", value=pixels_per_mm,
-                    min_value=1)
-        check_float(name=f"{GeometryMixin.bodyparts_to_circle.__name__} pixels_per_mm", value=pixels_per_mm,
-                    min_value=1)
+        check_valid_array(data=data, accepted_ndims=(1, 2, ), accepted_dtypes=Formats.NUMERIC_DTYPES.value, max_axis_1=2)
+        check_float(name=f"{GeometryMixin.bodyparts_to_circle.__name__} parallel_offset", value=pixels_per_mm, min_value=1)
+        check_float(name=f"{GeometryMixin.bodyparts_to_circle.__name__} pixels_per_mm", value=pixels_per_mm, min_value=1)
 
-        if data.shape == (2,):
+        if data.ndim == 1:
             return Point(data).buffer(parallel_offset / pixels_per_mm)
         else:
             results = []
@@ -634,8 +631,7 @@ class GeometryMixin(object):
             return LineString(data.tolist()).buffer(distance=area, cap_style=3)
 
     @staticmethod
-    def get_center(shape: Union[
-        LineString, Polygon, MultiPolygon, None, List[Union[LineString, Polygon, MultiPolygon, None]]]) -> np.ndarray:
+    def get_center(shape: Union[LineString, Polygon, MultiPolygon, None, List[Union[LineString, Polygon, MultiPolygon, None]]]) -> np.ndarray:
         """
         Get the center coordinate of a shape or a list of shapes.
 
@@ -1329,27 +1325,19 @@ class GeometryMixin(object):
         """
 
         timer = SimbaTimer(start=True)
-        check_int(name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True, )
+        check_int(name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True, unaccepted_vals=[0])
         if core_cnt == -1:
             core_cnt = find_core_cnt()[0]
         results = []
         with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-            constants = functools.partial(
-                GeometryMixin.bodyparts_to_circle,
-                parallel_offset=parallel_offset,
-                pixels_per_mm=pixels_per_mm,
-            )
+            constants = functools.partial(GeometryMixin.bodyparts_to_circle, parallel_offset=parallel_offset, pixels_per_mm=pixels_per_mm)
             for cnt, mp_return in enumerate(pool.imap(constants, data, chunksize=1)):
                 results.append(mp_return)
 
         pool.join()
         pool.terminate()
         timer.stop_timer()
-        stdout_success(
-            msg="Multiframe body-parts to circle complete",
-            source=GeometryMixin.multiframe_bodyparts_to_circle.__name__,
-            elapsed_time=timer.elapsed_time_str,
-        )
+        stdout_success(msg="Multiframe body-parts to circle complete", source=GeometryMixin.multiframe_bodyparts_to_circle.__name__, elapsed_time=timer.elapsed_time_str )
         return results
 
     @staticmethod
