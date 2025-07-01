@@ -2,10 +2,10 @@ import functools
 import gc
 import multiprocessing
 import os
+import platform
 import time
 from copy import copy, deepcopy
-from typing import Dict, Optional, Tuple, Union, List
-import platform
+from typing import Dict, List, Optional, Tuple, Union
 
 import cv2
 import numpy as np
@@ -16,8 +16,8 @@ from scipy.spatial.qhull import QhullError
 from shapely.affinity import scale
 from shapely.geometry import MultiPolygon, Polygon
 
-from simba.mixins.image_mixin import ImageMixin
 from simba.mixins.geometry_mixin import GeometryMixin
+from simba.mixins.image_mixin import ImageMixin
 from simba.utils.checks import (check_float, check_instance, check_int,
                                 check_nvidea_gpu_available,
                                 check_valid_boolean, is_img_bw)
@@ -27,8 +27,8 @@ from simba.utils.errors import FFMPEGCodecGPUError, SimBAGPUError
 from simba.utils.lookups import get_available_ram
 from simba.utils.read_write import (find_core_cnt, get_fn_ext,
                                     get_memory_usage_array,
-                                    get_video_meta_data, img_stack_to_bw, img_to_bw,
-                                    read_frm_of_video,
+                                    get_video_meta_data, img_stack_to_bw,
+                                    img_to_bw, read_frm_of_video,
                                     read_img_batch_from_video,
                                     read_img_batch_from_video_gpu)
 
