@@ -7,6 +7,7 @@ ENV = read_sys_env()
 
 ### IMPORT CURF IF SET BY simba/assets/.env
 use_cuml = ENV.get(ENV_VARS.CUML.value, False)  # Avoid KeyError, default to False
+#use_cuml = True
 if use_cuml:
     cuml_version = get_library_version(library_name='cuml', raise_error=False)
     if cuml_version:

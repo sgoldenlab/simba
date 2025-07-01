@@ -1433,7 +1433,7 @@ class TrainModelMixin(object):
                             max_depth=max_depth,
                             max_features=max_features,
                             min_samples_leaf=min_samples_leaf,
-                            verbose=True)
+                            verbose=6)
             else:
                 raise SimBAModuleNotFoundError(msg='SimBA could not find the cuml library for GPU machine learning algorithms. Set CUML to False in the SimBA model parameters, or import CUML environment variable using `export CUML=True`', source=self.__class__.__name__)
 

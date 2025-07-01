@@ -531,10 +531,7 @@ class Statistics(FeatureExtractionMixin):
         sample_1: np.ndarray,
         sample_2: np.ndarray,
         fill_value: Optional[int] = 1,
-        bucket_method: Literal[
-            "fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"
-        ] = "auto",
-    ) -> float:
+        bucket_method: Literal["fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"] = "auto") -> float:
 
         r"""
         Compute Kullback-Leibler divergence between two distributions.
@@ -549,6 +546,7 @@ class Statistics(FeatureExtractionMixin):
 
         .. seealso::
            For rolling comparisons in a timeseries, see :func:`simba.mixins.statistics_mixin.Statistics.rolling_kullback_leibler_divergence`
+           For GPU implementation, see :func:`simba.data_processors.cuda.statistics.kullback_leibler_divergence_gpu`.
 
         :param ndarray sample_1: First 1d array representing feature values.
         :param ndarray sample_2: Second 1d array representing feature values.
@@ -557,42 +555,17 @@ class Statistics(FeatureExtractionMixin):
         :returns: Kullback-Leibler divergence between ``sample_1`` and ``sample_2``
         :rtype: float
         """
-        check_valid_array(
-            data=sample_1,
-            source=Statistics.kullback_leibler_divergence.__name__,
-            accepted_ndims=(1,),
-            accepted_dtypes=Formats.NUMERIC_DTYPES.value,
-        )
-        check_valid_array(
-            data=sample_2,
-            source=Statistics.kullback_leibler_divergence.__name__,
-            accepted_ndims=(1,),
-            accepted_dtypes=Formats.NUMERIC_DTYPES.value,
-        )
-        check_str(
-            name=f"{self.__class__.__name__} bucket_method",
-            value=bucket_method,
-            options=Options.BUCKET_METHODS.value,
-        )
-        check_int(
-            name=f"{self.__class__.__name__} fill value", value=fill_value, min_value=1
-        )
+        check_valid_array(data=sample_1, source=Statistics.kullback_leibler_divergence.__name__, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=sample_2, source=Statistics.kullback_leibler_divergence.__name__, accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_str(name=f"{self.__class__.__name__} bucket_method", value=bucket_method, options=Options.BUCKET_METHODS.value)
+        check_int(name=f"{self.__class__.__name__} fill value", value=fill_value, min_value=1)
         bin_width, bin_count = bucket_data(data=sample_1, method=bucket_method)
-        sample_1_hist = self._hist_1d(
-            data=sample_1,
-            bin_count=bin_count,
-            range=np.array([0, int(bin_width * bin_count)]),
-        )
-        sample_2_hist = self._hist_1d(
-            data=sample_2,
-            bin_count=bin_count,
-            range=np.array([0, int(bin_width * bin_count)]),
-        )
+        r = np.array([np.min(sample_1), np.max(sample_1)])
+        sample_1_hist = self._hist_1d(data=sample_1, bin_count=bin_count, range=r)
+        sample_2_hist = self._hist_1d(data=sample_2, bin_count=bin_count, range=r)
         sample_1_hist[sample_1_hist == 0] = fill_value
         sample_2_hist[sample_2_hist == 0] = fill_value
-        sample_1_hist, sample_2_hist = sample_1_hist / np.sum(
-            sample_1_hist
-        ), sample_2_hist / np.sum(sample_2_hist)
+        sample_1_hist, sample_2_hist = sample_1_hist / np.sum(sample_1_hist), sample_2_hist / np.sum(sample_2_hist)
         return stats.entropy(pk=sample_1_hist, qk=sample_2_hist)
 
     def rolling_kullback_leibler_divergence(
@@ -878,10 +851,8 @@ class Statistics(FeatureExtractionMixin):
         data: np.ndarray,
         time_windows: np.ndarray,
         fps: int,
-        bucket_method: Literal[
-            "fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"
-        ] = "auto",
-    ) -> np.ndarray:
+        bucket_method: Literal["fd", "doane", "auto", "scott", "stone", "rice", "sturges", "sqrt"] = "auto") -> np.ndarray:
+
         """
         Compute rolling Wasserstein distance comparing the current time-window of size N to the preceding window of size N.
 
@@ -901,44 +872,22 @@ class Statistics(FeatureExtractionMixin):
         """
 
         check_valid_array(data=data, source=self.__class__.__name__, accepted_sizes=[1])
-        check_valid_array(
-            data=time_windows, source=self.__class__.__name__, accepted_sizes=[1]
-        )
+        check_valid_array(data=time_windows, source=self.__class__.__name__, accepted_sizes=[1])
         check_int(name=f"{self.__class__.__name__} fps", value=fps, min_value=1)
-        check_str(
-            name=f"{self.__class__.__name__} bucket_method",
-            value=bucket_method,
-            options=Options.BUCKET_METHODS.value,
-        )
+        check_str(name=f"{self.__class__.__name__} bucket_method", value=bucket_method, options=Options.BUCKET_METHODS.value)
         results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
         for i in prange(time_windows.shape[0]):
             window_size = int(time_windows[i] * fps)
-            data_split = np.split(
-                data, list(range(window_size, data.shape[0], window_size))
-            )
+            data_split = np.split(data, list(range(window_size, data.shape[0], window_size)))
             for j in prange(1, len(data_split)):
                 window_start = int(window_size * j)
                 window_end = int(window_start + window_size)
-                sample_1, sample_2 = data_split[j - 1].astype(np.float32), data_split[
-                    j
-                ].astype(np.float32)
+                sample_1, sample_2 = data_split[j - 1].astype(np.float32), data_split[j].astype(np.float32)
                 bin_width, bin_count = bucket_data(data=sample_1, method=bucket_method)
-                sample_1_hist = self._hist_1d(
-                    data=sample_1,
-                    bin_count=bin_count,
-                    range=np.array([0, int(bin_width * bin_count)]),
-                )
-                sample_2_hist = self._hist_1d(
-                    data=sample_2,
-                    bin_count=bin_count,
-                    range=np.array([0, int(bin_width * bin_count)]),
-                )
-                sample_1_hist, sample_2_hist = sample_1_hist / np.sum(
-                    sample_1_hist
-                ), sample_2_hist / np.sum(sample_2_hist)
-                w = stats.wasserstein_distance(
-                    u_values=sample_1_hist, v_values=sample_2_hist
-                )
+                sample_1_hist = self._hist_1d(data=sample_1, bin_count=bin_count, range=np.array([0, int(bin_width * bin_count)]))
+                sample_2_hist = self._hist_1d(data=sample_2, bin_count=bin_count, range=np.array([0, int(bin_width * bin_count)]))
+                sample_1_hist, sample_2_hist = sample_1_hist / np.sum(sample_1_hist), sample_2_hist / np.sum(sample_2_hist)
+                w = stats.wasserstein_distance(u_values=sample_1_hist, v_values=sample_2_hist)
                 results[window_start:window_end, i] = w
 
         return results

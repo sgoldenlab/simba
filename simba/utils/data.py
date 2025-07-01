@@ -836,8 +836,9 @@ def bucket_data(data: np.ndarray, method: Literal["fd", "doane", "auto", "scott"
     check_valid_array(data=data, source=bucket_data.__name__, accepted_ndims=(1,))
     check_str(name=f"{bucket_data.__name__} method", value=method, options=Options.BUCKET_METHODS.value)
     bin_edges = np.histogram_bin_edges(a=data, bins=method)
-    bin_counts = bin_edges.shape[0]
-    bin_width = bin_edges[1] - bin_edges[0]
+    bin_counts = bin_edges.shape[0] - 1
+    bin_widths = np.diff(bin_edges)
+    bin_width = bin_widths[0] if np.allclose(bin_widths, bin_widths[0]) else bin_widths
 
     return bin_width, bin_counts
 
