@@ -897,6 +897,11 @@ def hamming_distance_gpu(x: np.ndarray,
     :param ndarray w: A 1D array of shape (n_samples,) representing sample weights. If None, uniform weights are used.
     :returns: The weighted average Hamming distance between corresponding rows of `x` and `y`.
     :rtype: float
+
+
+    :example:
+    >>> x, y = np.random.randint(0, 2, (10, 1)).astype(np.int8), np.random.randint(0, 2, (10, 1)).astype(np.int8)
+    >>> gpu_hamming = hamming_distance_gpu(x=x, y=y)
     """
 
     check_valid_array(data=x, source=f'{hamming_distance_gpu.__name__} x', accepted_ndims=(1, 2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
@@ -912,3 +917,48 @@ def hamming_distance_gpu(x: np.ndarray,
     bpg = (x.shape[0] + (THREADS_PER_BLOCK - 1)) // THREADS_PER_BLOCK
     _hamming_kernel[bpg, THREADS_PER_BLOCK](x_dev, y_dev, w_dev, results_dev)
     return np.sum(results_dev.copy_to_host()) / x.shape[0]
+
+
+@cuda.jit()
+def _sokal_sneath_kernel(x, y, w, c):
+    idx = cuda.grid(1)
+    if idx < 0 or idx >= x.shape[0]:
+        return
+    if (x[idx] == 1) and (y[idx] == 1):
+        cuda.atomic.add(c, 0, 1 * w[idx])
+    elif (x[idx] == 1) and (y[idx] == 0):
+        cuda.atomic.add(c, 1, 1 * w[idx])
+    elif (x[idx] == 0) and (y[idx] == 1):
+        cuda.atomic.add(c, 2, 1 * w[idx])
+
+
+def sokal_sneath_gpu(x: np.ndarray, y: np.ndarray, w: Optional[np.ndarray] = None) -> float:
+    """
+    Compute the Sokal–Sneath similarity coefficient between two binary vectors using CUDA acceleration.
+
+    .. seealso::
+       For CPU method, see :func:`simba.mixins.statistics_mixin.Statistics.sokal_sneath`
+
+    :param ndarray x: First binary vector (1D array of 0s and 1s).
+    :param ndarray y: Second binary vector of the same shape as `x`.
+    :param ndarray w: A 1D array of shape (n_samples,) representing sample weights. If None, uniform weights are used.
+    :returns: The Sokal–Sneath similarity coefficient between `x` and `y`.
+    :rtype: float.
+    """
+
+
+    check_valid_array(data=x, source=f'{sokal_sneath_gpu.__name__} x', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=y, source=f'{sokal_sneath_gpu.__name__} y', accepted_ndims=(x.ndim,), accepted_axis_0_shape=[x.shape[0]], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    if w is None:
+        w = np.ones(x.shape[0]).astype(np.float32)
+    check_valid_array(data=w, source=f'{sokal_sneath_gpu.__name__} w', accepted_ndims=(1,), accepted_axis_0_shape=[x.shape[0]], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    x_dev = cuda.to_device(x)
+    y_dev = cuda.to_device(y)
+    w_dev = cuda.to_device(w)
+    counter = cuda.to_device(np.zeros(3, dtype=np.float32))
+    bpg = (x.shape[0] + (THREADS_PER_BLOCK - 1)) // THREADS_PER_BLOCK
+    _sokal_sneath_kernel[bpg, THREADS_PER_BLOCK](x_dev, y_dev, w_dev, counter)
+    result = counter.copy_to_host()
+    a, b, c = result[0], result[1], result[2]
+    denom = a + 2 * (b + c)
+    return a / denom if denom != 0.0 else 1.0

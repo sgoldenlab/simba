@@ -873,7 +873,8 @@ def check_valid_array(data: np.ndarray,
                       accepted_shapes: Optional[List[Tuple[int]]] = None,
                       min_axis_0: Optional[int] = None,
                       max_axis_1: Optional[int] = None,
-                      min_axis_1: Optional[int] = None) -> None:
+                      min_axis_1: Optional[int] = None,
+                      min_value: Optional[Union[float, int]] = None) -> None:
     """
     Check if the given  array satisfies specified criteria regarding its dimensions, shape, and data type.
 
@@ -961,6 +962,11 @@ def check_valid_array(data: np.ndarray,
         additional_vals = list(set(np.unique(data)) - set(accepted_values))
         if len(additional_vals) > 0:
             raise ArrayError(msg=f"Array contains unacceptable values. Found  {additional_vals}, accepted: {accepted_values}, {source}", source=check_valid_array.__name__,)
+
+    if min_value is not None:
+        check_float(name=f'{source} min_value', value=min_value)
+        if np.min(data) < min_value:
+            raise ArrayError(msg=f"Array contains value below accepted value. Found  {np.min(data)}, accepted minimum: {min_value}, {source}", source=check_valid_array.__name__, )
 
 
 def check_valid_lst(data: list,

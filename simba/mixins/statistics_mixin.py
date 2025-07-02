@@ -3079,9 +3079,7 @@ class Statistics(FeatureExtractionMixin):
     # @jit(nopython=True, cache=True)
     @dynamic_numba_decorator(dtypes=[(int8[:], int8[:], types.misc.Omitted(None)), (int8[:], int8[:], float32[:])], cache=True, fastmath=False)
 
-    def sokal_sneath(
-        x: np.ndarray, y: np.ndarray, w: Optional[np.ndarray] = None
-    ) -> float64:
+    def sokal_sneath(x: np.ndarray, y: np.ndarray, w: Optional[np.ndarray] = None) -> float64:
         """
         Jitted calculate of the sokal sneath coefficient between two binary vectors (e.g., to classified behaviors). 0 represent independence, 1 represents complete interdependence.
 
@@ -3090,6 +3088,9 @@ class Statistics(FeatureExtractionMixin):
 
         .. note::
            Adapted from `pynndescent <https://pynndescent.readthedocs.io/en/latest/>`_.
+
+        .. seealso::
+           For GPU method, see :func:`simba.data_processors.cuda.statistics.sokal_sneath_gpu`
 
         :param np.ndarray x: First binary vector.
         :param np.ndarray x: Second binary vector.
@@ -3245,6 +3246,25 @@ class Statistics(FeatureExtractionMixin):
             sensitivity = tp / (tp + fn)
             specificity = tn / (tn + fp)
             return sensitivity + specificity - 1
+
+    @staticmethod
+    def geometric_mean(x: np.ndarray) -> float:
+        """
+        Computes the geometric mean of a 1D NumPy array.
+
+        :param x: A 1D NumPy array of numeric type containing non-negative values. Must have at least two elements.
+        :return: The geometric mean of the values in `x`.
+        :rtype: float
+        """
+
+        check_valid_array(data=x,
+                          source=f'{Statistics.geometric_mean.__name__} x',
+                          accepted_ndims=(1,),
+                          accepted_dtypes=Formats.NUMERIC_DTYPES.value,
+                          min_value=0,
+                          min_axis_0=2)
+
+        return np.prod(x) ** (1 / x.shape[0])
 
     @staticmethod
     def jaccard_distance(x: np.ndarray, y: np.ndarray) -> float:
