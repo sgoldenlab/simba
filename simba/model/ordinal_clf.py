@@ -44,6 +44,8 @@ class OrdinalClassifier():
     ----------
     .. [1] Frank, Eibe, and Mark Hall. “A Simple Approach to Ordinal Classification.” In Machine Learning: ECML 2001, edited by Luc De Raedt and Peter Flach, 2167:145–56. Lecture Notes in Computer Science. Berlin, Heidelberg: Springer Berlin Heidelberg, 2001. https://doi.org/10.1007/3-540-44795-4_13.
     .. [2] Sabnis, Gautam, Leinani Hession, J. Matthew Mahoney, Arie Mobley, Marina Santos, and Vivek Kumar. “Visual Detection of Seizures in Mice Using Supervised Machine Learning,” May 31, 2024. https://doi.org/10.1101/2024.05.29.596520.
+    .. [3] Another implementation / benchmarking by Lee Prevost - `https://github.com/leeprevost/OrdinalClassifier/tree/main <https://github.com/leeprevost/OrdinalClassifier/tree/main>`_.
+
 
     :example:
     >>> X = np.random.randint(0, 500, (100, 50))
@@ -152,17 +154,17 @@ class OrdinalClassifier():
 #
 
 
-NS = [1000, 10000, 100000, 1000000, 2000000]
-CUDA = False
-for N in NS:
-    X = np.random.randint(0, 500, (N, 250)).astype(np.int32)
-    y = np.random.randint(1, 6, (N)).astype(np.int32)
-    rf_mdl = TrainModelMixin().clf_define(cuda=CUDA, verbose=False, n_estimators=250)
-    start = time.perf_counter()
-    fitted_mdl = OrdinalClassifier.fit(X, y, rf_mdl, -1, parallel=False)
-    stop = time.perf_counter()
-    elapsed = stop - start
-    print(N, '\t'* 4, elapsed)
+# NS = [1000, 10000, 100000, 1000000, 2000000]
+# CUDA = False
+# for N in NS:
+#     X = np.random.randint(0, 500, (N, 250)).astype(np.int32)
+#     y = np.random.randint(1, 6, (N)).astype(np.int32)
+#     rf_mdl = TrainModelMixin().clf_define(cuda=CUDA, verbose=False, n_estimators=250)
+#     start = time.perf_counter()
+#     fitted_mdl = OrdinalClassifier.fit(X, y, rf_mdl, -1, parallel=False)
+#     stop = time.perf_counter()
+#     elapsed = stop - start
+#     print(N, '\t'* 4, elapsed)
 
 #
 #
