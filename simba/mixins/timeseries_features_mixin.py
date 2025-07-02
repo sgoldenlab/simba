@@ -64,6 +64,7 @@ class TimeseriesFeatureMixin(object):
        .. [3] `antropy <https://github.com/raphaelvallat/antropy>`_.
        .. [4] `tsfresh <https://tsfresh.readthedocs.io>`_.
        .. [5] `pycaret <https://github.com/pycaret/pycaret>`_.
+       .. [6] `stumpy <https://stumpy.readthedocs.io/>`_.
     """
 
     def __init__(self):

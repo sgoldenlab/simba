@@ -2290,6 +2290,9 @@ class Statistics(FeatureExtractionMixin):
         >>> results = pd.DataFrame(results, columns=['X', 'Y', 'ISOLATION SCORE'])
         >>> PlottingMixin.continuous_scatter(data=results, palette='seismic', bg_clr='lightgrey', columns=['X', 'Y', 'ISOLATION SCORE'],size=30)
 
+        :references:
+        ----------
+           .. [1] Liu, Fei Tony, Kai Ming Ting, and Zhi-Hua Zhou. “Isolation Forest.” In 2008 Eighth IEEE International Conference on Data Mining, 413–22. Pisa, Italy: IEEE, 2008. https://doi.org/10.1109/ICDM.2008.17.
         """
 
         def get_if_scores(x: np.ndarray, estimators: estimators):
@@ -2967,9 +2970,11 @@ class Statistics(FeatureExtractionMixin):
             (int8[:], int8[:], bool_, float32[:]),
             (int8[:], int8[:], bool_, types.misc.Omitted(None)),
         ], cache=True, fastmath=False)
+
     def hamming_distance(x: np.ndarray,
                          y: np.ndarray,
-                         sort: Optional[bool] = False,w: Optional[np.ndarray] = None) -> float:
+                         sort: Optional[bool] = False,
+                         w: Optional[np.ndarray] = None) -> float:
         """
         Jitted compute of the Hamming similarity between two vectors.
 
@@ -2985,6 +2990,9 @@ class Statistics(FeatureExtractionMixin):
         where:
            - :math:`n` is the length of the vectors,
            - :math:`w_i` is the weight associated with the math:`i`th element of the vectors.
+
+        .. seealso::
+           For GPU method, see :func:`simba.data_processors.cuda.statistics.hamming_distance_gpu`.
 
         :param np.ndarray x: First binary vector.
         :param np.ndarray x: Second binary vector.

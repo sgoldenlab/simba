@@ -38,10 +38,10 @@ except:
     from sklearn.cluster import KMeans
 
 from simba.mixins.statistics_mixin import Statistics
-from simba.utils.checks import (check_int, check_str, check_valid_array,
-                                check_valid_tuple)
+from simba.utils.checks import (check_int, check_str, check_valid_array, check_valid_tuple)
 from simba.utils.data import bucket_data
 from simba.utils.enums import Formats
+from simba.data_processors.cuda.utils import _cuda_are_rows_equal
 
 THREADS_PER_BLOCK = 256
 
@@ -863,3 +863,52 @@ def kullback_leibler_divergence_gpu(x: np.ndarray, y: np.ndarray, fill_value: in
     y_hist[y_hist == 0] = fill_value
     x_hist, y_hist = x_hist / np.sum(x_hist), y_hist / np.sum(y_hist)
     return kl_divergence_gpu(P=x_hist.astype(np.float32), Q=y_hist.astype(np.float32), convert_dtype=False)
+
+
+@cuda.jit()
+def _hamming_kernel(x, y, w, r):
+    """
+    Hamming distance kernal called by :func:`simba.data_processors.cuda.statistics.hamming_distance_gpu`
+    """
+    idx = cuda.grid(1)
+    if idx < 0 or idx >= x.shape[0]:
+        return
+    if not _cuda_are_rows_equal(x, y, idx, idx):
+        r[idx] = 1.0 * w[idx]
+
+def hamming_distance_gpu(x: np.ndarray,
+                         y: np.ndarray,
+                         w: Optional[np.ndarray] = None) -> float:
+    """
+    Computes the weighted Hamming distance between two arrays using GPU acceleration.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/hamming_distance_gpu.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+    .. seealso::
+       For jitted CPU method, see :func:`simba.mixins.statistics_mixin.Statistics.hamming_distance`.
+
+    :param ndarray x: A 1D or 2D NumPy array representing the reference data. If 2D, shape should be (n_samples, n_features). Supported dtypes are numeric.
+    :param ndarray y: Array of the same shape as `x` representing the data to compare.
+    :param ndarray w: A 1D array of shape (n_samples,) representing sample weights. If None, uniform weights are used.
+    :returns: The weighted average Hamming distance between corresponding rows of `x` and `y`.
+    :rtype: float
+    """
+
+    check_valid_array(data=x, source=f'{hamming_distance_gpu.__name__} x', accepted_ndims=(1, 2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    check_valid_array(data=y, source=f'{hamming_distance_gpu.__name__} y', accepted_ndims=(x.ndim,), accepted_axis_0_shape=[x.shape[0]], accepted_axis_1_shape=[x.shape[1]] if x.ndim==2 else None, accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    if w is None:
+        w = np.ones(x.shape[0]).astype(np.float32)
+    check_valid_array(data=w, source=f'{hamming_distance_gpu.__name__} w', accepted_ndims=(1,), accepted_axis_0_shape=[x.shape[0]], accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+    results = np.full(shape=(x.shape[0],), fill_value=0.0, dtype=np.bool_)
+    x_dev = cuda.to_device(x)
+    y_dev = cuda.to_device(y)
+    w_dev = cuda.to_device(w)
+    results_dev = cuda.to_device(results)
+    bpg = (x.shape[0] + (THREADS_PER_BLOCK - 1)) // THREADS_PER_BLOCK
+    _hamming_kernel[bpg, THREADS_PER_BLOCK](x_dev, y_dev, w_dev, results_dev)
+    return np.sum(results_dev.copy_to_host()) / x.shape[0]

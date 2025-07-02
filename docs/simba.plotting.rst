@@ -258,7 +258,7 @@ Plotting methods
 Light-/Dark-box plotting
 -----------------------------------
 
-.. automodule:: simba.plotting.light_dark_box.LightDarkBoxPlotter
+.. automodule:: simba.plotting.light_dark_box_plotter.LightDarkBoxPlotter
    :members:
    :show-inheritance:
 

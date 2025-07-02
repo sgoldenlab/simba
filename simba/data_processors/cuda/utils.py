@@ -294,4 +294,14 @@ def _cuda_diff(x, start, end, diff):
     for j in range(start + 1, end):
         diff[j - start] = x[j] - x[j - 1]
 
+@cuda.jit(device=True)
+def _cuda_are_rows_equal(x, y, idx_1, idx_2):
+    """Helper to check if two rows in two 2D arrays are equal"""
+    for i in range(x.shape[1]):
+        if x[idx_1, i] != y[idx_2, i]:
+            return False
+    return True
+
+
+
 #_is_cuda_available()
