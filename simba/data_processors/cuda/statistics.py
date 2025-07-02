@@ -37,11 +37,12 @@ try:
 except:
     from sklearn.cluster import KMeans
 
+from simba.data_processors.cuda.utils import _cuda_are_rows_equal
 from simba.mixins.statistics_mixin import Statistics
-from simba.utils.checks import (check_int, check_str, check_valid_array, check_valid_tuple)
+from simba.utils.checks import (check_int, check_str, check_valid_array,
+                                check_valid_tuple)
 from simba.utils.data import bucket_data
 from simba.utils.enums import Formats
-from simba.data_processors.cuda.utils import _cuda_are_rows_equal
 
 THREADS_PER_BLOCK = 256
 
