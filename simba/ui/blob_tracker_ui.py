@@ -1,14 +1,14 @@
 import os
+import subprocess
+import sys
 from datetime import datetime
 from tkinter import *
 from typing import Union
-import subprocess
-import sys
-import simba
 
 import numpy as np
 from shapely.geometry import MultiPolygon, Point, Polygon
 
+import simba
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.roi_ui import ROI_ui
 from simba.roi_tools.roi_utils import get_roi_data, multiply_ROIs
