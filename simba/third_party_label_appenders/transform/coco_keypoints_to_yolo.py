@@ -54,6 +54,10 @@ class COCOKeypoints2Yolo:
     :example II:
     >>> runner = COCOKeypoints2Yolo(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\merged.json", img_dir=r"D:\cvat_annotations\frames", save_dir=r"D:\cvat_annotations\frames\yolo", clahe=False)
     >>> runner.run()
+
+     :references:
+        .. [1] Helpful YouTube tutorial by Farhan to get YOLO tracking data in animals - `https://www.youtube.com/watch?v=CcGbgFPwQTc <https://www.youtube.com/watch?v=CcGbgFPwQTc>`_.
+        .. [2] Great YouTube tutorial by Felipe on annotating data and making data YOLO ready - `https://www.youtube.com/watch?v=m9fH9OWn8YM <https://www.youtube.com/watch?v=m9fH9OWn8YM>`_.
     """
 
     def __init__(self,
@@ -157,7 +161,10 @@ class COCOKeypoints2Yolo:
 
 
 
-# runner = COCOKeypoints2Yolo(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\merged.json", img_dir=r"D:\cvat_annotations\frames", save_dir=r"D:\cvat_annotations\frames\yolo", clahe=False)
+# runner = COCOKeypoints2Yolo(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\merged\merged_07032025.json",
+#                             img_dir=r"D:\cvat_annotations\frames",
+#                             save_dir=r"D:\cvat_annotations\yolo_07032025",
+#                             clahe=False)
 # runner.run()
 
 

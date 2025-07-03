@@ -46,8 +46,15 @@ class FitYolo():
     :param device: Device to train on. Can be 'cpu' or a GPU index (e.g., 0). Default is 0.
     :param verbose: If True, prints detailed logs during training. Default is True.
     :param workers: Number of worker threads for data loading. Use -1 to use all available cores. Default is 8.
-
     :return: None. Trained model and logs are saved to the specified save_path.
+
+    :references:
+       .. [1] Augustine, Farhan, Shawn M. Doss, Ryan M. Lee, and Harvey S. Singer. “YOLOv11-Based Quantification and Temporal Analysis of Repetitive Behaviors in Deer Mice.” Neuroscience 577 (June 2025): 343–56. https://doi.org/10.1016/j.neuroscience.2025.05.017.
+
+    :example:
+    >>> fitter = FitYolo(weights_path=r"D:\yolo_weights\yolo11n-pose.pt",  model_yaml=r"D:\cvat_annotations\yolo_07032025\map.yaml",  save_path=r"D:\cvat_annotations\yolo_07032025\mdl",  epochs=1500,  batch=32,  format='onnx',  device=0,  imgsz=640)
+    >>> fitter.run()
+
     """
 
     def __init__(self,
@@ -118,7 +125,14 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 
 
 
-# fitter = FitYolo(weights_path=r"D:\yolo_weights\yolo11m-pose.pt", model_yaml=r"D:\cvat_annotations\frames\yolo\map.yaml", save_path=r"D:\cvat_annotations\frames\yolo\mdl", epochs=1500, batch=16, format='engine', device=0, imgsz=640)
+# fitter = FitYolo(weights_path=r"D:\yolo_weights\yolo11n-pose.pt",
+#                  model_yaml=r"D:\cvat_annotations\yolo_07032025\map.yaml",
+#                  save_path=r"D:\cvat_annotations\yolo_07032025\mdl",
+#                  epochs=1500,
+#                  batch=32,
+#                  format='onnx',
+#                  device=0,
+#                  imgsz=640)
 # fitter.run()
 
 

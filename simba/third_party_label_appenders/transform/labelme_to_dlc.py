@@ -33,6 +33,9 @@ class Labelme2DLC:
     .. note::
         See `labelme GitHub repo <https://github.com/wkentaro/labelme>`__.
 
+    .. seealso::
+       For DLC -> Labelme annotation conversion, see :func:`simba.third_party_label_appenders.transform.dlc_to_labelme.DLC2Labelme`
+
     :param Union[str, os.PathLike] labelme_dir: Directory with labelme json files.
     :param Optional[str] scorer: Name of the scorer (anticipated by DLC as header)
     :param bool greyscale: If True, convert images to grayscale.

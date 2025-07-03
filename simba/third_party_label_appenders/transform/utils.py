@@ -40,7 +40,6 @@ def arr_to_b64(x: np.ndarray) -> str:
     return base64.b64encode(buffer).decode("utf-8")
 
 
-
 def b64_to_arr(img_b64) -> np.ndarray:
     """
     Helper to convert byte string (e.g., created by `labelme <https://github.com/wkentaro/labelme>`__.) to image in numpy array format
@@ -383,7 +382,7 @@ def merge_coco_keypoints_files(data_dir: Union[str, os.PathLike],
 
 def check_valid_yolo_map(yolo_map: Union[str, os.PathLike]) -> None:
     """
-    Helper to surface check if yaml path leads to a valid yolo map file for pose-estimation.
+    Helper to do surface check if yaml path leads to a valid yolo map file for pose-estimation.
     """
 
     REQUIRED_KEYS = ['path', 'train', 'val', 'kpt_shape', 'flip_idx', 'names']
@@ -406,3 +405,7 @@ def check_valid_yolo_map(yolo_map: Union[str, os.PathLike]) -> None:
     _ = find_files_of_filetypes_in_directory(directory=img_val_dir, extensions=Options.ALL_IMAGE_FORMAT_OPTIONS.value, raise_error=True)
     _ = find_files_of_filetypes_in_directory(directory=lbl_train_dir, extensions=['.txt'], raise_error=True)
     _ = find_files_of_filetypes_in_directory(directory=lbl_val_dir, extensions=['.txt'], raise_error=True)
+
+
+
+#merge_coco_keypoints_files(data_dir=r'D:\cvat_annotations\frames\coco_keypoints_1', save_path=r'D:\cvat_annotations\frames\coco_keypoints_1\merged\merged_07032025.json')

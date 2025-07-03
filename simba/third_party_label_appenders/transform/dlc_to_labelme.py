@@ -22,6 +22,9 @@ class DLC2Labelme():
     """
     Convert a folder of DLC annotations into labelme json format.
 
+    .. seealso::
+       For Labelme -> DLC annotation conversion, see :func:`simba.third_party_label_appenders.transform.labelme_to_dlc.Labelme2DLC`
+
     :param Union[str, os.PathLike] dlc_dir: Folder with DLC annotations. I.e., directory inside
     :param Union[str, os.PathLike] save_dir: Directory to where to save the labelme json files.
     :param Optional[str] labelme_version: Version number encoded in the json files.
