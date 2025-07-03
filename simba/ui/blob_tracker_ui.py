@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import platform
 from datetime import datetime
 from tkinter import *
 from typing import Union
@@ -39,11 +40,8 @@ BUFFER_SIZES.insert(0, 'None')
 KERNEL_SIZES = list(np.round(np.arange(0.1, 100.1, 0.1), 2))
 KERNEL_SIZES.insert(0, 'None')
 
-
 SIMBA_DIR = os.path.dirname(simba.__file__)
 BLOB_EXECUTOR_PATH = os.path.join(SIMBA_DIR, Paths.BLOB_EXECUTOR_PATH.value)
-
-
 
 class BlobTrackingUI(PopUpMixin):
     """
@@ -329,8 +327,6 @@ class BlobTrackingUI(PopUpMixin):
             h = ((max_dim * float(self.videos[video_name]['open_kernel'].get_value())) / 100) / 5
             open_kernel = (int(max(h, 1)), int(max(w, 1)))
 
-
-
         if not os.path.isfile(bg_video_path):
             msg = f'The selected background video selected for {video_name} does not exist'
             self.set_status_bar_panel(text=msg, fg='red')
@@ -347,8 +343,7 @@ class BlobTrackingUI(PopUpMixin):
                                  open_kernel_size=open_kernel,
                                  open_kernel_iterations=open_kernel_iterations)
 
-    def _initialize_run(self,
-                        sp: bool = True):
+    def _initialize_run(self):
         _ = self._get_bg_videos()
         out = {'input_dir':  self.input_dir,
                'output_dir': self.output_dir,
@@ -401,8 +396,11 @@ class BlobTrackingUI(PopUpMixin):
         write_pickle(data=out, save_path=self.out_path)
         self.set_status_bar_panel(text=f'Starting blob detection, follow progress in OS terminal...({datetime.now().strftime("%H:%M:%S")})', fg='blue')
 
+        sp = False if platform.system() != "Darwin" else True
+        print(f'SimBA blob tracking subprocess: {sp} (platform: {platform.system()}).')
         if sp:
-            subprocess.Popen([sys.executable, BLOB_EXECUTOR_PATH, self.out_path])
+            cmd = f'python "{BLOB_EXECUTOR_PATH}" --data "{self.out_path}"'
+            subprocess.run(cmd, check=True, shell=True)
         else:
             executor = BlobTrackingExecutor(data=self.out_path)
             executor.run()
