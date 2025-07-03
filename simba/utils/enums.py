@@ -108,10 +108,8 @@ class Paths(Enum):
     LOGO_ICON_WINDOWS_PATH = Path("assets/icons/SimBA_logo_3.ico")
     LOGO_ICON_DARWIN_PATH = Path("assets/icons/SimBA_logo_3.png")
     UNSUPERVISED_MODEL_NAMES = Path("assets/lookups/model_names.parquet")
-
-
-
     CRITICAL_VALUES = Path("simba/assets/lookups/critical_values_05.pickle")
+    BLOB_EXECUTOR_PATH = Path("video_processors/blob_tracking_executor.py")
 
 class OS(Enum):
     WINDOWS = "Windows"

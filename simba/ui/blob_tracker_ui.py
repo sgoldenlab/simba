@@ -2,6 +2,9 @@ import os
 from datetime import datetime
 from tkinter import *
 from typing import Union
+import subprocess
+import sys
+import simba
 
 import numpy as np
 from shapely.geometry import MultiPolygon, Point, Polygon
@@ -15,7 +18,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
                                         SimBADropDown, SimBALabel)
 from simba.utils.checks import (check_if_dir_exists, check_int,
                                 check_nvidea_gpu_available, check_str)
-from simba.utils.enums import Formats
+from simba.utils.enums import Formats, Paths
 from simba.utils.errors import (InvalidInputError, InvalidVideoFileError,
                                 NoDataError)
 from simba.utils.read_write import (find_all_videos_in_directory,
@@ -35,6 +38,11 @@ BUFFER_SIZES = list(range(1, 101))
 BUFFER_SIZES.insert(0, 'None')
 KERNEL_SIZES = list(np.round(np.arange(0.1, 100.1, 0.1), 2))
 KERNEL_SIZES.insert(0, 'None')
+
+
+SIMBA_DIR = os.path.dirname(simba.__file__)
+BLOB_EXECUTOR_PATH = os.path.join(SIMBA_DIR, Paths.BLOB_EXECUTOR_PATH.value)
+
 
 
 class BlobTrackingUI(PopUpMixin):
@@ -339,7 +347,8 @@ class BlobTrackingUI(PopUpMixin):
                                  open_kernel_size=open_kernel,
                                  open_kernel_iterations=open_kernel_iterations)
 
-    def _initialize_run(self):
+    def _initialize_run(self,
+                        sp: bool = True):
         _ = self._get_bg_videos()
         out = {'input_dir':  self.input_dir,
                'output_dir': self.output_dir,
@@ -391,8 +400,12 @@ class BlobTrackingUI(PopUpMixin):
         out['video_data'] = video_out
         write_pickle(data=out, save_path=self.out_path)
         self.set_status_bar_panel(text=f'Starting blob detection, follow progress in OS terminal...({datetime.now().strftime("%H:%M:%S")})', fg='blue')
-        executor = BlobTrackingExecutor(data=self.out_path)
-        executor.run()
+
+        if sp:
+            subprocess.Popen([sys.executable, BLOB_EXECUTOR_PATH, self.out_path])
+        else:
+            executor = BlobTrackingExecutor(data=self.out_path)
+            executor.run()
 
 #_ = BlobTrackingUI(input_dir=r'C:\troubleshooting\blob_track_tester\videos', output_dir=r'C:\troubleshooting\blob_track_tester\results')
 

@@ -5318,3 +5318,33 @@ class Statistics(FeatureExtractionMixin):
             results.append(df)
 
         return pd.concat(results, axis=0)
+
+
+    @staticmethod
+    @dynamic_numba_decorator(dtypes="(float32[:], float32[:])", cache=True, fastmath=False)
+    def circular_euclidean_kantorovich(x: np.ndarray, y: np.ndarray):
+        """
+        Compute the circular Euclidean Kantorovich (Wasserstein) distance between two discrete distributions.
+
+        Suitable for comparing distributions of circular data such as angles, time-of-day, phase etc.
+
+        :param: np.ndarray x: 1D array representing the first discrete distribution or histogram.
+        :param: np.ndarray x: 1D array representing the second discrete distribution or histogram.
+
+        .. note::
+           Distance metric: smaller values represent similar distributions.
+           Adapted from `pynndescent <https://pynndescent.readthedocs.io/en/latest/>`_.
+
+        :example:
+        >>> x, y = np.random.normal(loc=65, scale=10, size=10000000), np.random.normal(loc=90, scale=1, size=10000000)
+        >>> b =Statistics.circular_euclidean_kantorovich(x, y)
+        """
+        x_sum, y_sum = np.sum(x), np.sum(y)
+        x_cdf, y_cdf = x / x_sum, y / y_sum
+        x_cdf, y_cdf = np.cumsum(x_cdf), np.cumsum(y_cdf)
+        mu = np.median((x_cdf - y_cdf) ** 2)
+        result = 0.0
+        for i in prange(x_cdf.shape[0]):
+            val = x_cdf[i] - y_cdf[i] - mu
+            result += val * val
+        return np.sqrt(result)
