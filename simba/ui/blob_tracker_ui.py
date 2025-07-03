@@ -1,7 +1,7 @@
 import os
+import platform
 import subprocess
 import sys
-import platform
 from datetime import datetime
 from tkinter import *
 from typing import Union
