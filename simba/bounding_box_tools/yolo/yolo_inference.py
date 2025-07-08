@@ -157,11 +157,12 @@ class YoloInference():
 
 # video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
 # video_path = "/mnt/d/netholabs/yolo_videos/input/mp4_20250606083508/2025-05-28_19-50-23.mp4"
-# video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-50-23.mp4"
-# weights_path = "/mnt/d/netholabs/yolo_mdls_1/train/weights/best.pt"
-# save_dir = '/mnt/d/netholabs/yolo_videos_out'
+# video_path = r"D:\cvat_annotations\videos\s24-eating.mp4"
+# weights_path = r"D:\cvat_annotations\yolo_07032025\mdl\train\weights\best.pt"
+# save_dir = r"D:\cvat_annotations\yolo_07032025\out_data"
 # i = YoloInference(weights_path=weights_path,
 #                   video_path=video_path,
 #                   save_dir=save_dir,
+#                   stream=True,
 #                   verbose=True)
 # i.run()

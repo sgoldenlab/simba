@@ -32,7 +32,7 @@ class YOLOVisualizer():
                  verbose: Optional[bool] = False):
 
         """
-        Visualize the results of YOLO model.
+        Visualize the results of YOLO bounding box model.
 
         .. seealso::
            :func:`simba.bounding_box_tools.yolo.model.inference_yolo`
@@ -101,6 +101,13 @@ class YOLOVisualizer():
                                   thickness=self.thickness,
                                   shape_opacity=0.6)
         plotter.run()
+
+
+
+
+
+
+
 
 
 #

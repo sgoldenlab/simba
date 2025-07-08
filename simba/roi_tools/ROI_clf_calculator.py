@@ -10,14 +10,11 @@ import pandas as pd
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.roi_tools.roi_utils import get_roi_dict_from_dfs
-from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log,
-    check_file_exist_and_readable, check_if_dir_exists, check_valid_dataframe,
-    check_valid_lst, check_valid_tuple)
+from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_file_exist_and_readable, check_if_dir_exists, check_valid_dataframe, check_valid_lst, check_valid_boolean)
 from simba.utils.data import detect_bouts, slice_roi_dict_for_video
 from simba.utils.enums import ROI_SETTINGS
-from simba.utils.errors import InvalidInputError, NoDataError, NoROIDataError
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.errors import InvalidInputError, NoROIDataError
+from simba.utils.printing import SimbaTimer, stdout_success, stdout_warning
 from simba.utils.read_write import get_fn_ext, read_df
 from simba.utils.warnings import ROIWarning
 
@@ -76,16 +73,21 @@ class ROIClfCalculator(ConfigReader):
                  roi_names: Optional[List[str]] = None,
                  clf_time: bool = True,
                  started_bout_cnt: bool = True,
-                 ended_bout_cnt: bool = True):
+                 ended_bout_cnt: bool = True,
+                 bout_table: bool = False):
 
-
-        if not any([clf_time, started_bout_cnt, ended_bout_cnt]):
-            raise InvalidInputError(msg='clf_time, started_bout_cnt, ended_bout_cnt are all False. Set at least one measure to True', source=self.__class__.__name__)
+        check_valid_boolean(value=clf_time, source=f'{self.__class__.__name__} clf_time', raise_error=True)
+        check_valid_boolean(value=started_bout_cnt, source=f'{self.__class__.__name__} started_bout_cnt', raise_error=True)
+        check_valid_boolean(value=ended_bout_cnt, source=f'{self.__class__.__name__} ended_bout_cnt', raise_error=True)
+        check_valid_boolean(value=bout_table, source=f'{self.__class__.__name__} bout_table', raise_error=True)
+        if not any([clf_time, started_bout_cnt, ended_bout_cnt, bout_table]):
+            raise InvalidInputError(msg='clf_time, started_bout_cnt, ended_bout_cnt, bout_table are all False. Set at least one measure to True', source=self.__class__.__name__)
         ConfigReader.__init__(self, config_path=config_path)
         if not os.path.isfile(self.roi_coordinates_path):
             raise NoROIDataError(msg=f'No ROI data found. Expected at path {self.roi_coordinates_path}. Create ROI data before computing ROI classification data stratisfied by ROI.', source=self.__class__.__name__)
         self.read_roi_data()
         check_valid_lst(data=bp_names, source=f'{self.__class__.__name__} bp_names', min_len=1, valid_dtypes=(str,), valid_values=self.body_parts_lst)
+        self.bout_save_path = os.path.join(self.logs_path, f"Classification_time_by_ROI_detailed_bouts_{self.datetime}.csv")
         if save_path is None:
             self.save_path = os.path.join(self.logs_path, f"Classification_time_by_ROI_{self.datetime}.csv")
         else:
@@ -101,15 +103,11 @@ class ROIClfCalculator(ConfigReader):
         self.data_paths = data_paths
         if clf_names is not None:
             check_valid_lst(data=clf_names, source=f'{self.__class__.__name__} clf_names', min_len=1, valid_dtypes=(str,), valid_values=self.clf_names)
-            self.clf_names = clf_names
         if roi_names is not None:
             check_valid_lst(data=roi_names, source=f'{self.__class__.__name__} roi_names', min_len=1, valid_dtypes=(str,), valid_values=self.shape_names)
-            self.roi_names = roi_names
-        else:
-            self.roi_names = self.shape_names
         self.bp_names, self.clf_time, self.started_bout_cnt, self.ended_bout_cnt = bp_names, clf_time, started_bout_cnt,ended_bout_cnt
-
         self.bp_cols = []
+        self.clf_names, self.roi_names, self.bout_table = clf_names, roi_names, bout_table
         for bp_name in self.bp_names: self.bp_cols.append([f"{bp_name}_x", f"{bp_name}_y", f"{bp_name}_p"])
         self.required_fields = [i for ii in self.bp_cols for i in ii] + list(self.clf_names)
         self.results_df = pd.DataFrame(columns=['VIDEO', 'CLASSIFIER', 'ROI', 'BODY-PART', 'MEASURE', 'VALUE'])
@@ -117,6 +115,7 @@ class ROIClfCalculator(ConfigReader):
     def run(self):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
         results = {}
+        bouts_results = []
         for cnt, data_path in enumerate(self.data_paths):
             video_timer = SimbaTimer(start=True)
             video_name = get_fn_ext(filepath=data_path)[1]
@@ -159,6 +158,11 @@ class ROIClfCalculator(ConfigReader):
                         roi_clf_idx = np.where((roi_data == 1) & (clf_data == 1))[0]
                         data_df[field_name].iloc[roi_clf_idx] = 1
                         bouts = detect_bouts(data_df=data_df, target_lst=[field_name], fps=int(self.fps))
+                        bouts['ROI NAME'] = roi_name
+                        bouts['BODY-PART NAME'] = bp_name
+                        bouts['CLASSIFIER NAME'] = clf_name
+                        bouts['VIDEO NAME'] = video_name
+                        bouts_results.append(bouts)
                         total_time = float(bouts['Bout_time'].sum())
                         start_frames, end_frames = list(bouts["Start_frame"]), list(bouts["End_frame"])
                         roi_clf_start_cnt = float(len([x for x in start_frames if x in roi_clf_idx]))
@@ -169,9 +173,11 @@ class ROIClfCalculator(ConfigReader):
                             self.results_df.loc[len(self.results_df)] = [video_name, clf_name, roi_name, bp_name, START_COUNTS, roi_clf_start_cnt]
                         if self.ended_bout_cnt:
                             self.results_df.loc[len(self.results_df)] = [video_name, clf_name, roi_name, bp_name, ENDED_COUNTS, roi_clf_end_cnt]
-
             video_timer.stop_timer()
             print(f'Video {video_name} classifier by ROI analysis complete {len(video_rois)} ROI(s) complete ({cnt+1}/{len(self.data_paths)}) (elapsed time {video_timer.elapsed_time_str}s) ...')
+
+        self.bouts_results = pd.concat(bouts_results, axis=0).reset_index(drop=True) if len(bouts_results) > 0 else None
+
     def save(self):
         if len(self.results_df) == 0:
             raise NoROIDataError(f'No ROI drawings detected for the {len(self.data_paths)} video file(s). No data is saved.', source=self.__class__.__name__)
@@ -181,10 +187,14 @@ class ROIClfCalculator(ConfigReader):
             self.results_df.to_csv(self.save_path)
             self.timer.stop_timer()
             stdout_success(msg=f"Classification by ROI data for {len(self.data_paths)} video(s) saved in {self.save_path}.", elapsed_time=self.timer.elapsed_time_str)
+        if self.bout_table and self.bouts_results is not None:
+            self.bouts_results = self.bouts_results.drop(['Event'], axis=1)
+            self.bouts_results= self.bouts_results.rename(columns={'Start_time': 'START TIME (S)', 'End Time': 'END TIME (S)', 'Start_frame': 'START FRAME', 'End_frame': 'END FRAME', 'Bout_time': 'DURATION (S)'})
+            self.bouts_results = self.bouts_results[['VIDEO NAME', 'BODY-PART NAME', 'ROI NAME', 'CLASSIFIER NAME', 'START TIME (S)', 'END TIME (S)', 'START FRAME', 'END FRAME', 'DURATION (S)']]
+            self.bouts_results.to_csv(self.bout_save_path)
+            stdout_success(msg=f"Detailed classification by ROI bout data for saved in {self.bout_save_path}.", elapsed_time=self.timer.elapsed_time_str)
 
-
-#
-# analyzer = ROIClfCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", bp_names=['Nose'], clf_names=['straub_tail'], roi_names=['RECTANGLE', 'CIRCLE', 'POLYGON'])
+# analyzer = ROIClfCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", bp_names=['Nose'], clf_names=['straub_tail'], roi_names=['Cue_light_1'], bout_table=True)
 # analyzer.run()
 # analyzer.save()
 

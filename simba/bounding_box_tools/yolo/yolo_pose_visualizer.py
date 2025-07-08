@@ -37,7 +37,8 @@ def _yolo_keypoint_visualizer(frm_ids: np.ndarray,
                               save_dir: str,
                               circle_size: int,
                               thickness: int,
-                              palettes: dict):
+                              palettes: dict,
+                              bbox: bool):
 
     batch_id, frame_rng = frm_ids[0], frm_ids[1]
     start_frm, end_frm, current_frm = frame_rng[0], frame_rng[-1], frame_rng[0]
@@ -56,7 +57,8 @@ def _yolo_keypoint_visualizer(frm_ids: np.ndarray,
             bbox_cords = row_data[BOX_CORD_FIELDS].values.astype(np.int32).reshape(-1, 2)
             kp_coords = row_data.drop(EXPECTED_COLS).values.astype(np.int32).reshape(-1, 3)[:, :-1]
             clr = tuple(int(c) for c in clrs[0])
-            img = cv2.polylines(img, [bbox_cords], True, clr, thickness=thickness, lineType=cv2.LINE_AA)
+            if bbox:
+                img = cv2.polylines(img, [bbox_cords], True, clr, thickness=thickness, lineType=cv2.LINE_AA)
             for kp_cnt, kp in enumerate(kp_coords):
                 clr = tuple(int(c) for c in clrs[kp_cnt+1])
                 img = cv2.circle(img, (tuple(kp)), circle_size, clr, -1)
@@ -110,7 +112,8 @@ class YOLOPoseVisualizer():
                  threshold: float = 0.0,
                  thickness: Optional[int] = None,
                  circle_size: Optional[int] = None,
-                 verbose: Optional[bool] = False):
+                 verbose: Optional[bool] = False,
+                 bbox: Optional[bool] = True):
 
         check_file_exist_and_readable(file_path=data_path)
         self.video_meta_data = get_video_meta_data(video_path=video_path)
@@ -119,7 +122,7 @@ class YOLOPoseVisualizer():
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
         if circle_size is None:
-            circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(self.video_meta_data['width'], self.video_meta_data['height']), circle_frame_ratio=100)
+            circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(self.video_meta_data['width'], self.video_meta_data['height']), circle_frame_ratio=80)
         else:
             check_int(name=f'{self.__class__.__name__} circle_size', value=circle_size, min_value=1)
         if thickness is None:
@@ -130,7 +133,8 @@ class YOLOPoseVisualizer():
         self.core_cnt = core_cnt
         if core_cnt == -1 or core_cnt > find_core_cnt()[0]: self.core_cnt = find_core_cnt()[0]
         check_if_dir_exists(in_dir=save_dir)
-        check_valid_boolean(value=[verbose], source=self.__class__.__name__, raise_error=True)
+        check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose', raise_error=True)
+        check_valid_boolean(value=[bbox], source=f'{self.__class__.__name__} bbox', raise_error=True)
         self.data_df = pd.read_csv(self.data_path, index_col=0)
         check_valid_dataframe(df=self.data_df, source=self.__class__.__name__, required_fields=EXPECTED_COLS)
         self.df_frm_cnt = np.unique(self.data_df[FRAME].values).shape[0]
@@ -145,7 +149,7 @@ class YOLOPoseVisualizer():
         for cnt, palette in enumerate(palettes):
             self.palettes[cnt] = create_color_palette(pallete_name=palette, increments=len(self.data_df.columns)-len(EXPECTED_COLS))
         self.save_dir, self.verbose, self.palette, self.thickness = save_dir, verbose, palettes, thickness
-        self.threshold, self.circle_size, self.thickness = threshold, circle_size, thickness
+        self.threshold, self.circle_size, self.thickness, self.bbox = threshold, circle_size, thickness, bbox
         self.video_temp_dir = os.path.join(self.save_dir, self.video_name, "temp")
         self.save_path = os.path.join(self.save_dir, f'{self.video_name}.mp4')
         create_directory(paths=self.video_temp_dir)
@@ -165,7 +169,8 @@ class YOLOPoseVisualizer():
                                           save_dir=self.video_temp_dir,
                                           circle_size=self.circle_size,
                                           thickness=self.thickness,
-                                          palettes=self.palettes)
+                                          palettes=self.palettes,
+                                          bbox=self.bbox)
             for cnt, result in enumerate(pool.imap(constants, frm_batches, chunksize=1)):
                 print(f'Video batch {result+1}/{self.core_cnt} complete...')
         pool.terminate()
@@ -176,13 +181,19 @@ class YOLOPoseVisualizer():
         stdout_success(msg=f'YOLO pose video saved at {self.save_path}', source=self.__class__.__name__, elapsed_time=video_timer.elapsed_time_str)
 
 
-# if __name__ == "__main__":
-#     kp_vis = YOLOPoseVisualizer(data_path=r"D:\netholabs\yolo_test\results\2025-05-28_19-50-23.csv",
-#                                 video_path=r"D:\netholabs\yolo_videos\input\mp4_20250606083508\2025-05-28_19-50-23.mp4",
-#                                 save_dir=r'D:\netholabs\yolo_videos_out',
-#                                 core_cnt=5)
-#
-#     kp_vis.run()
+if __name__ == "__main__":
+    video_path = r"D:\cvat_annotations\videos\mp4_20250624155703\s34-drinking.mp4"
+    data_path = r"D:\cvat_annotations\yolo_07032025\out_data\s34-drinking.csv"
+    save_dir = r"D:\cvat_annotations\yolo_07032025\out_video"
+
+    kp_vis = YOLOPoseVisualizer(data_path=data_path,
+                                video_path=video_path,
+                                save_dir=save_dir,
+                                core_cnt=24,
+                                bbox=False, verbose=True)
+
+    kp_vis.run()
+    print('s')
 
 
 # if __name__ == "__main__":

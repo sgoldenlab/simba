@@ -61,6 +61,9 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
         self.start_bouts_cb.grid(row=1, column=0, sticky=NW)
         self.end_bouts_cb, self.end_bouts_var = SimbaCheckbox(parent=measurements_frm, txt='ENDED BEHAVIOR BOUTS IN ROI (COUNT)', txt_img='abacus', val=True)
         self.end_bouts_cb.grid(row=2, column=0, sticky=NW)
+        self.detailed_bouts_cb, self.detailed_bouts_var = SimbaCheckbox(parent=measurements_frm, txt='DETAILED BOUTS TABLE - EACH BEHAVIOR EVENT BY ROI (START/END TIME)', txt_img='abacus', val=True)
+        self.detailed_bouts_cb.grid(row=3, column=0, sticky=NW)
+
 
         bp_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PARTS", icon_name='pose', icon_link=Links.ANALYZE_ML_RESULTS.value, padx=5, pady=5, relief='solid')
         self.bp_vars = {}
@@ -89,8 +92,9 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
         total_time = self.total_time_var.get()
         started_bouts = self.start_bouts_var.get()
         ended_bouts = self.end_bouts_var.get()
+        detailed_bouts = self.detailed_bouts_var.get()
 
-        if not any([total_time, started_bouts, ended_bouts]):
+        if not any([total_time, started_bouts, ended_bouts, detailed_bouts]):
             raise NoDataError(msg='Please check AT LEAST ONE MEASUREMENT,', source=self.__class__.__name__)
 
         analyzer = ROIClfCalculator(config_path=self.config_path,
@@ -101,9 +105,10 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
                                     roi_names=self.selected_rois,
                                     clf_time=total_time,
                                     started_bout_cnt=started_bouts,
-                                    ended_bout_cnt=ended_bouts)
+                                    ended_bout_cnt=ended_bouts,
+                                    bout_table=detailed_bouts)
         analyzer.run()
         analyzer.save()
 
-#x = ClfByROIPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+# x = ClfByROIPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
 # x.main_frm.mainloop()

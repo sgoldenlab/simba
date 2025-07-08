@@ -48,6 +48,8 @@ class CircularStatisticsMixin(object):
     .. [4] `pycircular <https://github.com/albahnsen/pycircular>`_.
     .. [5] `scipy.stats.directional_stats <https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.directional_stats.html>`_.
     .. [6] `astropy.stats.circstats <https://docs.astropy.org/en/stable/_modules/astropy/stats/circstats.html>`_.
+    .. [7] `pycircstat2 <https://github.com/circstat/pycircstat2/>`_.
+
     """
 
     def __init__(self):
@@ -608,6 +610,9 @@ class CircularStatisticsMixin(object):
         >>> sample_2 = np.array([50, 90, 70, 60, 20, 90]).astype(np.float32)
         >>> CircularStatisticsMixin().circular_correlation(sample_1=sample_1, sample_2=sample_2)
         >>> 0.7649115920066833
+
+        :references:
+           .. [1] Mardia, K. V. (1976). Linear-circular correlation coefficients and rhythmometry. Biometrika, 63(2), 403–405
         """
 
         sample_1, sample_2 = np.deg2rad(sample_1), np.deg2rad(sample_2)

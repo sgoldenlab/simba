@@ -396,16 +396,9 @@ class TrainModelMixin(object):
             scoring = None
 
         if platform.system() == "Darwin" or platform.system() == "Linux":
-            with parallel_backend("threading", n_jobs=-2):
-                train_sizes, train_scores, test_scores = learning_curve(estimator=rf_clf,
-                                                                        X=x_df.values,
-                                                                        y=y_df,
-                                                                        cv=cv,
-                                                                        scoring=scoring,
-                                                                        shuffle=False,
-                                                                        verbose=0,
-                                                                        train_sizes=np.linspace(0.01, 1.0, dataset_splits),
-                                                                        error_score="raise")
+            n_jobs = 31 if find_core_cnt()[0] > 31 and platform.system() == "Linux" else int(find_core_cnt()[0] - 2) #SAFETY FOR MACHINES WITH MANY CORES TO PREVENT LOKY HANGING ON LINUX. SEE: https://github.com/sgoldenlab/simba/issues/457
+            with parallel_backend("threading", n_jobs=n_jobs):
+                train_sizes, train_scores, test_scores = learning_curve(estimator=rf_clf, X=x_df.values, y=y_df, cv=cv, scoring=scoring, shuffle=False, verbose=0, train_sizes=np.linspace(0.01, 1.0, dataset_splits), error_score="raise")
         else:
             train_sizes, train_scores, test_scores = learning_curve(estimator=rf_clf,
                                                                     X=x_df,

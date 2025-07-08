@@ -63,6 +63,13 @@ class Statistics(FeatureExtractionMixin):
        :width: 1200
        :align: center
 
+
+    :references:
+       .. [1]  Bernard Desgraupes - https://cran.r-project.org/web/packages/clusterCrit/vignettes/clusterCrit.pdf
+       .. [2]  Ikotun, A. M., Habyarimana, F., & Ezugwu, A. E. (2025). Cluster validity indices for automatic clustering: A comprehensive review. Heliyon, 11(2), e41953. https://doi.org/10.1016/j.heliyon.2025.e41953
+       .. [3]  Hassan, B. A., Tayfor, N. B., Hassan, A. A., Ahmed, A. M., Rashid, T. A., & Abdalla, N. N. (2024). From A-to-Z review of clustering validation indices. arXiv. https://doi.org/10.48550/arXiv.2407.20246
+       .. [4]  Leland McInnes - `pynndescent <https://pynndescent.readthedocs.io/en/latest/>`_.
+
     """
 
     def __init__(self):

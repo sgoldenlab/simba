@@ -3,7 +3,11 @@ import os
 import sys
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
-from typing import List, Literal, Optional, Tuple, Union
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
@@ -187,20 +191,29 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
                                   imgsz=args.imgsz)
     inference.run()
 
-
-
-
-# weights_path = r"D:\cvat_annotations\frames\yolo\mdl\train13\weights\best.pt"
-# #video_path = r"D:\cvat_annotations\videos\s1.mp4"
-# save_dir= r"D:\cvat_annotations\frames\data_results_yolo11m"
 #
-# from simba.utils.read_write import find_files_of_filetypes_in_directory
+# video_paths = r"D:\cvat_annotations\videos\mp4_20250624155703\s34-drinking.mp4"
+# weights_path = r"D:\cvat_annotations\yolo_07032025\mdl\train\weights\best.pt"
+# save_dir = r"D:\cvat_annotations\yolo_07032025\out_data"
 #
-# video_paths = find_files_of_filetypes_in_directory(directory=r'D:\cvat_annotations\videos', extensions=['.mp4'])
 #
+#
+# #
+# # video_paths = r"D:\cvat_annotations\videos\mp4_20250624155703\s25_wishking_blurry.mp4"
+# # weights_path = r"D:\cvat_annotations\yolo_07032025\mdl\train\weights\best.pt"
+# # save_dir = r"D:\cvat_annotations\yolo_07032025\out_data"
+# #
+# # # weights_path = r"D:\cvat_annotations\frames\yolo\mdl\train13\weights\best.pt"
+# # # #video_path = r"D:\cvat_annotations\videos\s1.mp4"
+# # # save_dir= r"D:\cvat_annotations\frames\data_results_yolo11m"
+# # #
+# # # from simba.utils.read_write import find_files_of_filetypes_in_directory
+# # #
+# # # video_paths = find_files_of_filetypes_in_directory(directory=r'D:\cvat_annotations\videos', extensions=['.mp4'])
+# # #
 # keypoint_names = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
-#
-#
+# # #
+# # #
 # i = YOLOPoseInference(weights_path=weights_path,
 #                         video_path=video_paths,
 #                         save_dir=save_dir,
@@ -209,13 +222,13 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 #                         format='onnx',
 #                         stream=True,
 #                         keypoint_names=keypoint_names,
-#                         batch_size=200,
-#                         imgsz=640,
+#                         batch_size=420,
+#                         imgsz=840,
 #                         interpolate=True,
-#                         threshold=0.5,
-#                         max_tracks=2)
+#                         threshold=0.25,
+#                         max_tracks=1)
 # i.run()
-
+#
 
 # video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
 # video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-46-56.mp4"

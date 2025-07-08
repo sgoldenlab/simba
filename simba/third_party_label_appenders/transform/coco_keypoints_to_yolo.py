@@ -2,7 +2,8 @@ import os
 import random
 from copy import copy
 from typing import Tuple, Union
-
+import argparse
+import sys
 try:
     from typing import Literal
 except:
@@ -158,6 +159,30 @@ class COCOKeypoints2Yolo:
         create_yolo_keypoint_yaml(path=self.save_dir, train_path=self.train_img_dir, val_path=self.val_img_dir, names=self.map_dict, save_path=self.map_path, kpt_shape=(int(shapes[0]), 3), flip_idx=self.flip_idx)
         timer.stop_timer()
         if self.verbose: stdout_success(msg=f'COCO keypoints to YOLO conversion complete. Data saved in directory {self.save_dir}.', elapsed_time=timer.elapsed_time_str)
+
+
+if __name__ == "__main__" and not hasattr(sys, 'ps1'):
+    parser = argparse.ArgumentParser(description="Convert COCO keypoints json to YOLO training data.")
+    parser.add_argument('--coco_path', type=str, required=True, help='Path to JSON file holdeing keypoint annotations in COCO keypoints format.')
+    parser.add_argument('--img_dir', type=str, required=True, help='Path to directory holding the images of the annotation in the COCO keypoints file.')
+    parser.add_argument('--save_dir', type=str, required=True, help='Path to the directory where to save the YOLO training data.')
+    parser.add_argument('--verbose', type=lambda x: str(x).lower() == 'true', default=True, help='Print verbose messages. Use "True" or "False". Default is True')
+    parser.add_argument('--greyscale', type=lambda x: str(x).lower() == 'false', default=False, help='Convert images to greyscale. Use "True" or "False". Default is False')
+    parser.add_argument('--clahe', type=lambda x: str(x).lower() == 'false', default=False, help='CLAHE enhance images. Use "True" or "False". Default is False')
+    parser.add_argument('--train_size', type=float, default=0.7, help='The size of the training set in percent. Default is 0.7 (70%).')
+    parser.add_argument('--flip_idx', type=tuple, default=(0, 2, 1, 3, 5, 4, 6, 7, 8), help='The re-ordering of the body-part indexes following a horizontal flip of the image.')
+
+    args = parser.parse_args()
+    runner = COCOKeypoints2Yolo(coco_path=args.coco_path,
+                                img_dir=args.img_dir,
+                                save_dir=args.save_dir,
+                                clahe=args.clahe,
+                                greyscale=args.greyscale,
+                                flip_idx=args.flip_idx,
+                                verbose=args.verbose,
+                                train_size=args.train_size)
+    runner.run()
+
 
 
 

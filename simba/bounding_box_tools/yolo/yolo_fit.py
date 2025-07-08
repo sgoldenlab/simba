@@ -35,6 +35,10 @@ class FitYolo():
        - `Example model_yaml bounding-boxes <https://github.com/sgoldenlab/simba/blob/master/misc/ex_yolo_model.yaml>`__.
        - `Example model_yaml keypoints <https://github.com/sgoldenlab/simba/blob/master/misc/ex_yolo_model_keypoints.yaml>`__.
 
+    .. seealso::
+       :func:`simba.bounding_box_tools.yolo.utils.fit_yolo`
+       :func:`simba.bounding_box_tools.yolo.utils.load_yolo_model`
+
     :param weights_path: Path to the pre-trained YOLO model weights (e.g., 'yolov8.pt').
     :param model_yaml: Path to the dataset configuration YAML file containing train/val/test paths and class labels.
     :param save_path: Directory where the trained model, logs, and results will be saved.
