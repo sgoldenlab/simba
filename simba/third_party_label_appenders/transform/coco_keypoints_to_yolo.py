@@ -1,9 +1,10 @@
+import argparse
 import os
 import random
+import sys
 from copy import copy
 from typing import Tuple, Union
-import argparse
-import sys
+
 try:
     from typing import Literal
 except:
