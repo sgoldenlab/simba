@@ -10,7 +10,10 @@ import pandas as pd
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.roi_tools.roi_utils import get_roi_dict_from_dfs
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_file_exist_and_readable, check_if_dir_exists, check_valid_dataframe, check_valid_lst, check_valid_boolean)
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log,
+    check_file_exist_and_readable, check_if_dir_exists, check_valid_boolean,
+    check_valid_dataframe, check_valid_lst)
 from simba.utils.data import detect_bouts, slice_roi_dict_for_video
 from simba.utils.enums import ROI_SETTINGS
 from simba.utils.errors import InvalidInputError, NoROIDataError
