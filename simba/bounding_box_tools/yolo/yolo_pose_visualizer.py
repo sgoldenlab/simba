@@ -19,7 +19,7 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     get_fn_ext, get_video_meta_data,
-                                    read_frm_of_video)
+                                    read_frm_of_video, find_files_of_filetypes_in_directory)
 
 FRAME = 'FRAME'
 CLASS_ID = 'CLASS_ID'
@@ -48,7 +48,7 @@ def _yolo_keypoint_visualizer(frm_ids: np.ndarray,
     video_save_path = os.path.join(save_dir, f'{batch_id}.mp4')
     video_writer = cv2.VideoWriter(video_save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"], video_meta_data["height"]))
     while current_frm <= end_frm:
-        print(f'Processing frame {current_frm}/{video_meta_data["frame_count"]} (batch: {batch_id})...')
+        print(f'Processing frame {current_frm}/{video_meta_data["frame_count"]} (batch: {batch_id}, video: {video_meta_data["video_name"]})...')
         img = read_frm_of_video(video_path=video_path, frame_index=current_frm)
         frm_data = data.loc[data[FRAME] == current_frm]
         frm_data = frm_data[frm_data[CONFIDENCE] > threshold]
@@ -157,10 +157,11 @@ class YOLOPoseVisualizer():
 
     def run(self):
         video_timer = SimbaTimer(start=True)
-        # if self.video_meta_data['frame_count'] != self.df_frm_cnt:
-        #     raise FrameRangeError(msg=f'The bounding boxes contain data for {self.df_frm_cnt} frames, while the video is {self.video_meta_data["frame_count"]} frames', source=self.__class__.__name__)
+        if self.video_meta_data['frame_count'] != self.df_frm_cnt:
+            raise FrameRangeError(msg=f'The bounding boxes contain data for {self.df_frm_cnt} frames, while the video is {self.video_meta_data["frame_count"]} frames', source=self.__class__.__name__)
         frm_batches = np.array_split(np.array(list(range(0, self.df_frm_cnt))), self.core_cnt)
         frm_batches = [(i, j) for i, j in enumerate(frm_batches)]
+        if self.verbose: print(f'Visualizing video {self.video_meta_data["video_name"]} (frame count: {self.video_meta_data["frame_count"]})...')
         with multiprocessing.Pool(self.core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
             constants = functools.partial(_yolo_keypoint_visualizer,
                                           data=self.data_df,
@@ -182,18 +183,39 @@ class YOLOPoseVisualizer():
 
 
 if __name__ == "__main__":
-    video_path = r"D:\cvat_annotations\videos\mp4_20250624155703\s34-drinking.mp4"
-    data_path = r"D:\cvat_annotations\yolo_07032025\out_data\s34-drinking.csv"
-    save_dir = r"D:\cvat_annotations\yolo_07032025\out_video"
+    #video_path = r"D:\cvat_annotations\videos\mp4_20250624155703\s34-drinking.mp4"
+    #data_path = r"D:\cvat_annotations\yolo_07032025\out_data\s34-drinking.csv"
+    #save_dir = r"D:\cvat_annotations\yolo_07032025\out_video"
 
-    kp_vis = YOLOPoseVisualizer(data_path=data_path,
+    video_path = r"D:\cvat_annotations\videos\mp4_20250624155703\s34-drinking.mp4"
+    data_path = r'D:\cvat_annotations\yolo_mdl_07102025\out_csv\s34-drinking.csv'
+    save_dir = r'D:\cvat_annotations\yolo_mdl_07102025\out_video'
+
+    kp_vis = YOLOPoseVisualizer(data_path= data_path,
                                 video_path=video_path,
                                 save_dir=save_dir,
-                                core_cnt=24,
-                                bbox=False, verbose=True)
+                                core_cnt=28,
+                                bbox=True,
+                                verbose=True)
 
     kp_vis.run()
-    print('s')
+
+    # video_dir = r'D:\cvat_annotations\videos\mp4_20250624155703'
+    # data_dir = r'D:\cvat_annotations\yolo_mdl_07102025\out_csv'
+    # save_dir = r'D:\cvat_annotations\yolo_mdl_07102025\out_video'
+    #
+    # video_paths = find_files_of_filetypes_in_directory(directory=video_dir, extensions=['.mp4'], as_dict=True)
+    # data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=['.csv'], as_dict=True)
+    #
+    # for video_name, data_path in data_paths.items():
+    #     kp_vis = YOLOPoseVisualizer(data_path= data_path,
+    #                                 video_path=video_paths[video_name],
+    #                                 save_dir=save_dir,
+    #                                 core_cnt=28,
+    #                                 bbox=True,
+    #                                 verbose=True)
+    #
+    #     kp_vis.run()
 
 
 # if __name__ == "__main__":

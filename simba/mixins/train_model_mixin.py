@@ -66,7 +66,7 @@ from simba.utils.checks import (check_all_dfs_in_list_has_same_cols,
                                 check_instance, check_int, check_str,
                                 check_that_column_exist, check_valid_array,
                                 check_valid_boolean, check_valid_dataframe,
-                                check_valid_lst)
+                                check_valid_lst, is_lxc_container)
 from simba.utils.data import (detect_bouts, detect_bouts_multiclass,
                               get_library_version)
 from simba.utils.enums import (OS, ConfigKey, Defaults, Dtypes, Formats,
@@ -395,16 +395,18 @@ class TrainModelMixin(object):
         if multiclass:
             scoring = None
 
-        if platform.system() == "Darwin" or platform.system() == "Linux":
-            n_jobs = 31 if find_core_cnt()[0] > 31 and platform.system() == "Linux" else int(find_core_cnt()[0] - 2) #SAFETY FOR MACHINES WITH MANY CORES TO PREVENT LOKY HANGING ON LINUX. SEE: https://github.com/sgoldenlab/simba/issues/457
-            with parallel_backend("threading", n_jobs=n_jobs):
+        if (platform.system() == "Darwin" or platform.system() == "Linux") and not is_lxc_container():
+            with parallel_backend("threading", n_jobs=-2):
                 train_sizes, train_scores, test_scores = learning_curve(estimator=rf_clf, X=x_df.values, y=y_df, cv=cv, scoring=scoring, shuffle=False, verbose=0, train_sizes=np.linspace(0.01, 1.0, dataset_splits), error_score="raise")
         else:
+            n_jobs = 32 if find_core_cnt()[0] > 32 else find_core_cnt()[0]
             train_sizes, train_scores, test_scores = learning_curve(estimator=rf_clf,
                                                                     X=x_df,
                                                                     y=y_df,
                                                                     cv=cv,
-                                                                    scoring=scoring, shuffle=False, n_jobs=-1,
+                                                                    scoring=scoring,
+                                                                    shuffle=False,
+                                                                    n_jobs=n_jobs,
                                                                     verbose=0,
                                                                     train_sizes=np.linspace(0.01, 1.0, dataset_splits),
                                                                     error_score="raise")

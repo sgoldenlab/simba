@@ -1743,7 +1743,50 @@ def check_valid_device(device: Union[Literal['cpu'], int], raise_error: bool = T
             raise SimBAGPUError(msg=f'Unaccepted GPU device {device} passed. Accepted: {list(gpus.keys())}', source=source)
         return False
 
+def is_lxc_container() -> bool:
+    """
+    Helper to check if the current environment is inside a LXC Linux container.
 
+    .. note::
+       See GitHub issue 457 for origin - https://github.com/sgoldenlab/simba/issues/457#issuecomment-3052631284
+       Thanks Heinrich2818 - https://github.com/Heinrich2818
+
+    :return: True if current environment is a LXC linux container, False if not.
+    :rtype: bool
+    """
+
+    try:
+        with open('/proc/1/cgroup') as f:
+            for line in f:
+                if 'lxc' in line:
+                    return True
+    except IOError:
+        pass
+    try:
+        with open('/proc/self/mountinfo') as f:
+            for line in f:
+                if ' - cgroup2 ' in line:
+                    mount_point = line.strip().split()[-1]
+                    if 'lxc' in mount_point:
+                        return True
+    except IOError:
+        pass
+    try:
+        with open('/proc/1/environ', 'rb') as f:
+            env = f.read().split(b'\0')
+            for e in env:
+                if e == b'container=lxc':
+                    return True
+    except IOError:
+        pass
+    try:
+        import subprocess
+        r = subprocess.run(['systemd-detect-virt', '--container'], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, check=False, text=True)
+        if r.stdout.strip() == 'lxc':
+            return True
+    except Exception:
+        pass
+    return False
 
 
 

@@ -572,6 +572,31 @@ def find_bins(
     return video_bins_info
 
 
+def get_confusion_matrix(x: np.ndarray, y: np.ndarray) -> np.ndarray:
+    """
+    Compute a confusion matrix
+
+    .. note::
+       Adapted from mucunwuxian's Stack Overflow answer: https://stackoverflow.com/a/67747070
+
+    :param np.ndarray x: Predicted cluster labels (1D array of integers).
+    :param np.ndarray y: Ground truth class labels (1D array of integers, same length as `x`).
+    :returns: A 2D confusion matrix of shape (n_labels, n_labels), where entry (i, j) is the number of times label `i` in `x` coincided with label `j` in `y`.
+    :rtype: np.ndarray
+
+    :example:
+    >>> x = np.random.randint(0, 5, (100000,))
+    >>> y = np.random.randint(0, 5, (100000,))
+    >>> c = get_confusion_matrix(x=x, y=y)
+    """
+
+    check_valid_array(data=x, source=f'{get_confusion_matrix.__name__} x', accepted_ndims=(1,), accepted_dtypes=Formats.INTEGER_DTYPES.value)
+    check_valid_array(data=y, source=f'{get_confusion_matrix.__name__} y', accepted_ndims=(1,), accepted_axis_0_shape=[x.shape[0]], accepted_dtypes=Formats.INTEGER_DTYPES.value)
+    N = max(max(x), max(y)) + 1
+    y = N * x + y
+    y = np.bincount(y, minlength=N * N)
+    return y.reshape(N, N)
+
 def find_frame_numbers_from_time_stamp(start_time: str, end_time: str, fps: int) -> List[int]:
     """
     Given start and end timestamps in HH:MM:SS formats and the fps, return the frame numbers representing

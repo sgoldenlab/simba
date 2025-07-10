@@ -1,7 +1,7 @@
 import os
 import random
 from copy import copy
-from typing import Tuple, Union
+from typing import Tuple, Union, Optional
 import argparse
 import sys
 try:
@@ -24,7 +24,7 @@ from simba.utils.errors import (FaultyTrainingSetError, InvalidInputError,
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (create_directory, get_fn_ext, read_img,
                                     read_json, recursive_file_search)
-
+from simba.mixins.geometry_mixin import GeometryMixin
 
 class COCOKeypoints2Yolo:
 
@@ -69,12 +69,14 @@ class COCOKeypoints2Yolo:
                  flip_idx: Tuple[int, ...] = (0, 2, 1, 3, 5, 4, 6, 7, 8),
                  verbose: bool = True,
                  greyscale: bool = False,
-                 clahe: bool = False):
+                 clahe: bool = False,
+                 bbox_pad: Optional[float] = None):
 
         check_file_exist_and_readable(file_path=coco_path)
         check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir')
         check_if_dir_exists(in_dir=img_dir, source=f'{self.__class__.__name__} img_dir')
         check_float(name=f'{self.__class__.__name__} train_size', value=train_size, max_value=0.99, min_value=0.1)
+        if bbox_pad is not None: check_float(name=f'{self.__class__.__name__} bbox_pad', value=bbox_pad, max_value=1.0, min_value=10e-6)
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose', raise_error=True)
         check_valid_boolean(value=greyscale, source=f'{self.__class__.__name__} greyscale', raise_error=True)
         check_valid_boolean(value=clahe, source=f'{self.__class__.__name__} clahe', raise_error=True)
@@ -103,7 +105,7 @@ class COCOKeypoints2Yolo:
         self.train_idx = random.sample(img_idx, int(self.img_cnt * train_size))
         check_valid_tuple(x=flip_idx, source=self.__class__.__name__, valid_dtypes=(int,), minimum_length=1)
         self.verbose, self.coco_path, self.img_dir, self.coco_path, self.flip_idx = verbose, coco_path, img_dir, coco_path, flip_idx
-        self.save_dir, self.greyscale, self.clahe = save_dir, greyscale, clahe
+        self.save_dir, self.greyscale, self.clahe, self.bbox_pad = save_dir, greyscale, clahe, bbox_pad
 
     def run(self):
         shapes, timer = [], SimbaTimer(start=True)
@@ -125,25 +127,34 @@ class COCOKeypoints2Yolo:
             else:
                 label_save_path, img_save_path = os.path.join(self.val_lbl_dir, f'{img_name}.txt'), os.path.join(self.val_img_dir, f'{img_name}.png')
             for img_annotation in img_annotations:
-                check_if_keys_exist_in_dict(data=img_annotation, key=['bbox', 'keypoints', 'id', 'image_id', 'category_id'], name=self.coco_path)
-                x1, y1 = img_annotation['bbox'][0], img_annotation['bbox'][1]
-                w, h = img_annotation['bbox'][2], img_annotation['bbox'][3]
-                x_center = np.clip((x1 + (w / 2)) / img_data['width'], 0, 1)
-                y_center = np.clip((y1 + (h / 2)) / img_data['height'], 0, 1)
-                w = np.clip(w / img_data['width'], 0, 1)
-                h = np.clip(h / img_data['height'], 0, 1)
-                roi_str += ' '.join([f"{self.map_id_lk[img_annotation['category_id']]}", str(x_center), str(y_center), str(w), str(h), ' '])
+                check_if_keys_exist_in_dict(data=img_annotation, key=['bbox', 'keypoints', 'id', 'image_id', 'category_id'], name=str(self.coco_path))
                 kps = np.array(img_annotation['keypoints']).reshape(-1, 3).astype(np.int32)
+                bbox_kps = kps[kps[:, 2] != 0][:, 0:2]
+                if bbox_kps.shape[0] < 2 or kps.shape[0] == 0:
+                    continue
+                bbox_kps = bbox_kps.reshape(-1, bbox_kps.shape[0], 2).astype(np.int32)
+                bbox_arr = GeometryMixin().keypoints_to_axis_aligned_bounding_box(keypoints=bbox_kps)[0]
+                bbox_arr[:, 0] = np.clip(bbox_arr[:, 0], 0, img.shape[1])
+                bbox_arr[:, 1] = np.clip(bbox_arr[:, 1], 0, img.shape[0])
+                h = int(np.max(bbox_arr[:, 1].flatten()) - np.min(bbox_arr[:, 1].flatten()))
+                w = int(np.max(bbox_arr[:, 0].flatten()) - np.min(bbox_arr[:, 0].flatten()))
+                if self.bbox_pad is not None: w, h = int(w + (w * self.bbox_pad)), int(h + (h * self.bbox_pad))
+                center_w, center_h = int(np.mean(bbox_arr[:, 0].flatten())), int(np.mean(bbox_arr[:, 1].flatten()))
+                h_ratio, w_ratio = np.clip(h / img.shape[0], 0, 1), np.clip(w / img.shape[1], 0, 1)
+                center_h_ratio, center_w_ratio = np.clip(center_h / img.shape[0], 0, 1), np.clip(center_w / img.shape[1], 0, 1)
+                roi_str += ' '.join([f"{self.map_id_lk[img_annotation['category_id']]}", str(center_w_ratio), str(center_h_ratio), str(w_ratio), str(h_ratio), ' '])
                 x, y, v = kps[:, 0], kps[:, 1], kps[:, 2]
                 x = np.clip(x / img_data['width'], 0, 1)
                 y = np.clip(y / img_data['height'], 0, 1)
                 shapes.append(x.shape[0])
                 kps = list(np.column_stack((x, y, v)).flatten())
                 roi_str += ' '.join(str(x) for x in kps) + '\n'
+            if roi_str:
+                with open(label_save_path, mode='wt', encoding='utf-8') as f:
+                    f.write(roi_str)
+                cv2.imwrite(img_save_path, img)
 
-            with open(label_save_path, mode='wt', encoding='utf-8') as f:
-                f.write(roi_str)
-            cv2.imwrite(img_save_path, img)
+
         if len(list(set(shapes))) > 1:
             raise InvalidInputError(
                 msg=f'The annotation data {self.coco_path} contains more than one keypoint shapes: {set(shapes)}', source=self.__class__.__name__)
@@ -171,6 +182,8 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     parser.add_argument('--clahe', type=lambda x: str(x).lower() == 'false', default=False, help='CLAHE enhance images. Use "True" or "False". Default is False')
     parser.add_argument('--train_size', type=float, default=0.7, help='The size of the training set in percent. Default is 0.7 (70%).')
     parser.add_argument('--flip_idx', type=tuple, default=(0, 2, 1, 3, 5, 4, 6, 7, 8), help='The re-ordering of the body-part indexes following a horizontal flip of the image.')
+    parser.add_argument('--bbox_pad', type=float, default=None, help='Extra padding for the bounding box in percent (e.g., 0.2) to encompass all body-parts.')
+
 
     args = parser.parse_args()
     runner = COCOKeypoints2Yolo(coco_path=args.coco_path,
@@ -184,12 +197,11 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     runner.run()
 
 
-
-
 # runner = COCOKeypoints2Yolo(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\merged\merged_07032025.json",
 #                             img_dir=r"D:\cvat_annotations\frames",
-#                             save_dir=r"D:\cvat_annotations\yolo_07032025",
-#                             clahe=False)
+#                             save_dir=r"D:\cvat_annotations\yolo_07032025\bbox_test",
+#                             clahe=False,
+#                             bbox_pad=0.2)
 # runner.run()
 
 

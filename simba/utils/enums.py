@@ -54,6 +54,7 @@ class ConfigKey(Enum):
 
 class Paths(Enum):
     ENV_PATH = Path("assets/.env")
+    RECENT_PROJECTS_PATHS = Path("assets/.recent_projects.txt")
     INPUT_CSV = Path("csv/input_csv/")
     LINE_PLOT_DIR = Path("frames/output/line_plot/")
     VIDEO_INFO = Path("logs/video_info.csv")

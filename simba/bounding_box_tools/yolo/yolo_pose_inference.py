@@ -22,8 +22,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_tuple, get_fn_ext)
 from simba.utils.errors import CountError, InvalidFileTypeError
 from simba.utils.printing import SimbaTimer
-from simba.utils.read_write import get_video_meta_data
-
+from simba.utils.read_write import get_video_meta_data, find_files_of_filetypes_in_directory
+from simba.utils.enums import Options, Formats
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 NEAREST = 'nearest'
@@ -42,7 +42,7 @@ class YOLOPoseInference():
        For bounding box inference only (no pose), see :func:`~simba.bounding_box_tools.yolo.yolo_inference.YoloInference`.
 
     :param Union[str, os.PathLike] weights_path: Path to the trained YOLO model weights (e.g., 'best.pt').
-    :param Union[str, os.PathLike] or List[Union[str, os.PathLike]] video_path: Path to a single video or a list of videos to process.
+    :param Union[str, os.PathLike] or List[Union[str, os.PathLike]] video_path: Path to a single video, list of videos, or directory containing video files.
     :param Tuple[str, ...] keypoint_names: Tuple containing the names of keypoints to be tracked (e.g., ('nose', 'left_ear', ...)).
     :param Optional[bool] verbose: If True, outputs progress information and timing. Defaults to True.
     :param Optional[Union[str, os.PathLike]] save_dir: Directory to save the inference results. If None, results are returned in memory. Defaults to None.
@@ -77,9 +77,10 @@ class YOLOPoseInference():
 
         if isinstance(video_path, list):
             check_valid_lst(data=video_path, source=f'{self.__class__.__name__} video_path', valid_dtypes=(str, np.str_,), min_len=1)
-        elif isinstance(video_path, str):
-            check_file_exist_and_readable(file_path=video_path)
+        elif os.path.isfile(video_path):
             video_path = [video_path]
+        elif os.path.isdir(video_path):
+            video_path = find_files_of_filetypes_in_directory(directory=video_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, as_dict=False)
         for i in video_path:
             _ = get_video_meta_data(video_path=i)
         check_file_exist_and_readable(file_path=weights_path)
@@ -137,15 +138,17 @@ class YOLOPoseInference():
                 for cord_col in COORD_COLS:
                     results[video_name][cord_col] = results[video_name][cord_col].astype(np.float32).astype(np.int32).replace(to_replace=-1, value=np.nan)
                     results[video_name][cord_col] = results[video_name][cord_col].interpolate(method=NEAREST, axis=0).ffill().bfill()
+            if self.save_dir:
+                save_path = os.path.join(self.save_dir, f'{video_name}.csv')
+                results[video_name].to_csv(save_path)
+                del results[video_name]
+
         timer.stop_timer()
         if not self.save_dir:
             if self.verbose:
                 print(f'YOLO results created', timer.elapsed_time_str)
             return results
         else:
-            for k, v in results.items():
-                save_path = os.path.join(self.save_dir, f'{k}.csv')
-                v.to_csv(save_path)
             if self.verbose:
                 print(f'YOLO results saved in {self.save_dir} directory', timer.elapsed_time_str)
             return None
@@ -201,34 +204,34 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 # #
 # # video_paths = r"D:\cvat_annotations\videos\mp4_20250624155703\s25_wishking_blurry.mp4"
 # # weights_path = r"D:\cvat_annotations\yolo_07032025\mdl\train\weights\best.pt"
-# # save_dir = r"D:\cvat_annotations\yolo_07032025\out_data"
-# #
-# # # weights_path = r"D:\cvat_annotations\frames\yolo\mdl\train13\weights\best.pt"
-# # # #video_path = r"D:\cvat_annotations\videos\s1.mp4"
-# # # save_dir= r"D:\cvat_annotations\frames\data_results_yolo11m"
+# # # save_dir = r"D:\cvat_annotations\yolo_07032025\out_data"
 # # #
-# # # from simba.utils.read_write import find_files_of_filetypes_in_directory
-# # #
-# # # video_paths = find_files_of_filetypes_in_directory(directory=r'D:\cvat_annotations\videos', extensions=['.mp4'])
-# # #
+# weights_path = r"D:\cvat_annotations\yolo_mdl_07102025\train6\weights\best.pt"
+# video_path = r"D:\cvat_annotations\videos\mp4_20250624155703\s34-drinking.mp4"
+# save_dir= r"D:\cvat_annotations\yolo_mdl_07102025\out_csv"
+# # # #
+# # # # from simba.utils.read_write import find_files_of_filetypes_in_directory
+# # # #
+# # # # video_paths = find_files_of_filetypes_in_directory(directory=r'D:\cvat_annotations\videos', extensions=['.mp4'])
+# # # #
 # keypoint_names = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
 # # #
 # # #
 # i = YOLOPoseInference(weights_path=weights_path,
-#                         video_path=video_paths,
+#                         video_path=video_path,
 #                         save_dir=save_dir,
 #                         verbose=True,
 #                         device=0,
-#                         format='onnx',
+#                         format=None,
 #                         stream=True,
 #                         keypoint_names=keypoint_names,
-#                         batch_size=420,
-#                         imgsz=840,
-#                         interpolate=True,
-#                         threshold=0.25,
+#                         batch_size=100,
+#                         imgsz=640,
+#                         interpolate=False,
+#                         threshold=0.5,
 #                         max_tracks=1)
 # i.run()
-#
+
 
 # video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
 # video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-46-56.mp4"

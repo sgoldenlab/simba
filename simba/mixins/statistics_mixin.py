@@ -28,7 +28,7 @@ from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.utils.checks import (check_float, check_int, check_str,
                                 check_valid_array, check_valid_dataframe,
                                 check_valid_lst)
-from simba.utils.data import bucket_data, fast_mean_rank
+from simba.utils.data import bucket_data, fast_mean_rank, get_confusion_matrix
 from simba.utils.enums import ENV_VARS, Formats, Options
 from simba.utils.errors import CountError, InvalidInputError
 from simba.utils.read_write import get_unique_values_in_iterable, read_sys_env
@@ -3319,6 +3319,37 @@ class Statistics(FeatureExtractionMixin):
         differences = np.abs(data[:, np.newaxis, :] - data)
         results = np.sum(differences, axis=-1)
         return results
+
+    @staticmethod
+    def get_clustering_purity(x: np.ndarray, y: np.ndarray) -> float:
+        """
+        Compute clustering quality using purity score.
+
+        An external evaluation metric for clustering quality. It measures the extent to which clusters contain a single class.
+        The score ranges from 0 to 1, where 1 indicates perfect purity.
+
+        .. note::
+           Adapted from Ugurite's Stack Overflow answer: https://stackoverflow.com/a/51672699
+
+
+        :param np.ndarray x: Predicted cluster labels (1D array of integers).
+        :param np.ndarray y: Ground truth class labels (1D array of integers, same length as `x`).
+        :returns: Purity score in the range [0, 1].
+        :rtype: float
+
+        :example:
+        >>> x = np.random.randint(0, 5, (100000,))
+        >>> y = np.random.randint(0, 4, (100000,))
+        >>> p = Statistics.get_clustering_purity(x=x, y=y)
+
+        :references:
+           .. [1] Evaluation of clustering. *Introduction to Information Retrieval*. Available at: https://nlp.stanford.edu/IR-book/html/htmledition/evaluation-of-clustering-1.html
+        """
+
+        check_valid_array(data=x, source=f'{Statistics.get_clustering_purity.__name__} x', accepted_ndims=(1,), accepted_dtypes=Formats.INTEGER_DTYPES.value)
+        check_valid_array(data=y, source=f'{Statistics.get_clustering_purity.__name__} y', accepted_ndims=(1,), accepted_axis_0_shape=[x.shape[0]], accepted_dtypes=Formats.INTEGER_DTYPES.value)
+        c = get_confusion_matrix(x=x, y=y)
+        return np.sum(np.amax(c, axis=0)) / np.sum(c)
 
     @staticmethod
     #@jit('(float32[:,:],)')

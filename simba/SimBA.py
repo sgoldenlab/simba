@@ -28,9 +28,7 @@ from PIL import ImageTk
 from simba.bounding_box_tools.boundary_menus import BoundaryMenus
 from simba.labelling.labelling_advanced_interface import \
     select_labelling_video_advanced
-from simba.labelling.labelling_interface import select_labelling_video
-from simba.labelling.targeted_annotations_clips import \
-    select_labelling_video_targeted_clips
+from simba.labelling.targeted_annotations_clips import select_labelling_video_targeted_clips
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.model.grid_search_rf import GridSearchRandomForestClassifier
@@ -200,13 +198,12 @@ from simba.ui.video_info_ui import VideoInfoTable
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_int)
 from simba.utils.custom_feature_extractor import CustomFeatureExtractor
-from simba.utils.enums import (ENV_VARS, OS, Defaults, Formats, Keys, Links,
-                               Paths, TagNames)
+from simba.utils.enums import (ENV_VARS, OS, Defaults, Formats, Keys, Links, Paths, TagNames)
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
                                  get_icons_paths, load_simba_fonts)
 from simba.utils.read_write import (fetch_pip_data, find_core_cnt,
-                                    get_video_meta_data, read_sys_env)
+                                    get_video_meta_data, read_sys_env, get_recent_projects_paths, write_to_recent_project_paths)
 from simba.utils.warnings import (FFMpegNotFoundWarning, PythonVersionWarning,
                                   VersionWarning)
 from simba.video_processors.video_processing import \
@@ -639,6 +636,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             from simba.unsupervised.unsupervised_main import UnsupervisedGUI
             unsupervised_btn = Button(lbl_addon, text="Unsupervised analysis", fg="purple", font=Formats.FONT_REGULAR.value, command=lambda: UnsupervisedGUI(config_path=self.config_path))
             unsupervised_btn.grid(row=3, sticky=NW)
+        write_to_recent_project_paths(config_path=self.config_path)
 
     def create_video_info_table(self):
         video_info_tabler = VideoInfoTable(config_path=self.config_path)
@@ -792,6 +790,7 @@ class App(object):
         icon_path_windows = os.path.join(os.path.dirname(__file__), Paths.LOGO_ICON_WINDOWS_PATH.value)
         icon_path_darwin = os.path.join(os.path.dirname(__file__), Paths.LOGO_ICON_DARWIN_PATH.value)
         self.menu_icons = get_icons_paths()
+        recent_project_paths = get_recent_projects_paths()
         self.root = Tk()
         self.root.title("SimBA")
         self.root.minsize(750, 750)
@@ -817,6 +816,14 @@ class App(object):
         menu.add_cascade(label="File", menu=file_menu)
         file_menu.add_command(label="Create a new project", compound="left", image=self.menu_icons["create"]["img"], command=lambda: ProjectCreatorPopUp(), font=Formats.FONT_REGULAR.value)
         file_menu.add_command(label="Load project", compound="left", image=self.menu_icons["load"]["img"], command=lambda: LoadProjectPopUp(), font=Formats.FONT_REGULAR.value)
+        file_menu.add_separator()
+        recent_projects_menu = Menu(menu)
+
+        for recent_project_path in recent_project_paths:
+            recent_projects_menu.add_command(label=recent_project_path, command= lambda: SimbaProjectPopUp(config_path=recent_project_path), font=Formats.FONT_REGULAR.value)
+        recent_project_state = DISABLED if len(recent_project_paths) == 0 else NORMAL
+        file_menu.add_cascade(label="Open recent project...", compound="left", image=self.menu_icons["recent_files"]["img"], menu=recent_projects_menu, font=Formats.FONT_REGULAR.value, state=recent_project_state)
+
         file_menu.add_separator()
         file_menu.add_command(label="Restart", compound="left", image=self.menu_icons["restart"]["img"], command=lambda: self.restart(), font=Formats.FONT_REGULAR.value)
         file_menu.add_separator()

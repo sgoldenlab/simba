@@ -3190,4 +3190,38 @@ def read_sys_env():
     return env
 
 
+def get_recent_projects_paths(max: int = 10) -> List[str]:
+    file_path = os.path.join(SIMBA_DIR, Paths.RECENT_PROJECTS_PATHS.value)
+    if not os.path.isfile(file_path):
+        return []
+    try:
+        with open(file_path, "r") as file:
+            project_paths = [line.strip() for line in file if line.strip()]
+            project_paths = list(set(project_paths))
+            return [x for x in project_paths if os.path.isfile(x)][:max]
+    except:
+        return []
+
+
+def write_to_recent_project_paths(config_path: Union[str, os.PathLike]):
+    file_path = os.path.join(SIMBA_DIR, Paths.RECENT_PROJECTS_PATHS.value)
+    existing_paths = get_recent_projects_paths()
+    if os.path.isfile(config_path) and (config_path not in existing_paths):
+        try:
+            with open(file_path, "r") as f:
+                existing_content = f.read()
+            with open(file_path, "w") as f:
+                f.write(config_path + "\n" + existing_content)
+        except:
+            pass
+    else:
+        pass
+
+
+
+
+
+
+
+
 #concatenate_videos_in_folder(in_folder=r'C:\troubleshooting\RAT_NOR\project_folder\frames\output\path_plots\03152021_NOB_IOT_8', save_path=r"C:\troubleshooting\RAT_NOR\project_folder\frames\output\path_plots\new.mp4", remove_splits=False)

@@ -129,15 +129,15 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 
 
 
-# fitter = FitYolo(weights_path=r"D:\yolo_weights\yolo11n-pose.pt",
-#                  model_yaml=r"D:\cvat_annotations\yolo_07032025\map.yaml",
-#                  save_path=r"D:\cvat_annotations\yolo_07032025\mdl",
-#                  epochs=1500,
-#                  batch=32,
-#                  format='onnx',
-#                  device=0,
-#                  imgsz=640)
-# fitter.run()
+fitter = FitYolo(weights_path=r"D:\yolo_weights\yolo11m-pose.pt",
+                 model_yaml=r"D:\cvat_annotations\yolo_07032025\bbox_test\map.yaml",
+                 save_path=r"D:\cvat_annotations\yolo_07032025\bbox_test\mdl",
+                 epochs=1500,
+                 batch=32,
+                 format=None,
+                 device=0,
+                 imgsz=640)
+fitter.run()
 
 
 

@@ -153,6 +153,7 @@ def yolo_predict(model: YOLO,
                  batch_size: Optional[int] = 4,
                  stream: bool = False,
                  imgsz: int = 640,
+                 iou: float = 0.75,
                  device:  Union[Literal['cpu'], int] = 0,
                  threshold: float = 0.25,
                  max_detections: int = 300,
@@ -166,6 +167,7 @@ def yolo_predict(model: YOLO,
     :param bool half: Whether to use half precision (FP16) for inference to speed up processing.
     :param bool stream: If True, return a generator that yields results one by one. Useful for stream or large videos.
     :param int imgsz: Size to resize input images to (square dimension). Must be positive integer.
+    :param float iou: If max_detections > 1, then the bbox overlap allowed to detect multiple animals.
     :param Optional[int] batch_size: If stream is False, then the number of images to process in each batch.
     :param Union[Literal['cpu'], int] device: Device identifier for inference. 'cpu' to force CPU inference. E.g., integer index of the GPU device (e.g., 0 for 'cuda:0').
     :param float threshold: Confidence threshold for filtering predictions. Only detections with confidence >= threshold are returned. Must be between 0.0 and 1.0.
@@ -179,6 +181,7 @@ def yolo_predict(model: YOLO,
     check_valid_boolean(value=verbose, source=f'{yolo_predict.__name__} verbose', raise_error=True)
     check_int(name=f'{yolo_predict.__name__} imgsz', value=imgsz, min_value=1, raise_error=False)
     check_int(name=f'{yolo_predict.__name__} max_detections', value=max_detections, min_value=1, raise_error=False)
+    check_float(name=f'{yolo_predict.__name__} iou', value=iou, min_value=0.0, max_value=1.0, raise_error=True)
     check_float(name=f'{yolo_predict.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0, raise_error=False)
     if not stream:
         v, _ = check_int(name=f'{yolo_predict.__name__} batch_size', value=batch_size, min_value=1, raise_error=False)
@@ -190,6 +193,7 @@ def yolo_predict(model: YOLO,
         check_if_valid_img(data=source, source=f'{yolo_predict.__name__} source', raise_error=True)
     check_instance(source=f'{yolo_predict.__name__} model', instance=model, accepted_types=(YOLO,), raise_error=True)
     check_valid_device(device=device)
+
     return model.predict(source=source,
                          half=half,
                          batch=batch_size,
@@ -198,7 +202,8 @@ def yolo_predict(model: YOLO,
                          conf=threshold,
                          max_det=max_detections,
                          verbose=verbose,
-                         imgsz=imgsz)
+                         imgsz=imgsz,
+                         iou=iou)
 
 
 def keypoint_array_to_yolo_annotation_str(x: np.ndarray,
