@@ -1,12 +1,15 @@
 import os
+from typing import Optional, Union
+
 import cv2
 import numpy as np
-from typing import Union, Optional
-from simba.utils.checks import check_if_dir_exists, check_str, check_float
-from simba.utils.enums import Options, Formats
-from simba.utils.read_write import recursive_file_search, read_img
+
 from simba.mixins.plotting_mixin import PlottingMixin
+from simba.utils.checks import check_float, check_if_dir_exists, check_str
 from simba.utils.data import create_color_palettes
+from simba.utils.enums import Formats, Options
+from simba.utils.read_write import read_img, recursive_file_search
+
 
 class Yolo2Imgs():
 

@@ -7,6 +7,7 @@ try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+
 from typing import List, Optional, Tuple, Union
 
 import numpy as np
@@ -20,10 +21,12 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int,
                                 check_valid_boolean, check_valid_lst,
                                 check_valid_tuple, get_fn_ext)
+from simba.utils.enums import Formats, Options
 from simba.utils.errors import CountError, InvalidFileTypeError
 from simba.utils.printing import SimbaTimer
-from simba.utils.read_write import get_video_meta_data, find_files_of_filetypes_in_directory
-from simba.utils.enums import Options, Formats
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_video_meta_data)
+
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 NEAREST = 'nearest'

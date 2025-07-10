@@ -28,7 +28,8 @@ from PIL import ImageTk
 from simba.bounding_box_tools.boundary_menus import BoundaryMenus
 from simba.labelling.labelling_advanced_interface import \
     select_labelling_video_advanced
-from simba.labelling.targeted_annotations_clips import select_labelling_video_targeted_clips
+from simba.labelling.targeted_annotations_clips import \
+    select_labelling_video_targeted_clips
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.model.grid_search_rf import GridSearchRandomForestClassifier
@@ -198,12 +199,15 @@ from simba.ui.video_info_ui import VideoInfoTable
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_int)
 from simba.utils.custom_feature_extractor import CustomFeatureExtractor
-from simba.utils.enums import (ENV_VARS, OS, Defaults, Formats, Keys, Links, Paths, TagNames)
+from simba.utils.enums import (ENV_VARS, OS, Defaults, Formats, Keys, Links,
+                               Paths, TagNames)
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
                                  get_icons_paths, load_simba_fonts)
 from simba.utils.read_write import (fetch_pip_data, find_core_cnt,
-                                    get_video_meta_data, read_sys_env, get_recent_projects_paths, write_to_recent_project_paths)
+                                    get_recent_projects_paths,
+                                    get_video_meta_data, read_sys_env,
+                                    write_to_recent_project_paths)
 from simba.utils.warnings import (FFMpegNotFoundWarning, PythonVersionWarning,
                                   VersionWarning)
 from simba.video_processors.video_processing import \
