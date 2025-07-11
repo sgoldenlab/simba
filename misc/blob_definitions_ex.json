@@ -1,0 +1,79 @@
+{
+    "input_dir": "/Users/simon/Downloads/bg_videos",
+    "output_dir": "/Users/simon/Downloads/result_bg",
+    "gpu": false,
+    "core_cnt": 4,
+    "vertice_cnt": 30,
+    "close_iterations": 3,
+    "open_iterations": 3,
+    "save_bg_videos": true,
+    "video_data": {
+        "M2_coc_380_fps_15": {
+            "video_path": "/Users/simon/Downloads/bg_videos/M2_coc_380_fps_15.mp4",
+            "threshold": 18,
+            "smoothing_time": 0.25,
+            "buffer_size": null,
+            "reference": "/Users/simon/Downloads/bg_videos/M2_coc_380_fps_15.mp4",
+            "inclusion_zones": null,
+            "window_size": null,
+            "close_kernel": 20.0,
+            "open_kernel": 3.0
+        },
+        "F16_sal_400_fps_15": {
+            "video_path": "/Users/simon/Downloads/bg_videos/F16_sal_400_fps_15.mp4",
+            "threshold": 18,
+            "smoothing_time": 0.25,
+            "buffer_size": null,
+            "reference": "/Users/simon/Downloads/bg_videos/F16_sal_400_fps_15.mp4",
+            "inclusion_zones": null,
+            "window_size": null,
+            "close_kernel": 20.0,
+            "open_kernel": 3.0
+        },
+        "F12_sal_380_fps_15": {
+            "video_path": "/Users/simon/Downloads/bg_videos/F12_sal_380_fps_15.mp4",
+            "threshold": 18,
+            "smoothing_time": 0.25,
+            "buffer_size": null,
+            "reference": "/Users/simon/Downloads/bg_videos/F12_sal_380_fps_15.mp4",
+            "close_kernel": 20.0,
+            "open_kernel": 3.0
+        },
+        "M8_sal_400_fps_15": {
+            "video_path": "/Users/simon/Downloads/bg_videos/M8_sal_400_fps_15.mp4",
+            "threshold": 18,
+            "smoothing_time": 0.25,
+            "buffer_size": 5,
+            "reference": "/Users/simon/Downloads/bg_videos/M8_sal_400_fps_15.mp4",
+            "close_kernel": 20.0,
+            "open_kernel": 3.0
+        },
+        "M1_sal_380_fps_15": {
+            "video_path": "/Users/simon/Downloads/bg_videos/M1_sal_380_fps_15.mp4",
+            "threshold": 18,
+            "smoothing_time": 0.25,
+            "buffer_size": 5,
+            "reference": "/Users/simon/Downloads/bg_videos/M1_sal_380_fps_15.mp4",
+            "close_kernel": 20.0,
+            "open_kernel": 3.0
+        },
+        "F12_coc_364_fps_15": {
+            "video_path": "/Users/simon/Downloads/bg_videos/F12_coc_364_fps_15.mp4",
+            "threshold": 18,
+            "smoothing_time": 0.25,
+            "buffer_size": 5,
+            "reference": "/Users/simon/Downloads/bg_videos/F12_coc_364_fps_15.mp4",
+            "close_kernel": 20.0,
+            "open_kernel": 3.0
+        },
+        "M2_sal_380_fps_15": {
+            "video_path": "/Users/simon/Downloads/bg_videos/M2_sal_380_fps_15.mp4",
+            "threshold": 18,
+            "smoothing_time": 0.25,
+            "buffer_size": 5,
+            "reference": "/Users/simon/Downloads/bg_videos/M2_sal_380_fps_15.mp4",
+            "close_kernel": 20.0,
+            "open_kernel": 3.0
+        }
+    }
+}
