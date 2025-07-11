@@ -18,8 +18,9 @@ from simba.utils.errors import CountError, FrameRangeError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
+                                    find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data,
-                                    read_frm_of_video, find_files_of_filetypes_in_directory)
+                                    read_frm_of_video)
 
 FRAME = 'FRAME'
 CLASS_ID = 'CLASS_ID'
