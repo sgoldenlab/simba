@@ -95,7 +95,7 @@ class BlobTrackingExecutor():
             self.vertice_col_names.append(f"vertice_{i}_x"); self.vertice_col_names.append(f"vertice_{i}_y")
 
     def run(self):
-        self._remove_bgs()
+        #self._remove_bgs()
         self._find_blobs()
         self.timer.stop_timer()
         stdout_success(msg=f'Animal tracking complete. Results save din directory {self.data[OUT_DIR]}', elapsed_time=self.timer.elapsed_time_str)
@@ -161,15 +161,15 @@ class BlobTrackingExecutor():
             video_meta = get_video_meta_data(video_path=video_data['video_path'])
             temp_video_path = os.path.join(self.save_dir, f'{video_name}.mp4')
             save_path = os.path.join(self.data[OUT_DIR], f'{video_meta["video_name"]}.csv')
-            if os.path.isfile(save_path):
-                continue
+            inclusion_zone = None if 'inclusion_zones' not in video_data.keys() else video_data['inclusion_zones']
+            window_size = None if 'window_size' not in video_data.keys() else video_data['window_size']
             vertices = get_blob_vertices_from_video(video_path=temp_video_path,
                                                     gpu=self.gpu,
                                                     verbose=True,
                                                     core_cnt=self.core_cnt,
                                                     batch_size=None,
-                                                    inclusion_zone=video_data['inclusion_zones'],
-                                                    window_size=video_data['window_size'],
+                                                    inclusion_zone=inclusion_zone,
+                                                    window_size=window_size,
                                                     convex_hull=False,
                                                     vertice_cnt=self.vertice_cnt)
 

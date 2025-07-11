@@ -56,6 +56,8 @@ Some example operations pertaining to working with animals and environments as g
    nb/yolo_ex_2
    nb/bg_remove
    nb/egocentric_align
+   nb/blob_tracking
+   nb/blob_tracking_vis
 
 🧰 Miscellaneous
 -------------------
