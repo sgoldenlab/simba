@@ -1,7 +1,7 @@
 import functools
 import multiprocessing
 import os
-from typing import Optional, Tuple, Union, List
+from typing import List, Optional, Tuple, Union
 
 import cv2
 import numpy as np
@@ -11,7 +11,7 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int,
                                 check_valid_boolean, check_valid_dataframe,
-                                check_valid_tuple, check_valid_lst)
+                                check_valid_lst, check_valid_tuple)
 from simba.utils.data import create_color_palette
 from simba.utils.enums import Defaults, Options
 from simba.utils.errors import CountError, FrameRangeError
