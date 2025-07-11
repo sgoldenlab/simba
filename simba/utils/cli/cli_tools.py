@@ -9,23 +9,21 @@ try:
 except:
     from typing_extensions import Literal
 
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists,
+                                check_if_keys_exist_in_dict, check_int,
+                                check_str, check_valid_boolean,
+                                check_valid_dict)
 from simba.utils.enums import ConfigKey, Dtypes, Paths
 from simba.utils.lookups import get_bp_config_code_class_pairs
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (get_fn_ext, read_config_entry,
-                                    read_config_file,
+from simba.utils.read_write import (find_core_cnt, get_fn_ext,
+                                    get_video_meta_data, read_config_entry,
+                                    read_config_file, read_json,
                                     read_project_path_and_file_type,
-                                    read_video_info_csv,
-                                    read_json, find_core_cnt)
-
-from simba.utils.checks import (check_valid_boolean,
-                                check_if_dir_exists,
-                                check_file_exist_and_readable,
-                                check_if_keys_exist_in_dict,
-                                check_valid_dict,
-                                check_int, check_float, check_str)
+                                    read_video_info_csv)
 from simba.video_processors.blob_tracking_executor import BlobTrackingExecutor
-from simba.utils.read_write import get_video_meta_data
+
 
 def feature_extraction_runner(config_path: Union[str, os.PathLike]) -> None:
     """
