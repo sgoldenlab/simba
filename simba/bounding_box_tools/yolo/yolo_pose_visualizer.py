@@ -14,7 +14,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_tuple, check_valid_lst)
 from simba.utils.data import create_color_palette
 from simba.utils.enums import Defaults, Options
-from simba.utils.errors import CountError, FrameRangeError
+from simba.utils.errors import CountError, FrameRangeError, DataHeaderError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
@@ -66,9 +66,10 @@ def _yolo_keypoint_visualizer(frm_ids: np.ndarray,
                 img = cv2.circle(img, (tuple(kp)), circle_size, clr, -1)
             if skeleton is not None:
                 for (kp1, kp2) in skeleton:
-                    pos_1 = np.array([row_data[[f'{kp1}_X', f'{kp1}_Y']].values.astype(np.int32)])
-                    pos_2 = np.array([row_data[[f'{kp2}_X', f'{kp2}_Y']].values.astype(np.int32)])
-                    img = PlottingMixin().draw_lines_on_img(img=img, start_positions=pos_1, end_positions=pos_2, color=(105,105,105), highlight_endpoint=False, thickness=int(max(1, int(circle_size/2))))
+                    if row_data[f'{kp1}_P'] > threshold:
+                        pos_1 = np.array([row_data[[f'{kp1}_X', f'{kp1}_Y']].values.astype(np.int32)])
+                        pos_2 = np.array([row_data[[f'{kp2}_X', f'{kp2}_Y']].values.astype(np.int32)])
+                        img = PlottingMixin().draw_lines_on_img(img=img, start_positions=pos_1, end_positions=pos_2, color=(105,105,105), highlight_endpoint=False, thickness=int(max(1, int(circle_size/2))))
         video_writer.write(img)
         current_frm += 1
     cap.release()
@@ -160,6 +161,11 @@ class YOLOPoseVisualizer():
             check_valid_lst(data=skeleton, source=f'{self.__class__.__name__} skeleton', valid_dtypes=(list, tuple,), min_len=1, raise_error=True)
             for i in skeleton:
                 check_valid_tuple(x=i, source=f'{self.__class__.__name__} {i}', accepted_lengths=(2,), valid_dtypes=(str,))
+            required_s_cols = [f'{x}_{suffix}' for xs in skeleton for x in xs for suffix in ('X', 'Y', 'P')]
+            missing = [x for x in required_s_cols if x not in self.data_df.columns]
+            if len(missing) > 0:
+                raise DataHeaderError(msg=f'Columns {missing} missing in file {data_path} as passe by skeleton.', source=self.__class__.__name__)
+
         self.save_dir, self.verbose, self.palette, self.thickness = save_dir, verbose, palettes, thickness
         self.threshold, self.circle_size, self.thickness, self.bbox = threshold, circle_size, thickness, bbox
         self.video_temp_dir = os.path.join(self.save_dir, self.video_name, "temp")
@@ -210,10 +216,14 @@ if __name__ == "__main__":
                 ('LEFT_EAR', 'LEFT_SIDE'),
                 ('RIGHT_EAR', 'RIGHT_SIDE'),
                 ('LEFT_SIDE', 'CENTER'),
+                ('LEFT_EAR', 'CENTER'),
+                ('RIGHT_EAR', 'CENTER'),
                 ('CENTER', 'RIGHT_SIDE'),
                 ('CENTER', 'TAIL_BASE'),
                 ('LEFT_SIDE', 'TAIL_BASE'),
-                ('RIGHT_SIDE', 'TAIL_BASE')]
+                ('RIGHT_SIDE', 'TAIL_BASE'),
+                ('TAIL_BASE', 'TAIL_CENTER'),
+                ('TAIL_CENTER', 'TAIL_TIP')]
 
     kp_vis = YOLOPoseVisualizer(data_path= data_path,
                                 video_path=video_path,
@@ -221,7 +231,8 @@ if __name__ == "__main__":
                                 core_cnt=28,
                                 bbox=True,
                                 verbose=True,
-                                skeleton=skeleton)
+                                skeleton=skeleton,
+                                threshold=0.5)
 
     kp_vis.run()
 
