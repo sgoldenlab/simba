@@ -237,7 +237,7 @@ def blob_tracker(config_path: Union[str, os.PathLike]) -> None:
     tracker = BlobTrackingExecutor(data=data)
     tracker.run()
 
-blob_tracker(r'C:\troubleshooting\blob_track\blob_definitions_ex.json')
+#blob_tracker(r'C:\troubleshooting\blob_track\blob_definitions_ex.json')
 
 
 
