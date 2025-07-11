@@ -14,7 +14,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_lst, check_valid_tuple)
 from simba.utils.data import create_color_palette
 from simba.utils.enums import Defaults, Options
-from simba.utils.errors import CountError, FrameRangeError, DataHeaderError
+from simba.utils.errors import CountError, DataHeaderError, FrameRangeError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
