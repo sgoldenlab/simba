@@ -1704,16 +1704,14 @@ class PlottingMixin(object):
             data=start_positions,
             source=f"{PlottingMixin.draw_lines_on_img.__name__} start_positions",
             accepted_ndims=(2,),
-            accepted_dtypes=(np.int64,),
+            accepted_dtypes=(Formats.INTEGER_DTYPES.value),
             min_axis_0=1,
         )
         check_valid_array(
             data=end_positions,
             source=f"{PlottingMixin.draw_lines_on_img.__name__} end_positions",
-            accepted_shapes=[
-                (start_positions.shape[0], 2),
-            ],
-        )
+            accepted_shapes=[(start_positions.shape[0], 2),],
+            accepted_dtypes=Formats.INTEGER_DTYPES.value)
         check_if_valid_rgb_tuple(data=color)
         for i in range(start_positions.shape[0]):
             cv2.line(

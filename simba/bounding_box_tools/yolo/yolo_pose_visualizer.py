@@ -1,7 +1,7 @@
 import functools
 import multiprocessing
 import os
-from typing import Optional, Tuple, Union
+from typing import Optional, Tuple, Union, List
 
 import cv2
 import numpy as np
@@ -11,7 +11,7 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int,
                                 check_valid_boolean, check_valid_dataframe,
-                                check_valid_tuple)
+                                check_valid_tuple, check_valid_lst)
 from simba.utils.data import create_color_palette
 from simba.utils.enums import Defaults, Options
 from simba.utils.errors import CountError, FrameRangeError
@@ -39,7 +39,8 @@ def _yolo_keypoint_visualizer(frm_ids: np.ndarray,
                               circle_size: int,
                               thickness: int,
                               palettes: dict,
-                              bbox: bool):
+                              bbox: bool,
+                              skeleton: list):
 
     batch_id, frame_rng = frm_ids[0], frm_ids[1]
     start_frm, end_frm, current_frm = frame_rng[0], frame_rng[-1], frame_rng[0]
@@ -63,6 +64,11 @@ def _yolo_keypoint_visualizer(frm_ids: np.ndarray,
             for kp_cnt, kp in enumerate(kp_coords):
                 clr = tuple(int(c) for c in clrs[kp_cnt+1])
                 img = cv2.circle(img, (tuple(kp)), circle_size, clr, -1)
+            if skeleton is not None:
+                for (kp1, kp2) in skeleton:
+                    pos_1 = np.array([row_data[[f'{kp1}_X', f'{kp1}_Y']].values.astype(np.int32)])
+                    pos_2 = np.array([row_data[[f'{kp2}_X', f'{kp2}_Y']].values.astype(np.int32)])
+                    img = PlottingMixin().draw_lines_on_img(img=img, start_positions=pos_1, end_positions=pos_2, color=(105,105,105), highlight_endpoint=False, thickness=int(max(1, int(circle_size/2))))
         video_writer.write(img)
         current_frm += 1
     cap.release()
@@ -114,7 +120,8 @@ class YOLOPoseVisualizer():
                  thickness: Optional[int] = None,
                  circle_size: Optional[int] = None,
                  verbose: Optional[bool] = False,
-                 bbox: Optional[bool] = True):
+                 bbox: Optional[bool] = True,
+                 skeleton: List[Tuple[str, str]] = None):
 
         check_file_exist_and_readable(file_path=data_path)
         self.video_meta_data = get_video_meta_data(video_path=video_path)
@@ -149,10 +156,14 @@ class YOLOPoseVisualizer():
         self.palettes = {}
         for cnt, palette in enumerate(palettes):
             self.palettes[cnt] = create_color_palette(pallete_name=palette, increments=len(self.data_df.columns)-len(EXPECTED_COLS))
+        if skeleton is not None:
+            check_valid_lst(data=skeleton, source=f'{self.__class__.__name__} skeleton', valid_dtypes=(list, tuple,), min_len=1, raise_error=True)
+            for i in skeleton:
+                check_valid_tuple(x=i, source=f'{self.__class__.__name__} {i}', accepted_lengths=(2,), valid_dtypes=(str,))
         self.save_dir, self.verbose, self.palette, self.thickness = save_dir, verbose, palettes, thickness
         self.threshold, self.circle_size, self.thickness, self.bbox = threshold, circle_size, thickness, bbox
         self.video_temp_dir = os.path.join(self.save_dir, self.video_name, "temp")
-        self.save_path = os.path.join(self.save_dir, f'{self.video_name}.mp4')
+        self.save_path, self.skeleton = os.path.join(self.save_dir, f'{self.video_name}.mp4'), skeleton
         create_directory(paths=self.video_temp_dir)
 
 
@@ -172,7 +183,8 @@ class YOLOPoseVisualizer():
                                           circle_size=self.circle_size,
                                           thickness=self.thickness,
                                           palettes=self.palettes,
-                                          bbox=self.bbox)
+                                          bbox=self.bbox,
+                                          skeleton=self.skeleton)
             for cnt, result in enumerate(pool.imap(constants, frm_batches, chunksize=1)):
                 print(f'Video batch {result+1}/{self.core_cnt} complete...')
         pool.terminate()
@@ -192,12 +204,24 @@ if __name__ == "__main__":
     data_path = r'D:\cvat_annotations\yolo_mdl_07102025\out_csv\s34-drinking.csv'
     save_dir = r'D:\cvat_annotations\yolo_mdl_07102025\out_video'
 
+    skeleton = [('NOSE', 'LEFT_EAR'),
+                ('NOSE', 'RIGHT_EAR'),
+                ('RIGHT_EAR', 'LEFT_EAR'),
+                ('LEFT_EAR', 'LEFT_SIDE'),
+                ('RIGHT_EAR', 'RIGHT_SIDE'),
+                ('LEFT_SIDE', 'CENTER'),
+                ('CENTER', 'RIGHT_SIDE'),
+                ('CENTER', 'TAIL_BASE'),
+                ('LEFT_SIDE', 'TAIL_BASE'),
+                ('RIGHT_SIDE', 'TAIL_BASE')]
+
     kp_vis = YOLOPoseVisualizer(data_path= data_path,
                                 video_path=video_path,
                                 save_dir=save_dir,
                                 core_cnt=28,
                                 bbox=True,
-                                verbose=True)
+                                verbose=True,
+                                skeleton=skeleton)
 
     kp_vis.run()
 
@@ -246,3 +270,6 @@ if __name__ == "__main__":
 #
 #
 # kp_vis.run()
+
+
+
