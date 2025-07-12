@@ -67,3 +67,6 @@ SimBA Paper – Nature Neuroscience
    :target: https://static1.squarespace.com/static/5b1b659871069912b3022368/t/666b3f0bae03e61fecdaab73/1718304536255/Goodwin+2024+NN.pdf
 
 :download:`Download Published PDF link 1 <https://static1.squarespace.com/static/5b1b659871069912b3022368/t/666b3f0bae03e61fecdaab73/1718304536255/Goodwin+2024+NN.pdf>`
+:download:`Download Published PDF link 2 <../_static/pdf/Goodwin_etal_2024.pdf>`
+
+
