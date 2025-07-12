@@ -58,15 +58,17 @@ def _yolo_keypoint_visualizer(frm_ids: np.ndarray,
             clrs = np.array(palettes[int(row_data[CLASS_ID])]).astype(np.int32)
             bbox_cords = row_data[BOX_CORD_FIELDS].values.astype(np.int32).reshape(-1, 2)
             kp_coords = row_data.drop(EXPECTED_COLS).values.astype(np.int32).reshape(-1, 3)[:, :-1]
+            p_cords = row_data.drop(EXPECTED_COLS).values.astype(np.float64).reshape(-1, 3)[:, -1:].flatten()
             clr = tuple(int(c) for c in clrs[0])
             if bbox:
                 img = cv2.polylines(img, [bbox_cords], True, clr, thickness=thickness, lineType=cv2.LINE_AA)
             for kp_cnt, kp in enumerate(kp_coords):
-                clr = tuple(int(c) for c in clrs[kp_cnt+1])
-                img = cv2.circle(img, (tuple(kp)), circle_size, clr, -1)
+                if p_cords[kp_cnt] > threshold:
+                    clr = tuple(int(c) for c in clrs[kp_cnt+1])
+                    img = cv2.circle(img, (tuple(kp)), circle_size, clr, -1)
             if skeleton is not None:
                 for (kp1, kp2) in skeleton:
-                    if row_data[f'{kp1}_P'] > threshold:
+                    if (row_data[f'{kp1}_P'] > threshold) and (row_data[f'{kp2}_P'] > threshold):
                         pos_1 = np.array([row_data[[f'{kp1}_X', f'{kp1}_Y']].values.astype(np.int32)])
                         pos_2 = np.array([row_data[[f'{kp2}_X', f'{kp2}_Y']].values.astype(np.int32)])
                         img = PlottingMixin().draw_lines_on_img(img=img, start_positions=pos_1, end_positions=pos_2, color=(105,105,105), highlight_endpoint=False, thickness=int(max(1, int(circle_size/2))))
@@ -207,8 +209,14 @@ if __name__ == "__main__":
     #save_dir = r"D:\cvat_annotations\yolo_07032025\out_video"
 
     video_path = r"D:\cvat_annotations\videos\mp4_20250624155703\s34-drinking.mp4"
-    data_path = r'D:\cvat_annotations\yolo_mdl_07102025\out_csv\s34-drinking.csv'
-    save_dir = r'D:\cvat_annotations\yolo_mdl_07102025\out_video'
+    data_path = r"D:\cvat_annotations\yolo_mdl_07122025\out_data\s34-drinking.csv"
+    save_dir = r'D:\cvat_annotations\yolo_mdl_07122025\out_video'
+    video_dir = r"D:\cvat_annotations\videos\mp4_20250624155703"
+    data_dir = r"D:\cvat_annotations\yolo_mdl_07122025\out_data"
+
+    video_paths = find_files_of_filetypes_in_directory(directory=video_dir, extensions=['.mp4'], as_dict=True)
+    data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=['.csv'], as_dict=True)
+
 
     skeleton = [('NOSE', 'LEFT_EAR'),
                 ('NOSE', 'RIGHT_EAR'),
@@ -225,16 +233,20 @@ if __name__ == "__main__":
                 ('TAIL_BASE', 'TAIL_CENTER'),
                 ('TAIL_CENTER', 'TAIL_TIP')]
 
-    kp_vis = YOLOPoseVisualizer(data_path= data_path,
-                                video_path=video_path,
-                                save_dir=save_dir,
-                                core_cnt=28,
-                                bbox=True,
-                                verbose=True,
-                                skeleton=skeleton,
-                                threshold=0.5)
+    for video_name, video_path in video_paths.items():
+        data_path = data_paths[video_name]
+        #kp_vis = YOLOPoseVisualizer(data_path=data_path, video_path=video_path)
 
-    kp_vis.run()
+        kp_vis = YOLOPoseVisualizer(data_path= data_path,
+                                    video_path=video_path,
+                                    save_dir=save_dir,
+                                    core_cnt=28,
+                                    bbox=True,
+                                    verbose=True,
+                                    skeleton=skeleton,
+                                    threshold=0.5)
+
+        kp_vis.run()
 
     # video_dir = r'D:\cvat_annotations\videos\mp4_20250624155703'
     # data_dir = r'D:\cvat_annotations\yolo_mdl_07102025\out_csv'

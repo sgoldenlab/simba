@@ -76,7 +76,8 @@ class YOLOPoseInference():
                  threshold: float = 0.5,
                  max_tracks: Optional[int] = None,
                  interpolate: bool = False,
-                 imgsz: int = 640):
+                 imgsz: int = 640,
+                 iou: float = 0.5):
 
         if isinstance(video_path, list):
             check_valid_lst(data=video_path, source=f'{self.__class__.__name__} video_path', valid_dtypes=(str, np.str_,), min_len=1)
@@ -92,6 +93,7 @@ class YOLOPoseInference():
         check_int(name=f'{self.__class__.__name__} batch_size', value=batch_size, min_value=1)
         check_int(name=f'{self.__class__.__name__} imgsz', value=imgsz, min_value=1)
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=10e-6, max_value=1.0)
+        check_float(name=f'{self.__class__.__name__} iou', value=iou, min_value=10e-6, max_value=1.0)
         check_valid_tuple(x=keypoint_names, source=f'{self.__class__.__name__} keypoint_names', min_integer=1, valid_dtypes=(str,))
         if max_tracks is not None:
             check_int(name=f'{self.__class__.__name__} max_tracks', value=max_tracks, min_value=1)
@@ -104,7 +106,7 @@ class YOLOPoseInference():
         torch.set_num_threads(torch_threads)
         self.model = load_yolo_model(weights_path=weights_path, device=device, format=format)
         self.half_precision, self.stream, self.video_path = half_precision, stream, video_path
-        self.device, self.batch_size, self.threshold, self.max_tracks = device, batch_size, threshold, max_tracks
+        self.device, self.batch_size, self.threshold, self.max_tracks, self.iou = device, batch_size, threshold, max_tracks, iou
         self.verbose, self.save_dir, self.imgsz, self.interpolate = verbose, save_dir, imgsz, interpolate
         if self.model.model.task != 'pose':
             raise InvalidFileTypeError(msg=f'The model {weights_path} is not a pose model. It is a {self.model.model.task} model', source=self.__class__.__name__)
@@ -119,7 +121,7 @@ class YOLOPoseInference():
             _, video_name, _ = get_fn_ext(filepath=path)
             _ = get_video_meta_data(video_path=path)
             video_out = []
-            video_predictions = yolo_predict(model=self.model, source=path, half=self.half_precision, batch_size=self.batch_size, stream=self.stream, imgsz=self.imgsz, device=self.device, threshold=self.threshold, max_detections=self.max_tracks, verbose=self.verbose)
+            video_predictions = yolo_predict(model=self.model, source=path, half=self.half_precision, batch_size=self.batch_size, stream=self.stream, imgsz=self.imgsz, device=self.device, threshold=self.threshold, max_detections=self.max_tracks, verbose=self.verbose, iou=self.iou)
             for frm_cnt, video_prediction in enumerate(video_predictions):
                 boxes = video_prediction.obb.data if video_prediction.obb is not None else video_prediction.boxes.data
                 boxes = boxes.cpu().numpy().astype(np.float32)
@@ -160,7 +162,7 @@ class YOLOPoseInference():
 if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     parser = argparse.ArgumentParser(description="Perform YOLO-based keypoint pose estimation inference on videos.")
     parser.add_argument('--weights_path', type=str, required=True, help='Path to the trained YOLO model weights (e.g., "best.pt").')
-    parser.add_argument('--video_path', type=str, nargs='+', required=True, help='One or more paths to video files to process.')
+    parser.add_argument('--video_path', type=str, nargs='+', required=True, help='One or more paths to video files to process. Can be a directory of a file path.')
     parser.add_argument('--keypoint_names', type=str, nargs='+', required=True, help='List of keypoint names, e.g., nose left_ear right_ear.')
     parser.add_argument('--verbose', action='store_true', default=False, help='Enable verbose logging.')
     parser.add_argument('--save_dir', type=str, default=None, help='Directory to save output CSV files. If omitted, results are returned in memory.')
@@ -198,30 +200,15 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     inference.run()
 
 #
-# video_paths = r"D:\cvat_annotations\videos\mp4_20250624155703\s34-drinking.mp4"
-# weights_path = r"D:\cvat_annotations\yolo_07032025\mdl\train\weights\best.pt"
-# save_dir = r"D:\cvat_annotations\yolo_07032025\out_data"
+# video_paths = r"D:\cvat_annotations\videos\mp4_20250624155703"
+# weights_path = r"D:\cvat_annotations\yolo_mdl_07122025\weights\best.pt"
+# save_dir = r"D:\cvat_annotations\yolo_mdl_07122025\out_data"
 #
-#
-#
-# #
-# # video_paths = r"D:\cvat_annotations\videos\mp4_20250624155703\s25_wishking_blurry.mp4"
-# # weights_path = r"D:\cvat_annotations\yolo_07032025\mdl\train\weights\best.pt"
-# # # save_dir = r"D:\cvat_annotations\yolo_07032025\out_data"
-# # #
-# weights_path = r"D:\cvat_annotations\yolo_mdl_07102025\train6\weights\best.pt"
-# video_path = r"D:\cvat_annotations\videos\mp4_20250624155703\s34-drinking.mp4"
-# save_dir= r"D:\cvat_annotations\yolo_mdl_07102025\out_csv"
-# # # #
-# # # # from simba.utils.read_write import find_files_of_filetypes_in_directory
-# # # #
-# # # # video_paths = find_files_of_filetypes_in_directory(directory=r'D:\cvat_annotations\videos', extensions=['.mp4'])
-# # # #
 # keypoint_names = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
-# # #
-# # #
+# # # #
+# # # #
 # i = YOLOPoseInference(weights_path=weights_path,
-#                         video_path=video_path,
+#                         video_path=video_paths,
 #                         save_dir=save_dir,
 #                         verbose=True,
 #                         device=0,
@@ -232,7 +219,7 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 #                         imgsz=640,
 #                         interpolate=False,
 #                         threshold=0.5,
-#                         max_tracks=1)
+#                         max_tracks=4)
 # i.run()
 
 
