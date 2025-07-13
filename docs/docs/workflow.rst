@@ -59,7 +59,7 @@ SimBA Preprint – bioRxiv
 
 
 SimBA Paper – Nature Neuroscience
---------------------------
+----------------------------------------------------
 
 .. image:: ../_static/img/simba_paper_nn_header.webp
    :width: 1000
@@ -69,4 +69,16 @@ SimBA Paper – Nature Neuroscience
 :download:`Download Published PDF link 1 <https://static1.squarespace.com/static/5b1b659871069912b3022368/t/666b3f0bae03e61fecdaab73/1718304536255/Goodwin+2024+NN.pdf>`
 :download:`Download Published PDF link 2 <../_static/pdf/Goodwin_etal_2024.pdf>`
 
+SimBA published use cases
+----------------------------------------------------
+
+.. warning::
+   Not super-well-maintained
+
+.. image:: ../_static/img/simba_usecases_header.webp
+   :width: 1000
+   :align: center
+   :target: https://docs.google.com/spreadsheets/d/169enc3Am2KQKifxj1F9KEKKLbftpMhBlw49zjl-egsY/edit?usp=sharing
+
+`View Google Sheet <https://docs.google.com/spreadsheets/d/169enc3Am2KQKifxj1F9KEKKLbftpMhBlw49zjl-egsY/edit?usp=sharing>`
 
