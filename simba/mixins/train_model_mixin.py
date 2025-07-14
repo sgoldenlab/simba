@@ -1040,6 +1040,10 @@ class TrainModelMixin(object):
                     continue
                 model_dict[n] = {}
                 model_dict[n]["model_path"] = config.get(ConfigKey.SML_SETTINGS.value, "model_path_" + str(n + 1))
+                if not os.path.isfile(model_dict[n]["model_path"]):
+                    MissingUserInputWarning(msg=f'Skipping {str(config.get("SML settings", "target_name_" + str(n + 1)))} classifier analysis: The classifier file path does not exist: {model_dict[n]["model_path"]}', source=self.__class__.__name__,)
+                    del model_dict[n]
+                    continue
                 model_dict[n]["model_name"] = config.get(ConfigKey.SML_SETTINGS.value, "target_name_" + str(n + 1))
                 check_str("model_name", model_dict[n]["model_name"])
                 model_dict[n]["threshold"] = config.getfloat(ConfigKey.THRESHOLD_SETTINGS.value, "threshold_" + str(n + 1))
@@ -1047,9 +1051,7 @@ class TrainModelMixin(object):
                 model_dict[n]["minimum_bout_length"] = config.getfloat(ConfigKey.MIN_BOUT_LENGTH.value, "min_bout_" + str(n + 1)
                 )
                 check_int("minimum_bout_length", model_dict[n]["minimum_bout_length"])
-                if config.has_option(
-                        ConfigKey.SML_SETTINGS.value, f"classifier_map_{n + 1}"
-                ):
+                if config.has_option(ConfigKey.SML_SETTINGS.value, f"classifier_map_{n + 1}"):
                     model_dict[n]["classifier_map"] = config.get(
                         ConfigKey.SML_SETTINGS.value, f"classifier_map_{n + 1}"
                     )

@@ -15,8 +15,8 @@ from simba.utils.data import plug_holes_shortest_bout
 from simba.utils.enums import TagNames
 from simba.utils.errors import NoFilesFoundError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext, read_df, write_df)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, read_df, write_df)
+from simba.utils.warnings import NoFileFoundWarning
 
 
 class InferenceBatch(TrainModelMixin, ConfigReader):
@@ -63,6 +63,14 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
         print(f"Analyzing {len(self.feature_file_paths)} file(s) with {self.clf_cnt} classifier(s)")
         self.timer = SimbaTimer(start=True)
         self.model_dict = self.get_model_info(config=self.config, model_cnt=self.clf_cnt)
+        # clf_paths = [v["model_path"] for k, v in self.model_dict.items()]
+        # invalid_clf_paths = [k for k, v in self.model_dict.items() if not clf_paths]
+        # if len(invalid_clf_paths) == len(clf_paths):
+        #     raise NoFilesFoundError(msg=f"None of the classifier paths specified in the config file exists: {clf_paths}", source=self.__class__.__name__)
+        # if len(invalid_clf_paths) > 0:
+        #     for clf_name in invalid_clf_paths:
+        #         NoFileFoundWarning(msg=f'SKIPPING CLASSIFIER {self.model_dict["model_name"]}. The classifier model file {self.model_dict[clf_name]} could not be found.', source=self.__class__.__name__)
+        #         self.model_dict = {k: v for k, v in self.model_dict.items() if k != clf_name}
 
     def run(self):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.feature_file_paths)
@@ -79,7 +87,9 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
             for m, m_hyp in self.model_dict.items():
                 check_if_keys_exist_in_dict(data=m_hyp, key=['model_path', "model_name", "threshold", 'minimum_bout_length'], name=f'classifier {m}', raise_error=False)
                 if not os.path.isfile(m_hyp["model_path"]):
-                    raise NoFilesFoundError(msg=f"{m_hyp['model_path']} is not a VALID model file path", source=self.__class__.__name__)
+                    NoFileFoundWarning(msg=f'SKIPPING CLASSIFIER {m} for video {file_name}. The classifier model file {m_hyp["model_path"]} could not be found.', source=self.__class__.__name__)
+                    continue
+                    #raise NoFilesFoundError(msg=f"{m_hyp['model_path']} is not a VALID model file path", source=self.__class__.__name__)
                 probability_column = f"Probability_{m_hyp['model_name']}"
                 clf = self.read_pickle(file_path=m_hyp["model_path"])
                 out_df[probability_column] = self.clf_predict_proba(clf=clf, x_df=x_df, data_path=file_path, model_name=m_hyp["model_name"])

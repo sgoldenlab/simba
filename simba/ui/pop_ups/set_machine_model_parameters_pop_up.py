@@ -6,12 +6,12 @@ from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
-                                        FileSelect, SimbaButton)
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_int)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, FileSelect, SimbaButton)
+from simba.utils.checks import (check_file_exist_and_readable, check_float, check_int)
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.printing import stdout_success
+from simba.utils.warnings import NoFileFoundWarning
+from simba.utils.errors import InvalidInputError
 
 
 class SetMachineModelParameters(PopUpMixin, ConfigReader):
@@ -40,51 +40,37 @@ class SetMachineModelParameters(PopUpMixin, ConfigReader):
             self.clf_data[clf_name]["threshold"].grid(row=clf_cnt + 1, column=2, sticky=NW)
             self.clf_data[clf_name]["min_bout"].grid(row=clf_cnt + 1, column=3, sticky=NW)
 
-
         set_btn = SimbaButton(parent=self.main_frm, txt="SET MODEL(S)", img='tick', txt_clr='red', font=Formats.FONT_REGULAR.value, cmd=self.set)
         self.clf_table_frm.grid(row=0, sticky=W, pady=5, padx=5)
         set_btn.grid(row=1, pady=10)
         self.main_frm.mainloop()
 
     def set(self):
+        filtered_clf_data = {}
         for model_name, model_settings in self.clf_data.items():
-            check_file_exist_and_readable(model_settings["path"].file_path)
-            check_float(
-                name="Classifier {} threshhold".format(model_name),
-                value=model_settings["threshold"].entry_get,
-                max_value=1.0,
-                min_value=0.0,
-            )
-            check_int(
-                name="Classifier {} minimum bout".format(model_name),
-                value=model_settings["min_bout"].entry_get,
-                min_value=0.0,
-            )
+            valid_path = check_file_exist_and_readable(model_settings["path"].file_path, raise_error=False)
+            valid_threshold, _ = check_float(name=f"Classifier {model_name} threshold", value=model_settings["threshold"].entry_get, max_value=1.0, min_value=0.0, raise_error=False)
+            valid_min_bout, _ = check_int(name=f"Classifier {model_name} minimum bout", value=model_settings["min_bout"].entry_get, min_value=0, raise_error=False)
+            if not valid_path:
+                NoFileFoundWarning(msg=f'SKIPPING CLASSIFIER {model_name}: The path {model_settings["path"].file_path} is not a valid file path', source=self.__class__.__name__)
+            elif not valid_threshold:
+                NoFileFoundWarning(msg=f'SKIPPING CLASSIFIER {model_name}: Classifier {model_name} threshold {model_settings["threshold"].entry_get} is not a valid threshold between 0.0 - 1.0.', source=self.__class__.__name__)
+            elif not valid_min_bout:
+                NoFileFoundWarning(msg=f'SKIPPING CLASSIFIER {model_name}: Classifier {model_name} minimum bout length {model_settings["min_bout"].entry_get} is not a valid integer number', source=self.__class__.__name__)
+            else:
+                filtered_clf_data[model_name] = model_settings
+        if len(list(filtered_clf_data.keys())) == 0:
+            raise InvalidInputError(msg=f'None of the {len(self.clf_names)} classifier(s) have valid paths, minimum bout lengths, and/or thresholds', source=self.__class__.__name__)
 
-        for cnt, (model_name, model_settings) in enumerate(self.clf_data.items()):
-            self.config.set(
-                "SML settings",
-                "model_path_{}".format(str(cnt + 1)),
-                model_settings["path"].file_path,
-            )
-            self.config.set(
-                "threshold_settings",
-                "threshold_{}".format(str(cnt + 1)),
-                model_settings["threshold"].entry_get,
-            )
-            self.config.set(
-                "Minimum_bout_lengths",
-                "min_bout_{}".format(str(cnt + 1)),
-                model_settings["min_bout"].entry_get,
-            )
+        for cnt, (model_name, model_settings) in enumerate(filtered_clf_data.items()):
+            self.config.set("SML settings", "model_path_{}".format(str(cnt + 1)), model_settings["path"].file_path)
+            self.config.set("threshold_settings", f"threshold_{cnt + 1}", model_settings["threshold"].entry_get)
+            self.config.set("Minimum_bout_lengths", f"min_bout_{cnt + 1}", model_settings["min_bout"].entry_get)
 
         with open(self.config_path, "w") as f:
             self.config.write(f)
 
-        stdout_success(
-            msg="Model paths/settings saved in project_config.ini",
-            source=self.__class__.__name__,
-        )
+        stdout_success(msg="Model paths/settings saved in project_config.ini", source=self.__class__.__name__)
 
 
 #_ = SetMachineModelParameters(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

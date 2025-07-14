@@ -699,10 +699,18 @@ class FeatureExtractionMixin(object):
            :width: 400
            :align: center
 
+        .. video:: _static/img/ts_example.webm
+           :width: 800
+           :autoplay:
+           :loop:
+
         .. note::
            Input left ear, right ear, and nose coordinates of the observer is returned by :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.check_directionality_viable`
 
            If the target is moving, consider :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.jitted_line_crosses_to_nonstatic_targets`.
+
+        .. seealso::
+           For GPU accelerated methods, see :func:`simba.data_processors.cuda.geometry.directionality_to_static_targets`
 
         :param np.ndarray left_ear_array: 2D array of size len(frames) x 2 with the coordinates of the observer animals left ear
         :param np.ndarray right_ear_array: 2D array of size len(frames) x 2 with the coordinates of the observer animals right ear

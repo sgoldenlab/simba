@@ -94,6 +94,16 @@ ________________________________________________
 
    credits
    links
+
+.. toctree::
+   :maxdepth: 2
+   :caption: OTHER:
+
+   simba.related_software
+   simba.license
+
+
+
    
 
 
