@@ -21,7 +21,7 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists, check_int, check_str,
                                 check_valid_boolean, check_valid_device)
 from simba.utils.enums import Options
-from simba.utils.errors import SimBAGPUError
+from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
 from simba.utils.read_write import find_core_cnt
 
 
@@ -78,6 +78,8 @@ class FitYolo():
         os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
         if not _is_cuda_available()[0]:
             raise SimBAGPUError(msg='No GPU detected.', source=self.__class__.__name__)
+        if YOLO is None:
+            raise SimBAPAckageVersionError(msg='Ultralytics package not detected.', source=self.__class__.__name__)
         check_file_exist_and_readable(file_path=weights_path)
         check_file_exist_and_readable(file_path=model_yaml)
         check_valid_boolean(value=verbose, source=f'{__class__.__name__} verbose', raise_error=True)
@@ -156,16 +158,16 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 # fitter.run()
 
 
-fitter = FitYolo(weights_path=r"D:\yolo_weights\yolo11n.pt",
-                 model_yaml=r"D:\cvat_annotations\yolo_07032025\bbox_annot\map.yaml",
-                 save_path=r"D:\cvat_annotations\yolo_07032025\bbox_annot\mdl",
-                 epochs=32,
-                 batch=16,
-                 format=None,
-                 device=0,
-                 imgsz=640)
-fitter.run()
-
+# fitter = FitYolo(weights_path=r"D:\yolo_weights\yolo11m-pose.pt",
+#                  model_yaml=r"D:\platea\yolo_071525\map.yaml",
+#                  save_path=r"D:\platea\yolo_071525\mdl",
+#                  epochs=1000,
+#                  batch=16,
+#                  format=None,
+#                  device=0,
+#                  imgsz=640)
+# fitter.run()
+# #
 
 
 

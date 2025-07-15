@@ -239,13 +239,13 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     runner.run()
 
 #
-runner = COCOKeypoints2YoloBbox(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\merged\merged_07032025.json",
-                                img_dir=r"D:\cvat_annotations\frames",
-                                save_dir=r"D:\cvat_annotations\yolo_07032025\bbox_annot",
-                                clahe=False,
-                                bbox_pad=0.2,
-                                obb=False)
-runner.run()
+# runner = COCOKeypoints2YoloBbox(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\merged\merged_07032025.json",
+#                                 img_dir=r"D:\cvat_annotations\frames",
+#                                 save_dir=r"D:\cvat_annotations\yolo_07032025\bbox_annot",
+#                                 clahe=False,
+#                                 bbox_pad=0.2,
+#                                 obb=False)
+# runner.run()
 
 #
 # runner = COCOKeypoints2Yolo(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\s1\annotations\s1.json", img_dir=r"D:\cvat_annotations\frames\simon", save_dir=r"D:\cvat_annotations\frames\yolo_keypoints", clahe=True)

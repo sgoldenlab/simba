@@ -28,10 +28,12 @@ class LabelmeBoundingBoxes2YoloBoundingBoxes:
 
     .. note::
        For more information on the LabelMe annotation tool, see the `LabelMe GitHub repository <https://github.com/wkentaro/labelme>`_.
-       The LabemLe Json files **has too** contain a `imageData` key holding the image as a b64 string.
+       The Labelme Json files **has too** contain a `imageData` key holding the image as a b64 string.
+       For an expected Labelme json format, see `THIS FILE <https://github.com/sgoldenlab/simba/blob/master/misc/labelme_ex.json>`_.
 
     .. seealso::
        To split YOLO data into train, test, and validation sets (expected by e.g., UltraLytics), see :func:`simba.third_party_label_appenders.converters.split_yolo_train_test_val`.
+       To convert Labelme points annotations to YOLO keypoint training data, see :func:`simba.third_party_label_appenders.transform.labelme_to_yolo_keypoints.LabelmeKeypoints2YoloKeypoints`.
 
     .. important::
        For YOLO bounding boxes (not YOLO keypoint data!) from labelme keypoints.
