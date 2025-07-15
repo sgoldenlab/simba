@@ -4,8 +4,9 @@ import random
 import sys
 from copy import copy
 from typing import Optional, Tuple, Union
-from shapely.geometry import Polygon
+
 import yaml
+from shapely.geometry import Polygon
 
 try:
     from typing import Literal
@@ -16,6 +17,7 @@ import cv2
 import numpy as np
 
 from simba.mixins.geometry_mixin import GeometryMixin
+from simba.third_party_label_appenders.converters import create_yolo_yaml
 from simba.third_party_label_appenders.transform.utils import \
     create_yolo_keypoint_yaml
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
@@ -28,7 +30,6 @@ from simba.utils.errors import (FaultyTrainingSetError, InvalidInputError,
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (create_directory, get_fn_ext, read_img,
                                     read_json, recursive_file_search)
-from simba.third_party_label_appenders.converters import create_yolo_yaml
 
 
 class COCOKeypoints2YoloBbox:
