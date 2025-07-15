@@ -1049,7 +1049,7 @@ class GeometryMixin(object):
         stdout_success(msg=msg, elapsed_time=timer.elapsed_time_str, source=GeometryMixin.geometry_video.__name__)
 
     @staticmethod
-    def minimum_rotated_rectangle(shape: Polygon) -> Polygon:
+    def minimum_rotated_rectangle(shape: Polygon, buffer: Optional[int] = None) -> Polygon:
         """
         Calculate the minimum rotated rectangle that bounds a given polygon.
 
@@ -1063,6 +1063,7 @@ class GeometryMixin(object):
            For multicore call, use :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_minimum_rotated_rectangle`
 
         :param Polygon shape: The Polygon for which the minimum rotated rectangle is to be calculated.
+        :param Polygon shape: If not None, then a buffer in pixels to increate the polygon area with proior to vomputing the minimum rotating rectangle.
         :return: The minimum rotated rectangle geometry that bounds the input polygon.
         :rtype: Polygon
 
@@ -1071,11 +1072,10 @@ class GeometryMixin(object):
         >>> rectangle = GeometryMixin().minimum_rotated_rectangle(shape=polygon[0])
         """
 
-        check_instance(
-            source=GeometryMixin.minimum_rotated_rectangle.__name__,
-            instance=shape,
-            accepted_types=Polygon,
-        )
+        check_instance(source=GeometryMixin.minimum_rotated_rectangle.__name__, instance=shape, accepted_types=Polygon)
+        if buffer is not None:
+            check_int(name=f'{GeometryMixin.__name__} minimum_rotated_rectangle buffer', min_value=1, value=buffer)
+            shape = shape.buffer(distance=buffer)
         rotated_rectangle = shape.minimum_rotated_rectangle
         if isinstance(rotated_rectangle, Point):
             return Polygon([(0, 0), (0, 0), (0, 0)])

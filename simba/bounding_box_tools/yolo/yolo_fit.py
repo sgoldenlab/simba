@@ -72,7 +72,8 @@ class FitYolo():
                  format: Optional[str] = None,
                  device:  Union[Literal['cpu'], int] = 0,
                  verbose: bool = True,
-                 workers: int = 8):
+                 workers: int = 8,
+                 patience: int = 100):
 
         os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
         if not _is_cuda_available()[0]:
@@ -86,16 +87,29 @@ class FitYolo():
         check_int(name=f'{__class__.__name__} epochs', value=epochs, min_value=1)
         check_int(name=f'{__class__.__name__} imgsz', value=imgsz, min_value=1)
         check_int(name=f'{__class__.__name__} workers', value=workers, min_value=-1, unaccepted_vals=[0], max_value=find_core_cnt()[0])
+        check_int(name=f'{__class__.__name__} patience', value=patience, min_value=1)
         if workers == -1: workers = find_core_cnt()[0]
         check_valid_device(device=device)
         self.model_yaml, self.epochs, self.batch  = model_yaml, epochs, batch
         self.imgsz, self.device, self.workers, self.format = imgsz, device, workers, format
-        self.plots, self.save_path, self.verbose, self.weights_path = plots, save_path, verbose, weights_path
+        self.plots, self.save_path, self.verbose, self.weights_path, self.patience = plots, save_path, verbose, weights_path, patience
 
 
     def run(self):
-        model = load_yolo_model(weights_path=self.weights_path, verbose=self.verbose, format=self.format, device=self.device)
-        model.train(data=self.model_yaml, epochs=self.epochs, project=self.save_path, batch=self.batch, plots=self.plots, imgsz=self.imgsz, workers=self.workers, device=self.device)
+        model = load_yolo_model(weights_path=self.weights_path,
+                                verbose=self.verbose,
+                                format=self.format,
+                                device=self.device)
+
+        model.train(data=self.model_yaml,
+                    epochs=self.epochs,
+                    project=self.save_path,
+                    batch=self.batch,
+                    plots=self.plots,
+                    imgsz=self.imgsz,
+                    workers=self.workers,
+                    device=self.device,
+                    patience=self.patience)
 
 
 if __name__ == "__main__" and not hasattr(sys, 'ps1'):
@@ -111,6 +125,8 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     parser.add_argument('--device', type=str, default='0', help='Device to train on. Use "cpu" or GPU index (e.g., "0"). Default is "0"')
     parser.add_argument('--verbose', type=lambda x: str(x).lower() == 'true', default=True, help='Print verbose messages. Use "True" or "False". Default is True')
     parser.add_argument('--workers', type=int, default=8, help='Number of data loader workers. Default is 8. Use -1 for max cores')
+    parser.add_argument('--patience', type=int, default=100, help='Number of epochs to wait without improvement in validation metrics before early stopping the training. Default is 100')
+
 
     args = parser.parse_args()
 
@@ -129,15 +145,27 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 
 
 
-fitter = FitYolo(weights_path=r"D:\yolo_weights\yolo11m-pose.pt",
-                 model_yaml=r"D:\cvat_annotations\yolo_07032025\bbox_test\map.yaml",
-                 save_path=r"D:\cvat_annotations\yolo_07032025\bbox_test\mdl",
-                 epochs=1500,
-                 batch=32,
+# fitter = FitYolo(weights_path=r"D:\yolo_weights\yolo11n-seg.pt",
+#                  model_yaml=r"D:\cvat_annotations\yolo_07032025\bbox_test\map.yaml",
+#                  save_path=r"D:\cvat_annotations\yolo_07032025\bbox_test\mdl",
+#                  epochs=1500,
+#                  batch=32,
+#                  format=None,
+#                  device=0,
+#                  imgsz=640)
+# fitter.run()
+
+
+fitter = FitYolo(weights_path=r"D:\yolo_weights\yolo11n.pt",
+                 model_yaml=r"D:\cvat_annotations\yolo_07032025\bbox_annot\map.yaml",
+                 save_path=r"D:\cvat_annotations\yolo_07032025\bbox_annot\mdl",
+                 epochs=32,
+                 batch=16,
                  format=None,
                  device=0,
                  imgsz=640)
 fitter.run()
+
 
 
 

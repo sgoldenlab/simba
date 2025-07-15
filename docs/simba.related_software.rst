@@ -35,8 +35,6 @@ Related Software
      - Multi-animal pose
    * - `ezTrack <https://github.com/DeniseCaiLab/ezTrack>`__
      - Blob based tracking
-   * - `YAPiC <https://github.com/zhenglab/YAPiC>`__
-     - Image segmentation CNN
    * - `LiveMouseTracker <https://livemousetracker.org/>`__
      - Mouse tracking through rfid/deapth cameras
    * - `BehaviorDEPOT <https://github.com/HanLabBU/BehaviorDEPOT>`__

@@ -156,9 +156,9 @@ class YoloInference():
                 stdout_success(f'YOLO results saved in {self.save_dir} directory', elapsed_time=timer.elapsed_time_str)
 
 # video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
-# video_path = "/mnt/d/netholabs/yolo_videos/input/mp4_20250606083508/2025-05-28_19-50-23.mp4"
-# video_path = r"D:\cvat_annotations\videos\s24-eating.mp4"
-# weights_path = r"D:\cvat_annotations\yolo_07032025\mdl\train\weights\best.pt"
+# # video_path = "/mnt/d/netholabs/yolo_videos/input/mp4_20250606083508/2025-05-28_19-50-23.mp4"
+# # video_path = r"D:\cvat_annotations\videos\s24-eating.mp4"
+# weights_path = r"D:\cvat_annotations\yolo_07032025\bbox_annot\mdl\train10\weights\best.pt"
 # save_dir = r"D:\cvat_annotations\yolo_07032025\out_data"
 # i = YoloInference(weights_path=weights_path,
 #                   video_path=video_path,

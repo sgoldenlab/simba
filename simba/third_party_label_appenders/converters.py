@@ -243,9 +243,10 @@ def arr_to_b64(x: np.ndarray) -> str:
 def create_yolo_yaml(path: Union[str, os.PathLike],
                      train_path: Union[str, os.PathLike],
                      val_path: Union[str, os.PathLike],
-                     test_path: Union[str, os.PathLike],
                      names: Dict[str, int],
-                     save_path: Optional[Union[str, os.PathLike]] = None) -> Union[None, dict]:
+                     save_path: Optional[Union[str, os.PathLike]] = None,
+                     test_path: Optional[Union[str, os.PathLike]] = None,
+                     reverse_ids: Optional[bool] = True) -> Union[None, dict]:
     """
     Given a set of paths to directories, create a model.yaml file for model training though ultralytics wrappers.
 
@@ -257,13 +258,17 @@ def create_yolo_yaml(path: Union[str, os.PathLike],
     :param Union[str, os.PathLike] save_path: Optional location where to save the yolo model yaml file. If None, then the dict is returned.
     :return None:
     """
-    for p in [path, train_path, val_path, test_path]:
+
+    path_to_check = [path, train_path, val_path]
+    if test_path is not None: path_to_check.append(test_path)
+
+    for p in path_to_check:
         check_if_dir_exists(in_dir=p, source=create_yolo_yaml.__name__)
     check_valid_dict(x=names, valid_key_dtypes=(str,), valid_values_dtypes=(int,), min_len_keys=1)
     reversed_names = {v: k for k, v in names.items()}
 
-    unique_paths = list({path, train_path, val_path, test_path})
-    if len(unique_paths) < 4:
+    unique_paths = list(set(path_to_check))
+    if len(unique_paths) < len(path_to_check):
         raise InvalidInputError('The passed paths have to be unique.', source=create_yolo_yaml.__name__)
     if save_path is not None:
         check_if_dir_exists(in_dir=os.path.dirname(save_path), source=f'{create_yolo_yaml.__name__} save_path')
@@ -272,13 +277,15 @@ def create_yolo_yaml(path: Union[str, os.PathLike],
 
     train_path = os.path.relpath(train_path, path)
     val_path = os.path.relpath(val_path, path)
-    test_path = os.path.relpath(test_path, path)
 
     data = {'path': path,
             'train': train_path,  # train images (relative to 'path')
             'val': val_path,  # val images (relative to 'path')
-            'test': test_path,  # test images (relative to 'path')
             'names': reversed_names}
+
+    if test_path is not None:
+        test_path = os.path.relpath(test_path, path)
+        data['test'] = test_path
 
     if save_path is not None:
         with open(save_path, 'w') as file:

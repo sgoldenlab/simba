@@ -8,9 +8,7 @@ import numpy as np
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log, check_float,
-    check_if_dir_exists, check_if_keys_exist_in_dict)
+from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_float, check_if_dir_exists, check_if_keys_exist_in_dict)
 from simba.utils.data import plug_holes_shortest_bout
 from simba.utils.enums import TagNames
 from simba.utils.errors import NoFilesFoundError
@@ -102,6 +100,10 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
             print(f"Predictions created for {file_name} (elapsed time: {video_timer.elapsed_time_str}) ...")
         self.timer.stop_timer()
         stdout_success(msg=f"Machine predictions complete. Files saved in {self.save_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+
+# test = InferenceBatch(config_path=r"C:\troubleshooting\Top_down_old\project_folder\project_config.ini")
+# test.run()
+
 
 # test = InferenceBatch(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #                       features_dir=r'C:\troubleshooting\mitra\project_folder\videos\additional\bg_removed\rotated\tail_features_additional\APPENDED')

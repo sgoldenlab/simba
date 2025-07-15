@@ -157,7 +157,8 @@ def yolo_predict(model: YOLO,
                  device:  Union[Literal['cpu'], int] = 0,
                  threshold: float = 0.25,
                  max_detections: int = 300,
-                 verbose: bool = True):
+                 verbose: bool = True,
+                 retina_msk: Optional[bool] = False):
 
     """
     Produce YOLO predictions.
@@ -179,6 +180,7 @@ def yolo_predict(model: YOLO,
     check_valid_boolean(value=half, source=f'{yolo_predict.__name__} half', raise_error=True)
     check_valid_boolean(value=stream, source=f'{yolo_predict.__name__} stream', raise_error=True)
     check_valid_boolean(value=verbose, source=f'{yolo_predict.__name__} verbose', raise_error=True)
+    check_valid_boolean(value=retina_msk, source=f'{yolo_predict.__name__} retina_msk', raise_error=True)
     check_int(name=f'{yolo_predict.__name__} imgsz', value=imgsz, min_value=1, raise_error=False)
     check_int(name=f'{yolo_predict.__name__} max_detections', value=max_detections, min_value=1, raise_error=False)
     check_float(name=f'{yolo_predict.__name__} iou', value=iou, min_value=0.0, max_value=1.0, raise_error=True)
@@ -203,7 +205,8 @@ def yolo_predict(model: YOLO,
                          max_det=max_detections,
                          verbose=verbose,
                          imgsz=imgsz,
-                         iou=iou)
+                         iou=iou,
+                         retina_masks=retina_msk)
 
 
 def keypoint_array_to_yolo_annotation_str(x: np.ndarray,

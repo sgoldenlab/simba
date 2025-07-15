@@ -87,7 +87,6 @@ class LabelmeBoundingBoxes2YoloBoundingBoxes:
             check_if_keys_exist_in_dict(data=annot_data, key=['shapes', 'imageData', 'imagePath'], name=file_path)
             img_name = get_fn_ext(filepath=annot_data['imagePath'])[1]
             img = b64_to_arr(annot_data['imageData'])
-            cv2.imshow('asdasdas', img)
             if img.ndim == 3:
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             if self.greyscale:
@@ -114,7 +113,6 @@ class LabelmeBoundingBoxes2YoloBoundingBoxes:
                     x2, y2 = bp_data['points'][1]
                     x_min, x_max = sorted([x1, x2])
                     y_min, y_max = sorted([y1, y2])
-                    print(self.obb)
                     if not self.obb:
                         w = (x_max - x_min) / img_w
                         h = (y_max - y_min) / img_h
@@ -142,5 +140,5 @@ class LabelmeBoundingBoxes2YoloBoundingBoxes:
 # SAVE_DIR = r"D:\platea\yolo"
 # runner = LabelmeBoundingBoxes2YoloBoundingBoxes(labelme_dir=LABELME_DIR, save_dir=SAVE_DIR)
 # runner.run()
-
+#
 

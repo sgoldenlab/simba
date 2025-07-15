@@ -77,7 +77,8 @@ class YOLOPoseInference():
                  max_tracks: Optional[int] = None,
                  interpolate: bool = False,
                  imgsz: int = 640,
-                 iou: float = 0.5):
+                 iou: float = 0.5,
+                 retina_msk: Optional[bool] = False):
 
         if isinstance(video_path, list):
             check_valid_lst(data=video_path, source=f'{self.__class__.__name__} video_path', valid_dtypes=(str, np.str_,), min_len=1)
@@ -90,6 +91,7 @@ class YOLOPoseInference():
         check_file_exist_and_readable(file_path=weights_path)
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose')
         check_valid_boolean(value=interpolate, source=f'{self.__class__.__name__} interpolate')
+        check_valid_boolean(value=retina_msk, source=f'{self.__class__.__name__} retina_msk')
         check_int(name=f'{self.__class__.__name__} batch_size', value=batch_size, min_value=1)
         check_int(name=f'{self.__class__.__name__} imgsz', value=imgsz, min_value=1)
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=10e-6, max_value=1.0)
@@ -105,7 +107,7 @@ class YOLOPoseInference():
         COORD_COLS.extend(self.keypoint_cord_col_names)
         torch.set_num_threads(torch_threads)
         self.model = load_yolo_model(weights_path=weights_path, device=device, format=format)
-        self.half_precision, self.stream, self.video_path = half_precision, stream, video_path
+        self.half_precision, self.stream, self.video_path, self.retina_msk = half_precision, stream, video_path, retina_msk
         self.device, self.batch_size, self.threshold, self.max_tracks, self.iou = device, batch_size, threshold, max_tracks, iou
         self.verbose, self.save_dir, self.imgsz, self.interpolate = verbose, save_dir, imgsz, interpolate
         if self.model.model.task != 'pose':
@@ -121,7 +123,18 @@ class YOLOPoseInference():
             _, video_name, _ = get_fn_ext(filepath=path)
             _ = get_video_meta_data(video_path=path)
             video_out = []
-            video_predictions = yolo_predict(model=self.model, source=path, half=self.half_precision, batch_size=self.batch_size, stream=self.stream, imgsz=self.imgsz, device=self.device, threshold=self.threshold, max_detections=self.max_tracks, verbose=self.verbose, iou=self.iou)
+            video_predictions = yolo_predict(model=self.model,
+                                             source=path,
+                                             half=self.half_precision,
+                                             batch_size=self.batch_size,
+                                             stream=self.stream,
+                                             imgsz=self.imgsz,
+                                             device=self.device,
+                                             threshold=self.threshold,
+                                             max_detections=self.max_tracks,
+                                             verbose=self.verbose,
+                                             iou=self.iou,
+                                             retina_msk=self.retina_msk)
             for frm_cnt, video_prediction in enumerate(video_predictions):
                 boxes = video_prediction.obb.data if video_prediction.obb is not None else video_prediction.boxes.data
                 boxes = boxes.cpu().numpy().astype(np.float32)
@@ -132,31 +145,37 @@ class YOLOPoseInference():
                         video_out.append(_get_undetected_obs(frm_id=frm_cnt, class_id=class_id, class_name=class_name, value_cnt=(9 + (len(self.keypoint_col_names)))))
                         continue
                     cls_boxes, cls_keypoints = filter_yolo_keypoint_data(bbox_data=boxes, keypoint_data=keypoints, class_id=class_id, confidence=None, class_idx=-1, confidence_idx=None)
-                    for i in range(cls_boxes.shape[0]):
-                        box = np.array([cls_boxes[i][0], cls_boxes[i][1], cls_boxes[i][2], cls_boxes[i][1], cls_boxes[i][2], cls_boxes[i][3], cls_boxes[i][0], cls_boxes[i][3]]).astype(np.int32)
-                        bbox = np.array([frm_cnt, cls_boxes[i][-1], class_dict[cls_boxes[i][-1]], cls_boxes[i][-2]] + list(box))
-                        bbox = np.append(bbox, cls_keypoints[i].flatten())
-                        video_out.append(bbox)
+                    if self.retina_msk:
+                        print(video_prediction.keys())
 
-            results[video_name] = pd.DataFrame(video_out, columns=OUT_COLS)
-            if self.interpolate:
-                for cord_col in COORD_COLS:
-                    results[video_name][cord_col] = results[video_name][cord_col].astype(np.float32).astype(np.int32).replace(to_replace=-1, value=np.nan)
-                    results[video_name][cord_col] = results[video_name][cord_col].interpolate(method=NEAREST, axis=0).ffill().bfill()
-            if self.save_dir:
-                save_path = os.path.join(self.save_dir, f'{video_name}.csv')
-                results[video_name].to_csv(save_path)
-                del results[video_name]
-
-        timer.stop_timer()
-        if not self.save_dir:
-            if self.verbose:
-                print(f'YOLO results created', timer.elapsed_time_str)
-            return results
-        else:
-            if self.verbose:
-                print(f'YOLO results saved in {self.save_dir} directory', timer.elapsed_time_str)
-            return None
+                    break
+                break
+                    #
+                    # for i in range(cls_boxes.shape[0]):
+                    #     box = np.array([cls_boxes[i][0], cls_boxes[i][1], cls_boxes[i][2], cls_boxes[i][1], cls_boxes[i][2], cls_boxes[i][3], cls_boxes[i][0], cls_boxes[i][3]]).astype(np.int32)
+                    #     bbox = np.array([frm_cnt, cls_boxes[i][-1], class_dict[cls_boxes[i][-1]], cls_boxes[i][-2]] + list(box))
+                    #     bbox = np.append(bbox, cls_keypoints[i].flatten())
+                    #     video_out.append(bbox)
+        #
+        #     results[video_name] = pd.DataFrame(video_out, columns=OUT_COLS)
+        #     if self.interpolate:
+        #         for cord_col in COORD_COLS:
+        #             results[video_name][cord_col] = results[video_name][cord_col].astype(np.float32).astype(np.int32).replace(to_replace=-1, value=np.nan)
+        #             results[video_name][cord_col] = results[video_name][cord_col].interpolate(method=NEAREST, axis=0).ffill().bfill()
+        #     if self.save_dir:
+        #         save_path = os.path.join(self.save_dir, f'{video_name}.csv')
+        #         results[video_name].to_csv(save_path)
+        #         del results[video_name]
+        #
+        # timer.stop_timer()
+        # if not self.save_dir:
+        #     if self.verbose:
+        #         print(f'YOLO results created', timer.elapsed_time_str)
+        #     return results
+        # else:
+        #     if self.verbose:
+        #         print(f'YOLO results saved in {self.save_dir} directory', timer.elapsed_time_str)
+        #     return None
 
 
 if __name__ == "__main__" and not hasattr(sys, 'ps1'):
@@ -199,64 +218,65 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
                                   imgsz=args.imgsz)
     inference.run()
 
+# #
+# # video_paths = r"D:\cvat_annotations\videos\mp4_20250624155703"
+# # weights_path = r"D:\cvat_annotations\yolo_mdl_07122025\weights\best.pt"
+# # save_dir = r"D:\cvat_annotations\yolo_mdl_07122025\out_data"
+# #
+# # keypoint_names = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
+# # # # #
+# # # # #
+# # i = YOLOPoseInference(weights_path=weights_path,
+# #                         video_path=video_paths,
+# #                         save_dir=save_dir,
+# #                         verbose=True,
+# #                         device=0,
+# #                         format=None,
+# #                         stream=True,
+# #                         keypoint_names=keypoint_names,
+# #                         batch_size=100,
+# #                         imgsz=640,
+# #                         interpolate=False,
+# #                         threshold=0.5,
+# #                         max_tracks=4)
+# # i.run()
 #
-# video_paths = r"D:\cvat_annotations\videos\mp4_20250624155703"
-# weights_path = r"D:\cvat_annotations\yolo_mdl_07122025\weights\best.pt"
-# save_dir = r"D:\cvat_annotations\yolo_mdl_07122025\out_data"
 #
-# keypoint_names = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
-# # # #
-# # # #
+# # video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
+# # video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-46-56.mp4"
+# # video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-50-23.mp4"
+# #
+# #save_dir = r'/mnt/d/netholabs/yolo_videos_out'
+#
+#
+#
+# # video_path = "/mnt/d/platea/platea_videos/videos/2C_Mouse_5-choice_MustTouchTrainingNEWFINAL_a8.mp4"
+# # save_dir = r"/mnt/d/TS_DLC/yolo_kpt/results"
+# # weights_path = "/mnt/d/TS_DLC/yolo_kpt/mdl/train2/weights/best.pt"
+# #
+# # keypoint_names = ('right_ear', 'left_body', 'nose', 'center', 'tail', 'right_body', 'left_ear')
+#
+#
+#
+# weights_path = "C:/troubleshooting/mitra/yolo/mdl/train3/weights/best.pt"
+# video_path = "C:/troubleshooting/mitra/project_folder/videos/502_MA141_Gi_CNO_0514.mp4"
+# save_dir="C:/troubleshooting/mitra/yolo/results"
+# #
+# #
+# keypoint_names = ('Left_ear', 'Right_ear', 'Nose', 'Left_side', 'Right_side', 'Tail_base', 'Center', 'Tail_center', 'Tail_tip')
+# #
+# #
 # i = YOLOPoseInference(weights_path=weights_path,
-#                         video_path=video_paths,
+#                         video_path=video_path,
 #                         save_dir=save_dir,
 #                         verbose=True,
 #                         device=0,
 #                         format=None,
 #                         stream=True,
 #                         keypoint_names=keypoint_names,
-#                         batch_size=100,
-#                         imgsz=640,
-#                         interpolate=False,
-#                         threshold=0.5,
-#                         max_tracks=4)
-# i.run()
-
-
-# video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
-# video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-46-56.mp4"
-# video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-50-23.mp4"
-#
-#save_dir = r'/mnt/d/netholabs/yolo_videos_out'
-
-
-
-# video_path = "/mnt/d/platea/platea_videos/videos/2C_Mouse_5-choice_MustTouchTrainingNEWFINAL_a8.mp4"
-# save_dir = r"/mnt/d/TS_DLC/yolo_kpt/results"
-# weights_path = "/mnt/d/TS_DLC/yolo_kpt/mdl/train2/weights/best.pt"
-#
-# keypoint_names = ('right_ear', 'left_body', 'nose', 'center', 'tail', 'right_body', 'left_ear')
-
-
-
-# weights_path = "/mnt/c/troubleshooting/mitra/yolo/mdl/train3/weights/best.pt"
-# video_path = "/mnt/c/troubleshooting/mitra/project_folder/videos/502_MA141_Gi_CNO_0514.mp4"
-# save_dir="/mnt/c/troubleshooting/mitra/yolo/results"
-#
-#
-# keypoint_names = ('Left_ear', 'Right_ear', 'Nose', 'Left_side', 'Right_side', 'Tail_base', 'Center', 'Tail_center', 'Tail_tip')
-#
-#
-# i = YOLOPoseInference(weights_path=weights_path,
-#                         video_path=video_path,
-#                         save_dir=save_dir,
-#                         verbose=True,
-#                         device=0,
-#                         format='onnx',
-#                         stream=True,
-#                         keypoint_names=keypoint_names,
 #                         batch_size=32,
 #                         imgsz=320,
 #                         interpolate=True,
-#                         threshold=0.8)
+#                         threshold=0.8,
+#                         retina_msk=True)
 # i.run()
