@@ -90,6 +90,11 @@ class YOLOPoseVisualizer():
     .. seealso::
        To create YOLO pose data, see `:func:~simba.bounding_box_tools.yolo.yolo_pose_inference.YOLOPoseInference`
 
+    .. video:: _static/img/YOLOPoseVisualizer.webm
+       :width: 900
+       :loop:
+       :autoplay:
+
     :param Union[str, os.PathLike] data_path: Path to the CSV file containing keypoint data (output from YOLO pose inference).
     :param Union[str, os.PathLike] video_path: Path to the original input video to overlay keypoints on.
     :param Union[str, os.PathLike] save_dir: Directory to save the resulting annotated video.
@@ -124,6 +129,7 @@ class YOLOPoseVisualizer():
                  circle_size: Optional[int] = None,
                  verbose: Optional[bool] = False,
                  bbox: Optional[bool] = True,
+                 bbox_thickness: Optional[int] = None,
                  skeleton: List[Tuple[str, str]] = None):
 
         check_file_exist_and_readable(file_path=data_path)
@@ -178,7 +184,7 @@ class YOLOPoseVisualizer():
     def run(self):
         video_timer = SimbaTimer(start=True)
         if self.video_meta_data['frame_count'] != self.df_frm_cnt:
-            raise FrameRangeError(msg=f'The bounding boxes contain data for {self.df_frm_cnt} frames, while the video is {self.video_meta_data["frame_count"]} frames', source=self.__class__.__name__)
+            raise FrameRangeError(msg=f'The bounding boxes contain data for {self.df_frm_cnt} frames, while the video is {self.video_meta_data["frame_count"]} frames ({self.video_meta_data["video_name"]})', source=self.__class__.__name__)
         frm_batches = np.array_split(np.array(list(range(0, self.df_frm_cnt))), self.core_cnt)
         frm_batches = [(i, j) for i, j in enumerate(frm_batches)]
         if self.verbose: print(f'Visualizing video {self.video_meta_data["video_name"]} (frame count: {self.video_meta_data["frame_count"]})...')
@@ -209,10 +215,14 @@ if __name__ == "__main__":
     #save_dir = r"D:\cvat_annotations\yolo_07032025\out_video"
 
     video_path = r"D:\cvat_annotations\videos\mp4_20250624155703\s34-drinking.mp4"
+
     data_path = r"D:\cvat_annotations\yolo_mdl_07122025\out_data\s34-drinking.csv"
     save_dir = r'D:\cvat_annotations\yolo_mdl_07122025\out_video'
     video_dir = r"D:\cvat_annotations\videos\mp4_20250624155703"
     data_dir = r"D:\cvat_annotations\yolo_mdl_07122025\out_data"
+    data_dir = r"D:\platea\platea_videos\videos\yolo_results"
+    video_dir = r"D:\platea\platea_videos\videos\videos"
+    save_dir = r'D:\platea\platea_videos\videos\yolo_kp_video_out'
 
     video_paths = find_files_of_filetypes_in_directory(directory=video_dir, extensions=['.mp4'], as_dict=True)
     data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=['.csv'], as_dict=True)
@@ -233,6 +243,19 @@ if __name__ == "__main__":
                 ('TAIL_BASE', 'TAIL_CENTER'),
                 ('TAIL_CENTER', 'TAIL_TIP')]
 
+    skeleton = [('NOSE', 'LEFT_EAR'),
+                ('NOSE', 'RIGHT_EAR'),
+                ('RIGHT_EAR', 'LEFT_EAR'),
+                ('LEFT_EAR', 'LEFT_SIDE'),
+                ('RIGHT_EAR', 'RIGHT_SIDE'),
+                ('LEFT_SIDE', 'CENTER'),
+                ('LEFT_EAR', 'CENTER'),
+                ('RIGHT_EAR', 'CENTER'),
+                ('CENTER', 'RIGHT_SIDE'),
+                ('CENTER', 'TAIL_BASE'),
+                ('LEFT_SIDE', 'TAIL_BASE'),
+                ('RIGHT_SIDE', 'TAIL_BASE')]
+
     for video_name, video_path in video_paths.items():
         data_path = data_paths[video_name]
         #kp_vis = YOLOPoseVisualizer(data_path=data_path, video_path=video_path)
@@ -240,11 +263,13 @@ if __name__ == "__main__":
         kp_vis = YOLOPoseVisualizer(data_path= data_path,
                                     video_path=video_path,
                                     save_dir=save_dir,
-                                    core_cnt=28,
+                                    core_cnt=31,
                                     bbox=True,
                                     verbose=True,
                                     skeleton=skeleton,
-                                    threshold=0.5)
+                                    threshold=0.5,
+                                    thickness=3,
+                                    circle_size=10)
 
         kp_vis.run()
 

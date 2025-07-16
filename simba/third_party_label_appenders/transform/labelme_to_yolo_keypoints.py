@@ -39,6 +39,8 @@ class LabelmeKeypoints2YoloKeypoints:
            The Labelme Json files **has too** contain a `imageData` key holding the image as a b64 string.
            For an expected Labelme json format, see `THIS FILE <https://github.com/sgoldenlab/simba/blob/master/misc/labelme_ex.json>`_.
 
+           Only works with one animal (as of 07/25).
+
         :param Union[str, os.PathLike] dlc_dir: Directory path containing labelme JSON files with keypoint annotations.
         :param Union[str, os.PathLike] save_dir: Output directory where YOLO-formatted images, labels, and map YAML file will be saved. Subdirectories `images/train`, `images/val`, `labels/train`, `labels/val` will be created.
         :param float train_size: Proportion of frames randomly assigned to the training dataset. Value must be between 0.1 and 0.99. Default: 0.7.

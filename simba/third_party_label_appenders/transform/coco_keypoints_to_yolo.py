@@ -159,7 +159,6 @@ class COCOKeypoints2Yolo:
                     f.write(roi_str)
                 cv2.imwrite(img_save_path, img)
 
-
         if len(list(set(shapes))) > 1:
             raise InvalidInputError(
                 msg=f'The annotation data {self.coco_path} contains more than one keypoint shapes: {set(shapes)}', source=self.__class__.__name__)

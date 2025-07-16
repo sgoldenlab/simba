@@ -145,37 +145,32 @@ class YOLOPoseInference():
                         video_out.append(_get_undetected_obs(frm_id=frm_cnt, class_id=class_id, class_name=class_name, value_cnt=(9 + (len(self.keypoint_col_names)))))
                         continue
                     cls_boxes, cls_keypoints = filter_yolo_keypoint_data(bbox_data=boxes, keypoint_data=keypoints, class_id=class_id, confidence=None, class_idx=-1, confidence_idx=None)
-                    if self.retina_msk:
-                        print(video_prediction.keys())
 
-                    break
-                break
-                    #
-                    # for i in range(cls_boxes.shape[0]):
-                    #     box = np.array([cls_boxes[i][0], cls_boxes[i][1], cls_boxes[i][2], cls_boxes[i][1], cls_boxes[i][2], cls_boxes[i][3], cls_boxes[i][0], cls_boxes[i][3]]).astype(np.int32)
-                    #     bbox = np.array([frm_cnt, cls_boxes[i][-1], class_dict[cls_boxes[i][-1]], cls_boxes[i][-2]] + list(box))
-                    #     bbox = np.append(bbox, cls_keypoints[i].flatten())
-                    #     video_out.append(bbox)
-        #
-        #     results[video_name] = pd.DataFrame(video_out, columns=OUT_COLS)
-        #     if self.interpolate:
-        #         for cord_col in COORD_COLS:
-        #             results[video_name][cord_col] = results[video_name][cord_col].astype(np.float32).astype(np.int32).replace(to_replace=-1, value=np.nan)
-        #             results[video_name][cord_col] = results[video_name][cord_col].interpolate(method=NEAREST, axis=0).ffill().bfill()
-        #     if self.save_dir:
-        #         save_path = os.path.join(self.save_dir, f'{video_name}.csv')
-        #         results[video_name].to_csv(save_path)
-        #         del results[video_name]
-        #
-        # timer.stop_timer()
-        # if not self.save_dir:
-        #     if self.verbose:
-        #         print(f'YOLO results created', timer.elapsed_time_str)
-        #     return results
-        # else:
-        #     if self.verbose:
-        #         print(f'YOLO results saved in {self.save_dir} directory', timer.elapsed_time_str)
-        #     return None
+                    for i in range(cls_boxes.shape[0]):
+                        box = np.array([cls_boxes[i][0], cls_boxes[i][1], cls_boxes[i][2], cls_boxes[i][1], cls_boxes[i][2], cls_boxes[i][3], cls_boxes[i][0], cls_boxes[i][3]]).astype(np.int32)
+                        bbox = np.array([frm_cnt, cls_boxes[i][-1], class_dict[cls_boxes[i][-1]], cls_boxes[i][-2]] + list(box))
+                        bbox = np.append(bbox, cls_keypoints[i].flatten())
+                        video_out.append(bbox)
+
+            results[video_name] = pd.DataFrame(video_out, columns=OUT_COLS)
+            if self.interpolate:
+                for cord_col in COORD_COLS:
+                    results[video_name][cord_col] = results[video_name][cord_col].astype(np.float32).astype(np.int32).replace(to_replace=-1, value=np.nan)
+                    results[video_name][cord_col] = results[video_name][cord_col].interpolate(method=NEAREST, axis=0).ffill().bfill()
+            if self.save_dir:
+                save_path = os.path.join(self.save_dir, f'{video_name}.csv')
+                results[video_name].to_csv(save_path)
+                del results[video_name]
+
+        timer.stop_timer()
+        if not self.save_dir:
+            if self.verbose:
+                print(f'YOLO results created', timer.elapsed_time_str)
+            return results
+        else:
+            if self.verbose:
+                print(f'YOLO results saved in {self.save_dir} directory', timer.elapsed_time_str)
+            return None
 
 
 if __name__ == "__main__" and not hasattr(sys, 'ps1'):
@@ -258,12 +253,13 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 #
 #
 #
-# weights_path = "C:/troubleshooting/mitra/yolo/mdl/train3/weights/best.pt"
-# video_path = "C:/troubleshooting/mitra/project_folder/videos/502_MA141_Gi_CNO_0514.mp4"
-# save_dir="C:/troubleshooting/mitra/yolo/results"
+# weights_path = r"D:\platea\yolo_071525\mdl\train4\weights\best.pt"
+# video_path = r"D:\platea\platea_videos\videos\clipped\10B_Mouse_5-choice_MustTouchTrainingNEWFINAL_a7.mp4"
+# save_dir=r"D:\platea\platea_videos\videos\yolo_results"
 # #
 # #
-# keypoint_names = ('Left_ear', 'Right_ear', 'Nose', 'Left_side', 'Right_side', 'Tail_base', 'Center', 'Tail_center', 'Tail_tip')
+# #keypoint_names = ('Left_ear', 'Right_ear', 'Nose', 'Left_side', 'Right_side', 'Tail_base', 'Center', 'Tail_center', 'Tail_tip')
+# keypoint_names = ('Left_ear', 'Right_ear', 'Nose', 'Left_side', 'Right_side', 'Center', 'Tail_base')
 # #
 # #
 # i = YOLOPoseInference(weights_path=weights_path,
@@ -274,7 +270,7 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 #                         format=None,
 #                         stream=True,
 #                         keypoint_names=keypoint_names,
-#                         batch_size=32,
+#                         batch_size=500,
 #                         imgsz=320,
 #                         interpolate=True,
 #                         threshold=0.8,
