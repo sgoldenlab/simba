@@ -33,3 +33,7 @@ _build/html/
 docs/_build
 /docs/_build/
 /simba/sandbox/
+
+
+# ignore recent projects file anywhere
+**/.recent_projects.txt
