@@ -264,3 +264,15 @@ See tutorial: `Cue-light tutorial <https://github.com/sgoldenlab/simba/blob/mast
    :maxdepth: 2
 
    simba.cue_light_tools
+
+👁️ **YOLO Methods**
+-----------------------
+
+Methods for training YOLO models, creating training and validation datasets, and converting behavioral neuroscience-specific datasets to YOLO datasets.
+
+Uses the `Ultralytics <https://github.com/ultralytics/ultralytics>`_ package.
+
+.. toctree::
+   :maxdepth: 2
+
+   simba.yolo
