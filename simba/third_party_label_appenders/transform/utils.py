@@ -7,10 +7,11 @@ except:
 
 import base64
 import io
+import math
 import os
 from collections import Counter
 from copy import deepcopy
-import math
+
 import cv2
 import numpy as np
 import yaml
