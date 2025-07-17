@@ -118,8 +118,8 @@ class COCOKeypoints2YoloBbox:
 
     def run(self):
         shapes, timer = [], SimbaTimer(start=True)
-        #for cnt in range(len(self.coco_data['images'])):
-        for cnt in range(200):
+        for cnt in range(len(self.coco_data['images'])):
+        #for cnt in range(200):
             img_data = self.coco_data['images'][cnt]
             check_if_keys_exist_in_dict(data=img_data, key=['width', 'height', 'file_name', 'id'], name=self.coco_path)
             _, img_name, ext = get_fn_ext(filepath=img_data['file_name'])
@@ -129,7 +129,7 @@ class COCOKeypoints2YoloBbox:
                 raise NoFilesFoundError(msg=f'The file {img_name} could not be found in the {self.img_dir} directory', source=self.__class__.__name__)
             img = read_img(img_path=self.img_file_paths[img_name], greyscale=self.greyscale, clahe=self.clahe)
             if (img.shape[0] != img_data['height']) or (img.shape[1] != img_data['width']):
-                raise FaultyTrainingSetError(msg=f'Image {img_name} is of shape {img.shape[0]}x{img.shape[1]}, but the coco data has been annotated on an image of {img_data["height"]}x{img_data["width"]}.')
+                raise FaultyTrainingSetError(msg=f'Image {img_name} is of shape {img.shape[0]}x{img.shape[1]}, but the COCO data has been annotated on an image of {img_data["height"]}x{img_data["width"]}.')
             img_annotations = [x for x in self.coco_data['annotations'] if x['image_id'] == img_data['id']]
             roi_str = ''
             if cnt in self.train_idx:

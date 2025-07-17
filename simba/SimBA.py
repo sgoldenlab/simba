@@ -5,7 +5,6 @@ from simba.utils.printing import SimbaTimer, stdout_success, stdout_warning
 load_timer = SimbaTimer(start=True)
 import os.path
 import warnings
-
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 import atexit
@@ -44,6 +43,7 @@ from simba.outlier_tools.skip_outlier_correction import \
     OutlierCorrectionSkipper
 from simba.plotting.interactive_probability_grapher import \
     InteractiveProbabilityGrapher
+
 from simba.third_party_label_appenders.BENTO_appender import BentoAppender
 from simba.third_party_label_appenders.BORIS_appender import BorisAppender
 from simba.third_party_label_appenders.deepethogram_importer import \
@@ -52,6 +52,8 @@ from simba.third_party_label_appenders.ethovision_import import \
     ImportEthovision
 from simba.third_party_label_appenders.observer_importer import \
     NoldusObserverImporter
+
+
 from simba.third_party_label_appenders.solomon_importer import SolomonImporter
 from simba.ui.create_project_ui import ProjectCreatorPopUp
 from simba.ui.import_pose_frame import ImportPoseFrame
@@ -101,6 +103,8 @@ from simba.ui.pop_ups.direction_animal_to_bodypart_settings_pop_up import \
 from simba.ui.pop_ups.distance_plot_pop_up import DistancePlotterPopUp
 from simba.ui.pop_ups.dlc_annotations_to_labelme_popup import \
     DLCAnnotations2LabelMePopUp
+
+
 from simba.ui.pop_ups.dlc_h5_inference_to_yolo_popup import \
     DLCH5Inference2YoloPopUp
 from simba.ui.pop_ups.dlc_to_labelme_popup import DLC2LabelmePopUp

@@ -89,6 +89,7 @@ class YOLOPoseVisualizer():
 
     .. seealso::
        To create YOLO pose data, see `:func:~simba.bounding_box_tools.yolo.yolo_pose_inference.YOLOPoseInference`
+       To fit YOLO model, see `:func:~simba.bounding_box_tools.yolo.yolo_fit.FitYolo`
 
     .. video:: _static/img/YOLOPoseVisualizer.webm
        :width: 900
@@ -129,7 +130,6 @@ class YOLOPoseVisualizer():
                  circle_size: Optional[int] = None,
                  verbose: Optional[bool] = False,
                  bbox: Optional[bool] = True,
-                 bbox_thickness: Optional[int] = None,
                  skeleton: List[Tuple[str, str]] = None):
 
         check_file_exist_and_readable(file_path=data_path)

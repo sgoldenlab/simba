@@ -145,13 +145,13 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
                           workers=args.workers)
     yolo_fitter.run()
 
-
-
-# fitter = FitYolo(weights_path=r"D:\yolo_weights\yolo11n-seg.pt",
-#                  model_yaml=r"D:\cvat_annotations\yolo_07032025\bbox_test\map.yaml",
-#                  save_path=r"D:\cvat_annotations\yolo_07032025\bbox_test\mdl",
+#
+#
+# fitter = FitYolo(weights_path=r"D:\yolo_weights\yolo11m-seg.pt",
+#                  model_yaml=r"D:\platea\yolo_071525\map.yaml",
+#                  save_path=r"D:\platea\yolo_071525\mdl",
 #                  epochs=1500,
-#                  batch=32,
+#                  batch=8,
 #                  format=None,
 #                  device=0,
 #                  imgsz=640)

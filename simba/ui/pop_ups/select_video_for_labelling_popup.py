@@ -50,4 +50,4 @@ class SelectLabellingVideoPupUp():
 
 
 
-# SelectLabellingVideoPupUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", continuing=False)
+#SelectLabellingVideoPupUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", continuing=False)

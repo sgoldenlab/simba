@@ -72,6 +72,14 @@ COCO key-points -> YOLO bounding box conversion
    :show-inheritance:
 
 
+COCO key-points -> YOLO segmentation conversion
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.coco_keypoints_to_yolo_seg.COCOKeypoints2YoloSeg
+   :members:
+   :show-inheritance:
+
+
 Multi-animal DeepLabCut predictions -> YOLO pose-estimation annotations format conversion
 ---------------------------------------
 
@@ -124,6 +132,14 @@ Labelme points -> YOLO keypoints annotations
 ---------------------------------------
 
 .. autoclass:: simba.third_party_label_appenders.transform.labelme_to_yolo_keypoints.LabelmeKeypoints2YoloKeypoints
+   :members:
+   :show-inheritance:
+
+
+Labelme points -> YOLO segmentation annotations
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.labelme_to_yolo_seg.LabelmeKeypoints2YoloSeg
    :members:
    :show-inheritance:
 

@@ -21,7 +21,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int,
                                 check_valid_boolean, check_valid_lst,
                                 check_valid_tuple, get_fn_ext)
-from simba.utils.enums import Formats, Options
+from simba.utils.enums import Options
 from simba.utils.errors import CountError, InvalidFileTypeError
 from simba.utils.printing import SimbaTimer
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
@@ -43,6 +43,7 @@ class YOLOPoseInference():
 
     .. seealso::
        For bounding box inference only (no pose), see :func:`~simba.bounding_box_tools.yolo.yolo_inference.YoloInference`.
+       For segmentation inference, see :func:`~simba.bounding_box_tools.yolo.yolo_seg_inference.YOLOSegmentationInference`.
 
     :param Union[str, os.PathLike] weights_path: Path to the trained YOLO model weights (e.g., 'best.pt').
     :param Union[str, os.PathLike] or List[Union[str, os.PathLike]] video_path: Path to a single video, list of videos, or directory containing video files.
@@ -77,8 +78,7 @@ class YOLOPoseInference():
                  max_tracks: Optional[int] = None,
                  interpolate: bool = False,
                  imgsz: int = 640,
-                 iou: float = 0.5,
-                 retina_msk: Optional[bool] = False):
+                 iou: float = 0.5):
 
         if isinstance(video_path, list):
             check_valid_lst(data=video_path, source=f'{self.__class__.__name__} video_path', valid_dtypes=(str, np.str_,), min_len=1)
@@ -91,7 +91,6 @@ class YOLOPoseInference():
         check_file_exist_and_readable(file_path=weights_path)
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose')
         check_valid_boolean(value=interpolate, source=f'{self.__class__.__name__} interpolate')
-        check_valid_boolean(value=retina_msk, source=f'{self.__class__.__name__} retina_msk')
         check_int(name=f'{self.__class__.__name__} batch_size', value=batch_size, min_value=1)
         check_int(name=f'{self.__class__.__name__} imgsz', value=imgsz, min_value=1)
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=10e-6, max_value=1.0)
@@ -107,7 +106,7 @@ class YOLOPoseInference():
         COORD_COLS.extend(self.keypoint_cord_col_names)
         torch.set_num_threads(torch_threads)
         self.model = load_yolo_model(weights_path=weights_path, device=device, format=format)
-        self.half_precision, self.stream, self.video_path, self.retina_msk = half_precision, stream, video_path, retina_msk
+        self.half_precision, self.stream, self.video_path = half_precision, stream, video_path
         self.device, self.batch_size, self.threshold, self.max_tracks, self.iou = device, batch_size, threshold, max_tracks, iou
         self.verbose, self.save_dir, self.imgsz, self.interpolate = verbose, save_dir, imgsz, interpolate
         if self.model.model.task != 'pose':
@@ -133,8 +132,7 @@ class YOLOPoseInference():
                                              threshold=self.threshold,
                                              max_detections=self.max_tracks,
                                              verbose=self.verbose,
-                                             iou=self.iou,
-                                             retina_msk=self.retina_msk)
+                                             iou=self.iou)
             for frm_cnt, video_prediction in enumerate(video_predictions):
                 boxes = video_prediction.obb.data if video_prediction.obb is not None else video_prediction.boxes.data
                 boxes = boxes.cpu().numpy().astype(np.float32)

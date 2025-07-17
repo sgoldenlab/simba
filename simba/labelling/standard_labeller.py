@@ -206,7 +206,7 @@ class LabellingInterface(ConfigReader):
         self.update_img_from_video.grid(row=0, column=1, sticky=NSEW,  padx=3, pady=3)
 
 
-        self.main_window.mainloop()
+        #self.main_window.mainloop()
 
     def get_keyboard_shortcuts_lbl(self,
                                    type: str):
