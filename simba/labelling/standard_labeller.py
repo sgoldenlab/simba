@@ -115,6 +115,15 @@ class LabellingInterface(ConfigReader):
                 if not check_that_column_exist(df=self.data_df, column_name=clf, file_name=self.targets_inserted_file_path, raise_error=False):
                     DataHeaderWarning(msg=f'No column named {clf} in file {self.targets_inserted_file_path} - setting all annotations to absent for behavior {clf}.', source=self.__class__.__name__)
                     self.data_df[clf] = 0
+            if os.path.isfile(self.features_extracted_file_path):
+                features_df = read_df(self.features_extracted_file_path, self.file_type)
+                new_x = [x for x in features_df.columns if x not in self.data_df.columns and x not in self.bp_col_names]
+                if len(new_x) > 0:
+                    if len(features_df) == len(self.data_df):
+                        x_df = self.data_df.drop(self.clf_names, axis=1)
+                        self.data_df = pd.concat([x_df, features_df[new_x], self.data_df[self.clf_names]], axis=1).reset_index(drop=True).sort_index()
+                    else:
+                        DataHeaderWarning(msg=f'Cannot append {len(new_x)} additional feature(s) to your annotated data set. The CSV file at {self.features_extracted_file_path} and {self.targets_inserted_file_path} contain different numbers of rows.')
             self.main_window.title(f"SIMBA ANNOTATION INTERFACE (CONTINUING ANNOTATIONS) - {self.video_name}")
             self.img_idx = read_config_entry(self.config, "Last saved frames", self.video_name, data_type="int", default_value=0)
         else:

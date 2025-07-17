@@ -824,7 +824,7 @@ class App(object):
         recent_projects_menu = Menu(menu)
 
         for recent_project_path in recent_project_paths:
-            recent_projects_menu.add_command(label=recent_project_path, command= lambda: SimbaProjectPopUp(config_path=recent_project_path), font=Formats.FONT_REGULAR.value)
+            recent_projects_menu.add_command(label=recent_project_path,command=lambda p=recent_project_path: SimbaProjectPopUp(config_path=p), font=Formats.FONT_REGULAR.value)
         recent_project_state = DISABLED if len(recent_project_paths) == 0 else NORMAL
         file_menu.add_cascade(label="Open recent project...", compound="left", image=self.menu_icons["recent_files"]["img"], menu=recent_projects_menu, font=Formats.FONT_REGULAR.value, state=recent_project_state)
 

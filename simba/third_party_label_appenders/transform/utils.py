@@ -10,7 +10,7 @@ import io
 import os
 from collections import Counter
 from copy import deepcopy
-
+import math
 import cv2
 import numpy as np
 import yaml
@@ -299,7 +299,9 @@ def get_yolo_keypoint_bp_id_idx(animal_bp_dict: Dict[str, Dict[str, List[str]]])
 
 
 def merge_coco_keypoints_files(data_dir: Union[str, os.PathLike],
-                               save_path: Union[str, os.PathLike]):
+                               save_path: Union[str, os.PathLike],
+                               max_width: Optional[int] = None,
+                               max_height: Optional[int] = None):
     """
     Merges multiple annotation COCO-format keypoint JSON files into a single file.
 
@@ -313,13 +315,14 @@ def merge_coco_keypoints_files(data_dir: Union[str, os.PathLike],
 
     :param Union[str, os.PathLike] data_dir: Directory containing multiple COCO keypoints `.json` files to merge.
     :param Union[str, os.PathLike] save_path: File path to save the merged COCO keypoints JSON.
+    :param int max_width: Optional max width keypoint coordinate annotation. If above max, the annotation will be set to "not visible"
+    :param int max_height: Optional max height keypoint coordinate annotation. If above max, the annotation will be set to "not visible"
     :return: None. Results are saved in ``save_path``.
 
     :example:
     >>> DATA_DIR = r'D:\cvat_annotations\frames\coco_keypoints_1\TEST'
     >>> SAVE_PATH = r"D:\cvat_annotations\frames\coco_keypoints_1\TEST\merged.json"
     >>> merge_coco_keypoints_files(data_dir=DATA_DIR, save_path=SAVE_PATH)
-
     """
 
     timer = SimbaTimer(start=True)
@@ -327,6 +330,14 @@ def merge_coco_keypoints_files(data_dir: Union[str, os.PathLike],
     if os.path.isdir(save_path):
         raise InvalidInputError(msg=f'save_path has to be a filepath, not a directory.', source=f'{merge_coco_keypoints_files.__name__} save_path')
     check_if_dir_exists(in_dir=os.path.dirname(save_path))
+    if max_width is not None:
+        check_int(name=f'{merge_coco_keypoints_files.__name__} max_width', value=max_width, min_value=1, raise_error=True)
+    else:
+        max_width = math.inf
+    if max_height is not None:
+        check_int(name=f'{merge_coco_keypoints_files.__name__} max_height', value=max_height, min_value=1, raise_error=True)
+    else:
+        max_height = math.inf
     results, max_image_id, max_annotation_id = None, 0, 0
     data_file_cnt, img_names = len(data_files), []
     if data_file_cnt == 1:
@@ -368,6 +379,12 @@ def merge_coco_keypoints_files(data_dir: Union[str, os.PathLike],
                 ann['image_id'] = id_mapping.get(ann['image_id'], ann['image_id'])
                 new_annotations.append(ann)
             results['annotations'].extend(new_annotations)
+            for annotation_cnt, annotation in enumerate(results['annotations']):
+                x_kp, y_kp, p_kp = annotation['keypoints'][::3], annotation['keypoints'][1::3], annotation['keypoints'][2::3]
+                x_kp = [min(max(x, 0), max_width) for x in x_kp]
+                y_kp = [min(max(x, 0), max_height) for x in y_kp]
+                new_keypoints = [int(item) for trio in zip(x_kp, y_kp, p_kp) for item in trio]
+                results['annotations'][annotation_cnt]['keypoints'] = new_keypoints
             max_image_id = max((img['id'] for img in results['images']), default=max_image_id)
             max_annotation_id = max((ann['id'] for ann in results['annotations']), default=max_annotation_id)
 

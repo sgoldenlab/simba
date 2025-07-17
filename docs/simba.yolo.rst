@@ -24,6 +24,21 @@ Pose-estimation inference
    :show-inheritance:
 
 
+YOLO pose-estimation segmentation visualizer
+-----------------------------------------------------------------------
+
+.. autoclass:: simba.bounding_box_tools.yolo.yolo_seg_visualizer.YOLOSegmentationVisualizer
+   :members:
+   :show-inheritance:
+
+YOLO pose-estimation segmentation inference
+-----------------------------------------------------------------------
+
+.. autoclass:: simba.bounding_box_tools.yolo.yolo_seg_visualizer.YOLOSegmentationVisualizer
+   :members:
+   :show-inheritance:
+
+
 Pose-estimation track inference
 -----------------------------------------------------------------------
 
