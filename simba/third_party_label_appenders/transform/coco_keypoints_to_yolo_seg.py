@@ -1,20 +1,23 @@
 import os
 import random
-from typing import Optional, Union
-import numpy as np
-import cv2
 from copy import copy
+from typing import Optional, Union
+
+import cv2
+import numpy as np
+
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.third_party_label_appenders.converters import create_yolo_yaml
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
-                                check_if_keys_exist_in_dict,
-                                check_valid_boolean, check_int)
-
-from simba.utils.read_write import (create_directory, get_fn_ext, read_img, read_json, recursive_file_search)
-from simba.utils.errors import NoFilesFoundError, FaultyTrainingSetError
-from simba.mixins.geometry_mixin import GeometryMixin
+                                check_if_keys_exist_in_dict, check_int,
+                                check_valid_boolean)
 from simba.utils.enums import Options
-from simba.third_party_label_appenders.converters import create_yolo_yaml
+from simba.utils.errors import FaultyTrainingSetError, NoFilesFoundError
 from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (create_directory, get_fn_ext, read_img,
+                                    read_json, recursive_file_search)
+
 
 class COCOKeypoints2YoloSeg:
 

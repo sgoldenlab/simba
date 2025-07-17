@@ -8,9 +8,10 @@ import numpy as np
 import pandas as pd
 
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_dir_exists, check_int,
-                                check_valid_boolean, check_valid_dataframe,
-                                check_valid_lst, check_valid_tuple, check_if_valid_rgb_tuple)
+                                check_if_dir_exists, check_if_valid_rgb_tuple,
+                                check_int, check_valid_boolean,
+                                check_valid_dataframe, check_valid_lst,
+                                check_valid_tuple)
 from simba.utils.data import create_color_palette
 from simba.utils.enums import Defaults, Options
 from simba.utils.errors import CountError, DataHeaderError, FrameRangeError
@@ -18,9 +19,8 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     find_files_of_filetypes_in_directory,
-                                    get_fn_ext, get_video_meta_data,
-                                    read_frm_of_video, read_df)
-
+                                    get_fn_ext, get_video_meta_data, read_df,
+                                    read_frm_of_video)
 
 FRAME = 'FRAME'
 VERTICE = 'VERTICE'
