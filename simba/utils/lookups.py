@@ -94,6 +94,8 @@ def get_bp_config_codes() -> Dict[str, str]:
         "Multi-animals; 8 body-parts": "16",
         "3D tracking": "3D_user_defined",
         "AMBER": "AMBER",
+        "SimBA BLOB Tracking": Methods.SIMBA_BLOB.value,
+        "FaceMap": Methods.FACEMAP.value
     }
 
 

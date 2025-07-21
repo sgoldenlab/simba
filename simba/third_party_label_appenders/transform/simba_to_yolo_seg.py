@@ -12,11 +12,9 @@ except:
 import cv2
 import numpy as np
 
-from simba.bounding_box_tools.yolo.utils import \
-    keypoint_array_to_yolo_annotation_str
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.third_party_label_appenders.converters import create_yolo_yaml
 from simba.mixins.config_reader import ConfigReader
-from simba.third_party_label_appenders.transform.utils import (
-    create_yolo_keypoint_yaml, get_yolo_keypoint_flip_idx)
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int, check_str,
                                 check_valid_boolean, check_valid_dataframe, check_valid_tuple,
@@ -31,7 +29,7 @@ from simba.utils.read_write import (create_directory,
 from simba.utils.warnings import NoDataFoundWarning
 
 
-class SimBA2Yolo:
+class SimBA2YoloSegmentation(ConfigReader):
     """
     Convert pose estimation data from a SimBA project into the YOLO keypoint format, including frame sampling,
     image-label pair creation, bounding box computation, and train/validation splitting.
@@ -69,24 +67,21 @@ class SimBA2Yolo:
                  verbose: bool = False,
                  greyscale: bool = False,
                  clahe: bool = False,
-                 padding: float = 0.00,
+                 padding: int = 0,
                  threshold: float = 0.00,
-                 flip_idx: Optional[Tuple[int, ...]] = None,
-                 names: Tuple[str, ...] = ('animal_1',),
                  sample_size: Optional[int] = None,
-                 bp_id_idx: Optional[Dict[int, Union[Tuple[int], List[int]]]] = None,
                  single_id: Optional[str] = None) -> None:
+
 
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose')
         check_valid_boolean(value=greyscale, source=f'{self.__class__.__name__} greyscale')
         check_valid_boolean(value=clahe, source=f'{self.__class__.__name__} clahe')
         check_file_exist_and_readable(file_path=config_path)
-        check_float(name=f'{self.__class__.__name__} padding', value=padding, max_value=1.0, min_value=0.0, raise_error=True)
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False, create_logger=False)
+        if padding is not None: check_int(name=f'{self.__class__.__name__} padding', value=padding, min_value=0, raise_error=True)
         check_float(name=f'{self.__class__.__name__} train_size', value=train_size, max_value=0.99, min_value=0.1)
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, max_value=1.0, min_value=0.0)
-        check_valid_tuple(x=names, source=f'{self.__class__.__name__} names', valid_dtypes=(str,), minimum_length=1)
         check_if_dir_exists(in_dir=save_dir)
-        if flip_idx is not None: check_valid_tuple(x=flip_idx, source=self.__class__.__name__, valid_dtypes=(int,), minimum_length=1)
         self.img_dir, self.lbl_dir = os.path.join(save_dir, 'images'), os.path.join(save_dir, 'labels')
         self.img_train_dir, self.img_val_dir = os.path.join(self.img_dir, 'train'), os.path.join(self.img_dir, 'val')
         self.lbl_train_dir, self.lb_val_dir = os.path.join(self.lbl_dir, 'train'), os.path.join(self.lbl_dir, 'val')
@@ -98,23 +93,25 @@ class SimBA2Yolo:
         if data_dir is not None:
             check_if_dir_exists(in_dir=data_dir, source=f'{self.__class__.__name__} data_dir')
         else:
-            data_dir = self.config.outlier_corrected_dir
-        self.data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=[f'.{self.config.file_type}'], raise_error=True, as_dict=True)
-        self.video_paths = find_files_of_filetypes_in_directory(directory=self.config.video_dir, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True, as_dict=True)
+            data_dir = self.outlier_corrected_dir
+        self.data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=[f'.{self.file_type}'], raise_error=True, as_dict=True)
+        self.video_paths = find_files_of_filetypes_in_directory(directory=self.video_dir, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True, as_dict=True)
         missing_videos = [x for x in self.data_paths.keys() if x not in self.video_paths.keys()]
         if len(missing_videos) > 0:
-            NoDataFoundWarning(msg=f'Data files {missing_videos} do not have corresponding videos in the {self.config.video_dir} directory', source=self.__class__.__name__)
+            NoDataFoundWarning(msg=f'Data files {missing_videos} do not have corresponding videos in the {self.video_dir} directory', source=self.__class__.__name__)
         self.data_w_video = [x for x in self.data_paths.keys() if x in self.video_paths.keys()]
         if len(self.data_w_video) == 0:
-            raise NoFilesFoundError(msg=f'None of the data files in {data_dir} have matching videos in the {self.config.video_dir} directory', source=self.__class__.__name__)
+            raise NoFilesFoundError(msg=f'None of the data files in {data_dir} have matching videos in the {self.video_dir} directory', source=self.__class__.__name__)
         self.sample_size, self.train_size, self.verbose, self.save_dir = sample_size, train_size, verbose, save_dir
-        self.greyscale, self.bp_id_idx, self.padding, self.flip_idx = greyscale, bp_id_idx, padding, flip_idx
+        self.greyscale, self.padding = greyscale, padding
         self.clahe, self.threshold, self.single_id = clahe, threshold, single_id
-        self.names = {0: self.single_id} if self.single_id is not None else {k:v for k, v in enumerate(names)}
-
+        if self.single_id is None:
+            self.map_ids = {v: k for k, v in enumerate(self.animal_bp_dict.keys())}
+        else:
+            self.map_ids = {self.single_id: '0'}
 
     def run(self):
-        annotations, timer, body_part_headers = [], SimbaTimer(start=True), []
+        timer, annotations = SimbaTimer(start=True), []
         for file_cnt, video_name in enumerate(self.data_w_video):
             data = read_df(file_path=self.data_paths[video_name], file_type=self.config.file_type)
             check_valid_dataframe(df=data, source=f'{self.__class__.__name__} {self.data_paths[video_name]}', valid_dtypes=Formats.NUMERIC_DTYPES.value)
@@ -123,7 +120,6 @@ class SimBA2Yolo:
             p_data = data[data.columns[list(data.columns.str.endswith('_p'))]]
             data = data.loc[:, ~data.columns.str.endswith('_p')].reset_index(drop=True)
             data = data.iloc[(p_data[(p_data > self.threshold).all(axis=1)].index)]
-            body_part_headers = data.columns
             data['video'], frm_cnt = video_name, len(data)
             if self.sample_size is None:
                 video_sample_idx = list(range(0, frm_cnt))
@@ -131,58 +127,52 @@ class SimBA2Yolo:
                 video_sample_idx = list(range(0, frm_cnt)) if self.sample_size > frm_cnt else random.sample(list(range(0, frm_cnt)), self.sample_size)
             annotations.append(data.iloc[video_sample_idx].reset_index(drop=False))
 
-        if self.flip_idx is None:
-            self.flip_idx = get_yolo_keypoint_flip_idx(x=list(dict.fromkeys([x[:-2] for x in body_part_headers])))
-
         annotations = pd.concat(annotations, axis=0).reset_index(drop=True)
         video_names = annotations.pop('video').reset_index(drop=True).values
         train_idx = random.sample(list(annotations['index']), int(len(annotations) * self.train_size))
-        bp_id_idx = np.array_split(np.array(range(0, int(len(body_part_headers) / 2))), len(self.names.keys()))
-        bp_id_idx = [list(x) for x in bp_id_idx]
+
 
         for cnt, (idx, idx_data) in enumerate(annotations.iterrows()):
             vid_path = self.video_paths[video_names[cnt]]
             video_meta = get_video_meta_data(video_path=vid_path)
-            frm_idx, keypoints = idx_data[0], idx_data.values[1:].reshape(-1, 2)
-            mask = (keypoints[:, 0] == 0.0) & (keypoints[:, 1] == 0.0)
-            keypoints[mask] = np.nan
-            if np.all(np.isnan(keypoints)) or np.all(keypoints == 0.0) or np.all(np.isnan(keypoints) | (keypoints == 0.0)):
-                continue
-            img_lbl = ''
             if self.verbose:
-                print(f'Processing image {cnt + 1}/{len(annotations)}...')
-            file_name = f'{video_meta["video_name"]}.{frm_idx}'
-            if frm_idx in train_idx:
-                img_save_path, lbl_save_path = os.path.join(self.img_train_dir, f'{file_name}.png'), os.path.join(self.lbl_train_dir, f'{file_name}.txt')
+                print(f'Processing annotation {cnt + 1}/{len(annotations)} from SimBA to YOLO segmentation.. ({video_meta["video_name"]})...')
+            img = read_frm_of_video(video_path=vid_path, frame_index=idx_data['index'], greyscale=self.greyscale, clahe=self.clahe)
+            img_lbl = ''
+            img_name = f'{video_meta["video_name"]}.{idx}'
+            if idx_data['index'] in train_idx:
+                label_save_path, img_save_path = os.path.join(self.lbl_train_dir, f'{img_name}.txt'), os.path.join(self.img_train_dir, f'{img_name}.png')
             else:
-                img_save_path, lbl_save_path = os.path.join(self.img_train_dir, f'{file_name}.png'), os.path.join(self.lb_val_dir, f'{file_name}.txt')
-            img = read_frm_of_video(video_path=vid_path, frame_index=frm_idx, greyscale=self.greyscale, clahe=self.clahe)
-            img_h, img_w = img.shape[0], img.shape[1]
-            keypoints_with_id = {}
-            for k, idx in enumerate(bp_id_idx):
-                keypoints_with_id[k] = keypoints[idx, :]
-            for id, keypoints in keypoints_with_id.items():
-                if np.all(np.isnan(keypoints)) or np.all(keypoints == 0.0) or np.all(np.isnan(keypoints) | (keypoints == 0.0)):
-                    continue
-                visability_col = np.full((keypoints.shape[0], 1), fill_value=2).flatten()
-                keypoints = np.insert(keypoints, 2, visability_col, axis=1)
-                both_zero = (keypoints[:, 0] == 0) & (keypoints[:, 1] == 0)
-                has_nan_or_inf = ~np.isfinite(keypoints[:, 0]) | ~np.isfinite(keypoints[:, 1])
-                mask = both_zero | has_nan_or_inf
-                keypoints[mask, 2] = 0
-                instance_str = f'{id} ' if self.single_id is None else '0 '
-                instance_str += keypoint_array_to_yolo_annotation_str(x=keypoints, img_w=img_w, img_h=img_h, padding=self.padding)
-                img_lbl += instance_str.strip() + '\n'
-                with open(lbl_save_path, mode='wt', encoding='utf-8') as f:
+                label_save_path, img_save_path = os.path.join(self.lb_val_dir, f'{img_name}.txt'), os.path.join(self.img_val_dir, f'{img_name}.png')
+            for animal_cnt, (animal_name, bps_data) in enumerate(self.animal_bp_dict.items()):
+                cols = [item for group in zip(bps_data['X_bps'], bps_data['Y_bps']) for item in group]
+                keypoints = annotations.loc[idx, cols].values.reshape(-1, 2).astype(np.int32)
+                if self.padding is not None and self.padding > 0:
+                    keypoints = keypoints.reshape(-1, keypoints.shape[0], 2).astype(np.int32)
+                    keypoints = GeometryMixin().bodyparts_to_polygon(data=keypoints, parallel_offset=self.padding)[0]
+                    keypoints = np.array(keypoints.exterior.coords).astype(np.int32)
+                mask = ~(np.all(keypoints == 0, axis=1) | np.all(keypoints < 0, axis=1) | np.any(~np.isfinite(keypoints), axis=1))
+                keypoints = keypoints[mask]
+                if keypoints.shape[0] > 2:
+                    instance_str = f'{animal_cnt} ' if self.single_id is None else '0 '
+                    pts = np.unique(keypoints, axis=0)
+                    center = np.mean(pts, axis=0)
+                    angles = np.arctan2(pts[:, 1] - center[1], pts[:, 0] - center[0])
+                    seg_arr = pts[np.argsort(angles)]
+                    seg_arr_x, seg_arr_y = np.clip(seg_arr[:, 0].flatten() / video_meta['width'], 0, 1), np.clip(seg_arr[:, 1].flatten() / video_meta['height'], 0, 1)
+                    kps = list(np.column_stack((seg_arr_x, seg_arr_y)).flatten())
+                    instance_str += ' '.join(str(x) for x in kps).strip() + '\n'
+                    img_lbl += instance_str
+            if img_lbl:
+                with open(label_save_path, mode='wt', encoding='utf-8') as f:
                     f.write(img_lbl)
                 cv2.imwrite(img_save_path, img)
 
-        create_yolo_keypoint_yaml(path=self.save_dir, train_path=self.img_train_dir, val_path=self.img_val_dir, names=self.names, save_path=self.map_path, kpt_shape=(len(self.flip_idx), 3), flip_idx=self.flip_idx)
+        create_yolo_yaml(path=self.save_dir, train_path=self.img_train_dir, val_path=self.img_val_dir, names=self.map_ids, save_path=self.map_path)
         timer.stop_timer()
-        stdout_success(msg=f'YOLO formated data saved in {self.save_dir} directory', source=self.__class__.__name__, elapsed_time=timer.elapsed_time_str)
+        if self.verbose: stdout_success(msg=f'Labelme to YOLO conversion complete. Data saved in directory {self.save_dir}.', elapsed_time=timer.elapsed_time_str)
 
-
-# SAVE_DIR = r'D:\troubleshooting\mitra\mitra_yolo'
+# SAVE_DIR = r'D:\troubleshooting\mitra\mitra_yolo_seg'
 # CONFIG_PATH = r"C:\troubleshooting\mitra\project_folder\project_config.ini"
-# runner = SimBA2Yolo(config_path=CONFIG_PATH, save_dir=SAVE_DIR, sample_size=10, verbose=True, names=('animal_1',))
+# runner = SimBA2YoloSegmentation(config_path=CONFIG_PATH, save_dir=SAVE_DIR, sample_size=250, verbose=True, padding=None)
 # runner.run()

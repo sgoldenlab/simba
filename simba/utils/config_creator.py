@@ -128,55 +128,29 @@ class ProjectConfigCreator(object):
     def __create_configparser_config(self):
         self.config = ConfigParser(allow_no_value=True)
         self.config.add_section(ConfigKey.GENERAL_SETTINGS.value)
-        self.config[ConfigKey.GENERAL_SETTINGS.value][
-            ConfigKey.PROJECT_PATH.value
-        ] = self.project_folder
-        self.config[ConfigKey.GENERAL_SETTINGS.value][
-            ConfigKey.PROJECT_NAME.value
-        ] = self.project_name
-        self.config[ConfigKey.GENERAL_SETTINGS.value][
-            ConfigKey.FILE_TYPE.value
-        ] = self.file_type
-        self.config[ConfigKey.GENERAL_SETTINGS.value][ConfigKey.ANIMAL_CNT.value] = str(
-            self.animal_cnt
-        )
-        self.config[ConfigKey.GENERAL_SETTINGS.value][
-            ConfigKey.OS.value
-        ] = self.os_platform
+        self.config[ConfigKey.GENERAL_SETTINGS.value][ConfigKey.PROJECT_PATH.value] = self.project_folder
+        self.config[ConfigKey.GENERAL_SETTINGS.value][ConfigKey.PROJECT_NAME.value] = self.project_name
+        self.config[ConfigKey.GENERAL_SETTINGS.value][ConfigKey.FILE_TYPE.value] = self.file_type
+        self.config[ConfigKey.GENERAL_SETTINGS.value][ConfigKey.ANIMAL_CNT.value] = str(self.animal_cnt)
+        self.config[ConfigKey.GENERAL_SETTINGS.value][ConfigKey.OS.value] = self.os_platform
 
         self.config.add_section(ConfigKey.SML_SETTINGS.value)
-        self.config[ConfigKey.SML_SETTINGS.value][
-            ConfigKey.MODEL_DIR.value
-        ] = self.models_folder
+        self.config[ConfigKey.SML_SETTINGS.value][ConfigKey.MODEL_DIR.value] = self.models_folder
         for clf_cnt in range(len(self.target_list)):
-            self.config[ConfigKey.SML_SETTINGS.value][
-                "model_path_{}".format(str(clf_cnt + 1))
-            ] = os.path.join(
-                self.models_folder, str(self.target_list[clf_cnt]) + ".sav"
-            )
+            self.config[ConfigKey.SML_SETTINGS.value]["model_path_{}".format(str(clf_cnt + 1))] = os.path.join(self.models_folder, str(self.target_list[clf_cnt]) + ".sav")
 
-        self.config[ConfigKey.SML_SETTINGS.value][ConfigKey.TARGET_CNT.value] = str(
-            len(self.target_list)
-        )
+        self.config[ConfigKey.SML_SETTINGS.value][ConfigKey.TARGET_CNT.value] = str(len(self.target_list))
         for clf_cnt in range(len(self.target_list)):
-            self.config[ConfigKey.SML_SETTINGS.value][
-                "target_name_{}".format(str(clf_cnt + 1))
-            ] = str(self.target_list[clf_cnt])
+            self.config[ConfigKey.SML_SETTINGS.value]["target_name_{}".format(str(clf_cnt + 1))] = str(self.target_list[clf_cnt])
 
         self.config.add_section(ConfigKey.THRESHOLD_SETTINGS.value)
         for clf_cnt in range(len(self.target_list)):
-            self.config[ConfigKey.THRESHOLD_SETTINGS.value][
-                "threshold_{}".format(str(clf_cnt + 1))
-            ] = Dtypes.NONE.value
-        self.config[ConfigKey.THRESHOLD_SETTINGS.value][
-            ConfigKey.SKLEARN_BP_PROB_THRESH.value
-        ] = str(0.00)
+            self.config[ConfigKey.THRESHOLD_SETTINGS.value]["threshold_{}".format(str(clf_cnt + 1))] = Dtypes.NONE.value
+        self.config[ConfigKey.THRESHOLD_SETTINGS.value][ConfigKey.SKLEARN_BP_PROB_THRESH.value] = str(0.00)
 
         self.config.add_section(ConfigKey.MIN_BOUT_LENGTH.value)
         for clf_cnt in range(len(self.target_list)):
-            self.config[ConfigKey.MIN_BOUT_LENGTH.value][
-                "min_bout_{}".format(str(clf_cnt + 1))
-            ] = Dtypes.NONE.value
+            self.config[ConfigKey.MIN_BOUT_LENGTH.value]["min_bout_{}".format(str(clf_cnt + 1))] = Dtypes.NONE.value
 
         self.config.add_section(ConfigKey.FRAME_SETTINGS.value)
         self.config[ConfigKey.FRAME_SETTINGS.value][ConfigKey.DISTANCE_MM.value] = 0.00
@@ -187,9 +161,7 @@ class ProjectConfigCreator(object):
         self.config.add_section(ConfigKey.PROCESS_MOVEMENT_SETTINGS.value)
 
         self.config.add_section(ConfigKey.CREATE_ENSEMBLE_SETTINGS.value)
-        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
-            ConfigKey.POSE_SETTING.value
-        ] = str(self.pose_estimation_bp_cnt)
+        self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][ConfigKey.POSE_SETTING.value] = str(self.pose_estimation_bp_cnt)
         self.config[ConfigKey.CREATE_ENSEMBLE_SETTINGS.value][
             MLParamKeys.CLASSIFIER.value
         ] = Dtypes.NONE.value

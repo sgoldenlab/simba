@@ -150,6 +150,14 @@ SimBA pose-estimation -> YOLO pose-estimation annotations
    :members:
    :show-inheritance:
 
+
+SimBA pose-estimation -> YOLO segmentation annotations
+---------------------------------------
+
+.. autoclass:: simba.third_party_label_appenders.transform.simba_to_yolo_seg.SimBA2YoloSegmentation
+   :members:
+   :show-inheritance:
+
 SLEAP CSV predictions -> YOLO pose-estimation annotations
 ---------------------------------------
 

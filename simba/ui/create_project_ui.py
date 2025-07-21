@@ -155,6 +155,7 @@ class ProjectCreatorPopUp(PopUpMixin):
         elif selected_value == Methods.CLASSIC_TRACKING.value:
             self.selected_tracking_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=self.classical_tracking_options, label='BODY-PART CONFIGURATION: ', label_width=35, dropdown_width=35, value=self.classical_tracking_options[0], command=self.update_img)
             self.selected_tracking_dropdown.grid(row=1, column=0, sticky=NW)
+
         elif selected_value == Methods.THREE_D_TRACKING.value:
             self.selected_tracking_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=self.three_dim_tracking_options, label='BODY-PART CONFIGURATION: ', label_width=35, dropdown_width=35, value=self.three_dim_tracking_options[0], command=self.update_img)
             self.selected_tracking_dropdown.grid(row=1, column=0, sticky=NW)
@@ -204,5 +205,5 @@ class ProjectCreatorPopUp(PopUpMixin):
         self.config_path = config_creator.config_path
         ImportPoseFrame(parent_frm=self.import_data_tab, idx_row=0, idx_column=0, config_path=self.config_path)
         ImportVideosFrame(parent_frm=self.import_videos_tab, config_path=self.config_path, idx_row=0, idx_column=0)
-#
+
 #ProjectCreatorPopUp()

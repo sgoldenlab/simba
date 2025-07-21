@@ -201,9 +201,9 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     runner.run()
 
 
-# runner = COCOKeypoints2Yolo(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\merged\merged_07032025.json",
+# runner = COCOKeypoints2Yolo(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\test\merged_2.json",
 #                             img_dir=r"D:\cvat_annotations\frames",
-#                             save_dir=r"D:\cvat_annotations\yolo_07032025\bbox_test",
+#                             save_dir=r"D:\cvat_annotations\frames\yolo_072125",
 #                             clahe=False,
 #                             bbox_pad=0.2)
 # runner.run()

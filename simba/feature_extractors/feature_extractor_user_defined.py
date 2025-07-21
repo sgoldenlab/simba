@@ -41,10 +41,7 @@ class UserDefinedFeatureExtractor(ConfigReader, FeatureExtractionMixin):
         print("Calculating euclidean distances...")
         self.distance_col_names = []
         for animal_name, animal_data in self.animal_bp_dict.items():
-            current_animal_bp_xs, current_animal_bp_ys = (
-                animal_data["X_bps"],
-                animal_data["Y_bps"],
-            )
+            current_animal_bp_xs, current_animal_bp_ys = (animal_data["X_bps"], animal_data["Y_bps"])
             other_animals = {
                 i: self.animal_bp_dict[i]
                 for i in self.animal_bp_dict

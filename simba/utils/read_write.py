@@ -3218,7 +3218,48 @@ def write_to_recent_project_paths(config_path: Union[str, os.PathLike]):
         pass
 
 
+def read_facemap_h5(file_path: Union[str, os.PathLike]) -> pd.DataFrame:
+    """
+    Convert FaceMap pose-estimation data to pandas Dataframe format.
 
+    .. seealso::
+       See FaceMap GitHub repository for expected H5 file format: https://github.com/MouseLand/facemap
+
+    :param Union[str, os.PathLike] file_path: Path to facemap data file in .h5 format.
+    :return: FaceMap pose-estimation data in DataFrame format.
+    :rtype: pd.DataFrame
+    """
+
+    BODYPARTS = ["eye(back)", "eye(bottom)", "eye(front)", "eye(top)", "lowerlip", "mouth", "nose(bottom)", "nose(r)", "nose(tip)", "nose(top)", "nosebridge", "paw", "whisker(I)", "whisker(III)", "whisker(II)"]
+    FACEMAP = 'Facemap'
+    COORD_KEYS = ['x', 'y', 'likelihood']
+
+    check_file_exist_and_readable(file_path=file_path, raise_error=True)
+    pose_data = h5py.File(file_path, "r")
+    pose_keys = list(pose_data.keys())
+    if not FACEMAP in pose_keys:
+        raise InvalidInputError(msg=f'The file {file_path} does not contain the key {FACEMAP}', source=read_facemap_h5.__name__)
+    pose_data = pose_data[FACEMAP]
+    missing_bp_keys = [x for x in BODYPARTS if x not in pose_data.keys()]
+    if len(missing_bp_keys) > 0:
+        raise InvalidInputError(msg=f'The file {file_path} are missing the expected body-part keys: {missing_bp_keys}', source=read_facemap_h5.__name__)
+
+    results = pd.DataFrame()
+    for bodypart in BODYPARTS:
+        bp_data = pose_data[bodypart]
+        missing_bp_cord_keys = [x for x in COORD_KEYS if x not in bp_data.keys()]
+        if len(missing_bp_cord_keys) > 0:
+            raise InvalidInputError(msg=f'The body-part {bodypart} in file {file_path} are missing the expected data keys: {missing_bp_cord_keys}', source=read_facemap_h5.__name__)
+        bp_x = pose_data[bodypart][COORD_KEYS[0]][:]
+        bp_y = pose_data[bodypart][COORD_KEYS[1]][:]
+        bp_p = pose_data[bodypart][COORD_KEYS[2]][:]
+        check_valid_array(data=bp_x, source=f'{file_path} {bodypart} x', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
+        check_valid_array(data=bp_y, source=f'{file_path} {bodypart} y', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=[bp_x.shape[0]])
+        check_valid_array(data=bp_p, source=f'{file_path} {bodypart} p', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_0_shape=[bp_x.shape[0]], min_value=0, max_value=1.0)
+        results[f'{bodypart}_x'] = bp_x.astype(np.int32)
+        results[f'{bodypart}_y'] = bp_y.astype(np.int32)
+        results[f'{bodypart}_p'] = bp_p.astype(np.float32)
+    return results
 
 
 

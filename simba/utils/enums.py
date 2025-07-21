@@ -308,6 +308,8 @@ class Options(Enum):
         "H5 (SLEAP)",
         "TRK (multi-animal APT)",
         "MAT (DANNCE 3D)",
+        "CSV (SimBA BLOB)",
+        "H5 (FaceMap)",
     ]
     SMOOTHING_OPTIONS = ["Gaussian", "Savitzky Golay"]
     MULTI_DLC_TYPE_IMPORT_OPTION = ["skeleton", "box", "ellipse"]
@@ -364,6 +366,8 @@ class Options(Enum):
         "2 animals; 14 body-parts",
         "2 animals; 16 body-parts",
         "MARS",
+        "SimBA BLOB Tracking",
+        "FaceMap"
     ]
     MULTI_ANIMAL_TRACKING_OPTIONS = [
         "Multi-animals; 4 body-parts",
@@ -529,6 +533,8 @@ class Methods(Enum):
     WARNING = "WARNING"
     ERROR = "ERROR"
     ANOVA = "ANOVA"
+    SIMBA_BLOB = 'simba_blob'
+    FACEMAP = 'facemap'
     AGG_METHODS = ('mean', 'median')
     INVALID_THIRD_PARTY_APPENDER_FILE = "INVALID annotations file data format"
     ADDITIONAL_THIRD_PARTY_CLFS = "ADDITIONAL third-party behavior detected"

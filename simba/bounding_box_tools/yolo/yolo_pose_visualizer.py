@@ -88,8 +88,8 @@ class YOLOPoseVisualizer():
     for efficient processing of long videos.
 
     .. seealso::
-       To create YOLO pose data, see `:func:~simba.bounding_box_tools.yolo.yolo_pose_inference.YOLOPoseInference`
-       To fit YOLO model, see `:func:~simba.bounding_box_tools.yolo.yolo_fit.FitYolo`
+       To create YOLO pose data, see :func:`~simba.bounding_box_tools.yolo.yolo_pose_inference.YOLOPoseInference`
+       To fit YOLO model, see :func:`~simba.bounding_box_tools.yolo.yolo_fit.FitYolo`
 
     .. video:: _static/img/YOLOPoseVisualizer.webm
        :width: 900

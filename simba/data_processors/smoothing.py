@@ -90,7 +90,7 @@ class Smoothing(ConfigReader):
         return df
 
     def run(self):
-        print(f'Running smoothing on {len(self.file_paths)} data files...')
+        print(f'Running smoothing on {len(self.file_paths)} data file(s)...')
         for file_cnt, file_path in enumerate(self.file_paths):
             df = read_df(file_path=file_path, file_type=self.file_type, check_multiindex=True)
             video_timer = SimbaTimer(start=True)

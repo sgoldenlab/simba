@@ -874,7 +874,8 @@ def check_valid_array(data: np.ndarray,
                       min_axis_0: Optional[int] = None,
                       max_axis_1: Optional[int] = None,
                       min_axis_1: Optional[int] = None,
-                      min_value: Optional[Union[float, int]] = None) -> None:
+                      min_value: Optional[Union[float, int]] = None,
+                      max_value: Optional[Union[float, int]] = None) -> None:
     """
     Check if the given  array satisfies specified criteria regarding its dimensions, shape, and data type.
 
@@ -968,6 +969,10 @@ def check_valid_array(data: np.ndarray,
         if np.min(data) < min_value:
             raise ArrayError(msg=f"Array contains value below accepted value. Found  {np.min(data)}, accepted minimum: {min_value}, {source}", source=check_valid_array.__name__, )
 
+    if max_value is not None:
+        check_float(name=f'{source} max_value', value=max_value)
+        if np.max(data) > max_value:
+            raise ArrayError(msg=f"Array contains value above accepted maximum value. Found  {np.max(data)}, accepted minimum: {max_value}, {source}", source=check_valid_array.__name__, )
 
 def check_valid_lst(data: list,
                     source: Optional[str] = "",

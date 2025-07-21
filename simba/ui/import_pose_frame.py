@@ -21,6 +21,8 @@ from simba.pose_importers.sleap_csv_importer import SLEAPImporterCSV
 from simba.pose_importers.sleap_h5_importer import SLEAPImporterH5
 from simba.pose_importers.sleap_slp_importer import SLEAPImporterSLP
 from simba.pose_importers.trk_importer import TRKImporter
+from simba.pose_importers.simba_blob_importer import SimBABlobImporter
+from simba.pose_importers.facemap_h5_importer import FaceMapImporter
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, FileSelect, FolderSelect,
                                         SimBADropDown)
@@ -34,9 +36,9 @@ SAVITZKY_GOLAY = 'Savitzky Golay'
 INTERPOLATION_MAP = {'Animal(s)': 'animals', 'Body-parts': 'body-parts'}
 SMOOTHING_MAP = {'Savitzky Golay': 'savitzky-golay', 'Gaussian': 'gaussian'}
 
-FRAME_DIR_IMPORT_TITLES = {'CSV (DLC/DeepPoseKit)': 'IMPORT DLC CSV DIRECTORY',  'MAT (DANNCE 3D)': 'IMPORT DANNCE MAT DIRECTORY', 'JSON (BENTO)': 'IMPORT MARS JSON DIRECTORY'}
-FRAME_FILE_IMPORT_TITLES = {'CSV (DLC/DeepPoseKit)': 'IMPORT DLC CSV FILE',  'MAT (DANNCE 3D)': 'IMPORT DANNCE MAT FILE', 'JSON (BENTO)': 'IMPORT MARS JSON FILE'}
-FILE_TYPES = {'CSV (DLC/DeepPoseKit)': '*.csv', 'MAT (DANNCE 3D)': '*.mat', 'JSON (BENTO)': '*.json'}
+FRAME_DIR_IMPORT_TITLES = {'CSV (DLC/DeepPoseKit)': 'IMPORT DLC CSV DIRECTORY',  'MAT (DANNCE 3D)': 'IMPORT DANNCE MAT DIRECTORY', 'JSON (BENTO)': 'IMPORT MARS JSON DIRECTORY', 'CSV (SimBA BLOB)': 'IMPORT SIMBA BLOB CSV DIRECTORY', 'H5 (FaceMap)': 'IMPORT FaceMap H5 DIRECTORY'}
+FRAME_FILE_IMPORT_TITLES = {'CSV (DLC/DeepPoseKit)': 'IMPORT DLC CSV FILE',  'MAT (DANNCE 3D)': 'IMPORT DANNCE MAT FILE', 'JSON (BENTO)': 'IMPORT MARS JSON FILE', 'CSV (SimBA BLOB)': 'IMPORT SIMBA BLOB CSV FILE', 'H5 (FaceMap)': 'IMPORT FaceMap H5 FILE'}
+FILE_TYPES = {'CSV (DLC/DeepPoseKit)': '*.csv', 'MAT (DANNCE 3D)': '*.mat', 'JSON (BENTO)': '*.json', 'CSV (SimBA BLOB)': '*.csv', 'H5 (FaceMap)': '*.h5'}
 
 
 class ImportPoseFrame(ConfigReader, PopUpMixin):
@@ -53,6 +55,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
 
     :example:
     >>> _ = ImportPoseFrame(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+    >>> _ = ImportPoseFrame(config_path=r"C:\troubleshooting\simba_blob_project\project_folder\project_config.ini")
     """
 
     def __init__(self,
@@ -80,11 +83,10 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
             ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
             self.data_type_dropdown = SimBADropDown(parent=self.import_tracking_frm, dropdown_options=Options.IMPORT_TYPE_OPTIONS.value, label="DATA TYPE: ", label_width=25, command=self.create_import_menu, dropdown_width=25, value=Options.IMPORT_TYPE_OPTIONS.value[0])
             self.data_type_dropdown.grid(row=0, column=0, sticky=NW)
-
             self.create_import_menu(data_type_choice=Options.IMPORT_TYPE_OPTIONS.value[0])
             self.import_tracking_frm.grid(row=idx_row, column=idx_column, sticky=NW)
 
-        # parent_frm.mainloop()
+        #parent_frm.mainloop()
 
     def __show_smoothing_entry_box_from_dropdown(self, choice: str):
         if (choice == GAUSSIAN) or (choice == SAVITZKY_GOLAY):
@@ -124,6 +126,32 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
                             data_path=data_path,
                             interpolation_settings=interpolation_settings,
                             smoothing_settings=smoothing_settings)
+
+    def __import_simba_blob_data(self,
+                                interpolation_settings: str,
+                                smoothing_time: Union[str, int],
+                                data_path: Union[str, os.PathLike],
+                                smoothing_setting: Literal['Gaussian', 'None', 'Savitzky Golay']):
+
+            if not os.path.isfile(data_path) and not os.path.isdir(data_path):
+                raise InvalidInputError(msg=f'{data_path} is NOT a valid path', source=self.__class__.__name__)
+            smoothing_settings, interpolation_settings = self.__get_smooth_interpolation_settings(interpolation_settings, smoothing_setting, smoothing_time)
+
+            blob_importer = SimBABlobImporter(config_path=self.config_path, data_path=data_path, interpolation_settings=interpolation_settings, smoothing_settings=smoothing_settings, verbose=True)
+            blob_importer.run()
+
+    def __import_facemap_data(self,
+                              interpolation_settings: str,
+                              smoothing_time: Union[str, int],
+                              data_path: Union[str, os.PathLike],
+                              smoothing_setting: Literal['Gaussian', 'None', 'Savitzky Golay']):
+
+            if not os.path.isfile(data_path) and not os.path.isdir(data_path):
+                raise InvalidInputError(msg=f'{data_path} is NOT a valid path', source=self.__class__.__name__)
+            smoothing_settings, interpolation_settings = self.__get_smooth_interpolation_settings(interpolation_settings, smoothing_setting, smoothing_time)
+
+            facemap_importer = FaceMapImporter(config_path=self.config_path, data_path=data_path, interpolation_settings=interpolation_settings, smoothing_settings=smoothing_settings, verbose=True)
+            facemap_importer.run()
 
     def __multi_animal_run_call(self,
                                 pose_estimation_tool: str,
@@ -205,7 +233,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
             self.animal_name_entry_boxes[i + 1].grid(row=i, column=0, sticky=NW)
         self.animal_names_frm.grid(row=1, column=0, sticky=NW)
 
-    def create_import_menu(self, data_type_choice: Literal["CSV (DLC/DeepPoseKit)", "JSON (BENTO)", "H5 (multi-animal DLC)", "SLP (SLEAP)", "CSV (SLEAP)", "H5 (SLEAP)", "TRK (multi-animal APT)", "MAT (DANNCE 3D)"]):
+    def create_import_menu(self, data_type_choice: Literal["CSV (DLC/DeepPoseKit)", "JSON (BENTO)", "H5 (multi-animal DLC)", "SLP (SLEAP)", "CSV (SLEAP)", "H5 (SLEAP)", "TRK (multi-animal APT)", "MAT (DANNCE 3D)", "CSV (SimBA BLOB)"]):
         if hasattr(self, "choice_frm"):
             self.choice_frm.destroy()
 
@@ -224,7 +252,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
         self.smoothing_frm.grid(row=1, column=0, sticky=NW)
         self.smoothing_dropdown.grid(row=0, column=0, sticky=NW)
 
-        if data_type_choice in ["CSV (DLC/DeepPoseKit)", "MAT (DANNCE 3D)", "JSON (BENTO)"]: # DATA TYPES WHERE NO TRACKS HAVE TO BE SPECIFIED
+        if data_type_choice in ["CSV (DLC/DeepPoseKit)", "MAT (DANNCE 3D)", "JSON (BENTO)", "CSV (SimBA BLOB)", 'H5 (FaceMap)']: # DATA TYPES WHERE NO TRACKS HAVE TO BE SPECIFIED
             self.import_directory_frm = LabelFrame(self.choice_frm, text=FRAME_DIR_IMPORT_TITLES[data_type_choice], pady=5, padx=5, font=Formats.FONT_HEADER.value,)
             self.import_directory_select = FolderSelect(self.import_directory_frm, "Input data DIRECTORY:", lblwidth=25, initialdir=self.project_path)
             self.import_single_frm = LabelFrame(self.choice_frm, text=FRAME_FILE_IMPORT_TITLES[data_type_choice], pady=5, padx=5, font=Formats.FONT_HEADER.value,)
@@ -247,14 +275,18 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
                 self.import_file_btn = Button(self.import_single_frm, fg="blue", font=Formats.FONT_REGULAR.value, text="Import DANNCE MAT FILE to SimBA project", command=lambda: import_DANNCE_file(config_path=self.config_path,
                                                                                                                                                          file_path=self.import_file_select.file_path,
                                                                                                                                                          interpolation_method=self.interpolation_dropdown.getChoices()))
-            else:
-                self.import_dir_btn = Button(self.import_directory_frm, fg="blue", font=Formats.FONT_REGULAR.value, text="Import BENTO JSON DIRECTORY to SimBA project", command=lambda: MarsImporter(config_path=self.config_path,
-                                                                                                                                                                    data_path=self.import_directory_select.folder_path,
-                                                                                                                                                                    interpolation_method=self.interpolation_dropdown.getChoices(),
-                                                                                                                                                                    smoothing_method={"Method": self.smoothing_dropdown.getChoices(), "Parameters": {"Time_window": self.smoothing_time_eb.entry_get}}))
+            elif data_type_choice == "JSON (BENTO)":
+                self.import_dir_btn = Button(self.import_directory_frm, fg="blue", font=Formats.FONT_REGULAR.value, text="Import BENTO JSON DIRECTORY to SimBA project", command=lambda: MarsImporter(config_path=self.config_path, data_path=self.import_directory_select.folder_path, interpolation_method=self.interpolation_dropdown.getChoices(), smoothing_method={"Method": self.smoothing_dropdown.getChoices(), "Parameters": {"Time_window": self.smoothing_time_eb.entry_get}}))
+                self.import_file_btn = Button(self.import_single_frm, fg="blue", font=Formats.FONT_REGULAR.value, text="Import BENTO JSON FILE to SimBA project", command=lambda: MarsImporter(config_path=self.config_path, data_path=self.import_directory_select.folder_path, interpolation_method=self.interpolation_dropdown.getChoices(), smoothing_method={"Method": self.smoothing_dropdown.getChoices(), "Parameters": {"Time_window": self.smoothing_time_eb.entry_get}}))
 
-                self.import_file_btn = Button(self.import_single_frm, fg="blue", font=Formats.FONT_REGULAR.value, text="Import BENTO JSON FILE to SimBA project", command=lambda: MarsImporter(config_path=self.config_path, data_path=self.import_directory_select.folder_path, interpolation_method=self.interpolation_dropdown.getChoices(),
-                                                                                                                                                   smoothing_method={"Method": self.smoothing_dropdown.getChoices(), "Parameters": {"Time_window": self.smoothing_time_eb.entry_get}}))
+            elif data_type_choice == "CSV (SimBA BLOB)":
+                self.import_dir_btn = Button(self.import_directory_frm, fg="blue", font=Formats.FONT_REGULAR.value, text="Import SimBA BLOB CSV DIRECTORY to SimBA project", command=lambda: self.__import_simba_blob_data(interpolation_settings=self.interpolation_dropdown.getChoices(), smoothing_time=self.smoothing_time_eb.entry_get, data_path=self.import_directory_select.folder_path, smoothing_setting=self.smoothing_dropdown.getChoices()))
+                self.import_file_btn = Button(self.import_single_frm, fg="blue", font=Formats.FONT_REGULAR.value, text="Import SimBA BLOB CSV FILE to SimBA project", command=lambda: self.__import_simba_blob_data(interpolation_settings=self.interpolation_dropdown.getChoices(), smoothing_time=self.smoothing_time_eb.entry_get, data_path=self.import_file_select.file_path, smoothing_setting=self.smoothing_dropdown.getChoices()))
+
+            else:
+                self.import_dir_btn = Button(self.import_directory_frm, fg="blue", font=Formats.FONT_REGULAR.value, text="Import SimBA BLOB CSV DIRECTORY to SimBA project", command=lambda: self.__import_facemap_data(interpolation_settings=self.interpolation_dropdown.getChoices(), smoothing_time=self.smoothing_time_eb.entry_get, data_path=self.import_directory_select.folder_path, smoothing_setting=self.smoothing_dropdown.getChoices()))
+                self.import_file_btn = Button(self.import_single_frm, fg="blue", font=Formats.FONT_REGULAR.value, text="Import SimBA BLOB CSV FILE to SimBA project", command=lambda: self.__import_facemap_data(interpolation_settings=self.interpolation_dropdown.getChoices(), smoothing_time=self.smoothing_time_eb.entry_get, data_path=self.import_file_select.file_path, smoothing_setting=self.smoothing_dropdown.getChoices()))
+
 
             self.import_directory_frm.grid(row=2, column=0, sticky=NW)
             self.import_directory_select.grid(row=0, column=0, sticky=NW)
@@ -339,4 +371,4 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
             self.run_btn.grid(row=0, column=0, sticky=NW)
             self.choice_frm.grid(row=1, column=0, sticky=NW)
 
-#_ = ImportPoseFrame(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+#_ = ImportPoseFrame(config_path=r"C:\troubleshooting\facemap_project\project_folder\project_config.ini")
