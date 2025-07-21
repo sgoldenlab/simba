@@ -13,16 +13,16 @@ except:
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.pose_importers.dlc_importer_csv import import_dlc_csv_data
+from simba.pose_importers.facemap_h5_importer import FaceMapImporter
 from simba.pose_importers.import_mars import MarsImporter
 from simba.pose_importers.madlc_importer import MADLCImporterH5
 from simba.pose_importers.read_DANNCE_mat import (import_DANNCE_file,
                                                   import_DANNCE_folder)
+from simba.pose_importers.simba_blob_importer import SimBABlobImporter
 from simba.pose_importers.sleap_csv_importer import SLEAPImporterCSV
 from simba.pose_importers.sleap_h5_importer import SLEAPImporterH5
 from simba.pose_importers.sleap_slp_importer import SLEAPImporterSLP
 from simba.pose_importers.trk_importer import TRKImporter
-from simba.pose_importers.simba_blob_importer import SimBABlobImporter
-from simba.pose_importers.facemap_h5_importer import FaceMapImporter
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, FileSelect, FolderSelect,
                                         SimBADropDown)

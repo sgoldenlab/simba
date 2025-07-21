@@ -1,15 +1,21 @@
 import os
-from typing import Union, Optional
 from copy import copy
+from typing import Optional, Union
 
-from simba.utils.checks import check_str, check_int, check_valid_boolean, check_if_dir_exists, check_if_keys_exist_in_dict, check_file_exist_and_readable, check_valid_array
-from simba.mixins.config_reader import ConfigReader
-from simba.utils.read_write import find_files_of_filetypes_in_directory, get_fn_ext, write_df, read_facemap_h5
-from simba.utils.errors import NoFilesFoundError, InvalidInputError
-from simba.utils.enums import Methods, Formats, ConfigKey, Dtypes
 from simba.data_processors.interpolate import Interpolate
 from simba.data_processors.smoothing import Smoothing
-from simba.utils.printing import stdout_success, SimbaTimer
+from simba.mixins.config_reader import ConfigReader
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists,
+                                check_if_keys_exist_in_dict, check_int,
+                                check_str, check_valid_array,
+                                check_valid_boolean)
+from simba.utils.enums import ConfigKey, Dtypes, Formats, Methods
+from simba.utils.errors import InvalidInputError, NoFilesFoundError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_facemap_h5, write_df)
+
 
 class FaceMapImporter(ConfigReader):
     """
