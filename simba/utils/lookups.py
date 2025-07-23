@@ -8,8 +8,7 @@ import struct
 import subprocess
 import sys
 import tkinter as tk
-from copy import deepcopy
-from copy import copy
+from copy import copy, deepcopy
 from datetime import datetime
 from multiprocessing import Lock, Value
 from pathlib import Path
@@ -24,7 +23,8 @@ from matplotlib import cm
 
 import simba
 from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists, check_valid_dict, check_str, check_int)
+                                check_if_dir_exists, check_int, check_str,
+                                check_valid_dict)
 from simba.utils.enums import OS, UML, FontPaths, Methods, Paths
 from simba.utils.read_write import get_fn_ext
 from simba.utils.warnings import NoDataFoundWarning

@@ -277,6 +277,11 @@ Moreover, if you had set `SAVE BACKGROUND VIDEOS` to True in `RUN-TIME SETTINGS`
 Lastly, this directory will contain a `.pickle` file, named `blob_definitions.pickle`, which contains the settings which you used to process each of the video files, that will look something like [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/blob_definitions_example.json)
 
 
+#### NEXT STEPS
+
+To import blob tracking data into a SimBA project (e.g., for ROI analysis or build classifiers etc), see [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/blob_data_project_simba.md) tutorial. 
+
+
 
 
 
