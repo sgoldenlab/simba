@@ -12,8 +12,6 @@ except:
 import cv2
 import numpy as np
 
-from simba.utils.yolo import \
-    keypoint_array_to_yolo_annotation_str
 from simba.mixins.pose_importer_mixin import PoseImporterMixin
 from simba.third_party_label_appenders.transform.utils import (
     create_yolo_keypoint_yaml, get_yolo_keypoint_flip_idx)
@@ -26,6 +24,7 @@ from simba.utils.read_write import (create_directory,
                                     find_files_of_filetypes_in_directory,
                                     get_video_meta_data, read_frm_of_video)
 from simba.utils.warnings import FrameRangeWarning
+from simba.utils.yolo import keypoint_array_to_yolo_annotation_str
 
 H5_EXT = ['.H5', '.h5']
 

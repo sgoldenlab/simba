@@ -5,8 +5,6 @@ from typing import Optional, Tuple, Union
 import cv2
 import numpy as np
 
-from simba.utils.yolo import \
-    keypoint_array_to_yolo_annotation_str
 from simba.mixins.image_mixin import ImageMixin
 from simba.third_party_label_appenders.transform.utils import (
     b64_to_arr, create_yolo_keypoint_yaml, get_yolo_keypoint_flip_idx)
@@ -17,6 +15,7 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (create_directory,
                                     find_files_of_filetypes_in_directory,
                                     get_fn_ext, img_array_to_clahe, read_json)
+from simba.utils.yolo import keypoint_array_to_yolo_annotation_str
 
 
 class LabelmeKeypoints2YoloKeypoints:
