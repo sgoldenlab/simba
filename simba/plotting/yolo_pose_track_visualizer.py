@@ -52,7 +52,7 @@ def _yolo_keypoint_track_visualizer(frm_ids: np.ndarray,
         frm_data = data.loc[data[FRAME] == current_frm]
         frm_data = frm_data[frm_data[CONFIDENCE] > threshold]
         for cnt, (row, row_data) in enumerate(frm_data.iterrows()):
-            clrs = np.array(palettes[int(row_data[TRACK]-1)]).astype(np.int32)
+            clrs = np.array(palettes[int(row_data[TRACK])]).astype(np.int32)
             bbox_cords = row_data[BOX_CORD_FIELDS].values.astype(np.int32).reshape(-1, 2)
             kp_coords = row_data.drop(EXPECTED_COLS).values.astype(np.int32).reshape(-1, 3)[:, :-1]
             clr = tuple(int(c) for c in clrs[0])
@@ -139,7 +139,7 @@ class YOLOPoseTrackVisualizer():
         if palettes is None:
             palettes = Options.PALETTE_OPTIONS_CATEGORICAL.value[:int(max(self.tracks))]
             for cnt, palette in enumerate(palettes):
-                self.palettes[cnt] = create_color_palette(pallete_name=palette, increments=len(self.data_df.columns) - len(EXPECTED_COLS))
+                self.palettes[self.tracks[cnt]] = create_color_palette(pallete_name=palette, increments=len(self.data_df.columns) - len(EXPECTED_COLS))
         self.save_dir, self.verbose, self.palette, self.thickness = save_dir, verbose, palettes, thickness
         self.threshold, self.circle_size, self.thickness = threshold, circle_size, thickness
         self.video_temp_dir = os.path.join(self.save_dir, self.video_name, "temp")
@@ -182,3 +182,9 @@ class YOLOPoseTrackVisualizer():
 # SAVE_DIR = "/mnt/d/ares/data/ant/yolo/results"
 # kp_vis = YOLOPoseTrackVisualizer(data_path=DATA_PATH, video_path=VIDEO_PATH, save_dir=SAVE_DIR, core_cnt=18)
 # #kp_vis.run()
+if __name__ == "__main__":
+    VIDEO_PATH = r"D:\cvat_annotations\videos\mp4_20250624155703\s16-Chasing.mp4"
+    DATA_PATH = r"D:\cvat_annotations\frames\yolo_072125\results_track\s16-Chasing.csv"
+    SAVE_DIR = r"D:\cvat_annotations\frames\yolo_072125\results_track_videos"
+    kp_vis = YOLOPoseTrackVisualizer(data_path=DATA_PATH, video_path=VIDEO_PATH, save_dir=SAVE_DIR, core_cnt=18)
+    kp_vis.run()

@@ -331,6 +331,7 @@ class Options(Enum):
     ALL_IMAGE_FORMAT_OPTIONS = (".bmp", ".png", ".jpeg", ".jpg", ".webp")
     ALL_IMAGE_FORMAT_STR_OPTIONS = ".bmp .png .jpeg .jpg"
     ALL_VIDEO_FORMAT_STR_OPTIONS = ".avi .mp4 .mov .flv .m4v .webm .h264"
+    ALL_YOLO_MODEL_FORMAT_STR_OPTIONS = ".onnx .engine .jit .onnx .mlmodel .xml .pb .pb .tflite .pt"
     WORKFLOW_FILE_TYPE_OPTIONS = ["csv", "parquet"]
     WORKFLOW_FILE_TYPE_STR_OPTIONS = ".csv .parquet"
     TRACKING_TYPE_OPTIONS = ["Classic tracking", "Multi tracking", "3D tracking"]
@@ -807,6 +808,8 @@ class ROI_SETTINGS(Enum):
     POLYGON = 'polygon'
     RECTANGLE = 'rectangle'
 
+class PackageNames(Enum):
+    ULTRALYTICS = 'ultralytics'
 
 class ENV_VARS(Enum):
     PRINT_EMOJIS = 'PRINT_EMOJIS'

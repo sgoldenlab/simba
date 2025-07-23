@@ -1,14 +1,14 @@
 tracker_type: botsort
-track_high_thresh: 0.1 #Higher values make the tracker stricter (less false matches, but more ID loss).
-track_low_thresh: 0.1 #Used for low-confidence matching or future buffer merging.
-new_track_thresh: 0.80 #Too high → might miss new objects. Too low → might create too many false positives.
-track_buffer: 60 #Number of frames to keep a track alive without a match.
-match_thresh: 0.125 #Lower = stricter matching = fewer false positives, but more ID switches.
+track_high_thresh: 0.5
+track_low_thresh: 0.05
+new_track_thresh: 0.75
+match_thresh: 0.2
+appearance_thresh: 0.3
+track_buffer: 75
+proximity_thresh: 40
 with_reid: True
-model: auto  # Alternatively, specify the path to your ReID model
-appearance_thresh: 0.4
 gmc: False
-alpha: 0.9
 gmc_method: None
-proximity_thresh: 30
+alpha: 0.9
 fuse_score: 1
+model: auto

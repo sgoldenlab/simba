@@ -15,14 +15,14 @@ Utilities
 Bounding-box inference
 -----------------------------------------------------------------------
 
-.. autoclass:: simba.bounding_box_tools.yolo.yolo_inference.YoloInference
+.. autoclass:: simba.model.yolo_inference.YoloInference
    :members:
    :show-inheritance:
 
 Pose-estimation inference
 -----------------------------------------------------------------------
 
-.. autoclass:: simba.bounding_box_tools.yolo.yolo_pose_inference.YOLOPoseInference
+.. autoclass:: simba.model.yolo_pose_inference.YOLOPoseInference
    :members:
    :show-inheritance:
 
@@ -30,14 +30,14 @@ Pose-estimation inference
 YOLO pose-estimation segmentation visualizer
 -----------------------------------------------------------------------
 
-.. autoclass:: simba.bounding_box_tools.yolo.yolo_seg_visualizer.YOLOSegmentationVisualizer
+.. autoclass:: simba.plotting.yolo_seg_visualizer.YOLOSegmentationVisualizer
    :members:
    :show-inheritance:
 
 YOLO pose-estimation segmentation inference
 -----------------------------------------------------------------------
 
-.. autoclass:: simba.bounding_box_tools.yolo.yolo_seg_visualizer.YOLOSegmentationVisualizer
+.. autoclass:: simba.model.yolo_seg_inference.YOLOSegmentationInference
    :members:
    :show-inheritance:
 
@@ -45,14 +45,14 @@ YOLO pose-estimation segmentation inference
 Pose-estimation track inference
 -----------------------------------------------------------------------
 
-.. autoclass:: simba.bounding_box_tools.yolo.yolo_pose_track_inference.YOLOPoseTrackInference
+.. autoclass:: simba.model.yolo_pose_track_inference.YOLOPoseTrackInference
    :members:
    :show-inheritance:
 
 Pose-estimation track plotting
 -----------------------------------------------------------------------
 
-.. autoclass:: simba.bounding_box_tools.yolo.yolo_pose_track_visualizer.YOLOPoseTrackVisualizer
+.. autoclass:: simba.plotting.yolo_pose_track_visualizer.YOLOPoseTrackVisualizer
    :members:
    :show-inheritance:
 
@@ -60,14 +60,14 @@ Pose-estimation track plotting
 Pose-estimation plotting
 -----------------------------------------------------------------------
 
-.. autoclass:: simba.bounding_box_tools.yolo.yolo_pose_visualizer.YOLOPoseVisualizer
+.. autoclass:: simba.plotting.yolo_pose_visualizer.YOLOPoseVisualizer
    :members:
    :show-inheritance:
 
 Bounding box plotting
 -----------------------------------------------------------------------
 
-.. autoclass:: simba.bounding_box_tools.yolo.yolo_visualize.YOLOVisualizer
+.. autoclass:: simba.plotting.yolo_visualize.YOLOVisualizer
    :members:
    :show-inheritance:
 

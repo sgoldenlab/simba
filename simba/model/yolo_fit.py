@@ -15,7 +15,7 @@ try:
 except ModuleNotFoundError:
     YOLO = None
 
-from simba.bounding_box_tools.yolo.utils import load_yolo_model
+from simba.utils.yolo import load_yolo_model
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists, check_int, check_str,
@@ -158,16 +158,16 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 # fitter.run()
 
 
-fitter = FitYolo(weights_path=r"D:\yolo_weights\yolo11m-pose.pt",
-                 model_yaml=r"D:\cvat_annotations\frames\yolo_072125\map.yaml",
-                 save_path=r"D:\cvat_annotations\frames\yolo_072125\mdl",
-                 epochs=1000,
-                 batch=24,
-                 format=None,
-                 device=0,
-                 imgsz=640)
-fitter.run()
-# #
+# fitter = FitYolo(weights_path=r"D:\yolo_weights\yolo11m-pose.pt",
+#                  model_yaml=r"D:\cvat_annotations\frames\yolo_072125\map.yaml",
+#                  save_path=r"D:\cvat_annotations\frames\yolo_072125\mdl",
+#                  epochs=1000,
+#                  batch=24,
+#                  format=None,
+#                  device=0,
+#                  imgsz=640)
+# fitter.run()
+# # #
 
 #
 # fitter = FitYolo(weights_path=r"D:\yolo_weights\yolo11m-seg.pt",

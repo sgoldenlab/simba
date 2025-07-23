@@ -5,7 +5,7 @@ from typing import Optional, Tuple, Union
 import cv2
 import numpy as np
 
-from simba.bounding_box_tools.yolo.utils import \
+from simba.utils.yolo import \
     keypoint_array_to_yolo_annotation_str
 from simba.mixins.image_mixin import ImageMixin
 from simba.third_party_label_appenders.transform.utils import (

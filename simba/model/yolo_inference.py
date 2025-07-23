@@ -1,30 +1,34 @@
-
 import os
-
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Union
 
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+try:
+    from ultralytics import YOLO
+except ModuleNotFoundError:
+    YOLO = None
 
 import numpy as np
 import pandas as pd
 import torch
+from simba.data_processors.cuda.utils import _is_cuda_available
 
-from simba.bounding_box_tools.yolo.utils import (_get_undetected_obs,
-                                                 check_valid_device,
-                                                 load_yolo_model, yolo_predict)
+from simba.utils.yolo import (_get_undetected_obs,
+                              check_valid_device,
+                              load_yolo_model, yolo_predict)
 from simba.third_party_label_appenders.converters import \
     yolo_obb_data_to_bounding_box
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int, check_str,
-                                check_valid_array, check_valid_boolean,
-                                check_valid_lst, check_valid_tuple, get_fn_ext)
+                                check_valid_boolean,
+                                check_valid_lst, get_fn_ext, check_instance)
 from simba.utils.data import df_smoother, savgol_smoother
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import find_core_cnt, get_video_meta_data
+from simba.utils.read_write import get_video_meta_data, find_core_cnt
+from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
 
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
@@ -42,7 +46,7 @@ class YoloInference():
     .. seealso::
        To perform bounding box and keypoint (pose) detection, see :func:`~simba.bounding_box_tools.yolo.yolo_pose_inference.YOLOPoseInference`
 
-    :param Union[str, os.PathLike] weights_path: Path to the YOLO model weights file.
+    :param Union[str, os.PathLike] weights: Path to the YOLO model weights file or a loaded YOLO model object.
     :param Union[str, os.PathLike] or List[Union[str, os.PathLike]] video_path: Path(s) to the input video file(s) for performing inference.
     :param Optional[bool] verbose: If True, outputs progress information and timing. Defaults to False.
     :param Optional[Union[str, os.PathLike]] save_dir: Directory to save the inference results (e.g., as CSV). If None, results are returned. Defaults to None.
@@ -62,11 +66,11 @@ class YoloInference():
 
     :example:
     >>> video_path = "/mnt/d/netholabs/yolo_videos/input/mp4_20250606083508/2025-05-28_19-50-23.mp4"
-    >>> i = YoloInference(weights_path=r"/mnt/c/troubleshooting/coco_data/mdl/train8/weights/best.pt", video_path=video_path, save_dir=r"/mnt/c/troubleshooting/coco_data/mdl/results", verbose=True, gpu=True)
+    >>> i = YoloInference(weights=r"/mnt/c/troubleshooting/coco_data/mdl/train8/weights/best.pt", video_path=video_path, save_dir=r"/mnt/c/troubleshooting/coco_data/mdl/results", verbose=True, gpu=True)
     >>> i.run()
     """
     def __init__(self,
-                 weights_path: Union[str, os.PathLike],
+                 weights: Union[str, os.PathLike, YOLO],
                  video_path: Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]],
                  verbose: Optional[bool] = False,
                  save_dir: Optional[Union[str, os.PathLike]] = None,
@@ -82,6 +86,9 @@ class YoloInference():
                  imgsz: int = 640,
                  stream: Optional[bool] = True) -> Union[None, Dict[str, pd.DataFrame]]:
 
+        if not _is_cuda_available()[0]:
+            raise SimBAGPUError(msg='No GPU detected.', source=self.__class__.__name__)
+        if YOLO is None: raise SimBAPAckageVersionError(msg='ultralytics.YOLO package not detected.', source=self.__class__.__name__)
         if isinstance(video_path, list):
             check_valid_lst(data=video_path, source=f'{self.__class__.__name__} video_path', valid_dtypes=(str, np.str_,), min_len=1)
         elif isinstance(video_path, str):
@@ -89,12 +96,19 @@ class YoloInference():
             video_path = [video_path]
         for i in video_path:
             _ = get_video_meta_data(video_path=i)
-        check_file_exist_and_readable(file_path=weights_path)
+
+        check_instance(source=f'{self.__class__.__name__} weights', instance=weights, accepted_types=(str, os.PathLike, YOLO))
+        if not isinstance(weights, YOLO):
+            check_file_exist_and_readable(file_path=weights)
+            self.model = load_yolo_model(weights_path=weights, verbose=verbose, device=device)
+        else:
+            self.model = weights
         check_valid_boolean(value=[half_precision, verbose, stream, interpolate], source=self.__class__.__name__)
         check_int(name=f'{self.__class__.__name__} batch_size', value=batch_size, min_value=1)
         check_int(name=f'{self.__class__.__name__} imgsz', value=imgsz, min_value=1)
+        check_int(name=f'{self.__class__.__name__} imgsz', value=imgsz, min_value=1)
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
-        check_int(name=f'{self.__class__.__name__} max_detections', value=max_detections, min_value=1)
+        check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=1, max_value=find_core_cnt()[0])
         check_valid_device(device=device)
         if save_dir is not None:
             check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir')
@@ -102,7 +116,6 @@ class YoloInference():
             check_str(name=f'{self.__class__.__name__} smoothing', value=smoothing_method, options=SMOOTHING_METHODS)
             check_float(name=f'{self.__class__.__name__} smoothing_time_window', value=smoothing_time_window, min_value=10e-6)
         torch.set_num_threads(core_cnt)
-        self.model = load_yolo_model(weights_path=weights_path, verbose=verbose, device=device)
         self.video_path, self.half_precision, self.stream, self.batch_size = video_path, half_precision, stream, batch_size
         self.interpolate, self.smoothing_method, self.smoothing_time_window = interpolate, smoothing_method, smoothing_time_window
         self.save_dir, self.verbose, self.imgsz, self.core_cnt, self.device = save_dir, verbose, imgsz, core_cnt,device

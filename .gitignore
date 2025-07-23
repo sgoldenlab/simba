@@ -19,6 +19,7 @@ simba/pose_configurations_archive/
 # Ignore PyPI build artifacts
 dist/
 build/
+runs/
 *.egg-info/
 *.egg
 *.tar.gz

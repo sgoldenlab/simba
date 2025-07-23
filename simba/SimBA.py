@@ -69,6 +69,7 @@ from simba.ui.pop_ups.batch_preprocess_pop_up import BatchPreProcessPopUp
 from simba.ui.pop_ups.blob_visualizer_pop_up import BlobVisualizerPopUp
 from simba.ui.pop_ups.boolean_conditional_slicer_pup_up import \
     BooleanConditionalSlicerPopUp
+from simba.ui.pop_ups.yolo_pose_train_popup import YOLOPoseTrainPopUP
 from simba.ui.pop_ups.check_videos_seekable_pop_up import \
     CheckVideoSeekablePopUp
 from simba.ui.pop_ups.clf_add_remove_print_pop_up import (
@@ -200,14 +201,14 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_int)
 from simba.utils.custom_feature_extractor import CustomFeatureExtractor
 from simba.utils.enums import (ENV_VARS, OS, Defaults, Formats, Keys, Links,
-                               Paths, TagNames)
+                               Paths, TagNames, PackageNames)
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
                                  get_icons_paths, load_simba_fonts)
 from simba.utils.read_write import (fetch_pip_data, find_core_cnt,
                                     get_recent_projects_paths,
                                     get_video_meta_data, read_sys_env,
-                                    write_to_recent_project_paths)
+                                    write_to_recent_project_paths, get_pkg_version)
 from simba.utils.warnings import (FFMpegNotFoundWarning, PythonVersionWarning,
                                   VersionWarning)
 from simba.video_processors.video_processing import \
@@ -814,6 +815,10 @@ class App(object):
         background.pack(fill="both", expand=True)
         background.image = bg_img
 
+        ultralytics_version = get_pkg_version(pkg=PackageNames.ULTRALYTICS.value)
+        yolo_state = DISABLED if ultralytics_version is None else NORMAL
+
+
         menu = Menu(self.root)
         self.root.config(menu=menu)
         file_menu = Menu(menu)
@@ -841,6 +846,11 @@ class App(object):
         blob_tracking_menu.add_command(label="Perform blob tracking", compound="left", image=self.menu_icons["bubble_green"]["img"], command=InitializeBlobTrackerPopUp, font=Formats.FONT_REGULAR.value)
         blob_tracking_menu.add_command(label="Visualize blob tracking", compound="left", image=self.menu_icons["bubble_pink"]["img"], command=BlobVisualizerPopUp, font=Formats.FONT_REGULAR.value)
         batch_process_menu.add_cascade(label="Blob tracking...", compound="left", image=self.menu_icons["bubble"]["img"], menu=blob_tracking_menu, font=Formats.FONT_REGULAR.value)
+
+        yolo_tracking_menu = Menu(batch_process_menu)
+        yolo_tracking_menu.add_command(label="Train YOLO model", compound="left", image=self.menu_icons["ultralytics_2"]["img"], command=YOLOPoseTrainPopUP, font=Formats.FONT_REGULAR.value, state=yolo_state)
+        batch_process_menu.add_cascade(label="YOLO tracking...", compound="left", image=self.menu_icons["ultralytics_2"]["img"], menu=yolo_tracking_menu, font=Formats.FONT_REGULAR.value, state=yolo_state)
+
 
 
         video_process_menu = Menu(menu)

@@ -12,7 +12,7 @@ except:
 
 import cv2
 
-from simba.bounding_box_tools.yolo.utils import \
+from simba.utils.yolo import \
     keypoint_array_to_yolo_annotation_str
 from simba.third_party_label_appenders.transform.utils import (
     create_yolo_keypoint_yaml, get_yolo_keypoint_flip_idx)
@@ -20,7 +20,7 @@ from simba.utils.checks import (check_float, check_if_dir_exists, check_int,
                                 check_str, check_valid_boolean,
                                 check_valid_dataframe, check_valid_tuple)
 from simba.utils.enums import Options
-from simba.utils.errors import InvalidInputError, NoFilesFoundError
+from simba.utils.errors import NoFilesFoundError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (create_directory,
                                     find_files_of_filetypes_in_directory,

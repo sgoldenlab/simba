@@ -22,7 +22,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_array, check_valid_boolean,
                                 check_valid_device)
 from simba.utils.enums import Formats, Options
-from simba.utils.errors import InvalidInputError, SimBAGPUError
+from simba.utils.errors import InvalidInputError, SimBAGPUError, InvalidFileTypeError
 from simba.utils.read_write import find_core_cnt, get_video_meta_data
 
 
@@ -94,7 +94,10 @@ def load_yolo_model(weights_path: Union[str, os.PathLike],
     check_valid_boolean(value=verbose, source=f'{load_yolo_model.__name__} verbose', raise_error=True)
     if format is not None: check_str(name=f'{load_yolo_model.__name__} format', value=format.lower(), options=Options.VALID_YOLO_FORMATS.value, raise_error=True)
     check_valid_device(device=device)
-    model = YOLO(weights_path, verbose=verbose)
+    try:
+        model = YOLO(weights_path, verbose=verbose)
+    except Exception as e:
+        raise InvalidFileTypeError(msg=f'Could not load {weights_path} as a valid YOLO model: {e.args}', source=load_yolo_model.__name__)
     model.to(device=device)
     if format is not None:
         model.export(format=format)

@@ -490,7 +490,11 @@ def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                justify: Optional[str] = None,
                link: Optional[str] = None,
                width: Optional[int] = None,
-               cursor: Optional[str] = None):
+               cursor: Optional[str] = None,
+               anchor: Optional[str] = None):
+
+
+    anchor = 'w' if anchor is None else anchor
 
     lbl = Label(parent,
                 text=txt,
@@ -499,7 +503,8 @@ def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                 bg=bg_clr,
                 justify=justify,
                 relief=relief,
-                cursor=cursor)
+                cursor=cursor,
+                anchor=anchor)
 
     if width is not None:
         lbl.configure(width=width)
@@ -534,7 +539,8 @@ class SimBADropDown(Frame):
 
         super().__init__(master=parent)
         self.dropdown_var = StringVar()
-        self.dropdown_lbl = Label(self, text=label, width=label_width, anchor="w", font=label_font, bg=label_bg_clr)
+        self.dropdown_lbl = SimBALabel(parent=self, txt=label, txt_clr='black', bg_clr=label_bg_clr, font=label_font, width=label_width, anchor='w')
+        #self.dropdown_lbl = Label(self, text=label, width=label_width, anchor="w", font=label_font, bg=label_bg_clr)
         self.dropdown_lbl.grid(row=0, column=0)
         self.dropdown_options = dropdown_options
         self.command = command

@@ -53,7 +53,7 @@ class BlobVisualizer():
             check_file_exist_and_readable(file_path=data_path)
             self.data_paths = {get_fn_ext(filepath=data_path)[1]: data_path}
         else:
-            raise NoFilesFoundError(msg=f'{data_path} is not a valid directory of file path.')
+            raise NoFilesFoundError(msg=f'{data_path} is not a valid file path or directory.', source=self.__class__.__name__)
         if os.path.isdir(video_path):
             self.video_paths = find_all_videos_in_directory(directory=video_path, raise_error=True, as_dict=True)
         elif os.path.isfile(video_path):

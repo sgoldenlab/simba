@@ -70,7 +70,7 @@ from simba.utils.checks import (check_all_dfs_in_list_has_same_cols,
 from simba.utils.data import (detect_bouts, detect_bouts_multiclass,
                               get_library_version)
 from simba.utils.enums import (OS, ConfigKey, Defaults, Dtypes, Formats,
-                               Methods, MLParamKeys, Options)
+                               Methods, MLParamKeys, Options, Links)
 from simba.utils.errors import (ClassifierInferenceError, CorruptedFileError,
                                 DataHeaderError, FaultyTrainingSetError,
                                 FeatureNumberMismatchError, InvalidInputError,
@@ -1481,9 +1481,12 @@ class TrainModelMixin(object):
         frame_numbers = df.index
         df.index = [vid_name] * len(df)
         if clf_names != None:
-            for clf_name in clf_names:
+            for clf_cnt, clf_name in enumerate(clf_names):
                 if not clf_name in df.columns:
-                    raise MissingColumnsError(msg=f'The SimBA project specifies a classifier named "{clf_name}" that could not be found in your dataset for file {file_path}. Make sure that your project_config.ini is created correctly.', source=TrainModelMixin._read_data_file_helper.__name__)
+                    if clf_name.lower() == Dtypes.NONE.value.lower():
+                        raise InvalidInputError(msg=f'The classifier {clf_cnt+1} name is set to {clf_name}. Make sure you have correctly set the model hyperparameters as documented at {Links.TRAIN_ML_MODEL.value}', source=TrainModelMixin._read_data_file_helper.__name__)
+                    else:
+                        raise MissingColumnsError(msg=f'The SimBA project specifies a classifier named "{clf_name}" that could not be found in your dataset for file {file_path}. Make sure that your project_config.ini is created correctly as documented here: {Links.TRAIN_ML_MODEL.value}.', source=TrainModelMixin._read_data_file_helper.__name__)
                 elif (len(set(df[clf_name].unique()) - {0, 1}) > 0 and raise_bool_clf_error):
                     raise InvalidInputError(msg=f"The annotation column for a classifier should contain only 0 or 1 values. However, in file {file_path} the {clf_name} field column contains additional value(s): {list(set(df[clf_name].unique()) - {0, 1})}.", source=TrainModelMixin._read_data_file_helper.__name__)
         timer.stop_timer()
@@ -1869,15 +1872,13 @@ class TrainModelMixin(object):
             pass
 
     def read_model_settings_from_config(self, config: configparser.ConfigParser):
-        self.model_dir_out = os.path.join(
-            read_config_entry(config, ConfigKey.SML_SETTINGS.value, ConfigKey.MODEL_DIR.value, data_type=Dtypes.STR.value), "generated_models")
+        self.model_dir_out = os.path.join(read_config_entry(config, ConfigKey.SML_SETTINGS.value, ConfigKey.MODEL_DIR.value, data_type=Dtypes.STR.value), "generated_models")
         if not os.path.exists(self.model_dir_out):
             os.makedirs(self.model_dir_out)
         self.eval_out_path = os.path.join(self.model_dir_out, "model_evaluations")
         if not os.path.exists(self.eval_out_path):
             os.makedirs(self.eval_out_path)
-        self.clf_name = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value,
-                                          MLParamKeys.CLASSIFIER.value, data_type=Dtypes.STR.value)
+        self.clf_name = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.CLASSIFIER.value, data_type=Dtypes.STR.value)
         self.tt_size = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.TT_SIZE.value,
                                          data_type=Dtypes.FLOAT.value)
         self.algo = read_config_entry(config, ConfigKey.CREATE_ENSEMBLE_SETTINGS.value, MLParamKeys.MODEL_TO_RUN.value, data_type=Dtypes.STR.value, default_value="RF")

@@ -1,17 +1,14 @@
 import os
-from typing import Dict, List, Literal, Optional, Tuple, Union
-
+from typing import List, Literal, Optional, Tuple, Union
+os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 import numpy as np
 import pandas as pd
 import torch
 
-from simba.bounding_box_tools.yolo.utils import (_get_undetected_obs,
-                                                 filter_yolo_keypoint_data,
-                                                 load_yolo_model)
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_dir_exists, check_int, check_str,
-                                check_valid_array, check_valid_boolean,
-                                check_valid_lst, check_valid_tuple, get_fn_ext)
+from simba.utils.yolo import (_get_undetected_obs,
+                              filter_yolo_keypoint_data,
+                              load_yolo_model)
+from simba.utils.checks import (check_file_exist_and_readable, check_float, check_int, check_valid_boolean,  check_valid_lst, check_valid_tuple, get_fn_ext)
 from simba.utils.errors import CountError, InvalidFileTypeError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_video_meta_data
@@ -39,7 +36,8 @@ class YOLOPoseTrackInference():
                  interpolate: bool = False,
                  threshold: float = 0.7,
                  max_tracks: Optional[int] = 2,
-                 imgsz: int = 320):
+                 imgsz: int = 320,
+                 iou: float = 0.5):
 
         if isinstance(video_path, list):
             check_valid_lst(data=video_path, source=f'{self.__class__.__name__} video_path', valid_dtypes=(str, np.str_,), min_len=1)
@@ -53,6 +51,7 @@ class YOLOPoseTrackInference():
         check_int(name=f'{self.__class__.__name__} batch_size', value=batch_size, min_value=1)
         check_int(name=f'{self.__class__.__name__} imgsz', value=imgsz, min_value=1)
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=10e-6, max_value=1.0)
+        check_float(name=f'{self.__class__.__name__} iou', value=iou, min_value=10e-6, max_value=1.0)
         check_valid_tuple(x=keypoint_names, source=f'{self.__class__.__name__} keypoint_names', min_integer=1, valid_dtypes=(str,))
         check_file_exist_and_readable(file_path=config_path)
         self.keypoint_col_names = [f'{i}_{s}'.upper() for i in keypoint_names for s in ['x', 'y', 'p']]
@@ -62,7 +61,7 @@ class YOLOPoseTrackInference():
         torch.set_num_threads(torch_threads)
         self.model = load_yolo_model(weights_path=weights_path, device=device, format=format)
         self.half_precision, self.stream, self.video_path, self.config_path = half_precision, stream, video_path, config_path
-        self.batch_size, self.threshold, self.max_tracks = batch_size, threshold, max_tracks
+        self.batch_size, self.threshold, self.max_tracks, self.iou = batch_size, threshold, max_tracks, iou
         self.verbose, self.save_dir, self.imgsz, self.interpolate, self.device = verbose, save_dir, imgsz, interpolate, device
         if self.model.model.task != 'pose':
             raise InvalidFileTypeError(msg=f'The model {weights_path} is not a pose model. It is a {self.model.model.task} model', source=self.__class__.__name__)
@@ -78,7 +77,8 @@ class YOLOPoseTrackInference():
             _, video_name, _ = get_fn_ext(filepath=video_path)
             _ = get_video_meta_data(video_path=video_path)
             video_out = []
-            video_predictions = self.model.track(source=video_path, stream=self.stream, tracker=self.config_path, conf=self.threshold, half=self.half_precision, imgsz=self.imgsz, persist=False, device=self.device, max_det=self.max_tracks)
+            video_predictions = self.model.track(source=video_path, stream=self.stream, tracker=self.config_path, conf=self.threshold, half=self.half_precision, imgsz=self.imgsz, persist=False, iou=self.iou, device=self.device, max_det=self.max_tracks)
+            print(video_predictions)
             for frm_cnt, video_prediction in enumerate(video_predictions):
                 boxes = video_prediction.obb.data if video_prediction.obb is not None else video_prediction.boxes.data
                 boxes = boxes.cpu().numpy().astype(np.float32)
@@ -89,6 +89,7 @@ class YOLOPoseTrackInference():
                         video_out.append(_get_undetected_obs(frm_id=frm_cnt, class_id=class_id, class_name=class_name, value_cnt=(10 + (len(self.keypoint_col_names)))))
                         continue
                     if boxes.shape[1] != 7: boxes = np.insert(boxes, 4, -1, axis=1)
+                    print(boxes)
                     cls_boxes, cls_keypoints = filter_yolo_keypoint_data(bbox_data=boxes, keypoint_data=keypoints, class_id=class_id, confidence=None, class_idx=-1, confidence_idx=None)
                     for i in range(cls_boxes.shape[0]):
                         frm_results = np.array([frm_cnt, boxes[i][-1], self.class_ids[boxes[i][-1]], boxes[i][-2], boxes[i][-3]])
@@ -120,30 +121,41 @@ class YOLOPoseTrackInference():
 # VIDEO_PATH = "/mnt/d/netholabs/yolo_videos/input/mp4_20250606083508/2025-05-28_19-50-23.mp4"
 # #VIDEO_PATH = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-46-56.mp4"
 # VIDEO_PATH = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-46-56.mp4"
-BOTSORT_PATH = "/mnt/c/projects/simba/simba/simba/assets/bytetrack.yml"
+# BOTSORT_PATH = "/mnt/c/projects/simba/simba/simba/assets/bytetrack.yml"
 #BOTSORT_PATH = "/mnt/c/projects/simba/simba/simba/assets/botsort.yml"
 
 
-VIDEO_PATH = r"/mnt/d/ares/data/termite_2/videos/termite.mp4"
-WEIGHTS_PASS = r"/mnt/d/ares/data/termite_2/yolo/mdl/train13/weights/best.pt"
-SAVE_DIR = "/mnt/d/ares/data/termite_2/yolo/results"
+# VIDEO_PATH = r"/mnt/d/ares/data/termite_2/videos/termite.mp4"
+# WEIGHTS_PASS = r"/mnt/d/ares/data/termite_2/yolo/mdl/train13/weights/best.pt"
+# SAVE_DIR = "/mnt/d/ares/data/termite_2/yolo/results"
 
-VIDEO_PATH = r"/mnt/d/ares/data/ant/sleap_video/ant.mp4"
-WEIGHTS_PASS = r"/mnt/d/ares/data/ant/yolo/mdl/train6/weights/best.pt"
-SAVE_DIR = "/mnt/d/ares/data/ant/yolo/results"
+# VIDEO_PATH = r"/mnt/d/ares/data/ant/sleap_video/ant.mp4"
+# WEIGHTS_PASS = r"/mnt/d/ares/data/ant/yolo/mdl/train6/weights/best.pt"
+# SAVE_DIR = "/mnt/d/ares/data/ant/yolo/results"
 
-i = YOLOPoseTrackInference(weights_path=WEIGHTS_PASS,
-                           video_path=VIDEO_PATH,
-                           save_dir=SAVE_DIR,
-                           verbose=True,
-                           device=0,
-                           format='onnx',
-                           keypoint_names=('head', 'thorax', 'abdomen'),
-                           batch_size=32,
-                           threshold=0.01,
-                           config_path=BOTSORT_PATH,
-                           interpolate=False,
-                           imgsz=640,
-                           max_tracks=5,
-                           stream=True)
-i.run()
+
+
+
+# VIDEO_PATH = r"D:\cvat_annotations\videos\mp4_20250624155703\s16-Chasing.mp4"
+# WEIGHTS_PASS = r"D:\cvat_annotations\frames\yolo_072125\mdl\train\weights\best.pt"
+# SAVE_DIR = r"D:\cvat_annotations\frames\yolo_072125\results_track"
+# BOTSORT_PATH = r"C:\projects\simba\simba\simba\assets\bytetrack.yml"
+#
+# KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
+#
+# i = YOLOPoseTrackInference(weights_path=WEIGHTS_PASS,
+#                            video_path=VIDEO_PATH,
+#                            save_dir=SAVE_DIR,
+#                            verbose=True,
+#                            device=0,
+#                            format=None,
+#                            keypoint_names=KEYPOINT_NAMES,
+#                            batch_size=32,
+#                            threshold=0.01,
+#                            config_path=BOTSORT_PATH,
+#                            interpolate=False,
+#                            imgsz=640,
+#                            max_tracks=5,
+#                            stream=False,
+#                            iou=0.2)
+# i.run()

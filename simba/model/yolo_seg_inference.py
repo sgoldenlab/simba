@@ -1,6 +1,4 @@
-import argparse
 import os
-import sys
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 try:
@@ -14,11 +12,11 @@ import numpy as np
 import pandas as pd
 import torch
 
-from simba.bounding_box_tools.yolo.utils import load_yolo_model, yolo_predict
+from simba.utils.yolo import load_yolo_model, yolo_predict
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int,
                                 check_valid_boolean, check_valid_lst,
-                                check_valid_tuple, get_fn_ext)
+                                get_fn_ext)
 from simba.utils.data import resample_geometry_vertices
 from simba.utils.enums import Options
 from simba.utils.errors import InvalidFileTypeError

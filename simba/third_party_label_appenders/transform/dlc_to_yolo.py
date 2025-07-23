@@ -12,7 +12,7 @@ except:
 import cv2
 import numpy as np
 
-from simba.bounding_box_tools.yolo.utils import \
+from simba.utils.yolo import \
     keypoint_array_to_yolo_annotation_str
 from simba.third_party_label_appenders.transform.utils import (
     create_yolo_keypoint_yaml, get_yolo_keypoint_flip_idx)

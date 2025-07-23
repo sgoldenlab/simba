@@ -21,6 +21,30 @@ CLASS_NAME = 'CLASS_NAME'
 CORD_FIELDS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 
 class YOLOVisualizer():
+
+    """
+    Visualize the results of YOLO bounding box model.
+
+    .. seealso::
+       For inference, see :func:`simba.model.yolo_inference.YoloInference`
+
+    .. video:: _static/img/YOLOVisualizer.webm
+      :width: 500
+      :loop:
+      :autoplay:
+
+    :param Union[str, os.PathLike] data_path: Path to YOLO results CSV results. Produced by :func:`simba.bounding_box_tools.yolo.model.inference_yolo`
+    :param Union[str, os.PathLike] video_path: Path to the video from which the data was produced.
+    :param Union[str, os.PathLike] save_dir: Directory where to save the video results.
+    :param Optional[str] palette: Color palette from where to draw the colors for the bounding polygons/boxes. Default: `Set1`.
+    :param Optional[int] core_cnt: The number of CPU cores use dto produce the video. -1 for all available cores. Default: -1.
+    :param Optional[bool] verbose: If True, prints progress (useful for debugging). Default: False.
+
+    :example:
+    >>> test = YOLOVisualizer(data_path=r"/mnt/c/troubleshooting/yolo_inference/08102021_DOT_Rat7_8(2).csv", video_path=r'/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/08102021_DOT_Rat7_8(2).mp4', save_dir="/mnt/c/troubleshooting/yolo_videos")
+    >>> test.run()
+    """
+
     def __init__(self,
                  data_path: Union[str, os.PathLike],
                  video_path: Union[str, os.PathLike],
@@ -31,28 +55,7 @@ class YOLOVisualizer():
                  thickness: Optional[int] = None,
                  verbose: Optional[bool] = False):
 
-        """
-        Visualize the results of YOLO bounding box model.
 
-        .. seealso::
-           :func:`simba.bounding_box_tools.yolo.model.inference_yolo`
-
-        .. video:: _static/img/YOLOVisualizer.webm
-          :width: 500
-          :loop:
-          :autoplay:
-
-        :param Union[str, os.PathLike] data_path: Path to YOLO results CSV results. Produced by :func:`simba.bounding_box_tools.yolo.model.inference_yolo`
-        :param Union[str, os.PathLike] video_path: Path to the video from which the data was produced.
-        :param Union[str, os.PathLike] save_dir: Directory where to save the video results.
-        :param Optional[str] palette: Color palette from where to draw the colors for the bounding polygons/boxes. Default: `Set1`.
-        :param Optional[int] core_cnt: The number of CPU cores use dto produce the video. -1 for all available cores. Default: -1.
-        :param Optional[bool] verbose: If True, prints progress (useful for debugging). Default: False.
-
-        :example:
-        >>> test = YOLOVisualizer(data_path=r"/mnt/c/troubleshooting/yolo_inference/08102021_DOT_Rat7_8(2).csv", video_path=r'/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/08102021_DOT_Rat7_8(2).mp4', save_dir="/mnt/c/troubleshooting/yolo_videos")
-        >>> test.run()
-        """
 
         check_file_exist_and_readable(file_path=data_path)
         self.video_meta_data = get_video_meta_data(video_path=video_path)

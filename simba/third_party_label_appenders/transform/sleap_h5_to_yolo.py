@@ -6,7 +6,7 @@ import cv2
 import numpy as np
 import pandas as pd
 
-from simba.bounding_box_tools.yolo.utils import \
+from simba.utils.yolo import \
     keypoint_array_to_yolo_annotation_str
 from simba.third_party_label_appenders.converters import \
     create_yolo_keypoint_yaml

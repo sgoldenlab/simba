@@ -14,9 +14,10 @@ import numpy as np
 import pandas as pd
 import torch
 
-from simba.bounding_box_tools.yolo.utils import (_get_undetected_obs,
-                                                 filter_yolo_keypoint_data,
-                                                 load_yolo_model, yolo_predict)
+
+from simba.utils.yolo import (_get_undetected_obs,
+                              filter_yolo_keypoint_data,
+                              load_yolo_model, yolo_predict)
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int,
                                 check_valid_boolean, check_valid_lst,
@@ -79,6 +80,9 @@ class YOLOPoseInference():
                  interpolate: bool = False,
                  imgsz: int = 640,
                  iou: float = 0.5):
+
+
+
 
         if isinstance(video_path, list):
             check_valid_lst(data=video_path, source=f'{self.__class__.__name__} video_path', valid_dtypes=(str, np.str_,), min_len=1)
@@ -212,27 +216,27 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     inference.run()
 
 # #
-# # video_paths = r"D:\cvat_annotations\videos\mp4_20250624155703"
-# # weights_path = r"D:\cvat_annotations\yolo_mdl_07122025\weights\best.pt"
-# # save_dir = r"D:\cvat_annotations\yolo_mdl_07122025\out_data"
+video_paths = r"D:\cvat_annotations\videos\mp4_20250624155703"
+weights_path = r"D:\cvat_annotations\frames\yolo_072125\mdl\train\weights\best.pt"
+save_dir = r"D:\cvat_annotations\frames\yolo_072125\results"
 # #
-# # keypoint_names = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
-# # # # #
-# # # # #
-# # i = YOLOPoseInference(weights_path=weights_path,
-# #                         video_path=video_paths,
-# #                         save_dir=save_dir,
-# #                         verbose=True,
-# #                         device=0,
-# #                         format=None,
-# #                         stream=True,
-# #                         keypoint_names=keypoint_names,
-# #                         batch_size=100,
-# #                         imgsz=640,
-# #                         interpolate=False,
-# #                         threshold=0.5,
-# #                         max_tracks=4)
-# # i.run()
+keypoint_names = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
+# # #
+# # #
+i = YOLOPoseInference(weights_path=weights_path,
+                        video_path=video_paths,
+                        save_dir=save_dir,
+                        verbose=True,
+                        device=0,
+                        format=None,
+                        stream=True,
+                        keypoint_names=keypoint_names,
+                        batch_size=100,
+                        imgsz=640,
+                        interpolate=False,
+                        threshold=0.5,
+                        max_tracks=4)
+i.run()
 #
 #
 # # video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"

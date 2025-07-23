@@ -1,7 +1,7 @@
 import os
 
 from simba.bounding_box_tools.yolo.model import fit_yolo, inference_yolo
-from simba.bounding_box_tools.yolo.yolo_visualize import YOLOVisualizer
+from simba.plotting.yolo_visualize import YOLOVisualizer
 from simba.third_party_label_appenders.converters import (
     simba_rois_to_yolo, split_yolo_train_test_val)
 
