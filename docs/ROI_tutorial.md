@@ -90,6 +90,7 @@ following pop up:
  * `LAST ROI ENTRY TIME (S)`: The video time, in seconds, when each animal last enters each defined ROI  in each time-bin in each video (NOTE: will be `None` if an animal never enters a defined ROI).
  * `DETAILED ROI BOUT DATA (SEQUENCES)`: If checked, the SimBA ROI analysis generates a CSV file within the `project_folder/logs` directory named something like *Detailed_ROI_bout_data_20231031141848.csv*. This file contains the exact frame numbers, time stamps, and duration of each seqence when animals enter and exits each user-drawn ROIs. (NOTE: no file will be created if no animal in any video never enters an ROI)
  * `ROI MOVEMENT (VELOCITY AND DISTANCES)`: The total distance moved, and the average velocity, of each animal in each defined ROI  in each time-bin in each video.
+ * `OUTSIDE ROI ZONES DATA`: If checked, SimBA will treat **all areas NOT covered by a ROI drawing** as a single additional ROI and compute the chosen metrics for this, single, ROI. For example of the expected output when this checkbox is ticked, see [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/outside_roi_ex_timebin.csv) file.
 
 6). In the `FORMAT OPTION` frame, select how the output data should be formatted, and any addtional video meta data that should be included in the output which could be helpful for sanity checks. 
 
@@ -196,9 +197,11 @@ To to this, click the <kbd>VISUALIZE ROI TRACKING</kbd> in the `[ ROI ]` tab and
 
 5) `SELECT BODY-PARTS` frame: Select the body-parts that you wish to act as proxies for the location of the animal. If you have set the `SHOW POSE ESTIMATION LOCATIONS` dropdown to True, you can also select the color, and the size, of the circles denoting the location of the animals in each frame. Note: if KEY-POINT SIZE is set to "AUTO", then SimBA will try to auto-compute the optimal size of the bosy-part location using the resolution of your video.
 
-6). To create a single ROI visualization video, select which video you want to create an ROI video for in the *select Video* drop-down menu* and click the <kbd>CREATE SINGLE VIDEO</kbd> button. 
+6) `OUTSIDE ROI ZONES DATA`: If `TRUE`, SimBA will treat **all areas NOT covered by a ROI drawing** as a single additional ROI and visualize the metrics for this, single, ROI. For example of the expected output when this is set to TRUE, see [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/_static/img/outside_roi_example.mp4) video.
 
-7) To create ROI visualizations for all available videos in your project, click the the <kbd>CREATE ALL ROI VIDEOS</kbd> button.
+7) To create a single ROI visualization video, select which video you want to create an ROI video for in the *select Video* drop-down menu* and click the <kbd>CREATE SINGLE VIDEO</kbd> button. 
+
+8) To create ROI visualizations for all available videos in your project, click the the <kbd>CREATE ALL ROI VIDEOS</kbd> button.
 
 You can follow the progress in the main SimBA terminal and the main opertaing system terminal from where SimBA was launched. The ROI videos are saved in the `project_folder/frames/output/ROI_analysis` directory. 
 
