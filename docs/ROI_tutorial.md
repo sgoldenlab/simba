@@ -197,9 +197,11 @@ To to this, click the <kbd>VISUALIZE ROI TRACKING</kbd> in the `[ ROI ]` tab and
 
 5) `SELECT BODY-PARTS` frame: Select the body-parts that you wish to act as proxies for the location of the animal. If you have set the `SHOW POSE ESTIMATION LOCATIONS` dropdown to True, you can also select the color, and the size, of the circles denoting the location of the animals in each frame. Note: if KEY-POINT SIZE is set to "AUTO", then SimBA will try to auto-compute the optimal size of the bosy-part location using the resolution of your video.
 
-6). To create a single ROI visualization video, select which video you want to create an ROI video for in the *select Video* drop-down menu* and click the <kbd>CREATE SINGLE VIDEO</kbd> button. 
+6) `OUTSIDE ROI ZONES DATA`: If `TRUE`, SimBA will treat **all areas NOT covered by a ROI drawing** as a single additional ROI and visualize the metrics for this, single, ROI. For example of the expected output when this is set to TRUE, see [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/_static/img/outside_roi_example.mp4) video.
 
-7) To create ROI visualizations for all available videos in your project, click the the <kbd>CREATE ALL ROI VIDEOS</kbd> button.
+7) To create a single ROI visualization video, select which video you want to create an ROI video for in the *select Video* drop-down menu* and click the <kbd>CREATE SINGLE VIDEO</kbd> button. 
+
+8) To create ROI visualizations for all available videos in your project, click the the <kbd>CREATE ALL ROI VIDEOS</kbd> button.
 
 You can follow the progress in the main SimBA terminal and the main opertaing system terminal from where SimBA was launched. The ROI videos are saved in the `project_folder/frames/output/ROI_analysis` directory. 
 
