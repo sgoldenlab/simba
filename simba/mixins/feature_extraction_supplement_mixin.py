@@ -817,7 +817,6 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
             roi_frames = bout_df[["Start_frame", "End_frame"]].values
             for event_start_frm, event_end_frm in roi_frames:
                 event_pose = bp_data[event_start_frm:event_end_frm + 1, :]
-                print(event_pose)
                 if event_pose.shape[0] > 1:
                     distance, velocity = FeatureExtractionSupplemental.distance_and_velocity(x=event_pose, fps=fps, pixels_per_mm=px_per_mm, centimeters=True)
                     distances.append(distance)

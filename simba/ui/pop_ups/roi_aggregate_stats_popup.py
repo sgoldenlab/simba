@@ -14,6 +14,7 @@ from simba.utils.checks import check_float
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.errors import InvalidInputError, NoROIDataError
 
+OUTSIDE_ROI = 'OUTSIDE REGIONS OF INTEREST'
 
 class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
     """
@@ -68,7 +69,7 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         self.mean_bout_time_cb, self.mean_bout_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='MEAN ROI BOUT TIME (S)', val=False, txt_img='average')
         self.detailed_cb, self.detailed_var = SimbaCheckbox(parent=self.data_options_frm, txt='DETAILED ROI BOUT DATA (SEQUENCES)', val=False, txt_img='details')
         self.movement_cb, self.movement_var = SimbaCheckbox(parent=self.data_options_frm, txt='ROI MOVEMENT (VELOCITY & DISTANCES)', val=False, txt_img='pose')
-        self.outside_cb, self.outside_var = SimbaCheckbox(parent=self.data_options_frm, txt='OUTSIDE ROI ZONES DATA', val=False, txt_img='outside_2')
+        self.outside_cb, self.outside_var = SimbaCheckbox(parent=self.data_options_frm, txt='OUTSIDE ROI ZONES DATA', val=False, txt_img='outside_2', tooltip_txt=f'TREAT ALL NON-ROI REGIONS AS AN ROI REGION NAMED \n "{OUTSIDE_ROI}"')
 
         self.data_options_frm.grid(row=self.frame_children(frame=self.main_frm), column=0, sticky=NW)
         self.total_time_cb.grid(row=0, column=0, sticky=NW)
@@ -83,8 +84,8 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         self.format_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="FORMAT OPTIONS", icon_name='abacus')
         self.transpose_cb, self.transpose_var = SimbaCheckbox(parent=self.format_frm, txt='TRANSPOSE OUTPUT TABLE', val=False, txt_img='restart')
         self.fps_cb, self.fps_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE FPS DATA', val=False, txt_img='fps')
-        self.video_length_cb, self.video_length_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE VIDEO LENGTH DATA', val=False)
-        self.px_per_mm_cb, self.px_per_mm_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE PIXEL PER MILLIMETER DATA', val=False)
+        self.video_length_cb, self.video_length_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE VIDEO LENGTH DATA', val=False, txt_img='timer_2')
+        self.px_per_mm_cb, self.px_per_mm_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE PIXEL PER MILLIMETER DATA', val=False, txt_img='ruler')
 
         self.format_frm.grid(row=self.frame_children(frame=self.main_frm), column=0, sticky=NW)
         self.transpose_cb.grid(row=0, column=0, sticky=NW)
@@ -93,7 +94,7 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         self.px_per_mm_cb.grid(row=3, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
 
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self):
         probability = self.probability_entry.entry_get

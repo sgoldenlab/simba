@@ -27,7 +27,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_video_and_data_frm_count_align)
 from simba.utils.data import (create_color_palettes, detect_bouts,
                               slice_roi_dict_for_video)
-from simba.utils.enums import Formats, Keys, Paths, TextOptions
+from simba.utils.enums import Formats, Keys, Paths, TextOptions, ROI_SETTINGS
 from simba.utils.errors import (BodypartColumnNotFoundError, DuplicationError,
                                 NoFilesFoundError, NoROIDataError,
                                 ROICoordinatesNotFoundError)
@@ -58,13 +58,21 @@ def _roi_plotter_mp(data: Tuple[int, np.ndarray],
                     bp_colors: list,
                     style_attr: dict,
                     animal_ids: list,
-                    threshold: float):
+                    threshold: float,
+                    outside_roi: bool,
+                    verbose: bool):
 
     def __insert_texts(roi_dict, img):
         for animal_name in animal_ids:
             for shape_name, shape_data in roi_dict.items():
                 img = cv2.putText(img, loc_dict[animal_name][shape_name]["timer_text"], loc_dict[animal_name][shape_name]["timer_text_loc"], TextOptions.FONT.value, font_size, shape_data['Color BGR'], TextOptions.TEXT_THICKNESS.value)
                 img = cv2.putText(img, loc_dict[animal_name][shape_name]["entries_text"], loc_dict[animal_name][shape_name]["entries_text_loc"], TextOptions.FONT.value, font_size, shape_data['Color BGR'], TextOptions.TEXT_THICKNESS.value)
+            if outside_roi:
+                img = cv2.putText(img, loc_dict[animal_name][ROI_SETTINGS.OUTSIDE_ROI.value]["timer_text"], loc_dict[animal_name][ROI_SETTINGS.OUTSIDE_ROI.value]["timer_text_loc"], TextOptions.FONT.value, font_size, TextOptions.WHITE.value, TextOptions.TEXT_THICKNESS.value)
+                img = cv2.putText(img, loc_dict[animal_name][ROI_SETTINGS.OUTSIDE_ROI.value]["entries_text"], loc_dict[animal_name][ROI_SETTINGS.OUTSIDE_ROI.value]["entries_text_loc"], TextOptions.FONT.value, font_size, TextOptions.WHITE.value, TextOptions.TEXT_THICKNESS.value)
+            return img
+
+
         return img
 
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
@@ -91,15 +99,16 @@ def _roi_plotter_mp(data: Tuple[int, np.ndarray],
                             img = cv2.circle(img, (x, y), circle_sizes[animal_cnt], bp_colors[animal_cnt], -1)
                         if style_attr[SHOW_ANIMAL_NAMES]:
                             img = cv2.putText(img, animal_name, (x, y), TextOptions.FONT.value, font_size, bp_colors[animal_cnt], TextOptions.TEXT_THICKNESS.value)
-
                 for shape_name in video_shape_names:
+                    shape_color = TextOptions.WHITE.value if shape_name == ROI_SETTINGS.OUTSIDE_ROI.value else roi_dict[shape_name]["Color BGR"]
                     timer = round(data_df.loc[current_frm, f"{animal_name}_{shape_name}_cum_sum_time"], 2)
                     entries = data_df.loc[current_frm, f"{animal_name}_{shape_name}_cum_sum_entries"]
-                    img = cv2.putText(img, str(timer), loc_dict[animal_name][shape_name]["timer_data_loc"], TextOptions.FONT.value, font_size, roi_dict[shape_name]["Color BGR"], TextOptions.TEXT_THICKNESS.value)
-                    img = cv2.putText(img, str(entries), loc_dict[animal_name][shape_name]["entries_data_loc"], TextOptions.FONT.value, font_size, roi_dict[shape_name]["Color BGR"], TextOptions.TEXT_THICKNESS.value)
+                    img = cv2.putText(img, str(timer), loc_dict[animal_name][shape_name]["timer_data_loc"], TextOptions.FONT.value, font_size, shape_color, TextOptions.TEXT_THICKNESS.value)
+                    img = cv2.putText(img, str(entries), loc_dict[animal_name][shape_name]["entries_data_loc"], TextOptions.FONT.value, font_size, shape_color, TextOptions.TEXT_THICKNESS.value)
+
             writer.write(img)
             current_frm += 1
-            print(f"Multi-processing video frame {current_frm} on core {group_cnt}...")
+            if verbose: print(f"Multi-processing video frame {current_frm} on core {group_cnt}...")
         else:
             FrameRangeWarning(msg=f'Could not read frame {current_frm} in video {video_meta_data["video_name"]}', source=_roi_plotter_mp.__name__)
             break
@@ -127,10 +136,16 @@ class ROIPlotMultiprocess(ConfigReader):
        :width: 1000
        :align: center
 
+    .. video:: _static/img/outside_roi_example.mp4
+       :width: 800
+       :autoplay:
+       :loop:
+
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file in Configparser format
     :param Union[str, os.PathLike] video_path: Name of video to create ROI visualizations for
     :param Dict[str, bool] style_attr: User-defined visualization settings.
     :param Optional[int] core_cnt: Number of cores to use. Default to -1 representing all available cores
+    :param Optional[bool]: If True, SimBA will treat all areas NOT covered by a ROI drawing as a single additional ROI visualize the stats for this, single, ROI.
     :param List[str] body_parts: List of the body-parts to use as proxy for animal locations.
     :param Optional[float] threshold: Float between 0 and 1. Body-part locations detected below this confidence threshold are filtered. Default: 0.0.
 
@@ -150,6 +165,8 @@ class ROIPlotMultiprocess(ConfigReader):
                  style_attr: Dict[str, bool],
                  threshold: Optional[float] = 0.0,
                  core_cnt: int = -1,
+                 verbose: bool = True,
+                 outside_roi: bool = False,
                  data_path: Optional[Union[str, os.PathLike]] = None,
                  save_path: Optional[Union[str, os.PathLike]] = None,
                  bp_colors: Optional[List[Tuple[int, int, int]]] = None,
@@ -165,6 +182,8 @@ class ROIPlotMultiprocess(ConfigReader):
         check_if_keys_exist_in_dict(data=style_attr, key=STYLE_KEYS, name=f'{self.__class__.__name__} style_attr')
         check_valid_dict(x=style_attr, required_keys=tuple(STYLE_KEYS,), valid_values_dtypes=(bool,))
         check_valid_boolean(value=[gpu], source=f'{self.__class__.__name__} gpu', raise_error=True)
+        check_valid_boolean(value=[outside_roi], source=f'{self.__class__.__name__} outside_roi', raise_error=True)
+        check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose', raise_error=True)
         if gpu and not check_nvidea_gpu_available():
             GPUToolsWarning(msg='GPU not detected but GPU set to True - skipping GPU use.')
             gpu = False
@@ -188,11 +207,12 @@ class ROIPlotMultiprocess(ConfigReader):
             check_if_dir_exists(os.path.dirname(save_path))
         self.save_path, self.data_path = save_path, data_path
         check_valid_lst(data=body_parts, source=f'{self.__class__.__name__} body-parts', valid_dtypes=(str,), min_len=1)
+        if outside_roi: self.shape_names.append(ROI_SETTINGS.OUTSIDE_ROI.value)
         if len(set(body_parts)) != len(body_parts):
             raise DuplicationError(msg=f'All body-part entries have to be unique. Got {body_parts}', source=self.__class__.__name__)
         for bp in body_parts:
             if bp not in self.body_parts_lst: raise BodypartColumnNotFoundError(msg=f'The body-part {bp} is not a valid body-part in the SimBA project. Options: {self.body_parts_lst}', source=self.__class__.__name__)
-        self.roi_analyzer = ROIAggregateStatisticsAnalyzer(config_path=self.config_path, data_path=self.data_path,  detailed_bout_data=True, threshold=threshold, body_parts=body_parts)
+        self.roi_analyzer = ROIAggregateStatisticsAnalyzer(config_path=self.config_path, data_path=self.data_path,  detailed_bout_data=True, threshold=threshold, body_parts=body_parts, outside_rois=outside_roi, verbose=verbose)
         self.roi_analyzer.run()
         if bp_colors is not None:
             check_valid_lst(data=bp_colors, source=f'{self.__class__.__name__} bp_colors', valid_dtypes=(tuple,), exact_len=len(body_parts), raise_error=True)
@@ -215,7 +235,7 @@ class ROIPlotMultiprocess(ConfigReader):
         self.video_path = video_path
         check_video_and_data_frm_count_align(video=self.video_path, data=self.data_df, name=self.video_name, raise_error=False)
         self.cap = cv2.VideoCapture(self.video_path)
-        self.threshold, self.body_parts, self.style_attr, self.gpu = threshold, body_parts, style_attr, gpu
+        self.threshold, self.body_parts, self.style_attr, self.gpu, self.outside_roi, self.verbose = threshold, body_parts, style_attr, gpu, outside_roi, verbose
         self.roi_dict_ = get_roi_dict_from_dfs(rectangle_df=self.sliced_roi_dict[Keys.ROI_RECTANGLES.value], circle_df=self.sliced_roi_dict[Keys.ROI_CIRCLES.value], polygon_df=self.sliced_roi_dict[Keys.ROI_POLYGONS.value])
         self.temp_folder = os.path.join(os.path.dirname(self.save_path), self.video_name, "temp")
         if os.path.exists(self.temp_folder): shutil.rmtree(self.temp_folder)
@@ -251,7 +271,7 @@ class ROIPlotMultiprocess(ConfigReader):
              for shape in self.shape_names:
                  txt_strs.append(animal_name + ' ' + shape + ' entries')
          longest_text_str = max(txt_strs, key=len)
-         self.font_size, x_spacer, y_spacer = PlottingMixin().get_optimal_font_scales(text=longest_text_str, accepted_px_width=int(self.video_meta_data["width"] / 2), accepted_px_height=int(self.video_meta_data["height"] / 15), text_thickness=TextOptions.TEXT_THICKNESS.value)
+         self.font_size, x_spacer, y_spacer = PlottingMixin().get_optimal_font_scales(text=longest_text_str, accepted_px_width=int(self.video_meta_data["width"] / 1.5), accepted_px_height=int(self.video_meta_data["height"] / 10), text_thickness=TextOptions.TEXT_THICKNESS.value)
          row_counter = TextOptions.FIRST_LINE_SPACING.value
          for animal_cnt, animal_name in enumerate(self.animal_names):
              loc_dict[animal_name] = {}
@@ -315,12 +335,11 @@ class ROIPlotMultiprocess(ConfigReader):
         self.loc_dict = self.__get_text_locs()
         self.cnt_dict = self.__get_counters()
         self.__get_cumulative_data()
-
         data = np.array_split(self.data_df, self.core_cnt)
         data = [(i, j) for i, j in enumerate(data)]
         del self.data_df
         del self.roi_analyzer.logger
-        print(f"Creating ROI images, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
+        if self.verbose: print(f"Creating ROI images, multiprocessing (chunksize: {self.multiprocess_chunksize}, cores: {self.core_cnt})...")
         with multiprocessing.Pool(self.core_cnt, maxtasksperchild=self.maxtasksperchild) as pool:
             constants = functools.partial(_roi_plotter_mp,
                                           loc_dict=self.loc_dict,
@@ -335,7 +354,9 @@ class ROIPlotMultiprocess(ConfigReader):
                                           bp_colors=self.color_lst,
                                           style_attr=self.style_attr,
                                           animal_ids=self.animal_names,
-                                          threshold=self.threshold)
+                                          threshold=self.threshold,
+                                          outside_roi=self.outside_roi,
+                                          verbose=self.verbose)
 
             for cnt, batch_cnt in enumerate(pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):
                 print(f'Image batch {batch_cnt+1} / {self.core_cnt} complete...')
@@ -350,9 +371,11 @@ class ROIPlotMultiprocess(ConfigReader):
 
 # if __name__ == "__main__":
 #     test = ROIPlotMultiprocess(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
-#                                video_path=r"C:\troubleshooting\mitra\project_folder\videos\502_MA141_Gi_Saline_0517.mp4",
+#                                video_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_Saline_0513.mp4",
 #                                body_parts=['Nose'],
-#                                style_attr={'show_body_part': True, 'show_animal_name': False})
+#                                style_attr={'show_body_part': True, 'show_animal_name': False},
+#                                outside_roi=True,
+#                                gpu=True)
 #     test.run()
 
 # if __name__ == "__main__":

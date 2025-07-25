@@ -41,9 +41,7 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
     """
     Analyzes region-of-interest (ROI) data from video tracking experiments.
 
-    This class computes various statistics related to body-part movements inside defined ROIs,
-    including entry counts, total time spent, and bout durations.
-
+    This class computes various statistics related to body-part movements inside defined ROIs, including entry counts, total time spent, and bout durations.
 
     :param config_path (str | os.PathLike): Path to the configuration file.
     :param data_path (str | os.PathLike | List[str], optional): Path(s) to the data files.
@@ -54,6 +52,7 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
     :param total_time (bool): Whether to calculate total time spent in ROIs.
     :param entry_counts (bool): Whether to count entries into ROIs.
     :param first_entry_time (bool): Whether to record the first entry time.
+    :param outside_rois (bool): If checked, SimBA will treat all areas NOT covered by a ROI drawing as a single additional ROI and compute the chosen metrics for this, single, ROI.
     :param last_entry_time (bool): Whether to record the last entry time.
     :param mean_bout_time (bool): Whether to compute mean bout duration.
     :param transpose (bool): Whether to transpose the final results.
@@ -116,7 +115,7 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
         check_valid_boolean(value=[include_fps], source=f'{self.__class__.__name__} include_fps', raise_error=True)
         check_valid_boolean(value=[include_video_length], source=f'{self.__class__.__name__} include_video_length', raise_error=True)
         check_valid_boolean(value=[include_px_per_mm], source=f'{self.__class__.__name__} include_px_per_mm', raise_error=True)
-        check_valid_boolean(value=[outside_rois], source=f'{self.__class__.__name__} non_roi_zone', raise_error=True)
+        check_valid_boolean(value=[outside_rois], source=f'{self.__class__.__name__} outside_rois', raise_error=True)
         check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose', raise_error=True)
         self.read_roi_data()
         FeatureExtractionMixin.__init__(self)

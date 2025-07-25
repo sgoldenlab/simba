@@ -439,7 +439,7 @@ class TextOptions(Enum):
         255,
     )  # THE COLOR OF THE TEXT IN BGR. (147, 20, 255)  REPRESENT DEEP PINK: TYPICALLY NOT A COLOR IN ANIMAL ARENA.
     FONT = cv2.FONT_HERSHEY_SIMPLEX
-
+    WHITE = (255, 255, 255)
 
 class Defaults(Enum):
     MAX_TASK_PER_CHILD = 10
@@ -807,6 +807,7 @@ class ROI_SETTINGS(Enum):
     CIRCLE = 'circle'
     POLYGON = 'polygon'
     RECTANGLE = 'rectangle'
+    OUTSIDE_ROI = 'OUTSIDE REGIONS OF INTEREST'
 
 class PackageNames(Enum):
     ULTRALYTICS = 'ultralytics'

@@ -460,12 +460,12 @@ def SimbaCheckbox(parent: Union[Frame, Toplevel, LabelFrame, Canvas],
                   txt: str,
                   txt_clr: Optional[str] = 'black',
                   txt_img: Optional[str] = None,
-
                   txt_img_location: Literal['left', 'right', 'top', 'bottom'] = RIGHT,
                   font: Optional[Tuple[str, str, int]] = Formats.FONT_REGULAR.value,
                   val: Optional[bool] = False,
                   state: Literal["disabled", 'normal'] = NORMAL,
-                  cmd: Optional[Callable] = None):
+                  cmd: Optional[Callable] = None,
+                  tooltip_txt: Optional[str] = None):
 
     var = BooleanVar(value=False)
     if val: var.set(True)
@@ -479,6 +479,10 @@ def SimbaCheckbox(parent: Union[Frame, Toplevel, LabelFrame, Canvas],
         cb.image = txt_img
     if state == DISABLED:
         cb.configure(state=DISABLED)
+
+    if isinstance(tooltip_txt, str):
+        CreateToolTip(widget=cb, text=tooltip_txt)
+
     return cb, var
 
 def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
@@ -535,7 +539,8 @@ class SimBADropDown(Frame):
                 dropdown_width: Optional[int] = None,
                 command: Callable = None,
                 value: Optional[Any] = None,
-                state: Optional[str] = None):
+                state: Optional[str] = None,
+                tooltip_txt: Optional[str] = None):
 
         super().__init__(master=parent)
         self.dropdown_var = StringVar()
@@ -556,6 +561,8 @@ class SimBADropDown(Frame):
             self.dropdown.bind("<<ComboboxSelected>>", self.on_select)
         if state == 'disabled':
             self.disable()
+        if isinstance(tooltip_txt, str):
+            CreateToolTip(widget=self.dropdown_lbl, text=tooltip_txt)
 
     def set_value(self, value: Any):
         self.dropdown_var.set(value)

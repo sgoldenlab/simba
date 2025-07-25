@@ -16,7 +16,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         SimbaCheckbox, SimBADropDown,
                                         SimBALabel)
 from simba.utils.checks import check_file_exist_and_readable, check_float
-from simba.utils.enums import Formats, Keys, Links, Options
+from simba.utils.enums import Formats, Keys, Links, Options, ROI_SETTINGS
 from simba.utils.errors import NoDataError, ROICoordinatesNotFoundError
 from simba.utils.lookups import get_color_dict
 from simba.utils.read_write import (find_all_videos_in_directory,
@@ -56,6 +56,7 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         self.threshold_entry_box = Entry_Box(self.settings_frm, "BODY-PART PROBABILITY THRESHOLD:", "35", value='0.0', justify='center', entry_box_width=35)
         self.show_pose_estimation_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW POSE-ESTIMATED LOCATIONS:', label_width=35, value='TRUE', command=self._disable_clr)
         self.show_animal_name_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL NAMES:', label_width=35, value='FALSE')
+        self.outside_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='OUTSIDE ROI ZONES DATA:', label_width=35, value='FALSE', tooltip_txt=f'TREAT ALL NON-ROI REGIONS AS AN ROI REGION NAMED \n "{ROI_SETTINGS.OUTSIDE_ROI.value}"')
         self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt)), dropdown_width=self.longest_animal_name_len, label='NUMBER OF CPU CORES:', label_width=35, value=1)
         self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='USE GPU:', label_width=35, value='FALSE', state=gpu_state)
 
@@ -63,7 +64,8 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         self.threshold_entry_box.grid(row=0, column=0, sticky=NW)
         self.show_pose_estimation_dropdown.grid(row=2, column=0, sticky=NW)
         self.show_animal_name_dropdown.grid(row=3, column=0, sticky=NW)
-        self.core_cnt_dropdown.grid(row=4, column=0, sticky=NW)
+        self.outside_dropdown.grid(row=4, column=0, sticky=NW)
+        self.core_cnt_dropdown.grid(row=5, column=0, sticky=NW)
         #self.gpu_dropdown.grid(row=5, column=0, sticky=NW)
 
         self.body_parts_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMAL(S)", icon_name='pose', icon_link=Links.ROI_DATA_PLOT.value)
@@ -142,6 +144,7 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         show_names = str_2_bool(self.show_animal_name_dropdown.get_value())
         gpu = str_2_bool(self.gpu_dropdown.get_value())
         core_cnt = int(self.core_cnt_dropdown.get_value())
+        outside_roi = str_2_bool(self.outside_dropdown.get_value())
         style_attr = {"show_body_part": show_pose, "show_animal_name": show_names}
         body_parts = [v.get_value() for k, v in self.bp_dropdown_dict.items()]
         bp_clrs, bp_sizes = None, None
@@ -157,7 +160,8 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
                                          threshold=float(self.threshold_entry_box.entry_get),
                                          body_parts=body_parts,
                                          bp_colors=bp_clrs,
-                                         bp_sizes=bp_sizes)
+                                         bp_sizes=bp_sizes,
+                                         outside_roi=outside_roi)
                 threading.Thread(target=roi_plotter.run()).start()
 
             else:
@@ -169,7 +173,8 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
                                                   bp_colors=bp_clrs,
                                                   bp_sizes=bp_sizes,
                                                   core_cnt=core_cnt,
-                                                  gpu=gpu)
+                                                  gpu=gpu,
+                                                  outside_roi=outside_roi)
                 roi_plotter.run()
                 time.sleep(3)
         #
