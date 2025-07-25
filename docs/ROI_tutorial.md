@@ -90,6 +90,7 @@ following pop up:
  * `LAST ROI ENTRY TIME (S)`: The video time, in seconds, when each animal last enters each defined ROI  in each time-bin in each video (NOTE: will be `None` if an animal never enters a defined ROI).
  * `DETAILED ROI BOUT DATA (SEQUENCES)`: If checked, the SimBA ROI analysis generates a CSV file within the `project_folder/logs` directory named something like *Detailed_ROI_bout_data_20231031141848.csv*. This file contains the exact frame numbers, time stamps, and duration of each seqence when animals enter and exits each user-drawn ROIs. (NOTE: no file will be created if no animal in any video never enters an ROI)
  * `ROI MOVEMENT (VELOCITY AND DISTANCES)`: The total distance moved, and the average velocity, of each animal in each defined ROI  in each time-bin in each video.
+ * `OUTSIDE ROI ZONES DATA`: If checked, SimBA will treat **all areas NOT covered by a ROI drawing** as a single additional ROI and compute the chosen metrics for this, single, ROI. For example of the expected output when this checkbox is ticked, see [THIS](https://github.com/sgoldenlab/simba/blob/master/misc/outside_roi_ex_timebin.csv) file.
 
 6). In the `FORMAT OPTION` frame, select how the output data should be formatted, and any addtional video meta data that should be included in the output which could be helpful for sanity checks. 
 
