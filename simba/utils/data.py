@@ -51,7 +51,7 @@ from simba.utils.read_write import (find_video_of_file, get_fn_ext,
 from simba.utils.warnings import DuplicateNamesWarning
 
 
-def detect_bouts(data_df: pd.DataFrame, target_lst: List[str], fps: Union[int, float]) -> pd.DataFrame:
+def detect_bouts(data_df: pd.DataFrame, target_lst: Union[List[str], str], fps: Union[int, float]) -> pd.DataFrame:
     """
     Detect behavior "bouts" (e.g., continous sequence of classified behavior-present frames) for specified classifiers.
 
@@ -59,7 +59,7 @@ def detect_bouts(data_df: pd.DataFrame, target_lst: List[str], fps: Union[int, f
        Can be any field of boolean type. E.g., target_lst = ['Inside_ROI_1`] also works for bouts inside ROI shape.
 
     :param pd.DataFrame data_df: Dataframe with fields representing classifications in boolean type.
-    :param List[str] target_lst: Classifier names. E.g., ['Attack', 'Sniffing', 'Grooming'] or ROIs
+    :param Union[List[str], str] target_lst: Classifier names. E.g., as list or a single ['Attack', 'Sniffing', 'Grooming'] string value 'Attack'. Can be any boolean column name.
     :param Union[int, float] fps: The fps of the input video.
     :return: Dataframe where bouts are represented by rows and fields are represented by 'Event type ', 'Start time', 'End time', 'Start frame', 'End frame', 'Bout time'
     :rtype: pd.DataFrame
@@ -73,6 +73,7 @@ def detect_bouts(data_df: pd.DataFrame, target_lst: List[str], fps: Union[int, f
     >>> 2  'Sniffing'   3.47          3.83          104        114            0.37
     """
 
+    if isinstance(target_lst, (str,)): target_lst = [target_lst]
     boutsList, nameList, startTimeList, endTimeList, startFrameLst, endFrameList = [[] for _ in range(6)]
     data_df = data_df.reset_index(drop=True)
     for target_name in target_lst:

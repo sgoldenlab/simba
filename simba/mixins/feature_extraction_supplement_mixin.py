@@ -807,6 +807,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         check_valid_dataframe(df=bout_df, source=FeatureExtractionSupplemental.movement_stats_from_bouts_df.__name__, required_fields=['Event', 'Start_time', 'End Time', 'Start_frame', 'End_frame', 'Bout_time'])
         check_valid_array(data=bp_data, source=f'{FeatureExtractionSupplemental.movement_stats_from_bouts_df.__name__} bp_data', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_axis_1_shape=[2, ])
         check_str(name=f'{FeatureExtractionSupplemental.movement_stats_from_bouts_df.__name__} event_name)', value=event_name, raise_error=True)
+
         if len(bout_df) == 0:
             return 0, None
         elif event_name not in list(bout_df['Event'].unique()):
@@ -816,6 +817,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
             roi_frames = bout_df[["Start_frame", "End_frame"]].values
             for event_start_frm, event_end_frm in roi_frames:
                 event_pose = bp_data[event_start_frm:event_end_frm + 1, :]
+                print(event_pose)
                 if event_pose.shape[0] > 1:
                     distance, velocity = FeatureExtractionSupplemental.distance_and_velocity(x=event_pose, fps=fps, pixels_per_mm=px_per_mm, centimeters=True)
                     distances.append(distance)

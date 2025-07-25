@@ -7,9 +7,13 @@ try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+try:
+    from ultralytics import YOLO
+except ModuleNotFoundError:
+    YOLO = None
 
 from typing import List, Optional, Tuple, Union
-
+from simba.data_processors.cuda.utils import _is_cuda_available
 import numpy as np
 import pandas as pd
 import torch
@@ -21,13 +25,14 @@ from simba.utils.yolo import (_get_undetected_obs,
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int,
                                 check_valid_boolean, check_valid_lst,
-                                check_valid_tuple, get_fn_ext)
+                                check_valid_tuple, get_fn_ext, check_instance)
 from simba.utils.enums import Options
 from simba.utils.errors import CountError, InvalidFileTypeError
 from simba.utils.printing import SimbaTimer
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_video_meta_data)
 
+from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 NEAREST = 'nearest'
@@ -46,9 +51,9 @@ class YOLOPoseInference():
        For bounding box inference only (no pose), see :func:`~simba.bounding_box_tools.yolo.yolo_inference.YoloInference`.
        For segmentation inference, see :func:`~simba.bounding_box_tools.yolo.yolo_seg_inference.YOLOSegmentationInference`.
 
-    :param Union[str, os.PathLike] weights_path: Path to the trained YOLO model weights (e.g., 'best.pt').
+    :param Union[str, os.PathLike] weights: Path to the trained YOLO model weights (e.g., 'best.pt').
     :param Union[str, os.PathLike] or List[Union[str, os.PathLike]] video_path: Path to a single video, list of videos, or directory containing video files.
-    :param Tuple[str, ...] keypoint_names: Tuple containing the names of keypoints to be tracked (e.g., ('nose', 'left_ear', ...)).
+    :param Tuple[str, ...] keypoint_names: Tuple containing the names of keypoints to be tracked (e.g., ('nose', 'left_ear', ...)). If None, ('BP_0', 'BP_1', ...) will be used.
     :param Optional[bool] verbose: If True, outputs progress information and timing. Defaults to True.
     :param Optional[Union[str, os.PathLike]] save_dir: Directory to save the inference results. If None, results are returned in memory. Defaults to None.
     :param Union[Literal['cpu'], int] device: Device to use for inference. Use 'cpu' for CPU or GPU index (e.g., 0 for CUDA:0). Defaults to 0.
@@ -64,9 +69,9 @@ class YOLOPoseInference():
     """
 
     def __init__(self,
-                 weights_path: Union[str, os.PathLike],
+                 weights: Union[str, os.PathLike, YOLO],
                  video_path: Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]],
-                 keypoint_names: Tuple[str, ...],
+                 keypoint_names: Optional[Tuple[str, ...]] = None,
                  verbose: Optional[bool] = True,
                  save_dir: Optional[Union[str, os.PathLike]] = None,
                  device: Union[Literal['cpu'], int] = 0,
@@ -82,7 +87,10 @@ class YOLOPoseInference():
                  iou: float = 0.5):
 
 
-
+        if not _is_cuda_available()[0]:
+            raise SimBAGPUError(msg='No GPU detected.', source=self.__class__.__name__)
+        if YOLO is None:
+            raise SimBAPAckageVersionError(msg='ultralytics.YOLO package not detected.', source=self.__class__.__name__)
 
         if isinstance(video_path, list):
             check_valid_lst(data=video_path, source=f'{self.__class__.__name__} video_path', valid_dtypes=(str, np.str_,), min_len=1)
@@ -92,14 +100,25 @@ class YOLOPoseInference():
             video_path = find_files_of_filetypes_in_directory(directory=video_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, as_dict=False)
         for i in video_path:
             _ = get_video_meta_data(video_path=i)
-        check_file_exist_and_readable(file_path=weights_path)
+
+        check_instance(source=f'{self.__class__.__name__} weights', instance=weights, accepted_types=(str, os.PathLike, YOLO))
+        if not isinstance(weights, YOLO):
+            check_file_exist_and_readable(file_path=weights)
+            self.model = load_yolo_model(weights_path=weights, verbose=verbose, device=device, format=format)
+        else:
+            self.model = weights
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose')
         check_valid_boolean(value=interpolate, source=f'{self.__class__.__name__} interpolate')
         check_int(name=f'{self.__class__.__name__} batch_size', value=batch_size, min_value=1)
         check_int(name=f'{self.__class__.__name__} imgsz', value=imgsz, min_value=1)
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=10e-6, max_value=1.0)
         check_float(name=f'{self.__class__.__name__} iou', value=iou, min_value=10e-6, max_value=1.0)
-        check_valid_tuple(x=keypoint_names, source=f'{self.__class__.__name__} keypoint_names', min_integer=1, valid_dtypes=(str,))
+        if keypoint_names is not None:
+            check_valid_tuple(x=keypoint_names, source=f'{self.__class__.__name__} keypoint_names', min_integer=1, valid_dtypes=(str,))
+            if self.model.model.kpt_shape[0] != len(keypoint_names):
+                raise CountError(msg=f'The YOLO model expects {self.model.model.model.head.kpt_shape[0]} keypoints but you passed {len(keypoint_names)}: {keypoint_names}', source=self.__class__.__name__)
+        else:
+            keypoint_names = [f'BP_{x+1}' for x in range(self.model.model.kpt_shape[0])]
         if max_tracks is not None:
             check_int(name=f'{self.__class__.__name__} max_tracks', value=max_tracks, min_value=1)
         if save_dir is not None:
@@ -109,14 +128,12 @@ class YOLOPoseInference():
         OUT_COLS.extend(self.keypoint_col_names)
         COORD_COLS.extend(self.keypoint_cord_col_names)
         torch.set_num_threads(torch_threads)
-        self.model = load_yolo_model(weights_path=weights_path, device=device, format=format)
         self.half_precision, self.stream, self.video_path = half_precision, stream, video_path
         self.device, self.batch_size, self.threshold, self.max_tracks, self.iou = device, batch_size, threshold, max_tracks, iou
         self.verbose, self.save_dir, self.imgsz, self.interpolate = verbose, save_dir, imgsz, interpolate
         if self.model.model.task != 'pose':
-            raise InvalidFileTypeError(msg=f'The model {weights_path} is not a pose model. It is a {self.model.model.task} model', source=self.__class__.__name__)
-        if self.model.model.kpt_shape[0] != len(keypoint_names):
-            raise CountError(msg=f'The YOLO model expects {self.model.model.model.head.kpt_shape[0]} keypoints but you passed {len(keypoint_names)}: {keypoint_names}', source=self.__class__.__name__)
+            raise InvalidFileTypeError(msg=f'The model {weights} is not a pose model. It is a {self.model.model.task} model', source=self.__class__.__name__)
+
 
     def run(self):
         results = {}
@@ -153,8 +170,8 @@ class YOLOPoseInference():
                         bbox = np.array([frm_cnt, cls_boxes[i][-1], class_dict[cls_boxes[i][-1]], cls_boxes[i][-2]] + list(box))
                         bbox = np.append(bbox, cls_keypoints[i].flatten())
                         video_out.append(bbox)
-
             results[video_name] = pd.DataFrame(video_out, columns=OUT_COLS)
+            results[video_name]['FRAME'] = results[video_name]['FRAME'].astype(np.int64)
             if self.interpolate:
                 for cord_col in COORD_COLS:
                     results[video_name][cord_col] = results[video_name][cord_col].astype(np.float32).astype(np.int32).replace(to_replace=-1, value=np.nan)
@@ -198,7 +215,7 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     device_val = args.device if args.device == 'cpu' else int(args.device)
     video_paths = args.video_path if len(args.video_path) > 1 else args.video_path[0]
 
-    inference = YOLOPoseInference(weights_path=args.weights_path,
+    inference = YOLOPoseInference(weights=args.weights_path,
                                   video_path=video_paths,
                                   keypoint_names=keypoints_tuple,
                                   verbose=args.verbose,
@@ -215,29 +232,29 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
                                   imgsz=args.imgsz)
     inference.run()
 
-# #
-video_paths = r"D:\cvat_annotations\videos\mp4_20250624155703"
-weights_path = r"D:\cvat_annotations\frames\yolo_072125\mdl\train\weights\best.pt"
-save_dir = r"D:\cvat_annotations\frames\yolo_072125\results"
-# #
-keypoint_names = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
 # # #
+# video_paths = r"D:\cvat_annotations\videos\mp4_20250624155703"
+# weights_path = r"D:\cvat_annotations\frames\yolo_072125\mdl\train\weights\best.pt"
+# save_dir = r"D:\cvat_annotations\frames\yolo_072125\results"
 # # #
-i = YOLOPoseInference(weights_path=weights_path,
-                        video_path=video_paths,
-                        save_dir=save_dir,
-                        verbose=True,
-                        device=0,
-                        format=None,
-                        stream=True,
-                        keypoint_names=keypoint_names,
-                        batch_size=100,
-                        imgsz=640,
-                        interpolate=False,
-                        threshold=0.5,
-                        max_tracks=4)
-i.run()
-#
+# keypoint_names = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
+# # # #
+# # # #
+# i = YOLOPoseInference(weights=weights_path,
+#                         video_path=video_paths,
+#                         save_dir=save_dir,
+#                         verbose=True,
+#                         device=0,
+#                         format=None,
+#                         stream=True,
+#                         keypoint_names=keypoint_names,
+#                         batch_size=100,
+#                         imgsz=640,
+#                         interpolate=False,
+#                         threshold=0.5,
+#                         max_tracks=4)
+# i.run()
+# #
 #
 # # video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
 # # video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-46-56.mp4"

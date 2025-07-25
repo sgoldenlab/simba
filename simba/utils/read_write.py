@@ -427,7 +427,9 @@ def read_config_file(config_path: Union[str, os.PathLike]) -> configparser.Confi
     return config
 
 
-def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture], fps_as_int: bool = True) -> Dict[str, Any]:
+def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture],
+                        fps_as_int: bool = True,
+                        raise_error: bool = True) -> Union[Dict[str, Any], None]:
     """
     Read video metadata (fps, resolution, frame cnt etc.) from video file (e.g., mp4).
 
@@ -436,6 +438,7 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture], f
 
     :param str video_path: Path to a video file.
     :param bool fps_as_int: If True, force video fps to int through floor rounding, else float. Default = True.
+    :param bool raise_error: If True, raises an error if data cannot be read. If False, returns None. Default True.
     :return: The video metadata in dict format with parameter (e.g., ``fps``)  as keys.
     :rtype: Dict[str, Any].
 
@@ -453,7 +456,10 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture], f
         cap = video_path
         video_data["video_name"] = ''
     else:
-        raise InvalidInputError(msg=f'video_path is neither a file path or a cv2.VideoCapture: {type(video_path)}', source=get_video_meta_data.__name__)
+        if raise_error:
+            raise InvalidInputError(msg=f'video_path is neither a file path or a cv2.VideoCapture: {type(video_path)}', source=get_video_meta_data.__name__)
+        else:
+            return None
     video_data["fps"] = cap.get(cv2.CAP_PROP_FPS)
     if fps_as_int:
         video_data["fps"] = int(video_data["fps"])
@@ -466,7 +472,10 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture], f
         video_data["color_format"] = 'grey'
     for k, v in video_data.items():
         if v == 0:
-            raise InvalidVideoFileError(msg=f'Video {video_data["video_name"]} either does not exist or has {k} of {str(v)} (full error video path: {video_path}).', source=get_video_meta_data.__name__)
+            if raise_error:
+                raise InvalidVideoFileError(msg=f'Video {video_data["video_name"]} either does not exist or has {k} of {str(v)} (full error video path: {video_path}).', source=get_video_meta_data.__name__)
+            else:
+                return None
     video_data["resolution_str"] = str(f'{video_data["width"]} x {video_data["height"]}')
     video_data["video_length_s"] = int(video_data["frame_count"] / video_data["fps"])
     return video_data

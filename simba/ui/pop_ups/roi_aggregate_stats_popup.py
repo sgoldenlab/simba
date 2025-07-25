@@ -61,13 +61,15 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
             self.body_parts_dropdowns[bp_cnt].setChoices(self.body_parts_lst[bp_cnt])
 
         self.data_options_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="DATA OPTIONS", icon_name='abacus')
-        self.total_time_cb, self.total_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='TOTAL ROI TIME (S)', val=True)
-        self.entry_counts_cb, self.entry_counts_var = SimbaCheckbox(parent=self.data_options_frm, txt='ROI ENTRIES (COUNTS)', val=True)
-        self.first_entry_time_cb, self.first_entry_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='FIRST ROI ENTRY TIME (S)', val=False)
-        self.last_entry_time_cb, self.last_entry_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='LAST ROI ENTRY TIME (S)', val=False)
-        self.mean_bout_time_cb, self.mean_bout_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='MEAN ROI BOUT TIME (S)', val=False)
-        self.detailed_cb, self.detailed_var = SimbaCheckbox(parent=self.data_options_frm, txt='DETAILED ROI BOUT DATA (SEQUENCES)', val=False)
-        self.movement_cb, self.movement_var = SimbaCheckbox(parent=self.data_options_frm, txt='ROI MOVEMENT (VELOCITY & DISTANCES)', val=False)
+        self.total_time_cb, self.total_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='TOTAL ROI TIME (S)', val=True, txt_img='timer')
+        self.entry_counts_cb, self.entry_counts_var = SimbaCheckbox(parent=self.data_options_frm, txt='ROI ENTRIES (COUNTS)', val=True, txt_img='abacus_2')
+        self.first_entry_time_cb, self.first_entry_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='FIRST ROI ENTRY TIME (S)', val=False, txt_img='one_blue')
+        self.last_entry_time_cb, self.last_entry_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='LAST ROI ENTRY TIME (S)', val=False, txt_img='finish')
+        self.mean_bout_time_cb, self.mean_bout_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='MEAN ROI BOUT TIME (S)', val=False, txt_img='average')
+        self.detailed_cb, self.detailed_var = SimbaCheckbox(parent=self.data_options_frm, txt='DETAILED ROI BOUT DATA (SEQUENCES)', val=False, txt_img='details')
+        self.movement_cb, self.movement_var = SimbaCheckbox(parent=self.data_options_frm, txt='ROI MOVEMENT (VELOCITY & DISTANCES)', val=False, txt_img='pose')
+        self.outside_cb, self.outside_var = SimbaCheckbox(parent=self.data_options_frm, txt='OUTSIDE ROI ZONES DATA', val=False, txt_img='outside_2')
+
         self.data_options_frm.grid(row=self.frame_children(frame=self.main_frm), column=0, sticky=NW)
         self.total_time_cb.grid(row=0, column=0, sticky=NW)
         self.entry_counts_cb.grid(row=1, column=0, sticky=NW)
@@ -76,10 +78,11 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         self.mean_bout_time_cb.grid(row=4, column=0, sticky=NW)
         self.detailed_cb.grid(row=5, column=0, sticky=NW)
         self.movement_cb.grid(row=6, column=0, sticky=NW)
+        self.outside_cb.grid(row=7, column=0, sticky=NW)
 
         self.format_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="FORMAT OPTIONS", icon_name='abacus')
-        self.transpose_cb, self.transpose_var = SimbaCheckbox(parent=self.format_frm, txt='TRANSPOSE OUTPUT TABLE', val=False)
-        self.fps_cb, self.fps_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE FPS DATA', val=False)
+        self.transpose_cb, self.transpose_var = SimbaCheckbox(parent=self.format_frm, txt='TRANSPOSE OUTPUT TABLE', val=False, txt_img='restart')
+        self.fps_cb, self.fps_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE FPS DATA', val=False, txt_img='fps')
         self.video_length_cb, self.video_length_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE VIDEO LENGTH DATA', val=False)
         self.px_per_mm_cb, self.px_per_mm_var = SimbaCheckbox(parent=self.format_frm, txt='INCLUDE PIXEL PER MILLIMETER DATA', val=False)
 
@@ -89,6 +92,8 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         self.video_length_cb.grid(row=2, column=0, sticky=NW)
         self.px_per_mm_cb.grid(row=3, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
+
+        self.main_frm.mainloop()
 
     def run(self):
         probability = self.probability_entry.entry_get
@@ -103,6 +108,7 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         include_fps = self.fps_var.get()
         video_length = self.video_length_var.get()
         px_per_mm = self.px_per_mm_var.get()
+        outside_roi = self.outside_var.get()
 
         body_parts = []
         for k, v in self.body_parts_dropdowns.items(): body_parts.append(v.getChoices())
@@ -126,13 +132,14 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
                                                    transpose=transpose,
                                                    include_fps=include_fps,
                                                    include_video_length=video_length,
-                                                   include_px_per_mm=px_per_mm)
+                                                   include_px_per_mm=px_per_mm,
+                                                   outside_rois=outside_roi)
 
         analyzer.run()
         analyzer.save()
 
 
-# analyzer = ROIAggregateDataAnalyzerPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+#_ = ROIAggregateDataAnalyzerPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
 
 #analyzer = ROIAggregateDataAnalyzerPopUp(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
 

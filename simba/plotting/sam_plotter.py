@@ -75,27 +75,23 @@ class SamVisualizer():
 
     def run(self):
         print(
-            f'Running SAM visualization for {len(list(self.data_paths.keys()))} video(s) (start time: {get_current_time()})...')
+f'Running SAM visualization for {len(list(self.data_paths.keys()))} video(s) (start time: {get_current_time()})...')
         for file_name, file_path in self.data_paths.items():
             print(f'Running SAM visualization for video {file_name}...')
             geometries = []
             video_path = self.video_paths[file_name]
             df = read_df(file_path=file_path, file_type='csv')
             animal_names = df[NAME].unique()
+            animal_names = [x for x in animal_names if x != -1]
             if len(animal_names) != len(self.colors):
-                raise CountError(
-                    msg=f'{len(animal_names)} animals found in data {file_path} but {len(self.colors)} color(s) passed: {self.colors}',
-                    source=self.__class__.__name__)
+                raise CountError(msg=f'{len(animal_names)} animal names ({animal_names}) found in data {file_path} but {len(self.colors)} color(s) passed: {self.colors}', source=self.__class__.__name__)
             # check_video_and_data_frm_count_align(video=video_path, data=df, name=file_name, raise_error=True)
-            check_valid_dataframe(df=df, source='', valid_dtypes=Formats.NUMERIC_DTYPES.value,
-                                  required_fields=[FRAME, NAME])
+            check_valid_dataframe(df=df, source='', valid_dtypes=Formats.NUMERIC_DTYPES.value, required_fields=[FRAME, NAME])
             for animal_name in animal_names:
                 animal_df = df[df[NAME] == animal_name].reset_index(drop=True)
                 vertice_cols = [x for x in animal_df.columns if VERTICE in x]
-                animal_vertice_arr = animal_df[vertice_cols].values.reshape(len(animal_df), int(len(vertice_cols) / 2),
-                                                                            2).astype(np.int32)
-                geometries.append(GeometryMixin().bodyparts_to_polygon(data=animal_vertice_arr, simplify_tolerance=2,
-                                                                       convex_hull=False))
+                animal_vertice_arr = animal_df[vertice_cols].values.reshape(len(animal_df), int(len(vertice_cols) / 2), 2).astype(np.int32)
+                geometries.append(GeometryMixin().bodyparts_to_polygon(data=animal_vertice_arr, simplify_tolerance=2, convex_hull=False))
 
             plotter = GeometryPlotter(geometries=geometries,
                                       video_name=video_path,
@@ -110,8 +106,8 @@ class SamVisualizer():
             #
 
 
-# r = SamVisualizer(
-#     data_path=r"C:\troubleshooting\sam_results\10B_Mouse_5-choice_MustTouchTrainingNEWFINAL_a7_clipped_3.csv",
-#     video_path=r"D:\platea\platea_videos\videos\clipped\10B_Mouse_5-choice_MustTouchTrainingNEWFINAL_a7_clipped_3.mp4",
-#     save_dir='D:\cvat_annotations\sam_videos', color=[(255, 255, 1)])
-# r.run()
+r = SamVisualizer(
+    data_path=r"D:\cvat_annotations\sam_yolo_data\s34-drinking.csv",
+    video_path=r"D:\cvat_annotations\videos\mp4_20250624155703\s34-drinking.mp4",
+    save_dir='D:\cvat_annotations\sam_videos', color=[(255, 255, 1)])
+r.run()

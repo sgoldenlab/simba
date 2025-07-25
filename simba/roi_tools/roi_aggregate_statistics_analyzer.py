@@ -34,12 +34,13 @@ MEASUREMENT = 'MEASUREMENT'
 VIDEO_FPS = 'VIDEO FPS'
 VIDEO_LENGTH = 'VIDEO LENGTH (S)'
 PIX_PER_MM = 'PIXEL TO MILLIMETER CONVERSION FACTOR'
-
+OUTSIDE_ROI = 'OUTSIDE REGIONS OF INTEREST'
 
 
 class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
     """
     Analyzes region-of-interest (ROI) data from video tracking experiments.
+
     This class computes various statistics related to body-part movements inside defined ROIs,
     including entry counts, total time spent, and bout durations.
 
@@ -78,10 +79,12 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
                  first_entry_time: bool = False,
                  last_entry_time: bool = False,
                  mean_bout_time: bool = False,
+                 outside_rois: bool = False,
                  transpose: bool = False,
                  include_fps: bool = False,
                  include_video_length: bool = False,
                  include_px_per_mm: bool = False,
+                 verbose: bool = True,
                  detailed_bout_data_save_path: Optional[Union[str, os.PathLike]] = None,
                  save_path: Optional[Union[str, os.PathLike]] = None):
 
@@ -100,7 +103,7 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
         if save_path is not None:
             check_if_dir_exists(in_dir=os.path.dirname(save_path))
         else:
-            save_path = os.path.join(self.logs_path, f'{"ROI_descriptive statistics"}_{self.datetime}.csv')
+            save_path = os.path.join(self.logs_path, f'{"ROI_descriptive_statistics"}_{self.datetime}.csv')
         self.detailed_bout_data_save_path, self.save_path = detailed_bout_data_save_path, save_path
         check_valid_boolean(value=[detailed_bout_data], source=f'{self.__class__.__name__} detailed_bout_data', raise_error=True)
         check_valid_boolean(value=[total_time], source=f'{self.__class__.__name__} total_time', raise_error=True)
@@ -113,7 +116,8 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
         check_valid_boolean(value=[include_fps], source=f'{self.__class__.__name__} include_fps', raise_error=True)
         check_valid_boolean(value=[include_video_length], source=f'{self.__class__.__name__} include_video_length', raise_error=True)
         check_valid_boolean(value=[include_px_per_mm], source=f'{self.__class__.__name__} include_px_per_mm', raise_error=True)
-
+        check_valid_boolean(value=[outside_rois], source=f'{self.__class__.__name__} non_roi_zone', raise_error=True)
+        check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose', raise_error=True)
         self.read_roi_data()
         FeatureExtractionMixin.__init__(self)
         self.data_paths = read_data_paths(path=data_path, default=self.outlier_corrected_paths, default_name=self.outlier_corrected_dir, file_type=self.file_type)
@@ -128,8 +132,8 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
         self.detailed_bout_data = detailed_bout_data
         self.total_time, self.entry_counts = total_time, entry_counts
         self.first_entry_time, self.last_entry_time, self.mean_bout_time, self.include_px_per_mm = first_entry_time, last_entry_time, mean_bout_time, include_px_per_mm
-        self.transpose, self.include_fps, self.include_video_length = transpose, include_fps, include_video_length
-        self.detailed_dfs, self.detailed_df = [], []
+        self.transpose, self.include_fps, self.include_video_length, self.non_roi_zone = transpose, include_fps, include_video_length, outside_rois
+        self.detailed_dfs, self.detailed_df, self.verbose = [], [], verbose
         self.results = pd.DataFrame(columns=["VIDEO", "ANIMAL", "BODY-PART", "SHAPE", "SHAPE TYPE", "MEASUREMENT", "VALUE"])
 
     def __clean_results(self):
@@ -171,7 +175,7 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
         for file_cnt, file_path in enumerate(self.data_paths):
             _, video_name, _ = get_fn_ext(file_path)
             video_timer = SimbaTimer(start=True)
-            print(f"Analysing ROI data for video {video_name}... (Video {file_cnt+1}/{len(self.data_paths)})")
+            if self.verbose: print(f"Analysing ROI data for video {video_name}... (Video {file_cnt+1}/{len(self.data_paths)})")
             video_settings, pix_per_mm, self.fps = self.read_video_info(video_name=video_name)
             self.sliced_roi_dict, video_shape_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=video_name)
             if len(video_shape_names) == 0:
@@ -185,6 +189,7 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
                     p_arr = self.data_df[bp_cols[2]].values.astype(np.float32)
                     below_threshold_idx = np.argwhere(p_arr < self.threshold)
                     bp_arr = self.data_df[[bp_cols[0], bp_cols[1]]].values.astype(np.float32)
+                    animal_roi_bouts = []
                     for roi_cnt, (roi_name, roi_data) in enumerate(self.sliced_roi_dict.items()):
                         if roi_data[SHAPE_TYPE].lower() == ROI_SETTINGS.RECTANGLE.value.lower():
                             roi_coords = np.array([[roi_data['topLeftX'], roi_data['topLeftY']], [roi_data['Bottom_right_X'], roi_data['Bottom_right_Y']]])
@@ -208,6 +213,7 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
                             roi_bouts['VIDEO'] = video_name
                             roi_bouts['ANIMAL'] = animal_name
                             self.detailed_dfs.append(roi_bouts)
+                            animal_roi_bouts.append(roi_bouts)
                         else:
                             total_time = 0
                             entry_counts = 0
@@ -226,20 +232,56 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
                         self.results.loc[len(self.results)] = [video_name, animal_name, bp_cols[0][:-2], roi_name, roi_data[SHAPE_TYPE], VIDEO_LENGTH, len(self.data_df) / self.fps]
                         self.results.loc[len(self.results)] = [video_name, animal_name, bp_cols[0][:-2], roi_name, roi_data[SHAPE_TYPE], PIX_PER_MM, pix_per_mm]
 
+                    if self.non_roi_zone and len(animal_roi_bouts) > 0:
+                        animal_roi_bouts = pd.concat(animal_roi_bouts, axis=0)
+                        animal_roi_bouts = animal_roi_bouts.rename(columns={"Event": "SHAPE NAME", "Start_time": "START TIME", "End Time": "END TIME", "Start_frame": "START FRAME", "End_frame": "END FRAME", "Bout_time": "DURATION (S)"})
+                        inside_rois_frm = [i for s, e in zip(animal_roi_bouts['START FRAME'], animal_roi_bouts['END FRAME']) for i in range(s, e+1)]
+                        self.data_df[OUTSIDE_ROI] = 1
+                        self.data_df.loc[inside_rois_frm, OUTSIDE_ROI] = 0
+                        outside_roi_bouts = detect_bouts(data_df=self.data_df, target_lst=OUTSIDE_ROI, fps=self.fps)
+                        if len(outside_roi_bouts) > 0:
+                            total_time = outside_roi_bouts['Bout_time'].sum()
+                            entry_counts = len(outside_roi_bouts)
+                            first_entry_time = outside_roi_bouts['Start_time'].values[0]
+                            last_entry_time = outside_roi_bouts['Start_time'].values[-1]
+                            mean_bout_time = outside_roi_bouts['Bout_time'].mean()
+                            movement, velocity = FeatureExtractionSupplemental.movement_stats_from_bouts_df(bp_data=bp_arr, event_name=OUTSIDE_ROI, bout_df=outside_roi_bouts, fps=self.fps, px_per_mm=pix_per_mm)
+                            outside_roi_bouts['VIDEO'] = video_name
+                            outside_roi_bouts['ANIMAL'] = animal_name
+                            self.detailed_dfs.append(outside_roi_bouts)
+                            self.results.loc[len(self.results)] = [video_name, animal_name, bp_cols[0][:-2], OUTSIDE_ROI, 'NONE', TOTAL_ROI_TIME, total_time]
+                            self.results.loc[len(self.results)] = [video_name, animal_name, bp_cols[0][:-2], OUTSIDE_ROI, 'NONE', ENTRY_COUNTS, entry_counts]
+                            self.results.loc[len(self.results)] = [video_name, animal_name, bp_cols[0][:-2], OUTSIDE_ROI, 'NONE', FIRST_ROI_ENTRY_TIME, first_entry_time]
+                            self.results.loc[len(self.results)] = [video_name, animal_name, bp_cols[0][:-2], OUTSIDE_ROI, 'NONE', LAST_ROI_ENTRY_TIME, last_entry_time]
+                            self.results.loc[len(self.results)] = [video_name, animal_name, bp_cols[0][:-2], OUTSIDE_ROI, 'NONE', MEAN_BOUT_TIME, mean_bout_time]
+                            self.results.loc[len(self.results)] = [video_name, animal_name, bp_cols[0][:-2], OUTSIDE_ROI, 'NONE', VELOCITY, velocity]
+                            self.results.loc[len(self.results)] = [video_name, animal_name, bp_cols[0][:-2], OUTSIDE_ROI, 'NONE', MOVEMENT, movement]
+                            self.results.loc[len(self.results)] = [video_name, animal_name, bp_cols[0][:-2], OUTSIDE_ROI, 'NONE', VIDEO_FPS, self.fps]
+                            self.results.loc[len(self.results)] = [video_name, animal_name, bp_cols[0][:-2], OUTSIDE_ROI, 'NONE', VIDEO_LENGTH, len(self.data_df) / self.fps]
+                            self.results.loc[len(self.results)] = [video_name, animal_name, bp_cols[0][:-2], OUTSIDE_ROI, 'NONE', PIX_PER_MM, pix_per_mm]
+
                 video_timer.stop_timer()
-                print(f'ROI analysis video {video_name} complete... (elapsed time: {video_timer.elapsed_time_str}s)')
+                if self.verbose: print(f'ROI analysis video {video_name} complete... (elapsed time: {video_timer.elapsed_time_str}s)')
 
 
     def save(self):
         self.__clean_results()
         if self.detailed_bout_data and len(self.detailed_df) > 0:
             self.detailed_df.to_csv(self.detailed_bout_data_save_path)
-            print(f"Detailed ROI data saved at {self.detailed_bout_data_save_path}...")
+            if self.verbose: print(f"Detailed ROI data saved at {self.detailed_bout_data_save_path}...")
         self.results.to_csv(self.save_path)
         self.timer.stop_timer()
         stdout_success(f'ROI statistics saved at {self.save_path}', elapsed_time=self.timer.elapsed_time_str)
 
 
-# analyzer = ROIAggregateStatisticsAnalyzer(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", body_parts=['Center'], include_fps=True, threshold=0.0, calculate_distances=True, transpose=True, detailed_bout_data=True)
+# analyzer = ROIAggregateStatisticsAnalyzer(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#                                           body_parts=['Center'],
+#                                           include_fps=False,
+#                                           threshold=0.5,
+#                                           calculate_distances=True,
+#                                           transpose=False,
+#                                           detailed_bout_data=True,
+#                                           outside_rois=True,
+#                                           verbose=False)
 # analyzer.run()
 # analyzer.save()

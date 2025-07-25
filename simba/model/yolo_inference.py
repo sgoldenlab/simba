@@ -88,7 +88,8 @@ class YoloInference():
 
         if not _is_cuda_available()[0]:
             raise SimBAGPUError(msg='No GPU detected.', source=self.__class__.__name__)
-        if YOLO is None: raise SimBAPAckageVersionError(msg='ultralytics.YOLO package not detected.', source=self.__class__.__name__)
+        if YOLO is None:
+            raise SimBAPAckageVersionError(msg='ultralytics.YOLO package not detected.', source=self.__class__.__name__)
         if isinstance(video_path, list):
             check_valid_lst(data=video_path, source=f'{self.__class__.__name__} video_path', valid_dtypes=(str, np.str_,), min_len=1)
         elif isinstance(video_path, str):

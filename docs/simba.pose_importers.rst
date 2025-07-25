@@ -97,3 +97,16 @@ Pose import mixins
    :members:
    :show-inheritance:
 
+Import SimBA blob tracking as pose
+-----------------------------------------
+
+.. automodule:: simba.pose_importers.simba_blob_importer.SimBABlobImporter
+   :members:
+   :show-inheritance:
+
+Impost FaceMap body-part tracking
+-----------------------------------------
+
+.. automodule:: simba.pose_importers.facemap_h5_importer.FaceMapImporter
+   :members:
+   :show-inheritance:
