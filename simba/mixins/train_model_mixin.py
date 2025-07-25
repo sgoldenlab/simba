@@ -69,8 +69,8 @@ from simba.utils.checks import (check_all_dfs_in_list_has_same_cols,
                                 check_valid_lst, is_lxc_container)
 from simba.utils.data import (detect_bouts, detect_bouts_multiclass,
                               get_library_version)
-from simba.utils.enums import (OS, ConfigKey, Defaults, Dtypes, Formats,
-                               Methods, MLParamKeys, Options, Links)
+from simba.utils.enums import (OS, ConfigKey, Defaults, Dtypes, Formats, Links,
+                               Methods, MLParamKeys, Options)
 from simba.utils.errors import (ClassifierInferenceError, CorruptedFileError,
                                 DataHeaderError, FaultyTrainingSetError,
                                 FeatureNumberMismatchError, InvalidInputError,

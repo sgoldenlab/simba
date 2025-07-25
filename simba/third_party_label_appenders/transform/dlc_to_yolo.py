@@ -12,8 +12,6 @@ except:
 import cv2
 import numpy as np
 
-from simba.utils.yolo import \
-    keypoint_array_to_yolo_annotation_str
 from simba.third_party_label_appenders.transform.utils import (
     create_yolo_keypoint_yaml, get_yolo_keypoint_flip_idx)
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
@@ -23,6 +21,7 @@ from simba.utils.enums import Formats
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (create_directory, read_img,
                                     recursive_file_search)
+from simba.utils.yolo import keypoint_array_to_yolo_annotation_str
 
 
 class DLC2Yolo:

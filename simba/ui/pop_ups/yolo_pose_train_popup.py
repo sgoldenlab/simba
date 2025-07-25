@@ -1,9 +1,9 @@
 
 from tkinter import *
 
-from simba.model.yolo_fit import FitYolo
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.model.yolo_fit import FitYolo
 from simba.third_party_label_appenders.transform.utils import \
     check_valid_yolo_map
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,

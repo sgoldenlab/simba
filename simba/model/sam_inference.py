@@ -3,19 +3,27 @@ import os
 import pandas as pd
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
-from typing import Union, List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
+
 import numpy as np
+
 from simba.data_processors.cuda.utils import _is_cuda_available
+
 try:
     from ultralytics.models.sam import SAM2VideoPredictor
 except:
     SAM2VideoPredictor = None
 
-from simba.utils.read_write import find_files_of_filetypes_in_directory, get_video_meta_data, get_fn_ext, write_df
-from simba.utils.enums import Options, Formats
-from simba.utils.errors import InvalidInputError, SimBAGPUError, SimBAPAckageVersionError
-from simba.utils.checks import check_valid_array, check_instance, check_file_exist_and_readable, check_int, check_float, check_if_dir_exists, check_valid_tuple
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_dir_exists, check_instance, check_int,
+                                check_valid_array, check_valid_tuple)
 from simba.utils.data import resample_geometry_vertices
+from simba.utils.enums import Formats, Options
+from simba.utils.errors import (InvalidInputError, SimBAGPUError,
+                                SimBAPAckageVersionError)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, get_video_meta_data, write_df)
+
 
 class SamInference():
 

@@ -69,7 +69,6 @@ from simba.ui.pop_ups.batch_preprocess_pop_up import BatchPreProcessPopUp
 from simba.ui.pop_ups.blob_visualizer_pop_up import BlobVisualizerPopUp
 from simba.ui.pop_ups.boolean_conditional_slicer_pup_up import \
     BooleanConditionalSlicerPopUp
-from simba.ui.pop_ups.yolo_pose_train_popup import YOLOPoseTrainPopUP
 from simba.ui.pop_ups.check_videos_seekable_pop_up import \
     CheckVideoSeekablePopUp
 from simba.ui.pop_ups.clf_add_remove_print_pop_up import (
@@ -193,6 +192,7 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     VideoRotatorPopUp, VideoTemporalJoinPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
+from simba.ui.pop_ups.yolo_pose_train_popup import YOLOPoseTrainPopUP
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         FileSelect, SimbaButton, SimbaCheckbox,
                                         SimBALabel, hxtScrollbar)
@@ -201,14 +201,14 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_int)
 from simba.utils.custom_feature_extractor import CustomFeatureExtractor
 from simba.utils.enums import (ENV_VARS, OS, Defaults, Formats, Keys, Links,
-                               Paths, TagNames, PackageNames)
+                               PackageNames, Paths, TagNames)
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
                                  get_icons_paths, load_simba_fonts)
 from simba.utils.read_write import (fetch_pip_data, find_core_cnt,
-                                    get_recent_projects_paths,
+                                    get_pkg_version, get_recent_projects_paths,
                                     get_video_meta_data, read_sys_env,
-                                    write_to_recent_project_paths, get_pkg_version)
+                                    write_to_recent_project_paths)
 from simba.utils.warnings import (FFMpegNotFoundWarning, PythonVersionWarning,
                                   VersionWarning)
 from simba.video_processors.video_processing import \

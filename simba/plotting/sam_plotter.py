@@ -1,5 +1,5 @@
 import os
-from typing import Optional, Tuple, Union, List
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 
@@ -7,9 +7,10 @@ from simba.mixins.geometry_mixin import GeometryMixin
 from simba.plotting.geometry_plotter import GeometryPlotter
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_if_valid_rgb_tuple,
-                                check_int, check_valid_dataframe, check_instance)
+                                check_instance, check_int,
+                                check_valid_dataframe)
 from simba.utils.enums import Formats
-from simba.utils.errors import NoFilesFoundError, CountError
+from simba.utils.errors import CountError, NoFilesFoundError
 from simba.utils.lookups import get_current_time
 from simba.utils.read_write import (find_all_videos_in_directory,
                                     find_core_cnt,
