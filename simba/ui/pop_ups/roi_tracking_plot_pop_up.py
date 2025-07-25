@@ -16,7 +16,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         SimbaCheckbox, SimBADropDown,
                                         SimBALabel)
 from simba.utils.checks import check_file_exist_and_readable, check_float
-from simba.utils.enums import Formats, Keys, Links, Options, ROI_SETTINGS
+from simba.utils.enums import ROI_SETTINGS, Formats, Keys, Links, Options
 from simba.utils.errors import NoDataError, ROICoordinatesNotFoundError
 from simba.utils.lookups import get_color_dict
 from simba.utils.read_write import (find_all_videos_in_directory,
