@@ -387,7 +387,6 @@ Once all the ROI drawings on the video looks good. remember to hit the `SAVE` bu
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/roi_tutorial/save_btn.webp"/>
 </p>
 
-
 ## STANDARDIZE ROI SIZE ACROSS VIDEOS
 
 There may be situations where you have manually drawn ROIs on a bunch of videos where the camera location has shifted slightly across recordings.
@@ -412,7 +411,6 @@ Select the video that you want to act as the "baseline" reference video which th
 ## NEXT STEPS
 Once your ROI definitions are all defined, close the `ROI table`, `Regions of Interest Settings` and `Define Shape` windows and head back to the [ROI] tab in the load project menu. 
 
-
 * SimBA saves your drawn ROI definitions (the ROI locations, colors, shapes, sizes with their associated video file names etc) in a single compressed `.H5` file in that you can find at `project_folder/logs/measures/ROI_definitions.h5`. If you want to extract this H5 information, to a human-readable CSV format, use [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-roi-definitions-to-human-readable-format) tool. 
 
 * If you want to analyze descriptive statistics of movements in relation to your defined ROIs, use the `Analyze ROI data` button as detailed in `Step 2` in [THIS TUTORIAL](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-2-analyzing-roi-data).
@@ -420,6 +418,9 @@ Once your ROI definitions are all defined, close the `ROI table`, `Regions of In
 * If you want to create machine learning features using your ROI definitions, use the `Append ROI data to features` in the `Extract features` tab as detailed in [THIS TUTORIAL](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data)
 
 If you have any questions, bug reports or feature requests, please let us know by opening a new [github issue](https://github.com/sgoldenlab/simba/issues) or contact us through [gitter](https://gitter.im/SimBA-Resource/community)! 
+
+> [!IMPORTANT]
+> It is possible to treat all areas **NOT** covered by an ROI drawing as a single additional ROI and compute the chosen metrics for this, single, ROI. For an example of how this works, see [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/_static/img/outside_roi_example.mp4) visualization, and this [GitHub Issues](https://github.com/sgoldenlab/simba/issues/453#issuecomment-3114729111) discussion for more information. For more information on how to access this functionality, see [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-2-analyzing-roi-data) toturial for how to compute metrics for the "outside-ROIs" zones, and [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-4-visualizing-roi-data) tutorial for visualizations of the "outside-ROIs" zones. 
 
 ##
 Author [Simon N](https://github.com/sronilsson)
