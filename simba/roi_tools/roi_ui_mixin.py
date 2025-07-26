@@ -50,8 +50,8 @@ from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 from simba.utils.warnings import DuplicateNamesWarning
 
-MAX_DRAW_UI_DISPLAY_RATIO = (0.5, 0.75)  # W, H - THE INTERFACE IMAGE DISPLAY WILL BE DOWN-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS OR EXCEEDS OF THESE CRITERA. E.G (0.5, 0.75) MEANS IMAGES WILL COVER NO MORE THAN HALF THE DISPLAY WIDTH AND 3/4 OF THE DISPLAY HEIGHT.
-MIN_DRAW_UI_DISPLAY_RATIO = (0.25, 0.25) # W, H - THE INTERFACE IMAGE DISPLAY WILL BE UP-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS AND EXCEEDS BOTH CRITERIA. E.G (0.25, 0.25) MEANS IMAGES WILL COVER NO MORE THAN A QUARTER OF THE USERS DISPLAY HEIGHT AND WIDTH.
+MAX_DRAW_UI_DISPLAY_RATIO = (0.60, 0.75)  # W, H - THE INTERFACE IMAGE DISPLAY WILL BE DOWN-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS OR EXCEEDS OF THESE CRITERA. E.G (0.5, 0.75) MEANS IMAGES WILL COVER NO MORE THAN HALF THE DISPLAY WIDTH AND 3/4 OF THE DISPLAY HEIGHT.
+MIN_DRAW_UI_DISPLAY_RATIO = (0.25, 0.25) # W, H - THE INTERFACE IMAGE DISPLAY WILL BE UP-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS AND EXCEEDS BOTH CRITERIA. E.G (0.25, 0.25) MEANS IMAGES WILL COVER NO MORE THAN A QUARTER OF THE USERS DISPLAY HEIGHT AND NO MORE THAN A QUARTER OF THE USERS DISPLAY WIDTH.
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"
 SHAPE_TYPE = 'Shape_type'
@@ -98,10 +98,10 @@ class ROI_mixin(ConfigReader):
         self.display_img_width, self.display_img_height, self.downscale_factor, self.upscale_factor = get_img_resize_info(img_size=(self.video_meta['width'], self.video_meta['height']),
                                                                                                                           display_resolution=(self.display_w, self.display_h),
                                                                                                                           max_height_ratio=MAX_DRAW_UI_DISPLAY_RATIO[1],
-                                                                                                                          max_width_ratio=MAX_DRAW_UI_DISPLAY_RATIO[0],
                                                                                                                           min_height_ratio=MIN_DRAW_UI_DISPLAY_RATIO[1],
                                                                                                                           min_width_ratio=MIN_DRAW_UI_DISPLAY_RATIO[0])
-        print(self.downscale_factor, self.upscale_factor)
+
+        self.display_img_width, self.display_img_height = self.video_meta['width'], self.video_meta['height']
         if config_path is not None:
             ConfigReader.__init__(self, config_path=config_path, read_video_info=False, create_logger=False)
             check_file_exist_and_readable(file_path=config_path)
@@ -348,9 +348,13 @@ class ROI_mixin(ConfigReader):
         self.draw_btn = SimbaButton(parent=self.draw_panel, txt='DRAW', img='brush_large', txt_clr='black', cmd=self.draw, cmd_kwargs={'parent_frame': top_level})
         self.delete_all_btn = SimbaButton(parent=self.draw_panel, txt='DELETE ALL', img='delete_large_red', txt_clr='black', cmd=self.delete_all)
 
-        #self.roi_dropdown = SimBADropDown(parent=self.draw_panel, dropdown_options=self.roi_names, label="ROI: ", label_width=5, value=self.roi_names[0])
-        self.roi_dropdown = DropDownMenu(self.draw_panel, "ROI: ", self.roi_names, 5)
-        self.roi_dropdown.setChoices(self.roi_names[0])
+        self.roi_dropdown = SimBADropDown(parent=self.draw_panel, dropdown_options=self.roi_names, label="ROI: ", label_width=5, value=self.roi_names[0], dropdown_width=max(5, max(len(s) for s in self.roi_names)))
+        if self.roi_names == ['']: self.roi_dropdown.disable()
+
+
+
+        #self.roi_dropdown = DropDownMenu(self.draw_panel, "ROI: ", self.roi_names, 5)
+        #self.roi_dropdown.setChoices(self.roi_names[0])
         self.delete_selected_btn = SimbaButton(parent=self.draw_panel, txt='DELETE SELECTED ROI', img='delete_large_orange', txt_clr='black', cmd=self.delete_named_shape, cmd_kwargs={'name': lambda: self.roi_dropdown.getChoices()})
         self.duplicate_selected_btn = SimbaButton(parent=self.draw_panel, txt='DUPLICATE SELECTED ROI', img='duplicate_large',  txt_clr='black', cmd=self.duplicate_selected)
         self.chg_attr_btn = SimbaButton(parent=self.draw_panel, txt='CHANGE ROI', img='edit_roi_large', txt_clr='black', cmd=self.change_attr_pop_up)
@@ -368,9 +372,12 @@ class ROI_mixin(ConfigReader):
                                           row_idx: int):
 
         self.shapes_from_other_video_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="APPLY SHAPES FROM DIFFERENT VIDEO", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='duplicate_2_large', relief='solid')
-        self.other_videos_dropdown = DropDownMenu(self.shapes_from_other_video_panel, "FROM VIDEO: ", self.other_video_names_w_rois, 15)
-        self.other_videos_dropdown.setChoices(self.other_video_names_w_rois[0])
+        dropdown_width = max(len(s) for s in self.other_video_names_w_rois)
+        self.other_videos_dropdown = SimBADropDown(parent=self.shapes_from_other_video_panel, dropdown_options=self.other_video_names_w_rois, label="FROM VIDEO: ", label_width=15, dropdown_width=dropdown_width, value=self.other_video_names_w_rois[0])
         self.apply_other_video_btn = SimbaButton(parent=self.shapes_from_other_video_panel, txt="APPLY", img='tick_large', txt_clr='black', enabled=True, cmd=self.apply_different_video, cmd_kwargs={'video_name': lambda: self.other_videos_dropdown.getChoices()})
+        if self.other_video_names_w_rois == ['']:
+            self.other_videos_dropdown.disable()
+            self.apply_other_video_btn.config(state=DISABLED)
         self.shapes_from_other_video_panel.grid(row=row_idx, sticky=W, pady=10)
         self.other_videos_dropdown.grid(row=0, column=0, sticky=W, pady=10, padx=(0, 10))
         self.apply_other_video_btn.grid(row=0, column=1, sticky=W, pady=10, padx=(0, 10))
@@ -535,16 +542,25 @@ class ROI_mixin(ConfigReader):
         self.rectangles_df, self.circles_df, self.polygon_df = pd.DataFrame(columns=get_rectangle_df_headers()), pd.DataFrame(columns=get_circle_df_headers()), pd.DataFrame(columns=get_polygon_df_headers())
         self.update_dropdown_menu(dropdown=self.roi_dropdown, new_options=self.roi_names, set_index=0)
 
-    def update_dropdown_menu(self, dropdown: DropDownMenu, new_options: list, set_index: Optional[int] = 0, set_str: Optional[str] = None):
-        dropdown.popupMenu['menu'].delete(0, 'end')
-        for option in new_options:
-            dropdown.popupMenu['menu'].add_command(label=option, command=lambda value=option: dropdown.dropdownvar.set(value))
-        if isinstance(set_index, int) and (set_index < (len(new_options) - 1)):
-            dropdown.setChoices(new_options[set_index])
+    def update_dropdown_menu(self,
+                             dropdown: SimBADropDown,
+                             new_options: list,
+                             set_index: Optional[int] = 0,
+                             set_str: Optional[str] = None):
+
+        dropdown.dropdown['values'] = new_options
+        dropdown.dropdown_var.set('')
+        if isinstance(set_index, int) and (0 <= set_index <= len(new_options) - 1):
+            dropdown.dropdown.set(new_options[set_index])
         elif (set_str is not None) and (set_str in new_options):
-            dropdown.setChoices(set_str)
+            dropdown.dropdown.set(set_str)
         else:
-            dropdown.setChoices(new_options[0])
+            dropdown.dropdown.set(new_options[0])
+        dropdown.set_width(width=max(5, max(len(s) for s in new_options)))
+        if dropdown.dropdown['values'] == ('',):
+            dropdown.disable()
+        else:
+            dropdown.enable()
 
     def delete_named_shape(self, name: str):
         self.set_btn_clrs(btn=self.delete_selected_btn)

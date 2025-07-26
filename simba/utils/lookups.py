@@ -769,7 +769,7 @@ def get_img_resize_info(img_size: Tuple[int ,int],
     min_width = int(display_resolution[0] * min_width_ratio)
     min_height = int(display_resolution[1] * min_height_ratio)
 
-    if img_size[0] > max_width and img_size[1] > max_height:
+    if img_size[1] > max_width or img_size[0] > max_height:
         width_ratio = max_width / img_size[0]
         height_ratio = max_height / img_size[1]
         downscale_factor = min(width_ratio, height_ratio)
@@ -779,7 +779,7 @@ def get_img_resize_info(img_size: Tuple[int ,int],
         return new_width, new_height, downscale_factor, upscale_factor
 
 
-    elif img_size[0] < min_width or img_size[1] < min_height:
+    elif img_size[1] < min_width or img_size[0] < min_height:
         width_ratio = min_width / img_size[0]
         height_ratio = min_height / img_size[1]
         scale = max(width_ratio, height_ratio)  # ensures both dimensions meet or exceed min

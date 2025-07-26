@@ -586,6 +586,9 @@ class SimBADropDown(Frame):
         selected_value = self.dropdown_var.get()
         self.command(selected_value)
 
+    def set_width(self, width: int):
+        self.dropdown.configure(width=width)
+
 
 class DropDownMenu(Frame):
     def __init__(self,

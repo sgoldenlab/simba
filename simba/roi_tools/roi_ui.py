@@ -40,7 +40,7 @@ class ROI_ui(ROI_mixin, ConfigReader):
         check_file_exist_and_readable(file_path=video_path)
         if config_path is None:
             if (video_dir is None) and (roi_coordinates_path is None):
-                raise InvalidInputError(msg='If not passing a config path, then pass roi_coordinates_path and video_dir', source=self.__class__.__name__)
+                raise InvalidInputError(msg='If not passing a config path, then pass roi_coordinates_path AND video_dir', source=self.__class__.__name__)
         if config_path is not None:
             ConfigReader.__init__(self, config_path=config_path, read_video_info=False, create_logger=False)
             check_file_exist_and_readable(file_path=config_path)
@@ -89,8 +89,8 @@ class ROI_ui(ROI_mixin, ConfigReader):
 #        video_path=r"D:\ares\data\ant\ant.mp4",
 #        roi_coordinates_path=r'D:\ares\data\ant\roi_coordinates.h5')
 
-# ROI_ui(config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini",
-#        video_path=r'C:\troubleshooting\mouse_open_field\project_folder\videos\Video2.mp4')
+# ROI_ui(config_path="/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini",
+#        video_path="/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/videos/F1 HAB.mp4")
 
 # ROI_ui(config_path=None,
 #        video_path=r'C:\troubleshooting\mouse_open_field\project_folder\videos\Video2.mp4',
