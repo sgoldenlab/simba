@@ -35,12 +35,10 @@ from simba.roi_tools.roi_utils import (change_roi_dict_video_name,
                                        get_roi_data_for_video_name,
                                        get_roi_df_from_dict,
                                        get_triangle_vertices,
-                                       get_vertices_hexagon,
-                                       get_video_roi_data_from_dict,
-                                       set_roi_metric_sizes)
+                                       get_vertices_hexagon)
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, SimbaButton, SimBALabel,
-                                        get_menu_icons)
+                                        get_menu_icons, SimBADropDown)
 from simba.utils.checks import (check_file_exist_and_readable, check_int,
                                 check_str)
 from simba.utils.enums import OS, ROI_SETTINGS, Formats, Keys
@@ -49,11 +47,11 @@ from simba.utils.errors import (FrameRangeError, InvalidInputError,
 from simba.utils.lookups import (get_color_dict, get_display_resolution,
                                  get_img_resize_info)
 from simba.utils.printing import stdout_success
-from simba.utils.read_write import (get_video_meta_data, read_frm_of_video,
-                                    read_video_info)
+from simba.utils.read_write import (get_video_meta_data, read_frm_of_video)
 from simba.utils.warnings import DuplicateNamesWarning
 
-MAX_DRAW_UI_DISPLAY_RATIO = (0.5, 0.75) # W, H
+MAX_DRAW_UI_DISPLAY_RATIO = (0.5, 0.75)  # W, H - THE INTERFACE IMAGE DISPLAY WILL BE DOWN-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS OR EXCEEDS OF THESE CRITERA. E.G (0.5, 0.75) MEANS IMAGES WILL COVER NO MORE THAN HALF THE DISPLAY WIDTH AND 3/4 OF THE DISPLAY HEIGHT.
+MIN_DRAW_UI_DISPLAY_RATIO = (0.25, 0.25) # W, H - THE INTERFACE IMAGE DISPLAY WILL BE UP-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS AND EXCEEDS BOTH CRITERIA. E.G (0.25, 0.25) MEANS IMAGES WILL COVER NO MORE THAN A QUARTER OF THE USERS DISPLAY HEIGHT AND WIDTH.
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"
 SHAPE_TYPE = 'Shape_type'
@@ -97,7 +95,13 @@ class ROI_mixin(ConfigReader):
 
         self.video_meta = get_video_meta_data(video_path=video_path)
         self.display_w, self.display_h = get_display_resolution()
-        self.display_img_width, self.display_img_height, self.downscale_factor, self.upscale_factor = get_img_resize_info(img_size=(self.video_meta['width'], self.video_meta['height']), display_resolution=(self.display_w, self.display_h), max_height_ratio=MAX_DRAW_UI_DISPLAY_RATIO[1], max_width_ratio=MAX_DRAW_UI_DISPLAY_RATIO[0])
+        self.display_img_width, self.display_img_height, self.downscale_factor, self.upscale_factor = get_img_resize_info(img_size=(self.video_meta['width'], self.video_meta['height']),
+                                                                                                                          display_resolution=(self.display_w, self.display_h),
+                                                                                                                          max_height_ratio=MAX_DRAW_UI_DISPLAY_RATIO[1],
+                                                                                                                          max_width_ratio=MAX_DRAW_UI_DISPLAY_RATIO[0],
+                                                                                                                          min_height_ratio=MIN_DRAW_UI_DISPLAY_RATIO[1],
+                                                                                                                          min_width_ratio=MIN_DRAW_UI_DISPLAY_RATIO[0])
+        print(self.downscale_factor, self.upscale_factor)
         if config_path is not None:
             ConfigReader.__init__(self, config_path=config_path, read_video_info=False, create_logger=False)
             check_file_exist_and_readable(file_path=config_path)
@@ -285,12 +289,12 @@ class ROI_mixin(ConfigReader):
                              row_idx: int):
 
         self.shape_attr_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE ATTRIBUTES", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='attributes_large', relief='solid')
-        self.thickness_dropdown = DropDownMenu(self.shape_attr_panel, "SHAPE THICKNESS: ", ROI_SETTINGS.SHAPE_THICKNESS_OPTIONS.value, 17)
-        self.thickness_dropdown.setChoices(5)
-        self.color_dropdown = DropDownMenu(self.shape_attr_panel, "SHAPE COLOR: ", list(self.color_option_dict.keys()), 17)
-        self.color_dropdown.setChoices('Red')
-        self.ear_tag_size_dropdown = DropDownMenu(self.shape_attr_panel, "EAR TAG SIZE: ", ROI_SETTINGS.EAR_TAG_SIZE_OPTIONS.value,17)
-        self.ear_tag_size_dropdown.setChoices(15)
+
+        self.thickness_dropdown = SimBADropDown(parent=self.shape_attr_panel, dropdown_options=ROI_SETTINGS.SHAPE_THICKNESS_OPTIONS.value, label="SHAPE THICKNESS: ", label_width=17, value=5, dropdown_width=5)
+        self.color_dropdown = SimBADropDown(parent=self.shape_attr_panel, dropdown_options=list(self.color_option_dict.keys()), label="SHAPE COLOR: ", label_width=17, value='Red', dropdown_width=20)
+        self.ear_tag_size_dropdown = SimBADropDown(parent=self.shape_attr_panel, dropdown_options=ROI_SETTINGS.EAR_TAG_SIZE_OPTIONS.value, label="EAR TAG SIZE: ", label_width=17, value=15, dropdown_width=5)
+
+
         self.shape_attr_panel.grid(row=row_idx, sticky=W, pady=10)
         self.thickness_dropdown.grid(row=0, column=1, sticky=W, pady=10, padx=(0, 10))
         self.ear_tag_size_dropdown.grid(row=0, column=2, sticky=W, pady=10, padx=(0, 10))
@@ -343,6 +347,8 @@ class ROI_mixin(ConfigReader):
         self.draw_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="DRAW", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='palette_large', relief='solid')
         self.draw_btn = SimbaButton(parent=self.draw_panel, txt='DRAW', img='brush_large', txt_clr='black', cmd=self.draw, cmd_kwargs={'parent_frame': top_level})
         self.delete_all_btn = SimbaButton(parent=self.draw_panel, txt='DELETE ALL', img='delete_large_red', txt_clr='black', cmd=self.delete_all)
+
+        #self.roi_dropdown = SimBADropDown(parent=self.draw_panel, dropdown_options=self.roi_names, label="ROI: ", label_width=5, value=self.roi_names[0])
         self.roi_dropdown = DropDownMenu(self.draw_panel, "ROI: ", self.roi_names, 5)
         self.roi_dropdown.setChoices(self.roi_names[0])
         self.delete_selected_btn = SimbaButton(parent=self.draw_panel, txt='DELETE SELECTED ROI', img='delete_large_orange', txt_clr='black', cmd=self.delete_named_shape, cmd_kwargs={'name': lambda: self.roi_dropdown.getChoices()})

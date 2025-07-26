@@ -29,14 +29,14 @@ ROI feature visualization - multiprocess
 ROI visualizer
 ----------------------------------
 
-.. automodule:: simba.plotting.ROI_plotter.ROIPlot
+.. automodule:: simba.plotting.roi_plotter.ROIPlotter
    :members:
    :show-inheritance:
 
 ROI visualizer - multiprocess
 --------------------------------------
 
-.. automodule:: simba.plotting.ROI_plotter_mp.ROIPlotMultiprocess
+.. automodule:: simba.plotting.roi_plotter_mp.ROIPlotMultiprocess
    :members:
    :show-inheritance:
 

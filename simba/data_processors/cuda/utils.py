@@ -2,7 +2,7 @@ import math
 from typing import Any, Dict, Tuple
 
 import numpy as np
-from numba import cuda, float64, guvectorize
+from numba import cuda, float64
 
 
 @cuda.jit(device=True)

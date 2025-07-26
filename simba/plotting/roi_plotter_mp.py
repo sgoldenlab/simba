@@ -371,10 +371,10 @@ class ROIPlotMultiprocess(ConfigReader):
 
 # if __name__ == "__main__":
 #     test = ROIPlotMultiprocess(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
-#                                video_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_Saline_0513.mp4",
+#                                video_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_Saline_0515.mp4",
 #                                body_parts=['Nose'],
 #                                style_attr={'show_body_part': True, 'show_animal_name': False},
-#                                outside_roi=True,
+#                                outside_roi=False,
 #                                gpu=True)
 #     test.run()
 

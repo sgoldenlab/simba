@@ -46,16 +46,21 @@ class ROI_ui(ROI_mixin, ConfigReader):
             check_file_exist_and_readable(file_path=config_path)
         if roi_coordinates_path is not None:
             self.roi_coordinates_path = roi_coordinates_path
-            check_if_dir_exists(in_dir=video_dir)
-            self.video_dir = video_dir
+            if check_if_dir_exists(in_dir=video_dir, raise_error=False):
+                self.video_dir = video_dir
+            else:
+                self.video_dir = None
         self.video_meta =  get_video_meta_data(video_path=video_path, fps_as_int=False)
         self.video_ext = get_fn_ext(filepath=video_path)[2][1:]
         self.img, self.img_idx = ImageMixin.find_first_non_uniform_clr_frm(video_path=video_path)
         self.define_ui = PopUpMixin(title="REGION OF INTEREST (ROI) SETTINGS", size=WINDOW_SIZE, icon='shapes_small')
         ROI_mixin.__init__(self, video_path=video_path, config_path=config_path, img_idx=self.img_idx, main_frm=self.define_ui.root, roi_coordinates_path=self.roi_coordinates_path)
-        self.other_project_video_paths = find_all_videos_in_directory(directory=self.video_dir, as_dict=True).values()
-        self.other_project_video_paths = [x for x in self.other_project_video_paths if x != video_path]
-        self.other_project_video_names = [get_fn_ext(x)[1] for x in self.other_project_video_paths]
+        if self.video_dir is not None:
+            self.other_project_video_paths = find_all_videos_in_directory(directory=self.video_dir, as_dict=True).values()
+            self.other_project_video_paths = [x for x in self.other_project_video_paths if x != video_path]
+            self.other_project_video_names = [get_fn_ext(x)[1] for x in self.other_project_video_paths]
+        else:
+            self.other_project_video_names = []
         self.settings = {item.name: item.value for item in ROI_SETTINGS}
         self.get_video_info_panel(parent_frame=self.define_ui.main_frm, row_idx=0)
         self.get_select_img_panel(parent_frame=self.define_ui.main_frm, row_idx=1)
@@ -80,7 +85,9 @@ class ROI_ui(ROI_mixin, ConfigReader):
         self.define_ui.root.destroy()
         self.define_ui.root.quit()
 
-#ROI_ui(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", video_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_CNO_0514.mp4")
+# ROI_ui(config_path=None,
+#        video_path=r"D:\ares\data\ant\ant.mp4",
+#        roi_coordinates_path=r'D:\ares\data\ant\roi_coordinates.h5')
 
 # ROI_ui(config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini",
 #        video_path=r'C:\troubleshooting\mouse_open_field\project_folder\videos\Video2.mp4')

@@ -24,7 +24,7 @@ from matplotlib import cm
 import simba
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists, check_int, check_str,
-                                check_valid_dict)
+                                check_valid_dict, check_valid_tuple, check_float)
 from simba.utils.enums import OS, UML, FontPaths, Methods, Paths
 from simba.utils.read_write import get_fn_ext
 from simba.utils.warnings import NoDataFoundWarning
@@ -747,7 +747,9 @@ def get_display_resolution() -> Tuple[int, int]:
 def get_img_resize_info(img_size: Tuple[int ,int],
                         display_resolution: Optional[Tuple[int, int]] = None,
                         max_height_ratio: float = 0.5,
-                        max_width_ratio: float = 0.5) -> Tuple[int, int, float, float]:
+                        max_width_ratio: float = 0.5,
+                        min_height_ratio: float = 0.0,
+                        min_width_ratio: float = 0.0) -> Tuple[int, int, float, float]:
     """
     Calculates the new dimensions and scaling factors needed to resize an image while preserving its
     aspect ratio so that it fits within a given portion of the display resolution.
@@ -764,15 +766,35 @@ def get_img_resize_info(img_size: Tuple[int ,int],
         display_resolution = get_display_resolution()
     max_width = int(display_resolution[0] * max_width_ratio)
     max_height = int(display_resolution[1] * max_height_ratio)
-    if img_size[0] <= max_width and img_size[1] <= max_height:
+    min_width = int(display_resolution[0] * min_width_ratio)
+    min_height = int(display_resolution[1] * min_height_ratio)
+
+    if img_size[0] > max_width and img_size[1] > max_height:
+        width_ratio = max_width / img_size[0]
+        height_ratio = max_height / img_size[1]
+        downscale_factor = min(width_ratio, height_ratio)
+        upscale_factor = 1 / downscale_factor
+        new_width = int(img_size[0] * downscale_factor)
+        new_height = int(img_size[1] * downscale_factor)
+        return new_width, new_height, downscale_factor, upscale_factor
+
+
+    elif img_size[0] < min_width or img_size[1] < min_height:
+        width_ratio = min_width / img_size[0]
+        height_ratio = min_height / img_size[1]
+        scale = max(width_ratio, height_ratio)  # ensures both dimensions meet or exceed min
+        new_width = int(round(img_size[0] * scale))
+        new_height = int(round(img_size[1] * scale))
+        return new_width, new_height, scale, 1 / scale
+
+    else:
         return img_size[0], img_size[1], 1, 1
-    width_ratio = max_width / img_size[0]
-    height_ratio = max_height / img_size[1]
-    downscale_factor = min(width_ratio, height_ratio)
-    upscale_factor = 1 / downscale_factor
-    new_width = int(img_size[0] * downscale_factor)
-    new_height = int(img_size[1] * downscale_factor)
-    return new_width, new_height, downscale_factor, upscale_factor
+
+
+
+
+
+
 
 
 #
