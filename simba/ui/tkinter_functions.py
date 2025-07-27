@@ -304,11 +304,11 @@ def CreateLabelFrameWithIcon(parent: Union[Toplevel, LabelFrame, Canvas, Frame],
     icon = PIL.Image.open(MENU_ICONS[icon_name]["icon_path"])
     icon = ImageTk.PhotoImage(icon)
 
-    frm = Frame(parent, bg=bg)  # <- Apply bg here
-    label_text = Label(frm, text=header, font=font, bg=bg)  # <- And here
+    frm = Frame(parent, bg=bg)
+    label_text = Label(frm, text=header, font=font, bg=bg)
     label_text.grid(row=0, column=0)
 
-    label_image = Label(frm, image=icon, bg=bg)  # <- And here
+    label_image = Label(frm, image=icon, bg=bg)
     label_image.image = icon
     if icon_link:
         label_image.bind("<Button-1>", lambda e: callback(icon_link))

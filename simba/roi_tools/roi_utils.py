@@ -12,9 +12,9 @@ from PIL import ImageTk
 from scipy.spatial.distance import cdist
 from shapely.geometry import Polygon
 
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists, check_int, check_str,
-                                check_valid_dataframe, check_valid_tuple)
+from simba.utils.checks import (check_file_exist_and_readable, check_int, check_str,
+                                check_valid_dataframe, check_valid_tuple, check_video_and_data_frm_count_align,
+                                check_valid_array)
 from simba.utils.enums import (ROI_SETTINGS, ConfigKey, Formats, Keys, Options,
                                Paths)
 from simba.utils.errors import (InvalidInputError, NoROIDataError,
@@ -22,10 +22,11 @@ from simba.utils.errors import (InvalidInputError, NoROIDataError,
 from simba.utils.printing import stdout_success, stdout_trash
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, read_config_file,
-                                    read_roi_data)
+                                    read_roi_data, get_video_meta_data, read_df)
 from simba.video_processors.roi_selector import ROISelector
 from simba.video_processors.roi_selector_circle import ROISelectorCircle
 from simba.video_processors.roi_selector_polygon import ROISelectorPolygon
+from simba.utils.warnings import VideoFileWarning, NoFileFoundWarning, FrameRangeWarning
 
 warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 
@@ -546,3 +547,25 @@ def get_image_from_label(tk_lbl: Label):
         pil_image = ImageTk.getimage(tk_img)
         img = np.asarray(pil_image)
         return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+
+def get_pose_for_roi_ui(pose_path: Union[str, os.PathLike], video_path: Union[str, os.PathLike]) -> Union[None, np.ndarray]:
+    video_meta_data = get_video_meta_data(video_path=video_path, raise_error=False)
+    if video_meta_data is None:
+        VideoFileWarning(msg=f'Cannot plot pose on ROI as cannot read meta data for video {video_path}.', source=get_pose_for_roi_ui.__name__)
+        return None
+    file_readable = check_file_exist_and_readable(file_path=pose_path, raise_error=False)
+    if not file_readable:
+        NoFileFoundWarning(msg=f'Cannot plot tracking in ROI window: {pose_path} is unreadable.', source=get_pose_for_roi_ui.__name__)
+        return None
+    pose_df = read_df(file_path=pose_path, file_type='csv')
+    data_align = check_video_and_data_frm_count_align(video=video_path, data=pose_path, raise_error=False)
+    if not data_align:
+        FrameRangeWarning(msg=f'Cannot plot tracking in ROI window: The data contains {len(pose_path)} frames and the video has {video_meta_data["frame_count"]} frames', source=get_pose_for_roi_ui.__name__)
+        return None
+    pose_df = pose_df.drop(pose_df.columns[2::3], axis=1)
+    pose_data = pose_df.values.reshape(len(pose_df), int(len(pose_df.columns) / 2), 2).astype(np.int32)
+    valid_pose = check_valid_array(data=pose_data, source=f'{get_pose_for_roi_ui.__name__} pose_data', accepted_ndims=(3,), accepted_axis_0_shape=[video_meta_data['frame_count']], accepted_dtypes=Formats.INTEGER_DTYPES.value, raise_error=False)
+    if not valid_pose:
+        FrameRangeWarning(msg=f'Cannot plot tracking in ROI window: The pose data from path {pose_path} is not a 3D numeric array with length {video_meta_data["frame_count"]}', source=get_pose_for_roi_ui.__name__)
+    return pose_data

@@ -873,7 +873,8 @@ def check_valid_array(data: np.ndarray,
                       max_axis_1: Optional[int] = None,
                       min_axis_1: Optional[int] = None,
                       min_value: Optional[Union[float, int]] = None,
-                      max_value: Optional[Union[float, int]] = None) -> None:
+                      max_value: Optional[Union[float, int]] = None,
+                      raise_error: bool = True) -> Union[None, bool]:
     """
     Check if the given  array satisfies specified criteria regarding its dimensions, shape, and data type.
 
@@ -893,26 +894,28 @@ def check_valid_array(data: np.ndarray,
     check_instance(source=source, instance=data, accepted_types=np.ndarray)
     if accepted_ndims is not None:
         if data.ndim not in accepted_ndims:
-            raise ArrayError(msg=f"Array not of acceptable dimensions. Found {data.ndim}, accepted: {accepted_ndims}: {source}", source=check_valid_array.__name__)
+            if raise_error:
+                raise ArrayError(msg=f"Array not of acceptable dimensions. Found {data.ndim}, accepted: {accepted_ndims}: {source}", source=check_valid_array.__name__)
+            else:
+                return False
     if accepted_sizes is not None:
         if len(data.shape) not in accepted_sizes:
-            raise ArrayError(
-                msg=f"Array not of acceptable size. Found {len(data.shape)}, accepted: {accepted_sizes}: {source}",
-                source=check_valid_array.__name__,
-            )
+            if raise_error:
+                raise ArrayError(msg=f"Array not of acceptable size. Found {len(data.shape)}, accepted: {accepted_sizes}: {source}", source=check_valid_array.__name__)
+            else:
+                return False
     if accepted_dtypes is not None:
         if data.dtype not in accepted_dtypes:
-            raise ArrayError(
-                msg=f"Array not of acceptable type. Found {data.dtype}, accepted: {accepted_dtypes}: {source}",
-                source=check_valid_array.__name__,
-            )
+            if raise_error:
+                raise ArrayError(msg=f"Array not of acceptable type. Found {data.dtype}, accepted: {accepted_dtypes}: {source}", source=check_valid_array.__name__)
+            else:
+                return False
     if accepted_shapes is not None:
         if data.shape not in accepted_shapes:
-            raise ArrayError(
-                msg=f"Array not of acceptable shape. Found {data.shape}, accepted: {accepted_shapes}: {source}",
-                source=check_valid_array.__name__,
-            )
-
+            if raise_error:
+                raise ArrayError(msg=f"Array not of acceptable shape. Found {data.shape}, accepted: {accepted_shapes}: {source}", source=check_valid_array.__name__)
+            else:
+                return False
     if accepted_axis_0_shape is not None:
         # if data.ndim != 2:
         #     raise ArrayError(
@@ -920,57 +923,65 @@ def check_valid_array(data: np.ndarray,
         #         source=check_valid_array.__name__,
         #     )
         if data.shape[0] not in accepted_axis_0_shape:
-            raise ArrayError(
-                msg=f"Array not of acceptable shape. Found {data.shape[0]} rows, accepted: {accepted_axis_0_shape}, {source}",
-                source=check_valid_array.__name__,
-            )
-
+            if raise_error:
+                raise ArrayError(msg=f"Array not of acceptable shape. Found {data.shape[0]} rows, accepted: {accepted_axis_0_shape}, {source}", source=check_valid_array.__name__)
+            else:
+                return False
     if accepted_axis_1_shape is not None:
         if data.ndim != 2:
-            raise ArrayError(
-                msg=f"Array not of acceptable dimension. Found {data.ndim}, accepted: 2, {source}",
-                source=check_valid_array.__name__,
-            )
+            raise ArrayError(msg=f"Array not of acceptable dimension. Found {data.ndim}, accepted: 2, {source}",  source=check_valid_array.__name__,)
         elif data.shape[1] not in accepted_axis_1_shape:
-            raise ArrayError(
-                msg=f"Array not of acceptable shape. Found {data.shape[0]} columns (axis=1), accepted: {accepted_axis_1_shape}, {source}",
-                source=check_valid_array.__name__,
-            )
-
+            if raise_error:
+                raise ArrayError( msg=f"Array not of acceptable shape. Found {data.shape[0]} columns (axis=1), accepted: {accepted_axis_1_shape}, {source}", source=check_valid_array.__name__)
+            else:
+                return False
     if min_axis_0 is not None:
         check_int(name=f"{source} min_axis_0", value=min_axis_0)
         if data.shape[0] < min_axis_0:
-            raise ArrayError(
-                msg=f"Array not of acceptable shape. Found  {data.shape[0]} rows, minimum accepted: {min_axis_0}, {source}",
-                source=check_valid_array.__name__,
-            )
+            if raise_error:
+                raise ArrayError(msg=f"Array not of acceptable shape. Found  {data.shape[0]} rows, minimum accepted: {min_axis_0}, {source}", source=check_valid_array.__name__)
+            else:
+                return False
+
     if max_axis_1 is not None and data.ndim > 1:
         check_int(name=f"{source} max_axis_1", value=max_axis_1)
         if data.shape[1] > max_axis_1:
-            raise ArrayError(msg=f"Array not of acceptable shape. Found  {data.shape[1]} columns, maximum columns accepted: {max_axis_1}, {source}", source=check_valid_array.__name__)
+            if raise_error:
+                raise ArrayError(msg=f"Array not of acceptable shape. Found  {data.shape[1]} columns, maximum columns accepted: {max_axis_1}, {source}", source=check_valid_array.__name__)
+            else:
+                return False
     if min_axis_1 is not None and data.ndim > 1:
         check_int(name=f"{source} min_axis_1", value=min_axis_1)
         if data.shape[1] < min_axis_1:
-            raise ArrayError(
-                msg=f"Array not of acceptable shape. Found  {data.shape[1]} columns, minimum columns accepted: {min_axis_1}, {source}",
-                source=check_valid_array.__name__,
-            )
-
+            if raise_error:
+                raise ArrayError(msg=f"Array not of acceptable shape. Found  {data.shape[1]} columns, minimum columns accepted: {min_axis_1}, {source}", source=check_valid_array.__name__)
+            else:
+                return False
     if accepted_values is not None:
         check_valid_lst(data=accepted_values, source=f"{source} accepted_values")
         additional_vals = list(set(np.unique(data)) - set(accepted_values))
         if len(additional_vals) > 0:
-            raise ArrayError(msg=f"Array contains unacceptable values. Found  {additional_vals}, accepted: {accepted_values}, {source}", source=check_valid_array.__name__,)
+            if raise_error:
+                raise ArrayError(msg=f"Array contains unacceptable values. Found  {additional_vals}, accepted: {accepted_values}, {source}", source=check_valid_array.__name__,)
+            return False
 
     if min_value is not None:
         check_float(name=f'{source} min_value', value=min_value)
         if np.min(data) < min_value:
-            raise ArrayError(msg=f"Array contains value below accepted value. Found  {np.min(data)}, accepted minimum: {min_value}, {source}", source=check_valid_array.__name__, )
+            if raise_error:
+                raise ArrayError(msg=f"Array contains value below accepted value. Found  {np.min(data)}, accepted minimum: {min_value}, {source}", source=check_valid_array.__name__, )
+            else:
+                return False
 
     if max_value is not None:
         check_float(name=f'{source} max_value', value=max_value)
         if np.max(data) > max_value:
-            raise ArrayError(msg=f"Array contains value above accepted maximum value. Found  {np.max(data)}, accepted minimum: {max_value}, {source}", source=check_valid_array.__name__, )
+            if raise_error:
+                raise ArrayError(msg=f"Array contains value above accepted maximum value. Found  {np.max(data)}, accepted minimum: {max_value}, {source}", source=check_valid_array.__name__, )
+            else:
+                return False
+    else:
+        return True
 
 def check_valid_lst(data: list,
                     source: Optional[str] = "",
@@ -1365,7 +1376,7 @@ def check_valid_tuple(x: tuple,
 def check_video_and_data_frm_count_align(video: Union[str, os.PathLike, cv2.VideoCapture],
                                          data: Union[str, os.PathLike, pd.DataFrame],
                                          name: Optional[str] = "",
-                                         raise_error: Optional[bool] = True) -> None:
+                                         raise_error: Optional[bool] = True) -> Union[None, bool]:
     """
     Check if the frame count of a video matches the row count of a data file.
 
@@ -1416,12 +1427,10 @@ def check_video_and_data_frm_count_align(video: Union[str, os.PathLike, cv2.Vide
     if data_count != video_count:
         if not raise_error:
             FrameRangeWarning(msg=f"The video {name} has {video_count} frames, but the associated data file for this video has {data_count} rows", source=check_video_and_data_frm_count_align.__name__)
+            return False
         else:
-            raise FrameRangeError(
-                msg=f"The video {name} has {video_count} frames, but the associated data file for this video has {data_count} rows",
-                source=check_video_and_data_frm_count_align.__name__,
-            )
-
+            raise FrameRangeError(msg=f"The video {name} has {video_count} frames, but the associated data file for this video has {data_count} rows", source=check_video_and_data_frm_count_align.__name__,)
+    return True
 
 def check_if_video_corrupted(video: Union[str, os.PathLike, cv2.VideoCapture],
                              frame_interval: Optional[int] = None,

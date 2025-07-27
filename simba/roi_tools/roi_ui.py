@@ -8,12 +8,12 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.image_mixin import ImageMixin
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.roi_ui_mixin import ROI_mixin
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists, check_valid_array)
+from simba.roi_tools.roi_utils import get_pose_for_roi_ui
+from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists, check_valid_array, check_video_and_data_frm_count_align)
 from simba.utils.enums import ROI_SETTINGS, Formats
 from simba.utils.errors import InvalidInputError
-from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
-                                    get_video_meta_data, read_df)
+from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext, get_video_meta_data, read_df)
+from simba.utils.warnings import FrameRangeWarning
 
 warnings.filterwarnings("ignore")
 
@@ -53,15 +53,9 @@ class ROI_ui(ROI_mixin, ConfigReader):
             else: self.video_dir = None
         self.video_meta = get_video_meta_data(video_path=video_path, fps_as_int=False)
         if pose_path is not None:
-            if check_file_exist_and_readable(file_path=config_path, raise_error=False):
-                pose_df = read_df(file_path=pose_path, file_type='csv')
-                pose_df = pose_df.drop(pose_df.columns[2::3], axis=1)
-                pose_data = pose_df.values.reshape(len(pose_df), int(len(pose_df.columns)/2), 2).astype(np.int32)
-                check_valid_array(data=pose_data, source=f'{self.__class__.__name__} pose_data', accepted_ndims=(3,), accepted_axis_0_shape=[self.video_meta['frame_count']], accepted_dtypes=Formats.INTEGER_DTYPES.value)
-            else:
-                pose_data = None
-
-
+            pose_data = get_pose_for_roi_ui(pose_path=pose_path, video_path=video_path)
+        else:
+            pose_data = None
         self.video_ext = get_fn_ext(filepath=video_path)[2][1:]
         self.img, self.img_idx = ImageMixin.find_first_non_uniform_clr_frm(video_path=video_path)
         self.define_ui = PopUpMixin(title="REGION OF INTEREST (ROI) SETTINGS", size=WINDOW_SIZE, icon='shapes_small')
@@ -73,6 +67,7 @@ class ROI_ui(ROI_mixin, ConfigReader):
         else:
             self.other_project_video_names = []
         self.settings = {item.name: item.value for item in ROI_SETTINGS}
+        self.settings['SHOW_POSE'] = True if pose_data is not None else False
         self.get_video_info_panel(parent_frame=self.define_ui.main_frm, row_idx=0)
         self.get_select_img_panel(parent_frame=self.define_ui.main_frm, row_idx=1)
         self.get_select_shape_type_panel(parent_frame=self.define_ui.main_frm, row_idx=2)
@@ -108,10 +103,22 @@ class ROI_ui(ROI_mixin, ConfigReader):
 #        roi_coordinates_path=r"C:\troubleshooting\mitra\project_folder\logs\measures\ROI_definitions.h5",
 #        video_dir=r"C:\troubleshooting\mitra\test")
 
+
+# ROI_ui(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini",
+#        video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\03152021_NOB_IOT_8.mp4",
+#        roi_coordinates_path=r"C:\troubleshooting\RAT_NOR\project_folder\logs\measures\ROI_definitions.h5",
+#        pose_path=r"C:\troubleshooting\RAT_NOR\project_folder\csv\outlier_corrected_movement_location\03152021_NOB_IOT_8.csv")
+
+
+# ROI_ui(config_path=r"C:\troubleshooting\cue_light\t1\project_folder\project_config.ini",
+#        video_path=r"C:\troubleshooting\cue_light\t1\project_folder\videos\2025-05-21 16-10-06_cropped.mp4",
+#        roi_coordinates_path=r"C:\troubleshooting\cue_light\t1\project_folder\logs\measures\ROI_definitions.h5")
+#
+
 # ROI_ui(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #        video_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_CNO_0514.mp4")
-
 #
+# #
 #ROI_ui(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini',
 #       video_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4.mp4",
 #       pose_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/csv/outlier_corrected_movement_location/2022-06-20_NOB_DOT_4.csv')
