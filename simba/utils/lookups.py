@@ -790,7 +790,8 @@ def get_img_resize_info(img_size: Tuple[int ,int],
     else:
         return img_size[0], img_size[1], 1, 1
 
-
+def is_running_in_ide():
+    return hasattr(sys, 'ps1') or sys.flags.interactive
 
 
 

@@ -22,7 +22,6 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
-
 import h5py
 from PIL import Image
 
@@ -56,9 +55,9 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_nvidea_gpu_available, check_str,
                                 check_valid_array, check_valid_boolean,
                                 check_valid_dataframe, check_valid_lst,
-                                check_valid_url, is_img_bw, is_video_color)
+                                check_valid_url, is_video_color)
 from simba.utils.enums import (ENV_VARS, ConfigKey, Defaults, Dtypes, Formats,
-                               Keys, Links, Options, Paths)
+                               Keys, Links, Options, Paths, OS)
 from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 FFMPEGCodecGPUError, FFMPEGNotFoundError,
                                 FileExistError, FrameRangeError, IntegerError,
@@ -66,11 +65,9 @@ from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 InvalidInputError, InvalidVideoFileError,
                                 MissingProjectConfigEntryError, NoDataError,
                                 NoFilesFoundError, NotDirectoryError,
-                                ParametersFileError, PermissionError)
+                                ParametersFileError, PermissionError, SimBAPAckageVersionError)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.warnings import (
-    FileExistWarning, FrameRangeWarning, GPUToolsWarning, InvalidValueWarning,
-    NoFileFoundWarning, ThirdPartyAnnotationsInvalidFileFormatWarning)
+from simba.utils.warnings import (FileExistWarning, FrameRangeWarning, GPUToolsWarning, InvalidValueWarning, NoFileFoundWarning, ThirdPartyAnnotationsInvalidFileFormatWarning)
 
 SIMBA_DIR = os.path.dirname(simba.__file__)
 
@@ -1647,9 +1644,17 @@ def read_roi_data(roi_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, pd.D
         rectangles_df = pd.read_hdf(roi_path, key=Keys.ROI_RECTANGLES.value).dropna(how="any")
         circles_df = pd.read_hdf(roi_path, key=Keys.ROI_CIRCLES.value).dropna(how="any")
         polygon_df = pd.read_hdf(roi_path, key=Keys.ROI_POLYGONS.value)
+    except (pickle.UnpicklingError, ValueError) as e:
+        if "unsupported pickle protocol" in str(e).lower():
+            print(e.args)
+            raise SimBAPAckageVersionError(msg=f'Pickle VERSION ERROR. The ROIs where likely drawn using a SimBA installation that was built in a **Python** version different from the current Python version (e.g., 3.10 vs 3.6). You currently have Python version {OS.PYTHON_VER.value}. You may have drawn the ROIs in SimBA using Python version >3.8 and now you have Python version <3.8. To fix, use the same Python version as you used when drawing the ROIs')
+        else:
+            print(e.args)
+            raise InvalidFileTypeError(msg=f"{roi_path} is not a valid SimBA ROI definitions file. See above for more detailed error cause.", source=read_roi_data.__name__)
     except Exception as e:
         print(e.args)
-        raise InvalidFileTypeError(msg=f"{roi_path} is not a valid SimBA ROI definitions file", source=read_roi_data.__name__)
+        raise InvalidFileTypeError(msg=f"{roi_path} is not a valid SimBA ROI definitions file. See above for more detailed error cause.", source=read_roi_data.__name__)
+
     if "Center_XCenter_Y" in polygon_df.columns:
         polygon_df = polygon_df.drop(["Center_XCenter_Y"], axis=1)
     if 'Center_X' not in rectangles_df.columns:
@@ -1666,6 +1671,8 @@ def read_roi_data(roi_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, pd.D
     return rectangles_df, circles_df, polygon_df
 
 #read_roi_data(roi_path=r"C:\troubleshooting\mitra\project_folder\logs\measures\ROI_definitions.h5")
+
+
 
 def create_directory(paths: Union[str, os.PathLike, bytes, List[str], Tuple[str]], overwrite: bool = False) -> None:
 
