@@ -100,6 +100,6 @@ class ROI_ui(ROI_mixin, ConfigReader):
 # ROI_ui(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #        video_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_CNO_0514.mp4")
 
-
-ROI_ui(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini',
-       video_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4.mp4")
+#
+# ROI_ui(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini',
+#        video_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4.mp4")
