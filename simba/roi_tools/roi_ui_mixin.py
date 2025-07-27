@@ -50,8 +50,8 @@ from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 from simba.utils.warnings import DuplicateNamesWarning
 
-MAX_DRAW_UI_DISPLAY_RATIO = (0.60, 0.75)  # W, H - THE INTERFACE IMAGE DISPLAY WILL BE DOWN-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS OR EXCEEDS OF THESE CRITERA. E.G (0.5, 0.75) MEANS IMAGES WILL COVER NO MORE THAN HALF THE DISPLAY WIDTH AND 3/4 OF THE DISPLAY HEIGHT.
-MIN_DRAW_UI_DISPLAY_RATIO = (0.25, 0.35) # W, H - THE INTERFACE IMAGE DISPLAY WILL BE UP-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS AND EXCEEDS BOTH CRITERIA. E.G (0.25, 0.25) MEANS IMAGES WILL COVER NO MORE THAN A QUARTER OF THE USERS DISPLAY HEIGHT AND NO MORE THAN A QUARTER OF THE USERS DISPLAY WIDTH.
+MAX_DRAW_UI_DISPLAY_RATIO = (0.5, 0.75)  # W, H - THE INTERFACE IMAGE DISPLAY WILL BE DOWN-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS OR EXCEEDS OF THESE CRITERA. E.G (0.5, 0.75) MEANS IMAGES WILL COVER NO MORE THAN HALF THE DISPLAY WIDTH AND 3/4 OF THE DISPLAY HEIGHT.
+MIN_DRAW_UI_DISPLAY_RATIO = (0.225, 0.225) # W, H - THE INTERFACE IMAGE DISPLAY WILL BE UP-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS AND EXCEEDS BOTH CRITERIA. E.G (0.25, 0.25) MEANS IMAGES WILL COVER NO MORE THAN A QUARTER OF THE USERS DISPLAY HEIGHT AND NO MORE THAN A QUARTER OF THE USERS DISPLAY WIDTH.
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"
 SHAPE_TYPE = 'Shape_type'
@@ -95,13 +95,10 @@ class ROI_mixin(ConfigReader):
 
         self.video_meta = get_video_meta_data(video_path=video_path)
         self.display_w, self.display_h = get_display_resolution()
-        self.display_img_width, self.display_img_height, self.downscale_factor, self.upscale_factor = get_img_resize_info(img_size=(self.video_meta['width'], self.video_meta['height']),
-                                                                                                                          display_resolution=(self.display_w, self.display_h),
-                                                                                                                          max_height_ratio=MAX_DRAW_UI_DISPLAY_RATIO[1],
-                                                                                                                          min_height_ratio=MIN_DRAW_UI_DISPLAY_RATIO[1],
-                                                                                                                          min_width_ratio=MIN_DRAW_UI_DISPLAY_RATIO[0])
-
-        self.display_img_width, self.display_img_height = self.video_meta['width'], self.video_meta['height']
+        self.display_img_width, self.display_img_height, self.downscale_factor, self.upscale_factor = get_img_resize_info(img_size=(self.video_meta['width'], self.video_meta['height']), display_resolution=(self.display_w, self.display_h), max_height_ratio=MAX_DRAW_UI_DISPLAY_RATIO[1], max_width_ratio=MAX_DRAW_UI_DISPLAY_RATIO[0], min_height_ratio=MIN_DRAW_UI_DISPLAY_RATIO[1], min_width_ratio=MIN_DRAW_UI_DISPLAY_RATIO[0])
+        #self.display_img_width, self.display_img_height = self.video_meta['width'], self.video_meta['height']
+        #print(self.display_img_width, self.display_img_height, self.video_meta)
+        #print(self.downscale_factor, self.upscale_factor, self.display_w, self.display_h)
         if config_path is not None:
             ConfigReader.__init__(self, config_path=config_path, read_video_info=False, create_logger=False)
             check_file_exist_and_readable(file_path=config_path)
