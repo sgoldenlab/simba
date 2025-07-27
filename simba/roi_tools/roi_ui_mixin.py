@@ -50,8 +50,8 @@ from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 from simba.utils.warnings import DuplicateNamesWarning
 
-MAX_DRAW_UI_DISPLAY_RATIO = (1, 1)  # W, H - THE INTERFACE IMAGE DISPLAY WILL BE DOWN-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS OR EXCEEDS OF THESE CRITERA. E.G (0.5, 0.75) MEANS IMAGES WILL COVER NO MORE THAN HALF THE DISPLAY WIDTH AND 3/4 OF THE DISPLAY HEIGHT.
-MIN_DRAW_UI_DISPLAY_RATIO = (1, 1) # W, H - THE INTERFACE IMAGE DISPLAY WILL BE UP-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS AND EXCEEDS BOTH CRITERIA. E.G (0.25, 0.25) MEANS IMAGES WILL COVER NO MORE THAN A QUARTER OF THE USERS DISPLAY HEIGHT AND NO MORE THAN A QUARTER OF THE USERS DISPLAY WIDTH.
+MAX_DRAW_UI_DISPLAY_RATIO = (0.5, 0.75)  # W, H - THE INTERFACE IMAGE DISPLAY WILL BE DOWN-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS OR EXCEEDS OF THESE CRITERA. E.G (0.5, 0.75) MEANS IMAGES WILL COVER NO MORE THAN HALF THE DISPLAY WIDTH AND 3/4 OF THE DISPLAY HEIGHT.
+MIN_DRAW_UI_DISPLAY_RATIO = (0.225, 0.225) # W, H - THE INTERFACE IMAGE DISPLAY WILL BE UP-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS AND EXCEEDS BOTH CRITERIA. E.G (0.25, 0.25) MEANS IMAGES WILL COVER NO MORE THAN A QUARTER OF THE USERS DISPLAY HEIGHT AND NO MORE THAN A QUARTER OF THE USERS DISPLAY WIDTH.
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"
 SHAPE_TYPE = 'Shape_type'
@@ -111,7 +111,7 @@ class ROI_mixin(ConfigReader):
             self.roi_coordinates_path = roi_coordinates_path
         if pose_data is not None:
             check_valid_array(data=pose_data, source=f'{self.__class__.__name__} pose_data', accepted_ndims=(3,), accepted_axis_0_shape=[self.video_meta['frame_count']], accepted_dtypes=Formats.INTEGER_DTYPES.value)
-            self.circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(self.video_meta['width'], self.video_meta['height']), circle_frame_ratio=80)
+            self.circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(self.display_img_width, self.display_img_height), circle_frame_ratio=100)
             self.clrs = create_color_palettes(no_animals=1, map_size=int(pose_data.shape[1]))[0]
         else:
             self.circle_size, self.clrs = None, None
@@ -138,8 +138,18 @@ class ROI_mixin(ConfigReader):
             self.roi_dict = self.scale_roi_dict(roi_dict=self.roi_dict, scale_factor=self.downscale_factor)
             self.other_roi_dict = self.scale_roi_dict(roi_dict=self.other_roi_dict, scale_factor=self.downscale_factor, nesting=True)
             self.rectangles_df, self.circles_df, self.polygon_df = get_roi_df_from_dict(roi_dict=self.roi_dict)
+            if self.pose_data is not None:
+                self.pose_data = self.pose_data * self.downscale_factor
+                #self.pose_data = self.scale_pose(pose_data=self.pose_data, scale_factor=self.downscale_factor)
 
         self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
+
+    #def scale_pose(self, pose_data: np.ndarray, scale_factor: float) -> np.ndarray:
+    #    arr * factor
+
+
+
+
 
     def scale_roi_dict(self, roi_dict: dict, scale_factor: float, nesting: bool = False) -> dict:
         new_roi_dict = deepcopy(roi_dict)
