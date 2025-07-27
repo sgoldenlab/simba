@@ -9,10 +9,13 @@ from simba.mixins.image_mixin import ImageMixin
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.roi_ui_mixin import ROI_mixin
 from simba.roi_tools.roi_utils import get_pose_for_roi_ui
-from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists, check_valid_array, check_video_and_data_frm_count_align)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists, check_valid_array,
+                                check_video_and_data_frm_count_align)
 from simba.utils.enums import ROI_SETTINGS, Formats
 from simba.utils.errors import InvalidInputError
-from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext, get_video_meta_data, read_df)
+from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
+                                    get_video_meta_data, read_df)
 from simba.utils.warnings import FrameRangeWarning
 
 warnings.filterwarnings("ignore")
