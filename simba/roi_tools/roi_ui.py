@@ -1,16 +1,19 @@
 import os
 import warnings
 from typing import Optional, Union
+
 import numpy as np
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.image_mixin import ImageMixin
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.roi_ui_mixin import ROI_mixin
-from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists, check_valid_array)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists, check_valid_array)
 from simba.utils.enums import ROI_SETTINGS, Formats
 from simba.utils.errors import InvalidInputError
-from simba.utils.read_write import (read_df, find_all_videos_in_directory, get_fn_ext, get_video_meta_data)
+from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
+                                    get_video_meta_data, read_df)
 
 warnings.filterwarnings("ignore")
 

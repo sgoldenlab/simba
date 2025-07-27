@@ -44,8 +44,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_int,
 from simba.utils.enums import OS, ROI_SETTINGS, Formats, Keys
 from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 NoROIDataError)
-from simba.utils.lookups import (get_color_dict, get_display_resolution,
-                                 get_img_resize_info, create_color_palettes)
+from simba.utils.lookups import (create_color_palettes, get_color_dict,
+                                 get_display_resolution, get_img_resize_info)
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 from simba.utils.warnings import DuplicateNamesWarning
