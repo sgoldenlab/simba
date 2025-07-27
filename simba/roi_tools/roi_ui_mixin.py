@@ -40,18 +40,18 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, SimbaButton, SimBADropDown,
                                         SimBALabel, get_menu_icons)
 from simba.utils.checks import (check_file_exist_and_readable, check_int,
-                                check_str)
+                                check_str, check_valid_array)
 from simba.utils.enums import OS, ROI_SETTINGS, Formats, Keys
 from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 NoROIDataError)
 from simba.utils.lookups import (get_color_dict, get_display_resolution,
-                                 get_img_resize_info)
+                                 get_img_resize_info, create_color_palettes)
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 from simba.utils.warnings import DuplicateNamesWarning
 
-MAX_DRAW_UI_DISPLAY_RATIO = (0.5, 0.75)  # W, H - THE INTERFACE IMAGE DISPLAY WILL BE DOWN-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS OR EXCEEDS OF THESE CRITERA. E.G (0.5, 0.75) MEANS IMAGES WILL COVER NO MORE THAN HALF THE DISPLAY WIDTH AND 3/4 OF THE DISPLAY HEIGHT.
-MIN_DRAW_UI_DISPLAY_RATIO = (0.225, 0.225) # W, H - THE INTERFACE IMAGE DISPLAY WILL BE UP-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS AND EXCEEDS BOTH CRITERIA. E.G (0.25, 0.25) MEANS IMAGES WILL COVER NO MORE THAN A QUARTER OF THE USERS DISPLAY HEIGHT AND NO MORE THAN A QUARTER OF THE USERS DISPLAY WIDTH.
+MAX_DRAW_UI_DISPLAY_RATIO = (1, 1)  # W, H - THE INTERFACE IMAGE DISPLAY WILL BE DOWN-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS OR EXCEEDS OF THESE CRITERA. E.G (0.5, 0.75) MEANS IMAGES WILL COVER NO MORE THAN HALF THE DISPLAY WIDTH AND 3/4 OF THE DISPLAY HEIGHT.
+MIN_DRAW_UI_DISPLAY_RATIO = (1, 1) # W, H - THE INTERFACE IMAGE DISPLAY WILL BE UP-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS AND EXCEEDS BOTH CRITERIA. E.G (0.25, 0.25) MEANS IMAGES WILL COVER NO MORE THAN A QUARTER OF THE USERS DISPLAY HEIGHT AND NO MORE THAN A QUARTER OF THE USERS DISPLAY WIDTH.
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"
 SHAPE_TYPE = 'Shape_type'
@@ -91,6 +91,7 @@ class ROI_mixin(ConfigReader):
                  img_idx: int,
                  main_frm: Toplevel,
                  config_path: Optional[Union[str, os.PathLike]] = None,
+                 pose_data: Optional[np.ndarray] = None,
                  roi_coordinates_path: Optional[Union[str, os.PathLike]] = None):
 
         self.video_meta = get_video_meta_data(video_path=video_path)
@@ -99,6 +100,7 @@ class ROI_mixin(ConfigReader):
         #self.display_img_width, self.display_img_height = self.video_meta['width'], self.video_meta['height']
         #print(self.display_img_width, self.display_img_height, self.video_meta)
         #print(self.downscale_factor, self.upscale_factor, self.display_w, self.display_h)
+        #self.display_img_width, self.display_img_height, self.downscale_factor, self.upscale_factor = 1, 1, 1, 1
         if config_path is not None:
             ConfigReader.__init__(self, config_path=config_path, read_video_info=False, create_logger=False)
             check_file_exist_and_readable(file_path=config_path)
@@ -107,8 +109,14 @@ class ROI_mixin(ConfigReader):
             self.px_per_mm = 1
         if roi_coordinates_path is not None:
             self.roi_coordinates_path = roi_coordinates_path
+        if pose_data is not None:
+            check_valid_array(data=pose_data, source=f'{self.__class__.__name__} pose_data', accepted_ndims=(3,), accepted_axis_0_shape=[self.video_meta['frame_count']], accepted_dtypes=Formats.INTEGER_DTYPES.value)
+            self.circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(self.video_meta['width'], self.video_meta['height']), circle_frame_ratio=80)
+            self.clrs = create_color_palettes(no_animals=1, map_size=int(pose_data.shape[1]))[0]
+        else:
+            self.circle_size, self.clrs = None, None
         self.img_center = (int(self.display_img_width / 2), int(self.display_img_height / 2))
-        self.video_path = video_path
+        self.video_path, self.pose_data = video_path, pose_data
         self.img_idx = img_idx
         self.main_frm = main_frm
         self.selected_shape_type = None
@@ -204,6 +212,19 @@ class ROI_mixin(ConfigReader):
     def set_img(self, frame_idx: int):
         self.img = read_frm_of_video(video_path=self.video_path, frame_index=frame_idx, size=(self.display_img_width, self.display_img_height))
 
+    def get_frm_pose(self, frame_idx: int):
+        if (self.pose_data is not None) and (0 <= frame_idx < self.pose_data.shape[0]):
+            return self.pose_data[frame_idx]
+        else:
+            return None
+
+    def insert_pose(self, img: np.ndarray, pose_img_data: np.ndarray):
+        if pose_img_data is None:
+            return img
+        for pos_idx in range(pose_img_data.shape[0]):
+            img = cv2.circle(img, (int(pose_img_data[pos_idx][0]), int(pose_img_data[pos_idx][1])), self.circle_size, self.clrs[pos_idx], -1, lineType=-1)
+        return img
+
     def overlay_rois_on_image(self,
                               show_ear_tags: bool = False,
                               show_roi_info: bool = False):
@@ -212,6 +233,8 @@ class ROI_mixin(ConfigReader):
         self.img = PlottingMixin.rectangles_onto_image(img=self.img, rectangles=self.rectangles_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'])
         self.img = PlottingMixin.circles_onto_image(img=self.img, circles=self.circles_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'])
         self.img = PlottingMixin.polygons_onto_image(img=self.img, polygons=self.polygon_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'])
+        if self.pose_data is not None:
+            self.img = self.insert_pose(img=self.img, pose_img_data=self.get_frm_pose(frame_idx=self.img_idx))
         self.draw_img()
 
     def draw_img(self):
@@ -286,7 +309,6 @@ class ROI_mixin(ConfigReader):
                              row_idx: int):
 
         self.shape_attr_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE ATTRIBUTES", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='attributes_large', relief='solid')
-
         self.thickness_dropdown = SimBADropDown(parent=self.shape_attr_panel, dropdown_options=ROI_SETTINGS.SHAPE_THICKNESS_OPTIONS.value, label="SHAPE THICKNESS: ", label_width=17, value=5, dropdown_width=5)
         self.color_dropdown = SimBADropDown(parent=self.shape_attr_panel, dropdown_options=list(self.color_option_dict.keys()), label="SHAPE COLOR: ", label_width=17, value='Red', dropdown_width=20)
         self.ear_tag_size_dropdown = SimBADropDown(parent=self.shape_attr_panel, dropdown_options=ROI_SETTINGS.EAR_TAG_SIZE_OPTIONS.value, label="EAR TAG SIZE: ", label_width=17, value=15, dropdown_width=5)
