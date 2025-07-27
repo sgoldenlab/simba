@@ -22,6 +22,7 @@ from copy import deepcopy
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+
 import h5py
 from PIL import Image
 
@@ -56,8 +57,8 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_valid_array, check_valid_boolean,
                                 check_valid_dataframe, check_valid_lst,
                                 check_valid_url, is_video_color)
-from simba.utils.enums import (ENV_VARS, ConfigKey, Defaults, Dtypes, Formats,
-                               Keys, Links, Options, Paths, OS)
+from simba.utils.enums import (ENV_VARS, OS, ConfigKey, Defaults, Dtypes,
+                               Formats, Keys, Links, Options, Paths)
 from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 FFMPEGCodecGPUError, FFMPEGNotFoundError,
                                 FileExistError, FrameRangeError, IntegerError,
@@ -65,9 +66,12 @@ from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 InvalidInputError, InvalidVideoFileError,
                                 MissingProjectConfigEntryError, NoDataError,
                                 NoFilesFoundError, NotDirectoryError,
-                                ParametersFileError, PermissionError, SimBAPAckageVersionError)
+                                ParametersFileError, PermissionError,
+                                SimBAPAckageVersionError)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.warnings import (FileExistWarning, FrameRangeWarning, GPUToolsWarning, InvalidValueWarning, NoFileFoundWarning, ThirdPartyAnnotationsInvalidFileFormatWarning)
+from simba.utils.warnings import (
+    FileExistWarning, FrameRangeWarning, GPUToolsWarning, InvalidValueWarning,
+    NoFileFoundWarning, ThirdPartyAnnotationsInvalidFileFormatWarning)
 
 SIMBA_DIR = os.path.dirname(simba.__file__)
 
