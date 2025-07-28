@@ -549,7 +549,8 @@ def get_image_from_label(tk_lbl: Label):
         return cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
 
-def get_pose_for_roi_ui(pose_path: Union[str, os.PathLike], video_path: Union[str, os.PathLike]) -> Union[None, np.ndarray]:
+def get_pose_for_roi_ui(pose_path: Union[str, os.PathLike],
+                        video_path: Union[str, os.PathLike]) -> Union[None, np.ndarray]:
     video_meta_data = get_video_meta_data(video_path=video_path, raise_error=False)
     if video_meta_data is None:
         VideoFileWarning(msg=f'Cannot plot pose on ROI as cannot read meta data for video {video_path}.', source=get_pose_for_roi_ui.__name__)

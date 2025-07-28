@@ -1578,7 +1578,7 @@ class PlottingMixin(object):
             polygon_line_type = [4 if row['Thickness'] == 1 else line_type][0]
             tag_size = [row['Ear_tag_size'] if circle_size is None else circle_size][0]
             if isinstance(row["Color BGR"], str): row["Color BGR"] = ast.literal_eval(row["Color BGR"])
-            img = cv2.polylines( img, [row["vertices"].astype(int)], True, row["Color BGR"], thickness=int(row["Thickness"]), lineType=polygon_line_type)
+            img = cv2.polylines( img, [row["vertices"].astype(np.int32)], True, row["Color BGR"], thickness=int(row["Thickness"]), lineType=polygon_line_type)
             if show_center:
                 img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), tag_size, row["Color BGR"], polygon_line_type)
             if show_tags:

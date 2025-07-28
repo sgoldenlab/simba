@@ -1049,7 +1049,7 @@ class GeometryMixin(object):
         stdout_success(msg=msg, elapsed_time=timer.elapsed_time_str, source=GeometryMixin.geometry_video.__name__)
 
     @staticmethod
-    def minimum_rotated_rectangle(shape: Polygon, buffer: Optional[int] = None) -> Polygon:
+    def minimum_rotated_rectangle(shape: Union[Polygon, np.ndarray], buffer: Optional[int] = None) -> Polygon:
         """
         Calculate the minimum rotated rectangle that bounds a given polygon.
 
@@ -1062,7 +1062,7 @@ class GeometryMixin(object):
         .. seealso::
            For multicore call, use :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_minimum_rotated_rectangle`
 
-        :param Polygon shape: The Polygon for which the minimum rotated rectangle is to be calculated.
+        :param Polygon shape: The Polygon for which the minimum rotated rectangle is to be calculated. Can be a shapely object or a 2D array of at least 3 vertices.
         :param Polygon shape: If not None, then a buffer in pixels to increate the polygon area with proior to vomputing the minimum rotating rectangle.
         :return: The minimum rotated rectangle geometry that bounds the input polygon.
         :rtype: Polygon
@@ -1072,7 +1072,10 @@ class GeometryMixin(object):
         >>> rectangle = GeometryMixin().minimum_rotated_rectangle(shape=polygon[0])
         """
 
-        check_instance(source=GeometryMixin.minimum_rotated_rectangle.__name__, instance=shape, accepted_types=Polygon)
+        check_instance(source=f'{GeometryMixin.__name__} minimum_rotated_rectangle shape', instance=shape, accepted_types=(Polygon, np.ndarray))
+        if isinstance(shape, (np.ndarray,)):
+            check_valid_array(data=shape, source=f'{GeometryMixin.__name__} minimum_rotated_rectangle shape', accepted_ndims=(2,), min_axis_0=3, accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_value=0, raise_error=True, max_axis_1=2)
+            shape = GeometryMixin().bodyparts_to_polygon(data=shape.reshape(1, len(shape), 2), simplify_tolerance=500)[0]
         if buffer is not None:
             check_int(name=f'{GeometryMixin.__name__} minimum_rotated_rectangle buffer', min_value=1, value=buffer)
             shape = shape.buffer(distance=buffer)

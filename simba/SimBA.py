@@ -193,6 +193,7 @@ from simba.ui.pop_ups.video_processing_pop_up import (
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.pop_ups.yolo_pose_train_popup import YOLOPoseTrainPopUP
+from simba.ui.pop_ups.yolo_inference_popup import YOLOPoseInferencePopUP
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         FileSelect, SimbaButton, SimbaCheckbox,
                                         SimBALabel, hxtScrollbar)
@@ -849,9 +850,8 @@ class App(object):
 
         yolo_tracking_menu = Menu(batch_process_menu)
         yolo_tracking_menu.add_command(label="Train YOLO model", compound="left", image=self.menu_icons["ultralytics_2"]["img"], command=YOLOPoseTrainPopUP, font=Formats.FONT_REGULAR.value, state=yolo_state)
+        yolo_tracking_menu.add_command(label="Predict with YOLO model", compound="left", image=self.menu_icons["ultralytics_2"]["img"], command=YOLOPoseInferencePopUP, font=Formats.FONT_REGULAR.value, state=yolo_state)
         batch_process_menu.add_cascade(label="YOLO tracking...", compound="left", image=self.menu_icons["ultralytics_2"]["img"], menu=yolo_tracking_menu, font=Formats.FONT_REGULAR.value, state=yolo_state)
-
-
 
         video_process_menu = Menu(menu)
         fps_menu = Menu(video_process_menu)

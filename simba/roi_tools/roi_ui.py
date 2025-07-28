@@ -2,23 +2,21 @@ import os
 import warnings
 from typing import Optional, Union
 
-import numpy as np
-
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.image_mixin import ImageMixin
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.roi_ui_mixin import ROI_mixin
 from simba.roi_tools.roi_utils import get_pose_for_roi_ui
-from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists, check_valid_array, check_video_and_data_frm_count_align)
+from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists)
 from simba.utils.enums import ROI_SETTINGS, Formats
 from simba.utils.errors import InvalidInputError
 from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext, get_video_meta_data, read_df)
-from simba.utils.warnings import FrameRangeWarning
 
 warnings.filterwarnings("ignore")
 
 
 WINDOW_SIZE = (775, 900)
+SHOW_TRACKING = 'SHOW_TRACKING'
 
 class ROI_ui(ROI_mixin, ConfigReader):
 
@@ -67,7 +65,7 @@ class ROI_ui(ROI_mixin, ConfigReader):
         else:
             self.other_project_video_names = []
         self.settings = {item.name: item.value for item in ROI_SETTINGS}
-        self.settings['SHOW_POSE'] = True if pose_data is not None else False
+        self.settings[SHOW_TRACKING] = 'TRUE' if pose_data is not None else 'FALSE'
         self.get_video_info_panel(parent_frame=self.define_ui.main_frm, row_idx=0)
         self.get_select_img_panel(parent_frame=self.define_ui.main_frm, row_idx=1)
         self.get_select_shape_type_panel(parent_frame=self.define_ui.main_frm, row_idx=2)
@@ -115,6 +113,14 @@ class ROI_ui(ROI_mixin, ConfigReader):
 #        roi_coordinates_path=r"C:\troubleshooting\cue_light\t1\project_folder\logs\measures\ROI_definitions.h5")
 #
 
+
+# ROI_ui(config_path=r"C:\troubleshooting\cue_light\t1\project_folder\project_config.ini",
+#        video_path=r"C:\troubleshooting\cue_light\t1\project_folder\videos\2025-05-21 16-10-06_cropped.mp4",
+#        roi_coordinates_path=r"C:\troubleshooting\cue_light\t1\project_folder\logs\measures\ROI_definitions.h5")
+#
+
+
+
 # ROI_ui(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #        video_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_CNO_0514.mp4")
 #
@@ -127,3 +133,13 @@ class ROI_ui(ROI_mixin, ConfigReader):
 # ROI_ui(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/project_config.ini',
 #       video_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/videos/raw_clip1.mp4",
 #       pose_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/csv/outlier_corrected_movement_location/raw_clip1.csv')
+
+
+# ROI_ui(config_path=r"C:\troubleshooting\open_field_below\project_folder\project_config.ini",
+#       video_path=r"C:\troubleshooting\open_field_below\project_folder\videos\raw_clip1.mp4",
+#       pose_path=r"C:\troubleshooting\open_field_below\project_folder\csv\outlier_corrected_movement_location\raw_clip1.csv")
+#
+
+# ROI_ui(config_path=r"C:\troubleshooting\open_field_below\project_folder\project_config.ini",
+#       video_path=r"C:\troubleshooting\open_field_below\project_folder\videos\raw_clip1.mp4")
+
