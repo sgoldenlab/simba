@@ -192,8 +192,8 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     VideoRotatorPopUp, VideoTemporalJoinPopUp)
 from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
-from simba.ui.pop_ups.yolo_pose_train_popup import YOLOPoseTrainPopUP
 from simba.ui.pop_ups.yolo_inference_popup import YOLOPoseInferencePopUP
+from simba.ui.pop_ups.yolo_pose_train_popup import YOLOPoseTrainPopUP
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         FileSelect, SimbaButton, SimbaCheckbox,
                                         SimBALabel, hxtScrollbar)
