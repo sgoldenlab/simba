@@ -14,8 +14,8 @@ from scipy.spatial.distance import cdist
 from shapely.geometry import Polygon
 
 from simba.mixins.config_reader import ConfigReader
-from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.geometry_mixin import GeometryMixin
+from simba.mixins.plotting_mixin import PlottingMixin
 from simba.roi_tools.interactive_roi_modifier_tkinter import \
     InteractiveROIModifier
 from simba.roi_tools.roi_selector_circle_tkinter import ROISelectorCircle
