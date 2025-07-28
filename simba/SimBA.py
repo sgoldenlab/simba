@@ -378,7 +378,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_settings_outlier = SimbaButton(parent=label_outliercorrection, width=Formats.BUTTON_WIDTH_L.value, txt="SETTINGS", txt_clr='blue', img='settings', font=Formats.FONT_REGULAR.value, cmd=OutlierSettingsPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
 
         button_outliercorrection = SimbaButton(parent=label_outliercorrection, width=Formats.BUTTON_WIDTH_L.value, txt="RUN OUTLIER CORRECTION", txt_clr='green', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.correct_outlier, thread=False)
-        button_skipOC = SimbaButton(parent=label_outliercorrection, width=Formats.BUTTON_WIDTH_L.value, txt="SKIP OUTLIER CORRECTION (CAUTION)", txt_clr='red', img='skip_2', font=Formats.FONT_REGULAR.value, cmd=self.initiate_skip_outlier_correction, thread=True)
+        button_skipOC = SimbaButton(parent=label_outliercorrection, width=Formats.BUTTON_WIDTH_L.value, txt="SKIP OUTLIER CORRECTION (CAUTION)", txt_clr='red', img='skip_2', font=Formats.FONT_REGULAR.value, cmd=self.initiate_skip_outlier_correction, thread=False)
 
         def activate():
             if self.user_defined_var.get(): self.scriptfile.set_state(setstatus=NORMAL)
@@ -396,7 +396,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
         roi_feature_frm = CreateLabelFrameWithIcon(parent=tab5, header="APPEND ROI FEATURES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.APPEND_ROI_FEATURES.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
 
-        append_roi_features_by_animal = SimbaButton(parent=roi_feature_frm, width=Formats.BUTTON_WIDTH_XXL.value, txt="APPEND ROI DATA TO FEATURES: BY ANIMAL (CAUTION)", txt_clr='red', img='join_red', font=Formats.FONT_REGULAR.value, cmd=AppendROIFeaturesByAnimalPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=True)
+        append_roi_features_by_animal = SimbaButton(parent=roi_feature_frm, width=Formats.BUTTON_WIDTH_XXL.value, txt="APPEND ROI DATA TO FEATURES: BY ANIMAL (CAUTION)", txt_clr='red', img='join_red', font=Formats.FONT_REGULAR.value, cmd=AppendROIFeaturesByAnimalPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
         append_roi_features_by_body_part = SimbaButton(parent=roi_feature_frm, width=Formats.BUTTON_WIDTH_XXL.value, txt="APPEND ROI DATA TO FEATURES: BY BODY-PARTS (CAUTION)", img='join_yellow', txt_clr='orange', font=Formats.FONT_REGULAR.value, cmd=AppendROIFeaturesByBodyPartPopUp, cmd_kwargs={'config_path': lambda:self.config_path}, thread=False)
         remove_roi_features_from_feature_set = SimbaButton(parent=roi_feature_frm, width=Formats.BUTTON_WIDTH_XXL.value, txt="REMOVE ROI FEATURES FROM FEATURE SET", txt_clr='darkred', img='trash', font=Formats.FONT_REGULAR.value, cmd=RemoveROIFeaturesPopUp, cmd_kwargs={'config_path': lambda:self.config_path, 'dataset': lambda:'features_extracted'}, thread=False)
 
@@ -453,7 +453,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         self.csvfile = FileSelect(label_model_validation,fileDescription="SELECT DATA FEATURE FILE PATH", color="blue",lblwidth=40,file_types=[("SimBA CSV", "*.csv"), ("SimBA PARQUET", "*.parquet")], initialdir=os.path.join(self.project_path, Paths.FEATURES_EXTRACTED_DIR.value))
         self.modelfile = FileSelect(label_model_validation,fileDescription="SELECT MODEL FILE PATH", color="blue", lblwidth=40, initialdir=self.project_path)
 
-        button_runvalidmodel = SimbaButton(parent=label_model_validation, width=Formats.BUTTON_WIDTH_XL.value, txt="RUN MODEL", txt_clr='blue', img='rocket', cmd=self.validate_model_first_step, thread=True)
+        button_runvalidmodel = SimbaButton(parent=label_model_validation, width=Formats.BUTTON_WIDTH_XL.value, txt="RUN MODEL", txt_clr='blue', img='rocket', cmd=self.validate_model_first_step, thread=False)
         button_generateplot = SimbaButton(parent=label_model_validation, width=Formats.BUTTON_WIDTH_XL.value, txt="INTERACTIVE PROBABILITY PLOT",  img='interactive_blue', txt_clr='blue', cmd=self.launch_interactive_plot, thread=False)
 
         self.dis_threshold = Entry_Box(label_model_validation, "DISCRIMINATION THRESHOLD (0.0-1.0):", labelwidth=40, entry_box_width=30)
@@ -467,7 +467,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         label_runmachinemodel = CreateLabelFrameWithIcon(parent=tab9,header="RUN MACHINE MODEL",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.SCENARIO_2.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
 
         button_run_rfmodelsettings = SimbaButton(parent=label_runmachinemodel, width=Formats.BUTTON_WIDTH_XL.value, txt="MODEL SETTINGS", txt_clr='green', img='settings', cmd=SetMachineModelParameters, cmd_kwargs={'config_path': lambda:config_path})
-        button_runmachinemodel = SimbaButton(parent=label_runmachinemodel, width=Formats.BUTTON_WIDTH_XL.value, txt="RUN MODELS", txt_clr='green', img='clf', cmd=self.runrfmodel, thread=True)
+        button_runmachinemodel = SimbaButton(parent=label_runmachinemodel, width=Formats.BUTTON_WIDTH_XL.value, txt="RUN MODELS", txt_clr='green', img='clf', cmd=self.runrfmodel, thread=False)
 
         kleinberg_button = SimbaButton(parent=label_runmachinemodel, width=Formats.BUTTON_WIDTH_XL.value, txt="KLEINBERG SMOOTHING", txt_clr='green', img='feather_green', cmd=KleinbergPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         fsttc_button = SimbaButton(parent=label_runmachinemodel, width=Formats.BUTTON_WIDTH_XL.value, txt="FSTTC", txt_clr='green', img='tile_green', cmd=FSTTCPopUp, cmd_kwargs={'config_path': lambda:self.config_path})

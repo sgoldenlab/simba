@@ -53,8 +53,8 @@ from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
                                     read_frm_of_video, str_2_bool)
 from simba.utils.warnings import DuplicateNamesWarning
 
-MAX_DRAW_UI_DISPLAY_RATIO = (0.50, 0.75)#(0.5, 0.75)  # W, H - THE INTERFACE IMAGE DISPLAY WILL BE DOWN-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS OR EXCEEDS OF THESE CRITERA. E.G (0.5, 0.75) MEANS IMAGES WILL COVER NO MORE THAN HALF THE DISPLAY WIDTH AND 3/4 OF THE DISPLAY HEIGHT.
-MIN_DRAW_UI_DISPLAY_RATIO = (0.30, 0.60) # W, H - THE INTERFACE IMAGE DISPLAY WILL BE UP-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS AND EXCEEDS BOTH CRITERIA. E.G (0.25, 0.25) MEANS IMAGES WILL COVER NO MORE THAN A QUARTER OF THE USERS DISPLAY HEIGHT AND NO MORE THAN A QUARTER OF THE USERS DISPLAY WIDTH.
+MAX_DRAW_UI_DISPLAY_RATIO = (1, 1)#(0.5, 0.75)  # W, H - THE INTERFACE IMAGE DISPLAY WILL BE DOWN-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS OR EXCEEDS OF THESE CRITERA. E.G (0.5, 0.75) MEANS IMAGES WILL COVER NO MORE THAN HALF THE DISPLAY WIDTH AND 3/4 OF THE DISPLAY HEIGHT.
+MIN_DRAW_UI_DISPLAY_RATIO = (1, 1) #0.30, 0.60 W, H - THE INTERFACE IMAGE DISPLAY WILL BE UP-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS AND EXCEEDS BOTH CRITERIA. E.G (0.25, 0.25) MEANS IMAGES WILL COVER NO MORE THAN A QUARTER OF THE USERS DISPLAY HEIGHT AND NO MORE THAN A QUARTER OF THE USERS DISPLAY WIDTH.
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"
 SHAPE_TYPE = 'Shape_type'
@@ -87,6 +87,7 @@ ROI_TRACKING_STYLE = 'ROI_TRACKING_STYLE'
 KEYPOINTS = 'keypoints'
 BBOX = 'bbox'
 OBB = 'obb'
+KEYPOINTS_OBB = 'keypoints & obb'
 
 PLATFORM = platform.system()
 
@@ -243,17 +244,21 @@ class ROI_mixin(ConfigReader):
     def insert_pose(self, img: np.ndarray, pose_img_data: np.ndarray):
         if pose_img_data is None:
             return img
-        if self.settings[ROI_TRACKING_STYLE].lower() == KEYPOINTS:
+        if self.settings[ROI_TRACKING_STYLE].lower() in [KEYPOINTS, KEYPOINTS_OBB]:
             for pos_idx in range(pose_img_data.shape[0]):
                 img = cv2.circle(img, (int(pose_img_data[pos_idx][0]), int(pose_img_data[pos_idx][1])), self.circle_size, self.clrs[pos_idx], -1, lineType=-1)
-        else:
+        if self.settings[ROI_TRACKING_STYLE].lower() in [OBB, KEYPOINTS_OBB]:
             try:
-                if self.settings[ROI_TRACKING_STYLE].lower() == OBB:
-                    #bbox = GeometryMixin().bodyparts_to_polygon(data=pose_img_data.reshape(-1, len(pose_img_data), 2).astype(np.int32), convex_hull=True)[0]
-                    bbox = GeometryMixin().minimum_rotated_rectangle(shape=pose_img_data, buffer=10)
-                    pose_img_data = np.array(bbox.exterior.coords).astype(np.int32)
-                else:
-                    pose_img_data = GeometryMixin().keypoints_to_axis_aligned_bounding_box(keypoints=pose_img_data.reshape(-1, len(pose_img_data), 2).astype(np.int32))
+                print(pose_img_data)
+                bbox = GeometryMixin().minimum_rotated_rectangle(shape=pose_img_data, buffer=10)
+                pose_img_data = np.array(bbox.exterior.coords).astype(np.int64)
+                img = cv2.polylines(img, [pose_img_data], True, self.clrs[0], thickness=self.circle_size, lineType=-1)
+            except Exception as e:
+                msg = f'Cannot show bounding box tracking style: {e.args}.'
+                self.set_status_bar_panel(text=msg, fg='red')
+        if self.settings[ROI_TRACKING_STYLE].lower() in [BBOX]:
+            try:
+                pose_img_data = GeometryMixin().keypoints_to_axis_aligned_bounding_box(keypoints=pose_img_data.reshape(-1, len(pose_img_data), 2).astype(np.int32))
                 img = cv2.polylines(img, [pose_img_data], True, self.clrs[0], thickness=self.circle_size, lineType=-1)
             except Exception as e:
                 msg = f'Cannot show bounding box tracking style: {e.args}.'
@@ -803,7 +808,7 @@ class ROI_mixin(ConfigReader):
         self.roi_select_clr_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(self.color_option_dict.keys()), label="ROI SELECT COLOR: ", label_width=25, dropdown_width=35, value=next(key for key, val in self.color_option_dict.items() if val == self.settings['ROI_SELECT_CLR']))
         self.duplication_jump_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(range(1, 100, 5)), label="DUPLICATION JUMP SIZE: ", label_width=25, dropdown_width=35, value=self.settings['DUPLICATION_JUMP_SIZE'])
         self.show_pose_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['TRUE', 'FALSE'], label="SHOW TRACKING DATA: ", label_width=25, dropdown_width=35, value='TRUE' if self.settings[SHOW_TRACKING] else 'FALSE')
-        self.tracking_style_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['KEYPOINTS', 'BBOX', 'OBB'], label="TRACKING DATA STYLE: ", label_width=25, dropdown_width=35, value=self.settings[ROI_TRACKING_STYLE].upper())
+        self.tracking_style_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['KEYPOINTS', 'BBOX', 'OBB', 'KEYPOINTS & OBB'], label="TRACKING DATA STYLE: ", label_width=25, dropdown_width=35, value=self.settings[ROI_TRACKING_STYLE].upper())
         pref_save_btn = SimbaButton(parent=pref_frm_panel, txt="SAVE", img='save_large', font=Formats.FONT_REGULAR.value, cmd=self.set_settings)
 
         pref_frm_panel.grid(row=0, column=0, sticky=NW)

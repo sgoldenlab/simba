@@ -808,7 +808,7 @@ class ROI_SETTINGS(Enum):
     POLYGON = 'polygon'
     RECTANGLE = 'rectangle'
     OUTSIDE_ROI = 'OUTSIDE REGIONS OF INTEREST'
-    ROI_TRACKING_STYLE = 'keypoints' #bbox, keypoints, obb
+    ROI_TRACKING_STYLE = 'keypoints' #bbox, keypoints, obb, keypoints & obb
 
 class PackageNames(Enum):
     ULTRALYTICS = 'ultralytics'
