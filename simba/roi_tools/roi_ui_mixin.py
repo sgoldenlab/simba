@@ -32,12 +32,12 @@ from simba.roi_tools.roi_utils import (change_roi_dict_video_name,
                                        get_ear_tags_for_rectangle,
                                        get_half_circle_vertices,
                                        get_polygon_df_headers,
+                                       get_pose_for_roi_ui,
                                        get_rectangle_df_headers, get_roi_data,
                                        get_roi_data_for_video_name,
                                        get_roi_df_from_dict,
                                        get_triangle_vertices,
-                                       get_vertices_hexagon,
-                                       get_pose_for_roi_ui)
+                                       get_vertices_hexagon)
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, SimbaButton, SimBADropDown,
                                         SimBALabel, get_menu_icons)
@@ -49,7 +49,8 @@ from simba.utils.errors import (FrameRangeError, InvalidInputError,
 from simba.utils.lookups import (create_color_palettes, get_color_dict,
                                  get_display_resolution, get_img_resize_info)
 from simba.utils.printing import stdout_success
-from simba.utils.read_write import get_video_meta_data, read_frm_of_video, str_2_bool, get_fn_ext
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
+                                    read_frm_of_video, str_2_bool)
 from simba.utils.warnings import DuplicateNamesWarning
 
 MAX_DRAW_UI_DISPLAY_RATIO = (0.50, 0.75)#(0.5, 0.75)  # W, H - THE INTERFACE IMAGE DISPLAY WILL BE DOWN-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS OR EXCEEDS OF THESE CRITERA. E.G (0.5, 0.75) MEANS IMAGES WILL COVER NO MORE THAN HALF THE DISPLAY WIDTH AND 3/4 OF THE DISPLAY HEIGHT.

@@ -48,6 +48,7 @@ Moreover, the ROI data can  be used to build potentially valuable, additional, f
  * [APPLY SHAPES FROM ANOTHER VIDEO](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#apply-shapes-from-another-video)
  * [DELETE ALL ROI DEFINITIONS IN SIMBA PROJECT](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#delete-all-roi-definitions-in-simba-project)
  * [SAVE ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#save-rois)
+ * [OVERLAY TRACKING VISUALIXATION DATA IN DRAWING WINDOW](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#overlay-pose-estimation-data-on-roi-tracking)
  * [NEXT STEPS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#next-steps)
 
 # Before analyzing ROIs in SimBA
@@ -406,6 +407,13 @@ below:
 Select the video that you want to act as the "baseline" reference video which the ROI sizes should be corrected against. Once selected, click the 
 <kbd>RUN</kbd> button. All ROIs in the project will be standardized using the ROIs in the baseline video as reference. 
 
+## OVERLAY POSE-ESTIMATION DATA ON ROI TRACKING
+
+To show the tracking (pose) data in the ROI drawing window, click the `File (ROI')` menu button followed bt `Preferences`. Next, toggle the `SHOW TRACKING DATA:` drop-down menu to `True`, as in the video below. 
+
+Alternatively, to romove the tracking data from the drawing window, toggle the `SHOW TRACKING DATA:` drop-down menu to `False`.
+
+[roi_show_pose_fps_15.webm](https://github.com/user-attachments/assets/3e4c04a6-d20b-440b-9606-2f82a328ff8b)
 
 
 ## NEXT STEPS
