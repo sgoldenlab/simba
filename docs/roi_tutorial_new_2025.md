@@ -49,7 +49,9 @@ Moreover, the ROI data can  be used to build potentially valuable, additional, f
  * [DELETE ALL ROI DEFINITIONS IN SIMBA PROJECT](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#delete-all-roi-definitions-in-simba-project)
  * [SAVE ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#save-rois)
  * [OVERLAY TRACKING VISUALIXATION DATA IN DRAWING WINDOW](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#overlay-pose-estimation-data-on-roi-tracking)
+ * [SHOW GRID LINES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#overlay-grid-lines-on-drawing-images)
  * [NEXT STEPS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#next-steps)
+
 
 # Before analyzing ROIs in SimBA
 
