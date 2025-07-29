@@ -416,6 +416,15 @@ Alternatively, to romove the tracking data from the drawing window, toggle the `
 [roi_show_pose_fps_15.webm](https://github.com/user-attachments/assets/3e4c04a6-d20b-440b-9606-2f82a328ff8b)
 
 
+## OVERLAY GRID LINES ON DRAWING IMAGES
+
+To see grid-lines, click the `File (ROI')` menu button followed bt `Preferences`. Next, toggle the `SHOW SHOE GRID LINES:` drop-down menu to to the size (in millimeters) which you want your grid lines, as in the video below. 
+
+Alternatively, to romove the grid lines data from the drawing window, toggle the `SHOW SHOE GRID LINES` drop-down menu to `False`.
+
+[roi_show_gridline.webm](https://github.com/user-attachments/assets/afaf5d56-665c-440d-8de7-03552e940846)
+
+
 ## NEXT STEPS
 Once your ROI definitions are all defined, close the `ROI table`, `Regions of Interest Settings` and `Define Shape` windows and head back to the [ROI] tab in the load project menu. 
 
