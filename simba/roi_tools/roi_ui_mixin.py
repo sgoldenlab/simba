@@ -4,7 +4,7 @@ import os
 import platform
 from copy import copy, deepcopy
 from tkinter import *
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
 import cv2
 import numpy as np
@@ -41,8 +41,8 @@ from simba.roi_tools.roi_utils import (change_roi_dict_video_name,
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, SimbaButton, SimBADropDown,
                                         SimBALabel, get_menu_icons)
-from simba.utils.checks import (check_file_exist_and_readable, check_int,
-                                check_str, check_valid_array, check_float)
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_int, check_str, check_valid_array)
 from simba.utils.enums import OS, ROI_SETTINGS, Formats, Keys
 from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 NoROIDataError)
