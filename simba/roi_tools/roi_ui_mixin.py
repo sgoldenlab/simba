@@ -4,7 +4,7 @@ import os
 import platform
 from copy import copy, deepcopy
 from tkinter import *
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 import cv2
 import numpy as np
@@ -42,7 +42,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, SimbaButton, SimBADropDown,
                                         SimBALabel, get_menu_icons)
 from simba.utils.checks import (check_file_exist_and_readable, check_int,
-                                check_str, check_valid_array)
+                                check_str, check_valid_array, check_float)
 from simba.utils.enums import OS, ROI_SETTINGS, Formats, Keys
 from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 NoROIDataError)
@@ -52,6 +52,8 @@ from simba.utils.printing import stdout_success
 from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
                                     read_frm_of_video, str_2_bool)
 from simba.utils.warnings import DuplicateNamesWarning
+
+WINDOW_SIZE_OPTIONS = [round(x * 0.05, 2) for x in range(21)]
 
 MAX_DRAW_UI_DISPLAY_RATIO = (0.5, 0.75) #(0.5, 0.75)  # W, H - THE INTERFACE IMAGE DISPLAY WILL BE DOWN-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS OR EXCEEDS OF THESE CRITERA. E.G (0.5, 0.75) MEANS IMAGES WILL COVER NO MORE THAN HALF THE DISPLAY WIDTH AND 3/4 OF THE DISPLAY HEIGHT.
 MIN_DRAW_UI_DISPLAY_RATIO = (0.30, 0.60) #0.30, 0.60 W, H - THE INTERFACE IMAGE DISPLAY WILL BE UP-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS AND EXCEEDS BOTH CRITERIA. E.G (0.25, 0.25) MEANS IMAGES WILL COVER NO MORE THAN A QUARTER OF THE USERS DISPLAY HEIGHT AND NO MORE THAN A QUARTER OF THE USERS DISPLAY WIDTH.
@@ -87,6 +89,7 @@ ROI_TRACKING_STYLE = 'ROI_TRACKING_STYLE'
 KEYPOINTS = 'keypoints'
 BBOX = 'bbox'
 KEYPOINTS_BBOX = 'keypoints & bbox'
+SHOW_GRID_OVERLAY = 'SHOW_GRID_OVERLAY'
 
 PLATFORM = platform.system()
 
@@ -99,6 +102,7 @@ class ROI_mixin(ConfigReader):
                  main_frm: Toplevel,
                  config_path: Optional[Union[str, os.PathLike]] = None,
                  pose_data: Optional[Union[np.ndarray, str, os.PathLike]] = None,
+                 animal_cnt: Optional[int] = None,
                  roi_coordinates_path: Optional[Union[str, os.PathLike]] = None):
 
         self.video_meta = get_video_meta_data(video_path=video_path)
@@ -114,9 +118,10 @@ class ROI_mixin(ConfigReader):
             _, self.px_per_mm, _ = self.read_video_info(video_name=self.video_meta['video_name'], video_info_df_path=self.video_info_path)
             self.expected_pose_path = os.path.join(self.outlier_corrected_dir, f'{get_fn_ext(video_path)[1]}.{self.file_type}')
             self.pose_path = None if not os.path.isfile(self.expected_pose_path) else self.expected_pose_path
-        else:
-            self.px_per_mm, self.pose_path, self.expected_pose_path = 1, None, None
 
+        else:
+            self.px_per_mm, self.pose_path, self.expected_pose_path, self.animal_cnt = 1, None, None, animal_cnt
+            self.animal_bp_dict = None
         if roi_coordinates_path is not None:
             self.roi_coordinates_path = roi_coordinates_path
         if pose_data is not None:
@@ -124,33 +129,28 @@ class ROI_mixin(ConfigReader):
                 pose_data = get_pose_for_roi_ui(pose_path=pose_data, video_path=video_path)
             check_valid_array(data=pose_data, source=f'{self.__class__.__name__} pose_data', accepted_ndims=(3,), accepted_axis_0_shape=[self.video_meta['frame_count']], accepted_dtypes=Formats.INTEGER_DTYPES.value)
         self.circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(self.display_img_width, self.display_img_height), circle_frame_ratio=100)
-        self.clrs = create_color_palettes(no_animals=1, map_size=int(pose_data.shape[1]/2) + 5)[0] if pose_data is not None else None
+        self.clrs = create_color_palettes(no_animals=self.animal_cnt, map_size=int(pose_data.shape[1]/2) + 10) if pose_data is not None else None
         self.img_center = (int(self.display_img_width / 2), int(self.display_img_height / 2))
         self.video_path, self.pose_data = video_path, pose_data
         self.pose_data_cpy = deepcopy(self.pose_data)
         self.img_idx = img_idx
         self.main_frm = main_frm
-        self.selected_shape_type = None
+        self.selected_shape_type, self.grid = None, None
         self.color_option_dict = get_color_dict()
         self.menu_icons = get_menu_icons()
-
-
 
         if PLATFORM == OS.WINDOWS.value:
             self.draw_frm_handle = ctypes.windll.user32.FindWindowW(None, DRAW_FRAME_NAME)
             ctypes.windll.user32.SetWindowPos(self.draw_frm_handle, -1, 0, 0, 0, 0, 3)
         self.img_window = Toplevel()
         self.img_window.geometry(f"{self.display_img_width}x{self.display_img_height}")  # Set the window size
-        self.img_window.resizable(False, False)  # Disable resizing
+        self.img_window.resizable(False, False)
         self.img_window.title(DRAW_FRAME_NAME)
-
         self.img_window.iconphoto(False, self.menu_icons['paint']["img"])
-
         self.img_lbl = Label(self.img_window, name='img_lbl')
         self.img_lbl.pack()
         self.img_window.protocol("WM_DELETE_WINDOW", self.close_img)
         self.settings = {item.name: item.value for item in ROI_SETTINGS}
-        self.settings[SHOW_TRACKING] = 'TRUE' if pose_data is not None else 'FALSE'
 
         self.rectangles_df, self.circles_df, self.polygon_df, self.roi_dict, self.roi_names, self.other_roi_dict, self.other_video_names_w_rois = get_roi_data(roi_path=self.roi_coordinates_path, video_name=self.video_meta['video_name'])
         if self.downscale_factor != 1.0:
@@ -160,7 +160,6 @@ class ROI_mixin(ConfigReader):
             if self.pose_data is not None:
                 self.pose_data = self.pose_data * self.downscale_factor
                 self.pose_data_cpy = deepcopy(self.pose_data)
-
         self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
 
     def scale_roi_dict(self, roi_dict: dict, scale_factor: float, nesting: bool = False) -> dict:
@@ -244,16 +243,39 @@ class ROI_mixin(ConfigReader):
         if pose_img_data is None:
             return img
         if self.settings[ROI_TRACKING_STYLE].lower() in [KEYPOINTS, KEYPOINTS_BBOX]:
-            for pos_idx in range(pose_img_data.shape[0]):
-                img = cv2.circle(img, (int(pose_img_data[pos_idx][0]), int(pose_img_data[pos_idx][1])), self.circle_size, self.clrs[pos_idx], -1, lineType=-1)
+            for animal_cnt, (animal_name, animal_bp_data) in enumerate(self.animal_bp_dict.items()):
+                bp_cnt = len(animal_bp_data['X_bps'])
+            for cnt, i in enumerate(range(0, pose_img_data.shape[0], bp_cnt)):
+                animal_kp_data = pose_img_data[i:i+bp_cnt]
+                for pos_idx in range(animal_kp_data.shape[0]):
+                    img = cv2.circle(img, (int(animal_kp_data[pos_idx][0]), int(animal_kp_data[pos_idx][1])), self.circle_size, self.clrs[cnt][pos_idx], -1, lineType=-1)
         if self.settings[ROI_TRACKING_STYLE].lower() in [BBOX, KEYPOINTS_BBOX]:
             try:
-                pose_img_data = GeometryMixin().keypoints_to_axis_aligned_bounding_box(keypoints=pose_img_data.reshape(-1, len(pose_img_data), 2).astype(np.int32))
-                img = cv2.polylines(img, [pose_img_data], True, self.clrs[0], thickness=self.circle_size, lineType=-1)
+                for animal_cnt, (animal_name, animal_bp_data) in enumerate(self.animal_bp_dict.items()):
+                    bp_cnt = len(animal_bp_data['X_bps'])
+                for cnt, i in enumerate(range(0, pose_img_data.shape[0], bp_cnt)):
+                    animal_kp_data = pose_img_data[i:i + bp_cnt]
+                    bbox = GeometryMixin().keypoints_to_axis_aligned_bounding_box(keypoints=animal_kp_data.reshape(-1, len(animal_kp_data), 2).astype(np.int32))
+                    img = cv2.polylines(img, [bbox], True, self.clrs[cnt][0], thickness=self.circle_size, lineType=-1)
             except Exception as e:
                 msg = f'Cannot show bounding box tracking style: {e.args}.'
                 self.set_status_bar_panel(text=msg, fg='red')
         return img
+
+
+    def insert_grid(self, img: np.ndarray, grid: List[Polygon]) -> np.ndarray:
+        if grid is None or len(grid) == 0:
+            return img
+        else:
+            try:
+                for polygon in grid:
+                    cords = np.array(polygon.exterior.coords).astype(np.int32)
+                    img = cv2.polylines(img=img, pts=[cords], isClosed=True, color=(211, 211, 211), thickness=max(1, int(self.circle_size/5)), lineType=16)
+                return img
+            except Exception as e:
+                msg = f'Cannot draw gridlines: {e.args}'
+                self.set_status_bar_panel(text=msg, fg='red')
+                raise InvalidInputError(msg=msg, source=f'{self.__class__.__name__} draw')
 
     def overlay_rois_on_image(self,
                               show_ear_tags: bool = False,
@@ -265,6 +287,8 @@ class ROI_mixin(ConfigReader):
         self.img = PlottingMixin.polygons_onto_image(img=self.img, polygons=self.polygon_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'])
         if self.pose_data is not None:
             self.img = self.insert_pose(img=self.img, pose_img_data=self.get_frm_pose(frame_idx=self.img_idx))
+        if self.grid is not None:
+            self.img = self.insert_grid(img=self.img, grid=self.grid)
         self.draw_img()
 
     def draw_img(self):
@@ -794,28 +818,38 @@ class ROI_mixin(ConfigReader):
 
 
         pref_frm_panel = CreateLabelFrameWithIcon(parent=self.preferences_frm, header="PREFERENCES", icon_name='settings', padx=5, pady=5)
-        self.line_type_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=ROI_SETTINGS.LINE_TYPE_OPTIONS.value, label="LINE TYPE: ", label_width=25, dropdown_width=35, value=self.settings['LINE_TYPE'])
-        self.roi_select_clr_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(self.color_option_dict.keys()), label="ROI SELECT COLOR: ", label_width=25, dropdown_width=35, value=next(key for key, val in self.color_option_dict.items() if val == self.settings['ROI_SELECT_CLR']))
-        self.duplication_jump_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(range(1, 100, 5)), label="DUPLICATION JUMP SIZE: ", label_width=25, dropdown_width=35, value=self.settings['DUPLICATION_JUMP_SIZE'])
-        self.show_pose_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['TRUE', 'FALSE'], label="SHOW TRACKING DATA: ", label_width=25, dropdown_width=35, value='TRUE' if str_2_bool(self.settings[SHOW_TRACKING]) else 'FALSE')
-        self.tracking_style_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['KEYPOINTS', 'BBOX', 'KEYPOINTS & BBOX'], label="TRACKING DATA STYLE: ", label_width=25, dropdown_width=35, value=self.settings[ROI_TRACKING_STYLE].upper())
-        pref_save_btn = SimbaButton(parent=pref_frm_panel, txt="SAVE", img='save_large', font=Formats.FONT_REGULAR.value, cmd=self.set_settings)
+        self.line_type_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=ROI_SETTINGS.LINE_TYPE_OPTIONS.value, label="LINE TYPE: ", label_width=35, dropdown_width=35, value=self.settings['LINE_TYPE'])
+        self.roi_select_clr_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(self.color_option_dict.keys()), label="ROI SELECT COLOR: ", label_width=35, dropdown_width=35, value=next(key for key, val in self.color_option_dict.items() if val == self.settings['ROI_SELECT_CLR']))
+        self.duplication_jump_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(range(1, 100, 5)), label="DUPLICATION JUMP SIZE: ", label_width=35, dropdown_width=35, value=self.settings['DUPLICATION_JUMP_SIZE'])
+        self.show_tracking_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['FALSE', 'KEYPOINTS', 'BBOX', 'KEYPOINTS & BBOX'], label="SHOW TRACKING DATA: ", label_width=35, dropdown_width=35, value=self.settings[ROI_TRACKING_STYLE].upper())
+        self.show_grid_overlay_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['FALSE', '10MM', '20MM', '40MM', '80MM', '160MM'], label="SHOW GRID OVERLAY: ", label_width=35, dropdown_width=35, value=self.settings[SHOW_GRID_OVERLAY])
 
+
+
+        #self.max_width_ratio_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=WINDOW_SIZE_OPTIONS, label="MAX DRAW DISPLAY RATIO WIDTH: ", label_width=35, dropdown_width=35, value=MAX_DRAW_UI_DISPLAY_RATIO[0])
+        #self.max_height_ratio_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=WINDOW_SIZE_OPTIONS, label="HEIGHT: ", label_width=10, dropdown_width=10, value=MAX_DRAW_UI_DISPLAY_RATIO[1])
+        #self.min_width_ratio_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=WINDOW_SIZE_OPTIONS, label="MIN DRAW DISPLAY RATIO WIDTH: ", label_width=35, dropdown_width=35, value=MIN_DRAW_UI_DISPLAY_RATIO[0])
+       # self.min_height_ratio_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=WINDOW_SIZE_OPTIONS, label="HEIGHT: ", label_width=10, dropdown_width=10, value=MIN_DRAW_UI_DISPLAY_RATIO[1])
+        pref_save_btn = SimbaButton(parent=pref_frm_panel, txt="SAVE", img='save_large', font=Formats.FONT_REGULAR.value, cmd=self.set_settings)
         pref_frm_panel.grid(row=0, column=0, sticky=NW)
         self.line_type_dropdown.grid(row=0, column=0, sticky=NW, pady=5)
         self.roi_select_clr_dropdown.grid(row=1, column=0, sticky=NW, pady=5)
         self.duplication_jump_dropdown.grid(row=2, column=0, sticky=NW, pady=5)
-        self.show_pose_dropdown.grid(row=3, column=0, sticky=NW, pady=5)
-        self.tracking_style_dropdown.grid(row=4, column=0, sticky=NW, pady=5)
+        self.show_tracking_dropdown.grid(row=3, column=0, sticky=NW, pady=5)
+        self.show_grid_overlay_dropdown.grid(row=4, column=0, sticky=NW, pady=5)
+        #self.max_width_ratio_dropdown.grid(row=5, column=0, sticky=NW, pady=5)
+        #self.max_height_ratio_dropdown.grid(row=5, column=1, sticky=NW, pady=5)
+        #self.min_width_ratio_dropdown.grid(row=6, column=0, sticky=NW, pady=5)
+        #self.min_height_ratio_dropdown.grid(row=6, column=1, sticky=NW, pady=5)
         pref_save_btn.grid(row=5, column=0, sticky=NW, pady=5)
 
     def set_settings(self):
         self.settings['LINE_TYPE'] = int(self.line_type_dropdown.get_value())
         self.settings['ROI_SELECT_CLR'] = self.color_option_dict[self.roi_select_clr_dropdown.get_value()]
         self.settings['DUPLICATION_JUMP_SIZE'] = int(self.duplication_jump_dropdown.get_value())
-        self.settings[SHOW_TRACKING] = str_2_bool(self.show_pose_dropdown.get_value())
-        self.settings[ROI_TRACKING_STYLE] = self.tracking_style_dropdown.get_value().lower()
-        if not self.settings[SHOW_TRACKING]:
+        self.settings[ROI_TRACKING_STYLE] = self.show_tracking_dropdown.get_value()
+        self.settings[SHOW_GRID_OVERLAY] = self.show_grid_overlay_dropdown.get_value()
+        if self.settings[ROI_TRACKING_STYLE] == 'FALSE':
             self.pose_data = None
         else:
             if self.expected_pose_path is None and self.pose_data_cpy is None:
@@ -824,11 +858,24 @@ class ROI_mixin(ConfigReader):
                 raise InvalidInputError(msg=error_txt, source=self.__class__.__name__)
             elif self.expected_pose_path is not None and self.pose_data_cpy is None:
                 self.pose_data = get_pose_for_roi_ui(pose_path=self.expected_pose_path, video_path=self.video_path)
-                if self.downscale_factor != 1.0: self.pose_data = self.pose_data * self.downscale_factor
+                if self.downscale_factor != 1.0 and self.pose_data is not None: self.pose_data = self.pose_data * self.downscale_factor
                 self.pose_data_cpy = deepcopy(self.pose_data)
-                self.clrs = create_color_palettes(no_animals=1, map_size=int(self.pose_data.shape[1] / 2) + 5)[0]
+                self.clrs = create_color_palettes(no_animals=self.animal_cnt, map_size=int(self.pose_data.shape[1]/2) + 10)
             self.pose_data = self.pose_data_cpy
             self.settings[SHOW_TRACKING] = True
+        if self.settings[SHOW_GRID_OVERLAY] != 'FALSE':
+            bucket_grid_size_mm = int(self.settings[SHOW_GRID_OVERLAY][:-2])
+            self.grid = list(GeometryMixin().bucket_img_into_grid_square(img_size=(self.display_img_width, self.display_img_height), bucket_grid_size_mm=bucket_grid_size_mm, px_per_mm=self.px_per_mm, add_correction=True, verbose=False)[0].values())
+        else:
+            self.grid = None
+        # max_width = float(self.max_width_ratio_dropdown.get_value())
+        # max_height = float(self.max_height_ratio_dropdown.get_value())
+        # min_width = float(self.min_width_ratio_dropdown.get_value())
+        # min_height = float(self.min_height_ratio_dropdown.get_value())
+        #
+        # if (max_width, max_height) != MAX_DRAW_UI_DISPLAY_RATIO or (min_width, min_height) != MIN_DRAW_UI_DISPLAY_RATIO:
+        #     self.set_screen_display(max_width=max_width, max_height=max_height, min_width=min_width, min_height=min_height)
+
         self.overlay_rois_on_image()
 
 
@@ -1088,3 +1135,44 @@ class ROI_mixin(ConfigReader):
             self.main_frm.quit()
         except:
             pass
+
+    def set_screen_display(self,
+                           max_width: float,
+                           max_height: float,
+                           min_width: float,
+                           min_height: float):
+
+        for i in [max_width, max_height, min_width, min_height]:
+            check_float(name=f'set_screen_display', value=i, min_value=0.0, max_value=1.0)
+        MAX_DRAW_UI_DISPLAY_RATIO = (max_width, max_height)
+        MIN_DRAW_UI_DISPLAY_RATIO = (min_width, min_height)
+
+        self.display_img_width, self.display_img_height, self.downscale_factor, self.upscale_factor = get_img_resize_info(img_size=(self.video_meta['width'], self.video_meta['height']), display_resolution=(self.display_w, self.display_h), max_height_ratio=MAX_DRAW_UI_DISPLAY_RATIO[1], max_width_ratio=MAX_DRAW_UI_DISPLAY_RATIO[0], min_height_ratio=MIN_DRAW_UI_DISPLAY_RATIO[1], min_width_ratio=MIN_DRAW_UI_DISPLAY_RATIO[0])
+        self.circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(self.display_img_width, self.display_img_height), circle_frame_ratio=100)
+        self.img_center = (int(self.display_img_width / 2), int(self.display_img_height / 2))
+        self.img_window.update_idletasks()
+        self.img_window.geometry(f"{self.display_img_width}x{self.display_img_height}")
+        # if self.upscale_factor != 1.0:
+        #     self.roi_dict = self.scale_roi_dict(roi_dict=self.roi_dict, scale_factor=self.upscale_factor, nesting=False)
+        #     self.other_roi_dict = self.scale_roi_dict(roi_dict=self.other_roi_dict, scale_factor=self.upscale_factor, nesting=True)
+        #     self.rectangles_df, self.circles_df, self.polygon_df = get_roi_df_from_dict(roi_dict=self.roi_dict)
+        print(self.downscale_factor, self.upscale_factor)
+
+        if self.downscale_factor != 1.0:
+            self.roi_dict = self.scale_roi_dict(roi_dict=self.roi_dict, scale_factor=self.downscale_factor)
+            self.other_roi_dict = self.scale_roi_dict(roi_dict=self.other_roi_dict, scale_factor=self.downscale_factor, nesting=True)
+            self.rectangles_df, self.circles_df, self.polygon_df = get_roi_df_from_dict(roi_dict=self.roi_dict)
+            if self.pose_data is not None:
+                self.pose_data = self.pose_data * self.downscale_factor
+                self.pose_data_cpy = deepcopy(self.pose_data)
+
+            #self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
+
+
+
+
+
+
+
+
+

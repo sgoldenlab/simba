@@ -18,7 +18,7 @@ warnings.filterwarnings("ignore")
 
 
 WINDOW_SIZE = (775, 900)
-SHOW_TRACKING = 'SHOW_TRACKING'
+SHOW_GRID_OVERLAY = 'SHOW_GRID_OVERLAY'
 
 class ROI_ui(ROI_mixin, ConfigReader):
 
@@ -67,7 +67,7 @@ class ROI_ui(ROI_mixin, ConfigReader):
         else:
             self.other_project_video_names = []
         self.settings = {item.name: item.value for item in ROI_SETTINGS}
-        self.settings[SHOW_TRACKING] = 'TRUE' if pose_data is not None else 'FALSE'
+        self.settings[SHOW_GRID_OVERLAY] = 'FALSE'
         self.get_video_info_panel(parent_frame=self.define_ui.main_frm, row_idx=0)
         self.get_select_img_panel(parent_frame=self.define_ui.main_frm, row_idx=1)
         self.get_select_shape_type_panel(parent_frame=self.define_ui.main_frm, row_idx=2)
@@ -145,3 +145,5 @@ class ROI_ui(ROI_mixin, ConfigReader):
 # ROI_ui(config_path=r"C:\troubleshooting\open_field_below\project_folder\project_config.ini",
 #       video_path=r"C:\troubleshooting\open_field_below\project_folder\videos\raw_clip1.mp4")
 
+# ROI_ui(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini",
+#       video_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\videos\Together_1.avi")

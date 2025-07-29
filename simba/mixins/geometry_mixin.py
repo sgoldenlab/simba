@@ -3061,13 +3061,9 @@ class GeometryMixin(object):
 
         timer = SimbaTimer(start=True)
         if bucket_grid_size is not None and bucket_grid_size_mm is not None:
-            raise InvalidInputError(
-                msg="bucket_size_mm and bucket_grid_size are both not None. Either provide bucket size in millimeters, OR provide the grid size",
-                source=GeometryMixin().bucket_img_into_grid_square.__name__, )
-        check_instance(source=f"{GeometryMixin.bucket_img_into_grid_square.__name__} img_size", instance=img_size,
-                       accepted_types=(tuple, np.ndarray), )
-        check_iterable_length(source=f"{GeometryMixin.bucket_img_into_grid_square.__name__} img_size",
-                              val=len(img_size), exact_accepted_length=2, )
+            raise InvalidInputError(msg="bucket_size_mm and bucket_grid_size are both not None. Either provide bucket size in millimeters, OR provide the grid size", source=GeometryMixin().bucket_img_into_grid_square.__name__, )
+        check_instance(source=f"{GeometryMixin.bucket_img_into_grid_square.__name__} img_size", instance=img_size, accepted_types=(tuple, np.ndarray), )
+        check_iterable_length(source=f"{GeometryMixin.bucket_img_into_grid_square.__name__} img_size", val=len(img_size), exact_accepted_length=2, )
         check_int(name=f"{GeometryMixin.bucket_img_into_grid_square.__name__} img_size height", value=img_size[0], )
         check_int(name=f"{GeometryMixin.bucket_img_into_grid_square.__name__} img_size width", value=img_size[1], )
         check_valid_boolean(value=verbose, source=f"{GeometryMixin.bucket_img_into_grid_square.__name__} verbose")
