@@ -427,6 +427,11 @@ Alternatively, to romove the grid lines data from the drawing window, toggle the
 [roi_show_gridline.webm](https://github.com/user-attachments/assets/afaf5d56-665c-440d-8de7-03552e940846)
 
 
+## CHANGE DRAWING WINDOW SIZE
+If the drawing window is too big (or too small) for your monitor resolution, you can change the maximum and/or minimum percent the drawing window should take up. To make the drawing window larger, increase the values. To make the drawing window smaller, decrease the values:
+
+https://github.com/user-attachments/assets/aab9c5cf-0731-4ef4-a7ba-395beb56407d
+
 ## NEXT STEPS
 Once your ROI definitions are all defined, close the `ROI table`, `Regions of Interest Settings` and `Define Shape` windows and head back to the [ROI] tab in the load project menu. 
 
