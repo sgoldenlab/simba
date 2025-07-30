@@ -50,6 +50,11 @@ class ConfigKey(Enum):
     ROI_ANIMAL_CNT = "no_of_animals"
     DISTANCE_MM = "distance_mm"
     SKLEARN_BP_PROB_THRESH = "bp_threshold_sklearn"
+    DISPLAY_SETTINGS = 'DISPLAY SETTINGS'
+    MIN_ROI_DISPLAY_HEIGHT = 'min_roi_draw_display_ratio_height'
+    MIN_ROI_DISPLAY_WIDTH = 'min_roi_draw_display_ratio_width'
+    MAX_ROI_DISPLAY_HEIGHT = 'max_roi_draw_display_ratio_height'
+    MAX_ROI_DISPLAY_WIDTH = 'max_roi_draw_display_ratio_width'
 
 
 class Paths(Enum):
@@ -810,6 +815,7 @@ class ROI_SETTINGS(Enum):
     OUTSIDE_ROI = 'OUTSIDE REGIONS OF INTEREST'
     ROI_TRACKING_STYLE = 'FALSE' #bbox, keypoints, obb, keypoints & obb
     SHOW_GRID_OVERLAY = 'FALSE'
+    OVERLAY_GRID_COLOR = (192, 192, 192)
 
 class PackageNames(Enum):
     ULTRALYTICS = 'ultralytics'

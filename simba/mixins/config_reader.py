@@ -211,6 +211,12 @@ class ConfigReader(object):
         if read_video_info:
             self.video_info_df = self.read_video_info_csv(file_path=self.video_info_path)
 
+
+        self.min_draw_display_ratio_h = self.read_config_entry(config=self.config, section=ConfigKey.DISPLAY_SETTINGS.value, option=ConfigKey.MIN_ROI_DISPLAY_HEIGHT.value, default_value=0.60, data_type=Dtypes.FLOAT.value)
+        self.min_draw_display_ratio_w = self.read_config_entry(config=self.config, section=ConfigKey.DISPLAY_SETTINGS.value, option=ConfigKey.MIN_ROI_DISPLAY_WIDTH.value, default_value=0.30, data_type=Dtypes.FLOAT.value)
+        self.max_draw_display_ratio_h = self.read_config_entry(config=self.config, section=ConfigKey.DISPLAY_SETTINGS.value, option=ConfigKey.MAX_ROI_DISPLAY_HEIGHT.value, default_value=0.75, data_type=Dtypes.FLOAT.value)
+        self.max_draw_display_ratio_w = self.read_config_entry(config=self.config, section=ConfigKey.DISPLAY_SETTINGS.value, option=ConfigKey.MAX_ROI_DISPLAY_WIDTH.value, default_value=0.50, data_type=Dtypes.FLOAT.value)
+
     def read_roi_data(self) -> None:
         """
         Method to read in ROI definitions from SimBA project
@@ -639,6 +645,7 @@ class ConfigReader(object):
         >>> config.read_config_entry(config=self.config, section='Multi animal IDs', option='id_list', data_type='str')
         >>> 'simon,jj'
         """
+
         try:
             if config.has_option(section, option):
                 if data_type == Dtypes.FLOAT.value:
@@ -670,7 +677,7 @@ class ConfigReader(object):
                     msg=f"SimBA could not find an entry for option {option} under section {section} in the project_config.ini. Please specify the settings in the settings menu.",
                     source=self.__class__.__name__,
                 )
-        except ValueError:
+        except ValueError as e:
             if default_value != None:
                 return default_value
             else:

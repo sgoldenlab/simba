@@ -90,6 +90,8 @@ KEYPOINTS = 'keypoints'
 BBOX = 'bbox'
 KEYPOINTS_BBOX = 'keypoints & bbox'
 SHOW_GRID_OVERLAY = 'SHOW_GRID_OVERLAY'
+OVERLAY_GRID_COLOR = 'OVERLAY_GRID_COLOR'
+SHOW_HEXAGON_OVERLAY = 'SHOW_HEXAGON_OVERLAY'
 
 PLATFORM = platform.system()
 
@@ -106,12 +108,6 @@ class ROI_mixin(ConfigReader):
                  roi_coordinates_path: Optional[Union[str, os.PathLike]] = None):
 
         self.video_meta = get_video_meta_data(video_path=video_path)
-        self.display_w, self.display_h = get_display_resolution()
-        self.display_img_width, self.display_img_height, self.downscale_factor, self.upscale_factor = get_img_resize_info(img_size=(self.video_meta['width'], self.video_meta['height']), display_resolution=(self.display_w, self.display_h), max_height_ratio=MAX_DRAW_UI_DISPLAY_RATIO[1], max_width_ratio=MAX_DRAW_UI_DISPLAY_RATIO[0], min_height_ratio=MIN_DRAW_UI_DISPLAY_RATIO[1], min_width_ratio=MIN_DRAW_UI_DISPLAY_RATIO[0])
-        #self.display_img_width, self.display_img_height = self.video_meta['width'], self.video_meta['height']
-        #print(self.display_img_width, self.display_img_height, self.video_meta)
-        #print(self.downscale_factor, self.upscale_factor, self.display_w, self.display_h)
-        #self.display_img_width, self.display_img_height, self.downscale_factor, self.upscale_factor = 1, 1, 1, 1
         if config_path is not None:
             ConfigReader.__init__(self, config_path=config_path, read_video_info=False, create_logger=False)
             check_file_exist_and_readable(file_path=config_path)
@@ -122,6 +118,13 @@ class ROI_mixin(ConfigReader):
         else:
             self.px_per_mm, self.pose_path, self.expected_pose_path, self.animal_cnt = 1, None, None, animal_cnt
             self.animal_bp_dict = None
+            self.min_draw_display_ratio_h, self.min_draw_display_ratio_w = MIN_DRAW_UI_DISPLAY_RATIO[1], MIN_DRAW_UI_DISPLAY_RATIO[0]
+            self.max_draw_display_ratio_h, self.max_draw_display_ratio_w = MAX_DRAW_UI_DISPLAY_RATIO[1], MAX_DRAW_UI_DISPLAY_RATIO[0]
+
+        self.display_w, self.display_h = get_display_resolution()
+        self.display_img_width, self.display_img_height, self.downscale_factor, self.upscale_factor = get_img_resize_info(img_size=(self.video_meta['width'], self.video_meta['height']), display_resolution=(self.display_w, self.display_h), max_height_ratio=self.max_draw_display_ratio_h, max_width_ratio=self.max_draw_display_ratio_w, min_height_ratio=self.min_draw_display_ratio_h, min_width_ratio=self.min_draw_display_ratio_w)
+
+
         if roi_coordinates_path is not None:
             self.roi_coordinates_path = roi_coordinates_path
         if pose_data is not None:
@@ -135,7 +138,7 @@ class ROI_mixin(ConfigReader):
         self.pose_data_cpy = deepcopy(self.pose_data)
         self.img_idx = img_idx
         self.main_frm = main_frm
-        self.selected_shape_type, self.grid = None, None
+        self.selected_shape_type, self.grid, self.hexagon_grid = None, None, None
         self.color_option_dict = get_color_dict()
         self.menu_icons = get_menu_icons()
 
@@ -270,7 +273,7 @@ class ROI_mixin(ConfigReader):
             try:
                 for polygon in grid:
                     cords = np.array(polygon.exterior.coords).astype(np.int32)
-                    img = cv2.polylines(img=img, pts=[cords], isClosed=True, color=(211, 211, 211), thickness=max(1, int(self.circle_size/5)), lineType=16)
+                    img = cv2.polylines(img=img, pts=[cords], isClosed=True, color=self.settings[OVERLAY_GRID_COLOR], thickness=max(1, int(self.circle_size/5)), lineType=8)
                 return img
             except Exception as e:
                 msg = f'Cannot draw gridlines: {e.args}'
@@ -289,6 +292,8 @@ class ROI_mixin(ConfigReader):
             self.img = self.insert_pose(img=self.img, pose_img_data=self.get_frm_pose(frame_idx=self.img_idx))
         if self.grid is not None:
             self.img = self.insert_grid(img=self.img, grid=self.grid)
+        if self.hexagon_grid is not None:
+            self.img = self.insert_grid(img=self.img, grid=self.hexagon_grid)
         self.draw_img()
 
     def draw_img(self):
@@ -709,6 +714,8 @@ class ROI_mixin(ConfigReader):
         self.change_attr_frm = Toplevel()
         self.change_attr_frm.minsize(400, 300)
         self.change_attr_frm.wm_title("CHANGE ROI SHAPE ATTRIBUTES")
+        self.change_attr_frm.iconphoto(False, self.menu_icons['edit_roi_large']["img"])
+
         self.change_attr_panel = LabelFrame(self.change_attr_frm, text="SHAPE ATTRIBUTES", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         self.change_attr_input_dropdown = DropDownMenu(self.change_attr_panel, "CHANGE SHAPE: ", self.roi_names, 25, com= lambda x: self._set_shape_attributes_from_selection(x))
         self.change_attr_input_dropdown.setChoices(selected_roi_name)
@@ -822,8 +829,9 @@ class ROI_mixin(ConfigReader):
         self.roi_select_clr_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(self.color_option_dict.keys()), label="ROI SELECT COLOR: ", label_width=35, dropdown_width=35, value=next(key for key, val in self.color_option_dict.items() if val == self.settings['ROI_SELECT_CLR']))
         self.duplication_jump_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(range(1, 100, 5)), label="DUPLICATION JUMP SIZE: ", label_width=35, dropdown_width=35, value=self.settings['DUPLICATION_JUMP_SIZE'])
         self.show_tracking_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['FALSE', 'KEYPOINTS', 'BBOX', 'KEYPOINTS & BBOX'], label="SHOW TRACKING DATA: ", label_width=35, dropdown_width=35, value=self.settings[ROI_TRACKING_STYLE].upper())
+        self.overlay_color_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(self.color_option_dict.keys()), label="OVERLAY GRID COLOR: ", label_width=35, dropdown_width=35, value=next(key for key, val in self.color_option_dict.items() if val == self.settings[OVERLAY_GRID_COLOR]))
         self.show_grid_overlay_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['FALSE', '10MM', '20MM', '40MM', '80MM', '160MM'], label="SHOW GRID OVERLAY: ", label_width=35, dropdown_width=35, value=self.settings[SHOW_GRID_OVERLAY])
-
+        self.show_hexagon_overlay_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['FALSE', '10MM', '20MM', '40MM', '80MM', '160MM'], label="SHOW HEXAGON OVERLAY: ", label_width=35, dropdown_width=35, value=self.settings[SHOW_GRID_OVERLAY])
 
 
         #self.max_width_ratio_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=WINDOW_SIZE_OPTIONS, label="MAX DRAW DISPLAY RATIO WIDTH: ", label_width=35, dropdown_width=35, value=MAX_DRAW_UI_DISPLAY_RATIO[0])
@@ -836,12 +844,14 @@ class ROI_mixin(ConfigReader):
         self.roi_select_clr_dropdown.grid(row=1, column=0, sticky=NW, pady=5)
         self.duplication_jump_dropdown.grid(row=2, column=0, sticky=NW, pady=5)
         self.show_tracking_dropdown.grid(row=3, column=0, sticky=NW, pady=5)
-        self.show_grid_overlay_dropdown.grid(row=4, column=0, sticky=NW, pady=5)
+        self.overlay_color_dropdown.grid(row=4, column=0, sticky=NW, pady=5)
+        self.show_grid_overlay_dropdown.grid(row=5, column=0, sticky=NW, pady=5)
+        self.show_hexagon_overlay_dropdown.grid(row=6, column=0, sticky=NW, pady=5)
         #self.max_width_ratio_dropdown.grid(row=5, column=0, sticky=NW, pady=5)
         #self.max_height_ratio_dropdown.grid(row=5, column=1, sticky=NW, pady=5)
         #self.min_width_ratio_dropdown.grid(row=6, column=0, sticky=NW, pady=5)
         #self.min_height_ratio_dropdown.grid(row=6, column=1, sticky=NW, pady=5)
-        pref_save_btn.grid(row=5, column=0, sticky=NW, pady=5)
+        pref_save_btn.grid(row=7, column=0, sticky=NW, pady=5)
 
     def set_settings(self):
         self.settings['LINE_TYPE'] = int(self.line_type_dropdown.get_value())
@@ -849,6 +859,8 @@ class ROI_mixin(ConfigReader):
         self.settings['DUPLICATION_JUMP_SIZE'] = int(self.duplication_jump_dropdown.get_value())
         self.settings[ROI_TRACKING_STYLE] = self.show_tracking_dropdown.get_value()
         self.settings[SHOW_GRID_OVERLAY] = self.show_grid_overlay_dropdown.get_value()
+        self.settings[SHOW_HEXAGON_OVERLAY] = self.show_hexagon_overlay_dropdown.get_value()
+        self.settings[OVERLAY_GRID_COLOR] = self.color_option_dict[self.overlay_color_dropdown.get_value()]
         if self.settings[ROI_TRACKING_STYLE] == 'FALSE':
             self.pose_data = None
         else:
@@ -868,6 +880,15 @@ class ROI_mixin(ConfigReader):
             self.grid = list(GeometryMixin().bucket_img_into_grid_square(img_size=(self.display_img_width, self.display_img_height), bucket_grid_size_mm=bucket_grid_size_mm, px_per_mm=self.px_per_mm, add_correction=True, verbose=False)[0].values())
         else:
             self.grid = None
+        if self.settings[SHOW_HEXAGON_OVERLAY] != 'FALSE':
+            bucket_grid_size_mm = int(self.settings[SHOW_HEXAGON_OVERLAY][:-2])
+            self.hexagon_grid = list(GeometryMixin().bucket_img_into_grid_hexagon(img_size=(self.display_img_width, self.display_img_height), bucket_size_mm=bucket_grid_size_mm, px_per_mm=self.px_per_mm, verbose=False)[0].values())
+        else:
+            self.hexagon_grid = None
+
+
+
+
         # max_width = float(self.max_width_ratio_dropdown.get_value())
         # max_height = float(self.max_height_ratio_dropdown.get_value())
         # min_width = float(self.min_width_ratio_dropdown.get_value())
@@ -886,6 +907,8 @@ class ROI_mixin(ConfigReader):
         self.fixed_roi_frm = Toplevel()
         self.fixed_roi_frm.minsize(400, 300)
         self.fixed_roi_frm.wm_title("FIXED ROI PREFERENCES")
+        self.fixed_roi_frm.iconphoto(False, self.menu_icons['size_black']["img"])
+
         settings = LabelFrame(self.fixed_roi_frm, text="SETTINGS", font=Formats.FONT_HEADER.value, padx=5, pady=5)
 
         self.fixed_roi_name_eb = Entry_Box(parent=settings, fileDescription='ROI NAME: ', labelwidth=15, entry_box_width=25)

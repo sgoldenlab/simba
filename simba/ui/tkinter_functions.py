@@ -224,7 +224,8 @@ class FolderSelect(Frame):
         self.lblName.grid(row=0, column=0, sticky=NW)
         self.entPath = Label(self, textvariable=self.folderPath, relief=SUNKEN, font=font, bg=bg_clr, width=entry_width)
         self.entPath.grid(row=0, column=1, sticky=NW)
-        self.btnFind = Button(self, text=Defaults.BROWSE_FOLDER_BTN_TEXT.value, compound="left", image=browse_icon, relief=RAISED, font=font, command=self.setFolderPath)
+        self.btnFind = SimbaButton(parent=self, txt=Defaults.BROWSE_FOLDER_BTN_TEXT.value, font=font, cmd=self.setFolderPath, img=browse_icon)
+        #self.btnFind = Button(self, text=Defaults.BROWSE_FOLDER_BTN_TEXT.value, compound="left", image=browse_icon, relief=RAISED, font=font, command=self.setFolderPath)
         self.btnFind.image = browse_icon
         self.btnFind.grid(row=0, column=2, sticky=NW)
         self.folderPath.set("No folder selected")
@@ -624,13 +625,14 @@ class FileSelect(Frame):
                  parent=None,
                  fileDescription="",
                  color=None,
-                 title=None,
-                 lblwidth=None,
+                 title: Optional[str] = None,
+                 lblwidth: Optional[int] = None,
                  file_types=None,
                  bg_clr: Optional[str] = 'white',
                  dropdown: Union[DropDownMenu, SimBADropDown] = None,
                  entry_width: Optional[int] = 20,
                  status: Optional[str] = None,
+                 font: Tuple = Formats.FONT_REGULAR.value,
                  initialdir: Optional[Union[str, os.PathLike]] = None,
                  initial_path: Optional[Union[str, os.PathLike]] = None, **kw):
 
@@ -646,8 +648,7 @@ class FileSelect(Frame):
         self.lblName.grid(row=0, column=0, sticky=W)
         self.entPath = Label(self, textvariable=self.filePath, relief=SUNKEN, font=Formats.FONT_REGULAR.value, bg=bg_clr, width=entry_width)
         self.entPath.grid(row=0, column=1)
-        self.btnFind = Button(self, text=Defaults.BROWSE_FILE_BTN_TEXT.value, compound="left", image=browse_icon, relief=RAISED, command=self.setFilePath, font=Formats.FONT_REGULAR.value)
-        self.btnFind.image = browse_icon
+        self.btnFind = SimbaButton(parent=self, txt=Defaults.BROWSE_FILE_BTN_TEXT.value, font=font, cmd=self.setFilePath, img=browse_icon)
         self.btnFind.grid(row=0, column=2)
         self.filePath.set(Defaults.NO_FILE_SELECTED_TEXT.value)
         if initial_path is not None:

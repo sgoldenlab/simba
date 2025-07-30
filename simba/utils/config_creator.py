@@ -235,12 +235,8 @@ class ProjectConfigCreator(object):
         ] = Dtypes.NONE.value
 
         self.config.add_section(ConfigKey.OUTLIER_SETTINGS.value)
-        self.config[ConfigKey.OUTLIER_SETTINGS.value][
-            ConfigKey.MOVEMENT_CRITERION.value
-        ] = Dtypes.NONE.value
-        self.config[ConfigKey.OUTLIER_SETTINGS.value][
-            ConfigKey.LOCATION_CRITERION.value
-        ] = Dtypes.NONE.value
+        self.config[ConfigKey.OUTLIER_SETTINGS.value][ConfigKey.MOVEMENT_CRITERION.value] = Dtypes.NONE.value
+        self.config[ConfigKey.OUTLIER_SETTINGS.value][ConfigKey.LOCATION_CRITERION.value] = Dtypes.NONE.value
 
         self.config_path = os.path.join(self.project_folder, "project_config.ini")
         with open(self.config_path, "w") as file:

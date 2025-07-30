@@ -3130,7 +3130,7 @@ class GeometryMixin(object):
             return polygons, round((bucket_grid_size[1] / bucket_grid_size[0]), 3)
 
     @staticmethod
-    def bucket_img_into_grid_hexagon(bucket_size_mm: float, img_size: Tuple[int, int], px_per_mm: float) -> Tuple[
+    def bucket_img_into_grid_hexagon(bucket_size_mm: float, img_size: Tuple[int, int], px_per_mm: float, verbose: bool = True) -> Tuple[
         Dict[Tuple[int, int], Polygon], float]:
         """
         Bucketize an image into hexagons and return a dictionary of polygons representing the hexagon locations.
@@ -3146,6 +3146,7 @@ class GeometryMixin(object):
         :param float bucket_size_mm: The width/height of each hexagon bucket in millimeters.
         :param Tuple[int, int] img_size: Tuple representing the width and height of the image in pixels.
         :param float px_per_mm: Pixels per millimeter conversion factor.
+        :param bool verbose: If True, prints progress. Default True.
         :return: First value is a dictionary where keys are (row, column) indices of the bucket, and values are Shapely Polygon objects representing the corresponding hexagon buckets. Second value is the aspect ratio of the hexagonal grid.
         :rtype: Tuple[Dict[Tuple[int, int], Polygon], float]
 
@@ -3154,52 +3155,43 @@ class GeometryMixin(object):
         """
 
         timer = SimbaTimer(start=True)
-        check_float(
-            name=f"bucket_img_into_grid_hexagon bucket_size_mm", value=bucket_size_mm
-        )
-        check_int(
-            name=f"bucket_img_into_grid_hexagon img_size height", value=img_size[0]
-        )
-        check_int(
-            name=f"bucket_img_into_grid_hexagon img_size width", value=img_size[1]
-        )
-        check_float(name=f"bucket_img_into_grid_hexagon px_per_mm", value=px_per_mm)
+        check_float("bucket_img_into_grid_hexagon bucket_size_mm", bucket_size_mm)
+        check_int("bucket_img_into_grid_hexagon img_size width", img_size[0])
+        check_int("bucket_img_into_grid_hexagon img_size height", img_size[1])
+        check_float("bucket_img_into_grid_hexagon px_per_mm", px_per_mm)
 
-        sqrt_3 = math.sqrt(3)
-        hex_width = 3 / 2 * bucket_size_mm * px_per_mm
-        hex_height = sqrt_3 * bucket_size_mm * px_per_mm
+        radius = bucket_size_mm * px_per_mm
+        hex_width = 2 * radius
+        hex_height = math.sqrt(3) * radius
 
-        h_hex_cnt, v_hex_cnt = divmod(img_size[0], int(hex_height)), divmod(
-            img_size[1], int(hex_width)
-        )
-        if h_hex_cnt[1] != 0:
-            h_hex_cnt = (h_hex_cnt[0] + 1, h_hex_cnt[1])
-        if v_hex_cnt[1] != 0:
-            v_hex_cnt = (v_hex_cnt[0] + 1, v_hex_cnt[1])
+        n_cols = int(math.ceil(img_size[0] / (1.5 * radius)))
+        n_rows = int(math.ceil(img_size[1] / hex_height))
 
         polygons = {}
-        for i in range(h_hex_cnt[0]):
-            for j in range(v_hex_cnt[0] + (i % 2) * 1):
-                x = i * 3 / 2 * hex_width
-                y = j * sqrt_3 * hex_height + (i % 2) * sqrt_3 * hex_height / 2
-                vertices = []
-                for k in range(6):
-                    angle = (math.pi / 3) * k
-                    vertices.append(
-                        (
-                            x + hex_width * math.cos(angle),
-                            y + hex_height * math.sin(angle),
-                        )
+        for i in range(n_cols):
+            for j in range(n_rows + (i % 2)):
+                x = i * 1.5 * radius
+                y = j * hex_height + (i % 2) * (hex_height / 2)
+
+                vertices = [
+                    (
+                        x + radius * math.cos(math.pi / 3 * k),
+                        y + radius * math.sin(math.pi / 3 * k)
                     )
+                    for k in range(6)
+                ]
 
                 polygons[(i, j)] = Polygon(vertices)
 
         timer.stop_timer()
-        stdout_success(
-            msg="Bucket image into hexagon grid complete",
-            elapsed_time=timer.elapsed_time_str,
-        )
-        return polygons, round((v_hex_cnt[0] / h_hex_cnt[0]), 3)
+        if verbose:
+            stdout_success(
+                msg="Bucket image into hexagon grid complete",
+                elapsed_time=timer.elapsed_time_str,
+            )
+
+        aspect_ratio = round(n_rows / n_cols, 3) if n_cols > 0 else 0
+        return polygons, aspect_ratio
 
     @staticmethod
     def _cumsum_coord_geometries_helper(data: np.ndarray, geometries: Dict[Tuple[int, int], Polygon], verbose: bool

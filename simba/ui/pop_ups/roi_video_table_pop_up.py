@@ -6,14 +6,12 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.roi_ui import ROI_ui
 from simba.roi_tools.roi_utils import multiply_ROIs, reset_video_ROIs
-from simba.ui.pop_ups.roi_size_standardizer_popup import \
-    ROISizeStandardizerPopUp
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
-                                        SimbaButton, SimBALabel)
+from simba.ui.pop_ups.roi_size_standardizer_popup import ROISizeStandardizerPopUp
+from simba.ui.pop_ups.min_max_draw_size_popup import SetMinMaxDrawWindowSize
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, SimbaButton, SimBALabel)
 from simba.utils.enums import Keys, Links
 from simba.utils.errors import NoFilesFoundError
 from simba.utils.read_write import find_all_videos_in_directory, get_fn_ext
-
 
 class ROIVideoTable(ConfigReader, PopUpMixin):
 
@@ -40,6 +38,7 @@ class ROIVideoTable(ConfigReader, PopUpMixin):
         file_menu = Menu(menu)
         menu.add_cascade(label="File...", menu=file_menu)
         file_menu.add_command(label="Standardize ROI sizes by metric conversion factor...", compound="left", image=self.menu_icons["settings"]["img"], command=lambda: ROISizeStandardizerPopUp(config_path=self.config_path))
+        file_menu.add_command(label="Set min/max draw window size...", compound="left", image=self.menu_icons["monitor"]["img"], command=lambda: SetMinMaxDrawWindowSize(config_path=self.config_path))
         self.root.config(menu=menu)
 
     def run(self):

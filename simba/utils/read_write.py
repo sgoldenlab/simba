@@ -256,6 +256,8 @@ def get_fn_ext(filepath: Union[os.PathLike, str]) -> Tuple[str, str, str]:
     >>> get_fn_ext(filepath='C:/My_videos/MyVideo.mp4')
     >>> ('My_videos', 'MyVideo', '.mp4')
     """
+
+    check_instance(source=f'{get_fn_ext} filepath', accepted_types=(str, os.PathLike), instance=filepath)
     file_extension = Path(filepath).suffix
     try:
         file_name = os.path.basename(filepath.rsplit(file_extension, 1)[0])
@@ -315,11 +317,9 @@ def read_config_entry(config: configparser.ConfigParser,
         elif default_value != None:
             return default_value
         else:
-            raise MissingProjectConfigEntryError(
-                msg=f"SimBA could not find an entry for option {option} under section {section} in the project_config.ini. Please specify the settings in the settings menu and make sure the path to your project config is correct",
-                source=read_config_entry.__name__,
-            )
-    except ValueError:
+            raise MissingProjectConfigEntryError(msg=f"SimBA could not find an entry for option {option} under section {section} in the project_config.ini. Please specify the settings in the settings menu and make sure the path to your project config is correct", source=read_config_entry.__name__)
+    except ValueError as e:
+        print(e.args)
         if default_value != None:
             return default_value
         else:
@@ -3108,6 +3108,7 @@ def recursive_file_search(directory: Union[str, os.PathLike],
                           extensions: Union[str, List[str]],
                           case_sensitive: bool = False,
                           substrings: Optional[Union[str, List[str]]] = None,
+                          skip_substrings: Optional[Union[str, List[str]]] = None,
                           raise_error: bool = True,
                           as_dict: bool = False) -> Union[List[str], Dict[str, str]]:
     """
@@ -3117,6 +3118,7 @@ def recursive_file_search(directory: Union[str, os.PathLike],
 
     :param directory: Directory to start the search from.
     :param substrings: A substring or list of substrings to match in filenames. If None, all files with the specified extensions will be returned.
+    :param substrings: A substring or list of substrings to match. If filename contains this substring, it will be removed. If None, all files with the specified extensions will be returned.
     :param extensions: A file extension or list of allowed extensions (with or without dot).
     :param case_sensitive: If True, substring match is case-sensitive. Default False.
     :param raise_error: If True, raise an error if no matches are found.
@@ -3129,6 +3131,11 @@ def recursive_file_search(directory: Union[str, os.PathLike],
         if isinstance(substrings, str):
             substrings = [substrings]
         check_valid_lst(data=substrings, valid_dtypes=(str,), min_len=1, raise_error=True)
+
+    if skip_substrings is not None:
+        if isinstance(skip_substrings, str):
+            skip_substrings = [skip_substrings]
+        check_valid_lst(data=skip_substrings, valid_dtypes=(str,), min_len=1, raise_error=True)
 
     if isinstance(extensions, str): extensions = [extensions]
     if isinstance(extensions, (tuple,)): extensions = list(extensions)
@@ -3151,7 +3158,11 @@ def recursive_file_search(directory: Union[str, os.PathLike],
                     match_substr = any(s in f if case_sensitive else s in f.lower() for s in substrings)
                 else:
                     match_substr = True
-                if ext in extensions and match_substr:
+                if skip_substrings is not None:
+                    skip_match_substr = any(s in f if case_sensitive else s in f.lower() for s in skip_substrings)
+                else:
+                    skip_match_substr = False
+                if ext in extensions and match_substr and not skip_match_substr:
                     results.append(os.path.join(root, f))
 
     if not results and raise_error:

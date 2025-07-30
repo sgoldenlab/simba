@@ -226,6 +226,10 @@ class LoadProjectPopUp(object):
         self.main_frm = Toplevel()
         self.main_frm.minsize(300, 200)
         self.main_frm.wm_title("Load SimBA project (project_config.ini file)")
+        self.btn_icons = get_icons_paths()
+        for k in self.btn_icons.keys():
+            self.btn_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname(__file__), self.btn_icons[k]["icon_path"])))
+        self.main_frm.iconphoto(False, self.btn_icons['browse']["img"])
         self.load_project_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="LOAD SIMBA PROJECT_CONFIG.INI", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.LOAD_PROJECT.value)
         self.selected_file = FileSelect(self.load_project_frm, "SELECT SIMBA CONFIG FILE: ", title="Select project_config.ini file", file_types=[("SimBA Project .ini", "*.ini")], lblwidth=30)
 

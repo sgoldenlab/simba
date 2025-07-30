@@ -14,11 +14,8 @@ from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.import_pose_frame import ImportPoseFrame
 from simba.ui.import_videos_frame import ImportVideosFrame
 from simba.ui.pop_ups.clf_add_remove_print_pop_up import PoseResetterPopUp
-from simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up import \
-    CreateUserDefinedPoseConfigurationPopUp
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box, FolderSelect, SimbaButton,
-                                        SimBADropDown, hxtScrollbar)
+from simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up import CreateUserDefinedPoseConfigurationPopUp
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, FolderSelect, SimbaButton, SimBADropDown, hxtScrollbar)
 from simba.utils.checks import check_if_dir_exists, check_str
 from simba.utils.config_creator import ProjectConfigCreator
 from simba.utils.enums import Formats, Keys, Links, Methods, Options, Paths
@@ -57,12 +54,12 @@ class ProjectCreatorPopUp(PopUpMixin):
         self.create_project_tab = ttk.Frame(parent_tab)
         self.import_videos_tab = ttk.Frame(parent_tab)
         self.import_data_tab = ttk.Frame(parent_tab)
-        self.extract_frms_tab = ttk.Frame(parent_tab)
+        #.extract_frms_tab = ttk.Frame(parent_tab)
 
         parent_tab.add(self.create_project_tab, text=f'{"[ Create project config ]": ^20s}', compound="left", image=self.btn_icons["create"]["img"])
         parent_tab.add(self.import_videos_tab, text=f'{"[ Import videos ]": ^20s}', compound="left", image=self.btn_icons["video"]["img"])
         parent_tab.add(self.import_data_tab, text=f'{"[ Import tracking data ]": ^20s}', compound="left", image=self.btn_icons["pose"]["img"])
-        parent_tab.add( self.extract_frms_tab, text=f'{"[ Extract frames ]": ^20s}', compound="left", image=self.btn_icons["frames"]["img"])
+        #parent_tab.add( self.extract_frms_tab, text=f'{"[ Extract frames ]": ^20s}', compound="left", image=self.btn_icons["frames"]["img"])
         parent_tab.grid(row=0, column=0, sticky=NW)
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.create_project_tab, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CREATE_PROJECT.value)
@@ -128,13 +125,12 @@ class ProjectCreatorPopUp(PopUpMixin):
 
         ImportVideosFrame(parent_frm=self.import_videos_tab, config_path=None, idx_row=0, idx_column=0)
         ImportPoseFrame(parent_frm=self.import_data_tab, config_path=None, idx_row=0, idx_column=0)
-        extract_frames_frm = LabelFrame(self.extract_frms_tab, text="EXTRACT FRAMES INTO PROJECT", fg="black", font=Formats.FONT_HEADER.value, pady=5, padx=5)
-        extract_frames_note = Label(extract_frames_frm, text="Note: Frame extraction is not needed for any of the parts of the SimBA pipeline.\n Caution: This extract all frames from all videos in project. \n and is computationally expensive if there is a lot of videos at high frame rates/resolution.", font=Formats.FONT_REGULAR.value)
-
-        extract_frames_btn = SimbaButton(parent=extract_frames_frm, txt="EXTRACT FRAMES", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=None)
-        extract_frames_frm.grid(row=0, column=0, sticky=NW)
-        extract_frames_note.grid(row=0, column=0, sticky=NW)
-        extract_frames_btn.grid(row=1, column=0, sticky=NW)
+        #extract_frames_frm = LabelFrame(self.extract_frms_tab, text="EXTRACT FRAMES INTO PROJECT", fg="black", font=Formats.FONT_HEADER.value, pady=5, padx=5)
+        #extract_frames_note = Label(extract_frames_frm, text="Note: Frame extraction is not needed for any of the parts of the SimBA pipeline.\n Caution: This extract all frames from all videos in project. \n and is computationally expensive if there is a lot of videos at high frame rates/resolution.", font=Formats.FONT_REGULAR.value)
+        #extract_frames_btn = SimbaButton(parent=extract_frames_frm, txt="EXTRACT FRAMES", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=None)
+        #extract_frames_frm.grid(row=0, column=0, sticky=NW)
+        #extract_frames_note.grid(row=0, column=0, sticky=NW)
+        #extract_frames_btn.grid(row=1, column=0, sticky=NW)
         self.update_body_part_dropdown(Methods.CLASSIC_TRACKING.value)
         self.main_frm.mainloop()
 
