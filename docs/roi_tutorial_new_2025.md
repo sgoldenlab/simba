@@ -421,7 +421,8 @@ Alternatively, to romove the tracking data from the drawing window, toggle the `
 
 Similarly, to view bounding boxes derived from the pose estimation, or to view both pose-estimation and bounding boxes, select the appropriate option in the dropdown and hit SAVE:
 
-[roi_show_gridline_hexagon_fps_15.webm](https://github.com/user-attachments/assets/cdfe7fad-c302-423c-a2ba-55442e266490)
+[show_roi_bbox_fps_15.webm](https://github.com/user-attachments/assets/59d9a751-6b98-425e-8650-22b1a1e9363a)
+
 
 ## OVERLAY GRID LINES ON DRAWING IMAGES
 
