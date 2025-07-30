@@ -421,12 +421,15 @@ Alternatively, to romove the tracking data from the drawing window, toggle the `
 
 ## OVERLAY GRID LINES ON DRAWING IMAGES
 
-To see grid-lines, click the `File (ROI')` menu button followed bt `Preferences`. Next, toggle the `SHOW SHOE GRID LINES:` drop-down menu to to the size (in millimeters) which you want your grid lines, as in the video below. 
+To see grid-lines, click the `File (ROI')` menu button followed bt `Preferences`. Next, toggle the `SHOW GRID LINES:` drop-down menu to to the size (in millimeters) which you want your grid lines, as in the video below. 
 
 Alternatively, to romove the grid lines data from the drawing window, toggle the `SHOW SHOE GRID LINES` drop-down menu to `False`.
 
 [roi_show_gridline.webm](https://github.com/user-attachments/assets/afaf5d56-665c-440d-8de7-03552e940846)
 
+Similarly, to overlay hexagonal grid lines, which may help you draw straight, toggle the `SHOW HEXAGONAL GRID LINES:` drop-down menu to to the size (in millimeters) which you want your hexagon radii, as in the video below. You can also change their colors if it helps you see better:
+
+[roi_show_gridline_hexagon_fps_15.webm](https://github.com/user-attachments/assets/1bbd93a9-42df-47f0-867c-706de5efa3c7)
 
 ## CHANGE DRAWING WINDOW SIZE
 If the drawing window is too big (or too small) for your monitor resolution, you can change the maximum and/or minimum percent the drawing window should take up. To make the drawing window larger, increase the values. To make the drawing window smaller, decrease the values:
