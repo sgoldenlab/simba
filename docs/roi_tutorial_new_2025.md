@@ -419,6 +419,10 @@ Alternatively, to romove the tracking data from the drawing window, toggle the `
 [roi_show_pose_fps_15.webm](https://github.com/user-attachments/assets/3e4c04a6-d20b-440b-9606-2f82a328ff8b)
 
 
+Similarly, to view bounding boxes derived from the pose estimation, or to view both pose-estimation and bounding boxes, select the appropriate option in the dropdown and hit SAVE:
+
+[roi_show_gridline_hexagon_fps_15.webm](https://github.com/user-attachments/assets/cdfe7fad-c302-423c-a2ba-55442e266490)
+
 ## OVERLAY GRID LINES ON DRAWING IMAGES
 
 To see grid-lines, click the `File (ROI')` menu button followed bt `Preferences`. Next, toggle the `SHOW GRID LINES:` drop-down menu to to the size (in millimeters) which you want your grid lines, as in the video below. 
