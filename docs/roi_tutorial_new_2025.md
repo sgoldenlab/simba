@@ -50,6 +50,7 @@ Moreover, the ROI data can  be used to build potentially valuable, additional, f
  * [SAVE ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#save-rois)
  * [OVERLAY TRACKING VISUALIXATION DATA IN DRAWING WINDOW](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#overlay-pose-estimation-data-on-roi-tracking)
  * [SHOW GRID LINES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#overlay-grid-lines-on-drawing-images)
+ * [CHANGE DRAWING WINDOW SIZE](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#change-drawing-window-size)
  * [NEXT STEPS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#next-steps)
 
 
