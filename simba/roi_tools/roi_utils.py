@@ -3,7 +3,7 @@ import os
 import warnings
 from copy import copy, deepcopy
 from tkinter import *
-from typing import Dict, Optional, Tuple, Union, List
+from typing import Dict, List, Optional, Tuple, Union
 
 import cv2
 import numpy as np

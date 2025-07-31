@@ -1,6 +1,6 @@
 import math
 from tkinter import *
-from typing import Optional, Tuple, List
+from typing import List, Optional, Tuple
 
 import cv2
 import numpy as np
