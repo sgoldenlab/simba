@@ -1,14 +1,15 @@
 import os
-from typing import Union
 from tkinter import *
+from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import SimBADropDown, CreateLabelFrameWithIcon, SimbaButton
-from simba.utils.enums import Formats, Dtypes, ConfigKey
-from simba.utils.read_write import read_config_entry
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaButton,
+                                        SimBADropDown)
 from simba.utils.checks import check_float
+from simba.utils.enums import ConfigKey, Dtypes, Formats
 from simba.utils.printing import stdout_success
+from simba.utils.read_write import read_config_entry
 
 WINDOW_SIZE_OPTIONS = [round(x * 0.05, 2) for x in range(21)]
 
