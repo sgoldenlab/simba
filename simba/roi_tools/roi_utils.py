@@ -3,7 +3,7 @@ import os
 import warnings
 from copy import copy, deepcopy
 from tkinter import *
-from typing import Dict, Optional, Tuple, Union
+from typing import Dict, Optional, Tuple, Union, List
 
 import cv2
 import numpy as np
@@ -572,3 +572,21 @@ def get_pose_for_roi_ui(pose_path: Union[str, os.PathLike],
     if not valid_pose:
         FrameRangeWarning(msg=f'Cannot plot tracking in ROI window: The pose data from path {pose_path} is not a 3D numeric array with length {video_meta_data["frame_count"]}', source=get_pose_for_roi_ui.__name__)
     return pose_data
+
+
+def insert_gridlines_on_roi_img(img: np.ndarray,
+                                grid: List[Polygon],
+                                color: Tuple[int, int, int],
+                                thickness: int) -> np.ndarray:
+
+    if grid is None or len(grid) == 0:
+        return img
+    else:
+        try:
+            for polygon in grid:
+                cords = np.array(polygon.exterior.coords).astype(np.int32)
+                img = cv2.polylines(img=img, pts=[cords], isClosed=True, color=color, thickness=thickness, lineType=8)
+            return img
+        except Exception as e:
+            msg = f'Cannot draw gridlines: {e.args}'
+            raise InvalidInputError(msg=msg, source=f'{insert_gridlines_on_roi_img.__name__} draw')

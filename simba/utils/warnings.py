@@ -272,3 +272,7 @@ def VersionWarning(msg: str, source: str = ""):
 @log_warning
 def VideoFileWarning(msg: str, source: str = ""):
     pass
+
+@log_warning
+def MissingFileWarning(msg: str, source: str = ""):
+    pass

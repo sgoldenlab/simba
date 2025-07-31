@@ -1,6 +1,6 @@
 import math
 from tkinter import *
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
 import cv2
 import numpy as np
@@ -12,7 +12,8 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.roi_tools.roi_utils import (get_circle_df_headers,
                                        get_image_from_label,
                                        get_polygon_df_headers,
-                                       get_rectangle_df_headers)
+                                       get_rectangle_df_headers,
+                                       insert_gridlines_on_roi_img)
 from simba.utils.checks import check_instance, check_valid_polygon
 from simba.utils.enums import ROI_SETTINGS, Keys
 
@@ -38,6 +39,7 @@ CIRCLE_C_X = 'centerX'
 CIRCLE_C_Y = 'centerY'
 RADIUS = 'radius'
 VERTICES = 'vertices'
+OVERLAY_GRID_COLOR = 'OVERLAY_GRID_COLOR'
 
 
 def _plot_roi(roi_dict: dict,
@@ -65,15 +67,18 @@ class InteractiveROIModifier():
                  img_window: Toplevel,
                  original_img: np.ndarray,
                  roi_dict: dict,
-                 settings: Optional[dict] = None):
+                 settings: Optional[dict] = None,
+                 hex_grid: Optional[List[Polygon]] = None,
+                 rectangle_grid: Optional[List[Polygon]] = None):
 
         check_instance(source=self.__class__.__name__, instance=img_window, accepted_types=(Toplevel,))
         if settings is None: settings = {item.name: item.value for item in ROI_SETTINGS}
-
+        self.hex_grid, self.rectangle_grid = hex_grid, rectangle_grid
         self.img_lbl = img_window.nametowidget("img_lbl")
         self.img = get_image_from_label(self.img_lbl)
         self.original_img, self.roi_dict = original_img, roi_dict
         self.img_w, self.img_h = self.img.shape[1], self.img.shape[0]
+        self.circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(self.img_w, self.img_h), circle_frame_ratio=100)
         self.img_window, self.edge_selected, self.settings = img_window, False, settings
         self.bind_keys()
 
@@ -96,6 +101,15 @@ class InteractiveROIModifier():
                 if distance <= ear_tag_size:
                     clicked_roi, clicked_tag = roi_data, roi_tag_name
         return clicked_roi, clicked_tag
+
+
+    def get_gridline_copy(self):
+        gridline_img = self.original_img.copy()
+        if self.rectangle_grid is not None:
+            gridline_img = insert_gridlines_on_roi_img(img=gridline_img, grid=self.rectangle_grid, color=self.settings[OVERLAY_GRID_COLOR], thickness=max(1, int(self.circle_size/5)))
+        if self.hex_grid is not None:
+            gridline_img = insert_gridlines_on_roi_img(img=gridline_img, grid=self.rectangle_grid, color=self.settings[OVERLAY_GRID_COLOR], thickness=max(1, int(self.circle_size / 5)))
+        return gridline_img
 
     def update_image(self, img):
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -185,6 +199,7 @@ class InteractiveROIModifier():
         self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi['Tags'][TL_TAG], self.clicked_roi['Tags'][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
         self.temp_img = cv2.line(self.temp_img, self.clicked_roi['Tags'][BL_TAG], self.clicked_roi['Tags'][TL_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
         self.update_image(img=self.temp_img)
+
     def _select_rectangle_top_tag(self):
         self.clicked_roi['Tags'][TR_TAG] = (self.br_x, self.br_y - self.h)
         self.clicked_roi['Tags'][TL_TAG] = (self.br_x - self.w, self.br_y - self.h)
@@ -298,7 +313,8 @@ class InteractiveROIModifier():
         self.edge_selected = False
         if self.clicked_roi is not None:
             self.roi_dict[self.clicked_roi['Name']] = self.clicked_roi
-            self.temp_img = _plot_roi(roi_dict=self.roi_dict, img=self.original_img.copy(), show_tags=True)
+            draw_img = self.get_gridline_copy() if self.rectangle_grid is not None or self.hex_grid is not None else self.original_img.copy()
+            self.temp_img = _plot_roi(roi_dict=self.roi_dict, img=draw_img, show_tags=True)
             self.update_image(img=self.temp_img)
 
     def left_mouse_down(self, event):
@@ -312,7 +328,8 @@ class InteractiveROIModifier():
     def left_mouse_drag(self, event):
         if self.edge_selected:
             self.x, self.y = (event.x, event.y)
-            self.temp_img = _plot_roi(roi_dict=self.roi_dict, omitted_roi=self.clicked_roi['Name'], img=self.original_img.copy())
+            draw_img = self.get_gridline_copy() if self.rectangle_grid is not None or self.hex_grid is not None else self.original_img.copy()
+            self.temp_img = _plot_roi(roi_dict=self.roi_dict, omitted_roi=self.clicked_roi['Name'], img=draw_img)
             if self.clicked_roi['Shape_type'].lower() == ROI_SETTINGS.RECTANGLE.value:
                 self.tl_x, self.tl_y = self.clicked_roi['Tags'][TL_TAG]
                 self.tr_x, self.tr_y = self.clicked_roi['Tags'][TR_TAG]

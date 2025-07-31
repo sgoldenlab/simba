@@ -1,6 +1,6 @@
 import math
 from tkinter import *
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
 import cv2
 import numpy as np
@@ -11,7 +11,8 @@ from shapely.geometry import Polygon
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.roi_tools.roi_utils import (get_circle_df_headers,
                                        get_polygon_df_headers,
-                                       get_rectangle_df_headers)
+                                       get_rectangle_df_headers,
+                                       insert_gridlines_on_roi_img)
 from simba.utils.checks import check_valid_polygon
 from simba.utils.enums import ROI_SETTINGS, Keys
 
@@ -37,6 +38,7 @@ CIRCLE_C_X = 'centerX'
 CIRCLE_C_Y = 'centerY'
 RADIUS = 'radius'
 VERTICES = 'vertices'
+OVERLAY_GRID_COLOR = 'OVERLAY_GRID_COLOR'
 
 def _plot_roi(roi_dict: dict, 
               img: np.ndarray,
@@ -53,6 +55,8 @@ def _plot_roi(roi_dict: dict,
             polygon_df = pd.concat([polygon_df, pd.DataFrame([roi_data])], ignore_index=True)
     roi_dict = {Keys.ROI_RECTANGLES.value: rectangles_df, Keys.ROI_CIRCLES.value: circles_df, Keys.ROI_POLYGONS.value: polygon_df}
     img = PlottingMixin.roi_dict_onto_img(img=img, roi_dict=roi_dict, circle_size=None, show_tags=show_tags)
+
+
     return img
 
 
@@ -64,17 +68,22 @@ class InteractiveROIModifier():
                  img: np.ndarray,
                  orginal_img: np.ndarray,
                  settings: Optional[dict] = None,
-                 tkinter_window: bool = True):
+                 tkinter_window: bool = True,
+                 hex_grid: Optional[List[Polygon]] = None,
+                 rectangle_grid: Optional[List[Polygon]] = None):
 
         self.window_name = window_name
         self.roi_dict = roi_dict
         self.img = img
         self.img_h, self.img_w = (img.shape[0], img.shape[1])
+        self.circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(self.img_w, self.img_h), circle_frame_ratio=100)
+
         self.original = orginal_img
         self.dragging = False
         self.temp_img = None
         self.tkinter_window = tkinter_window
         self.terminate = False
+        self.rectangle_grid, self.hex_grid = rectangle_grid, hex_grid
         if settings is None:
             self.settings = {item.name: item.value for item in ROI_SETTINGS}
         else:
@@ -86,6 +95,16 @@ class InteractiveROIModifier():
             self.img_tk_frame = Frame(self.root, width=self.img_w, height=self.img_h, bg="gray")
             self.img_tk_frame.pack(pady=20)
             self.root.mainloop()
+
+
+    def get_gridline_copy(self):
+        gridline_img = self.original.copy()
+        if self.rectangle_grid is not None:
+            gridline_img = insert_gridlines_on_roi_img(img=gridline_img, grid=self.rectangle_grid, color=self.settings[OVERLAY_GRID_COLOR], thickness=max(1, int(self.circle_size/5)))
+        if self.hex_grid is not None:
+            gridline_img = insert_gridlines_on_roi_img(img=gridline_img, grid=self.rectangle_grid, color=self.settings[OVERLAY_GRID_COLOR], thickness=max(1, int(self.circle_size / 5)))
+        return gridline_img
+
 
     def find_closest_tag(self, roi_dict: dict, click_coordinate: Tuple[int, int]):
         clicked_roi, clicked_tag = None, None
@@ -276,7 +295,6 @@ class InteractiveROIModifier():
         cv2.line(self.temp_img, self.clicked_roi['Tags'][self.clicked_tag], self.clicked_roi['Tags'][self.n_tag_2_id], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
 
 
-
     def mouse_callback(self, event, x, y, flags, param):
         if event == cv2.EVENT_LBUTTONDOWN:
             self.clicked_roi, self.clicked_tag = self.find_closest_tag(roi_dict=self.roi_dict, click_coordinate=(x, y))
@@ -286,12 +304,14 @@ class InteractiveROIModifier():
         elif event == cv2.EVENT_LBUTTONUP:
             if self.clicked_roi is not None:
                 self.roi_dict[self.clicked_roi['Name']] = self.clicked_roi
-                self.temp_img = _plot_roi(roi_dict=self.roi_dict, img=self.original.copy(), show_tags=True)
+                draw_img = self.get_gridline_copy() if self.rectangle_grid is not None or self.hex_grid is not None else self.original.copy()
+                self.temp_img = _plot_roi(roi_dict=self.roi_dict, img=draw_img, show_tags=True)
             self.dragging = False
 
         elif event == cv2.EVENT_MOUSEMOVE and self.dragging:
             self.x, self.y = x, y
-            self.temp_img = _plot_roi(roi_dict=self.roi_dict, omitted_roi=self.clicked_roi['Name'], img=self.original.copy())
+            draw_img = self.get_gridline_copy() if self.rectangle_grid is not None or self.hex_grid is not None else self.original.copy()
+            self.temp_img = _plot_roi(roi_dict=self.roi_dict, omitted_roi=self.clicked_roi['Name'], img=draw_img)
             if self.clicked_roi['Shape_type'].lower() == ROI_SETTINGS.RECTANGLE.value:
                 self.tl_x, self.tl_y = self.clicked_roi['Tags'][TL_TAG]
                 self.tr_x, self.tr_y = self.clicked_roi['Tags'][TR_TAG]
@@ -383,8 +403,6 @@ class InteractiveROIModifier():
 
             else:
                 pass
-
-
 
     def run(self):
         cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL)

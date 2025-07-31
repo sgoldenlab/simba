@@ -37,7 +37,8 @@ from simba.roi_tools.roi_utils import (change_roi_dict_video_name,
                                        get_roi_data_for_video_name,
                                        get_roi_df_from_dict,
                                        get_triangle_vertices,
-                                       get_vertices_hexagon)
+                                       get_vertices_hexagon,
+                                       insert_gridlines_on_roi_img)
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, SimbaButton, SimBADropDown,
                                         SimBALabel, get_menu_icons)
@@ -266,19 +267,19 @@ class ROI_mixin(ConfigReader):
         return img
 
 
-    def insert_grid(self, img: np.ndarray, grid: List[Polygon]) -> np.ndarray:
-        if grid is None or len(grid) == 0:
-            return img
-        else:
-            try:
-                for polygon in grid:
-                    cords = np.array(polygon.exterior.coords).astype(np.int32)
-                    img = cv2.polylines(img=img, pts=[cords], isClosed=True, color=self.settings[OVERLAY_GRID_COLOR], thickness=max(1, int(self.circle_size/5)), lineType=8)
-                return img
-            except Exception as e:
-                msg = f'Cannot draw gridlines: {e.args}'
-                self.set_status_bar_panel(text=msg, fg='red')
-                raise InvalidInputError(msg=msg, source=f'{self.__class__.__name__} draw')
+    # def insert_grid(self, img: np.ndarray, grid: List[Polygon]) -> np.ndarray:
+    #     if grid is None or len(grid) == 0:
+    #         return img
+    #     else:
+    #         try:
+    #             for polygon in grid:
+    #                 cords = np.array(polygon.exterior.coords).astype(np.int32)
+    #                 img = cv2.polylines(img=img, pts=[cords], isClosed=True, color=self.settings[OVERLAY_GRID_COLOR], thickness=max(1, int(self.circle_size/5)), lineType=8)
+    #             return img
+    #         except Exception as e:
+    #             msg = f'Cannot draw gridlines: {e.args}'
+    #             self.set_status_bar_panel(text=msg, fg='red')
+    #             raise InvalidInputError(msg=msg, source=f'{self.__class__.__name__} draw')
 
     def overlay_rois_on_image(self,
                               show_ear_tags: bool = False,
@@ -291,9 +292,9 @@ class ROI_mixin(ConfigReader):
         if self.pose_data is not None:
             self.img = self.insert_pose(img=self.img, pose_img_data=self.get_frm_pose(frame_idx=self.img_idx))
         if self.grid is not None:
-            self.img = self.insert_grid(img=self.img, grid=self.grid)
+            self.img = insert_gridlines_on_roi_img(img=self.img, grid=self.grid, color=self.settings[OVERLAY_GRID_COLOR], thickness=max(1, int(self.circle_size/5)))
         if self.hexagon_grid is not None:
-            self.img = self.insert_grid(img=self.img, grid=self.hexagon_grid)
+            self.img = insert_gridlines_on_roi_img(img=self.img, grid=self.hexagon_grid, color=self.settings[OVERLAY_GRID_COLOR], thickness=max(1, int(self.circle_size/5)))
         self.draw_img()
 
     def draw_img(self):
@@ -536,7 +537,7 @@ class ROI_mixin(ConfigReader):
         self.set_status_bar_panel(text="IN ROI MOVE MODE. MODIFY ROI'S BY DRAGGING EAR TAGS. CLICK ESC OCH CLICK SETTINGS WINDOW TO EXIT MOVE MODE", fg="darkred")
         self.click_event, self.got_attributes = BooleanVar(value=False), False
         self.root = parent_frame
-        self.interactive_modifier = InteractiveROIModifier(img_window=self.img_window, original_img=self.read_img(frame_idx=self.img_idx), roi_dict=deepcopy(self.roi_dict), settings=self.settings)
+        self.interactive_modifier = InteractiveROIModifier(img_window=self.img_window, original_img=self.read_img(frame_idx=self.img_idx), roi_dict=deepcopy(self.roi_dict), settings=self.settings, rectangle_grid=self.grid, hex_grid=self.hexagon_grid)
         self.root.bind("<Button-1>", on_click); self.root.bind("<Escape>", on_click); self.img_window.bind("<Escape>", on_click)
         self.root.wait_variable(self.click_event)
 
@@ -912,13 +913,9 @@ class ROI_mixin(ConfigReader):
         settings = LabelFrame(self.fixed_roi_frm, text="SETTINGS", font=Formats.FONT_HEADER.value, padx=5, pady=5)
 
         self.fixed_roi_name_eb = Entry_Box(parent=settings, fileDescription='ROI NAME: ', labelwidth=15, entry_box_width=25)
-        self.fixed_roi_clr_drpdwn = DropDownMenu(settings, 'ROI COLOR: ', list(self.color_option_dict.keys()), 15)
-        self.fixed_roi_clr_drpdwn.setChoices('Red')
-        self.fixed_roi_thickness_drpdwn = DropDownMenu(settings, 'ROI THICKNESS:', self.settings['SHAPE_THICKNESS_OPTIONS'], 15)
-        self.fixed_roi_thickness_drpdwn.setChoices(10)
-        self.fixed_roi_eartag_size_drpdwn = DropDownMenu(settings, 'ROI EAR TAG SIZE: ', self.settings['EAR_TAG_SIZE_OPTIONS'], 15)
-        self.fixed_roi_eartag_size_drpdwn.setChoices(15)
-
+        self.fixed_roi_clr_drpdwn = SimBADropDown(parent=settings, dropdown_options=list(self.color_option_dict.keys()), label='COLOR:', label_width=15, value='Red')
+        self.fixed_roi_thickness_drpdwn = SimBADropDown(parent=settings, dropdown_options=self.settings['SHAPE_THICKNESS_OPTIONS'], label='THICKNESS:', label_width=15, value=10)
+        self.fixed_roi_eartag_size_drpdwn = SimBADropDown(parent=settings, dropdown_options=self.settings['EAR_TAG_SIZE_OPTIONS'], label='EAR TAG SIZE:', label_width=15, value=15)
         settings.grid(row=0, column=0, sticky=NW)
         self.fixed_roi_name_eb.grid(row=0, column=0, sticky=NW)
         self.fixed_roi_clr_drpdwn.grid(row=1, column=0, sticky=NW)
