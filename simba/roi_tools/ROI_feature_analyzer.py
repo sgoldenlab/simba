@@ -151,7 +151,7 @@ class ROIFeatureCreator(ConfigReader, FeatureExtractionMixin):
                         in_zone_col = f"{roi_name} {animal_name} {body_part_name} in zone"
                         self.out_df[in_zone_col] = 0
                         self.out_df.loc[self.out_df[c] <= (row["radius"] / self.pixels_per_mm), in_zone_col] = 1
-                    for _, row in self.roi_dict[Keys.ROI_POLYGONS.value].iterrows():
+                    for _, row in self.video_roi_dict[Keys.ROI_POLYGONS.value].iterrows():
                         roi_vertices = np.array(list(zip(row["vertices"][:, 0], row["vertices"][:, 1])))
                         roi_name, roi_center = row["Name"], np.array([row["Center_X"], row["Center_Y"]])
                         c = f"{roi_name} {animal_name} {body_part_name} distance"
@@ -175,7 +175,6 @@ class ROIFeatureCreator(ConfigReader, FeatureExtractionMixin):
                     if len(duplicated_columns) > 0:
                         DuplicateNamesWarning(msg=f'Some new ROI feature column names already exist in the {feature_path} file and have been duplicated: {duplicated_columns}', source=self.__class__.__name__)
                     self.out_df = pd.concat([features_df, self.out_df], axis=1).reset_index(drop=True)
-                    print(self.out_df.columns)
                     write_df(df=self.out_df, file_type=self.file_type, save_path=feature_path)
                     print(f"New file with ROI features created at  {feature_path} saved (File {file_cnt+1}/{len(self.data_paths)}), elapsed time: {video_timer.elapsed_time_str}s")
         self.timer.stop_timer()
@@ -192,12 +191,12 @@ class ROIFeatureCreator(ConfigReader, FeatureExtractionMixin):
             stdout_success(msg=f"{len(self.data_paths)} data files analyzed for ROI features", elapsed_time=self.timer.elapsed_time_str)
 
 
-# roi_featurizer = ROIFeatureCreator(config_path=r"C:\troubleshooting\spontenous_alternation\project_folder\project_config.ini",
+# #roi_featurizer = ROIFeatureCreator(config_path=r"C:\troubleshooting\roi_feature_issue\project_folder\project_config.ini",
 #                                    body_parts=['nose'],
-#                                    data_path=r"C:\troubleshooting\spontenous_alternation\project_folder\csv\outlier_corrected_movement_location\F1 HAB.csv",
+#                                    data_path=r"C:\troubleshooting\roi_feature_issue\project_folder\csv\outlier_corrected_movement_location\20250130_Oxyipn_Vls_D4_Sst-107.csv",
 #                                    append_data=True)
-# roi_featurizer.run()
-# roi_featurizer.save()
+# #roi_featurizer.run()
+# #roi_featurizer.save()
 
 
 

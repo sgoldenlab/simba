@@ -305,6 +305,18 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
 
 
 # if __name__ == '__main__':
+#     style_attr = {'roi_centers': True, 'roi_ear_tags': True, 'directionality': False, 'directionality_style': 'funnel', 'border_color': (0, 0, 0), 'pose_estimation': True, 'animal_names': False}
+#     test = ROIfeatureVisualizerMultiprocess(config_path=r"C:\troubleshooting\roi_feature_issue\project_folder\project_config.ini",
+#                                                 video_path=r"C:\troubleshooting\roi_feature_issue\project_folder\videos\20250130_Oxyipn_Vls_D4_Sst-107.avi",
+#                                                 style_attr=style_attr,
+#                                                 body_parts=['nose'],
+#                                                 core_cnt=-1)
+#     test.run()
+
+
+
+
+# if __name__ == '__main__':
 #     style_attr = {'roi_centers': True, 'roi_ear_tags': True, 'directionality': True, 'directionality_style': 'funnel', 'border_color': (0, 0, 0), 'pose_estimation': True, 'animal_names': True}
 #     test = ROIfeatureVisualizerMultiprocess(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #                                                 video_path=r"C:\troubleshooting\mitra\project_folder\videos\503_MA109_Gi_CNO_0514.mp4",
