@@ -1,18 +1,24 @@
 from tkinter import *
+
 import numpy as np
 
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect, FolderSelect, SimBADropDown)
-from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists)
-from simba.utils.enums import Options, PackageNames
-from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError, NoDataError
-from simba.utils.read_write import find_core_cnt, get_pkg_version, str_2_bool, find_files_of_filetypes_in_directory, get_video_meta_data
-from simba.ui.tkinter_functions import SimbaButton
-from simba.utils.warnings import MissingFileWarning
-from simba.utils.printing import stdout_warning
-
 from simba.plotting.yolo_pose_visualizer import YOLOPoseVisualizer
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
+                                        FolderSelect, SimbaButton,
+                                        SimBADropDown)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists)
+from simba.utils.enums import Options, PackageNames
+from simba.utils.errors import (NoDataError, SimBAGPUError,
+                                SimBAPAckageVersionError)
+from simba.utils.printing import stdout_warning
+from simba.utils.read_write import (find_core_cnt,
+                                    find_files_of_filetypes_in_directory,
+                                    get_pkg_version, get_video_meta_data,
+                                    str_2_bool)
+from simba.utils.warnings import MissingFileWarning
 
 MAX_TRACKS_OPTIONS = ['None', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 CORE_CNT_OPTIONS = list(range(1, find_core_cnt()[0]))
