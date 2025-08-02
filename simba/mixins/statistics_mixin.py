@@ -1328,23 +1328,24 @@ class Statistics(FeatureExtractionMixin):
 
         .. math::
 
-           W = -\frac{{n_x \\cdot n_y \\cdot (\bar{R}_y - \bar{R}_x)}}{{(n_x + n_y) \\cdot \\sqrt{{n_x \\cdot S_x + n_y \\cdot S_y}}}}
+           W = -\frac{n_x \cdot n_y \cdot (\bar{R}_y - \bar{R}_x)}{(n_x + n_y) \cdot \sqrt{n_x \cdot S_x + n_y \cdot S_y}}
 
         where:
            - :math:`n_x` and :math:`n_y` are the sizes of sample_1 and sample_2 respectively,
            - :math:`\bar{R}_x` and :math:`\bar{R}_y` are the mean ranks of sample_1 and sample_2, respectively.
            - :math:`S_x` and :math:`S_y` are the dispersion statistics of sample_1 and sample_2 respectively.
 
-        :parameter ndarray sample_1: First 1d array representing feature values.
-        :parameter ndarray sample_2: Second 1d array representing feature values.
-        :returns: Brunner-Munzel W.
+        :param np.ndarray sample_1: First 1d array representing feature values.
+        :param np.ndarray sample_2: Second 1d array representing feature values.
+        :return: Brunner-Munzel W statistic.
         :rtype: float
 
         :example:
         >>> sample_1, sample_2 = np.random.normal(loc=10, scale=2, size=10), np.random.normal(loc=20, scale=2, size=10)
         >>> Statistics().brunner_munzel(sample_1=sample_1, sample_2=sample_2)
-        >>> 0.5751408161437165
+        0.5751408161437165
         """
+
         nx, ny = len(sample_1), len(sample_2)
         rankc = fast_mean_rank(np.concatenate((sample_1, sample_2)))
         rankcx, rankcy = rankc[0:nx], rankc[nx : nx + ny]
