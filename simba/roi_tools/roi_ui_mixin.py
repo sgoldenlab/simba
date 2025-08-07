@@ -48,9 +48,11 @@ from simba.utils.enums import OS, ROI_SETTINGS, Formats, Keys
 from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 NoROIDataError)
 from simba.utils.lookups import (create_color_palettes, get_color_dict,
-                                 get_display_resolution, get_img_resize_info, get_monitor_info)
+                                 get_display_resolution, get_img_resize_info,
+                                 get_monitor_info)
 from simba.utils.printing import stdout_success
-from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_frm_of_video)
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
+                                    read_frm_of_video)
 from simba.utils.warnings import DuplicateNamesWarning
 
 WINDOW_SIZE_OPTIONS = [round(x * 0.05, 2) for x in range(21)]
