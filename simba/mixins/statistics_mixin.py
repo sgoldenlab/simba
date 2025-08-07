@@ -231,28 +231,28 @@ class Statistics(FeatureExtractionMixin):
 
         Higher values indicate a larger effect size, with 0.2 considered a small effect, 0.5 a medium effect, and 0.8 or above a large effect. Negative values indicate that the mean of sample 2 is larger than the mean of sample 1.
 
-
         .. seealso::
            For time-series based method, see :func:`simba.mixins.statistics_mixin.Statistics.rolling_cohens_d`
 
         .. math::
-           d = \\frac{{\bar{x}_1 - \bar{x}_2}}{{\\sqrt{{\\frac{{s_1^2 + s_2^2}}{2}}}}}
+           d = \frac{\bar{x}_1 - \bar{x}_2}{\sqrt{\frac{s_1^2 + s_2^2}{2}}}
 
         where:
            - :math:`\bar{x}_1` and :math:`\bar{x}_2` are the means of sample_1 and sample_2 respectively,
            - :math:`s_1` and :math:`s_2` are the standard deviations of sample_1 and sample_2 respectively.
 
-        :param ndarray sample_1: First 1d array representing feature values.
-        :param ndarray sample_2: Second 1d array representing feature values.
-        :returns: Cohens D statistic.
+        :param np.ndarray sample_1: First 1d array representing feature values.
+        :param np.ndarray sample_2: Second 1d array representing feature values.
+        :return: Cohen's D statistic.
         :rtype: float
 
         :example:
         >>> sample_1 = [2, 4, 7, 3, 7, 35, 8, 9]
         >>> sample_2 = [4, 8, 14, 6, 14, 70, 16, 18]
         >>> Statistics().cohens_d(sample_1=sample_1, sample_2=sample_2)
-        >>> -0.5952099775170546
+        -0.5952099775170546
         """
+
         return (np.mean(sample_1) - np.mean(sample_2)) / (
             np.sqrt((np.std(sample_1) ** 2 + np.std(sample_2) ** 2) / 2)
         )
@@ -412,24 +412,24 @@ class Statistics(FeatureExtractionMixin):
         between the means of the two samples, based on their variances. The F-statistic is computed as:
 
         .. math::
-          F = \\frac{MS_{\\text{between}}}{MS_{\\text{within}}}
+          F = \frac{MS_{\text{between}}}{MS_{\text{within}}}
 
         where:
-        - :math:`SS_{\\text{between}}` is the sum of squares between the groups.
-        - :math:`SS_{\\text{within}}` is the sum of squares within each group.
-        - :math:`MS_{\\text{between}} = \\frac{SS_{\\text{between}}}{df_{\\text{between}}}`
-        - :math:`MS_{\\text{within}} = \\frac{SS_{\\text{within}}}{df_{\\text{within}}}`
+        - :math:`SS_{\text{between}}` is the sum of squares between the groups.
+        - :math:`SS_{\text{within}}` is the sum of squares within each group.
+        - :math:`MS_{\text{between}} = \frac{SS_{\text{between}}}{df_{\text{between}}}`
+        - :math:`MS_{\text{within}} = \frac{SS_{\text{within}}}{df_{\text{within}}}`
 
         .. seealso::
            For rolling comparisons in a timeseries, see :func:`simba.mixins.statistics_mixin.Statistics.rolling_one_way_anova`
 
-        :param ndarray sample_1: First 1d array representing feature values.
-        :param ndarray sample_2: Second 1d array representing feature values.
-        :returns: Tuple representing ANOVA F statistic and associated probability value.
+        :param np.ndarray sample_1: First 1d array representing feature values.
+        :param np.ndarray sample_2: Second 1d array representing feature values.
+        :return: Tuple representing ANOVA F statistic and associated probability value.
         :rtype: Tuple[float, float]
 
         :example:
-        >>> saxfmple_1 = np.array([1, 2, 3, 1, 3, 2, 1, 10, 8, 4, 10])
+        >>> sample_1 = np.array([1, 2, 3, 1, 3, 2, 1, 10, 8, 4, 10])
         >>> sample_2 = np.array([8, 5, 5, 8, 8, 9, 10, 1, 7, 10, 10])
         >>> Statistics().one_way_anova(sample_1=sample_2, sample_2=sample_1)
         """
@@ -1328,23 +1328,24 @@ class Statistics(FeatureExtractionMixin):
 
         .. math::
 
-           W = -\frac{{n_x \\cdot n_y \\cdot (\bar{R}_y - \bar{R}_x)}}{{(n_x + n_y) \\cdot \\sqrt{{n_x \\cdot S_x + n_y \\cdot S_y}}}}
+           W = -\frac{n_x \cdot n_y \cdot (\bar{R}_y - \bar{R}_x)}{(n_x + n_y) \cdot \sqrt{n_x \cdot S_x + n_y \cdot S_y}}
 
         where:
            - :math:`n_x` and :math:`n_y` are the sizes of sample_1 and sample_2 respectively,
            - :math:`\bar{R}_x` and :math:`\bar{R}_y` are the mean ranks of sample_1 and sample_2, respectively.
            - :math:`S_x` and :math:`S_y` are the dispersion statistics of sample_1 and sample_2 respectively.
 
-        :parameter ndarray sample_1: First 1d array representing feature values.
-        :parameter ndarray sample_2: Second 1d array representing feature values.
-        :returns: Brunner-Munzel W.
+        :param np.ndarray sample_1: First 1d array representing feature values.
+        :param np.ndarray sample_2: Second 1d array representing feature values.
+        :return: Brunner-Munzel W statistic.
         :rtype: float
 
         :example:
         >>> sample_1, sample_2 = np.random.normal(loc=10, scale=2, size=10), np.random.normal(loc=20, scale=2, size=10)
         >>> Statistics().brunner_munzel(sample_1=sample_1, sample_2=sample_2)
-        >>> 0.5751408161437165
+        0.5751408161437165
         """
+
         nx, ny = len(sample_1), len(sample_2)
         rankc = fast_mean_rank(np.concatenate((sample_1, sample_2)))
         rankcx, rankcy = rankc[0:nx], rankc[nx : nx + ny]
@@ -5139,20 +5140,19 @@ class Statistics(FeatureExtractionMixin):
         The NGD is calculated as:
 
         .. math::
-          NGD(x, y) = \\frac{\\max(\\sum x, \\sum y) - \\sum \\min(x, y)}{(\\sum x + \\sum y) - \\min(\\sum x, \\sum y)}
+          NGD(x, y) = \frac{\max(\sum x, \sum y) - \sum \min(x, y)}{(\sum x + \sum y) - \min(\sum x, \sum y)}
 
         where:
-        - :math:`\\sum x` is the sum of elements in `x`
-        - :math:`\\sum y` is the sum of elements in `y`
-        - :math:`\\sum \\min(x, y)` is the sum of element-wise minimums of `x` and `y`
-
+        - :math:`\sum x` is the sum of elements in `x`
+        - :math:`\sum y` is the sum of elements in `y`
+        - :math:`\sum \min(x, y)` is the sum of element-wise minimums of `x` and `y`
 
         .. note::
            This function assumes x and y have the same shape. It computes NGD based on the sum of elements and the minimum values between corresponding elements of x and y.
 
         :param np.ndarray x: First numerical matrix with shape (m, n).
         :param np.ndarray y: Second array or matrix with shape (m, n).
-        :return:  Normalized Google Distance between x and y.
+        :return: Normalized Google Distance between x and y.
         :rtype: float
 
         :example:
@@ -5161,7 +5161,6 @@ class Statistics(FeatureExtractionMixin):
 
         :references:
            .. [1] Cilibrasi, R., & Vitányi, P. (2007). Clustering by compression. IEEE Transactions on Information Theory, 51(4), 1523-1545. https://doi.org/10.1109/TIT.2005.862080
-
         """
         check_valid_array(data=x, source=f'{Statistics.normalized_google_distance.__name__} x', accepted_ndims=(1, 2), accepted_dtypes=Formats.NUMERIC_DTYPES.value)
         check_valid_array(data=y, source=f'{Statistics.normalized_google_distance.__name__} y', accepted_ndims=(x.ndim,), accepted_shapes=(x.shape,), accepted_dtypes=Formats.NUMERIC_DTYPES.value)

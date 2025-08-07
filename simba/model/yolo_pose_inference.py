@@ -8,15 +8,16 @@ try:
 except:
     from typing_extensions import Literal
 try:
+    import torch
     from ultralytics import YOLO
 except ModuleNotFoundError:
     YOLO = None
+    torch = None
 
 from typing import List, Optional, Tuple, Union
 
 import numpy as np
 import pandas as pd
-import torch
 
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.checks import (check_file_exist_and_readable, check_float,

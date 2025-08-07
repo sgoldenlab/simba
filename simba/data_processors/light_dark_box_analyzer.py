@@ -26,6 +26,9 @@ class LightDarkBoxAnalyzer():
     .. note::
        If the specified body-part is detected below the specified threshold, then the animal is the dark-box. Otherwise its in the light-box.
 
+    .. seealso::
+       For light/dark box data plotting, see :func:`simba.plotting.light_dark_box_plotter.LightDarkBoxPlotter`.
+
     This class analyzes animal transitions between light and dark compartments  in a light–dark box behavioral test based on the availability of pose-estimation data. It assumes that if pose-estimation for a specified body part is available,
     the animal is in the light box; otherwise, the animal is in the dark box. It detects bouts (continuous time segments) for each condition and saves the bout-level data to a CSV file.
 
