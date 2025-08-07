@@ -48,10 +48,9 @@ from simba.utils.enums import OS, ROI_SETTINGS, Formats, Keys
 from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 NoROIDataError)
 from simba.utils.lookups import (create_color_palettes, get_color_dict,
-                                 get_display_resolution, get_img_resize_info)
+                                 get_display_resolution, get_img_resize_info, get_monitor_info)
 from simba.utils.printing import stdout_success
-from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
-                                    read_frm_of_video, str_2_bool)
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_frm_of_video)
 from simba.utils.warnings import DuplicateNamesWarning
 
 WINDOW_SIZE_OPTIONS = [round(x * 0.05, 2) for x in range(21)]
@@ -122,9 +121,10 @@ class ROI_mixin(ConfigReader):
             self.min_draw_display_ratio_h, self.min_draw_display_ratio_w = MIN_DRAW_UI_DISPLAY_RATIO[1], MIN_DRAW_UI_DISPLAY_RATIO[0]
             self.max_draw_display_ratio_h, self.max_draw_display_ratio_w = MAX_DRAW_UI_DISPLAY_RATIO[1], MAX_DRAW_UI_DISPLAY_RATIO[0]
 
-        self.display_w, self.display_h = get_display_resolution()
-        self.display_img_width, self.display_img_height, self.downscale_factor, self.upscale_factor = get_img_resize_info(img_size=(self.video_meta['width'], self.video_meta['height']), display_resolution=(self.display_w, self.display_h), max_height_ratio=self.max_draw_display_ratio_h, max_width_ratio=self.max_draw_display_ratio_w, min_height_ratio=self.min_draw_display_ratio_h, min_width_ratio=self.min_draw_display_ratio_w)
 
+        self.monitor_info, (self.display_w, self.display_h) = get_monitor_info()
+        print(f'MONITOR INFO: {self.monitor_info}')
+        self.display_img_width, self.display_img_height, self.downscale_factor, self.upscale_factor = get_img_resize_info(img_size=(self.video_meta['width'], self.video_meta['height']), display_resolution=(self.display_w, self.display_h), max_height_ratio=self.max_draw_display_ratio_h, max_width_ratio=self.max_draw_display_ratio_w, min_height_ratio=self.min_draw_display_ratio_h, min_width_ratio=self.min_draw_display_ratio_w)
 
         if roi_coordinates_path is not None:
             self.roi_coordinates_path = roi_coordinates_path
@@ -311,14 +311,18 @@ class ROI_mixin(ConfigReader):
 
         self.change_attr_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="VIDEO AND FRAME INFORMATION", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='info', relief='solid')
         self.video_name_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'VIDEO NAME: {self.video_meta["video_name"]}')
+        self.video_size_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'SIZE (PX): {self.video_meta["resolution_str"]}')
         self.video_fps_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'FPS: {self.video_meta["fps"]}')
         self.video_frame_id_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'DISPLAY FRAME #: {self.img_idx}')
         self.video_frame_time_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'DISPLAY FRAME (S): {(round((self.img_idx / self.video_meta["fps"]), 2))}')
+        self.display_size = SimBALabel(parent=self.change_attr_panel, txt=f'PRIMARY MONITOR (WxH): {self.display_w, self.display_h}')
         self.change_attr_panel.grid(row=row_idx, sticky=W)
-        self.video_name_lbl.grid(row=0, column=1)
-        self.video_fps_lbl.grid(row=0, column=2)
-        self.video_frame_id_lbl.grid(row=0, column=3)
-        self.video_frame_time_lbl.grid(row=0, column=4)
+        self.video_name_lbl.grid(row=0, column=0, sticky=NW)
+        self.video_fps_lbl.grid(row=0, column=1, sticky=NW)
+        self.video_size_lbl.grid(row=0, column=2, sticky=NW)
+        self.video_frame_id_lbl.grid(row=0, column=3, sticky=NW)
+        self.video_frame_time_lbl.grid(row=0, column=4, sticky=NW)
+        self.display_size.grid(row=1, column=0, sticky=NW)
 
     def get_file_menu(self,
                       root: Toplevel):
@@ -337,7 +341,7 @@ class ROI_mixin(ConfigReader):
         self.select_img_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="CHANGE IMAGE", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='frames', relief='solid')
         self.forward_1s_btn = SimbaButton(parent=self.select_img_panel, txt="+1s", img='plus_green_2', font=Formats.FONT_REGULAR.value, txt_clr='darkgreen', cmd=self.change_img, cmd_kwargs={'stride': int(self.video_meta['fps'])})
         self.backwards_1s_btn = SimbaButton(parent=self.select_img_panel, txt="-1s", img='minus_blue_2', font=Formats.FONT_REGULAR.value, txt_clr='darkblue', cmd=self.change_img, cmd_kwargs={'stride': -int(self.video_meta['fps'])})
-        self.custom_seconds_entry = Entry_Box(parent=self.select_img_panel, fileDescription='CUSTOM SECONDS:', labelwidth=18, validation='numeric', entry_box_width=4)
+        self.custom_seconds_entry = Entry_Box(parent=self.select_img_panel, fileDescription='CUSTOM SECONDS:', labelwidth=18, validation='numeric', entry_box_width=4, value=5)
         self.custom_fwd_btn = SimbaButton(parent=self.select_img_panel, txt="FORWARD", img='fastforward_green_2', font=Formats.FONT_REGULAR.value, txt_clr='darkgreen', cmd=self.change_img, cmd_kwargs={'stride': 'custom_forward'})
         self.custom_backwards_btn = SimbaButton(parent=self.select_img_panel, txt="REVERSE", img='rewind_blue_2', font=Formats.FONT_REGULAR.value, txt_clr='darkblue', cmd=self.change_img,cmd_kwargs={'stride': 'custom_backward'})
         self.first_frm_btn = SimbaButton(parent=self.select_img_panel, txt="FIRST FRAME", img='first_frame_blue', font=Formats.FONT_REGULAR.value, txt_clr='darkblue', cmd=self.change_img, cmd_kwargs={'stride': 'first'})
@@ -778,8 +782,7 @@ class ROI_mixin(ConfigReader):
             error_txt = f'No other video in the SimBA project has ROIs. Draw ROIs on other videos in the SimBA project to transfer ROIs between videos'
             self.status_bar.configure(text=error_txt, fg="red")
             raise InvalidInputError(msg=error_txt, source=self.__class__.__name__)
-        video_roi_dict = get_roi_data_for_video_name(roi_path=self.roi_coordinates_path, video_name=video_name)
-        video_roi_dict = change_roi_dict_video_name(roi_dict=video_roi_dict, video_name=self.video_meta['video_name'])
+        video_roi_dict = change_roi_dict_video_name(roi_dict=self.other_roi_dict[video_name], video_name=self.video_meta['video_name'])
         if len(video_roi_dict.keys()) > 0:
             self.reset_img_shape_memory()
             self.roi_names = list(video_roi_dict.keys())

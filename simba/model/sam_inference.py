@@ -29,12 +29,12 @@ class SamInference():
 
     """
     :example:
-    >>> i = SamInference(video_path=r"D:\platea\platea_videos\videos\clipped\10B_Mouse_5-choice_MustTouchTrainingNEWFINAL_a7_clipped_3.mp4",
-    >>>              labels=[[1]],
-    >>>              prompts=[[166, 428]],
-    >>>              weights_path=r"D:\yolo_weights\sam2.1_b.pt",
-    >>>              save_dir=r'C:\troubleshooting\sam_results',
-    >>>              names=('Animal1',))
+    >>> i = SamInference(video_path=r"MyVideo",
+    >>>                 labels=[[1]],
+    >>>                 prompts=[[166, 428]],
+    >>>                 weights_path=r"D:\yolo_weights\sam2.1_b.pt",
+    >>>                 save_dir=r'C:\troubleshooting\sam_results',
+    >>>                 names=('Animal1',))
     >>> i.run()
     """
     def __init__(self,

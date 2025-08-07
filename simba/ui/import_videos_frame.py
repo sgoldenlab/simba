@@ -5,7 +5,7 @@ from typing import Optional, Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
                                         FileSelect, FolderSelect, SimbaButton,
                                         SimbaCheckbox, SimBADropDown)
 from simba.utils.checks import (check_file_exist_and_readable,
@@ -14,6 +14,7 @@ from simba.utils.enums import Formats, Options
 from simba.utils.errors import InvalidInputError
 from simba.utils.read_write import (copy_multiple_videos_to_project,
                                     copy_single_video_to_project)
+#from simba.sandbox.tkinter_drag_and_drop import FileDropBox
 
 
 class ImportVideosFrame(PopUpMixin, ConfigReader):
@@ -42,7 +43,7 @@ class ImportVideosFrame(PopUpMixin, ConfigReader):
             raise InvalidInputError(msg='If parent_frm is None, please pass config_path', source=self.__class__.__name__)
 
         elif parent_frm is None and config_path is not None:
-            PopUpMixin.__init__(self, config_path=config_path, title='IMPORT VIDEO FILES')
+            PopUpMixin.__init__(self, config_path=config_path, title='IMPORT VIDEO FILES', icon='import')
             parent_frm = self.main_frm
 
         check_instance(source=f'{ImportVideosFrame} parent_frm', accepted_types=(Frame, Canvas, LabelFrame, ttk.Frame), instance=parent_frm)
@@ -81,6 +82,11 @@ class ImportVideosFrame(PopUpMixin, ConfigReader):
             import_single_btn.grid(row=2, sticky=W)
             import_videos_frm.grid(row=idx_row, column=idx_column, sticky=NW)
 
+            #video_drop_box = FileDropBox(parent=import_videos_frm)
+            #video_drop_box.drop_box_frm.grid(row=2, column=1, sticky=NW)
+
+
+
         #parent_frm.mainloop()
 
     def __run_video_import(self, multiple_videos: bool):
@@ -96,3 +102,6 @@ class ImportVideosFrame(PopUpMixin, ConfigReader):
             copy_single_video_to_project(simba_ini_path=self.config_path,
                                          symlink=self.single_video_symlink_var.get(),
                                          source_path=self.video_file_select.file_path)
+
+
+#ImportVideosFrame(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")

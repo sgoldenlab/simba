@@ -65,7 +65,7 @@ class FitYolo():
                  weights_path: Union[str, os.PathLike],
                  model_yaml: Union[str, os.PathLike],
                  save_path: Union[str, os.PathLike],
-                 epochs: int = 25,
+                 epochs: int = 200,
                  batch: Union[int, float] = 16,
                  plots: bool = True,
                  imgsz: int = 640,

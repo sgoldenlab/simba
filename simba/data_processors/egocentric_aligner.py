@@ -70,8 +70,8 @@ class EgocentricalAligner():
 
         self.data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=['.csv'])
         check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir')
-        check_str(name=f'{self.__class__.__name__} anchor_1', value=anchor_1)
-        check_str(name=f'{self.__class__.__name__} anchor_2', value=anchor_2)
+        check_str(name=f'{self.__class__.__name__} anchor_1', value=anchor_1, allow_blank=False)
+        check_str(name=f'{self.__class__.__name__} anchor_2', value=anchor_2, allow_blank=False)
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], unaccepted_vals=[0])
         if core_cnt == -1: self.core_cnt = find_core_cnt()[0]
         check_int(name=f'{self.__class__.__name__} direction', value=direction, min_value=0, max_value=360)

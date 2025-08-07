@@ -91,6 +91,12 @@ class ROI_ui(ROI_mixin, ConfigReader):
         self.define_ui.root.destroy()
         self.define_ui.root.quit()
 
+# ROI_ui(config_path=r"C:\troubleshooting\SDS_pre_post\project_folder\project_config.ini",
+#        video_path=r"C:\troubleshooting\SDS_pre_post\project_folder\videos\SDI100 x ALR2 pre_d7.mp4")
+#
+
+
+
 # ROI_ui(config_path=None,
 #        video_path=r"D:\ares\data\ant\ant.mp4",
 #        roi_coordinates_path=r'D:\ares\data\ant\roi_coordinates.h5')

@@ -21,7 +21,7 @@ from simba.utils.errors import NoDataError, ROICoordinatesNotFoundError
 from simba.utils.lookups import get_color_dict
 from simba.utils.read_write import (find_all_videos_in_directory,
                                     find_files_of_filetypes_in_directory,
-                                    get_fn_ext, str_2_bool)
+                                    find_core_cnt, str_2_bool)
 
 BP_SIZE_OPTIONS = list(range(1, 101, 1))
 BP_SIZE_OPTIONS.insert(0, 'AUTO')
@@ -57,7 +57,7 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         self.show_pose_estimation_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW POSE-ESTIMATED LOCATIONS:', label_width=35, value='TRUE', command=self._disable_clr)
         self.show_animal_name_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL NAMES:', label_width=35, value='FALSE')
         self.outside_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='OUTSIDE ROI ZONES DATA:', label_width=35, value='FALSE', tooltip_txt=f'TREAT ALL NON-ROI REGIONS AS AN ROI REGION NAMED \n "{ROI_SETTINGS.OUTSIDE_ROI.value}"')
-        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt)), dropdown_width=self.longest_animal_name_len, label='NUMBER OF CPU CORES:', label_width=35, value=1)
+        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt)), dropdown_width=self.longest_animal_name_len, label='NUMBER OF CPU CORES:', label_width=35, value=find_core_cnt()[1])
         self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='USE GPU:', label_width=35, value='FALSE', state=gpu_state)
 
         self.settings_frm.grid(row=0, column=0, sticky=NW)

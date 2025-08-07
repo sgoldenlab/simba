@@ -330,6 +330,9 @@ class FeatureExtractionMixin(object):
         the specified radius, the body part is considered inside the circle (marked as 1); otherwise,
         it is considered outside (marked as 0).
 
+        .. seealso::
+           For GPU acceleration, see :func:`simba.data_processors.cuda.geometry.is_inside_circle`
+
         :param np.ndarray bp: A (N, 2) array containing the (x, y) coordinates of N body parts.
         :param np.ndarray roi_center: A (2,) array representing the (x, y) coordinates of the circle center.
         :param int roi_radius: The radius of the circular region of interest.

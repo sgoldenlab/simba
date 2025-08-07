@@ -735,7 +735,13 @@ def get_current_time():
 
 
 def get_display_resolution() -> Tuple[int, int]:
-    """ Helper to get main monitor / display resolution"""
+    """
+    Helper to get main monitor / display resolution.
+
+    .. note::
+       May return the virtual geometry in multi-display setups. To return the resolution of each available monitor in mosaic, see :func:`simba.utils.lookups.get_monitor_info`.
+
+    """
     root = tk.Tk()
     root.withdraw()
     width = root.winfo_screenwidth()
@@ -763,7 +769,7 @@ def get_img_resize_info(img_size: Tuple[int ,int],
     """
 
     if display_resolution is None:
-        display_resolution = get_display_resolution()
+        _, display_resolution = get_monitor_info()
     max_width = int(display_resolution[0] * max_width_ratio)
     max_height = int(display_resolution[1] * max_height_ratio)
     min_width = int(display_resolution[0] * min_width_ratio)
@@ -794,7 +800,24 @@ def is_running_in_ide():
     return hasattr(sys, 'ps1') or sys.flags.interactive
 
 
+def get_monitor_info() -> Tuple[Dict[int, Dict[str, Union[int, bool]]], Tuple[int, int]]:
+    """
+    Helper to get main monitor / display resolution.
 
+    .. note::
+       Returns dict containing the resolution of each available monitor. To get the virtual geometry, see :func:`simba.utils.lookups.get_display_resolution`, and tuple of main monitor width and height.
+    """
+    monitors = pyglet.canvas.get_display().get_screens()
+    results = {}
+    for monitor_cnt, monitor_info in enumerate(monitors):
+        primary = True if monitor_info.x == 0 and monitor_info.y == 0 else False
+        results[monitor_cnt] = {'width': monitor_info.width,
+                                 'height': monitor_info.height,
+                                 'primary': primary}
+
+    main_monitor = next(({'width': v['width'], 'height': v['height']} for v in results.values() if v.get('primary')), {'width': next(iter(results.values()))['width'], 'height': next(iter(results.values()))['height']})
+
+    return results, (int(main_monitor['width']), int(main_monitor['height']))
 
 
 

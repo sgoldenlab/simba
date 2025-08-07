@@ -239,4 +239,4 @@ class SpontaneousAlternationPopUp(ConfigReader, PopUpMixin):
         plotter.run()
 
 
-# _ = SpontaneousAlternationPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/spontenous_alternation/project_folder/project_config.ini')
+#_ = SpontaneousAlternationPopUp(config_path=r"C:\troubleshooting\spontenous_alternation\project_folder\project_config.ini")

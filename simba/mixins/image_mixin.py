@@ -1075,7 +1075,7 @@ class ImageMixin(object):
 
     @staticmethod
     def create_uniform_img(size: Tuple[int, int],
-                           color: Tuple[int, int, int],
+                           color: Tuple[int, int, int] = (0, 0, 0),
                            save_path: Optional[Union[str, os.PathLike]] = None) -> Union[None, np.ndarray]:
 
         """
@@ -1086,7 +1086,7 @@ class ImageMixin(object):
            :align: center
 
         :param Tuple[int, int] size: A tuple of two integers representing the width and height of the image.
-        :param Tuple[int, int, int] color: A tuple of three integers representing the RGB color (e.g., (255, 0, 0) for red).
+        :param Tuple[int, int, int] color: A tuple of three integers representing the RGB color (e.g., (255, 0, 0) for red). Defaults to black (0, 0, 0).
         :param Optional[Union[str, os.PathLike]] save_path: a string representing the file path to save the image.  If not provided, the function returns the image as a numpy array.
         :return: If save_path is provided, the function saves the image to the specified path and returns None. f save_path is not provided, the function returns the image as a numpy ndarray.
         :rtype: Union[None, np.ndarray]
