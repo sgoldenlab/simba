@@ -9,7 +9,6 @@ import cv2
 import imutils
 import matplotlib
 import matplotlib.pyplot as plt
-
 import numpy as np
 import pandas as pd
 import PIL
@@ -44,8 +43,6 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data, read_df,
                                     read_frm_of_video, read_video_info)
-
-
 
 
 class PlottingMixin(object):
