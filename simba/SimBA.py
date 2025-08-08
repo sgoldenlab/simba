@@ -1022,11 +1022,12 @@ class App(object):
         self.txt = Text(self.frame, bg="white", insertborderwidth=2, height=30, width=100, yscrollcommand=y_sb)
         if currentPlatform == OS.WINDOWS.value: self.txt.bind("<Button-3>", self.show_right_click_pop_up)
         elif currentPlatform == OS.MAC.value: self.txt.bind("<Button-2>", self.show_right_click_pop_up)
-        self.txt.tag_configure(TagNames.GREETING.value, justify="center", foreground="blue", font=Formats.FONT_LARGE.value)
+        self.txt.tag_configure(TagNames.GREETING.value, justify="center", foreground="blue", font=Formats.FONT_LARGE_BOLD.value)
         self.txt.tag_configure(TagNames.ERROR.value, justify="left", foreground="red", font=Formats.FONT_REGULAR.value)
         self.txt.tag_configure(TagNames.STANDARD.value, justify="left", foreground="black", font=Formats.FONT_REGULAR.value)
-        self.txt.tag_configure(TagNames.COMPLETE.value, justify="left", foreground="darkgreen", font=Formats.FONT_REGULAR.value)
+        self.txt.tag_configure(TagNames.COMPLETE.value, justify="left", foreground="darkgreen", font=Formats.FONT_REGULAR_BOLD.value)
         self.txt.tag_configure(TagNames.WARNING.value, justify="left", foreground="darkorange", font=Formats.FONT_REGULAR.value)
+        self.txt.tag_configure(TagNames.INFORMATION.value, justify="left", foreground="blue", font=Formats.FONT_REGULAR.value)
         self.txt.tag_configure("TABLE", foreground="darkorange", font=Formats.FONT_REGULAR.value, wrap="none", borderwidth=0)
         if ENV[ENV_VARS.PRINT_EMOJIS.value]:
             self.txt.insert(INSERT, Defaults.WELCOME_MSG.value + emojis["relaxed"] + "\n" * 2)
@@ -1048,6 +1049,9 @@ class App(object):
 
         if not check_ffmpeg_available():
             FFMpegNotFoundWarning(msg='SimBA could not find a FFMPEG installation on computer (as evaluated by "ffmpeg" returning None). SimBA works best with FFMPEG and it is recommended to install it on your computer', source=self.__class__.__name__)
+
+
+
 
         simba_pip_data = fetch_pip_data(pip_url=Links.SIMBA_PIP_URL.value)
         if (simba_pip_data[1] is not None) and OS.SIMBA_VERSION.value is not None:

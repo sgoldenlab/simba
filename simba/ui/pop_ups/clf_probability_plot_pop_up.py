@@ -24,10 +24,12 @@ STYLE_FONT_SIZE = 'font size'
 STYLE_LINE_WIDTH = 'line width'
 STYLE_YMAX = 'y_max'
 STYLE_COLOR = 'color'
+STYLE_OPACITY = 'opacity'
 AUTO = 'AUTO'
 
 MAX_Y_OPTIONS = list(range(100, 0, -10))
 MAX_Y_OPTIONS.insert(0, AUTO)
+OPACITY_OPTIONS = [round(x * 0.1, 1) for x in range(1, 11)]
 
 class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
 
@@ -52,6 +54,7 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
         self.line_clr_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=color_names, label='LINE COLOR: ', label_width=25, dropdown_width=35, value='Red')
         self.font_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(1, 26)), label='TEXT SIZE: ', label_width=25, dropdown_width=35, value=10)
         self.line_width_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(1, 26)), label='LINE WIDTH: ', label_width=25, dropdown_width=35, value=6)
+        self.line_opacity_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=OPACITY_OPTIONS, label='LINE OPACITY: ', label_width=25, dropdown_width=35, value=1.0)
 
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VISUALIZATION SETTINGS", icon_name='eye', icon_link=Links.VISUALIZE_CLF_PROBABILITIES.value, pady=5, padx=5, relief='solid')
@@ -76,6 +79,7 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
         self.font_size_dropdown.grid(row=2, sticky=NW)
         self.line_width_dropdown.grid(row=3, sticky=NW)
         self.max_y_dropdown.grid(row=4, sticky=NW)
+        self.line_opacity_dropdown.grid(row=5, sticky=NW)
 
         self.settings_frm.grid(row=1, sticky=NW, padx=10, pady=10)
         self.clf_dropdown.grid(row=0, sticky=NW)
@@ -100,6 +104,7 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
         font_size = int(self.font_size_dropdown.get_value())
         line_width = int(self.line_width_dropdown.get_value())
         core_cnt = int(self.core_cnt_dropdown.get_value())
+        opacity = float(self.line_opacity_dropdown.get_value())
 
 
         style_attr = {
@@ -108,7 +113,8 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
             STYLE_FONT_SIZE: font_size,
             STYLE_LINE_WIDTH: line_width,
             STYLE_COLOR: self.line_clr_dropdown.getChoices(),
-            STYLE_YMAX: self.max_y_dropdown.getChoices()}
+            STYLE_YMAX: self.max_y_dropdown.getChoices(),
+            STYLE_OPACITY: opacity}
 
         if multiple:
             data_paths = list(self.files_found_dict.values())
@@ -140,5 +146,5 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
 
 
 
-#_ = VisualizeClassificationProbabilityPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+#_ = VisualizeClassificationProbabilityPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
 #_ = VisualizeClassificationProbabilityPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Two_animals_16bps/project_folder/project_config.ini')

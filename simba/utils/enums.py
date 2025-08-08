@@ -160,6 +160,7 @@ class Formats(Enum):
         FONT_REGULAR_BOLD = ('Poppins Bold', 13)
         FONT_LARGE = ('Poppins Regular', 15, "bold")
         FONT_LARGE_ITALICS = ('Poppins Regular', 15, "italic")
+        FONT_LARGE_BOLD = ('Poppins Regular', 15, "bold")
         FONT_PLAYWRITE = ('Playwrite ES Deco', 8)
         BUTTON_WIDTH_XS = 105
         BUTTON_WIDTH_S = 135
@@ -174,6 +175,7 @@ class Formats(Enum):
         FONT_HEADER = ('Poppins Regular', 10, "bold")
         FONT_LARGE = ('Poppins Regular', 13, "bold")
         FONT_LARGE_ITALICS = ('Poppins Regular', 13, "italic")
+        FONT_LARGE_BOLD = ('Poppins Regular', 13, "bold")
         FONT_PLAYWRITE = ('Playwrite ES Deco', 8)
         BUTTON_WIDTH_XS = 75
         BUTTON_WIDTH_S = 100
@@ -188,6 +190,7 @@ class Formats(Enum):
         FONT_HEADER = ('DejaVu Sans', 10, "bold")
         FONT_LARGE = ('DejaVu Sans', 13, "bold")
         FONT_LARGE_ITALICS = ('DejaVu Sans', 13, "italic")
+        FONT_LARGE_BOLD = ('DejaVu Sans', 13, "bold")
         BUTTON_WIDTH_XS = 105
         BUTTON_WIDTH_S = 135
         BUTTON_WIDTH_L = 310
@@ -467,6 +470,7 @@ class TagNames(Enum):
     GREETING = "greeting"
     COMPLETE = "complete"
     WARNING = "warning"
+    INFORMATION = "information"
     ERROR = "error"
     TRASH = "trash"
     STANDARD = "standard"

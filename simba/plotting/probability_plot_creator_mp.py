@@ -29,8 +29,10 @@ STYLE_FONT_SIZE = 'font size'
 STYLE_LINE_WIDTH = 'line width'
 STYLE_YMAX = 'y_max'
 STYLE_COLOR = 'color'
+AUTO = 'AUTO'
+STYLE_OPACITY = 'opacity'
 
-STYLE_ATTR = [STYLE_WIDTH, STYLE_HEIGHT, STYLE_FONT_SIZE, STYLE_LINE_WIDTH, STYLE_COLOR, STYLE_YMAX]
+STYLE_ATTR = [STYLE_WIDTH, STYLE_HEIGHT, STYLE_FONT_SIZE, STYLE_LINE_WIDTH, STYLE_COLOR, STYLE_YMAX, STYLE_OPACITY]
 
 def _probability_plot_mp(frm_range: Tuple[int, np.ndarray],
                          clf_data: np.ndarray,
@@ -48,6 +50,10 @@ def _probability_plot_mp(frm_range: Tuple[int, np.ndarray],
     group, data = frm_range[0], frm_range[1]
     start_frm, end_frm, current_frm = data[0], data[-1], data[0]
 
+    # Ensure y_max is a number, not a string
+    if style_attr[STYLE_YMAX] == AUTO:
+        style_attr[STYLE_YMAX] = float(np.max(clf_data))
+
     if video_setting:
         fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         video_save_path = os.path.join(video_dir, f"{group}.mp4")
@@ -56,16 +62,17 @@ def _probability_plot_mp(frm_range: Tuple[int, np.ndarray],
     while current_frm < end_frm:
         current_lst = [np.array(clf_data[0 : current_frm + 1])]
         current_frm += 1
-        img = PlottingMixin.make_line_plot_plotly(data=current_lst,
-                                                  colors=[style_attr[STYLE_COLOR]],
-                                                  width=style_attr[STYLE_WIDTH],
-                                                  height=style_attr[STYLE_HEIGHT],
-                                                  line_width=style_attr[STYLE_LINE_WIDTH],
-                                                  font_size=style_attr[STYLE_FONT_SIZE],
-                                                  y_lbl=f"{clf_name} probability",
-                                                  title=clf_name,
-                                                  y_max=style_attr[STYLE_YMAX],
-                                                  x_lbl='frame count')
+        img = PlottingMixin.make_line_plot(data=current_lst,
+                                                colors=[style_attr[STYLE_COLOR]],
+                                                width=style_attr[STYLE_WIDTH],
+                                                height=style_attr[STYLE_HEIGHT],
+                                                line_width=style_attr[STYLE_LINE_WIDTH],
+                                                font_size=style_attr[STYLE_FONT_SIZE],
+                                                line_opacity=style_attr[STYLE_OPACITY],
+                                                y_lbl=f"{clf_name} probability",
+                                                title=clf_name,
+                                                y_max=style_attr[STYLE_YMAX],
+                                                x_lbl='frame count')
 
         if video_setting:
             video_writer.write(img[:, :, :3])
@@ -157,20 +164,22 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
                 self.save_video_path = os.path.join(self.probability_plot_dir, f"{self.video_name}_{self.clf_name}.mp4")
 
             clf_data = data_df[self.probability_col].values
-            if self.style_attr[STYLE_YMAX] == 'auto': self.style_attr[STYLE_YMAX] = np.max(clf_data)
+            if self.style_attr[STYLE_YMAX] == 'AUTO':
+                self.style_attr[STYLE_YMAX] = float(np.max(clf_data))
             if self.last_frame:
                 final_frm_save_path = os.path.join(self.probability_plot_dir, f'{self.video_name}_{self.clf_name}_final_frm_{self.datetime}.png')
-                _ = PlottingMixin.make_line_plot_plotly(data=[clf_data],
-                                                        colors=[self.style_attr[STYLE_COLOR]],
-                                                        width=self.style_attr[STYLE_WIDTH],
-                                                        height=self.style_attr[STYLE_HEIGHT],
-                                                        line_width=self.style_attr[STYLE_LINE_WIDTH],
-                                                        font_size=self.style_attr[STYLE_FONT_SIZE],
-                                                        y_lbl=f"{self.clf_name} probability",
-                                                        y_max= self.style_attr[STYLE_YMAX],
-                                                        x_lbl='frame count',
-                                                        title=self.clf_name,
-                                                        save_path=final_frm_save_path)
+                _ = PlottingMixin.make_line_plot(data=[clf_data],
+                                                 colors=[self.style_attr[STYLE_COLOR]],
+                                                 width=self.style_attr[STYLE_WIDTH],
+                                                 height=self.style_attr[STYLE_HEIGHT],
+                                                 line_width=self.style_attr[STYLE_LINE_WIDTH],
+                                                 font_size=self.style_attr[STYLE_FONT_SIZE],
+                                                 y_lbl=f"{self.clf_name} probability",
+                                                 y_max=self.style_attr[STYLE_YMAX],
+                                                 x_lbl='frame count',
+                                                 title=self.clf_name,
+                                                 save_path=final_frm_save_path,
+                                                 line_opacity=self.style_attr[STYLE_OPACITY])
 
             if self.video_setting or self.frame_setting:
                 frm_nums = np.arange(0, len(data_df)+1)

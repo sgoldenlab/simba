@@ -62,6 +62,23 @@ def stdout_trash(msg: str, source: Optional[str] = "", elapsed_time: Optional[st
         print(f"SIMBA COMPLETE: {msg} {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.TRASH.value}")
 
 
+def stdout_information(msg: str, source: Optional[str] = "", elapsed_time: Optional[str] = None) -> None:
+    """
+    Helper to parse information msg to SimBA main interface. E.g., how many monitors and their resolutions which is available.
+
+    :param str msg: Message to be parsed.
+    :param Optional[str] source: Optional string indicating the source method or function of the operation for logging.
+    :param elapsed_time: Optional string indicating the runtime.
+    :return None:
+    """
+
+    log_event(logger_name=f"{source}.{stdout_trash.__name__}", log_type=TagNames.INFORMATION.value, msg=msg)
+    if elapsed_time:
+        print(f"SIMBA COMPLETE: {msg} (elapsed time: {elapsed_time}s) {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.INFORMATION.value}")
+    else:
+        print(f"{msg} {Defaults.STR_SPLIT_DELIMITER.value}{TagNames.INFORMATION.value}")
+
+
 class SimbaTimer(object):
     """Timer class for keeping track of start and end-times of calls"""
 

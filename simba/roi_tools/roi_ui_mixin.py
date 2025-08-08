@@ -47,9 +47,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.enums import OS, ROI_SETTINGS, Formats, Keys
 from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 NoROIDataError)
-from simba.utils.lookups import (create_color_palettes, get_color_dict,
-                                 get_display_resolution, get_img_resize_info, get_monitor_info)
-from simba.utils.printing import stdout_success
+from simba.utils.lookups import (create_color_palettes, get_color_dict, get_img_resize_info, get_monitor_info)
+from simba.utils.printing import stdout_success,stdout_information
 from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_frm_of_video)
 from simba.utils.warnings import DuplicateNamesWarning
 
@@ -123,7 +122,7 @@ class ROI_mixin(ConfigReader):
 
 
         self.monitor_info, (self.display_w, self.display_h) = get_monitor_info()
-        print(f'MONITOR INFO: {self.monitor_info}')
+        stdout_information(msg=f'AVAILABLE MONITOR(S): \n {self.monitor_info}')
         self.display_img_width, self.display_img_height, self.downscale_factor, self.upscale_factor = get_img_resize_info(img_size=(self.video_meta['width'], self.video_meta['height']), display_resolution=(self.display_w, self.display_h), max_height_ratio=self.max_draw_display_ratio_h, max_width_ratio=self.max_draw_display_ratio_w, min_height_ratio=self.min_draw_display_ratio_h, min_width_ratio=self.min_draw_display_ratio_w)
 
         if roi_coordinates_path is not None:

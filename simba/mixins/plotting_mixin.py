@@ -9,6 +9,7 @@ import cv2
 import imutils
 import matplotlib
 import matplotlib.pyplot as plt
+
 import numpy as np
 import pandas as pd
 import PIL
@@ -35,7 +36,7 @@ from simba.utils.checks import (
     check_valid_boolean, check_valid_dataframe, check_valid_lst,
     check_valid_tuple)
 from simba.utils.data import create_color_palette, detect_bouts
-from simba.utils.enums import Formats, Keys, Options
+from simba.utils.enums import Formats, Keys, Options, Paths
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
                                  get_named_colors)
@@ -43,6 +44,8 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data, read_df,
                                     read_frm_of_video, read_video_info)
+
+
 
 
 class PlottingMixin(object):
@@ -1122,23 +1125,21 @@ class PlottingMixin(object):
             return fig
 
     @staticmethod
-    def make_line_plot(
-        data: List[np.ndarray],
-        colors: List[str],
-        show_box: Optional[bool] = True,
-        width: Optional[int] = 640,
-        height: Optional[int] = 480,
-        line_width: Optional[int] = 6,
-        font_size: Optional[int] = 8,
-        bg_clr: Optional[str] = None,
-        x_lbl_divisor: Optional[float] = None,
-        title: Optional[str] = None,
-        y_lbl: Optional[str] = None,
-        x_lbl: Optional[str] = None,
-        y_max: Optional[int] = -1,
-        line_opacity: Optional[int] = 0.0,
-        save_path: Optional[Union[str, os.PathLike]] = None,
-    ):
+    def make_line_plot(data: List[np.ndarray],
+                        colors: List[str],
+                        show_box: Optional[bool] = True,
+                        width: Optional[int] = 640,
+                        height: Optional[int] = 480,
+                        line_width: Optional[int] = 6,
+                        font_size: Optional[int] = 8,
+                        bg_clr: Optional[str] = None,
+                        x_lbl_divisor: Optional[float] = None,
+                        title: Optional[str] = None,
+                        y_lbl: Optional[str] = None,
+                        x_lbl: Optional[str] = None,
+                        y_max: Optional[int] = -1,
+                        line_opacity: Optional[int] = 1.0,
+                        save_path: Optional[Union[str, os.PathLike]] = None):
 
         check_valid_lst(
             data=data,
@@ -1154,6 +1155,7 @@ class PlottingMixin(object):
             valid_dtypes=(str,),
             exact_len=len(data),
         )
+
         clr_dict = get_color_dict()
         matplotlib.font_manager._get_font.cache_clear()
         plt.close("all")
@@ -1166,9 +1168,7 @@ class PlottingMixin(object):
             line_clr = clr_dict[colors[i]][::-1]
             line_clr = tuple(x / 255 for x in line_clr)
             flat_data = data[i].flatten()
-            plt.plot(
-                flat_data, color=line_clr, linewidth=line_width, alpha=line_opacity
-            )
+            plt.plot( flat_data, color=line_clr, linewidth=line_width, alpha=line_opacity)
         max_x = max([len(x) for x in data])
         if y_max == -1:
             y_max = max([np.max(x) for x in data])

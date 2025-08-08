@@ -181,26 +181,13 @@ def get_emojis() -> Dict[str, str]:
     """
     python_version = str(f"{sys.version_info.major}.{sys.version_info.minor}")
     if python_version == "3.6":
-        return {
-            "thank_you": "".join(
-                chr(x) for x in struct.unpack(">2H", "\U0001f64f".encode("utf-16be"))
-            ),
-            "relaxed": "".join(
-                chr(x) for x in struct.unpack(">2H", "\U0001F600".encode("utf-16be"))
-            ),
-            "error": "".join(
-                chr(x) for x in struct.unpack(">2H", "\U0001F6A8".encode("utf-16be"))
-            ),
-            "complete": "".join(
-                chr(x) for x in struct.unpack(">2H", "\U0001F680".encode("utf-16be"))
-            ),
-            "warning": "".join(
-                chr(x) for x in struct.unpack(">2H", "\u2757\uFE0F".encode("utf-16be"))
-            ),
-            "trash": "".join(
-                chr(x) for x in struct.unpack(">2H", "\U0001F5D1".encode("utf-16be"))
-            ),
-        }
+        return {"thank_you": "".join(chr(x) for x in struct.unpack(">2H", "\U0001f64f".encode("utf-16be"))),
+                "relaxed": "".join(chr(x) for x in struct.unpack(">2H", "\U0001F600".encode("utf-16be"))),
+                "error": "".join(chr(x) for x in struct.unpack(">2H", "\U0001F6A8".encode("utf-16be"))),
+                "complete": "".join(chr(x) for x in struct.unpack(">2H", "\U0001F680".encode("utf-16be"))),
+                "warning": "".join(chr(x) for x in struct.unpack(">2H", "\u2757\uFE0F".encode("utf-16be"))),
+                "trash": "".join(chr(x) for x in struct.unpack(">2H", "\U0001F5D1".encode("utf-16be"))),
+                "information": "".join(chr(x) for x in struct.unpack(">2H", "\U0001F4DD".encode("utf-16be")))}  # 📝 memo
 
     elif python_version == "3.10" or python_version == "3.9":
         return {
@@ -210,6 +197,7 @@ def get_emojis() -> Dict[str, str]:
             "error": "\U0001F6A8".encode("utf-8", "replace").decode(),
             "complete": "\U0001F680".encode("utf-8", "replace").decode(),
             "trash": "\U0001F5D1".encode("utf-8", "replace").decode(),
+            "information": "\U0001F4DD".encode("utf-8", "replace").decode(),  # 📝 memo
         }
 
     elif python_version == "3.7":
@@ -229,9 +217,12 @@ def get_emojis() -> Dict[str, str]:
             "warning": "\u2757\uFE0F".encode("utf16", errors="surrogatepass").decode(
                 "utf16"
             ),
-            "trash": "\U0001F5D1F".encode("utf16", errors="surrogatepass").decode(
+            "trash": "\U0001F5D1".encode("utf16", errors="surrogatepass").decode(
                 "utf16"
             ),
+            "information": "\U0001F4DD".encode("utf16", errors="surrogatepass").decode(
+                "utf16"
+            ),  # 📝 memo
         }
 
     else:
@@ -241,8 +232,8 @@ def get_emojis() -> Dict[str, str]:
             "error": "\U0001F6A8",
             "complete": "\U0001F680",
             "trash": "\U0001F5D1",
+            "information": "\U0001F4DD",  # 📝 memo
         }
-
 
 def get_meta_data_file_headers() -> List[str]:
     """

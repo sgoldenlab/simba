@@ -75,14 +75,13 @@ class DataPlotterPopUp(PopUpMixin, ConfigReader):
         self.run_single_video_btn.grid(row=0, column=0, sticky=NW)
         self.single_video_dropdown.grid(row=0, column=1, sticky=NW)
 
-
         self.run_multiple_videos = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS", icon_name='stack', pady=5, padx=5, relief='solid')
         self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, img='rocket', txt=f"CREATE MULTIPLE VIDEOS ({len(self.outlier_corrected_paths)} video(s) found)", font=Formats.FONT_REGULAR.value, cmd=self._run, cmd_kwargs={'multiple': True})
 
         self.run_multiple_videos.grid(row=4, column=0, sticky=NW, pady=10, padx=10)
         self.run_multiple_video_btn.grid(row=0, column=0, sticky=NW)
 
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def _create_bp_menu(self, x):
         if hasattr(self, "bp_dropdowns"):
@@ -91,7 +90,7 @@ class DataPlotterPopUp(PopUpMixin, ConfigReader):
                 self.bp_colors[k].destroy()
         self.bp_dropdowns, self.bp_colors = {}, {}
         for animal_cnt in range(int(self.number_of_animals_dropdown.getChoices())):
-            self.bp_dropdowns[animal_cnt] = SimBADropDown(parent=self.body_parts_frm, dropdown_options=THICKNESS_OPTIONS, label=f"BODY-PART {animal_cnt+1}:", label_width=30, dropdown_width=20, value=self.body_parts_lst[animal_cnt])
+            self.bp_dropdowns[animal_cnt] = SimBADropDown(parent=self.body_parts_frm, dropdown_options=self.body_parts_lst, label=f"BODY-PART {animal_cnt+1}:", label_width=30, dropdown_width=20, value=self.body_parts_lst[animal_cnt])
             self.bp_colors[animal_cnt] = SimBADropDown(parent=self.body_parts_frm, dropdown_options=self.color_lst, label=f"", label_width=2, dropdown_width=20, value=self.color_lst[animal_cnt])
             self.bp_dropdowns[animal_cnt].grid(row=animal_cnt + 1, column=0, sticky=NW)
             self.bp_colors[animal_cnt].grid(row=animal_cnt + 1, column=1, sticky=NW)
@@ -141,5 +140,5 @@ class DataPlotterPopUp(PopUpMixin, ConfigReader):
 
         _ = data_plotter.run()
 
-# _ = DataPlotterPopUp(config_path=r'C:\troubleshooting\RAT_NOR\project_folder\project_config.ini')
+#_ = DataPlotterPopUp(config_path=r"C:\troubleshooting\SDS_pre_post\project_folder\project_config.ini")
 # _ = DataPlotterPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
