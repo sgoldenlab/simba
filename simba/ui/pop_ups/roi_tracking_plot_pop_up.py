@@ -20,8 +20,9 @@ from simba.utils.enums import ROI_SETTINGS, Formats, Keys, Links, Options
 from simba.utils.errors import NoDataError, ROICoordinatesNotFoundError
 from simba.utils.lookups import get_color_dict
 from simba.utils.read_write import (find_all_videos_in_directory,
+                                    find_core_cnt,
                                     find_files_of_filetypes_in_directory,
-                                    find_core_cnt, str_2_bool)
+                                    str_2_bool)
 
 BP_SIZE_OPTIONS = list(range(1, 101, 1))
 BP_SIZE_OPTIONS.insert(0, 'AUTO')
