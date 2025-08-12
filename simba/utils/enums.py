@@ -116,6 +116,7 @@ class Paths(Enum):
     UNSUPERVISED_MODEL_NAMES = Path("assets/lookups/model_names.parquet")
     CRITICAL_VALUES = Path("simba/assets/lookups/critical_values_05.pickle")
     BLOB_EXECUTOR_PATH = Path("video_processors/blob_tracking_executor.py")
+    KALEIDO_PATH = os.path.join(os.path.dirname(simba.__file__), 'kaleido', 'executable', 'bin', 'kaleido.exe')
 
 class OS(Enum):
     WINDOWS = "Windows"
@@ -209,6 +210,35 @@ class Formats(Enum):
         "ellipse": ["el.h5", "el_filtered.h5"],
     }
     EXPECTED_VIDEO_INFO_COLS = ["Video", "fps", "Resolution_width", "Resolution_height", "Distance_in_mm", "pixels/mm"]
+
+    SUPERANIMAL_TOPVIEW_BP_NAMES = ["nose",
+                                    "left_ear",
+                                    "right_ear",
+                                    "left_ear_tip",
+                                    "right_ear_tip",
+                                    "left_eye",
+                                    "right_eye",
+                                    "neck",
+                                    "mid_back",
+                                    "mouse_center",
+                                    "mid_backend",
+                                    "mid_backend2",
+                                    "mid_backend3",
+                                    "tail_base",
+                                    "tail1",
+                                    "tail2",
+                                    "tail3",
+                                    "tail4",
+                                    "tail5",
+                                    "left_shoulder",
+                                    "left_midside",
+                                    "left_hip",
+                                    "right_shoulder",
+                                    "right_midside",
+                                    "right_hip",
+                                    "tail_end",
+                                    "head_midpoint"]
+
 
 class Options(Enum):
     ROLLING_WINDOW_DIVISORS = [2, 5, 6, 7.5, 15]
@@ -318,6 +348,7 @@ class Options(Enum):
         "MAT (DANNCE 3D)",
         "CSV (SimBA BLOB)",
         "H5 (FaceMap)",
+        "H5 (SuperAnimal-TopView)",
     ]
     SMOOTHING_OPTIONS = ["Gaussian", "Savitzky Golay"]
     MULTI_DLC_TYPE_IMPORT_OPTION = ["skeleton", "box", "ellipse"]
@@ -383,6 +414,7 @@ class Options(Enum):
         "Multi-animals; 7 body-parts",
         "Multi-animals; 8 body-parts",
         "AMBER",
+        "SuperAnimal-TopView"
     ]
     THREE_DIM_TRACKING_OPTIONS = ["3D tracking"]
     TRAIN_TEST_SPLIT = ["FRAMES", "BOUTS"]

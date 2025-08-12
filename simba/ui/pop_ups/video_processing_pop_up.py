@@ -169,12 +169,13 @@ class CropVideoPopUp(PopUpMixin):
 
 class ClipVideoPopUp(PopUpMixin):
     def __init__(self):
-        super().__init__(title="CLIP VIDEO")
+        super().__init__(title="CLIP VIDEO", icon='clip')
         selected_video_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="Video path", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         selected_video = FileSelect(selected_video_frm, "FILE PATH: ", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         selected_video.grid(row=0, column=0, sticky="NW")
         use_gpu_frm = LabelFrame(self.main_frm, text="GPU", font=Formats.FONT_HEADER.value, padx=5, pady=5)
-        self.use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=use_gpu_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+        gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
+        self.use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=use_gpu_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2', state=gpu_available)
         self.use_gpu_cb.grid(row=0, column=0, sticky=NW)
         method_1_frm = LabelFrame(self.main_frm, text="Method 1", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         label_set_time_1 = Label(method_1_frm, text="Please enter the time frame in HH:MM:SS format", font=Formats.FONT_REGULAR.value)
@@ -240,16 +241,13 @@ class SuperImposeFrameCountPopUp(PopUpMixin):
         color_dict = list(get_color_dict().keys())
         font_dict = get_fonts()
 
-        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=settings_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
-        self.font_size_dropdown = DropDownMenu(settings_frm, "FONT SIZE:", list(range(1, 101, 2)), labelwidth=25)
-        self.font_color_dropdown = DropDownMenu(settings_frm, "FONT COLOR:", color_dict, labelwidth=25)
-        self.font_bg_color_dropdown = DropDownMenu(settings_frm, "FONT BACKGROUND COLOR:", color_dict, labelwidth=25)
-        self.font_dropdown = DropDownMenu(settings_frm, "FONT:", list(font_dict.keys()), labelwidth=25)
+        gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
+        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=settings_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2', state=gpu_available)
 
-        self.font_size_dropdown.setChoices('20')
-        self.font_color_dropdown.setChoices('Black')
-        self.font_bg_color_dropdown.setChoices('White')
-        self.font_dropdown.setChoices('Arial')
+        self.font_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=list(range(1, 101, 2)), label="FONT SIZE:", label_width=25, value=20)
+        self.font_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=color_dict, label="FONT COLOR:", label_width=25, value='Black')
+        self.font_bg_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=color_dict, label="FONT BACKGROUND COLOR:", label_width=25, value='White')
+        self.font_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=list(font_dict.keys()), label="FONT:", label_width=25, value='Arial')
 
         settings_frm.grid(row=0, column=0, sticky="NW")
         self.font_size_dropdown.grid(row=0, column=0, sticky="NW")
@@ -638,13 +636,10 @@ class MultiCropPopUp(PopUpMixin):
         self.input_folder = FolderSelect(self.main_frm, "INPUT VIDEO FOLDER: ", lblwidth=25)
         self.output_folder = FolderSelect(self.main_frm, "OUTPUT FOLDER: ", lblwidth=25)
         video_options = Options.ALL_VIDEO_FORMAT_OPTIONS_2.value
-        self.video_type_dropdown = DropDownMenu(self.main_frm, "INPUT VIDEO FORMAT: ", video_options, "25")
-        self.video_type_dropdown.setChoices("mp4")
-        self.crop_cnt_dropdown = DropDownMenu(self.main_frm, "CROPS PER VIDEO: ", list(range(2, 31)), "25")
-        self.crop_cnt_dropdown.setChoices(2)
+        self.video_type_dropdown = SimBADropDown(parent=self.main_frm, dropdown_options=video_options, label="INPUT VIDEO FORMAT: ", label_width=25, dropdown_width=25, value='mp4')
+        self.crop_cnt_dropdown = SimBADropDown(parent=self.main_frm, dropdown_options=list(range(2, 31)), label="CROPS PER VIDEO: ", label_width=25, dropdown_width=25, value=2)
         quality_options = list(percent_to_crf_lookup().keys())
-        self.quality_dropdown = DropDownMenu(self.main_frm, "CROP OUTPUT QUALITY: ", quality_options, "25")
-        self.quality_dropdown.setChoices(60)
+        self.quality_dropdown = SimBADropDown(parent=self.main_frm, dropdown_options=quality_options, label="CROP OUTPUT QUALITY: ", label_width=25, dropdown_width=25, value=60)
         self.use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=self.main_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
         self.create_run_frm(run_function=self.run)
         self.input_folder.grid(row=0, sticky=NW)
@@ -2392,23 +2387,16 @@ class SuperimposeTimerPopUp(PopUpMixin):
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.color_dict = get_color_dict()
         self.font_dict = get_fonts()
-        self.location_dropdown = DropDownMenu(settings_frm, "TIMER LOCATION:", list(self.LOCATIONS.keys()), labelwidth=25)
-        self.font_dropdown = DropDownMenu(settings_frm, "TIMER FONT:", list(self.font_dict.keys()), labelwidth=25)
-        self.font_size_dropdown = DropDownMenu(settings_frm, "FONT SIZE:", list(range(20, 100, 5)), labelwidth=25)
-        self.font_color_dropdown = DropDownMenu(settings_frm, "FONT COLOR:", list(self.color_dict.keys()), labelwidth=25)
-        self.font_border_dropdown = DropDownMenu(settings_frm, "FONT BORDER COLOR:", list(self.color_dict.keys()), labelwidth=25)
-        self.font_border_width_dropdown = DropDownMenu(settings_frm, "FONT BORDER WIDTH:", list(range(2, 52, 2)), labelwidth=25)
-        self.timer_format_dropdown = DropDownMenu(settings_frm, "TIME FORMAT:", ['MM:SS', 'HH:MM:SS', 'SS.MMMMMM', 'HH:MM:SS.MMMM'], labelwidth=25)
-        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
+        gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
 
-        self.location_dropdown.setChoices('TOP LEFT')
-        self.font_size_dropdown.setChoices(20)
-        self.font_dropdown.setChoices('Arial')
-        self.font_color_dropdown.setChoices('White')
-        self.font_border_dropdown.setChoices('Black')
-        self.font_border_width_dropdown.setChoices(2)
-        self.timer_format_dropdown.setChoices('HH:MM:SS.MMMM')
-        self.gpu_dropdown.setChoices('FALSE')
+        self.location_dropdown = SimBADropDown(parent=settings_frm, label="TIMER LOCATION:", dropdown_options=list(self.LOCATIONS.keys()), label_width=30, dropdown_width=35, value='TOP LEFT')
+        self.font_dropdown = SimBADropDown(parent=settings_frm, label="TIMER FONT:", dropdown_options=list(self.font_dict.keys()), label_width=30, dropdown_width=35, value='Arial')
+        self.font_size_dropdown = SimBADropDown(parent=settings_frm, label="FONT SIZE:", dropdown_options=list(range(20, 100, 5)), label_width=30, dropdown_width=35, value=20)
+        self.font_color_dropdown = SimBADropDown(parent=settings_frm, label="FONT COLOR:", dropdown_options=list(self.color_dict.keys()), label_width=30, dropdown_width=35, value='White')
+        self.font_border_dropdown = SimBADropDown(parent=settings_frm, label="FONT BORDER COLOR:", dropdown_options=list(self.color_dict.keys()), label_width=30, dropdown_width=35, value='Black')
+        self.font_border_width_dropdown = SimBADropDown(parent=settings_frm, label="FONT BORDER WIDTH:", dropdown_options=list(range(2, 52, 2)), label_width=30, dropdown_width=35, value=2)
+        self.timer_format_dropdown = SimBADropDown(parent=settings_frm, label="TIME FORMAT:", dropdown_options=['MM:SS', 'HH:MM:SS', 'SS.MMMMMM', 'HH:MM:SS.MMMM'], label_width=30, dropdown_width=35, value='HH:MM:SS.MMMM')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, label="USE GPU:", dropdown_options=['TRUE', 'FALSE'], label_width=30, dropdown_width=35, value='FALSE', state=gpu_available)
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.location_dropdown.grid(row=0, column=0, sticky=NW)
@@ -2454,15 +2442,18 @@ class SuperimposeTimerPopUp(PopUpMixin):
             data_path = self.selected_video_dir.folder_path
             check_if_dir_exists(in_dir=data_path)
 
-        threading.Thread(target=superimpose_elapsed_time(video_path=data_path,
-                                                         font=font,
-                                                         font_size=font_size,
-                                                         font_color=font_clr,
-                                                         font_border_color=font_border_clr,
-                                                         font_border_width=font_border_width,
-                                                         time_format=timer_format,
-                                                         position=loc,
-                                                         gpu=gpu)).start()
+        superimpose_elapsed_time(video_path=data_path,
+                                            font=font,
+                                            font_size=font_size,
+                                            font_color=font_clr,
+                                            font_border_color=font_border_clr,
+                                            font_border_width=font_border_width,
+                                            time_format=timer_format,
+                                            position=loc,
+                                            gpu=gpu)
+
+
+#SuperimposeTimerPopUp()
 
 
 class SuperimposeProgressBarPopUp(PopUpMixin):

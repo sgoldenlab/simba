@@ -135,7 +135,7 @@ class ProjectCreatorPopUp(PopUpMixin):
         #extract_frames_note.grid(row=0, column=0, sticky=NW)
         #extract_frames_btn.grid(row=1, column=0, sticky=NW)
         self.update_body_part_dropdown(Methods.CLASSIC_TRACKING.value)
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def __create_entry_boxes(self, cnt):
         for entry in self.clf_entry_boxes:

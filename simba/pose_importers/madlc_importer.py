@@ -77,9 +77,9 @@ class MADLCImporterH5(ConfigReader, PoseImporterMixin):
         self.interpolation_settings, self.smoothing_settings = interpolation_settings, smoothing_settings
         self.data_folder, self.id_lst = data_folder, id_lst
         self.import_log_path = os.path.join(self.logs_path, f"data_import_log_{self.datetime}.csv")
-        self.video_paths = find_all_videos_in_project(videos_dir=self.video_dir)
+        self.video_paths = find_all_videos_in_project(videos_dir=self.video_dir, raise_error=True if len(id_lst) > 1 else False)
         self.input_data_paths = self.find_data_files(dir=self.data_folder, extensions=Formats.DLC_FILETYPES.value[file_type])
-        self.data_and_videos_lk = self.link_video_paths_to_data_paths(data_paths=self.input_data_paths, video_paths=self.video_paths, str_splits=Formats.DLC_NETWORK_FILE_NAMES.value)
+        self.data_and_videos_lk = self.link_video_paths_to_data_paths(data_paths=self.input_data_paths, video_paths=self.video_paths, str_splits=Formats.DLC_NETWORK_FILE_NAMES.value, raise_error=True if len(id_lst) > 1 else False)
         if self.pose_setting is Methods.USER_DEFINED.value:
             self.__update_config_animal_cnt()
         if self.animal_cnt > 1:
@@ -104,10 +104,11 @@ class MADLCImporterH5(ConfigReader, PoseImporterMixin):
                     f"Make sure you have specified the correct number of animals and body-parts in your project. NOTE: The project body-parts is stored at {self.body_parts_path}."
                 )
             self.data_df.columns = self.bp_headers
-            self.out_df = deepcopy(self.data_df)
             if self.animal_cnt > 1:
                 self.initialize_multi_animal_ui(animal_bp_dict=self.animal_bp_dict, video_info=get_video_meta_data(video_data["VIDEO"]), data_df=self.data_df, video_path=video_data["VIDEO"])
                 self.multianimal_identification()
+            else:
+                self.out_df = self.insert_multi_idx_columns(df=self.data_df.fillna(0))
             self.save_path = os.path.join(os.path.join(self.input_csv_dir, f"{self.video_name}.{self.file_type}"))
             write_df(df=self.out_df, file_type=self.file_type, save_path=self.save_path, multi_idx_header=True)
             if self.interpolation_settings is not None:
@@ -119,7 +120,7 @@ class MADLCImporterH5(ConfigReader, PoseImporterMixin):
             video_timer.stop_timer()
             stdout_success(msg=f"Video {video_name} data imported...", elapsed_time=video_timer.elapsed_time_str)
         self.timer.stop_timer()
-        stdout_success(msg="All maDLC H5 data files imported", elapsed_time=self.timer.elapsed_time_str)
+        stdout_success(msg=f"All maDLC H5 data files imported to {self.input_csv_dir} directory", elapsed_time=self.timer.elapsed_time_str)
 
 
 # test = MADLCImporterH5(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',

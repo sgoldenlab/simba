@@ -3591,11 +3591,22 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
     font_dict = get_fonts()
     check_str(name='font', value=font, options=tuple(font_dict.keys()))
     font_path = font_dict[font]
-    time_format_map = {'MM:SS': '%{pts\\:mks}',
-                       'HH:MM:SS': '%{pts\\:hms}',
-                       'SS.MMMMMM': '%{pts}',
-                       'HH:MM:SS.MMMM': '%{pts\\:hms}.%{eif\\:mod(n\\,1000)\\:d\\:4}'}
-    position_map = { 'top_left': 'x=5:y=5', 'top_right': 'x=(w-tw-5):y=5', 'bottom_left': 'x=5:y=(h-th-5)', 'bottom_right': 'x=(w-tw-5):y=(h-th-5)', 'top_middle': 'x=(w-tw)/2:y=10', 'bottom_middle': 'x=(w-tw)/2:y=(h-th-10)'}
+    time_format_map = {
+        'MM:SS': '%{pts\\:mks}',
+        'HH:MM:SS': '%{pts\\:hms}',
+        'SS.MMMMMM': '%{pts}',
+        'HH:MM:SS.MMMM': '%{pts\\:hms}.%{eif\\:mod(n\\,1000)\\:d\\:4}'
+    }
+
+    position_map = {
+        'top_left': 'x=5:y=5',
+        'top_right': 'x=(w-tw-5):y=5',
+        'bottom_left': 'x=5:y=(h-th-5)',
+        'bottom_right': 'x=(w-tw-5):y=(h-th-5)',
+        'top_middle': 'x=(w-tw)/2:y=10',
+        'bottom_middle': 'x=(w-tw)/2:y=(h-th-10)'
+    }
+
     time_text = time_format_map[time_format]
     pos = position_map[position]
 
@@ -3604,19 +3615,31 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
     elif os.path.isdir(video_path):
         video_paths = list(find_all_videos_in_directory(directory=video_path, as_dict=True, raise_error=True).values())
     else:
-        raise InvalidInputError(msg=f'{video_path} is not a valid file path or a valid directory path', source=superimpose_elapsed_time.__name__)
+        raise InvalidInputError(
+            msg=f'{video_path} is not a valid file path or a valid directory path',
+            source=superimpose_elapsed_time.__name__
+        )
+
     if save_dir is not None:
         check_if_dir_exists(in_dir=save_dir)
     else:
         save_dir = os.path.dirname(video_paths[0])
+
     for file_cnt, video_path in enumerate(video_paths):
         _, video_name, ext = get_fn_ext(video_path)
         print(f'Superimposing time {video_name} (Video {file_cnt + 1}/{len(video_paths)})...')
         save_path = os.path.join(save_dir, f'{video_name}_time_superimposed{ext}')
+
+        # Escape Windows path for FFmpeg compatibility
+        font_path_escaped = font_path.replace('\\', '/') if os.name == 'nt' else font_path
+
+        vf_filter = f"drawtext=fontfile={font_path_escaped}:text='{time_text}':{pos}:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}"
+
         if not gpu:
-            cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text="{time_text}":{pos}:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -i "{video_path}" -vf "{vf_filter}" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
         else:
-            cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text="{time_text}":{pos}:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:v h264_nvenc -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -vf "{vf_filter}" -c:v h264_nvenc -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f'Super-imposed time on {len(video_paths)} video(s), saved in {save_dir}', elapsed_time=timer.elapsed_time_str)

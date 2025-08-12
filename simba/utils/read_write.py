@@ -1512,7 +1512,9 @@ def copy_multiple_videos_to_project(
     )
 
 
-def find_all_videos_in_project(videos_dir: Union[str, os.PathLike], basename: Optional[bool] = False) -> List[str]:
+def find_all_videos_in_project(videos_dir: Union[str, os.PathLike],
+                               basename: Optional[bool] = False,
+                               raise_error: bool = True) -> List[str]:
     """
     Get filenames of .avi and .mp4 files within a directory
 
@@ -1541,10 +1543,10 @@ def find_all_videos_in_project(videos_dir: Union[str, os.PathLike], basename: Op
             else:
                 video_paths.append(file_name)
     if len(video_paths) == 0:
-        raise NoFilesFoundError(
-            msg=f"No videos in mp4 or avi format found imported to SimBA project in the {videos_dir} directory",
-            source=find_all_videos_in_project.__name__,
-        )
+        if raise_error:
+            raise NoFilesFoundError(msg=f"No videos in mp4 or avi format found imported to SimBA project in the {videos_dir} directory", source=find_all_videos_in_project.__name__)
+        else:
+            return []
     else:
         return video_paths
 
@@ -1794,6 +1796,45 @@ def clean_sleap_file_name(filename: str) -> str:
             return filename
     else:
         return filename
+
+
+def clean_superanimal_topview_filename(file_name: str):
+
+    SUPERANIMAL_TOPVIEW = "_superanimal_topviewmouse_"
+    if (SUPERANIMAL_TOPVIEW in file_name.lower()):
+        filename_parts = file_name.split(SUPERANIMAL_TOPVIEW)
+        if len(filename_parts) >= 2:
+            return filename_parts[0]
+        else:
+            return file_name
+    else:
+        return file_name
+
+
+def read_dlc_superanimal_h5(path: Union[str, os.PathLike], col_names: List[str]) -> pd.DataFrame:
+    EXPECTED_KEYS = ['df_with_missing']
+    DF_W_MISSING = 'df_with_missing'
+    NESTED_EXPECTED_KEYS = ['_i_table', 'table']
+    check_file_exist_and_readable(file_path=path)
+    check_valid_lst(data=col_names, source=f'{read_dlc_superanimal_h5.__name__} col_names', valid_dtypes=(str,), min_len=1)
+    try:
+        pose_data = h5py.File(path, "r")
+    except Exception as e:
+        raise InvalidInputError(msg=f'The DLC file {path} could not be read as a valid H5 file: {e.args}', source=read_dlc_superanimal_h5.__name__)
+    pose_keys = list(pose_data.keys())
+    missing_keys = [x for x in EXPECTED_KEYS if x not in pose_keys]
+    if len(missing_keys) > 0:
+        raise InvalidInputError(msg=f'The file {path} does not contain the expected key(s) {missing_keys}. Is it a valid superanimal DLC h5 file?', source=read_dlc_superanimal_h5.__name__)
+    missing_keys = [x for x in NESTED_EXPECTED_KEYS if x not in pose_data[DF_W_MISSING]]
+    if len(missing_keys) > 0:
+        raise InvalidInputError(msg=f'The file {path} does not contain the expected key(s) {missing_keys}. Is it a valid superanimal DLC h5 file?', source=read_dlc_superanimal_h5.__name__)
+    data = pose_data[DF_W_MISSING]['table'][...]
+    data = pd.DataFrame([item[-1] for item in data])
+    if len(data.columns) < len(col_names):
+        raise InvalidInputError(msg=f'The file {path} does contains {len(data.columns)} columns. With your current project, SimBA expects this file to contain at least {len(col_names)} columns', source=read_dlc_superanimal_h5.__name__)
+    data = data.loc[:, :len(col_names)-1]
+    data.columns = col_names
+    return data
 
 
 def clean_sleap_filenames_in_directory(dir: Union[str, os.PathLike]) -> None:

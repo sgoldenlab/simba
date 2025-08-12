@@ -71,7 +71,7 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
         self.interpolation_settings, self.smoothing_settings = interpolation_settings, smoothing_settings
         self.data_folder, self.id_lst = data_folder, id_lst
         self.import_log_path = os.path.join(self.logs_path, f"data_import_log_{self.datetime}.csv")
-        self.video_paths = find_all_videos_in_project(videos_dir=self.video_dir)
+        self.video_paths = find_all_videos_in_project(videos_dir=self.video_dir, raise_error=True if len(id_lst) > 1 else False)
         self.input_data_paths = self.find_data_files(dir=self.data_folder, extensions=[".h5"])
         if self.pose_setting is Methods.USER_DEFINED.value:
             self.__update_config_animal_cnt()
@@ -142,7 +142,7 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
             video_timer.stop_timer()
             stdout_success(msg=f"Video {self.output_filename} data imported...", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
         self.timer.stop_timer()
-        stdout_success(msg="All SLEAP H5 data files imported", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+        stdout_success(msg=f"All SLEAP H5 data files imported to {self.input_csv_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
 
 

@@ -70,11 +70,17 @@ class PoseImporterMixin(object):
 
         return data_paths
 
+
+
+
+
+
     def link_video_paths_to_data_paths(self,
                                        data_paths: List[str],
                                        video_paths: List[str],
                                        str_splits: Optional[List[str]] = None,
-                                       filename_cleaning_func: Optional[object] = None) -> Dict[str, Dict[str, str]]:
+                                       filename_cleaning_func: Optional[object] = None,
+                                       raise_error: bool = True) -> Dict[str, Dict[str, str]]:
         """
         Given a list of paths to video files and a separate list of paths to data files, create a dictionary
         pairing each video file to a datafile based on the file names of the video and data file.
@@ -83,6 +89,7 @@ class PoseImporterMixin(object):
         :param List[str] video_paths: List of full paths to video files, e.g., MP4 or AVI files.
         :param Optional[List[str]] str_splits: Optional list of substrings that the data_paths would need to be split at in order to find a matching video name. E.g., ['dlc_resnet50'].
         :param Optional[object] filename_cleaning_func: Optional filename cleaning function that the data_paths filenames would have to pass through in order to find a matching video name. E.g., ``simba.utils.read_write.clean_sleap_filename(filepath)``.
+        :param bool raise_error: If True, raises an error if a video file representing a data file doesn't exist. If False, return None for the specific key.
         :returns dict: Dictionary with the data/file name as keys, and the video and data paths as values.
         """
 
@@ -101,9 +108,13 @@ class PoseImporterMixin(object):
                 data_file_names = [filename_cleaning_func(x) for x in data_file_names]
             video_idx = [i for i, x in enumerate(video_names) if x in data_file_names]
             if len(video_idx) == 0:
-                raise NoFilesFoundError(msg=f"SimBA could not locate a video file in your SimBA project for data file {data_file_name}", source=self.__class__.__name__)
-            _, video_name, _ = get_fn_ext(video_paths[video_idx[0]])
-            results[video_name] = {"DATA": data_path, "VIDEO": video_paths[video_idx[0]]}
+                if raise_error:
+                    raise NoFilesFoundError(msg=f"SimBA could not locate a video file in your SimBA project for data file {data_file_name}", source=self.__class__.__name__)
+                else:
+                    results[data_file_names[0]] = {"DATA": data_path, "VIDEO": None}
+            else:
+                _, video_name, _ = get_fn_ext(video_paths[video_idx[0]])
+                results[video_name] = {"DATA": data_path, "VIDEO": video_paths[video_idx[0]]}
         return results
 
     def get_x_y_loc_of_mouse_click(self, event, x, y, flags, param):

@@ -22,6 +22,7 @@ from simba.pose_importers.simba_blob_importer import SimBABlobImporter
 from simba.pose_importers.sleap_csv_importer import SLEAPImporterCSV
 from simba.pose_importers.sleap_h5_importer import SLEAPImporterH5
 from simba.pose_importers.sleap_slp_importer import SLEAPImporterSLP
+from simba.pose_importers.superanimal_import import SuperAnimalTopViewImporter
 from simba.pose_importers.trk_importer import TRKImporter
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, FileSelect, FolderSelect,
@@ -211,6 +212,16 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
                                             id_lst=animal_ids,
                                             interpolation_settings=interpolation_settings,
                                             smoothing_settings=smoothing_settings)
+
+
+        elif pose_estimation_tool == "H5 (SuperAnimal-TopView)":
+            data_importer = SuperAnimalTopViewImporter(config_path=self.config_path,
+                                                        data_folder=data_path,
+                                                        id_lst=animal_ids,
+                                                        interpolation_settings=interpolation_settings,
+                                                        smoothing_settings=smoothing_settings)
+
+
         else:
             raise InvalidInputError(msg=f'pose estimation tool {pose_estimation_tool} not recognized', source=self.__class__.__name__)
         data_importer.run()
@@ -311,7 +322,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
 
             if data_type_choice == "H5 (multi-animal DLC)":
                 self.tracking_type_frm = LabelFrame(self.choice_frm, text="TRACKING DATA TYPE", font=Formats.FONT_HEADER.value, pady=5, padx=5)
-                self.dlc_data_type_option_dropdown = DropDownMenu(self.tracking_type_frm, "TRACKING_TYPE", Options.MULTI_DLC_TYPE_IMPORT_OPTION.value, labelwidth=25)
+                self.dlc_data_type_option_dropdown = DropDownMenu(self.tracking_type_frm, "TRACKING TYPE", Options.MULTI_DLC_TYPE_IMPORT_OPTION.value, labelwidth=25)
                 self.dlc_data_type_option_dropdown.setChoices(Options.MULTI_DLC_TYPE_IMPORT_OPTION.value[1])
                 self.tracking_type_frm.grid(row=5, column=0, sticky=NW)
                 self.dlc_data_type_option_dropdown.grid(row=0, column=0, sticky=NW)
@@ -363,6 +374,17 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
                                                                                                                                        smoothing_window=self.smoothing_time_eb.entry_get,
                                                                                                                                        animal_names=self.animal_name_entry_boxes,
                                                                                                                                        data_path=self.data_dir_select.folder_path))
+            elif data_type_choice == "H5 (SuperAnimal-TopView)":
+                self.data_dir_select = FolderSelect(self.data_dir_frm, "H5 SuperAnimal DIRECTORY:", lblwidth=25)
+                self.instructions_lbl = Label(self.data_dir_frm, font=Formats.FONT_REGULAR.value, text="Please import videos before importing the H5 SuperAnimal tracking data \n IF you are tracking more than ONE animal")
+                self.run_btn = Button(self.import_frm, text="IMPORT SuperAnimal-Mouse-TopView H5", fg="blue", font=Formats.FONT_REGULAR.value, command=lambda: self.__multi_animal_run_call(pose_estimation_tool=data_type_choice,
+                                                                                                                                                                           interpolation_settings=self.interpolation_dropdown.getChoices(),
+                                                                                                                                                                           smoothing_settings=self.smoothing_dropdown.getChoices(),
+                                                                                                                                                                           smoothing_window=self.smoothing_time_eb.entry_get,
+                                                                                                                                                                           animal_names=self.animal_name_entry_boxes,
+                                                                                                                                                                           data_path=self.data_dir_select.folder_path))
+
+
 
             self.data_dir_frm.grid(row=self.frame_children(frame=self.choice_frm), column=0, sticky=NW)
             self.data_dir_select.grid(row=0, column=0, sticky=NW)

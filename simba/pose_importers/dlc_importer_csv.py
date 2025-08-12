@@ -128,4 +128,4 @@ def import_dlc_csv_data(config_path: Union[str, os.PathLike],
         smoother = Smoothing(config_path=config_path, data_path=imported_file_paths, time_window=smoothing_settings['time_window'], method=smoothing_settings['method'], multi_index_df_headers=True, copy_originals=False)
         smoother.run()
     timer.stop_timer()
-    stdout_success(msg=f"Imported {len(imported_file_paths)} pose estimation file(s) to directory", elapsed_time=timer.elapsed_time_str)
+    stdout_success(msg=f"Imported {len(imported_file_paths)} pose estimation file(s) to directory project cvs/input_csv", elapsed_time=timer.elapsed_time_str)

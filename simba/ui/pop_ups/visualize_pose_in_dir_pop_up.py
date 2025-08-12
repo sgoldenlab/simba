@@ -40,7 +40,7 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.keypoint_size_dropdown = SimBADropDown(parent=self.settings_frm, label='KEY-POINT SIZES', label_width=30, dropdown_width=20, value=AUTO, command=None, dropdown_options=KEYPOINT_SIZES)
         self.video_slice_dropdown = SimBADropDown(parent=self.settings_frm, label="VIDEO SECTION (SECONDS):", label_width=30, dropdown_width=20, value=ENTIRE_VIDEOS, command=None, dropdown_options=VIDEO_LENGTHS)
-        self.cpu_cnt_dropdown = SimBADropDown(parent=self.settings_frm, label="CPU COUNT:", label_width=30, dropdown_width=20, value=1, command=None, dropdown_options=list(range(1, find_core_cnt()[0])))
+        self.cpu_cnt_dropdown = SimBADropDown(parent=self.settings_frm, label="CPU COUNT:", label_width=30, dropdown_width=20, value=find_core_cnt()[1], command=None, dropdown_options=list(range(1, find_core_cnt()[0])))
         self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, label="USE GPU:", label_width=30, dropdown_width=20, value='FALSE', command=None, dropdown_options=['TRUE', 'FALSE'])
         self.save_dir = FolderSelect(self.settings_frm, "SAVE DIRECTORY: ", title="Select a data folder", lblwidth=30, initialdir=get_desktop_path())
         self.number_of_animals_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, 17)), label="NUMBER OF ANIMALS:", label_width=30, dropdown_width=20, command=self.__create_table, value=1)
