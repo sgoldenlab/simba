@@ -11,10 +11,10 @@ import cv2
 import simba
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.enums import Formats
-from simba.utils.lookups import gpu_quality_to_cpu_quality_lk, get_fonts
+from simba.utils.errors import PermissionError
+from simba.utils.lookups import get_fonts, gpu_quality_to_cpu_quality_lk
 from simba.utils.read_write import get_video_meta_data
 from simba.utils.warnings import CropWarning
-from simba.utils.errors import PermissionError
 
 
 class FFMPEGCommandCreator(object):
