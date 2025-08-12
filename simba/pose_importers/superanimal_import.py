@@ -1,5 +1,6 @@
 import os
 from typing import Dict, List, Optional, Union
+import numpy as np
 
 from simba.data_processors.interpolate import Interpolate
 from simba.data_processors.smoothing import Smoothing
@@ -27,11 +28,19 @@ class SuperAnimalTopViewImporter(PoseImporterMixin, ConfigReader):
 
        Trackes 27 body-parts on one or more mice recorded from zenith.
 
-    :paramstr config_path: path to SimBA project config file in Configparser format
+    .. image:: _static/img/superanimal_topview.png
+       :width: 150
+       :align: center
+
+    :param config_path: path to SimBA project config file in Configparser format
     :param str data_folder: Path to folder containing SuperAnimal data in ``.h5`` format.
     :param List[str] id_lst: Names of animals.
     :param Optional[Dict[str, str]] interpolation_setting: Dict defining the type and method to use to perform interpolation {'type': 'animals', 'method': 'linear'}.
     :param Optional[Dict[str, Union[str, int]]] smoothing_settings: Dictionary defining the pose estimation smoothing method {'time_window': 500, 'method': 'gaussian'}.
+
+    :references:
+        .. [1] Ye, Shaokai, Anastasiia Filippova, Jessy Lauer, et al. “SuperAnimal Pretrained Pose Estimation Models for Behavioral Analysis.” Nature Communications 15, no. 1 (2024): 5165. https://doi.org/10.1038/s41467-024-48792-2.
+        .. [2] mwmathis lab on huggingface - `https://huggingface.co/mwmathis/ <https://huggingface.co/mwmathis/>`_.
 
     :example:
     >>> importer = SuperAnimalTopViewImporter(config_path=r"C:\troubleshooting\super_animal_import\project_folder\project_config.ini", data_folder=r'C:\troubleshooting\super_animal_import\data_files', id_lst=['Animal_1'])
@@ -103,6 +112,8 @@ class SuperAnimalTopViewImporter(PoseImporterMixin, ConfigReader):
             else:
                 self.out_df = self.insert_multi_idx_columns(df=self.data_df.fillna(0))
             self.save_path = os.path.join(os.path.join(self.input_csv_dir, f"{self.video_name}.{self.file_type}"))
+            self.out_df = self.out_df.replace([np.inf, -np.inf], np.nan).fillna(0)
+            self.out_df[self.out_df < 0] = 0
             write_df(df=self.out_df, file_type=self.file_type, save_path=self.save_path, multi_idx_header=True)
             if self.interpolation_settings is not None:
                 interpolator = Interpolate(config_path=self.config_path, data_path=self.save_path, type=self.interpolation_settings['type'], method=self.interpolation_settings['method'], multi_index_df_headers=True, copy_originals=False)

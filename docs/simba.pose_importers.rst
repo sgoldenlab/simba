@@ -110,3 +110,10 @@ Impost FaceMap body-part tracking
 .. automodule:: simba.pose_importers.facemap_h5_importer.FaceMapImporter
    :members:
    :show-inheritance:
+
+Impost SuperAnimal-TopView Mouse body-part tracking
+-----------------------------------------
+
+.. automodule:: simba.pose_importers.superanimal_import.SuperAnimalTopViewImporter
+   :members:
+   :show-inheritance:
