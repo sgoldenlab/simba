@@ -633,19 +633,21 @@ class ROI_mixin(ConfigReader):
                              set_index: Optional[int] = 0,
                              set_str: Optional[str] = None):
 
-        dropdown.dropdown['values'] = new_options
-        dropdown.dropdown_var.set('')
-        if isinstance(set_index, int) and (0 <= set_index <= len(new_options) - 1):
-            dropdown.dropdown.set(new_options[set_index])
-        elif (set_str is not None) and (set_str in new_options):
-            dropdown.dropdown.set(set_str)
-        else:
-            dropdown.dropdown.set(new_options[0])
-        dropdown.set_width(width=max(5, max(len(s) for s in new_options)))
-        if dropdown.dropdown['values'] == ('',):
-            dropdown.disable()
-        else:
-            dropdown.enable()
+
+        dropdown.change_options(values=new_options, set_index=set_index, set_str=set_str)
+        # dropdown.dropdown['values'] = new_options
+        # dropdown.dropdown_var.set('')
+        # if isinstance(set_index, int) and (0 <= set_index <= len(new_options) - 1):
+        #     dropdown.dropdown.set(new_options[set_index])
+        # elif (set_str is not None) and (set_str in new_options):
+        #     dropdown.dropdown.set(set_str)
+        # else:
+        #     dropdown.dropdown.set(new_options[0])
+        # dropdown.set_width(width=max(5, max(len(s) for s in new_options)))
+        # if dropdown.dropdown['values'] == ('',):
+        #     dropdown.disable()
+        # else:
+        #     dropdown.enable()
 
     def delete_named_shape(self, name: str):
         self.set_btn_clrs(btn=self.delete_selected_btn)
@@ -723,16 +725,12 @@ class ROI_mixin(ConfigReader):
         self.change_attr_frm.iconphoto(False, self.menu_icons['edit_roi_large']["img"])
 
         self.change_attr_panel = LabelFrame(self.change_attr_frm, text="SHAPE ATTRIBUTES", font=Formats.FONT_HEADER.value, padx=5, pady=5)
-        self.change_attr_input_dropdown = DropDownMenu(self.change_attr_panel, "CHANGE SHAPE: ", self.roi_names, 25, com= lambda x: self._set_shape_attributes_from_selection(x))
-        self.change_attr_input_dropdown.setChoices(selected_roi_name)
-        self.new_shape_name_eb = Entry_Box(parent=self.change_attr_panel, fileDescription="NEW SHAPE NAME: ", labelwidth=25, entry_box_width=40)
-        self.new_shape_name_eb.entry_set(val=selected_roi_name)
-        self.new_thickness_dropdown = DropDownMenu(self.change_attr_panel, "NEW SHAPE THICKNESS: ", ROI_SETTINGS.SHAPE_THICKNESS_OPTIONS.value, 25)
-        self.new_thickness_dropdown.setChoices(self.roi_dict[selected_roi_name]['Thickness'])
-        self.new_color_dropdown = DropDownMenu(self.change_attr_panel, "NEW SHAPE COLOR: ", list(self.color_option_dict.keys()), 25)
-        self.new_color_dropdown.setChoices(self.roi_dict[selected_roi_name]['Color name'])
-        self.new_ear_tag_size_dropdown = DropDownMenu(self.change_attr_panel, "NEW EAR TAG SIZE: ", ROI_SETTINGS.EAR_TAG_SIZE_OPTIONS.value, 25)
-        self.new_ear_tag_size_dropdown.setChoices(self.roi_dict[selected_roi_name]['Ear_tag_size'])
+        self.change_attr_input_dropdown = SimBADropDown(parent=self.change_attr_panel, dropdown_options=self.roi_names, label="CHANGE SHAPE: ", label_width=25, command=lambda x: self._set_shape_attributes_from_selection(x), value=selected_roi_name)
+        self.new_shape_name_eb = Entry_Box(parent=self.change_attr_panel, fileDescription="NEW SHAPE NAME: ", labelwidth=25, entry_box_width=40, value=selected_roi_name)
+
+        self.new_thickness_dropdown = SimBADropDown(parent=self.change_attr_panel, dropdown_options=ROI_SETTINGS.SHAPE_THICKNESS_OPTIONS.value, label="NEW SHAPE THICKNESS: ", label_width=25, value=self.roi_dict[selected_roi_name]['Thickness'])
+        self.new_color_dropdown = SimBADropDown(parent=self.change_attr_panel, dropdown_options=list(self.color_option_dict.keys()), label="NEW SHAPE COLOR: ", label_width=25, value=self.roi_dict[selected_roi_name]['Color name'])
+        self.new_ear_tag_size_dropdown = SimBADropDown(parent=self.change_attr_panel, dropdown_options=ROI_SETTINGS.EAR_TAG_SIZE_OPTIONS.value, label="NEW EAR TAG SIZE: ", label_width=25, value=self.roi_dict[selected_roi_name]['Ear_tag_size'])
         self.change_attr_save_btn = SimbaButton(parent=self.change_attr_panel, txt='SAVE ATTRIBUTES', txt_clr='black', img='save_large', cmd=self.save_attr_changes)
         self.change_attr_panel.grid(row=0, sticky=NW)
         self.change_attr_input_dropdown.grid(row=0, column=0, sticky=NW)

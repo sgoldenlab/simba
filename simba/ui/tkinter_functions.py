@@ -590,6 +590,21 @@ class SimBADropDown(Frame):
     def set_width(self, width: int):
         self.dropdown.configure(width=width)
 
+    def change_options(self, values, set_index, set_str):
+        self.dropdown_var.set('')
+        self.dropdown['values'] = values
+        if isinstance(set_index, int) and (0 <= set_index <= len(values) - 1):
+            self.dropdown_var.set(values[set_index])
+        elif (set_str is not None) and (set_str in values):
+            self.dropdown_var.set(set_str)
+        else:
+            self.dropdown_var.set(values[0])
+        self.set_width(width=max(5, max(len(s) for s in values)))
+        if self.dropdown['values'] == ('',) or len(values) == 0:
+            self.disable()
+        else:
+            self.enable()
+
 
 class DropDownMenu(Frame):
     def __init__(self,

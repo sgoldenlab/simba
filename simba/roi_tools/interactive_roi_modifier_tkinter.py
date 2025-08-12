@@ -418,7 +418,7 @@ class InteractiveROIModifier():
                         polygon = Polygon(self.new_vertices)
                         self.polygon_area = polygon.area
                         valid_polygon = check_valid_polygon(polygon=polygon, raise_error=False)
-                        self.polygon_centroid = np.array(polygon.centroid).astype(int)
+                        #self.polygon_centroid = np.array(polygon.centroid).astype(int)
                         self.polygon_centroid = np.array([polygon.centroid.x, polygon.centroid.y]).astype(np.int32)
                         if valid_polygon:
                             self._select_polygon_vertice()

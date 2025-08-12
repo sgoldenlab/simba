@@ -11,9 +11,10 @@ import cv2
 import simba
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.enums import Formats
-from simba.utils.lookups import gpu_quality_to_cpu_quality_lk
+from simba.utils.lookups import gpu_quality_to_cpu_quality_lk, get_fonts
 from simba.utils.read_write import get_video_meta_data
 from simba.utils.warnings import CropWarning
+from simba.utils.errors import PermissionError
 
 
 class FFMPEGCommandCreator(object):
@@ -73,7 +74,11 @@ class FFMPEGCommandCreator(object):
     def create_process_dir(self):
         self.process_dir = os.path.join(self.temp_dir, "process_dir")
         if os.path.exists(self.process_dir):
-            shutil.rmtree(self.process_dir)
+            try:
+                shutil.rmtree(self.process_dir)
+            except PermissionError as e:
+                print(e.args)
+                raise PermissionError(msg=f'SimBA is not allowed to delete/manipulate {self.process_dir}. Are you doing batch processing on a VirtualDrive or Cloud storage? Try performing the batch processing on a local drive.', source=self.__class__.__name__)
         os.makedirs(self.process_dir)
 
     def find_relevant_videos(self, variable=None):
@@ -186,6 +191,8 @@ class FFMPEGCommandCreator(object):
     def apply_frame_count(self):
         self.videos_to_frm_cnt = self.find_relevant_videos(variable="frame_cnt")
         self.create_process_dir()
+        font_path = get_fonts()['Arial']
+        font_path = font_path.replace("\\", "/")
         for video, video_data in self.videos_to_frm_cnt.items():
             print(f"Applying frame count print {video}...")
             if video_data["last_operation"] == "frame_cnt":
@@ -195,10 +202,26 @@ class FFMPEGCommandCreator(object):
             )
             try:
                 if self.gpu:
-                    command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "drawtext==fontfile=Arial.ttf:text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor=white:box=1:boxcolor=white@0.5" -c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -y -hide_banner -loglevel error'
+                    command = (
+                        f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" '
+                        f'-vf "drawtext=fontfile=\'{font_path}\':text=\'%%{{n}}\':x=(w-tw)/2:y=h-th-10:fontcolor=white:box=1:boxcolor=white@0.5" '
+                        f'-c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -y -hide_banner -loglevel error'
+                    )
                 else:
-                    command = f'ffmpeg -i "{in_path}" -c:v {Formats.BATCH_CODEC.value} -crf {self.quality} -vf "drawtext=fontfile=Arial.ttf:text=\'%{{frame_num}}\':start_number=0:x=(w-tw)/2:y=h-(2*lh):fontcolor=black:fontsize=20:box=1:boxcolor=white:boxborderw=5" -c:a copy -y "{out_path}" -hide_banner -loglevel error'
-                subprocess.check_output(command, shell=True)
+                    command = [
+                        "ffmpeg",
+                        "-i", in_path,
+                        "-c:v", Formats.BATCH_CODEC.value,
+                        "-crf", str(self.quality),
+                        "-vf",
+                        f"drawtext=fontfile='{font_path}':text='%%{{frame_num}}':start_number=1:x=(w-tw)/2:y=h-(2*lh):fontcolor=black:fontsize=20:box=1:boxcolor=white:boxborderw=5",
+                        "-c:a", "copy",
+                        "-y",
+                        out_path,
+                        "-hide_banner",
+                        "-loglevel", "error",
+                    ]
+                    subprocess.check_output(command, shell=True)
                 subprocess.call(command, shell=True, stdout=subprocess.PIPE)
             except:
                 simba_cw = os.path.dirname(simba.__file__)

@@ -22,6 +22,8 @@ class SuperAnimalTopViewImporter(PoseImporterMixin, ConfigReader):
     .. note::
        For more information see the DeepLabCutModelZoo-SuperAnimal-TopViewMouse on huggingface https://huggingface.co/mwmathis/DeepLabCutModelZoo-SuperAnimal-TopViewMouse
 
+       Trackes 27 body-parts on one or more mice recorded from zenith.
+
     :paramstr config_path: path to SimBA project config file in Configparser format
     :param str data_folder: Path to folder containing SuperAnimal data in ``.h5`` format.
     :param List[str] id_lst: Names of animals.

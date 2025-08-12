@@ -54,9 +54,7 @@ class BatchProcessFrame(PopUpMixin):
     def __init__(
         self, input_dir: Union[str, os.PathLike], output_dir: Union[str, os.PathLike]
     ):
-        PopUpMixin.__init__(
-            self, title="BATCH PRE-PROCESS VIDEOS IN SIMBA", size=(2400, 600)
-        )
+        PopUpMixin.__init__(self, title="BATCH PRE-PROCESS VIDEOS IN SIMBA", size=(2400, 600), icon='factory')
         self.input_dir, self.output_dir = input_dir, output_dir
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
@@ -673,18 +671,14 @@ class BatchProcessFrame(PopUpMixin):
         ffmpeg_runner.apply_clahe()
         ffmpeg_runner.move_all_processed_files_to_output_folder()
         timer.stop_timer()
-        stdout_success(
-            msg=f"SimBA batch pre-process JSON saved at {self.save_path}",
-            source=self.__class__.__name__,
-        )
-        stdout_success(
-            msg=f"Video batch pre-processing complete, new videos stored in {self.output_dir}",
+        stdout_success(msg=f"SimBA batch pre-process JSON saved at {self.save_path}", source=self.__class__.__name__)
+        stdout_success(msg=f"Video batch pre-processing complete, new videos stored in {self.output_dir}",
             elapsed_time=timer.elapsed_time_str,
             source=self.__class__.__name__,
         )
 
 
-# test = BatchProcessFrame(input_dir=r'C:\Users\sroni\OneDrive\Desktop', output_dir=r"C:\Users\sroni\OneDrive\Desktop\edited")
+# test = BatchProcessFrame(input_dir=r'C:\troubleshooting\videos', output_dir=r"C:\troubleshooting\out")
 # test.create_main_window()
 # test.create_video_table_headings()
 # test.create_video_rows()
