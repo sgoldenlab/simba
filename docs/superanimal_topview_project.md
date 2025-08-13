@@ -21,7 +21,7 @@ Once selected, click the <kbd>CREATE PROJECT CONFIG</kbd> button to create the p
 After clicking on the <kbd>CREATE PROJECT CONFIG</kbd> button, head to the [`IMPORT VIDEOS`] tab to import the videos representing your SuperAnimal-Topview data into your new SuperAnimal-Topview SimBA project:
 For more information on video import, see the [Scenario 1 documentation](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config). 
 
-The import of videos is not a strict requirement, but recommended, for amongst others, visualization puposes and the ability to read video meta data relevant for data smoothing if selected (see next step).
+The import of videos is not a strict requirement, but recommended, for amongst others, visualization puposes and the ability to read video meta data relevant for data smoothing if selected (see next step). If you have many animals tracked, it is required as we physically have to identify each track across videos with an ID.
 
 <img width="743" height="400" alt="image" src="https://github.com/user-attachments/assets/03182aff-189a-4b97-a69b-3b87bbf58be8" />
 
