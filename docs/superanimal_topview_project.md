@@ -1,4 +1,4 @@
-# FaceMap data in SimBA
+# SuperAnimal-Topview data in SimBA
 
 ### CREATE A SuperAnimal-Topview PROJECT IN SIMBA
 
@@ -18,7 +18,7 @@ Once selected, click the <kbd>CREATE PROJECT CONFIG</kbd> button to create the p
 
 ### IMPORT SuperAnimal-Topview VIDEOS TO YOU SIMBA PROJECT
 
-After clicking on the <kbd>CREATE PROJECT CONFIG</kbd> button, head to the [`IMPORT VIDEOS`] tab to import the videos representing your FaceMap data into your new FaceMap SimBA project:
+After clicking on the <kbd>CREATE PROJECT CONFIG</kbd> button, head to the [`IMPORT VIDEOS`] tab to import the videos representing your SuperAnimal-Topview data into your new SuperAnimal-Topview SimBA project:
 For more information on video import, see the [Scenario 1 documentation](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-1-generate-project-config). 
 
 The import of videos is not a strict requirement, but recommended, for amongst others, visualization puposes and the ability to read video meta data relevant for data smoothing if selected (see next step).
@@ -43,7 +43,7 @@ smoothing section in the [Scenario 1 tutorial](https://github.com/sgoldenlab/sim
 (iii) Next, select the number of animals beeing tracked in your SuperAnimal-Topview tracking data, and give them names.
 
 (iv) Next, to import a directory of SuperAnimal-Topview H5 files, select a directory containing `.h5` files and hit the import button. Alternatively, to import a single SuperAnimal-Topview tracking data `.h5` file, go to the labelframe
-`IMPORT FACEMAP h5 file` and hit the import single file button. You can follow the progress in the main SImBA terminal. 
+`IMPORT SuperAnimal-Topview h5 file` and hit the import single file button. You can follow the progress in the main SImBA terminal. 
 
 (v) If you are tracking multiple animals using SuperAnimal-Topview, then you will be assigned track identities manually, as described [HERE](https://github.com/sgoldenlab/simba/blob/master/docs/Multi_animal_pose.md).
 
