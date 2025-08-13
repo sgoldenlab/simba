@@ -1337,7 +1337,7 @@ def body_part_interpolator(df: pd.DataFrame,
     check_valid_dataframe(df=df, source=source, valid_dtypes=Formats.NUMERIC_DTYPES.value)
     check_str(name='method', value=method, options=('nearest', 'linear', 'quadratic'), raise_error=True)
 
-    df = df.fillna(0).clip(lower=0).astype(np.int32)
+    df = df.fillna(0).clip(lower=0).astype(np.float32)
     for animal in animal_bp_dict:
         check_if_keys_exist_in_dict(data=animal_bp_dict[animal], key=["X_bps", "Y_bps"])
         for x_bps_name, y_bps_name in zip(animal_bp_dict[animal]["X_bps"], animal_bp_dict[animal]["Y_bps"]):

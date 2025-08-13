@@ -296,14 +296,14 @@ def get_ear_tags_for_rectangle(center: Tuple[int, int], width: int, height: int)
     check_int(name='width', value=width, min_value=1)
     check_int(name='height', value=height, min_value=1)
     tags = {}
-    tags['Top left tag'] = (int((center[1] - (width/2))), int(center[0] - (height/2)))
-    tags['Bottom right tag'] = (int(center[1] + (width/2)), int(center[0] + (height/2)))
-    tags['Top right tag'] = (int(center[1] + (width/2)), int(center[0] - (height/2)))
-    tags['Bottom left tag'] = (int(center[1] - (width / 2)), int(center[0] + (height / 2)))
-    tags['Top tag'] = (int(center[1]), int(center[0] - (height / 2)))
-    tags['Right tag'] = (int(center[1] + (width / 2)), int(center[0]))
-    tags['Left tag'] = (int(center[1] - (width / 2)), int(center[0]))
-    tags['Bottom tag'] = (int(center[1]), int(center[0] + (height / 2)))
+    tags['Top left tag'] = (round((center[1] - (width/2))), round(center[0] - (height/2)))
+    tags['Bottom right tag'] = (round(center[1] + (width/2)), round(center[0] + (height/2)))
+    tags['Top right tag'] = (round(center[1] + (width/2)), round(center[0] - (height/2)))
+    tags['Bottom left tag'] = (round(center[1] - (width / 2)), round(center[0] + (height / 2)))
+    tags['Top tag'] = (round(center[1]), round(center[0] - (height / 2)))
+    tags['Right tag'] = (round(center[1] + (width / 2)), round(center[0]))
+    tags['Left tag'] = (round(center[1] - (width / 2)), round(center[0]))
+    tags['Bottom tag'] = (round(center[1]), round(center[0] + (height / 2)))
     return tags
 
 
@@ -331,8 +331,8 @@ def get_vertices_hexagon(center: Tuple[int, int],
 
     vertices_dict = {"Center_tag": (center[0], center[1])}
     for tag_id, tag in enumerate(vertices):
-        vertices_dict[f"Tag_{tag_id}"] = (int(tag[0]), int(tag[1]))
-    return (np.array(vertices).astype(np.int32), vertices_dict)
+        vertices_dict[f"Tag_{tag_id}"] = (round(tag[0]), round(tag[1]))
+    return (np.round(np.array(vertices)).astype(np.int32), vertices_dict)
 
 
 def get_half_circle_vertices(center: Tuple[int, int],
@@ -372,13 +372,14 @@ def get_half_circle_vertices(center: Tuple[int, int],
     else:
         a = np.linspace(np.pi, 2 * np.pi, n_points)
     x, y = x_c + radius * np.cos(a), y_c + radius * np.sin(a)
-    vertices = np.column_stack((x, y)).astype(np.int32)
-    shape_center = np.array(Polygon(vertices).centroid.coords)[0].astype(np.int32)
+    vertices = np.round(np.column_stack((x, y))).astype(np.int32)
+    shape_center = np.round(np.array(Polygon(vertices).centroid.coords)[0]).astype(np.int32)
     vertices_dict = {"Center_tag": (shape_center[0], shape_center[1])}
 
     for tag_id in range(vertices.shape[0]):
         vertices_dict[f"Tag_{tag_id}"] = (vertices[tag_id][0], vertices[tag_id][1])
-    return (np.array(vertices).astype(np.int32), vertices_dict)
+    return (np.round(np.array(vertices)).astype(np.int32), vertices_dict)
+
 
 
 def get_triangle_vertices(center: Tuple[int, int], side_length: int, direction: int) -> Tuple[np.ndarray, Dict[str, Tuple[int, int]]]:
@@ -401,7 +402,7 @@ def get_triangle_vertices(center: Tuple[int, int], side_length: int, direction: 
     top_vertex = (center[0] + radius * np.cos(direction_radians), center[1] + radius * np.sin(direction_radians))
     vertex2 = (center[0] + radius * np.cos(direction_radians + np.radians(120)), center[1] + radius * np.sin(direction_radians + np.radians(120)))
     vertex3 = (center[0] + radius * np.cos(direction_radians + np.radians(-120)), center[1] + radius * np.sin(direction_radians + np.radians(-120)))
-    vertices = np.array([top_vertex, vertex2, vertex3, top_vertex]).astype(np.int32)
+    vertices = np.round(np.array([top_vertex, vertex2, vertex3, top_vertex])).astype(np.int32)
     vertices_dict = {"Center_tag": (int(center[0]), int(center[1])), 'Tag_0':  (int(top_vertex[0]), int(top_vertex[1])), 'Tag_1': (int(vertex2[0]), int(vertex2[1])), 'Tag_2': (int(vertex3[0]), int(vertex3[1]))}
     return (vertices, vertices_dict)
 
@@ -567,7 +568,7 @@ def get_pose_for_roi_ui(pose_path: Union[str, os.PathLike],
         FrameRangeWarning(msg=f'Cannot plot tracking in ROI window: The data contains {len(pose_path)} frames and the video has {video_meta_data["frame_count"]} frames', source=get_pose_for_roi_ui.__name__)
         return None
     pose_df = pose_df.drop(pose_df.columns[2::3], axis=1)
-    pose_data = pose_df.values.reshape(len(pose_df), int(len(pose_df.columns) / 2), 2).astype(np.int32)
+    pose_data = pose_df.values.reshape(len(pose_df), round(len(pose_df.columns) / 2), 2).astype(np.int32)
     valid_pose = check_valid_array(data=pose_data, source=f'{get_pose_for_roi_ui.__name__} pose_data', accepted_ndims=(3,), accepted_axis_0_shape=[video_meta_data['frame_count']], accepted_dtypes=Formats.INTEGER_DTYPES.value, raise_error=False)
     if not valid_pose:
         FrameRangeWarning(msg=f'Cannot plot tracking in ROI window: The pose data from path {pose_path} is not a 3D numeric array with length {video_meta_data["frame_count"]}', source=get_pose_for_roi_ui.__name__)
@@ -584,7 +585,7 @@ def insert_gridlines_on_roi_img(img: np.ndarray,
     else:
         try:
             for polygon in grid:
-                cords = np.array(polygon.exterior.coords).astype(np.int32)
+                cords = np.round(np.array(polygon.exterior.coords)).astype(np.int32)
                 img = cv2.polylines(img=img, pts=[cords], isClosed=True, color=color, thickness=thickness, lineType=8)
             return img
         except Exception as e:

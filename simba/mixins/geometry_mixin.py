@@ -3003,7 +3003,7 @@ class GeometryMixin(object):
         >>> GeometryMixin.bucket_img_into_grid_points(point_distance=20, px_per_mm=4, img_size=img.shape, border_sites=False)
         """
 
-        point_distance = int(point_distance * px_per_mm)
+        point_distance = round(point_distance * px_per_mm)
         v_bin_cnt, h_bin_cnt = divmod(img_size[0], point_distance), divmod(img_size[1], point_distance)
         if h_bin_cnt[1] != 0:
             h_bin_cnt = (h_bin_cnt[0] + 1, h_bin_cnt[1])
@@ -3071,7 +3071,7 @@ class GeometryMixin(object):
         if bucket_grid_size_mm is not None:
             check_float(name=f"{GeometryMixin.bucket_img_into_grid_square.__name__} bucket_size_mm",
                         value=bucket_grid_size_mm, )
-            bin_size_px = int(px_per_mm * bucket_grid_size_mm)
+            bin_size_px = round(px_per_mm * bucket_grid_size_mm)
             h_bin_cnt, v_bin_cnt = divmod(img_size[0], bin_size_px), divmod(img_size[1], bin_size_px)
             if (img_size[0] < bin_size_px) or (img_size[1] < bin_size_px):
                 raise InvalidInputError(

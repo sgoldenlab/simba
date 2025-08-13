@@ -81,3 +81,6 @@ class InterpolatePopUp(PopUpMixin, ConfigReader):
                                    copy_originals=copy_originals,
                                    multi_index_df_headers=multi_index_df_headers)
         interpolator.run()
+
+
+#InterpolatePopUp(config_path=r"C:\troubleshooting\my_project_tutorial\project_folder\project_config.ini")

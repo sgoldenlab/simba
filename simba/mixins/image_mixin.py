@@ -1958,7 +1958,7 @@ class ImageMixin(object):
         >>> resized_img = resize_img_stack(imgs=imgs)
         """
 
-        Nh, Nw = int(imgs.shape[1] * scale_factor), int(imgs.shape[2] * scale_factor)
+        Nh, Nw = round(imgs.shape[1] * scale_factor), round(imgs.shape[2] * scale_factor)
         results = np.empty((imgs.shape[0], Nh, Nw), dtype=imgs.dtype)
         for t in prange(imgs.shape[0]):
             for i in range(Nh):

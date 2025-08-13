@@ -761,18 +761,18 @@ def get_img_resize_info(img_size: Tuple[int ,int],
 
     if display_resolution is None:
         _, display_resolution = get_monitor_info()
-    max_width = int(display_resolution[0] * max_width_ratio)
-    max_height = int(display_resolution[1] * max_height_ratio)
-    min_width = int(display_resolution[0] * min_width_ratio)
-    min_height = int(display_resolution[1] * min_height_ratio)
+    max_width = round(display_resolution[0] * max_width_ratio)
+    max_height = round(display_resolution[1] * max_height_ratio)
+    min_width = round(display_resolution[0] * min_width_ratio)
+    min_height = round(display_resolution[1] * min_height_ratio)
 
     if img_size[1] > max_width or img_size[0] > max_height:
         width_ratio = max_width / img_size[0]
         height_ratio = max_height / img_size[1]
         downscale_factor = min(width_ratio, height_ratio)
         upscale_factor = 1 / downscale_factor
-        new_width = int(img_size[0] * downscale_factor)
-        new_height = int(img_size[1] * downscale_factor)
+        new_width = round(img_size[0] * downscale_factor)
+        new_height = round(img_size[1] * downscale_factor)
         return new_width, new_height, downscale_factor, upscale_factor
 
 
@@ -780,8 +780,8 @@ def get_img_resize_info(img_size: Tuple[int ,int],
         width_ratio = min_width / img_size[0]
         height_ratio = min_height / img_size[1]
         scale = max(width_ratio, height_ratio)  # ensures both dimensions meet or exceed min
-        new_width = int(round(img_size[0] * scale))
-        new_height = int(round(img_size[1] * scale))
+        new_width = round(round(img_size[0] * scale))
+        new_height = round(round(img_size[1] * scale))
         return new_width, new_height, scale, 1 / scale
 
     else:

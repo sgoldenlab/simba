@@ -57,7 +57,7 @@ from simba.utils.warnings import DuplicateNamesWarning
 WINDOW_SIZE_OPTIONS = [round(x * 0.05, 2) for x in range(21)]
 
 MAX_DRAW_UI_DISPLAY_RATIO = (0.5, 0.75) #(0.5, 0.75)  # W, H - THE INTERFACE IMAGE DISPLAY WILL BE DOWN-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS OR EXCEEDS OF THESE CRITERA. E.G (0.5, 0.75) MEANS IMAGES WILL COVER NO MORE THAN HALF THE DISPLAY WIDTH AND 3/4 OF THE DISPLAY HEIGHT.
-MIN_DRAW_UI_DISPLAY_RATIO = (0.30, 0.60) #0.30, 0.60 W, H - THE INTERFACE IMAGE DISPLAY WILL BE UP-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS AND EXCEEDS BOTH CRITERIA. E.G (0.25, 0.25) MEANS IMAGES WILL COVER NO MORE THAN A QUARTER OF THE USERS DISPLAY HEIGHT AND NO MORE THAN A QUARTER OF THE USERS DISPLAY WIDTH.
+MIN_DRAW_UI_DISPLAY_RATIO = (0.2, 0.2) #0.30, 0.60 W, H - THE INTERFACE IMAGE DISPLAY WILL BE UP-SCALED, PRESERVING THE ASPECT RATIO, UNTIL IT MEETS AND EXCEEDS BOTH CRITERIA. E.G (0.25, 0.25) MEANS IMAGES WILL COVER NO MORE THAN A QUARTER OF THE USERS DISPLAY HEIGHT AND NO MORE THAN A QUARTER OF THE USERS DISPLAY WIDTH.
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"
 SHAPE_TYPE = 'Shape_type'
@@ -177,62 +177,67 @@ class ROI_mixin(ConfigReader):
         if not nesting:
             for roi_name, roi_data in roi_dict.items():
                 if roi_data[SHAPE_TYPE] == ROI_SETTINGS.RECTANGLE.value:
-                    new_roi_dict[roi_name][TL_X] = int(roi_data[TL_X] * scale_factor)
-                    new_roi_dict[roi_name][TL_Y] = int(roi_data[TL_Y] * scale_factor)
-                    new_roi_dict[roi_name][BR_X] = int(roi_data[BR_X] * scale_factor)
-                    new_roi_dict[roi_name][BR_Y] = int(roi_data[BR_Y] * scale_factor)
-                    new_roi_dict[roi_name][CENTER_X] = int(roi_data[CENTER_X] * scale_factor)
-                    new_roi_dict[roi_name][CENTER_Y] = int(roi_data[CENTER_Y] * scale_factor)
-                    new_roi_dict[roi_name][WIDTH] = int(new_roi_dict[roi_name][BR_X] - new_roi_dict[roi_name][TL_X])
-                    new_roi_dict[roi_name][HEIGHT] = int(new_roi_dict[roi_name][BR_Y] - new_roi_dict[roi_name][TL_Y])
+                    new_roi_dict[roi_name][TL_X] = round(roi_data[TL_X] * scale_factor)
+                    new_roi_dict[roi_name][TL_Y] = round(roi_data[TL_Y] * scale_factor)
+                    new_roi_dict[roi_name][BR_X] = round(roi_data[BR_X] * scale_factor)
+                    new_roi_dict[roi_name][BR_Y] = round(roi_data[BR_Y] * scale_factor)
+                    new_roi_dict[roi_name][CENTER_X] = round(roi_data[CENTER_X] * scale_factor)
+                    new_roi_dict[roi_name][CENTER_Y] = round(roi_data[CENTER_Y] * scale_factor)
+                    new_roi_dict[roi_name][WIDTH] = round(new_roi_dict[roi_name][BR_X] - new_roi_dict[roi_name][TL_X])
+                    new_roi_dict[roi_name][HEIGHT] = round(new_roi_dict[roi_name][BR_Y] - new_roi_dict[roi_name][TL_Y])
                     for tag in roi_data[TAGS].keys():
-                        new_roi_dict[roi_name][TAGS][tag] = (int(roi_data[TAGS][tag][0] * scale_factor), int(roi_data[TAGS][tag][1] * scale_factor))
+                        new_roi_dict[roi_name][TAGS][tag] = (round(roi_data[TAGS][tag][0] * scale_factor), round(roi_data[TAGS][tag][1] * scale_factor))
                 elif roi_data[SHAPE_TYPE] == ROI_SETTINGS.CIRCLE.value:
-                    new_roi_dict[roi_name][CIRCLE_C_X] = int(roi_data[CIRCLE_C_X] * scale_factor)
-                    new_roi_dict[roi_name][CIRCLE_C_Y] = int(roi_data[CIRCLE_C_Y] * scale_factor)
-                    new_roi_dict[roi_name][RADIUS] = int(roi_data[RADIUS] * scale_factor)
+                    new_roi_dict[roi_name][CIRCLE_C_X] = round(roi_data[CIRCLE_C_X] * scale_factor)
+                    new_roi_dict[roi_name][CIRCLE_C_Y] = round(roi_data[CIRCLE_C_Y] * scale_factor)
+                    new_roi_dict[roi_name][RADIUS] = round(roi_data[RADIUS] * scale_factor)
                     for tag in roi_data[TAGS].keys():
-                        new_roi_dict[roi_name][TAGS][tag] = (int(roi_data[TAGS][tag][0] * scale_factor), int(roi_data[TAGS][tag][1] * scale_factor))
+                        new_roi_dict[roi_name][TAGS][tag] = (round(roi_data[TAGS][tag][0] * scale_factor), round(roi_data[TAGS][tag][1] * scale_factor))
                 elif roi_data[SHAPE_TYPE] == ROI_SETTINGS.POLYGON.value:
-                    new_roi_dict[roi_name][CENTER_X] = int(roi_data[CENTER_X] * scale_factor)
-                    new_roi_dict[roi_name][CENTER_Y] = int(roi_data[CENTER_Y] * scale_factor)
+                    new_roi_dict[roi_name][CENTER_X] = round(roi_data[CENTER_X] * scale_factor)
+                    new_roi_dict[roi_name][CENTER_Y] = round(roi_data[CENTER_Y] * scale_factor)
                     new_roi_dict[roi_name][CENTER] = (new_roi_dict[roi_name][CENTER_X], new_roi_dict[roi_name][CENTER_Y])
                     for tag in roi_data[TAGS].keys():
-                        new_roi_dict[roi_name][TAGS][tag] = (int(roi_data[TAGS][tag][0] * scale_factor), int(roi_data[TAGS][tag][1] * scale_factor))
+                        new_roi_dict[roi_name][TAGS][tag] = (round(roi_data[TAGS][tag][0] * scale_factor), round(roi_data[TAGS][tag][1] * scale_factor))
                     new_vertices = np.full_like(a=roi_data[VERTICES], fill_value=0, dtype=np.int32)
                     for vertice_idx in range(roi_data[VERTICES].shape[0]):
-                        new_vertices[vertice_idx][0], new_vertices[vertice_idx][1] = roi_data[VERTICES][vertice_idx][0] * scale_factor, roi_data[VERTICES][vertice_idx][1] * scale_factor
+                        #new_vertices[vertice_idx][0], new_vertices[vertice_idx][1] = roi_data[VERTICES][vertice_idx][0] * scale_factor, roi_data[VERTICES][vertice_idx][1] * scale_factor
+                        new_vertices[vertice_idx][0] = round(roi_data[VERTICES][vertice_idx][0] * scale_factor)
+                        new_vertices[vertice_idx][1] = round(roi_data[VERTICES][vertice_idx][1] * scale_factor)
                     new_roi_dict[roi_name][VERTICES] = new_vertices
         else:
             for video_name, video_data in roi_dict.items():
                 for roi_name, roi_data in video_data.items():
                     if roi_data[SHAPE_TYPE] == ROI_SETTINGS.RECTANGLE.value:
-                        new_roi_dict[video_name][roi_name][TL_X] = int(roi_data[TL_X] * scale_factor)
-                        new_roi_dict[video_name][roi_name][TL_Y] = int(roi_data[TL_Y] * scale_factor)
-                        new_roi_dict[video_name][roi_name][BR_X] = int(roi_data[BR_X] * scale_factor)
-                        new_roi_dict[video_name][roi_name][BR_Y] = int(roi_data[BR_Y] * scale_factor)
-                        new_roi_dict[video_name][roi_name][CENTER_X] = int(roi_data[CENTER_X] * scale_factor)
-                        new_roi_dict[video_name][roi_name][CENTER_Y] = int(roi_data[CENTER_Y] * scale_factor)
-                        new_roi_dict[video_name][roi_name][WIDTH] = int(new_roi_dict[video_name][roi_name][BR_X] - new_roi_dict[video_name][roi_name][TL_X])
-                        new_roi_dict[video_name][roi_name][HEIGHT] = int(new_roi_dict[video_name][roi_name][BR_Y] - new_roi_dict[video_name][roi_name][TL_Y])
+                        new_roi_dict[video_name][roi_name][TL_X] = round(roi_data[TL_X] * scale_factor)
+                        new_roi_dict[video_name][roi_name][TL_Y] = round(roi_data[TL_Y] * scale_factor)
+                        new_roi_dict[video_name][roi_name][BR_X] = round(roi_data[BR_X] * scale_factor)
+                        new_roi_dict[video_name][roi_name][BR_Y] = round(roi_data[BR_Y] * scale_factor)
+                        new_roi_dict[video_name][roi_name][CENTER_X] = round(roi_data[CENTER_X] * scale_factor)
+                        new_roi_dict[video_name][roi_name][CENTER_Y] = round(roi_data[CENTER_Y] * scale_factor)
+                        new_roi_dict[video_name][roi_name][WIDTH] = round(new_roi_dict[video_name][roi_name][BR_X] - new_roi_dict[video_name][roi_name][TL_X])
+                        new_roi_dict[video_name][roi_name][HEIGHT] = round(new_roi_dict[video_name][roi_name][BR_Y] - new_roi_dict[video_name][roi_name][TL_Y])
                         for tag in roi_data[TAGS].keys():
-                            new_roi_dict[video_name][roi_name][TAGS][tag] = (int(roi_data[TAGS][tag][0] * scale_factor), int(roi_data[TAGS][tag][1] * scale_factor))
+                            new_roi_dict[video_name][roi_name][TAGS][tag] = (round(roi_data[TAGS][tag][0] * scale_factor), round(roi_data[TAGS][tag][1] * scale_factor))
                     elif roi_data[SHAPE_TYPE] == ROI_SETTINGS.CIRCLE.value:
-                        new_roi_dict[video_name][roi_name][CIRCLE_C_X] = int(roi_data[CIRCLE_C_X] * scale_factor)
-                        new_roi_dict[video_name][roi_name][CIRCLE_C_Y] = int(roi_data[CIRCLE_C_Y] * scale_factor)
-                        new_roi_dict[video_name][roi_name][RADIUS] = int(roi_data[RADIUS] * scale_factor)
+                        new_roi_dict[video_name][roi_name][CIRCLE_C_X] = round(roi_data[CIRCLE_C_X] * scale_factor)
+                        new_roi_dict[video_name][roi_name][CIRCLE_C_Y] = round(roi_data[CIRCLE_C_Y] * scale_factor)
+                        new_roi_dict[video_name][roi_name][RADIUS] = round(roi_data[RADIUS] * scale_factor)
                         for tag in roi_data[TAGS].keys():
-                            new_roi_dict[video_name][roi_name][TAGS][tag] = (int(roi_data[TAGS][tag][0] * scale_factor), int(roi_data[TAGS][tag][1] * scale_factor))
+                            new_roi_dict[video_name][roi_name][TAGS][tag] = (round(roi_data[TAGS][tag][0] * scale_factor), round(roi_data[TAGS][tag][1] * scale_factor))
                     elif roi_data[SHAPE_TYPE] == ROI_SETTINGS.POLYGON.value:
-                        new_roi_dict[video_name][roi_name][CENTER_X] = int(roi_data[CENTER_X] * scale_factor)
-                        new_roi_dict[video_name][roi_name][CENTER_Y] = int(roi_data[CENTER_Y] * scale_factor)
+                        new_roi_dict[video_name][roi_name][CENTER_X] = round(roi_data[CENTER_X] * scale_factor)
+                        new_roi_dict[video_name][roi_name][CENTER_Y] = round(roi_data[CENTER_Y] * scale_factor)
                         new_roi_dict[video_name][roi_name][CENTER] = (new_roi_dict[video_name][roi_name][CENTER_X], new_roi_dict[video_name][roi_name][CENTER_Y])
                         for tag in roi_data[TAGS].keys():
-                            new_roi_dict[video_name][roi_name][TAGS][tag] = (int(roi_data[TAGS][tag][0] * scale_factor), int(roi_data[TAGS][tag][1] * scale_factor))
+                            new_roi_dict[video_name][roi_name][TAGS][tag] = (round(roi_data[TAGS][tag][0] * scale_factor), round(roi_data[TAGS][tag][1] * scale_factor))
                         new_vertices = np.full_like(a=roi_data[VERTICES], fill_value=0, dtype=np.int32)
                         for vertice_idx in range(roi_data[VERTICES].shape[0]):
                             new_vertices[vertice_idx][0], new_vertices[vertice_idx][1] = roi_data[VERTICES][vertice_idx][0] * scale_factor, roi_data[VERTICES][vertice_idx][1] * scale_factor
                         new_roi_dict[video_name][roi_name][VERTICES] = new_vertices
+
+
+
 
         return deepcopy(new_roi_dict)
 
@@ -819,7 +824,6 @@ class ROI_mixin(ConfigReader):
         self.set_status_bar_panel(text=msg, fg='blue')
         stdout_success(msg=f"ROI definitions saved for video: {self.video_meta['video_name']}", source=self.__class__.__name__)
 
-
     def set_status_bar_panel(self, text: str, fg: str = 'blue'):
         self.status_bar.configure(text=text, fg=fg)
         self.status_bar.update_idletasks()
@@ -1003,8 +1007,7 @@ class ROI_mixin(ConfigReader):
         self.thickness = int(self.fixed_roi_thickness_drpdwn.getChoices())
         self.ear_tag_size = int(self.fixed_roi_eartag_size_drpdwn.getChoices())
         self.shape_cnt = len(list(self.roi_dict.keys()))
-        self.shape_center = (self.img_center[0] + (self.settings['DUPLICATION_JUMP_SIZE'] * self.shape_cnt), int(self.img_center[1] + (self.settings['DUPLICATION_JUMP_SIZE'] * self.shape_cnt)))
-
+        self.shape_center = (round(self.img_center[0] + (self.settings['DUPLICATION_JUMP_SIZE'] * self.shape_cnt)), round(self.img_center[1] + (self.settings['DUPLICATION_JUMP_SIZE'] * self.shape_cnt)))
     def _fixed_roi_draw(self):
         self.rectangles_df, self.circles_df, self.polygon_df = get_roi_df_from_dict(roi_dict=self.roi_dict)
         self.roi_names = list(self.roi_dict.keys())
@@ -1021,8 +1024,8 @@ class ROI_mixin(ConfigReader):
         if not valid: self.fixed_roi_status_bar['text'] = error_msg; raise InvalidInputError(msg=error_msg, source=self.__class__.__name__)
         valid, error_msg = check_int(name='HEIGHT', value=self.rectangle_height_eb.entry_get, min_value=1)
         if not valid: self.fixed_roi_status_bar['text'] = error_msg; raise InvalidInputError(msg=error_msg, source=self.__class__.__name__)
-        mm_width, mm_height = int(self.rectangle_width_eb.entry_get), int(self.rectangle_height_eb.entry_get)
-        width, height = int(int(self.rectangle_width_eb.entry_get) * (float(self.px_per_mm) * self.downscale_factor)), int(int(self.rectangle_height_eb.entry_get) * (float(self.px_per_mm) * self.downscale_factor))
+        mm_width, mm_height = round(self.rectangle_width_eb.entry_get), round(self.rectangle_height_eb.entry_get)
+        width, height = round(self.rectangle_width_eb.entry_get * (float(self.px_per_mm) * self.downscale_factor)), round(self.rectangle_height_eb.entry_get * (float(self.px_per_mm) * self.downscale_factor))
         tags = get_ear_tags_for_rectangle(center=self.shape_center, width=width, height=height)
         self.roi_dict[self.fixed_roi_name] =  {'Video':                self.video_meta['video_name'],
                                                'Shape_type':           ROI_SETTINGS.RECTANGLE.value,
@@ -1038,8 +1041,8 @@ class ROI_mixin(ConfigReader):
                                                'Bottom_right_Y':       tags['Bottom right tag'][1],
                                                'width':                width,
                                                'height':               height,
-                                               'width_cm':             int(mm_width / 10),
-                                               'height_cm':            int(mm_height / 10),
+                                               'width_cm':             round(mm_width / 10),
+                                               'height_cm':            round(mm_height / 10),
                                                'area_cm':              round(int(mm_width / 10) * int(mm_height / 10), 2),
                                                "Tags":                 tags,
                                                'Ear_tag_size': self.ear_tag_size}
@@ -1052,8 +1055,8 @@ class ROI_mixin(ConfigReader):
         self._fixed_roi_checks()
         valid, error_msg = check_int(name='RADIUS', value=self.fixed_roi_circle_radius_eb.entry_get, min_value=1)
         if not valid: self.fixed_roi_status_bar['text'] = error_msg; raise InvalidInputError(msg=error_msg, source=self.__class__.__name__)
-        mm_radius = int(self.fixed_roi_circle_radius_eb.entry_get)
-        radius = int(int(self.fixed_roi_circle_radius_eb.entry_get) * (float(self.px_per_mm) * self.downscale_factor))
+        mm_radius = round(self.fixed_roi_circle_radius_eb.entry_get)
+        radius = round(self.fixed_roi_circle_radius_eb.entry_get * (float(self.px_per_mm) * self.downscale_factor))
         self.roi_dict[self.fixed_roi_name] =  {'Video':                self.video_meta['video_name'],
                                                'Shape_type':           ROI_SETTINGS.CIRCLE.value,
                                                'Name':                 self.fixed_roi_name,
@@ -1064,7 +1067,7 @@ class ROI_mixin(ConfigReader):
                                                'centerY':              self.shape_center[1],
                                                'radius':               radius,
                                                'radius_cm':            round(mm_radius / 10, 2),
-                                               'area_cm':              round(math.pi * (round(round(mm_radius / 10, 2) / 10, 2) ** 2), 2),
+                                               'area_cm':              round(math.pi * ((mm_radius / 10) / 10) ** 2, 2),
                                                "Tags":                  {"Center tag": self.shape_center,
                                                                          "Border tag": (self.shape_center[0] - radius, self.shape_center[1])},
                                                'Ear_tag_size': self.ear_tag_size}
@@ -1072,13 +1075,11 @@ class ROI_mixin(ConfigReader):
         self._fixed_roi_draw()
 
 
-
-
     def fixed_roi_hexagon(self):
         self._fixed_roi_checks()
         valid, error_msg = check_int(name='RADIUS', value=self.hexagon_radius_eb.entry_get, min_value=1)
         if not valid: self.fixed_roi_status_bar['text'] = error_msg; raise InvalidInputError(msg=error_msg, source=self.__class__.__name__)
-        radius = int(int(self.hexagon_radius_eb.entry_get) * (float(self.px_per_mm) * self.downscale_factor))
+        radius = round(round(self.hexagon_radius_eb.entry_get) * (float(self.px_per_mm) * self.downscale_factor))
         vertices, vertices_dict = get_vertices_hexagon(center=self.shape_center, radius=radius)
         area = Polygon(vertices).simplify(tolerance=20, preserve_topology=True).area
         self.roi_dict[self.fixed_roi_name] =  {'Video':                 self.video_meta['video_name'],
@@ -1104,7 +1105,7 @@ class ROI_mixin(ConfigReader):
         self._fixed_roi_checks()
         valid, error_msg = check_int(name='RADIUS', value=self.half_circle_radius_eb.entry_get, min_value=1)
         if not valid: self.fixed_roi_status_bar['text'] = error_msg; raise InvalidInputError(msg=error_msg, source=self.__class__.__name__)
-        radius = int(int(self.half_circle_radius_eb.entry_get) * (float(self.px_per_mm) * self.downscale_factor))
+        radius = round(round(self.half_circle_radius_eb.entry_get) * (float(self.px_per_mm) * self.downscale_factor))
         direction = self.half_circle_direction_drpdwn.getChoices()
         vertices, vertices_dict = get_half_circle_vertices(center=self.shape_center, radius=radius, direction=direction)
         area = Polygon(vertices).simplify(tolerance=20, preserve_topology=True).area
@@ -1130,7 +1131,7 @@ class ROI_mixin(ConfigReader):
         self._fixed_roi_checks()
         valid, error_msg = check_int(name='TRIANGLE SIDE LENGTH', value=self.triangle_side_length_eb.entry_get, min_value=1)
         if not valid: self.fixed_roi_status_bar['text'] = error_msg; raise InvalidInputError(msg=error_msg, source=self.__class__.__name__)
-        side_length = int(int(self.triangle_side_length_eb.entry_get) * (float(self.px_per_mm) * self.downscale_factor))
+        side_length = round(round(self.triangle_side_length_eb.entry_get) * (float(self.px_per_mm) * self.downscale_factor))
         direction = int(self.triangle_direction_drpdwn.getChoices())
         vertices, vertices_dict = get_triangle_vertices(center=self.shape_center, side_length=side_length, direction=direction)
         area = Polygon(vertices).simplify(tolerance=20, preserve_topology=True).area
@@ -1180,12 +1181,6 @@ class ROI_mixin(ConfigReader):
         self.img_center = (int(self.display_img_width / 2), int(self.display_img_height / 2))
         self.img_window.update_idletasks()
         self.img_window.geometry(f"{self.display_img_width}x{self.display_img_height}")
-        # if self.upscale_factor != 1.0:
-        #     self.roi_dict = self.scale_roi_dict(roi_dict=self.roi_dict, scale_factor=self.upscale_factor, nesting=False)
-        #     self.other_roi_dict = self.scale_roi_dict(roi_dict=self.other_roi_dict, scale_factor=self.upscale_factor, nesting=True)
-        #     self.rectangles_df, self.circles_df, self.polygon_df = get_roi_df_from_dict(roi_dict=self.roi_dict)
-        print(self.downscale_factor, self.upscale_factor)
-
         if self.downscale_factor != 1.0:
             self.roi_dict = self.scale_roi_dict(roi_dict=self.roi_dict, scale_factor=self.downscale_factor)
             self.other_roi_dict = self.scale_roi_dict(roi_dict=self.other_roi_dict, scale_factor=self.downscale_factor, nesting=True)

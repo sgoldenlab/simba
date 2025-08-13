@@ -97,8 +97,8 @@ class Interpolate(ConfigReader):
                 if len(df.columns) != len(self.bp_headers):
                     raise DataHeaderError( msg=f"The file {file_path} contains {len(df.columns)} columns, but your SimBA project expects {len(self.bp_headers)} columns representing {int(len(self.bp_headers) / 3)} body-parts (x, y, p). Check that the {self.body_parts_path} lists the correct body-parts associated with the project", source=self.__class__.__name__)
                 df.columns = self.bp_headers
-            df = df.apply(pd.to_numeric, errors="coerce").fillna(0)
-            df[df < 0] = 0
+            df = df.apply(pd.to_numeric, errors="coerce").fillna(0.0)
+            df[df < 0] = 0.0
             if self.type == 'animals':
                 df = animal_interpolator(df=df, animal_bp_dict=self.animal_bp_dict, source=file_path, method=self.method)
             else:
@@ -107,7 +107,7 @@ class Interpolate(ConfigReader):
                 df = self.__insert_multiindex_header(df=df)
             if self.copy_originals:
                 copy_files_to_directory(file_paths=[file_path], dir=self.originals_dir)
-            write_df(df=df.astype(np.int64), file_type=self.file_type, save_path=file_path, multi_idx_header=self.multi_index_df_headers)
+            write_df(df=df.astype(np.float32), file_type=self.file_type, save_path=file_path, multi_idx_header=self.multi_index_df_headers)
             video_timer.stop_timer()
             print(f"Video {self.video_name} interpolated (elapsed time {video_timer.elapsed_time_str}) ...")
         self.timer.stop_timer()
@@ -116,4 +116,3 @@ class Interpolate(ConfigReader):
         else:
             msg = f"{len(self.file_paths)} data file(s) interpolated using {self.type} {self.method} methods."
         stdout_success(msg=msg, elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
-
