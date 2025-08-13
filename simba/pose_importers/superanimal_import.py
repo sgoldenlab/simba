@@ -1,5 +1,6 @@
 import os
 from typing import Dict, List, Optional, Union
+
 import numpy as np
 
 from simba.data_processors.interpolate import Interpolate
