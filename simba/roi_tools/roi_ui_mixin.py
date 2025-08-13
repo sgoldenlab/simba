@@ -158,13 +158,18 @@ class ROI_mixin(ConfigReader):
         self.settings = {item.name: item.value for item in ROI_SETTINGS}
 
         self.rectangles_df, self.circles_df, self.polygon_df, self.roi_dict, self.roi_names, self.other_roi_dict, self.other_video_names_w_rois = get_roi_data(roi_path=self.roi_coordinates_path, video_name=self.video_meta['video_name'])
+
         if self.downscale_factor != 1.0:
             self.roi_dict = self.scale_roi_dict(roi_dict=self.roi_dict, scale_factor=self.downscale_factor)
-            self.other_roi_dict = self.scale_roi_dict(roi_dict=self.other_roi_dict, scale_factor=self.downscale_factor, nesting=True)
+            self.scaled_other_roi_dict = self.scale_roi_dict(roi_dict=self.other_roi_dict, scale_factor=self.downscale_factor, nesting=True)
             self.rectangles_df, self.circles_df, self.polygon_df = get_roi_df_from_dict(roi_dict=self.roi_dict)
             if self.pose_data is not None:
                 self.pose_data = self.pose_data * self.downscale_factor
                 self.pose_data_cpy = deepcopy(self.pose_data)
+        else:
+            self.scaled_other_roi_dict = deepcopy(self.other_roi_dict)
+
+
         self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
 
     def scale_roi_dict(self, roi_dict: dict, scale_factor: float, nesting: bool = False) -> dict:
@@ -781,7 +786,7 @@ class ROI_mixin(ConfigReader):
             error_txt = f'No other video in the SimBA project has ROIs. Draw ROIs on other videos in the SimBA project to transfer ROIs between videos'
             self.status_bar.configure(text=error_txt, fg="red")
             raise InvalidInputError(msg=error_txt, source=self.__class__.__name__)
-        video_roi_dict = change_roi_dict_video_name(roi_dict=self.other_roi_dict[video_name], video_name=self.video_meta['video_name'])
+        video_roi_dict = change_roi_dict_video_name(roi_dict=self.scaled_other_roi_dict[video_name], video_name=self.video_meta['video_name'])
         if len(video_roi_dict.keys()) > 0:
             self.reset_img_shape_memory()
             self.roi_names = list(video_roi_dict.keys())
@@ -797,13 +802,14 @@ class ROI_mixin(ConfigReader):
     def save_video_rois(self):
         self.set_btn_clrs(btn=self.save_data_btn)
         if self.upscale_factor != 1.0:
-            self.roi_dict = self.scale_roi_dict(roi_dict=self.roi_dict, scale_factor=self.upscale_factor, nesting=False)
-            self.other_roi_dict = self.scale_roi_dict(roi_dict=self.other_roi_dict, scale_factor=self.upscale_factor, nesting=True)
-            self.rectangles_df, self.circles_df, self.polygon_df = get_roi_df_from_dict(roi_dict=self.roi_dict)
+            save_rois = self.scale_roi_dict(roi_dict=self.roi_dict, scale_factor=self.upscale_factor, nesting=False)
+        else:
+            save_rois = deepcopy(self.roi_dict)
+        video_rectangles_df, video_circles_df, video_polygon_df = get_roi_df_from_dict(roi_dict=save_rois)
         other_rectangles_df, other_circles_df, other_polygons_df = get_roi_df_from_dict(roi_dict=self.other_roi_dict, video_name_nesting=True)
-        out_rectangles = pd.concat([self.rectangles_df, other_rectangles_df], axis=0).reset_index(drop=True)
-        out_circles = pd.concat([self.circles_df, other_circles_df], axis=0).reset_index(drop=True)
-        out_polygons = pd.concat([self.polygon_df, other_polygons_df], axis=0).reset_index(drop=True)
+        out_rectangles = pd.concat([video_rectangles_df, other_rectangles_df], axis=0).reset_index(drop=True)
+        out_circles = pd.concat([video_circles_df, other_circles_df], axis=0).reset_index(drop=True)
+        out_polygons = pd.concat([video_polygon_df, other_polygons_df], axis=0).reset_index(drop=True)
         store = pd.HDFStore(self.roi_coordinates_path, mode="w")
         store[Keys.ROI_RECTANGLES.value] = out_rectangles
         store[Keys.ROI_CIRCLES.value] = out_circles
