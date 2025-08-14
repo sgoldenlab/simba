@@ -82,7 +82,7 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
 
         self.run_multiple_videos.grid(row=1, sticky=NW)
         self.run_multiple_video_btn.grid(row=0, sticky=NW)
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def __create_heatmap_plots(self, multiple_videos: bool):
         if multiple_videos:
@@ -111,8 +111,7 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
                                                           bodypart=self.bp_dropdown.getChoices(),
                                                           data_paths=data_paths)
 
-            heatmapper_clf_processor = multiprocessing.Process(heatmapper_clf.run())
-            heatmapper_clf_processor.start()
+            heatmapper_clf.run()
 
         else:
             heatmapper_clf = HeatMapperLocationMultiprocess(config_path=self.config_path,

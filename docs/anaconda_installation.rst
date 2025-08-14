@@ -15,6 +15,13 @@ For Linux/macOS, click `HERE <https://docs.anaconda.com/navigator/install/>`__.
    If you want to install SimBA using conda, but do not want to use the Anaconda Navigator, see `THESE <https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md>`__
    instructions.
 
+.. hint::
+
+   **Video Tutorial**
+   
+   For a visual walkthrough of this installation process, see our `Anaconda Navigator Installation Video <install_anaconda_navigator_video.html>`_.
+
+
 **STEP 1**. Run Anaconda Navigator. The application looks like this:
 
 .. image:: tutorials_rst/img/installation/anaconda_navigator_1.webp
@@ -31,7 +38,7 @@ the <kbdCreate button highlighted in this image:
 **STEP 3**. Once clicked, its brings up teh below pop-up allowing you to
 enter the name of your new python conda environment, and which python
 version it should have. Here, we select python 3.6, and name the
-environment ``simba_env``. Next, we click the <kbdCreate button.
+environment ``simba_env``. Next, we click the Create button.
 
 .. image:: tutorials_rst/img/installation/anaconda_navigator_3.webp
   :width: 700
@@ -61,7 +68,7 @@ right in the image below) and hit Enter. After hitting Enter, SimBA will
 install on your system and you can follow the progress in the terminal
 window.
 
-.. image:: img/installation/anaconda_navigator_6.webp
+.. image:: tutorials_rst/img/installation/anaconda_navigator_6.webp
   :width: 700
   :align: center
 

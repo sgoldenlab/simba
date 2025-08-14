@@ -15,7 +15,7 @@ First, install Anaconda Navigator on your system. You can download Anaconda Navi
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/anaconda_navigator_1.webp" />
 </p>
 
-**STEP 2**. On the left, click on the `Environments` tab, followed by the <kbdCreate</kbd> button highlighted in this image:
+**STEP 2**. On the left, click on the `Environments` tab, followed by the <kbd>Create</kbd> button highlighted in this image:
 
 <p align="center">
 <img src="https://github.com/sgoldenlab/simba/blob/master/images/anaconda_navigator_2.webp" />

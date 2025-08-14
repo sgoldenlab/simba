@@ -1,7 +1,7 @@
 __author__ = "Simon Nilsson"
 
 import os
-from copy import deepcopy
+from pathlib import Path
 from tkinter import *
 from typing import Union
 
@@ -66,14 +66,15 @@ class InterpolatePopUp(PopUpMixin, ConfigReader):
         if not multiple:
             data_path = self.selected_file.file_path
             check_file_exist_and_readable(file_path=data_path)
-            data_dir = os.path.dirname(data_path)
+            data_dir = Path(os.path.dirname(data_path))
         else:
             data_path = self.selected_dir.folder_path
             check_if_dir_exists(in_dir=data_path)
-            data_dir = deepcopy(data_path)
+            data_dir = Path(data_path)
 
         multi_index_df_headers = False
-        if data_dir == self.input_csv_dir: multi_index_df_headers = True
+        if data_dir.resolve().absolute() == Path(self.input_csv_dir).resolve().absolute():
+            multi_index_df_headers = True
         interpolator = Interpolate(config_path=self.config_path,
                                    data_path=data_path,
                                    type=interpolation_type,
