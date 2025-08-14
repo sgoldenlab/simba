@@ -8,6 +8,8 @@ First, install Anaconda Navigator on your system. You can download Anaconda Navi
 > [!TIP]
 > If you want to install SimBA using conda, but do not want to use the Anaconda Navigator, see [THESE](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md) instructions.  
 
+> [!NOTE]
+> **Video Tutorial**: [Watch the SimBA Anaconda Navigator Installation Tutorial](https://www.youtube.com/watch?v=1xLvC6WAG6k?feature=shared)
 
 **STEP 1**. Run Anaconda Navigator. The application looks like this:
 
@@ -55,6 +57,5 @@ First, install Anaconda Navigator on your system. You can download Anaconda Navi
 
 >[!NOTE]
 > SimBA may take a little time to launch depending in your computer, but you should eventually see [THIS](https://github.com/sgoldenlab/simba/blob/master/simba/assets/img/splash_2024.mp4) splash screen followed by [THIS](https://github.com/sgoldenlab/simba/blob/master/images/main_gui_frm.webp) main GUI window.
-
 
 
