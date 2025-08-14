@@ -15,6 +15,12 @@ Requirements
   See e.g., installation instructions for `Windows <https://m.wikihow.com/Install-FFmpeg-on-Windows>`__, `MacOS/Linux <https://www.ffmpeg.org/download.html>`__. FFMpeg is used
   in SimBA for video pre-processing and video editing, and visualization tools. FFMpeg is not a strict requirement, but is strongly recommended.
 
+.. hint::
+
+   - See this video for a visual walkthrough of installation using `conda <install_conda_video.html>`_.
+   - See this video for a visual walkthrough of installation using `Anaconda Navigator Installation Video <install_anaconda_navigator_video.html>`_.
+   - See this video for a visual walkthrough of installation using `python venv <install_venv_video.html>`_.
+
 Install options:
 ----------------
 

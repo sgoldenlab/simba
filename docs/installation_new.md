@@ -16,6 +16,9 @@
 * [Install SimBA using Python venv](https://github.com/sgoldenlab/simba/blob/master/docs/installation_new.md#option-3-install-simba-using-python-venv)
 
 
+
+
+
 ### Option 1: Install SimBA using conda (recommended)
 
 Click [HERE](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html) for instructions for how to install conda.
@@ -128,6 +131,12 @@ simba
 
 See [THESE](https://github.com/sgoldenlab/simba/blob/master/docs/anaconda_2025.md) instructions. 
 
+
+### INSTALLATION VIDEO WALKTHROUGHS
+
+- See this video for a visual walkthrough of installation using [conda](https://simba-uw-tf-dev.readthedocs.io/en/latest/install_conda_video.html).
+- See this video for a visual walkthrough of installation using [Anaconda Navigator Installation Video](https://simba-uw-tf-dev.readthedocs.io/en/latest/install_anaconda_navigator_video.html).
+- See this video for a visual walkthrough of installation using [python venv](https://simba-uw-tf-dev.readthedocs.io/en/latest/install_venv_video.html).
 
 ### Requirements
 
