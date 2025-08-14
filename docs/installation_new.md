@@ -138,6 +138,7 @@ See [THESE](https://github.com/sgoldenlab/simba/blob/master/docs/anaconda_2025.m
 - See this video for a visual walkthrough of installation using [Anaconda Navigator Installation Video](https://simba-uw-tf-dev.readthedocs.io/en/latest/install_anaconda_navigator_video.html).
 - See this video for a visual walkthrough of installation using [python venv](https://simba-uw-tf-dev.readthedocs.io/en/latest/install_venv_video.html).
 
+
 ### Requirements
 
 For a list of the SimBA dependencies, and the packages that gets installed when running `pip install simba-uw-tf-dev`, see [THIS](https://github.com/sgoldenlab/simba/blob/master/requirements.txt) file.
