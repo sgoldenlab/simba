@@ -24,10 +24,11 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_valid_array, check_valid_dict,
                                 check_valid_lst, check_valid_tuple)
 from simba.utils.enums import Formats, Options
-from simba.utils.errors import InvalidInputError, FaultyTrainingSetError, NoFilesFoundError
+from simba.utils.errors import (FaultyTrainingSetError, InvalidInputError,
+                                NoFilesFoundError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    read_json, save_json, get_fn_ext, read_img)
+                                    get_fn_ext, read_img, read_json, save_json)
 from simba.utils.warnings import DuplicateNamesWarning
 
 
