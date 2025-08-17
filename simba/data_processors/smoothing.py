@@ -33,6 +33,11 @@ class Smoothing(ConfigReader):
        :width: 600
        :align: center
 
+    .. video:: _static/img/smoothing_example_2.webm
+       :width: 800
+       :autoplay:
+       :loop:
+
     .. note::
        `Smoothing tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#to-import-multiple-dlc-csv-files>`__.
 

@@ -217,6 +217,10 @@ class FeatureExtractionMixin(object):
            :width: 300
            :align: center
 
+        .. image:: _static/img/count_ranges_2.png
+           :width: 600
+           :align: center
+
         .. seealso::
            For GPU acceleration, use :func:`simba.data_processors.cuda.statistics.count_values_in_ranges`
 

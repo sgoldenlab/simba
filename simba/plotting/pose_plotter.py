@@ -3,21 +3,21 @@ __author__ = "Simon Nilsson"
 import os
 from pathlib import Path
 from typing import Dict, Optional, Union
-
+import numpy as np
 import cv2
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_instance, check_int, check_str,
-                                check_that_column_exist)
+                                check_that_column_exist, check_valid_boolean)
 from simba.utils.data import create_color_palette
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import CountError, InvalidFilepathError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext, get_video_meta_data, read_df)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data, read_df)
 from simba.utils.warnings import FrameRangeWarning
+from simba.mixins.geometry_mixin import GeometryMixin
 
 
 class PosePlotter(object):
@@ -36,6 +36,7 @@ class PosePlotter(object):
                  out_dir: Optional[Union[str, os.PathLike]] = None,
                  palettes: Optional[Dict[str, str]] = None,
                  circle_size: Optional[int] = None,
+                 bbox: Optional[bool] = False,
                  sample_time: Optional[int] = None) -> None:
 
         if os.path.isdir(data_path):
@@ -55,6 +56,7 @@ class PosePlotter(object):
         if circle_size is not None:
             check_int(name='circle_size', value=circle_size, min_value=1)
         self.color_dict = {}
+        check_valid_boolean(value=bbox, source=f'{self.__class__.__name__} bbox')
         if palettes is not None:
             check_instance(source=self.__class__.__name__, instance=palettes, accepted_types=(dict,))
             if len(list(palettes.keys())) != self.config.animal_cnt:
@@ -69,7 +71,7 @@ class PosePlotter(object):
             check_int(name='sample_time', value=sample_time, min_value=1)
         if out_dir is None:
             out_dir = os.path.join(os.path.dirname(self.files_found[0]), f'pose_videos_{self.config.datetime}')
-        self.circle_size,self.out_dir, self.sample_time = (circle_size, out_dir, sample_time)
+        self.circle_size,self.out_dir, self.sample_time, self.bbox = (circle_size, out_dir, sample_time, bbox)
         if not os.path.exists(self.out_dir):
             os.makedirs(self.out_dir)
         self.data = {}
@@ -106,10 +108,15 @@ class PosePlotter(object):
                     break
                 if ret:
                     for animal_cnt, (animal_name, animal_data) in enumerate(self.config.animal_bp_dict.items()):
+                        animal_bbox = []
                         for bp_cnt, (bp_x, bp_y) in enumerate(zip(animal_data["X_bps"], animal_data["Y_bps"])):
                             check_that_column_exist(df=pose_df, column_name=[bp_x, bp_y], file_name=pose_path)
                             bp_tuple = (int(pose_df.at[frm_cnt, bp_x]), int(pose_df.at[frm_cnt, bp_y]))
                             cv2.circle(frame, bp_tuple, video_circle_size, self.color_dict[animal_cnt][bp_cnt], -1)
+                            animal_bbox.append(list(bp_tuple))
+                        if self.bbox and len(animal_bbox) > 4:
+                            animal_bbox = GeometryMixin().keypoints_to_axis_aligned_bounding_box(keypoints=np.array(animal_bbox).reshape(-1, len(animal_bbox), 2).astype(np.int32))
+                            frame = cv2.polylines(frame, [animal_bbox], True, self.color_dict[animal_cnt][0], thickness=max(1, int(video_circle_size / 1.5)), lineType=-1)
                     frm_cnt += 1
                     writer.write(frame)
                     print(f"Video: {file_cnt + 1} / {len(self.files_found)} Frame: {frm_cnt} / {len(pose_df)}")

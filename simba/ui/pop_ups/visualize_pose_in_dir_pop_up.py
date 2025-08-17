@@ -42,6 +42,7 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
         self.video_slice_dropdown = SimBADropDown(parent=self.settings_frm, label="VIDEO SECTION (SECONDS):", label_width=30, dropdown_width=20, value=ENTIRE_VIDEOS, command=None, dropdown_options=VIDEO_LENGTHS)
         self.cpu_cnt_dropdown = SimBADropDown(parent=self.settings_frm, label="CPU COUNT:", label_width=30, dropdown_width=20, value=find_core_cnt()[1], command=None, dropdown_options=list(range(1, find_core_cnt()[0])))
         self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, label="USE GPU:", label_width=30, dropdown_width=20, value='FALSE', command=None, dropdown_options=['TRUE', 'FALSE'])
+        self.include_bbox_dropdown = SimBADropDown(parent=self.settings_frm, label="INCLUDE BOUNDING BOX:", label_width=30, dropdown_width=20, value='FALSE', command=None, dropdown_options=['TRUE', 'FALSE'])
         self.save_dir = FolderSelect(self.settings_frm, "SAVE DIRECTORY: ", title="Select a data folder", lblwidth=30, initialdir=get_desktop_path())
         self.number_of_animals_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, 17)), label="NUMBER OF ANIMALS:", label_width=30, dropdown_width=20, command=self.__create_table, value=1)
         self.__create_table(animal_cnt=1)
@@ -50,8 +51,9 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
         self.video_slice_dropdown.grid(row=1, column=0, sticky=NW)
         self.cpu_cnt_dropdown.grid(row=2, column=0, sticky=NW)
         self.gpu_dropdown.grid(row=3, column=0, sticky=NW)
-        self.save_dir.grid(row=4, column=0, sticky=NW)
-        self.number_of_animals_dropdown.grid(row=5, column=0, sticky=NW)
+        self.include_bbox_dropdown.grid(row=4, column=0, sticky=NW)
+        self.save_dir.grid(row=5, column=0, sticky=NW)
+        self.number_of_animals_dropdown.grid(row=6, column=0, sticky=NW)
 
         self.main_frm.mainloop()
 
@@ -100,6 +102,7 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
         else:
             circle_size = int(circle_size)
         gpu = str_2_bool(self.gpu_dropdown.get_value())
+        bbox = str_2_bool(self.include_bbox_dropdown.get_value())
         cpu_cnt = int(self.cpu_cnt_dropdown.get_value())
         sample_time = self.video_slice_dropdown.getChoices()
         if sample_time == ENTIRE_VIDEOS: sample_time = None
@@ -121,6 +124,7 @@ class VisualizePoseInFolderPopUp(PopUpMixin):
                                                gpu=gpu,
                                                circle_size=circle_size,
                                                sample_time=sample_time,
+                                               bbox=bbox,
                                                core_cnt=cpu_cnt)
         plotter.run()
 

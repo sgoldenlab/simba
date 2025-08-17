@@ -38,6 +38,11 @@ class AdvancedInterpolator(ConfigReader):
        :width: 600
        :align: center
 
+    .. video:: _static/img/smoothing_example_2.webm
+       :width: 800
+       :autoplay:
+       :loop:
+
     :parameter Union[str, os.PathLike] data_dir: path to folder containing pose-estimation data or a file with pose-estimation data.
     :parameter Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format.
     :parameter Literal["animal", "body-part"] type: Type of interpolation: animal or body-part.

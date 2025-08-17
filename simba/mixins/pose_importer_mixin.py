@@ -279,16 +279,7 @@ class PoseImporterMixin(object):
             multi_idx_cols, names=("scorer", "bodypart", "coords")
         )
 
-    def insert_multi_idx_columns(self, df: pd.DataFrame) -> pd.DataFrame:
-        multi_idx_cols = []
-        for col_idx in range(len(df.columns)):
-            multi_idx_cols.append(
-                tuple(("IMPORTED_POSE", "IMPORTED_POSE", df.columns[col_idx]))
-            )
-        df.columns = pd.MultiIndex.from_tuples(
-            multi_idx_cols, names=("scorer", "bodypart", "coords")
-        )
-        return df
+
 
     def check_intergity_of_chosen_animal_order(self):
         for click_key_combination in itertools.combinations(list(self.animal_order.keys()), 2):

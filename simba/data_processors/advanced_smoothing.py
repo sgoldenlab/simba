@@ -40,6 +40,11 @@ class AdvancedSmoother(ConfigReader):
        :width: 600
        :align: center
 
+    .. video:: _static/img/smoothing_example_2.webm
+       :width: 800
+       :autoplay:
+       :loop:
+
     :parameter str data_dir: path to pose-estimation data in CSV or parquet format
     :parameter str config_path: path to SimBA project config file in Configparser format.
     :parameter Literal type: Level of smoothing: animal or body-part.

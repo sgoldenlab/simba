@@ -141,6 +141,10 @@ def count_values_in_ranges(x: np.ndarray, r: np.ndarray) -> np.ndarray:
        :align: center
        :header-rows: 1
 
+    .. image:: _static/img/count_ranges_2.png
+       :width: 600
+       :align: center
+
     .. seealso::
        For CPU function see :func:`~simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.count_values_in_range`.
 

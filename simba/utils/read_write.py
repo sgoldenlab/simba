@@ -2148,20 +2148,23 @@ def get_unique_values_in_iterable(
     return cnt
 
 
-def copy_files_to_directory(file_paths: List[Union[str, os.PathLike]],
+def copy_files_to_directory(file_paths: Union[List[Union[str, os.PathLike]], Union[str, os.PathLike]],
                             dir: Union[str, os.PathLike],
                             verbose: Optional[bool] = True,
                             integer_save_names: Optional[bool] = False) -> List[Union[str, os.PathLike]]:
     """
     Copy a list of files to a specified directory.
 
-    :param List[Union[str, os.PathLike]] file_paths: List of paths to the files to be copied.
+    :param List[Union[str, os.PathLike]] file_paths: List of paths to the files to be copied, or a single filepath string.
     :param Union[str, os.PathLike] dir: Path to the directory where files will be copied.
     :param Optional[bool] verbose: If True, prints progress information. Default True.
     :param Optional[bool] integer_save_names: If True, saves files with integer names. E.g., file one in ``file_paths`` will be saved as dir/0.
     :return List[Union[str, os.PathLike]]: List of paths to the copied files
     """
 
+    check_instance(source=f'{copy_files_to_directory.__name__} file_paths', instance=file_paths, accepted_types=(str, list, os.PathLike,))
+    if isinstance(file_paths, (str,)):
+        file_paths = [file_paths]
     check_valid_lst(data=file_paths, source=f'{copy_files_to_directory.__name__} file_paths', min_len=1, valid_dtypes=(str, np.str_,))
     _ = [check_file_exist_and_readable(x) for x in file_paths]
     check_if_dir_exists(in_dir=dir, source=copy_files_to_directory)

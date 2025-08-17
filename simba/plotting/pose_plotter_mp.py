@@ -4,7 +4,7 @@ import os
 import platform
 from pathlib import Path
 from typing import Dict, Optional, Union
-
+import numpy as np
 import cv2
 import pandas as pd
 
@@ -17,12 +17,9 @@ from simba.utils.data import create_color_palette
 from simba.utils.enums import OS, Formats, Options
 from simba.utils.errors import CountError, InvalidFilepathError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder,
-                                    find_core_cnt,
-                                    find_files_of_filetypes_in_directory,
-                                    get_fn_ext, get_video_meta_data, read_df)
+from simba.utils.read_write import (concatenate_videos_in_folder, find_core_cnt, find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data, read_df)
 from simba.utils.warnings import FrameRangeWarning
-
+from simba.mixins.geometry_mixin import GeometryMixin
 
 def pose_plotter_mp(data: pd.DataFrame,
                     video_meta_data: dict,
@@ -30,6 +27,7 @@ def pose_plotter_mp(data: pd.DataFrame,
                     bp_dict: dict,
                     colors_dict: dict,
                     circle_size: int,
+                    bbox: bool,
                     video_save_dir: Union[str, os.PathLike],):
 
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
@@ -44,16 +42,21 @@ def pose_plotter_mp(data: pd.DataFrame,
         ret, img = cap.read()
         if ret:
             for animal_cnt, (animal_name, animal_data) in enumerate(bp_dict.items()):
+                animal_bbox = []
                 for cnt, (x_name, y_name) in enumerate(zip(animal_data["X_bps"], animal_data["Y_bps"])):
                     check_that_column_exist(df=data, column_name=[x_name, y_name], file_name=video_path)
                     bp_tuple = (int(data.at[current_frm, x_name]), int(data.at[current_frm, y_name]))
                     clr = colors_dict[animal_cnt][cnt]
-                    cv2.circle(img, bp_tuple, circle_size, clr, -1)
+                    img = cv2.circle(img, bp_tuple, circle_size, clr, -1)
+                    animal_bbox.append(list(bp_tuple))
+                if bbox and len(animal_bbox) > 4:
+                    animal_bbox = GeometryMixin().keypoints_to_axis_aligned_bounding_box(keypoints=np.array(animal_bbox).reshape(-1, len(animal_bbox), 2).astype(np.int32))
+                    img = cv2.polylines(img, [animal_bbox], True, colors_dict[animal_cnt][0], thickness=max(1, int(circle_size/1.5)), lineType=-1)
             writer.write(img)
             current_frm += 1
             print(f"Multi-processing video frame {current_frm} on core {group_cnt}...")
         else:
-            print(f'Frame {current_frm} not found in video, terminating video creation...')
+            print(f'Frame {current_frm} not found in video {video_path}, terminating video creation...')
             break
     cap.release()
     writer.release()
@@ -84,6 +87,7 @@ class PosePlotterMultiProcess():
                  circle_size: Optional[int] = None,
                  core_cnt: Optional[int] = -1,
                  gpu: Optional[bool] = False,
+                 bbox: Optional[bool] = False,
                  sample_time: Optional[int] = None) -> None:
 
         if os.path.isdir(data_path):
@@ -115,15 +119,17 @@ class PosePlotterMultiProcess():
         else:
             for cnt, (k, v) in enumerate(self.config.animal_bp_dict.items()):
                 self.color_dict[cnt] = self.config.animal_bp_dict[k]["colors"]
+        check_valid_boolean(value=bbox, source=f'{self.__class__.__name__} bbox')
         if sample_time is not None:
             check_int(name='sample_time', value=sample_time, min_value=1)
         if out_dir is None:
             out_dir = os.path.join(os.path.dirname(files_found[0]), f'pose_videos_{self.config.datetime}')
-        self.circle_size, self.core_cnt, self.out_dir, self.sample_time = (circle_size, core_cnt, out_dir, sample_time)
+        self.circle_size, self.core_cnt, self.out_dir, self.sample_time, self.bbox = (circle_size, core_cnt, out_dir, sample_time, bbox)
         if not os.path.exists(self.out_dir):
             os.makedirs(self.out_dir)
         self.data = {}
         check_valid_boolean(value=[gpu])
+
         if gpu and check_nvidea_gpu_available():
             self.gpu = True
         else:
@@ -166,6 +172,7 @@ class PosePlotterMultiProcess():
                                               bp_dict=self.config.animal_bp_dict,
                                               colors_dict=self.color_dict,
                                               circle_size=video_circle_size,
+                                              bbox=self.bbox,
                                               video_save_dir=self.temp_folder)
                 for cnt, result in enumerate(pool.imap(constants, pose_lst, chunksize=self.config.multiprocess_chunksize)):
                     print(f"Image {min(len(pose_df), obs_per_split*(cnt+1))}/{len(pose_df)}, Video {file_cnt+1}/{len(list(self.data.keys()))}...")
@@ -179,13 +186,14 @@ class PosePlotterMultiProcess():
         stdout_success(f"Pose visualizations for {len(list(self.data.keys()))} video(s) created in {self.out_dir} directory", elapsed_time=self.config.timer.elapsed_time_str, source=self.__class__.__name__)
 
 
-# if __name__ == "__main__":
-#     test = PosePlotterMultiProcess(data_path=r"D:\troubleshooting\pose_estimation\project_folder\csv\pose_estimation\3A_Mouse_5-choice_MustTouchTrainingNEWFINAL_a8_grayscale_clipped.csv",
-#                                    out_dir=None,
-#                                    circle_size=None,
-#                                    core_cnt=-1,
-#                                    palettes=None)
-#     test.run()
+if __name__ == "__main__":
+    test = PosePlotterMultiProcess(data_path=r"C:\troubleshooting\mitra\project_folder\csv\input_csv\501_MA142_Gi_DCZ_0603.csv",
+                                   out_dir=None,
+                                   circle_size=8,
+                                   core_cnt=18,
+                                   palettes=None,
+                                   bbox=True,)
+    test.run()
 
 
 
