@@ -8,8 +8,10 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, SimbaCheckbox
 from simba.utils.enums import Formats, Keys, Links
-from simba.utils.errors import (AnimalNumberError, InvalidInputError, NoFilesFoundError)
+from simba.utils.errors import (AnimalNumberError, InvalidInputError,
+                                NoFilesFoundError)
 from simba.utils.warnings import SkippingRuleWarning
+
 
 class AnimalDirectingAnimalPopUp(ConfigReader, PopUpMixin):
 
