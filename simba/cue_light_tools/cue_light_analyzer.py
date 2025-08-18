@@ -107,6 +107,11 @@ class CueLightAnalyzer(ConfigReader):
     .. note::
        `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.
 
+    .. video:: _static/img/cue_light_example_2.webm
+       :width: 800
+       :autoplay:
+       :loop:
+
     :example:
     >>> cue_light_analyzer = CueLightAnalyzer(config_path='MyProjectConfig', in_dir='project_folder/csv/outlier_corrected_movement_location', cue_light_names=['Cue_light'])
     >>> cue_light_analyzer.run()

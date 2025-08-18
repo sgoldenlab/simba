@@ -111,6 +111,12 @@ class CueLightVisualizer(ConfigReader):
     .. notes:
        `Cue light tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/cue_light_tutorial.md>`__.
 
+
+    .. video:: _static/img/cue_light_example_2.webm
+       :width: 800
+       :autoplay:
+       :loop:
+
     :examples:
     >>> cue_light_visualizer = CueLightVisualizer(config_path='SimBAConfig', cue_light_names=['Cue_light'], video_path='VideoPath', video_setting=True, frame_setting=False)
     >>> cue_light_visualizer.run()

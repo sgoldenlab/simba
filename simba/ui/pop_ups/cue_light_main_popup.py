@@ -49,7 +49,7 @@ class CueLightMainPopUp(ConfigReader, PopUpMixin):
                  config_path: Union[str, os.PathLike]):
 
         ConfigReader.__init__(self, config_path=config_path)
-        if len(self.outlier_corrected_movement_paths):
+        if len(self.outlier_corrected_paths) == 0:
             raise NoFilesFoundError(msg=f'No data found in the {self.outlier_corrected_dir} directory. Cannot compute cue-lights statistics.', source=self.__class__.__name__)
         if not os.path.isfile(self.roi_coordinates_path):
             raise NoROIDataError(msg=f'No ROIs found in project ({self.roi_coordinates_path} file not found). Draw ROIs before computing cue-light statistics', source=self.__class__.__name__)
