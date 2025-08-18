@@ -204,9 +204,7 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
                             body_part_data["Directing_BOOL"]
                         )
                 if self.append_bool_tables_to_features:
-                    print(
-                        f"Adding directionality tables to features data for video {video_name}..."
-                    )
+                    print(f"Adding directionality tables to features data for video {video_name}...")
                     df = read_df(
                         file_path=os.path.join(
                             self.features_dir, f"{video_name}.{self.file_type}"
