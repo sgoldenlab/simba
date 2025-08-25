@@ -5,23 +5,23 @@ from typing import Any, Dict, Optional, Union
 
 import numpy as np
 import pandas as pd
-
+from copy import deepcopy
 pd.options.mode.chained_assignment = None
 
 try:
     from typing import Literal
 except ImportError:
     from typing_extensions import Literal
-
+from datetime import datetime
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import (check_file_exist_and_readable, check_instance,
                                 check_str, check_that_column_exist,
-                                check_valid_boolean)
+                                check_valid_boolean, check_if_dir_exists, check_int)
 from simba.utils.errors import DataHeaderError, InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (copy_files_to_directory,
-                                    find_files_of_filetypes_in_directory,
-                                    get_fn_ext, read_df, write_df)
+from simba.utils.read_write import (copy_files_to_directory, find_files_of_filetypes_in_directory, get_fn_ext, read_df, write_df)
+from simba.utils.enums import Formats, Options
+from simba.utils.data import detect_bouts
 
 BODY_PART_TYPE = 'body-part'
 ANIMAL_TYPE = 'animal'
@@ -43,51 +43,75 @@ class AdvancedInterpolator(ConfigReader):
        :autoplay:
        :loop:
 
-    :parameter Union[str, os.PathLike] data_dir: path to folder containing pose-estimation data or a file with pose-estimation data.
-    :parameter Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format.
-    :parameter Literal["animal", "body-part"] type: Type of interpolation: animal or body-part.
-    :parameter Dict settings: Interpolation rules for each animal or each animal body-part. See examples.
-    :parameter bool initial_import_multi_index: If True, the incoming data is multi-index columns dataframes. Use of input data is the ``project_folder/csv/input_csv`` directory. Default: False.
-    :parameter bool overwrite: If True, overwrites the input data. If False, then saves input data in datetime-stamped sub-directory.
+    :param Union[str, os.PathLike] data_path: Path to folder containing pose-estimation data or a file with pose-estimation data.
+    :param Union[str, os.PathLike] config_path: Optional path to SimBA project config file in Configparser format.
+    :param Literal["animal", "body-part"] type: Type of interpolation: animal or body-part. Default: 'body-part'.
+    :param Dict settings: Interpolation rules for each animal or each animal body-part. See examples.
+    :param bool verbose: If True, prints progress messages. Default: True.
+    :param Union[str, os.PathLike] save_dir: Optional directory to save results. If None, saves in input directory.
+    :param bool multi_index_data: If True, the incoming data has multi-index columns. Default: False.
+    :param bool save_copy: If True, saves original data in datetime-stamped sub-directory. Default: True.
+    :param Optional[int] max_interpolation_length: Maximum length of gaps to interpolate. If None, interpolates all gaps. Default: None.
 
     :examples:
-    >>> interpolator = AdvancedInterpolator(data_dir='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/input_csv',
-    >>>                                     config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
-    >>>                                     type='animal',
-    >>>                                     settings={'Animal_1': 'linear', 'Animal_2': 'quadratic'},
-    >>>                                     multi_index_data=True)
+    >>> # Animal-level interpolation
+    >>> interpolator = AdvancedInterpolator(
+    ...     data_path='/path/to/project_folder/csv/input_csv',
+    ...     config_path='/path/to/project_folder/project_config.ini',
+    ...     type='animal',
+    ...     settings={'Animal_1': 'linear', 'Animal_2': 'quadratic'},
+    ...     multi_index_data=True
+    ... )
     >>> interpolator.run()
-    >>> interpolator = AdvancedInterpolator(data_dir='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/input_csv',
-    >>>                                     config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
-    >>>                                     type='animal',
-    >>>                                     settings={'Simon': {'Ear_left_1': 'linear',
-    >>>                                                 'Ear_right_1': 'linear',
-    >>>                                                 'Nose_1': 'quadratic',
-    >>>                                                 'Lat_left_1': 'quadratic',
-    >>>                                                 'Lat_right_1': 'quadratic',
-    >>>                                                 'Center_1': 'nearest',
-    >>>                                                 'Tail_base_1': 'nearest'},
-    >>>                                               'JJ': {'Ear_left_2': 'nearest',
-    >>>                                                  'Ear_right_2': 'nearest',
-    >>>                                                  'Nose_2': 'quadratic',
-    >>>                                                  'Lat_left_2': 'quadratic',
-    >>>                                                  'Lat_right_2': 'quadratic',
-    >>>                                                  'Center_2': 'linear',
-    >>>                                                  'Tail_base_2': 'linear'}},
-    >>>                                     multi_index_data=True)
+    >>> 
+    >>> # Body-part level interpolation
+    >>> interpolator = AdvancedInterpolator(
+    ...     data_path='/path/to/project_folder/csv/input_csv',
+    ...     config_path='/path/to/project_folder/project_config.ini',
+    ...     type='body-part',
+    ...     settings={
+    ...         'Simon': {
+    ...             'Ear_left_1': 'linear',
+    ...             'Ear_right_1': 'linear',
+    ...             'Nose_1': 'quadratic',
+    ...             'Lat_left_1': 'quadratic',
+    ...             'Lat_right_1': 'quadratic',
+    ...             'Center_1': 'nearest',
+    ...             'Tail_base_1': 'nearest'
+    ...         },
+    ...         'JJ': {
+    ...             'Ear_left_2': 'nearest',
+    ...             'Ear_right_2': 'nearest',
+    ...             'Nose_2': 'quadratic',
+    ...             'Lat_left_2': 'quadratic',
+    ...             'Lat_right_2': 'quadratic',
+    ...             'Center_2': 'linear',
+    ...             'Tail_base_2': 'linear'
+    ...         }
+    ...     },
+    ...     multi_index_data=True
+    ... )
     >>> interpolator.run()
     """
 
     def __init__(self,
                  data_path: Union[str, os.PathLike],
-                 config_path: Union[str, os.PathLike],
                  settings: Dict[str, Any],
                  type: Optional[Literal["animal", "body-part"]] = 'body-part',
                  verbose: Optional[bool] = True,
+                 config_path: Optional[Union[str, os.PathLike]] = None,
+                 save_dir: Optional[Union[str, os.PathLike]] = None,
                  multi_index_data: Optional[bool] = False,
-                 overwrite: Optional[bool] = True):
+                 save_copy: Optional[bool] = True,
+                 max_interpolation_length: Optional[int] = None):
 
-        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
+
+
+        if config_path is not None:
+            ConfigReader.__init__(self, config_path=config_path, read_video_info=False, create_logger=False)
+        else:
+            self.file_type, self.datetime = Formats.CSV.value, datetime.now().strftime("%Y%m%d%H%M%S")
+            self.timer = SimbaTimer(start=True)
         check_str(name=f'{self.__class__.__name__} type', value=type, options=["animal", "body-part"], raise_error=True)
         if os.path.isfile(data_path):
             check_file_exist_and_readable(file_path=data_path)
@@ -100,22 +124,29 @@ class AdvancedInterpolator(ConfigReader):
             self.input_dir = data_path
         else:
             raise InvalidInputError(msg=f'{data_path} is not a valid file path or file directory', source=self.__class__.__name__)
-        check_valid_boolean(value=[multi_index_data, overwrite], source=self.__class__.__name__, raise_error=True)
+        if save_dir is not None:
+            check_if_dir_exists(in_dir=save_dir)
+        else:
+            save_dir = self.input_dir
+
+        check_valid_boolean(value=[multi_index_data, save_copy], source=self.__class__.__name__, raise_error=True)
         check_instance(source=self.__class__.__name__, instance=settings, accepted_types=(dict,))
         for animal, animal_data in settings.items():
             if type == BODY_PART_TYPE:
                 check_instance(source=self.__class__.__name__, instance=animal_data, accepted_types=(dict,))
                 for bp_name, bp_data in animal_data.items():
-                    check_str(name='method', value=bp_name, options=self.project_bps)
+                    if config_path is not None:
+                        check_str(name='method', value=bp_name, options=self.project_bps)
                     check_str(name='method', value=bp_data, options=[LINEAR, NEAREST, QUADRATIC])
             else:
                check_str(name='method', value=animal_data, options=[LINEAR, NEAREST, QUADRATIC])
         self.settings, self.type, self.multi_index_data, self.verbose = settings, type, multi_index_data, verbose
-        if type == ANIMAL_TYPE:
-            self.__transpose_settings()
-
-        self.overwrite = overwrite
-        if not overwrite and not os.path.isdir(self.cpy_dir): os.makedirs(self.cpy_dir)
+        if type == ANIMAL_TYPE and config_path is not None: self.__transpose_settings()
+        self.save_copy, self.save_dir, self.config_path = save_copy, save_dir, config_path
+        if max_interpolation_length is not None:
+            check_int(name=f'{self.__class__.__name__} max_interpolation_length', min_value=1, raise_error=True, value=max_interpolation_length)
+        self.max_interpolation_length = max_interpolation_length
+        if save_copy and not os.path.isdir(self.cpy_dir): os.makedirs(self.cpy_dir)
 
     def __transpose_settings(self):
         """Helper to transpose settings dict if interpolating per animal, so the same method can be used for both animal and body-part interpolation"""
@@ -136,33 +167,55 @@ class AdvancedInterpolator(ConfigReader):
     def run(self):
         for file_cnt, file_path in enumerate(self.file_paths):
             video_timer = SimbaTimer(start=True)
-            df = read_df(file_path=file_path, file_type=self.file_type, check_multiindex=self.multi_index_data).fillna(0).reset_index(drop=True)
             _, video_name, _ = get_fn_ext(filepath=file_path)
-            if len(df.columns) != len(self.bp_col_names):
-                raise DataHeaderError(msg=f"The SimBA project suggest the data should have {len(self.bp_col_names)} columns, but the input data has {len(df.columns)} columns", source=self.__class__.__name__)
-            df.columns = self.bp_headers
-            df[df < 0] = 0
+            if self.config_path is not None:
+                df = read_df(file_path=file_path, file_type=self.file_type, check_multiindex=self.multi_index_data).fillna(0).reset_index(drop=True)
+                if len(df.columns) != len(self.bp_col_names):
+                    raise DataHeaderError(msg=f"The SimBA project suggest the data should have {len(self.bp_col_names)} columns, but the input data has {len(df.columns)} columns", source=self.__class__.__name__)
+                df.columns = self.bp_headers
+                df[df < 0] = 0
+            else:
+                df = pd.read_csv(filepath_or_buffer=file_path, index_col=0)
+
+            df.columns = [x.lower() for x in df.columns]
+            df_cpy = deepcopy(df)
             for animal_name, animal_body_parts in self.settings.items():
                 for bp, interpolation_setting in animal_body_parts.items():
+                    bp = bp.lower()
                     check_that_column_exist(df=df, column_name=[f"{bp}_x", f"{bp}_y"], file_name=file_path)
-                    df[[f"{bp}_x", f"{bp}_y"]] = df[[f"{bp}_x", f"{bp}_y"]].astype(int)
-                    idx = df.loc[(df[f"{bp}_x"] <= 0.0) & (df[f"{bp}_y"] <= 0.0)].index.tolist()
-                    if self.verbose: print(f"Interpolating {len(idx)} {bp} body-parts in video {video_name}...")
-                    df.loc[idx, [f"{bp}_x", f"{bp}_y"]] = np.nan
-                    df[[f"{bp}_x", f"{bp}_y"]] = (df[[f"{bp}_x", f"{bp}_y"]].interpolate(method=interpolation_setting, axis=0).ffill().bfill().astype(int))
-                    df[[f"{bp}_x", f"{bp}_y"]][df[[f"{bp}_x", f"{bp}_y"]] < 0] = 0
+                    df[[f"{bp}_x", f"{bp}_y"]] = df[[f"{bp}_x", f"{bp}_y"]].astype(np.int32)
+                    if self.max_interpolation_length is None:
+                        df[df <= 0] = 0
+                        idx = df.loc[(df[f"{bp}_x"] <= 0.0) & (df[f"{bp}_y"] <= 0.0)].index.tolist()
+                        if self.verbose: print(f"Interpolating {len(idx)} {bp} body-parts in video {video_name}...")
+                        df[[f"{bp}_x", f"{bp}_y"]] = (df[[f"{bp}_x", f"{bp}_y"]].interpolate(method=interpolation_setting, axis=0).ffill().bfill().astype(np.int32))
+                        df[[f"{bp}_x", f"{bp}_y"]][df[[f"{bp}_x", f"{bp}_y"]] < 0] = 0
+                    else:
+                        df_cpy.loc[df_cpy[f'{bp}_x'] <= 0, f'{bp}_x'] = 0
+                        df_cpy.loc[df_cpy[f'{bp}_y'] <= 0, f'{bp}_y'] = 0
+                        idx = df.loc[(df[f"{bp}_x"] <= 0.0) & (df[f"{bp}_y"] <= 0.0)].index.tolist()
+                        df_cpy[f'{bp}_temp'] = 0
+                        df_cpy.loc[idx, [f'{bp}_temp']] = 1
+                        bouts = detect_bouts(data_df=df_cpy, target_lst=[f'{bp}_temp'], fps=1)
+                        bouts = bouts[bouts['Bout_time'] <= self.max_interpolation_length]
+                        if len(bouts) > 0:
+                            idx = bouts.apply(lambda row: list(range(row['Start_frame'], row['End_frame'] + 1)), axis=1).explode().tolist()
+                            if self.verbose: print(f"Interpolating {len(idx)} {bp} body-parts in video {video_name}...")
+                            df.loc[idx, [f"{bp}_x", f"{bp}_y"]] = np.nan
+                            df[[f"{bp}_x", f"{bp}_y"]] = (df[[f"{bp}_x", f"{bp}_y"]].interpolate(method=interpolation_setting, axis=0).astype(np.int32))
             if self.multi_index_data:
                 df = self.__insert_multi_index(df=df)
-            if not self.overwrite:
+            if self.save_copy:
                 copy_files_to_directory(file_paths=[file_path], dir=self.cpy_dir, verbose=False)
-            write_df(df=df, file_type=self.file_type, save_path=file_path, multi_idx_header=self.multi_index_data)
+            save_path = os.path.join(self.save_dir, f'{video_name}{self.file_type}')
+            write_df(df=df, file_type=self.file_type, save_path=save_path, multi_idx_header=self.multi_index_data)
             video_timer.stop_timer()
             print(f'Video {video_name} complete. Elapsed time {video_timer.elapsed_time_str}s')
         self.timer.stop_timer()
-        if self.overwrite:
-            msg = f"Advanced interpolation complete. Data saved in {self.input_dir}."
+        if self.save_copy:
+            msg = f"Advanced interpolation complete. Data saved in {self.save_dir}. Original copies saved in {self.cpy_dir}."
         else:
-            msg = f"Advanced interpolation complete. Data saved in {self.input_dir}. Original data saved in {self.cpy_dir}."
+            msg = f"Advanced interpolation complete. Data saved in {self.save_dir}."
         stdout_success(msg=msg, elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
 # SMOOTHING_SETTINGS = {'Simon': {'Ear_left_1': {'method': 'Savitzky Golay', 'time_window': 3500},
@@ -181,28 +234,16 @@ class AdvancedInterpolator(ConfigReader):
 #                                'Tail_base_2': {'method': 'Savitzky Golay', 'time_window': 3500}}}
 #
 #
-# INTERPOLATION_SETTINGS = {'Simon': {'Ear_left_1': 'linear',
-#                                     'Ear_right_1': 'linear',
-#                                     'Nose_1': 'quadratic',
-#                                     'Lat_left_1': 'quadratic',
-#                                     'Lat_right_1': 'quadratic',
-#                                     'Center_1': 'nearest',
-#                                     'Tail_base_1': 'nearest'},
-#                         'JJ': {'Ear_left_2': 'nearest',
-#                                'Ear_right_2': 'nearest',
-#                                'Nose_2': 'quadratic',
-#                                'Lat_left_2': 'quadratic',
-#                                'Lat_right_2': 'quadratic',
-#                                'Center_2': 'linear',
-#                                'Tail_base_2': 'linear'}}
-#
-#
-# INTERPOLATION_SETTINGS = {'Animal_1': 'linear', 'Animal_2': 'quadratic'}
-#
-# advanced_interpolator = AdvancedInterpolator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini',
-#                      data_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/new_data',
-#                      settings=INTERPOLATION_SETTINGS, type='animal', multi_index_data=True, overwrite=False)
-#
+# INTERPOLATION_SETTINGS = {'Animal_1': {'NOSE': 'linear',
+#                           'LEFT_EAR': 'linear',
+#                           'RIGHT_EAR': 'quadratic',
+#                           'LEFT_SIDE': 'quadratic',
+#                           'CENTER': 'quadratic',
+#                           'RIGHT_SIDE': 'nearest',
+#                           'TAIL_BASE': 'nearest'}}
+
+# advanced_interpolator = AdvancedInterpolator(data_path=r'D:\netholabs\data', settings=INTERPOLATION_SETTINGS, type='body-part', multi_index_data=True, save_copy=False, max_interpolation_length=100)
+
 # advanced_interpolator.run()
 
 # for animal, animal_data in settings.items():

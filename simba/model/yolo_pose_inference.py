@@ -1,5 +1,6 @@
 import argparse
 import os
+import random
 import sys
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
@@ -15,7 +16,7 @@ except ModuleNotFoundError:
     torch = None
 
 from typing import List, Optional, Tuple, Union
-
+import random
 import numpy as np
 import pandas as pd
 
@@ -27,6 +28,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.enums import Options
 from simba.utils.errors import (CountError, InvalidFileTypeError,
                                 SimBAGPUError, SimBAPAckageVersionError)
+from simba.utils.warnings import FileExistWarning, NoDataFoundWarning
 from simba.utils.printing import SimbaTimer
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_video_meta_data)
@@ -62,9 +64,12 @@ class YOLOPoseInference():
     :param int torch_threads: Number of PyTorch threads to use. Defaults to 8.
     :param bool half_precision: If True, uses half-precision (FP16) inference. Defaults to True.
     :param bool stream: If True, processes frames one-by-one in a generator style. Recommended for long videos. Defaults to False.
-    :param float threshold: Confidence threshold for keypoint detection. Detections below this value are ignored. Defaults to 0.5.
+    :param float box_threshold: Confidence threshold bounding box detection. All detections (bounding boxes AND keypoints) below this value are ignored. Defaults to 0.5.
     :param Optional[int] max_tracks: Maximum number of pose tracks to keep. If None, all tracks are retained.
     :param bool interpolate: If True, interpolates missing keypoints across frames using the 'nearest' method. Defaults to False.
+    :param bool overwrite: If True, overwrites the data at the ``save_dir``. If False, skips the file if it exists.
+    :param bool raise_error: If True, raise error if the input video metadata can't be read. If False, then skips the video file.
+    :param bool randomize_order: If True, analyzes the input data in a random order. If False, then in fixed order.
     :param int imgsz: Input image size for inference. Must be square. Defaults to 640.
     """
 
@@ -80,18 +85,24 @@ class YOLOPoseInference():
                  torch_threads: int = 8,
                  half_precision: bool = True,
                  stream: bool = False,
-                 threshold: float = 0.5,
+                 box_threshold: float = 0.5,
                  max_tracks: Optional[int] = None,
                  interpolate: bool = False,
                  imgsz: int = 640,
-                 iou: float = 0.5):
+                 iou: float = 0.5,
+                 overwrite: bool = True,
+                 raise_error: bool = True,
+                 randomize_order: bool = False):
 
 
-        if not _is_cuda_available()[0]:
+        gpu_available, gpus = _is_cuda_available()
+        if not gpu_available:
             raise SimBAGPUError(msg='No GPU detected.', source=self.__class__.__name__)
+        else:
+            print(f'GPUS AVAILABLE: {gpus}')
         if YOLO is None:
             raise SimBAPAckageVersionError(msg='ultralytics.YOLO package not detected.', source=self.__class__.__name__)
-
+        check_valid_boolean(value=raise_error, source=f'{self.__class__.__name__} raise_error')
         if isinstance(video_path, list):
             check_valid_lst(data=video_path, source=f'{self.__class__.__name__} video_path', valid_dtypes=(str, np.str_,), min_len=1)
         elif os.path.isfile(video_path):
@@ -99,7 +110,8 @@ class YOLOPoseInference():
         elif os.path.isdir(video_path):
             video_path = find_files_of_filetypes_in_directory(directory=video_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, as_dict=False)
         for i in video_path:
-            _ = get_video_meta_data(video_path=i)
+            _ = get_video_meta_data(video_path=i, raise_error=raise_error)
+
 
         check_instance(source=f'{self.__class__.__name__} weights', instance=weights, accepted_types=(str, os.PathLike, YOLO))
         if not isinstance(weights, YOLO):
@@ -109,9 +121,13 @@ class YOLOPoseInference():
             self.model = weights
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose')
         check_valid_boolean(value=interpolate, source=f'{self.__class__.__name__} interpolate')
+        check_valid_boolean(value=overwrite, source=f'{self.__class__.__name__} overwrite')
+        check_valid_boolean(value=randomize_order, source=f'{self.__class__.__name__} randomize_order')
+        if randomize_order:
+            random.shuffle(video_path)
         check_int(name=f'{self.__class__.__name__} batch_size', value=batch_size, min_value=1)
         check_int(name=f'{self.__class__.__name__} imgsz', value=imgsz, min_value=1)
-        check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=10e-6, max_value=1.0)
+        check_float(name=f'{self.__class__.__name__} threshold', value=box_threshold, min_value=10e-6, max_value=1.0)
         check_float(name=f'{self.__class__.__name__} iou', value=iou, min_value=10e-6, max_value=1.0)
         if keypoint_names is not None:
             check_valid_tuple(x=keypoint_names, source=f'{self.__class__.__name__} keypoint_names', min_integer=1, valid_dtypes=(str,))
@@ -128,9 +144,9 @@ class YOLOPoseInference():
         OUT_COLS.extend(self.keypoint_col_names)
         COORD_COLS.extend(self.keypoint_cord_col_names)
         torch.set_num_threads(torch_threads)
-        self.half_precision, self.stream, self.video_path = half_precision, stream, video_path
-        self.device, self.batch_size, self.threshold, self.max_tracks, self.iou = device, batch_size, threshold, max_tracks, iou
-        self.verbose, self.save_dir, self.imgsz, self.interpolate = verbose, save_dir, imgsz, interpolate
+        self.half_precision, self.stream, self.video_path, self.raise_error = half_precision, stream, video_path, raise_error
+        self.device, self.batch_size, self.threshold, self.max_tracks, self.iou = device, batch_size, box_threshold, max_tracks, iou
+        self.verbose, self.save_dir, self.imgsz, self.interpolate, self.overwrite = verbose, save_dir, imgsz, interpolate, overwrite
         if self.model.model.task != 'pose':
             raise InvalidFileTypeError(msg=f'The model {weights} is not a pose model. It is a {self.model.model.task} model', source=self.__class__.__name__)
 
@@ -141,7 +157,15 @@ class YOLOPoseInference():
         timer = SimbaTimer(start=True)
         for path in self.video_path:
             _, video_name, _ = get_fn_ext(filepath=path)
-            _ = get_video_meta_data(video_path=path)
+            if self.save_dir:
+                save_path = os.path.join(self.save_dir, f'{video_name}.csv')
+                if not self.overwrite and os.path.isfile(save_path):
+                    FileExistWarning(msg=f'Skipping video {video_name} (already exist and overwrite equals False) ....')
+                    continue
+            video_meta = get_video_meta_data(video_path=path, raise_error=self.raise_error)
+            if video_meta is None and not self.raise_error:
+                NoDataFoundWarning(msg=f'Skipping video {video_name} (could not read video meta data)....')
+                continue
             video_out = []
             video_predictions = yolo_predict(model=self.model,
                                              source=path,
@@ -150,21 +174,22 @@ class YOLOPoseInference():
                                              stream=self.stream,
                                              imgsz=self.imgsz,
                                              device=self.device,
-                                             threshold=self.threshold,
+                                             threshold=0.0001, #self.threshold,
                                              max_detections=self.max_tracks,
-                                             verbose=self.verbose,
+                                             verbose=False, #self.verbose,
                                              iou=self.iou)
             for frm_cnt, video_prediction in enumerate(video_predictions):
                 boxes = video_prediction.obb.data if video_prediction.obb is not None else video_prediction.boxes.data
                 boxes = boxes.cpu().numpy().astype(np.float32)
                 keypoints = video_prediction.keypoints.data.cpu().numpy().astype(np.float32)
-                detected_classes = np.unique(boxes[:, -1]).astype(int) if boxes.size > 0 else []
+                print(boxes)
+                print(keypoints)
+                detected_classes = np.unique(boxes[:, -1]).astype(np.int32) if boxes.size > 0 else []
                 for class_id, class_name in class_dict.items():
                     if class_id not in detected_classes:
                         video_out.append(_get_undetected_obs(frm_id=frm_cnt, class_id=class_id, class_name=class_name, value_cnt=(9 + (len(self.keypoint_col_names)))))
                         continue
                     cls_boxes, cls_keypoints = filter_yolo_keypoint_data(bbox_data=boxes, keypoint_data=keypoints, class_id=class_id, confidence=None, class_idx=-1, confidence_idx=None)
-
                     for i in range(cls_boxes.shape[0]):
                         box = np.array([cls_boxes[i][0], cls_boxes[i][1], cls_boxes[i][2], cls_boxes[i][1], cls_boxes[i][2], cls_boxes[i][3], cls_boxes[i][0], cls_boxes[i][3]]).astype(np.int32)
                         bbox = np.array([frm_cnt, cls_boxes[i][-1], class_dict[cls_boxes[i][-1]], cls_boxes[i][-2]] + list(box))
@@ -192,47 +217,74 @@ class YOLOPoseInference():
             return None
 
 
-if __name__ == "__main__" and not hasattr(sys, 'ps1'):
-    parser = argparse.ArgumentParser(description="Perform YOLO-based keypoint pose estimation inference on videos.")
-    parser.add_argument('--weights_path', type=str, required=True, help='Path to the trained YOLO model weights (e.g., "best.pt").')
-    parser.add_argument('--video_path', type=str, nargs='+', required=True, help='One or more paths to video files to process. Can be a directory of a file path.')
-    parser.add_argument('--keypoint_names', type=str, nargs='+', required=True, help='List of keypoint names, e.g., nose left_ear right_ear.')
-    parser.add_argument('--verbose', action='store_true', default=False, help='Enable verbose logging.')
-    parser.add_argument('--save_dir', type=str, default=None, help='Directory to save output CSV files. If omitted, results are returned in memory.')
-    parser.add_argument('--device', type=str, default='0', help="Device to use: 'cpu' or GPU index as string (e.g., '0').")
-    parser.add_argument('--format', type=str, default=None, help='Optional export format: "onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite".')
-    parser.add_argument('--batch_size', type=int, default=4, help='Batch size for inference.')
-    parser.add_argument('--torch_threads', type=int, default=8, help='Number of PyTorch threads to use.')
-    parser.add_argument('--half_precision', action='store_true', help='Use half-precision (FP16) inference.')
-    parser.add_argument('--stream', action='store_true', help='Process frames in stream (one-by-one) mode.')
-    parser.add_argument('--threshold', type=float, default=0.5, help='Confidence threshold for detections (0.0 - 1.0).')
-    parser.add_argument('--max_tracks', type=int, default=None, help='Maximum number of pose tracks to retain.')
-    parser.add_argument('--interpolate', action='store_true', help='Interpolate missing keypoints across frames.')
-    parser.add_argument('--imgsz', type=int, default=640, help='Input image size (square). Default is 640.')
-    args = parser.parse_args()
+# if __name__ == "__main__" and not hasattr(sys, 'ps1'):
+#     parser = argparse.ArgumentParser(description="Perform YOLO-based keypoint pose estimation inference on videos.")
+#     parser.add_argument('--weights_path', type=str, required=True, help='Path to the trained YOLO model weights (e.g., "best.pt").')
+#     parser.add_argument('--video_path', type=str, nargs='+', required=True, help='One or more paths to video files to process. Can be a directory of a file path.')
+#     parser.add_argument('--keypoint_names', type=str, nargs='+', required=True, help='List of keypoint names, e.g., nose left_ear right_ear.')
+#     parser.add_argument('--verbose', action='store_true', default=False, help='Enable verbose logging.')
+#     parser.add_argument('--save_dir', type=str, default=None, help='Directory to save output CSV files. If omitted, results are returned in memory.')
+#     parser.add_argument('--device', type=str, default='0', help="Device to use: 'cpu' or GPU index as string (e.g., '0').")
+#     parser.add_argument('--format', type=str, default=None, help='Optional export format: "onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite".')
+#     parser.add_argument('--batch_size', type=int, default=4, help='Batch size for inference.')
+#     parser.add_argument('--torch_threads', type=int, default=8, help='Number of PyTorch threads to use.')
+#     parser.add_argument('--half_precision', action='store_true', help='Use half-precision (FP16) inference.')
+#     parser.add_argument('--stream', action='store_true', help='Process frames in stream (one-by-one) mode.')
+#     parser.add_argument('--threshold', type=float, default=0.5, help='Confidence threshold for detections (0.0 - 1.0).')
+#     parser.add_argument('--max_tracks', type=int, default=None, help='Maximum number of pose tracks to retain.')
+#     parser.add_argument('--interpolate', action='store_true', help='Interpolate missing keypoints across frames.')
+#     parser.add_argument('--imgsz', type=int, default=640, help='Input image size (square). Default is 640.')
+#     args = parser.parse_args()
+#
+#     keypoints_tuple = tuple(args.keypoint_names)
+#     device_val = args.device if args.device == 'cpu' else int(args.device)
+#     video_paths = args.video_path if len(args.video_path) > 1 else args.video_path[0]
+#
+#     inference = YOLOPoseInference(weights=args.weights_path,
+#                                   video_path=video_paths,
+#                                   keypoint_names=keypoints_tuple,
+#                                   verbose=args.verbose,
+#                                   save_dir=args.save_dir,
+#                                   device=device_val,
+#                                   format=args.format,
+#                                   batch_size=args.batch_size,
+#                                   torch_threads=args.torch_threads,
+#                                   half_precision=args.half_precision,
+#                                   stream=args.stream,
+#                                   threshold=args.threshold,
+#                                   max_tracks=args.max_tracks,
+#                                   interpolate=args.interpolate,
+#                                   imgsz=args.imgsz)
+#     inference.run()
 
-    keypoints_tuple = tuple(args.keypoint_names)
-    device_val = args.device if args.device == 'cpu' else int(args.device)
-    video_paths = args.video_path if len(args.video_path) > 1 else args.video_path[0]
 
-    inference = YOLOPoseInference(weights=args.weights_path,
-                                  video_path=video_paths,
-                                  keypoint_names=keypoints_tuple,
-                                  verbose=args.verbose,
-                                  save_dir=args.save_dir,
-                                  device=device_val,
-                                  format=args.format,
-                                  batch_size=args.batch_size,
-                                  torch_threads=args.torch_threads,
-                                  half_precision=args.half_precision,
-                                  stream=args.stream,
-                                  threshold=args.threshold,
-                                  max_tracks=args.max_tracks,
-                                  interpolate=args.interpolate,
-                                  imgsz=args.imgsz)
-    inference.run()
+# VIDEO_DIR = '/mnt/filesystem/video_data_mp4'
+# SAVE_DIR = '/mnt/filesystem/yolo_pose'
+# WEIGHTS_PATH = '/mnt/filesystem/weights/best.pt'
+# KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
+#
+#
+# i = YOLOPoseInference(weights=WEIGHTS_PATH,
+#                         video_path=VIDEO_DIR,
+#                         save_dir=SAVE_DIR,
+#                         verbose=True,
+#                         device=0,
+#                         format=None,
+#                         stream=True,
+#                         keypoint_names=KEYPOINT_NAMES,
+#                         batch_size=100,
+#                         imgsz=640,
+#                         interpolate=False,
+#                         threshold=0.5,
+#                         max_tracks=4,
+#                         overwrite=False,
+#                         randomize_order=True)
+# i.run()
 
-# # #
+#
+#
+#
+# # # #
 # video_paths = r"D:\cvat_annotations\videos\mp4_20250624155703"
 # weights_path = r"D:\cvat_annotations\frames\yolo_072125\mdl\train\weights\best.pt"
 # save_dir = r"D:\cvat_annotations\frames\yolo_072125\results"
@@ -241,20 +293,20 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 # # # #
 # # # #
 # i = YOLOPoseInference(weights=weights_path,
-#                         video_path=video_paths,
-#                         save_dir=save_dir,
-#                         verbose=True,
-#                         device=0,
-#                         format=None,
-#                         stream=True,
-#                         keypoint_names=keypoint_names,
-#                         batch_size=100,
-#                         imgsz=640,
-#                         interpolate=False,
-#                         threshold=0.5,
-#                         max_tracks=4)
+#                       video_path=video_paths,
+#                       save_dir=save_dir,
+#                       verbose=True,
+#                       device=0,
+#                       format=None,
+#                       stream=True,
+#                       keypoint_names=keypoint_names,
+#                       batch_size=100,
+#                       imgsz=640,
+#                       interpolate=False,
+#                       box_threshold=0.5,
+#                       max_tracks=4)
 # i.run()
-# #
+#
 #
 # # video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
 # # video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-46-56.mp4"

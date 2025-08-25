@@ -200,6 +200,7 @@ def yolo_predict(model: YOLO,
     check_instance(source=f'{yolo_predict.__name__} model', instance=model, accepted_types=(YOLO,), raise_error=True)
     check_valid_device(device=device)
 
+
     return model.predict(source=source,
                          half=half,
                          batch=batch_size,

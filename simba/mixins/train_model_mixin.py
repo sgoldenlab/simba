@@ -604,6 +604,10 @@ class TrainModelMixin(object):
            :width: 500
            :align: center
 
+        .. image:: _static/img/clf_report.webp
+           :width: 500
+           :align: center
+
         :param RandomForestClassifier rf_clf: sklearn RandomForestClassifier object.
         :param pd.DataFrame x_df: dataframe holding test features
         :param pd.DataFrame y_df: dataframe holding test target

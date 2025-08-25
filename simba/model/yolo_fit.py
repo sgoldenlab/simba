@@ -31,6 +31,7 @@ class FitYolo():
     Trains a YOLO model using specified weights and a configuration YAML file.
 
     .. note::
+       -  Can fit whatever model (bbox, kpts, segmentation).
        - `Download initial weights <https://huggingface.co/Ultralytics>`__.
        - `Example model_yaml bounding-boxes <https://github.com/sgoldenlab/simba/blob/master/misc/ex_yolo_model.yaml>`__.
        - `Example model_yaml keypoints <https://github.com/sgoldenlab/simba/blob/master/misc/ex_yolo_model_keypoints.yaml>`__.

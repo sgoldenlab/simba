@@ -770,6 +770,7 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
                       opacity: Optional[float] = None,
                       size: Optional[Tuple[int, int]] = None,
                       greyscale: Optional[bool] = False,
+                      black_and_white: Optional[bool] = False,
                       clahe: Optional[bool] = False,
                       use_ffmpeg: Optional[bool] = False) -> np.ndarray:
 
@@ -786,6 +787,7 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
     :param Optional[int] opacity: Value between 0 and 100 or None. If float value, returns image with opacity. 100 fully opaque. 0.0 fully transparant.
     :param Optional[Tuple[int, int]] size: If tuple, resizes the image to size. Else, returns original image size.
     :param Optional[bool] greyscale: If true, returns the greyscale image. Default False.
+    :param Optional[bool] black_and_white: If true, returns black and white image at threshold 127. Default False.
     :param Optional[bool] clahe: If true, returns clahe enhanced image. Default False.
     :return: Image as numpy array.
     :rtype: np.ndarray
@@ -848,9 +850,11 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
         img = cv2.addWeighted( img.astype(np.uint8), 1 - opacity, opacity_image.astype(np.uint8), opacity, 0)
     if size:
         img = cv2.resize(img, size, interpolation=cv2.INTER_LINEAR)
-    if greyscale:
+    if greyscale or black_and_white:
         if len(img.shape) > 2:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    if black_and_white:
+        img = np.where(img > 127, 255, 0).astype(np.uint8)
     if clahe:
         if len(img.shape) > 2:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -3004,7 +3008,7 @@ def get_downloads_path(raise_error: bool = False):
         return downloads_path
 
 
-def _read_img_batch_from_video_helper(frm_idx: np.ndarray, video_path: Union[str, os.PathLike], greyscale: bool, verbose: bool, black_and_white: bool):
+def _read_img_batch_from_video_helper(frm_idx: np.ndarray, video_path: Union[str, os.PathLike], greyscale: bool, verbose: bool, black_and_white: bool, clahe: bool):
     """Multiprocess helper used by read_img_batch_from_video to read in images from video file."""
     start_idx, end_frm, current_frm = frm_idx[0], frm_idx[-1] + 1, frm_idx[0]
     results = {}
@@ -3016,13 +3020,15 @@ def _read_img_batch_from_video_helper(frm_idx: np.ndarray, video_path: Union[str
             print(f'Reading frame {current_frm}/{video_meta_data["frame_count"]} ({video_meta_data["video_name"]})...')
         img = cap.read()[1]
         if img is not None:
-            if greyscale or black_and_white:
+            if greyscale or black_and_white or clahe:
                 if len(img.shape) != 2:
                     img = (0.07 * img[:, :, 2] + 0.72 * img[:, :, 1] + 0.21 * img[:, :, 0]).astype(np.uint8)
                 else:
                     img = img.astype(np.uint8)
             if black_and_white:
                 img = np.where(img > 127, 255, 0).astype(np.uint8)
+            if clahe:
+                img = img_array_to_clahe(img=img)
         else:
             if greyscale or black_and_white:
                 img = np.full(shape=(video_meta_data['height'], video_meta_data['width']), fill_value=0, dtype=np.uint8)
@@ -3037,6 +3043,7 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
                               end_frm: Optional[int] = None,
                               greyscale: bool = False,
                               black_and_white: bool = False,
+                              clahe: bool = False,
                               core_cnt: int = -1,
                               verbose: bool = False) -> Dict[int, np.ndarray]:
     """
@@ -3054,6 +3061,7 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
     :param Optionalint] core_cnt: Number of CPU cores to use for parallel processing. Default is -1, indicating using all available cores.
     :param Optional[bool] greyscale: If True, reads the images as greyscale. If False, then as original color scale. Default: False.
     :param bool black_and_white: If True, returns the images in black and white. Default False.
+    :param bool clahe: If True, returns clahe enhanced images.
     :returns: A dictionary containing frame indices as keys and corresponding frame arrays as values.
     :rtype: Dict[int, np.ndarray]
 
@@ -3076,6 +3084,7 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
         end_frm = video_meta_data["frame_count"] -1
     check_int(name=read_img_batch_from_video.__name__, value=core_cnt, min_value=-1)
     check_valid_boolean(value=[greyscale, black_and_white], source=f'{read_img_batch_from_video.__name__} greyscale black_and_white')
+    check_valid_boolean(value=clahe, source=f'{read_img_batch_from_video.__name__} clahe')
     if core_cnt < 0:
         core_cnt = multiprocessing.cpu_count()
     if end_frm <= start_frm:
@@ -3087,6 +3096,7 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
                                       video_path=video_path,
                                       greyscale=greyscale,
                                       black_and_white=black_and_white,
+                                      clahe=clahe,
                                       verbose=verbose)
         for cnt, result in enumerate(pool.imap(constants, frm_lst, chunksize=1)):
             results.update(result)
@@ -3249,11 +3259,13 @@ def read_sleap_h5(file_path: Union[str, os.PathLike]) -> pd.DataFrame:
     data_df = pd.read_csv(io.StringIO(csv_rows), delim_whitespace=True, header=None).fillna(0)
     return data_df
 
-def img_array_to_clahe(img: np.ndarray) -> np.ndarray:
+def img_array_to_clahe(img: np.ndarray,
+                       clip_limit: int = 2,
+                       tile_grid_size: Tuple[int, int] = (16, 16)) -> np.ndarray:
     check_if_valid_img(data=img, source=img_array_to_clahe.__name__, raise_error=True)
     if len(img.shape) > 2:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    return cv2.createCLAHE(clipLimit=2, tileGridSize=(16, 16)).apply(img)
+    return cv2.createCLAHE(clipLimit=clip_limit, tileGridSize=tile_grid_size).apply(img)
 
 
 def read_sys_env():

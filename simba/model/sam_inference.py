@@ -36,6 +36,11 @@ class SamInference():
     >>>                 save_dir=r'C:\troubleshooting\sam_results',
     >>>                 names=('Animal1',))
     >>> i.run()
+
+
+    .. video:: _static/img/sam_example.webm
+       :loop:
+
     """
     def __init__(self,
                  video_path: Union[str, os.PathLike],
@@ -107,6 +112,10 @@ class SamInference():
             #video_results['NAME'] = video_results['NAME'].map(self.animal_name_dict)
             video_results.to_csv(path_or_buf=save_path)
             #write_df(df=video_results, file_type='csv', save_path=save_path, multi_idx_header=False)
+
+
+
+
 
 
 # i = SamInference(video_path=r"D:\platea\platea_videos\videos\clipped\10B_Mouse_5-choice_MustTouchTrainingNEWFINAL_a7_clipped_3.mp4",
