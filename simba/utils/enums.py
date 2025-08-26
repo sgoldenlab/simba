@@ -240,6 +240,9 @@ class Formats(Enum):
                                     "head_midpoint"]
 
 
+    VALID_TABLEFMT = ( "plain", "simple", "github", "grid", "simple_grid", "rounded_grid", "heavy_grid", "mixed_grid", "double_grid", "fancy_grid", "outline", "simple_outline", "rounded_outline", "heavy_outline", "mixed_outline", "double_outline", "fancy_outline", "pipe", "orgtbl", "jira", "presto", "pretty", "psql", "rst", "mediawiki", "moinmoin", "youtrack", "html", "unsafehtml", "latex", "latex_raw", "latex_booktabs", "latex_longtable", "textile", "tsv",)
+
+
 class Options(Enum):
     ROLLING_WINDOW_DIVISORS = [2, 5, 6, 7.5, 15]
     CLF_MODELS = ["RF", "GBC", "XGBoost"]

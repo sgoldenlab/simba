@@ -244,17 +244,24 @@ def write_df(df: pd.DataFrame,
         raise InvalidFileTypeError(msg=f"{file_type} is not a valid filetype OPTIONS: [csv, pickle, parquet]", source=write_df.__name__)
 
 
-def get_fn_ext(filepath: Union[os.PathLike, str]) -> Tuple[str, str, str]:
+def get_fn_ext(filepath: Union[os.PathLike, str],
+               raise_error: bool = True) -> Union[Tuple[str, str, str], Tuple[None, None, None]]:
     """
     Split file path into three components: (i) directory, (ii) file name, and (iii) file extension.
 
-    :parameter str filepath: Path to file.
-    :returns: 3-part tuple with file directory name, file name (w/o extension), and file extension.
-    :rtype: Tuple[str, str, str]
+    .. note::
+       Returns a tuple of (directory_path, filename_without_extension, file_extension). If the filepath is invalid and raise_error is False, returns (None, None, None).
+
+    :param Union[os.PathLike, str] filepath: Path to the file to split.
+    :param bool raise_error: If True, raises InvalidFilepathError for invalid filepaths. If False, returns (None, None, None). Default: True.
+    :return: Tuple containing (directory_path, filename_without_extension, file_extension) or (None, None, None) if invalid and raise_error=False.
+    :rtype: Union[Tuple[str, str, str], Tuple[None, None, None]]
 
     :example:
     >>> get_fn_ext(filepath='C:/My_videos/MyVideo.mp4')
-    >>> ('My_videos', 'MyVideo', '.mp4')
+    ('C:/My_videos', 'MyVideo', '.mp4')
+    >>> get_fn_ext(filepath='invalid_path', raise_error=False)
+    (None, None, None)
     """
 
     check_instance(source=f'{get_fn_ext} filepath', accepted_types=(str, os.PathLike), instance=filepath)
@@ -262,7 +269,10 @@ def get_fn_ext(filepath: Union[os.PathLike, str]) -> Tuple[str, str, str]:
     try:
         file_name = os.path.basename(filepath.rsplit(file_extension, 1)[0])
     except ValueError:
-        raise InvalidFilepathError(msg=f"{filepath} is not a valid filepath", source=get_fn_ext.__name__)
+        if raise_error:
+            raise InvalidFilepathError(msg=f"{filepath} is not a valid filepath", source=get_fn_ext.__name__)
+        else:
+            return None, None, None
     dir_name = os.path.dirname(filepath)
     return dir_name, file_name, file_extension
 
@@ -454,7 +464,7 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture],
         cap = cv2.VideoCapture(video_path)
         _, video_data["video_name"], _ = get_fn_ext(video_path)
     elif isinstance(video_path, cv2.VideoCapture):
-        cap = video_path
+        cap = deepcopy(video_path)
         video_data["video_name"] = ''
     else:
         if raise_error:
@@ -467,10 +477,10 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture],
     video_data["width"] = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
     video_data["height"] = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
     video_data["frame_count"] = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    if cap.get(cv2.CAP_PROP_CHANNEL) == 3:
-        video_data["color_format"] = 'rgb'
+    if isinstance(video_path, str):
+        video_data["color_format"] = 'rgb' if is_video_color(video=video_path) else 'grey'
     else:
-        video_data["color_format"] = 'grey'
+        video_data["color_format"] = 'rgb' if is_video_color(video=cap) else 'grey'
     for k, v in video_data.items():
         if v == 0:
             if raise_error:
@@ -479,6 +489,7 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture],
                 return None
     video_data["resolution_str"] = str(f'{video_data["width"]} x {video_data["height"]}')
     video_data["video_length_s"] = int(video_data["frame_count"] / video_data["fps"])
+    video_data["length (HH:MM:SS)"] = seconds_to_timestamp(seconds=video_data["video_length_s"])
     return video_data
 
 
@@ -972,8 +983,8 @@ def find_files_of_filetypes_in_directory(directory: Union[str, os.PathLike],
     all_files_in_folder = [os.path.join(directory, x) for x in all_files_in_folder]
     accepted_file_paths = []
     for file_path in all_files_in_folder:
-        _, file_name, ext = get_fn_ext(file_path)
-        if ext.lower() in extensions:
+        _, file_name, ext = get_fn_ext(file_path, raise_error=raise_error)
+        if ext is not None and ext.lower() in extensions:
             accepted_file_paths.append(file_path)
     if not accepted_file_paths and raise_warning:
         NoFileFoundWarning(msg=f"SimBA could not find any files with accepted extensions {extensions} in the {directory} directory", source=find_files_of_filetypes_in_directory.__name__)
@@ -1584,6 +1595,10 @@ def timestamp_to_seconds(timestamp: str) -> int:
     """
     Returns the number of seconds into the video given a timestamp in HH:MM:SS format.
 
+    .. note::
+       To convert seconds to timestamp, use :func:`simba.utils.read_write.seconds_to_timestamp`.
+       To convert frame segment (start, end frame) to HH:MM:SS time-stamps, use func:`simba.utils.read_write.find_time_stamp_from_frame_numbers`.
+
     :param str timestamp: Timestamp in HH:MM:SS format
     :returns: The timestamps as seconds.
     :rtype: int
@@ -1594,7 +1609,7 @@ def timestamp_to_seconds(timestamp: str) -> int:
     >>> 5
     """
 
-    check_if_string_value_is_valid_video_timestamp(value=timestamp, name="Timestamp")
+    check_if_string_value_is_valid_video_timestamp(value=timestamp, name=f"{timestamp_to_seconds.__name__} timestamp")
     h, m, s = timestamp.split(":")
     return int(h) * 3600 + int(m) * 60 + int(s)
 
@@ -1605,6 +1620,11 @@ def find_time_stamp_from_frame_numbers(start_frame: int, end_frame: int, fps: fl
     """
     Given start and end frame numbers and frames per second (fps), return a list of formatted time stamps
     corresponding to the frame range start and end time.
+
+    .. note::
+       To convert time-stamp to seconds, use :func:`simba.utils.read_write.timestamp_to_seconds`.
+       To convert seconds to HH:MM:SS timestamp, use :func:`simba.utils.read_write.seconds_to_timestamp`.
+       To convert frame segment (start, end frame) to HH:MM:SS time-stamps, use func:`simba.utils.read_write.find_time_stamp_from_frame_numbers`.
 
     :param int start_frame: The starting frame index.
     :param int end_frame: The ending frame index.
@@ -2199,7 +2219,23 @@ def copy_files_to_directory(file_paths: Union[List[Union[str, os.PathLike]], Uni
 
 def seconds_to_timestamp(seconds: Union[int, float, List[Union[int, float]]]) -> Union[str, List[str]]:
     """
-    Convert an integer number representing seconds, or a list of integers representing seconds, to a HH:MM:SS format.
+    Convert seconds to HH:MM:SS timestamp format.
+
+    .. note::
+       To convert HH:MM:SS timestamp to seconds, use func:`simba.utils.read_write.timestamp_to_seconds`.
+       To convert frame segment (start, end frame) to HH:MM:SS time-stamps, use func:`simba.utils.read_write.find_time_stamp_from_frame_numbers`.
+
+
+
+    :param Union[int, float, List[Union[int, float]]] seconds: Seconds to convert. Can be a single number or a list of numbers.
+    :return Union[str, List[str]]: Timestamp(s) in HH:MM:SS format. Returns a single string for single input, list of strings for list input.
+
+
+    :example:
+    >>> seconds_to_timestamp(3661)
+    >>> '01:01:01'
+    >>> seconds_to_timestamp([3661, 7200, 45])
+    >>> ['01:01:01', '02:00:00', '00:00:45']
     """
     if isinstance(seconds, (int, float)):
         check_float(name=f"{seconds_to_timestamp.__name__} seconds", value=seconds, min_value=0)
@@ -3048,6 +3084,7 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
                               verbose: bool = False) -> Dict[int, np.ndarray]:
     """
     Read a batch of frames from a video file. This method reads frames from a specified range of frames within a video file using multiprocessing.
+
     .. seealso::
        For GPU acceleration, see :func:`simba.utils.read_write.read_img_batch_from_video_gpu`
 

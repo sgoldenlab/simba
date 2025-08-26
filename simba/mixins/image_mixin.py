@@ -1788,135 +1788,6 @@ class ImageMixin(object):
                 return frame, frame_index
         return first_frm, 0
 
-    # @staticmethod
-    # def get_blob_locations(video_path: Union[str, os.PathLike],
-    #                        batch_size: int = 3000,
-    #                        gpu: bool = False,
-    #                        verbose: bool = True,
-    #                        save_path: Optional[Union[str, os.PathLike]] = None,
-    #                        inclusion_zone: Optional[Union[Polygon, MultiPolygon]] = None,
-    #                        window_size: Optional[float] = None) -> Union[None, np.ndarray]:
-    #     """
-    #     Detects the location of the largest blob in each frame of a video. Processes frames in batches and optionally uses GPU for acceleration. Results can be saved to a specified path or returned as a NumPy array.
-    #
-    #     .. seealso::
-    #        For visualization of results, see :func:`simba.plotting.blob_plotter.BlobPlotter` and :func:`simba.mixins.plotting_mixin.PlottingMixin._plot_blobs`
-    #        Background subtraction can be performed using :func:`~simba.video_processors.video_processing.video_bg_subtraction_mp` or :func:`~simba.video_processors.video_processing.video_bg_subtraction`.
-    #
-    #     .. note::
-    #        In ``inclusion_zones`` is not None, then the largest blob will be searches for **inside** the passed vertices.
-    #
-    #     :param Union[str, os.PathLike] video_path: Path to the video file from which to extract frames. Often, a background subtracted video, which can be created with e.g., :func:`simba.video_processors.video_processing.video_bg_subtraction_mp`.
-    #     :param Optional[int] batch_size: Number of frames to process in each batch. Default is 3k.
-    #     :param Optional[bool] gpu: Whether to use GPU acceleration for processing. Default is False.
-    #     :param Optional[bool] verbose: Whether to print progress and status messages. Default is True.
-    #     :param Optional[Union[str, os.PathLike]] save_path: Path to save the results as a CSV file. If None, results are not saved.
-    #     :param Optional[Union[Polygon, MultiPolygon]] inclusion_zones: Optional shapely polygon, or multipolygon, restricting where to search for the largest blob. Default: None.
-    #     :param Optional[int] window_size: If not None, then integer representing the size multiplier of the animal geometry in previous frame. If not None, the animal geometry will only be searched for within this geometry.
-    #     :return: A NumPy array of shape (N, 2) where N is the number of frames, containing the X and Y coordinates of the centroid of the largest blob in each frame. If `save_path` is provided, returns None.
-    #     :rtype: Union[None, np.ndarray]
-    #
-    #     :example:
-    #     >>> x = ImageMixin.get_blob_locations(video_path=r"/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4_downsampled_bg_subtracted.mp4", gpu=True)
-    #     >>> y = ImageMixin.get_blob_locations(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_IOT_1_bg_subtracted.mp4", gpu=True)
-    #     """
-    #
-    #     timer = SimbaTimer(start=True)
-    #     video_meta = get_video_meta_data(video_path=video_path)
-    #     _, video_name, _ = get_fn_ext(filepath=video_path)
-    #     check_int(name=f'{ImageMixin.get_blob_locations.__name__} batch_size', value=batch_size, min_value=1)
-    #     if batch_size > video_meta['frame_count']: batch_size = video_meta['frame_count']
-    #     if save_path is not None:
-    #         if not os.path.isdir(os.path.basename(save_path)): raise NotDirectoryError(msg='Save path is not a valid directory', source=ImageMixin.get_blob_locations.__name__)
-    #     check_valid_boolean(value=gpu, source=f'{ImageMixin.get_blob_locations.__name__} gpu')
-    #     check_valid_boolean(value=gpu, source=f'{ImageMixin.get_blob_locations.__name__} verbose')
-    #     if gpu and not check_nvidea_gpu_available():
-    #         raise FFMPEGCodecGPUError(msg='No GPU detected, try to set GPU to False', source=ImageMixin.get_blob_locations.__name__)
-    #     if inclusion_zone is not None:
-    #         check_instance(source=f'{ImageMixin.get_blob_locations} inclusion_zone', instance=inclusion_zone, accepted_types=(MultiPolygon, Polygon,), raise_error=True)
-    #     if window_size is not None:
-    #         check_float(name='window_size', value=window_size, min_value=1.0, raise_error=True)
-    #     frame_ids = list(range(0, video_meta['frame_count']))
-    #     frame_ids = [frame_ids[i:i + batch_size] for i in range(0, len(frame_ids), batch_size)]
-    #     core_cnt = find_core_cnt()[0]
-    #     results = {}
-    #     if verbose:
-    #         print('Starting blob location detection...')
-    #     for frame_batch in range(len(frame_ids)):
-    #         start_frm, end_frm = frame_ids[frame_batch][0], frame_ids[frame_batch][-1]
-    #         if gpu:
-    #             imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=start_frm, end_frm=end_frm,  verbose=False, out_format='array', black_and_white=True)
-    #         else:
-    #             imgs = ImageMixin.read_img_batch_from_video(video_path=video_path, start_frm=start_frm, end_frm=end_frm, verbose=verbose, black_and_white=True)
-    #             imgs = np.stack(list(imgs.values()))
-    #         keys = np.arange(start_frm, end_frm+1)
-    #         img_dict = {}
-    #         for cnt, img_id in enumerate(range(start_frm, end_frm+1)):
-    #             img_dict[img_id] = imgs[cnt]
-    #         batch_results = {}
-    #         img_dict = [{k: img_dict[k] for k in subset} for subset in np.array_split(keys, core_cnt)]
-    #         del imgs
-    #         with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-    #             constants = functools.partial(find_animal_blob_location,
-    #                                           verbose=verbose,
-    #                                           video_name=video_name,
-    #                                           inclusion_zone=inclusion_zone)
-    #             for cnt, result in enumerate(pool.imap(constants, img_dict, chunksize=1)):
-    #                 batch_results.update(result)
-    #         results.update(batch_results)
-    #         pool.join()
-    #         pool.terminate()
-    #     results = dict(sorted(results.items()))
-    #     results = list(results.values())
-    #     results = np.stack(results, axis=0)
-    #     timer.stop_timer()
-    #     if save_path:
-    #         df = pd.DataFrame(results, columns=['X', 'Y'])
-    #         write_df(df=df, file_type=Formats.CSV.value, save_path=save_path)
-    #         if verbose:
-    #             stdout_success(f'Video {video_meta["video_name"]} blob detection complete, saved at {save_path}', elapsed_time=timer.elapsed_time_str)
-    #     else:
-    #         stdout_success(f'Video {video_meta["video_name"]} blob detection complete', elapsed_time=timer.elapsed_time_str)
-    #         return results.astype(np.int32)
-
-    @staticmethod
-    def img_diff(x: np.ndarray,
-                 y: np.ndarray,
-                 threshold: int,
-                 method: str = 'absolute') -> np.ndarray:
-
-        """
-        Computes the difference between two images using the specified method and applies a threshold to produce a binary image.
-
-        :param np.ndarray x: The first input image as a NumPy array.
-        :param np.ndarray y: The second input image as a NumPy array.
-        :param int threshold: The pixel intensity threshold for binarizing the difference image (range: 1-255).
-        :param str method: The method to compute the difference. Options are: - 'absolute': Uses OpenCV's `absdiff` function. - 'light': Computes absolute difference with potential overexposure handling. - 'dark': Computes absolute difference with potential underexposure handling.
-        :return: A binary image (NumPy array) where pixel values are either 255 (significant difference) or 0 (insignificant difference).
-        :rtype: np.ndarray
-
-        :example:
-        >>> img1 = np.random.randint(0, 255, (100, 100, 3), dtype=np.uint8)
-        >>> img2 = np.random.randint(0, 255, (100, 100, 3), dtype=np.uint8)
-        >>> result = ImageMixin.img_diff(img1, img2, threshold=50, method='absolute')
-        """
-
-        check_if_valid_img(data=x, source=f'{ImageMixin.img_diff.__name__} x', raise_error=True)
-        check_if_valid_img(data=y, source=f'{ImageMixin.img_diff.__name__} y', raise_error=True)
-        check_int(name=f'{ImageMixin.img_diff.__name__} threshold', value=threshold, max_value=255, min_value=1)
-        check_str(name='method', value=method, options=['absolute', 'light', 'dark'], raise_error=True)
-        if method == 'absolute':
-            diff = cv2.absdiff(x, y)
-        elif method == 'light':
-            diff = np.abs(x.astype(np.int16) - y.astype(np.int16)).astype(np.uint8)
-        elif method == 'dark':
-            diff = np.abs(x.astype(np.int16) - y.astype(np.int16)).astype(np.uint8)
-        else:
-            diff = cv2.absdiff(x, y)
-        gray_diff = cv2.cvtColor(diff, cv2.COLOR_BGR2GRAY)
-
-        return np.where(gray_diff > threshold, 255, 0).astype(np.uint8)
-
     @staticmethod
     def is_video_color(video: Union[str, os.PathLike, cv2.VideoCapture]):
         """
@@ -1928,13 +1799,28 @@ class ImageMixin(object):
         """
 
         frm, frm_idx = ImageMixin.find_first_non_uniform_clr_frm(video_path=video)
-        if frm.ndim > 2:
-            if frm.shape[2] != 1:
-                return True
-            else:
-                return False
-        else:
+        
+        # If frame has only 2 dimensions, it's definitely greyscale
+        if frm.ndim == 2:
             return False
+        
+        # If frame has 3 dimensions, check if it's actually greyscale
+        # (some greyscale videos are stored as 3-channel with identical values)
+        if frm.ndim == 3:
+            # Check if all channels are identical (indicating greyscale)
+            if frm.shape[2] == 3:  # BGR format
+                # Compare B, G, and R channels
+                if np.array_equal(frm[:, :, 0], frm[:, :, 1]) and np.array_equal(frm[:, :, 1], frm[:, :, 2]):
+                    return False  # All channels identical = greyscale
+                else:
+                    return True   # Channels different = color
+            elif frm.shape[2] == 1:
+                return False  # Single channel = greyscale
+            else:
+                return True   # Other multi-channel formats = color
+        
+        # Default case: assume greyscale
+        return False
 
     @staticmethod
     @jit(nopython=True)

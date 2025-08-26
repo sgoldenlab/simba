@@ -8,26 +8,32 @@ import struct
 import subprocess
 import sys
 import tkinter as tk
-from copy import copy, deepcopy
+from copy import copy
 from datetime import datetime
 from multiprocessing import Lock, Value
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union, Any
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 
 import matplotlib.font_manager
-import numpy as np
 import pandas as pd
 import psutil
 import pyglet
 from matplotlib import cm
+from tabulate import tabulate
 
 import simba
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
+from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists, check_int, check_str,
                                 check_valid_dict, check_valid_tuple)
-from simba.utils.enums import OS, UML, FontPaths, Methods, Paths
-from simba.utils.read_write import get_fn_ext
+from simba.utils.enums import OS, UML, FontPaths, Methods, Paths, Formats, Options, Defaults
+from simba.utils.read_write import get_fn_ext, find_files_of_filetypes_in_directory, get_video_meta_data
 from simba.utils.warnings import NoDataFoundWarning
+from simba.utils.errors import NoFilesFoundError
+from tabulate import tabulate
 
 if platform.system() == OS.WINDOWS.value:
     from pyglet.libs.win32 import constants
@@ -809,6 +815,65 @@ def get_monitor_info() -> Tuple[Dict[int, Dict[str, Union[int, bool]]], Tuple[in
     main_monitor = next(({'width': v['width'], 'height': v['height']} for v in results.values() if v.get('primary')), {'width': next(iter(results.values()))['width'], 'height': next(iter(results.values()))['height']})
 
     return results, (int(main_monitor['width']), int(main_monitor['height']))
+
+
+
+def get_table(data: Dict[str, Any],
+              headers: Optional[Tuple[str, str]] = ("SETTING", "VALUE"),
+              tablefmt: str = "grid") -> str:
+    """
+     Create a formatted table string from dictionary data using the tabulate library.
+
+     Converts a dictionary into a formatted table string suitable for display
+     or printing. Each key-value pair in the dictionary becomes a row in the table.
+
+     :param Dict[str, Any] data: Dictionary containing the data to be formatted as a table.  Keys become the first column, values become the second column.
+     :param Optional[Tuple[str, str]] headers: Tuple of two strings representing the column headers. Default is ("SETTING", "VALUE").
+     :param Literal["grid"] tablefmt: Table format style. For options, see simba.utils.enums.Formats.VALID_TABLEFMT
+     :return str: Formatted table string ready for display or printing.
+
+     :example:
+     >>> data = {"fps": 30, "width": 1920, "height": 1080, "frame_count": 3000}
+     >>> table = get_table(data=data, headers=("PARAMETER", "VALUE"))
+     """
+
+    check_valid_dict(x=data, valid_key_dtypes=(str,), min_len_keys=1, source=f'{get_table.__name__} data')
+    check_valid_tuple(x=headers, source=f'{get_table.__name__} data', accepted_lengths=(2,), valid_dtypes=(str,))
+    check_str(name=f'{get_table.__name__} tablefmt', value=tablefmt, options=Formats.VALID_TABLEFMT.value, raise_error=True)
+    table_view = [[key, data[key]] for key in data]
+    return tabulate(table_view, headers=headers, tablefmt=tablefmt)
+
+
+
+
+def print_video_meta_data(data_path: Union[str, os.PathLike]) -> None:
+    """
+    Print video metadata as formatted tables to the console.
+
+    This function reads video metadata from either a single video file or all video files
+    in a directory, then prints the metadata as formatted tables.
+
+    .. seealso::
+       To get video metadata as a dictionary without printing, use :func:`simba.utils.read_write.get_video_meta_data`.
+       To get video metadata as a table without printing, use :func:`simba.utils.lookups.get_table`.
+
+    :param Union[str, os.PathLike] data_path: Path to video file or directory containing videos.
+    :return: None. Video metadata is printed as formatted tables in the main console.
+    """
+
+    if os.path.isfile(data_path):
+        video_meta_data = [get_video_meta_data(video_path=data_path)]
+    elif os.path.isdir(data_path):
+        video_paths = find_files_of_filetypes_in_directory(directory=data_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=False)
+        video_meta_data = [get_video_meta_data(video_path=x) for x in video_paths]
+    else:
+        raise NoFilesFoundError(msg=f'{data_path} is not a valid file or directory path', source=print_video_meta_data.__name__)
+    for video_meta in video_meta_data:
+        table = get_table(data=video_meta, headers=('VIDEO PARAMETER', 'VALUE'), tablefmt='grid')
+        print(f"{table} {Defaults.STR_SPLIT_DELIMITER.value}TABLE")
+
+
+
 
 
 

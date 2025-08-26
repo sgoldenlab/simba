@@ -1553,19 +1553,44 @@ def is_video_color(video: Union[str, os.PathLike, cv2.VideoCapture]) -> bool:
     """
 
     check_instance(source=is_video_color.__name__, instance=video, accepted_types=(str, cv2.VideoCapture))
+    
+    # Handle string path vs VideoCapture object
+    should_release = False
     if isinstance(video, str):
         check_file_exist_and_readable(file_path=video)
         video = cv2.VideoCapture(video)
+        should_release = True
 
-    video.set(cv2.CAP_PROP_POS_FRAMES, 0)
-    _, frm = video.read()
-    if frm.ndim > 2:
-        if frm.shape[2] != 1:
-            return True
-        else:
+    try:
+        video.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        _, frm = video.read()
+        
+        # If frame has only 2 dimensions, it's definitely greyscale
+        if frm.ndim == 2:
             return False
-    else:
+        
+        # If frame has 3 dimensions, check if it's actually greyscale
+        # (some greyscale videos are stored as 3-channel with identical values)
+        if frm.ndim == 3:
+            # Check if all channels are identical (indicating greyscale)
+            if frm.shape[2] == 3:  # BGR format
+                # Compare B, G, and R channels
+                if np.array_equal(frm[:, :, 0], frm[:, :, 1]) and np.array_equal(frm[:, :, 1], frm[:, :, 2]):
+                    return False  # All channels identical = greyscale
+                else:
+                    return True   # Channels different = color
+            elif frm.shape[2] == 1:
+                return False  # Single channel = greyscale
+            else:
+                return True   # Other multi-channel formats = color
+        
+        # Default case: assume greyscale
         return False
+    
+    finally:
+        # Clean up VideoCapture if we created it
+        if should_release and video.isOpened():
+            video.release()
 
 
 def check_filepaths_in_iterable_exist(file_paths: Iterable[str],

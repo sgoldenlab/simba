@@ -709,5 +709,3 @@ class FileSelect(Frame):
         self.btnFind["state"] = setstatus
 
 
-
-

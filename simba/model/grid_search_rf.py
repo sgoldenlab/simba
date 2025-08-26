@@ -53,7 +53,6 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
             self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(self.x_df, self.y_df, test_size=meta_dict["train_test_size"])
         elif (meta_dict[MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value] == Methods.SPLIT_TYPE_BOUTS.value):
             self.x_train, self.x_test, self.y_train, self.y_test = (self.bout_train_test_splitter(x_df=self.x_df.reset_index(drop=True), y_df=self.y_df.reset_index(drop=True), test_size=meta_dict["train_test_size"]))
-            print(self.y_test)
         else:
             raise InvalidInputError(msg=f"{meta_dict[MLParamKeys.TRAIN_TEST_SPLIT_TYPE.value]} is not recognized as a valid SPLIT TYPE (OPTIONS: FRAMES, BOUTS).", source=self.__class__.__name__)
         if (meta_dict[MLParamKeys.UNDERSAMPLE_SETTING.value].lower() == Methods.RANDOM_UNDERSAMPLE.value):
