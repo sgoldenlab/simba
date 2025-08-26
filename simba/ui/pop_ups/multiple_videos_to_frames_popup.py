@@ -2,9 +2,8 @@ import os.path
 from tkinter import *
 
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
-                                        FolderSelect, SimbaButton,
-                                        SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FolderSelect,
+                                        SimbaButton, SimBADropDown)
 from simba.utils.checks import check_if_dir_exists, check_nvidea_gpu_available
 from simba.utils.read_write import (find_all_videos_in_directory,
                                     find_core_cnt, get_video_meta_data,

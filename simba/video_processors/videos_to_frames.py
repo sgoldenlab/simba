@@ -1,15 +1,21 @@
-from typing import Tuple, List, Optional, Union
+from typing import List, Optional, Tuple, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
+
 import functools
 import multiprocessing
 import os
+
 import cv2
-from simba.utils.checks import (check_if_dir_exists, check_int, check_str, check_valid_boolean)
+
+from simba.utils.checks import (check_if_dir_exists, check_int, check_str,
+                                check_valid_boolean)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_core_cnt, get_video_meta_data, read_frm_of_video)
+from simba.utils.read_write import (find_core_cnt, get_video_meta_data,
+                                    read_frm_of_video)
 
 JPEG, PNG, WEBP = 'jpeg', 'png', 'webp'
 
