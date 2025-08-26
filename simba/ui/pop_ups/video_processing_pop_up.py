@@ -639,7 +639,7 @@ class ExtractSpecificFramesPopUp(PopUpMixin):
                             include_fn=include_fn)
 
 
-ExtractSpecificFramesPopUp()
+#ExtractSpecificFramesPopUp()
 
 class ExtractAllFramesPopUp(PopUpMixin):
     def __init__(self):
