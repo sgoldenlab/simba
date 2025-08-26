@@ -11,7 +11,7 @@ from simba.utils.checks import (check_if_dir_exists, check_int, check_str, check
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_core_cnt, get_video_meta_data, read_frm_of_video)
 
-JPEG, PNG, WEBM = 'jpeg', 'png', 'webm'
+JPEG, PNG, WEBP = 'jpeg', 'png', 'webp'
 
 def _video_to_frms_helper(img_batch: Tuple[int, List[int]],
                           verbose: bool,
@@ -35,7 +35,7 @@ def _video_to_frms_helper(img_batch: Tuple[int, List[int]],
         if verbose:
             print(f"Saving image {save_path} ...")
         img = read_frm_of_video(video_path=cap, frame_index=frm_idx, greyscale=greyscale, clahe=clahe, black_and_white=black_and_white)
-        if img_format == WEBM:
+        if img_format == WEBP:
             cv2.imwrite(save_path, img, [cv2.IMWRITE_WEBP_QUALITY, quality])
         elif img_format == JPEG:
             cv2.imwrite(save_path, img, [cv2.IMWRITE_JPEG_QUALITY, quality])

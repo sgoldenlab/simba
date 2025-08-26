@@ -579,18 +579,33 @@ class ConvertVideoPopUp(PopUpMixin):
 class ExtractSpecificFramesPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="EXTRACT DEFINED FRAME RANGE FROM VIDEO", icon='frames')
-        self.video_file_selected = FileSelect(self.main_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=15)
+        self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm,header="SETTINGS", icon_name=Keys.DOCUMENTATION.value,icon_link=Links.VIDEO_TOOLS.value)
+        self.video_file_selected = FileSelect(self.settings_frm , "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=40)
+        self.save_dir = FolderSelect(self.settings_frm, "SAVE DIRECTORY: ", lblwidth=40, tooltip_txt='Optional directory where to save the images. \n If None, images are saved in a folder with the suffix `_frames` \n within the same directory as the video file')
+
+        self.format_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['jpeg', 'png', 'webp'], label="FORMAT: ", label_width=40, dropdown_width=25, value='png')
+        self.grey_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE: ", label_width=40, dropdown_width=25, value='FALSE')
+        self.clahe_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="CLAHE: ", label_width=40, dropdown_width=25, value='FALSE')
+        self.include_fn_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="INCLUDE VIDEO NAME IN IMAGE NAME: ", label_width=40, dropdown_width=25, value='FALSE')
+
+        self.settings_frm.grid(row=0, column=0, sticky=NW)
+        self.video_file_selected.grid(row=0, column=0, sticky=NW)
+        self.save_dir.grid(row=1, column=0, sticky=NW)
+        self.format_dropdown.grid(row=2, column=0, sticky=NW)
+        self.grey_dropdown.grid(row=3, column=0, sticky=NW)
+        self.clahe_dropdown.grid(row=4, column=0, sticky=NW)
+        self.include_fn_dropdown.grid(row=5, column=0, sticky=NW)
+
         select_frames_frm = LabelFrame(self.main_frm, text="FRAME RANGE TO BE EXTRACTED", font=Formats.FONT_HEADER.value, padx=5, pady=5)
-        self.start_frm = Entry_Box(select_frames_frm, "START FRAME:", "15", validation='numeric')
-        self.end_frm = Entry_Box(select_frames_frm, "END FRAME:", "15", validation='numeric')
-
-
+        self.start_frm = Entry_Box(select_frames_frm, "START FRAME NUMBER:", "40", validation='numeric')
+        self.end_frm = Entry_Box(select_frames_frm, "END FRAME NUMBER:", "40", validation='numeric')
         run_btn = SimbaButton(parent=select_frames_frm, txt="RUN", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.start_frm_extraction)
-        self.video_file_selected.grid(row=0, column=0, sticky=NW, pady=10)
+
         select_frames_frm.grid(row=1, column=0, sticky=NW)
         self.start_frm.grid(row=2, column=0, sticky=NW)
         self.end_frm.grid(row=3, column=0, sticky=NW)
         run_btn.grid(row=4, pady=5, sticky=NW)
+        self.main_frm.mainloop()
 
     def start_frm_extraction(self):
         start_frame = self.start_frm.entry_get
@@ -606,10 +621,25 @@ class ExtractSpecificFramesPopUp(PopUpMixin):
             raise FrameRangeError(msg=f"SIMBA ERROR: The start frame ({start_frame}) is larger than the number of frames in the video ({video_meta_data['frame_count']})", source=self.__class__.__name__)
         if int(end_frame) > video_meta_data["frame_count"]:
             raise FrameRangeError(msg=f"SIMBA ERROR: The end frame ({end_frame}) is larger than the number of frames in the video ({video_meta_data['frame_count']})", source=self.__class__.__name__)
+        grey = str_2_bool(self.grey_dropdown.get_value())
+        clahe = str_2_bool(self.clahe_dropdown.get_value())
+        include_fn = str_2_bool(self.include_fn_dropdown.get_value())
+        save_dir = self.save_dir.folder_path
+        save_dir = save_dir if os.path.isdir(save_dir) else None
+        img_format = self.format_dropdown.get_value()
+
+
         extract_frame_range(file_path=video_path,
                             start_frame=int(start_frame),
-                            end_frame=int(end_frame))
+                            end_frame=int(end_frame),
+                            save_dir=save_dir,
+                            greyscale=grey,
+                            clahe=clahe,
+                            img_format=img_format,
+                            include_fn=include_fn)
 
+
+ExtractSpecificFramesPopUp()
 
 class ExtractAllFramesPopUp(PopUpMixin):
     def __init__(self):

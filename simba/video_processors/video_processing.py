@@ -563,20 +563,38 @@ def extract_frame_range(file_path: Union[str, os.PathLike],
                         start_frame: int,
                         end_frame: int,
                         save_dir: Optional[Union[str, os.PathLike]] = None,
-                        verbose: Optional[bool] = True) -> None:
+                        img_format: Literal['png', 'webp', 'jpeg'] = 'png',
+                        verbose: Optional[bool] = True,
+                        greyscale: Optional[bool] = False,
+                        clahe: Optional[bool] = False,
+                        include_fn: Optional[bool] = False) -> None:
     """
-    Extract a user-defined range of frames from a video file to `png` format.
+    Extract a user-defined range of frames from a video file and save them as individual image files.
 
-    :param Union[str, os.PathLike] file_path: Path to video file
-    :param int start_frame: First frame in range to extract
-    :param int end_frame: Last frame in range to extract.
-    :param Optional[Union[str, os.PathLike]] save_dir: Optional save directory. Images are saved in a folder with the suffix `_frames` within the same directory as the video file, if None is passed.
-    :param Optional[bool] verbose: Wether to print progress. Default False.
-    :returns: None
+    .. note::
+       Frames are saved with sequential numbering matching the original frame numbers. If no save directory is specified, frames are saved in a subdirectory with the suffix `_frames` within the same directory as the video file.
+
+    :param Union[str, os.PathLike] file_path: Path to the video file to extract frames from.
+    :param int start_frame: First frame in range to extract (0-indexed).
+    :param int end_frame: Last frame in range to extract (inclusive).
+    :param Optional[Union[str, os.PathLike]] save_dir: Optional directory where extracted frames will be saved. If None, saves in a subdirectory with suffix `_frames` in the same directory as the video file.
+    :param Literal['png', 'webp', 'jpeg'] img_format: Format of the output images. One of: 'png', 'webp', 'jpeg'. Default: 'png'.
+    :param Optional[bool] verbose: If True, prints progress messages during extraction. Default: True.
+    :param Optional[bool] greyscale: If True, converts frames to greyscale. Default: False.
+    :param Optional[bool] clahe: If True, applies Contrast Limited Adaptive Histogram Equalization to each frame. Default: False.
+    :param Optional[bool] include_fn: If True, includes video name in frame filenames. Default: False.
+    :return: None. Frames are saved to disk in the specified directory.
 
     :example:
-    >>> _ = extract_frame_range(file_path='project_folder/videos/Video_1.mp4', start_frame=100, end_frame=500)
+    >>> _ = extract_frame_range(file_path='project_folder/videos/Video_1.mp4', 
+    ...                        start_frame=100, 
+    ...                        end_frame=500, 
+    ...                        img_format='webp', 
+    ...                        verbose=True)
     """
+
+    JPEG, PNG, WEBP = 'jpeg', 'png', 'webp'
+
 
     timer = SimbaTimer(start=True)
     check_file_exist_and_readable(file_path=file_path)
@@ -585,6 +603,10 @@ def extract_frame_range(file_path: Union[str, os.PathLike],
     file_dir, file_name, file_ext = get_fn_ext(filepath=file_path)
     check_int(name="end frame", value=end_frame, max_value=video_meta_data["frame_count"])
     frame_range = list(range(int(start_frame), int(end_frame) + 1))
+    check_valid_boolean(value=clahe, source=f'{extract_frame_range.__name__} clahe', raise_error=True)
+    check_valid_boolean(value=greyscale, source=f'{extract_frame_range.__name__} greyscale', raise_error=True)
+    check_valid_boolean(value=include_fn, source=f'{extract_frame_range.__name__} include_fn', raise_error=True)
+    check_str(name=f'{extract_frame_range.__name__} img_format', value=img_format, options=('png', 'webp', 'jpeg'), allow_blank=False, raise_error=True)
     if save_dir is None:
         save_dir = os.path.join(file_dir, f"{file_name}_frames")
     else:
@@ -594,9 +616,17 @@ def extract_frame_range(file_path: Union[str, os.PathLike],
         os.makedirs(save_dir)
     for frm_cnt, frm_number in enumerate(frame_range):
         frm_timer = SimbaTimer(start=True)
-        frame = read_frm_of_video(video_path=cap, frame_index=frm_cnt)
-        frm_save_path = os.path.join(save_dir, f"{frm_number}.png")
-        cv2.imwrite(frm_save_path, frame)
+        frame = read_frm_of_video(video_path=cap, frame_index=frm_cnt, greyscale=greyscale, clahe=clahe)
+        if not include_fn:
+            frm_save_path = os.path.join(save_dir, f"{frm_number}.{img_format}")
+        else:
+            frm_save_path = os.path.join(save_dir, f"{video_meta_data['video_name']}_{frm_number}.{img_format}")
+        if img_format == WEBP:
+            cv2.imwrite(frm_save_path, frame, [cv2.IMWRITE_WEBP_QUALITY, 90])
+        elif img_format == JPEG:
+            cv2.imwrite(frm_save_path, frame, [cv2.IMWRITE_JPEG_QUALITY, 95])
+        else:
+            cv2.imwrite(frm_save_path, frame, [cv2.IMWRITE_PNG_COMPRESSION, 3])
         frm_timer.stop_timer()
         if verbose:
             print(f"Frame {frm_number} saved (Frame {frm_cnt}/{len(frame_range)-1}) (elapsed time: {frm_timer.elapsed_time_str}s)")

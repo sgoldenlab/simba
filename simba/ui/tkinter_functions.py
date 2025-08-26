@@ -211,6 +211,7 @@ class FolderSelect(Frame):
                  bg_clr: Optional[str] = 'white',
                  entry_width: Optional[int] = 20,
                  initialdir: Optional[Union[str, os.PathLike]] = None,
+                 tooltip_txt: Optional[str] = None,
                  **kw):
 
         self.title, self.initialdir = title, initialdir
@@ -229,6 +230,9 @@ class FolderSelect(Frame):
         self.btnFind.image = browse_icon
         self.btnFind.grid(row=0, column=2, sticky=NW)
         self.folderPath.set("No folder selected")
+
+        if tooltip_txt is not None and isinstance(tooltip_txt, str):
+            CreateToolTip(widget=self.entPath, text=tooltip_txt)
 
     def setFolderPath(self):
         if self.initialdir is not None:
