@@ -12,7 +12,8 @@ from copy import copy
 from datetime import datetime
 from multiprocessing import Lock, Value
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union, Any
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 try:
     from typing import Literal
 except:
@@ -29,11 +30,12 @@ import simba
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists, check_int, check_str,
                                 check_valid_dict, check_valid_tuple)
-from simba.utils.enums import OS, UML, FontPaths, Methods, Paths, Formats, Options, Defaults
-from simba.utils.read_write import get_fn_ext, find_files_of_filetypes_in_directory, get_video_meta_data
-from simba.utils.warnings import NoDataFoundWarning
+from simba.utils.enums import (OS, UML, Defaults, FontPaths, Formats, Methods,
+                               Options, Paths)
 from simba.utils.errors import NoFilesFoundError
-from tabulate import tabulate
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, get_video_meta_data)
+from simba.utils.warnings import NoDataFoundWarning
 
 if platform.system() == OS.WINDOWS.value:
     from pyglet.libs.win32 import constants

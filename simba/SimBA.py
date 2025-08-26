@@ -73,7 +73,6 @@ from simba.ui.pop_ups.check_videos_seekable_pop_up import \
     CheckVideoSeekablePopUp
 from simba.ui.pop_ups.clf_add_remove_print_pop_up import (
     AddClfPopUp, PrintModelInfoPopUp, RemoveAClassifierPopUp)
-from simba.ui.pop_ups.print_video_meta_popup import PrintVideoMetaDataPopUp
 from simba.ui.pop_ups.clf_annotation_counts_pop_up import \
     ClfAnnotationCountPopUp
 from simba.ui.pop_ups.clf_by_roi_pop_up import ClfByROIPopUp
@@ -131,6 +130,7 @@ from simba.ui.pop_ups.outlier_settings_pop_up import OutlierSettingsPopUp
 from simba.ui.pop_ups.path_plot_pop_up import PathPlotPopUp
 from simba.ui.pop_ups.pose_bp_drop_pop_up import DropTrackingDataPopUp
 from simba.ui.pop_ups.pose_reorganizer_pop_up import PoseReorganizerPopUp
+from simba.ui.pop_ups.print_video_meta_popup import PrintVideoMetaDataPopUp
 from simba.ui.pop_ups.pup_retrieval_pop_up import PupRetrievalPopUp  # LAZY
 from simba.ui.pop_ups.quick_path_plot_pop_up import QuickLineplotPopup
 from simba.ui.pop_ups.remove_roi_features_pop_up import RemoveROIFeaturesPopUp
