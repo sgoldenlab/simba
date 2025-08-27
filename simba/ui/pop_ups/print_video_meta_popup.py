@@ -35,11 +35,11 @@ class PrintVideoMetaDataPopUp(PopUpMixin):
             check_if_dir_exists(in_dir=self.directory_path.folder_path)
             videos = find_all_videos_in_directory(directory=self.directory_path.folder_path, as_dict=True)
             for video_name, video_path in videos.items():
-                v = get_video_meta_data(video_path=video_path)
+                v = get_video_meta_data(video_path=video_path, fps_as_int=False)
                 results[v['video_name']] = v
         else:
             check_file_exist_and_readable(file_path=self.video_path.file_path)
-            v = get_video_meta_data(video_path=self.video_path.file_path)
+            v = get_video_meta_data(video_path=self.video_path.file_path, fps_as_int=False)
             results[v['video_name']] = v
 
         _ = GetTreeView(data=results, index_col_name='VIDEO', headers=('VALUE',), title='VIDEO META DATA')

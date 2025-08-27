@@ -479,8 +479,13 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture],
     video_data["frame_count"] = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     if isinstance(video_path, str):
         video_data["color_format"] = 'rgb' if is_video_color(video=video_path) else 'grey'
+        video_data["creation_date"] = get_file_creation_date(file_path=video_path, raise_error=False)
+        video_data["file_size_mb"] = get_file_size(file_path=video_path, raise_error=False)
     else:
         video_data["color_format"] = 'rgb' if is_video_color(video=cap) else 'grey'
+        video_data["creation_date"] = None
+        video_data["file_size_mb"] = None
+
     for k, v in video_data.items():
         if v == 0:
             if raise_error:
@@ -1625,6 +1630,8 @@ def find_time_stamp_from_frame_numbers(start_frame: int, end_frame: int, fps: fl
        To convert time-stamp to seconds, use :func:`simba.utils.read_write.timestamp_to_seconds`.
        To convert seconds to HH:MM:SS timestamp, use :func:`simba.utils.read_write.seconds_to_timestamp`.
        To convert frame segment (start, end frame) to HH:MM:SS time-stamps, use func:`simba.utils.read_write.find_time_stamp_from_frame_numbers`.
+       For the converse (find HH:MM:SS from start and in frame numbers format), use func:`simba.utils.data.find_frame_numbers_from_time_stamp`.
+
 
     :param int start_frame: The starting frame index.
     :param int end_frame: The ending frame index.
@@ -2225,11 +2232,8 @@ def seconds_to_timestamp(seconds: Union[int, float, List[Union[int, float]]]) ->
        To convert HH:MM:SS timestamp to seconds, use func:`simba.utils.read_write.timestamp_to_seconds`.
        To convert frame segment (start, end frame) to HH:MM:SS time-stamps, use func:`simba.utils.read_write.find_time_stamp_from_frame_numbers`.
 
-
-
     :param Union[int, float, List[Union[int, float]]] seconds: Seconds to convert. Can be a single number or a list of numbers.
     :return Union[str, List[str]]: Timestamp(s) in HH:MM:SS format. Returns a single string for single input, list of strings for list input.
-
 
     :example:
     >>> seconds_to_timestamp(3661)
@@ -3386,7 +3390,67 @@ def read_facemap_h5(file_path: Union[str, os.PathLike]) -> pd.DataFrame:
     return results
 
 
+def get_file_creation_date(file_path: Union[str, os.PathLike], raise_error: bool = True) -> Union[str, None]:
+    """
+    Get the creation date of a file as a formatted string.
+
+    :param Union[str, os.PathLike] file_path: Path to the file for which to get creation date.
+    :param bool raise_error: If True, raises an error if the file cannot be read. If False, returns None.  Default is True.
+    :return Union[str, None]: Creation date as a formatted string (e.g., "2024-01-15 14:30:25.123456"), or None if the file cannot be read and raise_error is False.
+
+    :example:
+    >>> creation_date = get_file_creation_date('file_path')
+    >>> print(creation_date)
+    >>> '2025-04-17 17:05:07.123456'
+    """
+    valid_path = check_file_exist_and_readable(file_path=file_path, raise_error=raise_error)
+    if not valid_path:
+        return None
+    try:
+        stat = os.stat(file_path).st_ctime
+        return str(datetime.fromtimestamp(stat))
+    except Exception as e:
+        if raise_error:
+            print(e.args)
+            raise InvalidFileTypeError(msg=f'Could not read creation date for file {file_path}', source=get_file_creation_date.__name__)
+        else:
+            return None
 
 
+def get_file_size(file_path: Union[str, os.PathLike],
+                  raise_error: bool = True,
+                  unit: Literal['B', 'KB', 'MB', 'GB'] = 'MB') -> Union[float, None]:
+    """
+    Get file size in specified unit.
+
+    :param Union[str, os.PathLike] file_path: Path to the file
+    :param bool raise_error: If True, raises error if file not found. If False, returns None.
+    :param Literal['B', 'KB', 'MB', 'GB'] unit: Unit to return size in. Default 'MB'.
+    :return Union[float, None]: File size in specified unit, or None if error and raise_error=False
+    """
+
+    valid_path = check_file_exist_and_readable(file_path=file_path, raise_error=raise_error)
+    check_str(name=f'{get_file_size.__name__} unit', value=unit, options=('B', 'KB', 'MB', 'GB'), raise_error=True)
+    if not valid_path:
+        return None
+    try:
+        size = os.path.getsize(file_path)
+
+        if unit == 'B':
+            return float(size)
+        elif unit == 'KB':
+            return round(size / 1024, 4)
+        elif unit == 'MB':
+            return round(size / (1024 * 1024), 4)
+        elif unit == 'GB':
+            return round(size / (1024 * 1024 * 1024), 4)
+        else:
+            return round(size / (1024 * 1024), 4)
+
+    except Exception as e:
+        if raise_error:
+            raise InvalidFileTypeError(msg=f'Could not read file size for file {file_path}', source=get_file_size.__name__)
+        else:
+            return None
 
 #concatenate_videos_in_folder(in_folder=r'C:\troubleshooting\RAT_NOR\project_folder\frames\output\path_plots\03152021_NOB_IOT_8', save_path=r"C:\troubleshooting\RAT_NOR\project_folder\frames\output\path_plots\new.mp4", remove_splits=False)

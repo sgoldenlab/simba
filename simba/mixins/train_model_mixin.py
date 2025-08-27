@@ -34,7 +34,7 @@ from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer,
                                    StandardScaler)
 from sklearn.tree import export_graphviz
 from sklearn.utils import parallel_backend
-from tabulate import tabulate
+
 
 from simba.mixins import cuRF
 
@@ -76,7 +76,7 @@ from simba.utils.errors import (ClassifierInferenceError, CorruptedFileError,
                                 FeatureNumberMismatchError, InvalidInputError,
                                 MissingColumnsError, NoDataError,
                                 SamplingError, SimBAModuleNotFoundError)
-from simba.utils.lookups import get_meta_data_file_headers
+from simba.utils.lookups import get_meta_data_file_headers, get_table
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_core_cnt, get_fn_ext,
                                     get_memory_usage_of_df, get_pkg_version,
@@ -967,11 +967,9 @@ class TrainModelMixin(object):
         Helper to print model information in tabular form.
 
         :param dict model_dict: dictionary holding model meta data in SimBA meta-config format.
-
         """
 
-        table_view = [[key, model_dict[key]] for key in model_dict]
-        table = tabulate(table_view, headers=["SETTING", "VALUE"], tablefmt="grid")
+        table = get_table(data=model_dict, headers=('SETTINGS', 'VALUE',), tablefmt="grid")
         print(f"{table} {Defaults.STR_SPLIT_DELIMITER.value}TABLE")
 
     def create_meta_data_csv_training_one_model(self, meta_data_lst: list, clf_name: str,

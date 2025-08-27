@@ -394,6 +394,8 @@ def merge_coco_keypoints_files(data_dir: Union[str, os.PathLike],
     if len(duplicates) > 0:
         DuplicateNamesWarning(msg=f'{len(duplicates)} annotated file names have the same name: {duplicates}', source=merge_coco_keypoints_files.__name__)
 
+    #PRINT THE NUMBER OF TOTAL ANNOTATIONS TODO
+
     timer.stop_timer()
     save_json(data=results, filepath=save_path)
     stdout_success(msg=f'Merged COCO key-points file (from {data_file_cnt} input files) saved at {save_path}', source=merge_coco_keypoints_files.__name__, elapsed_time=timer.elapsed_time_str)
@@ -454,6 +456,7 @@ def downsample_coco_dataset(json_path: Union[str, os.PathLike],
     ... )
     """
 
+    timer = SimbaTimer(start=True)
     check_file_exist_and_readable(file_path=json_path)
     check_if_dir_exists(in_dir=img_dir)
     check_if_dir_exists(in_dir=save_dir)
@@ -491,7 +494,8 @@ def downsample_coco_dataset(json_path: Union[str, os.PathLike],
         cv2.imwrite(filename=img_save_path, img=new_img)
 
     save_json(data=out_coco, filepath=out_coco_path)
-    if verbose: print(f'New COCO data stored in {save_dir}.')
+    timer.stop_timer()
+    if verbose: print(f'New COCO data stored in {save_dir} (elapsed time: {timer.elapsed_time_str}s)')
 
 
 

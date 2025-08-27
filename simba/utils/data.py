@@ -603,6 +603,9 @@ def find_frame_numbers_from_time_stamp(start_time: str, end_time: str, fps: int)
     Given start and end timestamps in HH:MM:SS formats and the fps, return the frame numbers representing
     the time period.
 
+    .. note::
+       For the converse (find frame numbers from start and in HH:MM:SS format), use func:`simba.utils.read_write.find_time_stamp_from_frame_numbers`.
+
     :param str start_time: Period start time in HH:MM:SS format.
     :param str end_time: Period end time in HH:MM:SS format.
     :param int fps: Framerate of the video.
