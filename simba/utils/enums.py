@@ -836,6 +836,7 @@ class UML(Enum):
 
 
 class ROI_SETTINGS(Enum):
+    POLYGON_TOLERANCE = 2
     SELECT_COLOR = "red"
     UNSELECT_COLOR = "black"
     CLICK_SENSITIVITY = 10
@@ -855,6 +856,7 @@ class ROI_SETTINGS(Enum):
     ROI_TRACKING_STYLE = 'FALSE' #bbox, keypoints, obb, keypoints & obb
     SHOW_GRID_OVERLAY = 'FALSE'
     OVERLAY_GRID_COLOR = (192, 192, 192)
+
 
 class PackageNames(Enum):
     ULTRALYTICS = 'ultralytics'

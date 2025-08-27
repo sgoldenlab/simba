@@ -58,6 +58,9 @@ def detect_bouts(data_df: pd.DataFrame, target_lst: Union[List[str], str], fps: 
     .. note::
        Can be any field of boolean type. E.g., target_lst = ['Inside_ROI_1`] also works for bouts inside ROI shape.
 
+    .. seealso::
+       For multi-class Boolean classifiers, see :func:`simba.utils.data.detect_bouts_multiclass`.
+
     :param pd.DataFrame data_df: Dataframe with fields representing classifications in boolean type.
     :param Union[List[str], str] target_lst: Classifier names. E.g., as list or a single ['Attack', 'Sniffing', 'Grooming'] string value 'Attack'. Can be any boolean column name.
     :param Union[int, float] fps: The fps of the input video.
@@ -123,6 +126,9 @@ def detect_bouts(data_df: pd.DataFrame, target_lst: Union[List[str], str], fps: 
 def detect_bouts_multiclass(data: pd.DataFrame, target: str, fps: int = 1, classifier_map: Dict[int, str] = None) -> pd.DataFrame:
     """
     Detect bouts in a multiclass time series dataset and return the bout event types, their start times, end times and duration.
+
+    .. seealso::
+       For single class Boolean classifiers, see :func:`simba.utils.data.detect_bouts`.
 
     :param pd.DataFrame data: A Pandas DataFrame containing multiclass time series data.
     :param str target: Name of the target column in ``data``.
@@ -386,7 +392,7 @@ def smooth_data_savitzky_golay(
     Perform Savitzky-Golay smoothing of pose-estimation data within a file.
 
     .. important::
-       LEGACY: USE ``savgol_smoother`` instead.
+       LEGACY: USE ``simba.utils.data.savgol_smoother`` instead.
 
        Overwrites the input data with smoothened data.
 
@@ -1187,7 +1193,7 @@ def run_user_defined_feature_extraction_class(file_path: Union[str, os.PathLike]
 
     .. warning::
 
-       Legacy function. The GUI since 12/23 uses ``simba.utils.custom_feature_extractor.UserDefinedFeatureExtractor``.
+       Legacy function. The GUI since 12/23 uses :func:`simba.utils.custom_feature_extractor.UserDefinedFeatureExtractor`.
 
     .. note::
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/extractFeatures.md>`_.
@@ -1320,8 +1326,7 @@ def body_part_interpolator(df: pd.DataFrame,
     Interpolate missing body-parts in pose-estimation data.
 
     .. note::
-       Data is inferred to be "missing" when data for the body-part is either "None" on both the x- and y-plane or located at
-       (0, 0).
+       Data is inferred to be "missing" when data for the body-part is either "None" on both the x- and y-plane or located at (0, 0).
 
     :param pd.DataFrame df: The input DataFrame containing animal body part positions.
     :param Dict[str, Any] animal_bp_dict: A dictionary where keys are animal names and values are dictionaries with keys "X_bps"  and "Y_bps", which are lists of column names for the x and y coordinates of the animal body parts.
@@ -1365,6 +1370,10 @@ def savgol_smoother(data: Union[pd.DataFrame, np.ndarray],
     Apply Savitzky-Golay smoothing to the input data pose-estimation data
 
     Applies the Savitzky-Golay filter to smooth the data in a DataFrame or a NumPy array. The filter smoothes the data using a polynomial of the specified order and a window size based on the frame rate per second (fps) and the time window.
+
+    .. seealso::
+       For 'bartlett', 'blackman', 'boxcar', 'cosine', 'gaussian', 'hamming', 'exponential' smoothing, see func:`simba.utils.data.df_smoother`.
+       For low-pass Fourier smoothing, see :func:`simba.utils.data.fft_lowpass_filter`.
 
     :param Union[pd.DataFrame, np.ndarray] data: The input data to be smoothed. Can be a pandas DataFrame or a 2D NumPy array.
     :param float fps: The frame rate per second of the data.
@@ -1422,6 +1431,10 @@ def df_smoother(data: pd.DataFrame,
     This function applies a rolling window smoothing operation to the data in the DataFrame. The type of window function
     and the standard deviation for the smoothing can be specified. The window size is determined based on the frame rate
     per second (fps) and the time window.
+
+    .. seealso::
+       For low-pass Fourier smoothing, see :func:`simba.utils.data.fft_lowpass_filter`.
+       For Savitzky-Golay smoothing, see :func:`simba.utils.data.savgol_smoother`.
 
     :param pd.DataFrame data: The input data to be smoothed.
     :param float fps: The frame rate per second of the data.
@@ -1761,6 +1774,51 @@ def resample_geometry_vertices(vertices: Union[List[np.ndarray], np.ndarray], ve
         except:
             pass
     return results
+
+def fft_lowpass_filter(data: np.ndarray, cut_off: float = 0.1) -> np.ndarray:
+    """
+    Apply FFT-based lowpass filter to 1D or 2D data.
+
+    .. seealso::
+       For Savitzky-Golay smoothing, see :func:`simba.utils.data.savgol_smoother`.
+       For 'bartlett', 'blackman', 'boxcar', 'cosine', 'gaussian', 'hamming', 'exponential' smoothing, see func:`simba.utils.data.df_smoother`.
+
+    :param np.ndarray data: Input data array (1D or 2D)
+    :param float cut_off: Cutoff frequency as fraction of Nyquist frequency (0 < cut_off < 1)
+    :return np.ndarray: Filtered data with same shape and dtype as input
+
+    :example:
+    >>> from simba.utils.read_write import read_df
+    >>> IN_PATH = r"C:\troubleshooting\RAT_NOR\project_folder\csv\outlier_corrected_movement_location\2022-06-20_NOB_DOT_4.csv"
+    >>> OUT_PATH = r"C:\troubleshooting\RAT_NOR\project_folder\csv\outlier_corrected_movement_location\2022-06-20_NOB_DOT_4_filtered.csv"
+    >>> df = read_df(file_path=IN_PATH)
+    >>> data = df.values
+    >>> x = fft_lowpass_filter(data=data, cut_off=0.1)
+    """
+
+    check_valid_array(data=data, source=f'{fft_lowpass_filter.__name__} data', accepted_ndims=(1, 2), accepted_dtypes=Formats.NUMERIC_DTYPES.value, raise_error=True)
+    check_float(name=f'{fft_lowpass_filter.__name__} cut_off', value=cut_off, min_value=10e-6, max_value=1.0 - 1e-9)
+    ndim = data.ndim
+
+    data_work = data.astype(np.float64)
+    results = np.zeros_like(data_work)
+
+    if ndim == 1:
+        data_work = data_work.reshape(-1, 1)
+        results = results.reshape(-1, 1)
+
+    mask = np.fft.rfftfreq(data_work.shape[0]) < cut_off
+    for dim in range(data_work.shape[1]):
+        column_data = data_work[:, dim].copy()
+        fft_vals = np.fft.rfft(column_data)
+        fft_vals[~mask] = 0
+        reconstructed = np.fft.irfft(fft_vals, n=data_work.shape[0])
+        results[:, dim] = reconstructed
+
+    if ndim == 1:
+        results = results.flatten()
+
+    return results.astype(data.dtype)
 
 
 

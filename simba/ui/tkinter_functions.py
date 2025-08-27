@@ -182,7 +182,6 @@ class Entry_Box(Frame):
 
     @property
     def entry_get(self):
-        self.entPath.get()
         return self.entPath.get()
 
     def entry_set(self, val):

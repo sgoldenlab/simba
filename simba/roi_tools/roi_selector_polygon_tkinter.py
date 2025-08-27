@@ -40,14 +40,16 @@ class ROISelectorPolygon(object):
                  img_window: Toplevel,
                  thickness: int = 10,
                  vertice_size: int = 2,
-                 clr: Tuple[int, int, int] = (147, 20, 255)) -> None:
+                 clr: Tuple[int, int, int] = (147, 20, 255),
+                 tolerance: int = 2) -> None:
 
         check_instance(source=self.__class__.__name__, instance=img_window, accepted_types=(Toplevel,))
         check_int(name=f'{self.__class__.__name__} thickness', value=thickness, min_value=1)
         check_int(name=f'{self.__class__.__name__} vertice_size', value=vertice_size, min_value=1)
+        check_int(name=f'{self.__class__.__name__} tolerance', value=tolerance, min_value=1)
         check_if_valid_rgb_tuple(data=clr)
         self.thickness, self.clr, self.img_window = thickness, clr, img_window
-        self.drawing, self.clr, self.thickness, self.vertice_size = False, clr, thickness, vertice_size
+        self.drawing, self.clr, self.thickness, self.vertice_size, self.tolerance = False, clr, thickness, vertice_size, tolerance
         self.polygon_vertices = []
 
         self.img_lbl = img_window.nametowidget("img_lbl")
@@ -81,7 +83,7 @@ class ROISelectorPolygon(object):
             ROIWarning(msg="ROI WARNING: At least 3 unique vertices are needed to form a polygon. Please try again.", source=self.__class__.__name__)
             return False
         else:
-            self.polygon = Polygon(np.array(self.polygon_vertices)).simplify(tolerance=20, preserve_topology=True)
+            self.polygon = Polygon(np.array(self.polygon_vertices)).simplify(tolerance=self.tolerance, preserve_topology=True)
             self.polygon_vertices = np.array(self.polygon.exterior.coords)
             self.polygon_area = self.polygon.area
             self.polygon_arr = np.array(self.polygon.exterior.coords).astype(np.int32)[1:]

@@ -10,7 +10,6 @@ import PIL.Image
 from PIL import ImageTk
 
 import simba
-from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.ui.import_pose_frame import ImportPoseFrame
 from simba.ui.import_videos_frame import ImportVideosFrame
 from simba.ui.pop_ups.clf_add_remove_print_pop_up import PoseResetterPopUp
@@ -19,7 +18,7 @@ from simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up import \
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         FolderSelect, SimbaButton,
                                         SimBADropDown, hxtScrollbar)
-from simba.utils.checks import check_if_dir_exists, check_str
+from simba.utils.checks import check_if_dir_exists, check_str, check_int
 from simba.utils.config_creator import ProjectConfigCreator
 from simba.utils.enums import Formats, Keys, Links, Methods, Options, Paths
 from simba.utils.errors import DuplicationError, MissingProjectConfigEntryError
@@ -29,7 +28,7 @@ from simba.video_processors.video_processing import \
     extract_frames_from_all_videos_in_directory
 
 
-class ProjectCreatorPopUp(PopUpMixin):
+class ProjectCreatorPopUp():
     """
     Mixin for GUI pop-up windows that accept user-inputs for creating a SimBA project.
 
@@ -138,13 +137,39 @@ class ProjectCreatorPopUp(PopUpMixin):
         #self.main_frm.mainloop()
 
     def __create_entry_boxes(self, cnt):
+        existing_values = []
         for entry in self.clf_entry_boxes:
-            entry.destroy()
+            try:
+                existing_values.append(entry.entry_get.strip())
+            except:
+                existing_values.append("")
+        for entry in self.clf_entry_boxes:
+            try:
+                entry.destroy()
+            except:
+                pass
         self.clf_entry_boxes = []
-        for clf_cnt in range(int(cnt)):
+        valid_cnt, _ = check_int(name=f'{self.__class__.__name__} cnt', value=cnt, min_value=1, raise_error=False)
+        count = int(cnt) if valid_cnt else 1
+        for clf_cnt in range(count):
             entry = Entry_Box(parent=self.ml_settings_frm, fileDescription=f'CLASSIFIER NAME {clf_cnt + 1}: ', labelwidth=35, entry_box_width=35)
             entry.grid(row=clf_cnt + 2, column=0, sticky=NW)
+            if clf_cnt < len(existing_values) and existing_values[clf_cnt]:
+                try:
+                    entry.entry_set(existing_values[clf_cnt])
+                except AttributeError:
+                    try:
+                        entry.entPath.insert(0, existing_values[clf_cnt])
+                    except:
+                        pass
             self.clf_entry_boxes.append(entry)
+        # for entry in self.clf_entry_boxes:
+        #     entry.destroy()
+        # self.clf_entry_boxes = []
+        # for clf_cnt in range(int(cnt)):
+        #     entry = Entry_Box(parent=self.ml_settings_frm, fileDescription=f'CLASSIFIER NAME {clf_cnt + 1}: ', labelwidth=35, entry_box_width=35)
+        #     entry.grid(row=clf_cnt + 2, column=0, sticky=NW)
+        #     self.clf_entry_boxes.append(entry)
 
     def update_body_part_dropdown(self, selected_value):
         self.selected_tracking_dropdown.destroy()
@@ -178,7 +203,8 @@ class ProjectCreatorPopUp(PopUpMixin):
         project_name = self.project_name_eb.entry_get
         check_str(name="PROJECT NAME", value=project_name, allow_blank=False)
         target_list = []
-        for number, entry_box in enumerate(self.clf_entry_boxes): target_list.append(entry_box.entry_get.strip())
+        for number, entry_box in enumerate(self.clf_entry_boxes):
+            target_list.append(entry_box.entry_get.strip())
         if len(list(set(target_list))) != len(self.clf_entry_boxes):
             raise DuplicationError(msg="All classifier names have to be unique")
         selected_config = self.selected_tracking_dropdown.getChoices()

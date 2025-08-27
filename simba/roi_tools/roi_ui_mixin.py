@@ -93,6 +93,7 @@ KEYPOINTS_BBOX = 'keypoints & bbox'
 SHOW_GRID_OVERLAY = 'SHOW_GRID_OVERLAY'
 OVERLAY_GRID_COLOR = 'OVERLAY_GRID_COLOR'
 SHOW_HEXAGON_OVERLAY = 'SHOW_HEXAGON_OVERLAY'
+POLYGON_TOLERANCE = 'POLYGON_TOLERANCE'
 
 PLATFORM = platform.system()
 
@@ -156,6 +157,7 @@ class ROI_mixin(ConfigReader):
         self.img_lbl.pack()
         self.img_window.protocol("WM_DELETE_WINDOW", self.close_img)
         self.settings = {item.name: item.value for item in ROI_SETTINGS}
+        self.settings[POLYGON_TOLERANCE] = 2
 
         self.rectangles_df, self.circles_df, self.polygon_df, self.roi_dict, self.roi_names, self.other_roi_dict, self.other_video_names_w_rois = get_roi_data(roi_path=self.roi_coordinates_path, video_name=self.video_meta['video_name'])
 
@@ -507,7 +509,7 @@ class ROI_mixin(ConfigReader):
         elif self.selected_shape_type == CIRCLE:
             self.selector = ROISelectorCircle(img_window=self.img_window, thickness=int(self.thickness_dropdown.getChoices()), clr=self.color_option_dict[self.color_dropdown.getChoices()])
         elif self.selected_shape_type == POLYGON:
-            self.selector = ROISelectorPolygon(img_window=self.img_window, thickness=int(self.thickness_dropdown.getChoices()), clr=self.color_option_dict[self.color_dropdown.getChoices()], vertice_size=int(self.ear_tag_size_dropdown.getChoices()))
+            self.selector = ROISelectorPolygon(img_window=self.img_window, thickness=int(self.thickness_dropdown.getChoices()), clr=self.color_option_dict[self.color_dropdown.getChoices()], vertice_size=int(self.ear_tag_size_dropdown.getChoices()), tolerance=int(self.settings[POLYGON_TOLERANCE]))
         self.root.bind("<Button-1>", on_click); self.root.bind("<Escape>", on_click); self.img_window.bind("<Escape>", on_click)
         self.root.wait_variable(self.click_event)
         if self.got_attributes:
@@ -845,6 +847,7 @@ class ROI_mixin(ConfigReader):
         self.overlay_color_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(self.color_option_dict.keys()), label="OVERLAY GRID COLOR: ", label_width=35, dropdown_width=35, value=next(key for key, val in self.color_option_dict.items() if val == self.settings[OVERLAY_GRID_COLOR]))
         self.show_grid_overlay_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['FALSE', '10MM', '20MM', '40MM', '80MM', '160MM'], label="SHOW GRID OVERLAY: ", label_width=35, dropdown_width=35, value=self.settings[SHOW_GRID_OVERLAY])
         self.show_hexagon_overlay_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['FALSE', '10MM', '20MM', '40MM', '80MM', '160MM'], label="SHOW HEXAGON OVERLAY: ", label_width=35, dropdown_width=35, value=self.settings[SHOW_GRID_OVERLAY])
+        self.polygon_tolerance_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(range(2, 22, 2)), label="POLYGON TOLERANCE: ", label_width=35, dropdown_width=35, value=self.settings[POLYGON_TOLERANCE], tooltip_txt='Higher values will simplify polygons. \n Smaller values will retain more polygon details')
 
 
         #self.max_width_ratio_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=WINDOW_SIZE_OPTIONS, label="MAX DRAW DISPLAY RATIO WIDTH: ", label_width=35, dropdown_width=35, value=MAX_DRAW_UI_DISPLAY_RATIO[0])
@@ -860,11 +863,12 @@ class ROI_mixin(ConfigReader):
         self.overlay_color_dropdown.grid(row=4, column=0, sticky=NW, pady=5)
         self.show_grid_overlay_dropdown.grid(row=5, column=0, sticky=NW, pady=5)
         self.show_hexagon_overlay_dropdown.grid(row=6, column=0, sticky=NW, pady=5)
+        self.polygon_tolerance_dropdown.grid(row=7, column=0, sticky=NW, pady=5)
         #self.max_width_ratio_dropdown.grid(row=5, column=0, sticky=NW, pady=5)
         #self.max_height_ratio_dropdown.grid(row=5, column=1, sticky=NW, pady=5)
         #self.min_width_ratio_dropdown.grid(row=6, column=0, sticky=NW, pady=5)
         #self.min_height_ratio_dropdown.grid(row=6, column=1, sticky=NW, pady=5)
-        pref_save_btn.grid(row=7, column=0, sticky=NW, pady=5)
+        pref_save_btn.grid(row=8, column=0, sticky=NW, pady=5)
 
     def set_settings(self):
         self.settings['LINE_TYPE'] = int(self.line_type_dropdown.get_value())
@@ -1157,11 +1161,13 @@ class ROI_mixin(ConfigReader):
     def close_img(self):
         try:
             self.img_window.destroy()
+            self.preferences_frm.destroy()
         except:
             pass
         try:
             self.main_frm.destroy()
             self.main_frm.quit()
+            self.preferences_frm.quit()
         except:
             pass
 
