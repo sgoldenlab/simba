@@ -35,7 +35,6 @@ from sklearn.preprocessing import (MinMaxScaler, QuantileTransformer,
 from sklearn.tree import export_graphviz
 from sklearn.utils import parallel_backend
 
-
 from simba.mixins import cuRF
 
 try:
