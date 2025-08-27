@@ -18,7 +18,7 @@ from simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up import \
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         FolderSelect, SimbaButton,
                                         SimBADropDown, hxtScrollbar)
-from simba.utils.checks import check_if_dir_exists, check_str, check_int
+from simba.utils.checks import check_if_dir_exists, check_int, check_str
 from simba.utils.config_creator import ProjectConfigCreator
 from simba.utils.enums import Formats, Keys, Links, Methods, Options, Paths
 from simba.utils.errors import DuplicationError, MissingProjectConfigEntryError
