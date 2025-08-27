@@ -1,8 +1,9 @@
-from typing import Dict, Any, Optional, Tuple
-from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.utils.checks import check_valid_dict, check_valid_tuple, check_str
-from tkinter.ttk import Treeview, Style
 from tkinter import ttk
+from tkinter.ttk import Style, Treeview
+from typing import Any, Dict, Optional, Tuple
+
+from simba.mixins.pop_up_mixin import PopUpMixin
+from simba.utils.checks import check_str, check_valid_dict, check_valid_tuple
 from simba.utils.enums import Formats
 
 

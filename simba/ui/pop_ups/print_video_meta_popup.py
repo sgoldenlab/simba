@@ -1,11 +1,16 @@
 from tkinter import *
+
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, FileSelect, FolderSelect, SimbaButton
-from simba.utils.enums import Options
-from simba.utils.checks import check_if_dir_exists, check_file_exist_and_readable
-from simba.utils.lookups import print_video_meta_data
 from simba.ui.get_tree_view import GetTreeView
-from simba.utils.read_write import find_all_videos_in_directory, get_video_meta_data
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
+                                        FolderSelect, SimbaButton)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists)
+from simba.utils.enums import Options
+from simba.utils.lookups import print_video_meta_data
+from simba.utils.read_write import (find_all_videos_in_directory,
+                                    get_video_meta_data)
+
 
 class PrintVideoMetaDataPopUp(PopUpMixin):
 
