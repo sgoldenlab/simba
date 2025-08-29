@@ -153,7 +153,7 @@ class YOLOPoseVisualizer():
         check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose', raise_error=True)
         check_valid_boolean(value=[bbox], source=f'{self.__class__.__name__} bbox', raise_error=True)
         self.data_df = pd.read_csv(self.data_path, index_col=0)
-        check_valid_dataframe(df=self.data_df, source=self.__class__.__name__, required_fields=EXPECTED_COLS)
+        check_valid_dataframe(df=self.data_df, source=f'{self.__class__.__name__} {self.data_path}', required_fields=EXPECTED_COLS)
         self.df_frm_cnt = np.unique(self.data_df[FRAME].values).shape[0]
         self.classes = np.unique(self.data_df[CLASS_NAME].values)
         if isinstance(palettes, str):
@@ -207,105 +207,113 @@ class YOLOPoseVisualizer():
         concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.save_path, gpu=True)
 
         stdout_success(msg=f'YOLO pose video saved at {self.save_path}', source=self.__class__.__name__, elapsed_time=video_timer.elapsed_time_str)
-
-
-if __name__ == "__main__":
-    #video_path = r"D:\cvat_annotations\videos\mp4_20250624155703\s34-drinking.mp4"
-    #data_path = r"D:\cvat_annotations\yolo_07032025\out_data\s34-drinking.csv"
-    #save_dir = r"D:\cvat_annotations\yolo_07032025\out_video"
-
-    video_path = r"D:\cvat_annotations\videos\mp4_20250624155703\s34-drinking.mp4"
-
-    data_path = r"D:\cvat_annotations\yolo_mdl_07122025\out_data\s34-drinking.csv"
-    save_dir = r'D:\cvat_annotations\yolo_mdl_07122025\out_video'
-    video_dir = r"D:\cvat_annotations\videos\mp4_20250624155703"
-    data_dir = r"D:\cvat_annotations\yolo_mdl_07122025\out_data"
-    data_dir = r"D:\platea\platea_videos\videos\yolo_results"
-    video_dir = r"D:\platea\platea_videos\videos\videos"
-    save_dir = r'D:\platea\platea_videos\videos\yolo_kp_video_out'
-
-    video_paths = find_files_of_filetypes_in_directory(directory=video_dir, extensions=['.mp4'], as_dict=True)
-    data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=['.csv'], as_dict=True)
-
-
-    skeleton = [('NOSE', 'LEFT_EAR'),
-                ('NOSE', 'RIGHT_EAR'),
-                ('RIGHT_EAR', 'LEFT_EAR'),
-                ('LEFT_EAR', 'LEFT_SIDE'),
-                ('RIGHT_EAR', 'RIGHT_SIDE'),
-                ('LEFT_SIDE', 'CENTER'),
-                ('LEFT_EAR', 'CENTER'),
-                ('RIGHT_EAR', 'CENTER'),
-                ('CENTER', 'RIGHT_SIDE'),
-                ('CENTER', 'TAIL_BASE'),
-                ('LEFT_SIDE', 'TAIL_BASE'),
-                ('RIGHT_SIDE', 'TAIL_BASE'),
-                ('TAIL_BASE', 'TAIL_CENTER'),
-                ('TAIL_CENTER', 'TAIL_TIP')]
-
-    skeleton = [('NOSE', 'LEFT_EAR'),
-                ('NOSE', 'RIGHT_EAR'),
-                ('RIGHT_EAR', 'LEFT_EAR'),
-                ('LEFT_EAR', 'LEFT_SIDE'),
-                ('RIGHT_EAR', 'RIGHT_SIDE'),
-                ('LEFT_SIDE', 'CENTER'),
-                ('LEFT_EAR', 'CENTER'),
-                ('RIGHT_EAR', 'CENTER'),
-                ('CENTER', 'RIGHT_SIDE'),
-                ('CENTER', 'TAIL_BASE'),
-                ('LEFT_SIDE', 'TAIL_BASE'),
-                ('RIGHT_SIDE', 'TAIL_BASE')]
-
-    for video_name, video_path in video_paths.items():
-        data_path = data_paths[video_name]
-        #kp_vis = YOLOPoseVisualizer(data_path=data_path, video_path=video_path)
-
-        kp_vis = YOLOPoseVisualizer(data_path= data_path,
-                                    video_path=video_path,
-                                    save_dir=save_dir,
-                                    core_cnt=31,
-                                    bbox=True,
-                                    verbose=True,
-                                    skeleton=skeleton,
-                                    threshold=0.5,
-                                    thickness=3,
-                                    circle_size=10)
-
-        kp_vis.run()
-
-    # video_dir = r'D:\cvat_annotations\videos\mp4_20250624155703'
-    # data_dir = r'D:\cvat_annotations\yolo_mdl_07102025\out_csv'
-    # save_dir = r'D:\cvat_annotations\yolo_mdl_07102025\out_video'
-    #
-    # video_paths = find_files_of_filetypes_in_directory(directory=video_dir, extensions=['.mp4'], as_dict=True)
-    # data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=['.csv'], as_dict=True)
-    #
-    # for video_name, data_path in data_paths.items():
-    #     kp_vis = YOLOPoseVisualizer(data_path= data_path,
-    #                                 video_path=video_paths[video_name],
-    #                                 save_dir=save_dir,
-    #                                 core_cnt=28,
-    #                                 bbox=True,
-    #                                 verbose=True)
-    #
-    #     kp_vis.run()
+#
+#
+# if __name__ == "__main__":
+#     #video_path = r"D:\cvat_annotations\videos\mp4_20250624155703\s34-drinking.mp4"
+#     #data_path = r"D:\cvat_annotations\yolo_07032025\out_data\s34-drinking.csv"
+#     #save_dir = r"D:\cvat_annotations\yolo_07032025\out_video"
+#
+#     video_path = r"D:\cvat_annotations\videos\mp4_20250624155703\s34-drinking.mp4"
+#
+#     data_path = r"D:\cvat_annotations\yolo_mdl_07122025\out_data\s34-drinking.csv"
+#     save_dir = r'D:\cvat_annotations\yolo_mdl_07122025\out_video'
+#     video_dir = r"D:\cvat_annotations\videos\mp4_20250624155703"
+#     data_dir = r"D:\cvat_annotations\yolo_mdl_07122025\out_data"
+#     data_dir = r"D:\platea\platea_videos\videos\yolo_results"
+#     video_dir = r"D:\platea\platea_videos\videos\videos"
+#     save_dir = r'D:\platea\platea_videos\videos\yolo_kp_video_out'
+#
+#     video_paths = find_files_of_filetypes_in_directory(directory=video_dir, extensions=['.mp4'], as_dict=True)
+#     data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=['.csv'], as_dict=True)
+#
+#
+#     skeleton = [('NOSE', 'LEFT_EAR'),
+#                 ('NOSE', 'RIGHT_EAR'),
+#                 ('RIGHT_EAR', 'LEFT_EAR'),
+#                 ('LEFT_EAR', 'LEFT_SIDE'),
+#                 ('RIGHT_EAR', 'RIGHT_SIDE'),
+#                 ('LEFT_SIDE', 'CENTER'),
+#                 ('LEFT_EAR', 'CENTER'),
+#                 ('RIGHT_EAR', 'CENTER'),
+#                 ('CENTER', 'RIGHT_SIDE'),
+#                 ('CENTER', 'TAIL_BASE'),
+#                 ('LEFT_SIDE', 'TAIL_BASE'),
+#                 ('RIGHT_SIDE', 'TAIL_BASE'),
+#                 ('TAIL_BASE', 'TAIL_CENTER'),
+#                 ('TAIL_CENTER', 'TAIL_TIP')]
+#
+#     skeleton = [('NOSE', 'LEFT_EAR'),
+#                 ('NOSE', 'RIGHT_EAR'),
+#                 ('RIGHT_EAR', 'LEFT_EAR'),
+#                 ('LEFT_EAR', 'LEFT_SIDE'),
+#                 ('RIGHT_EAR', 'RIGHT_SIDE'),
+#                 ('LEFT_SIDE', 'CENTER'),
+#                 ('LEFT_EAR', 'CENTER'),
+#                 ('RIGHT_EAR', 'CENTER'),
+#                 ('CENTER', 'RIGHT_SIDE'),
+#                 ('CENTER', 'TAIL_BASE'),
+#                 ('LEFT_SIDE', 'TAIL_BASE'),
+#                 ('RIGHT_SIDE', 'TAIL_BASE')]
+#
+#     for video_name, video_path in video_paths.items():
+#         data_path = data_paths[video_name]
+#         #kp_vis = YOLOPoseVisualizer(data_path=data_path, video_path=video_path)
+#
+#         kp_vis = YOLOPoseVisualizer(data_path= data_path,
+#                                     video_path=video_path,
+#                                     save_dir=save_dir,
+#                                     core_cnt=31,
+#                                     bbox=True,
+#                                     verbose=True,
+#                                     skeleton=skeleton,
+#                                     threshold=0.5,
+#                                     thickness=3,
+#                                     circle_size=10)
+#
+#         kp_vis.run()
+#
+#     # video_dir = r'D:\cvat_annotations\videos\mp4_20250624155703'
+#     # data_dir = r'D:\cvat_annotations\yolo_mdl_07102025\out_csv'
+#     # save_dir = r'D:\cvat_annotations\yolo_mdl_07102025\out_video'
+#     #
+#     # video_paths = find_files_of_filetypes_in_directory(directory=video_dir, extensions=['.mp4'], as_dict=True)
+#     # data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions=['.csv'], as_dict=True)
+#     #
+#     # for video_name, data_path in data_paths.items():
+#     #     kp_vis = YOLOPoseVisualizer(data_path= data_path,
+#     #                                 video_path=video_paths[video_name],
+#     #                                 save_dir=save_dir,
+#     #                                 core_cnt=28,
+#     #                                 bbox=True,
+#     #                                 verbose=True)
+#     #
+#     #     kp_vis.run()
 
 
 # if __name__ == "__main__":
 #     from simba.utils.read_write import find_files_of_filetypes_in_directory
 #
-#     video_paths = find_files_of_filetypes_in_directory(directory=r'D:\cvat_annotations\videos', extensions=['.mp4'], as_dict=True)
-#     data_paths = find_files_of_filetypes_in_directory(directory=r'D:\cvat_annotations\frames\data_results_yolo11m', extensions=['.csv'], as_dict=True)
-#     save_dir = r'D:\cvat_annotations\frames\video_results_yolo11m'
+#     video_paths = find_files_of_filetypes_in_directory(directory=r'D:\netholabs\minutes_examples', extensions=['.mp4', '.avi'], as_dict=True)
+#     data_paths = find_files_of_filetypes_in_directory(directory=r'D:\netholabs\mdls_08202025\10x\results', extensions=['.csv'], as_dict=True)
+#     save_dir = r"D:\netholabs\mdls_08202025\10x\results_videos"
 #
-#     for video_name, video_path in video_paths.items():
-#         data_path = data_paths[video_name]
-#         kp_vis = YOLOPoseVisualizer(data_path=data_path,
-#                                     video_path=video_path,
-#                                     save_dir=save_dir,
-#                                     core_cnt=18)
-#         kp_vis.run()
-
+#     video_paths = r"D:\netholabs\minutes_examples\minute_27.avi"
+#     data_paths = r'D:\netholabs\mdls_08202025\10x\results\minute_27.csv'
+#
+#     # for video_name, video_path in video_paths.items():
+#     #     data_path = data_paths[video_name]
+#     #     kp_vis = YOLOPoseVisualizer(data_path=data_path,
+#     #                                 video_path=video_path,
+#     #                                 save_dir=save_dir,
+#     #                                 core_cnt=18)
+#     #     kp_vis.run()
+#
+#     kp_vis = YOLOPoseVisualizer(data_path=data_paths,
+#                                 video_path=video_paths,
+#                                 save_dir=save_dir,
+#                                 core_cnt=18)
+#     kp_vis.run()
 
 # video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
 # video_path = "/mnt/c/troubleshooting/mitra/project_folder/videos/502_MA141_Gi_CNO_0514.mp4"

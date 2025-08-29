@@ -175,16 +175,14 @@ class YOLOPoseInference():
                                              stream=self.stream,
                                              imgsz=self.imgsz,
                                              device=self.device,
-                                             threshold=0.0001, #self.threshold,
+                                             threshold=self.threshold, #self.threshold,
                                              max_detections=self.max_tracks,
-                                             verbose=False, #self.verbose,
+                                             verbose=self.verbose, #self.verbose,
                                              iou=self.iou)
             for frm_cnt, video_prediction in enumerate(video_predictions):
                 boxes = video_prediction.obb.data if video_prediction.obb is not None else video_prediction.boxes.data
                 boxes = boxes.cpu().numpy().astype(np.float32)
                 keypoints = video_prediction.keypoints.data.cpu().numpy().astype(np.float32)
-                print(boxes)
-                print(keypoints)
                 detected_classes = np.unique(boxes[:, -1]).astype(np.int32) if boxes.size > 0 else []
                 for class_id, class_name in class_dict.items():
                     if class_id not in detected_classes:
@@ -210,11 +208,11 @@ class YOLOPoseInference():
         timer.stop_timer()
         if not self.save_dir:
             if self.verbose:
-                print(f'YOLO results created', timer.elapsed_time_str)
+                print(f'YOLO results created for {len(self.video_path)} videos', timer.elapsed_time_str)
             return results
         else:
             if self.verbose:
-                print(f'YOLO results saved in {self.save_dir} directory', timer.elapsed_time_str)
+                print(f'YOLO results for {len(self.video_path)} videos saved in {self.save_dir} directory', timer.elapsed_time_str)
             return None
 
 
@@ -286,9 +284,9 @@ class YOLOPoseInference():
 #
 #
 # # # #
-# video_paths = r"D:\cvat_annotations\videos\mp4_20250624155703"
-# weights_path = r"D:\cvat_annotations\frames\yolo_072125\mdl\train\weights\best.pt"
-# save_dir = r"D:\cvat_annotations\frames\yolo_072125\results"
+# video_paths = r"D:\netholabs\minutes_examples\minute_27.avi"
+# weights_path = r"D:\netholabs\mdls_08202025\10x\weights\best.pt"
+# save_dir = r"D:\netholabs\mdls_08202025\10x\results"
 # # #
 # keypoint_names = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
 # # # #
@@ -302,12 +300,12 @@ class YOLOPoseInference():
 #                       stream=True,
 #                       keypoint_names=keypoint_names,
 #                       batch_size=100,
-#                       imgsz=640,
+#                       imgsz=980,
 #                       interpolate=False,
-#                       box_threshold=0.5,
+#                       box_threshold=0.2,
 #                       max_tracks=4)
 # i.run()
-#
+
 #
 # # video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
 # # video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-46-56.mp4"

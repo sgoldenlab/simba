@@ -239,8 +239,10 @@ def get_emojis() -> Dict[str, str]:
             "relaxed": "\U0001F600",
             "error": "\U0001F6A8",
             "complete": "\U0001F680",
+            "warning": "\u2757\uFE0F",
             "trash": "\U0001F5D1",
-            "information": "\U0001F4DD",  # 📝 memo
+            "information": "\U0001F4DD",
+             # 📝 memo
         }
 
 def get_meta_data_file_headers() -> List[str]:

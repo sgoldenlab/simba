@@ -12,14 +12,15 @@ imbalanced-learn==0.6.2; python_version=="3.6"
 imbalanced-learn==0.12.2; python_version>="3.9"
 imgaug == 0.4.0
 imutils == 0.5.2
-matplotlib == 3.3.4; python_version=="3.6"
-matplotlib == 3.5.0; python_version>="3.9"
+matplotlib==3.3.4; python_version == "3.6"
+matplotlib==3.5.0; python_version >= "3.9" and python_version <= "3.11"
+matplotlib==3.8.*; python_version >= "3.12"
 numpy==1.19.1; python_version=="3.6"
+numpy==1.26.4; python_version>="3.9"
 pyglet==1.5.27; python_version=="3.6"
 pyglet==2.0.10; python_version>="3.9"
 python-dotenv==0.20.0; python_version=="3.6"
 python-dotenv==1.0.1; python_version>="3.9"
-numpy==1.26.4; python_version>="3.9"
 opencv-python == 3.4.5.20; python_version=="3.6"
 opencv-python == 4.8.1.78; python_version>="3.9"
 pandas==0.25.3;python_version=="3.6"
@@ -46,7 +47,7 @@ psutil == 5.9.8; python_version=="3.6"
 psutil; python_version>="3.9"
 dash == 1.14.0
 dash_color_picker == 0.0.1
-dash_core_components == 1.10.2
+dash_core_components==1.10.2
 dash_colorscales == 0.0.4
 dash_html_components == 1.0.3
 h5py==2.9.0;python_version=="3.6"
@@ -60,7 +61,9 @@ pyvis==0.3.2; python_version=="3.6"
 statsmodels==0.12.0;python_version=="3.6"
 statsmodels==0.14.2;python_version>="3.9"
 cefpython3 == 66.0
-pyarrow == 6.0.1
+pyarrow==6.0.1; python_version < "3.12"
+pyarrow==21.0.0; sys_platform == "win32" and python_version >= "3.12"
+pyarrow>=13.0.0; sys_platform != "win32" and python_version >= "3.12"
 shap == 0.35.0;python_version=="3.6"
 shap == 0.42.0;python_version>="3.9"
 tables==3.6.1;python_version=="3.6"

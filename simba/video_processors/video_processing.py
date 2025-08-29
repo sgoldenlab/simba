@@ -1059,9 +1059,12 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
     if out_dir is not None:
         check_if_dir_exists(in_dir=out_dir)
         dir = out_dir
+    _ = get_video_meta_data(video_path=file_path)
     check_if_string_value_is_valid_video_timestamp(value=start_time, name="START TIME")
     check_if_string_value_is_valid_video_timestamp(value=end_time, name="END TIME")
     check_that_hhmmss_start_is_before_end(start_time=start_time, end_time=end_time, name=f"{file_name} timestamps")
+    check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=start_time, video_path=file_path)
+    check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=end_time, video_path=file_path)
     if not include_clip_time_in_filename:
         save_name = os.path.join(dir, file_name + "_clipped.mp4")
     else:
@@ -1339,7 +1342,6 @@ def extract_frames_single_video(file_path: Union[str, os.PathLike],
     :param Union[str, os.PathLike] file_path: Path to video file.
     :param Optional[Union[str, os.PathLike]] save_dir: Optional directory where to save the frames. If ``save_dir`` is not passed, results are stored within a subdirectory in the same directory as the input file.
     :returns: None
-
 
     :example:
     >>> _ = extract_frames_single_video(file_path='project_folder/videos/Video_1.mp4')
