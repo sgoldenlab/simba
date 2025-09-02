@@ -652,7 +652,7 @@ class AmberFeatureExtractor(ConfigReader, FeatureExtractionMixin):
                 "top_head_dam_x",
                 "top_head_dam_y",
             ]
-            data_df["dam_head_angle"] = FeatureExtractionMixin.angle3pt_serialized(
+            data_df["dam_head_angle"] = FeatureExtractionMixin.angle3pt_vectorized(
                 data=data_df[head_angle_cords].values
             )
 
@@ -664,7 +664,7 @@ class AmberFeatureExtractor(ConfigReader, FeatureExtractionMixin):
                 "back_1_center_x",
                 "back_1_center_y",
             ]
-            data_df["dam_back_top_angle"] = FeatureExtractionMixin.angle3pt_serialized(
+            data_df["dam_back_top_angle"] = FeatureExtractionMixin.angle3pt_vectorized(
                 data=data_df[top_angle_cords].values
             )
 
@@ -676,7 +676,7 @@ class AmberFeatureExtractor(ConfigReader, FeatureExtractionMixin):
                 "top_head_dam_x",
                 "top_head_dam_y",
             ]
-            data_df["dam_head_angle2"] = FeatureExtractionMixin.angle3pt_serialized(
+            data_df["dam_head_angle2"] = FeatureExtractionMixin.angle3pt_vectorized(
                 data=data_df[head_angle_cords].values
             )
 

@@ -414,7 +414,7 @@ class ExtractFeaturesFrom7bps(ConfigReader, FeatureExtractionMixin):
                 )
 
             print("Calculating angles...")
-            self.out_data["Mouse_angle"] = self.angle3pt_serialized(
+            self.out_data["Mouse_angle"] = self.angle3pt_vectorized(
                 data=self.out_data[
                     [
                         "Nose_x",

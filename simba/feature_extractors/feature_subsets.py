@@ -163,7 +163,7 @@ class FeatureSubsetsCalculator(ConfigReader, TrainModelMixin):
         for animal, points in self.within_animal_three_point_combs.items():
             for point in points:
                 col_names = list(sum([(f"{x}_x", f"{y}_y") for (x, y) in zip(point, point)], ()))
-                self.results[f"Angle (degrees) {point[0]}-{point[1]}-{point[2]}"] = (FeatureExtractionMixin.angle3pt_serialized(data=self.data_df[col_names].values))
+                self.results[f"Angle (degrees) {point[0]}-{point[1]}-{point[2]}"] = (FeatureExtractionMixin.angle3pt_vectorized(data=self.data_df[col_names].values))
 
     def __get_three_point_hulls(self):
         for animal, points in self.within_animal_three_point_combs.items():

@@ -1,20 +1,11 @@
-# Exclude cache files first (before including anything)
-global-exclude *.pyc
-global-exclude *.pyo
-global-exclude __pycache__
-global-exclude */__pycache__/*
-global-exclude **/__pycache__/**
-prune **/__pycache__
-
-# Include simba package
 recursive-include simba *
-
-# Exclude specific directories within simba
 prune simba/sandbox
 recursive-exclude simba/sandbox *
-prune simba/pose_configurations_archive
-recursive-exclude simba/pose_configurations_archive *
-
-# Exclude cache directories again to be sure
-recursive-exclude simba */__pycache__/*
-recursive-exclude simba **/__pycache__/**
+prune */__pycache__
+recursive-exclude */__pycache__ *
+global-exclude __pycache__/*
+global-exclude */__pycache__/*
+prune */pose_configurations_archive
+recursive-exclude */pose_configurations_archive *
+global-exclude pose_configurations_archive/*
+global-exclude */pose_configurations_archive/*

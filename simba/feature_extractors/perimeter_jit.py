@@ -21,23 +21,43 @@ def process(S, P, a, b):
 @njit("(float32[:, :, :], types.unicode_type)", fastmath=True)
 def jitted_hull(points: np.ndarray, target: str = "perimeter") -> np.ndarray:
     """
-    Compute attributes (e.g., perimeter or area) of a polygon.
+    Compute convex hull attributes (perimeter or area) for a set of 2D points across multiple frames.
 
-    :param array points: 3d array FRAMESxBODY-PARTxCOORDINATE
-    :param str target: Options [perimeter, area, hull]
-    :return: 1d np.array representing perimeter length or area of polygon on each frame
-
-    .. note::
-       Modified from `Jérôme Richard <https://stackoverflow.com/questions/74812556/computing-quick-convex-hull-using-numba/74817179#74817179>`_
+    The algorithm uses a modified convex hull computation optimized for performance with numba
+    JIT compilation. Points are sorted by angle from their centroid to ensure proper polygon
+    ordering before computing the requested geometric attribute.
 
     .. image:: _static/img/jitted_hull.png
        :width: 400
        :align: center
 
+    .. image:: _static/img/simba.data_processors.cuda.geometry.poly_area_cuda.webp
+       :width: 400
+       :align: center
+
+    .. note::
+       Modified from `Jérôme Richard <https://stackoverflow.com/questions/74812556/computing-quick-convex-hull-using-numba/74817179#74817179>`_.
+       The convex hull represents the smallest convex polygon that contains all the input points, providing a measure of the overall spatial extent of the tracked body parts.
+
+    .. seealso::
+       For multicore based acceleration and Shapeley objects, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_polygon`.
+       For numba CUDA based acceleration, use :func:`simba.data_processors.cuda.geometry.get_convex_hull`.
+       For non-numba based compute of single convex hull area or perimeter, see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.convex_hull_calculator_mp`.
+
+    :param np.ndarray points: 3D array with shape (n_frames, n_body_parts, 2) containing [x, y] coordinates of body parts for each frame. Must be float32 dtype.
+    :param str target: Geometric attribute to compute. Options are:
+        - 'perimeter': Calculate the perimeter (circumference) of the convex hull
+        - 'area': Calculate the area enclosed by the convex hull
+        Default is 'perimeter'.
+    :return: 1D array with shape (n_frames,) containing the computed geometric attribute  or each frame. Contains NaN values for frames where computation fails.
+    :rtype: np.ndarray
 
     :example:
+    >>> # Calculate hull area for random body part coordinates across 50 frames
     >>> points = np.random.randint(1, 50, size=(50, 5, 2)).astype(np.float32)
-    >>> results = jitted_hull(points, target='area')
+    >>> hull_areas = jitted_hull(points, target='area')
+    >>> # Calculate perimeter of convex hull
+    >>> hull_perimeters = jitted_hull(points, target='perimeter')
     """
 
     def perimeter(xy):

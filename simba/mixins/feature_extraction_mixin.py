@@ -106,7 +106,7 @@ class FeatureExtractionMixin(object):
         Compute 3-point angle using thre body-parts.
 
         .. seealso::
-           For multicore numba based method across multiple observations, see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt_serialized`.
+           For multicore numba based method across multiple observations, see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.angle3pt_vectorized`.
            For GPU acceleration, use :func:`simba.data_processors.cuda.statistics.get_3pt_angle`.
 
 
@@ -132,7 +132,7 @@ class FeatureExtractionMixin(object):
 
     @staticmethod
     @jit(nopython=True, fastmath=True)
-    def angle3pt_serialized(data: np.ndarray) -> np.ndarray:
+    def angle3pt_vectorized(data: np.ndarray) -> np.ndarray:
         """
         Numba accelerated compute of frame-wise 3-point angles.
 
@@ -150,7 +150,7 @@ class FeatureExtractionMixin(object):
 
         :examples:
         >>> coordinates = np.random.randint(1, 10, size=(6, 6))
-        >>> FeatureExtractionMixin.angle3pt_serialized(data=coordinates)
+        >>> FeatureExtractionMixin.angle3pt_vectorized(data=coordinates)
         >>> [ 67.16634582,   1.84761027, 334.23067238, 258.69006753, 11.30993247, 288.43494882]
         """
 
@@ -179,9 +179,9 @@ class FeatureExtractionMixin(object):
            For acceptable run-time, call using parallel processing.
 
         .. seealso::
-           For numba CPU based acceleration, use :func:`~simba.feature_extractors.perimeter_jit.jitted_hull`.
-           For multicore based acceleration, use :func:`~simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_polygon`.
-           for numba CUDA based acceleration, use :func:`~simba.data_processors.cuda.geometry.get_convex_hull`,
+           For numba CPU based acceleration, use :func:`simba.feature_extractors.perimeter_jit.jitted_hull`.
+           For multicore based acceleration, use :func:`simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_polygon`.
+           For numba CUDA based acceleration, use :func:`simba.data_processors.cuda.geometry.get_convex_hull`,
 
         :param np.ndarray arr: 2D array of size len(body-parts) x 2.
         :param float px_per_mm: Video pixels per millimeter.
@@ -807,28 +807,44 @@ class FeatureExtractionMixin(object):
                                      px_per_mm: float,
                                      centimeter: bool = False) -> np.ndarray:
         """
-        Jitted helper finding frame-wise distances between two moving locations in millimeter or centimeter.
+        Compute frame-wise Euclidean distances between two sets of moving 2D locations.
+
+        This numba-jitted function efficiently calculates the straight-line distance between
+        corresponding points in two location arrays for each frame. The distances are converted
+        from pixels to real-world units (millimeters or centimeters) using the provided
+        pixel-to-millimeter conversion factor.
+
+        Uses the standard Euclidean distance formula: √((x₁-x₂)² + (y₁-y₂)²) / px_per_mm
 
         .. image:: _static/img/framewise_euclid_dist.png
            :width: 300
            :align: center
 
-        .. seealso::
-           For GPU CuPy solution, see :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cupy`,
-           For GPU numba CUDA solution, see :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cuda`
+        .. image:: _static/img/framewise_euclid_dist.webp
+           :width: 300
+           :align: center
 
-        :parameter ndarray location_1: 2D array of size len(frames) x 2.
-        :parameter ndarray location_1: 2D array of size len(frames) x 2.
-        :parameter float px_per_mm: The pixels per millimeter in the video.
-        :parameter bool centimeter: If true, the value in centimeters is returned. Else the value in millimeters.
-        :return: 1D array of size location_1.shape[0]
-        :rtype: np.ndarray.
+        .. note::
+           This function is optimized with numba JIT parallel execution compilation for high performance on large datasets.
+
+        .. seealso::
+           For GPU CuPy solution, see :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cupy`.
+           For GPU numba CUDA solution, see :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cuda`.
+           For Euclidean distance between one moving and one static target, see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance_roi`.
+
+        :param np.ndarray location_1: First set of 2D coordinates with shape (n_frames, 2), where each row contains [x, y] pixel coordinates for a specific frame.
+        :param np.ndarray location_2: Second set of 2D coordinates with shape (n_frames, 2), where each row contains [x, y] pixel coordinates for a specific frame. Must have same shape as location_1.
+        :param float px_per_mm: Conversion factor from pixels to millimeters. Must be positive.
+        :param bool centimeter: If True, returns distances in centimeters. If False, returns distances in millimeters. Default is False.
+        :return: Array of Euclidean distances with shape (n_frames,).
+        :rtype: np.ndarray
 
         :example:
-        >>> loc_1 = np.random.randint(1, 200, size=(6, 2)).astype(np.float32)
-        >>> loc_2 = np.random.randint(1, 200, size=(6, 2)).astype(np.float32)
-        >>> FeatureExtractionMixin.framewise_euclidean_distance(location_1=loc_1, location_2=loc_2, px_per_mm=4.56, centimeter=False)
-        >>> [49.80098657, 46.54963644, 49.60650394, 70.35919993, 37.91069901, 71.95422524]
+        >>> # Calculate distances between two body parts across frames
+        >>> nose_coords = np.array([[100, 150], [102, 148], [105, 145]], dtype=np.float32)
+        >>> ear_coords = np.array([[90, 140], [92, 138], [95, 135]], dtype=np.float32)
+        >>> distances_mm = FeatureExtractionMixin.framewise_euclidean_distance(location_1=nose_coords, location_2=ear_coords, px_per_mm=4.5, centimeter=False)
+        >>> distances_cm = FeatureExtractionMixin.framewise_euclidean_distance(location_1=nose_coords, location_2=ear_coords, px_per_mm=4.5, centimeter=True)
         """
 
         results = np.full((location_1.shape[0]), np.nan)

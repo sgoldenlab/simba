@@ -24,7 +24,7 @@ def test_angle3pt():
 def test_angle3pt_serialized():
     x, y, z = np.full((6, 2), 1), np.full((6, 2), 2), np.full((6, 2), 3)
     coordinates = np.hstack((x, y, z))
-    results = FeatureExtractionMixin.angle3pt_serialized(data=coordinates)
+    results = FeatureExtractionMixin.angle3pt_vectorized(data=coordinates)
     assert np.all(results == results[0])
     assert results.shape[0] == x.shape[0]
     assert results[0] == 180

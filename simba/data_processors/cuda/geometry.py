@@ -247,7 +247,6 @@ def get_convex_hull(pts: np.ndarray) -> np.ndarray:
 
     The function uses a variant of the Gift Wrapping algorithm (Jarvis March) to compute the convex hull. It finds the leftmost point, then iteratively determines the next point on the hull by checking the orientation of the remaining points. The results are stored in the `results` array, where each row corresponds to a frame and contains the indices of the points forming the convex hull. Points not on the hull are marked with `-1`.
 
-
     .. csv-table::
        :header: EXPECTED RUNTIMES
        :file: ../../../docs/tables/get_convex_hull.csv

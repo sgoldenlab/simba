@@ -80,7 +80,7 @@ READ_OPTIONS = csv.ReadOptions(encoding="utf8")
 
 
 def read_df(file_path: Union[str, os.PathLike],
-            file_type: Union[str, os.PathLike],
+            file_type: Union[str, os.PathLike] = 'csv',
             has_index: Optional[bool] = True,
             remove_columns: Optional[List[str]] = None,
             usecols: Optional[List[str]] = None,

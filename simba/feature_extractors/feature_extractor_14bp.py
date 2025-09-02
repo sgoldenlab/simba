@@ -873,7 +873,7 @@ class ExtractFeaturesFrom14bps(ConfigReader, FeatureExtractionMixin):
                 )
 
             print("Calculating angles...")
-            self.out_data["Mouse_1_angle"] = self.angle3pt_serialized(
+            self.out_data["Mouse_1_angle"] = self.angle3pt_vectorized(
                 data=self.out_data[
                     [
                         "Nose_1_x",
@@ -885,7 +885,7 @@ class ExtractFeaturesFrom14bps(ConfigReader, FeatureExtractionMixin):
                     ]
                 ].values
             )
-            self.out_data["Mouse_2_angle"] = self.angle3pt_serialized(
+            self.out_data["Mouse_2_angle"] = self.angle3pt_vectorized(
                 data=self.out_data[
                     [
                         "Nose_2_x",

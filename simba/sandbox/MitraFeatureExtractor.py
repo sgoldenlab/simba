@@ -122,9 +122,9 @@ class MitraFeatureExtractor(ConfigReader,
 
             # CIRCULAR FEATURES
             print('Compute circular features...')
-            results['CIRCULAR_FRAME_HULL_3POINT_ANGLE'] = FeatureExtractionMixin.angle3pt_serialized(data=np.hstack([nose_arr, center_arr, tailbase_arr]))
-            results['CIRCULAR_FRAME_TAIL_3POINT_ANGLE'] = FeatureExtractionMixin.angle3pt_serialized(data=np.hstack([tailbase_arr, tail_center_arr, tail_tip_arr]))
-            results['CIRCULAR_FRAME_HEAD_3POINT_ANGLE'] = FeatureExtractionMixin.angle3pt_serialized(data=np.hstack([left_ear_arr, nose_arr, right_ear_arr]))
+            results['CIRCULAR_FRAME_HULL_3POINT_ANGLE'] = FeatureExtractionMixin.angle3pt_vectorized(data=np.hstack([nose_arr, center_arr, tailbase_arr]))
+            results['CIRCULAR_FRAME_TAIL_3POINT_ANGLE'] = FeatureExtractionMixin.angle3pt_vectorized(data=np.hstack([tailbase_arr, tail_center_arr, tail_tip_arr]))
+            results['CIRCULAR_FRAME_HEAD_3POINT_ANGLE'] = FeatureExtractionMixin.angle3pt_vectorized(data=np.hstack([left_ear_arr, nose_arr, right_ear_arr]))
             results['CIRCULAR_INSTANTANEOUS_ANGULAR_VELOCITY'] = CircularStatisticsMixin.instantaneous_angular_velocity(data=direction_degrees, bin_size=1)
             angular_difference = pd.DataFrame(CircularStatisticsMixin.sliding_angular_diff(data=direction_degrees, time_windows=TIME_WINDOWS, fps=int(fps)), columns=['CIRCULAR_HEAD_DIRECTION_ANGULAR_DIFFERENCE_250', 'CIRCULAR_HEAD_DIRECTION_ANGULAR_DIFFERENCE_500', 'CIRCULAR_HEAD_DIRECTION_ANGULAR_DIFFERENCE_1000',  'CIRCULAR_HEAD_DIRECTION_ANGULAR_DIFFERENCE_2000'])
             rao_spacing = pd.DataFrame(CircularStatisticsMixin.sliding_rao_spacing(data=direction_degrees, time_windows=TIME_WINDOWS, fps=int(fps)), columns=['CIRCULAR_HEAD_DIRECTION_RAO_SPACING_250', 'CIRCULAR_HEAD_DIRECTION_RAO_SPACING_500', 'CIRCULAR_HEAD_DIRECTION_RAO_SPACING_1000', 'CIRCULAR_HEAD_DIRECTION_RAO_SPACING_2000'])
