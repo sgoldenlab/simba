@@ -340,11 +340,7 @@ class AmberFeatureExtractor(ConfigReader, FeatureExtractionMixin):
                     data_df_shifted[bp_cols].values,
                     data_df_shifted[s_bp_cols].values,
                 )
-                data_df[f"{col}_movement"] = (
-                    FeatureExtractionMixin.framewise_euclidean_distance(
-                        location_1=bp_arr, location_2=s_bp_arr, px_per_mm=self.px_per_mm
-                    )
-                )
+                data_df[f"{col}_movement"] = (FeatureExtractionMixin.framewise_euclidean_distance(location_1=bp_arr.astype(np.float64), location_2=s_bp_arr.astype(np.float64), px_per_mm=np.float64(self.px_per_mm), centimeter=False))
 
             back_point_movements = [
                 "back_2_movement",
@@ -473,101 +469,101 @@ class AmberFeatureExtractor(ConfigReader, FeatureExtractionMixin):
 
             data_df["dam_pup30m_distance"] = (
                 FeatureExtractionMixin.framewise_euclidean_distance(
-                    location_1=data_df[["dam_centroid_x", "dam_centroid_y"]].values,
+                    location_1=data_df[["dam_centroid_x", "dam_centroid_y"]].values.astype(np.float64),
                     location_2=data_df[
                         [
                             "pups_centroid_x_roll_mean_30m",
                             "pups_centroid_y_roll_mean_30m",
                         ]
-                    ].values,
-                    px_per_mm=self.px_per_mm,
+                    ].values.astype(np.float64),
+                    px_per_mm=np.float64(self.px_per_mm), centimeter=False
                 )
             )
 
             data_df["head_pup30m_distance"] = (
                 FeatureExtractionMixin.framewise_euclidean_distance(
-                    location_1=data_df[["head_centroid_x", "head_centroid_y"]].values,
+                    location_1=data_df[["head_centroid_x", "head_centroid_y"]].values.astype(np.float64),
                     location_2=data_df[
                         [
                             "pups_centroid_x_roll_mean_30m",
                             "pups_centroid_y_roll_mean_30m",
                         ]
-                    ].values,
-                    px_per_mm=self.px_per_mm,
+                    ].values.astype(np.float64),
+                    px_per_mm=np.float64(self.px_per_mm), centimeter=False
                 )
             )
 
             data_df["dam_pup60m_distance"] = (
                 FeatureExtractionMixin.framewise_euclidean_distance(
-                    location_1=data_df[["dam_centroid_x", "dam_centroid_y"]].values,
+                    location_1=data_df[["dam_centroid_x", "dam_centroid_y"]].values.astype(np.float64),
                     location_2=data_df[
                         [
                             "pups_centroid_x_roll_mean_60m",
                             "pups_centroid_y_roll_mean_60m",
                         ]
-                    ].values,
-                    px_per_mm=self.px_per_mm,
+                    ].values.astype(np.float64),
+                    px_per_mm=np.float64(self.px_per_mm), centimeter=False
                 )
             )
 
             data_df["head_pup60m_distance"] = (
                 FeatureExtractionMixin.framewise_euclidean_distance(
-                    location_1=data_df[["head_centroid_x", "head_centroid_y"]].values,
+                    location_1=data_df[["head_centroid_x", "head_centroid_y"]].values.astype(np.float64),
                     location_2=data_df[
                         [
                             "pups_centroid_x_roll_mean_60m",
                             "pups_centroid_y_roll_mean_60m",
                         ]
-                    ].values,
-                    px_per_mm=self.px_per_mm,
+                    ].values.astype(np.float64),
+                    px_per_mm=np.float64(self.px_per_mm), centimeter=False
                 )
             )
 
             data_df["dam_pup_distance"] = (
                 FeatureExtractionMixin.framewise_euclidean_distance(
-                    location_1=data_df[["dam_centroid_x", "dam_centroid_y"]].values,
-                    location_2=data_df[["pups_centroid_x", "pups_centroid_y"]].values,
-                    px_per_mm=self.px_per_mm,
+                    location_1=data_df[["dam_centroid_x", "dam_centroid_y"]].values.astype(np.float64),
+                    location_2=data_df[["pups_centroid_x", "pups_centroid_y"]].values.astype(np.float64),
+                    px_per_mm=np.float64(self.px_per_mm), centimeter=False
                 )
             )
 
             data_df["head_pup_distance"] = (
                 FeatureExtractionMixin.framewise_euclidean_distance(
-                    location_1=data_df[["head_centroid_x", "head_centroid_y"]].values,
-                    location_2=data_df[["pups_centroid_x", "pups_centroid_y"]].values,
-                    px_per_mm=self.px_per_mm,
+                    location_1=data_df[["head_centroid_x", "head_centroid_y"]].values.astype(np.float64),
+                    location_2=data_df[["pups_centroid_x", "pups_centroid_y"]].values.astype(np.float64),
+                    px_per_mm=np.float64(self.px_per_mm), centimeter=False
                 )
             )
 
             data_df["back_length"] = (
                 FeatureExtractionMixin.framewise_euclidean_distance(
-                    location_1=data_df[["back_2_x", "back_2_y"]].values,
-                    location_2=data_df[["back_10_x", "back_10_y"]].values,
-                    px_per_mm=self.px_per_mm,
+                    location_1=data_df[["back_2_x", "back_2_y"]].values.astype(np.float64),
+                    location_2=data_df[["back_10_x", "back_10_y"]].values.astype(np.float64),
+                    px_per_mm=np.float64(self.px_per_mm), centimeter=False
                 )
             )
 
             data_df["nose_back10_length"] = (
                 FeatureExtractionMixin.framewise_euclidean_distance(
-                    location_1=data_df[["dam_nose_x", "dam_nose_y"]].values,
-                    location_2=data_df[["back_10_x", "back_10_y"]].values,
-                    px_per_mm=self.px_per_mm,
+                    location_1=data_df[["dam_nose_x", "dam_nose_y"]].values.astype(np.float64),
+                    location_2=data_df[["back_10_x", "back_10_y"]].values.astype(np.float64),
+                    px_per_mm=np.float64(self.px_per_mm), centimeter=False
                 )
             )
 
             data_df["left_wrist_nose_length"] = (
                 FeatureExtractionMixin.framewise_euclidean_distance(
-                    location_1=data_df[["left_wrist_x", "left_wrist_y"]].values,
-                    location_2=data_df[["dam_nose_x", "dam_nose_y"]].values,
-                    px_per_mm=self.px_per_mm,
+                    location_1=data_df[["left_wrist_x", "left_wrist_y"]].values.astype(np.float64),
+                    location_2=data_df[["dam_nose_x", "dam_nose_y"]].values.astype(np.float64),
+                    px_per_mm=np.float64(self.px_per_mm), centimeter=False
                 )
             )
 
             data_df["right_wrist_nose_length"] = (
                 FeatureExtractionMixin.framewise_euclidean_distance(
-                    location_1=data_df[["right_wrist_x", "right_wrist_y"]].values,
-                    location_2=data_df[["dam_nose_x", "dam_nose_y"]].values,
-                    px_per_mm=self.px_per_mm,
+                    location_1=data_df[["right_wrist_x", "right_wrist_y"]].values.astype(np.float64),
+                    location_2=data_df[["dam_nose_x", "dam_nose_y"]].values.astype(np.float64),
+                    px_per_mm=np.float64(self.px_per_mm), centimeter=False
                 )
             )
 

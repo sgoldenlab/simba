@@ -129,9 +129,9 @@ class DistancePlotterSingleCore(ConfigReader):
                     )
                 distances.append(
                     FeatureExtractionMixin.framewise_euclidean_distance(
-                        location_1=data_df[bp_1].values,
-                        location_2=data_df[bp_2].values,
-                        px_per_mm=px_per_mm,
+                        location_1=data_df[bp_1].values.astype(np.float64),
+                        location_2=data_df[bp_2].values.astype(np.float64),
+                        px_per_mm=np.float64(px_per_mm),
                         centimeter=True,
                     )
                 )

@@ -864,7 +864,7 @@ def check_valid_array(data: np.ndarray,
                       source: Optional[str] = "",
                       accepted_ndims: Optional[Union[Tuple[int], Any]] = None,
                       accepted_sizes: Optional[List[int]] = None,
-                      accepted_axis_0_shape: Optional[List[int]] = None,
+                      accepted_axis_0_shape: Optional[Union[List[int], Tuple[int]]] = None,
                       accepted_axis_1_shape: Optional[List[int]] = None,
                       accepted_dtypes: Optional[Union[List[Union[str, Type]], Tuple[Union[str, Type]], Iterable[Any]]] = None,
                       accepted_values: Optional[List[Any]] = None,
@@ -917,6 +917,10 @@ def check_valid_array(data: np.ndarray,
             else:
                 return False
     if accepted_axis_0_shape is not None:
+        if not isinstance(accepted_axis_0_shape, (tuple, list)):
+            raise InvalidInputError(msg=f"accepted_axis_0_shape is invalid format. Accepted: {'list, tuple'}. Got: {type(accepted_axis_0_shape)}, {source}", source=check_valid_array.__name__)
+        for cnt, i in enumerate(accepted_axis_0_shape):
+            check_int(name=f"{source} {cnt} accepted_axis_0_shape", value=i, min_value=1)
         # if data.ndim != 2:
         #     raise ArrayError(
         #         msg=f"Array not of acceptable dimension. Found {data.ndim}, accepted: 2, {source}",

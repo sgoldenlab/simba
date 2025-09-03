@@ -28,12 +28,11 @@ class DirectingAnimalsToBodyPartAnalyzer(ConfigReader, FeatureExtractionMixin):
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data>`__.
        `Expected output <https://github.com/sgoldenlab/simba/blob/master/misc/Direction_data_example.csv>`__.
 
-
     .. image:: _static/img/DirectingOtherAnimalsAnalyzer.webp
        :width: 400
        :align: center
 
-    :example"
+    :example:
     >>> directing_analyzer = DirectingAnimalsToBodyPartAnalyzer(config_path='MyProjectConfig')
     >>> directing_analyzer.process_directionality()
     >>> directing_analyzer.create_directionality_dfs()

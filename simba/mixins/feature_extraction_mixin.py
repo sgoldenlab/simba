@@ -10,7 +10,7 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-from numba import jit, njit, prange
+from numba import jit, njit, prange, types
 from scipy import stats
 from scipy.signal import find_peaks, savgol_filter
 from scipy.spatial import ConvexHull
@@ -19,8 +19,10 @@ from scipy.spatial.qhull import QhullError
 import simba
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_filepath_list_is_empty,
-                                check_minimum_roll_windows)
-from simba.utils.enums import Options, Paths
+                                check_minimum_roll_windows, check_valid_boolean,
+                                check_valid_array,
+                                check_float)
+from simba.utils.enums import Options, Paths, Formats
 from simba.utils.errors import CountError
 from simba.utils.read_write import (get_bp_headers, read_config_file,
                                     read_project_path_and_file_type,
@@ -801,11 +803,12 @@ class FeatureExtractionMixin(object):
         return rval
 
     @staticmethod
-    @jit(nopython=True)
+    #@jit(nopython=True)
+    @njit([types.float64[:](types.float64[:, :], types.float64[:, :], types.float64, types.boolean)], fastmath=True, parallel=True, cache=True)
     def framewise_euclidean_distance(location_1: np.ndarray,
                                      location_2: np.ndarray,
                                      px_per_mm: float,
-                                     centimeter: bool = False) -> np.ndarray:
+                                     centimeter: bool) -> np.ndarray:
         """
         Compute frame-wise Euclidean distances between two sets of moving 2D locations.
 
@@ -827,10 +830,18 @@ class FeatureExtractionMixin(object):
         .. note::
            This function is optimized with numba JIT parallel execution compilation for high performance on large datasets.
 
+        .. csv-table::
+           :header: EXPECTED RUNTIMES
+           :file: ../../../docs/tables/bodypart_distance.csv
+           :widths: 10, 45, 45
+           :align: center
+           :header-rows: 1
+
         .. seealso::
            For GPU CuPy solution, see :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cupy`.
            For GPU numba CUDA solution, see :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cuda`.
            For Euclidean distance between one moving and one static target, see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance_roi`.
+           For wrapper function ensuring dtypes and data validity in this method, see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.bodypart_distance`.
 
         :param np.ndarray location_1: First set of 2D coordinates with shape (n_frames, 2), where each row contains [x, y] pixel coordinates for a specific frame.
         :param np.ndarray location_2: Second set of 2D coordinates with shape (n_frames, 2), where each row contains [x, y] pixel coordinates for a specific frame. Must have same shape as location_1.
@@ -854,6 +865,65 @@ class FeatureExtractionMixin(object):
             results = results / 10
         return results
 
+    @staticmethod
+    def bodypart_distance(bp1_coords: np.ndarray,
+                          bp2_coords: np.ndarray,
+                          px_per_mm: float = 1.0,
+                          in_centimeters: bool = False) -> np.ndarray:
+
+        """
+        Calculate frame-wise Euclidean distances between two sets of body part coordinates.
+
+        The function uses the standard Euclidean distance formula: distance = √((x₁-x₂)² + (y₁-y₂)²) / px_per_mm
+
+        .. seealso::
+           Wrapper function (ensuring data validity) for the underlying implementation :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance`.
+           For GPU CuPy solution, see :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cupy`.
+           For GPU numba CUDA solution, see :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cuda`.
+           For Euclidean distance between one moving and one static target, see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance_roi`.
+
+        .. image:: _static/img/framewise_euclid_dist.png
+           :width: 300
+           :align: center
+
+        .. image:: _static/img/framewise_euclid_dist.webp
+           :width: 300
+           :align: center
+
+        .. csv-table::
+           :header: EXPECTED RUNTIMES
+           :file: ../../../docs/tables/bodypart_distance.csv
+           :widths: 10, 45, 45
+           :align: center
+           :header-rows: 1
+
+        :param np.ndarray bp1_coords: First body part coordinates with shape (n_frames, 2), where each row  contains [x, y] pixel coordinates for a specific frame.
+        :param np.ndarray bp2_coords: Second body part coordinates with shape (n_frames, 2), where each row  contains [x, y] pixel coordinates for a specific frame. Must have the same number of frames as bp1_coords.
+        :param float px_per_mm: Conversion factor from pixels to millimeters. Must be positive. Default: 1.0.
+        :param bool in_centimeters: If True, returns distances in centimeters. If False, returns distances in millimeters. Default: False.
+        :return: Array of Euclidean distances with shape (n_frames,) in the specified units as float32.
+        :rtype: np.ndarray[np.float32]
+
+        :example:
+        >>> bp1_coords = np.random.randint(0, 500, size=(1000, 2))
+        >>> bp2_coords = np.random.randint(0, 500, size=(1000, 2))
+        >>> FeatureExtractionMixin().bodypart_distance(bp1_coords=bp1_coords, bp2_coords=bp2_coords, px_per_mm=1.0, in_centimeters=False)
+        """
+
+        check_valid_array(data=bp1_coords, source=f'{FeatureExtractionMixin.bodypart_distance.__name__} bp1_coords', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_value=0.0, raise_error=True)
+        check_valid_array(data=bp2_coords, source=f'{FeatureExtractionMixin.bodypart_distance.__name__} bp2_coords', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_value=0.0, raise_error=True, accepted_axis_0_shape=(bp1_coords.shape[0],))
+        check_float(name=f'{FeatureExtractionMixin.bodypart_distance.__name__} px_per_mm', value=px_per_mm, min_value=10e-16, raise_error=True)
+        check_valid_boolean(value=in_centimeters, source=f'{FeatureExtractionMixin. bodypart_distance.__name__} px_per_mm', raise_error=True)
+
+        bp1_coords = bp1_coords.astype(np.float64)
+        bp2_coords = bp2_coords.astype(np.float64)
+        px_per_mm = np.float64(px_per_mm)
+        results = FeatureExtractionMixin.framewise_euclidean_distance(location_1=bp1_coords,
+                                                                      location_2=bp2_coords,
+                                                                      px_per_mm=px_per_mm,
+                                                                      centimeter=in_centimeters)
+        return results.astype(np.float32)
+
     def change_in_bodypart_euclidean_distance(
                                               self,
                                               location_1: np.ndarray,
@@ -867,7 +937,7 @@ class FeatureExtractionMixin(object):
         Used for computing if animal body-parts are traveling away or towards each other within defined time-windows.
         """
         distances = self.framewise_euclidean_distance(
-            location_1=location_1, location_2=location_2, px_per_mm=px_per_mm
+            location_1=location_1.astype(np.float64), location_2=location_2.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False
         )
         return self._relative_distances(
             distances=distances, fps=fps, time_windows=time_windows

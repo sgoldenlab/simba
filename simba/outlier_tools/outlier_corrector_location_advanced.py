@@ -172,9 +172,9 @@ class OutlierCorrecterLocationAdvanced(ConfigReader, FeatureExtractionMixin):
                         animal_criterion_bps[1] + "_y",
                     ]
                     distances = self.framewise_euclidean_distance(
-                        location_1=self.data_df[bp_1_headers].values,
-                        location_2=self.data_df[bp_2_headers].values,
-                        px_per_mm=1,
+                        location_1=self.data_df[bp_1_headers].values.astype(np.float64),
+                        location_2=self.data_df[bp_2_headers].values.astype(np.float64),
+                        px_per_mm=np.float64(1), centimeter=False
                     )
                     if self.agg_method == "mean":
                         animal_movement_agg[animal_name] = np.mean(distances).astype(

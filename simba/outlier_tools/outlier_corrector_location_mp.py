@@ -38,7 +38,7 @@ def _location_outlier_corrector(data_path: str,
                 above_criterion_frms = []
                 for second_bp_cnt, second_bp in enumerate(second_bp_names):
                     second_bp_cords = animal_data[second_bp]
-                    distances = config.framewise_euclidean_distance(location_1=first_bp_cords, location_2=second_bp_cords, px_per_mm=1.0, centimeter=False)
+                    distances = config.framewise_euclidean_distance(location_1=first_bp_cords.astype(np.float64), location_2=second_bp_cords.astype(np.float64), px_per_mm=np.float64(1.0), centimeter=False)
                     above_criterion_frms.extend(np.argwhere(distances > animal_criterion).flatten())
                 unique, counts = np.unique(above_criterion_frms, return_counts=True)
                 above_criteria_dict[animal_name][first_body_part_name] = np.sort(unique[counts > 1])

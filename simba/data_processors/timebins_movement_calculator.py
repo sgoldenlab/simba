@@ -116,7 +116,7 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
             for animal_data in self.bp_dict.values():
                 name, bps = list(animal_data.keys())[0], list(animal_data.values())[0]
                 bp_time_1, bp_time_2 = (self.data_df[bps].values, self.data_df[[f"{bps[0]}_shifted", f"{bps[1]}_shifted"]].values,)
-                movement_data = pd.DataFrame(self.framewise_euclidean_distance(location_1=bp_time_1, location_2=bp_time_2, px_per_mm=px_per_mm, centimeter=True), columns=["VALUE"])
+                movement_data = pd.DataFrame(self.framewise_euclidean_distance(location_1=bp_time_1.astype(np.float64), location_2=bp_time_2.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=True), columns=["VALUE"])
                 self.movement_dict[video_name] = movement_data
                 movement_df_lists = [movement_data[i : i + bin_length_frames] for i in range(0, movement_data.shape[0], bin_length_frames)]
                 for bin, movement_df in enumerate(movement_df_lists):

@@ -170,9 +170,9 @@ class OutlierCorrecterMovementAdvanced(ConfigReader, FeatureExtractionMixin):
                     ]
                     print(self.data_df.columns)
                     distances = self.framewise_euclidean_distance(
-                        location_1=self.data_df[bp_1_headers].values,
-                        location_2=self.data_df[bp_2_headers].values,
-                        px_per_mm=1,
+                        location_1=self.data_df[bp_1_headers].values.astype(np.float64),
+                        location_2=self.data_df[bp_2_headers].values.astype(np.float64),
+                        px_per_mm=np.float64(1), centimeter=False
                     )
                     if self.agg_method == "mean":
                         animal_movement_agg[animal_name] = np.mean(distances).astype(
@@ -186,9 +186,9 @@ class OutlierCorrecterMovementAdvanced(ConfigReader, FeatureExtractionMixin):
                         bp_name = bps[0][:-2]
                         shifted_bps = [bps[0] + "_shifted", bps[1] + "_shifted"]
                         distances = self.framewise_euclidean_distance(
-                            location_1=self.data_df_combined[bps].values,
-                            location_2=self.data_df_combined[shifted_bps].values,
-                            px_per_mm=1,
+                            location_1=self.data_df_combined[bps].values.astype(np.float64),
+                            location_2=self.data_df_combined[shifted_bps].values.astype(np.float64),
+                            px_per_mm=np.float64(1), centimeter=False
                         )
                         self.movements[bp_name] = distances
 

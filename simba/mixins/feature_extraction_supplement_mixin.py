@@ -89,9 +89,7 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
         >>> location_2 = np.random.randint(low=0, high=100, size=(2000, 2)).astype('float32')
         >>> distances = self.euclidean_distance_timeseries_change(location_1=location_1, location_2=location_2, fps=10, px_per_mm=4.33, time_windows=np.array([0.2, 0.4, 0.8, 1.6]))
         """
-        distances = self.framewise_euclidean_distance(
-            location_1=location_1, location_2=location_2, px_per_mm=px_per_mm
-        )
+        distances = self.framewise_euclidean_distance(location_1=location_1.astype(np.float64), location_2=location_2.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False)
         return self._helper_euclidean_distance_timeseries_change(
             distances=distances, fps=fps, time_windows=time_windows
         ).astype(int)
@@ -458,9 +456,9 @@ class FeatureExtractionSupplemental(FeatureExtractionMixin):
             frm_dist = (
                 FeatureExtractionMixin()
                 .framewise_euclidean_distance(
-                    location_1=data_df.values,
-                    location_2=shifted_df.values,
-                    px_per_mm=px_per_mm,
+                    location_1=data_df.values.astype(np.float64),
+                    location_2=shifted_df.values.astype(np.float64),
+                    px_per_mm=np.float64(px_per_mm),
                     centimeter=True,
                 )
                 .astype(np.float32)

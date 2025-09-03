@@ -155,9 +155,9 @@ class FeatureSubsetsCalculator(ConfigReader, TrainModelMixin):
     def _get_two_point_bp_distances(self):
         for c in self.two_point_combs:
             x1, y1, x2, y2 = list(sum([(f"{x}_x", f"{y}_y") for (x, y) in zip(c, c)], ()))
-            bp1 = self.data_df[[x1, y1]].values.astype(np.float32)
-            bp2 = self.data_df[[x2, y2]].values.astype(np.float32)
-            self.results[f"Distance (mm) {c[0]}-{c[1]}"] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=bp1, location_2=bp2, px_per_mm=self.px_per_mm)
+            bp1 = self.data_df[[x1, y1]].values
+            bp2 = self.data_df[[x2, y2]].values
+            self.results[f"Distance (mm) {c[0]}-{c[1]}"] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=bp1.astype(np.float64), location_2=bp2.astype(np.float64), px_per_mm=np.float64(self.px_per_mm), centimeter=False)
 
     def __get_three_point_angles(self):
         for animal, points in self.within_animal_three_point_combs.items():
@@ -196,7 +196,7 @@ class FeatureSubsetsCalculator(ConfigReader, TrainModelMixin):
                 check_valid_dataframe(df=self.data_df, source=self.file_path, required_fields=[f"{bp}_x", f"{bp}_y"])
                 bp_arr = FeatureExtractionMixin.create_shifted_df(df=self.data_df[[f"{bp}_x", f"{bp}_y"]]).values
                 x, y = bp_arr[:, 0:2], bp_arr[:, 2:4]
-                self.results[f"{animal} movement {bp} (mm)"] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=x, location_2=y, px_per_mm=self.px_per_mm)
+                self.results[f"{animal} movement {bp} (mm)"] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=x.astype(np.float64), location_2=y.astype(np.float64), px_per_mm=np.float64(self.px_per_mm), centimeter=False)
 
     def __get_roi_center_distances(self):
         for animal, animal_bps in self.animal_bps.items():

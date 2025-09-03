@@ -4008,9 +4008,9 @@ class Statistics(FeatureExtractionMixin):
             centroids[k] = cluster_mean
             intra_dists[k] = np.average(
                 FeatureExtractionMixin.framewise_euclidean_distance(
-                    location_1=cluster_k,
-                    location_2=np.full(cluster_k.shape, cluster_mean),
-                    px_per_mm=1,
+                    location_1=cluster_k.astype(np.float64),
+                    location_2=np.full(cluster_k.shape, cluster_mean).astype(np.float64),
+                    px_per_mm=np.float64(1), centimeter=False
                 )
             )
         centroid_distances = FeatureExtractionMixin.cdist(

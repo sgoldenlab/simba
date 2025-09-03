@@ -89,8 +89,8 @@ class MitraFeatureExtractor(ConfigReader,
 
             # GEOMETRY FEATURES
             print('Compute geometry features...')
-            results['GEOMETRY_FRAME_HULL_LENGTH'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=nose_arr, location_2=tailbase_arr, px_per_mm=px_per_mm).astype(np.int32)
-            results['GEOMETRY_FRAME_HULL_WIDTH'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=lat_left_arr, location_2=lat_right_arr, px_per_mm=px_per_mm).astype(np.int32)
+            results['GEOMETRY_FRAME_HULL_LENGTH'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=nose_arr.astype(np.float64), location_2=tailbase_arr.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False).astype(np.int32)
+            results['GEOMETRY_FRAME_HULL_WIDTH'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=lat_left_arr.astype(np.float64), location_2=lat_right_arr.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False).astype(np.int32)
             results['GEOMETRY_FRAME_HULL_AREA'] = (jitted_hull(points=animal_hull_arr, target='area') / px_per_mm).astype(np.int32)
             results['GEOMETRY_FRAME_BODY_AREA'] = (jitted_hull(points=animal_body_arr, target='area') / px_per_mm).astype(np.int32)
             results['GEOMETRY_FRAME_LOWER_BODY_AREA'] = (jitted_hull(points=animal_lower_body_arr, target='area') / px_per_mm).astype(np.int32)
@@ -98,8 +98,8 @@ class MitraFeatureExtractor(ConfigReader,
             results['GEOMETRY_FRAME_HEAD_AREA'] = (jitted_hull(points=animal_head_arr, target='area') / px_per_mm).astype(np.int32)
             results['GEOMETRY_FRAME_LEFT_BODY_AREA'] = (jitted_hull(points=left_body_arr, target='area') / px_per_mm).astype(np.int32)
             results['GEOMETRY_FRAME_RIGHT_BODY_AREA'] = (jitted_hull(points=right_body_arr, target='area') / px_per_mm).astype(np.int32)
-            results['GEOMETRY_FRAME_TAIL_LENGTH'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=tailbase_arr, location_2=tail_tip_arr, px_per_mm=px_per_mm).astype(np.int32)
-            results['GEOMETRY_FRAME_EAR_DISTANCE'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=left_ear_arr, location_2=right_ear_arr, px_per_mm=px_per_mm).astype(np.int32)
+            results['GEOMETRY_FRAME_TAIL_LENGTH'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=tailbase_arr.astype(np.float64), location_2=tail_tip_arr.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False).astype(np.int32)
+            results['GEOMETRY_FRAME_EAR_DISTANCE'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=left_ear_arr.astype(np.float64), location_2=right_ear_arr.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False).astype(np.int32)
 
             for time, feature in product(TIME_WINDOWS, ['HULL_LENGTH', 'HULL_WIDTH', 'HULL_AREA', 'BODY_AREA', 'LOWER_BODY_AREA', 'UPPER_BODY_AREA', 'HEAD_AREA', 'LEFT_BODY_AREA', 'RIGHT_BODY_AREA', 'TAIL_LENGTH', 'EAR_DISTANCE']):
                 results[f'GEOMETRY_MEAN_{feature}_{time}'] = results[f'GEOMETRY_FRAME_{feature}'].rolling(int(time * fps), min_periods=1).mean().fillna(0).astype(np.int32)
@@ -141,13 +141,13 @@ class MitraFeatureExtractor(ConfigReader,
 
             # MOVEMENT FEATURES
             print('Compute movement features...')
-            results['MOVEMENT_FRAME_NOSE'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=nose_arr, location_2=shifted_[[f'{NOSE}_x', f'{NOSE}_y']].values.astype(np.float32), px_per_mm=px_per_mm).astype(np.int32)
-            results['MOVEMENT_FRAME_CENTER'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=center_arr, location_2=shifted_[[f'{CENTER}_x', f'{CENTER}_y']].values.astype(np.float32), px_per_mm=px_per_mm).astype(np.int32)
-            results['MOVEMENT_FRAME_TAILBASE'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=tailbase_arr, location_2=shifted_[[f'{TAIL_BASE}_x', f'{TAIL_BASE}_y']].values.astype(np.float32), px_per_mm=px_per_mm).astype(np.int32)
-            results['MOVEMENT_FRAME_TAILTIP'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=tail_tip_arr, location_2=shifted_[[f'{TAIL_TIP}_x', f'{TAIL_TIP}_y']].values.astype(np.float32), px_per_mm=px_per_mm).astype(np.int32)
-            results['MOVEMENT_FRAME_TAILCENTER'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=tail_tip_arr, location_2=shifted_[[f'{TAIL_CENTER}_x', f'{TAIL_CENTER}_y']].values.astype(np.float32), px_per_mm=px_per_mm).astype(np.int32)
-            results['MOVEMENT_FRAME_LEFT_EAR'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=left_ear_arr, location_2=shifted_[[f'{LEFT_EAR}_x', f'{LEFT_EAR}_y']].values.astype(np.float32), px_per_mm=px_per_mm).astype(np.int32)
-            results['MOVEMENT_FRAME_RIGHT_EAR'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=right_ear_arr, location_2=shifted_[[f'{RIGHT_EAR}_x', f'{RIGHT_EAR}_y']].values.astype(np.float32), px_per_mm=px_per_mm).astype(np.int32)
+            results['MOVEMENT_FRAME_NOSE'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=nose_arr.astype(np.float64), location_2=shifted_[[f'{NOSE}_x', f'{NOSE}_y']].values.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False).astype(np.int32)
+            results['MOVEMENT_FRAME_CENTER'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=center_arr.astype(np.float64), location_2=shifted_[[f'{CENTER}_x', f'{CENTER}_y']].values.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False).astype(np.int32)
+            results['MOVEMENT_FRAME_TAILBASE'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=tailbase_arr.astype(np.float64), location_2=shifted_[[f'{TAIL_BASE}_x', f'{TAIL_BASE}_y']].values.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False).astype(np.int32)
+            results['MOVEMENT_FRAME_TAILTIP'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=tail_tip_arr.astype(np.float64), location_2=shifted_[[f'{TAIL_TIP}_x', f'{TAIL_TIP}_y']].values.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False).astype(np.int32)
+            results['MOVEMENT_FRAME_TAILCENTER'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=tail_tip_arr.astype(np.float64), location_2=shifted_[[f'{TAIL_CENTER}_x', f'{TAIL_CENTER}_y']].values.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False).astype(np.int32)
+            results['MOVEMENT_FRAME_LEFT_EAR'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=left_ear_arr.astype(np.float64), location_2=shifted_[[f'{LEFT_EAR}_x', f'{LEFT_EAR}_y']].values.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False).astype(np.int32)
+            results['MOVEMENT_FRAME_RIGHT_EAR'] = FeatureExtractionMixin.framewise_euclidean_distance(location_1=right_ear_arr.astype(np.float64), location_2=shifted_[[f'{RIGHT_EAR}_x', f'{RIGHT_EAR}_y']].values.astype(np.float64), px_per_mm=np.float64(px_per_mm), centimeter=False).astype(np.int32)
             results['MOVEMENT_FRAME_SUMMED'] = results['MOVEMENT_FRAME_NOSE'] + results['MOVEMENT_FRAME_CENTER'] + results['MOVEMENT_FRAME_TAILBASE'] + results['MOVEMENT_FRAME_TAILTIP'] + results['MOVEMENT_FRAME_TAILCENTER'] + results['MOVEMENT_FRAME_LEFT_EAR'] + results['MOVEMENT_FRAME_RIGHT_EAR']
             results['MOVEMENT_NOSE_ACCELERATION_MM_S'] = TimeseriesFeatureMixin.acceleration(data=results['MOVEMENT_FRAME_NOSE'].values.astype(np.float32), pixels_per_mm=px_per_mm, fps=fps)
             results['MOVEMENT_CENTER_ACCELERATION_MM_S'] = TimeseriesFeatureMixin.acceleration(data=results['MOVEMENT_FRAME_CENTER'].values.astype(np.float32), pixels_per_mm=px_per_mm, fps=fps)
