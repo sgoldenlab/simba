@@ -28,17 +28,23 @@ class PupRetrieverCalculator(ConfigReader):
     .. note::
        `Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/add_on_pup_ret.md>`_
 
-    Examples
-    ----------
+    .. image:: _static/img/pup_retrieval.webp
+       :width: 400
+       :align: center
+
+
+    :examples:
     >>> settings = {'pup_track_p': 0.025, 'dam_track_p': 0.5, 'start_distance_criterion': 80.0, 'carry_frames': 90.0, 'core_nest': 'corenest', 'nest': 'nest', 'dam_name': '1_mother', 'pup_name': '2_pup', 'smooth_function': 'gaussian', 'smooth_factor': 5, 'max_time': 90.0, 'clf_carry': 'carry', 'clf_approach': 'approach', 'clf_dig': 'digging', 'distance_plots': True, 'log': True, 'swarm_plot': True}
     >>> config_path = '/Users/simon/Downloads/Automated PRT_test/project_folder/project_config.ini'
     >>> calculator = PupRetrieverCalculator(config_path=config_path, settings=settings)
     >>> calculator.run()
 
-    References
-    ----------
-    .. [1] Winters et al., Automated procedure to assess pup retrieval in laboratory mice, `Sci Reports`, 2022.
+    :references:
+    .. [1] Winters, Carmen, Wim Gorssen, Victoria A. Ossorio-Salazar, Simon Nilsson, Sam Golden, and Rudi D’Hooge. “Automated Procedure to Assess Pup Retrieval in Laboratory Mice.” Scientific Reports 12, no. 1 (2022): 1663. https://doi.org/10.1038/s41598-022-05641-w.
     """
+
+
+
 
     def __init__(self, config_path: str, settings: Dict[str, Union[float, str, bool]]):
         ConfigReader.__init__(config_path=config_path)

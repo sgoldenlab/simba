@@ -86,7 +86,8 @@ def read_df(file_path: Union[str, os.PathLike],
             usecols: Optional[List[str]] = None,
             anipose_data: Optional[bool] = False,
             check_multiindex: Optional[bool] = False,
-            multi_index_headers_to_keep: Optional[int] = None) -> Union[pd.DataFrame, dict]:
+            multi_index_headers_to_keep: Optional[int] = None,
+            verbose: Optional[bool] = False) -> Union[pd.DataFrame, dict]:
     """
     Read single tabular data file or pickle
 
@@ -107,6 +108,7 @@ def read_df(file_path: Union[str, os.PathLike],
     >>> read_df(file_path='project_folder/csv/input_csv/Video_1.csv', file_type='csv', check_multiindex=True)
     """
     check_file_exist_and_readable(file_path=file_path)
+    timer = SimbaTimer(start=True)
     if file_type == Formats.CSV.value:
         try:
             df = csv.read_csv(
@@ -185,7 +187,9 @@ def read_df(file_path: Union[str, os.PathLike],
             msg=f"{file_type} is not a valid filetype OPTIONS: [pickle, csv, parquet]",
             source=read_df.__name__,
         )
-
+    if verbose:
+        timer.stop_timer()
+        stdout_success(msg=f'Read in file {file_path} (elapsed time: {timer.elapsed_time_str}s)')
     return df
 
 

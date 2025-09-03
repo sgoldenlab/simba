@@ -1204,7 +1204,7 @@ class TrainModelMixin(object):
     def find_highly_correlated_fields(data: np.ndarray,threshold: float, field_names: types.ListType(types.unicode_type)) -> List[str]:
 
         """
-        Find highly correlated fields in a dataset.
+        Find highly correlated fields in a dataset using Pearson product-moment correlation coefficient.
 
         Calculates the absolute correlation coefficients between columns in a given dataset and identifies
         pairs of columns that have a correlation coefficient greater than the specified threshold. For every pair of correlated

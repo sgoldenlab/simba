@@ -15,15 +15,11 @@ import numpy as np
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_if_keys_exist_in_dict, check_int,
-                                check_valid_boolean,
-                                check_video_and_data_frm_count_align)
+from simba.utils.checks import (check_file_exist_and_readable, check_float, check_int, check_valid_boolean, check_video_and_data_frm_count_align)
 from simba.utils.data import plug_holes_shortest_bout
-from simba.utils.enums import Formats, TagNames, TextOptions
-from simba.utils.printing import log_event, stdout_success
-from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_df,
-                                    read_pickle, write_df)
+from simba.utils.enums import TagNames, TextOptions
+from simba.utils.printing import log_event, stdout_success, SimbaTimer
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_df, read_pickle, write_df)
 
 plt.interactive(True)
 plt.ioff()
@@ -32,32 +28,49 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 
 class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
     """
-    Create classifier validation video for a single input video. Results are stored in the
-    `project_folder/frames/output/validation directory`.
+    Create classifier validation video for a single input video with customizable visualization settings.
+    
+    This class generates validation videos that overlay classifier predictions, pose estimations, and 
+    optional Gantt charts onto the original video. Results are stored in the 
+    `project_folder/frames/output/validation` directory.
 
     .. note::
-       For improved run-time, see :meth:`simba.sing_run_model_validation_video_mp.ValidateModelOneVideoMultiprocess` for multiprocess class.
+       - For improved run-time with multiple cores, see :meth:`simba.plotting.single_run_model_validation_video_mp.ValidateModelOneVideoMultiprocess`.
+       - Video dimensions and optimal text/circle sizes are automatically calculated if not specified as a specific ratio of the image width/height.
 
-    :param str config_path: path to SimBA project config file in Configparser format
-    :param str feature_file_path: path to SimBA file (parquet or CSV) containing pose-estimation and feature fields.
-    :param str model_path: path to pickled classifier object
-    :param float discrimination_threshold: classification threshold.
-    :param int shortest_bout: Allowed classified bout length expressed in milliseconds. E.g., `1000` will shift frames classified
-        as containing the behavior, but occuring in a bout shorter than `1000`, from `target present to `target absent`.
-    :param str create_gantt:
-        If SimBA should create gantt charts alongside the validation video. OPTIONS: 'None', 'Gantt chart: final frame only (slightly faster)',
-        'Gantt chart: video'.
-    :param dict settings: User style settings for video. E.g., {'pose': True, 'animal_names': True, 'styles': None}
+    :param Union[str, os.PathLike] config_path: Path to SimBA project config file in Configparser format.
+    :param Union[str, os.PathLike] feature_path: Path to SimBA file (parquet or CSV) containing pose-estimation and feature data.
+    :param Union[str, os.PathLike] model_path: Path to pickled classifier object (.sav file).
+    :param bool show_pose: If True, overlay pose estimation keypoints on the video. Default: True.
+    :param bool show_animal_names: If True, display animal names near the first body part. Default: False.
+    :param Optional[int] font_size: Font size for text overlays. If None, automatically calculated based on video dimensions.
+    :param Optional[int] circle_size: Size of pose estimation circles. If None, automatically calculated based on video dimensions.
+    :param Optional[int] text_spacing: Spacing between text lines. If None, automatically calculated.
+    :param Optional[int] text_thickness: Thickness of text overlay. If None, uses default value.
+    :param Optional[float] text_opacity: Opacity of text overlays (0.1-1.0). If None, defaults to 0.8.
+    :param Optional[float] discrimination_threshold: Classification probability threshold (0.0-1.0). Default: 0.0.
+    :param Optional[int] shortest_bout: Minimum classified bout length in milliseconds. Bouts shorter than this  will be reclassified as absent. Default: 0.
+    :param Optional[Union[None, int]] create_gantt: Gantt chart creation option:
+        
+        - None: No Gantt chart
+        - 1: Static Gantt chart (final frame only, faster)
+        - 2: Dynamic Gantt chart (updated per frame)
 
     :example:
-    >>> test = ValidateModelOneVideo(config_path=r'/Users/simon/Desktop/envs/troubleshooting/naresh/project_folder/project_config.ini',
-    >>>                                 feature_file_path=r'/Users/simon/Desktop/envs/troubleshooting/naresh/project_folder/csv/features_extracted/SF2.csv',
-    >>>                                 model_path='/Users/simon/Desktop/envs/troubleshooting/naresh/models/generated_models/Top.sav',
-    >>>                                 discrimination_threshold=0.6,
-    >>>                                 shortest_bout=50,
-    >>>                                 settings={'pose': True, 'animal_names': True, 'styles': None},
-    >>>                                 create_gantt='Gantt chart: final frame only (slightly faster)')
-    >>> test.run()
+    >>> # Create validation video with pose overlay and static Gantt chart
+    >>> validator = ValidateModelOneVideo(
+    ...     config_path=r'/path/to/project_config.ini',
+    ...     feature_path=r'/path/to/features.csv',
+    ...     model_path=r'/path/to/classifier.sav',
+    ...     show_pose=True,
+    ...     show_animal_names=True,
+    ...     discrimination_threshold=0.6,
+    ...     shortest_bout=500,
+    ...     create_gantt=1
+    ... )
+    >>> validator.run()
+
+
     """
 
     def __init__(self,
@@ -97,7 +110,7 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
             os.makedirs(self.single_validation_video_save_dir)
         _, self.feature_filename, ext = get_fn_ext(feature_path)
         self.video_path = self.find_video_of_file(self.video_dir, self.feature_filename)
-        self.video_meta_data = get_video_meta_data(video_path=self.video_path)
+        self.video_meta_data = get_video_meta_data(video_path=self.video_path, fps_as_int=False)
         self.clf_name, self.feature_file_path = (os.path.basename(model_path).replace(".sav", ""), feature_path)
         self.vid_output_path = os.path.join(self.single_validation_video_save_dir, f"{self.feature_filename} {self.clf_name}.mp4")
         self.clf_data_save_path = os.path.join(self.clf_data_validation_dir, f"{self.feature_filename }.csv")
@@ -131,9 +144,10 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
         print(f"Behavior predictions created for model {self.clf_name} and video {self.feature_filename}...")
         cap = cv2.VideoCapture(self.video_path)
         fourcc, font = cv2.VideoWriter_fourcc(*"mp4v"), cv2.FONT_HERSHEY_COMPLEX
+        self._get_styles()
         if self.create_gantt is not None:
             self.bouts_df = self.get_bouts_for_gantt(data_df=self.data_df, clf_name=self.clf_name, fps=self.video_meta_data['fps'])
-            self.final_gantt_img = self.create_gantt_img(bouts_df=self.bouts_df, clf_name=self.clf_name, image_index=len(self.data_df), fps=self.video_meta_data['fps'], gantt_img_title=f"Behavior gantt chart (entire session, length (s): {self.video_meta_data['video_length_s']}, frames: {self.video_meta_data['frame_count']})")
+            self.final_gantt_img = self.create_gantt_img(bouts_df=self.bouts_df, clf_name=self.clf_name, image_index=len(self.data_df), fps=self.video_meta_data['fps'], gantt_img_title=f"Behavior gantt chart (entire session, length (s): {self.video_meta_data['video_length_s']}, frames: {self.video_meta_data['frame_count']})", header_font_size=9, label_font_size=12)
             self.final_gantt_img = self.resize_gantt(self.final_gantt_img, self.video_meta_data["height"])
             video_size = (int(self.video_meta_data["width"] + self.final_gantt_img.shape[1]), int(self.video_meta_data["height"]))
             writer = cv2.VideoWriter(self.vid_output_path, fourcc, self.video_meta_data["fps"], video_size)
@@ -141,11 +155,12 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
             video_size = (int(self.video_meta_data["width"]), int(self.video_meta_data["height"]))
             writer = cv2.VideoWriter(self.vid_output_path, fourcc, self.video_meta_data["fps"], video_size)
 
-        self._get_styles()
+
         self.data_df = self.data_df.head(min(len(self.data_df), self.video_meta_data["frame_count"]))
         frm_cnt, clf_frm_cnt = 0, 0
         print(f"Creating single core validation visualization for video {self.video_meta_data['video_name']} and classifier {self.clf_name}...")
         while (cap.isOpened()) and (frm_cnt < len(self.data_df)):
+            frm_timer = SimbaTimer(start=True)
             ret, frame = cap.read()
             clf_val = int(self.data_df.loc[frm_cnt, self.clf_name])
             clf_frm_cnt += clf_val
@@ -173,12 +188,13 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
             if self.create_gantt == 1:
                 frame = np.concatenate((frame, self.final_gantt_img), axis=1)
             elif self.create_gantt == 2:
-                gantt_img = self.create_gantt_img(bouts_df=self.bouts_df, clf_name=self.clf_name, image_index=len(self.data_df), fps=self.video_meta_data['fps'], gantt_img_title=f"Behavior gantt chart: {self.clf_name}")
+                gantt_img = self.create_gantt_img(bouts_df=self.bouts_df, clf_name=self.clf_name, image_index=len(self.data_df), fps=self.video_meta_data['fps'], gantt_img_title=f"Behavior gantt chart: {self.clf_name}", header_font_size=self.video_font_size, label_font_size=self.video_font_size)
                 gantt_img = self.resize_gantt(gantt_img, self.video_meta_data["height"])
                 frame = np.concatenate((frame, gantt_img), axis=1)
             frame = cv2.resize(frame, video_size, interpolation=cv2.INTER_LINEAR)
             writer.write(np.uint8(frame))
-            print(f"Frame created: for video {self.feature_filename} ({frm_cnt + 1} / {len(self.data_df)})...")
+            frm_timer.stop_timer()
+            print(f"Frame created: for video {self.feature_filename} ({frm_cnt + 1} / {len(self.data_df)}) (elapsed time: {frm_timer.elapsed_time_str}s)...")
             frm_cnt += 1
 
         cap.release()
@@ -189,7 +205,7 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
 
 # test = ValidateModelOneVideo(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini",
 #                              feature_path=r"D:\troubleshooting\mitra\project_folder\csv\features_extracted\592_MA147_CNO1_0515.csv",
-#                              model_path=r"C:\troubleshooting\mitra\models\generated_models\grroming_undersample_2_1000\grooming.sav",
+#                              model_path=r"C:\troubleshooting\mitra\models\validations\rearing_5\rearing.sav",
 #                              create_gantt=1,
 #                              show_pose=True,
 #                              show_animal_names=True)

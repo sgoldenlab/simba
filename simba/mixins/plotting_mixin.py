@@ -53,14 +53,14 @@ class PlottingMixin(object):
     def __init__(self):
         pass
 
-    def create_gantt_img(
-        self,
-        bouts_df: pd.DataFrame,
-        clf_name: str,
-        image_index: int,
-        fps: int,
-        gantt_img_title: str,
-    ):
+    def create_gantt_img(self,
+                         bouts_df: pd.DataFrame,
+                         clf_name: str,
+                         image_index: int,
+                         fps: int,
+                         gantt_img_title: str,
+                         header_font_size: int = 24,
+                         label_font_size: int = 12):
         """
         Helper to create a single gantt plot based on the data preceeding the input image
 
@@ -73,7 +73,7 @@ class PlottingMixin(object):
         """
 
         fig, ax = plt.subplots()
-        fig.suptitle(gantt_img_title, fontsize=24)
+        fig.suptitle(gantt_img_title, fontsize=header_font_size)
         relRows = bouts_df.loc[bouts_df["End_frame"] <= image_index]
         for i, event in enumerate(relRows.groupby("Event")):
             data_event = event[1][["Start_time", "Bout_time"]]
@@ -83,9 +83,9 @@ class PlottingMixin(object):
             xLength = 10
         ax.set_xlim(0, xLength)
         ax.set_ylim([0, 12])
-        plt.ylabel(clf_name, fontsize=12)
+        plt.ylabel(clf_name, fontsize=label_font_size)
         plt.yticks([])
-        plt.xlabel("time(s)", fontsize=12)
+        plt.xlabel("time(s)", fontsize=label_font_size)
         ax.yaxis.set_ticklabels([])
         ax.grid(True)
         buffer_ = io.BytesIO()

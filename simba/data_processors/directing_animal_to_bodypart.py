@@ -21,15 +21,19 @@ class DirectingAnimalsToBodyPartAnalyzer(ConfigReader, FeatureExtractionMixin):
     Calculate when animals are directing towards their own body-parts. Results are stored in
     the ``project_folder/logs/directionality_dataframes`` directory of the SimBA project.
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
+    :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
 
     .. important::
        Requires the pose-estimation data for the ``left ear``, ``right ear`` and ``nose`` of each individual animals.
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data>`__.
        `Expected output <https://github.com/sgoldenlab/simba/blob/master/misc/Direction_data_example.csv>`__.
 
-    Examples
-    -----
+
+    .. image:: _static/img/DirectingOtherAnimalsAnalyzer.webp
+       :width: 400
+       :align: center
+
+    :example"
     >>> directing_analyzer = DirectingAnimalsToBodyPartAnalyzer(config_path='MyProjectConfig')
     >>> directing_analyzer.process_directionality()
     >>> directing_analyzer.create_directionality_dfs()

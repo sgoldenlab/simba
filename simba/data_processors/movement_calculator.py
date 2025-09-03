@@ -30,14 +30,16 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
     .. note::
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results>`__.
 
+    .. image:: _static/img/MovementCalculator.webp
+       :width: 400
+       :align: center
+
     :examples:
     >>> body_parts=['Animal_1 CENTER OF GRAVITY']
     >>> movement_processor = MovementCalculator(config_path='project_folder/project_config.ini', body_parts=body_parts)
     >>> movement_processor.run()
     >>> movement_processor.save()
-
     """
-
     def __init__(self,
                  config_path: str,
                  body_parts: List[str],
