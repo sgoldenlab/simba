@@ -26,11 +26,16 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.checks import (check_file_exist_and_readable, check_float, check_int, check_valid_boolean, check_video_and_data_frm_count_align)
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_int, check_valid_boolean,
+                                check_video_and_data_frm_count_align)
 from simba.utils.data import plug_holes_shortest_bout
 from simba.utils.enums import TextOptions
-from simba.utils.printing import stdout_success, SimbaTimer
-from simba.utils.read_write import (concatenate_videos_in_folder, create_directory, find_core_cnt, get_fn_ext, get_video_meta_data, read_df, read_pickle, write_df)
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    create_directory, find_core_cnt,
+                                    get_fn_ext, get_video_meta_data, read_df,
+                                    read_pickle, write_df)
 
 
 def _validation_video_mp(data: pd.DataFrame,
