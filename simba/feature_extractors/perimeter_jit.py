@@ -47,6 +47,13 @@ def jitted_hull(points: np.ndarray, target: str = "perimeter") -> np.ndarray:
        For numba CUDA based acceleration, use :func:`simba.data_processors.cuda.geometry.get_convex_hull`.
        For non-numba based compute of single convex hull area or perimeter, see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.convex_hull_calculator_mp`.
 
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/get_hull_sizes.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
     :param np.ndarray points: 3D array with shape (n_frames, n_body_parts, 2) containing [x, y] coordinates of body parts for each frame. Must be float32 dtype.
     :param str target: Geometric attribute to compute. Options are:
         - 'perimeter': Calculate the perimeter (circumference) of the convex hull
