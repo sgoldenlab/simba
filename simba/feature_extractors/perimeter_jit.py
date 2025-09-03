@@ -3,9 +3,9 @@ __author__ = "Simon Nilsson"
 import numpy as np
 from numba import jit, njit, prange
 from numba.np.extensions import cross2d
-from simba.utils.checks import check_valid_array, check_str
-from simba.utils.enums import Formats
 
+from simba.utils.checks import check_str, check_valid_array
+from simba.utils.enums import Formats
 
 
 @njit("(float32[:,:], int64[:], int64, int64)")
