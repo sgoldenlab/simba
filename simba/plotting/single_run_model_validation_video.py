@@ -15,11 +15,14 @@ import numpy as np
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.checks import (check_file_exist_and_readable, check_float, check_int, check_valid_boolean, check_video_and_data_frm_count_align)
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_int, check_valid_boolean,
+                                check_video_and_data_frm_count_align)
 from simba.utils.data import plug_holes_shortest_bout
 from simba.utils.enums import TagNames, TextOptions
-from simba.utils.printing import log_event, stdout_success, SimbaTimer
-from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_df, read_pickle, write_df)
+from simba.utils.printing import SimbaTimer, log_event, stdout_success
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_df,
+                                    read_pickle, write_df)
 
 plt.interactive(True)
 plt.ioff()
