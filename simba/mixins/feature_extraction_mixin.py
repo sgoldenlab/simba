@@ -260,7 +260,7 @@ class FeatureExtractionMixin(object):
 
         .. seealso::
            For distances between two moving targets, use :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance`,
-           :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cupy` or :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cuda`
+           For GPU implementation, see :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cupy` or :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cuda`
 
         :param ndarray location_1: 2D numpy array of size len(frames) x 2.
         :param ndarray location_1: 1D numpy array holding the X and Y of the static location.
