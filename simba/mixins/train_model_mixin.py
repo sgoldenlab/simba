@@ -1212,12 +1212,14 @@ class TrainModelMixin(object):
 
         .. seealso::
            For non-numba method, see :func:`simba.mixins.statistics_mixin.Statistics.find_collinear_features`.
+           For validation wrapper, see :func:`simba.mixins.train_model_mixin.TrainModelMixin.find_collinear_features`
 
         :param np.ndarray data: Two dimension numpy array with features represented as columns and frames represented as rows.
         :param float threshold: Threshold value for significant collinearity.
         :param List[str] field_names: List mapping the column names in data to a field name. Use types.ListType(types.unicode_type) to take advantage of JIT compilation
         :return: Unique field names that correlates with at least one other field above the threshold value.
         :rtype: List[str]
+
 
         :example:
         >>> data = np.random.randint(0, 1000, (1000, 5000)).astype(np.float32)
@@ -1242,6 +1244,48 @@ class TrainModelMixin(object):
         remove_col_idx = list(remove_col_idx)
 
         return [field_names[x] for x in remove_col_idx]
+
+    @staticmethod
+    def find_collinear_features(data: pd.DataFrame,
+                                threshold: float) -> List[str]:
+
+        """
+        Identify collinear features in a pandas DataFrame for removal.
+
+        Finds pairs of features with Pearson correlation coefficients above the specified threshold and returns the names of features that should be removed to reduce multicollinearity.
+
+        Serves as a validation wrapper around numba implementation.
+
+        .. seealso::
+           For the underlying numba-accelerated implementation, see :func:`simba.mixins.train_model_mixin.TrainModelMixin.find_highly_correlated_fields`
+           For non-numba statistical methods, see :func:`simba.mixins.statistics_mixin.Statistics.find_collinear_features`
+
+
+        .. csv-table::
+           :header: EXPECTED RUNTIMES
+           :file: ../../../docs/tables/find_collinear_features.csv
+           :widths: 10, 45, 45
+           :align: center
+           :header-rows: 1
+
+        :param pd.DataFrame data: Input DataFrame containing numeric features. Each column represents a feature and each row represents an observation. Must contain only numeric data types.
+        :param float threshold: Correlation threshold for identifying collinear features. Must be between 0.0 and 1.0. Higher values (e.g., 0.9) identify only very highly correlated features, while lower values  (e.g., 0.1) identify more loosely correlated features.
+        :return: List of column names that are highly correlated with other features and should be considered for removal to reduce multicollinearity.
+        :rtype: List[str]
+
+        :example:
+        >>> a = np.random.randint(0, 5, (1_000_000, 100))
+        >>> df = pd.DataFrame(a)
+        >>> c = find_collinear_features(data=df, threshold=0.0025)
+        """
+
+        check_valid_dataframe(df=data, source=f'{TrainModelMixin.find_collinear_features.__name__} data', valid_dtypes=Formats.NUMERIC_DTYPES.value, allow_duplicate_col_names=False)
+        check_float(name=f'{TrainModelMixin.find_collinear_features.__name__} threshold', value=threshold, min_value=0, max_value=1, raise_error=True)
+
+        field_names = typed.List([str(x) for x in data.columns])
+
+        x = TrainModelMixin.find_highly_correlated_fields(data=data.values.astype(np.float32), threshold=np.float64(threshold), field_names=field_names)
+        return list(x)
 
     def check_sampled_dataset_integrity(self, x_df: pd.DataFrame, y_df: pd.DataFrame) -> None:
         """

@@ -341,8 +341,40 @@ class CircularStatisticsMixin(object):
         return results
 
     @staticmethod
-    @njit("(float32[:],)")
-    def degrees_to_cardinal(data: np.ndarray) -> List[str]:
+    @njit("types.ListType(types.unicode_type)(float32[:])")
+    def degrees_to_cardinal(data: np.ndarray) -> typed.List[str]:
+        """
+        Convert degree angles to cardinal direction bucket e.g., 0 -> "N", 180 -> "S"
+
+        .. note::
+           To convert cardinal literals to integers, map using :func:`simba.utils.enums.lookups.cardinality_to_integer_lookup`.
+           To convert integers to cardinal literals, map using :func:`simba.utils.enums.lookups.integer_to_cardinality_lookup`.
+           For pure numpy function, see func:`simba.mixins.circular_statistics.CircularStatisticsMixin.angle_to_cardinal`. (Appears to be quicker in pure numpy.)
+
+        .. image:: _static/img/degrees_to_cardinal.png
+           :width: 600
+           :align: center
+
+        :param np.ndarray data: 1D array of degrees in range [0, 360). 
+        :return: List of strings representing frame-wise cardinality.
+        :rtype: typed.List[str]
+
+        :example:
+        >>> data = np.array(list(range(0, 405, 45))).astype(np.float32)
+        >>> CircularStatisticsMixin().degrees_to_cardinal(data=data)
+        ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N']
+        """
+
+        DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+        results = typed.List.empty_list(types.unicode_type)
+        for i in prange(data.shape[0]):
+            ix = round(data[i] / (360.0 / len(DIRECTIONS)))
+            direction = DIRECTIONS[ix % len(DIRECTIONS)]
+            results.append(direction)
+        return results
+
+    @staticmethod
+    def angle_to_cardinal(data: np.ndarray) -> List[str]:
         """
         Convert degree angles to cardinal direction bucket e.g., 0 -> "N", 180 -> "S"
 
@@ -354,23 +386,31 @@ class CircularStatisticsMixin(object):
            :width: 600
            :align: center
 
-        :parameter np.ndarray degree_angles: 1d array of degrees. Note: return by ``self.head_direction``.
+        .. seealso::
+           For numba function, see func:`simba.mixins.circular_statistics.CircularStatisticsMixin.degrees_to_cardinal`
+           Appears to be quicker in pure numpy.
+
+        .. csv-table::
+           :header: EXPECTED RUNTIMES
+           :file: ../../../docs/tables/angle_to_cardinal.csv
+           :widths: 10, 45, 45
+           :align: center
+           :header-rows: 1
+
+        :param np.ndarray data: 1D array of degrees in range [0, 360).
         :return: List of strings representing frame-wise cardinality.
         :rtype: List[str]
 
         :example:
         >>> data = np.array(list(range(0, 405, 45))).astype(np.float32)
-        >>> CircularStatisticsMixin().degrees_to_cardinal(degree_angles=data)
-        >>> ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N']
+        >>> CircularStatisticsMixin().angle_to_cardinal(data=data)
+        ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N']
         """
 
-        DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
-        results = typed.List(["str"])
-        for i in prange(data.shape[0]):
-            ix = round(data[i] / (360.0 / len(DIRECTIONS)))
-            direction = DIRECTIONS[ix % len(DIRECTIONS)]
-            results.append(direction)
-        return results[1:]
+        check_valid_array(data=data, source=f'{CircularStatisticsMixin.angle_to_cardinal.__name__} angle_to_cardinal', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_value=0.0, max_value=360, raise_error=True)
+        DIRECTIONS = np.array(["N", "NE", "E", "SE", "S", "SW", "W", "NW"], dtype='<U2')
+        indices = np.round(data / 45.0).astype(int) % 8
+        return DIRECTIONS[indices].tolist()
 
     @staticmethod
     @njit("(int32[:,:], float64, float64)")

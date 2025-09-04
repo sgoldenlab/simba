@@ -1271,6 +1271,7 @@ def check_valid_dataframe(
     min_axis_1: Optional[int] = None,
     max_axis_0: Optional[int] = None,
     max_axis_1: Optional[int] = None,
+    allow_duplicate_col_names = True,
 ):
     """Helper to check if a dataframe is valid"""
     check_instance(source=source, instance=df, accepted_types=(pd.DataFrame,))
@@ -1322,6 +1323,16 @@ def check_valid_dataframe(
                 msg=f"The dataframe {source} are missing required columns {missing}.",
                 source=source,
             )
+
+    if not allow_duplicate_col_names:
+        col_names = list(df.columns)
+        seen = set()
+        duplicate_col_names = list(set(x for x in col_names if x in seen or seen.add(x)))
+        if len(duplicate_col_names) > 0:
+            raise InvalidInputError(msg=f"The dataframe {source} has duplicate column names {duplicate_col_names}.", source=source)
+
+
+
 
 def check_valid_boolean(value: Union[Any, List[Any]], source: Optional[str] = '', raise_error: Optional[bool] = True):
     if not isinstance(value, list):
