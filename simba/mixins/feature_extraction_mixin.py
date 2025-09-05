@@ -702,7 +702,6 @@ class FeatureExtractionMixin(object):
         Jitted helper to calculate if an animal is directing towards a static location (e.g., ROI centroid),
         given the target location and the left ear, right ear, and nose coordinates of the observer.
 
-
         .. image:: _static/img/directing_static_targets.png
            :width: 400
            :align: center
@@ -711,6 +710,11 @@ class FeatureExtractionMixin(object):
            :width: 800
            :autoplay:
            :loop:
+
+        ..  youtube:: vqdYUS3bM68
+           :width: 640
+           :height: 480
+           :align: center
 
         .. note::
            Input left ear, right ear, and nose coordinates of the observer is returned by :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.check_directionality_viable`

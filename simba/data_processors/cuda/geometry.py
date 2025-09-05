@@ -457,7 +457,12 @@ def directionality_to_static_targets(left_ear: np.ndarray,
     .. video:: _static/img/ts_example.webm
        :width: 800
        :autoplay:
+       :align: center
        :loop:
+
+    ..  youtube:: vqdYUS3bM68
+       :width: 640
+       :height: 480
 
     .. csv-table::
        :header: EXPECTED RUNTIMES

@@ -80,10 +80,10 @@ def jitted_hull(points: np.ndarray, target: str = "perimeter") -> np.ndarray:
     def area(x, y):
         return 0.5 * np.abs(np.dot(x, np.roll(y, 1)) - np.dot(y, np.roll(x, 1)))
 
-    results = np.full((points.shape[0]), np.nan)
+    results = np.full((points.shape[0]), np.float32(np.nan), dtype=np.float32)
     for i in range(points.shape[0]):
         S = points[i, :, :]
-        a, b = np.argmin(S[:, 0]), np.argmax(S[:, 0])
+        a = np.argmin(S[:, 0])
         max_index = np.argmax(S[:, 0])
         idx = (
             process(S, np.arange(S.shape[0]), a, max_index)[:-1]
@@ -93,17 +93,17 @@ def jitted_hull(points: np.ndarray, target: str = "perimeter") -> np.ndarray:
         for j in prange(len(idx)):
             x[j], y[j] = S[idx[j], 0], S[idx[j], 1]
         x0, y0 = np.mean(x), np.mean(y)
-        r = np.sqrt((x - x0) ** 2 + (y - y0) ** 2)
-        angles = np.where(
-            (y - y0) > 0, np.arccos((x - x0) / r), 2 * np.pi - np.arccos((x - x0) / r)
-        )
+        angles = np.arctan2(y - y0, x - x0)
         mask = np.argsort(angles)
         x_sorted, y_sorted = x[mask], y[mask]
         if target == "perimeter":
             xy = np.vstack((x_sorted, y_sorted)).T
             results[i] = perimeter(xy)
-        if target == "area":
-            results[i] = area(x_sorted, y_sorted)
+        elif target == "area":
+            if len(idx) < 3:
+                results[i] = np.float32(0.0)
+            else:
+                results[i] = area(x_sorted, y_sorted)
 
     return results
 
@@ -127,7 +127,7 @@ def get_hull_sizes(points: np.ndarray,
 
     .. csv-table::
        :header: EXPECTED RUNTIMES
-       :file: ../../../docs/tables/get_hull_sizes.csv
+       :file: ../../docs/tables/get_hull_sizes.csv
        :widths: 10, 45, 45
        :align: center
        :header-rows: 1
@@ -177,7 +177,8 @@ def jitted_centroid(points: np.ndarray) -> np.ndarray:
         results[i][1] = np.int(np.mean(perimeter_points[:, 1].flatten()))
     return results
 
-
+#points = np.random.randint(0, 500, size=(1000, 7, 2))
+#get_hull_sizes(points=points, target='area')
 # points = np.random.randint(1, 5, size=(1, 10, 2)).astype(np.float32)
 # points[0][1] = np.nan
 # results = jitted_hull(points, target='area')

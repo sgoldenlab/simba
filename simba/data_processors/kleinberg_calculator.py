@@ -31,6 +31,11 @@ class KleinbergCalculator(ConfigReader):
        :width: 400
        :align: center
 
+    ..  youtube:: HRzQ64nupM0
+       :width: 640
+       :height: 480
+       :align: center
+
     :param str config_path: path to SimBA project config file in Configparser format
     :param List[str] classifier_names: Classifier names to apply Kleinberg smoothing to.
     :param float sigma: Burst detection sigma value. Higher sigma values and fewer, longer, behavioural bursts will be recognised. Default: 2.

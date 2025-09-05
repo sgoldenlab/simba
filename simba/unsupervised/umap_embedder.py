@@ -45,6 +45,12 @@ class UmapEmbedder(UnsupervisedMixin):
     :param save_dir: Empty directory where to save the UMAP results.
     :param hyper_parameters: dict holding UMAP hyperparameters in list format.
 
+
+    ..  youtube:: JPRRF5ocNPo
+       :width: 640
+       :height: 480
+       :align: center
+
     :Example I: Fit.
     >>> hyper_parameters = {'n_neighbors': [10, 2], 'min_distance': [1.0], 'spread': [1.0], 'scaler': 'MIN-MAX', 'variance': 0.25, "multicolinearity": 0.5}
     >>> data_path = 'unsupervised/project_folder/logs/unsupervised_data_20230416145821.pickle'

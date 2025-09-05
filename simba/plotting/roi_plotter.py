@@ -59,6 +59,11 @@ class ROIPlotter(ConfigReader):
        :autoplay:
        :loop:
 
+    ..  youtube:: Q2ByLfwJIaw
+       :width: 640
+       :height: 480
+       :align: center
+
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file in Configparser format
     :param Union[str, os.PathLike] video_path: Name of video to create ROI visualizations for
     :param Dict[str, bool] style_attr: User-defined visualization settings.

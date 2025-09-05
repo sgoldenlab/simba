@@ -195,6 +195,12 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         - 1: Static Gantt chart (final frame only, faster)
         - 2: Dynamic Gantt chart (updated per frame)
 
+
+    ..  youtube:: UOLSj7DGKRo
+       :width: 640
+       :height: 480
+       :align: center
+
     :example:
     >>> # Create multiprocess validation video with dynamic Gantt chart
     >>> validator = ValidateModelOneVideoMultiprocess(

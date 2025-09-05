@@ -82,6 +82,12 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
        :width: 500
        :align: center
 
+
+    ..  youtube:: O41x96kXUHE
+       :width: 640
+       :height: 480
+       :align: center
+
     :param str config_path: path to SimBA project config file in Configparser format
     :param bool final_img_setting: If True, then create a single image representing the last frame of the input video
     :param bool video_setting: If True, then create a video of heatmaps.

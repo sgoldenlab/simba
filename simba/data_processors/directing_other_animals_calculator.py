@@ -34,6 +34,11 @@ class DirectingOtherAnimalsAnalyzer(ConfigReader, FeatureExtractionMixin):
        `Github Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial.md#part-3-generating-features-from-roi-data>`__.
        `Expected output <https://github.com/sgoldenlab/simba/blob/master/misc/Direction_data_example.csv>`__.
 
+    ..  youtube:: d6pAatreb1E
+       :width: 640
+       :height: 480
+       :align: center
+
     :parameter str config_path: path to SimBA project config file in Configparser format.
     :parameter bool bool_tables: If True, creates boolean output tables.
     :parameter bool summary_tables: If True, creates summary tables including approximate location of eye of observer and the location of observed body-parts and frames when observation was detected.

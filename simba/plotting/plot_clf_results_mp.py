@@ -130,6 +130,11 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
        :width: 600
        :align: center
 
+    ..  youtube:: Frq6mMcaHBc
+       :width: 640
+       :height: 480
+       :align: center
+
     :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
     :param Optional[bool] video_setting: If True, SimBA will create compressed videos. Default True.
     :param Optional[bool] frame_setting: If True, SimBA will create individual frames. Default True.

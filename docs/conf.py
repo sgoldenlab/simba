@@ -32,7 +32,8 @@ extensions = ['sphinx.ext.napoleon',
               'nbsphinx',
               'sphinx.ext.intersphinx',
               'sphinxcontrib.video',
-              'sphinx.ext.autosummary']
+              'sphinx.ext.autosummary',
+              'sphinxcontrib.youtube']
 
 #mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
 mathjax_path = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS-MML_HTMLorMML"

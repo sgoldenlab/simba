@@ -409,6 +409,11 @@ def clahe_enhance_video(file_path: Union[str, os.PathLike],
        :width: 800
        :align: center
 
+    ..  youtube:: 6zDh7E0F8IY
+       :width: 640
+       :height: 480
+       :align: center
+
     :param Union[str, os.PathLike] file_path: Path to video file.
     :param Optional[int] clip_limit: CLAHE amplification limit. Inccreased clip limit reduce noise in output. Default: 2.
     :param Optional[Tuple[int]] tile_grid_size: The histogram kernel size.
@@ -920,6 +925,11 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
 
     .. image:: _static/img/superimpose_frame_count.gif
        :width: 500
+       :align: center
+
+    ..  youtube:: TMQmNr8Ssyg
+       :width: 640
+       :height: 480
        :align: center
 
     :parameter Union[str, os.PathLike] file_path: Path to video file.
@@ -2668,6 +2678,11 @@ def mosaic_concatenator(
        :width: 600
        :align: center
 
+    ..  youtube:: Frq6mMcaHBc
+       :width: 640
+       :height: 480
+       :align: center
+
     .. note::
        if an uneven number of videos, the last index will be filled by ``uneven_fill_color``.
 
@@ -2819,6 +2834,11 @@ def mixed_mosaic_concatenator(
        The resolution of the output video is determined by the resolution of the video path at the first index.
 
        If an uneven number of right-panel videos ( if not (len(video_paths)-1) % 2) == 0), then the last index will be filled by ``uneven_fill_color``.
+
+    ..  youtube:: QLfVR4PjA
+       :width: 640
+       :height: 480
+       :align: center
 
     :param List[Union[str, os.PathLike]] video_paths: List of input video file paths.
     :param Union[str, os.PathLike] save_path: File path to save the concatenated video.

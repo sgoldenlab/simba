@@ -152,6 +152,12 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
        :width: 450
        :align: center
 
+
+    ..  youtube:: tsOJCOYZRAA
+       :width: 640
+       :height: 480
+       :align: center
+
     :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
     :param Union[str, os.PathLike] video_path: Path to video for to visualize directionality.
     :param Dict[str, Any] style_attr: Video style attribitions (colors and sizes etc.)

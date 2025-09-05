@@ -1,6 +1,5 @@
 import argparse
 import os
-import random
 import sys
 
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
@@ -156,7 +155,8 @@ class YOLOPoseInference():
         results = {}
         class_dict = self.model.names
         timer = SimbaTimer(start=True)
-        for path in self.video_path:
+        for video_cnt, path in enumerate(self.video_path):
+            video_timer = SimbaTimer(start=True)
             _, video_name, _ = get_fn_ext(filepath=path)
             if self.save_dir:
                 save_path = os.path.join(self.save_dir, f'{video_name}.csv')
@@ -204,6 +204,9 @@ class YOLOPoseInference():
                 save_path = os.path.join(self.save_dir, f'{video_name}.csv')
                 results[video_name].to_csv(save_path)
                 del results[video_name]
+            video_timer.stop_timer()
+            if self.verbose:
+                print(f'Video {video_name} complete (elapsed time: {video_timer.elapsed_time_str}s, video {video_cnt+1}/{len(self.video_path)})')
 
         timer.stop_timer()
         if not self.save_dir:
