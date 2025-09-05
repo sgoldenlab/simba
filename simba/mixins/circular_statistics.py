@@ -143,13 +143,17 @@ class CircularStatisticsMixin(object):
         Jitted compute of the circular mean of single sample.
 
 
+        The circular mean is calculated as:
+
         .. math::
 
-           \\mu = \\text{atan2}\\left(\\frac{1}{N} \\sum_{i=1}^{N} \\sin(\\theta_i), \\frac{1}{N} \\sum_{i=1}^{N} \\cos(\\theta_i)\\right)
+           \mu = \text{atan2}\left(\frac{1}{N} \sum_{i=1}^{N} \sin(\theta_i), \frac{1}{N} \sum_{i=1}^{N} \cos(\theta_i)\right)
 
         Where:
-           - :math:`\\theta_i` are the angles in radians within the sliding window
-           - :math:`N` is the number of samples in the window
+
+        - :math:`\theta_i` are the angles in radians within the sample
+        - :math:`N` is the number of samples
+        - :math:`\mu` is the circular mean angle
 
 
         :param np.ndarray data: 1D array of size len(frames) representing angles in degrees.
@@ -392,7 +396,7 @@ class CircularStatisticsMixin(object):
 
         .. csv-table::
            :header: EXPECTED RUNTIMES
-           :file: ../../../docs/tables/angle_to_cardinal.csv
+           :file: ../../docs/tables/angle_to_cardinal.csv
            :widths: 10, 45, 45
            :align: center
            :header-rows: 1
@@ -522,7 +526,7 @@ class CircularStatisticsMixin(object):
 
         .. csv-table::
            :header: EXPECTED RUNTIMES
-           :file: ../../../docs/tables/three_point_direction.csv
+           :file: ../../docs/tables/three_point_direction.csv
            :widths: 10, 45, 45
            :align: center
            :header-rows: 1
@@ -606,7 +610,7 @@ class CircularStatisticsMixin(object):
 
         .. csv-table::
            :header: EXPECTED RUNTIMES
-           :file: ../../../docs/tables/two_point_direction.csv
+           :file: ../../docs/tables/two_point_direction.csv
            :widths: 10, 45, 45
            :align: center
            :header-rows: 1
@@ -645,7 +649,7 @@ class CircularStatisticsMixin(object):
         The associated p-value is calculated as follows:
 
         .. math::
-           p = e^{\\sqrt{1 + 4n + 4(n^2 - R^2)} - (1 + 2n)}
+           p = e^{\sqrt{1 + 4n + 4(n^2 - R^2)} - (1 + 2n)}
 
         .. seealso::
            :func:`simba.data_processors.cuda.circular_statistics.sliding_rayleigh_z`,
@@ -712,14 +716,17 @@ class CircularStatisticsMixin(object):
         Ranges from -1 to 1: 1 indicates perfect positive correlation, -1 indicates perfect negative correlation, 0
         indicates no correlation.
 
+        The circular correlation coefficient is calculated as:
+
         .. math::
-           R = \\frac{\\sum \\sin(\\theta_1 - \\bar{\\theta}_1) \\sin(\\theta_2 - \\bar{\\theta}_2)}
-           {\\sqrt{\\sum \\sin^2(\\theta_1 - \\bar{\\theta}_1) \\sum \\sin^2(\\theta_2 - \\bar{\\theta}_2)}}
 
-        where:
+           R = \frac{\sum \sin(\theta_1 - \bar{\theta}_1) \sin(\theta_2 - \bar{\theta}_2)}{\sqrt{\sum \sin^2(\theta_1 - \bar{\theta}_1) \sum \sin^2(\theta_2 - \bar{\theta}_2)}}
 
-        - :math:`\\theta_1` and :math:`\\theta_2` are the angles (in radians) from `sample_1` and `sample_2`, respectively.
-        - :math:`\\bar{\\theta}_1` and :math:`\\bar{\\theta}_2` are the mean directions of `sample_1` and `sample_2`, respectively.
+        Where:
+
+        - :math:`\theta_1` and :math:`\theta_2` are the angles (in radians) from `sample_1` and `sample_2`, respectively
+        - :math:`\bar{\theta}_1` and :math:`\bar{\theta}_2` are the mean directions of `sample_1` and `sample_2`, respectively
+        - :math:`R` is the circular correlation coefficient ranging from -1 to 1
 
         .. note::
            Adapted from ``astropy.stats.circstats.circcorrcoef``.

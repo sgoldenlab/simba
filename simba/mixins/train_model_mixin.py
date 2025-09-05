@@ -1263,8 +1263,8 @@ class TrainModelMixin(object):
 
         .. csv-table::
            :header: EXPECTED RUNTIMES
-           :file: ../../../docs/tables/find_collinear_features.csv
-           :widths: 10, 45, 45
+           :file: ../../docs/tables/find_collinear_features.csv
+           :widths: 10, 90
            :align: center
            :header-rows: 1
 

@@ -192,20 +192,20 @@ def check_str(name: str,
     else:
         return True, msg
 
-def check_float(
-    name: str,
-    value: Any,
-    max_value: Optional[float] = None,
-    min_value: Optional[float] = None,
-    raise_error: bool = True,
-) -> Tuple[bool, str]:
+def check_float(name: str,
+                value: Any,
+                max_value: Optional[float] = None,
+                min_value: Optional[float] = None,
+                raise_error: bool = True,
+                allow_zero: bool = True) -> Tuple[bool, str]:
     """
     Check if variable is a valid float.
 
     :param str name: Name of variable
     :param Any value: Value of variable
     :param Optional[int] max_value: Maximum allowed value of the float. If None, then no maximum. Default: None.
-    :param Optional[int]: Minimum allowed value of the float. If None, then no minimum. Default: None.
+    :param Optional[int]: Minimum allowed value of the float. If None, then no minimum. Default: Non
+    :param Optional[bool] allow_zero: If True, do not allow float to be zero. Default: True and allow zero.
     :param Optional[bool] raise_error: If True, then raise error if invalid float. Default: True.
     :return: If `raise_error` is False, then returns size-2 tuple, with first value being a bool representing if valid float, and second value a string representing error (if valid is False, else empty string)
     :rtype: Tuple[bool, str]
@@ -238,6 +238,14 @@ def check_float(
                 raise FloatError(msg=msg, source=check_float.__name__)
             else:
                 return False, msg
+    if not allow_zero:
+        if float(value) == 0:
+            msg = f"{name} cannot be ZERO. It is set to {str(value)}"
+            if raise_error:
+                raise FloatError(msg=msg, source=check_float.__name__)
+            else:
+                return False, msg
+
     return True, msg
 
 
@@ -865,7 +873,7 @@ def check_valid_array(data: np.ndarray,
                       accepted_ndims: Optional[Union[Tuple[int], Any]] = None,
                       accepted_sizes: Optional[List[int]] = None,
                       accepted_axis_0_shape: Optional[Union[List[int], Tuple[int]]] = None,
-                      accepted_axis_1_shape: Optional[List[int]] = None,
+                      accepted_axis_1_shape: Optional[Union[List[int], Tuple[int]]] = None,
                       accepted_dtypes: Optional[Union[List[Union[str, Type]], Tuple[Union[str, Type]], Iterable[Any]]] = None,
                       accepted_values: Optional[List[Any]] = None,
                       accepted_shapes: Optional[List[Tuple[int]]] = None,
@@ -932,6 +940,10 @@ def check_valid_array(data: np.ndarray,
             else:
                 return False
     if accepted_axis_1_shape is not None:
+        if not isinstance(accepted_axis_1_shape, (tuple, list)):
+            raise InvalidInputError(msg=f"accepted_axis_1_shape is invalid format. Accepted: {'list, tuple'}. Got: {type(accepted_axis_1_shape)}, {source}", source=check_valid_array.__name__)
+        for cnt, i in enumerate(accepted_axis_1_shape):
+            check_int(name=f"{source} {cnt} accepted_axis_1_shape", value=i, min_value=1)
         if data.ndim != 2:
             raise ArrayError(msg=f"Array not of acceptable dimension. Found {data.ndim}, accepted: 2, {source}",  source=check_valid_array.__name__,)
         elif data.shape[1] not in accepted_axis_1_shape:

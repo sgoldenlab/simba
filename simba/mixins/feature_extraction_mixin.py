@@ -911,7 +911,7 @@ class FeatureExtractionMixin(object):
 
         check_valid_array(data=bp1_coords, source=f'{FeatureExtractionMixin.bodypart_distance.__name__} bp1_coords', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_value=0.0, raise_error=True)
         check_valid_array(data=bp2_coords, source=f'{FeatureExtractionMixin.bodypart_distance.__name__} bp2_coords', accepted_ndims=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_value=0.0, raise_error=True, accepted_axis_0_shape=(bp1_coords.shape[0],))
-        check_float(name=f'{FeatureExtractionMixin.bodypart_distance.__name__} px_per_mm', value=px_per_mm, min_value=10e-16, raise_error=True)
+        check_float(name=f'{FeatureExtractionMixin.bodypart_distance.__name__} px_per_mm', value=px_per_mm, min_value=10e-16, raise_error=True, allow_zero=False)
         check_valid_boolean(value=in_centimeters, source=f'{FeatureExtractionMixin. bodypart_distance.__name__} px_per_mm', raise_error=True)
 
         bp1_coords = bp1_coords.astype(np.float64)
@@ -922,6 +922,63 @@ class FeatureExtractionMixin(object):
                                                                       px_per_mm=px_per_mm,
                                                                       centimeter=in_centimeters)
         return results.astype(np.float32)
+
+    @staticmethod
+    def keypoint_distances(a: np.ndarray,
+                           b: np.ndarray,
+                           px_per_mm: Optional[float] = 1,
+                           in_centimeters: Optional[bool] = False) -> np.ndarray:
+
+        """
+        Compute Euclidean distances between corresponding 2D keypoints with unit conversion.
+
+        Given two arrays of 2D coordinates (x, y) sampled across frames, this function computes the
+        frame-wise Euclidean distance between matching rows, converts from pixels to millimeters
+        using ``px_per_mm``, and optionally reports distances in centimeters. Input validity is checked
+        and the output is guaranteed to be ``np.float32``.
+
+        .. seealso::
+           For numba decorated function, :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance`
+           For GPU CuPy solution, see :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cupy`.
+           For GPU numba CUDA solution, see :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cuda`.
+
+           Appears faster than numba deocrated method, and slower than GPU metheds.
+
+        .. image:: _static/img/framewise_euclid_dist.webp
+           :width: 300
+           :align: center
+
+        .. csv-table::
+           :header: EXPECTED RUNTIMES
+           :file: ../../docs/tables/keypoint_distances.csv
+           :widths: 20, 20, 20, 20, 20
+           :align: center
+           :header-rows: 1
+
+        :param np.ndarray a: Array of shape ``(n_frames, 2)`` with non-negative numeric [x, y] coordinates.
+        :param np.ndarray b: Array of shape ``(n_frames, 2)`` with non-negative numeric [x, y] coordinates. Must have the same number of rows as ``a``.
+        :param float px_per_mm: Pixels-per-millimeter scaling factor (> 0). Distances are divided by this value.
+        :param bool in_centimeters: If ``True``, returned distances are reported in centimeters (mm/10).
+        :return: Frame-wise distances between corresponding rows in ``a`` and ``b`` (mm or cm).
+        :rtype: np.ndarray
+
+        :example:
+        >>> a = np.array([[0, 0], [3, 4], [6, 8]], dtype=np.float32)
+        >>> b = np.array([[0, 0], [0, 0], [3, 4]], dtype=np.float32)
+        >>> # px_per_mm = 1 -> distances reported in millimeters (same numeric scale as pixels)
+        >>> d_mm = FeatureExtractionMixin.keypoint_distances(a=a, b=b, px_per_mm=1.0, in_centimeters=False)
+        >>> d_cm = FeatureExtractionMixin.keypoint_distances(a=a, b=b, px_per_mm=1.0, in_centimeters=True)
+        """
+
+        check_valid_array(data=a, source=f'{FeatureExtractionMixin.keypoint_distances.__name__} a', accepted_ndims=(2,), accepted_axis_1_shape=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_value=0)
+        check_valid_array(data=b, source=f'{FeatureExtractionMixin.keypoint_distances.__name__} b', accepted_ndims=(2,), accepted_axis_1_shape=(2,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_value=0, accepted_axis_0_shape=(a.shape[0],))
+        check_float(name=f'{FeatureExtractionMixin.keypoint_distances.__name__} px_per_mm', value=px_per_mm, allow_zero=False, min_value=10e-16, raise_error=True)
+        check_valid_boolean(value=in_centimeters, source=f'{FeatureExtractionMixin.keypoint_distances.__name__} in_centimeters', raise_error=True)
+
+        d = np.linalg.norm(a - b, axis=1) / px_per_mm
+        if in_centimeters:
+            d = d / 10.0
+        return d.astype(np.float32, copy=False)
 
     def change_in_bodypart_euclidean_distance(
                                               self,

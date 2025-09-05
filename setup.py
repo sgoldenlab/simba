@@ -29,7 +29,7 @@ with open(GPU_REQUIREMENTS_PATH, "r") as f:
 # Setup configuration
 setuptools.setup(
     name="simba_uw_tf_dev",
-    version="3.7.7",
+    version="3.7.8",
     author="Simon Nilsson, Jia Jie Choong, Sophia Hwang",
     author_email="sronilsson@gmail.com",
     description="Toolkit for computer classification and analysis of behaviors in experimental animals",
