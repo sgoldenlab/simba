@@ -485,6 +485,7 @@ def directionality_to_static_targets(left_ear: np.ndarray,
     >>> nose = np.random.randint(0, 500, (100, 2))
     >>> target = np.random.randint(0, 500, (2))
     >>> directionality_to_static_targets(left_ear=left_ear, right_ear=right_ear, nose=nose, target=target)
+
     """
 
     left_ear = np.ascontiguousarray(left_ear).astype(np.int32)

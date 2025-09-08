@@ -43,11 +43,6 @@ html_logo = "../simba/assets/icons/readthedocs_logo.png"
 latex_engine = 'xelatex'
 latex_elements = {'papersize': 'letterpaper'}
 
-# source_suffix = {
-#     '.rst': 'restructuredtext',
-#     '.ipynb': 'nbsphinx',
-# }
-
 
 source_suffix = ['.rst']
 nbsphinx_execute = 'never'

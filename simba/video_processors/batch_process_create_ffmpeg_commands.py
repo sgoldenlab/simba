@@ -76,7 +76,7 @@ class FFMPEGCommandCreator(object):
         if os.path.exists(self.process_dir):
             try:
                 shutil.rmtree(self.process_dir)
-            except PermissionError as e:
+            except Exception as e:
                 print(e.args)
                 raise PermissionError(msg=f'SimBA is not allowed to delete/manipulate {self.process_dir}. Are you doing batch processing on a VirtualDrive or Cloud storage? Try performing the batch processing on a local drive.', source=self.__class__.__name__)
         os.makedirs(self.process_dir)
@@ -118,9 +118,9 @@ class FFMPEGCommandCreator(object):
                 video_data["settings"]["height"]
             )
             if self.gpu:
-                command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "scale=w={width}:h={height}" -c:v h264_nvenc -preset {self.quality} -hide_banner -loglevel error "{out_path}"'
+                command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "scale=w={width}:h={height}" -c:v h264_nvenc -preset {self.quality} -hide_banner -loglevel error -stats "{out_path}"'
             else:
-                command = f'ffmpeg -i "{in_path}" -vf scale={width}:{height} "{out_path}" -c:v {Formats.BATCH_CODEC.value} -crf {self.quality} -hide_banner -loglevel error'
+                command = f'ffmpeg -i "{in_path}" -vf scale={width}:{height} "{out_path}" -c:v {Formats.BATCH_CODEC.value} -crf {self.quality} -hide_banner -loglevel error -stats -y'
             subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         self.replace_files_in_temp()
         print("Downsampling complete...")
@@ -130,7 +130,7 @@ class FFMPEGCommandCreator(object):
         self.create_process_dir()
 
         for video, video_data in self.videos_to_clip.items():
-            print("Clipping {}...".format(video))
+            print(f"Clipping {video}...")
             if video_data["last_operation"] == "clip":
                 self.quality = video_data["output_quality"]
             in_path, out_path = video_data["path"], os.path.join(
@@ -144,9 +144,9 @@ class FFMPEGCommandCreator(object):
             ), datetime.datetime.strptime(end_time, self.time_format)
             time_difference = str(end_time - start_time_shift)
             if self.gpu:
-                command = f'ffmpeg -hwaccel auto -i "{in_path}" -ss {start_time} -t {time_difference} -c:v h264_nvenc -async 1 "{out_path}" -preset {self.quality} -hide_banner -loglevel error'
+                command = f'ffmpeg -hwaccel auto -i "{in_path}" -ss {start_time} -t {time_difference} -c:v h264_nvenc -async 1 "{out_path}" -preset {self.quality} -hide_banner -loglevel error -stats -y'
             else:
-                command = f'ffmpeg -i "{in_path}" -ss {start_time} -t {time_difference} -c:v {Formats.BATCH_CODEC.value} -async 1 -crf {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error'
+                command = f'ffmpeg -i "{in_path}" -ss {start_time} -t {time_difference} -c:v {Formats.BATCH_CODEC.value} -async 1 -crf {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
             subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         self.replace_files_in_temp()
         print("Clipping complete...")
@@ -155,7 +155,7 @@ class FFMPEGCommandCreator(object):
         self.videos_to_change_fps = self.find_relevant_videos(variable="fps")
         self.create_process_dir()
         for video, video_data in self.videos_to_change_fps.items():
-            print("Changing FPS {}...".format(video))
+            print(f"Changing FPS {video}...")
             if video_data["last_operation"] == "fps":
                 self.quality = video_data["output_quality"]
             in_path, out_path = video_data["path"], os.path.join(
@@ -163,7 +163,7 @@ class FFMPEGCommandCreator(object):
             )
             fps = str(video_data["settings"]["fps"])
             if self.gpu:
-                command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "fps={fps}" -c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error'
+                command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "fps={fps}" -c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
             else:
                 command = f'ffmpeg -i "{in_path}" -c:v {Formats.BATCH_CODEC.value} -crf {self.quality} -filter:v fps=fps={fps} "{out_path}"'
             subprocess.call(command, shell=True, stdout=subprocess.PIPE)
@@ -177,13 +177,11 @@ class FFMPEGCommandCreator(object):
             print(f"Applying grayscale {video}...")
             if video_data["last_operation"] == "grayscale":
                 self.quality = video_data["output_quality"]
-            in_path, out_path = video_data["path"], os.path.join(
-                self.process_dir, os.path.basename(video_data["path"])
-            )
+            in_path, out_path = video_data["path"], os.path.join(self.process_dir, os.path.basename(video_data["path"]))
             if self.gpu:
-                command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "hwupload_cuda,hwdownload,format=nv12,format=gray" -c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error'
+                command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "hwupload_cuda,hwdownload,format=nv12,format=gray" -c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
             else:
-                command = f'ffmpeg -i "{in_path}" -c:v {Formats.BATCH_CODEC.value} -crf {self.quality} -vf hue=s=0 "{out_path}" -hide_banner -loglevel error'
+                command = f'ffmpeg -i "{in_path}" -c:v {Formats.BATCH_CODEC.value} -crf {self.quality} -vf hue=s=0 "{out_path}" -hide_banner -loglevel error -stats -y'
             subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         self.replace_files_in_temp()
         print("Grayscale complete...")
@@ -205,7 +203,7 @@ class FFMPEGCommandCreator(object):
                     command = (
                         f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" '
                         f'-vf "drawtext=fontfile=\'{font_path}\':text=\'%%{{n}}\':x=(w-tw)/2:y=h-th-10:fontcolor=white:box=1:boxcolor=white@0.5" '
-                        f'-c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -y -hide_banner -loglevel error'
+                        f'-c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -y -hide_banner -loglevel error -stats -y'
                     )
                 else:
                     command = [
@@ -219,7 +217,7 @@ class FFMPEGCommandCreator(object):
                         "-y",
                         out_path,
                         "-hide_banner",
-                        "-loglevel", "error",
+                        "-loglevel", "error", "-stats"
                     ]
                     subprocess.check_output(command, shell=True)
                 subprocess.call(command, shell=True, stdout=subprocess.PIPE)
@@ -229,9 +227,9 @@ class FFMPEGCommandCreator(object):
                     simba_cw, "assets", "UbuntuMono-Regular.ttf"
                 )
                 if self.gpu:
-                    command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "drawtext=fontsize=24:fontfile={simba_font_path}:text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor=white:box=1:boxcolor=white@0.5" -c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -y -hide_banner -loglevel error'
+                    command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "drawtext=fontsize=24:fontfile={simba_font_path}:text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor=white:box=1:boxcolor=white@0.5" -c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -y -hide_banner -loglevel error -stats -y'
                 else:
-                    command = f'ffmpeg -i "{in_path}" -vf "drawtext=fontfile={simba_font_path}:text=\'%{{frame_num}}\':start_number=1:x=(w-tw)/2:y=h-(2*lh):fontcolor=black:fontsize=20:box=1:boxcolor=white:boxborderw=5" -c:v {Formats.BATCH_CODEC.value} -crf {self.quality} -c:a copy -y "{out_path}" -hide_banner -loglevel error'
+                    command = f'ffmpeg -i "{in_path}" -vf "drawtext=fontfile={simba_font_path}:text=\'%{{frame_num}}\':start_number=1:x=(w-tw)/2:y=h-(2*lh):fontcolor=black:fontsize=20:box=1:boxcolor=white:boxborderw=5" -c:v {Formats.BATCH_CODEC.value} -crf {self.quality} -c:a copy -y "{out_path}" -hide_banner -loglevel error -stats -y'
                 subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         self.replace_files_in_temp()
         print("Applying frame count complete...")
@@ -298,7 +296,7 @@ class FFMPEGCommandCreator(object):
     def copy_videos_to_temp_dir(self):
         for video, video_data in self.video_dict["video_data"].items():
             source = video_data["video_info"]["file_path"]
-            print("Making a copy of {} ...".format(os.path.basename(source)))
+            print(f"Making a copy of {os.path.basename(source)} ...")
             destination = os.path.join(self.temp_dir, os.path.basename(source))
             shutil.copyfile(source, destination)
 

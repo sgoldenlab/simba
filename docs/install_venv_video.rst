@@ -3,7 +3,7 @@ Install SimBA using Python Virtual Environment
 
 .. raw:: html
 
-   <iframe width="100%" height="800" src="https://www.youtube.com/embed/tas2MQxu8LY?feature=shared&vq=hd1080" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+   <iframe width="100%" height="800" src="https://www.youtube.com/embed/95HwnuiIB6s?feature=shared&vq=hd1080" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 Written installation documentation
 -------------------
