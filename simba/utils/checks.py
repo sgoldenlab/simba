@@ -1865,6 +1865,3 @@ def is_lxc_container() -> bool:
     except Exception:
         pass
     return False
-
-
-

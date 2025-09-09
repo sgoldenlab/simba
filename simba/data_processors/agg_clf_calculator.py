@@ -45,24 +45,40 @@ class AggregateClfCalculator(ConfigReader):
     """
     Compute aggregate descriptive statistics from classification data.
 
+    This class analyzes machine learning classifier results to calculate various descriptive
+    statistics such as bout counts, durations, intervals, and first occurrences for each
+    classifier in each video. Results can be saved in detailed or summary formats.
+
     .. note::
        `GitHub tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results>`__.
-       `Example expected ouput file <https://github.com/sgoldenlab/simba/blob/master/misc/detailed_bout_data_summary_20231011091832.csv>`__.
+       `Example expected output file <https://github.com/sgoldenlab/simba/blob/master/misc/detailed_bout_data_summary_20231011091832.csv>`__.
 
+    :param Union[str, os.PathLike] config_path: Path to SimBA project config file in Configparser format.
+    :param List[str] classifiers: List of classifier names to calculate aggregate statistics for. Must be valid classifier names from the project.
+    :param Optional[Union[str, os.PathLike]] data_dir: Directory containing the machine results CSV files. If None, uses ``project_folder/csv/machine_results``.
+    :param bool detailed_bout_data: If True, saves detailed bout data (start frame, end frame, bout time, etc.) for each bout in each video. Default: False.
+    :param bool transpose: If True, creates output with one video per row. If False, one measurement per row. Default: False.
+    :param bool first_occurrence: If True, calculates first occurrence time for each classifier. Default: True.
+    :param bool event_count: If True, calculates total number of bouts for each classifier. Default: True.
+    :param bool total_event_duration: If True, calculates total duration of all bouts for each classifier. Default: True.
+    :param bool mean_event_duration: If True, calculates mean duration of bouts for each classifier. Default: True.
+    :param bool median_event_duration: If True, calculates median duration of bouts for each classifier. Default: True.
+    :param bool mean_interval_duration: If True, calculates mean interval between bouts for each classifier. Default: True.
+    :param bool median_interval_duration: If True, calculates median interval between bouts for each classifier. Default: True.
+    :param bool frame_count: If True, includes total frame count in the output. Default: False.
+    :param bool video_length: If True, includes video length in seconds in the output. Default: False.
 
-    :param str config_path: path to SimBA project config file in Configparser format
-    :param List[str] data_measures: Aggregate statistics measures to calculate. OPTIONS: ['Bout count', 'Total event duration (s)', 'Mean event bout duration (s)', 'Median event bout duration (s)', 'First event occurrence (s)', 'Mean event bout interval duration (s)', 'Median event bout interval duration (s)']. If None, then all measures are calculated.
-    :param List[str] classifiers: Classifiers to calculate aggregate statistics for. E.g.,: ['Attack', 'Sniffing']
-    :param Optional[List[str]] video_meta_data: Video metadata to include in the output. Options: 'Frame count', 'Video length (s)'.
-    :param bool detailed_bout_data: If True, save detailed data for each bout in each video (start frame, end frame, bout time etc.)
-    :param bool transpose: If True, then one video per row. Else, one meassure per row. Default: False.
-    :param Optional[Union[str, os.PathLike]] data_dir: Directory location of the data files. If None, the the ``project_folder/csv/machine_results`` directory is used.
-
+    :raises NoChoosenMeasurementError: If no measurement types are selected (all measurement booleans are False).
 
     :example:
-    >>> clf_log_creator = AggregateClfCalculator(config_path="MyConfigPath", data_measures=['Bout count', 'Total event duration (s)'], classifiers=['Attack', 'Sniffing'])
-    >>> clf_log_creator.run()
-    >>> clf_log_creator.save()
+    >>> clf_calculator = AggregateClfCalculator(
+    ...     config_path="project_folder/project_config.ini",
+    ...     classifiers=['Attack', 'Sniffing'],
+    ...     detailed_bout_data=True,
+    ...     transpose=True
+    ... )
+    >>> clf_calculator.run()
+    >>> clf_calculator.save()
     """
 
     def __init__(self,

@@ -29,10 +29,10 @@ from tabulate import tabulate
 import simba
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists, check_int, check_str,
-                                check_valid_dict, check_valid_tuple)
+                                check_valid_dict, check_valid_tuple, check_ffmpeg_available)
 from simba.utils.enums import (OS, UML, Defaults, FontPaths, Formats, Methods,
                                Options, Paths)
-from simba.utils.errors import NoFilesFoundError
+from simba.utils.errors import NoFilesFoundError, FFMPEGNotFoundError
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data)
 from simba.utils.warnings import NoDataFoundWarning
@@ -878,7 +878,40 @@ def print_video_meta_data(data_path: Union[str, os.PathLike]) -> None:
         print(f"{table} {Defaults.STR_SPLIT_DELIMITER.value}TABLE")
 
 
+def get_ffmpeg_encoders(raise_error: bool = True) -> List[str]:
+    """
+    Get a list of all available FFmpeg encoders.
 
+    :param bool raise_error: If True, raises an exception when FFmpeg is not available or the command fails. If False, returns an empty list on error. Default: True.
+    :return: List of encoder names (e.g., ['libx264', 'aac', 'libvpx', ...]). Returns empty list if FFmpeg is unavailable and raise_error=False.
+    :rtype: List[str]
+
+    :example:
+    >>> codecs = get_ffmpeg_encoders()
+    >>> print(Formats.BATCH_CODEC.value in codecs)
+    """
+
+    check_ffmpeg_available(raise_error=True)
+    try:
+        proc = subprocess.Popen(['ffmpeg', '-encoders'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = proc.communicate()
+        if isinstance(stdout, bytes):
+            stdout = stdout.decode('utf-8')
+    except Exception as e:
+        if raise_error:
+            raise FFMPEGNotFoundError(msg=str(e.args))
+        else:
+            return []
+    encoders = []
+    lines = stdout.split('\n')
+
+    for line in lines:
+        if re.match(r'^\s*[VAS]', line):
+            parts = line.split()
+            if len(parts) >= 2:
+                encoder_name = parts[1]
+                encoders.append(encoder_name)
+    return encoders
 
 
 

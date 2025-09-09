@@ -7,15 +7,13 @@ import shutil
 import subprocess
 
 import cv2
-
 import simba
 from simba.utils.checks import check_file_exist_and_readable
 from simba.utils.enums import Formats
 from simba.utils.errors import PermissionError
-from simba.utils.lookups import get_fonts, gpu_quality_to_cpu_quality_lk
+from simba.utils.lookups import get_fonts, gpu_quality_to_cpu_quality_lk, get_ffmpeg_encoders
 from simba.utils.read_write import get_video_meta_data
 from simba.utils.warnings import CropWarning
-
 
 class FFMPEGCommandCreator(object):
     """
@@ -64,6 +62,7 @@ class FFMPEGCommandCreator(object):
             shutil.rmtree(self.temp_dir)
         os.makedirs(self.temp_dir)
         self.copy_videos_to_temp_dir()
+        self.batch_codec = Formats.BATCH_CODEC.value if Formats.BATCH_CODEC.value in get_ffmpeg_encoders() else 'mpeg4'
 
     def replace_files_in_temp(self):
         processed_files = glob.glob(self.process_dir + "/*")
@@ -120,7 +119,7 @@ class FFMPEGCommandCreator(object):
             if self.gpu:
                 command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "scale=w={width}:h={height}" -c:v h264_nvenc -preset {self.quality} -hide_banner -loglevel error -stats "{out_path}"'
             else:
-                command = f'ffmpeg -i "{in_path}" -vf scale={width}:{height} "{out_path}" -c:v {Formats.BATCH_CODEC.value} -crf {self.quality} -hide_banner -loglevel error -stats -y'
+                command = f'ffmpeg -i "{in_path}" -vf scale={width}:{height} "{out_path}" -c:v {self.batch_codec} -crf {self.quality} -hide_banner -loglevel error -stats -y'
             subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         self.replace_files_in_temp()
         print("Downsampling complete...")
@@ -146,7 +145,7 @@ class FFMPEGCommandCreator(object):
             if self.gpu:
                 command = f'ffmpeg -hwaccel auto -i "{in_path}" -ss {start_time} -t {time_difference} -c:v h264_nvenc -async 1 "{out_path}" -preset {self.quality} -hide_banner -loglevel error -stats -y'
             else:
-                command = f'ffmpeg -i "{in_path}" -ss {start_time} -t {time_difference} -c:v {Formats.BATCH_CODEC.value} -async 1 -crf {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
+                command = f'ffmpeg -i "{in_path}" -ss {start_time} -t {time_difference} -c:v {self.batch_codec} -async 1 -crf {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
             subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         self.replace_files_in_temp()
         print("Clipping complete...")
@@ -165,7 +164,7 @@ class FFMPEGCommandCreator(object):
             if self.gpu:
                 command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "fps={fps}" -c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
             else:
-                command = f'ffmpeg -i "{in_path}" -c:v {Formats.BATCH_CODEC.value} -crf {self.quality} -filter:v fps=fps={fps} "{out_path}"'
+                command = f'ffmpeg -i "{in_path}" -c:v {self.batch_codec} -crf {self.quality} -filter:v fps=fps={fps} "{out_path}"'
             subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         self.replace_files_in_temp()
         print("FPS conversion complete...")
@@ -181,7 +180,7 @@ class FFMPEGCommandCreator(object):
             if self.gpu:
                 command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "hwupload_cuda,hwdownload,format=nv12,format=gray" -c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
             else:
-                command = f'ffmpeg -i "{in_path}" -c:v {Formats.BATCH_CODEC.value} -crf {self.quality} -vf hue=s=0 "{out_path}" -hide_banner -loglevel error -stats -y'
+                command = f'ffmpeg -i "{in_path}" -c:v {self.batch_codec} -crf {self.quality} -vf hue=s=0 "{out_path}" -hide_banner -loglevel error -stats -y'
             subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         self.replace_files_in_temp()
         print("Grayscale complete...")
@@ -209,7 +208,7 @@ class FFMPEGCommandCreator(object):
                     command = [
                         "ffmpeg",
                         "-i", in_path,
-                        "-c:v", Formats.BATCH_CODEC.value,
+                        "-c:v", self.batch_codec,
                         "-crf", str(self.quality),
                         "-vf",
                         f"drawtext=fontfile='{font_path}':text='%%{{frame_num}}':start_number=1:x=(w-tw)/2:y=h-(2*lh):fontcolor=black:fontsize=20:box=1:boxcolor=white:boxborderw=5",
@@ -229,7 +228,7 @@ class FFMPEGCommandCreator(object):
                 if self.gpu:
                     command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "drawtext=fontsize=24:fontfile={simba_font_path}:text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor=white:box=1:boxcolor=white@0.5" -c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -y -hide_banner -loglevel error -stats -y'
                 else:
-                    command = f'ffmpeg -i "{in_path}" -vf "drawtext=fontfile={simba_font_path}:text=\'%{{frame_num}}\':start_number=1:x=(w-tw)/2:y=h-(2*lh):fontcolor=black:fontsize=20:box=1:boxcolor=white:boxborderw=5" -c:v {Formats.BATCH_CODEC.value} -crf {self.quality} -c:a copy -y "{out_path}" -hide_banner -loglevel error -stats -y'
+                    command = f'ffmpeg -i "{in_path}" -vf "drawtext=fontfile={simba_font_path}:text=\'%{{frame_num}}\':start_number=1:x=(w-tw)/2:y=h-(2*lh):fontcolor=black:fontsize=20:box=1:boxcolor=white:boxborderw=5" -c:v {self.batch_codec} -crf {self.quality} -c:a copy -y "{out_path}" -hide_banner -loglevel error -stats -y'
                 subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         self.replace_files_in_temp()
         print("Applying frame count complete...")
@@ -285,10 +284,10 @@ class FFMPEGCommandCreator(object):
                     subprocess.run(gpu_cmd, check=True, shell=True)
                 except subprocess.CalledProcessError as e:
                     CropWarning(msg=f'GPU crop for video {video} failed, reverting to CPU crop.', source=self.__class__.__name__)
-                    cpu_cmd = f'ffmpeg -i "{in_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}" -c:v {Formats.BATCH_CODEC.value} -crf {self.gpu_to_cpu_quality_lk[self.quality]} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
+                    cpu_cmd = f'ffmpeg -i "{in_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}" -c:v {self.batch_codec} -crf {self.gpu_to_cpu_quality_lk[self.quality]} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
                     subprocess.call(cpu_cmd, shell=True)
             else:
-                cpu_cmd = f'ffmpeg -i "{in_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}" -c:v {Formats.BATCH_CODEC.value} -crf {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
+                cpu_cmd = f'ffmpeg -i "{in_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}" -c:v {self.batch_codec} -crf {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
                 subprocess.call(cpu_cmd, shell=True)
         self.replace_files_in_temp()
         print("Applying crop complete...")
