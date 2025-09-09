@@ -104,7 +104,8 @@ def get_bp_config_codes() -> Dict[str, str]:
         "3D tracking": "3D_user_defined",
         "AMBER": "AMBER",
         "SimBA BLOB Tracking": Methods.SIMBA_BLOB.value,
-        "FaceMap": Methods.FACEMAP.value
+        "FaceMap": Methods.FACEMAP.value,
+        "SuperAnimal-TopView": Methods.SUPER_ANIMAL_TOPVIEW.value
     }
 
 

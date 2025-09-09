@@ -470,7 +470,7 @@ def downsample_coco_dataset(json_path: Union[str, os.PathLike],
     img_cnt = len(coco_data['images'])
 
     for cnt in range(img_cnt):
-        if verbose: print(f'Processing COCO image {cnt+1}/{img_cnt}...')
+        if verbose: print(f'Processing COCO image {cnt+1}/{img_cnt} (shrink factor: {shrink_factor})...')
         img_data = coco_data['images'][cnt]
         new_img_data = deepcopy(img_data)
         check_if_keys_exist_in_dict(data=img_data, key=['width', 'height', 'file_name', 'id'], name=json_path)

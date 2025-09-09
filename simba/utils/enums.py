@@ -580,6 +580,7 @@ class Methods(Enum):
     ANOVA = "ANOVA"
     SIMBA_BLOB = 'simba_blob'
     FACEMAP = 'facemap'
+    SUPER_ANIMAL_TOPVIEW = 'superanimal_topview'
     AGG_METHODS = ('mean', 'median')
     INVALID_THIRD_PARTY_APPENDER_FILE = "INVALID annotations file data format"
     ADDITIONAL_THIRD_PARTY_CLFS = "ADDITIONAL third-party behavior detected"

@@ -47,7 +47,7 @@ class PoseConfigCreator(PlottingMixin):
                  bp_list: List[str],
                  animal_id_int_list: List[int]):
 
-        check_str(name="POSE CONFIG NAME", value=pose_name, allow_blank=False, raise_error=True)
+        check_str(name="POSE CONFIG NAME", value=pose_name, allow_blank=False, raise_error=True, invalid_substrs=(',',))
         check_int(name="NUMBER OF ANIMALS", value=animal_cnt, min_value=1, raise_error=True)
         check_valid_img_path(path=img_path, raise_error=True)
         check_valid_lst(data=bp_list, source=f'{self.__class__.__name__} bp_list', valid_dtypes=(str,), min_len=1, raise_error=True)

@@ -139,7 +139,8 @@ def check_str(name: str,
               options: Optional[Union[Tuple[Any], List[Any], Iterable[Any]]] = (),
               allow_blank: bool = False,
               invalid_options: Optional[Union[List[str], Tuple[str]]] = None,
-              raise_error: bool = True) -> Tuple[bool, str]:
+              raise_error: bool = True,
+              invalid_substrs: Optional[Union[List[str], Tuple[str]]] = None) -> Tuple[bool, str]:
 
     """
     Check if variable is a valid string.
@@ -189,6 +190,19 @@ def check_str(name: str,
                 return False, msg
         else:
             return True, msg
+    if invalid_substrs is not None:
+        if not isinstance(invalid_substrs, (tuple, list)):
+            check_instance(source=f'{name} invalid_characters', accepted_types=(tuple, list,), instance=invalid_options)
+        if isinstance(invalid_substrs, tuple):
+            invalid_substrs = list(invalid_substrs)
+        check_valid_lst(data=invalid_substrs, valid_dtypes=(str,), min_len=1)
+        for substr in invalid_substrs:
+            if substr in value:
+                msg = f'{name} contains the characters "{substr}" . This character/substring is NOT accepted.'
+                if raise_error:
+                    raise StringError(msg=msg, source=check_str.__name__)
+                else:
+                    return False, msg
     else:
         return True, msg
 

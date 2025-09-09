@@ -64,7 +64,7 @@ class PoseResetter(object):
         default_pic_list = []
         user_pic_lst = os.listdir(self.schematics_path)
         for idx in range(self.default_pose_configs_cnt):
-            default_pic_list.append("{}.png".format(str(idx + 1)))
+            default_pic_list.append(f"{idx + 1}.png")
         for i in list(set(user_pic_lst) - set(default_pic_list)):
             os.remove(os.path.join(self.schematics_path, i))
 

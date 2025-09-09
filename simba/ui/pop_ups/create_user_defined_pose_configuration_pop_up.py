@@ -44,9 +44,10 @@ class CreateUserDefinedPoseConfigurationPopUp(PopUpMixin):
             self.bp_table_frm.destroy()
 
         self.bp_table_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header='BODY-PARTS', icon_name='pose', padx=5, pady=5, relief='solid')
+        check_int(name="ANIMAL NUMBER", value=self.animal_cnt_entry_box.entry_get, min_value=1)
+        check_int(name="BODY-PART NUMBER", value=self.no_body_parts_entry_box.entry_get, min_value=1)
+        check_str(name="POSE CONFIG NAME", value=self.config_name_entry_box.entry_get.strip(), allow_blank=False, invalid_substrs=(',',))
 
-        check_int(name="ANIMAL NUMBER", value=self.animal_cnt_entry_box.entry_get)
-        check_int(name="BODY-PART NUMBER", value=self.no_body_parts_entry_box.entry_get)
         self.selected_animal_cnt, self.selected_bp_cnt = int(self.animal_cnt_entry_box.entry_get), int(self.no_body_parts_entry_box.entry_get)
         self.bp_name_ebs, self.bp_animal_ebs = [], []
 
@@ -91,7 +92,7 @@ class CreateUserDefinedPoseConfigurationPopUp(PopUpMixin):
         config_name = self.config_name_entry_box.entry_get
         image_path = self.img_path_file_select.file_path
         check_valid_img_path(path=image_path)
-        check_str(name="POSE CONFIG NAME", value=config_name.strip(), allow_blank=False)
+        check_str(name="POSE CONFIG NAME", value=config_name.strip(), allow_blank=False, invalid_substrs=(',',))
         bp_lst, animal_id_lst = [], []
         for bp_name_entry in self.bp_name_ebs: bp_lst.append(bp_name_entry.entry_get.strip())
         for animal_id_entry in self.bp_animal_ebs: animal_id_lst.append(animal_id_entry.entry_get.strip())

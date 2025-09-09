@@ -345,40 +345,8 @@ class CircularStatisticsMixin(object):
         return results
 
     @staticmethod
-    @njit("types.ListType(types.unicode_type)(float32[:])")
-    def degrees_to_cardinal(data: np.ndarray) -> typed.List[str]:
-        """
-        Convert degree angles to cardinal direction bucket e.g., 0 -> "N", 180 -> "S"
-
-        .. note::
-           To convert cardinal literals to integers, map using :func:`simba.utils.enums.lookups.cardinality_to_integer_lookup`.
-           To convert integers to cardinal literals, map using :func:`simba.utils.enums.lookups.integer_to_cardinality_lookup`.
-           For pure numpy function, see func:`simba.mixins.circular_statistics.CircularStatisticsMixin.angle_to_cardinal`. (Appears to be quicker in pure numpy.)
-
-        .. image:: _static/img/degrees_to_cardinal.png
-           :width: 600
-           :align: center
-
-        :param np.ndarray data: 1D array of degrees in range [0, 360). 
-        :return: List of strings representing frame-wise cardinality.
-        :rtype: typed.List[str]
-
-        :example:
-        >>> data = np.array(list(range(0, 405, 45))).astype(np.float32)
-        >>> CircularStatisticsMixin().degrees_to_cardinal(data=data)
-        ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N']
-        """
-
-        DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
-        results = typed.List.empty_list(types.unicode_type)
-        for i in prange(data.shape[0]):
-            ix = round(data[i] / (360.0 / len(DIRECTIONS)))
-            direction = DIRECTIONS[ix % len(DIRECTIONS)]
-            results.append(direction)
-        return results
-
-    @staticmethod
-    def angle_to_cardinal(data: np.ndarray) -> List[str]:
+    @njit("(float32[:],)")
+    def degrees_to_cardinal(data: np.ndarray) -> List[str]:
         """
         Convert degree angles to cardinal direction bucket e.g., 0 -> "N", 180 -> "S"
 
@@ -390,31 +358,23 @@ class CircularStatisticsMixin(object):
            :width: 600
            :align: center
 
-        .. seealso::
-           For numba function, see func:`simba.mixins.circular_statistics.CircularStatisticsMixin.degrees_to_cardinal`
-           Appears to be quicker in pure numpy.
-
-        .. csv-table::
-           :header: EXPECTED RUNTIMES
-           :file: ../../docs/tables/angle_to_cardinal.csv
-           :widths: 10, 45, 45
-           :align: center
-           :header-rows: 1
-
-        :param np.ndarray data: 1D array of degrees in range [0, 360).
+        :parameter np.ndarray degree_angles: 1d array of degrees. Note: return by ``self.head_direction``.
         :return: List of strings representing frame-wise cardinality.
         :rtype: List[str]
 
         :example:
         >>> data = np.array(list(range(0, 405, 45))).astype(np.float32)
-        >>> CircularStatisticsMixin().angle_to_cardinal(data=data)
-        ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N']
+        >>> CircularStatisticsMixin().degrees_to_cardinal(degree_angles=data)
+        >>> ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW', 'N']
         """
 
-        check_valid_array(data=data, source=f'{CircularStatisticsMixin.angle_to_cardinal.__name__} angle_to_cardinal', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_value=0.0, max_value=360, raise_error=True)
-        DIRECTIONS = np.array(["N", "NE", "E", "SE", "S", "SW", "W", "NW"], dtype='<U2')
-        indices = np.round(data / 45.0).astype(int) % 8
-        return DIRECTIONS[indices].tolist()
+        DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
+        results = typed.List(["str"])
+        for i in prange(data.shape[0]):
+            ix = round(data[i] / (360.0 / len(DIRECTIONS)))
+            direction = DIRECTIONS[ix % len(DIRECTIONS)]
+            results.append(direction)
+        return results[1:]
 
     @staticmethod
     @njit("(int32[:,:], float64, float64)")
@@ -454,53 +414,48 @@ class CircularStatisticsMixin(object):
         return results
 
     @staticmethod
-    @njit("float32[:](float32[:,:], float32[:,:], float32[:,:])", fastmath=True, parallel=True)
+    @njit("(float32[:,:], float32[:, :], float32[:, :])")
     def direction_three_bps(nose_loc: np.ndarray, left_ear_loc: np.ndarray, right_ear_loc: np.ndarray) -> np.ndarray:
         """
-        Numba accelerated compute of the directional angle from three body parts using circular statistics.
-
-        The function computes individual directional vectors from each ear to the nose, then find the mean angle, providing an estimate of the animal's facing direction.
+        Jitted helper to compute the degree angle from three body-parts. Computes the angle in degrees left_ear <-> nose
+        and right_ear_nose and returns the midpoint.
 
         .. image:: _static/img/angle_from_3_bps.png
           :width: 600
           :align: center
 
-        .. seealso::
-           For two-body-part CPU implementation, see :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.direction_two_bps`.
-           For GPU CUDA two-body-part implementation, see :func:`simba.data_processors.cuda.circular_statistics.direction_from_two_bps`.
-           For GPU CUDA three-body-part implementation, see :func:`simba.data_processors.cuda.circular_statistics.direction_from_three_bps`.
-           For validation wrapper, see :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.three_point_direction`
+        .. seealso:
+           :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.direction_two_bps`
+           :func:`simba.data_processors.cuda.circular_statistics.direction_from_two_bps`
+           :func:`simba.data_processors.cuda.circular_statistics.direction_from_three_bps`
 
-        .. note::
-           - This function is optimized with numba JIT compilation for high performance.
-
-        :param np.ndarray nose_loc: 2D array with shape (n_frames, 2) containing [x, y] coordinates of the nose for each frame. Must be float32 dtype.
-        :param np.ndarray left_ear_loc: 2D array with shape (n_frames, 2) containing [x, y] coordinates of the left ear for each frame. Must be float32 dtype.
-        :param np.ndarray right_ear_loc: 2D array with shape (n_frames, 2) containing [x, y] coordinates of the right ear for each frame. Must be float32 dtype.
-        :return: 1D array with shape (n_frames,) containing the mean directional angle in degrees  [0, 360) for each frame. Contains NaN values for frames where computation fails.
+        :param ndarray nose_loc: 2D array of size len(frames)x2 representing nose coordinates
+        :param ndarray left_ear_loc: 2D array of size len(frames)x2 representing left ear coordinates
+        :param ndarray right_ear_loc: 2D array of size len(frames)x2 representing right ear coordinates
+        :return: Array of size nose_loc.shape[0] with direction in degrees.
         :rtype: np.ndarray
 
         :example:
-        >>> nose_loc = np.array([[100, 150], [102, 148], [105, 145]], dtype=np.float32)
-        >>> left_ear_loc = np.array([[95, 160], [97, 158], [100, 155]], dtype=np.float32)
-        >>> right_ear_loc = np.array([[105, 160], [107, 158], [110, 155]], dtype=np.float32)
-        >>> directions = CircularStatisticsMixin.direction_three_bps( nose_loc=nose_loc, left_ear_loc=left_ear_loc, right_ear_loc=right_ear_loc)
+        >>> nose_loc = np.random.randint(low=0, high=500, size=(50, 2)).astype(np.float32)
+        >>> left_ear_loc = np.random.randint(low=0, high=500, size=(50, 2)).astype(np.float32)
+        >>> right_ear_loc = np.random.randint(low=0, high=500, size=(50, 2)).astype(np.float32)
+        >>> results = CircularStatisticsMixin().direction_three_bps(nose_loc=nose_loc, left_ear_loc=left_ear_loc, right_ear_loc=right_ear_loc)
         """
 
-        results = np.full((nose_loc.shape[0]), np.nan, dtype=np.float32)
-        for idx in prange(nose_loc.shape[0]):
+        results = np.full((nose_loc.shape[0]), np.nan)
+        for i in prange(nose_loc.shape[0]):
             left_ear_to_nose = np.arctan2(
-                nose_loc[idx][0] - left_ear_loc[idx][0], left_ear_loc[idx][1] - nose_loc[idx][1]
+                nose_loc[i][0] - left_ear_loc[i][0], left_ear_loc[i][1] - nose_loc[i][1]
             )
             right_ear_nose = np.arctan2(
-                nose_loc[idx][0] - right_ear_loc[idx][0],
-                right_ear_loc[idx][1] - nose_loc[idx][1],
+                nose_loc[i][0] - right_ear_loc[i][0],
+                right_ear_loc[i][1] - nose_loc[i][1],
             )
             mean_angle_rad = np.arctan2(
                 np.sin(left_ear_to_nose) + np.sin(right_ear_nose),
                 np.cos(left_ear_to_nose) + np.cos(right_ear_nose),
             )
-            results[idx] = (np.degrees(mean_angle_rad) + 360) % 360
+            results[i] = (np.degrees(mean_angle_rad) + 360) % 360
         return results
 
     @staticmethod
@@ -570,21 +525,19 @@ class CircularStatisticsMixin(object):
            :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.direction_three_bps`
            :func:`simba.data_processors.cuda.circular_statistics.direction_from_two_bps`
            :func:`simba.data_processors.cuda.circular_statistics.direction_from_three_bps`
-           For validation wrapper, see :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.two_point_direction`
 
-        :param np.ndarray anterior_loc: 2D array with shape (n_frames, 2) containing [x, y] coordinates for the anterior body part (e.g., nose, head). Must be float32 dtype.
-        :param np.ndarray posterior_loc: 2D array with shape (n_frames, 2) containing [x, y] coordinates for the posterior body part (e.g., tail base, nape). Must be float32 dtype.
-        :return: 1D array with shape (n_frames,) containing directional angles in degrees [0, 360) for each frame in np.float32 format
-        :rtype: np.ndarray
+
+        :parameter np.ndarray anterior_loc: Size len(frames) x 2 representing x and y coordinates for first body-part.
+        :parameter np.ndarray posterior_loc: Size len(frames) x 2 representing x and y coordinates for second body-part.
+        :return np.ndarray: Frame-wise directionality in degrees.
 
         :example:
-        >>> # Calculate direction from swim bladder to tail
-        >>> swim_bladder_loc = np.array([[100, 150], [102, 148]], dtype=np.float32)
-        >>> tail_loc = np.array([[90, 140], [92, 138]], dtype=np.float32)
-        >>> directions = CircularStatisticsMixin.direction_two_bps(anterior_loc=swim_bladder_loc, posterior_loc=tail_loc)
+        >>> swim_bladder_loc = np.random.randint(low=0, high=500, size=(50, 2)).astype(np.float32)
+        >>> tail_loc = np.random.randint(low=0, high=500, size=(50, 2)).astype(np.float32)
+        >>> CircularStatisticsMixin().direction_two_bps(anterior_loc=swim_bladder_loc, posterior_loc=tail_loc)
         """
 
-        results = np.full((anterior_loc.shape[0]), np.nan, dtype=np.float32)
+        results = np.full((anterior_loc.shape[0]), np.nan)
         for i in prange(anterior_loc.shape[0]):
             angle_degrees = np.degrees(np.arctan2(anterior_loc[i][0] - posterior_loc[i][0], posterior_loc[i][1] - anterior_loc[i][1]))
             results[i] = angle_degrees + 360 if angle_degrees < 0 else angle_degrees
@@ -649,7 +602,7 @@ class CircularStatisticsMixin(object):
         The associated p-value is calculated as follows:
 
         .. math::
-           p = e^{\sqrt{1 + 4n + 4(n^2 - R^2)} - (1 + 2n)}
+           p = e^{\\sqrt{1 + 4n + 4(n^2 - R^2)} - (1 + 2n)}
 
         .. seealso::
            :func:`simba.data_processors.cuda.circular_statistics.sliding_rayleigh_z`,
@@ -719,6 +672,8 @@ class CircularStatisticsMixin(object):
         The circular correlation coefficient is calculated as:
 
         .. math::
+           R = \\frac{\\sum \\sin(\\theta_1 - \\bar{\\theta}_1) \\sin(\\theta_2 - \\bar{\\theta}_2)}
+           {\\sqrt{\\sum \\sin^2(\\theta_1 - \\bar{\\theta}_1) \\sum \\sin^2(\\theta_2 - \\bar{\\theta}_2)}}
 
            R = \frac{\sum \sin(\theta_1 - \bar{\theta}_1) \sin(\theta_2 - \bar{\theta}_2)}{\sqrt{\sum \sin^2(\theta_1 - \bar{\theta}_1) \sum \sin^2(\theta_2 - \bar{\theta}_2)}}
 
