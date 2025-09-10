@@ -39,6 +39,11 @@ class MitraFeatureExtractor(ConfigReader,
     """
     Feature extractor used for grooming and rearing classifications. A subset is of created features are further used for straub-tail classifications.
 
+
+    .. image:: _static/GerbilFeaturizer.webp
+       :width: 500
+       :align: center
+
     :param Union[str, os.PathLike] config_path: Path to SimBA project_config.ini.
     :return: None. Featurized pose-estimation data is saved in the simba project `project_folder/csv/features_extracted` directory.
 
