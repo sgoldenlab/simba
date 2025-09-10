@@ -253,13 +253,16 @@ def get_fn_ext(filepath: Union[os.PathLike, str],
     """
     Split file path into three components: (i) directory, (ii) file name, and (iii) file extension.
 
-    :parameter str filepath: Path to file.
-    :returns: 3-part tuple with file directory name, file name (w/o extension), and file extension.
-    :rtype: Tuple[str, str, str]
+    :param Union[os.PathLike, str] filepath: Path to file.
+    :param bool raise_error: If True, raises InvalidFilepathError for invalid paths. If False, returns (None, None, None) for invalid paths. Default: True.
+    :returns: 3-part tuple with file directory name, file name (w/o extension), and file extension. Returns (None, None, None) if invalid path and raise_error=False.
+    :rtype: Union[Tuple[str, str, str], Tuple[None, None, None]]
 
     :example:
     >>> get_fn_ext(filepath='C:/My_videos/MyVideo.mp4')
-    >>> ('My_videos', 'MyVideo', '.mp4')
+    ('C:/My_videos', 'MyVideo', '.mp4')
+    >>> get_fn_ext(filepath='invalid_path', raise_error=False)
+    (None, None, None)
     """
 
     check_instance(source=f'{get_fn_ext} filepath', accepted_types=(str, os.PathLike), instance=filepath)
@@ -461,6 +464,7 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture],
         valid_file = check_file_exist_and_readable(file_path=video_path, raise_error=raise_error)
         if not valid_file:
             return None
+        cap = cv2.VideoCapture(video_path)
         cap = cv2.VideoCapture(video_path)
         _, video_data["video_name"], _ = get_fn_ext(video_path)
     elif isinstance(video_path, cv2.VideoCapture):

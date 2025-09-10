@@ -151,6 +151,7 @@ def check_str(name: str,
     :param Optional[bool] allow_blank: If True, allow empty string. Default: False.
     :param Optional[bool] raise_error: If True, then raise error if invalid string. Default: True.
     :param Optional[List[str]] invalid_options: If not None, then a list of strings that are invalid.
+    :param Optional[List[str]] invalid_substrs: If not None, then a list of characters or substrings that are not allowed in the string.
     :return: If `raise_error` is False, then returns size-2 Tuple, with first value being a bool representing if valid string, and second value a string representing error reason (if valid is False, else empty string).
     :rtype: Tuple[bool, str]
 
@@ -290,7 +291,8 @@ def check_instance(source: str, instance: object, accepted_types: Union[Tuple[An
     :param str name: Arbitrary name of instance used for interpretable error msg. Can also be the name of the method.
     :param object instance: A data object.
     :param Union[Tuple[object], object] accepted_types: Accepted instance types. E.g., (Polygon, pd.DataFrame) or Polygon.
-    :param Optional[bool] raise_error: If True, raises error. Else, prints warning.
+    :param Optional[bool] raise_error: If True, raises error of instance is not of valid type, else returns bool.
+    :param Optional[bool] warning: If True, prints warning of instance is not of valid type, else returns bool.
     """
 
     if not isinstance(instance, accepted_types):
@@ -376,7 +378,8 @@ def check_if_dir_exists(in_dir: Union[str, os.PathLike],
 
     :param Union[str, os.PathLike] in_dir: Putative directory path.
     :param Optional[str] source: String source for interpretable error messaging.
-    :param Optional[bool] create_if_not_exist: If directory does not exist, then create it. Default False,
+    :param Optional[bool] create_if_not_exist: If directory does not exist, then create it. Default False.
+    :param Optional[bool] raise_error: If True, raise error if dir does not exist. If False return None. Default True.
     :raise NotDirectoryError: The directory does not exist.
     """
 
@@ -414,11 +417,25 @@ def check_that_column_exist(df: pd.DataFrame,
     """
     Check if single named field or a list of fields exist within a dataframe.
 
-    :param pd.DataFrame df:
-    :param str column_name: Name or names of field(s).
-    :param str file_name: Path of ``df`` on disk.
-    :param bool raise_error: If True, raise error if column doesnt exist. If False, returns bool.
-    :raise ColumnNotFoundError: The ``column_name`` does not exist within ``df``.
+    .. seealso::
+       Consider :func:`simba.utils.checks.check_valid_dataframe` instead.
+
+    :param pd.DataFrame df: The DataFrame to check for column existence.
+    :param Union[str, os.PathLike, List[str]] column_name: Name or names of field(s) to check for existence.
+    :param str file_name: Path of ``df`` on disk (used for error messages).
+    :param bool raise_error: If True, raises ColumnNotFoundError if column doesn't exist. If False, returns bool. Default: True.
+    :return: True if all columns exist, False if any column is missing (when raise_error=False), None if raise_error=True and all columns exist.
+    :rtype: Union[None, bool]
+    :raises ColumnNotFoundError: The ``column_name`` does not exist within ``df``.
+
+    :example:
+    >>> df = pd.DataFrame({'A': [1, 2], 'B': [3, 4]})
+    >>> check_that_column_exist(df=df, column_name='A', file_name='test.csv')
+    True
+    >>> check_that_column_exist(df=df, column_name=['A', 'B'], file_name='test.csv')
+    True
+    >>> check_that_column_exist(df=df, column_name='C', file_name='test.csv', raise_error=False)
+    False
     """
 
     if type(column_name) == str:
@@ -436,7 +453,10 @@ def check_if_valid_input(
     name: str, input: str, options: List[str], raise_error: bool = True
 ) -> (bool, str):
     """
-    Check if string variable is valid option
+    Check if string variable is valid option.
+
+    .. seealso::
+       Consider :func:`simba.utils.checks.check_str`.
 
     :param str name: Atrbitrary name of variable.
     :param Any input: Value of variable.
@@ -601,6 +621,9 @@ def check_nvidea_gpu_available() -> bool:
 def check_ffmpeg_available(raise_error: Optional[bool] = False) -> Union[bool, None]:
     """
     Helper to check of FFMpeg is available via subprocess ``ffmpeg``.
+
+    .. seealso::
+       To check which encoders are available in FFMpeg installation, see :func:`simba.utils.lookups.get_ffmpeg_encoders`
 
     :param Optional[bool] raise_error: If True, raises ``FFMPEGNotFoundError`` if FFmpeg can't be found. Else return False. Default False.
     :returns bool: True if ``ffmpeg`` returns not None and raise_error is False. Else False.
@@ -771,7 +794,7 @@ def check_if_2d_array_has_min_unique_values(data: np.ndarray, min: int) -> bool:
 
 def check_if_module_has_import(parsed_file: ast.Module, import_name: str) -> bool:
     """
-    Check if a Python module has a specific import statement.
+    Check if a Python module has a specific import statement. For example, check if module imports `argparse` or circular statistics mixin.
 
     Used for e.g., user custom feature extraction classes in ``simba.utils.custom_feature_extractor.CustomFeatureExtractor``.
 
@@ -898,19 +921,32 @@ def check_valid_array(data: np.ndarray,
                       max_value: Optional[Union[float, int]] = None,
                       raise_error: bool = True) -> Union[None, bool]:
     """
-    Check if the given  array satisfies specified criteria regarding its dimensions, shape, and data type.
+    Check if the given array satisfies specified criteria regarding its dimensions, shape, and data type.
 
-    :parameter np.ndarray data: The numpy array to be checked.
-    :parameter Optional[str] source: A string identifying the source, name, or purpose of the array for interpretable error messaging.
-    :parameter Optional[Tuple[int]] accepted_ndims: List of tuples representing acceptable dimensions. If provided, checks whether the array's number of dimensions matches any tuple in the list.
-    :parameter Optional[List[str]] accepted_axis_0_shape: List of accepted number of rows of 2-dimensional array. Will also raise error if value passed and input is not a 2-dimensional array.
-    :parameter Optional[List[str]] accepted_axis_1_shape: List of accepted number of columns or fields of 2-dimensional array. Will also raise error if value passed and input is not a 2-dimensional array.
-    :parameter Optional[List[int]] accepted_sizes: List of acceptable sizes for the array's shape. If provided, checks whether the length of the array's shape matches any value in the list.
-    :parameter Optional[List[str]] accepted_dtypes: List of acceptable data types for the array. If provided, checks whether the array's data type matches any string in the list.
+    :param np.ndarray data: The numpy array to be checked.
+    :param Optional[str] source: A string identifying the source, name, or purpose of the array for interpretable error messaging.
+    :param Optional[Union[Tuple[int], Any]] accepted_ndims: List of tuples representing acceptable dimensions. If provided, checks whether the array's number of dimensions matches any tuple in the list.
+    :param Optional[List[int]] accepted_sizes: List of acceptable sizes for the array's shape. If provided, checks whether the length of the array's shape matches any value in the list.
+    :param Optional[Union[List[int], Tuple[int]]] accepted_axis_0_shape: List of accepted number of rows of 2-dimensional array. Will also raise error if value passed and input is not a 2-dimensional array.
+    :param Optional[Union[List[int], Tuple[int]]] accepted_axis_1_shape: List of accepted number of columns or fields of 2-dimensional array. Will also raise error if value passed and input is not a 2-dimensional array.
+    :param Optional[Union[List[Union[str, Type]], Tuple[Union[str, Type]], Iterable[Any]]] accepted_dtypes: List of acceptable data types for the array. If provided, checks whether the array's data type matches any string in the list.
+    :param Optional[List[Any]] accepted_values: List of acceptable values that can be present in the array.
+    :param Optional[List[Tuple[int]]] accepted_shapes: List of acceptable shapes for the array. If provided, checks whether the array's shape matches any tuple in the list.
+    :param Optional[int] min_axis_0: Minimum number of rows required for the array.
+    :param Optional[int] max_axis_1: Maximum number of columns allowed for the array.
+    :param Optional[int] min_axis_1: Minimum number of columns required for the array.
+    :param Optional[Union[float, int]] min_value: Minimum value allowed in the array.
+    :param Optional[Union[float, int]] max_value: Maximum value allowed in the array.
+    :param bool raise_error: If True, raises ArrayError if validation fails. If False, returns bool. Default: True.
+    :return: True if array passes all validation checks, False if validation fails (when raise_error=False), None if raise_error=True and validation passes.
+    :rtype: Union[None, bool]
 
     :example:
     >>> data = np.array([[1, 2], [3, 4]])
-    >>> check_valid_array(data, source="Example", accepted_ndims=(4, 3), accepted_sizes=[2], accepted_dtypes=['int'])
+    >>> check_valid_array(data, source="Example", accepted_ndims=(2,), accepted_sizes=[2], accepted_dtypes=[np.int64])
+    True
+    >>> check_valid_array(data, source="Example", min_axis_0=3, raise_error=False)
+    False
     """
 
     check_instance(source=source, instance=data, accepted_types=np.ndarray)
@@ -1023,20 +1059,26 @@ def check_valid_lst(data: list,
                     exact_len: Optional[int] = None,
                     raise_error: Optional[bool] = True) -> bool:
     """
-    Check the validity of a list based on passed  criteria.
+    Check the validity of a list based on passed criteria.
 
     :param list data: The input list to be validated.
     :param Optional[str] source: A string indicating the source or context of the data for informative error messaging.
-    :param Optional[Tuple[Any]] valid_dtypes: A tuple of accepted data types. If provided, check if all elements in the list have data types in this tuple.
+    :param Optional[Union[Tuple[Any], List[Any], Any]] valid_dtypes: A tuple, list, or single type of accepted data types. If provided, check if all elements in the list have data types in this collection.
     :param Optional[List[Any]] valid_values: A list of accepted list values. If provided, check if all elements in the list have matching values in this list.
-    :param Optional[int] min_len: The minimum allowed length of the list.
+    :param Optional[int] min_len: The minimum allowed length of the list. Default: 1.
     :param Optional[int] max_len: The maximum allowed length of the list.
-    :param Optional[bool] raise_error: If True, raise an InvalidInputError if any validation fails. If False, return False instead of raising an error.
+    :param Optional[float] min_value: The minimum value allowed for numeric elements in the list.
+    :param Optional[int] exact_len: The exact length required for the list. If provided, overrides min_len and max_len.
+    :param Optional[bool] raise_error: If True, raise an InvalidInputError if any validation fails. If False, return False instead of raising an error. Default: True.
     :return bool: True if all validation criteria are met, False otherwise.
 
     :example:
     >>> check_valid_lst(data=[1, 2, 'three'], valid_dtypes=(int, str), min_len=2, max_len=5)
-    >>> check_valid_lst(data=[1, 2, 3], valid_dtypes=(int,), min_len=3)
+    True
+    >>> check_valid_lst(data=[1, 2, 3], valid_dtypes=(int,), exact_len=3)
+    True
+    >>> check_valid_lst(data=[1, 2, 3], min_value=0, raise_error=False)
+    True
     """
     check_instance(source=source, instance=data, accepted_types=list)
     if min_len is not None:
@@ -1127,6 +1169,31 @@ def check_if_keys_exist_in_dict(
     name: Optional[str] = "",
     raise_error: Optional[bool] = True,
 ) -> bool:
+    """
+    Check if one or more keys exist in a dictionary.
+
+    This function validates that all specified keys are present in the given dictionary.
+    It can check for a single key or multiple keys at once.
+
+    .. seealso::
+       Consider :func:`simba.utils.checks.check_valid_dict`
+
+    :param dict data: The dictionary to check for key existence.
+    :param Union[str, int, tuple, List] key: The key(s) to check for in the dictionary. Can be a single key or a list/tuple of keys.
+    :param Optional[str] name: A string identifying the source or context of the data for informative error messaging. Default: "".
+    :param Optional[bool] raise_error: If True, raises InvalidInputError if any key is missing. If False, returns False instead of raising an error. Default: True.
+    :return bool: True if all keys exist in the dictionary, False if any key is missing (when raise_error=False).
+    :raises InvalidInputError: If any of the specified keys do not exist in the dictionary and raise_error=True.
+
+    :example:
+    >>> data = {'a': 1, 'b': 2, 'c': 3}
+    >>> check_if_keys_exist_in_dict(data=data, key='a')
+    True
+    >>> check_if_keys_exist_in_dict(data=data, key=['a', 'b'])
+    True
+    >>> check_if_keys_exist_in_dict(data=data, key='d', raise_error=False)
+    False
+    """
 
     check_instance(source=name, instance=data, accepted_types=(dict,))
     check_instance(
@@ -1237,6 +1304,32 @@ def check_video_has_rois(roi_dict: Dict[str, pd.DataFrame],
                          raise_error: bool = True):
     """
     Check that specified videos all have user-defined ROIs with specified names.
+
+    This function validates that all specified videos contain the required ROIs (Regions of Interest)
+    with the specified names. It checks across all ROI types: rectangles, circles, and polygons.
+
+    .. note::
+       To get roi dictionary, see :func:`simba.mixins.config_reader.ConfigReader.read_roi_data`.
+
+    :param Dict[str, pd.DataFrame] roi_dict: Dictionary containing ROI dataframes with keys for rectangles, circles, and polygons.
+    :param Optional[List[str]] roi_names: List of ROI names to check for. If None, uses all unique ROI names from the data. Default: None.
+    :param Optional[List[str]] video_names: List of video names to check. If None, uses all unique video names from the data. Default: None.
+    :param str source: A string identifying the source or context for informative error messaging. Default: 'roi dict'.
+    :param bool raise_error: If True, raises NoROIDataError if any videos are missing required ROIs. If False, returns tuple with validation result and missing ROIs. Default: True.
+    :return: If raise_error=True: None if all validations pass, raises exception if validation fails. If raise_error=False: Tuple of (bool, dict) where bool indicates success and dict contains missing ROIs by video.
+    :rtype: Union[None, Tuple[bool, Dict[str, List[str]]]]
+    :raises NoROIDataError: If any videos are missing required ROIs and raise_error=True.
+
+    :example:
+    >>> roi_dict = {
+    ...     'rectangles': pd.DataFrame({'Video': ['video1'], 'Name': ['ROI1']}),
+    ...     'circles': pd.DataFrame({'Video': ['video1'], 'Name': ['ROI2']}),
+    ...     'polygons': pd.DataFrame({'Video': ['video1'], 'Name': ['ROI3']})
+    ... }
+    >>> check_video_has_rois(roi_dict=roi_dict, roi_names=['ROI1', 'ROI2'], video_names=['video1'])
+    True
+    >>> check_video_has_rois(roi_dict=roi_dict, roi_names=['ROI1', 'ROI4'], video_names=['video1'], raise_error=False)
+    (False, {'video1': ['ROI4']})
     """
 
     check_valid_dict(x=roi_dict, valid_key_dtypes=(str,), valid_values_dtypes=(pd.DataFrame,), required_keys=(Keys.ROI_RECTANGLES.value, Keys.ROI_CIRCLES.value, Keys.ROI_POLYGONS.value,),)
@@ -1274,8 +1367,31 @@ def check_if_df_field_is_boolean(df: pd.DataFrame,
                                  raise_error: bool = True,
                                  bool_values: Optional[Tuple[Any]] = (0, 1),
                                  df_name: Optional[str] = ''):
+    """
+    Check if a DataFrame field contains only boolean values.
 
-    """Helper to check if a dataframe field is a boolean value"""
+    This function validates that a specified column in a DataFrame contains only
+    the expected boolean values (e.g., 0/1, True/False). It checks for any
+    unexpected values that are not in the allowed boolean values set.
+
+    :param pd.DataFrame df: The DataFrame to check.
+    :param str field: Name of the column to validate for boolean values.
+    :param bool raise_error: If True, raises CountError when non-boolean values are found. If False, returns False. Default: True.
+    :param Optional[Tuple[Any]] bool_values: Tuple of accepted boolean values. Default: (0, 1).
+    :param Optional[str] df_name: Name of the DataFrame for error messaging. Default: ''.
+    :return: True if field contains only boolean values, False if non-boolean values found and raise_error=False.
+    :rtype: bool
+    :raises CountError: If non-boolean values are found in the field and raise_error=True.
+
+    :example:
+    >>> df = pd.DataFrame({'binary_col': [0, 1, 0, 1], 'mixed_col': [0, 1, 2, 0]})
+    >>> check_if_df_field_is_boolean(df=df, field='binary_col')
+    True
+    >>> check_if_df_field_is_boolean(df=df, field='mixed_col', raise_error=False)
+    False
+    >>> check_if_df_field_is_boolean(df=df, field='mixed_col', bool_values=(0, 1, 2))
+    True
+    """
     check_instance(source=f'{check_if_df_field_is_boolean.__name__} df', instance=df, accepted_types=(pd.DataFrame,))
     check_str(name=f"{check_if_df_field_is_boolean.__name__} field", value=field)
     check_that_column_exist(df=df, column_name=field, file_name=check_if_df_field_is_boolean.__name__)
@@ -1299,7 +1415,32 @@ def check_valid_dataframe(
     max_axis_1: Optional[int] = None,
     allow_duplicate_col_names = True,
 ):
-    """Helper to check if a dataframe is valid"""
+    """
+    Validate a DataFrame against various criteria.
+
+    This function performs comprehensive validation of a pandas DataFrame including
+    data types, dimensions, required columns, and duplicate column names. It raises
+    exceptions for any validation failures.
+
+    :param pd.DataFrame df: The DataFrame to validate.
+    :param Optional[str] source: Source identifier for error messages. Default: "".
+    :param Optional[Tuple[Any]] valid_dtypes: Tuple of allowed data types. If None, no dtype validation. Default: None.
+    :param Optional[List[str]] required_fields: List of required column names. If None, no field validation. Default: None.
+    :param Optional[int] min_axis_0: Minimum number of rows required. If None, no minimum row validation. Default: None.
+    :param Optional[int] min_axis_1: Minimum number of columns required. If None, no minimum column validation. Default: None.
+    :param Optional[int] max_axis_0: Maximum number of rows allowed. If None, no maximum row validation. Default: None.
+    :param Optional[int] max_axis_1: Maximum number of columns allowed. If None, no maximum column validation. Default: None.
+    :param bool allow_duplicate_col_names: If False, raises error for duplicate column names. Default: True.
+    :return: None if validation passes.
+    :rtype: None
+    :raises InvalidInputError: If any validation criteria are not met.
+
+    :example:
+    >>> df = pd.DataFrame({'A': [1, 2], 'B': [3, 4]})
+    >>> check_valid_dataframe(df=df, required_fields=['A', 'B'], min_axis_0=1)
+    >>> check_valid_dataframe(df=df, valid_dtypes=(int,), max_axis_1=2)
+    >>> check_valid_dataframe(df=df, allow_duplicate_col_names=False)
+    """
     check_instance(source=source, instance=df, accepted_types=(pd.DataFrame,))
     if valid_dtypes is not None:
         dtypes = list(set(df.dtypes))
@@ -1361,6 +1502,30 @@ def check_valid_dataframe(
 
 
 def check_valid_boolean(value: Union[Any, List[Any]], source: Optional[str] = '', raise_error: Optional[bool] = True):
+    """
+    Check if a value or list of values contains only valid boolean values.
+
+    This function validates that the input value(s) are valid Python boolean values
+    (True or False). It can handle single values or lists of values, and provides
+    flexible error handling options.
+
+    :param Union[Any, List[Any]] value: Single value or list of values to validate for boolean type.
+    :param Optional[str] source: Source identifier for error messages. Default: ''.
+    :param Optional[bool] raise_error: If True, raises InvalidInputError when non-boolean values are found. If False, returns False. Default: True.
+    :return: True if all values are valid booleans, False if any non-boolean values found and raise_error=False.
+    :rtype: bool
+    :raises InvalidInputError: If non-boolean values are found and raise_error=True.
+
+    :example:
+    >>> check_valid_boolean(True)
+    True
+    >>> check_valid_boolean([True, False, True])
+    True
+    >>> check_valid_boolean([True, 1, False], raise_error=False)
+    False
+    >>> check_valid_boolean('not_bool', raise_error=False)
+    False
+    """
     if not isinstance(value, list):
         value = [value]
     for val in value:
@@ -1379,6 +1544,29 @@ def check_valid_tuple(x: tuple,
                       minimum_length: Optional[int] = None,
                       accepted_values: Optional[Iterable[Any]] = None,
                       min_integer: Optional[int] = None):
+    """
+    Validate a tuple against various criteria.
+
+    This function performs comprehensive validation of a tuple including
+    length constraints, data types, minimum values, and accepted values.
+    It raises exceptions for any validation failures.
+
+    :param tuple x: The tuple to validate.
+    :param Optional[str] source: Source identifier for error messages. Default: "".
+    :param Optional[Tuple[int]] accepted_lengths: Tuple of accepted lengths. If None, no length validation. Default: None.
+    :param Optional[Tuple[Any]] valid_dtypes: Tuple of allowed data types for tuple elements. If None, no dtype validation. Default: None.
+    :param Optional[int] minimum_length: Minimum length required. If None, no minimum length validation. Default: None.
+    :param Optional[Iterable[Any]] accepted_values: Iterable of accepted values for tuple elements. If None, no value validation. Default: None.
+    :param Optional[int] min_integer: Minimum value for integer elements. If None, no integer validation. Default: None.
+    :return: None if validation passes.
+    :rtype: None
+    :raises InvalidInputError: If any validation criteria are not met.
+
+    :example:
+    >>> check_valid_tuple(x=(1, 2, 3), accepted_lengths=(2, 3), valid_dtypes=(int,))
+    >>> check_valid_tuple(x=('a', 'b'), minimum_length=2, accepted_values=['a', 'b', 'c'])
+    >>> check_valid_tuple(x=(5, 10, 15), min_integer=5)
+    """
 
     if not isinstance(x, (tuple)):
         raise InvalidInputError(msg=f"{check_valid_tuple.__name__} {source} is not a valid tuple, got: {type(x)}", source=source,)
@@ -1531,6 +1719,32 @@ def check_valid_dict(x: dict,
                      max_value: Optional[Union[float, int]] = None,
                      min_value: Optional[Union[float, int]] = None,
                      source: Optional[str] = None):
+    """
+    Validate a dictionary against various criteria.
+
+    This function performs comprehensive validation of a dictionary including
+    key/value data types, key constraints, required keys, and numeric value ranges.
+    It raises exceptions for any validation failures.
+
+    :param dict x: The dictionary to validate.
+    :param Optional[Tuple[Any]] valid_key_dtypes: Tuple of allowed data types for dictionary keys. If None, no key type validation. Default: None.
+    :param Optional[Tuple[Any, ...]] valid_values_dtypes: Tuple of allowed data types for dictionary values. If None, no value type validation. Default: None.
+    :param Optional[Union[Tuple[Any], List[Any]]] valid_keys: Tuple or list of valid key names. If None, no key name validation. Default: None.
+    :param Optional[int] max_len_keys: Maximum number of keys allowed. If None, no maximum key count validation. Default: None.
+    :param Optional[int] min_len_keys: Minimum number of keys required. If None, no minimum key count validation. Default: None.
+    :param Optional[Tuple[Any, ...]] required_keys: Tuple of required key names. If None, no required key validation. Default: None.
+    :param Optional[Union[float, int]] max_value: Maximum numeric value allowed for numeric values. If None, no maximum value validation. Default: None.
+    :param Optional[Union[float, int]] min_value: Minimum numeric value allowed for numeric values. If None, no minimum value validation. Default: None.
+    :param Optional[str] source: Source identifier for error messages. If None, uses function name. Default: None.
+    :return: None if validation passes.
+    :rtype: None
+    :raises InvalidInputError: If any validation criteria are not met.
+
+    :example:
+    >>> check_valid_dict(x={'a': 1, 'b': 2}, valid_key_dtypes=(str,), valid_values_dtypes=(int,))
+    >>> check_valid_dict(x={'key1': 10, 'key2': 20}, required_keys=('key1',), min_value=5, max_value=25)
+    >>> check_valid_dict(x={'x': 1, 'y': 2}, valid_keys=('x', 'y', 'z'), min_len_keys=2)
+    """
 
 
     source = check_valid_dict.__name__ if source is None else source
@@ -1646,7 +1860,29 @@ def check_filepaths_in_iterable_exist(file_paths: Iterable[str],
             raise NoFilesFoundError(msg=f'{name} {file_path} is not a valid file path')
 
 def check_all_dfs_in_list_has_same_cols(dfs: List[pd.DataFrame], raise_error: bool = True, source: str = '') -> bool:
-    """ Checks that all dataframes in list has the same column names"""
+    """
+    Check that all DataFrames in a list have the same column names.
+
+    This function validates that all DataFrames in the provided list contain
+    identical column headers. It finds the intersection of all column names
+    and identifies any missing headers that are not present in all DataFrames.
+
+    :param List[pd.DataFrame] dfs: List of DataFrames to validate for consistent column names.
+    :param bool raise_error: If True, raises MissingColumnsError when column names don't match. If False, returns False. Default: True.
+    :param str source: Source identifier for error messages. Default: ''.
+    :return: True if all DataFrames have the same column names, False if they don't match and raise_error=False.
+    :rtype: bool
+    :raises MissingColumnsError: If DataFrames have different column names and raise_error=True.
+
+    :example:
+    >>> df1 = pd.DataFrame({'A': [1, 2], 'B': [3, 4]})
+    >>> df2 = pd.DataFrame({'A': [5, 6], 'B': [7, 8]})
+    >>> check_all_dfs_in_list_has_same_cols(dfs=[df1, df2])
+    True
+    >>> df3 = pd.DataFrame({'A': [1, 2], 'C': [3, 4]})
+    >>> check_all_dfs_in_list_has_same_cols(dfs=[df1, df3], raise_error=False)
+    False
+    """
     check_valid_lst(data=dfs, source=check_all_dfs_in_list_has_same_cols.__name__, valid_dtypes=(pd.DataFrame,), min_len=1)
     col_headers = [list(x.columns) for x in dfs]
     common_headers = set(col_headers[0]).intersection(*col_headers[1:])
@@ -1663,6 +1899,24 @@ def check_all_dfs_in_list_has_same_cols(dfs: List[pd.DataFrame], raise_error: bo
 def is_valid_video_file(file_path: Union[str, os.PathLike], raise_error: bool = True):
     """
     Check if a file path is a valid video file.
+
+    This function validates that a file path exists, is readable, and can be
+    opened as a video file using OpenCV. It performs basic video file validation
+    by attempting to open the file with cv2.VideoCapture.
+
+    :param Union[str, os.PathLike] file_path: Path to the video file to validate.
+    :param bool raise_error: If True, raises InvalidFilepathError when file is not a valid video. If False, returns False. Default: True.
+    :return: True if the file is a valid video file, False if it's not valid and raise_error=False.
+    :rtype: bool
+    :raises InvalidFilepathError: If the file is not a valid video file and raise_error=True.
+
+    :example:
+    >>> is_valid_video_file('/path/to/video.mp4')
+    True
+    >>> is_valid_video_file('/path/to/invalid.txt', raise_error=False)
+    False
+    >>> is_valid_video_file('/path/to/corrupted.mp4', raise_error=False)
+    False
     """
     check_file_exist_and_readable(file_path=file_path)
     try:
@@ -1713,7 +1967,26 @@ def is_img_bw(img: np.ndarray,
               raise_error: bool = True,
               source: Optional[str] = '') -> bool:
     """
-    Helper to check if an image is binarey black and white.
+    Check if an image is binary black and white.
+
+    This function validates that an image contains only two pixel values:
+    0 (black) and 255 (white). It checks all unique pixel values in the image
+    and ensures they are exactly these two values.
+
+    :param np.ndarray img: The image array to validate for binary black and white format.
+    :param bool raise_error: If True, raises InvalidInputError when image is not binary black and white. If False, returns False. Default: True.
+    :param Optional[str] source: Source identifier for error messages. Default: ''.
+    :return: True if the image is binary black and white, False if it's not and raise_error=False.
+    :rtype: bool
+    :raises InvalidInputError: If the image is not binary black and white and raise_error=True.
+
+    :example:
+    >>> bw_img = np.array([[0, 255], [255, 0]], dtype=np.uint8)
+    >>> is_img_bw(bw_img)
+    True
+    >>> gray_img = np.array([[128, 200], [50, 100]], dtype=np.uint8)
+    >>> is_img_bw(gray_img, raise_error=False)
+    False
     """
     check_if_valid_img(data=img, source=is_img_bw.__name__, raise_error=True)
     px_vals = set(list(np.sort(np.unique(img)).astype(np.int32)))
@@ -1729,7 +2002,28 @@ def is_img_bw(img: np.ndarray,
 def is_img_greyscale(img: np.ndarray,
                       raise_error: bool = True,
                       source: Optional[str] = '') -> bool:
+    """
+    Check if an image is greyscale.
 
+    This function validates that an image is in greyscale format by checking
+    that it has exactly 2 dimensions (height and width). Greyscale images
+    have a single channel and are represented as 2D arrays.
+
+    :param np.ndarray img: The image array to validate for greyscale format.
+    :param bool raise_error: If True, raises InvalidInputError when image is not greyscale. If False, returns False. Default: True.
+    :param Optional[str] source: Source identifier for error messages. Default: ''.
+    :return: True if the image is greyscale, False if it's not and raise_error=False.
+    :rtype: bool
+    :raises InvalidInputError: If the image is not greyscale and raise_error=True.
+
+    :example:
+    >>> gray_img = np.array([[128, 200], [50, 100]], dtype=np.uint8)
+    >>> is_img_greyscale(gray_img)
+    True
+    >>> color_img = np.array([[[128, 200, 50], [100, 150, 75]]], dtype=np.uint8)
+    >>> is_img_greyscale(color_img, raise_error=False)
+    False
+    """
     check_if_valid_img(data=img, source=is_img_greyscale.__name__, raise_error=False, greyscale=True)
     if not img.ndim == 2:
         if raise_error:
@@ -1741,7 +2035,22 @@ def is_img_greyscale(img: np.ndarray,
 
 
 def is_wsl() -> bool:
-    """ Helper to check if SimBA is running in Microsoft WSL """
+    """
+    Check if SimBA is running in Microsoft WSL (Windows Subsystem for Linux).
+
+    This function detects whether the current environment is running inside
+    Microsoft WSL by checking the contents of /proc/version for the presence
+    of "microsoft" string, which indicates WSL environment.
+
+    :return: True if running in WSL, False otherwise.
+    :rtype: bool
+
+    :example:
+    >>> is_wsl()
+    False  # When running on native Linux
+    >>> is_wsl()
+    True   # When running in WSL
+    """
     try:
         with open("/proc/version", "r") as f:
             return "microsoft" in f.read().lower()
@@ -1749,7 +2058,30 @@ def is_wsl() -> bool:
         return False
 
 def is_windows_path(value):
-    """Check if the value is a valid Windows path."""
+    """
+    Check if the value is a valid Windows path format.
+
+    This function validates that a string follows the Windows path format
+    by checking that it starts with a drive letter followed by a colon
+    (e.g., "C:", "D:", etc.). It performs basic format validation without
+    checking if the path actually exists on the filesystem.
+
+    :param value: The value to check for Windows path format.
+    :return: True if the value is a valid Windows path format, False otherwise.
+    :rtype: bool
+
+    :example:
+    >>> is_windows_path("C:\\Users\\username\\file.txt")
+    True
+    >>> is_windows_path("D:\\data\\folder")
+    True
+    >>> is_windows_path("/home/user/file.txt")
+    False
+    >>> is_windows_path("relative/path")
+    False
+    >>> is_windows_path("")
+    False
+    """
     return isinstance(value, str) and (len(value) > 1 and value[1] == ':' and value[0].isalpha())
 
 
@@ -1774,6 +2106,27 @@ def check_same_files_exist_in_all_directories(dirs: List[Union[str, os.PathLike]
 
 
 def check_valid_img_path(path: Union[str, os.PathLike], raise_error: bool = True):
+    """
+    Check if a file path is a valid image file.
+
+    This function validates that a file path exists, is readable, and can be
+    opened as an image file using OpenCV. It performs basic image file validation
+    by attempting to read the file with cv2.imread.
+
+    :param Union[str, os.PathLike] path: Path to the image file to validate.
+    :param bool raise_error: If True, raises InvalidInputError when file is not a valid image. If False, returns False. Default: True.
+    :return: True if the file is a valid image file, False if it's not valid and raise_error=False.
+    :rtype: bool
+    :raises InvalidInputError: If the file is not a valid image file and raise_error=True.
+
+    :example:
+    >>> check_valid_img_path('/path/to/image.jpg')
+    True
+    >>> check_valid_img_path('/path/to/invalid.txt', raise_error=False)
+    False
+    >>> check_valid_img_path('/path/to/corrupted.png', raise_error=False)
+    False
+    """
     check_file_exist_and_readable(path)
     try:
         _ = cv2.imread(path)
@@ -1792,8 +2145,26 @@ def check_valid_device(device: Union[Literal['cpu'], int], raise_error: bool = T
     """
     Validate a compute device specification, ensuring it is either 'cpu' or a valid GPU index.
 
-    :param device: The device to validate. Should be the string 'cpu' for CPU usage, or an integer representing a CUDA device index (e.g., 0 for 'cuda:0').
-    :param raise_error: If True, raises `InvalidInputError` or `SimBAGPUError` when the device is invalid. If False, returns `False` instead of raising errors. Default True.
+    This function validates that a device specification is valid for use with
+    PyTorch/CUDA operations. It checks if the device is either 'cpu' for CPU
+    usage or a valid integer representing a CUDA device index.
+
+    :param Union[Literal['cpu'], int] device: The device to validate. Should be the string 'cpu' for CPU usage, or an integer representing a CUDA device index (e.g., 0 for 'cuda:0').
+    :param bool raise_error: If True, raises InvalidInputError or SimBAGPUError when the device is invalid. If False, returns False instead of raising errors. Default: True.
+    :return: True if the device is valid, False if it's invalid and raise_error=False.
+    :rtype: bool
+    :raises InvalidInputError: If the device format is invalid and raise_error=True.
+    :raises SimBAGPUError: If the GPU device is not available or not valid and raise_error=True.
+
+    :example:
+    >>> check_valid_device('cpu')
+    True
+    >>> check_valid_device(0)  # GPU 0
+    True
+    >>> check_valid_device(5, raise_error=False)  # Non-existent GPU
+    False
+    >>> check_valid_device('gpu', raise_error=False)  # Invalid format
+    False
     """
     source = check_valid_device.__name__
     if isinstance(device, str):
