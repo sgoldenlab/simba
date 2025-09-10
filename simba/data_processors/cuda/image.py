@@ -415,7 +415,6 @@ def stack_sliding_mse(x: np.ndarray,
        :func:`~simba.mixins.image_mixin.ImageMixin.img_sliding_mse`.
 
     .. math::
-
        \text{MSE} = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
 
     :param np.ndarray x: Input array of images, where the first dimension corresponds to the stack of images. The array should be either 3D (height, width, channels) or 4D (batch, height, width, channels).
@@ -1008,11 +1007,11 @@ def sliding_psnr(data: np.ndarray,
 
     .. math::
 
-       \text{PSNR} = 20 \cdot \log_{10} \left( \frac{\text{MAX}}{\sqrt{\text{MSE}}} \right)
+       \text{PSNR} = 20 \log_{10} \left( \frac{\text{MAX}}{\sqrt{\text{MSE}}} \right)
 
     where:
-    - :math:`\text{MAX}` is the maximum possible pixel value (255 for 8-bit images).
-    - :math:`\text{MSE}` is the Mean Squared Error between the two images.
+    - :math:`\text{MAX}` is the maximum possible pixel value (255 for 8-bit images)
+    - :math:`\text{MSE}` is the Mean Squared Error between the two images
 
     :param data:  A 4D NumPy array of shape (N, H, W, C) representing a stack of images, where N is the number of images, H is the height, W is the width, and C is the number of color channels.
     :param stride_s: The base stride length in terms of the number of images between the images being compared. Determines the separation between images for comparison in the stack.

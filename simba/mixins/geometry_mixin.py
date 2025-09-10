@@ -958,8 +958,8 @@ class GeometryMixin(object):
         Helper to create a geometry video from a list of shapes.
 
         .. seealso::
-           If more aesthetic videos are needed, overlaid on video, then use func:`simba.plotting.geometry_plotter.GeometryPlotter`
-           If single images of geometries are needed, then use :func:`simba.mixins.geometry_mixin.view_shapes()`
+           * If more aesthetic videos are needed, overlaid on video, then use func:`simba.plotting.geometry_plotter.GeometryPlotter`
+           * If single images of geometries are needed, then use :func:`simba.mixins.geometry_mixin.view_shapes()`
 
         .. image:: _static/img/geometry_video.gif
            :width: 500
@@ -1060,7 +1060,8 @@ class GeometryMixin(object):
            :align: center
 
         .. seealso::
-           For multicore call, use :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_minimum_rotated_rectangle`
+           * For multicore call, use :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_minimum_rotated_rectangle`
+           * For axis-aligned bboxes, see func:`simba.mixins.geometry_mixin.GeometryMixin.keypoints_to_axis_aligned_bounding_box`.
 
         :param Polygon shape: The Polygon for which the minimum rotated rectangle is to be calculated. Can be a shapely object or a 2D array of at least 3 vertices.
         :param Polygon shape: If not None, then a buffer in pixels to increate the polygon area with proior to vomputing the minimum rotating rectangle.
@@ -3036,8 +3037,13 @@ class GeometryMixin(object):
         Segment an image into squares and return a dictionary of polygons representing the bucket locations.
 
         .. image:: _static/img/bucket_img_into_grid_square_3.png
-           :width: 800
+           :width: 500
            :align: center
+
+        .. video:: _static/img/roi_show_gridline.webm
+           :width: 500
+           :autoplay:
+           :loop:
 
         .. seealso::
            To segment image into **hexagons**, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
@@ -3138,6 +3144,11 @@ class GeometryMixin(object):
         .. image:: _static/img/bucket_img_into_grid_hexagon.png
            :width: 500
            :align: center
+
+        .. video:: _static/img/roi_show_gridline_hexagon_fps_15.webm
+           :width: 500
+           :autoplay:
+           :loop:
 
         .. seealso::
            To segment image into **rectangles**, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square`
@@ -3294,11 +3305,17 @@ class GeometryMixin(object):
                                verbose: bool = True,
                                core_cnt: Optional[int] = -1) -> np.ndarray:
         """
-        Compute the cumulative sums of boolean events within polygon geometries over time using multiprocessing. For example, compute the cumulative time of classified events within spatial locations at all time-points of the video.
+        Compute the cumulative sums of boolean events within polygon geometries over time using multiprocessing. For example, compute the cumulative bout count of classified events within spatial locations at all time-points of the video.
+
+
+        .. image:: _static/img/cumsum_bool_geometries.webp
+           :width: 500
+           :align: center
 
         .. seealso::
-           To create grid ``geometries``, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square` or :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
-
+           * To create grid ``geometries``, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square`
+           * To create hexagonal grid ``geometries``, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`
+           * To get Boolean counts, consider :func:`simba.utils.data.detect_bouts`
 
         :param np.ndarray data: Array containing spatial data with shape (n, 2). E.g., 2D-array with body-part coordinates.
         :param Dict[Tuple[int, int], Polygon] geometries: Dictionary of polygons representing spatial regions. E.g., created by :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_square` or :func:`simba.mixins.geometry_mixin.GeometryMixin.bucket_img_into_grid_hexagon`.
@@ -3971,7 +3988,7 @@ class GeometryMixin(object):
            :align: center
 
         .. seealso::
-           For minimum rotated bounding boxes, see :func:`simba.mixins.geometry_mixin.GeometryMixin.minimum_rotated_rectangle` or :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_minimum_rotated_rectangle`
+           * For minimum rotated bounding boxes, see :func:`simba.mixins.geometry_mixin.GeometryMixin.minimum_rotated_rectangle` or :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_minimum_rotated_rectangle`
 
         :param np.ndarray keypoints: A 3D array of shape (N, M, 2) where N is the number of observations, and each observation contains M points in 2D space (x, y).
         :return: A 3D array of shape (N, 4, 2), where each entry represents the four corners of the axis-aligned  bounding box corresponding to each set of keypoints.

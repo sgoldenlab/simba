@@ -463,6 +463,7 @@ def directionality_to_static_targets(left_ear: np.ndarray,
     ..  youtube:: vqdYUS3bM68
        :width: 640
        :height: 480
+       :align: center
 
     .. csv-table::
        :header: EXPECTED RUNTIMES

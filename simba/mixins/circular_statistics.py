@@ -537,7 +537,7 @@ class CircularStatisticsMixin(object):
         >>> CircularStatisticsMixin().direction_two_bps(anterior_loc=swim_bladder_loc, posterior_loc=tail_loc)
         """
 
-        results = np.full((anterior_loc.shape[0]), np.nan)
+        results = np.full((anterior_loc.shape[0]), np.nan, dtype=np.float32)
         for i in prange(anterior_loc.shape[0]):
             angle_degrees = np.degrees(np.arctan2(anterior_loc[i][0] - posterior_loc[i][0], posterior_loc[i][1] - anterior_loc[i][1]))
             results[i] = angle_degrees + 360 if angle_degrees < 0 else angle_degrees

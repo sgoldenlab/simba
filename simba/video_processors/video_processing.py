@@ -1162,7 +1162,7 @@ def gif_creator(file_path: Union[str, os.PathLike],
     .. note::
        The height is auto-computed to retain aspect ratio.
 
-    .. seealso:
+    .. seealso::
        GIFs are typically for online use but can be costly in terms of time to create and file size. For smaller files,
        consider ``webm`` format which are for online publication and ``simba.video_processors.video_processing.convert_to_webm``.
 
@@ -1202,7 +1202,7 @@ def gif_creator(file_path: Union[str, os.PathLike],
     if save_path is None:
         save_name = os.path.join(dir, f"{file_name}.gif")
     else:
-        check_if_dir_exists(in_dir=os.path.isdir(os.path.dirname(save_path)), source=f'{gif_creator.__name__} save_path', create_if_not_exist=True)
+        check_if_dir_exists(in_dir=os.path.dirname(save_path), source=f'{gif_creator.__name__} save_path', create_if_not_exist=True)
         save_name = save_path
     if gpu:
         command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -ss {start_time} -i "{file_path}" -to {duration} -vf "fps=10,scale={width}:-1" -c:v gif -pix_fmt rgb24 -y "{save_name}" -y'
@@ -4978,3 +4978,6 @@ def get_async_frame_batch(batch_reader: AsyncVideoFrameReader, timeout: int = 10
 #                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/frames/output/line_plot/Trial     3.mp4']
 
 # mixed_mosaic_concatenator(video_paths=video_paths, save_path=save_path, gpu=False, verbose=True)
+
+
+#gif_creator(file_path=r"C:\Users\sroni\OneDrive\Desktop\desktop\show_roi_bbox_fps_15.mp4", start_time=5, duration=10,  gpu=False, save_path=r'C:\Users\sroni\OneDrive\Desktop\desktop\Test.gif')

@@ -46,7 +46,11 @@ def direction_from_two_bps(x: np.ndarray, y: np.ndarray) -> np.ndarray:
        :header-rows: 1
 
     .. seealso::
-       For CPU function see :func:`~simba.mixins.circular_statistics.CircularStatisticsMixin.direction_two_bps`.
+       For CPU function see :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.direction_two_bps`.
+
+    .. image:: _static/img/angle_from_2_bps.png
+       :width: 600
+       :align: center
 
     :parameter np.ndarray x: Size len(frames) x 2 representing x and y coordinates for first body-part.
     :parameter np.ndarray y: Size len(frames) x 2 representing x and y coordinates for second body-part.
@@ -83,6 +87,10 @@ def sliding_circular_hotspots(x: np.ndarray,
        :widths: 10, 45, 45
        :align: center
        :header-rows: 1
+
+    .. image:: _static/img/sliding_circular_hotspot.png
+       :width: 300
+       :align: center
 
     .. seealso::
        For CPU function see :func:`~simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_circular_hotspots`.
@@ -457,7 +465,11 @@ def direction_from_three_bps(x: np.ndarray,
     the range [0, 360) degrees.
 
     .. seealso::
-       :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.direction_three_bps`
+       * More CPU function, see :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.direction_three_bps`
+
+    .. image:: _static/img/angle_from_3_bps.png
+       :width: 300
+       :align: center
 
     :param np.ndarray x: A 2D array of shape (N, 2) containing the x-coordinates of the first body part  (nose)
     :param np.ndarray y: A 2D array of shape (N, 2) containing the coordinates of the second body part (left ear).
@@ -507,6 +519,10 @@ def instantaneous_angular_velocity(x: np.ndarray, stride: Optional[int] = 1) -> 
     the current and previous values (with a specified stride) in the array.
     The result is returned in degrees per unit time.
 
+    .. image:: _static/img/instantaneous_angular_velocity.png
+       :width: 400
+       :align: center
+
     .. csv-table::
        :header: EXPECTED RUNTIMES
        :file: ../../../docs/tables/instantaneous_angular_velocity.csv
@@ -524,7 +540,7 @@ def instantaneous_angular_velocity(x: np.ndarray, stride: Optional[int] = 1) -> 
 
 
     .. seealso::
-       :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.instantaneous_angular_velocity`
+       For CPU function, see :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.instantaneous_angular_velocity`
 
     :param np.ndarray x: Array of angles in degrees, for which the instantaneous angular velocity will be calculated.
     :param Optional[int] stride: The stride or lag (in frames) to use when calculating the difference in angles. Defaults to 1.
@@ -576,6 +592,10 @@ def sliding_bearing(x: np.ndarray,
        :widths: 10, 45, 45
        :align: center
        :header-rows: 1
+
+    .. image:: _static/img/sliding_bearing.png
+       :width: 300
+       :align: center
 
     .. seealso::
        :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_bearing`
@@ -644,7 +664,7 @@ def sliding_angular_diff(x: np.ndarray,
 
 
     .. seealso::
-       :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_angular_diff`
+       * For CPU function, see :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.sliding_angular_diff`
 
     .. math::
        \text{difference} = \pi - |\pi - |a_1 - a_2||
@@ -709,6 +729,10 @@ def rotational_direction(data: np.ndarray, stride: Optional[int] = 1) -> np.ndar
 
     .. seealso::
        :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.rotational_direction` for jitted CPU method.
+
+    .. image:: _static/img/rotational_direction.png
+       :width: 400
+       :align: center
 
     :param np.ndarray data: 1D array of angular data (in degrees) to analyze. The data will be internally converted to radians and wrapped between [0, 360) degrees before processing.
     :param Optional[int] stride: The stride or gap between data points for which the rotational direction is calculated. Default is 1.

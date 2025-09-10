@@ -76,6 +76,19 @@ Peer-reviewed publication in *Nature Neuroscience* Describing SimBA.
 :download:`🔗 Published PDF (Primary Link) <https://static1.squarespace.com/static/5b1b659871069912b3022368/t/666b3f0bae03e61fecdaab73/1718304536255/Goodwin+2024+NN.pdf>`
 :download:`💾 Backup PDF <../_static/pdf/Goodwin_etal_2024.pdf>`
 
+📓 SimBA API example notebook and ML concepts
+----------------------------------------------------
+
+.. image:: ../_static/img/simba_api_example_nb.webp
+   :width: 1000
+   :align: center
+   :target: https://colab.research.google.com/drive/1x8oBKmSvndSakCsZvpITiNpQY-TDIsae#scrollTo=ETqBJrguDM6_
+
+:download:`🔗 Notebook <https://colab.research.google.com/drive/1x8oBKmSvndSakCsZvpITiNpQY-TDIsae#scrollTo=ETqBJrguDM6_>`
+
+
+
+
 
 🧪 SimBA Published Use Cases
 ----------------------------------------------------
