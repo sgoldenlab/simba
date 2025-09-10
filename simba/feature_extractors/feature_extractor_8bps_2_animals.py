@@ -20,19 +20,20 @@ class ExtractFeaturesFrom8bps2Animals(ConfigReader, FeatureExtractionMixin):
     Extracts hard-coded set of features from pose-estimation data from two animals with 4 tracked body-parts each.
     Results are stored in the `project_folder/csv/features_extracted` directory of the SimBA project.
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
+
 
     .. note::
-       `Feature extraction tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features>`__.
-       `Expected pose configuration <https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/5.png>`_
+       * `Feature extraction tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features>`__.
+       * `Expected pose configuration <https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/5.png>`_
 
-       .. image:: _static/img/pose_configurations/5.png
-          :width: 150
-          :align: center
+    .. image:: _static/img/pose_configurations/5.png
+       :width: 300
+       :align: center
 
 
-    Examples
-    ----------
+    :param str config_path: path to SimBA project config file in Configparser format
+
+    :example:
     >>> feature_extractor = ExtractFeaturesFrom8bps2Animals(config_path='MyProjectConfig')
     >>> feature_extractor.run()
     """

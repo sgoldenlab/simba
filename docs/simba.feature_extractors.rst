@@ -1,4 +1,4 @@
-Default feature extractor for 1 animals and 14 body-parts
+Default feature extractor for 2 animals and 14 body-parts
 ---------------------------------------------------------
 
 .. autoclass:: simba.feature_extractors.feature_extractor_14bp.ExtractFeaturesFrom14bps

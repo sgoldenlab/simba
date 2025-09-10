@@ -21,13 +21,12 @@ class UserDefinedFeatureExtractor(ConfigReader, FeatureExtractionMixin):
     Generic featurizer of data within SimBA project using user-defined body-parts in the pose-estimation data.
     Results are stored in the `project_folder/csv/features_extracted` directory of the SimBA project.
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
-
     .. note::
        `Feature extraction tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features>`__.
 
-    Examples
-    ----------
+    :param str config_path: path to SimBA project config file in Configparser format
+
+    :example:
     >>> feature_extractor = UserDefinedFeatureExtractor(config_path='MyProjectConfig')
     >>> feature_extractor.run()
     """

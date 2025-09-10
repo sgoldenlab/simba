@@ -36,7 +36,11 @@ class CaveFishFeaturizer(ConfigReader, FeatureExtractionMixin):
     Feature extractor used to score anxiety behaviors in Mexican cave fish species.
 
     .. note::
-       This class has also been named as ``fish_feature_extractor_2023_version_5.FishFeatureExtractor``
+       This class has previously been named as ``fish_feature_extractor_2023_version_5.FishFeatureExtractor``
+
+    .. image:: _static/img/CaveFishFeaturizer.webp
+       :width: 400
+       :align: center
 
     :param Union[str, os.PathLike] config_path: Path to SimBA project_config.ini.
     :return: None. Featurized pose-estimation data is saved in the simba project `project_folder/csv/features_extracted` directory.

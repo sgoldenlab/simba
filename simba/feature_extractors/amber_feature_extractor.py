@@ -94,11 +94,15 @@ class AmberFeatureExtractor(ConfigReader, FeatureExtractionMixin):
     Downstream behavior classifiers can be trained to assess maternal nest attendance, nursing, pup-directed licking and grooming, self-directed grooming, eating, and drinking.
 
     .. note::
-       `AMBER publication <https://www.nature.com/articles/s41598-023-45495-4>`_.
-       `AMBER GitHub Repository <https://github.com/lapphe/AMBER-pipeline>`_.
-       `AMBER OSF Repository <https://osf.io/e3dyc/>`_.
+       * `AMBER publication <https://www.nature.com/articles/s41598-023-45495-4>`_.
+       * `AMBER GitHub Repository <https://github.com/lapphe/AMBER-pipeline>`_.
+       * `AMBER OSF Repository <https://osf.io/e3dyc/>`_.
 
        For more info, contact Hannah E. Lapp `Hannah.Lapp@austin.utexas.edu <Hannah.Lapp@austin.utexas.edu/>`_.
+
+    .. image:: _static/img/pose_configurations/amber.png
+       :width: 400
+       :align: center
 
     :example:
     >>> AmberFeatureExtractor(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

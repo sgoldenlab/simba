@@ -28,12 +28,11 @@ class ExtractFeaturesFrom16bps(ConfigReader, FeatureExtractionMixin):
        `Feature extraction tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-5-extract-features>`__.
        `Expected pose configuration <https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/schematics/7.png>`_
 
-       .. image:: _static/img/pose_configurations/7.png
-          :width: 150
-          :align: center
+    .. image:: _static/img/pose_configurations/7.png
+       :width: 150
+       :align: center
 
-    Examples
-    ----------
+    :example:
     >>> feature_extractor = ExtractFeaturesFrom16bps(config_path='MyProjectConfig')
     >>> feature_extractor.run()
     """
