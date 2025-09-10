@@ -27,12 +27,13 @@ from matplotlib import cm
 from tabulate import tabulate
 
 import simba
-from simba.utils.checks import (check_file_exist_and_readable,
+from simba.utils.checks import (check_ffmpeg_available,
+                                check_file_exist_and_readable,
                                 check_if_dir_exists, check_int, check_str,
-                                check_valid_dict, check_valid_tuple, check_ffmpeg_available)
+                                check_valid_dict, check_valid_tuple)
 from simba.utils.enums import (OS, UML, Defaults, FontPaths, Formats, Methods,
                                Options, Paths)
-from simba.utils.errors import NoFilesFoundError, FFMPEGNotFoundError
+from simba.utils.errors import FFMPEGNotFoundError, NoFilesFoundError
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data)
 from simba.utils.warnings import NoDataFoundWarning
