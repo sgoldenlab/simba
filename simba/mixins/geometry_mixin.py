@@ -544,7 +544,7 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
-        .. image:: _static/img/multiframe_shape_distance.png
+        .. image:: _static/img/multiframe_shape_distance.webp
            :width: 400
            :align: center
 
@@ -1642,7 +1642,7 @@ class GeometryMixin(object):
         .. seealso::
            For single core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.shape_distance`
 
-        .. image:: _static/img/multiframe_shape_distance.png
+        .. image:: _static/img/multiframe_shape_distance.webp
            :width: 600
            :align: center
 
