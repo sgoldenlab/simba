@@ -442,7 +442,7 @@ class CircularStatisticsMixin(object):
         >>> results = CircularStatisticsMixin().direction_three_bps(nose_loc=nose_loc, left_ear_loc=left_ear_loc, right_ear_loc=right_ear_loc)
         """
 
-        results = np.full((nose_loc.shape[0]), np.nan)
+        results = np.full((nose_loc.shape[0]), np.float32(np.nan), dtype=np.float32)
         for i in prange(nose_loc.shape[0]):
             left_ear_to_nose = np.arctan2(
                 nose_loc[i][0] - left_ear_loc[i][0], left_ear_loc[i][1] - nose_loc[i][1]
@@ -455,7 +455,7 @@ class CircularStatisticsMixin(object):
                 np.sin(left_ear_to_nose) + np.sin(right_ear_nose),
                 np.cos(left_ear_to_nose) + np.cos(right_ear_nose),
             )
-            results[i] = (np.degrees(mean_angle_rad) + 360) % 360
+            results[i] = np.float32((np.degrees(mean_angle_rad) + 360) % 360)
         return results
 
     @staticmethod
@@ -537,9 +537,9 @@ class CircularStatisticsMixin(object):
         >>> CircularStatisticsMixin().direction_two_bps(anterior_loc=swim_bladder_loc, posterior_loc=tail_loc)
         """
 
-        results = np.full((anterior_loc.shape[0]), np.nan, dtype=np.float32)
+        results = np.full((anterior_loc.shape[0]), np.float32(np.nan), dtype=np.float32)
         for i in prange(anterior_loc.shape[0]):
-            angle_degrees = np.degrees(np.arctan2(anterior_loc[i][0] - posterior_loc[i][0], posterior_loc[i][1] - anterior_loc[i][1]))
+            angle_degrees = np.float32(np.degrees(np.arctan2(anterior_loc[i][0] - posterior_loc[i][0], posterior_loc[i][1] - anterior_loc[i][1])))
             results[i] = angle_degrees + 360 if angle_degrees < 0 else angle_degrees
         return results
 
@@ -1544,3 +1544,7 @@ class CircularStatisticsMixin(object):
 #     start = time.time()
 #     results = CircularStatisticsMixin().direction_two_bps(swim_bladder_loc=nose_loc,tail_loc=left_ear_loc)
 #     print(time.time() - start)
+
+# swim_bladder_loc = np.random.randint(low=0, high=500, size=(50, 2)).astype(np.float32)
+# tail_loc = np.random.randint(low=0, high=500, size=(50, 2)).astype(np.float32)
+# CircularStatisticsMixin().direction_two_bps(anterior_loc=swim_bladder_loc, posterior_loc=tail_loc)

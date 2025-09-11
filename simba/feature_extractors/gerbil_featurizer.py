@@ -36,7 +36,6 @@ class GerbilFeaturizer(object):
     :references:
        .. [1] Mitelut, C, M Diez Castro, Re Peterson, M Gonçalves, J Li, Mm Gamer, Sro Nilsson, Td Pereira, and Dh Sanes. “A Behavioral Roadmap for the Development of Agency in the Rodent.” Animal Behavior and Cognition, November 13, 2023. https://doi.org/10.1101/2023.11.10.566632.
        .. [2] Mitelut, Catalin, Marielisa Diez Castro, Ralph E. Peterson, et al. “Continuous Monitoring and Machine Vision Reveals That Developing Gerbils Exhibit Structured Social Behaviors Prior to the Emergence of Autonomy.” PLOS Biology 23, no. 9 (2025): e3003348. https://doi.org/10.1371/journal.pbio.3003348.
-
     """
 
     def __init__(self,

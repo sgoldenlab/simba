@@ -544,6 +544,10 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
+        .. image:: _static/img/multiframe_shape_distance.png
+           :width: 400
+           :align: center
+
         >>> shape_1 = Polygon([(0, 0), 10, 10), 0, 10), 10, 0)])
         >>> shape_2 = Polygon([(0, 0), 10, 10), 0, 10), 10, 0)])
         >>> GeometryMixin.shape_distance(shapes=[shape_1, shape_2], pixels_per_mm=1)
@@ -1628,18 +1632,28 @@ class GeometryMixin(object):
                                   shape_2: List[Union[LineString, Polygon]],
                                   pixels_per_mm: Optional[float] = 1,
                                   unit: Literal["mm", "cm", "dm", "m"] = "mm",
-                                  core_cnt=-1) -> List[float]:
+                                  verbose: bool = False,
+                                  core_cnt: int = -1,
+                                  maxchildpertask: int = Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value,
+                                  shape_names: Optional[str] = None) -> List[float]:
         """
         Compute shape distances between corresponding shapes in two lists of LineString or Polygon geometries for multiple frames.
 
         .. seealso::
            For single core method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.shape_distance`
 
+        .. image:: _static/img/multiframe_shape_distance.png
+           :width: 600
+           :align: center
+
         :param List[Union[LineString, Polygon]] shape_1: List of LineString or Polygon geometries.
         :param List[Union[LineString, Polygon]] shape_2: List of LineString or Polygon geometries with the same length as shape_1.
         :param float pixels_per_mm: Conversion factor from pixels to millimeters. Default 1.
         :param Literal['mm', 'cm', 'dm', 'm'] unit: Unit of measurement for the result. Options: 'mm', 'cm', 'dm', 'm'. Default: 'mm'.
-        :param core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores.
+        :param bool verbose: If True, prints progress information during computation. Default False.
+        :param int core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores.
+        :param int maxchildpertask: Maximum number of tasks per child process before restarting. Default is from Defaults.MAXIMUM_MAX_TASK_PER_CHILD.
+        :param Optional[str] shape_names: Optional name identifier for the shapes being compared, used in verbose output. Default None.
         :return: List of shape distances between corresponding shapes in passed unit.
         :rtype: List[float]
 
@@ -1654,31 +1668,38 @@ class GeometryMixin(object):
         >>> GeometryMixin().multiframe_shape_distance(shape_1=animal_1_geo, shape_2=animal_2_geo, pixels_per_mm=2.12, unit='cm')
         """
 
-        check_int(
-            name="CORE COUNT",
-            value=core_cnt,
-            min_value=-1,
-            max_value=find_core_cnt()[0],
-            raise_error=True,
-        )
+        timer = SimbaTimer(start=True)
+        check_int(name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
         check_float(name="PIXELS PER MM", value=pixels_per_mm, min_value=0.0)
         check_if_valid_input(name="UNIT", input=unit, options=["mm", "cm", "dm", "m"])
-        if core_cnt == -1:
-            core_cnt = find_core_cnt()[0]
+        if shape_names is not None:
+            check_str(name=f'{GeometryMixin.multiframe_shape_distance.__name__} verbose', value=shape_names, allow_blank=True, raise_error=True)
+        check_valid_boolean(value=verbose, source=f'{GeometryMixin.multiframe_shape_distance.__name__} verbose', raise_error=True)
+        if core_cnt == -1: core_cnt = find_core_cnt()[0]
         if len(shape_1) != len(shape_2):
-            raise InvalidInputError(msg=f"shape_1 and shape_2 are unequal sizes: {len(shape_1)} vs {len(shape_2)}",
-                                    source=GeometryMixin.multiframe_shape_distance.__name__)
+            raise InvalidInputError(msg=f"shape_1 and shape_2 are unequal sizes: {len(shape_1)} vs {len(shape_2)}", source=GeometryMixin.multiframe_shape_distance.__name__)
         check_float(name="pixels_per_mm", value=pixels_per_mm, min_value=0.0)
         data = [list(x) for x in zip(shape_1, shape_2)]
         results = []
-        with multiprocessing.Pool(
-                core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-        ) as pool:
-            constants = functools.partial(
-                GeometryMixin.shape_distance, pixels_per_mm=pixels_per_mm, unit=unit
-            )
+        print(Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value)
+        if verbose and shape_names is not None:
+            print(f'Computing shape distances for {len(shape_1)} comparisons ({shape_names})...')
+        if verbose and shape_names is None:
+                print(f'Computing shape distances for {len(shape_1)} comparisons...')
+        with multiprocessing.Pool(core_cnt, maxtasksperchild=maxchildpertask) as pool:
+            constants = functools.partial(GeometryMixin.shape_distance, pixels_per_mm=pixels_per_mm, unit=unit)
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
                 results.append(result)
+                if verbose:
+                    print(f'Shape distance batch {cnt+1} complete...')
+
+        timer.stop_timer()
+        if verbose and shape_names is not None:
+            stdout_success(msg=f'Shape distances computed for {len(shape_1)} comparisons ({shape_names})', source=f'{GeometryMixin.multiframe_shape_distance.__name__}', elapsed_time=timer.elapsed_time_str)
+        if verbose and shape_names is None:
+            stdout_success(msg=f'Shape distances computed for {len(shape_1)} comparisons', source=f'{GeometryMixin.multiframe_shape_distance.__name__}', elapsed_time=timer.elapsed_time_str)
+
+
 
         pool.join()
         pool.terminate()
