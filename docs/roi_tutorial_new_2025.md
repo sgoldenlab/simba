@@ -10,7 +10,8 @@ statistics based on animals movements and locations such as:
 * How much time the animals have spent in different ROIs.
 * How many times the animals have entered different ROIs.
 * The movement distances / velocity animals have in the different ROIs.
-* Calculate how many times and for how long animals have engaged in different classified behaviors in each ROI.
+* Movement entries / kinematics outside of defined ROIs.
+* Calculate how many times and for how long animals have engaged in different classified behaviors inside and outside each ROI.
 etc....
 
 Moreover, the ROI data can  be used to build potentially valuable, additional, features for random forest predictive classifiers. Such features can be used to generate a machine model that classify behaviors that depend on the spatial location of body parts in relation to the ROIs. 
