@@ -206,8 +206,9 @@ from simba.utils.custom_feature_extractor import CustomFeatureExtractor
 from simba.utils.enums import (ENV_VARS, OS, Defaults, Formats, Keys, Links,
                                PackageNames, Paths, TagNames)
 from simba.utils.errors import InvalidInputError
-from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
-                                 get_icons_paths, load_simba_fonts, get_current_time)
+from simba.utils.lookups import (get_bp_config_code_class_pairs,
+                                 get_current_time, get_emojis, get_icons_paths,
+                                 load_simba_fonts)
 from simba.utils.read_write import (fetch_pip_data, find_core_cnt,
                                     get_pkg_version, get_recent_projects_paths,
                                     get_video_meta_data, read_sys_env,

@@ -1,25 +1,32 @@
-import os
-from typing import Union, Optional
 import itertools
+import os
 from copy import deepcopy
+from typing import Optional, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
-import pandas as pd
+
 import numpy as np
-from simba.mixins.abstract_classes import AbstractFeatureExtraction
+import pandas as pd
 from shapely.geometry import LineString
-from simba.utils.checks import check_all_file_names_are_represented_in_video_log, check_valid_dataframe, check_that_column_exist, check_if_dir_exists
-from simba.utils.read_write import read_df, get_fn_ext, write_df, find_files_of_filetypes_in_directory, find_core_cnt
-from simba.utils.lookups import get_current_time
-from simba.mixins.geometry_mixin import GeometryMixin
+
+from simba.feature_extractors.perimeter_jit import get_hull_sizes
+from simba.mixins.abstract_classes import AbstractFeatureExtraction
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
+from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log, check_if_dir_exists,
+    check_that_column_exist, check_valid_dataframe)
 from simba.utils.enums import Formats
-from simba.feature_extractors.perimeter_jit import get_hull_sizes
+from simba.utils.lookups import get_current_time
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_core_cnt,
+                                    find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_df, write_df)
 
 ####################################################################
 

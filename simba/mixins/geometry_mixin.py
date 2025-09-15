@@ -43,7 +43,8 @@ from simba.utils.enums import Defaults, Formats, GeometryEnum, Options
 from simba.utils.errors import CountError, InvalidInputError
 from simba.utils.read_write import (SimbaTimer, find_core_cnt,
                                     find_max_vertices_coordinates, read_df,
-                                    read_frm_of_video, stdout_success, write_pickle, read_sleap_csv)
+                                    read_frm_of_video, read_sleap_csv,
+                                    stdout_success, write_pickle)
 
 
 class GeometryMixin(object):
