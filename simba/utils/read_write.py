@@ -376,6 +376,9 @@ def bgr_to_rgb_tuple(value: Tuple[int, int, int]) -> Tuple[int, int, int]:
     check_if_valid_rgb_tuple(data=value)
     return (value[2], value[1], value[0])
 
+
+
+
 def read_video_info_csv(file_path: Union[str, os.PathLike]) -> pd.DataFrame:
     """
     Helper to read the project_folder/logs/video_info.csv of the SimBA project in as a pd.DataFrame
@@ -3154,7 +3157,7 @@ def read_sleap_csv(file_path: Union[str, os.PathLike]) -> Tuple[pd.DataFrame, li
     Reads and validates a SLEAP-exported CSV file containing tracking data.
 
     :param  Union[str, os.PathLike] file_path: Path to the SLEAP CSV file.
-    :returns: Tuple with (i) The validated and cleaned DataFrame, (ii) A list of unique body part names, (iii) A flattened list of coordinate column names for each body part (e.g., ['nose.x', 'nose.y', ...]).
+    :returns: Tuple with (i) The validated and cleaned DataFrame, (ii) A list of unique body part names, (iii) A flattened list of coordinate column names for each body part (e.g., ['nose.x', 'nose.y', ...]) excliding probability scores.
     :rtype: Tuple[pd.DataFrame, list, list]
     """
     REQUIRED_COLUMNS = ['track', 'frame_idx', 'instance.score']

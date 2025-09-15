@@ -1194,7 +1194,6 @@ class TrainModelMixin(object):
         x_train = x_df[x_df.index.isin(train_bouts_frames + train_nonbouts_frames)]
         x_test = x_df[x_df.index.isin(test_bouts_frames + test_nonbouts_frames)]
         y_train = y_df[y_df.index.isin(train_bouts_frames + train_nonbouts_frames)]
-        print(y_df)
         y_test = y_df[y_df.index.isin(test_bouts_frames + test_nonbouts_frames)]
 
         return x_train, x_test, y_train, y_test

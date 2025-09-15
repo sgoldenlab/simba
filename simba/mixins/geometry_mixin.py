@@ -43,7 +43,7 @@ from simba.utils.enums import Defaults, Formats, GeometryEnum, Options
 from simba.utils.errors import CountError, InvalidInputError
 from simba.utils.read_write import (SimbaTimer, find_core_cnt,
                                     find_max_vertices_coordinates, read_df,
-                                    read_frm_of_video, stdout_success)
+                                    read_frm_of_video, stdout_success, write_pickle, read_sleap_csv)
 
 
 class GeometryMixin(object):
@@ -223,7 +223,10 @@ class GeometryMixin(object):
                             parallel_offset: Optional[float] = 1,
                             pixels_per_mm: Optional[int] = 1) -> Union[Polygon, List[Polygon]]:
         """
-        Create a circle geometry from a single body-part (x,y) coordinate.
+        Create circle geometries from body-part (x,y) coordinates.
+
+        Creates circular polygons around body-part coordinates. Can handle single coordinates (1D array) 
+        or multiple coordinates (2D array). The radius is calculated by dividing parallel_offset by pixels_per_mm.
 
         .. note::
            For multicore method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_bodyparts_to_circle`
@@ -236,20 +239,24 @@ class GeometryMixin(object):
            :width: 450
            :align: center
 
-        :param np.ndarray data: The body-part coordinate xy as a 1d array. E.g., np.array([364, 308])
-        :param float parallel_offset: The radius of the resultant circle in millimeters.
-        :param int pixels_per_mm: The pixels per millimeter of the video. If not passed, 1 will be used meaning revert to radius in pixels rather than millimeters.
-        :returns: Shapely Polygon of circular shape.
+        :param np.ndarray data: Body-part coordinate(s) as 1D array [x, y] or 2D array [[x1, y1], [x2, y2], ...]. E.g., np.array([364, 308]) or np.array([[364, 308], [100, 200]]).
+        :param float parallel_offset: The radius of the resultant circle(s). Default: 1.
+        :param float pixels_per_mm: The pixels per millimeter conversion factor. If 1, radius is in pixels. Default: 1.
+        :returns: Single Shapely Polygon for 1D input, or List[Polygon] for 2D input.
         :rtype: Union[Polygon, List[Polygon]]
 
         :example:
+        >>> # Single coordinate
         >>> data = np.array([364, 308])
-        >>> polygon = GeometryMixin().bodyparts_to_circle(data=data, parallel_offset=10, pixels_per_mm=4)
+        >>> polygon = GeometryMixin.bodyparts_to_circle(data=data, parallel_offset=10, pixels_per_mm=4)
+        >>> # Multiple coordinates
+        >>> data = np.array([[364, 308], [100, 200]])
+        >>> polygons = GeometryMixin.bodyparts_to_circle(data=data, parallel_offset=10, pixels_per_mm=4)
         """
 
         check_valid_array(data=data, accepted_ndims=(1, 2, ), accepted_dtypes=Formats.NUMERIC_DTYPES.value, max_axis_1=2)
-        check_float(name=f"{GeometryMixin.bodyparts_to_circle.__name__} parallel_offset", value=pixels_per_mm, min_value=1)
-        check_float(name=f"{GeometryMixin.bodyparts_to_circle.__name__} pixels_per_mm", value=pixels_per_mm, min_value=1)
+        check_float(name=f"{GeometryMixin.bodyparts_to_circle.__name__} parallel_offset", value=parallel_offset, min_value=0.1)
+        check_float(name=f"{GeometryMixin.bodyparts_to_circle.__name__} pixels_per_mm", value=pixels_per_mm, min_value=0.1)
 
         if data.ndim == 1:
             return Point(data).buffer(parallel_offset / pixels_per_mm)
@@ -524,18 +531,19 @@ class GeometryMixin(object):
         return shape.area / pixels_per_mm
 
     @staticmethod
-    def shape_distance(shapes: List[Union[LineString, Polygon, Point]], pixels_per_mm: float,
-                       unit: Literal["mm", "cm", "dm", "m"] = "mm") -> float:
+    def shape_distance(shapes: List[List[Union[LineString, Polygon, Point]]],
+                       pixels_per_mm: float,
+                       unit: Literal["mm", "cm", "dm", "m"] = "mm") -> List[float]:
         """
-        Calculate the distance between two geometries in specified units.
+        Calculate the distance between two lists of geometries in specified units.
 
         The distance method will compute the shortest distance between the boundaries of the two shapes. If the shapes overlap, the distance will be zero.
 
-        :param List[Union[LineString, Polygon]] shapes: A list containing two LineString or Polygon geometries.
+        :param List[Union[LineString, Polygon, Point]] shapes: A list of list of two LineString, Polygon or Point geometries.
         :param float pixels_per_mm: The conversion factor from pixels to millimeters.
         :param Literal['mm', 'cm', 'dm', 'm'] unit: The desired unit for the distance calculation. Options: 'mm', 'cm', 'dm', 'm'. Defaults to 'mm'.
-        :return: The distance between the two geometries in the specified unit.
-        :rtype: float
+        :return: A list of distances between corresponding geometries in the specified unit.
+        :rtype: List[float]
 
         .. seealso:
            For multicore method, see :func:`simba.mixins.geometry_mixin.GeometryMixin.multiframe_shape_distance`
@@ -548,33 +556,28 @@ class GeometryMixin(object):
            :width: 400
            :align: center
 
-        >>> shape_1 = Polygon([(0, 0), 10, 10), 0, 10), 10, 0)])
-        >>> shape_2 = Polygon([(0, 0), 10, 10), 0, 10), 10, 0)])
-        >>> GeometryMixin.shape_distance(shapes=[shape_1, shape_2], pixels_per_mm=1)
-        >>> 0
+        >>> from shapely.geometry import Polygon
+        >>> shape_1 = Polygon([(0, 0), (10, 0), (10, 10), (0, 10)])
+        >>> shape_2 = Polygon([(5, 5), (15, 5), (15, 15), (5, 15)])
+        >>> GeometryMixin.shape_distance(shapes_a=[shape_1], shapes_b=[shape_2], pixels_per_mm=1.0)
+        [0.0]
         """
 
-        check_if_valid_input(name="UNIT", input=unit, options=["mm", "cm", "dm", "m"])
-        for shape in shapes:
-            check_instance(
-                source=GeometryMixin.shape_distance.__name__,
-                instance=shape,
-                accepted_types=(LineString, Polygon, Point),
-            )
-        check_iterable_length(
-            source=GeometryMixin.shape_distance.__name__,
-            val=len(shapes),
-            exact_accepted_length=2,
-        )
-
-        D = shapes[0].distance(shapes[1]) / pixels_per_mm
+        check_if_valid_input(name=f'{GeometryMixin.__name__} UNIT', input=unit, options=["mm", "cm", "dm", "m"])
+        check_float(name=f'{GeometryMixin.__name__} pixels_per_mm', value=pixels_per_mm, allow_zero=False, allow_negative=False)
+        check_instance(source=GeometryMixin.shape_distance.__name__, instance=shapes, accepted_types=(list,))
+        for i in range(len(shapes)):
+            check_valid_lst(data=shapes[i], source=f'{GeometryMixin.shape_distance.__name__} shapes {i}', valid_dtypes=(LineString, Polygon, Point), exact_len=2)
+        result = []
+        for i in range(len(shapes)):
+            result.append(shapes[i][0].distance(shapes[i][1]) / pixels_per_mm)
         if unit == "cm":
-            D = D / 10
+            result = [x / 10 for x in result]
         elif unit == "dm":
-            D = D / 100
+            result = [x / 100 for x in result]
         elif unit == "m":
-            D = D / 1000
-        return D
+            result = [x / 1000 for x in result]
+        return result
 
     @staticmethod
     def bodyparts_to_line(data: np.ndarray,
@@ -1250,16 +1253,8 @@ class GeometryMixin(object):
         >>> point_lst_of_lst = GeometryMixin().multiframe_bodypart_to_point(data=data)
         """
 
-        check_valid_array(
-            data=data,
-            accepted_dtypes=Formats.NUMERIC_DTYPES.value,
-            accepted_ndims=(2, 3),
-        )
-        check_int(
-            name=GeometryMixin().multiframe_bodypart_to_point.__name__,
-            value=core_cnt,
-            min_value=-1,
-        )
+        check_valid_array( data=data, accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_ndims=(2, 3),)
+        check_int(name=GeometryMixin().multiframe_bodypart_to_point.__name__,value=core_cnt,min_value=-1)
         if core_cnt == -1:
             core_cnt = find_core_cnt()[0]
         results = []
@@ -1628,8 +1623,8 @@ class GeometryMixin(object):
         return results
 
     def multiframe_shape_distance(self,
-                                  shape_1: List[Union[LineString, Polygon]],
-                                  shape_2: List[Union[LineString, Polygon]],
+                                  shapes_a: List[Union[LineString, Polygon]],
+                                  shapes_b: List[Union[LineString, Polygon]],
                                   pixels_per_mm: Optional[float] = 1,
                                   unit: Literal["mm", "cm", "dm", "m"] = "mm",
                                   verbose: bool = False,
@@ -1646,8 +1641,8 @@ class GeometryMixin(object):
            :width: 600
            :align: center
 
-        :param List[Union[LineString, Polygon]] shape_1: List of LineString or Polygon geometries.
-        :param List[Union[LineString, Polygon]] shape_2: List of LineString or Polygon geometries with the same length as shape_1.
+        :param List[Union[LineString, Polygon]] shapes_a: List of LineString or Polygon geometries.
+        :param List[Union[LineString, Polygon]] shapes_b: List of LineString or Polygon geometries with the same length as shape_1.
         :param float pixels_per_mm: Conversion factor from pixels to millimeters. Default 1.
         :param Literal['mm', 'cm', 'dm', 'm'] unit: Unit of measurement for the result. Options: 'mm', 'cm', 'dm', 'm'. Default: 'mm'.
         :param bool verbose: If True, prints progress information during computation. Default False.
@@ -1665,42 +1660,37 @@ class GeometryMixin(object):
         >>> animal_2_arr = df[animal_2_cols].values.reshape(len(df), int(len(animal_1_cols)/ 2), 2)
         >>> animal_1_geo = GeometryMixin.bodyparts_to_polygon(data=animal_1_arr)
         >>> animal_2_geo = GeometryMixin.bodyparts_to_polygon(data=animal_2_arr)
-        >>> GeometryMixin().multiframe_shape_distance(shape_1=animal_1_geo, shape_2=animal_2_geo, pixels_per_mm=2.12, unit='cm')
+        >>> GeometryMixin().multiframe_shape_distance(shapes_a=animal_1_geo, shapes_b=animal_2_geo, pixels_per_mm=2.12, unit='cm')
         """
 
         timer = SimbaTimer(start=True)
         check_int(name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
-        check_float(name="PIXELS PER MM", value=pixels_per_mm, min_value=0.0)
+        check_float(name="PIXELS PER MM", value=pixels_per_mm, allow_zero=False, allow_negative=False)
         check_if_valid_input(name="UNIT", input=unit, options=["mm", "cm", "dm", "m"])
         if shape_names is not None:
             check_str(name=f'{GeometryMixin.multiframe_shape_distance.__name__} verbose', value=shape_names, allow_blank=True, raise_error=True)
         check_valid_boolean(value=verbose, source=f'{GeometryMixin.multiframe_shape_distance.__name__} verbose', raise_error=True)
         if core_cnt == -1: core_cnt = find_core_cnt()[0]
-        if len(shape_1) != len(shape_2):
-            raise InvalidInputError(msg=f"shape_1 and shape_2 are unequal sizes: {len(shape_1)} vs {len(shape_2)}", source=GeometryMixin.multiframe_shape_distance.__name__)
+        if len(shapes_a) != len(shapes_b):
+            raise InvalidInputError(msg=f"shape_1 and shape_2 are unequal sizes: {len(shapes_a)} vs {len(shapes_b)}", source=GeometryMixin.multiframe_shape_distance.__name__)
         check_float(name="pixels_per_mm", value=pixels_per_mm, min_value=0.0)
-        data = [list(x) for x in zip(shape_1, shape_2)]
+        data = [list(x) for x in zip(shapes_a, shapes_b)]
+        data = [data[i * (len(data) // core_cnt) + min(i, len(data) % core_cnt):(i + 1) * (len(data) // core_cnt) + min(i + 1, len(data) % core_cnt)] for i in range(core_cnt)]
         results = []
-        print(Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value)
         if verbose and shape_names is not None:
-            print(f'Computing shape distances for {len(shape_1)} comparisons ({shape_names})...')
+            print(f'Computing shape distances for {len(shapes_a)} comparisons ({shape_names})...')
         if verbose and shape_names is None:
-                print(f'Computing shape distances for {len(shape_1)} comparisons...')
+            print(f'Computing shape distances for {len(shapes_a)} comparisons...')
         with multiprocessing.Pool(core_cnt, maxtasksperchild=maxchildpertask) as pool:
             constants = functools.partial(GeometryMixin.shape_distance, pixels_per_mm=pixels_per_mm, unit=unit)
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=1)):
                 results.append(result)
-                if verbose:
-                    print(f'Shape distance batch {cnt+1} complete...')
-
+        results = [x for sublist in results for x in sublist]
         timer.stop_timer()
         if verbose and shape_names is not None:
-            stdout_success(msg=f'Shape distances computed for {len(shape_1)} comparisons ({shape_names})', source=f'{GeometryMixin.multiframe_shape_distance.__name__}', elapsed_time=timer.elapsed_time_str)
+            print(f'Shape distances computed for {len(shapes_a)} comparisons ({shape_names}) (elapsed time: {timer.elapsed_time_str}s)')
         if verbose and shape_names is None:
-            stdout_success(msg=f'Shape distances computed for {len(shape_1)} comparisons', source=f'{GeometryMixin.multiframe_shape_distance.__name__}', elapsed_time=timer.elapsed_time_str)
-
-
-
+            print( f'Shape distances computed for {len(shapes_a)} comparisons (elapsed time: {timer.elapsed_time_str}s)')
         pool.join()
         pool.terminate()
         return results
@@ -1734,22 +1724,11 @@ class GeometryMixin(object):
         >>> GeometryMixin().multiframe_minimum_rotated_rectangle(shapes=animal_1_geo)
         """
 
-        check_int(
-            name="CORE COUNT",
-            value=core_cnt,
-            min_value=-1,
-            max_value=find_core_cnt()[0],
-            raise_error=True,
-        )
-        if core_cnt == -1:
-            core_cnt = find_core_cnt()[0]
+        check_int(name="CORE COUNT", value=core_cnt, min_value=-1, max_value=find_core_cnt()[0], raise_error=True)
+        if core_cnt == -1: core_cnt = find_core_cnt()[0]
         results, timer = [], SimbaTimer(start=True)
-        with multiprocessing.Pool(
-                core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value
-        ) as pool:
-            for cnt, result in enumerate(
-                    pool.imap(GeometryMixin.minimum_rotated_rectangle, shapes, chunksize=1)
-            ):
+        with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
+            for cnt, result in enumerate(pool.imap(GeometryMixin.minimum_rotated_rectangle, shapes, chunksize=1)):
                 if verbose:
                     if not video_name and not animal_name:
                         print(f"Rotating polygon {cnt + 1}/{len(shapes)}...")
@@ -3746,8 +3725,8 @@ class GeometryMixin(object):
             points = [Point(x) for x in np.array(path.coords)]
             geometry = [geometry for x in range(len(points))]
             distances = GeometryMixin().multiframe_shape_distance(
-                shape_1=points,
-                shape_2=geometry,
+                shapes_a=points,
+                shapes_b=geometry,
                 pixels_per_mm=px_per_mm,
                 core_cnt=core_cnt,
             )
@@ -4122,6 +4101,47 @@ class GeometryMixin(object):
                     #results.append(coords[i])
                 results.append(np.array(splev(u, tck)).T)
         return results
+
+    @staticmethod
+    def sleap_csv_to_geometries(data: Union[str, os.PathLike],
+                                buffer: int = 10,
+                                save_path: Optional[Union[str, os.PathLike]] = None) -> Union[None, Dict[Any, dict]]:
+
+        """
+         Convert SLEAP CSV tracking data to polygon geometries for each track and frame.
+
+         This function reads SLEAP-exported CSV files containing pose estimation data and converts
+         the body part coordinates into polygon geometries. The polygons are created by connecting
+         the body parts with a specified buffer around the animal's body outline.
+
+         :param Union[str, os.PathLike] data: Path to SLEAP CSV file containing tracking data with columns 'track', 'frame_idx', and body part coordinates.
+         :param int buffer: Buffer size in pixels to add around the body part polygon. Default: 10.
+         :param Optional[Union[str, os.PathLike]] save_path: Optional path to save the results as a pickle file. If None, returns the data directly.
+         :return: Dictionary with track IDs as keys and frame-to-polygon mappings as values, or None if save_path is provided.
+         :rtype: Union[None, Dict[Any, dict]]
+
+         :example:
+             >>> results = sleap_csv_to_geometries(data=r"C:\troubleshooting\ants\pose_data\ant.csv")
+             >>> # Results structure: {track_id: {frame_idx: Polygon, ...}, ...}
+         """
+
+        TRACK, FRAME_IDX = 'track', 'frame_idx'
+        check_int(name=f'{GeometryMixin.sleap_csv_to_geometries.__name__} buffer', value=buffer, min_value=1, raise_error=True)
+        df, bp_names, headers = read_sleap_csv(file_path=data)
+        results = {}
+        track_ids = sorted(df[TRACK].unique())
+        for track_id in track_ids:
+            track_data = df[df[TRACK] == track_id]
+            track_cords = track_data[headers].fillna(-1).values.astype(np.int32).reshape(len(track_data), -1, 2)
+            track_frms = track_data[FRAME_IDX].values
+            polygons = GeometryMixin.bodyparts_to_polygon(data=track_cords, parallel_offset=buffer)
+            results[track_id] = {k: None for k in range(0, df[FRAME_IDX].max()+1)}
+            results[track_id].update({k: v for k, v in zip(track_frms, polygons)})
+
+        if save_path is not None:
+            write_pickle(data=results, save_path=save_path)
+        else:
+            return results
 
 # video_path = "/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/03152021_NOB_IOT_8.mp4"
 # data_path = "/mnt/c/troubleshooting/RAT_NOR/project_folder/csv/outlier_corrected_movement_location/03152021_NOB_IOT_8.csv"

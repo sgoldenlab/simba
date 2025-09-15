@@ -23,7 +23,7 @@ except:
     from typing_extensions import Literal
 
 import typing
-from typing import Optional, Tuple, get_type_hints
+from typing import Optional, Tuple, get_type_hints, Union
 
 from simba.mixins.statistics_mixin import Statistics
 from simba.utils.checks import (check_float, check_instance, check_int,
@@ -1002,6 +1002,56 @@ class TimeseriesFeatureMixin(object):
         magnitude = np.abs(fft_result)
 
         return frequencies[np.argsort(magnitude)[-(k + 1) : -1]]
+
+    def sliding_window_stats(data: np.ndarray, window_sizes: Union[List, np.ndarray], sample_rate: float,
+                             statistics: List[Literal[
+                                 "var", "max", "min", "std", "median", "mean", "mad", "sum", "mac", "rms", "absenergy"]]) -> np.ndarray:
+        """
+        Compute descriptive statistics over sliding windows in 1D data array.
+
+        This function is a wrapper around `TimeseriesFeatureMixin.sliding_descriptive_statistics` that provides
+        input validation and preprocessing. It computes various descriptive statistics for sliding windows of
+        varying sizes applied to the input data array.
+
+        .. note::
+           Validation wrapper for `func:`simba.mixins.timeseries_features_mixin.TimeseriesFeatureMixin.sliding_descriptive_statistics
+
+        :param np.ndarray data: 1D input data array containing the time series values to analyze.
+        :param Union[List, np.ndarray] window_sizes: Array or list of window sizes (in seconds) for computing statistics.
+        :param float sample_rate: Sampling rate of the data in samples per second (e.g., fps for video data).
+        :param List[Literal["var", "max", "min", "std", "median", "mean", "mad", "sum", "mac", "rms", "absenergy"]] statistics: List of statistics to compute. Available options:
+            - 'var': variance
+            - 'max': maximum value
+            - 'min': minimum value
+            - 'std': standard deviation
+            - 'median': median value
+            - 'mean': mean value
+            - 'mad': median absolute deviation
+            - 'sum': sum of values
+            - 'mac': mean absolute change
+            - 'rms': root mean square
+            - 'absenergy': absolute energy
+        :return np.ndarray: Array containing the selected descriptive statistics for each window size, data point, and statistic type. Shape is (len(statistics), data.shape[0], window_sizes.shape[0]).
+        :rtype: np.ndarray
+
+        :example:
+        >>> data = np.array([1.0, 4.0, 2.0, 3.0, 5.0, 6.0, 8.0, 7.0, 9.0, 10.0]).astype(np.float32)
+        >>> window_sizes = [0.5, 1.0, 1.5, 2.0]
+        >>> sample_rate = 30.0  # 30 fps
+        >>> statistics = ['mean', 'std', 'max']
+        >>> results = sliding_window_stats(data=data, window_sizes=window_sizes, sample_rate=sample_rate, statistics=statistics)
+        """
+        check_valid_array(data=data, source=f'{TimeseriesFeatureMixin.sliding_window_stats.__name__} data', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, raise_error=True)
+        check_instance(source=f'{TimeseriesFeatureMixin.sliding_window_stats.__name__} window_sizes', accepted_types=(np.ndarray, list), instance=window_sizes)
+        if isinstance(window_sizes, list):
+            check_valid_lst(data=window_sizes, source=f'{TimeseriesFeatureMixin.sliding_window_stats.__name__} window_sizes', valid_dtypes=Formats.NUMERIC_DTYPES.value, raise_error=True)
+            window_sizes = np.array(window_sizes)
+        check_valid_array(data=window_sizes, source=f'{TimeseriesFeatureMixin.sliding_window_stats.__name__} window_sizes', accepted_ndims=(1,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, raise_error=True, min_value=10e-16)
+        check_valid_lst(data=statistics, source=f'{TimeseriesFeatureMixin.sliding_window_stats.__name__} window_sizes', valid_dtypes=(str,), valid_values=["var", "max", "min", "std", "median", "mean", "mad", "sum", "mac", "rms", "absenergy"], min_len=1)
+        check_float(name=f'{TimeseriesFeatureMixin.sliding_window_stats.__name__} sample_rate', value=sample_rate, allow_zero=False, min_value=10e-16)
+        results = TimeseriesFeatureMixin.sliding_descriptive_statistics(data=data, window_sizes=window_sizes, sample_rate=sample_rate, statistics=typed.List(statistics))
+        return results
+
 
     @staticmethod
     # @njit(

@@ -212,7 +212,8 @@ def check_float(name: str,
                 max_value: Optional[float] = None,
                 min_value: Optional[float] = None,
                 raise_error: bool = True,
-                allow_zero: bool = True) -> Tuple[bool, str]:
+                allow_zero: bool = True,
+                allow_negative: bool = True) -> Tuple[bool, str]:
     """
     Check if variable is a valid float.
 
@@ -221,6 +222,7 @@ def check_float(name: str,
     :param Optional[int] max_value: Maximum allowed value of the float. If None, then no maximum. Default: None.
     :param Optional[int]: Minimum allowed value of the float. If None, then no minimum. Default: Non
     :param Optional[bool] allow_zero: If True, do not allow float to be zero. Default: True and allow zero.
+    :param Optional[bool] allow_negative: If True, do not allow float to be below zero Default: True and allow negative.
     :param Optional[bool] raise_error: If True, then raise error if invalid float. Default: True.
     :return: If `raise_error` is False, then returns size-2 tuple, with first value being a bool representing if valid float, and second value a string representing error (if valid is False, else empty string)
     :rtype: Tuple[bool, str]
@@ -256,6 +258,14 @@ def check_float(name: str,
     if not allow_zero:
         if float(value) == 0:
             msg = f"{name} cannot be ZERO. It is set to {str(value)}"
+            if raise_error:
+                raise FloatError(msg=msg, source=check_float.__name__)
+            else:
+                return False, msg
+
+    if not allow_negative:
+        if float(value) < 0:
+            msg = f"{name} cannot be BELOW zero. It is set to {str(value)}"
             if raise_error:
                 raise FloatError(msg=msg, source=check_float.__name__)
             else:

@@ -55,7 +55,7 @@ def locate_line_point(path: Union[LineString, np.ndarray],
     else:
         points = [Point(x) for x in np.array(path.coords)]
         geometry = [geometry for x in range(len(points))]
-        distances = GeometryMixin().multiframe_shape_distance(shape_1=points, shape_2=geometry, pixels_per_mm=px_per_mm, core_cnt=core_cnt)
+        distances = GeometryMixin().multiframe_shape_distance(shapes_a=points, shapes_b=geometry, pixels_per_mm=px_per_mm, core_cnt=core_cnt)
 
     if distance_min:
         distance_idx = np.argmin(distances)

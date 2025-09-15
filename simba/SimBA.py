@@ -207,7 +207,7 @@ from simba.utils.enums import (ENV_VARS, OS, Defaults, Formats, Keys, Links,
                                PackageNames, Paths, TagNames)
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_bp_config_code_class_pairs, get_emojis,
-                                 get_icons_paths, load_simba_fonts)
+                                 get_icons_paths, load_simba_fonts, get_current_time)
 from simba.utils.read_write import (fetch_pip_data, find_core_cnt,
                                     get_pkg_version, get_recent_projects_paths,
                                     get_video_meta_data, read_sys_env,
@@ -762,14 +762,14 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         _ = MachineModelSettingsPopUp(config_path=self.config_path)
 
     def run_feature_extraction(self):
-        print("Running feature extraction...")
-        print(f"Pose-estimation body part setting for feature extraction: {str(self.animal_cnt)} animals {str(self.pose_setting)} body-parts...")
+        print(f"Running feature extraction... start time: {get_current_time()}")
         feature_extractor_classes = get_bp_config_code_class_pairs()
         if self.user_defined_var.get():
             custom_feature_extractor = CustomFeatureExtractor(extractor_file_path=self.scriptfile.file_path,config_path=self.config_path)
             custom_feature_extractor.run()
             stdout_success(msg="Custom feature extraction complete!",source=self.__class__.__name__)
         else:
+            print(f"Pose-estimation body part setting for feature extraction: {str(self.animal_cnt)} animals {str(self.pose_setting)} body-parts...")
             if self.pose_setting not in feature_extractor_classes.keys():
                 raise InvalidInputError(msg=f"The project pose-configuration key is set to {self.pose_setting} which is invalid. OPTIONS: {list(feature_extractor_classes.keys())}. Check the pose-estimation setting in the project_config.ini", source=self.__class__.__name__)
             if self.pose_setting == "8":

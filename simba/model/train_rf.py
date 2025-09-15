@@ -247,6 +247,11 @@ class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):
 
 
 
+# test = TrainRandomForestClassifier(config_path=r"C:\troubleshooting\open_field_rearing\project_folder\project_config.ini")
+# test.run()
+# test.save()
+
+
 # test = TrainRandomForestClassifier(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
 # test.run()
 # test.save()

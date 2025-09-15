@@ -22,7 +22,7 @@ from simba.utils.lookups import get_color_dict
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, find_video_of_file,
-                                    get_fn_ext, get_video_meta_data)
+                                    get_fn_ext, get_video_meta_data, remove_a_folder)
 from simba.utils.warnings import FrameRangeWarning
 
 ACCEPTED_TYPES = [Polygon, LineString, MultiPolygon, MultiLineString, Point]
@@ -96,17 +96,30 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
 
     .. seealso::
        To quickly create static geometries on a white background (useful for troubleshooting unexpected geometries), see :func:`simba.mixins.geometry_mixin.GeometryMixin.view_shapes`
-       and :func:`:func:`simba.mixins.geometry_mixin.GeometryMixin.geometry_video`
+       and :func:`simba.mixins.geometry_mixin.GeometryMixin.geometry_video`
 
     .. image:: _static/img/GeometryPlotter.gif
        :width: 600
        :align: center
 
-    :param config_path: Union[str, os.PathLike]: Path to SimBA configuration file.
-    :param geometries: List[List[Union[Polygon, LineString, MultiPolygon, MultiLineString, Point]]]: List of lists of geometries for each frame.
-    :param video_name: str: Name of the input video.
-    :param core_cnt: int, optional: Number of CPU cores to use for parallel processing. Defaults to -1 represnting all available cores
-    :raises InvalidInputError: If the provided geometries contain invalid data types.
+    .. video:: _static/img/GeometryPlotter_1.webm
+       :width: 900
+       :autoplay:
+       :loop:
+
+    :param List[List[Union[Polygon, LineString, MultiPolygon, MultiLineString, Point]]] geometries: List of lists of geometries for each frame. Outer list represents frames, inner list contains geometries for that frame.
+    :param Union[str, os.PathLike] video_name: Name of the input video.
+    :param Optional[Union[str, os.PathLike]] config_path: Path to SimBA configuration file. Default: None.
+    :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default: -1 (all available cores).
+    :param Optional[Union[str, os.PathLike]] save_dir: Directory to save output videos. Default: None.
+    :param Optional[int] thickness: Thickness of geometry outlines in pixels. Default: None.
+    :param Optional[int] circle_size: Size of circles for Point geometries. Default: None.
+    :param Optional[float] bg_opacity: Background video opacity (0.0-1.0). Default: 1.0.
+    :param float shape_opacity: Shape fill opacity (0.0-1.0). Default: 0.3.
+    :param Optional[str] palette: Color palette name for geometries. Default: None.
+    :param Optional[List[Union[str, Tuple[int, int, int]]]] colors: Custom colors for geometries. Default: None.
+    :param Optional[bool] verbose: Print progress information. Default: True.
+    :raises InvalidInputError: If the provided geometries contain invalid data types or if neither palette nor colors are provided.
     :raises CountError: If the number of shapes in the geometries does not match the number of frames in the video.
     """
 
@@ -137,6 +150,8 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
         self.color_dict = get_color_dict()
         check_int(name="CORE COUNT", value=core_cnt, min_value=-1, raise_error=True, unaccepted_vals=[0])
         self.core_cnt = core_cnt
+        if palette is None and colors is None:
+            raise InvalidInputError(msg='Pass palette or colors', source=self.__class__.__name__)
         if core_cnt == -1 or core_cnt > find_core_cnt()[0]:
             self.core_cnt = find_core_cnt()[0]
         if config_path is not None:
@@ -177,7 +192,8 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
             self.save_dir = os.path.join(self.frames_output_dir, "geometry_visualization")
         if not os.path.isdir(self.save_dir): os.makedirs(self.save_dir)
         self.temp_dir = os.path.join(self.save_dir, video_name, "temp")
-        if not os.path.isdir(self.temp_dir): os.makedirs(self.temp_dir)
+        if os.path.isdir(self.temp_dir): remove_a_folder(folder_dir=self.temp_dir, ignore_errors=False)
+        os.makedirs(self.temp_dir)
         self.save_path = os.path.join(self.save_dir, f'{video_name}.mp4')
         self.verbose, self.bg_opacity, self.palette = verbose, bg_opacity, palette
         self.circles_size = circle_size
@@ -185,6 +201,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
     def run(self):
         video_timer = SimbaTimer(start=True)
         data = pd.DataFrame(self.geometries).T
+        #data = data.head(1900)
         data = np.array_split(data, self.core_cnt)
         data_splits = []
         for i in range(len(data)): data_splits.append((i, data[i]))

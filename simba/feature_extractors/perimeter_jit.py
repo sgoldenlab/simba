@@ -1,8 +1,10 @@
 __author__ = "Simon Nilsson"
-
+from typing import Optional
 import numpy as np
 from numba import jit, njit, prange
 from numba.np.extensions import cross2d
+from simba.utils.enums import Formats
+from simba.utils.checks import check_valid_array, check_str, check_float
 
 
 @njit("(float32[:,:], int64[:], int64, int64)")
@@ -135,6 +137,49 @@ def jitted_centroid(points: np.ndarray) -> np.ndarray:
         results[i][1] = np.int(np.mean(perimeter_points[:, 1].flatten()))
     return results
 
+
+
+def get_hull_sizes(points: np.ndarray,
+                   target: str = "perimeter",
+                   pixels_per_mm: Optional[float] = None):
+
+    """
+    Calculate convex hull geometric properties (perimeter or area) for sets of 2D points across multiple frames.
+
+    This function computes convex hull attributes for body part coordinates across video frames, providing
+    a measure of the overall spatial extent and shape of tracked points. The convex hull represents the
+    smallest convex polygon that contains all input points for each frame.
+
+    .. seealso::
+       Wrapper function (ensuring data validity) for the underlying numba-accelerated implementation, see :func:`simba.feature_extractors.perimeter_jit.jitted_hull`.
+
+    .. image:: _static/img/simba.data_processors.cuda.geometry.poly_area_cuda.webp
+       :width: 400
+       :align: center
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/get_hull_sizes.csv
+       :widths: 10, 45, 45
+       :align: center
+       :header-rows: 1
+
+    :param np.ndarray points: 3D array with shape (n_frames, n_body_parts, 2) containing [x, y] coordinates of body parts for each frame. Must contain non-negative pixel coordinates.
+    :param str target: Geometric property to calculate. Options: - 'perimeter': Calculate the perimeter (circumference) of the convex hull - 'area': Calculate the area enclosed by the convex hull. Default: 'perimeter'.
+    :return: Array with shape (n_frames,) containing the computed geometric property for each frame. Contains NaN values for frames where computation fails.
+    :rtype: np.ndarray
+
+    :example:
+    >>> points = np.random.randint(0, 500, size=(1000, 7, 2))
+    >>> get_hull_sizes(points=points)
+    """
+    if pixels_per_mm is not None:
+        check_float(name=f'{get_hull_sizes.__name__} pixels_per_mm', value=pixels_per_mm, min_value=1e-16, raise_error=True)
+    check_valid_array(data=points, source=f'{get_hull_sizes.__name__} points', accepted_ndims=(3,), accepted_dtypes=Formats.NUMERIC_DTYPES.value, min_value=0.0, raise_error=True)
+    check_str(name=f'{get_hull_sizes.__name__} target', options=('perimeter', 'area'), value=target, allow_blank=False, raise_error=True)
+    size = jitted_hull(points=points.astype(np.float32), target=target).astype(np.float32)
+
+    return size if pixels_per_mm is None else size / pixels_per_mm
 
 # points = np.random.randint(1, 5, size=(1, 10, 2)).astype(np.float32)
 # points[0][1] = np.nan
