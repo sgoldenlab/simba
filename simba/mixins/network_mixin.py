@@ -26,6 +26,11 @@ class NetworkMixin(object):
     """
     Methods to create and analyze time-dependent graphs from pose-estimation data.
 
+    .. video:: _static/img/NetworkMixin.mp4
+       :width: 640
+       :autoplay:
+       :loop:
+
     When working with pose-estimation data for more than two animals - over extended periods - it can be beneficial to
     represent the data as a graph where the animals feature as nodes are their relationship strengths are represented as edges.
 
@@ -38,12 +43,13 @@ class NetworkMixin(object):
 
     Very much wip and so far primarily depend on `networkx <https://github.com/networkx/networkx>`_.
 
-    References
-    ----------
-    See below references for mature and reliable packages (12/2023):
+    :references:
+    See below references for mature and reliable packages:
 
     .. [1] `networkx <https://github.com/networkx/networkx>`_
     .. [2] `igraph <https://igraph.org/>`_
+
+
     """
 
     def __init__(self):
