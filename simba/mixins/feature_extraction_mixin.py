@@ -81,7 +81,7 @@ class FeatureExtractionMixin(object):
         Compute Euclidean distance in millimeters between two body-parts.
 
         .. seealso::
-            For improved runtime on CPU, use :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance`.
+            For improved runtime on CPU, use :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance` or :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.keypoint_distances`.
             For GPU acceleration through CuPy, use :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cupy`.
             For GPU acceleration through numba CUDA, use :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cuda`.
 
@@ -261,6 +261,7 @@ class FeatureExtractionMixin(object):
         .. seealso::
            For distances between two moving targets, use :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.framewise_euclidean_distance`,
            For GPU implementation, see :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cupy` or :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cuda`
+           For numpy method (which appears faster than numba) use :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.keypoint_distances`.
 
         :param ndarray location_1: 2D numpy array of size len(frames) x 2.
         :param ndarray location_1: 1D numpy array holding the X and Y of the static location.
@@ -946,7 +947,7 @@ class FeatureExtractionMixin(object):
            For GPU CuPy solution, see :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cupy`.
            For GPU numba CUDA solution, see :func:`simba.data_processors.cuda.statistics.get_euclidean_distance_cuda`.
 
-           Appears faster than numba deocrated method, and slower than GPU metheds.
+           Appears faster than numba deocrated method, and slower than GPU methods.
 
         .. image:: _static/img/framewise_euclid_dist.webp
            :width: 300
