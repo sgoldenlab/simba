@@ -4103,10 +4103,12 @@ class GeometryMixin(object):
                 results.append(np.array(splev(u, tck)).T)
         return results
 
+
     @staticmethod
     def sleap_csv_to_geometries(data: Union[str, os.PathLike],
-                                buffer: int = 10,
-                                save_path: Optional[Union[str, os.PathLike]] = None) -> Union[None, Dict[Any, dict]]:
+                                buffer: int = 50,
+                                save_path: Optional[Union[str, os.PathLike]] = None,
+                                by_track: Optional[bool] = True) -> Union[None, Dict[Any, dict]]:
 
         """
          Convert SLEAP CSV tracking data to polygon geometries for each track and frame.
@@ -4117,28 +4119,43 @@ class GeometryMixin(object):
 
          :param Union[str, os.PathLike] data: Path to SLEAP CSV file containing tracking data with columns 'track', 'frame_idx', and body part coordinates.
          :param int buffer: Buffer size in pixels to add around the body part polygon. Default: 10.
+         :param Optional[bool] by_track: If True, create one circle per animal track. If False, then one circle per body-part. Default False.
+
          :param Optional[Union[str, os.PathLike]] save_path: Optional path to save the results as a pickle file. If None, returns the data directly.
-         :return: Dictionary with track IDs as keys and frame-to-polygon mappings as values, or None if save_path is provided.
+         :return: Dictionary with track IDs (or body-part ID) or body-part as keys and frame-to-polygon mappings as values.
          :rtype: Union[None, Dict[Any, dict]]
 
-         :example:
-             >>> results = sleap_csv_to_geometries(data=r"C:\troubleshooting\ants\pose_data\ant.csv")
+         :example I:
+             >>> results = GeometryMixin.sleap_csv_to_geometries(data=r"C:\troubleshooting\ants\pose_data\ant.csv")
              >>> # Results structure: {track_id: {frame_idx: Polygon, ...}, ...}
+
+        :example II
+        >>> data_path = r"/Users/simon/Desktop/envs/simba/troubleshooting/ant/ant.csv"
+        >>> save_path = r"/Users/simon/Desktop/envs/simba/troubleshooting/ant/ant_geometries.pickle"
+        >>> results = GeometryMixin.sleap_csv_to_geometries(data=data_path, save_path=save_path)
          """
 
         TRACK, FRAME_IDX = 'track', 'frame_idx'
         check_int(name=f'{GeometryMixin.sleap_csv_to_geometries.__name__} buffer', value=buffer, min_value=1, raise_error=True)
         df, bp_names, headers = read_sleap_csv(file_path=data)
-        results = {}
+        results, bp_cnt = {}, 0
         track_ids = sorted(df[TRACK].unique())
         for track_id in track_ids:
             track_data = df[df[TRACK] == track_id]
-            track_cords = track_data[headers].fillna(-1).values.astype(np.int32).reshape(len(track_data), -1, 2)
             track_frms = track_data[FRAME_IDX].values
-            polygons = GeometryMixin.bodyparts_to_polygon(data=track_cords, parallel_offset=buffer)
-            results[track_id] = {k: None for k in range(0, df[FRAME_IDX].max()+1)}
-            results[track_id].update({k: v for k, v in zip(track_frms, polygons)})
-
+            if by_track:
+                track_cords = track_data[headers].fillna(-1).values.astype(np.int32).reshape(len(track_data), -1, 2)
+                polygons = GeometryMixin.bodyparts_to_polygon(data=track_cords, parallel_offset=buffer)
+                results[track_id] = {k: None for k in range(0, df[FRAME_IDX].max() + 1)}
+                results[track_id].update({k: v for k, v in zip(track_frms, polygons)})
+            else:
+                track_cords = track_data[headers].fillna(-1).astype(np.int32)
+                for bp_name in bp_names:
+                    bp_data = track_cords[[f'{bp_name}.x', f'{bp_name}.y']].values.reshape(-1, 2)
+                    polygons = GeometryMixin.bodyparts_to_circle(data=bp_data, parallel_offset=buffer)
+                    results[bp_cnt] = {k: None for k in range(0, df[FRAME_IDX].max() + 1)}
+                    results[bp_cnt].update({k: v for k, v in zip(track_frms, polygons)})
+                    bp_cnt += 1
         if save_path is not None:
             write_pickle(data=results, save_path=save_path)
         else:

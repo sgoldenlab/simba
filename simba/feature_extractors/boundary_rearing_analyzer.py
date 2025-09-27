@@ -2,7 +2,7 @@ import itertools
 import os
 from copy import deepcopy
 from typing import Optional, Union
-
+from shapely.ops import linemerge
 try:
     from typing import Literal
 except:
@@ -47,6 +47,7 @@ WINDOW_SIZES = [0.5, 1.0, 2.0, 4.0]
 
 LEFT, RIGHT = 'left', 'right'
 TOP, BOTTOM = 'top', 'bottom'
+RECTANGLE = 'rectangle'
 
 
 class BoundaryRearingFeaturizer(ConfigReader,
@@ -60,14 +61,17 @@ class BoundaryRearingFeaturizer(ConfigReader,
 
     def __init__(self,
                  config_path: Union[str, os.PathLike],
-                 data_dir: Optional[Union[str, os.PathLike]] = None):
+                 data_dir: Optional[Union[str, os.PathLike]] = None,
+                 save_dir: Optional[Union[str, os.PathLike]] = None):
 
         ConfigReader.__init__(self, config_path=config_path, read_video_info=True, create_logger=False)
         if data_dir is None:
             self.data_dir = deepcopy(self.outlier_corrected_dir)
         else:
             check_if_dir_exists(in_dir=data_dir)
-            self.data_dir = deepcopy(self.data_dir)
+            self.data_dir = deepcopy(data_dir)
+        self.save_dir = self.features_dir if save_dir is None else save_dir
+        check_if_dir_exists(in_dir=save_dir)
         self.data_paths = find_files_of_filetypes_in_directory(directory=self.data_dir, extensions=[f'.{self.file_type}'], raise_error=True)
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
         self.core_count = find_core_cnt()[1]
@@ -84,7 +88,7 @@ class BoundaryRearingFeaturizer(ConfigReader,
         for file_cnt, file_path in enumerate(self.data_paths):
             video_timer = SimbaTimer(start=True)
             _, video_name, _ = get_fn_ext(filepath=file_path)
-            save_path = os.path.join(self.features_dir, f'{video_name}.{self.file_type}')
+            save_path = os.path.join(self.save_dir, f'{video_name}.{self.file_type}')
             print(f'Processing {video_name} ({file_cnt+1}/{len(self.data_paths)})... file start time: {get_current_time()}')
             _, pixels_per_mm, fps = self.read_video_info(video_name=video_name)
             df = read_df(file_path=file_path, file_type=self.file_type)
@@ -100,9 +104,12 @@ class BoundaryRearingFeaturizer(ConfigReader,
             lines[TOP] = [LineString(pts) for pts in np.stack([np.column_stack([tl_x, tl_y]), np.column_stack([tr_x, tr_y])], axis=1)]
             lines[BOTTOM] = [LineString(pts) for pts in np.stack([np.column_stack([bl_x, bl_y]), np.column_stack([br_x, br_y])], axis=1)]
 
+            lines[RECTANGLE] = []
+            for i in range(len(lines[LEFT])):
+                lines[RECTANGLE].append(linemerge([lines[LEFT][i], lines[TOP][i], lines[RIGHT][i], lines[BOTTOM][i]]))
             self.results, side_col_names = deepcopy(df), []
             wall_dists = pd.DataFrame()
-            for (bp, line) in list(itertools.product([SNOUT, TAILBASE], [TOP, BOTTOM, LEFT, RIGHT])):
+            for (bp, line) in list(itertools.product([SNOUT, TAILBASE], [RECTANGLE])):
                 bp_data = GeometryMixin.bodyparts_to_points(data=df[[f'{bp}_x', f'{bp}_y']].values.astype(np.int32))
                 wall_dists[f'{bp}->{line}_mm'] = GeometryMixin().multiframe_shape_distance(shapes_a=bp_data, shapes_b=lines[line], core_cnt=self.core_count, verbose=True, shape_names=f'{video_name}, {bp}->{line}', pixels_per_mm=pixels_per_mm)
                 side_col_names.append(f'{bp}->{line}_mm')
@@ -155,5 +162,7 @@ class BoundaryRearingFeaturizer(ConfigReader,
 
         write_df(df=data, file_type=self.file_type, save_path=save_path)
 
-# x = BoundaryRearingFeaturizer(config_path=r"C:\troubleshooting\open_field_rearing\project_folder\project_config.ini")
+# x = BoundaryRearingFeaturizer(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/open_field_rearing/project_folder/project_config.ini',
+#                               data_dir=r'/Users/simon/Desktop/envs/simba/troubleshooting/open_field_rearing/project_folder/csv/outlier_corrected_movement_location',
+#                               save_dir=r'/Users/simon/Desktop/envs/simba/troubleshooting/open_field_rearing/project_folder/csv/features_extracted/rect')
 # x.run()

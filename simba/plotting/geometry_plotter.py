@@ -35,6 +35,7 @@ def geometry_visualizer(data: Tuple[int, pd.DataFrame],
                         video_meta_data: dict,
                         thickness: int,
                         verbose: bool,
+                        intersection_clr: Optional[Tuple[int, int, int]],
                         bg_opacity: float,
                         colors: list,
                         circle_size: int,
@@ -58,23 +59,30 @@ def geometry_visualizer(data: Tuple[int, pd.DataFrame],
                 opacity_image = np.ones((h, w, clr), dtype=np.uint8) * int(255 * opacity)
                 img = cv2.addWeighted(img.astype(np.uint8), 1 - opacity, opacity_image.astype(np.uint8), opacity, 0)
             for shape_cnt, shape in enumerate(batch_shapes[frm_cnt]):
+                shape_clr = colors[shape_cnt]
+                if intersection_clr is not None and shape is not None:
+                    current_shapes = batch_shapes[frm_cnt]
+                    for i in range(len(current_shapes)):
+                        if i != shape_cnt and current_shapes[i] is not None and shape.intersects(current_shapes[i]):
+                            shape_clr = intersection_clr
+                            break
                 if isinstance(shape, Polygon):
-                    img_cpy = cv2.fillPoly(img_cpy, [np.array(shape.exterior.coords).astype(np.int32)], color=(colors[shape_cnt]))
+                    img_cpy = cv2.fillPoly(img_cpy, [np.array(shape.exterior.coords).astype(np.int32)], color=shape_clr)
                     interior_coords = [np.array(interior.coords, dtype=np.int32).reshape((-1, 1, 2)) for interior in shape.interiors]
                     for interior in interior_coords:
-                        img_cpy = cv2.fillPoly(img_cpy, [interior], color=(colors[shape_cnt][::-1]))
+                        img_cpy = cv2.fillPoly(img_cpy, [interior], color=(shape_clr[::-1]))
                 elif isinstance(shape, LineString):
-                    img_cpy = cv2.fillPoly(img_cpy, [np.array(shape.coords, dtype=np.int32)], color=(colors[shape_cnt]))
+                    img_cpy = cv2.fillPoly(img_cpy, [np.array(shape.coords, dtype=np.int32)], color=shape_clr)
                 elif isinstance(shape, MultiPolygon):
                     for polygon_cnt, polygon in enumerate(shape.geoms):
-                        img_cpy = cv2.fillPoly(img_cpy, [np.array((polygon.convex_hull.exterior.coords), dtype=np.int32)], color=(colors[shape_cnt]))
+                        img_cpy = cv2.fillPoly(img_cpy, [np.array((polygon.convex_hull.exterior.coords), dtype=np.int32)], color=shape_clr)
                 elif isinstance(shape, MultiLineString):
                     for line_cnt, line in enumerate(shape.geoms):
-                        img_cpy = cv2.fillPoly(img_cpy,[np.array(shape[line_cnt].coords, dtype=np.int32)], color=(colors[shape_cnt]))
+                        img_cpy = cv2.fillPoly(img_cpy,[np.array(shape[line_cnt].coords, dtype=np.int32)], color=shape_clr)
                 elif isinstance(shape, Point):
                     arr = np.array((shape.coords)).astype(np.int32)
                     x, y = arr[0][0], arr[0][1]
-                    img_cpy = cv2.circle(img_cpy,(x, y), circle_size, colors[shape_cnt], thickness)
+                    img_cpy = cv2.circle(img_cpy,(x, y), circle_size, shape_clr, thickness)
             if shape_opacity is not None:
                 img = cv2.addWeighted(img_cpy, shape_opacity, img, 1 - shape_opacity, 0, img)
             else:
@@ -108,7 +116,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
        :autoplay:
        :loop:
 
-    :param List[List[Union[Polygon, LineString, MultiPolygon, MultiLineString, Point]]] geometries: List of lists of geometries for each frame. Outer list represents frames, inner list contains geometries for that frame.
+    :param List[List[Union[Polygon, LineString, MultiPolygon, MultiLineString, Point]]] geometries: List of lists of geometries for each frame. Each list contains as many entries as frames. Each list may represent a track or unique tracked object.
     :param Union[str, os.PathLike] video_name: Name of the input video.
     :param Optional[Union[str, os.PathLike]] config_path: Path to SimBA configuration file. Default: None.
     :param Optional[int] core_cnt: Number of CPU cores to use for parallel processing. Default: -1 (all available cores).
@@ -117,8 +125,9 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
     :param Optional[int] circle_size: Size of circles for Point geometries. Default: None.
     :param Optional[float] bg_opacity: Background video opacity (0.0-1.0). Default: 1.0.
     :param float shape_opacity: Shape fill opacity (0.0-1.0). Default: 0.3.
-    :param Optional[str] palette: Color palette name for geometries. Default: None.
+    :param Optional[str] palette: Color palette name for geometries. Default: None. Provide either a `palette` name, or a list of `colors`. If both are passed, `palette` is used.
     :param Optional[List[Union[str, Tuple[int, int, int]]]] colors: Custom colors for geometries. Default: None.
+    :param Optional[Tuple[int, int, int]] intersection_clr: Color for geometries that intersect other geometries. Default to None (which means intersecting geometries maintain the original color while intersecting.
     :param Optional[bool] verbose: Print progress information. Default: True.
     :raises InvalidInputError: If the provided geometries contain invalid data types or if neither palette nor colors are provided.
     :raises CountError: If the number of shapes in the geometries does not match the number of frames in the video.
@@ -132,6 +141,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
                  save_dir: Optional[Union[str, os.PathLike]] = None,
                  thickness: Optional[int] = None,
                  circle_size: Optional[int] = None,
+                 intersection_clr: Optional[Tuple[int, int, int]] = None,
                  bg_opacity: Optional[float] = 1,
                  shape_opacity: float = 0.3,
                  palette: Optional[str] = None,
@@ -163,6 +173,8 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
             if config_path is None:
                 raise InvalidInputError(msg=f'When providing a non-path video name, pass config_path')
             self.video_path = find_video_of_file(video_dir=self.video_dir, filename=video_name, raise_error=True)
+        if intersection_clr is not None:
+            check_if_valid_rgb_tuple(data=intersection_clr, raise_error=True, source=f'{self.__class__.__name__} intersection_clr')
         video_name = get_fn_ext(filepath=self.video_path)[1]
         self.video_meta_data = get_video_meta_data(video_path=self.video_path)
         self.shape_opacity = shape_opacity
@@ -197,12 +209,12 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
         os.makedirs(self.temp_dir)
         self.save_path = os.path.join(self.save_dir, f'{video_name}.mp4')
         self.verbose, self.bg_opacity, self.palette = verbose, bg_opacity, palette
-        self.circles_size = circle_size
+        self.circles_size, self.intersection_clr = circle_size, intersection_clr
 
     def run(self):
         video_timer = SimbaTimer(start=True)
         data = pd.DataFrame(self.geometries).T
-        #data = data.head(1900)
+        #data = data.head(100)
         data = np.array_split(data, self.core_cnt)
         data_splits = []
         for i in range(len(data)): data_splits.append((i, data[i]))
@@ -216,6 +228,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
                                           thickness=self.thickness,
                                           verbose=self.verbose,
                                           bg_opacity=self.bg_opacity,
+                                          intersection_clr=self.intersection_clr,
                                           colors=self.colors,
                                           circle_size=self.circles_size,
                                           shape_opacity=self.shape_opacity)
