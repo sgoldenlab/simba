@@ -11,13 +11,13 @@ import math
 import os
 from collections import Counter
 from copy import deepcopy
-import pandas as pd
+from pathlib import Path
 
 import cv2
 import numpy as np
+import pandas as pd
 import yaml
 from PIL import Image
-from pathlib import Path
 
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists,
@@ -29,8 +29,10 @@ from simba.utils.enums import Formats, Options
 from simba.utils.errors import (FaultyTrainingSetError, InvalidInputError,
                                 NoFilesFoundError)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext, read_img, read_json, save_json, create_directory, recursive_file_search, copy_files_in_directory)
+from simba.utils.read_write import (copy_files_in_directory, create_directory,
+                                    find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_img, read_json,
+                                    recursive_file_search, save_json)
 from simba.utils.warnings import DuplicateNamesWarning
 
 
