@@ -7,7 +7,7 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.mixins.unsupervised_mixin import UMLMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_keys_exist_in_dict, check_instance)
@@ -25,7 +25,7 @@ SPEARMAN = "spearman"
 CORRELATIONS = "correlations"
 
 
-class EmbeddingCorrelationCalculator(UnsupervisedMixin, ConfigReader):
+class EmbeddingCorrelationCalculator(UMLMixin, ConfigReader):
     """
     Class for correlating dimensionality reduction features with original features for explainability purposes.
 

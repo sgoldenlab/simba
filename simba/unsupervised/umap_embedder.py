@@ -15,7 +15,7 @@ except:
 import pandas as pd
 
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.mixins.unsupervised_mixin import UMLMixin
 from simba.unsupervised.enums import Unsupervised
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists,
@@ -36,7 +36,7 @@ except ModuleNotFoundError:
     from umap import UMAP
 
 
-class UmapEmbedder(UnsupervisedMixin):
+class UmapEmbedder(UMLMixin):
     """
     Methods for grid-search UMAP model fit and transform.
     Defaults to GPU and cuml.UMAP if GPU available. If GPU unavailable, then umap.UMAP.

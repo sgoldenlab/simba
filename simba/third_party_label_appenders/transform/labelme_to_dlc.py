@@ -18,11 +18,9 @@ from simba.third_party_label_appenders.transform.utils import b64_to_arr
 from simba.utils.checks import (check_if_dir_exists,
                                 check_if_keys_exist_in_dict, check_str,
                                 check_valid_boolean)
-from simba.utils.enums import Options
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     img_array_to_clahe, read_json)
-from simba.utils.warnings import NoDataFoundWarning
 
 
 class Labelme2DLC:

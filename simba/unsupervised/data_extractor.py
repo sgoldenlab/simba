@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
-from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.mixins.unsupervised_mixin import UMLMixin
 from simba.unsupervised.enums import Clustering, UMLOptions, Unsupervised
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists,
@@ -40,7 +40,7 @@ BOUTS_DIM_CORDS = "BOUTS DIMENSIONALITY REDUCTION DATA"
 BOUTS_CLUSTER_LABELS = "BOUTS CLUSTER LABELS"
 
 
-class DataExtractor(UnsupervisedMixin, ConfigReader):
+class DataExtractor(UMLMixin, ConfigReader):
     """
     Extracts human-readable data from directory of pickles or single pickle file that holds unsupervised analyses.
 
@@ -64,7 +64,7 @@ class DataExtractor(UnsupervisedMixin, ConfigReader):
 
         check_file_exist_and_readable(file_path=config_path)
         ConfigReader.__init__(self, config_path=config_path)
-        UnsupervisedMixin.__init__(self)
+        UMLMixin.__init__(self)
         if os.path.isdir(data_path):
             check_if_dir_exists(in_dir=data_path)
             self.data_paths = find_files_of_filetypes_in_directory(

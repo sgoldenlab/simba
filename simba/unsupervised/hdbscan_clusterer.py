@@ -24,7 +24,7 @@ except:
 import pandas as pd
 
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.mixins.unsupervised_mixin import UMLMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.unsupervised.umap_embedder import UmapEmbedder
 from simba.utils.checks import (check_file_exist_and_readable,
@@ -38,7 +38,7 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import drop_df_fields, read_pickle, write_pickle
 
 
-class HDBSCANClusterer(UnsupervisedMixin):
+class HDBSCANClusterer(UMLMixin):
     """
     Methods for grid-search HDBSCAN model fit and transform.
     Defaults to GPU and cuml.cluster.HDBSCAN. If GPU unavailable, then hdbscan.HDBSCAN.

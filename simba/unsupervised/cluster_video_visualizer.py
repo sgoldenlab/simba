@@ -16,7 +16,7 @@ from shapely.geometry import MultiPoint
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
-from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.mixins.unsupervised_mixin import UMLMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_keys_exist_in_dict,
@@ -25,7 +25,7 @@ from simba.utils.data import sample_df_n_by_unique
 from simba.utils.read_write import read_pickle
 
 
-class ClusterVideoVisualizer(ConfigReader, UnsupervisedMixin):
+class ClusterVideoVisualizer(ConfigReader, UMLMixin):
     """
     Class for creating video examples of cluster assignments.
 
@@ -67,7 +67,7 @@ class ClusterVideoVisualizer(ConfigReader, UnsupervisedMixin):
             options=("VIDEO", "HULL", "SKELETON", "POINTS"),
         )
         ConfigReader.__init__(self, config_path=config_path)
-        UnsupervisedMixin.__init__(self)
+        UMLMixin.__init__(self)
         self.data = read_pickle(data_path=data_path)
         check_if_keys_exist_in_dict(
             data=self.data,

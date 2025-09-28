@@ -6,7 +6,7 @@ from typing import Union
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.mixins.statistics_mixin import Statistics
-from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.mixins.unsupervised_mixin import UMLMixin
 from simba.ui.tkinter_functions import FolderSelect
 from simba.unsupervised.cluster_validation_calculator import ClusterValidators
 from simba.unsupervised.dbcv_calculator import DBCVCalculator
@@ -29,12 +29,12 @@ DAVIS_BUILDIN = "DAVIS-BUILDIN INDEX"
 CALINSKI_HARABASZ = "CALINSKI-HARABASZ SCORE"
 
 
-class ClusterValidatorPopUp(PopUpMixin, ConfigReader, UnsupervisedMixin):
+class ClusterValidatorPopUp(PopUpMixin, ConfigReader, UMLMixin):
     def __init__(self, config_path: Union[str, os.PathLike]):
         check_file_exist_and_readable(file_path=config_path)
         PopUpMixin.__init__(self, title="CLUSTER VALIDATION METRICS")
         ConfigReader.__init__(self, config_path=config_path)
-        UnsupervisedMixin.__init__(self)
+        UMLMixin.__init__(self)
         self.data_frm = LabelFrame(
             self.main_frm,
             text="DATA",

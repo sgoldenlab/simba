@@ -12,6 +12,7 @@ imbalanced-learn==0.6.2; python_version=="3.6"
 imbalanced-learn==0.12.2; python_version>="3.9"
 imgaug == 0.4.0
 imutils == 0.5.2
+osfclient == 0.0.5
 matplotlib==3.3.4; python_version == "3.6"
 matplotlib==3.5.0; python_version >= "3.9" and python_version <= "3.11"
 matplotlib==3.8.*; python_version >= "3.12"

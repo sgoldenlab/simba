@@ -11,7 +11,7 @@ from scipy.sparse import csgraph
 from scipy.sparse.csgraph import minimum_spanning_tree
 
 from simba.mixins.config_reader import ConfigReader
-from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.mixins.unsupervised_mixin import UMLMixin
 from simba.unsupervised.enums import Clustering, Unsupervised
 from simba.utils.checks import (check_file_exist_and_readable,
                                 check_if_dir_exists, check_valid_extension)
@@ -26,7 +26,7 @@ EMBEDDER_NAME = "EMBEDDER_NAME"
 DBCV = "DBCV"
 
 
-class DBCVCalculator(UnsupervisedMixin, ConfigReader):
+class DBCVCalculator(UMLMixin, ConfigReader):
     """
     Density-based Cluster Validation (DBCV).
 
@@ -54,7 +54,7 @@ class DBCVCalculator(UnsupervisedMixin, ConfigReader):
     ):
         check_file_exist_and_readable(file_path=config_path)
         ConfigReader.__init__(self, config_path=config_path)
-        UnsupervisedMixin.__init__(self)
+        UMLMixin.__init__(self)
         if os.path.isdir(data_path):
             check_if_dir_exists(in_dir=data_path)
             self.data_paths = find_files_of_filetypes_in_directory(

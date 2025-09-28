@@ -10,7 +10,7 @@ from sklearn.inspection import permutation_importance
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.mixins.unsupervised_mixin import UMLMixin
 from simba.plotting.shap_agg_stats_visualizer import \
     ShapAggregateStatisticsCalculator
 from simba.unsupervised.enums import Clustering, Unsupervised
@@ -49,7 +49,7 @@ DESCRIPTIVE_STATISTICS = "descriptive_statistics"
 ANOVA_HEADERS = ["FEATURE NAME", "F-STATISTIC", "P-VALUE"]
 
 
-class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
+class ClusterXAICalculator(UMLMixin, ConfigReader):
     """
     Class for building RF models on top of cluster assignments, and calculating latent space explainability metrics based on RF models.
 
@@ -77,7 +77,7 @@ class ClusterXAICalculator(UnsupervisedMixin, ConfigReader):
             accepted_types=(dict,),
         )
         ConfigReader.__init__(self, config_path=config_path)
-        UnsupervisedMixin.__init__(self)
+        UMLMixin.__init__(self)
         self.settings, self.data_path = settings, data_path
         self.data = read_pickle(data_path=self.data_path)
         check_if_keys_exist_in_dict(

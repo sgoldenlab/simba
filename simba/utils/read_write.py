@@ -1893,7 +1893,9 @@ def clean_sleap_filenames_in_directory(dir: Union[str, os.PathLike]) -> None:
 def copy_files_in_directory(in_dir: Union[str, os.PathLike],
                             out_dir: Union[str, os.PathLike],
                             raise_error: bool = True,
-                            filetype: Optional[str] = None) -> None:
+                            filetype: Optional[str] = None,
+                            prefix: Optional[str] = None,
+                            verbose: Optional[bool] = False) -> None:
     """
     Copy files from the specified input directory to the output directory.
 
@@ -1901,12 +1903,16 @@ def copy_files_in_directory(in_dir: Union[str, os.PathLike],
     :param Union[str, os.PathLike] out_dir: The output directory where files will be copied to.
     :param bool raise_error: If True, raise an error if no files are found in the input directory. Default is True.
     :param Optional[str] filetype: If specified, only copy files with the given file extension. Default is None, meaning all files will be copied.
+    :param Optional[str] prefix: If specified, the given prefix will be added to the copied files' names.
+
 
     :example:
     >>> copy_files_in_directory('/input_dir', '/output_dir', raise_error=True, filetype='txt')
     """
 
     check_if_dir_exists(in_dir=in_dir)
+    if prefix is not None:
+        check_str(name=f'{copy_files_in_directory.__name__} prefix', value=prefix, allow_blank=False, raise_error=True)
     if not os.path.isdir(out_dir):
         os.makedirs(out_dir)
     if filetype is not None:
@@ -1918,8 +1924,16 @@ def copy_files_in_directory(in_dir: Union[str, os.PathLike],
     elif len(file_paths) == 0:
         pass
     else:
-        for file_path in file_paths:
-            shutil.copy(file_path, out_dir)
+        for file_cnt, file_path in enumerate(file_paths):
+            if verbose:
+                print(f'Copying file {file_cnt+1}/{len(file_paths)}...')
+            file_path = Path(file_path)
+            if prefix is not None:
+                new_name = f"{prefix}{file_path.name}"
+            else:
+                new_name = file_path.name
+            dst = Path(out_dir) / new_name
+            shutil.copy(file_path, dst)
 
 
 def remove_multiple_folders(folders: List[Union[os.PathLike, str]], raise_error: Optional[bool] = False) -> None:
@@ -1982,7 +1996,7 @@ def web_callback(url: str) -> None:
         raise InvalidInputError(msg="Invalid URL: {url}", source=web_callback.__name__)
 
 
-def get_pkg_version(pkg: str):
+def get_pkg_version(pkg: str, raise_error: Optional[bool] = False):
     """
     Helper to get the version of a package in the current python environment.
 
@@ -1992,10 +2006,16 @@ def get_pkg_version(pkg: str):
     >>> get_pkg_version(pkg='bla-bla')
     >>> None
     """
+
+    check_str(name=get_pkg_version.__name__, value=pkg, allow_blank=False)
+    check_valid_boolean(value=raise_error, source=get_pkg_version.__name__, raise_error=True)
     try:
         return pkg_resources.get_distribution(pkg).version
     except pkg_resources.DistributionNotFound:
-        return None
+        if raise_error:
+            raise SimBAPAckageVersionError(msg=f'Package not found: {pkg}', source=get_pkg_version.__name__)
+        else:
+            return None
 
 def fetch_pip_data(pip_url: str = Links.SIMBA_PIP_URL.value) -> Union[Tuple[Dict[str, Any], str], Tuple[None, None]]:
     """ Helper to fetch the pypi data associated with a package """
@@ -3222,19 +3242,20 @@ def recursive_file_search(directory: Union[str, os.PathLike],
     results = []
     for root, _, files in os.walk(directory):
         for f in files:
-            _, name, ext = get_fn_ext(filepath=f)
-            ext = ext.lstrip('.').lower()
-            if ext in extensions:
-                if substrings is not None:
-                    match_substr = any(s in f if case_sensitive else s in f.lower() for s in substrings)
-                else:
-                    match_substr = True
-                if skip_substrings is not None:
-                    skip_match_substr = any(s in f if case_sensitive else s in f.lower() for s in skip_substrings)
-                else:
-                    skip_match_substr = False
-                if ext in extensions and match_substr and not skip_match_substr:
-                    results.append(os.path.join(root, f))
+            _, name, ext = get_fn_ext(filepath=f, raise_error=False)
+            if name is not None:
+                ext = ext.lstrip('.').lower()
+                if ext in extensions:
+                    if substrings is not None:
+                        match_substr = any(s in f if case_sensitive else s in f.lower() for s in substrings)
+                    else:
+                        match_substr = True
+                    if skip_substrings is not None:
+                        skip_match_substr = any(s in f if case_sensitive else s in f.lower() for s in skip_substrings)
+                    else:
+                        skip_match_substr = False
+                    if ext in extensions and match_substr and not skip_match_substr:
+                        results.append(os.path.join(root, f))
 
     if not results and raise_error:
         raise NoFilesFoundError(msg=f'No files with extensions {extensions} and substrings {substrings} found in {directory}', source=recursive_file_search.__name__)
@@ -3365,7 +3386,36 @@ def read_facemap_h5(file_path: Union[str, os.PathLike]) -> pd.DataFrame:
         results[f'{bodypart}_p'] = bp_p.astype(np.float32)
     return results
 
+def osf_download(project_id: str, save_dir: Union[str, os.PathLike], storage: str = 'osfstorage', overwrite: bool = False):
+    """
+    Download all files from an OSF (Open Science Framework) project to a local directory.
 
+    This function connects to the OSF API, accesses the specified project and storage location,
+    and downloads all files to the local save directory. Files can be skipped if they already
+    exist locally and overwrite is disabled.
+
+    :param str project_id: OSF project identifier (e.g., 'abc123' from osf.io/abc123).
+    :param Union[str, os.PathLike] save_dir: Local directory path where files will be downloaded.
+    :param str storage: OSF storage location name (default: 'osfstorage').
+    :param bool overwrite: If True, overwrite existing files. If False, skip existing files (default: False).
+
+    :example:
+    >>> osf_download(project_id="7fgwn", save_dir=r'E:\rgb_white_vs_black_imgs')
+    """
+    _ = get_pkg_version(pkg='osfclient', raise_error=True)
+    from osfclient.api import OSF
+    osf = OSF()
+    storage = osf.project(project_id).storage(storage)
+    check_if_dir_exists(in_dir=save_dir, source=f'{osf_download.__name__} save_dir', raise_error=True)
+    check_str(name=f'{osf_download.__name__} project_id', value=project_id, allow_blank=False, raise_error=True)
+    check_valid_boolean(value=overwrite, source=f'{osf_download.__name__} overwrite', raise_error=True)
+    for file_cnt, file in enumerate(storage.files):
+        local_path = os.path.join(save_dir, file.path.strip("/")[1:])
+        if os.path.isfile(local_path) and not overwrite:
+            print(f'Skipping file {file} (exist and overwrite is False...')
+        with open(local_path, "wb") as f:
+            file.write_to(f)
+        print(f"Downloaded {local_path} ({file_cnt+1}/{len(storage.files)})")
 
 
 

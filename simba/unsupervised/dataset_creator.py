@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
-from simba.mixins.unsupervised_mixin import UnsupervisedMixin
+from simba.mixins.unsupervised_mixin import UMLMixin
 from simba.unsupervised.bout_aggregator import bout_aggregator
 from simba.unsupervised.enums import Unsupervised
 from simba.utils.checks import (check_file_exist_and_readable,
@@ -18,7 +18,7 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import get_fn_ext, read_df, write_pickle
 
 
-class DatasetCreator(ConfigReader, UnsupervisedMixin):
+class DatasetCreator(ConfigReader, UMLMixin):
     """
     Transform raw frame-wise supervised classification data into aggregated
     data for unsupervised analyses. Saves the aggergated data in to logs directory of the SimBa project.
@@ -40,7 +40,7 @@ class DatasetCreator(ConfigReader, UnsupervisedMixin):
             accepted_types=(dict,),
         )
         ConfigReader.__init__(self, config_path=config_path)
-        UnsupervisedMixin.__init__(self)
+        UMLMixin.__init__(self)
         print(
             f"Creating unsupervised learning dataset from {len(self.machine_results_paths)} data files..."
         )
