@@ -93,10 +93,11 @@ Peer-reviewed publication in *Nature Neuroscience* Describing SimBA.
 .. image:: ../_static/img/overview_video.webp
    :width: 1000
    :align: center
-   :target: https://www.youtube.com/watch?v=oEr2-3Cuhb0
+   :target: https://simba-uw-tf-dev.readthedocs.io/en/latest/overview_video_202510.html
 
 :download mp4:`🔗 OSF <https://osf.io/2uack>`
 :youtube:`🔗 VIEW <https://www.youtube.com/watch?v=oEr2-3Cuhb0>`
+
 
 🧪 SimBA Published Use Cases
 ----------------------------------------------------
