@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import h5py
-from PIL import Image
+from PIL import Image, ImageFile
 
 try:
     from typing import Literal
@@ -77,7 +77,7 @@ SIMBA_DIR = os.path.dirname(simba.__file__)
 
 PARSE_OPTIONS = csv.ParseOptions(delimiter=",")
 READ_OPTIONS = csv.ReadOptions(encoding="utf8")
-
+ImageFile.LOAD_TRUNCATED_IMAGES = False
 
 def read_df(file_path: Union[str, os.PathLike],
             file_type: Union[str, os.PathLike] = 'csv',
@@ -1895,7 +1895,8 @@ def copy_files_in_directory(in_dir: Union[str, os.PathLike],
                             raise_error: bool = True,
                             filetype: Optional[str] = None,
                             prefix: Optional[str] = None,
-                            verbose: Optional[bool] = False) -> None:
+                            verbose: Optional[bool] = False,
+                            skip_truncated_img: Optional[bool] = False) -> None:
     """
     Copy files from the specified input directory to the output directory.
 
@@ -1925,6 +1926,15 @@ def copy_files_in_directory(in_dir: Union[str, os.PathLike],
         pass
     else:
         for file_cnt, file_path in enumerate(file_paths):
+            _, _, file_ext =  get_fn_ext(filepath=file_path)
+            if skip_truncated_img and file_ext in Options.ALL_IMAGE_FORMAT_OPTIONS.value:
+                try:
+                    with Image.open(file_path) as img:
+                        img.verify()
+                except Exception:
+                    if verbose:
+                        print(f"Skipping truncated/corrupt image: {file_path}")
+                    continue
             if verbose:
                 print(f'Copying file {file_cnt+1}/{len(file_paths)}...')
             file_path = Path(file_path)
@@ -3401,7 +3411,9 @@ def osf_download(project_id: str, save_dir: Union[str, os.PathLike], storage: st
 
     :example:
     >>> osf_download(project_id="7fgwn", save_dir=r'E:\rgb_white_vs_black_imgs')
+    >>> osf_download(project_id="kym42", save_dir=r'E:\crim13_imgs', overwrite=True)
     """
+
     _ = get_pkg_version(pkg='osfclient', raise_error=True)
     from osfclient.api import OSF
     osf = OSF()
@@ -3409,14 +3421,20 @@ def osf_download(project_id: str, save_dir: Union[str, os.PathLike], storage: st
     check_if_dir_exists(in_dir=save_dir, source=f'{osf_download.__name__} save_dir', raise_error=True)
     check_str(name=f'{osf_download.__name__} project_id', value=project_id, allow_blank=False, raise_error=True)
     check_valid_boolean(value=overwrite, source=f'{osf_download.__name__} overwrite', raise_error=True)
+    timer = SimbaTimer(start=True)
     for file_cnt, file in enumerate(storage.files):
-        local_path = os.path.join(save_dir, file.path.strip("/")[1:])
+        local_path = os.path.join(save_dir, file.path.strip("/"))
+        if not os.path.isdir(os.path.dirname(local_path)):
+            create_directory(paths=os.path.dirname(local_path))
         if os.path.isfile(local_path) and not overwrite:
-            print(f'Skipping file {file} (exist and overwrite is False...')
-        with open(local_path, "wb") as f:
-            file.write_to(f)
-        print(f"Downloaded {local_path} ({file_cnt+1}/{len(storage.files)})")
+            print(f'Skipping file {local_path} (exist and overwrite is False...)')
+        else:
+            with open(local_path, "wb") as f:
+                file.write_to(f)
+        print(f"Downloaded {local_path} ({file_cnt+1}/{len(list(storage.files))})")
+    timer.stop_timer()
+    print(f'Download completed (elapsed time: {timer.elapsed_time_str}s)')
 
-
+#osf_download(project_id="tmu6y", save_dir=r'E:\annotations_preprint', overwrite=True)
 
 #concatenate_videos_in_folder(in_folder=r'C:\troubleshooting\RAT_NOR\project_folder\frames\output\path_plots\03152021_NOB_IOT_8', save_path=r"C:\troubleshooting\RAT_NOR\project_folder\frames\output\path_plots\new.mp4", remove_splits=False)

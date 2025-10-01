@@ -519,6 +519,10 @@ def concatenate_dlc_annotations(data_dir: Union[str, os.PathLike], save_dir: Uni
     ...     save_dir='/path/to/output',
     ...     annotator='John'
     ... )
+
+    >>> concatenate_dlc_annotations(data_dir=r'E:\crim13_imgs\CRIM_labelled_images', save_dir=r'E:\crim13_imgs\combined')
+    >>> concatenate_dlc_annotations(data_dir=r'E:\rgb_white_vs_black_imgs\GB_labelled_images.zip\labeled-data', save_dir=r'E:\rgb_white_vs_black_imgs\combined')
+
     """
 
     check_if_dir_exists(in_dir=data_dir, source=concatenate_dlc_annotations.__name__, raise_error=True)
@@ -528,6 +532,7 @@ def concatenate_dlc_annotations(data_dir: Union[str, os.PathLike], save_dir: Uni
     create_directory(out_dir)
 
     df_results = []
+    timer = SimbaTimer(start=True)
     annotation_paths = recursive_file_search(directory=data_dir, extensions=Formats.CSV.value, case_sensitive=True, substrings='CollectedData', raise_error=True, as_dict=False)
     for file_cnt, annotation_path in enumerate(annotation_paths):
         df = pd.read_csv(annotation_path, header=[0, 1, 2])
@@ -538,7 +543,12 @@ def concatenate_dlc_annotations(data_dir: Union[str, os.PathLike], save_dir: Uni
         print(f'File {file_cnt+1}/{len(annotation_paths)} complete...')
     df_results = pd.concat(df_results, axis=0)
     df_results.to_csv(df_destination, index=False)
+    timer.stop_timer()
+    print(f'DLC annotation concatenated (elapsed time: {timer.elapsed_time_str}s)')
 
 
 
+#concatenate_dlc_annotations(data_dir=r'E:\rgb_white_vs_black_imgs\GB_labelled_images.zip\labeled-data', save_dir=r'E:\rgb_white_vs_black_imgs\combined')
+
+#concatenate_dlc_annotations(data_dir=r'E:\crim13_imgs\CRIM_labelled_images', save_dir=r'E:\crim13_imgs\combined')
 #merge_coco_keypoints_files(data_dir=r'D:\cvat_annotations\frames\coco_keypoints_1', save_path=r'D:\cvat_annotations\frames\coco_keypoints_1\merged\merged_08132025.json')

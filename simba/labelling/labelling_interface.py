@@ -101,11 +101,6 @@ class LabellingInterface(ConfigReader):
             raise NoDataError(msg='To annotate behaviors, your SimBA project needs at least one defined classifier. Found 0 classifiers defined in SimBA project', source=self.__class__.__name__)
         self.main_window = Toplevel()
 
-
-
-
-
-
         if continuing:
             if not os.path.isfile(self.targets_inserted_file_path):
                 raise NoFilesFoundError(msg=f'When continuing annotations, SimBA expects a file at {self.targets_inserted_file_path}. SimBA could not find this file.', source=self.__class__.__name__)

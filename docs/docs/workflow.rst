@@ -87,8 +87,16 @@ Peer-reviewed publication in *Nature Neuroscience* Describing SimBA.
 :download:`🔗 Notebook <https://colab.research.google.com/drive/1x8oBKmSvndSakCsZvpITiNpQY-TDIsae#scrollTo=ETqBJrguDM6_>`
 
 
+🎥 SimBA overview 2025/10
+----------------------------------------------------
 
+.. image:: ../_static/img/overview_video.webp
+   :width: 1000
+   :align: center
+   :target: https://www.youtube.com/watch?v=oEr2-3Cuhb0
 
+:download mp4:`🔗 OSF <https://osf.io/2uack>`
+:youtube:`🔗 VIEW <https://www.youtube.com/watch?v=oEr2-3Cuhb0>`
 
 🧪 SimBA Published Use Cases
 ----------------------------------------------------
