@@ -133,7 +133,7 @@ class LabellingInterface(ConfigReader):
             self.main_window.title(f"SIMBA ANNOTATION INTERFACE (ANNOTATING FROM SCRATCH) - {self.video_name}")
             for clf in self.clf_names: self.data_df[clf] = 0
 
-        check_video_and_data_frm_count_align(video=self.video_path, data=self.data_df, name=self.video_name, raise_error=True)
+        check_video_and_data_frm_count_align(video=self.video_path, data=self.data_df, name=self.video_name, raise_error=False)
         check_valid_dataframe(df=self.data_df, source=f'{self.__class__.__name__} file_path', valid_dtypes=Formats.NUMERIC_DTYPES.value, required_fields=self.clf_names)
 
         self.data_df_targets = self.data_df[self.clf_names]

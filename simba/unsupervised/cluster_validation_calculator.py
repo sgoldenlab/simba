@@ -112,8 +112,8 @@ class ClusterValidators(ConfigReader):
         )
 
 
-calculator = ClusterValidators(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini',
-                               data_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_clusters',
-                               validator_func=Statistics.calinski_harabasz)
-calculator.run()
-calculator.save()
+# calculator = ClusterValidators(config_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/project_config.ini',
+#                                data_path='/Users/simon/Desktop/envs/NG_Unsupervised/project_folder/small_clusters',
+#                                validator_func=Statistics.calinski_harabasz)
+# calculator.run()
+# calculator.save()

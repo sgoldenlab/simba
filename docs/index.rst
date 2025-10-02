@@ -15,6 +15,8 @@ If you find any of the codebase or associated documentation useful, please `cite
 
 For support, see the `SimBA Gitter channel <https://app.gitter.im/#/room/#SimBA-Resource_community:gitter.im>`_.
 
+For a high-level overview of SimBA’s raison d’être, use cases, background, and key functions — aimed at behavioral scientists — see this `video <https://simba-uw-tf-dev.readthedocs.io/en/latest/overview_video_202510.html>`_.
+
 ________________________________
 
 🚀 INSTALLATION

@@ -48,7 +48,7 @@ ANOVA_HEADERS = ["FEATURE NAME", "F-STATISTIC", "P-VALUE"]
 KRUSKAL_HEADERS = ["FEATURE NAME", "KRUSKAL-WALLIS H STATISTIC", "P-VALUE"]
 
 
-class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
+class ClusterFrequentistCalculator(UMLMixin, ConfigReader):
     """
     Class for computing frequentist statitics based on cluster assignment labels for explainability purposes.
 
@@ -72,7 +72,7 @@ class ClusterFrequentistCalculator(UnsupervisedMixin, ConfigReader):
         check_file_exist_and_readable(file_path=data_path)
         check_file_exist_and_readable(file_path=config_path)
         ConfigReader.__init__(self, config_path=config_path)
-        UnsupervisedMixin.__init__(self)
+        UMLMixin.__init__(self)
         self.settings = settings
         self.data = read_pickle(data_path=data_path)
         self.save_path = os.path.join(
