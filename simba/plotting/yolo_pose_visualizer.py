@@ -44,7 +44,7 @@ def _yolo_keypoint_visualizer(frm_ids: np.ndarray,
 
     batch_id, frame_rng = frm_ids[0], frm_ids[1]
     start_frm, end_frm, current_frm = frame_rng[0], frame_rng[-1], frame_rng[0]
-    video_meta_data = get_video_meta_data(video_path=video_path)
+    video_meta_data = get_video_meta_data(video_path=video_path, fps_as_int=False)
     cap = cv2.VideoCapture(video_path)
     fourcc, font = cv2.VideoWriter_fourcc(*"mp4v"), cv2.FONT_HERSHEY_DUPLEX
     video_save_path = os.path.join(save_dir, f'{batch_id}.mp4')
@@ -294,38 +294,38 @@ class YOLOPoseVisualizer():
 # if __name__ == "__main__":
 #     from simba.utils.read_write import find_files_of_filetypes_in_directory
 #
-#     video_paths = find_files_of_filetypes_in_directory(directory=r'D:\netholabs\minutes_examples', extensions=['.mp4', '.avi'], as_dict=True)
-#     data_paths = find_files_of_filetypes_in_directory(directory=r'D:\netholabs\mdls_08202025\10x\results', extensions=['.csv'], as_dict=True)
-#     save_dir = r"D:\netholabs\mdls_08202025\10x\results_videos"
+#     video_paths = find_files_of_filetypes_in_directory(directory=r'E:\netholabs_videos\mosaics\subset', extensions=['.mp4', '.avi'], as_dict=True)
+#     data_paths = find_files_of_filetypes_in_directory(directory=r'E:\netholabs_videos\mosaics_inference', extensions=['.csv'], as_dict=True)
+#     save_dir = r"E:\netholabs_videos\mosaics_inference\out_videos"
 #
-#     video_paths = r"D:\netholabs\minutes_examples\minute_27.avi"
-#     data_paths = r'D:\netholabs\mdls_08202025\10x\results\minute_27.csv'
+#     # video_paths = r"D:\netholabs\minutes_examples\minute_27.avi"
+#     # data_paths = r'D:\netholabs\mdls_08202025\10x\results\minute_27.csv'
 #
-#     # for video_name, video_path in video_paths.items():
-#     #     data_path = data_paths[video_name]
-#     #     kp_vis = YOLOPoseVisualizer(data_path=data_path,
-#     #                                 video_path=video_path,
-#     #                                 save_dir=save_dir,
-#     #                                 core_cnt=18)
-#     #     kp_vis.run()
+#     for video_name, video_path in video_paths.items():
+#         data_path = data_paths[video_name]
+#         kp_vis = YOLOPoseVisualizer(data_path=data_path,
+#                                     video_path=video_path,
+#                                     save_dir=save_dir,
+#                                     core_cnt=8)
+#         kp_vis.run()
 #
-#     kp_vis = YOLOPoseVisualizer(data_path=data_paths,
-#                                 video_path=video_paths,
+#     # kp_vis = YOLOPoseVisualizer(data_path=data_paths,
+#     #                             video_path=video_paths,
+#     #                             save_dir=save_dir,
+#     #                             core_cnt=18)
+#     # kp_vis.run()
+# if __name__ == "__main__":
+#     video_path = r"E:\maplight_videos\Day 5\Trial_9_C24_D5_2.mp4"
+#     data_path = r"E:\maplight_videos\yolo_mdl\mdl\results\Trial_9_C24_D5_2.csv"
+#     save_dir = r'E:\maplight_videos\yolo_mdl\mdl\results'
+#     kp_vis = YOLOPoseVisualizer(data_path=data_path,
+#                                 video_path=video_path,
 #                                 save_dir=save_dir,
-#                                 core_cnt=18)
+#                                 core_cnt=14,
+#                                 palettes=('Set1', 'Pastel1'))
+#
+#
 #     kp_vis.run()
-
-# video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
-# video_path = "/mnt/c/troubleshooting/mitra/project_folder/videos/502_MA141_Gi_CNO_0514.mp4"
-# data_path = r"/mnt/c/troubleshooting/mitra/yolo/results/502_MA141_Gi_CNO_0514.csv"
-# save_dir = r'/mnt/c/troubleshooting/mitra/yolo/results/'
-# kp_vis = YOLOPoseVisualizer(data_path=data_path,
-#                             video_path=video_path,
-#                             save_dir=save_dir,
-#                             core_cnt=18)
 #
 #
-# kp_vis.run()
-
-
 

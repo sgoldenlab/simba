@@ -28,6 +28,10 @@ class DLC2Yolo:
     """
     Converts DLC annotations into YOLO keypoint format formatted for model training.
 
+
+    .. important::
+       Use for single animal DLC data. For multi-animal DLC data,
+
     .. note::
        ``dlc_dir`` can be a directory with subdirectories containing images and CSV files with the ``CollectedData`` substring filename.
        For creating the ``flip_idx``, see :func:`simba.third_party_label_appenders.converters.get_yolo_keypoint_flip_idx`.

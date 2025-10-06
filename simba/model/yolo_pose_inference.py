@@ -1,7 +1,6 @@
 import argparse
 import os
 import sys
-
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 try:
     from typing import Literal
@@ -18,7 +17,9 @@ import random
 from typing import List, Optional, Tuple, Union
 
 import numpy as np
+import warnings
 import pandas as pd
+warnings.filterwarnings("ignore")
 
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
@@ -27,17 +28,17 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_tuple, get_fn_ext)
 from simba.utils.enums import Options
 from simba.utils.errors import (CountError, InvalidFileTypeError,
-                                SimBAGPUError, SimBAPAckageVersionError)
+                                SimBAGPUError, SimBAPAckageVersionError, InvalidFilepathError)
 from simba.utils.printing import SimbaTimer
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_video_meta_data)
+                                    get_video_meta_data, recursive_file_search)
 from simba.utils.warnings import FileExistWarning, NoDataFoundWarning
 from simba.utils.yolo import (_get_undetected_obs, filter_yolo_keypoint_data,
                               load_yolo_model, yolo_predict)
 
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
-NEAREST = 'nearest'
+NEAREST, CLASS_ID = 'nearest', 'CLASS_ID'
 
 
 class YOLOPoseInference():
@@ -67,9 +68,11 @@ class YOLOPoseInference():
     :param float box_threshold: Confidence threshold bounding box detection. All detections (bounding boxes AND keypoints) below this value are ignored. Defaults to 0.5.
     :param Optional[int] max_tracks: Maximum number of pose tracks to keep. If None, all tracks are retained.
     :param bool interpolate: If True, interpolates missing keypoints across frames using the 'nearest' method. Defaults to False.
+    :param bool smoothing: If not None, then the time in milliseconds for Gaussian-applied body-part smoothing.
     :param bool overwrite: If True, overwrites the data at the ``save_dir``. If False, skips the file if it exists.
     :param bool raise_error: If True, raise error if the input video metadata can't be read. If False, then skips the video file.
     :param bool randomize_order: If True, analyzes the input data in a random order. If False, then in fixed order.
+    :param bool recursive: If True, analyzes all video files found recursively in the video_path directory. If False, only looks in the top directory.
     :param int imgsz: Input image size for inference. Must be square. Defaults to 640.
     """
 
@@ -87,13 +90,15 @@ class YOLOPoseInference():
                  stream: bool = False,
                  box_threshold: float = 0.5,
                  max_tracks: Optional[int] = None,
+                 max_per_class: Optional[int] = None,
                  interpolate: bool = False,
+                 smoothing: Optional[int] = None,
                  imgsz: int = 640,
                  iou: float = 0.5,
                  overwrite: bool = True,
                  raise_error: bool = True,
-                 randomize_order: bool = False):
-
+                 randomize_order: bool = False,
+                 recursive: bool = False):
 
         gpu_available, gpus = _is_cuda_available()
         if not gpu_available:
@@ -103,16 +108,18 @@ class YOLOPoseInference():
         if YOLO is None:
             raise SimBAPAckageVersionError(msg='ultralytics.YOLO package not detected.', source=self.__class__.__name__)
         check_valid_boolean(value=raise_error, source=f'{self.__class__.__name__} raise_error')
+        check_valid_boolean(value=recursive, source=f'{self.__class__.__name__} recursive')
         if isinstance(video_path, list):
             check_valid_lst(data=video_path, source=f'{self.__class__.__name__} video_path', valid_dtypes=(str, np.str_,), min_len=1)
         elif os.path.isfile(video_path):
             video_path = [video_path]
         elif os.path.isdir(video_path):
-            video_path = find_files_of_filetypes_in_directory(directory=video_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, as_dict=False)
+            if not recursive:
+                video_path = find_files_of_filetypes_in_directory(directory=video_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, as_dict=False)
+            else:
+                video_path = recursive_file_search(directory=video_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, as_dict=False)
         for i in video_path:
             _ = get_video_meta_data(video_path=i, raise_error=raise_error)
-
-
         check_instance(source=f'{self.__class__.__name__} weights', instance=weights, accepted_types=(str, os.PathLike, YOLO))
         if not isinstance(weights, YOLO):
             check_file_exist_and_readable(file_path=weights)
@@ -127,6 +134,8 @@ class YOLOPoseInference():
             random.shuffle(video_path)
         check_int(name=f'{self.__class__.__name__} batch_size', value=batch_size, min_value=1)
         check_int(name=f'{self.__class__.__name__} imgsz', value=imgsz, min_value=1)
+        if max_per_class is not None:
+            check_int(name=f'{self.__class__.__name__} max_per_class', value=max_per_class, min_value=1)
         check_float(name=f'{self.__class__.__name__} threshold', value=box_threshold, min_value=10e-6, max_value=1.0)
         check_float(name=f'{self.__class__.__name__} iou', value=iou, min_value=10e-6, max_value=1.0)
         if keypoint_names is not None:
@@ -139,14 +148,16 @@ class YOLOPoseInference():
             check_int(name=f'{self.__class__.__name__} max_tracks', value=max_tracks, min_value=1)
         if save_dir is not None:
             check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir')
+        if smoothing is not None:
+            check_int(name=f'{self.__class__.__name__} smoothing', value=smoothing, min_value=1, raise_error=True)
         self.keypoint_col_names = [f'{i}_{s}'.upper() for i in keypoint_names for s in ['x', 'y', 'p']]
         self.keypoint_cord_col_names = [f'{i}_{s}'.upper() for i in keypoint_names for s in ['x', 'y']]
         OUT_COLS.extend(self.keypoint_col_names)
         COORD_COLS.extend(self.keypoint_cord_col_names)
         torch.set_num_threads(torch_threads)
-        self.half_precision, self.stream, self.video_path, self.raise_error = half_precision, stream, video_path, raise_error
+        self.half_precision, self.stream, self.video_path, self.raise_error, self.smoothing = half_precision, stream, video_path, raise_error, smoothing
         self.device, self.batch_size, self.threshold, self.max_tracks, self.iou = device, batch_size, box_threshold, max_tracks, iou
-        self.verbose, self.save_dir, self.imgsz, self.interpolate, self.overwrite = verbose, save_dir, imgsz, interpolate, overwrite
+        self.verbose, self.save_dir, self.imgsz, self.interpolate, self.overwrite, self.max_per_class = verbose, save_dir, imgsz, interpolate, overwrite, max_per_class
         if self.model.model.task != 'pose':
             raise InvalidFileTypeError(msg=f'The model {weights} is not a pose model. It is a {self.model.model.task} model', source=self.__class__.__name__)
 
@@ -175,9 +186,9 @@ class YOLOPoseInference():
                                              stream=self.stream,
                                              imgsz=self.imgsz,
                                              device=self.device,
-                                             threshold=self.threshold, #self.threshold,
+                                             threshold=self.threshold,
                                              max_detections=self.max_tracks,
-                                             verbose=self.verbose, #self.verbose,
+                                             verbose=self.verbose,
                                              iou=self.iou)
             for frm_cnt, video_prediction in enumerate(video_predictions):
                 boxes = video_prediction.obb.data if video_prediction.obb is not None else video_prediction.boxes.data
@@ -189,20 +200,39 @@ class YOLOPoseInference():
                         video_out.append(_get_undetected_obs(frm_id=frm_cnt, class_id=class_id, class_name=class_name, value_cnt=(9 + (len(self.keypoint_col_names)))))
                         continue
                     cls_boxes, cls_keypoints = filter_yolo_keypoint_data(bbox_data=boxes, keypoint_data=keypoints, class_id=class_id, confidence=None, class_idx=-1, confidence_idx=None)
+                    if self.max_per_class is not None:
+                        cls_boxes = cls_boxes[:self.max_per_class, :]
                     for i in range(cls_boxes.shape[0]):
                         box = np.array([cls_boxes[i][0], cls_boxes[i][1], cls_boxes[i][2], cls_boxes[i][1], cls_boxes[i][2], cls_boxes[i][3], cls_boxes[i][0], cls_boxes[i][3]]).astype(np.int32)
                         bbox = np.array([frm_cnt, cls_boxes[i][-1], class_dict[cls_boxes[i][-1]], cls_boxes[i][-2]] + list(box))
                         bbox = np.append(bbox, cls_keypoints[i].flatten())
                         video_out.append(bbox)
+
             results[video_name] = pd.DataFrame(video_out, columns=OUT_COLS)
             results[video_name]['FRAME'] = results[video_name]['FRAME'].astype(np.int64)
+
+            results[video_name].loc[:, CLASS_ID] = (pd.to_numeric(results[video_name][CLASS_ID], errors='coerce').fillna(0).astype(np.int32))
             if self.interpolate:
-                for cord_col in COORD_COLS:
-                    results[video_name][cord_col] = results[video_name][cord_col].astype(np.float32).astype(np.int32).replace(to_replace=-1, value=np.nan)
-                    results[video_name][cord_col] = results[video_name][cord_col].interpolate(method=NEAREST, axis=0).ffill().bfill()
+                for class_id in class_dict.keys():
+                    class_df = results[video_name][results[video_name][CLASS_ID] == int(class_id)]
+                    for cord_col in COORD_COLS:
+                        class_df[cord_col] = class_df[cord_col].astype(np.float32).astype(np.int32).replace(to_replace=-1, value=np.nan).astype(np.float32)
+                        class_df[cord_col] = class_df[cord_col].interpolate(method=NEAREST, axis=0).ffill().bfill()
+                    results[video_name].update(class_df)
+            if self.smoothing:
+                frms_in_smoothing_window = int(self.smoothing / (1000 / video_meta['fps']))
+                if frms_in_smoothing_window > 1:
+                    for class_id in class_dict.keys():
+                        class_df = results[video_name][results[video_name][CLASS_ID] == int(class_id)]
+                        for cord_col in COORD_COLS:
+                            class_df[cord_col] = class_df[cord_col].rolling(window=frms_in_smoothing_window, win_type='gaussian', center=True).mean(std=5).fillna(results[video_name][cord_col]).abs()
+                        results[video_name].update(class_df)
             if self.save_dir:
                 save_path = os.path.join(self.save_dir, f'{video_name}.csv')
-                results[video_name].to_csv(save_path)
+                try:
+                    results[video_name].to_csv(save_path)
+                except PermissionError:
+                    raise InvalidFilepathError(msg=f'Permission error: Cannot save file {save_path}. Is the file open in another program?', source=self.__class__.__name__)
                 del results[video_name]
             video_timer.stop_timer()
             if self.verbose:
@@ -260,10 +290,17 @@ class YOLOPoseInference():
 #     inference.run()
 
 
-# VIDEO_DIR = '/mnt/filesystem/video_data_mp4'
-# SAVE_DIR = '/mnt/filesystem/yolo_pose'
-# WEIGHTS_PATH = '/mnt/filesystem/weights/best.pt'
+# VIDEO_DIR = r'E:\netholabs_videos\mosaics\subset'
+# SAVE_DIR = r'E:\netholabs_videos\mosaics_inference'
+# WEIGHTS_PATH = r"D:\netholabs\mdls_09282025\08252025\train4\weights\best.pt"
 # KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
+#
+
+# VIDEO_DIR = r"E:\maplight_videos\Day 5\Trial_9_C24_D5_2.mp4"
+# SAVE_DIR = r"E:\maplight_videos\yolo_mdl\mdl\results"
+# WEIGHTS_PATH = r"E:\maplight_videos\yolo_mdl\mdl\train\weights\best.pt"
+# KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base',)
+#
 #
 #
 # i = YOLOPoseInference(weights=WEIGHTS_PATH,
@@ -274,13 +311,17 @@ class YOLOPoseInference():
 #                         format=None,
 #                         stream=True,
 #                         keypoint_names=KEYPOINT_NAMES,
-#                         batch_size=100,
-#                         imgsz=640,
-#                         interpolate=False,
-#                         threshold=0.5,
-#                         max_tracks=4,
-#                         overwrite=False,
-#                         randomize_order=True)
+#                         batch_size=500,
+#                         imgsz=288,
+#                         interpolate=True,
+#                         box_threshold=0.1,
+#                         max_tracks=100,
+#                         max_per_class=1,
+#                         overwrite=True,
+#                         randomize_order=True,
+#                         raise_error=False,
+#                         smoothing=100,
+#                         recursive=True)
 # i.run()
 
 #

@@ -34,7 +34,7 @@ class COCOKeypoints2Yolo:
     Convert COCO Keypoints version 1.0 data format into a YOLO keypoints training set.
 
     .. note::
-       COCO keypoint files canpython A be created using `https://www.cvat.ai/ <https://www.cvat.ai/>`__.
+       COCO keypoint files can be be created using `https://www.cvat.ai/ <https://www.cvat.ai/>`__.
 
        This function expects the path to a single  COCO Keypoints version 1.0 file. To merge several before passing the file to thsi function, use
        :func:`simba.third_party_label_appenders.transform.utils.merge_coco_keypoints_files`.
@@ -71,7 +71,7 @@ class COCOKeypoints2Yolo:
                  img_dir: Union[str, os.PathLike],
                  save_dir: Union[str, os.PathLike],
                  train_size: float = 0.7,
-                 flip_idx: Tuple[int, ...] = (0, 2, 1, 3, 5, 4, 6, 7, 8),
+                 flip_idx: Tuple[int, ...] = (0, 2, 1, 3, 5, 4, 6),
                  verbose: bool = True,
                  greyscale: bool = False,
                  clahe: bool = False,
@@ -134,6 +134,7 @@ class COCOKeypoints2Yolo:
             for img_annotation in img_annotations:
                 check_if_keys_exist_in_dict(data=img_annotation, key=['bbox', 'keypoints', 'id', 'image_id', 'category_id'], name=str(self.coco_path))
                 kps = np.array(img_annotation['keypoints']).reshape(-1, 3).astype(np.int32)
+                #kps = kps[:-1, :]
                 bbox_kps = kps[kps[:, 2] != 0][:, 0:2]
                 if bbox_kps.shape[0] < 2 or kps.shape[0] == 0:
                     continue
@@ -201,11 +202,11 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     runner.run()
 
 
-# runner = COCOKeypoints2Yolo(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\test\merged_2.json",
-#                             img_dir=r"D:\cvat_annotations\frames",
-#                             save_dir=r"D:\cvat_annotations\frames\yolo_072125",
+# runner = COCOKeypoints2Yolo(coco_path=r"E:\maplight_videos\annotation_frames\maplight_1.json",
+#                             img_dir=r"E:\maplight_videos\annotation_frames",
+#                             save_dir=r"E:\maplight_videos\yolo_mdl",
 #                             clahe=False,
-#                             bbox_pad=0.2)
+#                             bbox_pad=0.1)
 # runner.run()
 
 

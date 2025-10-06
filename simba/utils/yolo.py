@@ -1,5 +1,5 @@
 import os
-
+import pandas as pd
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 from typing import Optional, Union
 
@@ -202,17 +202,16 @@ def yolo_predict(model: YOLO,
 
 
     return model.predict(source=source,
-                         half=half,
-                         batch=batch_size,
-                         stream=stream,
-                         device=device,
-                         conf=threshold,
-                         max_det=max_detections,
-                         verbose=verbose,
-                         imgsz=imgsz,
-                         iou=iou,
-                         retina_masks=retina_msk)
-
+                            half=half,
+                            batch=batch_size,
+                            stream=stream,
+                            device=device,
+                            conf=threshold,
+                            max_det=max_detections,
+                            verbose=verbose,
+                            imgsz=imgsz,
+                            iou=iou,
+                            retina_masks=retina_msk)
 
 def keypoint_array_to_yolo_annotation_str(x: np.ndarray,
                                           img_h: int,

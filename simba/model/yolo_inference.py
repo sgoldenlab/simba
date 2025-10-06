@@ -24,12 +24,12 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_str, check_valid_boolean,
                                 check_valid_lst, get_fn_ext)
 from simba.utils.data import df_smoother, savgol_smoother
-from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
+from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError, InvalidVideoFileError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import find_core_cnt, get_video_meta_data
+from simba.utils.read_write import find_core_cnt, get_video_meta_data, find_files_of_filetypes_in_directory
 from simba.utils.yolo import (_get_undetected_obs, check_valid_device,
                               load_yolo_model, yolo_predict)
-
+from simba.utils.enums import Options
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 SMOOTHING_METHODS = ('savitzky-golay', 'bartlett', 'blackman', 'boxcar', 'cosine', 'gaussian', 'hamming', 'exponential')
@@ -47,7 +47,7 @@ class YoloInference():
        To perform bounding box and keypoint (pose) detection, see :func:`~simba.bounding_box_tools.yolo.yolo_pose_inference.YOLOPoseInference`
 
     :param Union[str, os.PathLike] weights: Path to the YOLO model weights file or a loaded YOLO model object.
-    :param Union[str, os.PathLike] or List[Union[str, os.PathLike]] video_path: Path(s) to the input video file(s) for performing inference.
+    :param Union[str, os.PathLike] or List[Union[str, os.PathLike]] video_path: Path(s) to the input video file(s) for performing inference, or path to a directory containing video files.
     :param Optional[bool] verbose: If True, outputs progress information and timing. Defaults to False.
     :param Optional[Union[str, os.PathLike]] save_dir: Directory to save the inference results (e.g., as CSV). If None, results are returned. Defaults to None.
     :param Optional[bool] half_precision: If True, uses half precision (fp16) for inference. Reduces memory usage and speeds up inference on supported devices. Defaults to True.
@@ -92,12 +92,15 @@ class YoloInference():
             raise SimBAPAckageVersionError(msg='ultralytics.YOLO package not detected.', source=self.__class__.__name__)
         if isinstance(video_path, list):
             check_valid_lst(data=video_path, source=f'{self.__class__.__name__} video_path', valid_dtypes=(str, np.str_,), min_len=1)
-        elif isinstance(video_path, str):
+        elif os.path.isfile(video_path):
             check_file_exist_and_readable(file_path=video_path)
             video_path = [video_path]
+        elif os.path.isfile(video_path):
+            video_path = find_files_of_filetypes_in_directory(directory=video_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_warning=False, raise_error=True, as_dict=False)
+        else:
+            raise InvalidVideoFileError(msg=f'{video_path} is not a valid video path or directory path', source=self.__class__.__name__)
         for i in video_path:
             _ = get_video_meta_data(video_path=i)
-
         check_instance(source=f'{self.__class__.__name__} weights', instance=weights, accepted_types=(str, os.PathLike, YOLO))
         if not isinstance(weights, YOLO):
             check_file_exist_and_readable(file_path=weights)
@@ -170,13 +173,14 @@ class YoloInference():
                 stdout_success(f'YOLO results saved in {self.save_dir} directory', elapsed_time=timer.elapsed_time_str)
 
 # video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
-# # video_path = "/mnt/d/netholabs/yolo_videos/input/mp4_20250606083508/2025-05-28_19-50-23.mp4"
-# # video_path = r"D:\cvat_annotations\videos\s24-eating.mp4"
-# weights_path = r"D:\cvat_annotations\yolo_07032025\bbox_annot\mdl\train10\weights\best.pt"
-# save_dir = r"D:\cvat_annotations\yolo_07032025\out_data"
-# i = YoloInference(weights_path=weights_path,
+# video_path = "/mnt/d/netholabs/yolo_videos/input/mp4_20250606083508/2025-05-28_19-50-23.mp4"
+# video_path = r"E:\maplight_videos\Day 1\Trial_1_C24_D1_1.mp4"
+# weights_path = r"E:\maplight_videos\yolo_mdl\mdl\train\weights\best.pt"
+# save_dir = r"E:\maplight_videos\yolo_mdl\mdl\results"
+# i = YoloInference(weights=weights_path,
 #                   video_path=video_path,
 #                   save_dir=save_dir,
 #                   stream=True,
-#                   verbose=True)
+#                   verbose=True,
+#                   batch_size=100)
 # i.run()

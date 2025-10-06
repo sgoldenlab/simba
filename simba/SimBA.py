@@ -983,7 +983,6 @@ class App(object):
         remove_bg_menu.add_command(label="Remove background from multiple videos (mean subtraction)", compound="left", image=self.menu_icons["remove_bg"]["img"], command=BackgroundRemoverDirectoryPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_cascade(label="Remove video backgrounds...", compound="left", image=self.menu_icons["remove_bg"]["img"], menu=remove_bg_menu, font=Formats.FONT_REGULAR.value)
 
-
         temporal_join_videos = Menu(menu)
         temporal_join_videos.add_command(label="Temporal join all videos in directory", command=VideoTemporalJoinPopUp, font=Formats.FONT_REGULAR.value)
         temporal_join_videos.add_command(label="Temporal join selected videos", command=ManualTemporalJoinPopUp, font=Formats.FONT_REGULAR.value)
@@ -997,20 +996,22 @@ class App(object):
         help_menu = Menu(menu)
         menu.add_cascade(label="Help", menu=help_menu)
         links_menu = Menu(help_menu)
-        links_menu.add_command(label="Download weights", compound="left", image=self.menu_icons["dumbbell"]["img"], command=lambda: webbrowser.open_new(str(r"https://osf.io/sr3ck/")), font=Formats.FONT_REGULAR.value)
-        links_menu.add_command(label="Download data/classifiers", compound="left", image=self.menu_icons["osf"]["img"], command=lambda: webbrowser.open_new(str(r"https://osf.io/kwge8/")), font=Formats.FONT_REGULAR.value)
-        links_menu.add_command(label="Ex. feature list", compound='left', image=self.menu_icons["documentation"]["img"], command=lambda: webbrowser.open_new(str(r"https://github.com/sgoldenlab/simba/blob/master/misc/Feature_description.csv")), font=Formats.FONT_REGULAR.value)
+        download_menu = Menu(links_menu)
+        download_menu.add_command(label="Download weights", compound="left", image=self.menu_icons["dumbbell"]["img"], command=lambda: webbrowser.open_new(str(r"https://osf.io/sr3ck/")), font=Formats.FONT_REGULAR.value)
+        download_menu.add_command(label="Download data/classifiers", compound="left", image=self.menu_icons["osf"]["img"], command=lambda: webbrowser.open_new(str(r"https://osf.io/kwge8/")), font=Formats.FONT_REGULAR.value)
+
+        yolo_links = Menu(download_menu)
+        for mdl_name, mdl_link in Links.YOLO_11_WEIGHTS.value.items():
+            yolo_links.add_command(label=mdl_name, compound="left", image=self.menu_icons["ultralytics_2"]["img"], command=lambda: webbrowser.open_new(str({mdl_link})), font=Formats.FONT_REGULAR.value)
+
+        download_menu.add_cascade(label="YOLO weights...", compound="left", image=self.menu_icons["ultralytics_2"]["img"], menu=yolo_links, font=Formats.FONT_REGULAR.value)
+        links_menu.add_cascade(label="Download...", compound="left", image=self.menu_icons["download"]["img"], menu=download_menu, font=Formats.FONT_REGULAR.value)
         links_menu.add_command(label="SimBA Github", compound="left", image=self.menu_icons["github"]["img"], command=lambda: webbrowser.open_new(str(r"https://github.com/sgoldenlab/simba")), font=Formats.FONT_REGULAR.value)
         links_menu.add_command(label="SimBA Gitter Support Chatroom", compound="left", image=self.menu_icons["gitter"]["img"], command=lambda: webbrowser.open_new(str(r"https://gitter.im/SimBA-Resource/community")), font=Formats.FONT_REGULAR.value)
         links_menu.add_command(label="Install FFmpeg", compound="left", image=self.menu_icons["ffmpeg"]["img"],  command=lambda: webbrowser.open_new(str(r"https://m.wikihow.com/Install-FFmpeg-on-Windows")), font=Formats.FONT_REGULAR.value)
         links_menu.add_command(label="SimBA API", compound="left", image=self.menu_icons["api"]["img"], command=lambda: webbrowser.open_new(str(r"https://simba-uw-tf-dev.readthedocs.io/")), font=Formats.FONT_REGULAR.value)
         links_menu.add_command(label="SimBA usage statistics", compound="left", image=self.menu_icons["line_chart_light_blue"]["img"], command=lambda: webbrowser.open_new(str(r"https://sronilsson.github.io/download_stats/")), font=Formats.FONT_REGULAR.value)
         links_menu.add_command(label="SimBA developer contact", compound="left", image=self.menu_icons["developer"]["img"], command=lambda: webbrowser.open_new(str(r"https://sronilsson.netlify.app/")), font=Formats.FONT_REGULAR.value)
-        yolo_links = Menu(menu)
-        for mdl_name, mdl_link in Links.YOLO_11_WEIGHTS.value.items():
-            yolo_links.add_command(label=mdl_name, compound="left", image=self.menu_icons["ultralytics_2"]["img"], command=lambda: webbrowser.open_new(str({mdl_link})), font=Formats.FONT_REGULAR.value)
-
-        links_menu.add_cascade(label="YOLO weights...", compound="left", image=self.menu_icons["ultralytics_2"]["img"], menu=yolo_links, font=Formats.FONT_REGULAR.value)
 
         help_menu.add_cascade(label="Links", menu=links_menu, compound="left", image=self.menu_icons["link"]["img"], font=Formats.FONT_REGULAR.value)
         help_menu.add_command(label="About", compound="left", image=self.menu_icons["about"]["img"], command=AboutSimBAPopUp, font=Formats.FONT_REGULAR.value)
