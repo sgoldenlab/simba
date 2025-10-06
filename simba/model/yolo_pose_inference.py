@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 try:
     from typing import Literal
@@ -14,11 +15,12 @@ except ModuleNotFoundError:
     torch = None
 
 import random
+import warnings
 from typing import List, Optional, Tuple, Union
 
 import numpy as np
-import warnings
 import pandas as pd
+
 warnings.filterwarnings("ignore")
 
 from simba.data_processors.cuda.utils import _is_cuda_available
@@ -27,8 +29,9 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_boolean, check_valid_lst,
                                 check_valid_tuple, get_fn_ext)
 from simba.utils.enums import Options
-from simba.utils.errors import (CountError, InvalidFileTypeError,
-                                SimBAGPUError, SimBAPAckageVersionError, InvalidFilepathError)
+from simba.utils.errors import (CountError, InvalidFilepathError,
+                                InvalidFileTypeError, SimBAGPUError,
+                                SimBAPAckageVersionError)
 from simba.utils.printing import SimbaTimer
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_video_meta_data, recursive_file_search)
