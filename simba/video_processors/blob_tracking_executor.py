@@ -95,7 +95,7 @@ class BlobTrackingExecutor():
             self.vertice_col_names.append(f"vertice_{i}_x"); self.vertice_col_names.append(f"vertice_{i}_y")
 
     def run(self):
-        #self._remove_bgs()
+        self._remove_bgs()
         self._find_blobs()
         self.timer.stop_timer()
         stdout_success(msg=f'Animal tracking complete. Results save din directory {self.data[OUT_DIR]}', elapsed_time=self.timer.elapsed_time_str)
