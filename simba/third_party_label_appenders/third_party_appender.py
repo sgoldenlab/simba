@@ -145,7 +145,6 @@ class ThirdPartyLabelAppender(ConfigReader):
             data = read_solomon_files(data_paths=self.data_file_paths, error_setting=self.error_settings[Methods.INVALID_THIRD_PARTY_APPENDER_FILE.value], video_info_df=self.video_info_df, log_setting=self.log)
         elif self.annotation_app == BENTO:
             data = read_bento_files(data_paths=self.data_file_paths, error_setting=self.error_settings[Methods.INVALID_THIRD_PARTY_APPENDER_FILE.value], video_info_df=self.video_info_df, log_setting=self.log)
-
         for file_cnt, file_path in enumerate(self.feature_file_paths):
             _, self.video_name, _ = get_fn_ext(filepath=file_path)
             print(f"Processing annotations for {self.video_name} video...")
@@ -174,6 +173,7 @@ class ThirdPartyLabelAppender(ConfigReader):
                     elif self.error_settings[Methods.ZERO_THIRD_PARTY_VIDEO_BEHAVIOR_ANNOTATIONS.value] == Methods.ERROR.value:
                         raise ThirdPartyAnnotationsMissingAnnotationsError(video_name=self.video_name, clf_names=clf)
                 clf_annot = self.__check_annotation_clf_df_integrity(df=clf_annot)
+
                 annot_idx = list(clf_annot.apply(lambda x: list(range(int(x["START"]), int(x["STOP"]) + 1)), 1))
                 annot_idx = [x for xs in annot_idx for x in xs]
                 idx_diff = list(set(annot_idx) - set(out_df.index))
@@ -192,7 +192,22 @@ class ThirdPartyLabelAppender(ConfigReader):
         stdout_success(msg=f"{self.annotation_app} annotations appended to dataset and saved in {self.targets_folder} directory", elapsed_time=self.timer.elapsed_time_str)
 
 
-
+# log = True
+# error_settings = {'INVALID annotations file data format': 'ERROR',
+#                   'ADDITIONAL third-party behavior detected': 'NONE',
+#                   'Annotations EVENT COUNT conflict': 'WARNING',
+#                   'Annotations OVERLAP inaccuracy': 'WARNING',
+#                   'ZERO third-party video behavior annotations found': 'WARNING',
+#                   'Annotations and pose FRAME COUNT conflict': 'WARNING',
+#                   'Annotations data file NOT FOUND': 'WARNING'}
+#
+# test = ThirdPartyLabelAppender(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/boris_beeteamlmg/project_folder/project_config.ini",
+#                                data_dir=r"/Users/simon/Desktop/envs/simba/troubleshooting/boris_beeteamlmg/boris_data",
+#                                app='BORIS',
+#                                file_format='.csv',
+#                                error_settings=error_settings,
+#                                log=log)
+# test.run()
 
 # log = True
 # error_settings = {'INVALID annotations file data format': 'ERROR',

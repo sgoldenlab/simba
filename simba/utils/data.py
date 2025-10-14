@@ -1227,14 +1227,9 @@ def run_user_defined_feature_extraction_class(file_path: Union[str, os.PathLike]
     classes = [n for n in parsed.body if isinstance(n, ast.ClassDef)]
     class_name = [x.name for x in classes]
     if len(class_name) < 1:
-        raise CountError(
-            msg=f"The user-defined feature extraction file ({file_path}) contains no python classes",
-            source=run_user_defined_feature_extraction_class.__name__,
-        )
+        raise CountError(msg=f"The user-defined feature extraction file ({file_path}) contains no python classes", source=run_user_defined_feature_extraction_class.__name__)
     if len(class_name) > 1:
-        stdout_warning(
-            msg=f"The user-defined feature extraction file ({file_path}) contains more than 1 python class. SimBA will use the first python class: {class_name[0]}."
-        )
+        stdout_warning(msg=f"The user-defined feature extraction file ({file_path}) contains more than 1 python class. SimBA will use the first python class: {class_name[0]}.")
     class_name = class_name[0]
     spec = importlib.util.spec_from_file_location(class_name, file_path)
     user_module = importlib.util.module_from_spec(spec)
@@ -1242,15 +1237,10 @@ def run_user_defined_feature_extraction_class(file_path: Union[str, os.PathLike]
     spec.loader.exec_module(user_module)
     user_class = getattr(user_module, class_name)
     if "config_path" not in inspect.signature(user_class).parameters:
-        raise InvalidFileTypeError(
-            msg=f"The user-defined class {class_name} does not contain a {config_path} init argument",
-            source=run_user_defined_feature_extraction_class.__name__,
-        )
+        raise InvalidFileTypeError(msg=f"The user-defined class {class_name} does not contain a {config_path} init argument", source=run_user_defined_feature_extraction_class.__name__)
     functions = [n for n in parsed.body if isinstance(n, ast.FunctionDef)]
     function_names = [x.name for x in functions]
-    has_argparse = check_if_module_has_import(
-        parsed_file=parsed, import_name="argparse"
-    )
+    has_argparse = check_if_module_has_import(parsed_file=parsed, import_name="argparse")
     has_main = any(
         isinstance(node, ast.If)
         and isinstance(node.test, ast.Compare)

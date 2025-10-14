@@ -11,7 +11,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_lst, check_valid_tuple, get_fn_ext)
 from simba.utils.errors import CountError, InvalidFileTypeError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import get_video_meta_data
+from simba.utils.read_write import get_video_meta_data, find_files_of_filetypes_in_directory
 from simba.utils.yolo import (_get_undetected_obs, filter_yolo_keypoint_data,
                               load_yolo_model)
 
@@ -20,8 +20,6 @@ COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 NEAREST = 'nearest'
 
 class YOLOPoseTrackInference():
-
-
     def __init__(self,
                  weights_path: Union[str, os.PathLike],
                  video_path: Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]],
@@ -43,10 +41,13 @@ class YOLOPoseTrackInference():
 
         if isinstance(video_path, list):
             check_valid_lst(data=video_path, source=f'{self.__class__.__name__} video_path', valid_dtypes=(str, np.str_,), min_len=1)
-        elif isinstance(video_path, str):
+        elif os.path.isfile(video_path):
             check_file_exist_and_readable(file_path=video_path)
             video_path = [video_path]
-        for i in video_path: _ = get_video_meta_data(video_path=i)
+        elif os.path.isdir(video_path):
+            video_path = find_files_of_filetypes_in_directory(directory=video_path, extensions=['mp4'], as_dict=False)
+        for i in video_path:
+            _ = get_video_meta_data(video_path=i)
         check_file_exist_and_readable(file_path=weights_path)
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose')
         check_valid_boolean(value=interpolate, source=f'{self.__class__.__name__} interpolate')
@@ -91,7 +92,6 @@ class YOLOPoseTrackInference():
                         video_out.append(_get_undetected_obs(frm_id=frm_cnt, class_id=class_id, class_name=class_name, value_cnt=(10 + (len(self.keypoint_col_names)))))
                         continue
                     if boxes.shape[1] != 7: boxes = np.insert(boxes, 4, -1, axis=1)
-                    print(boxes)
                     cls_boxes, cls_keypoints = filter_yolo_keypoint_data(bbox_data=boxes, keypoint_data=keypoints, class_id=class_id, confidence=None, class_idx=-1, confidence_idx=None)
                     for i in range(cls_boxes.shape[0]):
                         frm_results = np.array([frm_cnt, boxes[i][-1], self.class_ids[boxes[i][-1]], boxes[i][-2], boxes[i][-3]])
@@ -144,6 +144,31 @@ class YOLOPoseTrackInference():
 # BOTSORT_PATH = r"C:\projects\simba\simba\simba\assets\bytetrack.yml"
 #
 # KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
+#
+# i = YOLOPoseTrackInference(weights_path=WEIGHTS_PASS,
+#                            video_path=VIDEO_PATH,
+#                            save_dir=SAVE_DIR,
+#                            verbose=True,
+#                            device=0,
+#                            format=None,
+#                            keypoint_names=KEYPOINT_NAMES,
+#                            batch_size=32,
+#                            threshold=0.01,
+#                            config_path=BOTSORT_PATH,
+#                            interpolate=False,
+#                            imgsz=640,
+#                            max_tracks=5,
+#                            stream=False,
+#                            iou=0.2)
+# i.run()
+
+
+# VIDEO_PATH = r"/mnt/data"
+# WEIGHTS_PASS = r"/mnt/data/simon/mdls/100825/yolo_mdl_wo_tail/mdl/train2/weights/best.pt"
+# SAVE_DIR = r"/mnt/data/simon/data_14102025"
+# BOTSORT_PATH = r"/home/netholabs/miniconda3/envs/yolo_env/lib/python3.10/site-packages/simba/assets"
+#
+# KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base')
 #
 # i = YOLOPoseTrackInference(weights_path=WEIGHTS_PASS,
 #                            video_path=VIDEO_PATH,

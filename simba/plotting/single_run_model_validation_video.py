@@ -21,8 +21,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.data import plug_holes_shortest_bout
 from simba.utils.enums import TagNames, TextOptions
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_df,
-                                    read_pickle, write_df)
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_df, read_pickle, write_df)
+from simba.utils.warnings import FrameRangeWarning
 
 plt.interactive(True)
 plt.ioff()
@@ -165,6 +165,9 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
         while (cap.isOpened()) and (frm_cnt < len(self.data_df)):
             frm_timer = SimbaTimer(start=True)
             ret, frame = cap.read()
+            if not ret:
+                FrameRangeWarning(msg=f'Frame {frm_cnt} could not be read in video {self.video_path}. The video contains {self.video_meta_data["frame_count"]} frames while the data file {self.feature_path} contains data for {len(self.data_df)} frames. Consider re-encoding the video, or make sure the pose-estimation data and associated video contains the same number of frames. ', source=self.__class__.__name__)
+                break
             clf_val = int(self.data_df.loc[frm_cnt, self.clf_name])
             clf_frm_cnt += clf_val
             if self.show_pose:

@@ -2698,10 +2698,12 @@ def read_boris_file(file_path: Union[str, os.PathLike],
                 ThirdPartyAnnotationsInvalidFileFormatWarning(annotation_app="BORIS", file_path=file_path, source=read_boris_file.__name__, log_status=log_setting)
                 return {}
         df = pd.read_csv(file_path, skiprows=range(0, int(start_idx + 1)))
+        print(df)
     else:
         MEDIA_FILE_PATH, STATUS = MEDIA_FILE_NAME, BEHAVIOR_TYPE
         expected_headers = [TIME, MEDIA_FILE_PATH, BEHAVIOR, STATUS]
         df = pd.read_csv(file_path)
+
     check_valid_dataframe(df=df, source=f'{read_boris_file.__name__} {file_path}', required_fields=expected_headers)
     df = df.dropna(how='all').reset_index(drop=True)
     numeric_check = pd.to_numeric(df[TIME], errors='coerce').notnull().all()
@@ -2714,7 +2716,7 @@ def read_boris_file(file_path: Union[str, os.PathLike],
     df[TIME] = df[TIME].astype(np.float32)
     media_file_names_in_file = df[MEDIA_FILE_PATH].unique()
     FRAME_INDEX = _find_cap_insensitive_name(target=FRAME_INDEX, values=list(df.columns))
-    if fps is None and FRAME_INDEX is None:
+    if fps is None:
         FPS = _find_cap_insensitive_name(target=FPS, values=list(df.columns))
         if not FPS in df.columns:
             if raise_error:
@@ -2728,8 +2730,11 @@ def read_boris_file(file_path: Union[str, os.PathLike],
             check_float(name='fps', value=fps, min_value=10e-6, raise_error=True)
             fps = [float(fps)]
         else:
-            print(media_file_names_in_file)
-            fps_lst = df[FPS].iloc[0].split(';')
+            fps_lst = df[FPS].iloc[0]
+            if isinstance(fps_lst, str):
+                fps_lst = fps_lst.split(';')
+            else:
+                fps_lst = [fps_lst]
             fps = []
             for fps_value in fps_lst:
                 check_float(name='fps', value=fps_value, min_value=10e-6, raise_error=True)
@@ -2742,8 +2747,16 @@ def read_boris_file(file_path: Union[str, os.PathLike],
         video_name = get_fn_ext(filepath=video_file_name)[1]
         results[video_name] = {}
         video_df = df[df[MEDIA_FILE_PATH] == video_file_name].reset_index(drop=True)
-        if FRAME_INDEX is None:
-            video_df['FRAME'] = (video_df[TIME] * fps[video_cnt]).astype(int)
+        if FRAME_INDEX is None or pd.to_numeric(video_df[FRAME_INDEX], errors='coerce').isna().any():
+            try:
+                video_df['FRAME'] = (video_df[TIME] * fps[video_cnt]).astype(np.int32)
+            except:
+                if raise_error:
+                    raise FrameRangeError(f'The annotations frame number could not be read in BORIS data file {video_file_name} by multiplying the Time column with the FPS value. Does any of these columns contain wonky values?', source=read_boris_file.__name__)
+                else:
+                    FrameRangeWarning(msg=f'The annotations frame number could not be read in BORIS data file {video_file_name} by multiplying the Time column with the FPS value. Does any of these columns contain wonky values?', source=read_boris_file.__name__)
+                    ThirdPartyAnnotationsInvalidFileFormatWarning(annotation_app="BORIS", file_path=file_path, source=read_boris_file.__name__, log_status=log_setting)
+                    return {}
         else:
             video_df['FRAME'] = video_df[FRAME_INDEX]
         video_df = video_df.drop([TIME, MEDIA_FILE_PATH], axis=1)
