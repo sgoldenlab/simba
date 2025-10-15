@@ -21,7 +21,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
 from simba.utils.data import plug_holes_shortest_bout
 from simba.utils.enums import TagNames, TextOptions
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_df, read_pickle, write_df)
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_df,
+                                    read_pickle, write_df)
 from simba.utils.warnings import FrameRangeWarning
 
 plt.interactive(True)
