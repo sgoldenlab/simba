@@ -36,6 +36,7 @@ from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     get_fn_ext, get_video_meta_data, read_df,
                                     read_pickle, write_df)
+from simba.utils.warnings import FrameRangeWarning
 
 
 def _validation_video_mp(data: pd.DataFrame,
@@ -158,6 +159,10 @@ def _validation_video_mp(data: pd.DataFrame,
             current_frm += 1
             frm_timer.stop_timer()
             print(f"Multi-processing video frame {current_frm} on core {batch_id}...(elapsed time: {frm_timer.elapsed_time_str}s)")
+        else:
+            FrameRangeWarning(msg=f'Frame {current_frm} could not be read in video {video_path}. The video contains {video_meta_data["frame_count"]} frames while the data file contains data for {len(batch_data)} frames. Consider re-encoding the video, or make sure the pose-estimation data and associated video contains the same number of frames. ', source=_validation_video_mp.__name__)
+            break
+
     cap.release()
     writer.release()
     return batch_id

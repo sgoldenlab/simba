@@ -11,7 +11,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_lst, check_valid_tuple, get_fn_ext)
 from simba.utils.errors import CountError, InvalidFileTypeError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import get_video_meta_data
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_video_meta_data)
 from simba.utils.yolo import (_get_undetected_obs, filter_yolo_keypoint_data,
                               load_yolo_model)
 
@@ -20,8 +21,6 @@ COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 NEAREST = 'nearest'
 
 class YOLOPoseTrackInference():
-
-
     def __init__(self,
                  weights_path: Union[str, os.PathLike],
                  video_path: Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]],
@@ -43,10 +42,13 @@ class YOLOPoseTrackInference():
 
         if isinstance(video_path, list):
             check_valid_lst(data=video_path, source=f'{self.__class__.__name__} video_path', valid_dtypes=(str, np.str_,), min_len=1)
-        elif isinstance(video_path, str):
+        elif os.path.isfile(video_path):
             check_file_exist_and_readable(file_path=video_path)
             video_path = [video_path]
-        for i in video_path: _ = get_video_meta_data(video_path=i)
+        elif os.path.isdir(video_path):
+            video_path = find_files_of_filetypes_in_directory(directory=video_path, extensions=['mp4'], as_dict=False)
+        for i in video_path:
+            _ = get_video_meta_data(video_path=i)
         check_file_exist_and_readable(file_path=weights_path)
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose')
         check_valid_boolean(value=interpolate, source=f'{self.__class__.__name__} interpolate')
@@ -79,48 +81,45 @@ class YOLOPoseTrackInference():
             _, video_name, _ = get_fn_ext(filepath=video_path)
             _ = get_video_meta_data(video_path=video_path)
             video_out = []
-            save_path = os.path.join(self.save_dir, f'{video_name}.csv')
-            print(video_path)
-            if os.path.isfile(save_path):
-                continue
-            else:
-                video_predictions = self.model.track(source=video_path, stream=self.stream, tracker=self.config_path, conf=self.threshold, half=self.half_precision, imgsz=self.imgsz, persist=False, iou=self.iou, device=self.device, max_det=self.max_tracks)
-                for frm_cnt, video_prediction in enumerate(video_predictions):
-                    boxes = video_prediction.obb.data if video_prediction.obb is not None else video_prediction.boxes.data
-                    boxes = boxes.cpu().numpy().astype(np.float32)
-                    keypoints = video_prediction.keypoints.data.cpu().numpy().astype(np.float32)
-                    detected_classes = np.unique(boxes[:, -1]).astype(int) if boxes.size > 0 else []
-                    for class_id, class_name in self.class_ids.items():
-                        if class_id not in detected_classes:
-                            video_out.append(_get_undetected_obs(frm_id=frm_cnt, class_id=class_id, class_name=class_name, value_cnt=(10 + (len(self.keypoint_col_names)))))
-                            continue
-                        if boxes.shape[1] != 7: boxes = np.insert(boxes, 4, -1, axis=1)
-                        cls_boxes, cls_keypoints = filter_yolo_keypoint_data(bbox_data=boxes, keypoint_data=keypoints, class_id=class_id, confidence=None, class_idx=-1, confidence_idx=None)
-                        for i in range(cls_boxes.shape[0]):
-                            frm_results = np.array([frm_cnt, boxes[i][-1], self.class_ids[boxes[i][-1]], boxes[i][-2], boxes[i][-3]])
-                            box = np.array([boxes[i][0], boxes[i][1], boxes[i][2], boxes[i][1], boxes[i][2], boxes[i][3], boxes[i][0], boxes[i][3]]).astype(np.int32)
-                            frm_results = np.append(frm_results, box)
-                            frm_results = np.append(frm_results, keypoints[i].flatten())
-                            video_out.append(frm_results)
-                self.results[video_name] = pd.DataFrame(video_out, columns=OUT_COLS)
-                self.results[video_name][COORD_COLS] = self.results[video_name][COORD_COLS].astype(float).astype(int)
-                if self.interpolate:
-                    for cord_col in COORD_COLS:
-                        self.results[video_name][cord_col] = self.results[video_name][cord_col].astype(np.int32).replace(to_replace=-1, value=np.nan)
-                        self.results[video_name][cord_col] = self.results[video_name][cord_col].interpolate(method=NEAREST, axis=0).ffill().bfill()
-                timer.stop_timer()
-                if not self.save_dir:
-                    if self.verbose:
-                        print(f'YOLO results created', timer.elapsed_time_str)
-                    return self.results
-                else:
-                    for k, v in self.results.items():
-                        save_path = os.path.join(self.save_dir, f'{k}.csv')
-                        v.to_csv(save_path)
-                        if self.verbose:
-                            print(f'YOLO results saved in {self.save_dir} directory', timer.elapsed_time_str)
-            stdout_success(msg=f'{len(self.video_path)} pose-estimation data files saved in {self.save_dir}', elapsed_time=timer.elapsed_time_str)
-            #return None
+            video_predictions = self.model.track(source=video_path, stream=self.stream, tracker=self.config_path, conf=self.threshold, half=self.half_precision, imgsz=self.imgsz, persist=False, iou=self.iou, device=self.device, max_det=self.max_tracks)
+            print(video_predictions)
+            for frm_cnt, video_prediction in enumerate(video_predictions):
+                boxes = video_prediction.obb.data if video_prediction.obb is not None else video_prediction.boxes.data
+                boxes = boxes.cpu().numpy().astype(np.float32)
+                keypoints = video_prediction.keypoints.data.cpu().numpy().astype(np.float32)
+                detected_classes = np.unique(boxes[:, -1]).astype(int) if boxes.size > 0 else []
+                for class_id, class_name in self.class_ids.items():
+                    if class_id not in detected_classes:
+                        video_out.append(_get_undetected_obs(frm_id=frm_cnt, class_id=class_id, class_name=class_name, value_cnt=(10 + (len(self.keypoint_col_names)))))
+                        continue
+                    if boxes.shape[1] != 7: boxes = np.insert(boxes, 4, -1, axis=1)
+                    print(boxes)
+                    cls_boxes, cls_keypoints = filter_yolo_keypoint_data(bbox_data=boxes, keypoint_data=keypoints, class_id=class_id, confidence=None, class_idx=-1, confidence_idx=None)
+                    for i in range(cls_boxes.shape[0]):
+                        frm_results = np.array([frm_cnt, boxes[i][-1], self.class_ids[boxes[i][-1]], boxes[i][-2], boxes[i][-3]])
+                        box = np.array([boxes[i][0], boxes[i][1], boxes[i][2], boxes[i][1], boxes[i][2], boxes[i][3], boxes[i][0], boxes[i][3]]).astype(np.int32)
+                        frm_results = np.append(frm_results, box)
+                        frm_results = np.append(frm_results, keypoints[i].flatten())
+                        video_out.append(frm_results)
+            self.results[video_name] = pd.DataFrame(video_out, columns=OUT_COLS)
+            self.results[video_name][COORD_COLS] = self.results[video_name][COORD_COLS].astype(float).astype(int)
+            if self.interpolate:
+                for cord_col in COORD_COLS:
+                    self.results[video_name][cord_col] = self.results[video_name][cord_col].astype(np.int32).replace(to_replace=-1, value=np.nan)
+                    self.results[video_name][cord_col] = self.results[video_name][cord_col].interpolate(method=NEAREST, axis=0).ffill().bfill()
+        timer.stop_timer()
+        if not self.save_dir:
+            if self.verbose:
+                print(f'YOLO results created', timer.elapsed_time_str)
+            return self.results
+        else:
+            for k, v in self.results.items():
+                save_path = os.path.join(self.save_dir, f'{k}.csv')
+                v.to_csv(save_path)
+                if self.verbose:
+                    print(f'YOLO results saved in {self.save_dir} directory', timer.elapsed_time_str)
+        stdout_success(msg=f'{len(self.video_path)} poe-estimation data files saved in {self.save_dir}', elapsed_time=timer.elapsed_time_str)
+        return None
 
 
 # VIDEO_PATH = "/mnt/d/netholabs/yolo_videos/input/mp4_20250606083508/2025-05-28_19-50-23.mp4"
@@ -165,5 +164,30 @@ class YOLOPoseTrackInference():
 #                            imgsz=640,
 #                            max_tracks=3,
 #                            stream=True,
+#                            iou=0.2)
+# i.run()
+
+
+# VIDEO_PATH = r"/mnt/data"
+# WEIGHTS_PASS = r"/mnt/data/simon/mdls/100825/yolo_mdl_wo_tail/mdl/train2/weights/best.pt"
+# SAVE_DIR = r"/mnt/data/simon/data_14102025"
+# BOTSORT_PATH = r"/home/netholabs/miniconda3/envs/yolo_env/lib/python3.10/site-packages/simba/assets"
+#
+# KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base')
+#
+# i = YOLOPoseTrackInference(weights_path=WEIGHTS_PASS,
+#                            video_path=VIDEO_PATH,
+#                            save_dir=SAVE_DIR,
+#                            verbose=True,
+#                            device=0,
+#                            format=None,
+#                            keypoint_names=KEYPOINT_NAMES,
+#                            batch_size=32,
+#                            threshold=0.01,
+#                            config_path=BOTSORT_PATH,
+#                            interpolate=False,
+#                            imgsz=640,
+#                            max_tracks=5,
+#                            stream=False,
 #                            iou=0.2)
 # i.run()

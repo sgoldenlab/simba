@@ -24,12 +24,16 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_str, check_valid_boolean,
                                 check_valid_lst, get_fn_ext)
 from simba.utils.data import df_smoother, savgol_smoother
-from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError, InvalidVideoFileError
+from simba.utils.enums import Options
+from simba.utils.errors import (InvalidVideoFileError, SimBAGPUError,
+                                SimBAPAckageVersionError)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import find_core_cnt, get_video_meta_data, find_files_of_filetypes_in_directory
+from simba.utils.read_write import (find_core_cnt,
+                                    find_files_of_filetypes_in_directory,
+                                    get_video_meta_data)
 from simba.utils.yolo import (_get_undetected_obs, check_valid_device,
                               load_yolo_model, yolo_predict)
-from simba.utils.enums import Options
+
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 SMOOTHING_METHODS = ('savitzky-golay', 'bartlett', 'blackman', 'boxcar', 'cosine', 'gaussian', 'hamming', 'exponential')

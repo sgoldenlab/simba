@@ -18,10 +18,11 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_valid_boolean,
                                 check_valid_dataframe, check_valid_tuple)
 from simba.utils.enums import Formats
-from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (create_directory, read_img, recursive_file_search, get_fn_ext)
-from simba.utils.yolo import keypoint_array_to_yolo_annotation_str
 from simba.utils.errors import InvalidInputError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (create_directory, get_fn_ext, read_img,
+                                    recursive_file_search)
+from simba.utils.yolo import keypoint_array_to_yolo_annotation_str
 
 COLLECTED_DATA = 'CollectedData'
 

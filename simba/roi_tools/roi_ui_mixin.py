@@ -1059,8 +1059,8 @@ class ROI_mixin(ConfigReader):
         self._fixed_roi_checks()
         valid, error_msg = check_int(name='RADIUS', value=self.fixed_roi_circle_radius_eb.entry_get, min_value=1)
         if not valid: self.fixed_roi_status_bar['text'] = error_msg; raise InvalidInputError(msg=error_msg, source=self.__class__.__name__)
-        mm_radius = round(self.fixed_roi_circle_radius_eb.entry_get)
-        radius = round(self.fixed_roi_circle_radius_eb.entry_get * (float(self.px_per_mm) * self.downscale_factor))
+        mm_radius = round(float(self.fixed_roi_circle_radius_eb.entry_get))
+        radius = round(float(self.fixed_roi_circle_radius_eb.entry_get) * (float(self.px_per_mm) * self.downscale_factor))
         self.roi_dict[self.fixed_roi_name] =  {'Video':                self.video_meta['video_name'],
                                                'Shape_type':           ROI_SETTINGS.CIRCLE.value,
                                                'Name':                 self.fixed_roi_name,
@@ -1083,7 +1083,7 @@ class ROI_mixin(ConfigReader):
         self._fixed_roi_checks()
         valid, error_msg = check_int(name='RADIUS', value=self.hexagon_radius_eb.entry_get, min_value=1)
         if not valid: self.fixed_roi_status_bar['text'] = error_msg; raise InvalidInputError(msg=error_msg, source=self.__class__.__name__)
-        radius = round(round(self.hexagon_radius_eb.entry_get) * (float(self.px_per_mm) * self.downscale_factor))
+        radius = round(round(float(self.hexagon_radius_eb.entry_get)) * (float(self.px_per_mm) * self.downscale_factor))
         vertices, vertices_dict = get_vertices_hexagon(center=self.shape_center, radius=radius)
         area = Polygon(vertices).simplify(tolerance=20, preserve_topology=True).area
         self.roi_dict[self.fixed_roi_name] =  {'Video':                 self.video_meta['video_name'],
