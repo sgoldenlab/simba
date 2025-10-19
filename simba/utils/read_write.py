@@ -196,7 +196,8 @@ def read_df(file_path: Union[str, os.PathLike],
 def write_df(df: pd.DataFrame,
              file_type: str,
              save_path: Union[str, os.PathLike],
-             multi_idx_header: bool = False) -> None:
+             multi_idx_header: bool = False,
+             verbose: bool = False) -> None:
     """
     Write single tabular data file.
 
@@ -207,11 +208,13 @@ def write_df(df: pd.DataFrame,
     :parameter str file_type: Type of data. OPTIONS: ``parquet``, ``csv``,  ``pickle``.
     :parameter str save_path: Location where to store the data.
     :parameter bool check_multiindex: check if input file is multi-index headers. Default: False.
+    :parameter bool verbose: Prints message on completion. Default: False.
 
     :example:
     >>> write_df(df=df, file_type='csv', save_path='project_folder/csv/input_csv/Video_1.csv')
     """
 
+    timer = SimbaTimer(start=True)
     if file_type == Formats.CSV.value:
         if not multi_idx_header:
             df = df.drop("scorer", axis=1, errors="ignore")
@@ -246,6 +249,9 @@ def write_df(df: pd.DataFrame,
             raise InvalidFileTypeError(msg="Data could not be saved as a pickle.", source=write_df.__name__)
     else:
         raise InvalidFileTypeError(msg=f"{file_type} is not a valid filetype OPTIONS: [csv, pickle, parquet]", source=write_df.__name__)
+    timer.stop_timer()
+    if verbose:
+        print(f'Saved file {save_path} (elapsed time: {timer.elapsed_time_str}s)')
 
 
 def get_fn_ext(filepath: Union[os.PathLike, str],
@@ -953,7 +959,7 @@ def find_video_of_file(video_dir: Union[str, os.PathLike],
 
 
 def find_files_of_filetypes_in_directory(directory: Union[str, os.PathLike],
-                                         extensions: List[str],
+                                         extensions: Union[List[str], str],
                                          raise_warning: bool = True,
                                          as_dict: bool = False,
                                          raise_error: bool = False) -> Union[List[str], Dict[str, str]]:
@@ -961,7 +967,7 @@ def find_files_of_filetypes_in_directory(directory: Union[str, os.PathLike],
     Find all files in a directory of specified extensions/types.
 
     :param str directory: Directory holding files.
-    :param List[str] extensions: Accepted file extensions.
+    :param List[str] extensions: Accepted file extensions as a list of string or a string.
     :param bool raise_warning: If True, raise warning if no files are found. Default True.
     :param bool raise_error: If True, raise error if no files are found. Default False.
     :param bool as_dict: If True, returns a dictionary with all filenames as keys and filepaths as values. If False, then a list of all filepaths. Default False.
@@ -972,6 +978,12 @@ def find_files_of_filetypes_in_directory(directory: Union[str, os.PathLike],
     >>> find_files_of_filetypes_in_directory(directory='project_folder/videos', extensions=['mp4', 'avi', 'png'], raise_warning=False)
     """
 
+
+    check_instance(source=f'{find_files_of_filetypes_in_directory.__name__} extensions', instance=extensions, accepted_types=(str, list,), raise_error=True)
+    if isinstance(extensions, str):
+        extensions = [extensions]
+    else:
+        check_valid_lst(data=extensions, source=f'{find_files_of_filetypes_in_directory.__name__} extensions', valid_dtypes=(str,), min_len=1, raise_error=True)
     if not os.path.isdir(directory):
         if raise_warning:
             NoFileFoundWarning(msg=f'{directory} is not a valid directory', source=find_files_of_filetypes_in_directory.__name__)

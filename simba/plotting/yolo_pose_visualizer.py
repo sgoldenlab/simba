@@ -2,10 +2,12 @@ import functools
 import multiprocessing
 import os
 from typing import List, Optional, Tuple, Union
+import random
 
 import cv2
 import numpy as np
 import pandas as pd
+from copy import deepcopy
 
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
@@ -14,13 +16,13 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_lst, check_valid_tuple)
 from simba.utils.data import create_color_palette
 from simba.utils.enums import Defaults, Options
-from simba.utils.errors import CountError, DataHeaderError, FrameRangeError
+from simba.utils.errors import CountError, DataHeaderError, FrameRangeError, InvalidInputError, NoDataError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data,
-                                    read_frm_of_video)
+                                    read_frm_of_video, recursive_file_search, remove_a_folder)
 
 FRAME = 'FRAME'
 CLASS_ID = 'CLASS_ID'
@@ -96,8 +98,8 @@ class YOLOPoseVisualizer():
        :loop:
        :autoplay:
 
-    :param Union[str, os.PathLike] data_path: Path to the CSV file containing keypoint data (output from YOLO pose inference).
-    :param Union[str, os.PathLike] video_path: Path to the original input video to overlay keypoints on.
+    :param Union[str, os.PathLike] data_path: Path to the CSV file containing keypoint data, or folder containing keypoint data (output from YOLO pose inference).
+    :param Union[str, os.PathLike] video_path: Path to the original input video, or folder containing original videos, to overlay keypoints on.
     :param Union[str, os.PathLike] save_dir: Directory to save the resulting annotated video.
     :param Optional[Union[str, Tuple[str, ...]]] palettes: Name of the color palette(s) to use for drawing keypoints. Can be a string or a tuple of strings (e.g., 'Set1', ('Set1', 'Dark2')). Defaults to 'Set1'.
     :param Optional[int] core_cnt: Number of CPU cores to use for parallel rendering. Defaults to -1 (use all available cores).
@@ -105,7 +107,8 @@ class YOLOPoseVisualizer():
     :param Optional[int] thickness: Thickness of lines connecting keypoints. If None, determined automatically. Defaults to None.
     :param Optional[int] circle_size: Radius of the circles drawn for keypoints. If None, determined automatically based on frame size. Defaults to None.
     :param Optional[bool] verbose: If True, enables logging and progress messages. Defaults to False.
-
+    :param Optional[bool] recursive: If True, recursively searches for data files and video files in the parent directories. If False, then searches main level only.
+    :param Optional[bool] sample_n: If int, then randomly samples ``sample_n`` data files in the input to visualize. If None, then videos are produces for all the data files.
 
     :example:
     >>> video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
@@ -130,21 +133,46 @@ class YOLOPoseVisualizer():
                  circle_size: Optional[int] = None,
                  verbose: Optional[bool] = False,
                  bbox: Optional[bool] = True,
-                 skeleton: List[Tuple[str, str]] = None):
+                 skeleton: List[Tuple[str, str]] = None,
+                 recursive: Optional[bool] = False,
+                 sample_n: Optional[int] = None):
 
-        check_file_exist_and_readable(file_path=data_path)
-        self.video_meta_data = get_video_meta_data(video_path=video_path)
-        self.data_path, self.video_path = data_path, video_path
-        self.video_name = get_fn_ext(filepath=data_path)[1]
+        check_valid_boolean(value=[recursive], source=f'{self.__class__.__name__} recursive', raise_error=True)
+        if os.path.isdir(data_path):
+            if not recursive:
+                data_paths = find_files_of_filetypes_in_directory(directory=data_path, extensions=['.csv'], as_dict=True, raise_error=True)
+            else:
+                data_paths = recursive_file_search(directory=data_path, extensions='csv', as_dict=True, raise_error=True)
+            if sample_n is not None:
+                check_int(name=f'{self.__class__.__name__} sample', min_value=1, raise_error=True, value=sample_n)
+                sample_n = min(sample_n, len(list(data_paths)))
+                data_paths = dict(random.sample(list(data_paths.items()), sample_n))
+
+
+        elif os.path.isfile(data_path):
+            check_file_exist_and_readable(file_path=data_path)
+            data_paths = {get_fn_ext(filepath=data_path)[1]: data_path}
+        else:
+            raise InvalidInputError(msg=f'{data_path} is not a valid directory path or file path', source=self.__class__.__name__)
+        if os.path.isdir(video_path):
+            if not recursive:
+                video_paths = find_files_of_filetypes_in_directory(directory=video_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, as_dict=True, raise_error=True)
+            else:
+                video_paths = recursive_file_search(directory=video_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS_2.value, as_dict=True, raise_error=True)
+        elif os.path.isfile(video_path):
+            video_paths = {get_fn_ext(filepath=video_path)[1]: video_path}
+        else:
+            raise InvalidInputError(msg=f'{video_path} is not a valid directory path or file path', source=self.__class__.__name__)
+        missing_video_paths = [x for x in data_paths.keys() if x not in video_paths.keys()]
+        if len(missing_video_paths) > 0:
+            raise NoDataError(msg=f'The data file(s) {missing_video_paths} does not have a representative video.', source=self.__class__.__name__)
+        #for _, v in video_paths.items(): _ = get_video_meta_data(video_path=v)
+        self.data_paths, self.video_paths = data_paths, video_paths
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
-        if circle_size is None:
-            circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(self.video_meta_data['width'], self.video_meta_data['height']), circle_frame_ratio=80)
-        else:
+        if circle_size is not None:
             check_int(name=f'{self.__class__.__name__} circle_size', value=circle_size, min_value=1)
-        if thickness is None:
-            thickness = circle_size
-        else:
+        if thickness is not None:
             check_int(name=f'{self.__class__.__name__} thickness', value=thickness, min_value=1)
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
         self.core_cnt = core_cnt
@@ -152,61 +180,79 @@ class YOLOPoseVisualizer():
         check_if_dir_exists(in_dir=save_dir)
         check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose', raise_error=True)
         check_valid_boolean(value=[bbox], source=f'{self.__class__.__name__} bbox', raise_error=True)
-        self.data_df = pd.read_csv(self.data_path, index_col=0)
-        check_valid_dataframe(df=self.data_df, source=f'{self.__class__.__name__} {self.data_path}', required_fields=EXPECTED_COLS)
-        self.df_frm_cnt = np.unique(self.data_df[FRAME].values).shape[0]
-        self.classes = np.unique(self.data_df[CLASS_NAME].values)
         if isinstance(palettes, str):
             palettes = (palettes,)
         else:
             check_valid_tuple(x=palettes, source=f'{self.__class__.__name__} palettes', minimum_length=1, valid_dtypes=(str,), accepted_values=Options.PALETTE_OPTIONS_CATEGORICAL.value)
-        if len(self.classes) != len(palettes):
-            raise CountError(msg=f'{len(self.classes)} classes detected in {self.data_path}, but {len(palettes)} color palette names passed: {palettes}', source=self.__class__.__name__)
-        self.palettes = {}
-        for cnt, palette in enumerate(palettes):
-            self.palettes[cnt] = create_color_palette(pallete_name=palette, increments=len(self.data_df.columns)-len(EXPECTED_COLS))
-        if skeleton is not None:
-            check_valid_lst(data=skeleton, source=f'{self.__class__.__name__} skeleton', valid_dtypes=(list, tuple,), min_len=1, raise_error=True)
-            for i in skeleton:
-                check_valid_tuple(x=i, source=f'{self.__class__.__name__} {i}', accepted_lengths=(2,), valid_dtypes=(str,))
-            required_s_cols = [f'{x}_{suffix}' for xs in skeleton for x in xs for suffix in ('X', 'Y', 'P')]
-            missing = [x for x in required_s_cols if x not in self.data_df.columns]
-            if len(missing) > 0:
-                raise DataHeaderError(msg=f'Columns {missing} missing in file {data_path} as passe by skeleton.', source=self.__class__.__name__)
-
         self.save_dir, self.verbose, self.palette, self.thickness = save_dir, verbose, palettes, thickness
         self.threshold, self.circle_size, self.thickness, self.bbox = threshold, circle_size, thickness, bbox
-        self.video_temp_dir = os.path.join(self.save_dir, self.video_name, "temp")
-        self.save_path, self.skeleton = os.path.join(self.save_dir, f'{self.video_name}.mp4'), skeleton
-        create_directory(paths=self.video_temp_dir)
-
+        self.palettes, self.skeleton = palettes, skeleton
+        self.timer = SimbaTimer(start=True)
 
     def run(self):
-        video_timer = SimbaTimer(start=True)
-        if self.video_meta_data['frame_count'] != self.df_frm_cnt:
-            raise FrameRangeError(msg=f'The bounding boxes contain data for {self.df_frm_cnt} frames, while the video is {self.video_meta_data["frame_count"]} frames ({self.video_meta_data["video_name"]})', source=self.__class__.__name__)
-        frm_batches = np.array_split(np.array(list(range(0, self.df_frm_cnt))), self.core_cnt)
-        frm_batches = [(i, j) for i, j in enumerate(frm_batches)]
-        if self.verbose: print(f'Visualizing video {self.video_meta_data["video_name"]} (frame count: {self.video_meta_data["frame_count"]})...')
-        with multiprocessing.Pool(self.core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
-            constants = functools.partial(_yolo_keypoint_visualizer,
+        for video_cnt, (video_name, data_path) in enumerate(self.data_paths.items()):
+            video_timer = SimbaTimer(start=True)
+            self.video_temp_dir = os.path.join(self.save_dir, video_name, "temp")
+            if os.path.isdir(self.video_temp_dir):
+                remove_a_folder(folder_dir=self.video_temp_dir)
+            create_directory(paths=self.video_temp_dir)
+            self.data_df = pd.read_csv(data_path, index_col=0)
+            print(f'Visualizing video {video_name} ({video_cnt+1}/{len(list(self.data_paths.keys()))})...')
+            self.video_meta_data = get_video_meta_data(video_path=self.video_paths[video_name])
+            check_valid_dataframe(df=self.data_df, source=f'{self.__class__.__name__} {data_path}', required_fields=EXPECTED_COLS)
+            self.df_frm_cnt = np.unique(self.data_df[FRAME].values).shape[0]
+            self.classes = np.unique(self.data_df[CLASS_NAME].values)
+            self.save_path, self.skeleton = os.path.join(self.save_dir, f'{video_name}.mp4'), self.skeleton
+            if len(self.classes) != len(self.palettes):
+                raise CountError(msg=f'{len(self.classes)} classes detected in {data_path}, but {len(self.palettes)} color palette names passed: {self.palettes}', source=self.__class__.__name__)
+            self.clrs = {}
+            for cnt, palette in enumerate(self.palettes):
+                self.clrs[cnt] = create_color_palette(pallete_name=palette, increments=len(self.data_df.columns) - len(EXPECTED_COLS))
+            if self.skeleton is not None:
+                check_valid_lst(data=self.skeleton, source=f'{self.__class__.__name__} skeleton', valid_dtypes=(list, tuple,), min_len=1, raise_error=True)
+                for i in self.skeleton:
+                    check_valid_tuple(x=i, source=f'{self.__class__.__name__} {i}', accepted_lengths=(2,), valid_dtypes=(str,))
+                required_s_cols = [f'{x}_{suffix}' for xs in self.skeleton for x in xs for suffix in ('X', 'Y', 'P')]
+                missing = [x for x in required_s_cols if x not in self.data_df.columns]
+                if len(missing) > 0:
+                    raise DataHeaderError(msg=f'Columns {missing} missing in file {data_path} as passe by skeleton.', source=self.__class__.__name__)
+            if self.video_meta_data['frame_count'] != self.df_frm_cnt:
+                raise FrameRangeError(msg=f'The bounding boxes contain data for {self.df_frm_cnt} frames, while the video is {self.video_meta_data["frame_count"]} frames ({self.video_meta_data["video_name"]})', source=self.__class__.__name__)
+            if self.circle_size is None:
+                circle_size = PlottingMixin().get_optimal_circle_size(frame_size=(self.video_meta_data['width'], self.video_meta_data['height']), circle_frame_ratio=80)
+            else:
+                circle_size = deepcopy(self.circle_size)
+            if self.thickness is None:
+                thickness = deepcopy(circle_size)
+            else:
+                thickness = deepcopy(self.thickness)
+            frm_batches = np.array_split(np.array(list(range(0, self.df_frm_cnt))), self.core_cnt)
+            frm_batches = [(i, j) for i, j in enumerate(frm_batches)]
+            if self.verbose: print(f'Visualizing video {self.video_meta_data["video_name"]} (frame count: {self.video_meta_data["frame_count"]})...')
+            with multiprocessing.Pool(self.core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
+                constants = functools.partial(_yolo_keypoint_visualizer,
                                           data=self.data_df,
                                           threshold=self.threshold,
-                                          video_path=self.video_path,
+                                          video_path=self.video_paths[video_name],
                                           save_dir=self.video_temp_dir,
-                                          circle_size=self.circle_size,
-                                          thickness=self.thickness,
-                                          palettes=self.palettes,
+                                          circle_size=circle_size,
+                                          thickness=thickness,
+                                          palettes=self.clrs,
                                           bbox=self.bbox,
                                           skeleton=self.skeleton)
-            for cnt, result in enumerate(pool.imap(constants, frm_batches, chunksize=1)):
-                print(f'Video batch {result+1}/{self.core_cnt} complete...')
-        pool.terminate()
-        pool.join()
-        video_timer.stop_timer()
-        concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.save_path, gpu=True)
+                for cnt, result in enumerate(pool.imap(constants, frm_batches, chunksize=1)):
+                    print(f'Video batch {result+1}/{self.core_cnt} complete...')
+            pool.terminate()
+            pool.join()
+            video_timer.stop_timer()
+            concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.save_path, gpu=True)
+            stdout_success(msg=f'YOLO pose video saved at {self.save_path} (Video {video_cnt+1}/{len(list(self.data_paths.keys()))})', source=self.__class__.__name__, elapsed_time=video_timer.elapsed_time_str)
 
-        stdout_success(msg=f'YOLO pose video saved at {self.save_path}', source=self.__class__.__name__, elapsed_time=video_timer.elapsed_time_str)
+        self.timer.stop_timer()
+        stdout_success(msg=f'{len(list(self.data_paths.keys()))} YOLO pose video saved in directory {self.save_dir}', source=self.__class__.__name__, elapsed_time=self.timer.elapsed_time_str)
+
+
+
 #
 #
 # if __name__ == "__main__":
@@ -314,18 +360,34 @@ class YOLOPoseVisualizer():
 #     #                             save_dir=save_dir,
 #     #                             core_cnt=18)
 #     # kp_vis.run()
+
+
 # if __name__ == "__main__":
-#     video_path = r"E:\maplight_videos\Day 5\Trial_9_C24_D5_2.mp4"
-#     data_path = r"E:\maplight_videos\yolo_mdl\mdl\results\Trial_9_C24_D5_2.csv"
-#     save_dir = r'E:\maplight_videos\yolo_mdl\mdl\results'
+#     video_path = r"E:\maplight_videos"
+#     data_path = r"E:\maplight_videos\yolo_mdl\mdl\results"
+#     save_dir = r'E:\maplight_videos\yolo_mdl\mdl\videos'
 #     kp_vis = YOLOPoseVisualizer(data_path=data_path,
 #                                 video_path=video_path,
 #                                 save_dir=save_dir,
 #                                 core_cnt=14,
-#                                 palettes=('Set1', 'Pastel1'))
+#                                 palettes=('Set1', 'Pastel1'),
+#                                 recursive=True,
+#                                 sample_n=1)
 #
 #
 #     kp_vis.run()
-#
-#
 
+if __name__ == "__main__":
+    video_path = r"E:\netholabs_videos\mosaics\subset"
+    data_path = r"E:\netholabs_videos\mosaics\yolo_mdl\results_csvs"
+    save_dir = r'E:\netholabs_videos\mosaics\yolo_mdl\results_videos'
+    kp_vis = YOLOPoseVisualizer(data_path=data_path,
+                                video_path=video_path,
+                                save_dir=save_dir,
+                                core_cnt=14,
+                                palettes=('Set1',),
+                                recursive=True,
+                                sample_n=None)
+
+
+    kp_vis.run()

@@ -50,6 +50,7 @@ def jitted_hull(points: np.ndarray, target: str = "perimeter") -> np.ndarray:
        For multicore based acceleration and Shapeley objects, see :func:`simba.mixins.geometry_mixin.GeometryMixin.bodyparts_to_polygon`.
        For numba CUDA based acceleration, use :func:`simba.data_processors.cuda.geometry.get_convex_hull`.
        For non-numba based compute of single convex hull area or perimeter, see :func:`simba.mixins.feature_extraction_mixin.FeatureExtractionMixin.convex_hull_calculator_mp`.
+       For wrapper function (ensuring data validity), see :func:`simba.feature_extractors.perimeter_jit.get_hull_sizes`
 
     .. csv-table::
        :header: EXPECTED RUNTIMES

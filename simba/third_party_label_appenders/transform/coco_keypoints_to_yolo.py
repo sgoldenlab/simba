@@ -61,6 +61,10 @@ class COCOKeypoints2Yolo:
     >>> runner = COCOKeypoints2Yolo(coco_path=r"D:\cvat_annotations\frames\coco_keypoints_1\merged.json", img_dir=r"D:\cvat_annotations\frames", save_dir=r"D:\cvat_annotations\frames\yolo", clahe=False)
     >>> runner.run()
 
+    :example III:
+    >>> runner = COCOKeypoints2Yolo(coco_path=r"E:\netholabs_videos\mosaics\subset\to_annotate\2d_mosaic_batch_1.json", img_dir=r"E:\netholabs_videos\mosaics\subset\to_annotate", save_dir=r"E:\netholabs_videos\mosaics\yolo_mdl", clahe=False)
+    >>> runner.run()
+
      :references:
         .. [1] Helpful YouTube tutorial by Farhan to get YOLO tracking data in animals - `https://www.youtube.com/watch?v=CcGbgFPwQTc <https://www.youtube.com/watch?v=CcGbgFPwQTc>`_.
         .. [2] Great YouTube tutorial by Felipe on annotating data and making data YOLO ready - `https://www.youtube.com/watch?v=m9fH9OWn8YM <https://www.youtube.com/watch?v=m9fH9OWn8YM>`_.
@@ -71,7 +75,7 @@ class COCOKeypoints2Yolo:
                  img_dir: Union[str, os.PathLike],
                  save_dir: Union[str, os.PathLike],
                  train_size: float = 0.7,
-                 flip_idx: Tuple[int, ...] = (0, 2, 1, 3, 5, 4, 6),
+                 flip_idx: Tuple[int, ...] = (0, 2, 1, 3, 5, 4, 6, 7, 8),
                  verbose: bool = True,
                  greyscale: bool = False,
                  clahe: bool = False,
@@ -200,6 +204,13 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
                                 verbose=args.verbose,
                                 train_size=args.train_size)
     runner.run()
+
+
+# runner = COCOKeypoints2Yolo(coco_path=r"E:\netholabs_videos\mosaics\subset\to_annotate\2d_mosaic_batch_1.json",
+#                             img_dir=r"E:\netholabs_videos\mosaics\subset\to_annotate",
+#                             save_dir=r"E:\netholabs_videos\mosaics\yolo_mdl",
+#                             clahe=False)
+# runner.run()
 
 
 # runner = COCOKeypoints2Yolo(coco_path=r"E:\maplight_videos\annotation_frames\maplight_1.json",

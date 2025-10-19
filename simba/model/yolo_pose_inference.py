@@ -38,7 +38,7 @@ from simba.utils.yolo import (_get_undetected_obs, filter_yolo_keypoint_data,
 
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
-NEAREST, CLASS_ID = 'nearest', 'CLASS_ID'
+NEAREST, CLASS_ID, CONFIDENCE  = 'nearest', 'CLASS_ID', 'CONFIDENCE'
 
 
 class YOLOPoseInference():
@@ -66,7 +66,8 @@ class YOLOPoseInference():
     :param bool half_precision: If True, uses half-precision (FP16) inference. Defaults to True.
     :param bool stream: If True, processes frames one-by-one in a generator style. Recommended for long videos. Defaults to False.
     :param float box_threshold: Confidence threshold bounding box detection. All detections (bounding boxes AND keypoints) below this value are ignored. Defaults to 0.5.
-    :param Optional[int] max_tracks: Maximum number of pose tracks to keep. If None, all tracks are retained.
+    :param Optional[int] max_tracks: Maximum number (total sum) of pose tracks to keep. If None, all tracks are retained.
+    :param Optional[int] max_per_class: Maximum number pose tracks per class. E.g., if one 'resident' and one 'intruder' is expecte, set this to 1. Defaults to None meaning all detected instances of each class are retained.
     :param bool interpolate: If True, interpolates missing keypoints across frames using the 'nearest' method. Defaults to False.
     :param bool smoothing: If not None, then the time in milliseconds for Gaussian-applied body-part smoothing.
     :param bool overwrite: If True, overwrites the data at the ``save_dir``. If False, skips the file if it exists.
@@ -115,7 +116,7 @@ class YOLOPoseInference():
             video_path = [video_path]
         elif os.path.isdir(video_path):
             if not recursive:
-                video_path = find_files_of_filetypes_in_directory(directory=video_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, as_dict=False)
+                video_path = find_files_of_filetypes_in_directory(directory=video_path, extensions=list(Options.ALL_VIDEO_FORMAT_OPTIONS.value), as_dict=False)
             else:
                 video_path = recursive_file_search(directory=video_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, as_dict=False)
         for i in video_path:
@@ -210,7 +211,6 @@ class YOLOPoseInference():
 
             results[video_name] = pd.DataFrame(video_out, columns=OUT_COLS)
             results[video_name]['FRAME'] = results[video_name]['FRAME'].astype(np.int64)
-
             results[video_name].loc[:, CLASS_ID] = (pd.to_numeric(results[video_name][CLASS_ID], errors='coerce').fillna(0).astype(np.int32))
             if self.interpolate:
                 for class_id in class_dict.keys():
@@ -218,6 +218,8 @@ class YOLOPoseInference():
                     for cord_col in COORD_COLS:
                         class_df[cord_col] = class_df[cord_col].astype(np.float32).astype(np.int32).replace(to_replace=-1, value=np.nan).astype(np.float32)
                         class_df[cord_col] = class_df[cord_col].interpolate(method=NEAREST, axis=0).ffill().bfill()
+                    class_df[CONFIDENCE] = class_df[CONFIDENCE].astype(np.float32).replace(to_replace=-1.0, value=np.nan).astype(np.float32)
+                    class_df[CONFIDENCE] = class_df[CONFIDENCE].interpolate(method=NEAREST, axis=0).ffill().bfill()
                     results[video_name].update(class_df)
             if self.smoothing:
                 frms_in_smoothing_window = int(self.smoothing / (1000 / video_meta['fps']))
@@ -227,6 +229,7 @@ class YOLOPoseInference():
                         for cord_col in COORD_COLS:
                             class_df[cord_col] = class_df[cord_col].rolling(window=frms_in_smoothing_window, win_type='gaussian', center=True).mean(std=5).fillna(results[video_name][cord_col]).abs()
                         results[video_name].update(class_df)
+            results[video_name] = results[video_name].replace([-1, -1.0, '-1'], 0).reset_index(drop=True)
             if self.save_dir:
                 save_path = os.path.join(self.save_dir, f'{video_name}.csv')
                 try:
@@ -291,18 +294,21 @@ class YOLOPoseInference():
 
 
 # VIDEO_DIR = r'E:\netholabs_videos\mosaics\subset'
-# SAVE_DIR = r'E:\netholabs_videos\mosaics_inference'
-# WEIGHTS_PATH = r"D:\netholabs\mdls_09282025\08252025\train4\weights\best.pt"
+# SAVE_DIR = r'E:\netholabs_videos\mosaics\yolo_mdl\results_csvs'
+# WEIGHTS_PATH = r"E:\netholabs_videos\mosaics\yolo_mdl\mdl\train2\weights\best.pt"
 # KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
-#
 
-# VIDEO_DIR = r"E:\maplight_videos\Day 5\Trial_9_C24_D5_2.mp4"
-# SAVE_DIR = r"E:\maplight_videos\yolo_mdl\mdl\results"
-# WEIGHTS_PATH = r"E:\maplight_videos\yolo_mdl\mdl\train\weights\best.pt"
+#
+# VIDEO_DIR = r"E:\netholabs_videos\mosaics\subset"
+# WEIGHTS_PATH = r"E:\netholabs_videos\mosaics\yolo_mdl_wo_tail\mdl\train2\weights\best.pt"
+# SAVE_DIR = r"E:\netholabs_videos\mosaics\yolo_mdl_wo_tail\results_csv"
+#
+# # VIDEO_DIR = r"E:\maplight_videos"
+# # SAVE_DIR = r"E:\maplight_videos\yolo_mdl\mdl\results"
+# # WEIGHTS_PATH = r"E:\maplight_videos\yolo_mdl\mdl\train\weights\best.pt"
+#
 # KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base',)
-#
-#
-#
+# #
 # i = YOLOPoseInference(weights=WEIGHTS_PATH,
 #                         video_path=VIDEO_DIR,
 #                         save_dir=SAVE_DIR,
@@ -311,28 +317,28 @@ class YOLOPoseInference():
 #                         format=None,
 #                         stream=True,
 #                         keypoint_names=KEYPOINT_NAMES,
-#                         batch_size=500,
-#                         imgsz=288,
-#                         interpolate=True,
-#                         box_threshold=0.1,
-#                         max_tracks=100,
-#                         max_per_class=1,
+#                         batch_size=250,
+#                         imgsz=640,
+#                         interpolate=False,
+#                         box_threshold=0.5,
+#                         max_tracks=3,
+#                         max_per_class=None,
 #                         overwrite=True,
 #                         randomize_order=True,
 #                         raise_error=False,
-#                         smoothing=100,
-#                         recursive=True)
+#                         smoothing=None,
+#                         recursive=False)
 # i.run()
 
 #
 #
 #
-# # # #
-# video_paths = r"D:\netholabs\minutes_examples\minute_27.avi"
-# weights_path = r"D:\netholabs\mdls_08202025\10x\weights\best.pt"
-# save_dir = r"D:\netholabs\mdls_08202025\10x\results"
 # # #
-# keypoint_names = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
+# video_paths = r"E:\netholabs_videos\mosaics\subset"
+# weights_path = r"E:\netholabs_videos\mosaics\yolo_mdl_wo_tail\mdl\train2\weights\best.pt"
+# save_dir = r"E:\netholabs_videos\mosaics\yolo_mdl_wo_tail\results_csv"
+# # #
+# # keypoint_names = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
 # # # #
 # # # #
 # i = YOLOPoseInference(weights=weights_path,

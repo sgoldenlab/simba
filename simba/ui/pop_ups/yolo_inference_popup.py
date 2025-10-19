@@ -22,6 +22,8 @@ MAX_TRACKS_OPTIONS = ['None', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 BATCH_SIZE_OPTIONS =  list(range(50, 1050, 50))
 CORE_CNT_OPTIONS = list(range(1, find_core_cnt()[0]))
 IMG_SIZE_OPTIONS = [256, 320, 416, 480, 512, 640, 720, 768, 960, 1280]
+SMOOTHING_OPTIONS = ['None', 50, 100, 200, 300, 400, 500]
+
 devices = ['CPU']
 THRESHOLD_OPTIONS = np.arange(0.1, 1.1, 0.1).astype(np.float32)
 
@@ -36,6 +38,9 @@ class YOLOPoseInferencePopUP(PopUpMixin):
         if ultralytics_version is None:
             raise SimBAPAckageVersionError(msg=f'Cannot train YOLO pose-estimation model: Could not find ultralytics package in python environment',  source=self.__class__.__name__)
 
+
+
+
         PopUpMixin.__init__(self, title="PREDICT USING YOLO POSE ESTIMATION MODEL", icon='ultralytics_2')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
         devices.extend([f'{x} : {y["model"]}' for x, y in gpus.items()])
@@ -44,14 +49,16 @@ class YOLOPoseInferencePopUP(PopUpMixin):
         self.batch_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=BATCH_SIZE_OPTIONS, label="BATCH SIZE: ", label_width=35, dropdown_width=40, value=250)
         self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE:", label_width=35, dropdown_width=40, value='TRUE')
         self.workers_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=CORE_CNT_OPTIONS, label="CPU WORKERS:", label_width=35, dropdown_width=40, value=int(max(CORE_CNT_OPTIONS)/2))
-        self.format_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=Options.VALID_YOLO_FORMATS.value, label="FORMAT:", label_width=35, dropdown_width=40, value='engine')
+        self.format_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=Options.VALID_YOLO_FORMATS.value, label="FORMAT:", label_width=35, dropdown_width=40, value='pb')
         self.img_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=IMG_SIZE_OPTIONS, label="IMAGE SIZE:", label_width=35, dropdown_width=40, value=640)
         self.devices_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=devices, label="DEVICE:", label_width=35, dropdown_width=40, value=devices[1])
-        self.interpolate_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="INTERPOLATE:",  label_width=35, dropdown_width=40, value='FALSE')
-        self.stream_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="STREAM:", label_width=35, dropdown_width=40, value='FALSE')
-        self.threshold_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=THRESHOLD_OPTIONS, label="THRESHOLD:", label_width=35, dropdown_width=40, value=0.7)
+        self.interpolate_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="INTERPOLATE:",  label_width=35, dropdown_width=40, value='TRUE')
+        self.stream_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="STREAM:", label_width=35, dropdown_width=40, value='TRUE')
+        self.threshold_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=THRESHOLD_OPTIONS, label="THRESHOLD:", label_width=35, dropdown_width=40, value=0.5)
         self.iou_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=THRESHOLD_OPTIONS,  label="IOU:", label_width=35, dropdown_width=40, value=0.7)
-        self.max_tracks_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=MAX_TRACKS_OPTIONS, label="MAX TRACKS:", label_width=35, dropdown_width=40, value=0.7)
+        self.max_tracks_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=MAX_TRACKS_OPTIONS, label="MAX TRACKS:", label_width=35, dropdown_width=40, value=MAX_TRACKS_OPTIONS[0])
+        self.max_track_per_id_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=MAX_TRACKS_OPTIONS, label="MAX TRACKS PER ID:", label_width=35, dropdown_width=40, value=1)
+        self.smoothing_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=SMOOTHING_OPTIONS, label="SMOOTHING (MS):", label_width=35, dropdown_width=40, value=SMOOTHING_OPTIONS[2])
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.weights_path.grid(row=0, column=0, sticky=NW)
@@ -66,6 +73,8 @@ class YOLOPoseInferencePopUP(PopUpMixin):
         self.verbose_dropdown.grid(row=9, column=0, sticky=NW)
         self.devices_dropdown.grid(row=10, column=0, sticky=NW)
         self.max_tracks_dropdown.grid(row=11, column=0, sticky=NW)
+        self.max_track_per_id_dropdown.grid(row=12, column=0, sticky=NW)
+        self.smoothing_dropdown.grid(row=13, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="ANALYZE SINGLE VIDEO", icon_name='video')
         self.video_path = FileSelect(parent=single_video_frm, fileDescription='VIDEO PATH:', lblwidth=35, entry_width=45, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -96,13 +105,19 @@ class YOLOPoseInferencePopUP(PopUpMixin):
         interpolate = str_2_bool(self.interpolate_dropdown.get_value())
         iou = float(self.iou_dropdown.get_value())
         stream = str_2_bool(self.stream_dropdown.get_value())
-        max_tracks = str_2_bool(self.stream_dropdown.get_value())
+        max_tracks = self.max_tracks_dropdown.get_value()
+        max_tracks_per_id = self.max_track_per_id_dropdown.get_value()
+        smoothing = self.smoothing_dropdown.get_value()
         verbose = str_2_bool(self.verbose_dropdown.get_value())
         workers = int(self.workers_dropdown.get_value())
         device = self.devices_dropdown.get_value()
         device = 'cpu' if device == 'CPU' else int(device.split(':', 1)[0])
         check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} SAVE DIRECTORY')
         check_file_exist_and_readable(file_path=mdl_path, raise_error=True)
+
+        max_tracks = None if max_tracks == 'None' else int(max_tracks)
+        max_tracks_per_id = None if max_tracks_per_id == 'None' else int(max_tracks_per_id)
+        smoothing = None if smoothing == 'None' else int(smoothing)
 
         if multiple:
             check_if_dir_exists(in_dir=self.video_dir.folder_path, source=self.__class__.__name__, raise_error=True)
@@ -122,10 +137,12 @@ class YOLOPoseInferencePopUP(PopUpMixin):
                                    torch_threads=workers,
                                    box_threshold=threshold,
                                    max_tracks=max_tracks,
+                                   max_per_class=max_tracks_per_id,
                                    interpolate=interpolate,
                                    imgsz=img_size,
                                    iou=iou,
-                                   stream=stream)
+                                   stream=stream,
+                                   smoothing=smoothing)
         runner.run()
 
 
