@@ -1475,38 +1475,35 @@ def copy_single_video_to_project(
             )
 
 
-def copy_multiple_videos_to_project(
-    config_path: Union[str, os.PathLike],
-    source: Union[str, os.PathLike],
-    file_type: str,
-    symlink: Optional[bool] = False,
-    allowed_video_formats: Optional[Tuple[str]] = ("avi", "mp4"),
-) -> None:
+def copy_multiple_videos_to_project(config_path: Union[str, os.PathLike],
+                                    source: Union[str, os.PathLike],
+                                    file_type: str,
+                                    symlink: Optional[bool] = False,
+                                    recursive_search: Optional[bool] = False,
+                                    allowed_video_formats: Optional[Tuple[str]] = ("avi", "mp4")) -> None:
     """
     Import directory of videos to SimBA project.
 
-    :param Union[str, os.PathLike] simba_ini_path: path to SimBA project config file in Configparser format
-    :param Union[str, os.PathLike] source_path: Path to directory with video files outside SimBA project.
+    :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
+    :param Union[str, os.PathLike] source: Path to directory with video files outside SimBA project.
     :param str file_type: Video format of imported videos (i.e.,: mp4 or avi)
     :param Optional[bool] symlink: If True, creates soft copies rather than hard copies. Default: False.
+    :param Optional[bool] recursive_search: If True, copies all video files in subdirectories and immediately in ``source``. If False, only files immediately in ``source``. Default: False.
     :param Optional[Tuple[str]] allowed_video_formats: Allowed video formats. DEFAULT: avi or mp4
     """
 
     multiple_video_timer = SimbaTimer(start=True)
+    check_valid_boolean(value=recursive_search, source=f'{copy_multiple_videos_to_project.__name__} recursive_search', raise_error=True)
     if file_type.lower().strip() not in allowed_video_formats:
-        raise InvalidFileTypeError(
-            msg="SimBA only works with avi and mp4 video files (Please enter mp4 or avi in entrybox). Or convert your videos to mp4 or avi to continue.",
-            source=copy_multiple_videos_to_project.__name__,
-        )
-    video_path_lst = find_all_videos_in_directory(
-        directory=source, video_formats=(file_type), raise_error=True
-    )
-    video_path_lst = [os.path.join(source, x) for x in video_path_lst]
+        raise InvalidFileTypeError(msg="SimBA only works with avi and mp4 video files (Please enter mp4 or avi in entrybox). Or convert your videos to mp4 or avi to continue.", source=copy_multiple_videos_to_project.__name__)
+    if not recursive_search:
+        video_path_lst = find_all_videos_in_directory(directory=source, video_formats=(file_type,), raise_error=True)
+        video_path_lst = [os.path.join(source, x) for x in video_path_lst]
+    else:
+        video_path_lst = recursive_file_search(directory=source, extensions=list(allowed_video_formats), as_dict=True, raise_error=True)
+        video_path_lst = list(video_path_lst.values())
     if len(video_path_lst) == 0:
-        raise NoFilesFoundError(
-            msg=f"SIMBA ERROR: No videos found in {source} directory of file-type {file_type}",
-            source=copy_multiple_videos_to_project.__name__,
-        )
+        raise NoFilesFoundError(msg=f"SIMBA ERROR: No videos found in {source} directory of file-type {file_type}", source=copy_multiple_videos_to_project.__name__,)
     destination_dir = os.path.join(os.path.dirname(config_path), "videos")
     for file_cnt, file_path in enumerate(video_path_lst):
         timer = SimbaTimer(start=True)
@@ -1515,10 +1512,7 @@ def copy_multiple_videos_to_project(
         newFileName = os.path.join(filebasename + file_extension)
         dest1 = os.path.join(destination_dir, newFileName)
         if os.path.isfile(dest1):
-            FileExistWarning(
-                msg=f"{filebasename} already exist in SimBA project. Skipping video...",
-                source=copy_multiple_videos_to_project.__name__,
-            )
+            FileExistWarning(msg=f"{filebasename} already exist in SimBA project. Skipping video...", source=copy_multiple_videos_to_project.__name__)
         else:
             if not symlink:
                 shutil.copy(file_path, dest1)
@@ -1539,7 +1533,7 @@ def copy_multiple_videos_to_project(
 
     multiple_video_timer.stop_timer()
     stdout_success(
-        msg=f"{len(video_path_lst)} videos copied to project.",
+        msg=f"{len(video_path_lst)} videos copied to project {config_path}.",
         elapsed_time=multiple_video_timer.elapsed_time_str,
         source=copy_multiple_videos_to_project.__name__,
     )
@@ -3460,6 +3454,10 @@ def osf_download(project_id: str, save_dir: Union[str, os.PathLike], storage: st
     timer.stop_timer()
     print(f'Download completed (elapsed time: {timer.elapsed_time_str}s)')
 
-#osf_download(project_id="tmu6y", save_dir=r'E:\annotations_preprint', overwrite=True)
 
+#copy_multiple_videos_to_project(config_path=r"C:\troubleshooting\multi_animal_dlc_two_c57\project_folder\project_config.ini", source=r'E:\maplight_videos\video_test', file_type='mp4', recursive_search=False)
+
+
+
+#osf_download(project_id="tmu6y", save_dir=r'E:\annotations_preprint', overwrite=True)
 #concatenate_videos_in_folder(in_folder=r'C:\troubleshooting\RAT_NOR\project_folder\frames\output\path_plots\03152021_NOB_IOT_8', save_path=r"C:\troubleshooting\RAT_NOR\project_folder\frames\output\path_plots\new.mp4", remove_splits=False)

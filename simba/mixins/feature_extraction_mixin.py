@@ -225,8 +225,8 @@ class FeatureExtractionMixin(object):
         .. seealso::
            For GPU acceleration, use :func:`simba.data_processors.cuda.statistics.count_values_in_ranges`
 
-        :param                                np.ndarray data: 2D numpy array with frames on X.
-        :param                                np.ndarray ranges: 2D numpy array representing the brackets. E.g., [[0, 0.1], [0.1, 0.5]]
+        :param np.ndarray data: 2D numpy array with frames on X.
+        :param np.ndarray ranges: 2D numpy array representing the brackets. E.g., [[0, 0.1], [0.1, 0.5]]
         :return: 2D numpy array of size data.shape[0], ranges.shape[1]
         :rtype: np.ndarray
 

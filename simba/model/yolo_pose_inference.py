@@ -41,7 +41,7 @@ from simba.utils.yolo import (_get_undetected_obs, filter_yolo_keypoint_data,
 
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
-NEAREST, CLASS_ID, CONFIDENCE  = 'nearest', 'CLASS_ID', 'CONFIDENCE'
+NEAREST, CLASS_ID, CONFIDENCE, FRAME  = 'nearest', 'CLASS_ID', 'CONFIDENCE', 'FRAME'
 
 
 class YOLOPoseInference():
@@ -213,7 +213,7 @@ class YOLOPoseInference():
                         video_out.append(bbox)
 
             results[video_name] = pd.DataFrame(video_out, columns=OUT_COLS)
-            results[video_name]['FRAME'] = results[video_name]['FRAME'].astype(np.int64)
+            results[video_name][FRAME] = results[video_name][FRAME].astype(np.int64)
             results[video_name].loc[:, CLASS_ID] = (pd.to_numeric(results[video_name][CLASS_ID], errors='coerce').fillna(0).astype(np.int32))
             if self.interpolate:
                 for class_id in class_dict.keys():

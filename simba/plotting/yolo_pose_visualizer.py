@@ -28,6 +28,7 @@ FRAME = 'FRAME'
 CLASS_ID = 'CLASS_ID'
 CONFIDENCE = 'CONFIDENCE'
 CLASS_NAME = 'CLASS_NAME'
+TRACK = 'TRACK'
 BOX_CORD_FIELDS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 EXPECTED_COLS = [FRAME, CLASS_ID, CLASS_NAME, CONFIDENCE, 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 
@@ -51,6 +52,8 @@ def _yolo_keypoint_visualizer(frm_ids: np.ndarray,
     fourcc, font = cv2.VideoWriter_fourcc(*"mp4v"), cv2.FONT_HERSHEY_DUPLEX
     video_save_path = os.path.join(save_dir, f'{batch_id}.mp4')
     video_writer = cv2.VideoWriter(video_save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"], video_meta_data["height"]))
+    if TRACK in data.columns:
+        data = data.drop([TRACK], axis=1)
     while current_frm <= end_frm:
         print(f'Processing frame {current_frm}/{video_meta_data["frame_count"]} (batch: {batch_id}, video: {video_meta_data["video_name"]})...')
         img = read_frm_of_video(video_path=video_path, frame_index=current_frm)
@@ -378,9 +381,9 @@ class YOLOPoseVisualizer():
 #     kp_vis.run()
 
 if __name__ == "__main__":
-    video_path = r"E:\netholabs_videos\mosaics\subset"
-    data_path = r"E:\netholabs_videos\mosaics\yolo_mdl\results_csvs"
-    save_dir = r'E:\netholabs_videos\mosaics\yolo_mdl\results_videos'
+    video_path = r"E:\netholabs_videos\mosaic_inference_test"
+    data_path = r"E:\netholabs_videos\mosaic_inference_test\results_csv"
+    save_dir = r'E:\netholabs_videos\mosaic_inference_test\results_videos'
     kp_vis = YOLOPoseVisualizer(data_path=data_path,
                                 video_path=video_path,
                                 save_dir=save_dir,

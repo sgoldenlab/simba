@@ -5,7 +5,7 @@ import pandas as pd
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.read_write import find_files_of_filetypes_in_directory, write_df
 from simba.utils.checks import check_valid_dataframe, check_valid_boolean, check_float, check_valid_tuple
-from simba.utils.printing import stdout_success
+from simba.utils.printing import stdout_success, SimbaTimer
 from simba.utils.errors import PermissionError
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
@@ -15,10 +15,11 @@ FRAME = 'FRAME'
 class SimBAYoloImporter(ConfigReader):
 
     """
-    Import YOLO pose estimation results created in SimBA into SimBA project format.
+    Import YOLO pose estimation results into SimBA project format.
+
 
     .. seealso::
-       YOLO pose data can be created in SimBA using :func:`simba.model.yolo_pose_inference.YOLOPoseInference`.
+       YOLO pose data can be created with :func:`simba.model.yolo_pose_inference.YOLOPoseInference`.
 
     :param config_path: Path to SimBA project config file.
     :param data_dir: Directory containing YOLO results CSV files.
@@ -58,6 +59,7 @@ class SimBAYoloImporter(ConfigReader):
 
     def run(self):
         for video_counter, (video_name, data_path) in enumerate(self.data_paths.items()):
+            video_timer = SimbaTimer(start=True)
             yolo_df = pd.read_csv(data_path, index_col=0)
             check_valid_dataframe(df=yolo_df, source=data_path, required_fields=OUT_COLS)
             class_names = yolo_df[CLASS_NAME].unique()
@@ -68,10 +70,15 @@ class SimBAYoloImporter(ConfigReader):
                 bp_names = [f"{cls}_{bp}" for cls in class_names for bp in bp_names]
                 with open(self.body_parts_path, "w") as f:
                     f.writelines(f"{bp}\n" for bp in bp_names)
-            pivoted = yolo_df.pivot(index='FRAME', columns='CLASS_NAME')
+            pivoted = yolo_df.pivot(index=FRAME, columns=CLASS_NAME)
             pivoted.columns = [f"{cls}_{col}" for col, cls in pivoted.columns]
             out_df = pivoted.reset_index(drop=True)
-            write_df(df=out_df, file_type='csv', save_path=os.path.join(self.outlier_corrected_dir, f'{video_name}.csv'), verbose=True)
+            col_order = []
+            for class_name in class_names:
+                class_cols = [x for x in out_df.columns if class_name in x]
+                col_order.extend((class_cols))
+            out_df = out_df[col_order].reset_index(drop=True)
+            write_df(df=out_df, file_type='csv', save_path=os.path.join(self.outlier_corrected_dir, f'{video_name}.csv'))
             if hasattr(self, 'video_info_df'):
                 self.video_info_df = self.video_info_df[self.video_info_df['Video'] != video_name]
                 self.video_info_df.loc[len(self.video_info_df)] = [video_name, self.fps, self.resolution[1], self.resolution[1], 927.927, self.px_per_mm]
@@ -80,7 +87,11 @@ class SimBAYoloImporter(ConfigReader):
                     self.video_info_df.to_csv(self.video_info_path)
                 except PermissionError:
                     raise PermissionError(msg=f"SimBA tried to write to {self.video_info_path}, but was not allowed. If this file is open in another program, try closing it.", source=self.__class__.__name__)
-
+            video_timer.stop_timer()
+            print(f'Imported video {video_name} ({video_counter+1}/{len(list(self.data_paths.keys()))}) (elapsed time: {video_timer.elapsed_time_str}s)...')
         self.timer.stop_timer()
         if self.verbose:
             stdout_success(msg=f'{len(list(self.data_paths.keys()))} data file(s) imported to SimBA project in directory {self.outlier_corrected_dir}', elapsed_time=self.timer.elapsed_time_str)
+
+# importer = SimBAYoloImporter(data_dir=r'E:\maplight_videos\yolo_mdl\mdl\results', config_path=r"E:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini", verbose=True, px_per_mm=1.43, fps=30)
+# importer.run()

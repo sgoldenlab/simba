@@ -61,7 +61,7 @@ from simba.utils.read_write import (
     find_all_videos_in_directory, find_core_cnt,
     find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data,
     read_config_entry, read_config_file, read_frm_of_video,
-    read_img_batch_from_video_gpu)
+    read_img_batch_from_video_gpu, recursive_file_search)
 from simba.utils.warnings import (CropWarning, FFMpegCodecWarning,
                                   FileExistWarning, FrameRangeWarning,
                                   GPUToolsWarning, InValidUserInputWarning,
@@ -909,6 +909,7 @@ def batch_video_to_greyscale(path: Union[str, os.PathLike, List[Union[str, os.Pa
 
 def superimpose_frame_count(file_path: Union[str, os.PathLike],
                             gpu: Optional[bool] = False,
+                            recursive: Optional[bool] = False,
                             font: Optional[str] = 'Arial',
                             font_color: Optional[str] = 'black',
                             bg_color: Optional[str] = 'white',
@@ -932,10 +933,11 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
        :height: 480
        :align: center
 
-    :parameter Union[str, os.PathLike] file_path: Path to video file.
+    :parameter Union[str, os.PathLike] file_path: Path to video file or directory containing video files.
     :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :parameter Optional[bool] recursive: If True, processes all video files in ``file_path`` directory found recursively. If False, then grabs just the video in the parent.
     :parameter Optional[int] fontsize: The size of the font represetnting the current frame. Default: 20.
-    :parameter Optional[Union[str, os.PathLike]] save_path: Optional save location for the video with frame numbers. If None, then the new video is saved in the same directory as the input video with the ``_frame_no`` suffix.
+    :parameter Optional[Union[str, os.PathLike]] save_path: Optional save path or save directory for the video with frame numbers. If None, then the new video is saved in the same directory as the input video with the ``_frame_no`` suffix.
     :parameter Optional[str] font_color: The color of frame number text. Default: 'Black'.
     :parameter Optional[str] loc: The location of the font number text. Options: 'top_left', 'top_middle', 'top_right', 'bottom_left', 'bottom_middle', 'bottom_right'. Default: Bottom middle.
     :parameter Optional[str] bg_color: The color of the box which the frame number is printed in. Default: 'White'.
@@ -950,47 +952,65 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
     timer = SimbaTimer(start=True)
     check_ffmpeg_available(raise_error=True)
     check_int(name=f'{superimpose_frame_count.__name__} fontsize', value=fontsize, min_value=1)
+    check_valid_boolean(value=recursive, source=f'{superimpose_frame_count.__name__} recursive', raise_error=True)
     font_color = ''.join(filter(str.isalnum, font_color)).lower()
     bg_color = ''.join(filter(str.isalnum, bg_color)).lower()
     font_dict = get_fonts()
+    if save_path is not None:
+        check_str(name=f'{superimpose_frame_count.__name__} save_path', value=save_path, raise_error=True)
     check_str(name='font', value=font, options=tuple(font_dict.keys()))
     check_str(name='loc', value=loc, options=('top_left', 'top_middle', 'top_right', 'bottom_left', 'bottom_middle', 'bottom_right'))
     font_path = font_dict[font]
-    check_file_exist_and_readable(file_path=file_path)
-    dir, file_name, ext = get_fn_ext(filepath=file_path)
-    if save_path is None:
-        save_name = os.path.join(dir, f"{file_name}_frame_no.mp4")
-    else:
-        check_if_dir_exists(in_dir=os.path.isdir(os.path.dirname(save_path)), source=f'{superimpose_frame_count.__name__} save_path', create_if_not_exist=True)
-        save_name = save_path
-    if gpu:
-        if loc == 'top_left':
-            cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=10:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
-        elif loc == 'top_center':
-            cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=(w-tw)/2:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
-        elif loc == 'top_right':
-            cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=w-tw-10:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
-        elif loc == 'bottom_left':
-            cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=10:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
-        elif loc == 'bottom_right':
-            cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=w-tw-10:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
+    if os.path.isfile(file_path):
+        check_file_exist_and_readable(file_path=file_path)
+        file_paths = [file_path]
+    elif os.path.isdir(file_path):
+        if not recursive:
+            file_paths = find_all_videos_in_directory(directory=file_path, as_dict=True, raise_error=True)
+            file_paths = list(file_paths.values())
         else:
-            cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
+            file_paths = recursive_file_search(directory=file_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True, as_dict=False)
+            print(len(file_paths), file_path)
     else:
-        if loc == 'top_left':
-            cmd = f'''ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=10: y=10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
-        elif loc == 'top_middle':
-            cmd = f'''ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=(w-tw)/2: y=10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
-        elif loc == 'bottom_left':
-            cmd = f'''ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=10: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
-        elif loc == 'bottom_right':
-            cmd = f'''ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=w-tw-10: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
-        else:
-            cmd = f'''ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=(w-tw)/2: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
+        raise InvalidInputError(msg='{} is not a valid file path or file directory.', source=superimpose_frame_count.__name__)
 
-    subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
-    timer.stop_timer()
-    stdout_success(msg=f"Superimposed video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str)
+    for video_cnt, file_path in enumerate(file_paths):
+        dir, file_name, ext = get_fn_ext(filepath=file_path)
+        print(f'Superimposing frame count video {video_cnt+1}/{len(file_paths)}...')
+        if save_path is None:
+            save_name = os.path.join(dir, f"{file_name}_frame_no.mp4")
+        elif os.path.isdir(save_path):
+            save_name = os.path.join(save_path, f"{file_name}_frame_no.mp4")
+        else:
+            check_if_dir_exists(in_dir=os.path.isdir(os.path.dirname(save_path)), source=f'{superimpose_frame_count.__name__} save_path', create_if_not_exist=True)
+            save_name = save_path
+        if gpu:
+            if loc == 'top_left':
+                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=10:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
+            elif loc == 'top_center':
+                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=(w-tw)/2:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
+            elif loc == 'top_right':
+                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=w-tw-10:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
+            elif loc == 'bottom_left':
+                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=10:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
+            elif loc == 'bottom_right':
+                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=w-tw-10:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
+            else:
+                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
+        else:
+            if loc == 'top_left':
+                cmd = f'''ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=10: y=10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
+            elif loc == 'top_middle':
+                cmd = f'''ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=(w-tw)/2: y=10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
+            elif loc == 'bottom_left':
+                cmd = f'''ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=10: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
+            elif loc == 'bottom_right':
+                cmd = f'''ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=w-tw-10: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
+            else:
+                cmd = f'''ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=(w-tw)/2: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
+        subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
+        timer.stop_timer()
+        stdout_success(msg=f"Superimposed video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str)
 
 def remove_beginning_of_video(file_path: Union[str, os.PathLike],
                               time: int,
@@ -4953,6 +4973,10 @@ def get_async_frame_batch(batch_reader: AsyncVideoFrameReader, timeout: int = 10
         return x
 
 
+
+
+
+#superimpose_frame_count(file_path=r'E:\maplight_videos', recursive=True, save_path=f'E:\maplight_videos\superimposed_frm_count')
 
 # video_paths = ['/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped_gantt.mp4',
 #                '/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/merge/Trial    10_clipped.mp4',
