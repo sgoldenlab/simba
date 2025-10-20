@@ -56,7 +56,7 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_nvidea_gpu_available, check_str,
                                 check_valid_array, check_valid_boolean,
                                 check_valid_dataframe, check_valid_lst,
-                                check_valid_url, is_video_color)
+                                check_valid_url, is_video_color, check_valid_tuple)
 from simba.utils.enums import (ENV_VARS, OS, ConfigKey, Defaults, Dtypes,
                                Formats, Keys, Links, Options, Paths)
 from simba.utils.errors import (DataHeaderError, DuplicationError,
@@ -959,7 +959,7 @@ def find_video_of_file(video_dir: Union[str, os.PathLike],
 
 
 def find_files_of_filetypes_in_directory(directory: Union[str, os.PathLike],
-                                         extensions: Union[List[str], str],
+                                         extensions: Union[List[str], Tuple[str], str],
                                          raise_warning: bool = True,
                                          as_dict: bool = False,
                                          raise_error: bool = False) -> Union[List[str], Dict[str, str]]:
@@ -967,7 +967,7 @@ def find_files_of_filetypes_in_directory(directory: Union[str, os.PathLike],
     Find all files in a directory of specified extensions/types.
 
     :param str directory: Directory holding files.
-    :param List[str] extensions: Accepted file extensions as a list of string or a string.
+    :param List[str] extensions: Accepted file extensions as a list of string, string, or tuple.
     :param bool raise_warning: If True, raise warning if no files are found. Default True.
     :param bool raise_error: If True, raise error if no files are found. Default False.
     :param bool as_dict: If True, returns a dictionary with all filenames as keys and filepaths as values. If False, then a list of all filepaths. Default False.
@@ -979,9 +979,12 @@ def find_files_of_filetypes_in_directory(directory: Union[str, os.PathLike],
     """
 
 
-    check_instance(source=f'{find_files_of_filetypes_in_directory.__name__} extensions', instance=extensions, accepted_types=(str, list,), raise_error=True)
+    check_instance(source=f'{find_files_of_filetypes_in_directory.__name__} extensions', instance=extensions, accepted_types=(str, list, tuple), raise_error=True)
     if isinstance(extensions, str):
         extensions = [extensions]
+    elif isinstance(extensions, tuple):
+        check_valid_tuple(x=extensions, source=f'{find_files_of_filetypes_in_directory.__name__} extensions', valid_dtypes=(str,), minimum_length=1)
+        extensions = list(extensions)
     else:
         check_valid_lst(data=extensions, source=f'{find_files_of_filetypes_in_directory.__name__} extensions', valid_dtypes=(str,), min_len=1, raise_error=True)
     if not os.path.isdir(directory):

@@ -152,7 +152,7 @@ class YOLOPoseInference():
             check_int(name=f'{self.__class__.__name__} max_tracks', value=max_tracks, min_value=1)
         if save_dir is not None:
             check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir')
-        if smoothing is not None:
+        if smoothing is not None and smoothing is not False:
             check_int(name=f'{self.__class__.__name__} smoothing', value=smoothing, min_value=1, raise_error=True)
         self.keypoint_col_names = [f'{i}_{s}'.upper() for i in keypoint_names for s in ['x', 'y', 'p']]
         self.keypoint_cord_col_names = [f'{i}_{s}'.upper() for i in keypoint_names for s in ['x', 'y']]
@@ -219,9 +219,9 @@ class YOLOPoseInference():
                 for class_id in class_dict.keys():
                     class_df = results[video_name][results[video_name][CLASS_ID] == int(class_id)]
                     for cord_col in COORD_COLS:
-                        class_df[cord_col] = class_df[cord_col].astype(np.float32).astype(np.int32).replace(to_replace=-1, value=np.nan).astype(np.float32)
+                        class_df[cord_col] = class_df[cord_col].astype(np.float32).replace([-1, 0], np.nan)
                         class_df[cord_col] = class_df[cord_col].interpolate(method=NEAREST, axis=0).ffill().bfill()
-                    class_df[CONFIDENCE] = class_df[CONFIDENCE].astype(np.float32).replace(to_replace=-1.0, value=np.nan).astype(np.float32)
+                    class_df[CONFIDENCE] = class_df[CONFIDENCE].astype(np.float32).replace([-1, 0], np.nan)
                     class_df[CONFIDENCE] = class_df[CONFIDENCE].interpolate(method=NEAREST, axis=0).ffill().bfill()
                     results[video_name].update(class_df)
             if self.smoothing:

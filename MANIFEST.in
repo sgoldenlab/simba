@@ -9,3 +9,9 @@ prune */pose_configurations_archive
 recursive-exclude */pose_configurations_archive *
 global-exclude pose_configurations_archive/*
 global-exclude */pose_configurations_archive/*
+prune docs
+prune misc
+prune images
+prune tests
+prune output
+prune lightning_logs
