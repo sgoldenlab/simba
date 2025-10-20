@@ -1,13 +1,13 @@
 import functools
 import multiprocessing
 import os
-from typing import List, Optional, Tuple, Union
 import random
+from copy import deepcopy
+from typing import List, Optional, Tuple, Union
 
 import cv2
 import numpy as np
 import pandas as pd
-from copy import deepcopy
 
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
@@ -16,13 +16,15 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_lst, check_valid_tuple)
 from simba.utils.data import create_color_palette
 from simba.utils.enums import Defaults, Options
-from simba.utils.errors import CountError, DataHeaderError, FrameRangeError, InvalidInputError, NoDataError
+from simba.utils.errors import (CountError, DataHeaderError, FrameRangeError,
+                                InvalidInputError, NoDataError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data,
-                                    read_frm_of_video, recursive_file_search, remove_a_folder)
+                                    read_frm_of_video, recursive_file_search,
+                                    remove_a_folder)
 
 FRAME = 'FRAME'
 CLASS_ID = 'CLASS_ID'
