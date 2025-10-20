@@ -56,7 +56,8 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_nvidea_gpu_available, check_str,
                                 check_valid_array, check_valid_boolean,
                                 check_valid_dataframe, check_valid_lst,
-                                check_valid_url, is_video_color, check_valid_tuple)
+                                check_valid_tuple, check_valid_url,
+                                is_video_color)
 from simba.utils.enums import (ENV_VARS, OS, ConfigKey, Defaults, Dtypes,
                                Formats, Keys, Links, Options, Paths)
 from simba.utils.errors import (DataHeaderError, DuplicationError,
