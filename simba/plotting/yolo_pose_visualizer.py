@@ -383,16 +383,16 @@ class YOLOPoseVisualizer():
 #     kp_vis.run()
 
 if __name__ == "__main__":
-    video_path = r"E:\netholabs_videos\mosaic_inference_test"
-    data_path = r"E:\netholabs_videos\mosaic_inference_test\results_csv"
-    save_dir = r'E:\netholabs_videos\mosaic_inference_test\results_videos'
+    video_path = r"E:\netholabs_videos\50_largest_files\videos"
+    data_path = r"E:\netholabs_videos\50_largest_files\results_csv_025"
+    save_dir = r'E:\netholabs_videos\50_largest_files\results_videos_025'
     kp_vis = YOLOPoseVisualizer(data_path=data_path,
                                 video_path=video_path,
                                 save_dir=save_dir,
                                 core_cnt=14,
                                 palettes=('Set1',),
                                 recursive=True,
-                                sample_n=None)
+                                sample_n=75)
 
 
     kp_vis.run()

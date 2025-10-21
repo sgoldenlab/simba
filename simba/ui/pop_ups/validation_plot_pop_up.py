@@ -31,9 +31,6 @@ TEXT_SPACE_OPTIONS.insert(0, AUTO)
 OPACITY_OPTIONS = list(np.arange(0.1, 1.1, 0.1))
 OPACITY_OPTIONS = [round(x, 1) for x in OPACITY_OPTIONS]
 POSE_PALETTE_OPTIONS = Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value
-
-print(POSE_PALETTE_OPTIONS)
-
 class ValidationVideoPopUp(PopUpMixin, ConfigReader):
     def __init__(self,
                  config_path: Union[str, os.PathLike],
@@ -44,12 +41,11 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
 
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         if not os.path.isfile(feature_path):
-            raise NoFilesFoundError(msg=f'Set DATA FEATURE FILE PATH to a valid file before creating validation video: Got {model_path}.', source=self.__class__.__name__)
+            raise NoFilesFoundError(msg=f'Set DATA FEATURE FILE PATH to a valid file before creating validation video: Got {feature_path}.', source=self.__class__.__name__)
         if not os.path.isfile(model_path):
             raise NoFilesFoundError(msg=f'Set MODEL FILE PATH to a valid file before creating validation video: Got {model_path}.', source=self.__class__.__name__)
         if not check_float(name=f'{self.__class__.__name__} discrimination_threshold', min_value=0.0, max_value=1.0, value=discrimination_threshold, raise_error=False):
             raise InvalidInputError(msg=f'Set the DISCRIMINATION THRESHOLD to a value between 0.0 and 1.0 before creating validation video. Got: {discrimination_threshold}.', source=self.__class__.__name__)
-        print(discrimination_threshold)
         discrimination_threshold = float(discrimination_threshold)
         if not check_int(name=f'{self.__class__.__name__} shortest_bout', value=shortest_bout, min_value=0, raise_error=False):
             raise InvalidInputError(msg=f'Set the MINIMUM BOUT LENGTH (MS) to a value above 1 before creating validation video. Got {shortest_bout}.', source=self.__class__.__name__)
@@ -63,7 +59,7 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
         self.circle_size_dropdown = SimBADropDown(parent=style_frm, dropdown_options=TEXT_SPACE_OPTIONS, label='CIRCLE SIZE: ', label_width=30, dropdown_width=40, value=AUTO)
         self.text_opacity_dropdown = SimBADropDown(parent=style_frm, dropdown_options=OPACITY_OPTIONS, label='TEXT OPACITY: ', label_width=30, dropdown_width=40, value=0.8)
         self.text_thickness_dropdown = SimBADropDown(parent=style_frm, dropdown_options=FONT_SIZE_OPTIONS, label='TEXT THICKNESS: ', label_width=30, dropdown_width=40, value=2)
-        self.bp_palette_dropdown = SimBADropDown(parent=style_frm, dropdown_options=POSE_PALETTE_OPTIONS, label='BODY-PART PALETTE: ', label_width=30, dropdown_width=40, value=2)
+        self.bp_palette_dropdown = SimBADropDown(parent=style_frm, dropdown_options=POSE_PALETTE_OPTIONS, label='BODY-PART PALETTE: ', label_width=30, dropdown_width=40, value=POSE_PALETTE_OPTIONS[0])
 
         style_frm.grid(row=0, column=0, sticky=NW, padx=10, pady=10)
         self.font_size_dropdown.grid(row=0, column=0, sticky=NW)
@@ -95,13 +91,13 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
     def __run(self):
         show_pose = str_2_bool(self.show_pose_dropdown.getChoices())
         show_animal_names = str_2_bool(self.show_animal_names_dropdown.getChoices())
-        print(self.font_size_dropdown.getChoices())
         font_size = None if self.font_size_dropdown.getChoices() == AUTO else int(self.font_size_dropdown.getChoices())
         circle_size = None if self.circle_size_dropdown.getChoices() == AUTO else int(self.circle_size_dropdown.getChoices())
         text_space_scale = None if self.space_dropdown.getChoices() == AUTO else int(self.space_dropdown.getChoices())
         text_thickness = int(self.text_thickness_dropdown.getChoices())
         text_opacity = float(self.text_opacity_dropdown.getChoices())
         core_cnt = int(self.core_cnt_dropdown.getChoices())
+        bp_palette = self.bp_palette_dropdown.getChoices()
         create_gantt = self.gantt_dropdown.getChoices()
         if create_gantt.strip() == GANTT_FRAME: create_gantt = 1
         elif create_gantt.strip() == GANTT_VIDEO: create_gantt = 2
@@ -136,6 +132,7 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
                                                                          show_pose=show_pose,
                                                                          text_thickness=text_thickness,
                                                                          text_opacity=text_opacity,
+                                                                         bp_palette=bp_palette,
                                                                          show_animal_names=show_animal_names,
                                                                          core_cnt=core_cnt)
 
@@ -143,8 +140,8 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
 
 
 
-# ValidationVideoPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
-#                      feature_path=r"C:\troubleshooting\mitra\project_folder\csv\features_extracted\501_MA142_Gi_CNO_0521.csv",
-#                      model_path=r"C:\troubleshooting\mitra\models\generated_models\grroming_undersample_2_1000\grooming.sav",
+# ValidationVideoPopUp(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini",
+#                      feature_path=r"D:\troubleshooting\mitra\project_folder\csv\features_extracted\592_MA147_CNO1_0515.csv",
+#                      model_path=r"D:\troubleshooting\mitra\models\grooming_undersample_2_2000\grooming.sav",
 #                      discrimination_threshold=0.4,
 #                      shortest_bout=500)

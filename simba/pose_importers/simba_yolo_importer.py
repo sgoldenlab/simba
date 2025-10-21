@@ -5,7 +5,7 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import (check_float, check_valid_boolean,
-                                check_valid_dataframe, check_valid_tuple)
+                                check_valid_dataframe, check_valid_tuple, check_if_dir_exists)
 from simba.utils.errors import PermissionError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
@@ -57,6 +57,7 @@ class SimBAYoloImporter(ConfigReader):
             fps = 927
         check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose', raise_error=True)
         read_video_info = True if px_per_mm is not None else False
+        check_if_dir_exists(in_dir=data_dir, source=f'{self.__class__.__name__} data_dir')
         ConfigReader.__init__(self, config_path=config_path, read_video_info=read_video_info, create_logger=False)
         self.data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions='.csv', as_dict=True, raise_error=True)
         self.verbose, self.px_per_mm, self.resolution, self.fps = verbose, px_per_mm, resolution, fps
@@ -82,6 +83,7 @@ class SimBAYoloImporter(ConfigReader):
                 class_cols = [x for x in out_df.columns if class_name in x]
                 col_order.extend((class_cols))
             out_df = out_df[col_order].reset_index(drop=True)
+            out_df.columns = [s[:-1] + s[-1].lower() if s else s for s in list(out_df.columns)]
             write_df(df=out_df, file_type='csv', save_path=os.path.join(self.outlier_corrected_dir, f'{video_name}.csv'))
             if hasattr(self, 'video_info_df'):
                 self.video_info_df = self.video_info_df[self.video_info_df['Video'] != video_name]

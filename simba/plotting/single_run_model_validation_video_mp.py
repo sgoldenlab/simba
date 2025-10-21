@@ -7,8 +7,9 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 import functools
 import multiprocessing
 import os
+from copy import deepcopy
 import platform
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import cv2
 import pandas as pd
@@ -28,9 +29,9 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_valid_boolean,
-                                check_video_and_data_frm_count_align)
-from simba.utils.data import plug_holes_shortest_bout
-from simba.utils.enums import TextOptions
+                                check_video_and_data_frm_count_align, check_str)
+from simba.utils.data import plug_holes_shortest_bout, create_color_palette
+from simba.utils.enums import TextOptions, Options
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
@@ -233,6 +234,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
                  text_spacing: Optional[int] = None,
                  text_thickness: Optional[int] = None,
                  text_opacity: Optional[float] = None,
+                 bp_palette: Optional[str] = None,
                  discrimination_threshold: float = 0.0,
                  shortest_bout: int = 0.0,
                  core_cnt: int = -1,
@@ -259,6 +261,13 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
             check_int(name=f"{self.__class__.__name__} create gantt", value=create_gantt, max_value=2, min_value=1)
         if not os.path.exists(self.single_validation_video_save_dir):
             os.makedirs(self.single_validation_video_save_dir)
+        if bp_palette is not None:
+            self.bp_palette = []
+            check_str(name=f'{self.__class__.__name__} bp_palette', value=bp_palette, options=(Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value))
+            for animal in range(self.animal_cnt):
+                self.bp_palette.append(create_color_palette(pallete_name=bp_palette, increments=(int(len(self.body_parts_lst)/self.animal_cnt) +1), as_int=True))
+        else:
+            self.bp_palette = deepcopy(self.clr_lst)
         _, self.feature_filename, ext = get_fn_ext(feature_path)
         self.video_path = self.find_video_of_file(self.video_dir, self.feature_filename)
         self.video_meta_data = get_video_meta_data(video_path=self.video_path, fps_as_int=False)
@@ -297,7 +306,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         if self.shortest_bout > 1:
             self.data_df = plug_holes_shortest_bout(data_df=self.data_df, clf_name=self.clf_name, fps=self.video_meta_data['fps'], shortest_bout=self.shortest_bout)
         _ = write_df(df=self.data_df, file_type=self.file_type, save_path=self.clf_data_save_path)
-        print(f"Predictions created for video {self.feature_filename}...")
+        print(f"Predictions created for video {self.feature_filename} (creating video, follow progressin OS terminal)...")
         self._get_styles()
         if self.create_gantt is not None:
             self.bouts_df = self.get_bouts_for_gantt(data_df=self.data_df, clf_name=self.clf_name, fps=self.video_meta_data['fps'])
@@ -325,7 +334,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
                                           gantt_setting=self.create_gantt,
                                           final_gantt=self.final_gantt_img,
                                           clf_data=self.data_df[self.clf_name].values,
-                                          clrs=self.clr_lst,
+                                          clrs=self.bp_palette,
                                           clf_name=self.clf_name,
                                           bouts_df=self.bouts_df)
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):

@@ -115,9 +115,9 @@ class YOLOPoseTrackInference():
                 for class_id in self.class_ids.keys():
                     class_df = self.results[video_name][self.results[video_name][CLASS_ID] == int(class_id)]
                     for cord_col in COORD_COLS:
-                        class_df[cord_col] = class_df[cord_col].astype(np.float32).astype(np.int32).replace(to_replace=-1, value=np.nan).astype(np.float32)
+                        class_df[cord_col] = class_df[cord_col].astype(np.float32).replace([-1, 0], np.nan)
                         class_df[cord_col] = class_df[cord_col].interpolate(method=NEAREST, axis=0).ffill().bfill()
-                    class_df[CONFIDENCE] = class_df[CONFIDENCE].astype(np.float32).replace(to_replace=-1.0, value=np.nan).astype(np.float32)
+                    class_df[CONFIDENCE] = class_df[CONFIDENCE].astype(np.float32).replace([-1, 0], np.nan)
                     class_df[CONFIDENCE] = class_df[CONFIDENCE].interpolate(method=NEAREST, axis=0).ffill().bfill()
                     self.results[video_name].update(class_df)
             if self.smoothing:
@@ -197,26 +197,26 @@ class YOLOPoseTrackInference():
 # i.run()
 
 
-# VIDEO_PATH = r"E:\netholabs_videos\mosaic_inference_test"
-# WEIGHTS_PASS = r"E:\netholabs_videos\mosaics\yolo_mdl_w_tail\mdl\train2\weights\best.pt"
-# SAVE_DIR = r"E:\netholabs_videos\mosaic_inference_test\results_csv"
-# BOTSORT_PATH = r"C:\projects\simba\simba\simba\assets\botsort.yml"
-#
-# KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_mid', 'Tail_end')
-#
-# i = YOLOPoseTrackInference(weights_path=WEIGHTS_PASS,
-#                            video_path=VIDEO_PATH,
-#                            save_dir=SAVE_DIR,
-#                            verbose=True,
-#                            device=0,
-#                            format=None,
-#                            keypoint_names=KEYPOINT_NAMES,
-#                            batch_size=500,
-#                            threshold=0.5,
-#                            config_path=BOTSORT_PATH,
-#                            interpolate=False,
-#                            imgsz=640,
-#                            max_tracks=5,
-#                            stream=True,
-#                            iou=0.2)
-# i.run()
+VIDEO_PATH = r"E:\netholabs_videos\50_largest_files\videos"
+WEIGHTS_PASS = r"E:\netholabs_videos\mosaics\yolo_mdl_w_tail\mdl\train2\weights\best.pt"
+SAVE_DIR = r"E:\netholabs_videos\50_largest_files\results_csv_025"
+BOTSORT_PATH = r"C:\projects\simba\simba\simba\assets\botsort.yml"
+
+KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_mid', 'Tail_end')
+
+i = YOLOPoseTrackInference(weights_path=WEIGHTS_PASS,
+                           video_path=VIDEO_PATH,
+                           save_dir=SAVE_DIR,
+                           verbose=True,
+                           device=0,
+                           format=None,
+                           keypoint_names=KEYPOINT_NAMES,
+                           batch_size=500,
+                           threshold=0.25,
+                           config_path=BOTSORT_PATH,
+                           interpolate=False,
+                           imgsz=640,
+                           max_tracks=5,
+                           stream=True,
+                           iou=0.2)
+i.run()

@@ -232,6 +232,7 @@ class YOLOPoseInference():
                         for cord_col in COORD_COLS:
                             class_df[cord_col] = class_df[cord_col].rolling(window=frms_in_smoothing_window, win_type='gaussian', center=True).mean(std=5).fillna(results[video_name][cord_col]).abs()
                         results[video_name].update(class_df)
+
             results[video_name] = results[video_name].replace([-1, -1.0, '-1'], 0).reset_index(drop=True)
             if self.save_dir:
                 save_path = os.path.join(self.save_dir, f'{video_name}.csv')

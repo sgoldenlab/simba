@@ -96,7 +96,7 @@ class GridSearchRandomForestClassifier(ConfigReader, TrainModelMixin):
                                           verbose=1,
                                           class_weight=meta_dict[MLParamKeys.CLASS_WEIGHTS.value],
                                           cuda=meta_dict[MLParamKeys.CUDA.value])
-            print(f"Fitting {self.clf_name} model...")
+            print(f"Fitting {self.clf_name} model...(follow progress in OS terminal)")
 
             self.rf_clf = self.clf_fit(clf=self.rf_clf, x_df=self.x_train, y_df=self.y_train)
             if (meta_dict[MLParamKeys.PERMUTATION_IMPORTANCE.value] in Options.PERFORM_FLAGS.value):

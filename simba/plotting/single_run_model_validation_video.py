@@ -7,7 +7,7 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 import os
 import warnings
 from typing import Optional, Union
-
+from copy import deepcopy
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
@@ -17,9 +17,9 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_valid_boolean,
-                                check_video_and_data_frm_count_align)
-from simba.utils.data import plug_holes_shortest_bout
-from simba.utils.enums import TagNames, TextOptions
+                                check_video_and_data_frm_count_align, check_str)
+from simba.utils.data import plug_holes_shortest_bout, create_color_palette
+from simba.utils.enums import TagNames, TextOptions, Options
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
 from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_df,
                                     read_pickle, write_df)
@@ -85,6 +85,7 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
                  show_animal_names: bool = False,
                  font_size: Optional[bool] = None,
                  circle_size: Optional[int] = None,
+                 bp_palette: Optional[str] = None,
                  text_spacing: Optional[int] = None,
                  text_thickness: Optional[int] = None,
                  text_opacity: Optional[float] = None,
@@ -112,6 +113,13 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
             check_int(name=f"{self.__class__.__name__} create gantt", value=create_gantt, max_value=2, min_value=1)
         if not os.path.exists(self.single_validation_video_save_dir):
             os.makedirs(self.single_validation_video_save_dir)
+        if bp_palette is not None:
+            self.bp_palette = []
+            check_str(name=f'{self.__class__.__name__} bp_palette', value=bp_palette, options=(Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value))
+            for animal in range(self.animal_cnt):
+                self.bp_palette.append(create_color_palette(pallete_name=bp_palette, increments=(int(len(self.body_parts_lst)/self.animal_cnt) +1), as_int=True))
+        else:
+            self.bp_palette = deepcopy(self.clr_lst)
         _, self.feature_filename, ext = get_fn_ext(feature_path)
         self.video_path = self.find_video_of_file(self.video_dir, self.feature_filename)
         self.video_meta_data = get_video_meta_data(video_path=self.video_path, fps_as_int=False)
@@ -176,12 +184,12 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
                     for bp_cnt, bp in enumerate(range(len(animal_data["X_bps"]))):
                         x_header, y_header = (animal_data["X_bps"][bp], animal_data["Y_bps"][bp])
                         animal_cords = tuple(self.data_df.loc[self.data_df.index[frm_cnt], [x_header, y_header]])
-                        cv2.circle(frame, (int(animal_cords[0]), int(animal_cords[1])), self.video_circle_size, self.clr_lst[animal_cnt][bp_cnt], -1)
+                        cv2.circle(frame, (int(animal_cords[0]), int(animal_cords[1])), self.video_circle_size, self.bp_palette[animal_cnt][bp_cnt], -1)
             if self.show_animal_names:
                 for animal_cnt, (animal_name, animal_data) in enumerate(self.animal_bp_dict.items()):
                     x_header, y_header = ( animal_data["X_bps"][0], animal_data["Y_bps"][0])
                     animal_cords = tuple(self.data_df.loc[self.data_df.index[frm_cnt], [x_header, y_header]])
-                    cv2.putText(frame, animal_name, (int(animal_cords[0]), int(animal_cords[1])), self.font, self.video_font_size, self.clr_lst[animal_cnt][0], self.video_text_thickness)
+                    cv2.putText(frame, animal_name, (int(animal_cords[0]), int(animal_cords[1])), self.font, self.video_font_size, self.bp_palette[animal_cnt][0], self.video_text_thickness)
             target_timer = round((1 / self.video_meta_data['fps']) * clf_frm_cnt, 2)
             frame = PlottingMixin().put_text(img=frame, text="TIMER:", pos=(TextOptions.BORDER_BUFFER_Y.value, self.video_space_size), font_size=self.video_font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=(255, 255, 255))
             addSpacer = 2

@@ -71,8 +71,8 @@ class AgressionFeatureExtractor(ConfigReader, AbstractFeatureExtraction):
             for animal_name, animal_bps in self.animal_bp_dict.items():
                 for bp in animal_bps['X_bps']:
                     bp_name = bp[:-2]
-                    bp_arr = df[[f'{bp_name}_X', f'{bp_name}_Y']].values.astype(np.float32)
-                    bp_arr_shifted = df_shifted[[f'{bp_name}_X', f'{bp_name}_Y']].values.astype(np.float32)
+                    bp_arr = df[[f'{bp_name}_x', f'{bp_name}_y']].values.astype(np.float32)
+                    bp_arr_shifted = df_shifted[[f'{bp_name}_x', f'{bp_name}_y']].values.astype(np.float32)
                     x = TimeseriesFeatureMixin.sliding_descriptive_statistics(data=bp_arr, window_sizes=TIME_WINDOWS, sample_rate=int(fps), statistics=List(['sum']))
                     for i in range(x.shape[0]):
                         v = pd.DataFrame(x[i], columns=[f'MOVEMENT_SUM_{animal_name}_{bp_name}_100', f'MOVEMENT_SUM_{animal_name}_{bp_name}_250', f'MOVEMENT_SUM_{animal_name}_{bp_name}_500', f'MOVEMENT_SUM_{animal_name}_{bp_name}_1000'])
@@ -82,7 +82,7 @@ class AgressionFeatureExtractor(ConfigReader, AbstractFeatureExtraction):
                     self.results[out_col_name] = FeatureExtractionMixin.bodypart_distance(bp1_coords=bp_arr, bp2_coords=bp_arr_shifted, px_per_mm=np.float64(px_per_mm), in_centimeters=False).astype(np.int32)
 
 
-                bps_x , bps_y = [f'{bp[:-2]}_X' for bp in animal_bps['X_bps']], [f'{bp[:-2]}_Y' for bp in animal_bps['X_bps']]
+                bps_x , bps_y = [f'{bp[:-2]}_x' for bp in animal_bps['X_bps']], [f'{bp[:-2]}_y' for bp in animal_bps['X_bps']]
                 animal_arr = df[[x for pair in zip(bps_x, bps_y) for x in pair]].values.reshape(len(df), -1, 2)
                 self.results[f'HULL_SIZE_{animal_name}'] = get_hull_sizes(points=animal_arr, target='perimeter', pixels_per_mm=px_per_mm)
                 x = TimeseriesFeatureMixin.sliding_descriptive_statistics(data=self.results[f'HULL_SIZE_{animal_name}'].values.astype(np.float32), window_sizes=TIME_WINDOWS, sample_rate=int(fps), statistics=List(['mean']))
@@ -111,8 +111,8 @@ class AgressionFeatureExtractor(ConfigReader, AbstractFeatureExtraction):
             bp_distance_pairs = list(itertools.product([(ANIMAL_NAMES[0], bp) for bp in BPS],  [(ANIMAL_NAMES[1], bp) for bp in BPS]))
             for bp_1, bp_2 in bp_distance_pairs:
                 bp_1_col_name, bp_2_col_name = f'{bp_1[0]}_{bp_1[1]}', f'{bp_2[0]}_{bp_2[1]}'
-                bp_1_data = df[[f'{bp_1_col_name}_X', f'{bp_1_col_name}_Y']].values
-                bp_2_data = df[[f'{bp_2_col_name}_X', f'{bp_2_col_name}_Y']].values
+                bp_1_data = df[[f'{bp_1_col_name}_x', f'{bp_1_col_name}_y']].values
+                bp_2_data = df[[f'{bp_2_col_name}_x', f'{bp_2_col_name}_y']].values
                 out_col = f'DISTANCE_{bp_1_col_name}_{bp_2_col_name}'
                 self.results[out_col] = FeatureExtractionMixin.keypoint_distances(a=bp_1_data, b=bp_2_data, px_per_mm=px_per_mm, in_centimeters=False).astype(np.int32)
                 distance_cols.append(out_col)
@@ -125,7 +125,7 @@ class AgressionFeatureExtractor(ConfigReader, AbstractFeatureExtraction):
 
             bp_data = pd.DataFrame()
             for animal_name, animal_bps in self.animal_bp_dict.items():
-                bps_p = [f'{bp[:-2]}_P' for bp in animal_bps['X_bps']]
+                bps_p = [f'{bp[:-2]}_p' for bp in animal_bps['X_bps']]
                 animal_p_data = df[bps_p].astype(np.float32)
                 bp_data = pd.concat([bp_data, animal_p_data], axis=1)
                 self.results[f'{animal_name}_FRAME_MEAN_BP_CONFIDENCE'] = np.mean(animal_p_data, axis=1)

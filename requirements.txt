@@ -71,6 +71,7 @@ shap == 0.42.0;python_version>="3.9"
 tables==3.6.1;python_version=="3.6"
 tables==3.9.2;python_version>="3.9"
 openpyxl==3.1.2;python_version=="3.6"
+openpyxl==3.1.5;python_version >= "3.9" and python_version <= "3.11"
 xlrd==1.2.0
 trafaret==2.1.1
 geos==0.2.3

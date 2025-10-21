@@ -194,8 +194,8 @@ def read_df(file_path: Union[str, os.PathLike],
 
 
 def write_df(df: pd.DataFrame,
-             file_type: str,
              save_path: Union[str, os.PathLike],
+             file_type: str = 'csv',
              multi_idx_header: bool = False,
              verbose: bool = False) -> None:
     """
@@ -2111,7 +2111,7 @@ def read_pickle(data_path: Union[str, os.PathLike], verbose: Optional[bool] = Fa
                 except Exception as e:
                     print(e.args)
                     raise InvalidFileTypeError(
-                        msg=f"Could not decompress file {file_path} - invalid pickle",
+                        msg=f"Could not decompress file {file_path} - invalid pickle. Was this file created in SimBA using a different version of Python?",
                         source=read_pickle.__name__,
                     )
     elif os.path.isfile(data_path):
