@@ -4,8 +4,9 @@ from typing import Optional, Union
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_float, check_valid_boolean,
-                                check_valid_dataframe, check_valid_tuple, check_if_dir_exists)
+from simba.utils.checks import (check_float, check_if_dir_exists,
+                                check_valid_boolean, check_valid_dataframe,
+                                check_valid_tuple)
 from simba.utils.errors import PermissionError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,

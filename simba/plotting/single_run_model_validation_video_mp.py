@@ -7,8 +7,8 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 import functools
 import multiprocessing
 import os
-from copy import deepcopy
 import platform
+from copy import deepcopy
 from typing import List, Optional, Tuple, Union
 
 import cv2
@@ -28,10 +28,10 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_int, check_valid_boolean,
-                                check_video_and_data_frm_count_align, check_str)
-from simba.utils.data import plug_holes_shortest_bout, create_color_palette
-from simba.utils.enums import TextOptions, Options
+                                check_int, check_str, check_valid_boolean,
+                                check_video_and_data_frm_count_align)
+from simba.utils.data import create_color_palette, plug_holes_shortest_bout
+from simba.utils.enums import Options, TextOptions
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
