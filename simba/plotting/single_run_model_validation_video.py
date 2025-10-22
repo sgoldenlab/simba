@@ -15,6 +15,7 @@ import numpy as np
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
+from simba.mixins.geometry_mixin import GeometryMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_valid_boolean,
                                 check_video_and_data_frm_count_align, check_str)
@@ -52,6 +53,7 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
     :param Optional[int] text_spacing: Spacing between text lines. If None, automatically calculated.
     :param Optional[int] text_thickness: Thickness of text overlay. If None, uses default value.
     :param Optional[float] text_opacity: Opacity of text overlays (0.1-1.0). If None, defaults to 0.8.
+    :param Optional[str] bp_palette: Optional name of the palette to use to color the animal body-parts (e.g., Pastel1). If None, ``spring`` is used.
     :param Optional[float] discrimination_threshold: Classification probability threshold (0.0-1.0). Default: 0.0.
     :param Optional[int] shortest_bout: Minimum classified bout length in milliseconds. Bouts shorter than this  will be reclassified as absent. Default: 0.
     :param Optional[Union[None, int]] create_gantt: Gantt chart creation option:
@@ -86,6 +88,7 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
                  font_size: Optional[bool] = None,
                  circle_size: Optional[int] = None,
                  bp_palette: Optional[str] = None,
+                 show_animal_bounding_boxes: bool = False,
                  text_spacing: Optional[int] = None,
                  text_thickness: Optional[int] = None,
                  text_opacity: Optional[float] = None,
@@ -102,6 +105,7 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
         check_file_exist_and_readable(file_path=model_path)
         check_valid_boolean(value=[show_pose], source=f'{self.__class__.__name__} show_pose', raise_error=True)
         check_valid_boolean(value=[show_animal_names], source=f'{self.__class__.__name__} show_animal_names', raise_error=True)
+        check_valid_boolean(value=[show_animal_bounding_boxes], source=f'{self.__class__.__name__} show_animal_bounding_boxes', raise_error=True)
         if font_size is not None: check_int(name=f'{self.__class__.__name__} font_size', value=font_size)
         if circle_size is not None: check_int(name=f'{self.__class__.__name__} circle_size', value=circle_size)
         if text_spacing is not None: check_int(name=f'{self.__class__.__name__} text_spacing', value=text_spacing)
@@ -127,7 +131,7 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
         self.vid_output_path = os.path.join(self.single_validation_video_save_dir, f"{self.feature_filename} {self.clf_name}.mp4")
         self.clf_data_save_path = os.path.join(self.clf_data_validation_dir, f"{self.feature_filename }.csv")
         self.show_pose, self.show_animal_names = show_pose, show_animal_names
-        self.font_size, self.circle_size, self.text_spacing = font_size, circle_size, text_spacing
+        self.font_size, self.circle_size, self.text_spacing, self.show_bbox = font_size, circle_size, text_spacing, show_animal_bounding_boxes
         self.text_opacity, self.text_thickness = text_opacity, text_thickness
         self.clf = read_pickle(data_path=model_path, verbose=True)
         self.data_df = read_df(feature_path, self.file_type)
@@ -190,6 +194,17 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
                     x_header, y_header = ( animal_data["X_bps"][0], animal_data["Y_bps"][0])
                     animal_cords = tuple(self.data_df.loc[self.data_df.index[frm_cnt], [x_header, y_header]])
                     cv2.putText(frame, animal_name, (int(animal_cords[0]), int(animal_cords[1])), self.font, self.video_font_size, self.bp_palette[animal_cnt][0], self.video_text_thickness)
+            if self.show_bbox:
+                for animal_cnt, (animal_name, animal_data) in enumerate(self.animal_bp_dict.items()):
+                    animal_headers = [val for pair in zip(animal_data["X_bps"], animal_data["Y_bps"]) for val in pair]
+                    animal_cords = self.data_df.loc[self.data_df.index[frm_cnt], animal_headers].values.reshape(-1, 2).astype(np.int32)
+                    try:
+                        bbox = GeometryMixin().keypoints_to_axis_aligned_bounding_box(keypoints=animal_cords.reshape(-1, len(animal_cords), 2).astype(np.int32))
+                        cv2.polylines(frame, [bbox], True, self.bp_palette[animal_cnt][0], thickness=self.video_text_thickness, lineType=-1)
+                    except:
+                        pass
+
+
             target_timer = round((1 / self.video_meta_data['fps']) * clf_frm_cnt, 2)
             frame = PlottingMixin().put_text(img=frame, text="TIMER:", pos=(TextOptions.BORDER_BUFFER_Y.value, self.video_space_size), font_size=self.video_font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=(255, 255, 255))
             addSpacer = 2

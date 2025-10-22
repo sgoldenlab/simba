@@ -26,6 +26,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
+from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_valid_boolean,
@@ -50,6 +51,7 @@ def _validation_video_mp(data: pd.DataFrame,
                         text_spacing: int,
                         circle_size: int,
                         show_pose: bool,
+                        show_animal_bounding_boxes: bool,
                         show_animal_names: bool,
                         gantt_setting: Union[int, None],
                         final_gantt: Optional[np.ndarray],
@@ -139,7 +141,15 @@ def _validation_video_mp(data: pd.DataFrame,
                     x_header, y_header = (animal_data["X_bps"][0], animal_data["Y_bps"][0],)
                     animal_cords = tuple(batch_data.loc[current_frm, [x_header, y_header]])
                     cv2.putText(img, animal_name, (int(animal_cords[0]), int(animal_cords[1])), font, font_size, clrs[animal_cnt][0], text_thickness)
-
+            if show_animal_bounding_boxes:
+                for animal_cnt, (animal_name, animal_data) in enumerate(bp_dict.items()):
+                    animal_headers = [val for pair in zip(animal_data["X_bps"], animal_data["Y_bps"]) for val in pair]
+                    animal_cords = batch_data.loc[current_frm, animal_headers].values.reshape(-1, 2).astype(np.int32)
+                    try:
+                        bbox = GeometryMixin().keypoints_to_axis_aligned_bounding_box(keypoints=animal_cords.reshape(-1, len(animal_cords), 2).astype(np.int32))
+                        cv2.polylines(img, [bbox], True, clrs[animal_cnt][0], thickness=text_thickness, lineType=-1)
+                    except:
+                        pass
             target_timer = round((1 / video_meta_data["fps"]) * clf_frm_cnt, 2)
             img = _put_text(img=img, text="BEHAVIOR TIMER:", pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value)
             addSpacer = 2
@@ -187,13 +197,15 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
     :param bool show_pose: If True, overlay pose estimation keypoints on the video. Default: True.
     :param bool show_animal_names: If True, display animal names near the first body part. Default: False.
     :param Optional[int] font_size: Font size for text overlays. If None, automatically calculated based on video dimensions.
+    :param Optional[str] bp_palette: Optional name of the palette to use to color the animal body-parts (e.g., Pastel1). If None, ``spring`` is used.
+
+
     :param Optional[int] circle_size: Size of pose estimation circles. If None, automatically calculated based on video dimensions.
     :param Optional[int] text_spacing: Spacing between text lines. If None, automatically calculated.
     :param Optional[int] text_thickness: Thickness of text overlay. If None, uses default value.
     :param Optional[float] text_opacity: Opacity of text overlays (0.1-1.0). If None, defaults to 0.8.
     :param float discrimination_threshold: Classification probability threshold (0.0-1.0). Default: 0.0.
-    :param int shortest_bout: Minimum classified bout length in milliseconds. Bouts shorter than this 
-        will be reclassified as absent. Default: 0.
+    :param int shortest_bout: Minimum classified bout length in milliseconds. Bouts shorter than this will be reclassified as absent. Default: 0.
     :param int core_cnt: Number of CPU cores to use for processing. If -1, uses all available cores. Default: -1.
     :param Optional[Union[None, int]] create_gantt: Gantt chart creation option:
         
@@ -229,6 +241,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
                  model_path: Union[str, os.PathLike],
                  show_pose: bool = True,
                  show_animal_names: bool = False,
+                 show_animal_bounding_boxes: bool = False,
                  font_size: Optional[bool] = None,
                  circle_size: Optional[int] = None,
                  text_spacing: Optional[int] = None,
@@ -249,6 +262,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         check_file_exist_and_readable(file_path=model_path)
         check_valid_boolean(value=[show_pose], source=f'{self.__class__.__name__} show_pose', raise_error=True)
         check_valid_boolean(value=[show_animal_names], source=f'{self.__class__.__name__} show_animal_names', raise_error=True)
+        check_valid_boolean(value=[show_animal_bounding_boxes], source=f'{self.__class__.__name__} show_animal_bounding_boxes', raise_error=True)
         check_int(name=f"{self.__class__.__name__} core_cnt", value=core_cnt, min_value=-1, unaccepted_vals=[0])
         if font_size is not None: check_int(name=f'{self.__class__.__name__} font_size', value=font_size)
         if circle_size is not None: check_int(name=f'{self.__class__.__name__} circle_size', value=circle_size)
@@ -276,7 +290,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         self.clf_data_save_path = os.path.join(self.clf_data_validation_dir, f"{self.feature_filename }.csv")
         self.show_pose, self.show_animal_names = show_pose, show_animal_names
         self.font_size, self.circle_size, self.text_spacing = font_size, circle_size, text_spacing
-        self.text_opacity, self.text_thickness = text_opacity, text_thickness
+        self.text_opacity, self.text_thickness, self.show_animal_bounding_boxes = text_opacity, text_thickness, show_animal_bounding_boxes
         self.clf = read_pickle(data_path=model_path, verbose=True)
         self.data_df = read_df(feature_path, self.file_type)
         self.x_df = self.drop_bp_cords(df=self.data_df)
@@ -331,6 +345,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
                                           video_path=self.video_path,
                                           show_pose=self.show_pose,
                                           show_animal_names=self.show_animal_names,
+                                          show_animal_bounding_boxes=self.show_animal_bounding_boxes,
                                           gantt_setting=self.create_gantt,
                                           final_gantt=self.final_gantt_img,
                                           clf_data=self.data_df[self.clf_name].values,

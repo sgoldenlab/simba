@@ -195,8 +195,8 @@ def read_df(file_path: Union[str, os.PathLike],
 
 
 def write_df(df: pd.DataFrame,
+             file_type: str,
              save_path: Union[str, os.PathLike],
-             file_type: str = 'csv',
              multi_idx_header: bool = False,
              verbose: bool = False) -> None:
     """

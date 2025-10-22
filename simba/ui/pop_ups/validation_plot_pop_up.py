@@ -73,11 +73,15 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
         self.show_pose_dropdown = SimBADropDown(parent=tracking_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW POSE: ', label_width=30, dropdown_width=40, value='TRUE')
         self.show_animal_names_dropdown = SimBADropDown(parent=tracking_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ANIMAL NAMES: ', label_width=30, dropdown_width=40, value='FALSE')
         self.core_cnt_dropdown = SimBADropDown(parent=tracking_frm, dropdown_options=list(range(1, self.cpu_cnt + 1)), label='CPU COUNT: ', label_width=30, dropdown_width=40, value=int(self.cpu_cnt/2))
+        self.show_bbox_dropdown = SimBADropDown(parent=tracking_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW BOUNDING BOX: ', label_width=30, dropdown_width=40, value='FALSE')
+
+
 
         tracking_frm.grid(row=1, column=0, sticky=NW, padx=10, pady=10)
         self.show_pose_dropdown.grid(row=0, column=0, sticky=NW)
         self.show_animal_names_dropdown.grid(row=1, column=0, sticky=NW)
-        self.core_cnt_dropdown.grid(row=2, column=0, sticky=NW)
+        self.show_bbox_dropdown.grid(row=2, column=0, sticky=NW)
+        self.core_cnt_dropdown.grid(row=3, column=0, sticky=NW)
 
         gantt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GANTT SETTINGS", icon_name='gantt_small', icon_link=Links.OUT_OF_SAMPLE_VALIDATION.value, padx=5, pady=5, relief='solid')
         self.gantt_dropdown = SimBADropDown(parent=gantt_frm, dropdown_options= Options.GANTT_VALIDATION_OPTIONS.value, label='GANTT TYPE:', label_width=30, dropdown_width=40, value=Options.GANTT_VALIDATION_OPTIONS.value[0])
@@ -98,6 +102,7 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
         text_opacity = float(self.text_opacity_dropdown.getChoices())
         core_cnt = int(self.core_cnt_dropdown.getChoices())
         bp_palette = self.bp_palette_dropdown.getChoices()
+        bbox = str_2_bool(self.show_bbox_dropdown.getChoices())
         create_gantt = self.gantt_dropdown.getChoices()
         if create_gantt.strip() == GANTT_FRAME: create_gantt = 1
         elif create_gantt.strip() == GANTT_VIDEO: create_gantt = 2
@@ -127,6 +132,7 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
                                                                          shortest_bout=self.shortest_bout,
                                                                          font_size=font_size,
                                                                          create_gantt=create_gantt,
+                                                                         show_animal_bounding_boxes=bbox,
                                                                          circle_size=circle_size,
                                                                          text_spacing=text_space_scale,
                                                                          show_pose=show_pose,
@@ -137,6 +143,7 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
                                                                          core_cnt=core_cnt)
 
         threading.Thread(target=validation_video_creator.run()).start()
+
 
 
 

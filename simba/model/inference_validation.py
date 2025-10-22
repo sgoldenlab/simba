@@ -58,10 +58,8 @@ class InferenceValidation(ConfigReader, TrainModelMixin):
         data_df = self.drop_bp_cords(df=data_df)
         clf = self.read_pickle(file_path=clf_path)
         probability_col_name = f"Probability_{classifier_name}"
-        output_df[probability_col_name] = self.clf_predict_proba(
-            clf=clf, x_df=data_df, model_name=classifier_name, data_path=input_file_path
-        )
-        save_filename = os.path.join(self.save_path, file_name + "." + self.file_type)
+        output_df[probability_col_name] = self.clf_predict_proba(clf=clf, x_df=data_df, model_name=classifier_name, data_path=input_file_path )
+        save_filename = os.path.join(self.save_path, f"{file_name}.{self.file_type}")
         write_df(output_df, self.file_type, save_filename)
         self.timer.stop_timer()
         stdout_success(
