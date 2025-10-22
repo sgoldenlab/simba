@@ -25,8 +25,8 @@ import numpy as np
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 from simba.mixins.config_reader import ConfigReader
-from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.geometry_mixin import GeometryMixin
+from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_str, check_valid_boolean,
