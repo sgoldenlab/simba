@@ -118,5 +118,16 @@ Gerbil single body-part feature extraction wrapper
    :show-inheritance:
    :undoc-members:
 
+Aggression feature extractor (11/25)
+-----------------------------------------------
+
+.. autoclass:: simba.feature_extractors.aggression_feature_extractor.AgressionFeatureExtractor
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+
+
+
 
 

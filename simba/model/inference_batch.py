@@ -3,7 +3,8 @@ __author__ = "Simon Nilsson"
 import os
 from copy import deepcopy
 from typing import Optional, Union
-
+import sys
+import argparse
 import numpy as np
 
 from simba.mixins.config_reader import ConfigReader
@@ -103,6 +104,15 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
             print(f"Predictions created for {file_name} (elapsed time: {video_timer.elapsed_time_str}) ...")
         self.timer.stop_timer()
         stdout_success(msg=f"Machine predictions complete. Files saved in {self.save_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+
+if __name__ == "__main__" and not hasattr(sys, 'ps1'):
+    parser = argparse.ArgumentParser(description="Perform classifications according to rules defined in SImAB project_config.ini.")
+    parser.add_argument('--config_path', type=str, required=True, help='Path to SimBA Project config.')
+    args = parser.parse_args()
+    runner = InferenceBatch(config_path=args.config_path)
+    runner.run()
+
+
 
 # test = InferenceBatch(config_path=r"C:\troubleshooting\Top_down_old\project_folder\project_config.ini")
 # test.run()

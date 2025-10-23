@@ -2,6 +2,8 @@ import itertools
 import os
 from copy import deepcopy
 from typing import Union
+import sys
+import argparse
 
 import numpy as np
 import pandas as pd
@@ -158,6 +160,18 @@ class AgressionFeatureExtractor(ConfigReader, AbstractFeatureExtraction):
 
     def save(self, data: pd.DataFrame, save_path: Union[str, os.PathLike]):
         write_df(df=self.results, file_type='csv', save_path=self.save_path)
+
+
+if __name__ == "__main__" and not hasattr(sys, 'ps1'):
+    parser = argparse.ArgumentParser(description="Extract features for aggression classification in resident intruder setups.")
+    parser.add_argument('--config_path', type=str, required=True, help='Path to SimBA Project config.')
+    args = parser.parse_args()
+    runner = AgressionFeatureExtractor(config_path=args.config_path)
+    runner.run()
+
+
+
+
 
 # f = AgressionFeatureExtractor(config_path=r"E:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
 # f.run()

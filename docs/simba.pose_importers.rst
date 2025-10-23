@@ -104,16 +104,24 @@ Import SimBA blob tracking as pose
    :members:
    :show-inheritance:
 
-Impost FaceMap body-part tracking
+Import FaceMap body-part tracking
 -----------------------------------------
 
 .. automodule:: simba.pose_importers.facemap_h5_importer.FaceMapImporter
    :members:
    :show-inheritance:
 
-Impost SuperAnimal-TopView Mouse body-part tracking
+Import SuperAnimal-TopView Mouse body-part tracking
 -----------------------------------------
 
 .. automodule:: simba.pose_importers.superanimal_import.SuperAnimalTopViewImporter
    :members:
    :show-inheritance:
+
+Import YOLO pose-estimation tracking (unique individuals, non-track based, only)
+-----------------------------------------
+
+.. automodule:: simba.pose_importers.simba_yolo_importer.SimBAYoloImporter
+   :members:
+   :show-inheritance:
+

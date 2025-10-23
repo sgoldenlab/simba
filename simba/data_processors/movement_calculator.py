@@ -1,6 +1,6 @@
 __author__ = "Simon Nilsson"
 import os
-from typing import List, Optional
+from typing import List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -41,7 +41,7 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
     >>> movement_processor.save()
     """
     def __init__(self,
-                 config_path: str,
+                 config_path: Union[str, os.PathLike],
                  body_parts: List[str],
                  threshold: float = 0.00,
                  file_paths: Optional[List[str]] = None):

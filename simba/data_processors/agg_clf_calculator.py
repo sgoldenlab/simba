@@ -1,6 +1,8 @@
 __author__ = "Simon Nilsson"
 
+import argparse
 import os
+import sys
 from copy import deepcopy
 from typing import List, Optional, Union
 
@@ -34,12 +36,6 @@ MEDIAN_EVENT_INTERVAL = "Median event interval (s)"
 FRAME_COUNT = 'Frame count'
 VIDEO_LENGTH = "Video length (s)"
 MEASUREMENT_NAMES = [FIRST_OCCURRENCE, EVENT_COUNT, TOTAL_EVENT_DURATION, MEAN_EVENT_DURATION, MEDIAN_EVENT_DURATION, MEAN_EVENT_INTERVAL, MEDIAN_EVENT_INTERVAL]
-
-
-
-
-
-
 
 class AggregateClfCalculator(ConfigReader):
     """
@@ -207,6 +203,48 @@ class AggregateClfCalculator(ConfigReader):
                 stdout_success(msg=f"Detailed bout data log saved at {self.detailed_save_path}", source=self.__class__.__name__)
         self.timer.stop_timer()
         stdout_success(msg=f"Data aggregate log saved at {self.save_path}", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+
+if __name__ == "__main__" and not hasattr(sys, 'ps1'):
+    parser = argparse.ArgumentParser(description='Compute aggregate descriptive statistics from classification data.')
+    parser.add_argument('--config_path', type=str, required=True, help='Path to SimBA project config file')
+    parser.add_argument('--classifiers', type=str, nargs='+', required=True, help='List of classifier names to analyze')
+    parser.add_argument('--data_dir', type=str, default=None, help='Directory containing machine results CSV files (default: project machine_results directory)')
+    parser.add_argument('--detailed_bout_data', action='store_true', help='Save detailed bout data for each bout')
+    parser.add_argument('--transpose', action='store_true', help='Create output with one video per row')
+    parser.add_argument('--no_first_occurrence', action='store_true', help='Disable first occurrence calculation')
+    parser.add_argument('--no_event_count', action='store_true', help='Disable event count calculation')
+    parser.add_argument('--no_total_event_duration', action='store_true', help='Disable total event duration calculation')
+    parser.add_argument('--no_mean_event_duration', action='store_true', help='Disable mean event duration calculation')
+    parser.add_argument('--no_median_event_duration', action='store_true', help='Disable median event duration calculation')
+    parser.add_argument('--no_mean_interval_duration', action='store_true', help='Disable mean interval duration calculation')
+    parser.add_argument('--no_median_interval_duration', action='store_true', help='Disable median interval duration calculation')
+    parser.add_argument('--frame_count', action='store_true', help='Include frame count in output')
+    parser.add_argument('--video_length', action='store_true', help='Include video length in output')
+    
+    args = parser.parse_args()
+    
+    clf_calculator = AggregateClfCalculator(
+        config_path=args.config_path,
+        classifiers=args.classifiers,
+        data_dir=args.data_dir,
+        detailed_bout_data=args.detailed_bout_data,
+        transpose=args.transpose,
+        first_occurrence=not args.no_first_occurrence,
+        event_count=not args.no_event_count,
+        total_event_duration=not args.no_total_event_duration,
+        mean_event_duration=not args.no_mean_event_duration,
+        median_event_duration=not args.no_median_event_duration,
+        mean_interval_duration=not args.no_mean_interval_duration,
+        median_interval_duration=not args.no_median_interval_duration,
+        frame_count=args.frame_count,
+        video_length=args.video_length
+    )
+    clf_calculator.run()
+    clf_calculator.save()
+
+
+
+
 
 # test = AggregateClfCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #                               classifiers=['straub_tail'],

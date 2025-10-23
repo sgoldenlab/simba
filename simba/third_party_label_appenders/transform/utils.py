@@ -325,10 +325,14 @@ def merge_coco_keypoints_files(data_dir: Union[str, os.PathLike],
     :param int max_height: Optional max height keypoint coordinate annotation. If above max, the annotation will be set to "not visible"
     :return: None. Results are saved in ``save_path``.
 
-    :example:
+    :example I:
     >>> DATA_DIR = r'D:\cvat_annotations\frames\coco_keypoints_1\TEST'
     >>> SAVE_PATH = r"D:\cvat_annotations\frames\coco_keypoints_1\TEST\merged.json"
     >>> merge_coco_keypoints_files(data_dir=DATA_DIR, save_path=SAVE_PATH)
+
+
+    :example II:
+    >>> merge_coco_keypoints_files(data_dir=DATA_DIR, save_path=SAVE_PATH, max_width=662, max_height=217)
     """
 
     timer = SimbaTimer(start=True)
@@ -554,3 +558,8 @@ def concatenate_dlc_annotations(data_dir: Union[str, os.PathLike], save_dir: Uni
 
 #concatenate_dlc_annotations(data_dir=r'E:\crim13_imgs\CRIM_labelled_images', save_dir=r'E:\crim13_imgs\combined')
 #merge_coco_keypoints_files(data_dir=r'D:\cvat_annotations\frames\coco_keypoints_1', save_path=r'D:\cvat_annotations\frames\coco_keypoints_1\merged\merged_08132025.json')
+
+
+
+
+#merge_coco_keypoints_files(data_dir=r'E:\netholabs_videos\50_largest_files\imgs_to_lbl', save_path=r'E:\netholabs_videos\50_largest_files\imgs_to_lbl\merged.json', max_width=662, max_height=217)
