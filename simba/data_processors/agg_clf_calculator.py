@@ -109,7 +109,7 @@ class AggregateClfCalculator(ConfigReader):
         self.measurements = []
         for i, j  in zip([first_occurrence, event_count, total_event_duration, mean_event_duration, median_event_duration, mean_interval_duration, median_interval_duration], MEASUREMENT_NAMES):
             check_valid_boolean(value=i, source=f'{self.__class__.__name__} {j}', raise_error=True)
-            self.measurements.append(j)
+            if i: self.measurements.append(j)
 
         check_valid_boolean(value=frame_count, source=f'{self.__class__.__name__} frame_count', raise_error=True)
         check_valid_boolean(value=video_length, source=f'{self.__class__.__name__} video_length', raise_error=True)
@@ -186,7 +186,7 @@ class AggregateClfCalculator(ConfigReader):
         """
 
         self.results_df = self.results_df[self.results_df["CLASSIFIER"].isin(self.classifiers)].set_index("VIDEO")
-        out_df = self.results_df[self.results_df["MEASUREMENT"].isin(self.measurements + [FRAME_COUNT, VIDEO_LENGTH])]
+        self.results_df = self.results_df[self.results_df["MEASUREMENT"].isin(self.measurements + [FRAME_COUNT, VIDEO_LENGTH])]
         if not self.transpose:
             self.results_df.to_csv(self.save_path)
         else:

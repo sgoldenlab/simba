@@ -31,6 +31,7 @@ TEXT_SPACE_OPTIONS.insert(0, AUTO)
 OPACITY_OPTIONS = list(np.arange(0.1, 1.1, 0.1))
 OPACITY_OPTIONS = [round(x, 1) for x in OPACITY_OPTIONS]
 POSE_PALETTE_OPTIONS = Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value
+
 class ValidationVideoPopUp(PopUpMixin, ConfigReader):
     def __init__(self,
                  config_path: Union[str, os.PathLike],
@@ -84,7 +85,7 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
         self.core_cnt_dropdown.grid(row=3, column=0, sticky=NW)
 
         gantt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GANTT SETTINGS", icon_name='gantt_small', icon_link=Links.OUT_OF_SAMPLE_VALIDATION.value, padx=5, pady=5, relief='solid')
-        self.gantt_dropdown = SimBADropDown(parent=gantt_frm, dropdown_options= Options.GANTT_VALIDATION_OPTIONS.value, label='GANTT TYPE:', label_width=30, dropdown_width=40, value=Options.GANTT_VALIDATION_OPTIONS.value[0])
+        self.gantt_dropdown = SimBADropDown(parent=gantt_frm, dropdown_options= Options.GANTT_VALIDATION_OPTIONS.value, label='GANTT TYPE:', label_width=30, dropdown_width=40, value=Options.GANTT_VALIDATION_OPTIONS.value[2])
         gantt_frm.grid(row=3, column=0, sticky=NW, padx=10, pady=10)
         self.gantt_dropdown.grid(row=0, column=0, sticky=NW)
 
@@ -142,7 +143,9 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
                                                                          show_animal_names=show_animal_names,
                                                                          core_cnt=core_cnt)
 
-        threading.Thread(target=validation_video_creator.run()).start()
+        threading.Thread(target=validation_video_creator.run).start()
+        #self.root.destroy()
+
 
 
 

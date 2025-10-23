@@ -153,7 +153,8 @@ class YOLOPoseInference():
         if save_dir is not None:
             check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir')
         if smoothing is not None and smoothing is not False:
-            check_int(name=f'{self.__class__.__name__} smoothing', value=smoothing, min_value=1, raise_error=True)
+            check_int(name=f'{self.__class__.__name__} smoothing', value=smoothing, min_value=0, raise_error=True)
+            smoothing = smoothing if smoothing > 0 else False
         self.keypoint_col_names = [f'{i}_{s}'.upper() for i in keypoint_names for s in ['x', 'y', 'p']]
         self.keypoint_cord_col_names = [f'{i}_{s}'.upper() for i in keypoint_names for s in ['x', 'y']]
         OUT_COLS.extend(self.keypoint_col_names)
@@ -164,7 +165,6 @@ class YOLOPoseInference():
         self.verbose, self.save_dir, self.imgsz, self.interpolate, self.overwrite, self.max_per_class = verbose, save_dir, imgsz, interpolate, overwrite, max_per_class
         if self.model.model.task != 'pose':
             raise InvalidFileTypeError(msg=f'The model {weights} is not a pose model. It is a {self.model.model.task} model', source=self.__class__.__name__)
-
 
     def run(self):
         results = {}
@@ -256,45 +256,49 @@ class YOLOPoseInference():
             return None
 
 
-# if __name__ == "__main__" and not hasattr(sys, 'ps1'):
-#     parser = argparse.ArgumentParser(description="Perform YOLO-based keypoint pose estimation inference on videos.")
-#     parser.add_argument('--weights_path', type=str, required=True, help='Path to the trained YOLO model weights (e.g., "best.pt").')
-#     parser.add_argument('--video_path', type=str, nargs='+', required=True, help='One or more paths to video files to process. Can be a directory of a file path.')
-#     parser.add_argument('--keypoint_names', type=str, nargs='+', required=True, help='List of keypoint names, e.g., nose left_ear right_ear.')
-#     parser.add_argument('--verbose', action='store_true', default=False, help='Enable verbose logging.')
-#     parser.add_argument('--save_dir', type=str, default=None, help='Directory to save output CSV files. If omitted, results are returned in memory.')
-#     parser.add_argument('--device', type=str, default='0', help="Device to use: 'cpu' or GPU index as string (e.g., '0').")
-#     parser.add_argument('--format', type=str, default=None, help='Optional export format: "onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite".')
-#     parser.add_argument('--batch_size', type=int, default=4, help='Batch size for inference.')
-#     parser.add_argument('--torch_threads', type=int, default=8, help='Number of PyTorch threads to use.')
-#     parser.add_argument('--half_precision', action='store_true', help='Use half-precision (FP16) inference.')
-#     parser.add_argument('--stream', action='store_true', help='Process frames in stream (one-by-one) mode.')
-#     parser.add_argument('--threshold', type=float, default=0.5, help='Confidence threshold for detections (0.0 - 1.0).')
-#     parser.add_argument('--max_tracks', type=int, default=None, help='Maximum number of pose tracks to retain.')
-#     parser.add_argument('--interpolate', action='store_true', help='Interpolate missing keypoints across frames.')
-#     parser.add_argument('--imgsz', type=int, default=640, help='Input image size (square). Default is 640.')
-#     args = parser.parse_args()
-#
-#     keypoints_tuple = tuple(args.keypoint_names)
-#     device_val = args.device if args.device == 'cpu' else int(args.device)
-#     video_paths = args.video_path if len(args.video_path) > 1 else args.video_path[0]
-#
-#     inference = YOLOPoseInference(weights=args.weights_path,
-#                                   video_path=video_paths,
-#                                   keypoint_names=keypoints_tuple,
-#                                   verbose=args.verbose,
-#                                   save_dir=args.save_dir,
-#                                   device=device_val,
-#                                   format=args.format,
-#                                   batch_size=args.batch_size,
-#                                   torch_threads=args.torch_threads,
-#                                   half_precision=args.half_precision,
-#                                   stream=args.stream,
-#                                   threshold=args.threshold,
-#                                   max_tracks=args.max_tracks,
-#                                   interpolate=args.interpolate,
-#                                   imgsz=args.imgsz)
-#     inference.run()
+if __name__ == "__main__" and not hasattr(sys, 'ps1'):
+    parser = argparse.ArgumentParser(description="Perform YOLO-based keypoint pose estimation inference on videos.")
+    parser.add_argument('--weights_path', type=str, required=True, help='Path to the trained YOLO model weights (e.g., "best.pt").')
+    parser.add_argument('--video_path', type=str, nargs='+', required=True, help='One or more paths to video files to process. Can be a directory of a file path.')
+    parser.add_argument('--keypoint_names', type=str, nargs='+', required=True, help='List of keypoint names, e.g., nose left_ear right_ear.')
+    parser.add_argument('--verbose', action='store_true', default=False, help='Enable verbose logging.')
+    parser.add_argument('--save_dir', type=str, default=None, help='Directory to save output CSV files. If omitted, results are returned in memory.')
+    parser.add_argument('--device', type=str, default='0', help="Device to use: 'cpu' or GPU index as string (e.g., '0').")
+    parser.add_argument('--format', type=str, default=None, help='Optional export format: "onnx", "engine", "torchscript", "onnxsimplify", "coreml", "openvino", "pb", "tf", "tflite".')
+    parser.add_argument('--batch_size', type=int, default=5, help='Batch size for inference.')
+    parser.add_argument('--torch_threads', type=int, default=8, help='Number of PyTorch threads to use.')
+    parser.add_argument('--half_precision', action='store_true', help='Use half-precision (FP16) inference.')
+    parser.add_argument('--stream', action='store_true', default=True, help='Process frames in stream (one-by-one) mode.')
+    parser.add_argument('--box_threshold', type=float, default=0.5, help='Confidence threshold for detections (0.0 - 1.0).')
+    parser.add_argument('--max_tracks', type=int, default=None, help='Maximum number of pose tracks to retain.')
+    parser.add_argument('--interpolate', action='store_true', default=True, help='Interpolate missing keypoints across frames.')
+    parser.add_argument('--smoothing', type=int, default=100, help='Time in milliseconds to perform smoothing')
+    parser.add_argument('--max_per_class', type=int, default=2, help='Maximum number pose tracks per class.')
+    parser.add_argument('--imgsz', type=int, default=640, help='Input image size (square). Default is 640.')
+    args = parser.parse_args()
+
+    keypoints_tuple = tuple(args.keypoint_names[0].split(","))
+    device_val = args.device if args.device == 'cpu' else int(args.device)
+    video_paths = args.video_path if len(args.video_path) > 1 else args.video_path[0]
+
+    inference = YOLOPoseInference(weights=args.weights_path,
+                                  video_path=video_paths,
+                                  keypoint_names=keypoints_tuple,
+                                  verbose=args.verbose,
+                                  save_dir=args.save_dir,
+                                  device=device_val,
+                                  format=args.format,
+                                  batch_size=args.batch_size,
+                                  torch_threads=args.torch_threads,
+                                  half_precision=args.half_precision,
+                                  stream=args.stream,
+                                  box_threshold=args.box_threshold,
+                                  max_tracks=args.max_tracks,
+                                  max_per_class=args.max_per_class,
+                                  interpolate=args.interpolate,
+                                  smoothing=args.smoothing,
+                                  imgsz=args.imgsz)
+    inference.run()
 
 
 # VIDEO_DIR = r'E:\netholabs_videos\mosaics\subset'
@@ -338,29 +342,29 @@ class YOLOPoseInference():
 #
 #
 # # #
-# video_paths = r"E:\netholabs_videos\mosaics\subset"
-# weights_path = r"E:\netholabs_videos\mosaics\yolo_mdl_wo_tail\mdl\train2\weights\best.pt"
-# save_dir = r"E:\netholabs_videos\mosaics\yolo_mdl_wo_tail\results_csv"
+# VIDEO_PATH = r"E:\netholabs_videos\two_tracks\videos"
+# WEIGHTS_PASS = r"E:\netholabs_videos\mosaics\yolo_mdl_w_tail\mdl\train2\weights\best.pt"
+# SAVE_DIR = r"E:\netholabs_videos\two_tracks\csv_no_track_025"
 # # #
-# # keypoint_names = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
+# KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_center', 'Tail_tip')
 # # # #
 # # # #
-# i = YOLOPoseInference(weights=weights_path,
-#                       video_path=video_paths,
-#                       save_dir=save_dir,
+# i = YOLOPoseInference(weights=WEIGHTS_PASS,
+#                       video_path=VIDEO_PATH,
+#                       save_dir=SAVE_DIR,
 #                       verbose=True,
 #                       device=0,
 #                       format=None,
 #                       stream=True,
-#                       keypoint_names=keypoint_names,
+#                       keypoint_names=KEYPOINT_NAMES,
 #                       batch_size=100,
-#                       imgsz=980,
+#                       imgsz=640,
 #                       interpolate=False,
-#                       box_threshold=0.2,
+#                       box_threshold=0.25,
 #                       max_tracks=4)
 # i.run()
-
 #
+# #
 # # video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
 # # video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-46-56.mp4"
 # # video_path = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-50-23.mp4"

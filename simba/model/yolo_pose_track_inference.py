@@ -1,22 +1,28 @@
 import os
-from typing import List, Literal, Optional, Tuple, Union
-
+from typing import List, Optional, Tuple, Union
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 import numpy as np
 import pandas as pd
 import torch
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
 
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_valid_boolean,
-                                check_valid_lst, check_valid_tuple, get_fn_ext)
+                                check_valid_lst, check_valid_tuple, get_fn_ext, check_if_dir_exists)
 from simba.utils.enums import Options
 from simba.utils.errors import (CountError, InvalidFilepathError,
-                                InvalidFileTypeError)
+                                InvalidFileTypeError, SimBAGPUError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_video_meta_data)
+                                    get_video_meta_data, get_pkg_version)
 from simba.utils.yolo import (_get_undetected_obs, filter_yolo_keypoint_data,
                               load_yolo_model)
+from simba.data_processors.cuda.utils import _is_cuda_available
 
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'TRACK', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
@@ -43,6 +49,12 @@ class YOLOPoseTrackInference():
                  imgsz: int = 320,
                  iou: float = 0.5):
 
+        _ = get_pkg_version(pkg='ultralytics', raise_error=True)
+        gpu_available, gpus = _is_cuda_available()
+        if not gpu_available:
+            raise SimBAGPUError(msg='No GPU detected.', source=self.__class__.__name__)
+        else:
+            print(f'GPUS AVAILABLE: {gpus}')
         if isinstance(video_path, list):
             check_valid_lst(data=video_path, source=f'{self.__class__.__name__} video_path', valid_dtypes=(str, np.str_,), min_len=1)
         elif os.path.isfile(video_path):
@@ -52,6 +64,7 @@ class YOLOPoseTrackInference():
             video_path = find_files_of_filetypes_in_directory(directory=video_path, extensions=list(Options.ALL_VIDEO_FORMAT_OPTIONS.value), as_dict=False)
         for i in video_path:
             _ = get_video_meta_data(video_path=i)
+        check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir', raise_error=True)
         check_file_exist_and_readable(file_path=weights_path)
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose')
         check_valid_boolean(value=interpolate, source=f'{self.__class__.__name__} interpolate')
@@ -87,7 +100,17 @@ class YOLOPoseTrackInference():
             _, video_name, _ = get_fn_ext(filepath=video_path)
             video_meta = get_video_meta_data(video_path=video_path)
             video_out = []
-            video_predictions = self.model.track(source=video_path, stream=self.stream, tracker=self.config_path, conf=self.threshold, half=self.half_precision, imgsz=self.imgsz, persist=False, iou=self.iou, device=self.device, max_det=self.max_tracks)
+            video_predictions = self.model.track(source=video_path,
+                                                 stream=self.stream,
+                                                 tracker=self.config_path,
+                                                 conf=self.threshold,
+                                                 half=self.half_precision,
+                                                 imgsz=self.imgsz,
+                                                 persist=False,
+                                                 iou=self.iou,
+                                                 device=self.device,
+                                                 max_det=self.max_tracks)
+
             for frm_cnt, video_prediction in enumerate(video_predictions):
                 boxes = video_prediction.obb.data if video_prediction.obb is not None else video_prediction.boxes.data
                 boxes = boxes.cpu().numpy().astype(np.float32)
@@ -197,26 +220,26 @@ class YOLOPoseTrackInference():
 # i.run()
 
 
-VIDEO_PATH = r"E:\netholabs_videos\50_largest_files\videos"
-WEIGHTS_PASS = r"E:\netholabs_videos\mosaics\yolo_mdl_w_tail\mdl\train2\weights\best.pt"
-SAVE_DIR = r"E:\netholabs_videos\50_largest_files\results_csv_025"
-BOTSORT_PATH = r"C:\projects\simba\simba\simba\assets\botsort.yml"
-
-KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_mid', 'Tail_end')
-
-i = YOLOPoseTrackInference(weights_path=WEIGHTS_PASS,
-                           video_path=VIDEO_PATH,
-                           save_dir=SAVE_DIR,
-                           verbose=True,
-                           device=0,
-                           format=None,
-                           keypoint_names=KEYPOINT_NAMES,
-                           batch_size=500,
-                           threshold=0.25,
-                           config_path=BOTSORT_PATH,
-                           interpolate=False,
-                           imgsz=640,
-                           max_tracks=5,
-                           stream=True,
-                           iou=0.2)
-i.run()
+# VIDEO_PATH = r"E:\netholabs_videos\two_tracks\videos"
+# WEIGHTS_PASS = r"E:\netholabs_videos\mosaics\yolo_mdl_w_tail\mdl\train2\weights\best.pt"
+# SAVE_DIR = r"E:\netholabs_videos\two_tracks\csv_track_025"
+# BOTSORT_PATH = r"C:\projects\simba\simba\simba\assets\bytetrack.yml"
+#
+# KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_mid', 'Tail_end')
+#
+# i = YOLOPoseTrackInference(weights_path=WEIGHTS_PASS,
+#                            video_path=VIDEO_PATH,
+#                            save_dir=SAVE_DIR,
+#                            verbose=True,
+#                            device=0,
+#                            format=None,
+#                            keypoint_names=KEYPOINT_NAMES,
+#                            batch_size=500,
+#                            threshold=0.25,
+#                            config_path=BOTSORT_PATH,
+#                            interpolate=False,
+#                            imgsz=640,
+#                            max_tracks=3,
+#                            stream=True,
+#                            iou=0.2)
+# i.run()

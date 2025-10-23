@@ -5,6 +5,8 @@ import os
 import platform
 from configparser import ConfigParser
 from typing import List
+import argparse
+import sys
 
 import simba
 from simba.utils.enums import ConfigKey, DirNames, Dtypes, MLParamKeys, Paths
@@ -263,3 +265,23 @@ class ProjectConfigCreator(object):
             msg=f"Project directory tree and project_config.ini created in {self.project_folder}",
             elapsed_time=self.timer.elapsed_time_str,
         )
+
+
+if __name__ == "__main__" and not hasattr(sys, 'ps1'):
+    parser = argparse.ArgumentParser(description="Create a SimBA project from CLI.")
+    parser.add_argument('--project_path', type=str, required=True, help='Path to directory where to save the SimBA project directory tree.')
+    parser.add_argument('--project_name', type=str, required=True, help='Name of the SimBA project.')
+    parser.add_argument('--target_list', type=str, nargs='+', default='ATTACK', required=True, help='Classifier names in the SimBA project')
+    parser.add_argument('--pose_estimation_bp_cnt', type=int, default=14, help="String representing the number of body-parts in the pose-estimation data used in the simba project.")
+    parser.add_argument('--body_part_config_idx', type=int, default=6, help="The index of the SimBA GUI dropdown pose-estimation selection. E.g., ``1``. I.e., the row representing your pose-estimated body-parts")
+    parser.add_argument('--animal_cnt', type=int, default=2, help="Number of animals tracked in the input pose-estimation data.")
+    parser.add_argument('--file_type', type=str, default='csv', help='The SimBA project file type. OPTIONS: ``csv`` or ``parquet``.')
+    args = parser.parse_args()
+
+    _ = ProjectConfigCreator(project_path=args.project_path,
+                             project_name=args.project_name,
+                             target_list=args.target_list,
+                             pose_estimation_bp_cnt=args.pose_estimation_bp_cnt,
+                             body_part_config_idx=args.body_part_config_idx,
+                             animal_cnt=args.animal_cnt,
+                             file_type=args.file_type)

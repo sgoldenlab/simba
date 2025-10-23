@@ -1,5 +1,7 @@
 import os
 from typing import Optional, Union
+import sys
+import argparse
 
 import pandas as pd
 
@@ -99,6 +101,26 @@ class SimBAYoloImporter(ConfigReader):
         self.timer.stop_timer()
         if self.verbose:
             stdout_success(msg=f'{len(list(self.data_paths.keys()))} data file(s) imported to SimBA project in directory {self.outlier_corrected_dir}', elapsed_time=self.timer.elapsed_time_str)
+
+if __name__ == "__main__" and not hasattr(sys, 'ps1'):
+    parser = argparse.ArgumentParser(description="Create a SimBA project from CLI.")
+    parser.add_argument('--data_dir', type=str, required=True, help='Path to directory with YOLO data.')
+    parser.add_argument('--config_path', type=str, required=True, help='Path to SimBA project config.')
+    parser.add_argument('--verbose', action='store_true', help='Process verbosity.')
+    parser.add_argument('--px_per_mm', type=float, default=1.12, help='Pixels per millimeter for all videos imported')
+    parser.add_argument('--fps', type=float, default=30.0, help='FPS of all videos imported')
+    args = parser.parse_args()
+
+    importer = SimBAYoloImporter(data_dir=args.data_dir,
+                                 config_path=args.config_path,
+                                 verbose=args.verbose,
+                                 px_per_mm=args.px_per_mm,
+                                 fps=args.fps)
+    importer.run()
+
+
+
+
 
 # importer = SimBAYoloImporter(data_dir=r'E:\maplight_videos\yolo_mdl\mdl\results', config_path=r"E:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini", verbose=True, px_per_mm=1.43, fps=30)
 # importer.run()

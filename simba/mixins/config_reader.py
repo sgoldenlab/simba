@@ -686,7 +686,8 @@ class ConfigReader(object):
                     source=self.__class__.__name__,
                 )
 
-    def read_video_info_csv(self, file_path: Union[str, os.PathLike]) -> pd.DataFrame:
+    def read_video_info_csv(self,
+                            file_path: Union[str, os.PathLike]) -> pd.DataFrame:
         """
         Helper to read the project_folder/logs/video_info.csv of the SimBA project in as a pd.DataFrame
 

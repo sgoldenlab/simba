@@ -1,11 +1,10 @@
 tracker_type: botsort
-track_high_thresh: 0.5
-track_low_thresh: 0.05
-new_track_thresh: 0.75
-match_thresh: 0.2
-appearance_thresh: 0.3
-track_buffer: 75
-proximity_thresh: 40
+track_high_thresh: 0.3        # lower detection threshold
+track_low_thresh: 0.05        # keep tracks alive longer
+new_track_thresh: 0.3         # allow new tracks from weaker detections
+match_thresh: 0.7             # more permissive matching
+appearance_thresh: 0.25       # slightly lower ReID strictness
+track_buffer: 90
 with_reid: True
 gmc: False
 gmc_method: None

@@ -2125,7 +2125,7 @@ def read_pickle(data_path: Union[str, os.PathLike], verbose: Optional[bool] = Fa
             except Exception as e:
                 print(e.args)
                 raise InvalidFileTypeError(
-                    msg=f"Could not decompress file {data_path} - invalid pickle",
+                    msg=f"Could not decompress file {data_path} - invalid pickle. Was this file created in SimBA using a different version of Python?",
                     source=read_pickle.__name__,
                 )
     else:
