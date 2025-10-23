@@ -1,12 +1,12 @@
 __author__ = "Simon Nilsson"
 
+import argparse
 import csv
 import os
 import platform
+import sys
 from configparser import ConfigParser
 from typing import List
-import argparse
-import sys
 
 import simba
 from simba.utils.enums import ConfigKey, DirNames, Dtypes, MLParamKeys, Paths
