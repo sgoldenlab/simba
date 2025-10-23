@@ -1,28 +1,32 @@
 import os
 from typing import List, Optional, Tuple, Union
+
 try:
     from typing import Literal
 except:
     from typing_extensions import Literal
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
+import warnings
+
 import numpy as np
 import pandas as pd
 import torch
-import warnings
+
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
+from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
-                                check_int, check_valid_boolean,
-                                check_valid_lst, check_valid_tuple, get_fn_ext, check_if_dir_exists)
+                                check_if_dir_exists, check_int,
+                                check_valid_boolean, check_valid_lst,
+                                check_valid_tuple, get_fn_ext)
 from simba.utils.enums import Options
 from simba.utils.errors import (CountError, InvalidFilepathError,
                                 InvalidFileTypeError, SimBAGPUError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_video_meta_data, get_pkg_version)
+                                    get_pkg_version, get_video_meta_data)
 from simba.utils.yolo import (_get_undetected_obs, filter_yolo_keypoint_data,
                               load_yolo_model)
-from simba.data_processors.cuda.utils import _is_cuda_available
 
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'TRACK', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
