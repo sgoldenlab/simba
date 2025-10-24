@@ -1,10 +1,11 @@
 __author__ = "Simon Nilsson"
 
+import argparse
 import os
+import sys
 from copy import deepcopy
 from typing import Optional, Union
-import sys
-import argparse
+
 import numpy as np
 
 from simba.mixins.config_reader import ConfigReader
