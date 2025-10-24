@@ -155,8 +155,8 @@ class AggregateClfCalculator(ConfigReader):
                     clf_results_dict[MEDIAN_EVENT_DURATION] = round(clf_data["Bout_time"].median(), 3)
                 else:
                     clf_results_dict[FIRST_OCCURRENCE] = None
-                    clf_results_dict[EVENT_COUNT] = None
-                    clf_results_dict[TOTAL_EVENT_DURATION] = None
+                    clf_results_dict[EVENT_COUNT] = 0
+                    clf_results_dict[TOTAL_EVENT_DURATION] = 0
                     clf_results_dict[MEAN_EVENT_DURATION] = None
                     clf_results_dict[MEDIAN_EVENT_DURATION] = None
                 if len(clf_data) > 1:
@@ -249,9 +249,10 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 # test = AggregateClfCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #                               classifiers=['straub_tail'],
 #                               transpose=True,
-#                               frame_count=True,
-#                               video_length=True,
-#                               detailed_bout_data=True)
+#                               mean_event_duration = False,
+#                               median_event_duration = False,
+#                               mean_interval_duration = False,
+#                               median_interval_duration = False)
 # test.run()
 # test.save()
 

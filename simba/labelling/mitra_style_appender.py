@@ -20,6 +20,9 @@ class MitraStyleAnnotationAppender(ConfigReader):
     :param Union[str, os.PathLike] features_dir: Path to folder containing featurized pose-estimation data
     :param Union[str, os.PathLike] save_dir: Directory where annotated files will be saved
 
+    .. note::
+       `Example expected input file <https://github.com/sgoldenlab/simba/blob/master/misc/Start-Stop Annotations.xlsx>`__.
+
     :example:
     >>> data_path = r"C:\annotations\Start-Stop Annotations.xlsx"
     >>> features_dir = r"C:\project_folder\features"

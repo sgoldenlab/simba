@@ -54,6 +54,7 @@ class FreezingDetector(ConfigReader):
     .. [1] Sabnis et al., Visual detection of seizures in mice using supervised machine learning, `biorxiv`, doi: https://doi.org/10.1101/2024.05.29.596520.
     .. [2] Lopez et al., Region-specific Nucleus Accumbens Dopamine Signals Encode Distinct Aspects of Avoidance Learning, `biorxiv`, doi: https://doi.org/10.1101/2024.08.28.610149
     .. [3] Lopez, Gabriela C., Louis D. Van Camp, Ryan F. Kovaleski, et al. “Region-Specific Nucleus Accumbens Dopamine Signals Encode Distinct Aspects of Avoidance Learning.” `Cell Biology`, Volume 35, Issue 10p2433-2443.e5May 19, 2025. DOI: 10.1016/j.cub.2025.04.006
+    .. [4] Lazaro et al., Brainwide Genetic Capture for Conscious State Transitions, `biorxiv`, doi: https://doi.org/10.1101/2025.03.28.646066
     """
 
     def __init__(self,

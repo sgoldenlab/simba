@@ -1,6 +1,8 @@
 __author__ = "Simon Nilsson"
 import os
 from typing import List, Optional, Union
+import sys
+import argparse
 
 import numpy as np
 import pandas as pd
@@ -8,14 +10,11 @@ import pandas as pd
 from simba.feature_extractors.perimeter_jit import jitted_centroid
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.mixins.feature_extraction_supplement_mixin import \
-    FeatureExtractionSupplemental
-from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log, check_float,
-    check_that_column_exist, check_valid_lst)
+from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
+from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_float, check_that_column_exist, check_valid_lst, check_str)
 from simba.utils.errors import NoDataError
 from simba.utils.printing import stdout_success
-from simba.utils.read_write import get_fn_ext, read_df
+from simba.utils.read_write import get_fn_ext, read_df, find_files_of_filetypes_in_directory
 
 
 class MovementCalculator(ConfigReader, FeatureExtractionMixin):
@@ -44,18 +43,33 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
                  config_path: Union[str, os.PathLike],
                  body_parts: List[str],
                  threshold: float = 0.00,
-                 file_paths: Optional[List[str]] = None):
+                 file_paths: Optional[List[str]] = None,
+                 save_path: Optional[Union[str, os.PathLike]] = None):
 
         ConfigReader.__init__(self, config_path=config_path)
         FeatureExtractionMixin.__init__(self)
         if file_paths is not None:
-            check_valid_lst(data=file_paths, source=f'{self.__class__.__name__} file_paths', min_len=1, valid_dtypes=(str,))
-            self.file_paths = file_paths
+            if isinstance(file_paths, list):
+                check_valid_lst(data=file_paths, source=f'{self.__class__.__name__} file_paths', min_len=1, valid_dtypes=(str,))
+                self.file_paths = file_paths
+            if isinstance(file_paths, str):
+                if os.path.isfile(file_paths):
+                    self.file_paths = [file_paths]
+                elif os.path.isdir(file_paths):
+                    self.file_paths = find_files_of_filetypes_in_directory(directory=file_paths, extensions=['.csv'], as_dict=False, raise_error=True)
+                else:
+                    raise NoDataError(msg=f'{file_paths} is not a valid data file path or data directory path', source=self.__class__.__name__)
+            else:
+                raise NoDataError(msg=f'{file_paths} is not a valid data file path or data directory path', source=self.__class__.__name__)
         else:
             if len(self.outlier_corrected_paths) == 0:
                 raise NoDataError(msg=f'No data files found in {self.outlier_corrected_dir}', source=self.__class__.__name__)
             self.file_paths = self.outlier_corrected_paths
-        self.save_path = os.path.join(self.logs_path, f"Movement_log_{self.datetime}.csv")
+        if save_path is None:
+            self.save_path = os.path.join(self.logs_path, f"Movement_log_{self.datetime}.csv")
+        else:
+            check_str(name=f'{self.__class__.__name__} save_path', value=save_path, raise_error=True)
+            self.save_path = save_path
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
         check_valid_lst(data=body_parts, source=f'{self.__class__.__name__} file_paths', min_len=1, valid_dtypes=(str,), valid_values=self.body_parts_lst)
         self.body_parts, self.threshold, self.body_parts = file_paths, threshold, body_parts
@@ -108,14 +122,26 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
         stdout_success(msg=f"Movement log saved in {self.save_path}", elapsed_time=self.timer.elapsed_time_str)
 
 
+if __name__ == "__main__" and not hasattr(sys, 'ps1'):
+    parser = argparse.ArgumentParser(description="Compute movement statistics from pose-estimation data.")
+    parser.add_argument('--config_path', type=str, required=True, help='Path to SimBA project config.')
+    parser.add_argument('--body_parts', type=str, nargs='+', required=True, help='Body-parts to use for movement calculations.')
+    parser.add_argument('--threshold', type=float, default=0.0, help='Confidence threshold for detections (0.0 - 1.0).')
+    args = parser.parse_args()
+    body_parts = list(args.body_parts[0].split(","))
+
+    runner = MovementCalculator(config_path=args.config_path,
+                                body_parts=body_parts,
+                                threshold=args.threshold)
+    runner.run()
+    runner.save()
+
 
 # test = MovementCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #                           body_parts=['Animal_1 CENTER OF GRAVITY', 'Nose'], #['Simon CENTER OF GRAVITY', 'JJ CENTER OF GRAVITY', 'Animal_1 CENTER OF GRAVITY']
 #                           threshold=0.00)
 # test.run()
 # test.save()
-
-
 
 
 # test = MovementCalculator(config_path=r"C:\troubleshooting\ROI_movement_test\project_folder\project_config.ini",
