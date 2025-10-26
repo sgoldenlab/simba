@@ -1,14 +1,17 @@
-from typing import Union
 import os
+from typing import Union
+
 import numpy as np
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.read_write import find_files_of_filetypes_in_directory, read_df, write_df
-from simba.utils.checks import check_if_dir_exists, check_file_exist_and_readable, check_valid_dataframe
-from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.errors import NoFilesFoundError, FrameRangeError
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists, check_valid_dataframe)
 from simba.utils.enums import Formats
+from simba.utils.errors import FrameRangeError, NoFilesFoundError
+from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    read_df, write_df)
 
 CLASSIFIER_NAME = 'ATTACK'
 START, END = 'START', 'END'

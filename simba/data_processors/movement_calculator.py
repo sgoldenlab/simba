@@ -1,8 +1,8 @@
 __author__ = "Simon Nilsson"
-import os
-from typing import List, Optional, Union
-import sys
 import argparse
+import os
+import sys
+from typing import List, Optional, Union
 
 import numpy as np
 import pandas as pd
@@ -10,11 +10,15 @@ import pandas as pd
 from simba.feature_extractors.perimeter_jit import jitted_centroid
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
-from simba.mixins.feature_extraction_supplement_mixin import FeatureExtractionSupplemental
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_float, check_that_column_exist, check_valid_lst, check_str)
+from simba.mixins.feature_extraction_supplement_mixin import \
+    FeatureExtractionSupplemental
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log, check_float, check_str,
+    check_that_column_exist, check_valid_lst)
 from simba.utils.errors import NoDataError
 from simba.utils.printing import stdout_success
-from simba.utils.read_write import get_fn_ext, read_df, find_files_of_filetypes_in_directory
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_df)
 
 
 class MovementCalculator(ConfigReader, FeatureExtractionMixin):
