@@ -12,9 +12,9 @@ import numpy as np
 import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
+from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.mixins.geometry_mixin import GeometryMixin
 from simba.utils.checks import (check_float, check_if_valid_rgb_tuple,
                                 check_int, check_nvidea_gpu_available,
                                 check_str, check_that_column_exist,

@@ -9,13 +9,13 @@ import numpy as np
 from PIL import Image
 
 from simba.mixins.config_reader import ConfigReader
+from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.mixins.geometry_mixin import GeometryMixin
 from simba.utils.checks import (check_float, check_if_valid_rgb_tuple,
-                                check_str, check_that_column_exist,
+                                check_int, check_str, check_that_column_exist,
                                 check_valid_boolean,
-                                check_video_and_data_frm_count_align, check_int)
+                                check_video_and_data_frm_count_align)
 from simba.utils.data import create_color_palette, detect_bouts
 from simba.utils.enums import (ConfigKey, Dtypes, Formats, Options, TagNames,
                                TextOptions)
