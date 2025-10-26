@@ -27,6 +27,7 @@ TEXT_SIZE_OPTIONS.insert(0, 'AUTO')
 
 OPACITY_OPTIONS = list(np.arange(0.1, 1.1, 0.1))
 OPACITY_OPTIONS = [round(x, 1) for x in OPACITY_OPTIONS]
+GANTT_OPTIONS = {'NO GANTT': None, 'Static Gantt (final frame, faster)': 1, 'Dynamic Gantt (updated per frame)': 2}
 
 class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
 
@@ -79,24 +80,29 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.tracking_clr_palette_dropdown.grid(row=7, column=0, sticky=NW)
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VISUALIZATION SETTINGS",  icon_name='eye', icon_link=Links.SKLEARN_PLOTS.value, padx=5,  pady=5, relief='solid')
-        self.multiprocess_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt+1)), label='CPU CORES: ', label_width=40, dropdown_width=15, value=int(self.cpu_cnt/2))
-        self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ', label_width=40, dropdown_width=15, value='FALSE', state=DISABLED if not gpu_available else NORMAL)
+        self.multiprocess_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt+1)), label='CPU CORES: ', label_width=40, dropdown_width=30, value=int(self.cpu_cnt/2))
+        self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ', label_width=40, dropdown_width=30, value='FALSE', state=DISABLED if not gpu_available else NORMAL)
+        self.gantt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(GANTT_OPTIONS.keys()), label='SHOW GANTT PLOT:', label_width=40, dropdown_width=30, value=list(GANTT_OPTIONS.keys())[0])
+
         self.create_videos_cb, self.create_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEO', font=Formats.FONT_REGULAR.value, txt_img='video', val=True)
         self.create_frames_cb, self.create_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', font=Formats.FONT_REGULAR.value, txt_img='frames', val=False)
         self.timers_cb, self.include_timers_var = SimbaCheckbox(parent=self.settings_frm, txt='INCLUDE TIMERS OVERLAY', font=Formats.FONT_REGULAR.value, txt_img='timer', val=True)
         self.rotate_cb, self.rotate_img_var = SimbaCheckbox(parent=self.settings_frm, txt="ROTATE VIDEO 90°", font=Formats.FONT_REGULAR.value, txt_img='rotate', val=False)
-        self.show_pose_cb, self.show_pose_var = SimbaCheckbox(parent=self.settings_frm, txt="SHOW TRACKING", font=Formats.FONT_REGULAR.value, txt_img='pose', val=True)
+        self.show_pose_cb, self.show_pose_var = SimbaCheckbox(parent=self.settings_frm, txt="SHOW TRACKING (POSE)", font=Formats.FONT_REGULAR.value, txt_img='pose', val=True)
         self.show_animal_names_cb, self.show_animal_names_var = SimbaCheckbox(parent=self.settings_frm, txt="SHOW ANIMAL NAME(S)", font=Formats.FONT_REGULAR.value, txt_img='label', val=False)
+        self.show_bboxes_cb, self.show_bboxes_var = SimbaCheckbox(parent=self.settings_frm, txt="SHOW ANIMAL BOUNDING BOXES", font=Formats.FONT_REGULAR.value, txt_img='rectangle_2', val=False)
 
         self.settings_frm.grid(row=2, column=0,  sticky=NW)
         self.multiprocess_dropdown.grid(row=0, column=0, sticky=NW)
         self.gpu_dropdown.grid(row=1, column=0, sticky=NW)
-        self.show_pose_cb.grid(row=2, column=0, sticky=NW)
-        self.show_animal_names_cb.grid(row=3, column=0, sticky=NW)
-        self.create_videos_cb.grid(row=4, column=0,  sticky=NW)
-        self.create_frames_cb.grid(row=5, column=0,  sticky=NW)
-        self.timers_cb.grid(row=6, column=0, sticky=NW)
-        self.rotate_cb.grid(row=7, column=0, sticky=NW)
+        self.gantt_dropdown.grid(row=2, column=0, sticky=NW)
+        self.show_pose_cb.grid(row=3, column=0, sticky=NW)
+        self.show_bboxes_cb.grid(row=4, column=0, sticky=NW)
+        self.show_animal_names_cb.grid(row=5, column=0, sticky=NW)
+        self.create_videos_cb.grid(row=6, column=0,  sticky=NW)
+        self.create_frames_cb.grid(row=7, column=0,  sticky=NW)
+        self.timers_cb.grid(row=8, column=0, sticky=NW)
+        self.rotate_cb.grid(row=9, column=0, sticky=NW)
 
 
         self.run_single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO",  icon_name='video', icon_link=Links.SKLEARN_PLOTS.value, padx=5,  pady=5, relief='solid')
@@ -138,6 +144,8 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         text_clr = self.clr_dict[self.text_clr_dropdown.get_value()]
         text_bg_clr = self.clr_dict[self.bg_clr_dropdown.get_value()]
         pose_palette = self.tracking_clr_palette_dropdown.get_value()
+        bbox = self.show_bboxes_var.get()
+        gantt = GANTT_OPTIONS[self.gantt_dropdown.get_value()]
         show_pose, show_animal_names = self.show_pose_var.get(), self.show_animal_names_var.get()
         gpu = str_2_bool(self.gpu_dropdown.get_value())
         core_cnt = int(self.multiprocess_dropdown.get_value())
@@ -167,7 +175,9 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
                                                    text_opacity=text_opacity,
                                                    text_clr=text_clr,
                                                    text_bg_clr=text_bg_clr,
-                                                   pose_palette=pose_palette)
+                                                   pose_palette=pose_palette,
+                                                   show_bbox=bbox,
+                                                   show_gantt=gantt)
 
         else:
             plotter = PlotSklearnResultsMultiProcess(config_path=self.config_path,
@@ -187,9 +197,11 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
                                                      text_clr=text_clr,
                                                      text_bg_clr=text_bg_clr,
                                                      gpu=gpu,
-                                                     pose_palette=pose_palette)
+                                                     pose_palette=pose_palette,
+                                                     show_bbox=bbox,
+                                                     show_gantt=gantt)
 
         plotter.run()
 
 
-#_ = SklearnVisualizationPopUp(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
+#_ = SklearnVisualizationPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")

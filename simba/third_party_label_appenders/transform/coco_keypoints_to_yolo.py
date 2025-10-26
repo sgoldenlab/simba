@@ -209,7 +209,7 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 
 # runner = COCOKeypoints2Yolo(coco_path=r"E:\netholabs_videos\50_largest_files\imgs_to_lbl\merged.json",
 #                             img_dir=r"E:\netholabs_videos\50_largest_files\imgs_to_lbl",
-#                             save_dir=r"E:\netholabs_videos\50_largest_files\yolo_mosaic_data_102315")
+#                             save_dir=r"D:\netholabs\yolo_mosaic_data_102315")
 # runner.run()
 
 

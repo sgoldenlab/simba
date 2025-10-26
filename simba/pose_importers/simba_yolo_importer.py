@@ -89,15 +89,16 @@ class SimBAYoloImporter(ConfigReader):
             out_df.columns = [s[:-1] + s[-1].lower() if s else s for s in list(out_df.columns)]
             write_df(df=out_df, file_type='csv', save_path=os.path.join(self.outlier_corrected_dir, f'{video_name}.csv'))
             if hasattr(self, 'video_info_df'):
-                self.video_info_df = self.video_info_df[self.video_info_df['Video'] != video_name]
+                self.video_info_df = self.video_info_df[self.video_info_df['Video'] != video_name].reset_index(drop=True)
                 self.video_info_df.loc[len(self.video_info_df)] = [video_name, self.fps, self.resolution[1], self.resolution[1], 927.927, self.px_per_mm]
-                self.video_info_df = self.video_info_df.set_index("Video")
-                try:
-                    self.video_info_df.to_csv(self.video_info_path)
-                except PermissionError:
-                    raise PermissionError(msg=f"SimBA tried to write to {self.video_info_path}, but was not allowed. If this file is open in another program, try closing it.", source=self.__class__.__name__)
             video_timer.stop_timer()
             print(f'Imported video {video_name} ({video_counter+1}/{len(list(self.data_paths.keys()))}) (elapsed time: {video_timer.elapsed_time_str}s)...')
+        if hasattr(self, 'video_info_df'):
+            self.video_info_df = self.video_info_df.set_index("Video")
+            try:
+                self.video_info_df.to_csv(self.video_info_path)
+            except PermissionError:
+                raise PermissionError(msg=f"SimBA tried to write to {self.video_info_path}, but was not allowed. If this file is open in another program, try closing it.", source=self.__class__.__name__)
         self.timer.stop_timer()
         if self.verbose:
             stdout_success(msg=f'{len(list(self.data_paths.keys()))} data file(s) imported to SimBA project in directory {self.outlier_corrected_dir}', elapsed_time=self.timer.elapsed_time_str)
@@ -122,5 +123,5 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 
 
 
-# importer = SimBAYoloImporter(data_dir=r'E:\maplight_videos\yolo_mdl\mdl\results', config_path=r"E:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini", verbose=True, px_per_mm=1.43, fps=30)
-# importer.run()
+importer = SimBAYoloImporter(data_dir=r'E:\maplight_videos\yolo_mdl\mdl\results', config_path=r"E:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini", verbose=True, px_per_mm=1.43, fps=30)
+importer.run()

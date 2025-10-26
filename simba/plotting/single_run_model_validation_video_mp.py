@@ -219,6 +219,11 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
        :height: 480
        :align: center
 
+    .. video:: _static/img/T1.webm
+       :width: 1000
+       :autoplay:
+       :loop:
+
     :example:
     >>> # Create multiprocess validation video with dynamic Gantt chart
     >>> validator = ValidateModelOneVideoMultiprocess(

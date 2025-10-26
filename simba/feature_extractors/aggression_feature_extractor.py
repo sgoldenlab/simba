@@ -15,11 +15,9 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.statistics_mixin import Statistics
 from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
-from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log, check_if_dir_exists)
+from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_if_dir_exists)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    read_df, write_df)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, read_df, write_df)
 
 BPS = ['NOSE', 'LEFT_EAR', 'RIGHT_EAR', 'LEFT_SIDE', 'CENTER', 'RIGHT_SIDE', 'TAIL_BASE']
 ANIMAL_NAMES = ['resident', 'intruder']

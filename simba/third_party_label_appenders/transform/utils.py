@@ -562,4 +562,4 @@ def concatenate_dlc_annotations(data_dir: Union[str, os.PathLike], save_dir: Uni
 
 
 
-#merge_coco_keypoints_files(data_dir=r'E:\netholabs_videos\50_largest_files\imgs_to_lbl', save_path=r'E:\netholabs_videos\50_largest_files\imgs_to_lbl\merged.json', max_width=662, max_height=217)
+    #merge_coco_keypoints_files(data_dir=r'E:\netholabs_videos\50_largest_files\imgs_to_lbl', save_path=r'E:\netholabs_videos\50_largest_files\imgs_to_lbl\merged.json', max_width=662, max_height=217)

@@ -269,12 +269,13 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
     parser.add_argument('--torch_threads', type=int, default=8, help='Number of PyTorch threads to use.')
     parser.add_argument('--half_precision', action='store_true', help='Use half-precision (FP16) inference.')
     parser.add_argument('--stream', action='store_true', default=True, help='Process frames in stream (one-by-one) mode.')
-    parser.add_argument('--box_threshold', type=float, default=0.5, help='Confidence threshold for detections (0.0 - 1.0).')
-    parser.add_argument('--max_tracks', type=int, default=None, help='Maximum number of pose tracks to retain.')
+    parser.add_argument('--box_threshold', type=float, default=0.1, help='Confidence threshold for detections (0.0 - 1.0).')
+    parser.add_argument('--max_tracks', type=int, default=100, help='Maximum number of pose tracks to retain.')
     parser.add_argument('--interpolate', action='store_true', default=True, help='Interpolate missing keypoints across frames.')
     parser.add_argument('--smoothing', type=int, default=100, help='Time in milliseconds to perform smoothing')
     parser.add_argument('--max_per_class', type=int, default=2, help='Maximum number pose tracks per class.')
     parser.add_argument('--imgsz', type=int, default=640, help='Input image size (square). Default is 640.')
+    parser.add_argument('--recursive', action='store_true', help='Use half-precision (FP16) inference.')
     args = parser.parse_args()
 
     keypoints_tuple = tuple(args.keypoint_names[0].split(","))
@@ -292,6 +293,7 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
                                   torch_threads=args.torch_threads,
                                   half_precision=args.half_precision,
                                   stream=args.stream,
+                                  recursive=args.recursive,
                                   box_threshold=args.box_threshold,
                                   max_tracks=args.max_tracks,
                                   max_per_class=args.max_per_class,
