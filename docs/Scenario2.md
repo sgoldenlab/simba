@@ -162,7 +162,7 @@ To access the visualization functions, click the `[Visualizations]` tab.
 On the left of the `Visualization` tab menu, there is a sub-menu with the heading `DATA VISUALIZATION` with a button named `VISUALIZE CLASSIFICATIONS`. Use this button to create videos with classification visualization overlays, similar to what is presented [HERE](https://youtu.be/lGzbS7OaVEg). Clicking this button brings up the below pop-up menu allowing customization of the videos and how they are created. We will go through each of the settings in the visualization options in turn:
 
 <p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/clf_viz_1.png" height="700"/>
+<img src="https://github.com/sgoldenlab/simba/blob/master/images/viz_clf_202510.png" height="700"/>
 </p>
 
 * **BODY-PART VISUALIZATION THRESHOLD** (0.0-1.0): In this entry-box, enter the **minimum** pose-estimation detection probability threshold required for the body-part to be included in the visualization. For example, enter `0.0` for **all** body-part predictions to be included in teh visualization. Enter `1.0` for only body-parts detected with 100% certainty to be visualized. 
@@ -170,11 +170,16 @@ On the left of the `Visualization` tab menu, there is a sub-menu with the headin
 * **STYLE SETTINGS**: By default, SimBA will **auto-compute** suitable visualization (i) font sizes, (ii) spacing between text rows, (iii) font thickness, and (iv) pose-estimation body-part location circles which depend on the resolution of your videos. If you do **not** want SimBA to auto-compute these attributes, go ahead and and **un-tick** the `Auto-compute font/key-point sizes checkbox, and fill in these values manually in each entry box. 
 
 * **VISUALIZATION SETTINGS**:
-  - **Create video**: Tick the `Create video` checkbox to generate `.mp4` videos with classification result overlays.
-  - **Create frames**: Tick the `Create frames` checkbox to generate `.png` files with classification result overlays (NOTE: this will create one png file for each frame in each video. If you are concerned about storage, leave this checkbox unchecked). 
-  - **Include timers overlay**: Tick the `Include timers overlay` checkbox to insert the cumulative time in seconds each classified behavior has occured in the top left corner of the video. 
-  - **Rotate video 90°**: Tick the `Rotate video 90°` checkbox to rotate the output video 90 degrees clockwise relative to the input video. 
-  - **Multiprocess videos (faster)**: Creating videos can be computationally costly, and creating many, long, videos can come with unacceptable run-times. We can solve this using multiprocessing over multiple cores on your computer. To use multi-processing, tick the `Multiprocess videos (faster)` checkbox. Once ticked, the `CPU cores` dropdown becomes enabled. This dropdown contains values between `2` and the number of cores available on your computer with fancier computers having higher CPU counts. In this dropdown, select the number of cores you want to use to create your visualizations. 
+  - **CPU CORES**: How many CPU cores to use to create the visualization(s). The more cores the faster the videos will be created, but the more the RAM memory will be taxed. Defaults to half of your available cores.
+  - **USE GPU**: If `True`, parts of the video processing will use the GPU to speed the video creation up. Defaults to `False`.
+  - **SHOW GANTT PLOT**: Chose to display a gantt plot to the right of the video displaying the bouts of detected behaviors. This can either be a static image (displaying the detected behaviors in the entire video) or a dynamic video showing all the behaviors detected up until the current time of the video. 
+  - **SHOW TRACKING (POSE)**: If checked, the pose in the video is displayed as circles. 
+  - **SHOW ANIMAL BOUNDING BOXES**: If checked, an axis-aligned bounding box is displayed for each animal encompassing the animals detected body-parts.
+  - **SHOW ANIMAL NAMES(S)**: If checked, the animals names are printed next to each animal.
+  - **CREATE VIDEO**: Tick the `Create video` checkbox to generate `.mp4` videos with classification result overlays.
+  - **CREATE FRAMES**: Tick the `Create frames` checkbox to generate `.png` files with classification result overlays (NOTE: this will create one png file for each frame in each video. If you are concerned about storage, leave this checkbox unchecked). 
+  - **INCLUDE TIMERS OVERLAY**: Tick the `Include timers overlay` checkbox to insert the cumulative time in seconds each classified behavior has occured in the top left corner of the video. 
+  - **ROTATE VIDEO 90°**: Tick the `Rotate video 90°` checkbox to rotate the output video 90 degrees clockwise relative to the input video. 
 
 * **RUN**:
 
