@@ -31,6 +31,7 @@ try:
 except:
     from typing_extensions import Literal
 
+import sysconfig
 from urllib import request
 from urllib.parse import urlparse
 
@@ -38,7 +39,6 @@ import cv2
 import numpy as np
 import pandas as pd
 import pkg_resources
-import sysconfig
 import pyarrow as pa
 from numba import njit, prange
 from pyarrow import csv
