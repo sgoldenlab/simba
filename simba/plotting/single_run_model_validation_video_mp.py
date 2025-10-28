@@ -10,7 +10,7 @@ import os
 import platform
 from copy import deepcopy
 from typing import List, Optional, Tuple, Union
-
+import imutils
 import cv2
 import pandas as pd
 
@@ -164,6 +164,7 @@ def _validation_video_mp(data: pd.DataFrame,
                 img = np.concatenate((img, final_gantt), axis=1)
             elif gantt_setting == 2:
                 gantt_img = _create_gantt(bouts_df, clf_name, current_frm, video_meta_data["fps"], header_font_size=9, label_font_size=12)
+                gantt_img = imutils.resize(gantt_img, height=video_meta_data["height"])
                 img = np.concatenate((img, gantt_img), axis=1)
             img = cv2.resize(img, video_size, interpolation=cv2.INTER_LINEAR)
             writer.write(np.uint8(img))
@@ -329,7 +330,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         self._get_styles()
         if self.create_gantt is not None:
             self.bouts_df = self.get_bouts_for_gantt(data_df=self.data_df, clf_name=self.clf_name, fps=self.video_meta_data['fps'])
-            self.final_gantt_img = self.create_gantt_img(self.bouts_df,self.clf_name,len(self.data_df), self.video_meta_data['fps'],f"Behavior gantt chart (entire session, length (s): {self.video_meta_data['video_length_s']}, frames: {self.video_meta_data['frame_count']})", header_font_size=9, label_font_size=12)
+            self.final_gantt_img = self.create_gantt_img(self.bouts_df ,self.clf_name,len(self.data_df), self.video_meta_data['fps'],f"Behavior gantt chart (entire session, length (s): {self.video_meta_data['video_length_s']}, frames: {self.video_meta_data['frame_count']})", header_font_size=9, label_font_size=12)
             self.final_gantt_img = self.resize_gantt(self.final_gantt_img, self.video_meta_data["height"])
         else:
             self.bouts_df, self.final_gantt_img = None, None

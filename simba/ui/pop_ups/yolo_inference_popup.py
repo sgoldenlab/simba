@@ -1,22 +1,15 @@
-
 from tkinter import *
-
 import numpy as np
-
+import os
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.model.yolo_pose_inference import YOLOPoseInference
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
-                                        FolderSelect, SimbaButton,
-                                        SimBADropDown)
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists)
-from simba.utils.enums import Options, PackageNames
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect, FolderSelect, SimbaButton, SimBADropDown)
+from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists)
+from simba.utils.enums import Options, PackageNames, Paths
 from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
-from simba.utils.read_write import (find_core_cnt,
-                                    find_files_of_filetypes_in_directory,
-                                    get_pkg_version, get_video_meta_data,
-                                    str_2_bool)
+from simba.utils.read_write import (find_core_cnt, find_files_of_filetypes_in_directory, get_pkg_version, get_video_meta_data, str_2_bool)
+import simba
 
 MAX_TRACKS_OPTIONS = ['None', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 BATCH_SIZE_OPTIONS =  list(range(50, 1050, 50))
@@ -26,7 +19,6 @@ SMOOTHING_OPTIONS = ['None', 50, 100, 200, 300, 400, 500]
 
 devices = ['CPU']
 THRESHOLD_OPTIONS = np.arange(0.1, 1.1, 0.1).astype(np.float32)
-
 
 class YOLOPoseInferencePopUP(PopUpMixin):
 
@@ -38,14 +30,20 @@ class YOLOPoseInferencePopUP(PopUpMixin):
         if ultralytics_version is None:
             raise SimBAPAckageVersionError(msg=f'Cannot train YOLO pose-estimation model: Could not find ultralytics package in python environment',  source=self.__class__.__name__)
 
-
-
+        simba_dir = os.path.dirname(simba.__file__)
+        yolo_schematics_dir = os.path.join(simba_dir, Paths.YOLO_SCHEMATICS_DIR.value)
+        seven_bp_dir = os.path.join(yolo_schematics_dir, 'yolo_7bps.csv')
 
         PopUpMixin.__init__(self, title="PREDICT USING YOLO POSE ESTIMATION MODEL", icon='ultralytics_2')
-        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
         devices.extend([f'{x} : {y["model"]}' for x, y in gpus.items()])
-        self.weights_path = FileSelect(parent=settings_frm, fileDescription='MODEL PATH (E.G., .PT):', lblwidth=35,  entry_width=45, file_types=[("YOLO MODEL FILE", Options.ALL_YOLO_MODEL_FORMAT_STR_OPTIONS.value)])
-        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, entry_width=45)
+
+        paths_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MODEL & DATA PATHS", icon_name='browse')
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
+
+        self.weights_path = FileSelect(parent=paths_frm, fileDescription='MODEL PATH (E.G., .PT):', lblwidth=35,  entry_width=45, file_types=[("YOLO MODEL FILE", Options.ALL_YOLO_MODEL_FORMAT_STR_OPTIONS.value)])
+        self.save_dir = FolderSelect(paths_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, entry_width=45)
+        self.bp_config_csv_path = FileSelect(parent=paths_frm, fileDescription='BODY-PART NAMES (.CSV):', lblwidth=35,  entry_width=45, file_types=[("CSV FILE", ".csv")], initialdir=yolo_schematics_dir, initial_path=seven_bp_dir)
+
         self.batch_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=BATCH_SIZE_OPTIONS, label="BATCH SIZE: ", label_width=35, dropdown_width=40, value=250)
         self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE:", label_width=35, dropdown_width=40, value='TRUE')
         self.workers_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=CORE_CNT_OPTIONS, label="CPU WORKERS:", label_width=35, dropdown_width=40, value=int(max(CORE_CNT_OPTIONS)/2))
@@ -60,27 +58,31 @@ class YOLOPoseInferencePopUP(PopUpMixin):
         self.max_track_per_id_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=MAX_TRACKS_OPTIONS, label="MAX TRACKS PER ID:", label_width=35, dropdown_width=40, value=1)
         self.smoothing_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=SMOOTHING_OPTIONS, label="SMOOTHING (MS):", label_width=35, dropdown_width=40, value=SMOOTHING_OPTIONS[2])
 
-        settings_frm.grid(row=0, column=0, sticky=NW)
+        paths_frm.grid(row=0, column=0, sticky=NW)
+        settings_frm.grid(row=1, column=0, sticky=NW)
+
         self.weights_path.grid(row=0, column=0, sticky=NW)
         self.save_dir.grid(row=1, column=0, sticky=NW)
-        self.format_dropdown.grid(row=2, column=0, sticky=NW)
-        self.img_size_dropdown.grid(row=3, column=0, sticky=NW)
-        self.threshold_dropdown.grid(row=4, column=0, sticky=NW)
-        self.interpolate_dropdown.grid(row=5, column=0, sticky=NW)
-        self.iou_dropdown.grid(row=6, column=0, sticky=NW)
-        self.stream_dropdown.grid(row=7, column=0, sticky=NW)
-        self.workers_dropdown.grid(row=8, column=0, sticky=NW)
-        self.verbose_dropdown.grid(row=9, column=0, sticky=NW)
-        self.devices_dropdown.grid(row=10, column=0, sticky=NW)
-        self.max_tracks_dropdown.grid(row=11, column=0, sticky=NW)
-        self.max_track_per_id_dropdown.grid(row=12, column=0, sticky=NW)
-        self.smoothing_dropdown.grid(row=13, column=0, sticky=NW)
+        self.bp_config_csv_path.grid(row=2, column=0, sticky=NW)
+
+        self.format_dropdown.grid(row=0, column=0, sticky=NW)
+        self.img_size_dropdown.grid(row=1, column=0, sticky=NW)
+        self.threshold_dropdown.grid(row=2, column=0, sticky=NW)
+        self.interpolate_dropdown.grid(row=3, column=0, sticky=NW)
+        self.iou_dropdown.grid(row=4, column=0, sticky=NW)
+        self.stream_dropdown.grid(row=5, column=0, sticky=NW)
+        self.workers_dropdown.grid(row=6, column=0, sticky=NW)
+        self.verbose_dropdown.grid(row=7, column=0, sticky=NW)
+        self.devices_dropdown.grid(row=8, column=0, sticky=NW)
+        self.max_tracks_dropdown.grid(row=9, column=0, sticky=NW)
+        self.max_track_per_id_dropdown.grid(row=10, column=0, sticky=NW)
+        self.smoothing_dropdown.grid(row=11, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="ANALYZE SINGLE VIDEO", icon_name='video')
         self.video_path = FileSelect(parent=single_video_frm, fileDescription='VIDEO PATH:', lblwidth=35, entry_width=45, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         run_single_video_btn = SimbaButton(parent=single_video_frm, txt='ANALYZE SINGLE VIDEO', txt_clr='blue', img='rocket', cmd=self.run, cmd_kwargs={'multiple': False})
 
-        single_video_frm.grid(row=1, column=0, sticky=NW)
+        single_video_frm.grid(row=2, column=0, sticky=NW)
         self.video_path.grid(row=0, column=0, sticky=NW)
         run_single_video_btn.grid(row=1, column=0, sticky=NW)
 
@@ -89,11 +91,11 @@ class YOLOPoseInferencePopUP(PopUpMixin):
         self.video_dir = FolderSelect(parent=video_dir_frm, folderDescription='VIDEO DIRECTORY PATH:', entry_width=45, lblwidth=35)
         run_multiple_video_btn = SimbaButton(parent=video_dir_frm, txt='ANALYZE VIDEO DIRECTORY', txt_clr='blue', img='rocket', cmd=self.run, cmd_kwargs={'multiple': True})
 
-        video_dir_frm.grid(row=2, column=0, sticky=NW)
+        video_dir_frm.grid(row=3, column=0, sticky=NW)
         self.video_dir.grid(row=0, column=0, sticky=NW)
         run_multiple_video_btn.grid(row=1, column=0, sticky=NW)
 
-        #self.main_frm.mainloop()
+        self.main_frm.mainloop()
 
     def run(self, multiple: bool):
         mdl_path = self.weights_path.file_path
