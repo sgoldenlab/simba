@@ -13,19 +13,15 @@ import simba
 from simba.ui.import_pose_frame import ImportPoseFrame
 from simba.ui.import_videos_frame import ImportVideosFrame
 from simba.ui.pop_ups.clf_add_remove_print_pop_up import PoseResetterPopUp
-from simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up import \
-    CreateUserDefinedPoseConfigurationPopUp
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
-                                        FolderSelect, SimbaButton,
-                                        SimBADropDown, hxtScrollbar)
-from simba.utils.checks import check_if_dir_exists, check_int, check_str
+from simba.ui.pop_ups.create_user_defined_pose_configuration_pop_up import CreateUserDefinedPoseConfigurationPopUp
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, FolderSelect, SimbaButton, SimBADropDown, hxtScrollbar)
+from simba.ui.ml_settings_frm import GetMLSettingsFrame
+from simba.utils.checks import check_if_dir_exists, check_str
 from simba.utils.config_creator import ProjectConfigCreator
 from simba.utils.enums import Formats, Keys, Links, Methods, Options, Paths
-from simba.utils.errors import DuplicationError, MissingProjectConfigEntryError
-from simba.utils.lookups import (get_body_part_configurations,
-                                 get_bp_config_codes, get_icons_paths)
-from simba.video_processors.video_processing import \
-    extract_frames_from_all_videos_in_directory
+from simba.utils.errors import DuplicationError, MissingProjectConfigEntryError, InvalidInputError
+from simba.utils.lookups import (get_body_part_configurations, get_bp_config_codes, get_icons_paths)
+from simba.video_processors.video_processing import extract_frames_from_all_videos_in_directory
 
 
 class ProjectCreatorPopUp():
@@ -56,12 +52,10 @@ class ProjectCreatorPopUp():
         self.create_project_tab = ttk.Frame(parent_tab)
         self.import_videos_tab = ttk.Frame(parent_tab)
         self.import_data_tab = ttk.Frame(parent_tab)
-        #.extract_frms_tab = ttk.Frame(parent_tab)
 
         parent_tab.add(self.create_project_tab, text=f'{"[ Create project config ]": ^20s}', compound="left", image=self.btn_icons["create"]["img"])
         parent_tab.add(self.import_videos_tab, text=f'{"[ Import videos ]": ^20s}', compound="left", image=self.btn_icons["video"]["img"])
         parent_tab.add(self.import_data_tab, text=f'{"[ Import tracking data ]": ^20s}', compound="left", image=self.btn_icons["pose"]["img"])
-        #parent_tab.add( self.extract_frms_tab, text=f'{"[ Extract frames ]": ^20s}', compound="left", image=self.btn_icons["frames"]["img"])
         parent_tab.grid(row=0, column=0, sticky=NW)
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.create_project_tab, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CREATE_PROJECT.value)
@@ -70,10 +64,7 @@ class ProjectCreatorPopUp():
         self.project_name_eb = Entry_Box(self.general_settings_frm, "PROJECT NAME:", labelwidth=35, entry_box_width=35)
         self.file_type_dropdown = SimBADropDown(parent=self.general_settings_frm, dropdown_options=Options.WORKFLOW_FILE_TYPE_OPTIONS.value, label='WORKFLOW FILE TYPE:', label_width=35, dropdown_width=35, value=Options.WORKFLOW_FILE_TYPE_OPTIONS.value[0])
 
-        self.clf_entry_boxes = []
-        self.ml_settings_frm = CreateLabelFrameWithIcon(parent=self.create_project_tab, header="MACHINE LEARNING SETTINGS", icon_name='forest', icon_link=Links.CREATE_PROJECT.value, font=Formats.FONT_HEADER.value, padx=5, pady=5, relief='solid')
-        self.clf_cnt_dropdown = SimBADropDown(parent=self.ml_settings_frm, dropdown_options=list(range(1, 26)), label='NUMBER OF CLASSIFIERS (BEHAVIORS)', label_width=35, dropdown_width=35, value=1, command=self.__create_entry_boxes)
-        self.__create_entry_boxes(cnt=1)
+        self.ml_settings_frm = GetMLSettingsFrame(parent=self.create_project_tab, lbl_width=35, bx_width=22)
         self.animal_settings_frm = CreateLabelFrameWithIcon(parent=self.create_project_tab, header="ANIMAL SETTINGS", icon_name='pose', icon_link=Links.CREATE_PROJECT.value, font=Formats.FONT_HEADER.value, padx=5, pady=5, relief='solid')
         self.tracking_type_dropdown = SimBADropDown(parent=self.animal_settings_frm, dropdown_options=Options.TRACKING_TYPE_OPTIONS.value, label='TYPE OF TRACKING', label_width=35, dropdown_width=35, value=Options.TRACKING_TYPE_OPTIONS.value[0], command=self.update_body_part_dropdown)
 
@@ -114,9 +105,6 @@ class ProjectCreatorPopUp():
         self.project_name_eb.grid(row=1, column=0, sticky=NW)
         self.file_type_dropdown.grid(row=2, column=0, sticky=NW)
 
-        self.ml_settings_frm.grid(row=1, column=0, sticky=NW, pady=5)
-        self.clf_cnt_dropdown.grid(row=0, column=0, sticky=NW)
-
         self.animal_settings_frm.grid(row=2, column=0, sticky=NW, pady=5)
         self.tracking_type_dropdown.grid(row=0, column=0, sticky=NW)
         self.selected_tracking_dropdown.grid(row=1, column=0, sticky=NW)
@@ -127,49 +115,8 @@ class ProjectCreatorPopUp():
 
         ImportVideosFrame(parent_frm=self.import_videos_tab, config_path=None, idx_row=0, idx_column=0)
         ImportPoseFrame(parent_frm=self.import_data_tab, config_path=None, idx_row=0, idx_column=0)
-        #extract_frames_frm = LabelFrame(self.extract_frms_tab, text="EXTRACT FRAMES INTO PROJECT", fg="black", font=Formats.FONT_HEADER.value, pady=5, padx=5)
-        #extract_frames_note = Label(extract_frames_frm, text="Note: Frame extraction is not needed for any of the parts of the SimBA pipeline.\n Caution: This extract all frames from all videos in project. \n and is computationally expensive if there is a lot of videos at high frame rates/resolution.", font=Formats.FONT_REGULAR.value)
-        #extract_frames_btn = SimbaButton(parent=extract_frames_frm, txt="EXTRACT FRAMES", txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=None)
-        #extract_frames_frm.grid(row=0, column=0, sticky=NW)
-        #extract_frames_note.grid(row=0, column=0, sticky=NW)
-        #extract_frames_btn.grid(row=1, column=0, sticky=NW)
         self.update_body_part_dropdown(Methods.CLASSIC_TRACKING.value)
-        #self.main_frm.mainloop()
-
-    def __create_entry_boxes(self, cnt):
-        existing_values = []
-        for entry in self.clf_entry_boxes:
-            try:
-                existing_values.append(entry.entry_get.strip())
-            except:
-                existing_values.append("")
-        for entry in self.clf_entry_boxes:
-            try:
-                entry.destroy()
-            except:
-                pass
-        self.clf_entry_boxes = []
-        valid_cnt, _ = check_int(name=f'{self.__class__.__name__} cnt', value=cnt, min_value=1, raise_error=False)
-        count = int(cnt) if valid_cnt else 1
-        for clf_cnt in range(count):
-            entry = Entry_Box(parent=self.ml_settings_frm, fileDescription=f'CLASSIFIER NAME {clf_cnt + 1}: ', labelwidth=35, entry_box_width=35)
-            entry.grid(row=clf_cnt + 2, column=0, sticky=NW)
-            if clf_cnt < len(existing_values) and existing_values[clf_cnt]:
-                try:
-                    entry.entry_set(existing_values[clf_cnt])
-                except AttributeError:
-                    try:
-                        entry.entPath.insert(0, existing_values[clf_cnt])
-                    except:
-                        pass
-            self.clf_entry_boxes.append(entry)
-        # for entry in self.clf_entry_boxes:
-        #     entry.destroy()
-        # self.clf_entry_boxes = []
-        # for clf_cnt in range(int(cnt)):
-        #     entry = Entry_Box(parent=self.ml_settings_frm, fileDescription=f'CLASSIFIER NAME {clf_cnt + 1}: ', labelwidth=35, entry_box_width=35)
-        #     entry.grid(row=clf_cnt + 2, column=0, sticky=NW)
-        #     self.clf_entry_boxes.append(entry)
+        self.main_frm.mainloop()
 
     def update_body_part_dropdown(self, selected_value):
         self.selected_tracking_dropdown.destroy()
@@ -203,10 +150,12 @@ class ProjectCreatorPopUp():
         project_name = self.project_name_eb.entry_get
         check_str(name="PROJECT NAME", value=project_name, allow_blank=False)
         target_list = []
-        for number, entry_box in enumerate(self.clf_entry_boxes):
+        for number, entry_box in enumerate(self.ml_settings_frm.clf_entry_boxes):
+            #if entry_box.entry_get.strip() == "":
+            #    raise InvalidInputError(msg=f'Classifier {number+1} is not named. Give classifier {number+1} a name before creating project', source=self.__class__.__name__)
             target_list.append(entry_box.entry_get.strip())
-        if len(list(set(target_list))) != len(self.clf_entry_boxes):
-            raise DuplicationError(msg="All classifier names have to be unique")
+        if len(list(set(target_list))) != len(self.ml_settings_frm.clf_entry_boxes):
+            raise DuplicationError(msg="ALL classifier NAMES have to be UNIQUE!")
         selected_config = self.selected_tracking_dropdown.getChoices()
         if selected_config in self.bp_config_codes.keys():
             config_code = self.bp_config_codes[selected_config]

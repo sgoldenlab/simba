@@ -45,27 +45,23 @@ This section describes how to create a new project for behavioral classifier pre
 
 ### Step 1: Generate Project Config
 
-In this step you create your main project folder, which will then auto-populate with all the required sub-directories.
+In this step you create your main project folder, which will then autopopulate with all the required subdirectories.
 
-1. In the main SimBA window, click on `File` and and `Create a new project`. The following windows will pop up.
+1. In the main SimBA window, click the `File` tab followed by `Create a new project`. The following windows will pop up.
 
-![](/images/Create_project_1.PNG "createproject")
+![](/images/create_project_102025_1.png "createproject")
 
-2. Navigate to the `[ Generate project config ]` tab. Under **General Settings**, specify a `Project Path` which is the directory that will contain your main project folder.
+2. Navigate to the `[ Create project config ]` tab. Under **GENERAL PROJECT SETTINGS**, specify a `PROJECT DIRECTORY` which is the directory that will contain your main project folder.
 
-3. `Project Name` is the name of your project. 
-*Keep in mind that the project name cannot contain spaces. We suggest to instead use underscore "_"* 
+3. `PROJECT NAME` is the name of your project. *I would avoid using spaces in your project name. I suggest to instead use underscore "_"* 
 
-4. In the `SML Settings` sub-menu, put in the number of predictive classifiers that you wish to create. For an example, in Scenario 1 we would like to create a single classifier. We will enter the number 1. Note that in the real world you would probably want to create multiple classifiers concurrently as this would decrease the number of times a video would need to be manually annotated. For simplicity, we will here create a single classifier. *Note: If you are using SimBA only for region of intrest (ROI) analysis, and do not wish to create any classifiers, enter `1` in this entry box.*
-
-5. Click <img src="https://github.com/sgoldenlab/simba/blob/master/images/addclassifier.PNG" width="153" height="27" /> a single time, and it creates a row as shown in the following image. In each entry box, fill in the name of the behavior (BtWGaNP) that you want to classify. If you click too many times, as long as you leave the extra boxes empty, all is well. *Note: If you are using SimBA only for region of intrest (ROI) analysis, and do not wish to create any classifiers, enter any name in the the single entry box.*
-
+4. In the `MACHINE LEARNING SETTINGS` sub-menu, enter the names of the behaviors you want to create machine learning models for. To add further behaviors, click the `plus` icon. To remove a behaviors, click the `minus` icon. *Note: If you are using SimBA only for region of intrest (ROI) analysis, and do not wish to create any classifiers, feel free to leave the entry boxes(s) blank.*
 
 <p align="center">
   <img width="385" height="106" src="https://github.com/sgoldenlab/simba/blob/master/images/classifier1.PNG">
 </p>
 
-6. The sub-menu `Animal Settings - # config` is used to specify the number of animals and body parts that that the pose estimation tracking data contains. The default for **SimBA** is 2 animals and 16 body parts (`2 animals, 16bp`). There are a few other - **yet not validaded** - options, accessible in the dropdown menu. This selection is the annotation configuration you should have previously used when labelling images in DeepLabCut or DeepPoseKit - see the tutorial for **[Pose estimation body-part labelling](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling)** for more information.
+5. The sub-menu `Animal Settings - # config` is used to specify the number of animals and body parts that that the pose estimation tracking data contains. The default for **SimBA** is 2 animals and 16 body parts (`2 animals, 16bp`). There are a few other - **yet not validaded** - options, accessible in the dropdown menu. This selection is the annotation configuration you should have previously used when labelling images in DeepLabCut or DeepPoseKit - see the tutorial for **[Pose estimation body-part labelling](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_DLC.md#pose-estimation-body-part-labelling)** for more information.
 
 The second drop-down in the `Animal Settings` menu is the `Type of Tracking` menu. In the current scenario we will leave this at the default `Classical tracking`. `Classical tracking` is used when your videos contain one animal, or two animals that are clearly (by eye) discriminable, such as a white and a black coated animal. A second option in the `Type of Tracking` dropdown menu is `Multi tracking`. Select the `Multi tracking` option from the `Type of Tracking` dropdown menu *only when* the animals in your protocol are not discriminable by eye and you have used newer pose-estimation tools to perform your animal tracking. These newer tools include multi-animal DeepLabCut [DLC version >=2.2b5](https://github.com/DeepLabCut/DeepLabCut/releases/tag/v2.2b5) and [SLEAP](https://sleap.ai/). In this tutorial we will use `Classical tracking`. If you have multi-animal tracking data from [DeepLabCut >=2.2b5](https://github.com/DeepLabCut/DeepLabCut/releases/tag/v2.2b5) or [SLEAP](https://sleap.ai/), then head over to the seperate tutorial on *Import multi-animal data* to learn how to import this data into SimBA. Come back to this tutorial after you have completed the *Import multi-animal data* tutorial and your multi-animal data has been imported into SimBA. 
 
@@ -73,7 +69,7 @@ The second drop-down in the `Animal Settings` menu is the `Type of Tracking` men
 
 *>Note II:*  If you select the `Multi tracking` option from the `Type of Tracking` dropdown menu, you will also se an option named ``AMBER``. The AMBER pipeline was developed for quantifying home-cage maternal and mother-pup interactions from side-view recordings. Behavior classifiers are trained to assess maternal nest attendance, nursing, pup-directed licking and grooming, self-directed grooming, eating, and drinking. To find more information about AMBER, download AMBER DeepLabCut models or AMBER SimBA models, see the [AMBER publication](https://www.nature.com/articles/s41598-023-45495-4), or visit the [AMBER github](https://github.com/lapphe/AMBER-pipeline) or [OSF](https://osf.io/e3dyc/) repositories. 
 
-7. Click on `Generate Project Config` to generate your project. The project folder will be located in the specified `Project Path`. The Project will remain open, and the main console will report that the project has been created.
+6. Click on `Generate Project Config` to generate your project. The project folder will be located in the specified `Project Path`. The Project will remain open, and the main console will report that the project has been created.
 
 ### Step 2: Import videos into project folder
 

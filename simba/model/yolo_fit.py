@@ -168,8 +168,8 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 #                  device=0,
 #                  imgsz=640)
 # fitter.run()
-#
-#
+
+
 
 # fitter = FitYolo(weights_path=r"D:\yolo_weights\yolo11m-pose.pt",
 #                  model_yaml=r"D:\cvat_annotations\frames\yolo_072125\map.yaml",

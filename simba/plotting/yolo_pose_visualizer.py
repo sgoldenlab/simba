@@ -382,17 +382,17 @@ class YOLOPoseVisualizer():
 #
 #     kp_vis.run()
 
-if __name__ == "__main__":
-    video_path = r"E:\netholabs_videos\two_tracks\videos"
-    data_path = r"E:\netholabs_videos\two_tracks\csv_track_025"
-    save_dir = r'E:\netholabs_videos\two_tracks\track_videos'
-    kp_vis = YOLOPoseVisualizer(data_path=data_path,
-                                video_path=video_path,
-                                save_dir=save_dir,
-                                core_cnt=14,
-                                palettes=('Set1',),
-                                recursive=True,
-                                sample_n=75)
-
-
-    kp_vis.run()
+# if __name__ == "__main__":
+#     video_path = r"E:\netholabs_videos\two_tracks\videos"
+#     data_path = r"E:\netholabs_videos\two_tracks\csv_track_025"
+#     save_dir = r'E:\netholabs_videos\two_tracks\track_videos'
+#     kp_vis = YOLOPoseVisualizer(data_path=data_path,
+#                                 video_path=video_path,
+#                                 save_dir=save_dir,
+#                                 core_cnt=14,
+#                                 palettes=('Set1',),
+#                                 recursive=True,
+#                                 sample_n=75)
+#
+#
+#     kp_vis.run()

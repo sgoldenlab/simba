@@ -38,6 +38,7 @@ import cv2
 import numpy as np
 import pandas as pd
 import pkg_resources
+import sysconfig
 import pyarrow as pa
 from numba import njit, prange
 from pyarrow import csv
@@ -3418,6 +3419,47 @@ def read_facemap_h5(file_path: Union[str, os.PathLike]) -> pd.DataFrame:
         results[f'{bodypart}_y'] = bp_y.astype(np.int32)
         results[f'{bodypart}_p'] = bp_p.astype(np.float32)
     return results
+
+
+def get_site_packages_path(raise_error: Optional[bool] = True) -> Union[None, os.PathLike, str]:
+    """
+    Retrieve the path to the current Python environment's `site-packages` directory.
+    """
+    check_valid_boolean(value=[raise_error], source=f'{get_site_packages_path.__name__} raise_error')
+    try:
+        dir_path = sysconfig.get_paths()["purelib"]
+        check_if_dir_exists(in_dir=dir_path, source=get_site_packages_path.__name__, create_if_not_exist=False, raise_error=True)
+        return dir_path
+    except Exception as e:
+        if raise_error:
+            raise SimBAPAckageVersionError(msg=f'site-package directory could not be found: {e.args}', source=get_site_packages_path.__name__)
+        else:
+            return None
+
+
+def get_env_pose_config_dir(raise_error: Optional[bool] = True):
+    """
+    Locate and validate the `pose_configurations` directory in the active SimBA installation.
+    """
+    EXPECTED_SUBDIRS = ['bp_names', 'no_animals', 'configuration_names', 'schematics']
+
+    check_valid_boolean(value=[raise_error], source=f'{get_env_pose_config_dir.__name__} raise_error')
+    site_packages_dir = get_site_packages_path(raise_error=raise_error)
+    pose_config_dir = os.path.join(site_packages_dir, 'simba', 'pose_configurations')
+    if os.path.isdir(pose_config_dir):
+        subdirs = [d for d in os.listdir(pose_config_dir) if os.path.isdir(os.path.join(pose_config_dir, d))]
+        missing_subdirs = [x for x in EXPECTED_SUBDIRS if x not in subdirs]
+        if len(missing_subdirs) > 0 and raise_error:
+            raise SimBAPAckageVersionError(msg=f'pose_configurations directory did not contain the expected sub-directories: {missing_subdirs}', source=get_env_pose_config_dir.__name__)
+        elif len(missing_subdirs) > 0 and not raise_error:
+            return None
+        else:
+            return pose_config_dir
+    else:
+        if raise_error:
+            raise SimBAPAckageVersionError(msg=f'pose_configurations directory could not be found. Expected directory: {pose_config_dir}', source=get_pose_config_dir.__name__)
+        return None
+
 
 def osf_download(project_id: str, save_dir: Union[str, os.PathLike], storage: str = 'osfstorage', overwrite: bool = False):
     """

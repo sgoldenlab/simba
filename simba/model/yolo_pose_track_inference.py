@@ -225,7 +225,7 @@ class YOLOPoseTrackInference():
 
 
 # VIDEO_PATH = r"E:\netholabs_videos\two_tracks\videos"
-# WEIGHTS_PASS = r"E:\netholabs_videos\mosaics\yolo_mdl_w_tail\mdl\train2\weights\best.pt"
+# WEIGHTS_PASS = r"D:\netholabs\yolo_mosaic_data_102315\mdl\train\weights\best.pt"
 # SAVE_DIR = r"E:\netholabs_videos\two_tracks\csv_track_025"
 # BOTSORT_PATH = r"C:\projects\simba\simba\simba\assets\bytetrack.yml"
 #
