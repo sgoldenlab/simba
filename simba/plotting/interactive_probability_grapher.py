@@ -85,7 +85,7 @@ class InteractiveProbabilityGrapher(ConfigReader):
         current_x_cord, prior_x_cord = None, None
 
         fig, ax = plt.subplots()
-        fig.canvas.manager.set_window_title(f"SimBA - {self.clf_name} Probability")
+        fig.canvas.manager.set_window_title(f"SimBA - {self.clf_name} Probability - {get_fn_ext(filepath=self.file_path)[1]}")
         if (platform.system() == OS.WINDOWS.value) and os.path.isfile(ICON_WINDOWS):
             fig.canvas.manager.window.iconbitmap(ICON_WINDOWS)
         if (platform.system() == OS.MAC.value) and os.path.isfile(ICON_DARWIN):
@@ -135,5 +135,5 @@ class InteractiveProbabilityGrapher(ConfigReader):
 #                                      file_path=r"C:\troubleshooting\mitra\project_folder\csv\features_extracted\501_MA142_Gi_CNO_0521.csv",
 #                                      model_path=r"C:\troubleshooting\mitra\models\generated_models\straub_tail.sav")
 # test.run()
-#
+
 

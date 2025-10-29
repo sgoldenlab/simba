@@ -12,21 +12,32 @@ from PIL import ImageTk
 from simba.utils.errors import FrameRangeError
 from simba.utils.read_write import get_video_meta_data
 from simba.utils.warnings import FrameRangeWarning
-
+from simba.utils.lookups import get_icons_paths
+from simba.utils.checks import check_file_exist_and_readable, check_valid_array
+from simba.utils.enums import Formats
 PADDING = 5
 MAX_SIZE = (1080, 650)
 
 
 class InteractiveVideoPlotterWindow(object):
     def __init__(self,
-                 video_path: Union[str, os.PathLike], p_arr: np.array):
+                 video_path: Union[str, os.PathLike],
+                 p_arr: np.array):
+
+        check_file_exist_and_readable(file_path=video_path, raise_error=True)
+        check_valid_array(data=p_arr, source=f'{self.__class__.__name__} p_arr', accepted_dtypes=Formats.NUMERIC_DTYPES.value)
         self.main_frm = Toplevel()
+        self.btn_icons = get_icons_paths()
+        for k in self.btn_icons.keys():
+            self.btn_icons[k]["img"] = ImageTk.PhotoImage(image=Img.open(os.path.join(os.path.dirname("__file__"), self.btn_icons[k]["icon_path"])))
+        self.main_frm.iconphoto(False, self.btn_icons['frames']['img'])
         self.current_frm_number, self.jump_size = 0, 0
         self.img_frm = Frame(self.main_frm)
         self.img_frm.grid(row=0, column=1, sticky=NW)
         self.button_frame = Frame(self.main_frm, bd=2, width=700, height=300)
         self.button_frame.grid(row=1, column=0)
         self.video_meta_data = get_video_meta_data(video_path=video_path)
+        self.main_frm.wm_title(self.video_meta_data['video_name'])
         self.cap = cv2.VideoCapture(video_path)
         self.cap.set(1, self.current_frm_number)
         self.max_frm = np.argmax(p_arr)
