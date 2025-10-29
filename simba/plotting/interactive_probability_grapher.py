@@ -54,7 +54,7 @@ class InteractiveProbabilityGrapher(ConfigReader):
         check_file_exist_and_readable(file_path=model_path)
         check_int(name=f'{self.__class__.__name__} lbl_font_size', value=lbl_font_size, min_value=1, raise_error=True)
         self.file_path, self.model_path, self.lbl_font_size = file_path, model_path, lbl_font_size
-        self.click_counter = 0
+        self.click_counter, self.is_playing = 0, False
         _, self.clf_name, _ = get_fn_ext(filepath=self.model_path)
         if self.clf_name not in self.clf_names:
             raise InvalidInputError(msg=f"The classifier name {self.clf_name} is not a classifier in the SimBA project. Accepted model names: {self.clf_names}. Try re-naming the classifier name or add the classifier name to the SImBA project", source=self.__class__.__name__)
@@ -66,9 +66,10 @@ class InteractiveProbabilityGrapher(ConfigReader):
         check_valid_dataframe(df=self.data_df, source=f'{self.__class__.__name__} {self.data_path}', valid_dtypes=Formats.NUMERIC_DTYPES.value, required_fields=[p_col])
         self.p_arr = self.data_df[["Probability_{}".format(self.clf_name)]].to_numpy()
         current_video_file_path = self.find_video_of_file(video_dir=self.video_dir, filename=video_name, raise_error=True)
-        video_meta_data = get_video_meta_data(video_path=current_video_file_path)
-        if video_meta_data['frame_count'] != len(self.data_df):
-            FrameRangeWarning(msg=f'The video {current_video_file_path} contains {video_meta_data["frame_count"]} frames, while the data file {self.data_path} contains {len(self.data_df)} frames.', source=self.__class__.__name__)
+        self.video_meta_data = get_video_meta_data(video_path=current_video_file_path)
+        self.play_speed = self.video_meta_data['fps'] / 1000
+        if self.video_meta_data['frame_count'] != len(self.data_df):
+            FrameRangeWarning(msg=f'The video {current_video_file_path} contains {self.video_meta_data["frame_count"]} frames, while the data file {self.data_path} contains {len(self.data_df)} frames.', source=self.__class__.__name__)
         self.video_frm = InteractiveVideoPlotterWindow(video_path=current_video_file_path, p_arr=self.p_arr)
         self.video_frm.main_frm.protocol("WM_DELETE_WINDOW", self._close_windows)
 
@@ -77,6 +78,15 @@ class InteractiveProbabilityGrapher(ConfigReader):
         global current_x_cord
         if (event.dblclick) and (event.button == 1) and (type(event.xdata) != None):
             current_x_cord = int(event.xdata)
+
+    def __key_press_event(self, event):
+        global current_x_cord
+        if event.key == ' ':
+            self.is_playing = not self.is_playing
+        if event.key == 'left' and current_x_cord is not None and current_x_cord > 0:
+            current_x_cord -= 1
+        elif event.key == 'right' and current_x_cord is not None and current_x_cord < len(self.p_arr) - 1:
+            current_x_cord += 1
 
     def run(self):
         import matplotlib
@@ -97,27 +107,35 @@ class InteractiveProbabilityGrapher(ConfigReader):
         plt.ylabel(f"{self.clf_name} probability", fontsize=self.lbl_font_size)
         plt.title(plt_title)
         plt.grid()
+        ax.text(0.5, 1.12, "Double-click: jump to frame | ← →: navigate | Space: play/pause", 
+                transform=ax.transAxes, ha='center', va='bottom', fontsize=10, 
+                bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
         line = None
         fig.canvas.draw()
         fig.canvas.flush_events()
+        fig.canvas.mpl_connect("button_press_event", lambda event: self.__click_event(event))  # ADD THIS - it's missing!
+        fig.canvas.mpl_connect("key_press_event", self.__key_press_event)
         plt.show(block=False)
 
         while plt.fignum_exists(fig.number):
-            _ = fig.canvas.mpl_connect("button_press_event", lambda event: self.__click_event(event))
             if current_x_cord != prior_x_cord:
                 prior_x_cord = copy(current_x_cord)
                 probability_txt = f"Selected frame: {current_x_cord}, {self.clf_name} probability: {self.p_arr[current_x_cord][0]}"
                 plt_title = f"Click on the points of the graph to display the corresponding video frame. \n {probability_txt}"
                 self.video_frm.load_new_frame(frm_cnt=int(current_x_cord))
-                if line != None:
+                if line is not None:
                     line.remove()
                 plt.title(plt_title)
                 line = plt.axvline(x=current_x_cord, color="r")
+
+            # Auto-advance when playing
+            if self.is_playing and current_x_cord is not None and current_x_cord < len(self.p_arr) - 1:
+                current_x_cord += 1
+
             fig.canvas.draw()
             fig.canvas.flush_events()
             plt.ion()
-            threading.Thread(plt.show()).start()
-            plt.pause(0.0001)
+            plt.pause(self.play_speed)
 
         self.video_frm.main_frm.destroy()
 
@@ -129,10 +147,6 @@ class InteractiveProbabilityGrapher(ConfigReader):
         plt.close('all')
 
 
-
-
-
-#
 # test = InteractiveProbabilityGrapher(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #                                      file_path=r"C:\troubleshooting\mitra\project_folder\csv\features_extracted\501_MA142_Gi_CNO_0521.csv",
 #                                      model_path=r"C:\troubleshooting\mitra\models\generated_models\straub_tail.sav")
