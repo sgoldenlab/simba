@@ -1,15 +1,23 @@
-from tkinter import *
-import numpy as np
 import os
+from tkinter import *
+
+import numpy as np
+
+import simba
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.model.yolo_pose_inference import YOLOPoseInference
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect, FolderSelect, SimbaButton, SimBADropDown)
-from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
+                                        FolderSelect, SimbaButton,
+                                        SimBADropDown)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists)
 from simba.utils.enums import Options, PackageNames, Paths
 from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
-from simba.utils.read_write import (find_core_cnt, find_files_of_filetypes_in_directory, get_pkg_version, get_video_meta_data, str_2_bool)
-import simba
+from simba.utils.read_write import (find_core_cnt,
+                                    find_files_of_filetypes_in_directory,
+                                    get_pkg_version, get_video_meta_data,
+                                    str_2_bool)
 
 MAX_TRACKS_OPTIONS = ['None', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 BATCH_SIZE_OPTIONS =  list(range(50, 1050, 50))

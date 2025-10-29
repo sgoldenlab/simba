@@ -10,8 +10,9 @@ import os
 import platform
 from copy import deepcopy
 from typing import List, Optional, Tuple, Union
-import imutils
+
 import cv2
+import imutils
 import pandas as pd
 
 try:
