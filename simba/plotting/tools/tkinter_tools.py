@@ -9,12 +9,13 @@ import numpy as np
 from PIL import Image as Img
 from PIL import ImageTk
 
-from simba.utils.errors import FrameRangeError
-from simba.utils.read_write import get_video_meta_data
-from simba.utils.warnings import FrameRangeWarning
-from simba.utils.lookups import get_icons_paths
 from simba.utils.checks import check_file_exist_and_readable, check_valid_array
 from simba.utils.enums import Formats
+from simba.utils.errors import FrameRangeError
+from simba.utils.lookups import get_icons_paths
+from simba.utils.read_write import get_video_meta_data
+from simba.utils.warnings import FrameRangeWarning
+
 PADDING = 5
 MAX_SIZE = (1080, 650)
 
