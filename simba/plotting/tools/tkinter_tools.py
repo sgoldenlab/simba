@@ -1,6 +1,8 @@
 __author__ = "Simon Nilsson"
 
+import os
 from tkinter import *
+from typing import Union
 
 import cv2
 import numpy as np
@@ -16,7 +18,8 @@ MAX_SIZE = (1080, 650)
 
 
 class InteractiveVideoPlotterWindow(object):
-    def __init__(self, video_path: str, p_arr: np.array):
+    def __init__(self,
+                 video_path: Union[str, os.PathLike], p_arr: np.array):
         self.main_frm = Toplevel()
         self.current_frm_number, self.jump_size = 0, 0
         self.img_frm = Frame(self.main_frm)

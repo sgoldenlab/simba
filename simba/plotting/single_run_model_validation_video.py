@@ -86,6 +86,7 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
                  model_path: Union[str, os.PathLike],
                  show_pose: bool = True,
                  show_animal_names: bool = False,
+                 show_clf_confidence: bool = False,
                  font_size: Optional[bool] = None,
                  circle_size: Optional[int] = None,
                  bp_palette: Optional[str] = None,
@@ -107,6 +108,7 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
         check_valid_boolean(value=[show_pose], source=f'{self.__class__.__name__} show_pose', raise_error=True)
         check_valid_boolean(value=[show_animal_names], source=f'{self.__class__.__name__} show_animal_names', raise_error=True)
         check_valid_boolean(value=[show_animal_bounding_boxes], source=f'{self.__class__.__name__} show_animal_bounding_boxes', raise_error=True)
+        check_valid_boolean(value=[show_clf_confidence], source=f'{self.__class__.__name__} show_clf_confidence', raise_error=True)
         if font_size is not None: check_int(name=f'{self.__class__.__name__} font_size', value=font_size)
         if circle_size is not None: check_int(name=f'{self.__class__.__name__} circle_size', value=circle_size)
         if text_spacing is not None: check_int(name=f'{self.__class__.__name__} text_spacing', value=text_spacing)
@@ -132,7 +134,7 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
         self.vid_output_path = os.path.join(self.single_validation_video_save_dir, f"{self.feature_filename} {self.clf_name}.mp4")
         self.clf_data_save_path = os.path.join(self.clf_data_validation_dir, f"{self.feature_filename }.csv")
         self.show_pose, self.show_animal_names = show_pose, show_animal_names
-        self.font_size, self.circle_size, self.text_spacing, self.show_bbox = font_size, circle_size, text_spacing, show_animal_bounding_boxes
+        self.font_size, self.circle_size, self.text_spacing, self.show_bbox, self.show_clf_confidence = font_size, circle_size, text_spacing, show_animal_bounding_boxes, show_clf_confidence
         self.text_opacity, self.text_thickness = text_opacity, text_thickness
         self.clf = read_pickle(data_path=model_path, verbose=True)
         self.data_df = read_df(feature_path, self.file_type)
@@ -171,7 +173,7 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
         else:
             video_size = (int(self.video_meta_data["width"]), int(self.video_meta_data["height"]))
             writer = cv2.VideoWriter(self.vid_output_path, fourcc, self.video_meta_data["fps"], video_size)
-
+        conf_data = self.data_df[self.prob_col_name].values if self.show_clf_confidence else None
 
         self.data_df = self.data_df.head(min(len(self.data_df), self.video_meta_data["frame_count"]))
         frm_cnt, clf_frm_cnt = 0, 0
@@ -204,13 +206,15 @@ class ValidateModelOneVideo(ConfigReader, PlottingMixin, TrainModelMixin):
                         cv2.polylines(frame, [bbox], True, self.bp_palette[animal_cnt][0], thickness=self.video_text_thickness, lineType=-1)
                     except:
                         pass
-
-
             target_timer = round((1 / self.video_meta_data['fps']) * clf_frm_cnt, 2)
             frame = PlottingMixin().put_text(img=frame, text="TIMER:", pos=(TextOptions.BORDER_BUFFER_Y.value, self.video_space_size), font_size=self.video_font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=(255, 255, 255))
             addSpacer = 2
             frame = PlottingMixin().put_text(img=frame, text=(f"{self.clf_name} {target_timer}s"), pos=(TextOptions.BORDER_BUFFER_Y.value, self.video_space_size * addSpacer), font_size=self.video_font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=(255, 255, 255))
             addSpacer += 1
+            if conf_data is not None:
+                frame = PlottingMixin().put_text(img=frame, text=f"{self.clf_name} PROBABILITY: {round(conf_data[frm_cnt], 4)}", pos=(TextOptions.BORDER_BUFFER_Y.value, self.video_space_size * addSpacer), font_size=self.video_font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=(255, 255, 255))
+                addSpacer += 1
+
             frame = PlottingMixin().put_text(img=frame, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, self.video_space_size * addSpacer), font_size=self.video_font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_color=(255, 255, 255))
             addSpacer += 2
             if clf_val == 1:

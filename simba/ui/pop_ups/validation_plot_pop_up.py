@@ -75,14 +75,14 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
         self.show_animal_names_dropdown = SimBADropDown(parent=tracking_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ANIMAL NAMES: ', label_width=30, dropdown_width=40, value='FALSE')
         self.core_cnt_dropdown = SimBADropDown(parent=tracking_frm, dropdown_options=list(range(1, self.cpu_cnt + 1)), label='CPU COUNT: ', label_width=30, dropdown_width=40, value=int(self.cpu_cnt/2))
         self.show_bbox_dropdown = SimBADropDown(parent=tracking_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW BOUNDING BOX: ', label_width=30, dropdown_width=40, value='FALSE')
-
-
+        self.show_clf_conf_dropdown = SimBADropDown(parent=tracking_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW CONFIDENCE: ', label_width=30, dropdown_width=40, value='FALSE')
 
         tracking_frm.grid(row=1, column=0, sticky=NW, padx=10, pady=10)
         self.show_pose_dropdown.grid(row=0, column=0, sticky=NW)
         self.show_animal_names_dropdown.grid(row=1, column=0, sticky=NW)
         self.show_bbox_dropdown.grid(row=2, column=0, sticky=NW)
-        self.core_cnt_dropdown.grid(row=3, column=0, sticky=NW)
+        self.show_clf_conf_dropdown.grid(row=3, column=0, sticky=NW)
+        self.core_cnt_dropdown.grid(row=4, column=0, sticky=NW)
 
         gantt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GANTT SETTINGS", icon_name='gantt_small', icon_link=Links.OUT_OF_SAMPLE_VALIDATION.value, padx=5, pady=5, relief='solid')
         self.gantt_dropdown = SimBADropDown(parent=gantt_frm, dropdown_options= Options.GANTT_VALIDATION_OPTIONS.value, label='GANTT TYPE:', label_width=30, dropdown_width=40, value=Options.GANTT_VALIDATION_OPTIONS.value[2])
@@ -104,6 +104,7 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
         core_cnt = int(self.core_cnt_dropdown.getChoices())
         bp_palette = self.bp_palette_dropdown.getChoices()
         bbox = str_2_bool(self.show_bbox_dropdown.getChoices())
+        clf_conf = str_2_bool(self.show_clf_conf_dropdown.getChoices())
         create_gantt = self.gantt_dropdown.getChoices()
         if create_gantt.strip() == GANTT_FRAME: create_gantt = 1
         elif create_gantt.strip() == GANTT_VIDEO: create_gantt = 2
@@ -122,7 +123,8 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
                                                              show_pose=show_pose,
                                                              text_thickness=text_thickness,
                                                              text_opacity=text_opacity,
-                                                             show_animal_names=show_animal_names)
+                                                             show_animal_names=show_animal_names,
+                                                             show_clf_confidence=clf_conf)
 
 
         else:
@@ -141,7 +143,8 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
                                                                          text_opacity=text_opacity,
                                                                          bp_palette=bp_palette,
                                                                          show_animal_names=show_animal_names,
-                                                                         core_cnt=core_cnt)
+                                                                         core_cnt=core_cnt,
+                                                                         show_clf_confidence=clf_conf)
 
         threading.Thread(target=validation_video_creator.run).start()
         #self.root.destroy()

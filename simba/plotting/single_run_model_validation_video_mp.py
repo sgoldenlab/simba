@@ -38,7 +38,7 @@ from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
                                     get_fn_ext, get_video_meta_data, read_df,
                                     read_pickle, write_df)
-from simba.utils.warnings import FrameRangeWarning
+from simba.utils.warnings import FrameRangeWarning, NoDataFoundWarning
 
 
 def _validation_video_mp(data: pd.DataFrame,
@@ -58,7 +58,8 @@ def _validation_video_mp(data: pd.DataFrame,
                         clf_data: np.ndarray,
                         clrs: List[List],
                         clf_name: str,
-                        bouts_df: pd.DataFrame):
+                        bouts_df: pd.DataFrame,
+                        conf_data: np.ndarray):
 
     def _put_text(img: np.ndarray,
                   text: str,
@@ -155,6 +156,9 @@ def _validation_video_mp(data: pd.DataFrame,
             addSpacer = 2
             img = _put_text(img=img, text=f"{clf_name} {target_timer}s", pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing * addSpacer), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_bg_alpha=text_opacity)
             addSpacer += 1
+            if conf_data is not None:
+                img = _put_text(img=img, text=f"{clf_name} PROBABILITY: {round(conf_data[current_frm], 4)}", pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing * addSpacer), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_bg_alpha=text_opacity)
+                addSpacer += 1
             img = _put_text(img=img, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, text_spacing * addSpacer), font_size=font_size, font_thickness=TextOptions.TEXT_THICKNESS.value, text_bg_alpha=text_opacity)
             addSpacer += 1
             if clf_data[current_frm] == 1:
@@ -248,6 +252,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
                  show_pose: bool = True,
                  show_animal_names: bool = False,
                  show_animal_bounding_boxes: bool = False,
+                 show_clf_confidence: bool = False,
                  font_size: Optional[bool] = None,
                  circle_size: Optional[int] = None,
                  text_spacing: Optional[int] = None,
@@ -269,6 +274,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         check_valid_boolean(value=[show_pose], source=f'{self.__class__.__name__} show_pose', raise_error=True)
         check_valid_boolean(value=[show_animal_names], source=f'{self.__class__.__name__} show_animal_names', raise_error=True)
         check_valid_boolean(value=[show_animal_bounding_boxes], source=f'{self.__class__.__name__} show_animal_bounding_boxes', raise_error=True)
+        check_valid_boolean(value=[show_clf_confidence], source=f'{self.__class__.__name__} show_clf_confidence', raise_error=True)
         check_int(name=f"{self.__class__.__name__} core_cnt", value=core_cnt, min_value=-1, unaccepted_vals=[0])
         if font_size is not None: check_int(name=f'{self.__class__.__name__} font_size', value=font_size)
         if circle_size is not None: check_int(name=f'{self.__class__.__name__} circle_size', value=circle_size)
@@ -295,7 +301,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         self.vid_output_path = os.path.join(self.single_validation_video_save_dir, f"{self.feature_filename} {self.clf_name}.mp4")
         self.clf_data_save_path = os.path.join(self.clf_data_validation_dir, f"{self.feature_filename }.csv")
         self.show_pose, self.show_animal_names = show_pose, show_animal_names
-        self.font_size, self.circle_size, self.text_spacing = font_size, circle_size, text_spacing
+        self.font_size, self.circle_size, self.text_spacing, self.show_clf_confidence = font_size, circle_size, text_spacing, show_clf_confidence
         self.text_opacity, self.text_thickness, self.show_animal_bounding_boxes = text_opacity, text_thickness, show_animal_bounding_boxes
         self.clf = read_pickle(data_path=model_path, verbose=True)
         self.data_df = read_df(feature_path, self.file_type)
@@ -334,6 +340,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
             self.final_gantt_img = self.resize_gantt(self.final_gantt_img, self.video_meta_data["height"])
         else:
             self.bouts_df, self.final_gantt_img = None, None
+        conf_data = self.data_df[self.prob_col_name].values if self.show_clf_confidence else None
 
         self.data_df = self.data_df.head(min(len(self.data_df), self.video_meta_data["frame_count"]))
         data = np.array_split(self.data_df, self.core_cnt)
@@ -357,7 +364,9 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
                                           clf_data=self.data_df[self.clf_name].values,
                                           clrs=self.bp_palette,
                                           clf_name=self.clf_name,
-                                          bouts_df=self.bouts_df)
+                                          bouts_df=self.bouts_df,
+                                          conf_data=conf_data)
+
             for cnt, result in enumerate(pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):
                 print(f"Image batch {result} complete, Video {self.feature_filename}...")
         pool.terminate()
@@ -366,7 +375,7 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
         self.timer.stop_timer()
         stdout_success(msg=f"Video complete, saved at {self.video_save_path}", elapsed_time=self.timer.elapsed_time_str)
 
-
+#
 # if __name__ == "__main__":
 #     test = ValidateModelOneVideoMultiprocess(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini",
 #                                              feature_path=r"D:\troubleshooting\mitra\project_folder\csv\features_extracted\592_MA147_CNO1_0515.csv",
@@ -374,7 +383,9 @@ class ValidateModelOneVideoMultiprocess(ConfigReader, PlottingMixin, TrainModelM
 #                                              create_gantt=2,
 #                                              show_pose=True,
 #                                              show_animal_names=True,
-#                                              core_cnt=25)
+#                                              core_cnt=13,
+#                                              show_clf_confidence=True,
+#                                              discrimination_threshold=0.20)
 #     test.run()
 
 
