@@ -5,15 +5,17 @@ import platform
 import threading
 from copy import copy
 from typing import Union
+
 import matplotlib.pyplot as plt
 
 import simba
 from simba.mixins.config_reader import ConfigReader
 from simba.plotting.tools.tkinter_tools import InteractiveVideoPlotterWindow
-from simba.utils.checks import check_file_exist_and_readable, check_valid_dataframe, check_int
-from simba.utils.enums import Paths, Formats, OS
+from simba.utils.checks import (check_file_exist_and_readable, check_int,
+                                check_valid_dataframe)
+from simba.utils.enums import OS, Formats, Paths
 from simba.utils.errors import ColumnNotFoundError, InvalidInputError
-from simba.utils.read_write import get_fn_ext, read_df, get_video_meta_data
+from simba.utils.read_write import get_fn_ext, get_video_meta_data, read_df
 from simba.utils.warnings import FrameRangeWarning
 
 ICON_WINDOWS = os.path.join(os.path.dirname(simba.__file__), Paths.LOGO_ICON_WINDOWS_PATH.value)
