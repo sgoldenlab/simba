@@ -11,16 +11,21 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_int,
                                 check_valid_boolean, check_valid_dataframe,
-                                check_valid_tuple, check_video_and_data_frm_count_align)
+                                check_valid_tuple,
+                                check_video_and_data_frm_count_align)
 from simba.utils.data import create_color_palette
-from simba.utils.enums import Defaults, Options, Formats
-from simba.utils.errors import CountError, FrameRangeError, InvalidFilepathError
+from simba.utils.enums import Defaults, Formats, Options
+from simba.utils.errors import (CountError, FrameRangeError,
+                                InvalidFilepathError)
 from simba.utils.lookups import get_random_color_palette
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
-                                    create_directory, find_core_cnt,
+                                    create_directory,
+                                    find_all_videos_in_directory,
+                                    find_core_cnt,
+                                    find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data,
-                                    read_frm_of_video, remove_a_folder, find_all_videos_in_directory, find_files_of_filetypes_in_directory)
+                                    read_frm_of_video, remove_a_folder)
 from simba.utils.warnings import FrameRangeWarning, MissingFileWarning
 
 FRAME = 'FRAME'

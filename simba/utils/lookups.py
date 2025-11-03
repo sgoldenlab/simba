@@ -3,6 +3,7 @@ __author__ = "Simon Nilsson"
 import glob
 import os
 import platform
+import random
 import re
 import struct
 import subprocess
@@ -10,7 +11,6 @@ import sys
 import tkinter as tk
 from copy import copy
 from datetime import datetime
-import random
 from multiprocessing import Lock, Value
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -26,7 +26,6 @@ import psutil
 import pyglet
 from matplotlib import cm
 from tabulate import tabulate
-
 
 import simba
 from simba.utils.checks import (check_ffmpeg_available,
