@@ -2170,9 +2170,12 @@ class Convert2MP4PopUp(PopUpMixin):
 
         self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=self.cpu_codec_qualities, label="OUTPUT VIDEO QUALITY:", label_width=30, dropdown_width=40, value=60)
         self.codec_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.MP4_CODEC_LK.keys()), label="COMPRESSION CODEC:", label_width=30, dropdown_width=40, value='H.264 (AVC)', command=self.update_quality_dropdown)
+        self.keep_audio_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['FALSE', 'TRUE'], label="KEEP AUDIO (IF EXIST):", label_width=30, dropdown_width=40, value='FALSE')
+
         settings_frm.grid(row=0, column=0, sticky=NW, padx=10, pady=10)
         self.quality_dropdown.grid(row=0, column=0, sticky=NW)
         self.codec_dropdown.grid(row=1, column=0, sticky=NW)
+        self.keep_audio_dropdown.grid(row=2, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name='video', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5, relief='solid')
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=30, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -2207,7 +2210,8 @@ class Convert2MP4PopUp(PopUpMixin):
             check_if_dir_exists(in_dir=video_path, source=self.__class__.__name__)
         codec = self.MP4_CODEC_LK[self.codec_dropdown.getChoices()]
         quality = self.quality_dropdown.getChoices()
-        threading.Thread(target=convert_to_mp4(path=video_path, codec=codec, quality=quality))
+        audio = str_2_bool(self.keep_audio_dropdown.get_value())
+        threading.Thread(target=convert_to_mp4(path=video_path, codec=codec, quality=quality, keep_audio=audio))
 
 
 

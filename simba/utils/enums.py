@@ -249,7 +249,7 @@ class Formats(Enum):
 class Options(Enum):
     ROLLING_WINDOW_DIVISORS = [2, 5, 6, 7.5, 15]
     CLF_MODELS = ["RF", "GBC", "XGBoost"]
-    CLF_MAX_FEATURES = ["sqrt", "log", "None"]
+    CLF_MAX_FEATURES = ["sqrt", "log2", "None"]
     CLF_CRITERION = ["gini", "entropy"]
     UNDERSAMPLE_OPTIONS = ["None", "random undersample"]
     OVERSAMPLE_OPTIONS = ["None", "SMOTE", "SMOTEENN"]

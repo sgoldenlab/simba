@@ -207,9 +207,10 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 
 
 
-# runner = COCOKeypoints2Yolo(coco_path=r"E:\netholabs_videos\50_largest_files\imgs_to_lbl\merged.json",
-#                             img_dir=r"E:\netholabs_videos\50_largest_files\imgs_to_lbl",
-#                             save_dir=r"D:\netholabs\yolo_mosaic_data_102315")
+# runner = COCOKeypoints2Yolo(coco_path=r"E:\netholabs_videos\3d\imgs\3d_merged.json",
+#                             img_dir=r"E:\netholabs_videos\3d\imgs",
+#                             save_dir=r"E:\netholabs_videos\3d\yolo_mdl",
+#                             flip_idx=(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14))
 # runner.run()
 
 

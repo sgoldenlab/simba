@@ -396,3 +396,20 @@ class YOLOPoseVisualizer():
 #
 #
 #     kp_vis.run()
+
+
+# if __name__ == "__main__":
+#     video_path = r"E:\netholabs_videos\3d_videos_batch_2\Cage_3_Simon_vid_examples_for_annotatino-20251019T183855Z-1-001\Cage_3_Simon_vid_examples_for_annotatino\rot\test_inference"
+#     data_path = r"E:\netholabs_videos\3d_videos_batch_2\Cage_3_Simon_vid_examples_for_annotatino-20251019T183855Z-1-001\Cage_3_Simon_vid_examples_for_annotatino\predictions"
+#     save_dir = r'E:\netholabs_videos\3d_videos_batch_2\Cage_3_Simon_vid_examples_for_annotatino-20251019T183855Z-1-001\Cage_3_Simon_vid_examples_for_annotatino\predictions\videos'
+#     kp_vis = YOLOPoseVisualizer(data_path=data_path,
+#                                 video_path=video_path,
+#                                 save_dir=save_dir,
+#                                 core_cnt=14,
+#                                 palettes=('tab20',),
+#                                 recursive=True,
+#                                 sample_n=None)
+#
+#
+#     kp_vis.run()
+#

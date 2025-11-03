@@ -557,7 +557,7 @@ def concatenate_dlc_annotations(data_dir: Union[str, os.PathLike], save_dir: Uni
 #concatenate_dlc_annotations(data_dir=r'E:\rgb_white_vs_black_imgs\GB_labelled_images.zip\labeled-data', save_dir=r'E:\rgb_white_vs_black_imgs\combined')
 
 #concatenate_dlc_annotations(data_dir=r'E:\crim13_imgs\CRIM_labelled_images', save_dir=r'E:\crim13_imgs\combined')
-#merge_coco_keypoints_files(data_dir=r'D:\cvat_annotations\frames\coco_keypoints_1', save_path=r'D:\cvat_annotations\frames\coco_keypoints_1\merged\merged_08132025.json')
+#merge_coco_keypoints_files(data_dir=r'E:\netholabs_videos\3d\cvat_annotations', save_path=r'E:\netholabs_videos\3d\cvat_annotations\3d_merged.json')
 
 
 

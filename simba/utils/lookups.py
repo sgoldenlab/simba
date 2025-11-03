@@ -10,6 +10,7 @@ import sys
 import tkinter as tk
 from copy import copy
 from datetime import datetime
+import random
 from multiprocessing import Lock, Value
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
@@ -25,6 +26,7 @@ import psutil
 import pyglet
 from matplotlib import cm
 from tabulate import tabulate
+
 
 import simba
 from simba.utils.checks import (check_ffmpeg_available,
@@ -437,6 +439,12 @@ def create_color_palettes(no_animals: int, map_size: int) -> List[List[int]]:
         colorListofList.append(currColorList)
     return colorListofList
 
+
+
+def get_random_color_palette(n_colors: int):
+    """ Get a random color palette with N random colors."""
+    check_int(name=f'{get_random_color_palette.__name__} n_colors', value=n_colors, min_value=1, raise_error=True)
+    return [tuple(random.randint(0, 255) for _ in range(3)) for _ in range(n_colors)]
 
 def cardinality_to_integer_lookup() -> Dict[str, int]:
     """

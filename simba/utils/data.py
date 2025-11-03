@@ -381,7 +381,6 @@ def interpolate_color_palette(start_color: Tuple[int, int, int],
 
 
 
-
 def smooth_data_savitzky_golay(
     config: configparser.ConfigParser,
     file_path: Union[str, os.PathLike],

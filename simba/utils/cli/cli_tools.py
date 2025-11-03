@@ -92,7 +92,7 @@ def set_video_parameters(
             ]
         ).set_index("Video")
         df.to_csv(video_info_path)
-    video_info = read_video_info_csv(os.path.join(project_path, Paths.VIDEO_INFO.value))
+    video_info = read_video_info_csv(file_path=os.path.join(project_path, Paths.VIDEO_INFO.value), raise_error=False)
     data_paths = glob.glob(
         os.path.join(project_path, Paths.OUTLIER_CORRECTED.value) + "/*." + file_type
     )
@@ -263,4 +263,4 @@ def blob_tracker(config_path: Union[str, os.PathLike]) -> None:
 # _ = OutlierCorrecterLocation(config_path=CONFIG_PATH).run()
 
 
-# set_video_parameters(config_path='/Users/simon/Desktop/envs/troubleshooting/notebook_example/project_folder/project_config.ini', px_per_mm=5.6, fps=25, resolution=(400, 400))
+#set_video_parameters(config_path=r'C:\troubleshooting\ethan_alyssa\project_folder\project_config.ini', px_per_mm=5.6, fps=25, resolution=(400, 400))

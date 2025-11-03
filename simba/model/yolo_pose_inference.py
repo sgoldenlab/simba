@@ -406,3 +406,28 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 #                         threshold=0.8,
 #                         retina_msk=True)
 # i.run()
+
+
+# WEIGHTS_PATH = r"E:\netholabs_videos\3d\yolo_mdl\mdl\train6\weights\best.pt"
+# VIDEO_PATH = r"E:\netholabs_videos\3d_videos_batch_2\Cage_3_Simon_vid_examples_for_annotatino-20251019T183855Z-1-001\Cage_3_Simon_vid_examples_for_annotatino\rot\test_inference"
+# SAVE_DIR = r"E:\netholabs_videos\3d_videos_batch_2\Cage_3_Simon_vid_examples_for_annotatino-20251019T183855Z-1-001\Cage_3_Simon_vid_examples_for_annotatino\predictions"
+# KEYPOINT_NAMES = ('NOSE', 'LEFT_EAR', 'RIGHT_EAR', 'LEFT_FRONT_LEG', 'LEFT_FRONT_PAW',
+#                   'RIGHT_FRONT_LEG', 'RIGHT_FRONT_PAW', 'CENTER', 'LEFT_BACK_LEG',
+#                   'LEFT_BACK_PAW', 'RIGHT_BACK_LEG', 'RIGHT_BACK_PAW', 'TAIL_BASE',
+#                   'MIDDLE_TAIL', 'TAIL_END')
+#
+# i = YOLOPoseInference(weights=WEIGHTS_PATH,
+#                       video_path=VIDEO_PATH,
+#                       save_dir=SAVE_DIR,
+#                       verbose=True,
+#                       device=0,
+#                       format=None,
+#                       stream=True,
+#                       keypoint_names=KEYPOINT_NAMES,
+#                       batch_size=100,
+#                       imgsz=640,
+#                       interpolate=False,
+#                       box_threshold=0.25,
+#                       max_tracks=4)
+# i.run()
+# #

@@ -2205,13 +2205,13 @@ def crop_single_video_polygon(file_path: Union[str, os.PathLike]) -> None:
        :width: 400
        :align: center
 
-    :param  Union[str, os.PathLike] file_path: The path to the input video file.
-
     .. note::
        This function crops the input video based on polygonal regions of interest (ROIs) selected by the user.
        The user is prompted to select a polygonal ROI on the video frame, and the function then crops the video
        based on the selected ROI. The cropped video is saved with "_polygon_cropped" suffix in the same directory
        as the input video file.
+
+    :param  Union[str, os.PathLike] file_path: The path to the input video file.
 
     :example:
     >>> crop_single_video_polygon(file_path='/Users/simon/Desktop/AGGRESSIVITY_4_11_21_Trial_2_camera1_rotated_20240211143355.mp4')
@@ -3022,7 +3022,8 @@ def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]],
 def convert_to_mp4(path: Union[str, os.PathLike],
                    codec: Literal['libx265', 'libx264', 'vp9', 'h264_cuvid', 'powerpoint'] = 'libx265',
                    save_dir: Optional[Union[str, os.PathLike]] = None,
-                   quality: Optional[int] = 60) -> None:
+                   quality: Optional[int] = 60,
+                   keep_audio: Optional[bool] = False) -> None:
     """
     Convert a directory containing videos, or a single video, to MP4 format using passed quality and codec.
 
@@ -3038,6 +3039,7 @@ def convert_to_mp4(path: Union[str, os.PathLike],
     :param Literal['libx265', 'libx264', 'vp9', 'powerpoint'] codec:
     :param Optional[Optional[Union[str, os.PathLike]]] save_dir: Directory where to save the converted videos. If None, then creates a directory in the same directory as the input.
     :param Optional[int] quality: If CPU codec, then integer representing the quality: 10, 20, 30.. 100. If GPU codec, then string: 'Low', 'Medium', 'High'
+    :param Optional[bool] keep_audio: If True, keep audio track with AAC codec. If False, remove audio. Default: False.
     :return: None.
 
     :example:
@@ -3048,6 +3050,7 @@ def convert_to_mp4(path: Union[str, os.PathLike],
     check_ffmpeg_available(raise_error=True)
     check_str(name=f'{convert_to_mp4.__name__} codec', value=codec, options=('libx265', 'libx264', 'powerpoint', 'vp9', 'h264_cuvid'))
     check_instance(source=f'{convert_to_mp4.__name__} path', instance=path, accepted_types=(str,))
+    check_valid_boolean(source=f'{convert_to_mp4.__name__} keep_audio', value=keep_audio, raise_error=True)
     datetime_ = datetime.now().strftime("%Y%m%d%H%M%S")
     crf_lk = percent_to_crf_lookup()
     preset_lookup = video_quality_to_preset_lookup()
@@ -3078,14 +3081,15 @@ def convert_to_mp4(path: Union[str, os.PathLike],
         print(f'Converting video {video_name} to MP4 (Video {file_cnt+1}/{len(file_paths)})...')
         _ = get_video_meta_data(video_path=file_path)
         out_path = os.path.join(save_dir, f'{video_name}.mp4')
+        audio_flag = '-c:a aac' if keep_audio else '-an'
         if codec == 'powerpoint':
-            cmd = f'ffmpeg -i "{file_path}" -c:v libx264 -preset slow -profile:v high -level:v 4.0 -pix_fmt yuv420p -crf {quality} -c:v libx264 -codec:a aac "{out_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -i "{file_path}" -c:v libx264 -preset slow -profile:v high -level:v 4.0 -pix_fmt yuv420p -crf {quality} {audio_flag} "{out_path}" -loglevel error -stats -hide_banner -y'
         elif codec == 'vp9':
-            cmd = f'ffmpeg -i "{file_path}" -c:v libvpx-vp9 -crf {quality} -b:v 0 -an "{out_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -i "{file_path}" -c:v libvpx-vp9 -crf {quality} -b:v 0 {audio_flag} "{out_path}" -loglevel error -stats -hide_banner -y'
         elif codec == 'h264_cuvid':
-            cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -c:v h264_nvenc -preset {quality} "{out_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -c:v h264_nvenc -preset {quality} {audio_flag} "{out_path}" -loglevel error -stats -hide_banner -y'
         else:
-            cmd = f'ffmpeg -i "{file_path}" -c:v {codec} -crf {quality} -c:a copy -an "{out_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -i "{file_path}" -c:v {codec} -crf {quality} {audio_flag} "{out_path}" -loglevel error -stats -hide_banner -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f"{len(file_paths)} video(s) converted to MP4 and saved in {save_dir} directory.", elapsed_time=timer.elapsed_time_str, source=convert_to_mp4.__name__,)
