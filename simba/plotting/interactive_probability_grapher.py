@@ -3,14 +3,16 @@ __author__ = "Simon Nilsson"
 import os
 import platform
 from copy import copy
-from typing import Union, Tuple
+from typing import Tuple, Union
 
 import matplotlib.pyplot as plt
 
 import simba
 from simba.mixins.config_reader import ConfigReader
 from simba.plotting.tools.tkinter_tools import InteractiveVideoPlotterWindow
-from simba.utils.checks import (check_file_exist_and_readable, check_int, check_valid_dataframe, check_if_valid_rgb_tuple, check_valid_boolean)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_valid_rgb_tuple, check_int,
+                                check_valid_boolean, check_valid_dataframe)
 from simba.utils.enums import OS, Formats, Paths
 from simba.utils.errors import ColumnNotFoundError, InvalidInputError
 from simba.utils.read_write import get_fn_ext, get_video_meta_data, read_df

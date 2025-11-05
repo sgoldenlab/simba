@@ -24,7 +24,8 @@ from simba.utils.errors import (CountError, InvalidFilepathError,
                                 InvalidFileTypeError, SimBAGPUError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_pkg_version, get_video_meta_data, recursive_file_search)
+                                    get_pkg_version, get_video_meta_data,
+                                    recursive_file_search)
 from simba.utils.yolo import (_get_undetected_obs, filter_yolo_keypoint_data,
                               load_yolo_model)
 

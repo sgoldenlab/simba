@@ -20,8 +20,9 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_valid_lst,
                                 check_video_and_data_frm_count_align)
 from simba.utils.data import create_color_palettes
-from simba.utils.enums import Formats, TextOptions, Keys
-from simba.utils.errors import AnimalNumberError, NoFilesFoundError, InvalidInputError
+from simba.utils.enums import Formats, Keys, TextOptions
+from simba.utils.errors import (AnimalNumberError, InvalidInputError,
+                                NoFilesFoundError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_fn_ext,
