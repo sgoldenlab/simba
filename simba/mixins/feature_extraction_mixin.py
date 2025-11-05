@@ -1075,16 +1075,12 @@ class FeatureExtractionMixin(object):
         """
         Helper to check if ear and nose body-parts are present within the pose-estimation data.
 
-        :return dict: Body-part names of ear and nose body-parts as values and animal names as keys. If empty,
-            ear and nose body-parts are not present within the pose-estimation data
+        :return dict: Body-part names of ear and nose body-parts as values and animal names as keys. If empty, ear and nose body-parts are not present within the pose-estimation data
 
         """
         results = {}
         for animal in self.animal_bp_dict.keys():
-            results[animal] = {}
-            results[animal]["Nose"] = {}
-            results[animal]["Ear_left"] = {}
-            results[animal]["Ear_right"] = {}
+            results[animal] = {'Nose': {}, 'Ear_left': {}, 'Ear_right': {}}
             for dimension in ["X_bps", "Y_bps"]:
                 for cord in self.animal_bp_dict[animal][dimension]:
                     if ("nose" in cord.lower()) and ("x" in cord.lower()):

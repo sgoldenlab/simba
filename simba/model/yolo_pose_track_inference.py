@@ -24,7 +24,7 @@ from simba.utils.errors import (CountError, InvalidFilepathError,
                                 InvalidFileTypeError, SimBAGPUError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_pkg_version, get_video_meta_data)
+                                    get_pkg_version, get_video_meta_data, recursive_file_search)
 from simba.utils.yolo import (_get_undetected_obs, filter_yolo_keypoint_data,
                               load_yolo_model)
 
@@ -33,6 +33,65 @@ COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 NEAREST, CLASS_ID, CONFIDENCE, FRAME  = 'nearest', 'CLASS_ID', 'CONFIDENCE', 'FRAME'
 
 class YOLOPoseTrackInference():
+    """
+    Perform YOLO-based pose estimation and object tracking inference on single or multiple videos.
+
+    This class uses YOLOv8/YOLO pose models to detect and track objects with keypoint localization
+    across video frames. It supports GPU acceleration, multi-object tracking with configurable trackers
+    (e.g., BoTSORT, ByteTrack), and post-processing options including interpolation and smoothing of
+    keypoint trajectories.
+
+    .. note::
+       Requires GPU with CUDA support. The class will raise an error if no GPU is detected.
+       The ultralytics package must be installed.
+
+    :param Union[str, os.PathLike] weights_path: Path to the YOLO pose model weights file (e.g., .pt file). Must be a valid YOLO pose model, not a detection or segmentation model.
+    :param Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]] video_path: Path(s) to video file(s) or directory containing videos. Can be a single video path, a list of video paths, or a directory path. If a directory is provided, all video files in the directory will be processed.
+    :param Tuple[str, ...] keypoint_names: Tuple of keypoint names corresponding to the model's keypoint outputs. Length must match the number of keypoints expected by the model.
+    :param Union[str, os.PathLike] config_path: Path to the tracker configuration YAML file (e.g., 'botsort.yml', 'bytetrack.yml').
+    :param Optional[bool] verbose: If True, prints progress information during processing. Default: False.
+    :param Optional[Union[str, os.PathLike]] save_dir: Directory to save output CSV files. If None, results are returned as a dictionary of DataFrames instead of being saved. Default: None.
+    :param Union[Literal['cpu'], int] device: Device to run inference on. Use 'cpu' for CPU inference or an integer for GPU device ID (e.g., 0 for cuda:0). Default: 0.
+    :param Optional[str] format: Model format for loading. If None, inferred from weights file extension. Default: None.
+    :param Optional[int] batch_size: Number of frames to process in each batch. Higher values increase memory usage but may improve throughput. Default: 4.
+    :param int torch_threads: Number of threads for PyTorch operations. Default: 8.
+    :param bool half_precision: If True, uses FP16 half-precision inference for faster processing.  Requires GPU support. Default: True.
+    :param bool recursive: If True and video_path is a directory, recursively searches subdirectories for video files. Default: False.
+    :param bool stream: If True, enables streaming mode for memory-efficient processing of long videos. Default: False.
+    :param bool interpolate: If True, interpolates missing keypoint coordinates and confidence values using nearest-neighbor interpolation with forward/backward filling. Default: False.
+    :param float threshold: Confidence threshold for detections. Detections with confidence below this value are filtered out. Range: (0, 1]. Default: 0.7.
+    :param Optional[int] max_tracks: Maximum number of tracks to maintain simultaneously. If None, unlimited tracks are allowed. Default: 2.
+    :param Optional[int] smoothing: Smoothing window size in milliseconds. If provided, applies Gaussian smoothing to keypoint trajectories. If None, no smoothing is applied. Default: None.
+    :param int imgsz: Input image size for inference. Images are resized to this dimension while maintaining aspect ratio. Default: 320.
+    :param float iou: IoU (Intersection over Union) threshold for Non-Maximum Suppression (NMS) during tracking. Range: (0, 1]. Default: 0.5.
+
+    :example:
+        >>> keypoint_names = ('Nose', 'Left_ear', 'Right_ear', 'Tail_base')
+        >>> inference = YOLOPoseTrackInference(
+        ...     weights_path='path/to/model.pt',
+        ...     video_path='path/to/video.mp4',
+        ...     keypoint_names=keypoint_names,
+        ...     config_path='botsort.yml',
+        ...     save_dir='path/to/output',
+        ...     verbose=True,
+        ...     threshold=0.5,
+        ...     interpolate=True,
+        ...     smoothing=100
+        ... )
+        >>> inference.run()
+
+    :example:
+        >>> # Process multiple videos and return results as DataFrames
+        >>> inference = YOLOPoseTrackInference(
+        ...     weights_path='model.pt',
+        ...     video_path=['video1.mp4', 'video2.mp4'],
+        ...     keypoint_names=('Nose', 'Tail'),
+        ...     config_path='bytetrack.yml',
+        ...     save_dir=None,
+        ...     max_tracks=5
+        ... )
+        >>> results_dict = inference.run()  # Returns dict of video_name: DataFrame
+    """
     def __init__(self,
                  weights_path: Union[str, os.PathLike],
                  video_path: Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]],
@@ -45,6 +104,7 @@ class YOLOPoseTrackInference():
                  batch_size: Optional[int] = 4,
                  torch_threads: int = 8,
                  half_precision: bool = True,
+                 recursive: bool = False,
                  stream: bool = False,
                  interpolate: bool = False,
                  threshold: float = 0.7,
@@ -65,7 +125,10 @@ class YOLOPoseTrackInference():
             check_file_exist_and_readable(file_path=video_path)
             video_path = [video_path]
         elif os.path.isdir(video_path):
-            video_path = find_files_of_filetypes_in_directory(directory=video_path, extensions=list(Options.ALL_VIDEO_FORMAT_OPTIONS.value), as_dict=False)
+            if not recursive:
+                video_path = find_files_of_filetypes_in_directory(directory=video_path, extensions=list(Options.ALL_VIDEO_FORMAT_OPTIONS.value), as_dict=False)
+            else:
+                video_path = recursive_file_search(directory=video_path, extensions=list(Options.ALL_VIDEO_FORMAT_OPTIONS.value), as_dict=False)
         for i in video_path:
             _ = get_video_meta_data(video_path=i)
         check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir', raise_error=True)
@@ -178,72 +241,28 @@ class YOLOPoseTrackInference():
                 print(f'YOLO results for {len(self.video_path)} videos saved in {self.save_dir} directory', timer.elapsed_time_str)
             return None
 
-# VIDEO_PATH = "/mnt/d/netholabs/yolo_videos/input/mp4_20250606083508/2025-05-28_19-50-23.mp4"
-# #VIDEO_PATH = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-46-56.mp4"
-# VIDEO_PATH = "/mnt/d/netholabs/yolo_videos/2025-05-28_19-46-56.mp4"
-# BOTSORT_PATH = "/mnt/c/projects/simba/simba/simba/assets/bytetrack.yml"
-#BOTSORT_PATH = "/mnt/c/projects/simba/simba/simba/assets/botsort.yml"
 
 
-# VIDEO_PATH = r"/mnt/d/ares/data/termite_2/videos/termite.mp4"
-# WEIGHTS_PASS = r"/mnt/d/ares/data/termite_2/yolo/mdl/train13/weights/best.pt"
-# SAVE_DIR = "/mnt/d/ares/data/termite_2/yolo/results"
+VIDEO_PATH = r"E:\netholabs_videos\two_tracks\videos"
+WEIGHTS_PASS = r"D:\netholabs\yolo_mosaic_data_102315\mdl\train\weights\best.pt"
+SAVE_DIR = r"E:\netholabs_videos\two_tracks\csv_track_025"
+BOTSORT_PATH = r"bytetrack.yml"
 
-# VIDEO_PATH = r"/mnt/d/ares/data/ant/sleap_video/ant.mp4"
-# WEIGHTS_PASS = r"/mnt/d/ares/data/ant/yolo/mdl/train6/weights/best.pt"
-# SAVE_DIR = "/mnt/d/ares/data/ant/yolo/results"
+KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_mid', 'Tail_end')
 
-
-# from simba.utils.read_write import find_files_of_filetypes_in_directory
-#
-# VIDEO_PATH = find_files_of_filetypes_in_directory(directory=r'E:\netholabs_videos\mosaics\subset', extensions=['.avi'])
-#
-#
-# #VIDEO_PATH = r"D:\cvat_annotations\videos\mp4_20250624155703\s16-Chasing.mp4"
-# WEIGHTS_PASS = r"E:\netholabs_videos\mosaics\yolo_mdl_wo_tail\mdl\train2\weights\best.pt"
-# SAVE_DIR = r"E:\netholabs_videos\mosaics\yolo_mdl_wo_tail\results_tracks"
-# BOTSORT_PATH = r"C:\projects\simba\simba\simba\assets\bytetrack.yml"
-#
-# KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base')
-#
-# i = YOLOPoseTrackInference(weights_path=WEIGHTS_PASS,
-#                            video_path=VIDEO_PATH,
-#                            save_dir=SAVE_DIR,
-#                            verbose=False,
-#                            device=0,
-#                            format=None,
-#                            keypoint_names=KEYPOINT_NAMES,
-#                            batch_size=32,
-#                            threshold=0.5,
-#                            config_path=BOTSORT_PATH,
-#                            interpolate=False,
-#                            imgsz=640,
-#                            max_tracks=3,
-#                            stream=True,
-#                            iou=0.2)
-# i.run()
-
-
-# VIDEO_PATH = r"E:\netholabs_videos\two_tracks\videos"
-# WEIGHTS_PASS = r"D:\netholabs\yolo_mosaic_data_102315\mdl\train\weights\best.pt"
-# SAVE_DIR = r"E:\netholabs_videos\two_tracks\csv_track_025"
-# BOTSORT_PATH = r"C:\projects\simba\simba\simba\assets\bytetrack.yml"
-#
-# KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_mid', 'Tail_end')
-#
-# i = YOLOPoseTrackInference(weights_path=WEIGHTS_PASS,
-#                            video_path=VIDEO_PATH,
-#                            save_dir=SAVE_DIR,
-#                            verbose=True,
-#                            device=0,
-#                            format=None,
-#                            keypoint_names=KEYPOINT_NAMES,
-#                            batch_size=500,
-#                            threshold=0.25,
-#                            config_path=BOTSORT_PATH,
-#                            interpolate=False,
-#                            imgsz=640,
-#                            max_tracks=3,
-#                            stream=True,
-#                            iou=0.2)
-# i.run()
+i = YOLOPoseTrackInference(weights_path=WEIGHTS_PASS,
+                           video_path=VIDEO_PATH,
+                           save_dir=SAVE_DIR,
+                           verbose=True,
+                           device=0,
+                           format=None,
+                           keypoint_names=KEYPOINT_NAMES,
+                           batch_size=500,
+                           threshold=0.25,
+                           config_path=BOTSORT_PATH,
+                           interpolate=False,
+                           imgsz=640,
+                           max_tracks=3,
+                           stream=True,
+                           iou=0.2)
+i.run()

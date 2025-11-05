@@ -1,7 +1,7 @@
 __author__ = "Simon Nilsson"
 
 import os
-from typing import Any, Dict, Union
+from typing import Any, Dict, Union, Optional
 
 import cv2
 import numpy as np
@@ -17,7 +17,7 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_video_and_data_frm_count_align)
 from simba.utils.data import create_color_palettes
 from simba.utils.enums import Formats, TextOptions
-from simba.utils.errors import AnimalNumberError, NoFilesFoundError
+from simba.utils.errors import AnimalNumberError, NoFilesFoundError, InvalidInputError
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import get_fn_ext, get_video_meta_data, read_df
 from simba.utils.warnings import NoDataFoundWarning
@@ -29,14 +29,7 @@ HIGHLIGHT_ENDPOINTS = "highlight_endpoints"
 SHOW_POSE = "show_pose"
 ANIMAL_NAMES = "animal_names"
 
-STYLE_ATTR = [
-    DIRECTION_THICKNESS,
-    DIRECTIONALITY_COLOR,
-    CIRCLE_SIZE,
-    HIGHLIGHT_ENDPOINTS,
-    SHOW_POSE,
-    ANIMAL_NAMES,
-]
+STYLE_ATTR = [DIRECTION_THICKNESS,DIRECTIONALITY_COLOR,CIRCLE_SIZE,HIGHLIGHT_ENDPOINTS,SHOW_POSE,ANIMAL_NAMES]
 
 
 class DirectingOtherAnimalsVisualizer(ConfigReader, PlottingMixin):
@@ -71,44 +64,38 @@ class DirectingOtherAnimalsVisualizer(ConfigReader, PlottingMixin):
 
     """
 
-    def __init__(
-        self,
-        config_path: Union[str, os.PathLike],
-        video_path: Union[str, os.PathLike],
-        style_attr: Dict[str, Any],
-    ):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike],
+                 video_path: Union[str, os.PathLike],
+                 style_attr: Dict[str, Any],
+                 left_ear_name: Optional[str] = None,
+                 right_ear_name: Optional[str] = None,
+                 nose_name: Optional[str] = None):
 
         check_file_exist_and_readable(file_path=video_path)
         check_file_exist_and_readable(file_path=config_path)
-        check_if_keys_exist_in_dict(
-            data=style_attr,
-            key=STYLE_ATTR,
-            name=f"{self.__class__.__name__} style_attr",
-        )
+        check_if_keys_exist_in_dict(data=style_attr, key=STYLE_ATTR, name=f"{self.__class__.__name__} style_attr")
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
         if self.animal_cnt < 2:
-            raise AnimalNumberError(
-                "Cannot analyze directionality between animals in a project with less than two animals.",
-                source=self.__class__.__name__,
-            )
+            raise AnimalNumberError("Cannot analyze directionality between animals in a project with less than two animals.", source=self.__class__.__name__)
         self.animal_names = [k for k in self.animal_bp_dict.keys()]
         _, self.video_name, _ = get_fn_ext(video_path)
-        self.data_path = os.path.join(
-            self.outlier_corrected_dir, f"{self.video_name}.{self.file_type}"
-        )
+        self.data_path = os.path.join(self.outlier_corrected_dir, f"{self.video_name}.{self.file_type}")
+        passed_bps = [left_ear_name, right_ear_name, nose_name]
+        if sum(p is None for p in passed_bps) not in (0, len(passed_bps)):
+            raise InvalidInputError(msg="left_ear_name, right_ear_name, and nose_name must either all be None or all be provided as strings", source=self.__class__.__name__)
         if not os.path.isfile(self.data_path):
-            raise NoFilesFoundError(
-                msg=f"SIMBA ERROR: Could not find the file at path {self.data_path}. Make sure the data file exist to create directionality visualizations",
-                source=self.__class__.__name__,
-            )
-        self.direction_analyzer = DirectingOtherAnimalsAnalyzer(
-            config_path=config_path,
-            bool_tables=False,
-            summary_tables=False,
-            aggregate_statistics_tables=False,
-            data_paths=self.data_path,
-        )
+            raise NoFilesFoundError(msg=f"SIMBA ERROR: Could not find the file at path {self.data_path}. Make sure the data file exist to create directionality visualizations", source=self.__class__.__name__)
+        self.direction_analyzer = DirectingOtherAnimalsAnalyzer(config_path=config_path,
+                                                                bool_tables=False,
+                                                                summary_tables=False,
+                                                                aggregate_statistics_tables=False,
+                                                                verbose=False,
+                                                                data_paths=self.data_path,
+                                                                nose_name=nose_name,
+                                                                left_ear_name=left_ear_name,
+                                                                right_ear_name=right_ear_name)
         self.direction_analyzer.run()
         self.direction_analyzer.transpose_results()
         self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
@@ -148,6 +135,10 @@ class DirectingOtherAnimalsVisualizer(ConfigReader, PlottingMixin):
         )
         self.cap = cv2.VideoCapture(video_path)
         self.video_meta_data = get_video_meta_data(video_path)
+        if style_attr[CIRCLE_SIZE] is None:
+            style_attr[CIRCLE_SIZE] = PlottingMixin().get_optimal_circle_size(frame_size=(self.video_meta_data['width'], self.video_meta_data['height']), circle_frame_ratio=100)
+        if style_attr[DIRECTION_THICKNESS] is None:
+            style_attr[DIRECTION_THICKNESS] = PlottingMixin().get_optimal_circle_size(frame_size=(self.video_meta_data['width'], self.video_meta_data['height']), circle_frame_ratio=80)
         check_video_and_data_frm_count_align(
             video=video_path, data=self.data_path, name=video_path, raise_error=False
         )

@@ -21,18 +21,18 @@ class ProjectConfigCreator(object):
     .. note::
        `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#part-1-create-a-new-project-1>`__.
 
-    :parameter str project_path: path to directory where to save the SimBA project directory tree
-    :parameter str project_name: Name of the SimBA project
-    :parameter List[str] target_list: Classifier names in the SimBA project
-    :parameter str pose_estimation_bp_cnt: String representing the number of body-parts in the pose-estimation data used in the simba project.
-                                           E.g., '4', '7', '8', '9', '14', '16' or 'user_defined', '3D_user_defined'.
-    :parameter int body_part_config_idx: The index of the SimBA GUI dropdown pose-estimation selection. E.g., ``1``. I.e., the row representing
-                                         your pose-estimated body-parts in `this file <https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/bp_names/bp_names.csv>`_.
-    :parameter int animal_cnt: Number of animals tracked in the input pose-estimation data.
-    :parameter str file_type: The SimBA project file type. OPTIONS: ``csv`` or ``parquet``.
+    :param str project_path: path to directory where to save the SimBA project directory tree
+    :param str project_name: Name of the SimBA project
+    :param List[str] target_list: Classifier names in the SimBA project
+    :param str pose_estimation_bp_cnt: String representing the number of body-parts in the pose-estimation data used in the simba project. E.g., '4', '7', '8', '9', '14', '16' or 'user_defined', '3D_user_defined'.
+    :param int body_part_config_idx: The index of the SimBA GUI dropdown pose-estimation selection. E.g., ``1``. I.e., the row representing your pose-estimated body-parts in `this file <https://github.com/sgoldenlab/simba/blob/master/simba/pose_configurations/bp_names/bp_names.csv>`_.
+    :param int animal_cnt: Number of animals tracked in the input pose-estimation data.
+    :param str file_type: The SimBA project file type. OPTIONS: ``csv`` or ``parquet``.
 
-    Examples
-    ----------
+    .. note::
+       For example `project_config.ini` files, see `https://github.com/sgoldenlab/simba/tree/master/tests/data/test_projects`.
+
+    :example:
     >>> _ = ProjectConfigCreator(project_path = 'project/path', project_name='project_name', target_list=['Attack'], pose_estimation_bp_cnt='16', body_part_config_idx=9, animal_cnt=2, file_type='csv')
 
     """

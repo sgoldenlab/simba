@@ -542,6 +542,11 @@ class Keys(Enum):
     ROI_POLYGONS = "polygons"
     DOCUMENTATION = "documentation"
     FRAME_COUNT = "frame_count"
+    EAR_LEFT = 'Ear_left'
+    EAR_RIGHT = 'Ear_right'
+    NOSE = 'Nose'
+    X_BPS = 'X_bps'
+    Y_BPS = 'Y_bps'
 
 
 class UMAPParam(Enum):

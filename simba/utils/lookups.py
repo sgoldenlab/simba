@@ -31,10 +31,10 @@ import simba
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable,
                                 check_if_dir_exists, check_int, check_str,
-                                check_valid_dict, check_valid_tuple)
+                                check_valid_dict, check_valid_tuple, check_instance)
 from simba.utils.enums import (OS, UML, Defaults, FontPaths, Formats, Methods,
-                               Options, Paths)
-from simba.utils.errors import FFMPEGNotFoundError, NoFilesFoundError
+                               Options, Paths, Keys)
+from simba.utils.errors import FFMPEGNotFoundError, NoFilesFoundError, InvalidInputError
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data)
 from simba.utils.warnings import NoDataFoundWarning
@@ -920,6 +920,167 @@ def get_ffmpeg_encoders(raise_error: bool = True) -> List[str]:
                 encoder_name = parts[1]
                 encoders.append(encoder_name)
     return encoders
+
+
+def find_closest_string(target: str,
+                        string_list: List[str],
+                        case_sensitive: bool = False,
+                        token_based: bool = True) -> Optional[Tuple[str, Union[int, float]]]:
+    """
+    Find the closest string in a list to a target string using hybrid similarity matching.
+
+    This function uses a combination of token-based matching and Levenshtein distance to find
+    the best match. Token-based matching is particularly useful for strings like body part names
+    where word order may vary (e.g., "Left_ear" vs "Ear_left").
+
+    :param str target: The target string to match against.
+    :param List[str] string_list: List of strings to search through.
+    :param bool case_sensitive: If True, comparison is case-sensitive. If False (default), comparison is case-insensitive.
+    :param bool token_based: If True (default), uses hybrid token-based and Levenshtein matching which handles word reordering better. If False, uses pure Levenshtein distance only.
+    :return: Tuple of (closest_string, distance) or None if string_list is empty. When token_based=True, distance is a float score (lower is better). When token_based=False, distance is integer edit distance.
+    :rtype: Optional[Tuple[str, Union[int, float]]]
+
+    :example:
+    >>> find_closest_string("cat", ["dog", "car", "bat"])
+    >>> ('car', 0.33)
+    >>> find_closest_string("Left_ear", ["Ear_left", "Right_ear", "Nose"])
+    >>> ('Ear_left', 0.0)
+    >>> find_closest_string("CAT", ["dog", "car", "bat"], case_sensitive=False)
+    >>> ('car', 0.33)
+    >>> find_closest_string("CAT", ["dog", "car", "bat"], case_sensitive=True, token_based=False)
+    >>> ('car', 3)
+    """
+
+    check_str(name=f'{find_closest_string.__name__} target', value=target, allow_blank=False, raise_error=True)
+    check_instance(source=f'{find_closest_string.__name__} string_list', instance=string_list, accepted_types=(list,), raise_error=True)
+    if len(string_list) == 0:
+        return None
+    for i in string_list:
+        check_str(name=f'{find_closest_string.__name__} string_list entry', value=i, allow_blank=False, raise_error=True)
+
+    def levenshtein(s1: str, s2: str) -> int:
+        if s1 == s2: return 0
+        if not s1: return len(s2)
+        if not s2: return len(s1)
+        if len(s1) > len(s2): s1, s2 = s2, s1
+        prev_row = list(range(len(s1) + 1))
+        for i, c2 in enumerate(s2):
+            curr_row = [i + 1]
+            for j, c1 in enumerate(s1):
+                cost = 0 if c1 == c2 else 1
+                curr_row.append(min(prev_row[j + 1] + 1, curr_row[j] + 1, prev_row[j] + cost))
+            prev_row = curr_row
+        return prev_row[-1]
+
+    def tokenize(s: str) -> List[str]:
+        """Split string by common delimiters and return sorted tokens"""
+        tokens = re.split(r'[_\-\s]+', s)
+        return sorted([t for t in tokens if t])
+
+    def token_sort_similarity(s1: str, s2: str) -> float:
+        """
+        Hybrid similarity score combining token matching with character-level Levenshtein.
+        Returns a score where 0.0 = perfect match, higher = worse match.
+        """
+        tokens1 = tokenize(s1)
+        tokens2 = tokenize(s2)
+        
+        # Token set matching
+        set1, set2 = set(tokens1), set(tokens2)
+        intersection = len(set1 & set2)
+        union = len(set1 | set2)
+        
+        if union == 0:
+            token_score = 1.0
+        else:
+            token_score = 1.0 - (intersection / union)  # Jaccard distance
+
+        sorted_s1 = '_'.join(tokens1)
+        sorted_s2 = '_'.join(tokens2)
+        max_len = max(len(sorted_s1), len(sorted_s2))
+        if max_len == 0:
+            lev_score = 0.0
+        else:
+            lev_score = levenshtein(sorted_s1, sorted_s2) / max_len
+        
+        # Weighted combination: token matching (70%) + order similarity (30%)
+        return token_score * 0.7 + lev_score * 0.3
+
+    # Prepare strings for comparison
+    if not case_sensitive:
+        target_cmp = target.lower()
+        string_list_cmp = [s.lower() for s in string_list]
+    else:
+        target_cmp = target
+        string_list_cmp = string_list
+
+    # Find closest match
+    if token_based:
+        scores = [token_sort_similarity(target_cmp, s) for s in string_list_cmp]
+        closest_idx = min(range(len(scores)), key=lambda i: scores[i])
+        closest = string_list[closest_idx]
+        distance = scores[closest_idx]
+    else:
+        distances = [levenshtein(target_cmp, s) for s in string_list_cmp]
+        closest_idx = min(range(len(distances)), key=lambda i: distances[i])
+        closest = string_list[closest_idx]
+        distance = distances[closest_idx]
+    
+    return closest, distance
+
+
+
+def create_directionality_cords(bp_dict: dict,
+                                left_ear_name: str,
+                                nose_name: str,
+                                right_ear_name: str) -> dict:
+    """
+    Helper to create a dictionary mapping animal body-parts (nose, left ear, right ear) to their X and Y coordinate
+    column names for directionality analysis.
+
+    :param dict bp_dict: Dictionary with animal names as keys and body-part coordinate information as values. Expected to contain 'X_bps' and 'Y_bps' keys with lists of column names.
+    :param str left_ear_name: Name of the left ear body-part to search for in coordinate column names.
+    :param str nose_name: Name of the nose body-part to search for in coordinate column names.
+    :param str right_ear_name: Name of the right ear body-part to search for in coordinate column names.
+    :return: Nested dictionary with animal names as keys, body-part types (nose, ear_left, ear_right) as second-level keys, and coordinate types (X_bps, Y_bps) as third-level keys with corresponding column names as values.
+    :rtype: dict
+    :raises InvalidInputError: If any required body-part or coordinate cannot be found in the input dictionary.
+
+    :example:
+    >>> bp_dict = {'Animal_1': {'X_bps': ['Animal_1_Nose_x', 'Animal_1_Ear_left_x', 'Animal_1_Ear_right_x'], 'Y_bps': ['Animal_1_Nose_y', 'Animal_1_Ear_left_y', 'Animal_1_Ear_right_y']}}
+    >>> create_directionality_cords(bp_dict=bp_dict, left_ear_name='Ear_left', nose_name='Nose', right_ear_name='Ear_right')
+    >>> {'Animal_1': {'nose': {'X_bps': 'Animal_1_Nose_x', 'Y_bps': 'Animal_1_Nose_y'}, 'ear_left': {'X_bps': 'Animal_1_Ear_left_x', 'Y_bps': 'Animal_1_Ear_left_y'}, 'ear_right': {'X_bps': 'Animal_1_Ear_right_x', 'Y_bps': 'Animal_1_Ear_right_y'}}}
+    """
+
+    NOSE, EAR_LEFT, EAR_RIGHT = Keys.NOSE.value, Keys.EAR_LEFT.value, Keys.EAR_RIGHT.value
+
+    results = {}
+    for animal in bp_dict.keys():
+        results[animal] = {NOSE: {}, EAR_LEFT: {}, EAR_RIGHT: {}}
+        for dimension in ["X_bps", "Y_bps"]:
+            for cord in bp_dict[animal][dimension]:
+                if (nose_name.lower() in cord.lower()) and ("x" in cord.lower()):
+                    results[animal][NOSE]["X_bps"] = cord
+                elif (nose_name.lower() in cord.lower()) and ("y" in cord.lower()):
+                    results[animal][NOSE]["Y_bps"] = cord
+                elif (left_ear_name.lower() in cord.lower()) and ("x" in cord.lower()):
+                    results[animal][EAR_LEFT]["X_bps"] = cord
+                elif (left_ear_name.lower() in cord.lower()) and ("y" in cord.lower()):
+                    results[animal][EAR_LEFT]["Y_bps"] = cord
+                elif (right_ear_name.lower() in cord.lower()) and ("x" in cord.lower()):
+                    results[animal][EAR_RIGHT]["X_bps"] = cord
+                elif (right_ear_name.lower() in cord.lower()) and ("y" in cord.lower()):
+                    results[animal][EAR_RIGHT]["Y_bps"] = cord
+
+    for animal_name, animal_bps in results.items():
+        for bp_name, bp_values in animal_bps.items():
+           if len(bp_values.keys()) == 0:
+               raise InvalidInputError(msg=f'Could not detect a body-part for animal {animal_name}, body-part {bp_name} in SimBA project. Make sure the body-part configuration file at {Paths.BP_NAMES.value} lists the appropriate body-parts', source=create_directionality_cords.__name__)
+           for cord_key, cord_value in bp_values.items():
+                if cord_value == '':
+                    raise InvalidInputError(msg=f'Could not detect a body-part for animal {animal_name}, body-part {bp_name} and coordinate {cord_key} in SimBA project. MAke sure the body-part configuration file at {Paths.BP_NAMES.value} lists the appropriate body-parts. Passed values: {left_ear_name, nose_name, right_ear_name}', source=create_directionality_cords.__name__)
+    return results
+
 
 
 

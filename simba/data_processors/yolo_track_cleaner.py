@@ -6,13 +6,10 @@ from typing import Union
 import numpy as np
 import pandas as pd
 
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists, check_int, check_str,
-                                check_valid_boolean, check_valid_dataframe)
+from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists, check_int, check_str, check_valid_boolean, check_valid_dataframe)
 from simba.utils.errors import InvalidFilepathError, InvalidInputError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext, recursive_file_search)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,  get_fn_ext, recursive_file_search)
 
 warnings.simplefilter(action='ignore', category=pd.errors.SettingWithCopyWarning)
 
@@ -211,7 +208,5 @@ class YoloTrackCleaner:
 # x.run()
 # x = YoloTrackCleaner(data_path=r"E:\netholabs_videos\two_tracks_102725\csvs", save_dir=r'E:\netholabs_videos\two_tracks_102725\tracks_cleaned', bp_loc='NOSE')
 # x.run()
-
-
 # x = YoloTrackCleaner(data_path=r"E:\netholabs_videos\two_tracks_102725\csvs\cage_1_date_2025_09_13_hour_03_minute_46.csv", save_dir=r'E:\netholabs_videos\two_tracks_102725\tracks_cleaned', bp_loc='NOSE')
 # x.run()
