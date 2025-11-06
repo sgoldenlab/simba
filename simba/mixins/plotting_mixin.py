@@ -42,7 +42,8 @@ from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data, read_df,
-                                    read_frm_of_video, read_video_info, seconds_to_timestamp)
+                                    read_frm_of_video, read_video_info,
+                                    seconds_to_timestamp)
 
 
 class PlottingMixin(object):
