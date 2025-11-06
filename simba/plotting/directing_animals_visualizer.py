@@ -34,16 +34,16 @@ STYLE_ATTR = [DIRECTION_THICKNESS,DIRECTIONALITY_COLOR,CIRCLE_SIZE,HIGHLIGHT_END
 
 class DirectingOtherAnimalsVisualizer(ConfigReader, PlottingMixin):
     """
-    Visualize when animals are directing towards body-parts of other animals.
+    Create videos visualizing when animals direct their gaze toward body parts of other animals (single-threaded).
+
+    Draws directional lines from eye positions (calculated from nose and ear coordinates) to target body parts.
+    For faster processing of large videos, use :class:`~simba.plotting.directing_animals_visualizer_mp.DirectingOtherAnimalsVisualizerMultiprocess`.
 
     .. important::
-       Requires the pose-estimation data for the left ear, right ears and nose of individual animals.
-       For better runtime, use :meth:`simba.plotting.Directing_animals_visualizer.DirectingOtherAnimalsVisualizerMultiprocess`.
+       Requires pose-estimation data for left ear, right ear, and nose of each animal. Project must contain at least 2 animals.
 
     .. note::
-       `Example expected output <https://www.youtube.com/watch?v=d6pAatreb1E&list=PLi5Vwf0hhy1R6NDQJ3U28MOUJPfl2YWYl&index=22`_.
-
-       `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-data-tables`>__.
+       `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#visualizing-data-tables>`__.
 
     .. image:: _static/img/directing_other_animals.png
        :width: 500
@@ -53,15 +53,25 @@ class DirectingOtherAnimalsVisualizer(ConfigReader, PlottingMixin):
        :width: 500
        :align: center
 
-    :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
-    :param Union[str, os.PathLike] video_path: Path to video for to visualize directionality.
-    :param Dict[str, Any] style_attr: Video style attributes (colors and sizes etc.)
+    .. seealso::
+       For improved runtime, consider multiprocess class at :func:`simba.plotting.directing_animals_visualizer_mp.DirectingOtherAnimalsVisualizerMultiprocess`.
+
+
+    :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
+    :param Union[str, os.PathLike] video_path: Path to video file. Corresponding data file must exist in outlier_corrected_movement_location directory.
+    :param Dict[str, Any] style_attr: Video style attributes with required keys: 'show_pose' (bool), 'animal_names' (bool), 'circle_size' (int or None), 'directionality_color' (RGB tuple, list of tuples, or 'Random'), 'direction_thickness' (int or None), 'highlight_endpoints' (bool).
+    :param Optional[str] left_ear_name: Left ear body part name. If None, auto-detected. Must provide all three body part names or none.
+    :param Optional[str] right_ear_name: Right ear body part name. If None, auto-detected.
+    :param Optional[str] nose_name: Nose body part name. If None, auto-detected.
+
+    :raises AnimalNumberError: If project contains fewer than 2 animals.
+    :raises NoFilesFoundError: If pose-estimation data file not found.
+    :raises InvalidInputError: If body part names partially provided.
 
     :example:
-    >>> style_attr = {'show_pose': True, 'animal_names': True, 'circle_size': 3, 'directionality_color': [(255, 0, 0), (0, 0, 255)], 'direction_thickness': 10, 'highlight_endpoints': True}
-    >>> test = DirectingOtherAnimalsVisualizer(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', video_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/videos/Together_1.avi', style_attr=style_attr)
-    >>> test.run()
-
+        >>> style_attr = {'show_pose': True, 'animal_names': True, 'circle_size': 3, 'directionality_color': [(255, 0, 0), (0, 0, 255)], 'direction_thickness': 10, 'highlight_endpoints': True}
+        >>> visualizer = DirectingOtherAnimalsVisualizer(config_path='project_config.ini', video_path='video.avi', style_attr=style_attr)
+        >>> visualizer.run()
     """
 
     def __init__(self,

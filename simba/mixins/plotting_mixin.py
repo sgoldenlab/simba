@@ -42,7 +42,7 @@ from simba.utils.lookups import (get_categorical_palettes, get_color_dict,
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_fn_ext, get_video_meta_data, read_df,
-                                    read_frm_of_video, read_video_info)
+                                    read_frm_of_video, read_video_info, seconds_to_timestamp)
 
 
 class PlottingMixin(object):
@@ -340,11 +340,26 @@ class PlottingMixin(object):
                         height: int = 480,
                         font_size: int = 8,
                         font_rotation: int = 45,
-                        save_path: Optional[str] = None) -> Union[None, np.ndarray]:
+                        save_path: Optional[str] = None,
+                        hhmmss: bool = False) -> Union[None, np.ndarray]:
 
         video_timer = SimbaTimer(start=True)
         colour_tuple_x = list(np.arange(3.5, 203.5, 5))
         fig, ax = plt.subplots()
+        fig.patch.set_facecolor('#fafafa')
+        ax.set_facecolor('#ffffff')
+        fig.patch.set_facecolor('white')
+        plt.title(video_name, fontsize=font_size + 6, pad=15, fontweight='bold')
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_color('#666666')
+        ax.spines['bottom'].set_color('#666666')
+
+        if not hhmmss:
+            x_label: str = "SESSION TIME (S)"
+        else:
+            x_label: str = "SESSION TIME (HH:MM:SS)"
+
         for i, event in enumerate(bouts_df.groupby("Event")):
             for x in clf_names:
                 if event[0] == x:
@@ -352,15 +367,24 @@ class PlottingMixin(object):
                     data_event = event[1][["Start_time", "Bout_time"]]
                     ax.broken_barh(data_event.values, (colour_tuple_x[ix], 3), facecolors=palette[ix])
 
-        x_ticks_locs = x_lbls = np.round(np.linspace(0, x_length / fps, 6))
+        x_ticks_seconds = np.round(np.linspace(0, x_length / fps, 6))
+        x_ticks_locs = x_ticks_seconds
+
+        if hhmmss:
+            x_lbls = [seconds_to_timestamp(sec) for sec in x_ticks_seconds]
+        else:
+            x_lbls = x_ticks_seconds
+
+        #x_ticks_locs = x_lbls = np.round(np.linspace(0, x_length / fps, 6))
         ax.set_xticks(x_ticks_locs)
         ax.set_xticklabels(x_lbls)
         ax.set_ylim(0, colour_tuple_x[len(clf_names)])
         ax.set_yticks(np.arange(5, 5 * len(clf_names) + 1, 5))
         ax.set_yticklabels(clf_names, rotation=font_rotation)
         ax.tick_params(axis="both", labelsize=font_size)
-        plt.xlabel("SESSION TIME (S)", fontsize=font_size + 3)
-        ax.yaxis.grid(True)
+        plt.xlabel(x_label, fontsize=font_size + 3)
+        ax.yaxis.grid(True, linewidth=1.5, color='gray', alpha=0.4, linestyle='--')
+        #ax.yaxis.grid(True)
         buffer_ = io.BytesIO()
         plt.savefig(buffer_, format="png")
         buffer_.seek(0)

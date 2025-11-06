@@ -36,9 +36,9 @@ class DirectingAnimalsToBodyPartVisualizer(ConfigReader, PlottingMixin):
            :width: 450
            :align: center
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
-    :parameter str data_path: path to data file
-    :parameter dict style_attr: Visualisation attributes (colors and sizes etc.)
+    :param str config_path: path to SimBA project config file in Configparser format
+    :param str data_path: path to data file
+    :param dict style_attr: Visualisation attributes (colors and sizes etc.)
 
 
     :example:

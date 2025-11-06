@@ -35,7 +35,6 @@ class DirectingOtherAnimalsVisualizerPopUp(PopUpMixin, ConfigReader):
             raise AnimalNumberError(msg="Cannot visualize directionality between animals in a 1 animal project.", source=self.__class__.__name__,)
 
         PopUpMixin.__init__(self, title="CREATE ANIMAL DIRECTION VIDEOS", icon='eye')
-
         bp_names = list(set([x[:-2] for x in self.body_parts_lst]))
         nose_guess = find_closest_string(target=NOSE, string_list=bp_names)[0]
         ear_left_guess = find_closest_string(target=EAR_LEFT, string_list=bp_names)[0]

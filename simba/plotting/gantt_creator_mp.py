@@ -19,7 +19,7 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_file_exist_and_readable, check_int, check_str,
-    check_that_column_exist, check_valid_lst)
+    check_that_column_exist, check_valid_lst, check_valid_boolean)
 from simba.utils.data import create_color_palette, detect_bouts
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import NoSpecifiedOutputError
@@ -47,7 +47,8 @@ def gantt_creator_mp(data: np.array,
                      height: int,
                      font_size: int,
                      font_rotation: int,
-                     palette: np.ndarray):
+                     palette: np.ndarray,
+                     hhmmss: bool):
 
     batch_id, frame_rng = data[0], data[1]
     start_frm, end_frm, current_frm = frame_rng[0], frame_rng[-1], frame_rng[0]
@@ -69,7 +70,8 @@ def gantt_creator_mp(data: np.array,
                                                font_rotation=font_rotation,
                                                video_name=video_name,
                                                save_path=None,
-                                               palette=palette)
+                                               palette=palette,
+                                               hhmmss=hhmmss)
         current_frm += 1
         if frame_setting:
             frame_save_path = os.path.join(frame_folder_dir, f"{current_frm}.png")
@@ -119,7 +121,8 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
                  font_size: int = 8,
                  font_rotation: int = 45,
                  palette: str = 'Set1',
-                 core_cnt: Optional[int] = -1):
+                 core_cnt: Optional[int] = -1,
+                 hhmmss: bool = False):
 
         check_file_exist_and_readable(file_path=config_path)
         if (not frame_setting) and (not video_setting) and (not last_frm_setting):
@@ -130,12 +133,13 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
         check_int(value=height, min_value=1, name=f'{self.__class__.__name__} height')
         check_int(value=font_size, min_value=1, name=f'{self.__class__.__name__} font_size')
         check_int(value=font_rotation, min_value=0, max_value=180, name=f'{self.__class__.__name__} font_rotation')
+        check_valid_boolean(value=hhmmss, source=f'{self.__class__.__name__} hhmmss', raise_error=False)
         palettes = Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value
         check_str(name=f'{self.__class__.__name__} palette', value=palette, options=palettes)
         for file_path in data_paths: check_file_exist_and_readable(file_path=file_path)
         check_int(name=f"{self.__class__.__name__} core_cnt",value=core_cnt, min_value=-1, unaccepted_vals=[0], max_value=find_core_cnt()[0])
         self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
-        self.width, self.height, self.font_size, self.font_rotation = width, height, font_size, font_rotation
+        self.width, self.height, self.font_size, self.font_rotation, self.hhmmss = width, height, font_size, font_rotation, hhmmss
         ConfigReader.__init__(self, config_path=config_path, create_logger=False)
         PlottingMixin.__init__(self)
         self.clr_lst = create_color_palette(pallete_name=palette, increments=len(self.body_parts_lst) + 1, as_int=True, as_rgb_ratio=True)
@@ -174,7 +178,8 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
                                      font_rotation=self.font_rotation,
                                      video_name=self.video_name,
                                      save_path=os.path.join(self.gantt_plot_dir, f"{self.video_name}_final_image.png"),
-                                     palette=self.clr_lst)
+                                     palette=self.clr_lst,
+                                     hhmmss=self.hhmmss)
 
             if self.video_setting or self.frame_setting:
                 frame_data = np.array_split(list(range(0, len(self.data_df))), self.core_cnt)
@@ -194,7 +199,8 @@ class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
                                                   font_size=self.font_size,
                                                   font_rotation=self.font_rotation,
                                                   video_name=self.video_name,
-                                                  palette=self.clr_lst)
+                                                  palette=self.clr_lst,
+                                                  hhmmss=self.hhmmss)
                     for cnt, result in enumerate(pool.imap(constants, frame_data, chunksize=self.multiprocess_chunksize)):
                         print(f'Batch {result+1/self.core_cnt} complete...')
                 pool.terminate()

@@ -8,11 +8,11 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.gantt_creator import GanttCreatorSingleProcess
 from simba.plotting.gantt_creator_mp import GanttCreatorMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
                                         SimbaButton, SimbaCheckbox,
                                         SimBADropDown)
-from simba.utils.checks import check_if_filepath_list_is_empty, check_int
-from simba.utils.enums import Formats, Keys, Links, Options, Paths
+from simba.utils.checks import check_if_filepath_list_is_empty
+from simba.utils.enums import Formats, Links, Options
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.read_write import find_files_of_filetypes_in_directory
 
@@ -23,19 +23,22 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
     :example:
     >>>  _ = GanttPlotPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
     """
-    def __init__(self, config_path: Union[str, os.PathLike]):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike]):
+
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         check_if_filepath_list_is_empty(filepaths=self.machine_results_paths,error_msg=f"SIMBA ERROR: Zero files found in the {self.machine_results_dir} directory. Create classification results before visualizing gantt charts",)
         palettes = Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value
         self.data_paths = find_files_of_filetypes_in_directory(directory=self.machine_results_dir, extensions=[f'.{self.file_type}'], as_dict=True)
         max_file_name_len = max(len(k) for k in self.data_paths) + 5
-
         PopUpMixin.__init__(self, config_path=config_path, title="VISUALIZE GANTT PLOTS", icon='gantt_small')
+
         self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name='settings', icon_link=Links.GANTT_PLOTS.value, relief='solid', padx=5, pady=5)
         self.resolution_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.resolutions, label='GANTT PLOT RESOLUTION: ', label_width=30, dropdown_width=30, value='640×480')
         self.font_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(1, 26)), label='TEXT SIZE: ', label_width=30, dropdown_width=30, value=8)
         self.font_rotation_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(0, 182, 2)), label='TEXT ROTATION (°): ', label_width=30, dropdown_width=30, value=0)
         self.palette_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=palettes, label='COLOR PALETTE: ', label_width=30, dropdown_width=30, value='Set1')
+        self.time_format_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=['SECONDS', 'HH:MM:SS'], label='X-AXIS TIME FORMAT: ', label_width=30, dropdown_width=30, value='SECONDS')
         self.core_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(1, self.cpu_cnt+1)), label='CPU CORES: ', label_width=30, dropdown_width=30, value=int(self.cpu_cnt/2))
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VISUALIZATION SETTINGS", icon_name='eye', icon_link=Links.GANTT_PLOTS.value, relief='solid', padx=5, pady=5)
@@ -54,7 +57,8 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
         self.font_size_dropdown.grid(row=1, sticky=NW)
         self.font_rotation_dropdown.grid(row=2, sticky=NW)
         self.palette_dropdown.grid(row=3, sticky=NW)
-        self.core_dropdown.grid(row=4, sticky=NW)
+        self.time_format_dropdown.grid(row=4, sticky=NW)
+        self.core_dropdown.grid(row=5, sticky=NW)
 
         self.settings_frm.grid(row=1, sticky=NW, padx=10, pady=10)
         gantt_videos_cb.grid(row=0, sticky=NW)
@@ -82,6 +86,7 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
         video_setting = self.gantt_videos_var.get()
         last_frm_setting = self.gantt_last_frame_var.get()
         palette = self.palette_dropdown.get_value()
+        hhmmss = True if self.time_format_dropdown.get_value() == 'HH:MM:SS' else False
 
         if not frame_setting and not video_setting and not last_frm_setting:
             raise NoSpecifiedOutputError(msg="SIMBA ERROR: Please select gantt videos, frames, and/or last frame.")
@@ -102,7 +107,8 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
                                                      font_size=font_size,
                                                      font_rotation=font_rotation,
                                                      core_cnt=core_cnt,
-                                                     palette=palette)
+                                                     palette=palette,
+                                                     hhmmss=hhmmss)
 
         else:
             gantt_creator = GanttCreatorSingleProcess(config_path=self.config_path,
@@ -119,6 +125,6 @@ class GanttPlotPopUp(PopUpMixin, ConfigReader):
 
 
 
-#_ = GanttPlotPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+# _ = GanttPlotPopUp(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini")
 
  # _ = GanttPlotPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")

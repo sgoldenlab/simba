@@ -40,10 +40,10 @@ class AnimalDirectingAnimalPopUp(ConfigReader, PopUpMixin):
         self.nose_dropdown = SimBADropDown(parent=self.bp_frm, dropdown_options=self.body_parts_lst, label_width=30, dropdown_width=25, value=nose_guess, label='NOSE BODY-PART NAME:')
 
         self.settings_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="OUTPUT FORMATS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DIRECTING_ANIMALS_PLOTS.value)
-        boolean_tables_cb, self.boolean_tables_var = SimbaCheckbox(parent=self.settings_frm, txt="CREATE BOOLEAN TABLES", txt_img='table')
-        summary_table_cb, self.summary_tables_var = SimbaCheckbox(parent=self.settings_frm, txt="CREATE DETAILED SUMMARY TABLES (INCLUDING COORDINATES)", txt_img='table')
-        aggregate_statistics_cb, self.aggregate_statistics_var = SimbaCheckbox(parent=self.settings_frm, txt="CREATE AGGREGATE STATISTICS TABLE", txt_img='table')
-        append_cb, self.append_var = SimbaCheckbox(parent=self.settings_frm, txt="APPEND BOOLEAN TABLES TO FEATURES", txt_img='table')
+        boolean_tables_cb, self.boolean_tables_var = SimbaCheckbox(parent=self.settings_frm, txt="CREATE BOOLEAN TABLES", txt_img='table', val=False)
+        summary_table_cb, self.summary_tables_var = SimbaCheckbox(parent=self.settings_frm, txt="CREATE DETAILED SUMMARY TABLES (INCLUDING COORDINATES)", txt_img='table', val=True)
+        aggregate_statistics_cb, self.aggregate_statistics_var = SimbaCheckbox(parent=self.settings_frm, txt="CREATE AGGREGATE STATISTICS TABLE", txt_img='table', val=True)
+        append_cb, self.append_var = SimbaCheckbox(parent=self.settings_frm, txt="APPEND BOOLEAN TABLES TO FEATURES", txt_img='table', val=False)
 
         self.bp_frm.grid(row=0, column=0, sticky="NW")
         self.ear_left_dropdown.grid(row=0, column=0, sticky="NW")
