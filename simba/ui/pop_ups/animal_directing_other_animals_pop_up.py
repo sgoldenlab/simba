@@ -2,14 +2,17 @@ import os
 from tkinter import *
 from typing import Union
 
-from simba.data_processors.directing_other_animals_calculator import DirectingOtherAnimalsAnalyzer
+from simba.data_processors.directing_other_animals_calculator import \
+    DirectingOtherAnimalsAnalyzer
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, SimbaCheckbox, SimBADropDown
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
+                                        SimbaCheckbox, SimBADropDown)
 from simba.utils.enums import Keys, Links
-from simba.utils.errors import (AnimalNumberError, InvalidInputError, NoFilesFoundError)
-from simba.utils.warnings import SkippingRuleWarning
+from simba.utils.errors import (AnimalNumberError, InvalidInputError,
+                                NoFilesFoundError)
 from simba.utils.lookups import find_closest_string
+from simba.utils.warnings import SkippingRuleWarning
 
 NOSE, EAR_LEFT, EAR_RIGHT = Keys.NOSE.value, Keys.EAR_LEFT.value, Keys.EAR_RIGHT.value
 

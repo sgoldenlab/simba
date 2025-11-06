@@ -7,13 +7,17 @@ from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.plotting.directing_animals_visualizer import DirectingOtherAnimalsVisualizer
-from simba.plotting.directing_animals_visualizer_mp import DirectingOtherAnimalsVisualizerMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, SimbaButton, SimBADropDown)
+from simba.plotting.directing_animals_visualizer import \
+    DirectingOtherAnimalsVisualizer
+from simba.plotting.directing_animals_visualizer_mp import \
+    DirectingOtherAnimalsVisualizerMultiprocess
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        SimbaButton, SimBADropDown)
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.errors import AnimalNumberError
-from simba.utils.lookups import get_color_dict, find_closest_string
-from simba.utils.read_write import find_all_videos_in_directory, find_core_cnt, str_2_bool
+from simba.utils.lookups import find_closest_string, get_color_dict
+from simba.utils.read_write import (find_all_videos_in_directory,
+                                    find_core_cnt, str_2_bool)
 
 DIRECTION_THICKNESS = "direction_thickness"
 DIRECTIONALITY_COLOR = "directionality_color"
