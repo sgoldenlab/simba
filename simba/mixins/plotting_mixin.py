@@ -1147,44 +1147,34 @@ class PlottingMixin(object):
 
     @staticmethod
     def make_line_plot(data: List[np.ndarray],
-                        colors: List[str],
-                        show_box: Optional[bool] = True,
-                        width: Optional[int] = 640,
-                        height: Optional[int] = 480,
-                        line_width: Optional[int] = 6,
-                        font_size: Optional[int] = 8,
-                        bg_clr: Optional[str] = None,
-                        x_lbl_divisor: Optional[float] = None,
-                        title: Optional[str] = None,
-                        y_lbl: Optional[str] = None,
-                        x_lbl: Optional[str] = None,
-                        y_max: Optional[int] = -1,
-                        line_opacity: Optional[int] = 1.0,
-                        save_path: Optional[Union[str, os.PathLike]] = None):
+                       colors: List[str],
+                       show_box: Optional[bool] = True,
+                       width: Optional[int] = 640,
+                       height: Optional[int] = 480,
+                       line_width: Optional[int] = 6,
+                       font_size: Optional[int] = 8,
+                       bg_clr: Optional[str] = None,
+                       x_lbl_divisor: Optional[float] = None,
+                       title: Optional[str] = None,
+                       y_lbl: Optional[str] = None,
+                       x_lbl: Optional[str] = None,
+                       y_max: Optional[int] = -1,
+                       line_opacity: Optional[int] = 1.0,
+                       save_path: Optional[Union[str, os.PathLike]] = None):
 
-        check_valid_lst(
-            data=data,
-            source=PlottingMixin.make_line_plot.__name__,
-            valid_dtypes=(
-                np.ndarray,
-                list,
-            ),
-        )
-        check_valid_lst(
-            data=colors,
-            source=PlottingMixin.make_line_plot.__name__,
-            valid_dtypes=(str,),
-            exact_len=len(data),
-        )
+        check_valid_lst(data=data, source=PlottingMixin.make_line_plot.__name__, valid_dtypes=(np.ndarray, list))
+        check_valid_lst(data=colors, source=PlottingMixin.make_line_plot.__name__, valid_dtypes=(str,), exact_len=len(data))
 
         clr_dict = get_color_dict()
         matplotlib.font_manager._get_font.cache_clear()
         plt.close("all")
         fig, ax = plt.subplots()
-        if bg_clr is not None:
-            fig.set_facecolor(bg_clr)
-        if not show_box:
-            plt.axis("off")
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_linewidth(1.2)
+        ax.spines['bottom'].set_linewidth(1.2)
+        if bg_clr is not None: fig.set_facecolor(bg_clr)
+        if not show_box: plt.axis("off")
         for i in range(len(data)):
             line_clr = clr_dict[colors[i]][::-1]
             line_clr = tuple(x / 255 for x in line_clr)

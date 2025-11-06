@@ -120,7 +120,7 @@ class TresholdPlotCreatorSingleProcess(ConfigReader, PlottingMixin):
                                                        y_lbl=f"{self.clf_name} probability",
                                                        y_max= self.style_attr[STYLE_YMAX],
                                                        x_lbl='frame count',
-                                                       title=self.clf_name,
+                                                       title=f'{self.video_name} - {self.clf_name}',
                                                        save_path=final_frm_save_path,
                                                        line_opacity=self.style_attr[STYLE_OPACITY])
 

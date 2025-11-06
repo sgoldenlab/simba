@@ -88,26 +88,34 @@ def gantt_creator_mp(data: np.array,
 
 class GanttCreatorMultiprocess(ConfigReader, PlottingMixin):
     """
-    Multiprocess creation of classifier gantt charts in video and/or image format.
-    See meth:`simba.gantt_creator.GanttCreatorSingleProcess` for single-process class.
+    Create classifier gantt charts in video and/or image format using multiprocessing for faster generation.
 
-    ..note::
+    .. note::
        `GitHub gantt tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#gantt-plot>`__.
+
+    .. seealso::
+       For single core class, see :func:`simba.plotting.gantt_creator.GanttCreatorSingleProcess`.
 
     .. image:: _static/img/gantt_plot.png
        :width: 300
        :align: center
 
-    :param str config_path: path to SimBA project config file in Configparser format.
-    :param bool frame_setting: If True, creates individual frames.
-    :param bool last_frm_setting: If True, creates single .png image representing entire video.
-    :param bool video_setting: If True, creates videos
-    :param dict style_attr: Attributes of gannt chart (size, font size, font rotation etc).
-    :param List[str] files_found: File paths representing files with machine predictions e.g., ['project_folder/csv/machine_results/My_results.csv']
-    :param int cores: Number of cores to use.
+    :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
+    :param List[Union[str, os.PathLike]] data_paths: File paths to machine prediction CSV files.
+    :param Optional[bool] frame_setting: If True, creates individual frame images. Default: False.
+    :param Optional[bool] video_setting: If True, creates gantt videos. Default: False.
+    :param Optional[bool] last_frm_setting: If True, creates single final frame PNG showing entire session. Default: True.
+    :param int width: Width of output images/videos in pixels. Default: 640.
+    :param int height: Height of output images/videos in pixels. Default: 480.
+    :param int font_size: Font size for behavior labels. Default: 8.
+    :param int font_rotation: Rotation angle for y-axis labels in degrees (0-180). Default: 45.
+    :param str palette: Color palette name for behaviors. Default: 'Set1'.
+    :param Optional[int] core_cnt: Number of CPU cores to use. If -1, uses all available cores. Default: -1.
+    :param bool hhmmss: If True, displays time in HH:MM:SS format instead of seconds. Default: False.
 
-    :examples:
-    >>> gantt_creator = GanttCreatorMultiprocess(config_path='project_folder/project_config.ini', frame_setting=False, video_setting=True, files_found=['project_folder/csv/machine_results/Together_1.csv'], cores=5, style_attr={'width': 640, 'height': 480, 'font size': 8, 'font rotation': 45}).run()
+    :example:
+        >>> gantt_creator = GanttCreatorMultiprocess(config_path='project_config.ini', video_setting=True, data_paths=['csv/machine_results/video1.csv'], core_cnt=5, hhmmss=True)
+        >>> gantt_creator.run()
     """
 
     def __init__(self,

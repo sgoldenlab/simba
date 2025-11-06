@@ -24,23 +24,29 @@ ICON_DARWIN = os.path.join(os.path.dirname(simba.__file__), Paths.LOGO_ICON_DARW
 
 class InteractiveProbabilityGrapher(ConfigReader):
     """
-    Launch interactive GUI for classifier probability inspection.
+    Launch interactive GUI for inspecting classifier probabilities with synchronized video playback.
 
-    :param str config_path: path to SimBA project config file in Configparser format
-    :param str file_path: Data with classification probability field.
-    :param str model_path: Path to classifier used to create probability field.
+    Displays probability plot with interactive navigation. Double-click plot to jump to frame, use arrow keys to navigate, space to play/pause.
 
     .. note::
        `Validation tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#critical-validation-step-before-running-machine-model-on-new-data>`__.
-        .. image:: _static/img/interactive_probability_plot.png
-           :width: 450
-           :align: center
 
+    .. image:: _static/img/interactive_probability_plot.png
+       :width: 450
+       :align: center
 
-    Examples
-    ----------
-    >>> interactive_plotter = InteractiveProbabilityGrapher(config_path=r'MyConfigPath', file_path='MyFeatureFilepath', model_path='MyPickledClassifier.sav')
-    >>> interactive_plotter.run()
+    :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
+    :param Union[str, os.PathLike] file_path: Path to CSV file with classification probability data.
+    :param Union[str, os.PathLike] model_path: Path to classifier pickle file (.sav) used to generate probabilities.
+    :param int lbl_font_size: Font size for axis labels. Default: 16.
+    :param Tuple[int, int, int] data_clr: RGB color for probability line (0-255). Default: (0, 0, 255) [blue].
+    :param Tuple[int, int, int] line_clr: RGB color for current frame marker line (0-255). Default: (255, 0, 0) [red].
+    :param bool show_thresholds: If True, displays threshold lines at 0.25, 0.5, and 0.75. Default: True.
+    :param bool show_statistics_legend: If True, displays statistics box (max, mean, frame count). Default: True.
+
+    :example:
+        >>> interactive_plotter = InteractiveProbabilityGrapher(config_path='project_config.ini', file_path='features.csv', model_path='classifier.sav')
+        >>> interactive_plotter.run()
     """
 
     def __init__(self,
@@ -50,7 +56,8 @@ class InteractiveProbabilityGrapher(ConfigReader):
                  lbl_font_size: int = 16,
                  data_clr: Tuple[int, int, int] = (0, 0, 255),
                  line_clr: Tuple[int, int, int] = (255, 0, 0),
-                 show_thresholds: bool = True):
+                 show_thresholds: bool = True,
+                 show_statistics_legend: bool = True):
 
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False, create_logger=False)
         check_file_exist_and_readable(file_path=file_path)
@@ -59,6 +66,7 @@ class InteractiveProbabilityGrapher(ConfigReader):
         check_if_valid_rgb_tuple(data=data_clr, raise_error=True, source=f'{self.__class__.__name__} data_clr')
         check_if_valid_rgb_tuple(data=line_clr, raise_error=True, source=f'{self.__class__.__name__} line_clr')
         check_valid_boolean(value=show_thresholds, source=f'{check_valid_boolean.__name__} show_thresholds', raise_error=True)
+        check_valid_boolean(value=show_statistics_legend, source=f'{check_valid_boolean.__name__} show_statistics_legend', raise_error=True)
         self.file_path, self.model_path, self.lbl_font_size = file_path, model_path, lbl_font_size
         self.click_counter, self.is_playing = 0, False
         _, self.clf_name, _ = get_fn_ext(filepath=self.model_path)
@@ -74,7 +82,7 @@ class InteractiveProbabilityGrapher(ConfigReader):
         current_video_file_path = self.find_video_of_file(video_dir=self.video_dir, filename=video_name, raise_error=True)
         self.video_meta_data = get_video_meta_data(video_path=current_video_file_path)
         self.data_clr, self.line_clr = tuple([x/255 for x in data_clr]), tuple([x/255 for x in line_clr])
-        self.show_thresholds = show_thresholds
+        self.show_thresholds, self.show_statistics_legend = show_thresholds, show_statistics_legend
         self.play_speed = self.video_meta_data['fps'] / 1000
         if self.video_meta_data['frame_count'] != len(self.data_df):
             FrameRangeWarning(msg=f'The video {current_video_file_path} contains {self.video_meta_data["frame_count"]} frames, while the data file {self.data_path} contains {len(self.data_df)} frames.', source=self.__class__.__name__)
@@ -113,8 +121,7 @@ class InteractiveProbabilityGrapher(ConfigReader):
         ax.spines['bottom'].set_color('#666666')
         ax.set_facecolor('#f8f9fa')
         ax.grid(True, linestyle='--', alpha=0.3, color='gray', linewidth=0.5)
-        ax.tick_params(axis='both', which='major', labelsize=11, colors='#333333', 
-                       length=6, width=1.5, direction='out')
+        ax.tick_params(axis='both', which='major', labelsize=11, colors='#333333',  length=6, width=1.5, direction='out')
 
         ax.plot(self.p_arr, color='black', linewidth=2, alpha=0.1, zorder=1)  # shadow
         ax.plot(self.p_arr, color=self.data_clr, linewidth=1.5, alpha=0.9, zorder=2, label='Probability')
@@ -122,9 +129,10 @@ class InteractiveProbabilityGrapher(ConfigReader):
             ax.axhline(y=0.75, color='#ec4899', linestyle=(0, (3, 1, 1, 1)), linewidth=1.5, alpha=0.9, label='Threshold: 75%')
             ax.axhline(y=0.5, color='#3b82f6', linestyle=(0, (3, 1, 1, 1)), linewidth=1.5, alpha=0.9, label='Threshold: 50%')
             ax.axhline(y=0.25, color='#8b5cf6', linestyle=(0, (3, 1, 1, 1)), linewidth=1.5, alpha=0.9, label='Threshold: 25%')
-        ax.legend(loc='upper right', frameon=True, fancybox=True, 
-                  framealpha=0.95, edgecolor='#cccccc', fontsize=10)
-
+        ax.legend(loc='upper right', frameon=True, fancybox=True, framealpha=0.95, edgecolor='#cccccc', fontsize=10)
+        if self.show_statistics_legend:
+            stats_text = f"max: {self.p_arr.max():.2f}\nmean: {self.p_arr.mean():.2f}\nframes: {len(self.p_arr)}"
+            plt.text(0.98, 0.02, stats_text, transform=ax.transAxes, fontsize=max(1, self.lbl_font_size - 6), verticalalignment='bottom', horizontalalignment='right', bbox=dict(boxstyle='round', facecolor='white', alpha=0.8, edgecolor='gray'))
         fig.canvas.manager.set_window_title(f"SimBA - {self.clf_name} Probability - {get_fn_ext(filepath=self.file_path)[1]}")
         if (platform.system() == OS.WINDOWS.value) and os.path.isfile(ICON_WINDOWS):
             fig.canvas.manager.window.iconbitmap(ICON_WINDOWS)
@@ -159,9 +167,7 @@ class InteractiveProbabilityGrapher(ConfigReader):
                 if marker is not None: marker.pop(0).remove()
                 plt.title(plt_title)
                 line = plt.axvline(x=current_x_cord, color=self.line_clr, alpha=0.8, linewidth=2)
-                marker = ax.plot(current_x_cord, self.p_arr[current_x_cord][0], 'o',
-                                 markersize=8, color=self.line_clr, markeredgecolor='white',
-                                 markeredgewidth=2, zorder=5)
+                marker = ax.plot(current_x_cord, self.p_arr[current_x_cord][0], 'o', markersize=8, color=self.line_clr, markeredgecolor='white', markeredgewidth=2, zorder=5)
                 ax.set_xlim(xlim)
                 ax.set_ylim(ylim)
                 
@@ -192,8 +198,9 @@ class InteractiveProbabilityGrapher(ConfigReader):
 
 # test = InteractiveProbabilityGrapher(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/mitra/project_folder/project_config.ini",
 #                                      file_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/mitra/project_folder/csv/validation/704_MA115_Gi_CNO_0521.csv",
-#                                      model_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/mitra/models/generated_models/grooming.sav")
+#                                      model_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/mitra/models/generated_models/grooming.sav",
+#                                      show_statistics_legend=True)
 # test.run()
-
+#
 
 

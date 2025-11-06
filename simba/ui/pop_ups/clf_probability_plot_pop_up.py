@@ -53,7 +53,7 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
         self.max_y_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=MAX_Y_OPTIONS, label='MAX Y-AXIS: ', label_width=25, dropdown_width=35, value=AUTO)
         self.line_clr_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=color_names, label='LINE COLOR: ', label_width=25, dropdown_width=35, value='Red')
         self.font_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(1, 26)), label='TEXT SIZE: ', label_width=25, dropdown_width=35, value=10)
-        self.line_width_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(1, 26)), label='LINE WIDTH: ', label_width=25, dropdown_width=35, value=6)
+        self.line_width_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(1, 26)), label='LINE WIDTH: ', label_width=25, dropdown_width=35, value=2)
         self.line_opacity_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=OPACITY_OPTIONS, label='LINE OPACITY: ', label_width=25, dropdown_width=35, value=1.0)
 
 

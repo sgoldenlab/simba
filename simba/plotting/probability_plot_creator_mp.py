@@ -50,7 +50,6 @@ def _probability_plot_mp(frm_range: Tuple[int, np.ndarray],
     group, data = frm_range[0], frm_range[1]
     start_frm, end_frm, current_frm = data[0], data[-1], data[0]
 
-    # Ensure y_max is a number, not a string
     if style_attr[STYLE_YMAX] == AUTO:
         style_attr[STYLE_YMAX] = float(np.max(clf_data))
 
@@ -63,16 +62,16 @@ def _probability_plot_mp(frm_range: Tuple[int, np.ndarray],
         current_lst = [np.array(clf_data[0 : current_frm + 1])]
         current_frm += 1
         img = PlottingMixin.make_line_plot(data=current_lst,
-                                                colors=[style_attr[STYLE_COLOR]],
-                                                width=style_attr[STYLE_WIDTH],
-                                                height=style_attr[STYLE_HEIGHT],
-                                                line_width=style_attr[STYLE_LINE_WIDTH],
-                                                font_size=style_attr[STYLE_FONT_SIZE],
-                                                line_opacity=style_attr[STYLE_OPACITY],
-                                                y_lbl=f"{clf_name} probability",
-                                                title=clf_name,
-                                                y_max=style_attr[STYLE_YMAX],
-                                                x_lbl='frame count')
+                                           colors=[style_attr[STYLE_COLOR]],
+                                           width=style_attr[STYLE_WIDTH],
+                                           height=style_attr[STYLE_HEIGHT],
+                                           line_width=style_attr[STYLE_LINE_WIDTH],
+                                           font_size=style_attr[STYLE_FONT_SIZE],
+                                           line_opacity=style_attr[STYLE_OPACITY],
+                                           y_lbl=f"{clf_name} probability",
+                                           title=f'{video_name} - {clf_name}',
+                                           y_max=style_attr[STYLE_YMAX],
+                                           x_lbl='frame count')
 
         if video_setting:
             video_writer.write(img[:, :, :3])
@@ -177,7 +176,7 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
                                                  y_lbl=f"{self.clf_name} probability",
                                                  y_max=self.style_attr[STYLE_YMAX],
                                                  x_lbl='frame count',
-                                                 title=self.clf_name,
+                                                 title=f'{self.video_name} - {self.clf_name}',
                                                  save_path=final_frm_save_path,
                                                  line_opacity=self.style_attr[STYLE_OPACITY])
 

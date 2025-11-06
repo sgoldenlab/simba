@@ -12,7 +12,7 @@ from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
     check_file_exist_and_readable, check_int, check_str, check_valid_dataframe,
-    check_valid_lst)
+    check_valid_lst, check_valid_boolean)
 from simba.utils.data import create_color_palette, detect_bouts
 from simba.utils.enums import Formats, Options
 from simba.utils.errors import NoSpecifiedOutputError
@@ -29,29 +29,33 @@ STYLE_ATTR = [STYLE_WIDTH, STYLE_HEIGHT, STYLE_FONT_SIZE, STYLE_FONT_ROTATION]
 
 class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
     """
-    Create gantt chart videos and/or images using a single core.
+    Create classifier gantt charts in video and/or image format using single-threaded processing.
 
     .. note::
        `GitHub gantt tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#gantt-plot>`__.
-       For improved run-time, see :meth:`simba.gantt_creator_mp.GanttCreatorMultiprocess` for multiprocess class.
+
+    .. seealso::
+       For improved run-time, see :func:`simba.plotting.gantt_creator_mp.GanttCreatorMultiprocess`.
 
     .. image:: _static/img/gantt_plot.png
        :width: 300
        :align: center
 
-
-    :param str config_path: path to SimBA project config file in Configparser format.
-    :param bool frame_setting: If True, creates individual frames.
-    :param bool last_frm_setting: If True, creates single .png image representing entire video.
-    :param bool video_setting: If True, creates videos
-    :param dict style_attr: Attributes of gannt chart (size, font size, font rotation etc).
-    :param List[str] files_found: File paths representing files with machine predictions e.g., ['project_folder/csv/machine_results/My_results.csv']
+    :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
+    :param List[Union[str, os.PathLike]] data_paths: File paths to machine prediction CSV files.
+    :param int width: Width of output images/videos in pixels. Default: 640.
+    :param int height: Height of output images/videos in pixels. Default: 480.
+    :param int font_size: Font size for behavior labels. Default: 8.
+    :param int font_rotation: Rotation angle for y-axis labels in degrees (0-180). Default: 45.
+    :param str palette: Color palette name for behaviors. Default: 'Set1'.
+    :param Optional[bool] frame_setting: If True, creates individual frame images. Default: False.
+    :param Optional[bool] video_setting: If True, creates gantt videos. Default: False.
+    :param Optional[bool] last_frm_setting: If True, creates single final frame PNG showing entire session. Default: True.
+    :param Optional[bool] hhmmss: If True, displays time in HH:MM:SS format instead of seconds. Default: True.
 
     :example:
-    >>> style_attr = {'width': 640, 'height': 480, 'font size': 12, 'font rotation': 45}
-    >>> gantt_creator = GanttCreatorSingleProcess(config_path='tests/test_data/multi_animal_dlc_two_c57/project_folder/project_config.ini', frame_setting=False, video_setting=True, files_found=['tests/test_data/multi_animal_dlc_two_c57/project_folder/csv/machine_results/Together_1.csv'])
-    >>> gantt_creator.run()
-
+        >>> gantt_creator = GanttCreatorSingleProcess(config_path='project_config.ini', video_setting=True, data_paths=['csv/machine_results/video1.csv'], hhmmss=True)
+        >>> gantt_creator.run()
     """
 
     def __init__(self,
@@ -64,7 +68,8 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
                  palette: str = 'Set1',
                  frame_setting: Optional[bool] = False,
                  video_setting: Optional[bool] = False,
-                 last_frm_setting: Optional[bool] = True):
+                 last_frm_setting: Optional[bool] = True,
+                 hhmmss: Optional[bool] = True):
 
         if ((frame_setting != True) and (video_setting != True) and (last_frm_setting != True)):
             raise NoSpecifiedOutputError(msg="SIMBA ERROR: Please select gantt videos, frames, and/or last frame.")
@@ -74,6 +79,7 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
         check_int(value=font_size, min_value=1, name=f'{self.__class__.__name__} font_size')
         check_int(value=font_rotation, min_value=0, max_value=180, name=f'{self.__class__.__name__} font_rotation')
         check_valid_lst(data=data_paths, source=f'{self.__class__.__name__} data_paths', valid_dtypes=(str,), min_len=1)
+        check_valid_boolean(value=hhmmss, source=f'{self.__class__.__name__} hhmmss', raise_error=False)
         palettes = Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value
         check_str(name=f'{self.__class__.__name__} palette', value=palette, options=palettes)
         for file_path in data_paths: check_file_exist_and_readable(file_path=file_path)
@@ -84,7 +90,7 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
         if not os.path.exists(self.gantt_plot_dir): os.makedirs(self.gantt_plot_dir)
         self.frame_setting, self.video_setting, self.last_frm_setting = frame_setting, video_setting, last_frm_setting
         self.width, self.height, self.font_size, self.font_rotation = width, height, font_size, font_rotation
-        self.data_paths = data_paths
+        self.data_paths, self.hhmmss = data_paths, hhmmss
         self.colours = get_named_colors()
         self.colour_tuple_x = list(np.arange(3.5, 203.5, 5))
 
@@ -116,7 +122,8 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
                                      font_rotation=self.font_rotation,
                                      video_name=self.video_name,
                                      save_path=os.path.join(self.gantt_plot_dir, f"{self.video_name }_final_image.png"),
-                                     palette=self.clr_lst)
+                                     palette=self.clr_lst,
+                                     hhmmss=self.hhmmss)
 
             if self.frame_setting or self.video_setting:
                 for image_cnt, k in enumerate(range(len(self.data_df))):
@@ -131,7 +138,8 @@ class GanttCreatorSingleProcess(ConfigReader, PlottingMixin):
                                                 font_rotation=self.font_rotation,
                                                 video_name=self.video_name,
                                                 palette=self.clr_lst,
-                                                save_path=None)
+                                                save_path=None,
+                                                hhmmss=self.hhmmss)
                     if self.frame_setting:
                         frame_save_path = os.path.join(self.save_frame_folder_dir, f"{k}.png")
                         cv2.imwrite(frame_save_path, plot)
