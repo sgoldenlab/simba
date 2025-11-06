@@ -8,9 +8,8 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.gantt_creator import GanttCreatorSingleProcess
 from simba.plotting.gantt_creator_mp import GanttCreatorMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
-                                        SimbaButton, SimbaCheckbox,
-                                        SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaButton,
+                                        SimbaCheckbox, SimBADropDown)
 from simba.utils.checks import check_if_filepath_list_is_empty
 from simba.utils.enums import Formats, Links, Options
 from simba.utils.errors import NoSpecifiedOutputError
