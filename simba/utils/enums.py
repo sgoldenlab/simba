@@ -116,7 +116,7 @@ class Paths(Enum):
     UNSUPERVISED_MODEL_NAMES = Path("assets/lookups/model_names.parquet")
     CRITICAL_VALUES = Path("simba/assets/lookups/critical_values_05.pickle")
     BLOB_EXECUTOR_PATH = Path("video_processors/blob_tracking_executor.py")
-    YOLO_SCHEMATICS_DIR = Path("assets/yolo_schematics/")
+    YOLO_SCHEMATICS_DIR = Path("assets/lookups/yolo_schematics/")
     TOOLTIPS = Path("assets/lookups/tooptips.json")
     KALEIDO_PATH = os.path.join(os.path.dirname(simba.__file__), 'kaleido', 'executable', 'bin', 'kaleido.exe')
 

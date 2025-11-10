@@ -14,5 +14,6 @@
   "iou_dropdown": "Minimum bounding-box overlap required to keep the same track between frames. Higher values demand tighter alignment.",
   "max_tracks_dropdown": "Maximum number of simultaneous object tracks the model can follow in each frame.",
   "max_track_per_id_dropdown": "Cap on how many concurrent tracks a single class ID (e.g., a specific animal) can occupy.",
-  "smoothing_dropdown": "Apply temporal smoothing over this many milliseconds to reduce jitter in keypoint trajectories."
+  "smoothing_dropdown": "Apply temporal smoothing over this many milliseconds to reduce jitter in keypoint trajectories.",
+  "recursive_dropdown": "If False, only analyses videos in the immediate parent folder. If True, searches all sub-directories as well."
 }

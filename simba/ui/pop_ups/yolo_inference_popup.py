@@ -19,12 +19,12 @@ from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
 from simba.utils.read_write import (find_core_cnt,
                                     find_files_of_filetypes_in_directory,
                                     get_pkg_version, get_video_meta_data,
-                                    read_yolo_bp_names_file, str_2_bool)
+                                    read_yolo_bp_names_file, str_2_bool, recursive_file_search)
 
 MAX_TRACKS_OPTIONS = ['None', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 BATCH_SIZE_OPTIONS =  list(range(50, 1050, 50))
 CORE_CNT_OPTIONS = list(range(1, find_core_cnt()[0]))
-IMG_SIZE_OPTIONS = [256, 320, 416, 480, 512, 640, 720, 768, 960, 1280]
+IMG_SIZE_OPTIONS = [256, 288, 320, 416, 480, 512, 640, 720, 768, 960, 1280]
 SMOOTHING_OPTIONS = ['None', 50, 100, 200, 300, 400, 500]
 
 YOLO_FORMATS = Options.VALID_YOLO_FORMATS.value + ['None']
@@ -66,15 +66,19 @@ class YOLOPoseInferencePopUP(PopUpMixin):
         self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE:", label_width=35, dropdown_width=40, value='TRUE', tooltip_key='verbose_dropdown')
         self.workers_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=CORE_CNT_OPTIONS, label="CPU WORKERS:", label_width=35, dropdown_width=40, value=int(math.ceil((max(CORE_CNT_OPTIONS)/2))), tooltip_key='workers_dropdown')
         self.format_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=YOLO_FORMATS, label="FORMAT:", label_width=35, dropdown_width=40, value='None', tooltip_key='format_dropdown')
-        self.img_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=IMG_SIZE_OPTIONS, label="IMAGE SIZE:", label_width=35, dropdown_width=40, value=640, tooltip_key='img_size_dropdown')
+        self.img_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=IMG_SIZE_OPTIONS, label="IMAGE SIZE:", label_width=35, dropdown_width=40, value=256, tooltip_key='img_size_dropdown')
         self.devices_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=devices, label="DEVICE:", label_width=35, dropdown_width=40, value=devices[1], tooltip_key='devices_dropdown')
         self.interpolate_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="INTERPOLATE:",  label_width=35, dropdown_width=40, value='TRUE', tooltip_key='interpolate_dropdown')
         self.stream_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="STREAM:", label_width=35, dropdown_width=40, value='TRUE', tooltip_key='stream_dropdown')
-        self.threshold_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=THRESHOLD_OPTIONS, label="THRESHOLD:", label_width=35, dropdown_width=40, value=0.5, tooltip_key='threshold_dropdown')
+        self.threshold_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=THRESHOLD_OPTIONS, label="THRESHOLD:", label_width=35, dropdown_width=40, value=0.1, tooltip_key='threshold_dropdown')
         self.iou_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=THRESHOLD_OPTIONS,  label="IOU:", label_width=35, dropdown_width=40, value=0.8, tooltip_key='iou_dropdown')
         self.max_tracks_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=MAX_TRACKS_OPTIONS, label="MAX TRACKS:", label_width=35, dropdown_width=40, value=MAX_TRACKS_OPTIONS[0], tooltip_key='max_tracks_dropdown')
         self.max_track_per_id_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=MAX_TRACKS_OPTIONS, label="MAX TRACKS PER ID:", label_width=35, dropdown_width=40, value=1, tooltip_key='max_track_per_id_dropdown')
         self.smoothing_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=SMOOTHING_OPTIONS, label="SMOOTHING (MS):", label_width=35, dropdown_width=40, value=SMOOTHING_OPTIONS[2], tooltip_key='smoothing_dropdown')
+        self.recursive_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="RECURSIVE VIDEO SEARCH:", label_width=35, dropdown_width=40, value='FALSE', tooltip_key='recursive_dropdown')
+
+
+
 
         paths_frm.grid(row=0, column=0, sticky=NW)
         settings_frm.grid(row=1, column=0, sticky=NW)
@@ -97,6 +101,7 @@ class YOLOPoseInferencePopUP(PopUpMixin):
         self.max_tracks_dropdown.grid(row=10, column=0, sticky=NW)
         self.max_track_per_id_dropdown.grid(row=11, column=0, sticky=NW)
         self.smoothing_dropdown.grid(row=12, column=0, sticky=NW)
+        self.recursive_dropdown.grid(row=13, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="ANALYZE SINGLE VIDEO", icon_name='video')
         self.video_path = FileSelect(parent=single_video_frm, fileDescription='VIDEO PATH:', lblwidth=35, entry_width=45, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -142,10 +147,14 @@ class YOLOPoseInferencePopUP(PopUpMixin):
         smoothing = None if smoothing == 'None' else int(smoothing)
         check_file_exist_and_readable(file_path=bp_config_csv_path, raise_error=True)
         keypoint_names = read_yolo_bp_names_file(file_path=bp_config_csv_path)
+        recursive = str_2_bool(self.recursive_dropdown.get_value())
 
         if multiple:
             check_if_dir_exists(in_dir=self.video_dir.folder_path, source=self.__class__.__name__, raise_error=True)
-            video_paths = find_files_of_filetypes_in_directory(directory=self.video_dir.folder_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True)
+            if not recursive:
+                video_paths = find_files_of_filetypes_in_directory(directory=self.video_dir.folder_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True)
+            else:
+                video_path = recursive_file_search(directory=self.video_dir.folder_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, as_dict=False)
         else:
             check_file_exist_and_readable(file_path=self.video_path.file_path, raise_error=True)
             video_paths = [self.video_path.file_path]
@@ -169,7 +178,8 @@ class YOLOPoseInferencePopUP(PopUpMixin):
                                        iou=iou,
                                        stream=stream,
                                        smoothing=smoothing,
-                                       keypoint_names=keypoint_names)
+                                       keypoint_names=keypoint_names,
+                                       recursive=recursive)
         else:
             runner = YOLOPoseTrackInference(weights_path=mdl_path,
                                             video_path=video_paths,

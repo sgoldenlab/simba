@@ -14,6 +14,7 @@ except ModuleNotFoundError:
     YOLO = None
     torch = None
 
+from copy import deepcopy
 import random
 import warnings
 from typing import List, Optional, Tuple, Union
@@ -32,12 +33,13 @@ from simba.utils.enums import Options
 from simba.utils.errors import (CountError, InvalidFilepathError,
                                 InvalidFileTypeError, SimBAGPUError,
                                 SimBAPAckageVersionError)
-from simba.utils.printing import SimbaTimer
+from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_video_meta_data, recursive_file_search)
 from simba.utils.warnings import FileExistWarning, NoDataFoundWarning
 from simba.utils.yolo import (_get_undetected_obs, filter_yolo_keypoint_data,
                               load_yolo_model, yolo_predict)
+from simba.utils.lookups import get_current_time
 
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
@@ -157,8 +159,9 @@ class YOLOPoseInference():
             smoothing = smoothing if smoothing > 0 else False
         self.keypoint_col_names = [f'{i}_{s}'.upper() for i in keypoint_names for s in ['x', 'y', 'p']]
         self.keypoint_cord_col_names = [f'{i}_{s}'.upper() for i in keypoint_names for s in ['x', 'y']]
-        OUT_COLS.extend(self.keypoint_col_names)
-        COORD_COLS.extend(self.keypoint_cord_col_names)
+        self.out_cols, self.cord_cols = deepcopy(OUT_COLS), deepcopy(COORD_COLS)
+        self.out_cols.extend(self.keypoint_col_names)
+        self.cord_cols.extend(self.keypoint_cord_col_names)
         torch.set_num_threads(torch_threads)
         self.half_precision, self.stream, self.video_path, self.raise_error, self.smoothing = half_precision, stream, video_path, raise_error, smoothing
         self.device, self.batch_size, self.threshold, self.max_tracks, self.iou = device, batch_size, box_threshold, max_tracks, iou
@@ -170,6 +173,7 @@ class YOLOPoseInference():
         results = {}
         class_dict = self.model.names
         timer = SimbaTimer(start=True)
+        print(f'Starting tracking inference for {len(self.video_path)} video(s) ({get_current_time()})... ')
         for video_cnt, path in enumerate(self.video_path):
             video_timer = SimbaTimer(start=True)
             _, video_name, _ = get_fn_ext(filepath=path)
@@ -212,13 +216,13 @@ class YOLOPoseInference():
                         bbox = np.append(bbox, cls_keypoints[i].flatten())
                         video_out.append(bbox)
 
-            results[video_name] = pd.DataFrame(video_out, columns=OUT_COLS)
+            results[video_name] = pd.DataFrame(video_out, columns=self.out_cols)
             results[video_name][FRAME] = results[video_name][FRAME].astype(np.int64)
             results[video_name].loc[:, CLASS_ID] = (pd.to_numeric(results[video_name][CLASS_ID], errors='coerce').fillna(0).astype(np.int32))
             if self.interpolate:
                 for class_id in class_dict.keys():
                     class_df = results[video_name][results[video_name][CLASS_ID] == int(class_id)]
-                    for cord_col in COORD_COLS:
+                    for cord_col in self.cord_cols:
                         class_df[cord_col] = class_df[cord_col].astype(np.float32).replace([-1, 0], np.nan)
                         class_df[cord_col] = class_df[cord_col].interpolate(method=NEAREST, axis=0).ffill().bfill()
                     class_df[CONFIDENCE] = class_df[CONFIDENCE].astype(np.float32).replace([-1, 0], np.nan)
@@ -229,7 +233,7 @@ class YOLOPoseInference():
                 if frms_in_smoothing_window > 1:
                     for class_id in class_dict.keys():
                         class_df = results[video_name][results[video_name][CLASS_ID] == int(class_id)]
-                        for cord_col in COORD_COLS:
+                        for cord_col in self.cord_cols:
                             class_df[cord_col] = class_df[cord_col].rolling(window=frms_in_smoothing_window, win_type='gaussian', center=True).mean(std=5).fillna(results[video_name][cord_col]).abs()
                         results[video_name].update(class_df)
 
@@ -243,16 +247,16 @@ class YOLOPoseInference():
                 del results[video_name]
             video_timer.stop_timer()
             if self.verbose:
-                print(f'Video {video_name} complete (elapsed time: {video_timer.elapsed_time_str}s, video {video_cnt+1}/{len(self.video_path)})')
+                print(f'Video {video_name} complete (elapsed time: {video_timer.elapsed_time_str}s, video: {video_cnt+1}/{len(self.video_path)})')
 
         timer.stop_timer()
         if not self.save_dir:
             if self.verbose:
-                print(f'YOLO results created for {len(self.video_path)} videos', timer.elapsed_time_str)
+                stdout_success(msg=f'YOLO results created for {len(self.video_path)} videos', elapsed_time=timer.elapsed_time_str)
             return results
         else:
             if self.verbose:
-                print(f'YOLO results for {len(self.video_path)} videos saved in {self.save_dir} directory', timer.elapsed_time_str)
+                stdout_success(msg=f'YOLO results for {len(self.video_path)} videos saved in {self.save_dir} directory', elapsed_time=timer.elapsed_time_str)
             return None
 
 

@@ -3183,7 +3183,7 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
     pool.terminate()
     return results
 
-def read_yolo_bp_names_file(file_path: Union[str, os.PathLike]) -> List[str]:
+def read_yolo_bp_names_file(file_path: Union[str, os.PathLike]) -> Tuple[str]:
     """
     Helper to read CSV with single column listing body-part names. 
     """
@@ -3195,7 +3195,7 @@ def read_yolo_bp_names_file(file_path: Union[str, os.PathLike]) -> List[str]:
         .tolist()
     )
     check_valid_lst(data=data, source=f'{read_yolo_bp_names_file.__name__} data', valid_dtypes=(str,), min_len=2)
-    return data
+    return tuple(data)
 
 def read_df_array(df: pd.DataFrame, column: str):
     """
