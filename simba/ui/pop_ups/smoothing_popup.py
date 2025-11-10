@@ -8,10 +8,8 @@ from typing import Union
 from simba.data_processors.smoothing import Smoothing
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (DropDownMenu, Entry_Box, FileSelect,
-                                        FolderSelect, SimbaButton)
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists, check_int)
+from simba.ui.tkinter_functions import (Entry_Box, FileSelect, FolderSelect, SimbaButton, SimBADropDown)
+from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists, check_int)
 from simba.utils.enums import Formats, Options
 from simba.utils.read_write import str_2_bool
 
@@ -29,12 +27,13 @@ class SmoothingPopUp(PopUpMixin, ConfigReader):
         self.config_path = config_path
 
         self.settings_frm = LabelFrame(self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value)
-        self.time_window = Entry_Box(self.settings_frm, "TIME WINDOW (MILLISECONDS):", "35", validation="numeric")
-        self.method_dropdown = DropDownMenu(self.settings_frm, "SMOOTHING METHOD:", Options.SMOOTHING_OPTIONS.value, "35")
-        self.save_originals_dropdown = DropDownMenu(self.settings_frm, "SAVE ORIGINALS:", Options.BOOL_STR_OPTIONS.value, "35")
-        self.save_originals_dropdown.setChoices(Options.BOOL_STR_OPTIONS.value[0])
+        self.time_window = Entry_Box(self.settings_frm, "TIME WINDOW (MILLISECONDS):", "35", validation="numeric", entry_box_width=35, value=100)
 
-        self.method_dropdown.setChoices(Options.SMOOTHING_OPTIONS.value[0])
+
+
+        self.method_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=Options.SMOOTHING_OPTIONS.value, label="SMOOTHING METHOD:", label_width=35, dropdown_width=35, value=Options.SMOOTHING_OPTIONS.value[0])
+        self.save_originals_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="SAVE ORIGINALS:", label_width=35, dropdown_width=35, value='TRUE')
+
         self.settings_frm.grid(row=0, column=0, sticky=NW)
         self.time_window.grid(row=0, column=0, sticky=NW)
         self.method_dropdown.grid(row=1, column=0, sticky=NW)
@@ -84,4 +83,4 @@ class SmoothingPopUp(PopUpMixin, ConfigReader):
         smoothing.run()
 
 
-#SmoothingPopUp(config_path='"C:\troubleshooting\mitra\project_folder\project_config.ini"')
+# SmoothingPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")

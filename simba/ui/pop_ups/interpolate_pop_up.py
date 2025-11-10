@@ -8,10 +8,8 @@ from typing import Union
 from simba.data_processors.interpolate import Interpolate
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (DropDownMenu, FileSelect, FolderSelect,
-                                        SimbaButton)
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists)
+from simba.ui.tkinter_functions import (DropDownMenu, FileSelect, FolderSelect, SimbaButton, SimBADropDown)
+from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists)
 from simba.utils.enums import Formats, Options
 from simba.utils.read_write import str_2_bool
 
@@ -24,17 +22,17 @@ class InterpolatePopUp(PopUpMixin, ConfigReader):
 
     """
 
-    def __init__(self, config_path: Union[str, os.PathLike]):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike]):
         PopUpMixin.__init__(self, title="INTERPOLATE POSE", icon='line_chart_blue')
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         self.config_path = config_path
         self.settings_frm = LabelFrame(self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value)
-        self.type_dropdown = DropDownMenu(self.settings_frm, "INTERPOLATION TYPE:", ['MISSING BODY-PARTS', 'MISSING ANIMALS'], "35")
-        self.method_dropdown = DropDownMenu(self.settings_frm, "INTERPOLATION METHOD:", ['NEAREST', 'LINEAR', 'QUADRATIC'], "35")
-        self.save_originals_dropdown = DropDownMenu(self.settings_frm, "SAVE ORIGINALS:", Options.BOOL_STR_OPTIONS.value, "35")
-        self.type_dropdown.setChoices('MISSING BODY-PARTS')
-        self.method_dropdown.setChoices('NEAREST')
-        self.save_originals_dropdown.setChoices(Options.BOOL_STR_OPTIONS.value[0])
+
+
+        self.type_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['MISSING BODY-PARTS', 'MISSING ANIMALS'], label="INTERPOLATION TYPE:", label_width=35, value='MISSING BODY-PARTS', dropdown_width=35)
+        self.method_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['NEAREST', 'LINEAR', 'QUADRATIC'], label="INTERPOLATION METHOD:", label_width=35, value='NEAREST', dropdown_width=35)
+        self.save_originals_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="SAVE ORIGINALS:", label_width=35, value='TRUE', dropdown_width=35)
 
         self.settings_frm.grid(row=0, column=0, sticky=NW)
         self.type_dropdown.grid(row=0, column=0, sticky=NW)
@@ -84,4 +82,4 @@ class InterpolatePopUp(PopUpMixin, ConfigReader):
         interpolator.run()
 
 
-#InterpolatePopUp(config_path=r"C:\troubleshooting\my_project_tutorial\project_folder\project_config.ini")
+#InterpolatePopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")

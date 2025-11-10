@@ -8,14 +8,11 @@ import pandas as pd
 from simba.data_processors.interpolate import Interpolate
 from simba.data_processors.smoothing import Smoothing
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_float, check_if_dir_exists,
-                                check_if_keys_exist_in_dict, check_int,
-                                check_str, check_valid_boolean,
-                                check_valid_dataframe, check_valid_tuple)
+from simba.utils.checks import (check_float, check_if_dir_exists, check_if_keys_exist_in_dict, check_int, check_str, check_valid_boolean, check_valid_dataframe, check_valid_tuple)
 from simba.utils.errors import PermissionError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    write_df)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, write_df)
+from simba.utils.enums import ConfigKey
 
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
@@ -107,6 +104,7 @@ class SimBAYoloImporter(ConfigReader):
                 bp_names = [f"{cls}_{bp}" for cls in class_names for bp in bp_names]
                 with open(self.body_parts_path, "w") as f:
                     f.writelines(f"{bp}\n" for bp in bp_names)
+                self.config.set(section=ConfigKey.MULTI_ANIMAL_ID_SETTING.value, option=ConfigKey.MULTI_ANIMAL_IDS.value, value=','.join(class_names))
             pivoted = yolo_df.pivot(index=FRAME, columns=CLASS_NAME)
             pivoted.columns = [f"{cls}_{col}" for col, cls in pivoted.columns]
             out_df = pivoted.reset_index(drop=True)

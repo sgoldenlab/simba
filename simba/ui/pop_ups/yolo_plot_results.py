@@ -22,7 +22,7 @@ from simba.utils.warnings import MissingFileWarning
 
 MAX_TRACKS_OPTIONS = ['None', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 CORE_CNT_OPTIONS = list(range(1, find_core_cnt()[0]))
-THRESHOLD_OPTIONS = np.arange(0.1, 1.1, 0.1).astype(np.float32)
+THRESHOLD_OPTIONS = list(np.arange(0.0, 1.1, 0.1).astype(np.float32))
 SIZE_OPTIONS = list(range(1, 21, 1))
 SIZE_OPTIONS.insert(0, 'AUTO')
 
@@ -42,7 +42,7 @@ class YoloPoseVisualizerPopUp(PopUpMixin):
         self.core_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=CORE_CNT_OPTIONS, label="CPU CORE COUNT:", label_width=35, dropdown_width=40, value=int(max(CORE_CNT_OPTIONS) / 2))
         self.bbox_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="SHOW BOUNDING BOXES:",  label_width=35, dropdown_width=40, value='FALSE')
         self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE:",  label_width=35, dropdown_width=40, value='TRUE')
-        self.threshold_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=THRESHOLD_OPTIONS, label="THRESHOLD:",  label_width=35, dropdown_width=40, value=0.5)
+        self.threshold_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=THRESHOLD_OPTIONS, label="THRESHOLD:",  label_width=35, dropdown_width=40, value=0.0)
         self.thickness_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=SIZE_OPTIONS, label="LINE THICKNESS:",  label_width=35, dropdown_width=40, value='AUTO')
         self.circle_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=SIZE_OPTIONS, label="CIRCLE SIZE:", label_width=35, dropdown_width=40, value='AUTO')
 
@@ -84,8 +84,8 @@ class YoloPoseVisualizerPopUp(PopUpMixin):
         bbox = str_2_bool(self.bbox_dropdown.get_value())
         verbose = str_2_bool(self.verbose_dropdown.get_value())
         threshold = float(self.threshold_dropdown.get_value())
-        thickness = None if self.threshold_dropdown.get_value() == 'AUTO' else float(self.threshold_dropdown.get_value())
-        circle_size = None if self.circle_dropdown.get_value() == 'AUTO' else float(self.circle_dropdown.get_value())
+        thickness = None if self.thickness_dropdown.get_value() == 'AUTO' else int(self.threshold_dropdown.get_value())
+        circle_size = None if self.circle_dropdown.get_value() == 'AUTO' else int(self.circle_dropdown.get_value())
         if not multiple:
             data_path = self.data_path.file_path
             video_path = self.video_path.file_path
@@ -115,7 +115,7 @@ class YoloPoseVisualizerPopUp(PopUpMixin):
             for cnt, (name, data_path) in enumerate(data_paths.items()):
                 if name in video_paths.keys():
                     video_path = video_paths[name]
-                    print(f'Plotting YOLO results for video {name} (video {cnt+1}/{video_cnt})')
+                    print(f'Plotting YOLO results for video {name} (video {cnt+1}/{video_cnt}) ...')
                     plotter = YOLOPoseVisualizer(data_path=data_path, video_path=video_path, save_dir=save_dir, core_cnt=core_cnt, threshold=threshold, thickness=thickness, circle_size=circle_size, verbose=verbose, bbox=bbox)
                     plotter.run()
                 else:
@@ -123,7 +123,7 @@ class YoloPoseVisualizerPopUp(PopUpMixin):
 
 
 
-#YoloPlotSingleVideoPopUp()
+#YoloPoseVisualizerPopUp()
 
 
 

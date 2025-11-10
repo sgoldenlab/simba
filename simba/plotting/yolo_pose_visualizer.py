@@ -16,8 +16,8 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_valid_lst, check_valid_tuple)
 from simba.utils.data import create_color_palette
 from simba.utils.enums import Defaults, Options
-from simba.utils.errors import (CountError, DataHeaderError, FrameRangeError,
-                                InvalidInputError, NoDataError)
+from simba.utils.errors import (CountError, DataHeaderError, FrameRangeError, InvalidInputError, NoDataError)
+from simba.utils.warnings import InvalidValueWarning
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
@@ -106,14 +106,16 @@ class YOLOPoseVisualizer():
     :param Union[str, os.PathLike] data_path: Path to the CSV file containing keypoint data, or folder containing keypoint data (output from YOLO pose inference).
     :param Union[str, os.PathLike] video_path: Path to the original input video, or folder containing original videos, to overlay keypoints on.
     :param Union[str, os.PathLike] save_dir: Directory to save the resulting annotated video.
-    :param Optional[Union[str, Tuple[str, ...]]] palettes: Name of the color palette(s) to use for drawing keypoints. Can be a string or a tuple of strings (e.g., 'Set1', ('Set1', 'Dark2')). Defaults to 'Set1'.
-    :param Optional[int] core_cnt: Number of CPU cores to use for parallel rendering. Defaults to -1 (use all available cores).
-    :param float threshold: Confidence threshold for visualizing keypoints. Only keypoints with confidence >= threshold are drawn. Defaults to 0.0.
-    :param Optional[int] thickness: Thickness of lines connecting keypoints. If None, determined automatically. Defaults to None.
-    :param Optional[int] circle_size: Radius of the circles drawn for keypoints. If None, determined automatically based on frame size. Defaults to None.
-    :param Optional[bool] verbose: If True, enables logging and progress messages. Defaults to False.
-    :param Optional[bool] recursive: If True, recursively searches for data files and video files in the parent directories. If False, then searches main level only.
-    :param Optional[bool] sample_n: If int, then randomly samples ``sample_n`` data files in the input to visualize. If None, then videos are produces for all the data files.
+    :param Optional[Union[str, Tuple[str, ...]]] palettes: Name(s) of categorical color palettes used to draw keypoints per detected class. A single string applies to all classes; a tuple assigns one palette per class. Defaults to ('Set1',).
+    :param Optional[int] core_cnt: Number of CPU cores to use for parallel rendering. Defaults to -1 (all available cores).
+    :param float threshold: Confidence threshold for rendering bounding boxes, keypoints, and skeleton edges. Only entries with confidence >= threshold are drawn.
+    :param Optional[int] thickness: Thickness of bounding boxes and skeleton edges. If None, computed from frame dimensions.
+    :param Optional[int] circle_size: Radius of keypoint circles. If None, computed from frame dimensions.
+    :param Optional[bool] verbose: Set True to enable progress logging.
+    :param Optional[bool] bbox: Set False to disable rendering of bounding boxes around detections.
+    :param Optional[List[Tuple[str, str]]] skeleton: Iterable of keypoint name pairs defining skeleton edges to render when both keypoints exceed ``threshold``.
+    :param Optional[bool] recursive: If True, search data and video directories recursively; otherwise only the top level is scanned.
+    :param Optional[int] sample_n: Randomly sample ``sample_n`` data files to visualize. If None, visualize all detected files.
 
     :example:
     >>> video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
@@ -152,7 +154,6 @@ class YOLOPoseVisualizer():
                 check_int(name=f'{self.__class__.__name__} sample', min_value=1, raise_error=True, value=sample_n)
                 sample_n = min(sample_n, len(list(data_paths)))
                 data_paths = dict(random.sample(list(data_paths.items()), sample_n))
-
 
         elif os.path.isfile(data_path):
             check_file_exist_and_readable(file_path=data_path)
@@ -209,7 +210,11 @@ class YOLOPoseVisualizer():
             self.classes = np.unique(self.data_df[CLASS_NAME].values)
             self.save_path, self.skeleton = os.path.join(self.save_dir, f'{video_name}.mp4'), self.skeleton
             if len(self.classes) != len(self.palettes):
-                raise CountError(msg=f'{len(self.classes)} classes detected in {data_path}, but {len(self.palettes)} color palette names passed: {self.palettes}', source=self.__class__.__name__)
+                #InvalidValueWarning(msg=f'{len(self.classes)} classes detected in {data_path}, but {len(self.palettes)} color palette names passed: {self.palettes}', source=self.__class__.__name__)
+                if len(self.classes) > len(Options.PALETTE_OPTIONS_CATEGORICAL.value):
+                    raise CountError(msg=f'There are more classes ({len(self.classes)}) than available color palettes ({len(Options.PALETTE_OPTIONS_CATEGORICAL.value)})', source=self.__class__.__name__)
+                else:
+                    self.palettes = Options.PALETTE_OPTIONS_CATEGORICAL.value[:len(self.classes)+1]
             self.clrs = {}
             for cnt, palette in enumerate(self.palettes):
                 self.clrs[cnt] = create_color_palette(pallete_name=palette, increments=len(self.data_df.columns) - len(EXPECTED_COLS))
