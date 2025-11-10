@@ -10,7 +10,10 @@ import warnings
 
 import numpy as np
 import pandas as pd
-import torch
+try:
+    import torch
+except:
+    torch = None
 
 warnings.simplefilter(action='ignore', category=FutureWarning)
 
@@ -115,6 +118,7 @@ class YOLOPoseTrackInference():
                  iou: float = 0.5):
 
         _ = get_pkg_version(pkg='ultralytics', raise_error=True)
+        _ = get_pkg_version(pkg='torch', raise_error=True)
         gpu_available, gpus = _is_cuda_available()
         if not gpu_available:
             raise SimBAGPUError(msg='No GPU detected.', source=self.__class__.__name__)
@@ -242,28 +246,28 @@ class YOLOPoseTrackInference():
                 print(f'YOLO results for {len(self.video_path)} videos saved in {self.save_dir} directory', timer.elapsed_time_str)
             return None
 
-
-
-VIDEO_PATH = r"E:\netholabs_videos\two_tracks\videos"
-WEIGHTS_PASS = r"D:\netholabs\yolo_mosaic_data_102315\mdl\train\weights\best.pt"
-SAVE_DIR = r"E:\netholabs_videos\two_tracks\csv_track_025"
-BOTSORT_PATH = r"bytetrack.yml"
-
-KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_mid', 'Tail_end')
-
-i = YOLOPoseTrackInference(weights_path=WEIGHTS_PASS,
-                           video_path=VIDEO_PATH,
-                           save_dir=SAVE_DIR,
-                           verbose=True,
-                           device=0,
-                           format=None,
-                           keypoint_names=KEYPOINT_NAMES,
-                           batch_size=500,
-                           threshold=0.25,
-                           config_path=BOTSORT_PATH,
-                           interpolate=False,
-                           imgsz=640,
-                           max_tracks=3,
-                           stream=True,
-                           iou=0.2)
-i.run()
+#
+#
+# VIDEO_PATH = r"E:\netholabs_videos\two_tracks\videos"
+# WEIGHTS_PASS = r"D:\netholabs\yolo_mosaic_data_102315\mdl\train\weights\best.pt"
+# SAVE_DIR = r"E:\netholabs_videos\two_tracks\csv_track_025"
+# BOTSORT_PATH = r"bytetrack.yml"
+#
+# KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_mid', 'Tail_end')
+#
+# i = YOLOPoseTrackInference(weights_path=WEIGHTS_PASS,
+#                            video_path=VIDEO_PATH,
+#                            save_dir=SAVE_DIR,
+#                            verbose=True,
+#                            device=0,
+#                            format=None,
+#                            keypoint_names=KEYPOINT_NAMES,
+#                            batch_size=500,
+#                            threshold=0.25,
+#                            config_path=BOTSORT_PATH,
+#                            interpolate=False,
+#                            imgsz=640,
+#                            max_tracks=3,
+#                            stream=True,
+#                            iou=0.2)
+# i.run()
