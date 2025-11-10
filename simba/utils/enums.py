@@ -117,7 +117,7 @@ class Paths(Enum):
     CRITICAL_VALUES = Path("simba/assets/lookups/critical_values_05.pickle")
     BLOB_EXECUTOR_PATH = Path("video_processors/blob_tracking_executor.py")
     YOLO_SCHEMATICS_DIR = Path("assets/yolo_schematics/")
-
+    TOOLTIPS = Path("assets/lookups/tooptips.json")
     KALEIDO_PATH = os.path.join(os.path.dirname(simba.__file__), 'kaleido', 'executable', 'bin', 'kaleido.exe')
 
 class OS(Enum):
@@ -355,6 +355,7 @@ class Options(Enum):
         "CSV (SimBA BLOB)",
         "H5 (FaceMap)",
         "H5 (SuperAnimal-TopView)",
+        'CSV (SimBA YOLO)',
     ]
     SMOOTHING_OPTIONS = ["Gaussian", "Savitzky Golay"]
     MULTI_DLC_TYPE_IMPORT_OPTION = ["skeleton", "box", "ellipse"]

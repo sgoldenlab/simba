@@ -21,11 +21,11 @@ import PIL.Image
 from PIL import ImageTk
 
 from simba.utils.enums import Defaults, Formats
-from simba.utils.lookups import get_icons_paths
+from simba.utils.lookups import get_icons_paths, get_tooltips
 from simba.utils.read_write import get_fn_ext
 
 MENU_ICONS = get_icons_paths()
-
+TOOLTIPS = get_tooltips()
 
 def onMousewheel(event, canvas):
     try:
@@ -211,6 +211,7 @@ class FolderSelect(Frame):
                  entry_width: Optional[int] = 20,
                  initialdir: Optional[Union[str, os.PathLike]] = None,
                  tooltip_txt: Optional[str] = None,
+                 tooltip_key: Optional[str] = None,
                  **kw):
 
         self.title, self.initialdir = title, initialdir
@@ -229,9 +230,10 @@ class FolderSelect(Frame):
         self.btnFind.image = browse_icon
         self.btnFind.grid(row=0, column=2, sticky=NW)
         self.folderPath.set("No folder selected")
-
         if tooltip_txt is not None and isinstance(tooltip_txt, str):
-            CreateToolTip(widget=self.entPath, text=tooltip_txt)
+            CreateToolTip(widget=self.lblName, text=tooltip_txt)
+        elif tooltip_key in TOOLTIPS.keys():
+            CreateToolTip(widget=self.lblName, text=TOOLTIPS[tooltip_key])
 
     def setFolderPath(self):
         if self.initialdir is not None:
@@ -544,7 +546,8 @@ class SimBADropDown(Frame):
                 command: Callable = None,
                 value: Optional[Any] = None,
                 state: Optional[str] = None,
-                tooltip_txt: Optional[str] = None):
+                tooltip_txt: Optional[str] = None,
+                tooltip_key: Optional[str] = None):
 
         super().__init__(master=parent)
         self.dropdown_var = StringVar()
@@ -567,7 +570,8 @@ class SimBADropDown(Frame):
             self.disable()
         if isinstance(tooltip_txt, str):
             CreateToolTip(widget=self.dropdown_lbl, text=tooltip_txt)
-
+        elif tooltip_key in TOOLTIPS.keys():
+            CreateToolTip(widget=self.dropdown_lbl, text=TOOLTIPS[tooltip_key])
     def set_value(self, value: Any):
         self.dropdown_var.set(value)
 
@@ -652,7 +656,10 @@ class FileSelect(Frame):
                  status: Optional[str] = None,
                  font: Tuple = Formats.FONT_REGULAR.value,
                  initialdir: Optional[Union[str, os.PathLike]] = None,
-                 initial_path: Optional[Union[str, os.PathLike]] = None, **kw):
+                 initial_path: Optional[Union[str, os.PathLike]] = None,
+                 tooltip_txt: Optional[str] = None,
+                 tooltip_key: Optional[str] = None,
+                 **kw):
 
         self.title, self.dropdown, self.initialdir = title, dropdown, initialdir
         self.file_type = file_types
@@ -673,7 +680,10 @@ class FileSelect(Frame):
             self.filePath.set(initial_path)
         if status is not None:
             self.set_state(setstatus=status)
-
+        if tooltip_txt is not None and isinstance(tooltip_txt, str):
+            CreateToolTip(widget=self.lblName, text=tooltip_txt)
+        elif tooltip_key in TOOLTIPS.keys():
+            CreateToolTip(widget=self.lblName, text=TOOLTIPS[tooltip_key])
 
     def setFilePath(self):
         if self.initialdir is not None:

@@ -251,16 +251,16 @@ class HeatMapperLocationMultiprocess(ConfigReader, PlottingMixin):
 #                                       core_cnt=5,
 #                                       files_found=['/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/outlier_corrected_movement_location/Together_1.csv'])
 # test.run()
-
-# test = HeatMapperLocationMultiprocess(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini',
-#                                       style_attr = {'palette': 'magma', 'shading': 'gouraud', 'bin_size': 100, 'max_scale': 'auto'},
-#                                       final_img_setting=True,
-#                                       video_setting=True,
-#                                       frame_setting=False,
-#                                       bodypart='Nose',
-#                                       core_cnt=5,
-#                                       data_paths=['/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/csv/machine_results/2022-06-20_NOB_DOT_4.csv'])
-# test.run()
+# if __name__ == "__main__":
+#     test = HeatMapperLocationMultiprocess(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/project_config.ini',
+#                                           style_attr = {'palette': 'magma', 'shading': 'gouraud', 'bin_size': 100, 'max_scale': 'auto'},
+#                                           final_img_setting=True,
+#                                           video_setting=True,
+#                                           frame_setting=False,
+#                                           bodypart='Nose',
+#                                           core_cnt=5,
+#                                           data_paths=['/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/csv/machine_results/2022-06-20_NOB_DOT_4.csv'])
+#     test.run()
 
 # img = np.zeros((img_size[0], img_size[1], 3)).astype(np.uint8)
 # for i in polygons:

@@ -37,7 +37,7 @@ from simba.utils.enums import (OS, UML, Defaults, FontPaths, Formats, Keys,
 from simba.utils.errors import (FFMPEGNotFoundError, InvalidInputError,
                                 NoFilesFoundError)
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext, get_video_meta_data)
+                                    get_fn_ext, get_video_meta_data, read_json)
 from simba.utils.warnings import NoDataFoundWarning
 
 if platform.system() == OS.WINDOWS.value:
@@ -1082,6 +1082,13 @@ def create_directionality_cords(bp_dict: dict,
                     raise InvalidInputError(msg=f'Could not detect a body-part for animal {animal_name}, body-part {bp_name} and coordinate {cord_key} in SimBA project. MAke sure the body-part configuration file at {Paths.BP_NAMES.value} lists the appropriate body-parts. Passed values: {left_ear_name, nose_name, right_ear_name}', source=create_directionality_cords.__name__)
     return results
 
+def get_tooltips() -> Dict[str, str]:
+    simba_dir = os.path.dirname(simba.__file__)
+    tool_tips_path = os.path.join(simba_dir, Paths.TOOLTIPS.value)
+    if not os.path.isfile(tool_tips_path):
+        return {}
+    else:
+        return read_json(x=tool_tips_path, raise_error=False)
 
 
 

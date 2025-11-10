@@ -1,14 +1,15 @@
 import argparse
 import os
 import sys
-from typing import Optional, Union
-
+from typing import Optional, Union, Dict
 import pandas as pd
 
+from simba.data_processors.interpolate import Interpolate
+from simba.data_processors.smoothing import Smoothing
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import (check_float, check_if_dir_exists,
                                 check_valid_boolean, check_valid_dataframe,
-                                check_valid_tuple)
+                                check_valid_tuple, check_if_keys_exist_in_dict, check_str, check_int)
 from simba.utils.errors import PermissionError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
@@ -20,24 +21,32 @@ CLASS_ID, CONFIDENCE, CLASS_NAME  = 'CLASS_ID', 'CONFIDENCE', 'CLASS_NAME'
 FRAME = 'FRAME'
 
 class SimBAYoloImporter(ConfigReader):
-
     """
-    Import YOLO pose estimation results into SimBA project format.
-
+    Import YOLO pose estimation results into SimBA project format with optional interpolation and smoothing.
 
     .. seealso::
-       YOLO pose data can be created with :func:`simba.model.yolo_pose_inference.YOLOPoseInference`.
+       YOLO pose data can be created with :func:`simba.model.yolo_pose_inference.YOLOPoseInference` or :func:`simba.model.yolo_pose_track_inference.YOLOPoseTrackInference`.
 
-    :param config_path: Path to SimBA project config file.
-    :param data_dir: Directory containing YOLO results CSV files.
-    :param verbose: If True, prints progress information.
-    :param px_per_mm: Pixels per millimeter for the video. If provided, updates project video info.
-    :param resolution: Video resolution as tuple (width, height). Defaults to (927, 927).
-    :param fps: Video frames per second. Defaults to 927.
+    :param Union[str, os.PathLike] config_path: Path to SimBA project config file.
+    :param Union[str, os.PathLike] data_dir: Directory containing YOLO results CSV files.
+    :param bool verbose: If True, prints progress information. Default: False.
+    :param Optional[float] px_per_mm: Pixels per millimeter for the videos. If provided, updates project video info.
+    :param Optional[tuple] resolution: Video resolution as (width, height). Default: (927, 927).
+    :param Optional[float] fps: Video frames per second. Default: 927.
+    :param Optional[bool] add_to_video_info: If True, adds video metadata to project video_info.csv. Default: True.
+    :param Optional[Dict[str, str]] interpolation_settings: Dictionary with 'method' ('linear', 'quadratic', 'nearest') and 'type' ('body-parts', 'animals'). If None, no interpolation applied.
+    :param Optional[Dict[str, str]] smoothing_settings: Dictionary with 'method' ('savitzky-golay', 'gaussian') and 'time_window' (int, milliseconds). If None, no smoothing applied.
 
     :example:
-    >>> importer = SimBAYoloImporter(data_dir=r'E:\maplight_videos\yolo_mdl\mdl\results', config_path=r"E:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini", verbose=True, px_per_mm=1.43, fps=30)
-    >>> importer.run()
+        >>> importer = SimBAYoloImporter(data_dir='yolo_results/', config_path='project_config.ini', verbose=True, px_per_mm=1.43, fps=30)
+        >>> importer.run()
+
+    :example:
+        >>> # With interpolation and smoothing
+        >>> interpolation = {'method': 'linear', 'type': 'body-parts'}
+        >>> smoothing = {'method': 'savitzky-golay', 'time_window': 200}
+        >>> importer = SimBAYoloImporter(data_dir='yolo_results/', config_path='project_config.ini', interpolation_settings=interpolation, smoothing_settings=smoothing)
+        >>> importer.run()
     """
 
     def __init__(self,
@@ -46,7 +55,10 @@ class SimBAYoloImporter(ConfigReader):
                  verbose: bool = False,
                  px_per_mm: Optional[float] = None,
                  resolution: Optional[tuple] = None, #WxH
-                 fps: Optional[Union[float]] = None):
+                 fps: Optional[Union[float]] = None,
+                 add_to_video_info: Optional[bool] = True,
+                 interpolation_settings: Optional[Dict[str, str]] = None,
+                 smoothing_settings: Optional[Dict[str, str]] = None):
 
         if px_per_mm is not None:
             check_float(name=f'{self.__class__.__name__} px_per_mm', value=px_per_mm, allow_negative=False, allow_zero=False)
@@ -59,12 +71,27 @@ class SimBAYoloImporter(ConfigReader):
         else:
             fps = 927
         check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose', raise_error=True)
+        check_valid_boolean(value=add_to_video_info, source=f'{self.__class__.__name__} verbose', raise_error=True)
+        if interpolation_settings is not None:
+            check_if_keys_exist_in_dict(data=interpolation_settings, key=['method', 'type'], name=f'{self.__class__.__name__} interpolation_settings')
+            check_str(name=f'{self.__class__.__name__} interpolation_settings type', value=interpolation_settings['type'], options=('body-parts', 'animals'))
+            check_str(name=f'{self.__class__.__name__} interpolation_settings method', value=interpolation_settings['method'], options=('linear', 'quadratic', 'nearest'))
+            self.interpolation_type, self.interpolation_method = interpolation_settings['type'], interpolation_settings['method']
+        else:
+            self.interpolation_type, self.interpolation_method = None, None
+        if smoothing_settings is not None:
+            check_if_keys_exist_in_dict(data=smoothing_settings, key=['method', 'time_window'], name=f'{self.__class__.__name__} smoothing_settings')
+            check_str(name=f'{self.__class__.__name__} smoothing_settings method', value=smoothing_settings['method'], options=('savitzky-golay', 'gaussian'))
+            check_int(name=f'{self.__class__.__name__} smoothing_settings time_window', value=smoothing_settings['time_window'], min_value=1)
+            self.smoothing_time, self.smoothing_method = smoothing_settings['time_window'], smoothing_settings['method']
+        else:
+            self.smoothing_time, self.smoothing_method = None, None
         read_video_info = True if px_per_mm is not None else False
         check_if_dir_exists(in_dir=data_dir, source=f'{self.__class__.__name__} data_dir')
         ConfigReader.__init__(self, config_path=config_path, read_video_info=read_video_info, create_logger=False)
         self.data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions='.csv', as_dict=True, raise_error=True)
-        self.verbose, self.px_per_mm, self.resolution, self.fps = verbose, px_per_mm, resolution, fps
-
+        self.verbose, self.px_per_mm, self.resolution, self.fps, self.add_to_video_info = verbose, px_per_mm, resolution, fps, add_to_video_info
+        self.interpolation_settings, self.smoothing_settings = interpolation_settings, smoothing_settings
     def run(self):
         for video_counter, (video_name, data_path) in enumerate(self.data_paths.items()):
             video_timer = SimbaTimer(start=True)
@@ -87,8 +114,15 @@ class SimBAYoloImporter(ConfigReader):
                 col_order.extend((class_cols))
             out_df = out_df[col_order].reset_index(drop=True)
             out_df.columns = [s[:-1] + s[-1].lower() if s else s for s in list(out_df.columns)]
-            write_df(df=out_df, file_type='csv', save_path=os.path.join(self.outlier_corrected_dir, f'{video_name}.csv'))
-            if hasattr(self, 'video_info_df'):
+            data_save_path = os.path.join(self.outlier_corrected_dir, f'{video_name}.csv')
+            write_df(df=out_df, file_type='csv', save_path=data_save_path)
+            if self.interpolation_settings is not None:
+                interpolator = Interpolate(config_path=self.config_path, data_path=data_save_path, type=self.interpolation_type, method=self.interpolation_method, multi_index_df_headers=False, copy_originals=False)
+                interpolator.run()
+            if self.smoothing_settings is not None:
+                smoother = Smoothing(config_path=self.config_path, data_path=data_save_path, time_window=self.smoothing_time, method=self.smoothing_method, multi_index_df_headers=False, copy_originals=False)
+                smoother.run()
+            if hasattr(self, 'video_info_df') and self.add_to_video_info:
                 self.video_info_df = self.video_info_df[self.video_info_df['Video'] != video_name].reset_index(drop=True)
                 self.video_info_df.loc[len(self.video_info_df)] = [video_name, self.fps, self.resolution[1], self.resolution[1], 927.927, self.px_per_mm]
             video_timer.stop_timer()
@@ -122,6 +156,6 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 
 
 
-
-importer = SimBAYoloImporter(data_dir=r'E:\maplight_videos\yolo_mdl\mdl\results', config_path=r"E:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini", verbose=True, px_per_mm=1.43, fps=30)
-importer.run()
+#
+# importer = SimBAYoloImporter(data_dir=r'E:\maplight_videos\yolo_mdl\mdl\results', config_path=r"E:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini", verbose=True, px_per_mm=1.43, fps=30)
+# importer.run()

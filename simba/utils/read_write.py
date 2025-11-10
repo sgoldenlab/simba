@@ -2975,7 +2975,7 @@ def get_memory_usage_array(x: np.ndarray) -> Dict[str, float]:
     results["gigabytes"] = int(mb / 1000)
     return results
 
-def read_json(x: Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]], encoding: str = 'utf-8') -> dict:
+def read_json(x: Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]], encoding: str = 'utf-8', raise_error: bool = True) -> dict:
     """
     Reads one or multiple JSON files from disk and returns their contents as a dictionary.
 
@@ -2995,12 +2995,18 @@ def read_json(x: Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]], 
                 data_name = get_fn_ext(filepath=file_path)[1]
                 results[data_name] = json.load(x)
         else:
-            raise InvalidInputError(msg='x is not a valid iterable of paths or a valid path', source=read_json.__name__)
+            if raise_error:
+                raise InvalidInputError(msg='x is not a valid iterable of paths or a valid path', source=read_json.__name__)
+            else:
+                return {}
 
         return  results
 
     except Exception as e:
-        raise InvalidFileTypeError(f"Unexpected error reading json: {e}", source=read_json.__name__)
+        if raise_error:
+            raise InvalidFileTypeError(f"Unexpected error reading json: {e}", source=read_json.__name__)
+        else:
+            return {}
 
 
 
@@ -3120,12 +3126,13 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
                               verbose: bool = False) -> Dict[int, np.ndarray]:
     """
     Read a batch of frames from a video file. This method reads frames from a specified range of frames within a video file using multiprocessing.
+
     .. seealso::
        For GPU acceleration, see :func:`simba.utils.read_write.read_img_batch_from_video_gpu`
 
     .. note::
-      When black-and-white videos are saved as MP4, there can be some small errors in pixel values during compression. A video with only (0, 255) pixel values therefore gets other pixel values, around 0 and 255, when read in again.
-      If you expect that the video you are reading in is black and white, set ``black_and_white`` to True to round any of these wonly value sto 0 and 255.
+       When black-and-white videos are saved as MP4, there can be some small errors in pixel values during compression. A video with only (0, 255) pixel values therefore gets other pixel values, around 0 and 255, when read in again.
+       If you expect that the video you are reading in is black and white, set ``black_and_white`` to True to round any of these wonly value sto 0 and 255.
 
     :param Union[str, os.PathLike] video_path: Path to the video file.
     :param int start_frm: Starting frame index.
@@ -3174,10 +3181,21 @@ def read_img_batch_from_video(video_path: Union[str, os.PathLike],
             results.update(result)
     pool.join()
     pool.terminate()
-
     return results
 
-
+def read_yolo_bp_names_file(file_path: Union[str, os.PathLike]) -> List[str]:
+    """
+    Helper to read CSV with single column listing body-part names. 
+    """
+    check_file_exist_and_readable(file_path=file_path, raise_error=True)
+    data = (
+        pd.read_csv(filepath_or_buffer=file_path, header=None)[0]
+        .astype(str)
+        .str.strip()
+        .tolist()
+    )
+    check_valid_lst(data=data, source=f'{read_yolo_bp_names_file.__name__} data', valid_dtypes=(str,), min_len=2)
+    return data
 
 def read_df_array(df: pd.DataFrame, column: str):
     """

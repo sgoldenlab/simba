@@ -22,6 +22,7 @@ from simba.pose_importers.simba_blob_importer import SimBABlobImporter
 from simba.pose_importers.sleap_csv_importer import SLEAPImporterCSV
 from simba.pose_importers.sleap_h5_importer import SLEAPImporterH5
 from simba.pose_importers.sleap_slp_importer import SLEAPImporterSLP
+from simba.pose_importers.simba_yolo_importer import SimBAYoloImporter
 from simba.pose_importers.superanimal_import import SuperAnimalTopViewImporter
 from simba.pose_importers.trk_importer import TRKImporter
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
@@ -37,13 +38,12 @@ SAVITZKY_GOLAY = 'Savitzky Golay'
 INTERPOLATION_MAP = {'Animal(s)': 'animals', 'Body-parts': 'body-parts'}
 SMOOTHING_MAP = {'Savitzky Golay': 'savitzky-golay', 'Gaussian': 'gaussian'}
 
-FRAME_DIR_IMPORT_TITLES = {'CSV (DLC/DeepPoseKit)': 'IMPORT DLC CSV DIRECTORY',  'MAT (DANNCE 3D)': 'IMPORT DANNCE MAT DIRECTORY', 'JSON (BENTO)': 'IMPORT MARS JSON DIRECTORY', 'CSV (SimBA BLOB)': 'IMPORT SIMBA BLOB CSV DIRECTORY', 'H5 (FaceMap)': 'IMPORT FaceMap H5 DIRECTORY'}
-FRAME_FILE_IMPORT_TITLES = {'CSV (DLC/DeepPoseKit)': 'IMPORT DLC CSV FILE',  'MAT (DANNCE 3D)': 'IMPORT DANNCE MAT FILE', 'JSON (BENTO)': 'IMPORT MARS JSON FILE', 'CSV (SimBA BLOB)': 'IMPORT SIMBA BLOB CSV FILE', 'H5 (FaceMap)': 'IMPORT FaceMap H5 FILE'}
-FILE_TYPES = {'CSV (DLC/DeepPoseKit)': '*.csv', 'MAT (DANNCE 3D)': '*.mat', 'JSON (BENTO)': '*.json', 'CSV (SimBA BLOB)': '*.csv', 'H5 (FaceMap)': '*.h5'}
+FRAME_DIR_IMPORT_TITLES = {'CSV (DLC/DeepPoseKit)': 'IMPORT DLC CSV DIRECTORY',  'MAT (DANNCE 3D)': 'IMPORT DANNCE MAT DIRECTORY', 'JSON (BENTO)': 'IMPORT MARS JSON DIRECTORY', 'CSV (SimBA BLOB)': 'IMPORT SIMBA BLOB CSV DIRECTORY', 'H5 (FaceMap)': 'IMPORT FaceMap H5 DIRECTORY', 'CSV (SimBA YOLO)': 'IMPORT YOLO CSV DIRECTORY'}
+FRAME_FILE_IMPORT_TITLES = {'CSV (DLC/DeepPoseKit)': 'IMPORT DLC CSV FILE',  'MAT (DANNCE 3D)': 'IMPORT DANNCE MAT FILE', 'JSON (BENTO)': 'IMPORT MARS JSON FILE', 'CSV (SimBA BLOB)': 'IMPORT SIMBA BLOB CSV FILE', 'H5 (FaceMap)': 'IMPORT FaceMap H5 FILE', 'CSV (SimBA YOLO)': 'IMPORT YOLO CSV FILE'}
+FILE_TYPES = {'CSV (DLC/DeepPoseKit)': '*.csv', 'MAT (DANNCE 3D)': '*.mat', 'JSON (BENTO)': '*.json', 'CSV (SimBA BLOB)': '*.csv', 'H5 (FaceMap)': '*.h5', 'CSV (SimBA YOLO)': '*.csv'}
 
 
 class ImportPoseFrame(ConfigReader, PopUpMixin):
-
     """
     .. image:: _static/img/ImportPoseFrame.webp
        :width: 500
@@ -140,6 +140,18 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
 
             blob_importer = SimBABlobImporter(config_path=self.config_path, data_path=data_path, interpolation_settings=interpolation_settings, smoothing_settings=smoothing_settings, verbose=True)
             blob_importer.run()
+
+    def __import_yolo_data(self,
+                           interpolation_settings: str,
+                           smoothing_time: Union[str, int],
+                           data_path: Union[str, os.PathLike],
+                           smoothing_setting: Literal['Gaussian', 'None', 'Savitzky Golay']):
+
+        if not os.path.isfile(data_path) and not os.path.isdir(data_path):
+            raise InvalidInputError(msg=f'{data_path} is NOT a valid path', source=self.__class__.__name__)
+        smoothing_settings, interpolation_settings = self.__get_smooth_interpolation_settings(interpolation_settings, smoothing_setting, smoothing_time)
+        importer = SimBAYoloImporter(config_path=self.config_path, data_dir=data_path, verbose=True, add_to_video_info=False, smoothing_settings=smoothing_settings, interpolation_settings=interpolation_settings)
+        importer.run()
 
     def __import_facemap_data(self,
                               interpolation_settings: str,
@@ -244,7 +256,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
             self.animal_name_entry_boxes[i + 1].grid(row=i, column=0, sticky=NW)
         self.animal_names_frm.grid(row=1, column=0, sticky=NW)
 
-    def create_import_menu(self, data_type_choice: Literal["CSV (DLC/DeepPoseKit)", "JSON (BENTO)", "H5 (multi-animal DLC)", "SLP (SLEAP)", "CSV (SLEAP)", "H5 (SLEAP)", "TRK (multi-animal APT)", "MAT (DANNCE 3D)", "CSV (SimBA BLOB)"]):
+    def create_import_menu(self, data_type_choice: Literal["CSV (DLC/DeepPoseKit)", "JSON (BENTO)", "H5 (multi-animal DLC)", "SLP (SLEAP)", "CSV (SLEAP)", "H5 (SLEAP)", "TRK (multi-animal APT)", "MAT (DANNCE 3D)", "CSV (SimBA BLOB)", "CSV (SimBA YOLO)"]):
         if hasattr(self, "choice_frm"):
             self.choice_frm.destroy()
 
@@ -263,7 +275,7 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
         self.smoothing_frm.grid(row=1, column=0, sticky=NW)
         self.smoothing_dropdown.grid(row=0, column=0, sticky=NW)
 
-        if data_type_choice in ["CSV (DLC/DeepPoseKit)", "MAT (DANNCE 3D)", "JSON (BENTO)", "CSV (SimBA BLOB)", 'H5 (FaceMap)']: # DATA TYPES WHERE NO TRACKS HAVE TO BE SPECIFIED
+        if data_type_choice in ["CSV (DLC/DeepPoseKit)", "MAT (DANNCE 3D)", "JSON (BENTO)", "CSV (SimBA BLOB)", 'H5 (FaceMap)', 'CSV (SimBA YOLO)']: # DATA TYPES WHERE NO TRACKS HAVE TO BE SPECIFIED
             self.import_directory_frm = LabelFrame(self.choice_frm, text=FRAME_DIR_IMPORT_TITLES[data_type_choice], pady=5, padx=5, font=Formats.FONT_HEADER.value,)
             self.import_directory_select = FolderSelect(self.import_directory_frm, "Input data DIRECTORY:", lblwidth=25, initialdir=self.project_path)
             self.import_single_frm = LabelFrame(self.choice_frm, text=FRAME_FILE_IMPORT_TITLES[data_type_choice], pady=5, padx=5, font=Formats.FONT_HEADER.value,)
@@ -293,6 +305,10 @@ class ImportPoseFrame(ConfigReader, PopUpMixin):
             elif data_type_choice == "CSV (SimBA BLOB)":
                 self.import_dir_btn = Button(self.import_directory_frm, fg="blue", font=Formats.FONT_REGULAR.value, text="Import SimBA BLOB CSV DIRECTORY to SimBA project", command=lambda: self.__import_simba_blob_data(interpolation_settings=self.interpolation_dropdown.getChoices(), smoothing_time=self.smoothing_time_eb.entry_get, data_path=self.import_directory_select.folder_path, smoothing_setting=self.smoothing_dropdown.getChoices()))
                 self.import_file_btn = Button(self.import_single_frm, fg="blue", font=Formats.FONT_REGULAR.value, text="Import SimBA BLOB CSV FILE to SimBA project", command=lambda: self.__import_simba_blob_data(interpolation_settings=self.interpolation_dropdown.getChoices(), smoothing_time=self.smoothing_time_eb.entry_get, data_path=self.import_file_select.file_path, smoothing_setting=self.smoothing_dropdown.getChoices()))
+
+            elif data_type_choice == 'CSV (SimBA YOLO)':
+                self.import_dir_btn = Button(self.import_directory_frm, fg="blue", font=Formats.FONT_REGULAR.value, text="Import YOLO CSV DIRECTORY to SimBA project", command=lambda: self.__import_simba_blob_data(interpolation_settings=self.interpolation_dropdown.getChoices(), smoothing_time=self.smoothing_time_eb.entry_get, data_path=self.import_directory_select.folder_path, smoothing_setting=self.smoothing_dropdown.getChoices()))
+                self.import_file_btn = Button(self.import_single_frm, fg="blue", font=Formats.FONT_REGULAR.value, text="Import YOLO CSV FILE to SimBA project", command=lambda: self.__import_simba_blob_data(interpolation_settings=self.interpolation_dropdown.getChoices(), smoothing_time=self.smoothing_time_eb.entry_get, data_path=self.import_file_select.file_path, smoothing_setting=self.smoothing_dropdown.getChoices()))
 
             else:
                 self.import_dir_btn = Button(self.import_directory_frm, fg="blue", font=Formats.FONT_REGULAR.value, text="Import SimBA FaceMap H5 DIRECTORY to SimBA project", command=lambda: self.__import_facemap_data(interpolation_settings=self.interpolation_dropdown.getChoices(), smoothing_time=self.smoothing_time_eb.entry_get, data_path=self.import_directory_select.folder_path, smoothing_setting=self.smoothing_dropdown.getChoices()))

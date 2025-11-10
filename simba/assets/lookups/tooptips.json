@@ -1,0 +1,18 @@
+{
+  "weights_path": "Absolute path to the YOLO pose model (.pt, .onnx, etc.) you want to run. Choose the file exported from training.",
+  "save_dir": "Folder where SimBA will write the tracked pose CSV files. Leave blank to keep results in memory only.",
+  "bp_config_csv_path": "CSV listing body-part names in the order expected by the model. Each name on its own line (e.g., Nose, LeftEar, ...).",
+  "batch_dropdown": "Number of frames processed at once. Larger batches speed up inference but require more GPU RAM.",
+  "verbose_dropdown": "Toggle console printouts for progress and timings. Keep TRUE while tuning, FALSE for quiet runs.",
+  "workers_dropdown": "How many CPU worker threads to use for pre/post-processing. Set <= available cores.",
+  "format_dropdown": "Model serialization format (None = auto-detect from file extension). Match the format used when exporting the weights.",
+  "img_size_dropdown": "Resize shorter image side to this many pixels before inference. Larger sizes improve accuracy but slow down processing.",
+  "devices_dropdown": "Compute device to run on. Select CUDA device ID for GPU or CPU.",
+  "interpolate_dropdown": "Fill missing detections by interpolating coordinates over time. Recommended for cleaner trajectories.",
+  "stream_dropdown": "Enable streaming inference which reads frames sequentially (lower memory footprint). Disable for random seeking.",
+  "threshold_dropdown": "Minimum detection confidence to keep. Lower values detect more poses but introduce more false positives.",
+  "iou_dropdown": "Minimum bounding-box overlap required to keep the same track between frames. Higher values demand tighter alignment.",
+  "max_tracks_dropdown": "Maximum number of simultaneous object tracks the model can follow in each frame.",
+  "max_track_per_id_dropdown": "Cap on how many concurrent tracks a single class ID (e.g., a specific animal) can occupy.",
+  "smoothing_dropdown": "Apply temporal smoothing over this many milliseconds to reduce jitter in keypoint trajectories."
+}
