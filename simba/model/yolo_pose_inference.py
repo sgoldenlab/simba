@@ -14,9 +14,9 @@ except ModuleNotFoundError:
     YOLO = None
     torch = None
 
-from copy import deepcopy
 import random
 import warnings
+from copy import deepcopy
 from typing import List, Optional, Tuple, Union
 
 import numpy as np
@@ -33,13 +33,13 @@ from simba.utils.enums import Options
 from simba.utils.errors import (CountError, InvalidFilepathError,
                                 InvalidFileTypeError, SimBAGPUError,
                                 SimBAPAckageVersionError)
+from simba.utils.lookups import get_current_time
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_video_meta_data, recursive_file_search)
 from simba.utils.warnings import FileExistWarning, NoDataFoundWarning
 from simba.utils.yolo import (_get_undetected_obs, filter_yolo_keypoint_data,
                               load_yolo_model, yolo_predict)
-from simba.utils.lookups import get_current_time
 
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']

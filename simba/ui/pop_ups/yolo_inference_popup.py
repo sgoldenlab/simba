@@ -19,7 +19,8 @@ from simba.utils.errors import SimBAGPUError, SimBAPAckageVersionError
 from simba.utils.read_write import (find_core_cnt,
                                     find_files_of_filetypes_in_directory,
                                     get_pkg_version, get_video_meta_data,
-                                    read_yolo_bp_names_file, str_2_bool, recursive_file_search)
+                                    read_yolo_bp_names_file,
+                                    recursive_file_search, str_2_bool)
 
 MAX_TRACKS_OPTIONS = ['None', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 BATCH_SIZE_OPTIONS =  list(range(50, 1050, 50))
