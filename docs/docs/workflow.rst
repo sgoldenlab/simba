@@ -1,4 +1,4 @@
-SimBA Presentations Workflow Documents
+SimBA Presentations, Workflow, Documents
 ==========================================
 
 .. contents::
