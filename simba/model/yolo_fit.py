@@ -28,37 +28,45 @@ from simba.utils.yolo import load_yolo_model
 class FitYolo():
 
     """
-    Trains a YOLO model using specified weights and a configuration YAML file.
+    Fit an Ultralytics YOLO model (detection, pose, or segmentation) from SimBA projects with parameter validation.
 
     .. note::
-       -  Can fit whatever model (bbox, kpts, segmentation).
-       - `Download initial weights <https://huggingface.co/Ultralytics>`__.
-       - `Example model_yaml bounding-boxes <https://github.com/sgoldenlab/simba/blob/master/misc/ex_yolo_model.yaml>`__.
-       - `Example model_yaml keypoints <https://github.com/sgoldenlab/simba/blob/master/misc/ex_yolo_model_keypoints.yaml>`__.
+       - Works with any Ultralytics model flavour (bbox, pose, segmentation).
+       - Download starter weights from `HuggingFace <https://huggingface.co/Ultralytics>`__.
+       - Example dataset YAMLs: `bbox <https://github.com/sgoldenlab/simba/blob/master/misc/ex_yolo_model.yaml>`__, `pose <https://github.com/sgoldenlab/simba/blob/master/misc/ex_yolo_model_keypoints.yaml>`__.
 
     .. seealso::
-       :func:`simba.bounding_box_tools.yolo.utils.fit_yolo`
-       :func:`simba.bounding_box_tools.yolo.utils.load_yolo_model`
+       :func:`simba.bounding_box_tools.yolo.utils.fit_yolo` for the functional API.
+       :func:`simba.bounding_box_tools.yolo.utils.load_yolo_model` to load trained weights.
 
-    :param weights_path: Path to the pre-trained YOLO model weights (e.g., 'yolov8.pt').
-    :param model_yaml: Path to the dataset configuration YAML file containing train/val/test paths and class labels.
-    :param save_path: Directory where the trained model, logs, and results will be saved.
-    :param epochs: Number of training epochs. Must be ≥ 1. Default is 25.
-    :param batch: Batch size used for training. Default is 16.
-    :param plots: Whether to generate training plots (e.g., loss curves). Default is True.
-    :param imgsz: Image size (height/width in pixels) used for training. Must be ≥ 1. Default is 640.
-    :param format: Format of the YOLO model weights (e.g., 'pt', 'onnx'). Must be one of the supported formats or None.
-    :param device: Device to train on. Can be 'cpu' or a GPU index (e.g., 0). Default is 0.
-    :param verbose: If True, prints detailed logs during training. Default is True.
-    :param workers: Number of worker threads for data loading. Use -1 to use all available cores. Default is 8.
-    :return: None. Trained model and logs are saved to the specified save_path.
-
-    :references:
-       .. [1] Augustine, Farhan, Shawn M. Doss, Ryan M. Lee, and Harvey S. Singer. “YOLOv11-Based Quantification and Temporal Analysis of Repetitive Behaviors in Deer Mice.” Neuroscience 577 (June 2025): 343–56. https://doi.org/10.1016/j.neuroscience.2025.05.017.
+    :param Union[str, os.PathLike] weights_path: Path to base weights (e.g., ``yolo11n.pt`` or ``.onnx`` export).
+    :param Union[str, os.PathLike] model_yaml: Dataset configuration YAML describing dataset folders and class labels.
+    :param Union[str, os.PathLike] save_path: Directory where training outputs (weights, metrics, plots) are written.
+    :param int epochs: Training epochs to run. Must be ≥ 1. Default ``200``.
+    :param Union[int, float] batch: Batch size per step. Default ``16``.
+    :param bool plots: If ``True``, Ultralytics saves training curves. Default ``True``.
+    :param int imgsz: Square image resolution used during training. Default ``640``.
+    :param Optional[str] format: Optional weights format override. Must belong to :class:`simba.utils.enums.Options.VALID_YOLO_FORMATS`. Default ``None``.
+    :param Union[Literal['cpu'], int] device: Compute device string or CUDA index. Default ``0``.
+    :param bool verbose: Emit detailed progress information. Default ``True``.
+    :param int workers: Data-loader worker processes. Use ``-1`` for all cores. Default ``8``.
+    :param int patience: Early-stopping patience (epochs without improvement). Default ``100``.
+    :raises SimBAGPUError: If no CUDA-capable GPU is detected.
+    :raises SimBAPAckageVersionError: If ``ultralytics`` is unavailable in the environment.
+    :raises FileNotFoundError: If ``weights_path`` or ``model_yaml`` do not exist.
+    :raises ValueError: If provided arguments fail SimBA validation checks.
 
     :example:
-    >>> fitter = FitYolo(weights_path=r"D:\yolo_weights\yolo11n-pose.pt",  model_yaml=r"D:\cvat_annotations\yolo_07032025\map.yaml",  save_path=r"D:\cvat_annotations\yolo_07032025\mdl",  epochs=1500,  batch=32,  format='onnx',  device=0,  imgsz=640)
-    >>> fitter.run()
+       >>> fitter = FitYolo(
+       ...     weights_path=r"D:\\yolo_weights\\yolo11n-pose.pt",
+       ...     model_yaml=r"D:\\datasets\\pose_project\\map.yaml",
+       ...     save_path=r"D:\\datasets\\pose_project\\mdl",
+       ...     epochs=300,
+       ...     batch=24,
+       ...     device=0,
+       ...     imgsz=640,
+       ... )
+       >>> fitter.run()
 
     """
 
@@ -193,4 +201,3 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 #                  imgsz=640)
 # fitter.run()
 #
-

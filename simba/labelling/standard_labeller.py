@@ -36,10 +36,8 @@ from simba.utils.lookups import (get_current_time, get_display_resolution,
                                  get_labelling_img_kbd_bindings,
                                  get_labelling_video_kbd_bindings)
 from simba.utils.printing import log_event, stdout_success
-from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
-                                    read_config_entry, read_config_file,
-                                    read_df, read_frm_of_video, write_df)
-from simba.utils.warnings import DataHeaderWarning
+from simba.utils.read_write import (get_video_meta_data, read_config_entry, read_df, read_frm_of_video, write_df)
+from simba.utils.warnings import DataHeaderWarning, FrameRangeWarning
 
 PLAY_VIDEO_SCRIPT_PATH = os.path.join(os.path.dirname(simba.__file__), "labelling/play_annotation_video.py")
 PADDING = 5
@@ -53,7 +51,7 @@ class LabellingInterface(ConfigReader):
     Launch ``standard`` or ``pseudo``-labelling (annotation) GUI interface in SimBA.
 
     .. note::
-       Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/label_behavior.md>`__.
+       See the `tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/label_behavior.md>`__.
 
     .. image:: _static/img/annotator.png
        :width: 500
@@ -62,12 +60,11 @@ class LabellingInterface(ConfigReader):
 
     :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
     :param Union[str, os.PathLike] file_path: Path to video that is to be annotated.
-    :param Literal["from_scratch", "pseudo"] setting: String representing annotation method. OPTIONS: ``from_scratch`` or ``pseudo``
-    :param Optional[Dict[str, float]] threshold_dict: If setting ``pseudo``, threshold_dict dict contains the machine probability thresholds, with the classifier names as keys and the classification probabilities as values, e.g. {'Attack': 0.40, 'Sniffing': 0.7).
-    :param bool continuing: If True, continouing previously started annotation session.
+    :param Optional[Dict[str, float]] thresholds: Probability thresholds applied to classifier predictions when running pseudo-labelling. Keys must match classifier names and values must be between 0.0 and 1.0. Defaults to None.
+    :param bool continuing: Set True to resume annotations from an existing targets file. Defaults to False.
 
     :example:
-    >>> _ = LabellingInterface(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", file_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_CNO_0521.mp4", threshold_dict=None, continuing=False)
+    >>> _ = LabellingInterface(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", file_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_CNO_0521.mp4", thresholds=None, continuing=False)
     """
 
     def __init__(self,
@@ -123,9 +120,18 @@ class LabellingInterface(ConfigReader):
                         x_df = self.data_df.drop(self.clf_names, axis=1)
                         self.data_df = pd.concat([x_df, features_df[new_x], self.data_df[self.clf_names]], axis=1).reset_index(drop=True).sort_index()
                     else:
-                        DataHeaderWarning(msg=f'Cannot append {len(new_x)} additional feature(s) to your annotated data set. The CSV file at {self.features_extracted_file_path} and {self.targets_inserted_file_path} contain different numbers of rows.')
+                        DataHeaderWarning(msg=f'Cannot append {len(new_x)} additional feature(s) to your annotated data set. The CSV file at {self.features_extracted_file_path} and {self.targets_inserted_file_path} contain different numbers of rows ({len(features_df)} vs {len(self.data_df)}).')
             self.main_window.title(f"SIMBA ANNOTATION INTERFACE (CONTINUING ANNOTATIONS) - {self.video_name}")
-            self.img_idx = read_config_entry(self.config, "Last saved frames", self.video_name, data_type="int", default_value=0)
+            self.img_idx = max(0, read_config_entry(self.config, "Last saved frames", self.video_name, data_type="int", default_value=0))
+            if self.video_meta_data['frame_count'] != len(self.data_df):
+                self.max_frm_id = min(len(self.data_df), self.video_meta_data['frame_count']) - 1
+                msg = f'The data file for video {self.video_name} contains data for {len(self.data_df)} frames, while the video contains data for {self.video_meta_data["frame_count"]} frames. Setting maximal annotated frame index to {self.img_idx}'
+                FrameRangeWarning(msg=msg)
+            if (self.img_idx > 0) and (self.img_idx > self.max_frm_id):
+                FrameRangeWarning(msg=f'The last annotated frame of video {self.video_name} as detected in in the [Last saved frames] section of the project_config.ini was frame {self.img_idx}. However the video {self.video_name} contains {self.max_frm_id} frames. \n SimBA will display frame {self.max_frm_id}.')
+                self.img_idx = deepcopy(self.max_frm_id)
+
+
         else:
             if not os.path.isfile(self.features_extracted_file_path):
                 raise NoFilesFoundError(msg=f'When annotating data from scratch, SimBA expects a data file representing video {self.video_name} at {self.features_extracted_file_path}. SimBA could not find this file. Extract features for video {self.video_name} before annotating data.', source=self.__class__.__name__)
@@ -133,7 +139,11 @@ class LabellingInterface(ConfigReader):
             self.main_window.title(f"SIMBA ANNOTATION INTERFACE (ANNOTATING FROM SCRATCH) - {self.video_name}")
             for clf in self.clf_names: self.data_df[clf] = 0
 
-        check_video_and_data_frm_count_align(video=self.video_path, data=self.data_df, name=self.video_name, raise_error=False)
+        aligns = check_video_and_data_frm_count_align(video=self.video_path, data=self.data_df, name=self.video_name, raise_error=False)
+        if not aligns:
+            self.max_frm_id = min(len(self.data_df), self.video_meta_data['frame_count']) - 1
+            msg = f'The data file for video {self.video_name} contains data for {len(self.data_df)} frames, while the video contains data for {self.video_meta_data["frame_count"]} frames. Setting maximal annotated frame index to {self.img_idx}'
+            FrameRangeWarning(msg=msg)
         check_valid_dataframe(df=self.data_df, source=f'{self.__class__.__name__} file_path', valid_dtypes=Formats.NUMERIC_DTYPES.value, required_fields=self.clf_names)
 
         self.data_df_targets = self.data_df[self.clf_names]
@@ -267,45 +277,6 @@ class LabellingInterface(ConfigReader):
         self.__advance_frame(frm_id=vid_frame_no)
         f.close()
 
-
-
-
-
-
-        #
-        # labels = [v['label'] for v in kbd_bindings.values()]
-        # num_items = len(labels)
-        # mid = math.ceil(num_items / 2)
-        # col1 = labels[:mid]
-        # col2 = labels[mid:]
-        # if len(col2) < len(col1):
-        #     col2 += [''] * (len(col1) - len(col2))
-        # key_presses_lbl = f"\n\n {header}\n"
-        # for left, right in zip(col1, col2):
-        #     key_presses_lbl += f"{left:<40} {right}\n"
-        # return key_presses_lbl
-
-        # labels = [v['label'] for v in kbd_bindings.values()]
-        # num_items = len(labels)
-        # mid = math.ceil(num_items / 2)
-        # col1 = labels[:mid]
-        # col2 = labels[mid:]
-        #
-        # if len(col2) < len(col1):
-        #     col2 += [''] * (len(col1) - len(col2))
-        #
-        # def format_label(label: str, width: int = 30):
-        #     if ':' in label:
-        #         left, right = label.split(':', 1)
-        #         return f"{left.strip():<{width}}: {right.strip():>{width}}"
-        #     return label
-        #
-        # key_presses_lbl = f"\n\n {header}\n"
-        # for left, right in zip(col1, col2):
-        #     key_presses_lbl += f"{format_label(left)}    {format_label(right)}\n"
-        #
-        # return key_presses_lbl
-
     def set_img(self,
                 img_lbl: Label,
                 video_path: Union[str, os.PathLike],
@@ -402,7 +373,7 @@ class LabellingInterface(ConfigReader):
         stdout_success(msg=f"SAVED: Annotation file for video {self.video_name} saved within the {self.targets_folder} directory at file path: {self.targets_inserted_file_path}.", source=self.__class__.__name__)
         if not self.config.has_section("Last saved frames"):
             self.config.add_section("Last saved frames")
-        self.config.set("Last saved frames", str(self.video_name), str(self.img_idx))
+        self.config.set("Last saved frames", str(self.video_name), str(self.img_idx-1))
         with open(self.config_path, "w") as configfile: self.config.write(configfile)
 
     def __create_print_statements(self,
