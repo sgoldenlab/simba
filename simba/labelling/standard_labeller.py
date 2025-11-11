@@ -36,7 +36,8 @@ from simba.utils.lookups import (get_current_time, get_display_resolution,
                                  get_labelling_img_kbd_bindings,
                                  get_labelling_video_kbd_bindings)
 from simba.utils.printing import log_event, stdout_success
-from simba.utils.read_write import (get_video_meta_data, read_config_entry, read_df, read_frm_of_video, write_df)
+from simba.utils.read_write import (get_video_meta_data, read_config_entry,
+                                    read_df, read_frm_of_video, write_df)
 from simba.utils.warnings import DataHeaderWarning, FrameRangeWarning
 
 PLAY_VIDEO_SCRIPT_PATH = os.path.join(os.path.dirname(simba.__file__), "labelling/play_annotation_video.py")
