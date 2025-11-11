@@ -251,8 +251,8 @@ class YOLOPoseTrackInference():
 #
 # VIDEO_PATH = r"E:\netholabs_videos\two_tracks\videos"
 # WEIGHTS_PASS = r"D:\netholabs\yolo_mosaic_data_102315\mdl\train\weights\best.pt"
-# SAVE_DIR = r"E:\netholabs_videos\two_tracks\csv_track_025"
-# BOTSORT_PATH = r"bytetrack.yml"
+# SAVE_DIR = r"E:\netholabs_videos\two_tracks\tow_yaml"
+# BOTSORT_PATH = r"C:\projects\simba\simba\simba\assets\tow_bytetrack.yaml"
 #
 # KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_mid', 'Tail_end')
 #

@@ -28,9 +28,9 @@ class YoloTrackCleaner:
     def __init__(self,
                  data_path: Union[str, os.PathLike],
                  save_dir: Union[str, os.PathLike],
-                 bp_loc: str,
+                 bp_loc: str = 'CENTER',
                  max_frame_gap: int = 50,
-                 max_pixel_gap: int = 100,
+                 max_pixel_gap: int = 250,
                  recursive: bool = False,
                  randomize_order: bool = False,
                  overwrite: bool = False):
@@ -207,8 +207,8 @@ class YoloTrackCleaner:
         stdout_success(msg=f'Track cleaning complete for {len(self.data_paths.keys())} data file(s). Results saved in {self.save_dir}', elapsed_time=timer.elapsed_time_str)
 
 #
-# x = YoloTrackCleaner(data_path=r"E:\netholabs_videos\two_tracks_102725\csvs\cage_1_date_2025_09_13_hour_00_minute_23.csv", save_dir=r'E:\netholabs_videos\two_tracks_102725\tracks_cleaned', bp_loc='NOSE')
-# x.run()
+x = YoloTrackCleaner(data_path=r"E:\netholabs_videos\two_tracks\tow_yaml", save_dir=r'E:\netholabs_videos\two_tracks\tow_cleaned', bp_loc='NOSE')
+x.run()
 # x = YoloTrackCleaner(data_path=r"E:\netholabs_videos\two_tracks_102725\csvs", save_dir=r'E:\netholabs_videos\two_tracks_102725\tracks_cleaned', bp_loc='NOSE')
 # x.run()
 # x = YoloTrackCleaner(data_path=r"E:\netholabs_videos\two_tracks_102725\csvs\cage_1_date_2025_09_13_hour_03_minute_46.csv", save_dir=r'E:\netholabs_videos\two_tracks_102725\tracks_cleaned', bp_loc='NOSE')

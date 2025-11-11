@@ -15,11 +15,10 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.statistics_mixin import Statistics
 from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
-from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log, check_if_dir_exists)
+from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_if_dir_exists)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    read_df, write_df)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, read_df, write_df)
+from simba.utils.errors import ParametersFileError
 
 BPS = ['NOSE', 'LEFT_EAR', 'RIGHT_EAR', 'LEFT_SIDE', 'CENTER', 'RIGHT_SIDE', 'TAIL_BASE']
 ANIMAL_NAMES = ['resident', 'intruder']
@@ -56,6 +55,9 @@ class AgressionFeatureExtractor(ConfigReader, AbstractFeatureExtraction):
         self.save_dir = self.features_dir if save_dir is None else save_dir
         check_if_dir_exists(in_dir=self.save_dir, raise_error=True)
         self.data_paths = find_files_of_filetypes_in_directory(directory=data_dir, extensions='.csv', raise_error=True, as_dict=True)
+        if list(self.animal_bp_dict.keys()) != ANIMAL_NAMES:
+            raise ParametersFileError(msg=f'The animal names in the project has to be {ANIMAL_NAMES}, got: {list(self.animal_bp_dict.keys())}', source=self.__class__.__name__)
+        print(f'Analyzing features for {len(list(self.data_paths.keys()))} data file(s)...')
 
     def run(self):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=list(self.data_paths.values()))
@@ -85,6 +87,7 @@ class AgressionFeatureExtractor(ConfigReader, AbstractFeatureExtraction):
 
 
                 bps_x , bps_y = [f'{bp[:-2]}_x' for bp in animal_bps['X_bps']], [f'{bp[:-2]}_y' for bp in animal_bps['X_bps']]
+
                 animal_arr = df[[x for pair in zip(bps_x, bps_y) for x in pair]].values.reshape(len(df), -1, 2)
                 self.results[f'HULL_SIZE_{animal_name}'] = get_hull_sizes(points=animal_arr, target='perimeter', pixels_per_mm=px_per_mm)
                 x = TimeseriesFeatureMixin.sliding_descriptive_statistics(data=self.results[f'HULL_SIZE_{animal_name}'].values.astype(np.float32), window_sizes=TIME_WINDOWS, sample_rate=int(fps), statistics=List(['mean']))

@@ -5,19 +5,13 @@ import numpy as np
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.yolo_pose_visualizer import YOLOPoseVisualizer
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
-                                        FolderSelect, SimbaButton,
-                                        SimBADropDown)
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists)
+from simba.plotting.yolo_pose_track_visualizer import YOLOPoseTrackVisualizer
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect, FolderSelect, SimbaButton, SimBADropDown)
+from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists)
 from simba.utils.enums import Options, PackageNames
-from simba.utils.errors import (NoDataError, SimBAGPUError,
-                                SimBAPAckageVersionError)
+from simba.utils.errors import (NoDataError, SimBAGPUError, SimBAPAckageVersionError)
 from simba.utils.printing import stdout_warning
-from simba.utils.read_write import (find_core_cnt,
-                                    find_files_of_filetypes_in_directory,
-                                    get_pkg_version, get_video_meta_data,
-                                    str_2_bool)
+from simba.utils.read_write import (find_core_cnt, find_files_of_filetypes_in_directory, get_pkg_version, get_video_meta_data, str_2_bool)
 from simba.utils.warnings import MissingFileWarning
 
 MAX_TRACKS_OPTIONS = ['None', 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -39,21 +33,23 @@ class YoloPoseVisualizerPopUp(PopUpMixin):
         PopUpMixin.__init__(self, title="PLOT YOLO POSE ESTIMATION RESULTS", icon='ultralytics_2')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
         self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, entry_width=45)
-        self.core_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=CORE_CNT_OPTIONS, label="CPU CORE COUNT:", label_width=35, dropdown_width=40, value=int(max(CORE_CNT_OPTIONS) / 2))
-        self.bbox_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="SHOW BOUNDING BOXES:",  label_width=35, dropdown_width=40, value='FALSE')
+        self.core_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=CORE_CNT_OPTIONS, label="CPU CORE COUNT:", label_width=35, dropdown_width=40, value=int(max(CORE_CNT_OPTIONS) / 3))
+        self.bbox_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="SHOW BOUNDING BOXES:",  label_width=35, dropdown_width=40, value='TRUE')
         self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE:",  label_width=35, dropdown_width=40, value='TRUE')
         self.threshold_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=THRESHOLD_OPTIONS, label="THRESHOLD:",  label_width=35, dropdown_width=40, value=0.0)
         self.thickness_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=SIZE_OPTIONS, label="LINE THICKNESS:",  label_width=35, dropdown_width=40, value='AUTO')
         self.circle_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=SIZE_OPTIONS, label="CIRCLE SIZE:", label_width=35, dropdown_width=40, value='AUTO')
+        self.tracks_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="PLOT TRACKS:", label_width=35, dropdown_width=40, value='FALSE')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.save_dir.grid(row=0, column=0, sticky=NW)
-        self.core_cnt_dropdown.grid(row=1, column=0, sticky=NW)
-        self.bbox_dropdown.grid(row=2, column=0, sticky=NW)
-        self.verbose_dropdown.grid(row=3, column=0, sticky=NW)
-        self.threshold_dropdown.grid(row=4, column=0, sticky=NW)
-        self.thickness_dropdown.grid(row=5, column=0, sticky=NW)
-        self.circle_dropdown.grid(row=6, column=0, sticky=NW)
+        self.tracks_dropdown.grid(row=1, column=0, sticky=NW)
+        self.core_cnt_dropdown.grid(row=2, column=0, sticky=NW)
+        self.bbox_dropdown.grid(row=3, column=0, sticky=NW)
+        self.verbose_dropdown.grid(row=4, column=0, sticky=NW)
+        self.threshold_dropdown.grid(row=5, column=0, sticky=NW)
+        self.thickness_dropdown.grid(row=6, column=0, sticky=NW)
+        self.circle_dropdown.grid(row=7, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="PLOT SINGLE VIDEO", icon_name='video')
         self.data_path = FileSelect(parent=single_video_frm, fileDescription='DATA PATH (CSV):', lblwidth=35,  entry_width=45, file_types=[("YOLO CSV RESULT", ".csv")])
@@ -86,12 +82,24 @@ class YoloPoseVisualizerPopUp(PopUpMixin):
         threshold = float(self.threshold_dropdown.get_value())
         thickness = None if self.thickness_dropdown.get_value() == 'AUTO' else int(self.threshold_dropdown.get_value())
         circle_size = None if self.circle_dropdown.get_value() == 'AUTO' else int(self.circle_dropdown.get_value())
+        tracks = str_2_bool(self.tracks_dropdown.get_value())
+
+        Plotter = YOLOPoseTrackVisualizer if tracks else YOLOPoseVisualizer
+
         if not multiple:
             data_path = self.data_path.file_path
             video_path = self.video_path.file_path
             check_file_exist_and_readable(file_path=data_path, raise_error=True)
             _ = get_video_meta_data(video_path=video_path)
-            plotter = YOLOPoseVisualizer(data_path=data_path, video_path=video_path, save_dir=save_dir, core_cnt=core_cnt, threshold=threshold, thickness=thickness, circle_size=circle_size, verbose=verbose, bbox=bbox)
+            plotter = Plotter(data_path=data_path,
+                              video_path=video_path,
+                              save_dir=save_dir,
+                              core_cnt=core_cnt,
+                              threshold=threshold,
+                              thickness=thickness,
+                              circle_size=circle_size,
+                              verbose=verbose,
+                              bbox=bbox)
             plotter.run()
         else:
             data_dir = self.data_dir_path.folder_path
@@ -116,7 +124,15 @@ class YoloPoseVisualizerPopUp(PopUpMixin):
                 if name in video_paths.keys():
                     video_path = video_paths[name]
                     print(f'Plotting YOLO results for video {name} (video {cnt+1}/{video_cnt}) ...')
-                    plotter = YOLOPoseVisualizer(data_path=data_path, video_path=video_path, save_dir=save_dir, core_cnt=core_cnt, threshold=threshold, thickness=thickness, circle_size=circle_size, verbose=verbose, bbox=bbox)
+                    plotter = Plotter(data_path=data_path,
+                                      video_path=video_path,
+                                      save_dir=save_dir,
+                                      core_cnt=core_cnt,
+                                      threshold=threshold,
+                                      thickness=thickness,
+                                      circle_size=circle_size,
+                                      verbose=verbose,
+                                      bbox=bbox)
                     plotter.run()
                 else:
                     stdout_warning(msg=f'Skipping video {name} (no video exist in {video_dir})...')

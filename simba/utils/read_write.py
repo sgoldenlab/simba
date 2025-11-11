@@ -3194,6 +3194,8 @@ def read_yolo_bp_names_file(file_path: Union[str, os.PathLike]) -> Tuple[str]:
         .str.strip()
         .tolist()
     )
+
+    data = [x for x in data if x != '']
     check_valid_lst(data=data, source=f'{read_yolo_bp_names_file.__name__} data', valid_dtypes=(str,), min_len=2)
     return tuple(data)
 

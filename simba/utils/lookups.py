@@ -21,6 +21,7 @@ except:
     from typing_extensions import Literal
 
 import matplotlib.font_manager
+from matplotlib.colors import hsv_to_rgb, rgb2hex
 import pandas as pd
 import psutil
 import pyglet
@@ -31,7 +32,7 @@ import simba
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable,
                                 check_if_dir_exists, check_instance, check_int,
-                                check_str, check_valid_dict, check_valid_tuple)
+                                check_str, check_valid_dict, check_valid_tuple, check_float)
 from simba.utils.enums import (OS, UML, Defaults, FontPaths, Formats, Keys,
                                Methods, Options, Paths)
 from simba.utils.errors import (FFMPEGNotFoundError, InvalidInputError,
@@ -44,6 +45,8 @@ if platform.system() == OS.WINDOWS.value:
     from pyglet.libs.win32 import constants
     constants.COINIT_MULTITHREADED = 0x2  # 0x2 = COINIT_APARTMENTTHREADED
 
+
+RGBFloat = Tuple[float, float, float]
 
 class SharedCounter(object):
     """Counter that can be shared across processes on different cores"""
@@ -1089,6 +1092,64 @@ def get_tooltips() -> Dict[str, str]:
         return {}
     else:
         return read_json(x=tool_tips_path, raise_error=False)
+
+def intermittent_palette(n: int = 10,
+                         base_light: float = 0.55,
+                         contrast_delta: float = 0.18,
+                         seed_hue: Optional[float] = None,
+                         output: Literal["rgb", "rgb255", "hex"] = "rgb",
+                         rng: Optional[random.Random] = None) -> Union[List[RGBFloat], List[Tuple[int, int, int]], List[str]]:
+    """
+    Generate a categorical colour palette with evenly spaced hues and alternating lightness.
+
+    .. note::
+       Use to get color palette where immediate colors are distinct.
+
+    :param int n: Number of colours to generate. Must be greater than or equal to 1.
+    :param float base_light: Midpoint HSV value (0-1) used as the baseline lightness. Default ``0.55``.
+    :param float contrast_delta: Lightness offset added/subtracted per colour to improve visual separation. Default ``0.18``.
+    :param Optional[float] seed_hue: Initial hue (0-1). If ``None``, a random hue is sampled. Default ``None``.
+    :param str output: Output colour format. One of ``{"rgb", "rgb255", "hex"}``. Default ``"rgb"``.
+    :param Optional[random.Random] rng: Optional pre-seeded RNG for reproducible random starts.
+    :return: Colour palette in the requested format (RGB floats, RGB 0-255 integers, or hexadecimal strings).
+    :rtype: Union[List[Tuple[float, float, float]], List[Tuple[int, int, int]], List[str]]
+
+    :example:
+        >>> palette = intermittent_palette(n=6, output="hex")
+        >>> palette
+        >>> ['#a33f46', '#51a5df', '#b36824', '#4dbd9f', '#c749b4', '#7a9a3e']
+    """
+
+    fn_name = intermittent_palette.__name__
+    check_int(name=f"{fn_name} n", value=n, min_value=1)
+    check_float(name=f"{fn_name} base_light", value=base_light, min_value=0.0, max_value=1.0)
+    check_float(name=f"{fn_name} contrast_delta", value=contrast_delta, min_value=0.0, max_value=1.0)
+    if seed_hue is not None:
+        check_float(name=f"{fn_name} seed_hue", value=seed_hue, min_value=0.0, max_value=1.0)
+    check_str(name=f"{fn_name} output", value=output, options={"rgb", "rgb255", "hex"}, raise_error=True)
+
+    if rng is not None and not isinstance(rng, random.Random):
+        raise InvalidInputError(msg="rng must be an instance of random.Random.", source=fn_name)
+
+    golden_ratio = 0.618033988749895
+    rnd = rng or random.Random()
+    hue = seed_hue % 1.0 if seed_hue is not None else rnd.random()
+    colours: List[RGBFloat] = []
+
+    for idx in range(n):
+        hue = (hue + golden_ratio) % 1.0
+        sat = 0.72 if idx % 3 else 0.85
+        light = base_light + (contrast_delta if idx % 2 else -contrast_delta)
+        light = min(max(light, 0.25), 0.85)
+        colours.append(tuple(hsv_to_rgb((hue, sat, light))))
+
+    fmt = output.lower()
+    if fmt == "rgb":
+        return colours
+    elif fmt == "rgb255":
+        return [tuple(int(round(c * 255)) for c in colour) for colour in colours]
+    else:
+        return [rgb2hex(colour) for colour in colours]
 
 
 

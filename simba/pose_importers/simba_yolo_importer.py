@@ -109,6 +109,8 @@ class SimBAYoloImporter(ConfigReader):
                 with open(self.body_parts_path, "w") as f:
                     f.writelines(f"{bp}\n" for bp in bp_names)
                 self.config.set(section=ConfigKey.MULTI_ANIMAL_ID_SETTING.value, option=ConfigKey.MULTI_ANIMAL_IDS.value, value=','.join(class_names))
+                with open(self.config_path, "w") as file:
+                    self.config.write(file)
             pivoted = yolo_df.pivot(index=FRAME, columns=CLASS_NAME)
             pivoted.columns = [f"{cls}_{col}" for col, cls in pivoted.columns]
             out_df = pivoted.reset_index(drop=True)
