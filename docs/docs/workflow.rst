@@ -87,7 +87,7 @@ Peer-reviewed publication in *Nature Neuroscience* Describing SimBA.
 :download:`🔗 Notebook <https://colab.research.google.com/drive/1x8oBKmSvndSakCsZvpITiNpQY-TDIsae#scrollTo=ETqBJrguDM6_>`
 
 
-📓 SimBA QR codes
+𝄃𝄃𝄂𝄂𝄀𝄁𝄃𝄂𝄂𝄃 SimBA QR codes
 ----------------------------------------------------
 
 .. image:: ../_static/img/simba_qr_codes.webp
