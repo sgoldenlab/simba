@@ -8,11 +8,15 @@ import pandas as pd
 from simba.data_processors.interpolate import Interpolate
 from simba.data_processors.smoothing import Smoothing
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import (check_float, check_if_dir_exists, check_if_keys_exist_in_dict, check_int, check_str, check_valid_boolean, check_valid_dataframe, check_valid_tuple)
+from simba.utils.checks import (check_float, check_if_dir_exists,
+                                check_if_keys_exist_in_dict, check_int,
+                                check_str, check_valid_boolean,
+                                check_valid_dataframe, check_valid_tuple)
+from simba.utils.enums import ConfigKey
 from simba.utils.errors import PermissionError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, write_df)
-from simba.utils.enums import ConfigKey
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    write_df)
 
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']

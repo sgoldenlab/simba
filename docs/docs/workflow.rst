@@ -1,4 +1,4 @@
-SimBA Presentations Workflow Documents
+SimBA Presentations, Workflow, Documents
 ==========================================
 
 .. contents::
@@ -85,6 +85,17 @@ Peer-reviewed publication in *Nature Neuroscience* Describing SimBA.
    :target: https://colab.research.google.com/drive/1x8oBKmSvndSakCsZvpITiNpQY-TDIsae#scrollTo=ETqBJrguDM6_
 
 :download:`🔗 Notebook <https://colab.research.google.com/drive/1x8oBKmSvndSakCsZvpITiNpQY-TDIsae#scrollTo=ETqBJrguDM6_>`
+
+
+𝄃𝄃𝄂𝄂𝄀𝄁𝄃𝄂𝄂𝄃 SimBA QR codes
+----------------------------------------------------
+
+.. image:: ../_static/img/simba_qr_codes.webp
+   :width: 1000
+   :align: center
+   :target: https://osf.io/re4x8
+
+:download:`🔗 PDF <https://osf.io/re4x8>`
 
 
 🎥 SimBA overview 2025/10
