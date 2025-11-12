@@ -21,18 +21,18 @@ except:
     from typing_extensions import Literal
 
 import matplotlib.font_manager
-from matplotlib.colors import hsv_to_rgb, rgb2hex
 import pandas as pd
 import psutil
 import pyglet
 from matplotlib import cm
+from matplotlib.colors import hsv_to_rgb, rgb2hex
 from tabulate import tabulate
 
 import simba
 from simba.utils.checks import (check_ffmpeg_available,
-                                check_file_exist_and_readable,
+                                check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_instance, check_int,
-                                check_str, check_valid_dict, check_valid_tuple, check_float)
+                                check_str, check_valid_dict, check_valid_tuple)
 from simba.utils.enums import (OS, UML, Defaults, FontPaths, Formats, Keys,
                                Methods, Options, Paths)
 from simba.utils.errors import (FFMPEGNotFoundError, InvalidInputError,
