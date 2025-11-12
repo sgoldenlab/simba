@@ -445,19 +445,33 @@ Use this tool to delete user-specified body-parts from pose-estimation tracking 
 ### Visualize pose estimation in folder
 Use this tool to visualize the pose-estimation of all the files inside a SimBA project directory. This tool can be useful when you have [interpolated  and/or smoothened](https://github.com/sgoldenlab/simba/blob/master/docs/Scenario1.md#step-3-import-dlc-tracking-data) and or [performed outlier correction](https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-4-outlier-correction) on your pose-estimation data at import, and now you want to visualize the results of that interpolation and smoothing inside the . 
 
-1. Click on `Tools`, then `Visualize pose-estimation in folder...`.
-2. In the `Input directory (with csv/parquet files)` menu, click bowse and select a folder that contain CSV or parquet files (e.g., the `project_folder/csv/input_csv` or `project_folder/csv/outlier_corrected_movement_location` directory of your SimBA project) 
-3. In the `Output directory (where your videos will be saved)` menu, click bowse and select a folder where your videos should be saved (I recommend to choose an empty folder or create a new folder).
-4. In the `Circle size` entry box, choose the size of the circles denoting the location of your body-parts (e.g., `5`)
-5. Often-times, you may want to save time and only create a sample of each input video and not the entire videos.  For example, to create 20s samples of each video inside your choosen `Input directory`, set the `Vido putput sample size (s)` to `20`. To create entire videos (potentially long run-times), set this dropdown to `ENTIRE VIDEO(S)`.
-6. To save further time, we can tell SimBA to create the videos across multiple CPU cores (the more CPU cores, the faster the run-time). To use multiple CPU cores, Set the `Core count` dropdown to the number of CPU cores you weant to use. The max number will be the number of CPU cores available on your computer.
-7. **OPTIONAL**: If you want to manually set the colors for each of the animals, click on `OPEN ADVANCED SETTINGS` and choose the number of animals in your data file. Then use the dropdown menus to set the color of each animal. If you **do not** set the animal colors using the `ADVANCED SETTINGS` menu, SimBA will automatically assign colors to each of the body-parts. 
-8. Click on the `VISUALIZE`. You can follow the progress in the main SimBA terminal window. 
+1. Click on `Tools`, then `Visualize pose-estimation in folder...` which brings up the following pop-up:
 
-<p align="center">
-<img src="https://github.com/sgoldenlab/simba/blob/master/images/visualize_pose_in_folder.png" />
-</p>
+<img width="632" height="547" alt="image" src="https://github.com/user-attachments/assets/82bd4876-c175-4b3a-af8b-a1a0fb930a85" />
 
+With the following OPTIONS:
+
+* **KEY-POINT SIZES** – Options: AUTO, 1 through 100. Sets the pose-estimated key-pointradius in the visualization; AUTO derives suitable size automatically from video resolution.
+
+* **VIDEO SECTION (SECONDS)** – Options: ENTIRE VIDEO(S), plus 10, 20, …, 200. Restricts rendering to a clip length of each video in seconds, or produces the full video.
+
+* **CPU COUNT** – Options: integers 1 up to detected cores minus one. Controls single-process vs. multiprocessing plotters. The more cores the faster the video is created but with taxing GPU RAM more.
+
+*  **USE GPU** – Options: TRUE, FALSE. Enables GPU-assisted concatenation when multiprocessing.
+
+*  **INCLUDE BOUNDING BOX** – Options: TRUE, FALSE. Adds rectangular bounding boxes encompassing each animals body-parts to the rendered pose output.
+
+*  **SAVE DIRECTORY** – Folder chooser (defaults to the desktop). Destination for annotated videos.
+
+*  **NUMBER OF ANIMALS** – Tells SimBA how many tracked individuals to expect.
+
+*  **ANIMAL n COLOR PALETTE** – Options: Assigns color schemes per animal. AUTO and SImBA will pick a random categorical palette. 
+
+*  **SELECT DATA FILE (CSV/PARQUET)** – File picker limited to CSV/Parquet. Runs pose visualization on a single file when you click RUN.
+
+*  **SELECT DATA DIRECTORY (CSV/PARQUET)** – Folder picker. Batch-runs pose visualization across all supported files in the selected directory when you click RUN.
+
+2. Click on the `RUN`. You can follow the progress in the main SimBA terminal window. The videos are stored in the selected **SAVE DIRECTORY** folder. 
 
 ### Temporal join videos
 Use this tool to join a single recording represented by multiple video files into a video file. 
