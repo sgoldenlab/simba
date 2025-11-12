@@ -23,7 +23,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
                                         CreateToolTip, DropDownMenu, Entry_Box,
                                         FileSelect, FolderSelect, SimbaButton,
                                         SimbaCheckbox, SimBADropDown,
-                                        SimBALabel)
+                                        SimBALabel, SimBARadioButton)
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable,
                                 check_if_dir_exists,
@@ -893,13 +893,16 @@ class ConcatenatingVideosPopUp(PopUpMixin):
         self.video_path_1 = FileSelect(settings_frm, "FIRST VIDEO PATH: ", title="Select a video file", lblwidth=35, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         self.video_path_2 = FileSelect(settings_frm, "SECOND VIDEO PATH: ", title="Select a video file", lblwidth=35, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         resolutions = ["VIDEO 1", "VIDEO 2", 240, 320, 480, 640, 720, 800, 960, 1120, 1080, 1980]
-        self.resolution_dropdown = DropDownMenu(settings_frm, "RESOLUTION (ASPECT RATIO RETAINED):", resolutions, "35")
-        self.resolution_dropdown.setChoices(resolutions[0])
+
+
+        self.resolution_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=resolutions, label="RESOLUTION (ASPECT RATIO RETAINED):", label_width=35, dropdown_width=35, value=resolutions[0])
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU (REDUCED RUN-TIME):", label_width=35, dropdown_width=35, value='FALSE')
+
         self.horizontal = BooleanVar(value=False)
-        horizontal_radio_btn = Radiobutton(settings_frm, text="HORIZONTAL concatenation", font=Formats.FONT_REGULAR.value, variable=self.horizontal, value=True)
-        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU (REDUCED RUN-TIME):", ['TRUE', 'FALSE'], "35")
-        vertical_radio_btn = Radiobutton(settings_frm, text="VERTICAL concatenation", font=Formats.FONT_REGULAR.value, variable=self.horizontal, value=False)
-        self.gpu_dropdown.setChoices('FALSE')
+        horizontal_radio_btn = SimBARadioButton(parent=settings_frm, txt="HORIZONTAL concatenation", variable=self.horizontal, img='horizontal', value=True, compound='left')
+        vertical_radio_btn = SimBARadioButton(parent=settings_frm, txt="VERTICAL concatenation", variable=self.horizontal, img='vertical', value=False, compound='left')
+
+
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.video_path_1.grid(row=0, column=0, sticky=NW)
         self.video_path_2.grid(row=1, column=0, sticky=NW)
@@ -915,8 +918,8 @@ class ConcatenatingVideosPopUp(PopUpMixin):
         video_2_path = self.video_path_2.file_path
         resolution = self.resolution_dropdown.getChoices()
         int_res, _ = check_int(name='resolution', value=resolution, raise_error=False)
-        if int_res:
-            resolution = int(resolution)
+        if int_res: resolution = int(resolution)
+        else: resolution = resolution.lower()
         horizontal_bool = self.horizontal.get()
         gpu_bool = str_2_bool(self.gpu_dropdown.getChoices())
         check_file_exist_and_readable(file_path=video_1_path)
@@ -925,58 +928,46 @@ class ConcatenatingVideosPopUp(PopUpMixin):
         video_2_meta = get_video_meta_data(video_path=video_2_path)
         if horizontal_bool and not int_res:
             if not video_1_meta['height'] == video_2_meta['height']:
-                raise ResolutionError(f'For HORIZONTAL concatenation, the videos has to be the same height. Got Video 1 height: {video_1_meta["height"]}, Video 2 height: {video_2_meta["height"]}. Select a specific resolution or convert the video resolution heights of the two videos first to be the same.', source=self.__class__.__name__)
+                if resolution == 'video 1': resolution = video_1_meta['height']
+                else: resolution = video_2_meta['height']
+            else:
+                resolution = video_1_meta['height']
+            # if not video_1_meta['height'] == video_2_meta['height']:
+            #     raise ResolutionError(f'For HORIZONTAL concatenation, the videos has to be the same height. Got Video 1 height: {video_1_meta["height"]}, Video 2 height: {video_2_meta["height"]}. Select a specific resolution or convert the video resolution heights of the two videos first to be the same.', source=self.__class__.__name__)
         elif not horizontal_bool and not int_res:
             if not video_1_meta['width'] == video_2_meta['width']:
-                raise ResolutionError(f'For VERTICAL concatenation, the videos has to be the same width. Got Video 1 width: {video_1_meta["width"]}, Video 2 width: {video_2_meta["width"]}. Select a specific resolution or convert the video resolution widths of the two videos first to be the same.', source=self.__class__.__name__)
+                if not video_1_meta['width'] == video_2_meta['width']:
+                    if resolution == 'video 1':
+                        resolution = video_1_meta['width']
+                    else: resolution = video_2_meta['width']
+                else: resolution = video_1_meta['width']
+
+                #raise ResolutionError(f'For VERTICAL concatenation, the videos has to be the same width. Got Video 1 width: {video_1_meta["width"]}, Video 2 width: {video_2_meta["width"]}. Select a specific resolution or convert the video resolution widths of the two videos first to be the same.', source=self.__class__.__name__)
         threading.Thread(video_concatenator(video_one_path=video_1_path, video_two_path=video_2_path, resolution=resolution, horizontal=horizontal_bool, gpu=gpu_bool)).start()
 
 class ConcatenatorPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Optional[Union[str, os.PathLike]] = None):
+        self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
         PopUpMixin.__init__(self, title="MERGE (CONCATENATE) VIDEOS", icon='concat_videos')
         self.config_path = config_path
-        self.select_video_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEOS #", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CONCAT_VIDEOS.value)
-        self.select_video_cnt_dropdown = DropDownMenu( self.select_video_cnt_frm, "VIDEOS #", list(range(2, 21)), "15")
-        self.select_video_cnt_dropdown.setChoices(2)
-
-        self.select_video_cnt_btn  = SimbaButton(parent=self.select_video_cnt_frm, txt="APPLY", img='tick', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.populate_table)
+        self.select_video_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="NUMBER OF VIDEOS TO CONCATENATE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CONCAT_VIDEOS.value)
+        self.select_video_cnt_dropdown = SimBADropDown(parent=self.select_video_cnt_frm, dropdown_options=list(range(2, 21)), label="VIDEOS #", label_width=15, dropdown_width=25, value=2, command=lambda value: self.populate_table(int(value)))
         self.select_video_cnt_frm.grid(row=0, column=0, sticky=NW)
         self.select_video_cnt_dropdown.grid(row=0, column=0, sticky=NW)
-        self.select_video_cnt_btn.grid(row=0, column=1, sticky=NW)
+        self.populate_table(video_cnt=int(self.select_video_cnt_dropdown.get_value()))
         self.main_frm.mainloop()
 
-    def populate_table(self):
-        if hasattr(self, "video_table_frm"):
-            self.video_table_frm.destroy()
-            self.join_type_frm.destroy()
-        self.video_table_frm = LabelFrame(
-            self.main_frm,
-            text="VIDEO PATHS",
-            pady=5,
-            padx=5,
-            font=Formats.FONT_HEADER.value,
-            fg="black",
-        )
+    def populate_table(self, video_cnt):
+        if hasattr(self, "video_table_frm"): self.video_table_frm.destroy()
+        if hasattr(self, "join_type_frm"): self.join_type_frm.destroy()
+        self.video_table_frm = LabelFrame(self.main_frm, text="VIDEO PATHS", pady=5, padx=5, font=Formats.FONT_HEADER.value, fg="black")
         self.video_table_frm.grid(row=1, sticky=NW)
-        self.join_type_frm = LabelFrame(
-            self.main_frm,
-            text="JOIN TYPE",
-            pady=5,
-            padx=5,
-            font=Formats.FONT_HEADER.value,
-            fg="black",
-        )
-        self.join_type_frm.grid(row=2, sticky=NW)
         self.videos_dict = {}
-        for cnt in range(int(self.select_video_cnt_dropdown.getChoices())):
-            self.videos_dict[cnt] = FileSelect(
-                self.video_table_frm,
-                "Video {}: ".format(str(cnt + 1)),
-                title="Select a video file",
-                file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-            )
+        for cnt in range(int(video_cnt)):
+            self.videos_dict[cnt] = FileSelect(self.video_table_frm, f"VIDEO {cnt+1}: ", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
             self.videos_dict[cnt].grid(row=cnt, column=0, sticky=NW)
-
+        self.join_type_frm = LabelFrame(self.main_frm, text="JOIN TYPE", pady=5, padx=5, font=Formats.FONT_HEADER.value, fg="black")
+        self.join_type_frm.grid(row=2, sticky=NW)
         self.join_type_var = StringVar()
         self.icons_dict = {}
         simba_dir = os.path.dirname(simba.__file__)
@@ -985,49 +976,16 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
         for file_cnt, file_path in enumerate(glob.glob(concat_icon_dir + "/*.png")):
             _, file_name, _ = get_fn_ext(file_path)
             self.icons_dict[file_name] = {}
-            self.icons_dict[file_name]["img"] = ImageTk.PhotoImage(
-                Image.open(file_path)
-            )
-            self.icons_dict[file_name]["btn"] = Radiobutton(
-                self.join_type_frm,
-                text=file_name,
-                variable=self.join_type_var,
-                value=file_name,
-            )
-            self.icons_dict[file_name]["btn"].config(
-                image=self.icons_dict[file_name]["img"]
-            )
-            self.icons_dict[file_name]["btn"].image = self.icons_dict[file_name]["img"]
+            self.icons_dict[file_name]["img"] = ImageTk.PhotoImage(Image.open(file_path))
+
+            self.icons_dict[file_name]["btn"] = SimBARadioButton(parent=self.join_type_frm, txt=file_name, variable=self.join_type_var, img=self.icons_dict[file_name]["img"], value=file_name)
             self.icons_dict[file_name]["btn"].grid(row=0, column=file_cnt, sticky=NW)
         self.join_type_var.set(value="mosaic")
-        self.resolution_frm = LabelFrame(
-            self.main_frm,
-            text="RESOLUTION",
-            pady=5,
-            padx=5,
-            font=Formats.FONT_HEADER.value,
-            fg="black",
-        )
-        self.resolution_width = DropDownMenu(
-            self.resolution_frm, "Width", ["480", "640", "1280", "1920", "2560"], "15"
-        )
-        self.resolution_width.setChoices("480")
-        self.resolution_height = DropDownMenu(
-            self.resolution_frm, "Height", ["480", "640", "1280", "1920", "2560"], "15"
-        )
-        self.resolution_height.setChoices("640")
-        self.gpu_frm = LabelFrame(
-            self.main_frm,
-            text="GPU",
-            pady=5,
-            padx=5,
-            font=Formats.FONT_HEADER.value,
-            fg="black",
-        )
-
-        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=self.gpu_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
-
-
+        self.resolution_frm = LabelFrame(self.main_frm, text="RESOLUTION", pady=5, padx=5, font=Formats.FONT_HEADER.value, fg="black")
+        self.resolution_width = SimBADropDown(parent=self.resolution_frm, dropdown_options=["480", "640", "1280", "1920", "2560"], label='WIDTH:', label_width=15, dropdown_width=30, value="480")
+        self.resolution_height = SimBADropDown(parent=self.resolution_frm, dropdown_options=["480", "640", "1280", "1920", "2560"], label='HEIGHT:', label_width=15, dropdown_width=30, value="640")
+        self.gpu_frm = LabelFrame(self.main_frm, text="GPU", pady=5, padx=5, font=Formats.FONT_HEADER.value, fg="black")
+        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=self.gpu_frm, txt="USE (reduced runtime)", txt_img='gpu_2', state=self.gpu_available)
         use_gpu_cb.grid(row=0, column=0, sticky="NW")
         self.resolution_frm.grid(row=3, column=0, sticky=NW)
         self.gpu_frm.grid(row=4, column=0, sticky="NW")
@@ -1042,23 +1000,17 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
         for cnt, (video_name, video_data) in enumerate(self.videos_dict.items()):
             _ = get_video_meta_data(video_path=video_data.file_path)
             file_paths.append(video_data.file_path)
-
         if (len(file_paths) < 3) & (self.join_type_var.get() == "mixed_mosaic"):
-            raise MixedMosaicError(
-                msg="If using the mixed mosaic join type, please tick check-boxes for at least three video types.",
-                source=self.__class__.__name__,
-            )
+            raise MixedMosaicError(msg="If using the mixed mosaic join type, please tick check-boxes for at least three video types.", source=self.__class__.__name__ )
         if (len(file_paths) < 3) & (self.join_type_var.get() == "mosaic"):
             self.join_type_var.set(value="vertical")
 
-        video_merger = FrameMergererFFmpeg(
-            config_path=self.config_path,
-            video_paths=file_paths,
-            video_height=int(self.resolution_height.getChoices()),
-            video_width=int(self.resolution_width.getChoices()),
-            concat_type=self.join_type_var.get(),
-            gpu=self.use_gpu_var.get(),
-        )
+        video_merger = FrameMergererFFmpeg(config_path=self.config_path,
+                                           video_paths=file_paths,
+                                           video_height=int(self.resolution_height.getChoices()),
+                                           video_width=int(self.resolution_width.getChoices()),
+                                           concat_type=self.join_type_var.get(),
+                                           gpu=self.use_gpu_var.get())
 
         threading.Thread(target=video_merger.run())
 

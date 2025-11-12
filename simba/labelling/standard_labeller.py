@@ -404,6 +404,21 @@ class LabellingInterface(ConfigReader):
 #                        thresholds=None,
 #                        continuing=False)
 
+
+# _ = LabellingInterface(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#                        file_path=r"C:\troubleshooting\mitra\project_folder\videos\video_test_vaishnavi.mp4",
+#                        thresholds=None,
+#                        continuing=False)
+
+
+
+# _ = LabellingInterface(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#                        file_path=r"C:\troubleshooting\mitra\project_folder\videos\video_test_vaishnavi.mp4",
+#                        thresholds=None,
+#                        continuing=False)
+
+
+
 #
 # import threading
 # import subprocess
