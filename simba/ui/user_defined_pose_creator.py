@@ -1,12 +1,12 @@
 __author__ = "Simon Nilsson"
 
 import os
-from typing import List, Union, Optional
+from copy import deepcopy
+from typing import List, Optional, Union
 
 import cv2
 import imutils
 import numpy as np
-from copy import deepcopy
 
 import simba
 from simba.mixins.plotting_mixin import PlottingMixin
@@ -16,7 +16,8 @@ from simba.utils.checks import (check_file_exist_and_readable,
 from simba.utils.data import create_color_palettes
 from simba.utils.enums import Paths, TextOptions
 from simba.utils.errors import InvalidInputError
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, read_img)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    read_img)
 
 WINDOW_NAME = "DEFINE POSE ESTIMATED BODY-PARTS"
 

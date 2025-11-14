@@ -6,8 +6,9 @@ try:
 except:
     from typing_extensions import Literal
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
-import warnings
 import random
+import warnings
+
 import numpy as np
 import pandas as pd
 
@@ -30,7 +31,8 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_pkg_version, get_video_meta_data,
                                     recursive_file_search)
-from simba.utils.yolo import (_get_undetected_obs, filter_yolo_keypoint_data, load_yolo_model)
+from simba.utils.yolo import (_get_undetected_obs, filter_yolo_keypoint_data,
+                              load_yolo_model)
 
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'TRACK', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
