@@ -7,7 +7,7 @@ except:
     from typing_extensions import Literal
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 import warnings
-
+import random
 import numpy as np
 import pandas as pd
 
@@ -30,8 +30,7 @@ from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_pkg_version, get_video_meta_data,
                                     recursive_file_search)
-from simba.utils.yolo import (_get_undetected_obs, filter_yolo_keypoint_data,
-                              load_yolo_model)
+from simba.utils.yolo import (_get_undetected_obs, filter_yolo_keypoint_data, load_yolo_model)
 
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'TRACK', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
@@ -115,7 +114,11 @@ class YOLOPoseTrackInference():
                  threshold: float = 0.7,
                  max_tracks: Optional[int] = 2,
                  smoothing: Optional[int] = None,
+                 randomize_order: Optional[bool] = False,
+                 n: Optional[int] = None,
                  imgsz: int = 320,
+                 min_video_size: Optional[float] = None,
+                 overwrite: bool = True,
                  iou: float = 0.5):
 
         _ = get_pkg_version(pkg='ultralytics', raise_error=True)
@@ -141,12 +144,16 @@ class YOLOPoseTrackInference():
         check_file_exist_and_readable(file_path=weights_path)
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose')
         check_valid_boolean(value=interpolate, source=f'{self.__class__.__name__} interpolate')
+        check_valid_boolean(value=randomize_order, source=f'{self.__class__.__name__} randomize')
+        check_valid_boolean(value=overwrite, source=f'{self.__class__.__name__} overwrite')
         check_int(name=f'{self.__class__.__name__} batch_size', value=batch_size, min_value=1)
         check_int(name=f'{self.__class__.__name__} imgsz', value=imgsz, min_value=1)
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=10e-6, max_value=1.0)
         check_float(name=f'{self.__class__.__name__} iou', value=iou, min_value=10e-6, max_value=1.0)
         check_valid_tuple(x=keypoint_names, source=f'{self.__class__.__name__} keypoint_names', min_integer=1, valid_dtypes=(str,))
         check_file_exist_and_readable(file_path=config_path)
+        if n is not None: check_int(name=f'{self.__class__.__name__} n', value=n, min_value=1)
+        if min_video_size is not None: check_float(name=f'{self.__class__.__name__} min_video_size', value=min_video_size, min_value=10e-6)
         if smoothing is not None:
             check_int(name=f'{self.__class__.__name__} smoothing', value=smoothing, min_value=1, raise_error=True)
         self.keypoint_col_names = [f'{i}_{s}'.upper() for i in keypoint_names for s in ['x', 'y', 'p']]
@@ -157,13 +164,15 @@ class YOLOPoseTrackInference():
         self.model = load_yolo_model(weights_path=weights_path, device=device, format=format)
         self.half_precision, self.stream, self.video_path, self.config_path = half_precision, stream, video_path, config_path
         self.batch_size, self.threshold, self.max_tracks, self.iou = batch_size, threshold, max_tracks, iou
-        self.verbose, self.save_dir, self.imgsz, self.interpolate, self.device = verbose, save_dir, imgsz, interpolate, device
+        self.verbose, self.save_dir, self.imgsz, self.interpolate, self.device, self.n = verbose, save_dir, imgsz, interpolate, device, n
+        self.randomize, self.min_size, self.overwrite = randomize_order, min_video_size, overwrite
         if self.model.model.task != 'pose':
             raise InvalidFileTypeError(msg=f'The model {weights_path} is not a pose model. It is a {self.model.model.task} model', source=self.__class__.__name__)
         if self.model.model.kpt_shape[0] != len(keypoint_names):
             raise CountError(msg=f'The YOLO model expects {self.model.model.model.head.kpt_shape[0]} keypoints but you passed {len(keypoint_names)}: {keypoint_names}', source=self.__class__.__name__)
         self.class_ids, self.smoothing = self.model.names, smoothing
-
+        if self.randomize: random.shuffle(self.video_path)
+        if n is not None: self.video_path = self.video_path[:n]
 
     def run(self):
         self.results = {}
@@ -171,6 +180,15 @@ class YOLOPoseTrackInference():
         for video_cnt, video_path in enumerate(self.video_path):
             video_timer = SimbaTimer(start=True)
             _, video_name, _ = get_fn_ext(filepath=video_path)
+            video_size = round(os.path.getsize(video_path) / (1024 * 1024), 6)
+            if (self.min_size is not None) and (video_size < self.min_size):
+                print(f'Skipping video {video_name} (file size: {video_size}mb, minimum file size: {self.min_size}mb) ...')
+                continue
+            if self.save_dir:
+                save_path = os.path.join(self.save_dir, f'{video_name}.csv')
+                if os.path.isfile(save_path) and not self.overwrite:
+                    print(f'Skipping video {video_name} (output file {save_path} exist and overwrite is False) ...')
+                    continue
             video_meta = get_video_meta_data(video_path=video_path)
             video_out = []
             video_predictions = self.model.track(source=video_path,
@@ -271,4 +289,33 @@ class YOLOPoseTrackInference():
 #                            max_tracks=3,
 #                            stream=True,
 #                            iou=0.2)
+# i.run()
+
+
+
+# VIDEO_PATH = r"E:\netholabs_videos\two_tracks\videos"
+# WEIGHTS_PASS = r"/root/scripts/best.pt"
+# SAVE_DIR = r"E:\netholabs_videos\two_tracks\tow_yaml"
+# BOTSORT_PATH = r"/root/scripts/tow_bytetrack.yaml"
+#
+# KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_mid', 'Tail_end')
+#
+# i = YOLOPoseTrackInference(weights_path=WEIGHTS_PASS,
+#                            video_path=VIDEO_PATH,
+#                            save_dir=SAVE_DIR,
+#                            verbose=True,
+#                            device=0,
+#                            format=None,
+#                            keypoint_names=KEYPOINT_NAMES,
+#                            batch_size=500,
+#                            threshold=0.25,
+#                            config_path=BOTSORT_PATH,
+#                            interpolate=False,
+#                            imgsz=640,
+#                            max_tracks=3,
+#                            stream=True,
+#                            iou=0.2,
+#                            n=1,
+#                            overwrite=True,
+#                            min_video_size=2)
 # i.run()

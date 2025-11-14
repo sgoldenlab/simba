@@ -57,7 +57,10 @@ class PoseResetter(object):
             self.no_animals_csv_path,
         ]:
             check_file_exist_and_readable(file_path=file_path)
-            df = pd.read_csv(file_path, header=None, error_bad_lines=False)
+            try:
+                df = pd.read_csv(file_path, header=None, error_bad_lines=False)
+            except TypeError:
+                df = pd.read_csv(file_path, header=None, on_bad_lines='skip')
             df = df.iloc[0 : self.default_pose_configs_cnt]
             df.to_csv(file_path, index=False, header=False)
 

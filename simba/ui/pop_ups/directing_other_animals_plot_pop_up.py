@@ -45,9 +45,9 @@ class DirectingOtherAnimalsVisualizerPopUp(PopUpMixin, ConfigReader):
         ear_right_guess = find_closest_string(target=EAR_RIGHT, string_list=bp_names)[0]
 
         self.bp_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PARTS", icon_name='pose', icon_link=Links.DIRECTING_ANIMALS_PLOTS.value)
-        self.ear_left_dropdown = SimBADropDown(parent=self.bp_frm, dropdown_options=self.body_parts_lst, label_width=30, dropdown_width=25, value=ear_left_guess, label='LEFT EAR body-part name:')
-        self.ear_right_dropdown = SimBADropDown(parent=self.bp_frm, dropdown_options=self.body_parts_lst, label_width=30, dropdown_width=25, value=ear_right_guess, label='RIGHT EAR body-part name:')
-        self.nose_dropdown = SimBADropDown(parent=self.bp_frm, dropdown_options=self.body_parts_lst, label_width=30, dropdown_width=25, value=nose_guess, label='NOSE body-part name:')
+        self.ear_left_dropdown = SimBADropDown(parent=self.bp_frm, dropdown_options=bp_names, label_width=30, dropdown_width=25, value=ear_left_guess, label='LEFT EAR body-part name:')
+        self.ear_right_dropdown = SimBADropDown(parent=self.bp_frm, dropdown_options=bp_names, label_width=30, dropdown_width=25, value=ear_right_guess, label='RIGHT EAR body-part name:')
+        self.nose_dropdown = SimBADropDown(parent=self.bp_frm, dropdown_options=bp_names, label_width=30, dropdown_width=25, value=nose_guess, label='NOSE body-part name:')
 
         self.color_dict = get_color_dict()
         self.color_lst = list(self.color_dict.keys())

@@ -1,12 +1,12 @@
 __author__ = "Simon Nilsson"
 
-import glob
 import os
-from typing import List, Union
+from typing import List, Union, Optional
 
 import cv2
 import imutils
 import numpy as np
+from copy import deepcopy
 
 import simba
 from simba.mixins.plotting_mixin import PlottingMixin
@@ -16,8 +16,7 @@ from simba.utils.checks import (check_file_exist_and_readable,
 from simba.utils.data import create_color_palettes
 from simba.utils.enums import Paths, TextOptions
 from simba.utils.errors import InvalidInputError
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    read_img)
+from simba.utils.read_write import (find_files_of_filetypes_in_directory, read_img)
 
 WINDOW_NAME = "DEFINE POSE ESTIMATED BODY-PARTS"
 
@@ -45,10 +44,12 @@ class PoseConfigCreator(PlottingMixin):
                  animal_cnt: int,
                  img_path: Union[str, os.PathLike],
                  bp_list: List[str],
-                 animal_id_int_list: List[int]):
+                 animal_id_int_list: List[int],
+                 circle_scale: Optional[int] = None):
 
         check_str(name="POSE CONFIG NAME", value=pose_name, allow_blank=False, raise_error=True, invalid_substrs=(',',))
         check_int(name="NUMBER OF ANIMALS", value=animal_cnt, min_value=1, raise_error=True)
+        if circle_scale is not None: check_int(name="circle_size", value=circle_scale, min_value=1, raise_error=True)
         check_valid_img_path(path=img_path, raise_error=True)
         check_valid_lst(data=bp_list, source=f'{self.__class__.__name__} bp_list', valid_dtypes=(str,), min_len=1, raise_error=True)
         for bp_name in bp_list:
@@ -67,9 +68,12 @@ class PoseConfigCreator(PlottingMixin):
         if self.img_w < 800:
             self.img = imutils.resize(self.img, width=800).astype(np.uint8)
             self.img_h, self.img_w = int(self.img.shape[0]), int(self.img.shape[1])
-
-        self.circle_scale = self.get_optimal_circle_size(frame_size=(self.img_h, self.img_w), circle_frame_ratio=50)
-        self.font_size, self.x_scale, self.y_scale = self.get_optimal_font_scales(text='Left click on body part XXXXXXXXXXWWW',accepted_px_width=self.img_w, accepted_px_height=int(self.img_h/10), text_thickness=4)
+        self.side_img_size = (int(self.img_h / 4), self.img_w)
+        if circle_scale is None:
+            self.circle_scale = self.get_optimal_circle_size(frame_size=(self.img_h, self.img_w), circle_frame_ratio=50)
+        else:
+            self.circle_scale = deepcopy(self.circle_scale)
+        self.font_size, self.x_scale, self.y_scale = self.get_optimal_font_scales(text='Left click on body part XXXXXXXXXXWWW',accepted_px_width=self.side_img_size[1], accepted_px_height=int(self.side_img_size[0]/2), text_thickness=4)
         cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
         self.overlay = self.img.copy()
 
@@ -81,8 +85,10 @@ class PoseConfigCreator(PlottingMixin):
     def launch(self):
         def draw_circle(event, x, y, flags, param):
             if event == cv2.EVENT_LBUTTONDOWN:
+                clr = tuple([int(x) for x in self.color_lst[self.bp_cnt]])
                 cv2.circle(self.overlay, (x, int(y - self.side_img.shape[0])), self.circle_scale, self.color_lst[self.bp_cnt], -1)
-                cv2.putText(self.overlay, str(self.bp_cnt + 1), (x + 4, int(y - self.side_img.shape[0])), cv2.FONT_HERSHEY_SIMPLEX, self.font_size, self.color_lst[self.bp_cnt], 4)
+                self.overlay = PlottingMixin().put_text(img=self.overlay, text=str(self.bp_cnt + 1), pos=(x + 4, int(y - self.side_img.shape[0])), font_size=self.font_size, font_thickness=4, font=TextOptions.FONT.value, text_color=clr, text_bg_alpha=0.8)
+                #cv2.putText(self.overlay, str(self.bp_cnt + 1), (x + 4, int(y - self.side_img.shape[0])), cv2.FONT_HERSHEY_SIMPLEX, self.font_size, self.color_lst[self.bp_cnt], 4)
                 self.cord_written = True
 
         for bp_cnt, bp_name in enumerate(self.bp_list):
@@ -91,7 +97,8 @@ class PoseConfigCreator(PlottingMixin):
             self.side_img = np.zeros((int(self.img_h / 4), self.img_w, 3), np.uint8)
             if self.overlay.ndim != 3:
                 self.side_img = cv2.cvtColor(self.side_img, cv2.COLOR_BGR2GRAY)
-            cv2.putText(self.side_img, f"LEFT CLICK ON BODY-PART {bp_name}.", (10, 50), TextOptions.FONT.value, self.font_size, self.color_lst[bp_cnt], 4)
+            clr = tuple([int(x) for x in self.color_lst[self.bp_cnt]])
+            self.side_img = PlottingMixin().put_text(img=self.side_img, text=f"LEFT CLICK ON BODY-PART {bp_name}.", pos=(int(self.side_img_size[0]/10), int(self.side_img_size[0]/2)), font_size=self.font_size, font_thickness=6, font=TextOptions.FONT.value, text_color=clr, text_bg_alpha=1.0)
             img_concat = cv2.vconcat([self.side_img, self.overlay])
             cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
             cv2.imshow(WINDOW_NAME, img_concat)
@@ -128,6 +135,23 @@ class PoseConfigCreator(PlottingMixin):
             fd.write(str(self.animal_cnt) + "\n")
         cv2.imwrite(new_img_path, overlay)
 
+#
+# pose_config_creator = PoseConfigCreator(pose_name="My_test_config",
+#                                         animal_cnt=2,
+#                                         img_path=r"C:\Users\sroni\OneDrive\Desktop\desktop\ATTACK_0_feature_importance_bar_graph.png",
+#                                         bp_list=['Ear', 'Nose', 'Left_ear', 'Ear', 'Nose', 'Left_ear'],
+#                                         animal_id_int_list= [1, 1, 1, 2, 2, 2])
+# pose_config_creator.launch()
+#
+#
 
-# pose_config_creator = PoseConfigCreator(pose_name="My_test_config", animal_cnt=2, img_path=r"C:\Users\sroni\OneDrive\Desktop\Screenshot 2024-09-22 151619.png", bp_list=['Ear', 'Nose', 'Left_ear', 'Ear', 'Nose', 'Left_ear'], animal_id_int_list= [1, 1, 1, 2, 2, 2])
+
+
+
+
+# pose_config_creator = PoseConfigCreator(pose_name="My_test_config",
+#                                         animal_cnt=2,
+#                                         img_path=r"C:\troubleshooting\two_animals_16_bp_JAG\project_folder\videos\Together_1\0.png",
+#                                         bp_list=['Ear', 'Nose', 'Left_ear', 'Ear', 'Nose', 'Left_ear'],
+#                                         animal_id_int_list= [1, 1, 1, 2, 2, 2])
 # pose_config_creator.launch()

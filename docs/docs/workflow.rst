@@ -109,6 +109,7 @@ Peer-reviewed publication in *Nature Neuroscience* Describing SimBA.
 
 :download:`🔗 OSF-MP4 <https://osf.io/2uack>`
 :download:`🔗 VIEW-YOUTUBE <https://www.youtube.com/watch?v=oEr2-3Cuhb0>`
+:download:`🔗 SLIDES <https://osf.io/32vtd/files/97zc6>`
 
 
 🧪 SimBA Published Use Cases

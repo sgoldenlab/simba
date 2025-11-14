@@ -38,9 +38,9 @@ class AnimalDirectingAnimalPopUp(ConfigReader, PopUpMixin):
         ear_right_guess = find_closest_string(target=EAR_RIGHT, string_list=bp_names)[0]
 
         self.bp_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PARTS", icon_name='pose', icon_link=Links.DIRECTING_ANIMALS_PLOTS.value)
-        self.ear_left_dropdown = SimBADropDown(parent=self.bp_frm, dropdown_options=self.body_parts_lst, label_width=30, dropdown_width=25, value=ear_left_guess, label='LEFT EAR BODY-PART NAME:')
-        self.ear_right_dropdown = SimBADropDown(parent=self.bp_frm, dropdown_options=self.body_parts_lst, label_width=30, dropdown_width=25, value=ear_right_guess, label='RIGHT EAR BODY-PART NAME:')
-        self.nose_dropdown = SimBADropDown(parent=self.bp_frm, dropdown_options=self.body_parts_lst, label_width=30, dropdown_width=25, value=nose_guess, label='NOSE BODY-PART NAME:')
+        self.ear_left_dropdown = SimBADropDown(parent=self.bp_frm, dropdown_options=bp_names, label_width=30, dropdown_width=25, value=ear_left_guess, label='LEFT EAR BODY-PART NAME:')
+        self.ear_right_dropdown = SimBADropDown(parent=self.bp_frm, dropdown_options=bp_names, label_width=30, dropdown_width=25, value=ear_right_guess, label='RIGHT EAR BODY-PART NAME:')
+        self.nose_dropdown = SimBADropDown(parent=self.bp_frm, dropdown_options=bp_names, label_width=30, dropdown_width=25, value=nose_guess, label='NOSE BODY-PART NAME:')
 
         self.settings_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="OUTPUT FORMATS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DIRECTING_ANIMALS_PLOTS.value)
         boolean_tables_cb, self.boolean_tables_var = SimbaCheckbox(parent=self.settings_frm, txt="CREATE BOOLEAN TABLES", txt_img='table', val=False)
@@ -84,4 +84,4 @@ class AnimalDirectingAnimalPopUp(ConfigReader, PopUpMixin):
         directing_animals_analyzer.run()
 
 
-#test = AnimalDirectingAnimalPopUp(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini")
+#test = AnimalDirectingAnimalPopUp(config_path=r"C:\troubleshooting\two_animals_16_bp_JAG\project_folder\project_config.ini")
