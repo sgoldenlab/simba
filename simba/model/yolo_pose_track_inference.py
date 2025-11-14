@@ -31,6 +31,7 @@ from simba.utils.read_write import (find_files_of_filetypes_in_directory,
                                     get_pkg_version, get_video_meta_data,
                                     recursive_file_search)
 from simba.utils.yolo import (_get_undetected_obs, filter_yolo_keypoint_data, load_yolo_model)
+from simba.utils.warnings import FrameRangeWarning
 
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'TRACK', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
@@ -119,7 +120,8 @@ class YOLOPoseTrackInference():
                  imgsz: int = 320,
                  min_video_size: Optional[float] = None,
                  overwrite: bool = True,
-                 iou: float = 0.5):
+                 iou: float = 0.5,
+                 raise_error: bool = True):
 
         _ = get_pkg_version(pkg='ultralytics', raise_error=True)
         _ = get_pkg_version(pkg='torch', raise_error=True)
@@ -128,6 +130,7 @@ class YOLOPoseTrackInference():
             raise SimBAGPUError(msg='No GPU detected.', source=self.__class__.__name__)
         else:
             print(f'GPUS AVAILABLE: {gpus}')
+        check_valid_boolean(value=raise_error, source=f'{self.__class__.__name__} raise_error')
         if isinstance(video_path, list):
             check_valid_lst(data=video_path, source=f'{self.__class__.__name__} video_path', valid_dtypes=(str, np.str_,), min_len=1)
         elif os.path.isfile(video_path):
@@ -139,7 +142,7 @@ class YOLOPoseTrackInference():
             else:
                 video_path = recursive_file_search(directory=video_path, extensions=list(Options.ALL_VIDEO_FORMAT_OPTIONS.value), as_dict=False)
         for i in video_path:
-            _ = get_video_meta_data(video_path=i)
+            _ = get_video_meta_data(video_path=i, raise_error=raise_error)
         check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir', raise_error=True)
         check_file_exist_and_readable(file_path=weights_path)
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose')
@@ -165,7 +168,7 @@ class YOLOPoseTrackInference():
         self.half_precision, self.stream, self.video_path, self.config_path = half_precision, stream, video_path, config_path
         self.batch_size, self.threshold, self.max_tracks, self.iou = batch_size, threshold, max_tracks, iou
         self.verbose, self.save_dir, self.imgsz, self.interpolate, self.device, self.n = verbose, save_dir, imgsz, interpolate, device, n
-        self.randomize, self.min_size, self.overwrite = randomize_order, min_video_size, overwrite
+        self.randomize, self.min_size, self.overwrite, self.raise_error = randomize_order, min_video_size, overwrite, raise_error
         if self.model.model.task != 'pose':
             raise InvalidFileTypeError(msg=f'The model {weights_path} is not a pose model. It is a {self.model.model.task} model', source=self.__class__.__name__)
         if self.model.model.kpt_shape[0] != len(keypoint_names):
@@ -180,6 +183,10 @@ class YOLOPoseTrackInference():
         for video_cnt, video_path in enumerate(self.video_path):
             video_timer = SimbaTimer(start=True)
             _, video_name, _ = get_fn_ext(filepath=video_path)
+            video_meta = get_video_meta_data(video_path=video_path, raise_error=self.raise_error)
+            if video_meta is None:
+                FrameRangeWarning(msg=f'Skipping video {video_name}, could not read its meta-data successfully', source=self.__class__.__name__)
+                continue
             video_size = round(os.path.getsize(video_path) / (1024 * 1024), 6)
             if (self.min_size is not None) and (video_size < self.min_size):
                 print(f'Skipping video {video_name} (file size: {video_size}mb, minimum file size: {self.min_size}mb) ...')
@@ -189,7 +196,6 @@ class YOLOPoseTrackInference():
                 if os.path.isfile(save_path) and not self.overwrite:
                     print(f'Skipping video {video_name} (output file {save_path} exist and overwrite is False) ...')
                     continue
-            video_meta = get_video_meta_data(video_path=video_path)
             video_out = []
             video_predictions = self.model.track(source=video_path,
                                                  stream=self.stream,
@@ -318,4 +324,34 @@ class YOLOPoseTrackInference():
 #                            n=1,
 #                            overwrite=True,
 #                            min_video_size=2)
+# i.run()
+
+# VIDEO_PATH = r"/root/b2_csv/avis_1st_batch"
+# WEIGHTS_PASS = r"/root/tracking_scripts/best.pt"
+# SAVE_DIR = r"/root/out_data"
+# BOTSORT_PATH = r"/root/tracking_scripts/tow_bytetrack.yaml"
+#
+# KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_mid', 'Tail_end')
+#
+# i = YOLOPoseTrackInference(weights_path=WEIGHTS_PASS,
+#                            video_path=VIDEO_PATH,
+#                            save_dir=SAVE_DIR,
+#                            verbose=True,
+#                            device=0,
+#                            format=None,
+#                            keypoint_names=KEYPOINT_NAMES,
+#                            batch_size=500,
+#                            threshold=0.25,
+#                            config_path=BOTSORT_PATH,
+#                            interpolate=False,
+#                            imgsz=640,
+#                            max_tracks=3,
+#                            stream=True,
+#                            iou=0.2,
+#                            n=5000,
+#                            overwrite=False,
+#                            min_video_size=1,
+#                            randomize_order=True,
+#                            recursive=True,
+#                            raise_error=False)
 # i.run()

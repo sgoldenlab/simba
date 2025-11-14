@@ -14,7 +14,7 @@ from simba.plotting.directing_animals_visualizer_mp import \
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         SimbaButton, SimBADropDown)
 from simba.utils.enums import Formats, Keys, Links
-from simba.utils.errors import AnimalNumberError
+from simba.utils.errors import AnimalNumberError, CountError
 from simba.utils.lookups import find_closest_string, get_color_dict
 from simba.utils.read_write import (find_all_videos_in_directory,
                                     find_core_cnt, str_2_bool)
@@ -115,6 +115,9 @@ class DirectingOtherAnimalsVisualizerPopUp(PopUpMixin, ConfigReader):
         nose = self.nose_dropdown.get_value()
         left_ear = self.ear_left_dropdown.get_value()
         right_ear = self.ear_right_dropdown.get_value()
+
+        if len(list(set(list([nose, left_ear, right_ear])))) != 3:
+            raise CountError(msg=f'The three chosen body-parts have to be unique: Got {nose, left_ear, right_ear}', source=self.__class__.__name__)
 
         style_attr = {SHOW_POSE: show_pose,
                       CIRCLE_SIZE: circle_size,

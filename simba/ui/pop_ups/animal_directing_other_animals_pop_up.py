@@ -1,16 +1,12 @@
 import os
-from tkinter import *
 from typing import Union
 
-from simba.data_processors.directing_other_animals_calculator import \
-    DirectingOtherAnimalsAnalyzer
+from simba.data_processors.directing_other_animals_calculator import DirectingOtherAnimalsAnalyzer
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
-                                        SimbaCheckbox, SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaCheckbox, SimBADropDown)
 from simba.utils.enums import Keys, Links
-from simba.utils.errors import (AnimalNumberError, InvalidInputError,
-                                NoFilesFoundError)
+from simba.utils.errors import (AnimalNumberError, InvalidInputError, NoFilesFoundError, CountError)
 from simba.utils.lookups import find_closest_string
 from simba.utils.warnings import SkippingRuleWarning
 
@@ -72,6 +68,10 @@ class AnimalDirectingAnimalPopUp(ConfigReader, PopUpMixin):
         nose_name = self.nose_dropdown.get_value()
         left_ear = self.ear_left_dropdown.get_value()
         ear_right = self.ear_right_dropdown.get_value()
+
+        if len(list(set(list([nose_name, left_ear, ear_right])))) != 3:
+            raise CountError(msg=f'The three chosen body-parts have to be unique: Got {nose_name, left_ear, ear_right}', source=self.__class__.__name__)
+
 
         directing_animals_analyzer = DirectingOtherAnimalsAnalyzer(config_path=self.config_path,
                                                                    bool_tables=self.boolean_tables_var.get(),
