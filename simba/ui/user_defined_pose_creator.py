@@ -71,10 +71,10 @@ class PoseConfigCreator(PlottingMixin):
             self.img_h, self.img_w = int(self.img.shape[0]), int(self.img.shape[1])
         self.side_img_size = (int(self.img_h / 4), self.img_w)
         if circle_scale is None:
-            self.circle_scale = self.get_optimal_circle_size(frame_size=(self.img_h, self.img_w), circle_frame_ratio=50)
+            self.circle_scale = self.get_optimal_circle_size(frame_size=(self.img_h, self.img_w), circle_frame_ratio=100)
         else:
             self.circle_scale = deepcopy(self.circle_scale)
-        self.font_size, self.x_scale, self.y_scale = self.get_optimal_font_scales(text='Left click on body part XXXXXXXXXXWWW',accepted_px_width=self.side_img_size[1], accepted_px_height=int(self.side_img_size[0]/2), text_thickness=4)
+        self.font_size, self.x_scale, self.y_scale = self.get_optimal_font_scales(text='Left click on body part XXXXXXXXXXWWW', accepted_px_width=self.side_img_size[1], accepted_px_height=int(self.side_img_size[0]/2), text_thickness=4)
         cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
         self.overlay = self.img.copy()
 
@@ -88,7 +88,7 @@ class PoseConfigCreator(PlottingMixin):
             if event == cv2.EVENT_LBUTTONDOWN:
                 clr = tuple([int(x) for x in self.color_lst[self.bp_cnt]])
                 cv2.circle(self.overlay, (x, int(y - self.side_img.shape[0])), self.circle_scale, self.color_lst[self.bp_cnt], -1)
-                self.overlay = PlottingMixin().put_text(img=self.overlay, text=str(self.bp_cnt + 1), pos=(x + 4, int(y - self.side_img.shape[0])), font_size=self.font_size, font_thickness=4, font=TextOptions.FONT.value, text_color=clr, text_bg_alpha=0.8)
+                self.overlay = PlottingMixin().put_text(img=self.overlay, text=str(self.bp_cnt + 1), pos=(x + 4, int(y - self.side_img.shape[0])), font_size=self.font_size, font_thickness=4, font=TextOptions.FONT.value, text_color=clr, text_bg_alpha=0.4)
                 #cv2.putText(self.overlay, str(self.bp_cnt + 1), (x + 4, int(y - self.side_img.shape[0])), cv2.FONT_HERSHEY_SIMPLEX, self.font_size, self.color_lst[self.bp_cnt], 4)
                 self.cord_written = True
 
@@ -114,11 +114,9 @@ class PoseConfigCreator(PlottingMixin):
 
     def save(self):
         overlay = cv2.resize(self.overlay, (250, 300))
-
         simba_cw = os.path.dirname(simba.__file__)
         img_dir = os.path.join(simba_cw, Paths.SCHEMATICS.value)
         check_if_dir_exists(in_dir=img_dir, source=self.__class__.__name__, create_if_not_exist=True)
-
         pose_name_path = os.path.join(simba_cw, Paths.PROJECT_POSE_CONFIG_NAMES.value)
         bp_path = os.path.join(simba_cw, Paths.SIMBA_BP_CONFIG_PATH.value)
         no_animals_path = os.path.join(simba_cw, Paths.SIMBA_NO_ANIMALS_PATH.value)
@@ -136,15 +134,15 @@ class PoseConfigCreator(PlottingMixin):
             fd.write(str(self.animal_cnt) + "\n")
         cv2.imwrite(new_img_path, overlay)
 
-#
+
 # pose_config_creator = PoseConfigCreator(pose_name="My_test_config",
 #                                         animal_cnt=2,
 #                                         img_path=r"C:\Users\sroni\OneDrive\Desktop\desktop\ATTACK_0_feature_importance_bar_graph.png",
 #                                         bp_list=['Ear', 'Nose', 'Left_ear', 'Ear', 'Nose', 'Left_ear'],
 #                                         animal_id_int_list= [1, 1, 1, 2, 2, 2])
 # pose_config_creator.launch()
-#
-#
+
+
 
 
 
