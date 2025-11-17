@@ -8,14 +8,14 @@ from typing import Union
 from simba.data_processors.smoothing import Smoothing
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (Entry_Box, FileSelect, FolderSelect,
-                                        SimbaButton, SimBADropDown)
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_dir_exists, check_int)
+from simba.ui.tkinter_functions import (Entry_Box, FileSelect, FolderSelect, SimbaButton, SimBADropDown, SimBALabel, CreateLabelFrameWithIcon)
+from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists, check_int)
 from simba.utils.enums import Formats, Options
 from simba.utils.read_write import str_2_bool
 
 SMOOTHING_OPTION = {'Savitzky Golay': "savitzky-golay", "Gaussian": "gaussian"}
+
+INSTRUCTIONS_LBL = 'NOTE: The chosen data will be overwritten with the smoothened data. \n The original, un-smoothened, data - if saved - is placed in a timestamped \n sub-directory of the original data with the "pre" prefix.'
 
 class SmoothingPopUp(PopUpMixin, ConfigReader):
 
@@ -28,18 +28,20 @@ class SmoothingPopUp(PopUpMixin, ConfigReader):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         self.config_path = config_path
 
-        self.settings_frm = LabelFrame(self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value)
+        self.settings_frm= CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
+
+        #self.settings_frm = LabelFrame(self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value)
+
+        instruction_lbl = SimBALabel(parent=self.settings_frm, txt=INSTRUCTIONS_LBL, font=Formats.FONT_REGULAR_ITALICS.value)
         self.time_window = Entry_Box(self.settings_frm, "TIME WINDOW (MILLISECONDS):", "35", validation="numeric", entry_box_width=35, value=100)
-
-
-
         self.method_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=Options.SMOOTHING_OPTIONS.value, label="SMOOTHING METHOD:", label_width=35, dropdown_width=35, value=Options.SMOOTHING_OPTIONS.value[0])
         self.save_originals_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="SAVE ORIGINALS:", label_width=35, dropdown_width=35, value='TRUE')
 
         self.settings_frm.grid(row=0, column=0, sticky=NW)
-        self.time_window.grid(row=0, column=0, sticky=NW)
-        self.method_dropdown.grid(row=1, column=0, sticky=NW)
-        self.save_originals_dropdown.grid(row=2, column=0, sticky=NW)
+        instruction_lbl.grid(row=0, column=0, sticky=NW)
+        self.time_window.grid(row=1, column=0, sticky=NW)
+        self.method_dropdown.grid(row=2, column=0, sticky=NW)
+        self.save_originals_dropdown.grid(row=3, column=0, sticky=NW)
 
         self.single_file_frm = LabelFrame(self.main_frm, text="SMOOTH SINGLE DATA FILE", font=Formats.FONT_HEADER.value)
         self.selected_file = FileSelect(self.single_file_frm, "DATA PATH:", lblwidth=35, file_types=[("VIDEO FILE", ".csv .parquet")], initialdir=self.project_path)
@@ -85,4 +87,4 @@ class SmoothingPopUp(PopUpMixin, ConfigReader):
         smoothing.run()
 
 
-# SmoothingPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+#SmoothingPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")

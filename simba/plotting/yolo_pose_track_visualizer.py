@@ -54,20 +54,21 @@ def _yolo_keypoint_track_visualizer(frm_ids: np.ndarray,
     video_writer = cv2.VideoWriter(video_save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"], video_meta_data["height"]))
     while current_frm <= end_frm:
         print(f'Processing frame {current_frm}/{video_meta_data["frame_count"]} (batch: {batch_id})...')
-        img = read_frm_of_video(video_path=video_path, frame_index=current_frm)
-        frm_data = data.loc[data[FRAME] == current_frm]
-        frm_data = frm_data[frm_data[CONFIDENCE] > threshold]
-        for cnt, (row, row_data) in enumerate(frm_data.iterrows()):
-            clrs = np.array(palettes[int(row_data[TRACK])]).astype(np.int32)
-            bbox_cords = row_data[BOX_CORD_FIELDS].values.astype(np.int32).reshape(-1, 2)
-            kp_coords = row_data.drop(EXPECTED_COLS).values.astype(np.int32).reshape(-1, 3)[:, :-1]
-            clr = tuple(int(c) for c in clrs[0])
-            if show_bbox:
-                img = cv2.polylines(img, [bbox_cords], True, clr, thickness=thickness, lineType=cv2.LINE_AA)
-            for kp_cnt, kp in enumerate(kp_coords):
-                clr = tuple(int(c) for c in clrs[kp_cnt+1])
-                img = cv2.circle(img, (tuple(kp)), circle_size, clr, -1)
-        video_writer.write(img)
+        img = read_frm_of_video(video_path=video_path, frame_index=current_frm, raise_error=False)
+        if img is not None:
+            frm_data = data.loc[data[FRAME] == current_frm]
+            frm_data = frm_data[frm_data[CONFIDENCE] > threshold]
+            for cnt, (row, row_data) in enumerate(frm_data.iterrows()):
+                clrs = np.array(palettes[int(row_data[TRACK])]).astype(np.int32)
+                bbox_cords = row_data[BOX_CORD_FIELDS].values.astype(np.int32).reshape(-1, 2)
+                kp_coords = row_data.drop(EXPECTED_COLS).values.astype(np.int32).reshape(-1, 3)[:, :-1]
+                clr = tuple(int(c) for c in clrs[0])
+                if show_bbox:
+                    img = cv2.polylines(img, [bbox_cords], True, clr, thickness=thickness, lineType=cv2.LINE_AA)
+                for kp_cnt, kp in enumerate(kp_coords):
+                    clr = tuple(int(c) for c in clrs[kp_cnt+1])
+                    img = cv2.circle(img, (tuple(kp)), circle_size, clr, -1)
+            video_writer.write(img)
         current_frm += 1
     cap.release()
     video_writer.release()
@@ -120,10 +121,8 @@ class YOLOPoseTrackVisualizer():
                  thickness: Optional[int] = None,
                  circle_size: Optional[int] = None,
                  verbose: Optional[bool] = False,
-                 bbox: Optional[bool] = False):
-
-
-
+                 bbox: Optional[bool] = False,
+                 overwrite: bool = True):
 
         if not os.path.isdir(data_path) and not os.path.isfile(data_path):
             raise InvalidFilepathError(msg=f'data_path {data_path} is not a valid directory of file path.', source=self.__class__.__name__)
@@ -153,11 +152,12 @@ class YOLOPoseTrackVisualizer():
         check_if_dir_exists(in_dir=save_dir)
         check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose', raise_error=True)
         check_valid_boolean(value=[bbox], source=f'{self.__class__.__name__} show_bbox', raise_error=True)
+        check_valid_boolean(value=overwrite, source=f'{self.__class__.__name__} overwrite', raise_error=True)
         if core_cnt == -1 or core_cnt > find_core_cnt()[0]: core_cnt = find_core_cnt()[0]
         if circle_size is not None: check_int(name=f'{self.__class__.__name__} circle_size', value=circle_size, min_value=1)
         if thickness is not None: check_int(name=f'{self.__class__.__name__} thickness', value=thickness, min_value=1)
         self.save_dir, self.verbose, self.palettes, self.thickness, self.core_cnt = save_dir, verbose, palettes, thickness, core_cnt
-        self.threshold, self.circle_size, self.thickness, self.show_bbox = threshold, circle_size, thickness, bbox
+        self.threshold, self.circle_size, self.thickness, self.show_bbox, self.overwrite = threshold, circle_size, thickness, bbox, overwrite
 
     def run(self):
         for video_cnt, (video_name, data_path) in enumerate(self.data_paths.items()):
@@ -165,6 +165,9 @@ class YOLOPoseTrackVisualizer():
             video_timer = SimbaTimer(start=True)
             video_temp_dir = os.path.join(self.save_dir, video_name)
             save_path = os.path.join(self.save_dir, f'{video_name}.mp4')
+            if os.path.isfile(save_path) and not self.overwrite:
+                print(f'Skipping {video_name} (file {save_path} exist and overwrite is passed as False')
+                continue
             if os.path.isdir(video_temp_dir): remove_a_folder(folder_dir=video_temp_dir)
             create_directory(paths=video_temp_dir)
             self.video_meta_data = get_video_meta_data(video_path=self.video_paths[video_name])
@@ -246,9 +249,9 @@ class YOLOPoseTrackVisualizer():
 
 
 if __name__ == "__main__":
-    VIDEO_PATH = r"E:\netholabs_videos\two_tracks\videos"
-    DATA_PATH = r"E:\netholabs_videos\two_tracks\tow_cleaned"
-    SAVE_DIR = r"E:\netholabs_videos\two_tracks\tow_out_videos"
+    VIDEO_PATH = r"E:\netholabs_videos\primeintellect_100_videos"
+    DATA_PATH = r"E:\netholabs_videos\primeintellect_100_largest"
+    SAVE_DIR = r"E:\netholabs_videos\primeintellect_100_videos\out"
     kp_vis = YOLOPoseTrackVisualizer(data_path=DATA_PATH,
                                      video_path=VIDEO_PATH,
                                      save_dir=SAVE_DIR,

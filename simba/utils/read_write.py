@@ -798,25 +798,28 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
                       greyscale: Optional[bool] = False,
                       black_and_white: Optional[bool] = False,
                       clahe: Optional[bool] = False,
-                      use_ffmpeg: Optional[bool] = False) -> np.ndarray:
+                      use_ffmpeg: Optional[bool] = False,
+                      raise_error: Optional[bool] = True) -> Union[np.ndarray, None]:
 
     """
-    Reads single image from video file.
+    Reads a single frame from a video file.
 
     .. seealso::
        To read a batch of images with GPU acceleration, see :func:`simba.utils.read_write.read_img_batch_from_video_gpu`.
        To read a batch of videos using multicore CPU acceleration, see :func:`simba.utils.read_write.read_img_batch_from_video`.
-       To read frames batches asynchrnously, see :func:`simba.video_processors.async_frame_reader.AsyncVideoFrameReader`.
+       To read frames batches asynchronously, see :func:`simba.video_processors.async_frame_reader.AsyncVideoFrameReader`.
 
-    :param Union[str, os.PathLike] video_path: Path to video file, or cv2.VideoCapture object.
-    :param int frame_index: The frame of video to return. Default: 1. Note, if frame index -1 is passed, the last frame of the video is read in.
-    :param Optional[int] opacity: Value between 0 and 100 or None. If float value, returns image with opacity. 100 fully opaque. 0.0 fully transparant.
+    :param Union[str, os.PathLike, cv2.VideoCapture] video_path: Path to video file, or cv2.VideoCapture object.
+    :param Optional[int] frame_index: The frame index to return (0-based). Default: 0. If -1 is passed, the last frame of the video is read.
+    :param Optional[float] opacity: Value between 0 and 100 or None. If float value, returns image with opacity. 100 fully opaque. 0.0 fully transparent.
     :param Optional[Tuple[int, int]] size: If tuple, resizes the image to size. Else, returns original image size.
-    :param Optional[bool] greyscale: If true, returns the greyscale image. Default False.
-    :param Optional[bool] black_and_white: If true, returns black and white image at threshold 127. Default False.
-    :param Optional[bool] clahe: If true, returns clahe enhanced image. Default False.
-    :return: Image as numpy array.
-    :rtype: np.ndarray
+    :param Optional[bool] greyscale: If True, returns the greyscale image. Default False.
+    :param Optional[bool] black_and_white: If True, returns black and white image at threshold 127. Default False.
+    :param Optional[bool] clahe: If True, returns CLAHE enhanced image. Default False.
+    :param Optional[bool] use_ffmpeg: If True, uses FFmpeg for frame extraction instead of OpenCV. Default False.
+    :param Optional[bool] raise_error: If True, raises error on failure. If False, returns None on failure. Default True.
+    :return: Image as numpy array, or None if raise_error=False and an error occurs.
+    :rtype: Union[np.ndarray, None]
 
     :example:
     >>> img = read_frm_of_video(video_path='/Users/simon/Desktop/envs/platea_featurizer/data/video/3D_Mouse_5-choice_MouseTouchBasic_s9_a4_grayscale.mp4', clahe=True)
@@ -844,7 +847,10 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
     if frame_index == -1:
         frame_index = video_meta_data["frame_count"] - 1
     if (frame_index > video_meta_data["frame_count"]) or (frame_index < 0):
-        raise FrameRangeError(msg=f'Frame {frame_index} is out of range: The video {video_path} contains {video_meta_data["frame_count"]} frames.', source=read_frm_of_video.__name__)
+        if raise_error:
+            raise FrameRangeError(msg=f'Frame {frame_index} is out of range: The video {video_path} contains {video_meta_data["frame_count"]} frames.', source=read_frm_of_video.__name__)
+        else:
+            return None
     if not use_ffmpeg:
         if type(video_path) == str:
             capture = cv2.VideoCapture(video_path)
@@ -853,10 +859,16 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
         capture.set(cv2.CAP_PROP_POS_FRAMES, frame_index)
         ret, img = capture.read()
         if not ret:
-            raise FrameRangeError(msg=f"Frame {frame_index} for video {video_path} could not be read.")
+            if raise_error:
+                raise FrameRangeError(msg=f"Frame {frame_index} for video {video_path} could not be read.")
+            else:
+                return None
     else:
         if not isinstance(video_path, str):
-            raise NoDataError(msg='When using FFMpeg, pass video path', source=read_frm_of_video.__name__)
+            if raise_error:
+                raise NoDataError(msg='When using FFMpeg, pass video path', source=read_frm_of_video.__name__)
+            else:
+                return None
         is_color = is_video_color(video=video_path)
         timestamp = frame_index / video_meta_data['fps']
         if is_color:

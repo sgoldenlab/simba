@@ -206,9 +206,12 @@ class YoloTrackCleaner:
         timer.stop_timer()
         stdout_success(msg=f'Track cleaning complete for {len(self.data_paths.keys())} data file(s). Results saved in {self.save_dir}', elapsed_time=timer.elapsed_time_str)
 
+# DATA_PATH = r"E:\netholabs_videos\two_tracks\tow_yaml"
+# SAVE_DIR = r"E:\netholabs_videos\two_tracks\tow_cleaned"
+# BP_LOC = 'NOSE'
 #
-x = YoloTrackCleaner(data_path=r"E:\netholabs_videos\two_tracks\tow_yaml", save_dir=r'E:\netholabs_videos\two_tracks\tow_cleaned', bp_loc='NOSE')
-x.run()
+# x = YoloTrackCleaner(data_path=DATA_PATH, save_dir=SAVE_DIR, bp_loc=BP_LOC)
+# x.run()
 # x = YoloTrackCleaner(data_path=r"E:\netholabs_videos\two_tracks_102725\csvs", save_dir=r'E:\netholabs_videos\two_tracks_102725\tracks_cleaned', bp_loc='NOSE')
 # x.run()
 # x = YoloTrackCleaner(data_path=r"E:\netholabs_videos\two_tracks_102725\csvs\cage_1_date_2025_09_13_hour_03_minute_46.csv", save_dir=r'E:\netholabs_videos\two_tracks_102725\tracks_cleaned', bp_loc='NOSE')
