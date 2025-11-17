@@ -8,8 +8,11 @@ from typing import Union
 from simba.data_processors.interpolate import Interpolate
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (DropDownMenu, FileSelect, FolderSelect, SimbaButton, SimBADropDown, SimBALabel, CreateLabelFrameWithIcon)
-from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        FileSelect, FolderSelect, SimbaButton,
+                                        SimBADropDown, SimBALabel)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_dir_exists)
 from simba.utils.enums import Formats, Options
 from simba.utils.read_write import str_2_bool
 
