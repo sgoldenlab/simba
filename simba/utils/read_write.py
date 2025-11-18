@@ -522,6 +522,7 @@ def get_video_info_ffmpeg(video_path: Union[str, os.PathLike]) -> Dict[str, Any]
     :return: A dictionary containing video metadata:
     :rtype: Dict[str, Any]
     """
+
     if not check_ffmpeg_available(raise_error=False):
         raise FFMPEGNotFoundError(msg=f'Cannot get video meta data from video using FFMPEG: FFMPEG not found on computer.', source=get_video_info_ffmpeg.__name__)
     check_file_exist_and_readable(file_path=video_path)
@@ -836,6 +837,7 @@ def read_frm_of_video(video_path: Union[str, os.PathLike, cv2.VideoCapture],
         if not use_ffmpeg:
             video_meta_data = get_video_meta_data(video_path=video_path)
         else:
+            print('s')
             video_meta_data = get_video_info_ffmpeg(video_path=video_path)
     else:
         video_meta_data = {"frame_count": int(video_path.get(cv2.CAP_PROP_FRAME_COUNT)),
@@ -3607,6 +3609,57 @@ def extract_audio_from_video(video_path: Union[str, os.PathLike],
                                   source='extract_audio_from_video')
     timer.stop_timer()
     stdout_success(msg=f'Audio track saved at {save_path}', elapsed_time=timer.elapsed_time_str)
+
+
+def find_closest_readable_frame(video_path: Union[str, os.PathLike],
+                                target_frame: int,
+                                max_search_range: int = 50) -> Tuple[Optional[np.ndarray], Optional[int]]:
+    """
+    Finds the closest readable frame to a target frame index.
+
+    This function attempts to read the target frame from a video. If the target frame cannot be read
+    (e.g., due to corruption or encoding issues), it searches nearby frames in both directions to find
+    the closest readable frame.
+
+    :param Union[str, os.PathLike] video_path: Path to video file.
+    :param int target_frame: Target frame index to read (0-based).
+    :param int max_search_range: Maximum number of frames to search in each direction from target. Default: 100.
+    :return: Tuple of (frame array, actual frame index) or (None, None) if no readable frame found.
+    :rtype: Tuple[Optional[np.ndarray], Optional[int]]
+
+    :example:
+    >>> frame, actual_idx = find_closest_readable_frame(video_path='video.mp4', target_frame=10810)
+    >>> if frame is not None:
+    >>>     print(f"Read frame {actual_idx} (target was 10810, offset: {actual_idx - 10810})")
+    """
+
+    check_file_exist_and_readable(file_path=video_path)
+    check_int(name='target_frame', value=target_frame, min_value=0)
+    check_int(name='max_search_range', value=max_search_range, min_value=1)
+
+    video_meta = get_video_meta_data(video_path=video_path)
+    target_frame = max(0, min(target_frame, video_meta['frame_count'] - 1))
+
+    img = read_frm_of_video(video_path=video_path, frame_index=target_frame, raise_error=False)
+    if img is not None:
+        return img, target_frame
+
+    for offset in range(1, max_search_range + 1):
+        test_frame = target_frame - offset
+        if test_frame >= 0:
+            img = read_frm_of_video(video_path=video_path, frame_index=test_frame, raise_error=False)
+            if img is not None:
+                return img, test_frame
+
+        test_frame = target_frame + offset
+        if test_frame < video_meta['frame_count']:
+            img = read_frm_of_video(video_path=video_path, frame_index=test_frame, raise_error=False)
+            if img is not None:
+                return img, test_frame
+
+    return None, None
+
+
 
 #copy_multiple_videos_to_project(config_path=r"C:\troubleshooting\multi_animal_dlc_two_c57\project_folder\project_config.ini", source=r'E:\maplight_videos\video_test', file_type='mp4', recursive_search=False)
 

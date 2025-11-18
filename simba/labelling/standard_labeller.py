@@ -37,7 +37,7 @@ from simba.utils.lookups import (get_current_time, get_display_resolution,
                                  get_labelling_video_kbd_bindings)
 from simba.utils.printing import log_event, stdout_success
 from simba.utils.read_write import (get_video_meta_data, read_config_entry,
-                                    read_df, read_frm_of_video, write_df)
+                                    read_df, read_frm_of_video, write_df, find_closest_readable_frame)
 from simba.utils.warnings import DataHeaderWarning, FrameRangeWarning
 
 PLAY_VIDEO_SCRIPT_PATH = os.path.join(os.path.dirname(simba.__file__), "labelling/play_annotation_video.py")
@@ -157,7 +157,7 @@ class LabellingInterface(ConfigReader):
         self.img_lbl = Label(self.img_frm, name='img_lbl')
         self.img_frm.grid(row=0, column=0, sticky=NW, padx=10, pady=10, columnspan=3, rowspan=2)
         self.img_lbl.grid(row=0, column=0, sticky=NW)
-        self.set_img(img_lbl=self.img_lbl, video_path=self.video_path, img_idx=self.img_idx, display_size=self.img_display_size)
+
 
         self.navigation_frm = CreateLabelFrameWithIcon(parent=self.main_window, header='FRAME NAVIGATION',  icon_name='navigation', relief='solid')
         self.current_frm_eb = Entry_Box(parent=self.navigation_frm, fileDescription='CURRENT FRAME: ', labelwidth=20, validation='numeric', entry_box_width=10, value=self.img_idx, justify='center', label_font=Formats.FONT_HEADER.value, entry_font=Formats.FONT_HEADER.value)
@@ -166,6 +166,8 @@ class LabellingInterface(ConfigReader):
         self.reverse_btn = SimbaButton(parent=self.navigation_frm, txt="", img='reverse_large_red', tooltip_txt="-1 FRAME", cmd=self.__advance_frame, cmd_kwargs={'frm_id': lambda: self.img_idx - 1})
         self.forward_btn = SimbaButton(parent=self.navigation_frm, txt="", img='play_large_green', tooltip_txt="+1 FRAME", cmd=self.__advance_frame, cmd_kwargs={'frm_id': lambda: self.img_idx + 1})
         self.last_frm_btn = SimbaButton(parent=self.navigation_frm, txt="", img='skip_forward_large', tooltip_txt="GO TO LAST FRAME", cmd=self.__advance_frame, cmd_kwargs={'frm_id': self.max_frm_id})
+
+        self.set_img(img_lbl=self.img_lbl, video_path=self.video_path, img_idx=self.img_idx, display_size=self.img_display_size)
 
         self.navigation_frm.grid(row=2, column=0, sticky=NSEW, pady=10, padx=10, columnspan=1)
         self.current_frm_eb.grid(row=0, column=0, sticky=EW, columnspan=4)
@@ -226,7 +228,7 @@ class LabellingInterface(ConfigReader):
         self.update_img_from_video.grid(row=0, column=1, sticky=NSEW,  padx=3, pady=3)
 
 
-        #self.main_window.mainloop()
+        self.main_window.mainloop()
 
     def get_keyboard_shortcuts_lbl(self,
                                    type: str):
@@ -284,7 +286,16 @@ class LabellingInterface(ConfigReader):
                 img_idx: int,
                 display_size: Optional[Tuple[int, int]] = None):
 
-        self.img = read_frm_of_video(video_path=video_path, frame_index=img_idx, size=display_size)
+        self.img = read_frm_of_video(video_path=video_path, frame_index=img_idx, size=display_size, raise_error=False)
+        if self.img is None:
+            FrameRangeWarning(msg=f'Frame {img_idx} could not be read in video {video_path}. Attempting to find closest readable frame...')
+            img, img_idx = find_closest_readable_frame(video_path=video_path, target_frame=img_idx, max_search_range=50)
+            if img_idx is not None:
+                self.img = read_frm_of_video(video_path=video_path, frame_index=img_idx, size=display_size, raise_error=True)
+                self.img_idx = deepcopy(img_idx)
+                self.current_frm_eb.entry_set(val=str(img_idx))
+            else:
+                raise FrameRangeError(msg=f'Could not find a readable frame (± frames of {img_idx}) in video {video_path}. Cannot proceed with annotations in this video.', source=self.__class__.__name__)
         img_rgb = cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB)
         self.pil_image = Image.fromarray(img_rgb)
         self.tk_image = ImageTk.PhotoImage(self.pil_image)
@@ -416,6 +427,14 @@ class LabellingInterface(ConfigReader):
 #                        file_path=r"C:\troubleshooting\mitra\project_folder\videos\video_test_vaishnavi.mp4",
 #                        thresholds=None,
 #                        continuing=False)
+
+
+
+# _ = LabellingInterface(config_path=r"D:\troubleshooting\lbl_frm_rng\project_folder\project_config.ini",
+#                        file_path=r"D:\troubleshooting\lbl_frm_rng\project_folder\videos\M5_Prb3dTom_SNP_EmptyCupHab.mp4",
+#                        thresholds=None,
+#                        continuing=True)
+
 
 
 

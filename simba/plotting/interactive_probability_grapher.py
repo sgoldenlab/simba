@@ -143,11 +143,9 @@ class InteractiveProbabilityGrapher(ConfigReader):
         plt.ylabel(f"{self.clf_name} Probability", fontsize=self.lbl_font_size, fontweight='500')
         plt.title(plt_title, fontsize=self.lbl_font_size - 2, pad=20)
 
-        ax.text(0.5, 1.20, "Double-click: jump to frame | ← →: navigate | Space: play/pause",
-                transform=ax.transAxes, ha='center', va='bottom', fontsize=10,
-                bbox=dict(boxstyle='round,pad=0.5', facecolor='#f0f0f0',
-                          edgecolor='#cccccc', alpha=0.9, linewidth=1.5))
-        line, marker = None, None
+        ax.text(0.5, 1.20, "Double-click: jump to frame | ← →: navigate | Space: play/pause", transform=ax.transAxes, ha='center', va='bottom', fontsize=10, bbox=dict(boxstyle='round,pad=0.5', facecolor='#f0f0f0', edgecolor='#cccccc', alpha=0.9, linewidth=1.5))
+        ax.set_ylim(0, 1)
+        ax.set_yticks([0, 0.25, 0.5, 0.75, 1])
         fig.tight_layout()
         fig.canvas.draw()
         fig.canvas.flush_events()
@@ -158,7 +156,7 @@ class InteractiveProbabilityGrapher(ConfigReader):
         while plt.fignum_exists(fig.number):
             if current_x_cord != prior_x_cord and current_x_cord <= self.p_arr.shape[0]:
                 prior_x_cord = copy(current_x_cord)
-                xlim, ylim = ax.get_xlim(), ax.get_ylim()
+                xlim = ax.get_xlim()
                 prob_val_txt = round(float(self.p_arr[current_x_cord][0]), 8)
                 probability_txt = f"Selected frame: {current_x_cord}, {self.clf_name} probability: {prob_val_txt}"
                 plt_title = f"Click on the points of the graph to display the corresponding video frame. \n {probability_txt}"
