@@ -5,23 +5,21 @@ import multiprocessing
 import os
 import platform
 import shutil
-from typing import Any, Dict, List, Optional, Tuple, Union
-
+from typing import List, Optional, Tuple, Union
+from copy import deepcopy
 import cv2
 import numpy as np
-import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log,
-    check_if_keys_exist_in_dict, check_int, check_str, check_that_column_exist,
-    check_valid_lst)
+from simba.utils.checks import (check_all_file_names_are_represented_in_video_log,
+                                check_int, check_str, check_that_column_exist, check_float, check_valid_tuple, check_instance, check_file_exist_and_readable, check_valid_boolean)
 from simba.utils.enums import Formats
 from simba.utils.errors import NoSpecifiedOutputError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_fn_ext, read_df)
+from simba.utils.lookups import get_color_dict
 
 STYLE_WIDTH = 'width'
 STYLE_HEIGHT = 'height'
@@ -31,6 +29,9 @@ STYLE_YMAX = 'y_max'
 STYLE_COLOR = 'color'
 AUTO = 'AUTO'
 STYLE_OPACITY = 'opacity'
+
+VALID_COLORS = list(get_color_dict().keys())
+FOURCC = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
 
 STYLE_ATTR = [STYLE_WIDTH, STYLE_HEIGHT, STYLE_FONT_SIZE, STYLE_LINE_WIDTH, STYLE_COLOR, STYLE_YMAX, STYLE_OPACITY]
 
@@ -42,36 +43,40 @@ def _probability_plot_mp(frm_range: Tuple[int, np.ndarray],
                          video_dir: str,
                          frame_dir: str,
                          fps: int,
-                         style_attr: dict,
-                         video_name: str):
+                         video_name: str,
+                         y_max: Union[int, float],
+                         size: tuple,
+                         line_width: int,
+                         font_size: int,
+                         opacity: float,
+                         color: str,
+                         show_thresholds: bool):
 
 
 
     group, data = frm_range[0], frm_range[1]
     start_frm, end_frm, current_frm = data[0], data[-1], data[0]
 
-    if style_attr[STYLE_YMAX] == AUTO:
-        style_attr[STYLE_YMAX] = float(np.max(clf_data))
-
     if video_setting:
         fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         video_save_path = os.path.join(video_dir, f"{group}.mp4")
-        video_writer = cv2.VideoWriter(video_save_path, fourcc, fps, (style_attr[STYLE_WIDTH], style_attr[STYLE_HEIGHT]))
+        video_writer = cv2.VideoWriter(video_save_path, fourcc, fps, size)
 
     while current_frm < end_frm:
         current_lst = [np.array(clf_data[0 : current_frm + 1])]
         current_frm += 1
         img = PlottingMixin.make_line_plot(data=current_lst,
-                                           colors=[style_attr[STYLE_COLOR]],
-                                           width=style_attr[STYLE_WIDTH],
-                                           height=style_attr[STYLE_HEIGHT],
-                                           line_width=style_attr[STYLE_LINE_WIDTH],
-                                           font_size=style_attr[STYLE_FONT_SIZE],
-                                           line_opacity=style_attr[STYLE_OPACITY],
+                                           colors=[color],
+                                           width=size[0],
+                                           height=size[1],
+                                           line_width=line_width,
+                                           font_size=font_size,
+                                           line_opacity=opacity,
                                            y_lbl=f"{clf_name} probability",
                                            title=f'{video_name} - {clf_name}',
-                                           y_max=style_attr[STYLE_YMAX],
-                                           x_lbl='frame count')
+                                           y_max=y_max,
+                                           x_lbl='frame count',
+                                           show_thresholds=show_thresholds)
 
         if video_setting:
             video_writer.write(img[:, :, :3])
@@ -111,38 +116,56 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
 
     def __init__(self,
                  config_path: Union[str, os.PathLike],
-                 files_found: List[Union[str, os.PathLike]],
-                 style_attr: Dict[str, Any],
+                 data_path: Union[List[Union[str, os.PathLike]], str, os.PathLike],
                  clf_name: str,
                  frame_setting: Optional[bool] = False,
                  video_setting: Optional[bool] = False,
                  last_frame: Optional[bool] = True,
-                 cores: Optional[int] = -1):
+                 size: Tuple[int, int] = (640, 480),
+                 font_size: int = 10,
+                 line_width: int = 2,
+                 y_max: Optional[int] = None,
+                 line_color: str = 'Red',
+                 line_opacity: float = 0.8,
+                 cores: Optional[int] = -1,
+                 show_thresholds: bool = True):
 
         if platform.system() == "Darwin":
             multiprocessing.set_start_method("spawn", force=True)
         if (not video_setting) and (not frame_setting) and (not last_frame):
             raise NoSpecifiedOutputError(msg="SIMBA ERROR: Please choose to create video and/or frames data plots. SimBA found that you ticked neither video and/or frames")
-        check_valid_lst(data=files_found, source=self.__class__.__name__, valid_dtypes=(str,), min_len=1)
-        check_int(name=f"{self.__class__.__name__} core_cnt", value=cores, min_value=-1, max_value=find_core_cnt()[0])
+        check_int(name=f"{self.__class__.__name__} core_cnt", value=cores, min_value=-1, max_value=find_core_cnt()[0], unaccepted_vals=[0])
         if cores == -1: cores = find_core_cnt()[0]
-        check_if_keys_exist_in_dict(data=style_attr, key=STYLE_ATTR, name=f'{self.__class__.__name__} style_attr')
+        check_valid_tuple(x=size, source=f'{self.__class__.__name__} size', accepted_lengths=(2,), valid_dtypes=Formats.INTEGER_DTYPES.value, min_integer=100)
+        check_int(name=f'{self.__class__.__name__} font_size', value=font_size, min_value=1, raise_error=True)
+        check_int(name=f'{self.__class__.__name__} line_width', value=line_width, min_value=1, raise_error=True)
+        check_valid_boolean(value=show_thresholds, source=f'{self.__class__.__name__} show_thresholds')
+        if y_max is not None:
+            check_float(name=f'{self.__class__.__name__} y_max', value=y_max, min_value=0.00001, raise_error=True)
+        check_str(name=f'{self.__class__.__name__} color', value=line_color, options=VALID_COLORS)
+        check_float(name=f'{self.__class__.__name__} line_opacity', value=line_opacity, min_value=0.001, max_value=1.0, raise_error=True)
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
         check_str(name=f"{self.__class__.__name__} clf_name", value=clf_name, options=(self.clf_names))
-        self.frame_setting, self.video_setting, self.cores, self.style_attr, self.last_frame = (frame_setting, video_setting, cores, style_attr, last_frame)
-        self.clf_name, self.files_found = clf_name, files_found
-        self.probability_col = f"Probability_{self.clf_name}"
-        self.out_width, self.out_height = (self.style_attr["width"], self.style_attr["height"],)
-        self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
-        if not os.path.exists(self.probability_plot_dir):
-            os.makedirs(self.probability_plot_dir)
-        print(f"Processing {len(self.files_found)} video(s)...")
+        self.frame_setting, self.video_setting, self.last_image = frame_setting, video_setting, last_frame
+        self.line_opacity, self.line_clr, self.line_width = line_opacity, line_color, line_width
+        self.font_size, self.img_size, self.y_max = font_size, size, y_max
+        check_instance(source=f'{self.__class__.__name__} data_path' , instance=data_path, accepted_types=(str, list,), raise_error=True)
+        if isinstance(data_path, str):
+            data_path = [data_path]
+        for path in data_path:
+            check_file_exist_and_readable(file_path=path, raise_error=True)
+        check_str(name=f"{self.__class__.__name__} clf_name", value=clf_name, options=(self.clf_names))
+        self.show_thresholds = show_thresholds
+        self.frame_setting, self.video_setting, self.cores, self.last_frame = (frame_setting, video_setting, cores, last_frame)
+        self.clf_name, self.data_paths = clf_name, data_path
+        self.probability_col, self.img_size = f"Probability_{self.clf_name}", size
+        if not os.path.exists(self.probability_plot_dir): os.makedirs(self.probability_plot_dir)
+        print(f"Processing {len(self.data_paths)} video(s)...")
 
     def run(self):
-        check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.files_found)
-        for file_cnt, file_path in enumerate(self.files_found):
-            print(file_path)
+        check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
+        for file_cnt, file_path in enumerate(self.data_paths):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(file_path)
             video_info, self.px_per_mm, self.fps = self.read_video_info(video_name=self.video_name)
@@ -163,22 +186,23 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
                 self.save_video_path = os.path.join(self.probability_plot_dir, f"{self.video_name}_{self.clf_name}.mp4")
 
             clf_data = data_df[self.probability_col].values
-            if self.style_attr[STYLE_YMAX] == 'AUTO':
-                self.style_attr[STYLE_YMAX] = float(np.max(clf_data))
+            y_max = deepcopy(self.y_max) if self.y_max is not None else float(np.max(clf_data))
+
             if self.last_frame:
                 final_frm_save_path = os.path.join(self.probability_plot_dir, f'{self.video_name}_{self.clf_name}_final_frm_{self.datetime}.png')
                 _ = PlottingMixin.make_line_plot(data=[clf_data],
-                                                 colors=[self.style_attr[STYLE_COLOR]],
-                                                 width=self.style_attr[STYLE_WIDTH],
-                                                 height=self.style_attr[STYLE_HEIGHT],
-                                                 line_width=self.style_attr[STYLE_LINE_WIDTH],
-                                                 font_size=self.style_attr[STYLE_FONT_SIZE],
-                                                 y_lbl=f"{self.clf_name} probability",
-                                                 y_max=self.style_attr[STYLE_YMAX],
-                                                 x_lbl='frame count',
-                                                 title=f'{self.video_name} - {self.clf_name}',
-                                                 save_path=final_frm_save_path,
-                                                 line_opacity=self.style_attr[STYLE_OPACITY])
+                                                       colors=[self.line_clr],
+                                                       width=self.img_size[0],
+                                                       height=self.img_size[1],
+                                                       line_width=self.line_width,
+                                                       font_size=self.font_size,
+                                                       y_lbl=f"{self.clf_name} probability",
+                                                       y_max=y_max,
+                                                       x_lbl='frame count',
+                                                       title=f'{self.video_name} - {self.clf_name}',
+                                                       save_path=final_frm_save_path,
+                                                       line_opacity=self.line_opacity,
+                                                       show_thresholds=self.show_thresholds)
 
             if self.video_setting or self.frame_setting:
                 frm_nums = np.arange(0, len(data_df)+1)
@@ -195,8 +219,15 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
                                                   fps=self.fps,
                                                   video_dir=self.temp_folder,
                                                   frame_dir=self.save_frame_folder_dir,
-                                                  style_attr=self.style_attr,
-                                                  video_name=self.video_name)
+                                                  video_name=self.video_name,
+                                                  y_max=y_max,
+                                                  size=self.img_size,
+                                                  line_width=self.line_width,
+                                                  font_size=self.font_size,
+                                                  opacity=self.line_opacity,
+                                                  color=self.line_clr,
+                                                  show_thresholds=self.show_thresholds)
+
                     for cnt, result in enumerate(pool.imap(constants, frm_range, chunksize=self.multiprocess_chunksize)):
                         print(f"Core batch {result} complete...")
 
@@ -210,7 +241,7 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
                 print(f"Probability video {self.video_name} complete (elapsed time: {video_timer.elapsed_time_str}s) ...")
 
         self.timer.stop_timer()
-        stdout_success(msg=f"Probability visualizations for {str(len(self.files_found))} videos created in {self.probability_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str,)
+        stdout_success(msg=f"Probability visualizations for {str(len(self.data_paths))} videos created in {self.probability_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str,)
 
 
 # test = TresholdPlotCreatorMultiprocess(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/project_config.ini',
@@ -234,3 +265,21 @@ class TresholdPlotCreatorMultiprocess(ConfigReader, PlottingMixin):
 #                                         files_found=['/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/csv/machine_results/Together_1.csv'],
 #                                         style_attr={'width': 640, 'height': 480, 'font size': 10, 'line width': 3, 'color': 'blue', 'circle size': 20, 'y_max': 'auto'})
 # test.create_plots()
+
+# if __name__ == "__main__":
+#     test = TresholdPlotCreatorMultiprocess(config_path=r"C:\troubleshooting\sleap_two_animals\project_folder\project_config.ini",
+#                                             frame_setting=True,
+#                                             video_setting=False,
+#                                             last_frame=True,
+#                                             clf_name='Attack',
+#                                             data_path=[r"C:\troubleshooting\sleap_two_animals\project_folder\csv\machine_results\Together_1.csv"],
+#                                             size = (640, 480),
+#                                             font_size=10,
+#                                             line_width=6,
+#                                             line_color='Orange',
+#                                             y_max=None,
+#                                             line_opacity=0.8,
+#                                             cores=4)
+#     test.run()
+#
+

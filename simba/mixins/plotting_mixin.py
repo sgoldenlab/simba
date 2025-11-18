@@ -8,6 +8,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import cv2
 import imutils
 import matplotlib
+#matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -1159,9 +1160,10 @@ class PlottingMixin(object):
                        title: Optional[str] = None,
                        y_lbl: Optional[str] = None,
                        x_lbl: Optional[str] = None,
-                       y_max: Optional[int] = -1,
-                       line_opacity: Optional[int] = 1.0,
-                       save_path: Optional[Union[str, os.PathLike]] = None):
+                       y_max: Optional[Union[int, float]] = -1,
+                       line_opacity: Optional[float] = 1.0,
+                       save_path: Optional[Union[str, os.PathLike]] = None,
+                       show_thresholds: bool = False):
 
         check_valid_lst(data=data, source=PlottingMixin.make_line_plot.__name__, valid_dtypes=(np.ndarray, list))
         check_valid_lst(data=colors, source=PlottingMixin.make_line_plot.__name__, valid_dtypes=(str,), exact_len=len(data))
@@ -1174,6 +1176,10 @@ class PlottingMixin(object):
         ax.spines['right'].set_visible(False)
         ax.spines['left'].set_linewidth(1.2)
         ax.spines['bottom'].set_linewidth(1.2)
+        if show_thresholds:
+            ax.axhline(y=0.75, color='#ec4899', linestyle=(0, (3, 1, 1, 1)), linewidth=1.5, alpha=0.9, label='Threshold: 75%')
+            ax.axhline(y=0.5, color='#3b82f6', linestyle=(0, (3, 1, 1, 1)), linewidth=1.5, alpha=0.9, label='Threshold: 50%')
+            ax.axhline(y=0.25, color='#8b5cf6', linestyle=(0, (3, 1, 1, 1)), linewidth=1.5, alpha=0.9, label='Threshold: 25%')
         if bg_clr is not None: fig.set_facecolor(bg_clr)
         if not show_box: plt.axis("off")
         for i in range(len(data)):

@@ -1,7 +1,6 @@
 __author__ = "Simon Nilsson"
 
 import os
-import threading
 from tkinter import *
 from typing import Union
 
@@ -11,12 +10,10 @@ from simba.plotting.probability_plot_creator import \
     TresholdPlotCreatorSingleProcess
 from simba.plotting.probability_plot_creator_mp import \
     TresholdPlotCreatorMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaButton,
-                                        SimbaCheckbox, SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaButton, SimbaCheckbox, SimBADropDown)
 from simba.utils.enums import Formats, Links
 from simba.utils.lookups import get_color_dict
-from simba.utils.read_write import (check_if_filepath_list_is_empty,
-                                    get_file_name_info_in_directory)
+from simba.utils.read_write import (check_if_filepath_list_is_empty, get_file_name_info_in_directory, str_2_bool)
 
 STYLE_WIDTH = 'width'
 STYLE_HEIGHT = 'height'
@@ -55,11 +52,11 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
         self.font_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(1, 26)), label='TEXT SIZE: ', label_width=25, dropdown_width=35, value=10)
         self.line_width_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(1, 26)), label='LINE WIDTH: ', label_width=25, dropdown_width=35, value=2)
         self.line_opacity_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=OPACITY_OPTIONS, label='LINE OPACITY: ', label_width=25, dropdown_width=35, value=1.0)
-
+        self.threshold_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW THRESHOLD LINES: ', label_width=25, dropdown_width=35, value='TRUE')
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VISUALIZATION SETTINGS", icon_name='eye', icon_link=Links.VISUALIZE_CLF_PROBABILITIES.value, pady=5, padx=5, relief='solid')
         self.clf_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=self.clf_names, label='CLASSIFIER: ', label_width=25, dropdown_width=35, value=self.clf_names[0])
-        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt+1)), label='CPU CORE COUNT: ', label_width=25, dropdown_width=35, value=int(self.cpu_cnt/2))
+        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt+1)), label='CPU CORE COUNT: ', label_width=25, dropdown_width=35, value=int(self.cpu_cnt/3))
 
         probability_frames_cb, self.probability_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', font=Formats.FONT_REGULAR.value, txt_img='frames', val=False)
         probability_videos_cb, self.probability_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', font=Formats.FONT_REGULAR.value, txt_img='video', val=False)
@@ -80,6 +77,7 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
         self.line_width_dropdown.grid(row=3, sticky=NW)
         self.max_y_dropdown.grid(row=4, sticky=NW)
         self.line_opacity_dropdown.grid(row=5, sticky=NW)
+        self.threshold_dropdown.grid(row=6, sticky=NW)
 
         self.settings_frm.grid(row=1, sticky=NW, padx=10, pady=10)
         self.clf_dropdown.grid(row=0, sticky=NW)
@@ -105,16 +103,10 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
         line_width = int(self.line_width_dropdown.get_value())
         core_cnt = int(self.core_cnt_dropdown.get_value())
         opacity = float(self.line_opacity_dropdown.get_value())
+        color = self.line_clr_dropdown.get_value()
+        show_threshold = str_2_bool(self.threshold_dropdown.get_value())
+        y_max = None if self.max_y_dropdown.get_value() == 'AUTO' else (int(self.max_y_dropdown.get_value()) / 100)
 
-
-        style_attr = {
-            STYLE_WIDTH: width,
-            STYLE_HEIGHT: height,
-            STYLE_FONT_SIZE: font_size,
-            STYLE_LINE_WIDTH: line_width,
-            STYLE_COLOR: self.line_clr_dropdown.getChoices(),
-            STYLE_YMAX: self.max_y_dropdown.getChoices(),
-            STYLE_OPACITY: opacity}
 
         if multiple:
             data_paths = list(self.files_found_dict.values())
@@ -125,19 +117,30 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
             probability_plot_creator = TresholdPlotCreatorSingleProcess(config_path=self.config_path,
                                                                         frame_setting=self.probability_frames_var.get(),
                                                                         video_setting=self.probability_videos_var.get(),
-                                                                        last_image=self.probability_last_frm_var.get(),
-                                                                        files_found=data_paths,
+                                                                        last_frame=self.probability_last_frm_var.get(),
+                                                                        data_path=data_paths,
                                                                         clf_name=self.clf_dropdown.getChoices(),
-                                                                        style_attr=style_attr)
+                                                                        font_size=font_size,
+                                                                        line_width=line_width,
+                                                                        line_opacity=opacity,
+                                                                        size=(width, height),
+                                                                        line_color=color,
+                                                                        y_max=y_max)
         else:
             probability_plot_creator = TresholdPlotCreatorMultiprocess(config_path=self.config_path,
                                                                        frame_setting=self.probability_frames_var.get(),
                                                                        video_setting=self.probability_videos_var.get(),
                                                                        last_frame=self.probability_last_frm_var.get(),
-                                                                       files_found=data_paths,
+                                                                       data_path=data_paths,
                                                                        clf_name=self.clf_dropdown.getChoices(),
                                                                        cores=core_cnt,
-                                                                       style_attr=style_attr)
+                                                                       line_width=line_width,
+                                                                       font_size=font_size,
+                                                                       line_opacity=opacity,
+                                                                       size=(width, height),
+                                                                       line_color=color,
+                                                                       y_max=y_max,
+                                                                       show_thresholds=show_threshold)
 
         probability_plot_creator.run()
 
@@ -147,4 +150,4 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
 
 
 #_ = VisualizeClassificationProbabilityPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
-#_ = VisualizeClassificationProbabilityPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Two_animals_16bps/project_folder/project_config.ini')
+# _ = VisualizeClassificationProbabilityPopUp(config_path=r"C:\troubleshooting\sleap_two_animals\project_folder\project_config.ini")

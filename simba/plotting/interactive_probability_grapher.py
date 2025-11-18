@@ -167,8 +167,6 @@ class InteractiveProbabilityGrapher(ConfigReader):
                 line = plt.axvline(x=current_x_cord, color=self.line_clr, alpha=0.8, linewidth=2)
                 marker = ax.plot(current_x_cord, self.p_arr[current_x_cord][0], 'o', markersize=8, color=self.line_clr, markeredgecolor='white', markeredgewidth=2, zorder=5)
                 ax.set_xlim(xlim)
-                ax.set_ylim(ylim)
-                
                 fig.canvas.draw()
                 fig.canvas.flush_events()
 
