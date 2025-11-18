@@ -1,18 +1,17 @@
 __author__ = "Simon Nilsson"
 
-import math
 import os
 from copy import deepcopy
 from subprocess import PIPE, Popen
 from tkinter import *
-from tkinter import filedialog
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import matplotlib
+matplotlib.use('agg')
 from PIL import Image, ImageTk
 from tabulate import tabulate
 
-matplotlib.use('agg')
+
 import cv2
 import pandas as pd
 
@@ -291,6 +290,7 @@ class LabellingInterface(ConfigReader):
             FrameRangeWarning(msg=f'Frame {img_idx} could not be read in video {video_path}. Attempting to find closest readable frame...')
             img, img_idx = find_closest_readable_frame(video_path=video_path, target_frame=img_idx, max_search_range=50)
             if img_idx is not None:
+                print(f'Showing frame {img_idx} in video {self.video_name}...')
                 self.img = read_frm_of_video(video_path=video_path, frame_index=img_idx, size=display_size, raise_error=True)
                 self.img_idx = deepcopy(img_idx)
                 self.current_frm_eb.entry_set(val=str(img_idx))
@@ -434,7 +434,7 @@ class LabellingInterface(ConfigReader):
 #                        file_path=r"D:\troubleshooting\lbl_frm_rng\project_folder\videos\M5_Prb3dTom_SNP_EmptyCupHab.mp4",
 #                        thresholds=None,
 #                        continuing=True)
-
+#
 
 
 
