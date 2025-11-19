@@ -112,6 +112,7 @@ from simba.ui.pop_ups.heatmap_clf_pop_up import HeatmapClfPopUp
 from simba.ui.pop_ups.heatmap_location_pop_up import HeatmapLocationPopup
 from simba.ui.pop_ups.initialize_blob_tracking_pop_up import \
     InitializeBlobTrackerPopUp
+from simba.ui.pop_ups.extract_annotation_frames_pop_up import ExtractAnnotationFramesPopUp
 from simba.ui.pop_ups.interpolate_pop_up import InterpolatePopUp
 from simba.ui.pop_ups.kleinberg_pop_up import KleinbergPopUp
 from simba.ui.pop_ups.labelme_bbox_to_yolo_bbox_popup import \
@@ -180,8 +181,7 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     ConvertROIDefinitionsPopUp, CreateAverageFramePopUp, CreateGIFPopUP,
     CropVideoCirclesPopUp, CropVideoPolygonsPopUp, CropVideoPopUp,
     CrossfadeVideosPopUp, DownsampleMultipleVideosPopUp,
-    DownsampleSingleVideoPopUp, ExtractAllFramesPopUp,
-    ExtractAnnotationFramesPopUp, ExtractSEQFramesPopUp,
+    DownsampleSingleVideoPopUp, ExtractAllFramesPopUp, ExtractSEQFramesPopUp,
     ExtractSpecificFramesPopUp, FlipVideosPopUp, GreyscaleSingleVideoPopUp,
     ImportFrameDirectoryPopUp, InitiateClipMultipleVideosByFrameNumbersPopUp,
     InitiateClipMultipleVideosByTimestampsPopUp, InteractiveClahePopUp,
