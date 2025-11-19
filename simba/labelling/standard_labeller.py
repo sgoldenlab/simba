@@ -7,13 +7,12 @@ from tkinter import *
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 import matplotlib
+
 matplotlib.use('agg')
-from PIL import Image, ImageTk
-from tabulate import tabulate
-
-
 import cv2
 import pandas as pd
+from PIL import Image, ImageTk
+from tabulate import tabulate
 
 try:
     from typing import Literal
