@@ -1,17 +1,17 @@
 from __future__ import division
 
+import argparse
 import glob
 import math
 import os
 import sys
-import argparse
 from itertools import combinations
 from typing import Union
-from numba.typed import List
 
 import numpy as np
 import pandas as pd
-from numba import jit, prange, cuda
+from numba import cuda, jit, prange
+from numba.typed import List
 from scipy import stats
 from scipy.signal import find_peaks
 from scipy.spatial import ConvexHull
@@ -19,13 +19,16 @@ from scipy.spatial.qhull import QhullError
 from scipy.stats import zscore
 from statsmodels.stats.diagnostic import lilliefors
 
+from simba.mixins.abstract_classes import AbstractFeatureExtraction
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
-from simba.mixins.abstract_classes import AbstractFeatureExtraction
 from simba.utils.enums import Paths
 from simba.utils.printing import SimbaTimer
-from simba.utils.read_write import (check_if_filepath_list_is_empty, get_fn_ext, read_config_file, read_df, read_project_path_and_file_type, read_video_info, write_df)
+from simba.utils.read_write import (check_if_filepath_list_is_empty,
+                                    get_fn_ext, read_config_file, read_df,
+                                    read_project_path_and_file_type,
+                                    read_video_info, write_df)
 
 HEAD_BP_NAMES = ["Heat_tip", "Left_eye", "Right_eye", "Head_back"]
 THORAX_BP_NAMES = ["Thorax", "Thorax_rear"]
