@@ -7,11 +7,14 @@ from typing import Union
 from simba.labelling.extract_labelled_frames import AnnotationFrameExtractor
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (DropDownMenu, SimbaButton, CreateLabelFrameWithIcon, SimbaCheckbox, SimBADropDown)
-from simba.utils.enums import Dtypes, Formats
-from simba.utils.errors import (NoChoosenClassifierError, NoFilesFoundError, NoDataError, InvalidInputError)
-from simba.utils.read_write import (find_video_of_file, get_fn_ext, str_2_bool)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        SimbaButton, SimbaCheckbox,
+                                        SimBADropDown)
 from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.enums import Dtypes, Formats
+from simba.utils.errors import (InvalidInputError, NoChoosenClassifierError,
+                                NoDataError, NoFilesFoundError)
+from simba.utils.read_write import find_video_of_file, get_fn_ext, str_2_bool
 
 DOWNSAMPLE_OPTION = ["None", "2x", "3x", "4x", "5x"]
 IMG_FORMAT_OPTIONS = ['png', 'jpg', 'webp']

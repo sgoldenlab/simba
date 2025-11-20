@@ -106,13 +106,14 @@ from simba.ui.pop_ups.dlc_h5_inference_to_yolo_popup import \
 from simba.ui.pop_ups.dlc_to_labelme_popup import DLC2LabelmePopUp
 from simba.ui.pop_ups.dlc_to_yolo_keypoints_popup import DLCYoloKeypointsPopUp
 from simba.ui.pop_ups.egocentric_alignment_pop_up import EgocentricAlignPopUp
+from simba.ui.pop_ups.extract_annotation_frames_pop_up import \
+    ExtractAnnotationFramesPopUp
 from simba.ui.pop_ups.fsttc_pop_up import FSTTCPopUp
 from simba.ui.pop_ups.gantt_pop_up import GanttPlotPopUp
 from simba.ui.pop_ups.heatmap_clf_pop_up import HeatmapClfPopUp
 from simba.ui.pop_ups.heatmap_location_pop_up import HeatmapLocationPopup
 from simba.ui.pop_ups.initialize_blob_tracking_pop_up import \
     InitializeBlobTrackerPopUp
-from simba.ui.pop_ups.extract_annotation_frames_pop_up import ExtractAnnotationFramesPopUp
 from simba.ui.pop_ups.interpolate_pop_up import InterpolatePopUp
 from simba.ui.pop_ups.kleinberg_pop_up import KleinbergPopUp
 from simba.ui.pop_ups.labelme_bbox_to_yolo_bbox_popup import \
