@@ -21,7 +21,7 @@ from simba.utils.data import (find_frame_numbers_from_time_stamp,
                               slice_roi_dict_for_video)
 from simba.utils.enums import Formats, TagNames
 from simba.utils.errors import (FrameRangeError, InvalidVideoFileError,
-                                NoSpecifiedOutputError)
+                                NoSpecifiedOutputError, InvalidInputError)
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
 from simba.utils.read_write import (find_video_of_file, get_fn_ext, read_df,
                                     read_frm_of_video, remove_a_folder)
@@ -235,6 +235,11 @@ class PathPlotterSingleCore(ConfigReader, PlottingMixin):
 
             line_data = []
             for k, v in self.bp_data.items():
+                data = self.data_df[[v['x'], v['y']]]
+                bad_cols = (data.isna().any() | data.isin([np.inf, -np.inf]).any() | (data < 0).any())
+                bad_cols = bad_cols[bad_cols].index.tolist()
+                if len(bad_cols) > 0:
+                    raise InvalidInputError(msg=f'The columns {v} contains None, NaN, infinity, and/or negative values in file {file_path}', source=self.__class__.__name__)
                 line_data.append(self.data_df[[v['x'], v['y']]].values)
 
             if self.last_frame:

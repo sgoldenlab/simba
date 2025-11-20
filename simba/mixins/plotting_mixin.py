@@ -1455,8 +1455,11 @@ class PlottingMixin(object):
             name=f"{PlottingMixin.make_path_plot.__name__} line_width", value=line_width
         )
         timer = SimbaTimer(start=True)
-        img = np.zeros((height, width, 3))
-        img[:] = bg_clr
+        if (isinstance(bg_clr, np.ndarray)) and bg_clr.ndim > 1:
+            img = np.zeros((bg_clr.shape[0], bg_clr.shape[1], 3))
+        else:
+            img = np.zeros((height, width, 3))
+            img[:] = bg_clr
         for line_cnt in range(len(data)):
             clr = colors[line_cnt]
             line_data = data[line_cnt]

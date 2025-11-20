@@ -24,7 +24,7 @@ from simba.utils.data import (find_frame_numbers_from_time_stamp,
                               slice_roi_dict_for_video)
 from simba.utils.enums import Formats, TagNames
 from simba.utils.errors import (FrameRangeError, InvalidVideoFileError,
-                                NoSpecifiedOutputError)
+                                NoSpecifiedOutputError, InvalidInputError)
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
@@ -74,12 +74,13 @@ def path_plot_mp(data: np.ndarray,
                  roi: Union[dict, None],
                  animal_names: Union[None, List[str]],
                  fps: Union[int, float],
-                 clf_attr: dict):
+                 clf_attr: dict,
+                 verbose: bool):
 
     batch_id, frm_cnt_rng, frm_id_rng = data[0], data[1], data[2]
     if video_setting:
         video_save_path = os.path.join(video_save_dir, f"{batch_id}.mp4")
-        FOURCC = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
+        FOURCC = cv2.VideoWriter_fourcc(*Formats.AVI_CODEC.value)
         video_writer = cv2.VideoWriter(video_save_path, FOURCC, int(fps), (style_attr[STYLE_WIDTH], style_attr[STYLE_HEIGHT]))
     for frm_cnt, frm_id in zip(frm_cnt_rng, frm_id_rng):
         if isinstance(style_attr[STYLE_BG], str):
@@ -106,13 +107,12 @@ def path_plot_mp(data: np.ndarray,
                                            save_path=None)
         if roi is not None:
             img = PlottingMixin.roi_dict_onto_img(img=img, roi_dict=roi, show_tags=False, show_center=False)
-
         if video_setting:
-            video_writer.write(img)
+            video_writer.write(np.uint8(img))
         if frame_setting:
             frm_name = os.path.join(frame_folder_dir, f"{frm_id}.png")
             cv2.imwrite(frm_name, np.uint8(img))
-        print(f"Path frame created: {frm_id}, Video: {video_name}, Processing core: {batch_id}")
+        if verbose: print(f"Path frame created: {frm_id}, Video: {video_name}, Processing core: {batch_id}")
     if video_setting:
         video_writer.release()
     return batch_id
@@ -174,7 +174,8 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
                  print_animal_names: bool = True,
                  slicing: Optional[Dict] = None,
                  core_cnt: int = -1,
-                 roi: bool = False):
+                 roi: bool = False,
+                 verbose: bool = True):
 
         log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
         if (not frame_setting) and (not video_setting) and (not last_frame):
@@ -206,7 +207,7 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
         self.fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
         if not os.path.exists(self.path_plot_dir): os.makedirs(self.path_plot_dir)
         self.video_setting, self.frame_setting, self.style_attr, self.data_paths, self.animal_attr, self.clf_attr, self.last_frame, self.roi = video_setting, frame_setting, style_attr, data_paths, animal_attr, clf_attr, last_frame, roi
-        self.print_animal_names, self.slicing = print_animal_names, slicing
+        self.print_animal_names, self.slicing, self.verbose = print_animal_names, slicing, verbose
         self.bp_data, self.data_cols, self.animal_names, self.colors = self.__get_bp_data()
         self.animal_names = None if not self.print_animal_names else self.animal_names
         self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
@@ -275,7 +276,7 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
             video_styles = self.__get_styles(self.style_attr)
             if self.video_setting:
                 self.video_save_path = os.path.join(self.path_plot_dir, f"{self.video_name}.mp4")
-                self.writer = cv2.VideoWriter(self.video_save_path, self.fourcc, self.fps, (video_styles[STYLE_WIDTH], video_styles[STYLE_HEIGHT]))
+                #self.writer = cv2.VideoWriter(self.video_save_path, self.fourcc, self.fps, (video_styles[STYLE_WIDTH], video_styles[STYLE_HEIGHT]))
                 self.video_temp_dir = os.path.join(self.path_plot_dir, self.video_name)
                 create_directory(paths=self.video_temp_dir, overwrite=True)
             if self.frame_setting:
@@ -296,6 +297,11 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
 
             line_data = []
             for k, v in self.bp_data.items():
+                data = self.data_df[[v['x'], v['y']]]
+                bad_cols = (data.isna().any() | data.isin([np.inf, -np.inf]).any() | (data < 0).any())
+                bad_cols = bad_cols[bad_cols].index.tolist()
+                if len (bad_cols) > 0:
+                    raise InvalidInputError(msg=f'The columns {v} contains None, NaN, infinity, and/or negative values in file {file_path}', source=self.__class__.__name__)
                 line_data.append(self.data_df[[v['x'], v['y']]].values)
 
             if self.last_frame:
@@ -340,7 +346,8 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
                                                   clf_attr=clf_attr,
                                                   animal_names=self.animal_names,
                                                   fps=self.fps,
-                                                  roi=video_rois)
+                                                  roi=video_rois,
+                                                  verbose=self.verbose)
                     for cnt, result in enumerate(pool.imap(constants, frm_range, chunksize=self.multiprocess_chunksize)):
                         print(f"Path batch {result+1}/{self.core_cnt} complete...")
                 pool.terminate()
@@ -349,7 +356,7 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
                 if self.video_setting:
                     print(f"Joining {self.video_name} multi-processed video...")
                     print(self.video_temp_dir, self.video_save_path)
-                    concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.video_save_path, remove_splits=False)
+                    concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.video_save_path, remove_splits=True)
                 video_timer.stop_timer()
                 print(f"Path plot video {self.video_name} complete (elapsed time: {video_timer.elapsed_time_str}s) ...")
 
@@ -469,24 +476,32 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
 
 #
 
-
-# style_attr = None
-# style_attr = {'width': 'As input',
-#               'height': 'As input',
-#               'line width': 5, 'font size': 5, 'font thickness': 2, 'circle size': 5, 'bg color': {'opacity': 100}, 'max lines': 10000}
-# animal_attr = {0: ['mouth', 'Red']}
-# clf_attr = {0: ['Freezing', 'Black', 'Size: 10'], 1: ['Normal Swimming', 'Red', 'Size: 10']}
+#
+# #style_attr = None
+# style_attr = {'width': 1800,
+#               'height': 2200,
+#               'line width': 5,
+#               'font size': 5,
+#               'font thickness': 2,
+#               'circle size': 5,
+#               'bg': (255, 255, 255),
+#               'bg_opacity': 1.0,
+#               'max lines': None}
+# animal_attr = {0: {'color': (255, 0, 0), 'body_part': 'Nose'}}
+# #clf_attr = {0: ['Freezing', 'Black', 'Size: 10'], 1: ['Normal Swimming', 'Red', 'Size: 10']}
 # #
 # # clf_attr = None
 #
-#
-# path_plotter = PathPlotterMulticore(config_path='/Users/simon/Desktop/envs/troubleshooting/naresh/project_folder/project_config.ini',
-#                                     frame_setting=False,
-#                                     video_setting=True,
-#                                     last_frame=True,
-#                                     input_clf_attr=clf_attr,
-#                                     input_style_attr=style_attr,
-#                                     animal_attr=animal_attr,
-#                                     files_found=['/Users/simon/Desktop/envs/troubleshooting/naresh/project_folder/csv/machine_results/SF8.csv'],
-#                                     cores=5)
-# path_plotter.run()
+# if __name__ == "__main__":
+#     path_plotter = PathPlotterMulticore(config_path=r"D:\troubleshooting\path_plotx\project_folder\project_config.ini",
+#                                         frame_setting=False,
+#                                         video_setting=True,
+#                                         last_frame=True,
+#                                         clf_attr=None,
+#                                         style_attr=style_attr,
+#                                         animal_attr=animal_attr,
+#                                         print_animal_names=False,
+#                                         data_paths=[r"D:\troubleshooting\path_plotx\project_folder\csv\outlier_corrected_movement_location\Hyb_P2_VMHvl-Syn_B11_C2_B.csv"],
+#                                         core_cnt=8,
+#                                         verbose=True)
+#     path_plotter.run()

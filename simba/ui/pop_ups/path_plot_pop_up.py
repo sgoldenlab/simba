@@ -20,7 +20,7 @@ from simba.utils.enums import Formats, Links
 from simba.utils.errors import (FrameRangeError, NoFilesFoundError,
                                 NoROIDataError)
 from simba.utils.lookups import get_color_dict
-from simba.utils.read_write import get_file_name_info_in_directory
+from simba.utils.read_write import get_file_name_info_in_directory, str_2_bool
 
 AUTO = 'AUTO'
 CUSTOM = 'CUSTOM'
@@ -82,11 +82,13 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.font_thickness_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.font_thickness_options, label='FONT THICKNESS: ', label_width=35, dropdown_width=30, value=AUTO)
         self.bg_opacity_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.bg_opacity_options, label='BACKGROUND OPACITY (%): ', label_width=35, dropdown_width=30, value=100)
         self.circle_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.circle_size_options, label='CIRCLE SIZE: ', label_width=35, dropdown_width=30, value=AUTO)
+        self.show_animal_names_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ANIMAL NAMES: ', label_width=35, dropdown_width=30, value='FALSE')
+
         self.body_parts_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CHOOSE BODY-PARTS", icon_name='pose', icon_link=Links.PATH_PLOTS.value)
         self.number_of_animals_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.animal_cnt_options, label="# ANIMALS:", label_width=35, dropdown_width=30, value=self.animal_cnt_options[0], command=self.populate_body_parts_menu)
 
         self.style_settings_frm.grid(row=0, sticky=NW)
-        self.resolution_dropdown.grid(row=0, sticky=NW)
+        self.resolution_dropdown.grid(row=1, sticky=NW)
         self.max_prior_lines_dropdown.grid(row=2, sticky=NW)
         self.line_width_dropdown.grid(row=4, sticky=NW)
         self.circle_size_dropdown.grid(row=5, sticky=NW)
@@ -94,6 +96,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.font_thickness_dropdown.grid(row=7, sticky=NW)
         self.bg_clr_dropdown.grid(row=8, sticky=NW)
         self.bg_opacity_dropdown.grid(row=9, sticky=NW)
+        self.show_animal_names_dropdown.grid(row=10, sticky=NW)
 
         self.video_slicing_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SEGMENTS", icon_name='clip', icon_link=Links.PATH_PLOTS.value)
         self.slice_var = BooleanVar(value=False)
@@ -122,8 +125,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         path_frames_cb, self.path_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', txt_img='frames', val=False)
         path_videos_cb, self.path_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', txt_img='video', val=False)
         path_last_frm_cb, self.path_last_frm_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE LAST FRAME', txt_img='finish', val=True)
-        self.include_animal_names_cb, self.include_animal_names_var = SimbaCheckbox(parent=self.settings_frm, txt='INCLUDE ANIMAL NAMES', txt_img='id_card')
-        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt+1)), label='CPU CORE COUNT: ', label_width=35, dropdown_width=30, value=int(self.cpu_cnt/2))
+        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt+1)), label='CPU CORE COUNT: ', label_width=35, dropdown_width=30, value=int(self.cpu_cnt/3))
 
         self.run_frm = LabelFrame(self.main_frm, text="RUN", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
         self.run_single_video_frm = LabelFrame(self.run_frm, text="SINGLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
@@ -133,8 +135,6 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.single_video_dropdown.setChoices(self.files_found[0])
         self.run_multiple_videos = LabelFrame( self.run_frm, text="MULTIPLE VIDEO", font=Formats.FONT_HEADER.value, pady=5, padx=5, fg="black")
         self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt=f"Create multiple videos ({len(self.files_found)} video(s) found)", font=Formats.FONT_REGULAR.value, img='rocket', txt_clr='blue', cmd=self._run, cmd_kwargs={'multiple_videos': True})
-
-
 
         self.roi_frm.grid(row=3, sticky=NW)
         roi_cb.grid(row=0, sticky=NW)
@@ -147,7 +147,6 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         path_frames_cb.grid(row=1, sticky=NW)
         path_videos_cb.grid(row=2, sticky=NW)
         path_last_frm_cb.grid(row=3, sticky=NW)
-        self.include_animal_names_cb.grid(row=4, sticky=NW)
 
 
         self.run_frm.grid(row=6, sticky=NW)
@@ -289,7 +288,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         include_clf = self.include_clf_locations_var.get()
         roi = self.roi_var.get()
         core_cnt = int(self.core_cnt_dropdown.get_value())
-        print_animal_names = self.include_animal_names_var.get()
+        print_animal_names = str_2_bool(self.show_animal_names_dropdown.get_value())
         clf_attr = None
 
         w, h = (None, None) if resolution == AUTO else tuple(map(int, resolution.split("×")))
@@ -317,6 +316,8 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
             if multiple_videos:
                 data_paths = list(self.outlier_corrected_files.values())
             else:
+                if self.single_video_dropdown.getChoices() not in self.outlier_corrected_files.keys():
+                    raise NoFilesFoundError(msg=f'The data for video {self.single_video_dropdown.getChoices()} could not be found in the {self.outlier_corrected_dir} directory.')
                 data_paths = [self.outlier_corrected_files[self.single_video_dropdown.getChoices()]]
 
         if roi:
@@ -373,4 +374,5 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
 
 # _ = PathPlotPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 
-# _ = PathPlotPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/dorian_2/project_folder/project_config.ini')
+#_ = PathPlotPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/dorian_2/project_folder/project_config.ini')
+#_ = PathPlotPopUp(config_path=r"D:\troubleshooting\path_plotx\project_folder\project_config.ini")

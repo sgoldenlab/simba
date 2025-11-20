@@ -152,12 +152,16 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
 
 class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixin):
     """
-    Plot classification results on videos. Results are stored in the
+    Plot classification results on videos using multiprocessing. Results are stored in the
     `project_folder/frames/output/sklearn_results` directory of the SimBA project.
 
+    This class creates annotated videos/frames showing classifier predictions overlaid on pose-estimation data,
+    with optional Gantt charts, timers, and bounding boxes. Processing is parallelized across multiple CPU cores
+    for faster rendering of large video datasets.
+
     .. seealso::
-       `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-10-sklearn-visualization__.
-        For non-multiptocess class, see :meth:`simba.plotting.plot_clf_results.PlotSklearnResultsSingleCore`.
+       `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/tutorial.md#step-10-sklearn-visualization>`__.
+       For single-core processing, see :meth:`simba.plotting.plot_clf_results.PlotSklearnResultsSingleCore`.
 
     .. image:: _static/img/sklearn_visualization.gif
        :width: 600
@@ -173,26 +177,40 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
        :height: 480
        :align: center
 
-    :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
-    :param Optional[bool] video_setting: If True, SimBA will create compressed videos. Default True.
-    :param Optional[bool] frame_setting: If True, SimBA will create individual frames. Default True.
-    :param Optional[int] cores: Number of cores to use. Pass ``-1`` for all available cores.
-    :param Optional[str] video_file_path: Path to video file to create classification visualizations for. If None, then all the videos in the csv/machine_results will be used. Default None.
-    :param Optional[Union[Dict[str, float], bool]] text_settings: Dictionary holding the circle size, font size, spacing size, and text thickness of the printed text. If None, then these are autocomputed.
-    :param Optional[bool] rotate: If True, the output video will be rotated 90 degrees from the input. Default False.
-    :param Optional[bool] show_bbox: If True, axis-aligned bounding boxes created encompassing each anmals pose and displayed. Default True.
-    :param Optional[str] palette: The name of the palette used for the pose-estimation key-points. Default ``Set1``.
-    :param Optional[bool] print_timers: If True, the output video will have the cumulative time of the classified behaviours overlaid. Default True.
+    :param Union[str, os.PathLike] config_path: Path to SimBA project config file in Configparser format.
+    :param bool video_setting: If True, creates compressed MP4 videos. Default True.
+    :param bool frame_setting: If True, saves individual annotated frames as PNG images. Default False.
+    :param Optional[Union[List[Union[str, os.PathLike]], Union[str, os.PathLike]]] video_paths: Path(s) to video file(s) to process. If None, processes all videos found in the project's video directory. Default None.
+    :param bool rotate: If True, rotates output videos 90 degrees clockwise. Default False.
+    :param bool animal_names: If True, displays animal names on the video frames. Default False.
+    :param bool show_pose: If True, overlays pose-estimation keypoints on the video. Default True.
+    :param Optional[Union[int, float]] font_size: Font size for text overlays. If None, auto-computed based on video resolution. Default None.
+    :param Optional[Union[int, float]] space_size: Vertical spacing between text lines. If None, auto-computed. Default None.
+    :param Optional[Union[int, float]] text_thickness: Thickness of text characters. If None, uses default. Default None.
+    :param Optional[Union[int, float]] text_opacity: Opacity of text background (0.0-1.0). If None, defaults to 0.8. Default None.
+    :param Optional[Union[int, float]] circle_size: Radius of pose keypoint circles. If None, auto-computed based on video resolution. Default None.
+    :param Optional[str] pose_palette: Name of color palette for pose keypoints. Must be from :class:`simba.utils.enums.Options.PALETTE_OPTIONS_CATEGORICAL` or :class:`simba.utils.enums.Options.PALETTE_OPTIONS`. Default 'Set1'.
+    :param bool print_timers: If True, displays cumulative time for each classifier behavior on each frame. Default True.
+    :param bool show_bbox: If True, draws axis-aligned bounding boxes around detected animals. Default False.
+    :param Optional[int] show_gantt: If 1, appends static Gantt chart to video. If 2, appends dynamic Gantt chart that updates per frame. If None, no Gantt chart. Default None.
+    :param Tuple[int, int, int] text_clr: RGB color tuple for text foreground. Default (255, 255, 255) (white).
+    :param Tuple[int, int, int] text_bg_clr: RGB color tuple for text background. Default (0, 0, 0) (black).
+    :param bool gpu: If True, uses GPU acceleration for video concatenation (requires CUDA-capable GPU). Default False.
+    :param int core_cnt: Number of CPU cores to use for parallel processing. Pass -1 to use all available cores. Default -1.
 
     :example:
-    >>> text_settings = {'circle_scale': 5, 'font_size': 0.528, 'spacing_scale': 28, 'text_thickness': 2}
-    >>> clf_plotter = PlotSklearnResultsMultiProcess(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/project_config.ini',
-    >>>                                              video_setting=True,
-    >>>                                              frame_setting=False,
-    >>>                                              rotate=False,
-    >>>                                              video_file_path='Trial    10.mp4',
-    >>>                                              cores=5,
-    >>>                                              text_settings=False)
+    >>> clf_plotter = PlotSklearnResultsMultiProcess(
+    ...     config_path='/Users/simon/Desktop/envs/simba/troubleshooting/beepboop174/project_folder/project_config.ini',
+    ...     video_setting=True,
+    ...     frame_setting=False,
+    ...     video_paths='Trial_10.mp4',
+    ...     rotate=False,
+    ...     show_pose=True,
+    ...     show_bbox=True,
+    ...     print_timers=True,
+    ...     show_gantt=1,
+    ...     core_cnt=5
+    ... )
     >>> clf_plotter.run()
     """
 
@@ -391,4 +409,13 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
 #
 
 # clf_plotter = PlotSklearnResultsMultiProcess(config_path='/Users/simon/Desktop/envs/troubleshooting/DLC_2_Black_animals/project_folder/project_config.ini', video_setting=True, frame_setting=False, rotate=False, video_file_path='Together_1.avi', cores=5)
+# clf_plotter.run()
+
+
+# clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini",
+#                                              video_setting = False,
+#                                              frame_setting = False,
+#
+#                                              rotate = False,
+#                                              video_paths=r"C:\troubleshooting\mouse_open_field\project_folder\videos\Video1.mp4")
 # clf_plotter.run()

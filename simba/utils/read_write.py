@@ -320,7 +320,7 @@ def read_config_entry(config: configparser.ConfigParser,
                 value = config.get(section, option).strip()
                 if not os.path.isdir(value):
                     raise NotDirectoryError(
-                        msg=f"The SimBA config file includes paths to a folder ({value}) that does not exist.",
+                        msg=f"The SimBA config file includes paths to a FOLDER ({value}) that does not exist.",
                         source=read_config_entry.__name__,
                     )
             if options != None:
