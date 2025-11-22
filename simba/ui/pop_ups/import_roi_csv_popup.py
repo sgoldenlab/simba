@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional, Any
 import os
 
 from simba.mixins.config_reader import ConfigReader
@@ -16,7 +16,8 @@ class ROIDefinitionsCSVImporterPopUp(ConfigReader, PopUpMixin):
     >>> ROIDefinitionsCSVImporterPopUp(config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini")
     """
     def __init__(self,
-                 config_path: Union[str, os.PathLike]):
+                 config_path: Union[str, os.PathLike],
+                 roi_table_frm: Optional[Any] = None):
 
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False, create_logger=False)
         PopUpMixin.__init__(self, title="IMPORT SIMBA ROI CSV DEFINITIONS TO PROJECT", size=(720, 960), icon='data_table')
@@ -27,10 +28,9 @@ class ROIDefinitionsCSVImporterPopUp(ConfigReader, PopUpMixin):
         self.rectangle_file_select = FileSelect(self.paths_frm, "RECTANGLE CSV PATH", title="SELECT CSV FILE", lblwidth=35, file_types=[("CSV FILE", (".csv", ".CSV"))])
         self.circle_file_select = FileSelect(self.paths_frm, "CIRCLE CSV PATH", title="SELECT CSV FILE", lblwidth=35, file_types=[("CSV FILE", (".csv", ".CSV"))])
         self.polygon_file_select = FileSelect(self.paths_frm, "POLYGON CSV PATH", title="SELECT CSV FILE", lblwidth=35, file_types=[("CSV FILE", (".csv", ".CSV"))])
-
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header=f"SETTINGS", icon_name='settings', icon_link=Links.ROI.value, pady=10)
         self.append_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='APPEND TO EXISTING ROI DATA: ', label_width=35, dropdown_width=30, value='FALSE', state=self.append_activated)
-
+        self.roi_table_frm = roi_table_frm if roi_table_frm is not None and hasattr(roi_table_frm, 'refresh_window') else None
         self.run_btn = SimbaButton(parent=self.main_frm, txt='RUN', img='rocket', txt_clr='blue', font=Formats.FONT_LARGE.value, hover_font=Formats.FONT_LARGE_BOLD.value, cmd=self.run)
         self.paths_frm.grid(row=0, column=0, sticky='NW')
         instruct_lbl.grid(row=0, column=0, sticky='NW')
@@ -42,7 +42,7 @@ class ROIDefinitionsCSVImporterPopUp(ConfigReader, PopUpMixin):
         self.append_dropdown.grid(row=0, column=0, sticky='NW')
         self.run_btn.grid(row=2, column=0, sticky='NW')
 
-        self.main_frm.mainloop()
+        #self.main_frm.mainloop()
 
     def run(self):
         rectangle_path = None if not os.path.isfile(self.rectangle_file_select.file_path) else self.rectangle_file_select.file_path
@@ -59,5 +59,7 @@ class ROIDefinitionsCSVImporterPopUp(ConfigReader, PopUpMixin):
                                              polygon_path=polygon_path,
                                              append=append)
         importer.run()
+
+        if self.roi_table_frm is not None: self.roi_table_frm.refresh_window()
 
 #ROIDefinitionsCSVImporterPopUp(config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini")

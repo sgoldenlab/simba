@@ -68,7 +68,7 @@ class ROIVideoTable(ConfigReader, PopUpMixin):
         menu.add_cascade(label="File...", menu=file_menu)
         file_menu.add_command(label="Standardize ROI sizes by metric conversion factor...", compound="left", image=self.menu_icons["settings"]["img"], command=lambda: ROISizeStandardizerPopUp(config_path=self.config_path))
         file_menu.add_command(label="Duplicate ROIs from source video to target videos... ", compound="left", image=self.menu_icons["duplicate_small"]["img"], command=lambda: DuplicateROIsBySourceTarget(config_path=self.config_path, roi_data_path=self.roi_coordinates_path, roi_table_popup=self))
-        file_menu.add_command(label="Import SimBA ROI CSV definitions... ", compound="left", image=self.menu_icons["csv_black"]["img"], command=lambda: ROIDefinitionsCSVImporterPopUp(config_path=self.config_path))
+        file_menu.add_command(label="Import SimBA ROI CSV definitions... ", compound="left", image=self.menu_icons["csv_black"]["img"], command=lambda: ROIDefinitionsCSVImporterPopUp(config_path=self.config_path, roi_table_frm=self))
         file_menu.add_command(label="Set min/max draw window size...", compound="left", image=self.menu_icons["monitor"]["img"], command=lambda: SetMinMaxDrawWindowSize(config_path=self.config_path))
         self.root.config(menu=menu)
 
