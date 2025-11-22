@@ -23,8 +23,8 @@ from simba.utils.checks import (
 from simba.utils.data import (find_frame_numbers_from_time_stamp,
                               slice_roi_dict_for_video)
 from simba.utils.enums import Formats, TagNames
-from simba.utils.errors import (FrameRangeError, InvalidVideoFileError,
-                                NoSpecifiedOutputError, InvalidInputError)
+from simba.utils.errors import (FrameRangeError, InvalidInputError,
+                                InvalidVideoFileError, NoSpecifiedOutputError)
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     create_directory, find_core_cnt,
