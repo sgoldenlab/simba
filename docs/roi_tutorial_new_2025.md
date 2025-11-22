@@ -472,6 +472,26 @@ With the following options:
 
 Once you've clicked <kbd>RUN</kbd>, the SimBA project ROI definitions, stored at `project_folder/logs/measures/ROI_definitions.h5`, will be updated to contain the ROIs defined in the CSV files.
 
+## DUPLICATE ROIs FROM SOURCE TO TARGET VIDEOS
+Sometimes, we have drawn ROIs on one video, and want to apply the same ROI definitions to **A SUBSET** videos in the project without having to manually redraw them. This tool allows you to duplicate all ROI definitions (rectangles, circles, and polygons) from a source video to one or more target videos.
+
+To do this, click on [File] -> [Duplicate ROIs from source video to target video] in the video table window:
+
+<img width="721" height="279" alt="image" src="https://github.com/user-attachments/assets/19150b68-5161-4d52-8f67-c39ccd2d7951" />
+
+Once clicked, you should see the following pop-up:
+
+<img width="647" height="324" alt="image" src="https://github.com/user-attachments/assets/a07da2f3-171d-4a1e-a4d1-6b989006a161" />
+
+With the following options:
+
+- **ROI SOURCE VIDEO**: Dropdown menu listing all videos in the project that have ROI definitions. Select the video whose ROIs you want to copy to other videos.
+
+- **SELECT ROI TARGET VIDEO(S)**: A checkbox section displaying all videos in the project (except the selected source video). Check one or more target videos where you want to duplicate the ROI definitions. You must select at least one target video.
+
+- **RUN**: Button that executes the ROI duplication process. Click after selecting a source video and at least one target video.
+
+
 ## NEXT STEPS
 Once your ROI definitions are all defined, close the `ROI table`, `Regions of Interest Settings` and `Define Shape` windows and head back to the [ROI] tab in the load project menu. 
 
