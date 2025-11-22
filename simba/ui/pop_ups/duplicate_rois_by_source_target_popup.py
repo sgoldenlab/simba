@@ -1,17 +1,23 @@
-from typing import Union, Optional, Any
 import os
 from copy import deepcopy
+from typing import Any, Optional, Union
 
 import pandas as pd
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.utils.read_write import find_all_videos_in_directory
-from simba.utils.errors import NoFilesFoundError
+from simba.roi_tools.roi_utils import (change_roi_dict_video_name,
+                                       get_roi_data_for_video_name,
+                                       get_roi_df_from_dict)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaButton,
+                                        SimbaCheckbox, SimBADropDown,
+                                        SimBALabel)
 from simba.utils.checks import check_file_exist_and_readable
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaButton, SimBALabel, SimBADropDown, SimbaCheckbox)
-from simba.utils.enums import Links, Formats, Keys
-from simba.roi_tools.roi_utils import get_roi_data_for_video_name, change_roi_dict_video_name, get_roi_df_from_dict
+from simba.utils.enums import Formats, Keys, Links
+from simba.utils.errors import NoFilesFoundError
 from simba.utils.printing import stdout_success
+from simba.utils.read_write import find_all_videos_in_directory
+
 
 class DuplicateROIsBySourceTarget(ConfigReader, PopUpMixin):
 
