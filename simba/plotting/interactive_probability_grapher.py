@@ -142,6 +142,7 @@ class InteractiveProbabilityGrapher(ConfigReader):
         plt.xlabel("Frame #", fontsize=self.lbl_font_size, fontweight='500')
         plt.ylabel(f"{self.clf_name} Probability", fontsize=self.lbl_font_size, fontweight='500')
         plt.title(plt_title, fontsize=self.lbl_font_size - 2, pad=20)
+        line, marker = None, None
 
         ax.text(0.5, 1.20, "Double-click: jump to frame | ← →: navigate | Space: play/pause", transform=ax.transAxes, ha='center', va='bottom', fontsize=10, bbox=dict(boxstyle='round,pad=0.5', facecolor='#f0f0f0', edgecolor='#cccccc', alpha=0.9, linewidth=1.5))
         ax.set_ylim(0, 1)
@@ -185,7 +186,7 @@ class InteractiveProbabilityGrapher(ConfigReader):
             pass
         plt.close('all')
 
-
+#
 # test = InteractiveProbabilityGrapher(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
 #                                      file_path=r"C:\troubleshooting\mitra\project_folder\csv\features_extracted\501_MA142_Gi_CNO_0521.csv",
 #                                      model_path=r"C:\troubleshooting\mitra\models\generated_models\straub_tail.sav")

@@ -10,8 +10,6 @@ from simba.utils.warnings import NoFileFoundWarning, MissingFileWarning
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import find_all_videos_in_directory
 
-
-
 VIDEO = 'Video'
 EXPECTED_RECT_COLS = ['Video', 'Shape_type', 'Name', 'Color name', 'Color BGR', 'Thickness', 'Center_X', 'Center_Y', 'topLeftX', 'topLeftY', 'Bottom_right_X', 'Bottom_right_Y', 'width', 'height', 'width_cm', 'height_cm', 'area_cm','Tags', 'Ear_tag_size']
 EXPECTED_CIRC_COLS = ['Video', 'Shape_type', 'Name', 'Color name', 'Color BGR', 'Thickness', 'centerX', 'centerY', 'radius', 'radius_cm', 'area_cm', 'Tags', 'Ear_tag_size', 'Center_X', 'Center_Y']
