@@ -251,7 +251,7 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
             check_if_string_value_is_valid_video_timestamp(value=self.video_start_time_entry.entry_get, name="Video slicing START TIME")
             check_if_string_value_is_valid_video_timestamp(value=self.video_end_time_entry.entry_get, name="Video slicing END TIME")
             if (self.video_start_time_entry.entry_get == self.video_end_time_entry.entry_get):
-                raise FrameRangeError(msg="The sliced start and end times cannot be identical", source=self.__class__.__name__)
+                raise FrameRangeError(msg=f"The sliced start and end times cannot be identical: {self.video_start_time_entry.entry_get} and {self.video_end_time_entry.entry_get}. Un-check the time slicing box or correct the time stamps.", source=self.__class__.__name__)
             check_that_hhmmss_start_is_before_end(start_time=self.video_start_time_entry.entry_get, end_time=self.video_end_time_entry.entry_get, name="SLICE TIME STAMPS")
             return {"start_time": self.video_start_time_entry.entry_get, "end_time": self.video_end_time_entry.entry_get}
         else:

@@ -412,6 +412,9 @@ def SimbaButton(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
     def on_leave(e):
         e.widget.config(bg=bg_clr, font=font)
 
+    # if hover_font != font:
+    #     hover_font = copy(font)
+
     if isinstance(img, str):
         img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS[img]["icon_path"]))
 
@@ -497,14 +500,19 @@ def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                bg_clr: Optional[str] = None,
                font: tuple = Formats.FONT_REGULAR.value,
                relief: str = FLAT,
+               compound: Optional[Literal['left', 'right', 'top', 'bottom', 'center']] = 'left',
                justify: Optional[str] = None,
                link: Optional[str] = None,
                width: Optional[int] = None,
                cursor: Optional[str] = None,
+               img: Optional[str] = None,
                anchor: Optional[str] = None):
 
 
     anchor = 'w' if anchor is None else anchor
+
+    if isinstance(img, str):
+        img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS[img]["icon_path"]))
 
     lbl = Label(parent,
                 text=txt,
@@ -514,7 +522,12 @@ def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                 justify=justify,
                 relief=relief,
                 cursor=cursor,
-                anchor=anchor)
+                anchor=anchor,
+                image=img,
+                compound=compound)
+
+    if img is not None:
+        lbl.image = img
 
     if width is not None:
         lbl.configure(width=width)

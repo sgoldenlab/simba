@@ -746,9 +746,10 @@ def read_video_info(video_name: str,
         return video_settings, px_per_mm, fps
 
 def find_all_videos_in_directory(directory: Union[str, os.PathLike],
-                                 as_dict: Optional[bool] = False,
+                                 as_dict: bool = False,
                                  raise_error: bool = False,
-                                 video_formats: Optional[Tuple[str]] = (".avi", ".mp4", ".mov", ".flv", ".m4v", '.webm'),) -> Union[dict, list]:
+                                 video_formats: Tuple[str] = (".avi", ".mp4", ".mov", ".flv", ".m4v", '.webm'),
+                                 sort_alphabetically: bool = False) -> Union[dict, list]:
     """
     Get all video file paths within a provided directory
 
@@ -771,15 +772,10 @@ def find_all_videos_in_directory(directory: Union[str, os.PathLike],
             video_lst.append(i)
     if not video_lst:
         if raise_error:
-            raise NoFilesFoundError(
-                f"No videos found in directory {directory} in formats {video_formats}."
-            )
+            raise NoFilesFoundError(f"No videos found in directory {directory} in formats {video_formats}.")
         else:
             video_lst.append("No videos found")
-            NoFileFoundWarning(
-                msg=f"No videos found in directory ({directory})",
-                source=find_all_videos_in_directory.__name__,
-            )
+            NoFileFoundWarning(msg=f"No videos found in directory ({directory})", source=find_all_videos_in_directory.__name__)
 
     if video_lst and as_dict:
         video_dict = {}
@@ -787,8 +783,12 @@ def find_all_videos_in_directory(directory: Union[str, os.PathLike],
             video_path = os.path.join(directory, video_name)
             _, name, _ = get_fn_ext(filepath=video_path)
             video_dict[name] = video_path
+        if sort_alphabetically:
+            video_dict = dict(sorted(video_dict.items(), key=lambda x: [int(t) if t.isdigit() else t.lower() for t in re.split(r'(\d+)', x[0])]))
         return video_dict
 
+    if sort_alphabetically:
+        video_lst = sorted(video_lst, key=str.lower)
     return video_lst
 
 

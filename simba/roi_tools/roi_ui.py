@@ -1,6 +1,6 @@
 import os
 import warnings
-from typing import Optional, Union
+from typing import Optional, Union, Any
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.image_mixin import ImageMixin
@@ -38,7 +38,8 @@ class ROI_ui(ROI_mixin, ConfigReader):
                  config_path: Optional[Union[str, os.PathLike]] = None,
                  roi_coordinates_path: Optional[Union[str, os.PathLike]] = None,
                  pose_path: Optional[Union[str, os.PathLike]] = None,
-                 video_dir: Optional[Union[str, os.PathLike]] = None):
+                 video_dir: Optional[Union[str, os.PathLike]] = None,
+                 roi_table_popup: Optional[Any] = None):
 
         check_file_exist_and_readable(file_path=video_path)
         if config_path is None:
@@ -57,6 +58,7 @@ class ROI_ui(ROI_mixin, ConfigReader):
         else:
             pose_data = None
         self.video_ext = get_fn_ext(filepath=video_path)[2][1:]
+        self.roi_table_popup = roi_table_popup
         self.img, self.img_idx = ImageMixin.find_first_non_uniform_clr_frm(video_path=video_path)
         self.define_ui = PopUpMixin(title="REGION OF INTEREST (ROI) SETTINGS", size=WINDOW_SIZE, icon='shapes_small')
         ROI_mixin.__init__(self, video_path=video_path, config_path=config_path, img_idx=self.img_idx, main_frm=self.define_ui.root, roi_coordinates_path=self.roi_coordinates_path, pose_data=pose_data)
@@ -90,6 +92,7 @@ class ROI_ui(ROI_mixin, ConfigReader):
             pass
         self.define_ui.root.destroy()
         self.define_ui.root.quit()
+        self.roi_table_popup.refresh_window()
 
 # ROI_ui(config_path=r"C:\troubleshooting\SDS_pre_post\project_folder\project_config.ini",
 #        video_path=r"C:\troubleshooting\SDS_pre_post\project_folder\videos\SDI100 x ALR2 pre_d7.mp4")

@@ -1318,10 +1318,10 @@ class DownsampleVideoPopUp(PopUpMixin):
 
 class ConvertROIDefinitionsPopUp(PopUpMixin):
     def __init__(self):
-        super().__init__(title="CONVERT ROI DEFINITIONS")
-        settings_frm = LabelFrame(self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value)
-        self.roi_definitions_file_select = FileSelect(settings_frm, "ROI DEFINITIONS PATH (H5)", title="SELECT H5 FILE", lblwidth=20, file_types=[("H5 FILE", (".h5", ".H5"))])
-        self.save_dir = FolderSelect(settings_frm, "SAVE DIRECTORY", title="SELECT H5 FILE", lblwidth=20)
+        super().__init__(title="CONVERT ROI DEFINITIONS", icon='roi')
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header='SETTINGS', icon_name='settings', font=Formats.FONT_HEADER.value)
+        self.roi_definitions_file_select = FileSelect(settings_frm, "ROI DEFINITIONS PATH (H5)", title="SELECT H5 FILE", lblwidth=30, file_types=[("H5 FILE", (".h5", ".H5"))])
+        self.save_dir = FolderSelect(settings_frm, "SAVE DIRECTORY", title="SELECT H5 FILE", lblwidth=30)
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.roi_definitions_file_select.grid(row=0, column=0, sticky=NW)
         self.save_dir.grid(row=1, column=0, sticky=NW)
