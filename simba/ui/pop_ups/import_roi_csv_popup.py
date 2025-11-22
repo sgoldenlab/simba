@@ -1,13 +1,14 @@
-from typing import Union, Optional, Any
 import os
+from typing import Any, Optional, Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.utils.errors import InvalidInputError
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaButton, SimBALabel, SimBADropDown, FileSelect)
-from simba.utils.enums import Links, Formats
-from simba.utils.read_write import str_2_bool
 from simba.roi_tools.import_roi_csvs import ROIDefinitionsCSVImporter
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
+                                        SimbaButton, SimBADropDown, SimBALabel)
+from simba.utils.enums import Formats, Links
+from simba.utils.errors import InvalidInputError
+from simba.utils.read_write import str_2_bool
 
 
 class ROIDefinitionsCSVImporterPopUp(ConfigReader, PopUpMixin):
