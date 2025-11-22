@@ -1,13 +1,18 @@
 import os
-from typing import Union, Optional
+from typing import Optional, Union
+
 import pandas as pd
+
 from simba.mixins.config_reader import ConfigReader
-from simba.utils.checks import check_file_exist_and_readable, check_valid_boolean
-from simba.utils.errors import InvalidInputError
+from simba.roi_tools.roi_utils import (get_circle_df_headers,
+                                       get_polygon_df_headers,
+                                       get_rectangle_df_headers)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_valid_boolean)
 from simba.utils.enums import Keys
-from simba.roi_tools.roi_utils import get_rectangle_df_headers, get_circle_df_headers, get_polygon_df_headers
-from simba.utils.warnings import NoFileFoundWarning
+from simba.utils.errors import InvalidInputError
 from simba.utils.printing import stdout_success
+from simba.utils.warnings import NoFileFoundWarning
 
 EXPECTED_RECT_COLS = ['Video', 'Shape_type', 'Name', 'Color name', 'Color BGR', 'Thickness', 'Center_X', 'Center_Y', 'topLeftX', 'topLeftY', 'Bottom_right_X', 'Bottom_right_Y', 'width', 'height', 'width_cm', 'height_cm', 'area_cm','Tags', 'Ear_tag_size']
 EXPECTED_CIRC_COLS = ['Video', 'Shape_type', 'Name', 'Color name', 'Color BGR', 'Thickness', 'centerX', 'centerY', 'radius', 'radius_cm', 'area_cm', 'Tags', 'Ear_tag_size', 'Center_X', 'Center_Y']

@@ -1,6 +1,6 @@
 import os
 import warnings
-from typing import Optional, Union, Any
+from typing import Any, Optional, Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.image_mixin import ImageMixin
