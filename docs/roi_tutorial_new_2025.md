@@ -447,7 +447,7 @@ https://github.com/user-attachments/assets/aab9c5cf-0731-4ef4-a7ba-395beb56407d
 
 Sometimes, we have exported ROI drawings to human-redable CSV format using [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-roi-definitions-to-human-readable-format) tool. For whatever reason, we now want to convert these files(s) back into SimBA .H5 format, so that these ROIs can be visualized, manipulated, and used in the SimBA graphical interface. 
 
-To do this, click on [File] -> [] in the video table window:
+To do this, click on [File] -> [Import SimBA ROI CSV definitions] in the video table window:
 
 <img width="721" height="276" alt="image" src="https://github.com/user-attachments/assets/ca643899-8409-4903-8717-943e170dde31" />
 
