@@ -442,6 +442,35 @@ If the drawing window is too big (or too small) for your monitor resolution, you
 
 https://github.com/user-attachments/assets/aab9c5cf-0731-4ef4-a7ba-395beb56407d
 
+## IMPORTING ROI DEFINITIONS FROM CSVs
+
+Sometimes, we have exported ROI drawings to human-redable CSV format using [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-roi-definitions-to-human-readable-format) tool. For whatever reason, we now want to convert these files(s) back into SimBA .H5 format, so that these ROIs can be visualized, manipulated, and used in the SimBA graphical interface. 
+
+To do this, click on [File] -> [] in the video table window:
+
+<img width="721" height="276" alt="image" src="https://github.com/user-attachments/assets/ca643899-8409-4903-8717-943e170dde31" />
+
+Once clicked, you should see the following pop-up:
+
+<img width="721" height="279" alt="image" src="https://github.com/user-attachments/assets/25357ac4-3492-461e-aa4e-867d8e850e81" />
+
+With the following options:
+
+- **RECTANGLE CSV PATH**: File selection dialog to browse and select a CSV file containing rectangle ROI definitions. Leave empty if you don't have rectangle ROIs to import.
+  
+- **CIRCLE CSV PATH**: File selection dialog to browse and select a CSV file containing circle ROI definitions. Leave empty if you don't have circle ROIs to import.
+
+- **POLYGON CSV PATH**: File selection dialog to browse and select a CSV file containing polygon ROI definitions. Leave empty if you don't have polygon ROIs to import.
+
+- **APPEND TO EXISTING ROI DATA**: Dropdown menu with options 'TRUE' or 'FALSE'. 
+  - Select **'TRUE'** if you want to add the imported ROIs to an existing ROI definitions file (merges with existing data).
+  - Select **'FALSE'** if you want to overwrite any existing ROI definitions file with the newly imported data.
+  - Note: This dropdown is automatically disabled if no existing ROI definitions file is found in the project.
+
+- **RUN**: Button that executes the import process. Click after selecting at least one CSV file (rectangle, circle, or polygon).
+
+Once you've clicked <kbd>RUN</kbd>, the SimBA project ROI definitions, stored at `project_folder/logs/measures/ROI_definitions.h5`, will be updated to contain the ROIs defined in the CSV files.
+
 ## NEXT STEPS
 Once your ROI definitions are all defined, close the `ROI table`, `Regions of Interest Settings` and `Define Shape` windows and head back to the [ROI] tab in the load project menu. 
 
