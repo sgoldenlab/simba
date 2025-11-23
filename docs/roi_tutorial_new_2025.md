@@ -53,6 +53,7 @@ Moreover, the ROI data can  be used to build potentially valuable, additional, f
  * [SHOW GRID LINES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#overlay-grid-lines-on-drawing-images)
  * [CHANGE DRAWING WINDOW SIZE](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#change-drawing-window-size)
  * [IMPORTING ROI DEFINITIONS FROM CSVs](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#importing-roi-definitions-from-csvs)
+ * [KEYBOARD CONTROLLED FINE-TUNING OF ROI](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#keyboard-controlled-fine-tuning-of-roi-region-of-interest)
  * [NEXT STEPS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#next-steps)
 
 
