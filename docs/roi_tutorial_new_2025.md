@@ -492,6 +492,36 @@ With the following options:
 - **RUN**: Button that executes the ROI duplication process. Click after selecting a source video and at least one target video.
 
 
+
+## KEYBOARD CONTROLLED FINE-TUNING OF ROI (REGION OF INTEREST
+SimBA allows **keyboard-controlled fine-tuning** of ROI (Region of Interest) shapes during interactive editing. 
+
+These keyboard controls are automatically activated **when you HOLD the left maouse button down click on an ROI ear-tag (i.e., center, corner, or edge tag)**. 
+
+- **↑ (Up Arrow)**: Moves the selected ROI edge UP.
+- **↓ (Down Arrow)**: Moves the selected ROI edge DOWN.
+- **← (Left Arrow)**: Moves the selected ROI edge LEFTWARDS.
+- **→ (Right Arrow)**: Moves the selected ROI edge RIGHRWARDS.
+
+Once you are happy, RELEASE the left mouse button.
+
+https://github.com/user-attachments/assets/ec4a1f61-5a86-451f-859c-6560a2fac2f1
+
+> [!NOTE]
+> If needed, you can control the number of pixels the ROI moves with a single key-board button press through the preference menu (the default is 3 pixels)
+> <img width="1145" height="388" alt="image" src="https://github.com/user-attachments/assets/c8527918-72ed-43aa-a5a9-1df8bdbb2c06" />
+
+
+
+
+
+
+
+
+**keyboard-controlled fine-tuning** of ROI (Region of Interest)
+
+
+
 ## NEXT STEPS
 Once your ROI definitions are all defined, close the `ROI table`, `Regions of Interest Settings` and `Define Shape` windows and head back to the [ROI] tab in the load project menu. 
 
