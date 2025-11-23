@@ -431,6 +431,15 @@ In the left window in the example above, you can see the video of the analyzed f
 
 In the right window we see the frame number on the x-axis and the classification probability on the y-axis. Clicking on any frame in the graph will display the associated video frame in the left window. The frame number, and the classification probability of the frame, is shown in the graph title. We look at the graph and determine a suitable behavioral probability threshold (the y-axis in the right graph) that separetes the non-behavior from the behavior frames. 
 
+> [!NOTE]
+> As of 2025/11, the right window has been updated, and has several keyboard shortcuts associated with it (as printed on the top of the frame) to help choose the most suitable discrimination threshold. To use them, be sure to first select the line plot window. 
+> 
+> - **Right Arrow** (`→`): Navigate forward one frame (controls both the probability plot and video windows)
+> - **Left Arrow** (`←`): Navigate backward one frame (controls both the probability plot and video windows)
+> - **Space**: Play/pause video playback (controls both the probability plot and video windows; note: If playing the video interactively is slow, try using a machine with better CPU power)
+
+<img width="1025" height="589" alt="image" src="https://github.com/user-attachments/assets/4a9884b6-27d1-4af1-a1e9-459e26844ddb" />
+
 **(5).** Once we have decided on the probability threshold, we fill this value into the `DISCRIMINATION THRESHOLD (0.00-1.0):` entry box. For example, if set to 0.50, then all frames with a probability of containing the behavior of 0.5 or above will be classified as containing the behavior. For further information on classification theshold, click [here](https://www.scikit-yb.org/en/latest/api/classifier/threshold.html). In this Scenario. Go ahead and enter the classification threshold identified in the previous Steps.
 
 **(6).** We can also set a `MINIMUM BOUT LENGTH (MS)` criterion. This value represents the minimum length of a classified behavioral bout. **Example**: The random forest makes the following predictions for behavior BtWGaNP over 9 consecutive frames in a 50 fps video: 1,1,1,1,0,1,1,1,1. This would mean, if we don't have a minimum bout length, that the animals enganged in behavior BtWGaNP for 80ms (4 frames), took a break for 20ms (1 frame), then again enganged in behavior BtWGaNP for another 80ms (4 frames). You may want to classify this as a single 180ms behavior BtWGaNP bout, rather than two separate 80ms BtWGaNP bouts. If the minimum behavior bout length is set to 20, any interruption in the behavior that is 20ms or shorter will be removed and the example behavioral sequence above will be re-classified as: 1,1,1,1,1,1,1,1,1 - and instead classified as a single 180ms BtWGaNP bout. 

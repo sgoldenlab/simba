@@ -52,6 +52,7 @@ Moreover, the ROI data can  be used to build potentially valuable, additional, f
  * [OVERLAY TRACKING VISUALIZATION DATA IN DRAWING WINDOW](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#overlay-pose-estimation-data-on-roi-tracking)
  * [SHOW GRID LINES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#overlay-grid-lines-on-drawing-images)
  * [CHANGE DRAWING WINDOW SIZE](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#change-drawing-window-size)
+ * [IMPORTING ROI DEFINITIONS FROM CSVs](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#importing-roi-definitions-from-csvs)
  * [NEXT STEPS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#next-steps)
 
 
@@ -441,6 +442,55 @@ Similarly, to overlay hexagonal grid lines, which may help you draw straight, to
 If the drawing window is too big (or too small) for your monitor resolution, you can change the maximum and/or minimum percent the drawing window should take up. To make the drawing window larger, increase the values. To make the drawing window smaller, decrease the values:
 
 https://github.com/user-attachments/assets/aab9c5cf-0731-4ef4-a7ba-395beb56407d
+
+## IMPORTING ROI DEFINITIONS FROM CSVs
+
+Sometimes, we have exported ROI drawings to human-redable CSV format using [THIS](https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-roi-definitions-to-human-readable-format) tool. For whatever reason, we now want to convert these files(s) back into SimBA .H5 format, so that these ROIs can be visualized, manipulated, and used in the SimBA graphical interface. 
+
+To do this, click on [File] -> [Import SimBA ROI CSV definitions] in the video table window:
+
+<img width="721" height="276" alt="image" src="https://github.com/user-attachments/assets/ca643899-8409-4903-8717-943e170dde31" />
+
+Once clicked, you should see the following pop-up:
+
+<img width="721" height="279" alt="image" src="https://github.com/user-attachments/assets/25357ac4-3492-461e-aa4e-867d8e850e81" />
+
+With the following options:
+
+- **RECTANGLE CSV PATH**: File selection dialog to browse and select a CSV file containing rectangle ROI definitions. Leave empty if you don't have rectangle ROIs to import.
+  
+- **CIRCLE CSV PATH**: File selection dialog to browse and select a CSV file containing circle ROI definitions. Leave empty if you don't have circle ROIs to import.
+
+- **POLYGON CSV PATH**: File selection dialog to browse and select a CSV file containing polygon ROI definitions. Leave empty if you don't have polygon ROIs to import.
+
+- **APPEND TO EXISTING ROI DATA**: Dropdown menu with options 'TRUE' or 'FALSE'. 
+  - Select **'TRUE'** if you want to add the imported ROIs to an existing ROI definitions file (merges with existing data).
+  - Select **'FALSE'** if you want to overwrite any existing ROI definitions file with the newly imported data.
+  - Note: This dropdown is automatically disabled if no existing ROI definitions file is found in the project.
+
+- **RUN**: Button that executes the import process. Click after selecting at least one CSV file (rectangle, circle, or polygon).
+
+Once you've clicked <kbd>RUN</kbd>, the SimBA project ROI definitions, stored at `project_folder/logs/measures/ROI_definitions.h5`, will be updated to contain the ROIs defined in the CSV files.
+
+## DUPLICATE ROIs FROM SOURCE TO TARGET VIDEOS
+Sometimes, we have drawn ROIs on one video, and want to apply the same ROI definitions to **A SUBSET** videos in the project without having to manually redraw them. This tool allows you to duplicate all ROI definitions (rectangles, circles, and polygons) from a source video to one or more target videos.
+
+To do this, click on [File] -> [Duplicate ROIs from source video to target video] in the video table window:
+
+<img width="721" height="279" alt="image" src="https://github.com/user-attachments/assets/19150b68-5161-4d52-8f67-c39ccd2d7951" />
+
+Once clicked, you should see the following pop-up:
+
+<img width="647" height="324" alt="image" src="https://github.com/user-attachments/assets/a07da2f3-171d-4a1e-a4d1-6b989006a161" />
+
+With the following options:
+
+- **ROI SOURCE VIDEO**: Dropdown menu listing all videos in the project that have ROI definitions. Select the video whose ROIs you want to copy to other videos.
+
+- **SELECT ROI TARGET VIDEO(S)**: A checkbox section displaying all videos in the project (except the selected source video). Check one or more target videos where you want to duplicate the ROI definitions. You must select at least one target video.
+
+- **RUN**: Button that executes the ROI duplication process. Click after selecting a source video and at least one target video.
+
 
 ## NEXT STEPS
 Once your ROI definitions are all defined, close the `ROI table`, `Regions of Interest Settings` and `Define Shape` windows and head back to the [ROI] tab in the load project menu. 
