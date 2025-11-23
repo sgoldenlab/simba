@@ -345,7 +345,6 @@ class InteractiveROIModifier():
 
     def left_mouse_drag(self, event: Event, x_correction: Optional[int] = None, y_correction: Optional[int] = None):
         if self.edge_selected:
-            print(self.interactive_loc[0],x_correction, self.interactive_loc[1],y_correction)
             if x_correction is not None and y_correction is not None:
                 self.interactive_loc = (self.interactive_loc[0] + x_correction, self.interactive_loc[1] + y_correction)
                 self.x, self.y = (self.interactive_loc[0], self.interactive_loc[1])
