@@ -93,6 +93,7 @@ SHOW_GRID_OVERLAY = 'SHOW_GRID_OVERLAY'
 OVERLAY_GRID_COLOR = 'OVERLAY_GRID_COLOR'
 SHOW_HEXAGON_OVERLAY = 'SHOW_HEXAGON_OVERLAY'
 POLYGON_TOLERANCE = 'POLYGON_TOLERANCE'
+KEYBOARD_SENSITIVITY = 'KEYBOARD_SENSITIVITY'
 
 PLATFORM = platform.system()
 
@@ -156,7 +157,8 @@ class ROI_mixin(ConfigReader):
         self.img_lbl.pack()
         self.img_window.protocol("WM_DELETE_WINDOW", self.close_img)
         self.settings = {item.name: item.value for item in ROI_SETTINGS}
-        self.settings[POLYGON_TOLERANCE] = 2
+        self.settings[POLYGON_TOLERANCE] = 3
+        self.settings[KEYBOARD_SENSITIVITY] = 2
 
         self.rectangles_df, self.circles_df, self.polygon_df, self.roi_dict, self.roi_names, self.other_roi_dict, self.other_video_names_w_rois = get_roi_data(roi_path=self.roi_coordinates_path, video_name=self.video_meta['video_name'])
 
@@ -237,9 +239,6 @@ class ROI_mixin(ConfigReader):
                             new_vertices[vertice_idx][0], new_vertices[vertice_idx][1] = roi_data[VERTICES][vertice_idx][0] * scale_factor, roi_data[VERTICES][vertice_idx][1] * scale_factor
                         new_roi_dict[video_name][roi_name][VERTICES] = new_vertices
 
-
-
-
         return deepcopy(new_roi_dict)
 
 
@@ -277,21 +276,6 @@ class ROI_mixin(ConfigReader):
                 msg = f'Cannot show bounding box tracking style: {e.args}.'
                 self.set_status_bar_panel(text=msg, fg='red')
         return img
-
-
-    # def insert_grid(self, img: np.ndarray, grid: List[Polygon]) -> np.ndarray:
-    #     if grid is None or len(grid) == 0:
-    #         return img
-    #     else:
-    #         try:
-    #             for polygon in grid:
-    #                 cords = np.array(polygon.exterior.coords).astype(np.int32)
-    #                 img = cv2.polylines(img=img, pts=[cords], isClosed=True, color=self.settings[OVERLAY_GRID_COLOR], thickness=max(1, int(self.circle_size/5)), lineType=8)
-    #             return img
-    #         except Exception as e:
-    #             msg = f'Cannot draw gridlines: {e.args}'
-    #             self.set_status_bar_panel(text=msg, fg='red')
-    #             raise InvalidInputError(msg=msg, source=f'{self.__class__.__name__} draw')
 
     def overlay_rois_on_image(self,
                               show_ear_tags: bool = False,
@@ -847,32 +831,26 @@ class ROI_mixin(ConfigReader):
         self.show_grid_overlay_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['FALSE', '10MM', '20MM', '40MM', '80MM', '160MM'], label="SHOW GRID OVERLAY: ", label_width=35, dropdown_width=35, value=self.settings[SHOW_GRID_OVERLAY])
         self.show_hexagon_overlay_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=['FALSE', '10MM', '20MM', '40MM', '80MM', '160MM'], label="SHOW HEXAGON OVERLAY: ", label_width=35, dropdown_width=35, value=self.settings[SHOW_GRID_OVERLAY])
         self.polygon_tolerance_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(range(2, 22, 2)), label="POLYGON TOLERANCE: ", label_width=35, dropdown_width=35, value=self.settings[POLYGON_TOLERANCE], tooltip_txt='Higher values will simplify polygons. \n Smaller values will retain more polygon details')
+        self.keyboard_sensitivity_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=list(range(1, 52, 1)), label="KEYBOARD MOVEMENT SENSITIVITY: ", label_width=35, dropdown_width=35, value=self.settings[KEYBOARD_SENSITIVITY], tooltip_txt='How many pixels the ROI borders move when editing the borders visa the keyboard ')
 
-
-        #self.max_width_ratio_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=WINDOW_SIZE_OPTIONS, label="MAX DRAW DISPLAY RATIO WIDTH: ", label_width=35, dropdown_width=35, value=MAX_DRAW_UI_DISPLAY_RATIO[0])
-        #self.max_height_ratio_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=WINDOW_SIZE_OPTIONS, label="HEIGHT: ", label_width=10, dropdown_width=10, value=MAX_DRAW_UI_DISPLAY_RATIO[1])
-        #self.min_width_ratio_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=WINDOW_SIZE_OPTIONS, label="MIN DRAW DISPLAY RATIO WIDTH: ", label_width=35, dropdown_width=35, value=MIN_DRAW_UI_DISPLAY_RATIO[0])
-       # self.min_height_ratio_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=WINDOW_SIZE_OPTIONS, label="HEIGHT: ", label_width=10, dropdown_width=10, value=MIN_DRAW_UI_DISPLAY_RATIO[1])
         pref_save_btn = SimbaButton(parent=pref_frm_panel, txt="SAVE", img='save_large', font=Formats.FONT_REGULAR.value, cmd=self.set_settings)
         pref_frm_panel.grid(row=0, column=0, sticky=NW)
         self.line_type_dropdown.grid(row=0, column=0, sticky=NW, pady=5)
         self.roi_select_clr_dropdown.grid(row=1, column=0, sticky=NW, pady=5)
-        self.duplication_jump_dropdown.grid(row=2, column=0, sticky=NW, pady=5)
-        self.show_tracking_dropdown.grid(row=3, column=0, sticky=NW, pady=5)
-        self.overlay_color_dropdown.grid(row=4, column=0, sticky=NW, pady=5)
-        self.show_grid_overlay_dropdown.grid(row=5, column=0, sticky=NW, pady=5)
-        self.show_hexagon_overlay_dropdown.grid(row=6, column=0, sticky=NW, pady=5)
-        self.polygon_tolerance_dropdown.grid(row=7, column=0, sticky=NW, pady=5)
-        #self.max_width_ratio_dropdown.grid(row=5, column=0, sticky=NW, pady=5)
-        #self.max_height_ratio_dropdown.grid(row=5, column=1, sticky=NW, pady=5)
-        #self.min_width_ratio_dropdown.grid(row=6, column=0, sticky=NW, pady=5)
-        #self.min_height_ratio_dropdown.grid(row=6, column=1, sticky=NW, pady=5)
-        pref_save_btn.grid(row=8, column=0, sticky=NW, pady=5)
+        self.keyboard_sensitivity_dropdown.grid(row=2, column=0, sticky=NW, pady=5)
+        self.duplication_jump_dropdown.grid(row=3, column=0, sticky=NW, pady=5)
+        self.show_tracking_dropdown.grid(row=4, column=0, sticky=NW, pady=5)
+        self.overlay_color_dropdown.grid(row=5, column=0, sticky=NW, pady=5)
+        self.show_grid_overlay_dropdown.grid(row=6, column=0, sticky=NW, pady=5)
+        self.show_hexagon_overlay_dropdown.grid(row=7, column=0, sticky=NW, pady=5)
+        self.polygon_tolerance_dropdown.grid(row=8, column=0, sticky=NW, pady=5)
+        pref_save_btn.grid(row=9, column=0, sticky=NW, pady=5)
 
     def set_settings(self):
         self.settings['LINE_TYPE'] = int(self.line_type_dropdown.get_value())
         self.settings['ROI_SELECT_CLR'] = self.color_option_dict[self.roi_select_clr_dropdown.get_value()]
         self.settings['DUPLICATION_JUMP_SIZE'] = int(self.duplication_jump_dropdown.get_value())
+        self.settings[KEYBOARD_SENSITIVITY] = int(self.keyboard_sensitivity_dropdown.get_value())
         self.settings[ROI_TRACKING_STYLE] = self.show_tracking_dropdown.get_value()
         self.settings[SHOW_GRID_OVERLAY] = self.show_grid_overlay_dropdown.get_value()
         self.settings[SHOW_HEXAGON_OVERLAY] = self.show_hexagon_overlay_dropdown.get_value()

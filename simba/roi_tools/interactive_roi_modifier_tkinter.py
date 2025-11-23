@@ -15,7 +15,7 @@ from simba.roi_tools.roi_utils import (get_circle_df_headers,
                                        get_rectangle_df_headers,
                                        insert_gridlines_on_roi_img)
 from simba.utils.checks import check_instance, check_valid_polygon
-from simba.utils.enums import ROI_SETTINGS, Keys
+from simba.utils.enums import ROI_SETTINGS, Keys, TkBinds
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"
 
@@ -39,8 +39,9 @@ CIRCLE_C_X = 'centerX'
 CIRCLE_C_Y = 'centerY'
 RADIUS = 'radius'
 VERTICES = 'vertices'
+TAGS = 'Tags'
 OVERLAY_GRID_COLOR = 'OVERLAY_GRID_COLOR'
-
+KEYBOARD_SENSITIVITY = 'KEYBOARD_SENSITIVITY'
 
 def _plot_roi(roi_dict: dict,
               img: np.ndarray,
@@ -83,20 +84,32 @@ class InteractiveROIModifier():
         self.bind_keys()
 
     def bind_keys(self):
-        self.img_window.bind("<ButtonPress-1>", self.left_mouse_down)
-        self.img_window.bind("<B1-Motion>", self.left_mouse_drag)
-        self.img_window.bind("<ButtonRelease-1>", self.left_mouse_up)
+        self.img_window.bind(TkBinds.B1_PRESS.value, self.left_mouse_down)
+        self.img_window.bind(TkBinds.B1_MOTION.value, self.left_mouse_drag)
+        self.img_window.bind(TkBinds.B1_RELEASE.value, self.left_mouse_up)
 
     def unbind_keys(self):
-        self.img_window.unbind("<ButtonPress-1>")
-        self.img_window.unbind("<B1-Motion>")
-        self.img_window.unbind("<ButtonRelease-1>")
+        self.img_window.unbind(TkBinds.B1_PRESS.value)
+        self.img_window.unbind(TkBinds.B1_MOTION.value)
+        self.img_window.unbind(TkBinds.B1_RELEASE.value)
+
+    def bind_kbd_keys(self, kbd_sensitivity: int = 3):
+        self.img_window.bind(TkBinds.UP.value, lambda event: self.left_mouse_drag(event, x_correction=0, y_correction=-kbd_sensitivity))
+        self.img_window.bind(TkBinds.DOWN.value, lambda event: self.left_mouse_drag(event, x_correction=0, y_correction=kbd_sensitivity))
+        self.img_window.bind(TkBinds.LEFT.value, lambda event: self.left_mouse_drag(event, x_correction=-kbd_sensitivity, y_correction=0))
+        self.img_window.bind(TkBinds.RIGHT.value, lambda event: self.left_mouse_drag(event, x_correction=kbd_sensitivity, y_correction=0))
+
+    def unbind_kbd_keys(self):
+        self.img_window.unbind(TkBinds.UP.value)
+        self.img_window.unbind(TkBinds.DOWN.value)
+        self.img_window.unbind(TkBinds.LEFT.value)
+        self.img_window.unbind(TkBinds.RIGHT.value)
 
     def find_closest_tag(self, roi_dict: dict, click_coordinate: Tuple[int, int]):
         clicked_roi, clicked_tag = None, None
         for roi_name, roi_data in roi_dict.items():
             ear_tag_size = roi_data['Ear_tag_size']
-            for roi_tag_name, roi_tag_coordinate in roi_data['Tags'].items():
+            for roi_tag_name, roi_tag_coordinate in roi_data[TAGS].items():
                 distance = math.sqrt((roi_tag_coordinate[0] - click_coordinate[0]) ** 2 + (roi_tag_coordinate[1] - click_coordinate[1]) ** 2)
                 if distance <= ear_tag_size:
                     clicked_roi, clicked_tag = roi_data, roi_tag_name
@@ -123,126 +136,126 @@ class InteractiveROIModifier():
         self.clicked_roi[BR_X], self.clicked_roi[BR_Y] = self.x, self.y
         self.clicked_roi[HEIGHT], self.clicked_roi[WIDTH] = self.h, self.w
         self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y] = int(self.tl_x + self.w / 2), int(self.tl_y + self.h / 2)
-        self.clicked_roi['Tags'][TR_TAG] = (self.x, self.y - self.h)
-        self.clicked_roi['Tags'][BL_TAG] = (self.x - self.w, self.y)
-        self.clicked_roi['Tags'][BR_TAG] = (self.x, self.y)
-        self.clicked_roi['Tags'][R_TAG] = (self.x, int(self.tl_y + (self.h / 2)))
-        self.clicked_roi['Tags'][L_TAG] = (self.tl_x, int(self.tl_y + (self.h / 2)))
-        self.clicked_roi['Tags'][B_TAG] = (int(self.tl_x + self.w / 2), self.y)
-        self.clicked_roi['Tags'][T_TAG] = (int(self.tl_x + self.w / 2), self.y - self.h)
-        self.clicked_roi['Tags'][C_TAG] = (self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y])
-        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi['Tags'][TL_TAG], (self.x, self.y), self.clicked_roi['Color BGR'],self.clicked_roi['Thickness'])
-        self.temp_img = cv2.line(self.temp_img, (self.x, self.y), self.clicked_roi['Tags'][BL_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
-        self.temp_img = cv2.line(self.temp_img, (self.x, self.y), self.clicked_roi['Tags'][TR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.clicked_roi[TAGS][TR_TAG] = (self.x, self.y - self.h)
+        self.clicked_roi[TAGS][BL_TAG] = (self.x - self.w, self.y)
+        self.clicked_roi[TAGS][BR_TAG] = (self.x, self.y)
+        self.clicked_roi[TAGS][R_TAG] = (self.x, int(self.tl_y + (self.h / 2)))
+        self.clicked_roi[TAGS][L_TAG] = (self.tl_x, int(self.tl_y + (self.h / 2)))
+        self.clicked_roi[TAGS][B_TAG] = (int(self.tl_x + self.w / 2), self.y)
+        self.clicked_roi[TAGS][T_TAG] = (int(self.tl_x + self.w / 2), self.y - self.h)
+        self.clicked_roi[TAGS][C_TAG] = (self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y])
+        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], (self.x, self.y), self.clicked_roi['Color BGR'],self.clicked_roi['Thickness'])
+        self.temp_img = cv2.line(self.temp_img, (self.x, self.y), self.clicked_roi[TAGS][BL_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.line(self.temp_img, (self.x, self.y), self.clicked_roi[TAGS][TR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
         self.update_image(img=self.temp_img)
 
     def _select_rectangle_right(self):
         self.clicked_roi[WIDTH] = self.w
         self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y] = int(self.tl_x + self.w / 2), int(self.tl_y + self.h / 2)
-        self.clicked_roi['Tags'][TR_TAG] = (self.x, self.tl_y)
-        self.clicked_roi['Tags'][BR_TAG] = (self.x, self.tl_y + self.h)
-        self.clicked_roi['Tags'][R_TAG] = (self.tl_x + self.w, self.tl_y + int(self.h / 2))
-        self.clicked_roi['Tags'][T_TAG] = (self.tl_x + int(self.w / 2), self.tl_y)
-        self.clicked_roi['Tags'][B_TAG] = (self.tl_x + int(self.w / 2), self.tl_y + self.h)
-        self.clicked_roi['Tags'][C_TAG] = (self.tl_x + int(self.w / 2), self.tl_y + int(self.h / 2))
+        self.clicked_roi[TAGS][TR_TAG] = (self.x, self.tl_y)
+        self.clicked_roi[TAGS][BR_TAG] = (self.x, self.tl_y + self.h)
+        self.clicked_roi[TAGS][R_TAG] = (self.tl_x + self.w, self.tl_y + int(self.h / 2))
+        self.clicked_roi[TAGS][T_TAG] = (self.tl_x + int(self.w / 2), self.tl_y)
+        self.clicked_roi[TAGS][B_TAG] = (self.tl_x + int(self.w / 2), self.tl_y + self.h)
+        self.clicked_roi[TAGS][C_TAG] = (self.tl_x + int(self.w / 2), self.tl_y + int(self.h / 2))
         self.clicked_roi[BR_X] = self.x
         self.clicked_roi[BR_Y] = self.tl_y + self.h
-        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi['Tags'][TL_TAG], self.clicked_roi['Tags'][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
-        self.temp_img =  cv2.line(self.temp_img, self.clicked_roi['Tags'][BR_TAG], self.clicked_roi['Tags'][TR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
+        self.temp_img =  cv2.line(self.temp_img, self.clicked_roi[TAGS][BR_TAG], self.clicked_roi[TAGS][TR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
         self.update_image(img=self.temp_img)
 
     def _select_rectangle_bottom(self):
-        self.clicked_roi['Tags'][BR_TAG] = (self.tl_x + self.w, self.tl_y + self.h)
-        self.clicked_roi['Tags'][BL_TAG] = (self.tl_x, self.tl_y + self.h)
-        self.clicked_roi['Tags'][L_TAG] = (self.tl_x, self.tl_y + int(self.h / 2))
-        self.clicked_roi['Tags'][R_TAG] = (self.tl_x + self.w, self.tl_y + int(self.h / 2))
-        self.clicked_roi['Tags'][B_TAG] = (self.tl_x + int(self.w / 2), self.tl_y + self.h)
-        self.clicked_roi['Tags'][C_TAG] = (self.tl_x + int(self.w / 2), self.tl_y + int(self.h / 2))
+        self.clicked_roi[TAGS][BR_TAG] = (self.tl_x + self.w, self.tl_y + self.h)
+        self.clicked_roi[TAGS][BL_TAG] = (self.tl_x, self.tl_y + self.h)
+        self.clicked_roi[TAGS][L_TAG] = (self.tl_x, self.tl_y + int(self.h / 2))
+        self.clicked_roi[TAGS][R_TAG] = (self.tl_x + self.w, self.tl_y + int(self.h / 2))
+        self.clicked_roi[TAGS][B_TAG] = (self.tl_x + int(self.w / 2), self.tl_y + self.h)
+        self.clicked_roi[TAGS][C_TAG] = (self.tl_x + int(self.w / 2), self.tl_y + int(self.h / 2))
         self.clicked_roi[BR_X] = self.tl_x + self.w
         self.clicked_roi[BR_Y] = self.tl_y + self.h
         self.clicked_roi[HEIGHT] = self.h
         self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y] = self.tl_x + int(self.w / 2), self.tl_y + int(self.h / 2)
-        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi['Tags'][TL_TAG], self.clicked_roi['Tags'][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi['Tags'][BL_TAG], self.clicked_roi['Tags'][BR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][BL_TAG], self.clicked_roi[TAGS][BR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
         self.update_image(img=self.temp_img)
 
     def _select_rectangle_bottom_left(self):
-        self.clicked_roi['Tags'][TL_TAG] = (self.x, self.tr_y)
-        self.clicked_roi['Tags'][L_TAG] = (self.x, self.tr_y + int(self.h / 2))
-        self.clicked_roi['Tags'][BL_TAG] = (self.x, self.y)
-        self.clicked_roi['Tags'][B_TAG] = (self.x + int(self.w / 2), self.y)
-        self.clicked_roi['Tags'][BR_TAG] = (self.x + self.w, self.tr_y + self.h)
-        self.clicked_roi['Tags'][R_TAG] = (self.x + self.w, self.tr_y + int(self.h / 2))
-        self.clicked_roi['Tags'][T_TAG] = (self.x + int(self.w / 2), self.tr_y)
-        self.clicked_roi['Tags'][C_TAG] = (self.x + int(self.w / 2), self.tr_y + int(self.h / 2))
+        self.clicked_roi[TAGS][TL_TAG] = (self.x, self.tr_y)
+        self.clicked_roi[TAGS][L_TAG] = (self.x, self.tr_y + int(self.h / 2))
+        self.clicked_roi[TAGS][BL_TAG] = (self.x, self.y)
+        self.clicked_roi[TAGS][B_TAG] = (self.x + int(self.w / 2), self.y)
+        self.clicked_roi[TAGS][BR_TAG] = (self.x + self.w, self.tr_y + self.h)
+        self.clicked_roi[TAGS][R_TAG] = (self.x + self.w, self.tr_y + int(self.h / 2))
+        self.clicked_roi[TAGS][T_TAG] = (self.x + int(self.w / 2), self.tr_y)
+        self.clicked_roi[TAGS][C_TAG] = (self.x + int(self.w / 2), self.tr_y + int(self.h / 2))
         self.clicked_roi[TL_X] = self.x
         self.clicked_roi[BR_X] = self.x + self.w
         self.clicked_roi[BR_Y] = self.tr_y + self.h
         self.clicked_roi[HEIGHT] = self.h
         self.clicked_roi[WIDTH] = self.w
         self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y] = self.x + int(self.w / 2), self.tr_y + int(self.h / 2)
-        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi['Tags'][TL_TAG], self.clicked_roi['Tags'][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi['Tags'][BL_TAG], self.clicked_roi['Tags'][TL_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi['Tags'][BL_TAG], self.clicked_roi['Tags'][BR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][BL_TAG], self.clicked_roi[TAGS][TL_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][BL_TAG], self.clicked_roi[TAGS][BR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
         self.update_image(img=self.temp_img)
 
     def _select_rectangle_left_tag(self):
         self.clicked_roi[WIDTH] = self.w
         self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y] = int(self.tr_x - (self.w / 2)), int(self.tr_y + self.h / 2)
-        self.clicked_roi['Tags'][BL_TAG] = (self.tr_x - self.w, self.tr_y + self.h)
-        self.clicked_roi['Tags'][TL_TAG] = (self.tr_x - self.w, self.tr_y)
-        self.clicked_roi['Tags'][L_TAG] = (self.x, int(self.tr_y + self.h / 2))
-        self.clicked_roi['Tags'][B_TAG] = (self.tr_x - int(self.w / 2), self.tr_y + self.h)
-        self.clicked_roi['Tags'][T_TAG] = (self.tr_x - int(self.w / 2), self.tr_y)
-        self.clicked_roi['Tags'][C_TAG] = (int(self.tr_x - (self.w / 2)), int(self.tr_y + self.h / 2))
+        self.clicked_roi[TAGS][BL_TAG] = (self.tr_x - self.w, self.tr_y + self.h)
+        self.clicked_roi[TAGS][TL_TAG] = (self.tr_x - self.w, self.tr_y)
+        self.clicked_roi[TAGS][L_TAG] = (self.x, int(self.tr_y + self.h / 2))
+        self.clicked_roi[TAGS][B_TAG] = (self.tr_x - int(self.w / 2), self.tr_y + self.h)
+        self.clicked_roi[TAGS][T_TAG] = (self.tr_x - int(self.w / 2), self.tr_y)
+        self.clicked_roi[TAGS][C_TAG] = (int(self.tr_x - (self.w / 2)), int(self.tr_y + self.h / 2))
         self.clicked_roi[TL_X] = self.tr_x - self.w
-        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi['Tags'][TL_TAG], self.clicked_roi['Tags'][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi['Tags'][BL_TAG], self.clicked_roi['Tags'][TL_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][BL_TAG], self.clicked_roi[TAGS][TL_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
         self.update_image(img=self.temp_img)
 
     def _select_rectangle_top_tag(self):
-        self.clicked_roi['Tags'][TR_TAG] = (self.br_x, self.br_y - self.h)
-        self.clicked_roi['Tags'][TL_TAG] = (self.br_x - self.w, self.br_y - self.h)
-        self.clicked_roi['Tags'][T_TAG] = (self.br_x - int(self.w / 2), self.br_y - self.h)
-        self.clicked_roi['Tags'][L_TAG] = (self.br_x - self.w, self.br_y - int(self.h / 2))
-        self.clicked_roi['Tags'][R_TAG] = (self.br_x, self.br_y - int(self.h / 2))
-        self.clicked_roi['Tags'][C_TAG] = (self.br_x - int(self.w / 2), self.br_y - int(self.h / 2))
+        self.clicked_roi[TAGS][TR_TAG] = (self.br_x, self.br_y - self.h)
+        self.clicked_roi[TAGS][TL_TAG] = (self.br_x - self.w, self.br_y - self.h)
+        self.clicked_roi[TAGS][T_TAG] = (self.br_x - int(self.w / 2), self.br_y - self.h)
+        self.clicked_roi[TAGS][L_TAG] = (self.br_x - self.w, self.br_y - int(self.h / 2))
+        self.clicked_roi[TAGS][R_TAG] = (self.br_x, self.br_y - int(self.h / 2))
+        self.clicked_roi[TAGS][C_TAG] = (self.br_x - int(self.w / 2), self.br_y - int(self.h / 2))
         self.clicked_roi[TL_X] = self.br_x - self.w
         self.clicked_roi[TL_Y] = self.br_y - self.h
         self.clicked_roi[HEIGHT] = self.h
         self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y] = self.br_x - int(self.w / 2), self.br_y - int(self.h / 2)
-        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi['Tags'][TL_TAG], self.clicked_roi['Tags'][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi['Tags'][TL_TAG], self.clicked_roi['Tags'][TR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][TR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
         self.update_image(img=self.temp_img)
 
     def _select_rectangle_top_left_tag(self):
-        self.clicked_roi['Tags'][TR_TAG] = (self.br_x, self.br_y - self.h)
-        self.clicked_roi['Tags'][T_TAG] = (self.br_x - int(self.w / 2), self.br_y - self.h)
-        self.clicked_roi['Tags'][L_TAG] = (self.br_x - self.w, self.br_y - int(self.h / 2))
-        self.clicked_roi['Tags'][R_TAG] = (self.br_x, self.br_y - int(self.h / 2))
-        self.clicked_roi['Tags'][BL_TAG] = (self.x, self.br_y)
-        self.clicked_roi['Tags'][B_TAG] = (self.x + int(self.w/2), self.br_y)
-        self.clicked_roi['Tags'][TL_TAG] = (self.x, self.y)
-        self.clicked_roi['Tags'][C_TAG] = (self.x + int(self.w / 2), self.y + int(self.h / 2))
+        self.clicked_roi[TAGS][TR_TAG] = (self.br_x, self.br_y - self.h)
+        self.clicked_roi[TAGS][T_TAG] = (self.br_x - int(self.w / 2), self.br_y - self.h)
+        self.clicked_roi[TAGS][L_TAG] = (self.br_x - self.w, self.br_y - int(self.h / 2))
+        self.clicked_roi[TAGS][R_TAG] = (self.br_x, self.br_y - int(self.h / 2))
+        self.clicked_roi[TAGS][BL_TAG] = (self.x, self.br_y)
+        self.clicked_roi[TAGS][B_TAG] = (self.x + int(self.w/2), self.br_y)
+        self.clicked_roi[TAGS][TL_TAG] = (self.x, self.y)
+        self.clicked_roi[TAGS][C_TAG] = (self.x + int(self.w / 2), self.y + int(self.h / 2))
         self.clicked_roi[TL_X] = self.x
         self.clicked_roi[TL_Y] = self.y
         self.clicked_roi[HEIGHT] = self.h
         self.clicked_roi[WIDTH] = self.w
         self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y] = self.x + int(self.w / 2), self.y + int(self.h / 2)
-        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi['Tags'][TL_TAG], self.clicked_roi['Tags'][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi['Tags'][TL_TAG], self.clicked_roi['Tags'][TR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi['Tags'][TL_TAG], self.clicked_roi['Tags'][BL_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][TR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BL_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
         self.update_image(img=self.temp_img)
 
     def _select_rectangle_top_right_tag(self):
-        self.clicked_roi['Tags'][TL_TAG] = (self.bl_x, self.y)
-        self.clicked_roi['Tags'][L_TAG] = (self.bl_x, self.bl_y - int(self.h / 2))
-        self.clicked_roi['Tags'][T_TAG] = (self.bl_x + int(self.w / 2), self.y)
-        self.clicked_roi['Tags'][TR_TAG] = (self.x, self.y)
-        self.clicked_roi['Tags'][R_TAG] = (self.x, self.bl_y - int(self.h / 2))
-        self.clicked_roi['Tags'][BR_TAG] = (self.x, self.y + self.h)
-        self.clicked_roi['Tags'][B_TAG] = (self.x - int(self.w / 2), self.bl_y)
-        self.clicked_roi['Tags'][C_TAG] = (self.bl_x + int(self.w / 2), self.bl_y - int(self.h / 2))
+        self.clicked_roi[TAGS][TL_TAG] = (self.bl_x, self.y)
+        self.clicked_roi[TAGS][L_TAG] = (self.bl_x, self.bl_y - int(self.h / 2))
+        self.clicked_roi[TAGS][T_TAG] = (self.bl_x + int(self.w / 2), self.y)
+        self.clicked_roi[TAGS][TR_TAG] = (self.x, self.y)
+        self.clicked_roi[TAGS][R_TAG] = (self.x, self.bl_y - int(self.h / 2))
+        self.clicked_roi[TAGS][BR_TAG] = (self.x, self.y + self.h)
+        self.clicked_roi[TAGS][B_TAG] = (self.x - int(self.w / 2), self.bl_y)
+        self.clicked_roi[TAGS][C_TAG] = (self.bl_x + int(self.w / 2), self.bl_y - int(self.h / 2))
         self.clicked_roi[TL_X] = self.bl_x
         self.clicked_roi[TL_Y] = self.y
         self.clicked_roi[BR_X] = self.x
@@ -250,21 +263,21 @@ class InteractiveROIModifier():
         self.clicked_roi[HEIGHT] = self.h
         self.clicked_roi[WIDTH] = self.w
         self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y] = self.bl_x + int(self.w / 2), self.bl_y - int(self.h / 2)
-        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi['Tags'][TL_TAG], self.clicked_roi['Tags'][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi['Tags'][TL_TAG], self.clicked_roi['Tags'][TR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi['Tags'][TR_TAG], self.clicked_roi['Tags'][BR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][TR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][TR_TAG], self.clicked_roi[TAGS][BR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
         self.update_image(img=self.temp_img)
 
     def _select_rectangle_center_tag(self):
-        self.clicked_roi['Tags'][TL_TAG] = (self.tl_x, self.tl_y)
-        self.clicked_roi['Tags'][L_TAG] = (self.tl_x, self.tl_y + int(self.h / 2))
-        self.clicked_roi['Tags'][BL_TAG] = (self.tl_x, self.tl_y + self.h)
-        self.clicked_roi['Tags'][B_TAG] = (self.tl_x + int(self.w / 2), self.tl_y + self.h)
-        self.clicked_roi['Tags'][BR_TAG] = (self.br_x, self.br_y)
-        self.clicked_roi['Tags'][R_TAG] = (self.tl_x + self.w, self.tl_y + int(self.h / 2))
-        self.clicked_roi['Tags'][TR_TAG] = (self.tl_x + self.w, self.tl_y)
-        self.clicked_roi['Tags'][T_TAG] = (self.tl_x + int(self.w / 2), self.tl_y)
-        self.clicked_roi['Tags'][C_TAG] = (self.x, self.y)
+        self.clicked_roi[TAGS][TL_TAG] = (self.tl_x, self.tl_y)
+        self.clicked_roi[TAGS][L_TAG] = (self.tl_x, self.tl_y + int(self.h / 2))
+        self.clicked_roi[TAGS][BL_TAG] = (self.tl_x, self.tl_y + self.h)
+        self.clicked_roi[TAGS][B_TAG] = (self.tl_x + int(self.w / 2), self.tl_y + self.h)
+        self.clicked_roi[TAGS][BR_TAG] = (self.br_x, self.br_y)
+        self.clicked_roi[TAGS][R_TAG] = (self.tl_x + self.w, self.tl_y + int(self.h / 2))
+        self.clicked_roi[TAGS][TR_TAG] = (self.tl_x + self.w, self.tl_y)
+        self.clicked_roi[TAGS][T_TAG] = (self.tl_x + int(self.w / 2), self.tl_y)
+        self.clicked_roi[TAGS][C_TAG] = (self.x, self.y)
         self.clicked_roi[TL_X] = self.tl_x
         self.clicked_roi[TL_Y] = self.tl_y
         self.clicked_roi[BR_X] = self.br_x
@@ -272,73 +285,81 @@ class InteractiveROIModifier():
         self.clicked_roi[HEIGHT] = self.h
         self.clicked_roi[WIDTH] = self.w
         self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y] = self.x, self.y
-        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi['Tags'][TL_TAG], self.clicked_roi['Tags'][BR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
         self.update_image(img=self.temp_img)
 
     def _select_circle_border(self):
         self.clicked_roi[RADIUS] = self.radius
-        self.clicked_roi["Tags"][BORDER_TAG] = self.l_edge
-        self.temp_img = cv2.circle(self.temp_img, center=self.clicked_roi["Tags"][C_TAG], radius=self.radius, color=self.settings['ROI_SELECT_CLR'], thickness=self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.clicked_roi[TAGS][BORDER_TAG] = self.l_edge
+        self.temp_img = cv2.circle(self.temp_img, center=self.clicked_roi[TAGS][C_TAG], radius=self.radius, color=self.settings['ROI_SELECT_CLR'], thickness=self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
         self.update_image(img=self.temp_img)
 
     def _select_circle_center(self):
         self.clicked_roi[CIRCLE_C_X], self.clicked_roi[CIRCLE_C_Y] = self.x, self.y
-        self.clicked_roi["Tags"][C_TAG] = (self.x, self.y)
-        self.clicked_roi["Tags"][BORDER_TAG] = self.l_edge
-        self.temp_img = cv2.circle(self.temp_img, center=self.clicked_roi["Tags"][C_TAG], radius=self.radius, color=self.settings['ROI_SELECT_CLR'], thickness=self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.clicked_roi[TAGS][C_TAG] = (self.x, self.y)
+        self.clicked_roi[TAGS][BORDER_TAG] = self.l_edge
+        self.temp_img = cv2.circle(self.temp_img, center=self.clicked_roi[TAGS][C_TAG], radius=self.radius, color=self.settings['ROI_SELECT_CLR'], thickness=self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
         self.update_image(img=self.temp_img)
 
     def _select_polygon_center(self):
         self.new_vertices = np.array([np.array(v) for k, v in self.new_tags.items() if k != 'Center_tag']).astype(np.int32)
-        self.clicked_roi['Tags'] = self.new_tags
+        self.clicked_roi[TAGS] = self.new_tags
         self.clicked_roi[VERTICES] = self.new_vertices
-        self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y] = self.clicked_roi['Tags']["Center_tag"]
-        self.clicked_roi['center'] = self.clicked_roi['Tags']['Center_tag']
+        self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y] = self.clicked_roi[TAGS]["Center_tag"]
+        self.clicked_roi['center'] = self.clicked_roi[TAGS]['Center_tag']
         self.temp_img = cv2.polylines(self.temp_img, [self.clicked_roi[VERTICES]], True, color=self.settings['ROI_SELECT_CLR'], thickness=self.clicked_roi['Thickness'],lineType=self.settings['LINE_TYPE'])
         self.update_image(img=self.temp_img)
 
     def _select_polygon_vertice(self):
-        self.clicked_roi['Tags'][self.clicked_tag] = self.new_poly_tag_loc
+        self.clicked_roi[TAGS][self.clicked_tag] = self.new_poly_tag_loc
         self.clicked_roi[VERTICES][self.clicked_tag_id] = np.array([self.new_poly_tag_loc])
         self.clicked_roi['center'] = self.polygon_centroid
         self.clicked_roi['area'] = self.polygon_area
-        self.clicked_roi['Tags']['Center_tag'] = tuple(self.polygon_centroid)
+        self.clicked_roi[TAGS]['Center_tag'] = tuple(self.polygon_centroid)
         self.temp_img = cv2.polylines(self.temp_img, [self.clicked_roi[VERTICES].astype(np.int32)], True, color=self.clicked_roi['Color BGR'], thickness=self.clicked_roi['Thickness'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi['Tags'][self.clicked_tag], self.clicked_roi['Tags'][self.n_tag_1_id], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi['Tags'][self.clicked_tag], self.clicked_roi['Tags'][self.n_tag_2_id], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][self.clicked_tag], self.clicked_roi[TAGS][self.n_tag_1_id], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][self.clicked_tag], self.clicked_roi[TAGS][self.n_tag_2_id], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
         self.update_image(img=self.temp_img)
 
 
     def left_mouse_up(self, event):
         self.edge_selected = False
+        self.unbind_kbd_keys()
         if self.clicked_roi is not None:
             self.roi_dict[self.clicked_roi['Name']] = self.clicked_roi
             draw_img = self.get_gridline_copy() if self.rectangle_grid is not None or self.hex_grid is not None else self.original_img.copy()
             self.temp_img = _plot_roi(roi_dict=self.roi_dict, img=draw_img, show_tags=True)
             self.update_image(img=self.temp_img)
 
-    def left_mouse_down(self, event):
+    def left_mouse_down(self, event: Event):
         self.click_loc = (event.x, event.y)
         self.clicked_roi, self.clicked_tag = self.find_closest_tag(roi_dict=self.roi_dict, click_coordinate=self.click_loc)
         if self.clicked_roi is not None and self.clicked_tag is not None:
+            draw_img = self.get_gridline_copy() if self.rectangle_grid is not None or self.hex_grid is not None else self.original_img.copy()
+            self.temp_img = _plot_roi(roi_dict=self.roi_dict, img=draw_img)
+            self.temp_img = cv2.circle(self.temp_img, center=self.clicked_roi[TAGS][self.clicked_tag], radius=self.clicked_roi['Ear_tag_size'], color=self.settings['ROI_SELECT_CLR'], thickness=-1, lineType=self.settings['LINE_TYPE'])
+            self.update_image(img=self.temp_img)
+            self.interactive_loc = self.clicked_roi[TAGS][self.clicked_tag]
+            self.bind_kbd_keys(kbd_sensitivity=self.settings[KEYBOARD_SENSITIVITY])
             self.edge_selected = True
 
-
-
-    def left_mouse_drag(self, event):
+    def left_mouse_drag(self, event: Event, x_correction: Optional[int] = None, y_correction: Optional[int] = None):
         if self.edge_selected:
-            self.x, self.y = (event.x, event.y)
+            print(self.interactive_loc[0],x_correction, self.interactive_loc[1],y_correction)
+            if x_correction is not None and y_correction is not None:
+                self.interactive_loc = (self.interactive_loc[0] + x_correction, self.interactive_loc[1] + y_correction)
+                self.x, self.y = (self.interactive_loc[0], self.interactive_loc[1])
+            else:
+                self.x, self.y = (event.x, event.y)
+                self.interactive_loc = (self.x, self.y)
             draw_img = self.get_gridline_copy() if self.rectangle_grid is not None or self.hex_grid is not None else self.original_img.copy()
             self.temp_img = _plot_roi(roi_dict=self.roi_dict, omitted_roi=self.clicked_roi['Name'], img=draw_img)
+            #self.temp_img = cv2.circle(self.temp_img, center=self.clicked_roi["Tags"][self.clicked_tag], radius=self.clicked_roi['Ear_tag_size'], color=self.settings['ROI_SELECT_CLR'], thickness=-1, lineType=self.settings['LINE_TYPE'])
             if self.clicked_roi['Shape_type'].lower() == ROI_SETTINGS.RECTANGLE.value:
-                self.tl_x, self.tl_y = self.clicked_roi['Tags'][TL_TAG]
-                self.tr_x, self.tr_y = self.clicked_roi['Tags'][TR_TAG]
-                self.br_x, self.br_y = self.clicked_roi['Tags'][BR_TAG]
-                self.bl_x, self.bl_y = self.clicked_roi['Tags'][BL_TAG]
-                if self.clicked_tag == BR_TAG:
-                    self.w, self.h = self.x - self.tl_x, self.y - self.tl_y
-                    if (self.w > 1 < self.h) and (0 <= self.x <= self.img_w) and (0 <= self.y <= self.img_h):
-                        self._select_rectangle_bottom_right()
+                self.tl_x, self.tl_y = self.clicked_roi[TAGS][TL_TAG]
+                self.tr_x, self.tr_y = self.clicked_roi[TAGS][TR_TAG]
+                self.br_x, self.br_y = self.clicked_roi[TAGS][BR_TAG]
+                self.bl_x, self.bl_y = self.clicked_roi[TAGS][BL_TAG]
                 if self.clicked_tag == BR_TAG:
                     self.w, self.h = self.x - self.tl_x, self.y - self.tl_y
                     if (self.w > 1 < self.h) and (0 <= self.x <= self.img_w) and (0 <= self.y <= self.img_h):
@@ -380,8 +401,8 @@ class InteractiveROIModifier():
                         self._select_rectangle_center_tag()
             elif self.clicked_roi['Shape_type'].lower() == ROI_SETTINGS.CIRCLE.value:
                 if self.clicked_tag == BORDER_TAG:
-                    c_x, c_y = self.clicked_roi["Tags"][C_TAG]
-                    self.radius = self.clicked_roi["Tags"][C_TAG][0] - self.x
+                    c_x, c_y = self.clicked_roi[TAGS][C_TAG]
+                    self.radius = self.clicked_roi[TAGS][C_TAG][0] - self.x
                     self.l_edge, t_edge =  (c_x - self.radius, c_y), (c_x, c_y - self.radius)
                     r_edge, b_edge = (c_x +self. radius, c_y), (c_x, c_y + self.radius)
                     if (0 <= self.l_edge[0]) and (0 <= t_edge[1]) and (r_edge[0] <= self.img_w) and (b_edge[1] <= self.img_h) and (self.radius >= 1):
@@ -397,7 +418,7 @@ class InteractiveROIModifier():
                 if self.clicked_tag == 'Center_tag':
                     x_diff, y_diff = self.x - self.clicked_roi[CENTER_X], self.y - self.clicked_roi[CENTER_Y]
                     self.new_tags, outside_img_flag = {}, False
-                    for tag_name, tag in self.clicked_roi['Tags'].items():
+                    for tag_name, tag in self.clicked_roi[TAGS].items():
                         t  = (tag[0] + x_diff, tag[1] + y_diff)
                         self.new_tags[tag_name] = t
                         if (0 > t[0]) or (t[0] > self.img_w) or (0 > t[1]) or (t[1] > self.img_h):
@@ -406,8 +427,8 @@ class InteractiveROIModifier():
                         self._select_polygon_center()
                 else:
                     self.clicked_tag_id = int(self.clicked_tag[-1])
-                    click_tag = self.clicked_roi['Tags'][self.clicked_tag]
-                    max_tag_id = len(self.clicked_roi["Tags"].keys()) - 2
+                    click_tag = self.clicked_roi[TAGS][self.clicked_tag]
+                    max_tag_id = len(self.clicked_roi[TAGS].keys()) - 2
                     self.n_tag_1_id = f'Tag_{0 if self.clicked_tag_id == max_tag_id else max_tag_id if self.clicked_tag_id == 0 else self.clicked_tag_id - 1}'
                     self.n_tag_2_id = f'Tag_{self.clicked_tag_id - 1 if self.clicked_tag_id == max_tag_id else self.clicked_tag_id + 1}'
                     x_diff, y_diff = self.x - click_tag[0], self.y - click_tag[1]

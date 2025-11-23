@@ -866,13 +866,28 @@ class ROI_SETTINGS(Enum):
     ROI_TRACKING_STYLE = 'FALSE' #bbox, keypoints, obb, keypoints & obb
     SHOW_GRID_OVERLAY = 'FALSE'
     OVERLAY_GRID_COLOR = (192, 192, 192)
+    KEYBOARD_SENSITIVITY = 3
 
 
 class PackageNames(Enum):
     ULTRALYTICS = 'ultralytics'
+
+
+class TkBinds(Enum):
+    UP = "<Up>"
+    DOWN = "<Down>"
+    LEFT = "<Left>"
+    RIGHT = "<Right>"
+    B1_PRESS = "<ButtonPress-1>"
+    B1_RELEASE = "<ButtonRelease-1>"
+    B1_MOTION = "<B1-Motion>"
 
 class ENV_VARS(Enum):
     PRINT_EMOJIS = 'PRINT_EMOJIS'
     UNSUPERVISED_INTERFACE = 'UNSUPERVISED_INTERFACE'
     NUMBA_PRECOMPILE = 'NUMBA_PRECOMPILE'
     CUML = 'CUML'
+
+
+
+

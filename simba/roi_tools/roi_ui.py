@@ -97,7 +97,7 @@ class ROI_ui(ROI_mixin, ConfigReader):
 # ROI_ui(config_path=r"C:\troubleshooting\SDS_pre_post\project_folder\project_config.ini",
 #        video_path=r"C:\troubleshooting\SDS_pre_post\project_folder\videos\SDI100 x ALR2 pre_d7.mp4")
 #
-
+#
 
 
 # ROI_ui(config_path=None,
@@ -117,7 +117,7 @@ class ROI_ui(ROI_mixin, ConfigReader):
 #        video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\03152021_NOB_IOT_8.mp4",
 #        roi_coordinates_path=r"C:\troubleshooting\RAT_NOR\project_folder\logs\measures\ROI_definitions.h5",
 #        pose_path=r"C:\troubleshooting\RAT_NOR\project_folder\csv\outlier_corrected_movement_location\03152021_NOB_IOT_8.csv")
-
+#
 
 # ROI_ui(config_path=r"C:\troubleshooting\cue_light\t1\project_folder\project_config.ini",
 #        video_path=r"C:\troubleshooting\cue_light\t1\project_folder\videos\2025-05-21 16-10-06_cropped.mp4",
