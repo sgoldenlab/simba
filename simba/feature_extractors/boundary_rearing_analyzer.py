@@ -20,7 +20,9 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_if_dir_exists, check_that_column_exist, check_valid_dataframe)
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log, check_if_dir_exists,
+    check_that_column_exist, check_valid_dataframe)
 from simba.utils.enums import Formats
 from simba.utils.lookups import get_current_time
 from simba.utils.printing import SimbaTimer, stdout_success

@@ -20,7 +20,7 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_valid_lst,
                                 check_video_and_data_frm_count_align)
 from simba.utils.data import create_color_palettes
-from simba.utils.enums import Formats, Keys, TextOptions, OS
+from simba.utils.enums import OS, Formats, Keys, TextOptions
 from simba.utils.errors import (AnimalNumberError, InvalidInputError,
                                 NoFilesFoundError)
 from simba.utils.printing import stdout_success

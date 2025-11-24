@@ -2,21 +2,27 @@ __author__ = "Simon Nilsson"
 
 import argparse
 import os
+import platform
 import sys
 from copy import deepcopy
 from typing import Optional, Union
 
 import numpy as np
+
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
-from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_if_dir_exists, check_if_keys_exist_in_dict, check_int)
+from simba.utils.checks import (
+    check_all_file_names_are_represented_in_video_log, check_if_dir_exists,
+    check_if_keys_exist_in_dict, check_int)
 from simba.utils.data import plug_holes_shortest_bout
 from simba.utils.enums import TagNames
 from simba.utils.errors import NoFilesFoundError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (find_files_of_filetypes_in_directory, get_fn_ext, read_df, write_df, find_core_cnt)
+from simba.utils.read_write import (find_core_cnt,
+                                    find_files_of_filetypes_in_directory,
+                                    get_fn_ext, read_df, write_df)
 from simba.utils.warnings import NoFileFoundWarning
-import platform
+
 MINIMUM_BOUT_LENGTH = 'minimum_bout_length'
 THRESHOLD = 'threshold'
 MODEL_NAME = 'model_name'
