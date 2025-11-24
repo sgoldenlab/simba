@@ -42,6 +42,10 @@ VERTICES = 'vertices'
 TAGS = 'Tags'
 OVERLAY_GRID_COLOR = 'OVERLAY_GRID_COLOR'
 KEYBOARD_SENSITIVITY = 'KEYBOARD_SENSITIVITY'
+ROI_SELECT_CLR = 'ROI_SELECT_CLR'
+THICKNESS = 'Thickness'
+COLOR_BGR = "Color BGR"
+LINE_TYPE = 'LINE_TYPE'
 
 def _plot_roi(roi_dict: dict,
               img: np.ndarray,
@@ -144,9 +148,9 @@ class InteractiveROIModifier():
         self.clicked_roi[TAGS][B_TAG] = (int(self.tl_x + self.w / 2), self.y)
         self.clicked_roi[TAGS][T_TAG] = (int(self.tl_x + self.w / 2), self.y - self.h)
         self.clicked_roi[TAGS][C_TAG] = (self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y])
-        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], (self.x, self.y), self.clicked_roi['Color BGR'],self.clicked_roi['Thickness'])
-        self.temp_img = cv2.line(self.temp_img, (self.x, self.y), self.clicked_roi[TAGS][BL_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
-        self.temp_img = cv2.line(self.temp_img, (self.x, self.y), self.clicked_roi[TAGS][TR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], (self.x, self.y), self.clicked_roi[COLOR_BGR],self.clicked_roi[THICKNESS])
+        self.temp_img = cv2.line(self.temp_img, (self.x, self.y), self.clicked_roi[TAGS][BL_TAG], self.settings[ROI_SELECT_CLR], self.clicked_roi[THICKNESS], lineType=self.settings[LINE_TYPE])
+        self.temp_img = cv2.line(self.temp_img, (self.x, self.y), self.clicked_roi[TAGS][TR_TAG], self.settings[ROI_SELECT_CLR], self.clicked_roi[THICKNESS], lineType=self.settings[LINE_TYPE])
         self.update_image(img=self.temp_img)
 
     def _select_rectangle_right(self):
@@ -160,8 +164,8 @@ class InteractiveROIModifier():
         self.clicked_roi[TAGS][C_TAG] = (self.tl_x + int(self.w / 2), self.tl_y + int(self.h / 2))
         self.clicked_roi[BR_X] = self.x
         self.clicked_roi[BR_Y] = self.tl_y + self.h
-        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
-        self.temp_img =  cv2.line(self.temp_img, self.clicked_roi[TAGS][BR_TAG], self.clicked_roi[TAGS][TR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi[COLOR_BGR], self.clicked_roi[THICKNESS])
+        self.temp_img =  cv2.line(self.temp_img, self.clicked_roi[TAGS][BR_TAG], self.clicked_roi[TAGS][TR_TAG], self.settings[ROI_SELECT_CLR], self.clicked_roi[THICKNESS], lineType=self.settings[LINE_TYPE])
         self.update_image(img=self.temp_img)
 
     def _select_rectangle_bottom(self):
@@ -175,8 +179,8 @@ class InteractiveROIModifier():
         self.clicked_roi[BR_Y] = self.tl_y + self.h
         self.clicked_roi[HEIGHT] = self.h
         self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y] = self.tl_x + int(self.w / 2), self.tl_y + int(self.h / 2)
-        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][BL_TAG], self.clicked_roi[TAGS][BR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi[COLOR_BGR], self.clicked_roi[THICKNESS])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][BL_TAG], self.clicked_roi[TAGS][BR_TAG], self.settings[ROI_SELECT_CLR], self.clicked_roi[THICKNESS], lineType=self.settings[LINE_TYPE])
         self.update_image(img=self.temp_img)
 
     def _select_rectangle_bottom_left(self):
@@ -194,9 +198,9 @@ class InteractiveROIModifier():
         self.clicked_roi[HEIGHT] = self.h
         self.clicked_roi[WIDTH] = self.w
         self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y] = self.x + int(self.w / 2), self.tr_y + int(self.h / 2)
-        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][BL_TAG], self.clicked_roi[TAGS][TL_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][BL_TAG], self.clicked_roi[TAGS][BR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi[COLOR_BGR], self.clicked_roi[THICKNESS])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][BL_TAG], self.clicked_roi[TAGS][TL_TAG], self.settings[ROI_SELECT_CLR], self.clicked_roi[THICKNESS], lineType=self.settings[LINE_TYPE])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][BL_TAG], self.clicked_roi[TAGS][BR_TAG], self.settings[ROI_SELECT_CLR], self.clicked_roi[THICKNESS], lineType=self.settings[LINE_TYPE])
         self.update_image(img=self.temp_img)
 
     def _select_rectangle_left_tag(self):
@@ -209,8 +213,8 @@ class InteractiveROIModifier():
         self.clicked_roi[TAGS][T_TAG] = (self.tr_x - int(self.w / 2), self.tr_y)
         self.clicked_roi[TAGS][C_TAG] = (int(self.tr_x - (self.w / 2)), int(self.tr_y + self.h / 2))
         self.clicked_roi[TL_X] = self.tr_x - self.w
-        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][BL_TAG], self.clicked_roi[TAGS][TL_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi[COLOR_BGR], self.clicked_roi[THICKNESS])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][BL_TAG], self.clicked_roi[TAGS][TL_TAG], self.settings[ROI_SELECT_CLR], self.clicked_roi[THICKNESS], lineType=self.settings[LINE_TYPE])
         self.update_image(img=self.temp_img)
 
     def _select_rectangle_top_tag(self):
@@ -224,8 +228,8 @@ class InteractiveROIModifier():
         self.clicked_roi[TL_Y] = self.br_y - self.h
         self.clicked_roi[HEIGHT] = self.h
         self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y] = self.br_x - int(self.w / 2), self.br_y - int(self.h / 2)
-        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][TR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi[COLOR_BGR], self.clicked_roi[THICKNESS])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][TR_TAG], self.settings[ROI_SELECT_CLR], self.clicked_roi[THICKNESS], lineType=self.settings[LINE_TYPE])
         self.update_image(img=self.temp_img)
 
     def _select_rectangle_top_left_tag(self):
@@ -242,9 +246,9 @@ class InteractiveROIModifier():
         self.clicked_roi[HEIGHT] = self.h
         self.clicked_roi[WIDTH] = self.w
         self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y] = self.x + int(self.w / 2), self.y + int(self.h / 2)
-        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][TR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BL_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi[COLOR_BGR], self.clicked_roi[THICKNESS])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][TR_TAG], self.settings[ROI_SELECT_CLR], self.clicked_roi[THICKNESS], lineType=self.settings[LINE_TYPE])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BL_TAG], self.settings[ROI_SELECT_CLR], self.clicked_roi[THICKNESS], lineType=self.settings[LINE_TYPE])
         self.update_image(img=self.temp_img)
 
     def _select_rectangle_top_right_tag(self):
@@ -263,9 +267,9 @@ class InteractiveROIModifier():
         self.clicked_roi[HEIGHT] = self.h
         self.clicked_roi[WIDTH] = self.w
         self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y] = self.bl_x + int(self.w / 2), self.bl_y - int(self.h / 2)
-        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi['Color BGR'], self.clicked_roi['Thickness'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][TR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][TR_TAG], self.clicked_roi[TAGS][BR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.clicked_roi[COLOR_BGR], self.clicked_roi[THICKNESS])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][TR_TAG], self.settings[ROI_SELECT_CLR], self.clicked_roi[THICKNESS], lineType=self.settings[LINE_TYPE])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][TR_TAG], self.clicked_roi[TAGS][BR_TAG], self.settings[ROI_SELECT_CLR], self.clicked_roi[THICKNESS], lineType=self.settings[LINE_TYPE])
         self.update_image(img=self.temp_img)
 
     def _select_rectangle_center_tag(self):
@@ -285,20 +289,20 @@ class InteractiveROIModifier():
         self.clicked_roi[HEIGHT] = self.h
         self.clicked_roi[WIDTH] = self.w
         self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y] = self.x, self.y
-        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.rectangle(self.temp_img, self.clicked_roi[TAGS][TL_TAG], self.clicked_roi[TAGS][BR_TAG], self.settings[ROI_SELECT_CLR], self.clicked_roi[THICKNESS], lineType=self.settings[LINE_TYPE])
         self.update_image(img=self.temp_img)
 
     def _select_circle_border(self):
         self.clicked_roi[RADIUS] = self.radius
         self.clicked_roi[TAGS][BORDER_TAG] = self.l_edge
-        self.temp_img = cv2.circle(self.temp_img, center=self.clicked_roi[TAGS][C_TAG], radius=self.radius, color=self.settings['ROI_SELECT_CLR'], thickness=self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.circle(self.temp_img, center=self.clicked_roi[TAGS][C_TAG], radius=self.radius, color=self.settings[ROI_SELECT_CLR], thickness=self.clicked_roi[THICKNESS], lineType=self.settings[LINE_TYPE])
         self.update_image(img=self.temp_img)
 
     def _select_circle_center(self):
         self.clicked_roi[CIRCLE_C_X], self.clicked_roi[CIRCLE_C_Y] = self.x, self.y
         self.clicked_roi[TAGS][C_TAG] = (self.x, self.y)
         self.clicked_roi[TAGS][BORDER_TAG] = self.l_edge
-        self.temp_img = cv2.circle(self.temp_img, center=self.clicked_roi[TAGS][C_TAG], radius=self.radius, color=self.settings['ROI_SELECT_CLR'], thickness=self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.circle(self.temp_img, center=self.clicked_roi[TAGS][C_TAG], radius=self.radius, color=self.settings[ROI_SELECT_CLR], thickness=self.clicked_roi[THICKNESS], lineType=self.settings[LINE_TYPE])
         self.update_image(img=self.temp_img)
 
     def _select_polygon_center(self):
@@ -307,7 +311,7 @@ class InteractiveROIModifier():
         self.clicked_roi[VERTICES] = self.new_vertices
         self.clicked_roi[CENTER_X], self.clicked_roi[CENTER_Y] = self.clicked_roi[TAGS]["Center_tag"]
         self.clicked_roi['center'] = self.clicked_roi[TAGS]['Center_tag']
-        self.temp_img = cv2.polylines(self.temp_img, [self.clicked_roi[VERTICES]], True, color=self.settings['ROI_SELECT_CLR'], thickness=self.clicked_roi['Thickness'],lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.polylines(self.temp_img, [self.clicked_roi[VERTICES]], True, color=self.settings[ROI_SELECT_CLR], thickness=self.clicked_roi[THICKNESS],lineType=self.settings[LINE_TYPE])
         self.update_image(img=self.temp_img)
 
     def _select_polygon_vertice(self):
@@ -316,9 +320,9 @@ class InteractiveROIModifier():
         self.clicked_roi['center'] = self.polygon_centroid
         self.clicked_roi['area'] = self.polygon_area
         self.clicked_roi[TAGS]['Center_tag'] = tuple(self.polygon_centroid)
-        self.temp_img = cv2.polylines(self.temp_img, [self.clicked_roi[VERTICES].astype(np.int32)], True, color=self.clicked_roi['Color BGR'], thickness=self.clicked_roi['Thickness'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][self.clicked_tag], self.clicked_roi[TAGS][self.n_tag_1_id], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
-        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][self.clicked_tag], self.clicked_roi[TAGS][self.n_tag_2_id], self.settings['ROI_SELECT_CLR'], self.clicked_roi['Thickness'], lineType=self.settings['LINE_TYPE'])
+        self.temp_img = cv2.polylines(self.temp_img, [self.clicked_roi[VERTICES].astype(np.int32)], True, color=self.clicked_roi[COLOR_BGR], thickness=self.clicked_roi[THICKNESS])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][self.clicked_tag], self.clicked_roi[TAGS][self.n_tag_1_id], self.settings[ROI_SELECT_CLR], self.clicked_roi[THICKNESS], lineType=self.settings[LINE_TYPE])
+        self.temp_img = cv2.line(self.temp_img, self.clicked_roi[TAGS][self.clicked_tag], self.clicked_roi[TAGS][self.n_tag_2_id], self.settings[ROI_SELECT_CLR], self.clicked_roi[THICKNESS], lineType=self.settings[LINE_TYPE])
         self.update_image(img=self.temp_img)
 
 
@@ -337,7 +341,7 @@ class InteractiveROIModifier():
         if self.clicked_roi is not None and self.clicked_tag is not None:
             draw_img = self.get_gridline_copy() if self.rectangle_grid is not None or self.hex_grid is not None else self.original_img.copy()
             self.temp_img = _plot_roi(roi_dict=self.roi_dict, img=draw_img)
-            self.temp_img = cv2.circle(self.temp_img, center=self.clicked_roi[TAGS][self.clicked_tag], radius=self.clicked_roi['Ear_tag_size'], color=self.settings['ROI_SELECT_CLR'], thickness=-1, lineType=self.settings['LINE_TYPE'])
+            self.temp_img = cv2.circle(self.temp_img, center=self.clicked_roi[TAGS][self.clicked_tag], radius=self.clicked_roi['Ear_tag_size'], color=self.settings[ROI_SELECT_CLR], thickness=-1, lineType=self.settings[LINE_TYPE])
             self.update_image(img=self.temp_img)
             self.interactive_loc = self.clicked_roi[TAGS][self.clicked_tag]
             self.bind_kbd_keys(kbd_sensitivity=self.settings[KEYBOARD_SENSITIVITY])

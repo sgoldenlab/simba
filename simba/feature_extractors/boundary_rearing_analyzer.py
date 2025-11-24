@@ -20,9 +20,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.timeseries_features_mixin import TimeseriesFeatureMixin
-from simba.utils.checks import (
-    check_all_file_names_are_represented_in_video_log, check_if_dir_exists,
-    check_that_column_exist, check_valid_dataframe)
+from simba.utils.checks import (check_all_file_names_are_represented_in_video_log, check_if_dir_exists, check_that_column_exist, check_valid_dataframe)
 from simba.utils.enums import Formats
 from simba.utils.lookups import get_current_time
 from simba.utils.printing import SimbaTimer, stdout_success
@@ -164,7 +162,7 @@ class BoundaryRearingFeaturizer(ConfigReader,
 
         write_df(df=data, file_type=self.file_type, save_path=save_path)
 
-# x = BoundaryRearingFeaturizer(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/open_field_rearing/project_folder/project_config.ini',
-#                               data_dir=r'/Users/simon/Desktop/envs/simba/troubleshooting/open_field_rearing/project_folder/csv/outlier_corrected_movement_location',
-#                               save_dir=r'/Users/simon/Desktop/envs/simba/troubleshooting/open_field_rearing/project_folder/csv/features_extracted/rect')
+# x = BoundaryRearingFeaturizer(config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini",
+#                               data_dir=r'C:\troubleshooting\mouse_open_field\project_folder\csv\outlier_corrected_movement_location',
+#                               save_dir=r'C:\troubleshooting\mouse_open_field\project_folder\csv\features_extracted')
 # x.run()

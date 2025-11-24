@@ -142,7 +142,8 @@ class FeatureSubsetsCalculator(ConfigReader, TrainModelMixin):
         self.__get_bp_combinations()
 
     def __get_bp_combinations(self):
-        self.two_point_combs = np.array(list(combinations(self.project_bps, 2)))
+        ordered_bps = sorted(self.project_bps)
+        self.two_point_combs = np.array(list(combinations(ordered_bps, 2)))
         self.within_animal_three_point_combs = {}
         self.within_animal_four_point_combs = {}
         self.animal_bps = {}

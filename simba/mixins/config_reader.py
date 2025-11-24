@@ -574,9 +574,7 @@ class ConfigReader(object):
             self.y_cols.append(f"{bp}_y")
             self.p_cols.append(f"{bp}_p")
 
-    def drop_bp_cords(
-        self, df: pd.DataFrame, raise_error: bool = False
-    ) -> pd.DataFrame:
+    def drop_bp_cords(self, df: pd.DataFrame, raise_error: bool = False) -> pd.DataFrame:
         """
         Helper to remove pose-estimation fields from dataframe.
 
@@ -591,10 +589,7 @@ class ConfigReader(object):
         """
         missing_body_part_fields = list(set(self.bp_col_names) - set(list(df.columns)))
         if len(missing_body_part_fields) > 0 and not raise_error:
-            BodypartColumnNotFoundWarning(
-                msg=f"SimBA could not drop body-part coordinates, some body-part names are missing in dataframe. SimBA expected the following body-parts, that could not be found inside the file: {missing_body_part_fields}",
-                source=self.__class__.__name__,
-            )
+            BodypartColumnNotFoundWarning(msg=f"SimBA could not drop body-part coordinates, some body-part names are missing in dataframe. SimBA expected the following body-parts, that could not be found inside the file: {missing_body_part_fields}", source=self.__class__.__name__)
             return df.drop(self.bp_col_names, axis=1, errors="ignore")
         elif len(missing_body_part_fields) > 0 and raise_error:
             raise BodypartColumnNotFoundError(

@@ -20,10 +20,10 @@ from simba.utils.checks import (check_file_exist_and_readable,
                                 check_valid_lst,
                                 check_video_and_data_frm_count_align)
 from simba.utils.data import create_color_palettes
-from simba.utils.enums import Formats, Keys, TextOptions
+from simba.utils.enums import Formats, Keys, TextOptions, OS
 from simba.utils.errors import (AnimalNumberError, InvalidInputError,
                                 NoFilesFoundError)
-from simba.utils.printing import SimbaTimer, stdout_success
+from simba.utils.printing import stdout_success
 from simba.utils.read_write import (concatenate_videos_in_folder,
                                     find_core_cnt, get_fn_ext,
                                     get_video_meta_data, read_df)
@@ -141,7 +141,7 @@ class DirectingOtherAnimalsVisualizerMultiprocess(ConfigReader, PlottingMixin):
                  right_ear_name: Optional[str] = None,
                  nose_name: Optional[str] = None):
 
-        if platform.system() == "Darwin":
+        if platform.system() == OS.MAC.value:
             multiprocessing.set_start_method("spawn", force=True)
         check_file_exist_and_readable(file_path=video_path)
         check_file_exist_and_readable(file_path=config_path)
