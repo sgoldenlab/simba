@@ -91,6 +91,7 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.show_pose_cb, self.show_pose_var = SimbaCheckbox(parent=self.settings_frm, txt="SHOW TRACKING (POSE)", font=Formats.FONT_REGULAR.value, txt_img='pose', val=True)
         self.show_animal_names_cb, self.show_animal_names_var = SimbaCheckbox(parent=self.settings_frm, txt="SHOW ANIMAL NAME(S)", font=Formats.FONT_REGULAR.value, txt_img='label', val=False)
         self.show_bboxes_cb, self.show_bboxes_var = SimbaCheckbox(parent=self.settings_frm, txt="SHOW ANIMAL BOUNDING BOXES", font=Formats.FONT_REGULAR.value, txt_img='rectangle_2', val=False)
+        self.conf_cb, self.conf_var = SimbaCheckbox(parent=self.settings_frm, txt="SHOW CLASSIFICATION PROBABILITY", font=Formats.FONT_REGULAR.value, txt_img='probability', val=False)
 
         self.settings_frm.grid(row=2, column=0,  sticky=NW)
         self.multiprocess_dropdown.grid(row=0, column=0, sticky=NW)
@@ -98,11 +99,12 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.gantt_dropdown.grid(row=2, column=0, sticky=NW)
         self.show_pose_cb.grid(row=3, column=0, sticky=NW)
         self.show_bboxes_cb.grid(row=4, column=0, sticky=NW)
-        self.show_animal_names_cb.grid(row=5, column=0, sticky=NW)
-        self.create_videos_cb.grid(row=6, column=0,  sticky=NW)
-        self.create_frames_cb.grid(row=7, column=0,  sticky=NW)
-        self.timers_cb.grid(row=8, column=0, sticky=NW)
-        self.rotate_cb.grid(row=9, column=0, sticky=NW)
+        self.conf_cb.grid(row=5, column=0, sticky=NW)
+        self.show_animal_names_cb.grid(row=6, column=0, sticky=NW)
+        self.create_videos_cb.grid(row=7, column=0,  sticky=NW)
+        self.create_frames_cb.grid(row=8, column=0,  sticky=NW)
+        self.timers_cb.grid(row=9, column=0, sticky=NW)
+        self.rotate_cb.grid(row=10, column=0, sticky=NW)
 
 
         self.run_single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO",  icon_name='video', icon_link=Links.SKLEARN_PLOTS.value, padx=5,  pady=5, relief='solid')
@@ -145,6 +147,7 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         text_bg_clr = self.clr_dict[self.bg_clr_dropdown.get_value()]
         pose_palette = self.tracking_clr_palette_dropdown.get_value()
         bbox = self.show_bboxes_var.get()
+        show_confidence = self.conf_var.get()
         gantt = GANTT_OPTIONS[self.gantt_dropdown.get_value()]
         show_pose, show_animal_names = self.show_pose_var.get(), self.show_animal_names_var.get()
         gpu = str_2_bool(self.gpu_dropdown.get_value())
@@ -175,6 +178,7 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
                                                    text_opacity=text_opacity,
                                                    text_clr=text_clr,
                                                    text_bg_clr=text_bg_clr,
+                                                   show_confidence=show_confidence,
                                                    pose_palette=pose_palette,
                                                    show_bbox=bbox,
                                                    show_gantt=gantt)
@@ -193,6 +197,7 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
                                                      circle_size=circle_size,
                                                      show_pose=show_pose,
                                                      animal_names=show_animal_names,
+                                                     show_confidence=show_confidence,
                                                      text_opacity=text_opacity,
                                                      text_clr=text_clr,
                                                      text_bg_clr=text_bg_clr,

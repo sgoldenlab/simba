@@ -84,6 +84,7 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
                  animal_names: bool = False,
                  show_pose: bool = True,
                  show_bbox: bool = False,
+                 show_confidence: bool = False,
                  show_gantt: Optional[int] = None,
                  font_size: Optional[Union[int, float]] = None,
                  space_size: Optional[Union[int, float]] = None,
@@ -99,7 +100,7 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
         TrainModelMixin.__init__(self)
         PlottingMixin.__init__(self)
         log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
-        for i in [video_setting, frame_setting, rotate, print_timers, animal_names, show_pose, show_bbox]:
+        for i in [video_setting, frame_setting, rotate, print_timers, animal_names, show_pose, show_bbox, show_confidence]:
             check_valid_boolean(value=i, source=self.__class__.__name__, raise_error=True)
         if (not video_setting) and (not frame_setting):
             raise NoSpecifiedOutputError(msg="Please choose to create a video and/or frames. SimBA found that you ticked neither video and/or frames", source=self.__class__.__name__)
@@ -112,7 +113,7 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
         check_if_valid_rgb_tuple(data=text_bg_clr, source=f'{self.__class__.__name__} text_bg_clr')
         check_if_valid_rgb_tuple(data=text_clr, source=f'{self.__class__.__name__} text_clr')
         self.text_color, self.text_bg_color = text_clr, text_bg_clr
-        self.video_paths, self.print_timers = video_paths, print_timers
+        self.video_paths, self.print_timers, self.show_confidence = video_paths, print_timers, show_confidence
         if self.video_paths is None:
             self.video_paths = find_all_videos_in_project(videos_dir=self.video_dir)
             if len(self.video_paths) == 0:
@@ -127,7 +128,7 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
             os.makedirs(self.sklearn_plot_dir)
         pose_palettes = Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value
         check_str(name=f'{self.__class__.__name__} pose_palette', value=pose_palette, options=pose_palettes)
-
+        self.conf_cols = [f'Probability_{x}' for x in self.clf_names]
         self.clr_lst = create_color_palette(pallete_name=pose_palette, increments=len(self.body_parts_lst)+1)
         if isinstance(self.video_paths, str): self.video_paths = [video_paths]
         elif isinstance(self.video_paths, list): self.video_paths = video_paths
@@ -155,6 +156,7 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
             self.data_path = os.path.join(self.machine_results_dir, f'{self.video_name}.{self.file_type}')
             self.data_df = read_df(self.data_path, self.file_type).reset_index(drop=True).fillna(0)
             if self.show_pose: check_that_column_exist(df=self.data_df, column_name=self.bp_col_names, file_name=self.data_path)
+            if self.show_confidence: check_that_column_exist(df=self.data_df, column_name=self.conf_cols, file_name=self.data_path)
             self.video_meta_data = get_video_meta_data(video_path=video_path)
             height, width = deepcopy(self.video_meta_data["height"]), deepcopy(self.video_meta_data["width"])
             self.save_path = os.path.join(self.sklearn_plot_dir, f"{self.video_name}.mp4")
@@ -231,6 +233,11 @@ class PlotSklearnResultsSingleCore(ConfigReader, TrainModelMixin, PlottingMixin)
                         self.clf_timers[clf_name] += (frame_results / self.video_meta_data['fps'])
                         if self.print_timers:
                             self.frame = PlottingMixin().put_text(img=self.frame, text=f"{clf_name} {round(self.clf_timers[clf_name], 2)}", pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.video_space_size * self.add_spacer)), font_size=self.video_font_size, font_thickness=self.video_text_thickness, font=self.font, text_bg_alpha=self.video_text_opacity, text_color_bg=self.text_bg_color, text_color=self.text_color)
+                            self.add_spacer += 1
+                        if self.show_confidence:
+                            col_name = f'Probability_{clf_name}'
+                            conf_txt = f'{clf_name} CONFIDENCE {self.data_df.loc[frm_idx, col_name]}'
+                            self.frame = PlottingMixin().put_text(img=self.frame, text=conf_txt, pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.video_space_size * self.add_spacer)), font_size=self.video_font_size, font_thickness=self.video_text_thickness, font=self.font, text_bg_alpha=self.video_text_opacity, text_color_bg=self.text_bg_color, text_color=self.text_color)
                             self.add_spacer += 1
                     self.frame = PlottingMixin().put_text(img=self.frame, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, ((self.video_meta_data["height"] - self.video_meta_data["height"]) + self.video_space_size * self.add_spacer)), font_size=self.video_font_size, font_thickness=self.video_text_thickness, font=self.font, text_bg_alpha=self.video_text_opacity, text_color_bg=self.text_bg_color, text_color=self.text_color)
                     self.add_spacer += 1

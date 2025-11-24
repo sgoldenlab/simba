@@ -45,6 +45,7 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
                                 video_setting: bool,
                                 frame_setting: bool,
                                 pose_threshold: float,
+                                clf_confidence: Union[dict, None],
                                 show_pose: bool,
                                 show_animal_names: bool,
                                 show_bbox: bool,
@@ -127,6 +128,11 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
                 if print_timers:
                     img = PlottingMixin().put_text(img=img, text=f"{clf_name} {clf_time}",pos=(TextOptions.BORDER_BUFFER_Y.value, ((video_meta_data["height"] - video_meta_data["height"]) + space_size * add_spacer)), font_size=font_size,  font_thickness=text_thickness, font=font, text_bg_alpha=text_opacity, text_color_bg=text_bg_clr, text_color=text_color)
                     add_spacer += 1
+                if clf_confidence is not None:
+                    frm_clf_conf_txt = f'{clf_name} CONFIDENCE {clf_confidence[clf_name][current_frm]}'
+                    img = PlottingMixin().put_text(img=img, text=frm_clf_conf_txt,pos=(TextOptions.BORDER_BUFFER_Y.value, ((video_meta_data["height"] - video_meta_data["height"]) + space_size * add_spacer)), font_size=font_size,  font_thickness=text_thickness, font=font, text_bg_alpha=text_opacity, text_color_bg=text_bg_clr, text_color=text_color)
+                    add_spacer += 1
+
             img = PlottingMixin().put_text(img=img, text="ENSEMBLE PREDICTION:", pos=(TextOptions.BORDER_BUFFER_Y.value, ((video_meta_data["height"] - video_meta_data["height"]) + space_size * add_spacer)), font_size=font_size, font_thickness=text_thickness, font=font, text_bg_alpha=text_opacity, text_color_bg=text_bg_clr, text_color=text_color)
             add_spacer += 1
             for clf_name in clf_cumsum.keys():
@@ -222,6 +228,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
                  rotate: bool = False,
                  animal_names: bool = False,
                  show_pose: bool = True,
+                 show_confidence: bool = False,
                  font_size: Optional[Union[int, float]] = None,
                  space_size: Optional[Union[int, float]] = None,
                  text_thickness: Optional[Union[int, float]] = None,
@@ -241,7 +248,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         TrainModelMixin.__init__(self)
         PlottingMixin.__init__(self)
         log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
-        for i in [video_setting, frame_setting, rotate, print_timers, animal_names, show_pose, gpu, show_bbox]:
+        for i in [video_setting, frame_setting, rotate, print_timers, animal_names, show_pose, gpu, show_bbox, show_confidence]:
             check_valid_boolean(value=i, source=self.__class__.__name__, raise_error=True)
         if (not video_setting) and (not frame_setting):
             raise NoSpecifiedOutputError(msg="Please choose to create a video and/or frames. SimBA found that you ticked neither video and/or frames", source=self.__class__.__name__)
@@ -266,7 +273,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         self.video_setting, self.frame_setting, self.rotate = video_setting, frame_setting, rotate
         self.circle_size, self.font_size, self.animal_names, self.text_opacity = circle_size, font_size, animal_names, text_opacity
         self.text_thickness, self.space_size, self.show_pose, self.pose_palette = text_thickness, space_size, show_pose, pose_palette
-        self.text_color, self.text_bg_color, self.show_bbox, self.show_gantt = text_clr, text_bg_clr, show_bbox, show_gantt
+        self.text_color, self.text_bg_color, self.show_bbox, self.show_gantt, self.show_confidence = text_clr, text_bg_clr, show_bbox, show_gantt, show_confidence
         self.gpu = True if check_nvidea_gpu_available() and gpu else False
         self.pose_threshold = read_config_entry(self.config, ConfigKey.THRESHOLD_SETTINGS.value, ConfigKey.SKLEARN_BP_PROB_THRESH.value, Dtypes.FLOAT.value, 0.00)
         if not os.path.exists(self.sklearn_plot_dir):
@@ -281,6 +288,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
             if not os.path.isfile(data_path): raise NoDataError(msg=f'Cannot create classification videos for {video_name}. Expected classification data at location {data_path} but file does not exist', source=self.__class__.__name__)
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0])
         self.core_cnt = find_core_cnt()[0] if int(core_cnt) == -1 or int(core_cnt) > find_core_cnt()[0] else int(core_cnt)
+        self.conf_cols = [f'Probability_{x}' for x in self.clf_names]
         if platform.system() == "Darwin":
             multiprocessing.set_start_method("spawn", force=True)
 
@@ -302,6 +310,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
             self.data_path = os.path.join(self.machine_results_dir, f'{self.video_name}.{self.file_type}')
             self.data_df = read_df(self.data_path, self.file_type).reset_index(drop=True).fillna(0)
             if self.show_pose: check_that_column_exist(df=self.data_df, column_name=self.bp_col_names, file_name=self.data_path)
+            if self.show_confidence: check_that_column_exist(df=self.data_df, column_name=self.conf_cols, file_name=self.data_path)
             self.video_meta_data = get_video_meta_data(video_path=video_path)
             height, width = deepcopy(self.video_meta_data["height"]), deepcopy(self.video_meta_data["width"])
             self.save_path = os.path.join(self.sklearn_plot_dir, f"{self.video_name}.mp4")
@@ -327,9 +336,10 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
                 self.bouts_df, self.final_gantt_img, self.gantt_clrs = None, None, None
 
 
-            self.clf_cumsums = {}
+            self.clf_cumsums, self.clf_p = {}, {} if self.show_confidence else None
             for clf_name in self.clf_names:
                 self.clf_cumsums[clf_name] = self.data_df[clf_name].cumsum()
+                if self.show_confidence: self.clf_p[clf_name] = np.round(self.data_df[f'Probability_{clf_name}'].values.reshape(-1), 4)
 
             self.data_df["index"] = self.data_df.index
             data = np.array_split(self.data_df, self.core_cnt)
@@ -343,6 +353,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
                                               clf_cumsum=self.clf_cumsums,
                                               rotate=self.rotate,
                                               video_path=video_path,
+                                              clf_confidence=self.clf_p,
                                               print_timers=self.print_timers,
                                               video_setting=self.video_setting,
                                               frame_setting=self.frame_setting,
@@ -377,7 +388,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
 
         self.timer.stop_timer()
         if self.video_setting:
-            stdout_success(msg=f"{len(self.video_paths)} videos saved in {self.sklearn_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+            stdout_success(msg=f"{len(self.video_paths)} video(s) saved in {self.sklearn_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
         if self.frame_setting:
             stdout_success(f"Frames for {len(self.video_paths)} videos saved in sub-folders within {self.sklearn_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
@@ -411,11 +422,12 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
 # clf_plotter = PlotSklearnResultsMultiProcess(config_path='/Users/simon/Desktop/envs/troubleshooting/DLC_2_Black_animals/project_folder/project_config.ini', video_setting=True, frame_setting=False, rotate=False, video_file_path='Together_1.avi', cores=5)
 # clf_plotter.run()
 
-
-# clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"C:\troubleshooting\mouse_open_field\project_folder\project_config.ini",
-#                                              video_setting = False,
-#                                              frame_setting = False,
-#
-#                                              rotate = False,
-#                                              video_paths=r"C:\troubleshooting\mouse_open_field\project_folder\videos\Video1.mp4")
-# clf_plotter.run()
+# if __name__ == "__main__":
+#     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
+#                                                  video_setting = True,
+#                                                  frame_setting = False,
+#                                                  rotate = False,
+#                                                  core_cnt = 6,
+#                                                  show_confidence=True,
+#                                                  video_paths=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_CNO_0521.mp4")
+#     clf_plotter.run()
