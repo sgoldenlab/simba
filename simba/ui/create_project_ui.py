@@ -103,7 +103,7 @@ class ProjectCreatorPopUp():
         reset_btn = SimbaButton(parent=self.animal_settings_frm, txt="RESET USER DEFINED POSE-CONFIGS", txt_clr='red', img='clean', cmd=PoseResetterPopUp)
 
         run_frm = CreateLabelFrameWithIcon(parent=self.create_project_tab, header="CREATE PROJECT CONFIG", icon_name='create', icon_link=Links.CREATE_PROJECT.value)
-        create_project_btn = SimbaButton(parent=run_frm, txt="CREATE PROJECT CONFIG", txt_clr='navy', img='create', font=Formats.FONT_HEADER.value, cmd=self.run)
+        create_project_btn = SimbaButton(parent=run_frm, txt="CREATE PROJECT CONFIG", txt_clr='navy', img='create', font=Formats.FONT_HEADER.value, hover_font=Formats.FONT_HEADER.value, cmd=self.run)
 
         self.settings_frm.grid(row=0, column=0, sticky=NW)
         self.general_settings_frm.grid(row=0, column=0, sticky=NW, pady=5)

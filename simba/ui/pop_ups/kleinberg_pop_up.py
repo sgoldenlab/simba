@@ -7,17 +7,20 @@ from typing import Union
 from simba.data_processors.kleinberg_calculator import KleinbergCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
-                                        SimbaButton, SimbaCheckbox)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,  SimbaButton, SimbaCheckbox)
 from simba.utils.checks import check_float, check_int
 from simba.utils.enums import Formats, Keys, Links
-from simba.utils.errors import NoChoosenClassifierError
+from simba.utils.errors import NoChoosenClassifierError, NoDataError
 
 
 class KleinbergPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: Union[str, os.PathLike]):
-        PopUpMixin.__init__(self, title="APPLY KLEINBERG BEHAVIOR CLASSIFICATION SMOOTHING", icon='smooth')
+    def __init__(self,
+                 config_path: Union[str, os.PathLike]):
+
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
+        if len(self.machine_results_paths):
+            raise NoDataError(msg=f'Cannot perform Kleinberg smoothing: No data files found in {self.machine_results_dir} directory', source=self.__class__.__name__)
+        PopUpMixin.__init__(self, title="APPLY KLEINBERG BEHAVIOR CLASSIFICATION SMOOTHING", icon='smooth')
         kleinberg_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="KLEINBERG SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.KLEINBERG.value)
         self.k_sigma = Entry_Box(kleinberg_settings_frm, "SIGMA", "10")
         self.k_sigma.entry_set("2")

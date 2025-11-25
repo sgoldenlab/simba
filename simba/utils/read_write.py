@@ -3384,7 +3384,7 @@ def read_sys_env():
     return env
 
 
-def get_recent_projects_paths(max: int = 10) -> List[str]:
+def get_recent_projects_paths(max: int = 10, sort_alphabetically: bool = True) -> List[str]:
     file_path = os.path.join(SIMBA_DIR, Paths.RECENT_PROJECTS_PATHS.value)
     if not os.path.isfile(file_path):
         return []
@@ -3392,7 +3392,10 @@ def get_recent_projects_paths(max: int = 10) -> List[str]:
         with open(file_path, "r") as file:
             project_paths = [line.strip() for line in file if line.strip()]
             project_paths = list(set(project_paths))
-            return [x for x in project_paths if os.path.isfile(x)][:max]
+            project_paths = [x for x in project_paths if os.path.isfile(x)]
+            if sort_alphabetically:
+                project_paths = sorted(project_paths, key=lambda path: [int(part) if part.isdigit() else part.lower() for part in re.split(r"(\d+)", path)])
+            return project_paths[:max]
     except:
         return []
 

@@ -67,6 +67,7 @@ from simba.ui.pop_ups.append_roi_features_bodypart_pop_up import \
 from simba.ui.pop_ups.archive_files_pop_up import ArchiveProcessedFilesPopUp
 from simba.ui.pop_ups.batch_preprocess_pop_up import BatchPreProcessPopUp
 from simba.ui.pop_ups.blob_visualizer_pop_up import BlobVisualizerPopUp
+from simba.ui.pop_ups.run_machine_models_popup import RunMachineModelsPopUp
 from simba.ui.pop_ups.boolean_conditional_slicer_pup_up import \
     BooleanConditionalSlicerPopUp
 from simba.ui.pop_ups.check_videos_seekable_pop_up import \
@@ -149,8 +150,6 @@ from simba.ui.pop_ups.select_video_for_labelling_popup import \
     SelectLabellingVideoPupUp
 from simba.ui.pop_ups.select_video_for_pseudo_labelling_popup import \
     SelectPseudoLabellingVideoPupUp
-from simba.ui.pop_ups.set_machine_model_parameters_pop_up import \
-    SetMachineModelParameters
 from simba.ui.pop_ups.severity_analysis_pop_up import AnalyzeSeverityPopUp
 from simba.ui.pop_ups.simba_rois_to_yolo_pop_up import SimBAROIs2YOLOPopUp
 from simba.ui.pop_ups.simba_to_yolo_keypoints_popup import \
@@ -474,8 +473,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
         label_runmachinemodel = CreateLabelFrameWithIcon(parent=tab9,header="RUN MACHINE MODEL",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.SCENARIO_2.value, bg=Formats.LABELFRAME_GREY.value, padx=5, pady=5)
 
-        button_run_rfmodelsettings = SimbaButton(parent=label_runmachinemodel, width=Formats.BUTTON_WIDTH_XL.value, txt="MODEL SETTINGS", txt_clr='green', img='settings', cmd=SetMachineModelParameters, cmd_kwargs={'config_path': lambda:config_path})
-        button_runmachinemodel = SimbaButton(parent=label_runmachinemodel, width=Formats.BUTTON_WIDTH_XL.value, txt="RUN MODELS", txt_clr='green', img='clf', cmd=self.runrfmodel, thread=False)
+        button_runmachinemodel = SimbaButton(parent=label_runmachinemodel, width=Formats.BUTTON_WIDTH_XL.value, txt="RUN MODELS", txt_clr='green', img='clf', cmd=RunMachineModelsPopUp, thread=False, cmd_kwargs={'config_path': lambda:self.config_path})
 
         kleinberg_button = SimbaButton(parent=label_runmachinemodel, width=Formats.BUTTON_WIDTH_XL.value, txt="KLEINBERG SMOOTHING", txt_clr='green', img='feather_green', cmd=KleinbergPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
         fsttc_button = SimbaButton(parent=label_runmachinemodel, width=Formats.BUTTON_WIDTH_XL.value, txt="FSTTC", txt_clr='green', img='tile_green', cmd=FSTTCPopUp, cmd_kwargs={'config_path': lambda:self.config_path})
@@ -617,11 +615,10 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         button_validate_model.grid(row=6, sticky=W)
 
         label_runmachinemodel.grid(row=8, sticky=NW, padx=10, pady=10)
-        button_run_rfmodelsettings.grid(row=0, sticky=NW)
-        button_runmachinemodel.grid(row=1, sticky=NW)
-        kleinberg_button.grid(row=2, sticky=NW)
-        fsttc_button.grid(row=3, sticky=NW)
-        mutual_exclusivity.grid(row=4, sticky=NW)
+        button_runmachinemodel.grid(row=0, sticky=NW)
+        kleinberg_button.grid(row=1, sticky=NW)
+        fsttc_button.grid(row=2, sticky=NW)
+        mutual_exclusivity.grid(row=3, sticky=NW)
 
         label_machineresults.grid(row=9, sticky=W, padx=10, pady=10)
         button_process_datalog.grid(row=2, column=0, sticky=W, padx=3)
@@ -755,10 +752,6 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         )
         subprocess_children = [self.p, self.p2]
         atexit.register(terminate_children, subprocess_children)
-
-    def runrfmodel(self):
-        rf_model_runner = InferenceBatch(config_path=self.config_path)
-        rf_model_runner.run()
 
     def trainmachinemodelsetting(self):
         _ = MachineModelSettingsPopUp(config_path=self.config_path)
