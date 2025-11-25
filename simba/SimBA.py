@@ -33,7 +33,6 @@ from simba.labelling.targeted_annotations_clips import \
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.model.grid_search_rf import GridSearchRandomForestClassifier
-from simba.ui.pop_ups.merge_coco_keypoint_files_pop_up import MergeCOCOKeypointFilesPopUp
 from simba.model.inference_validation import InferenceValidation
 from simba.model.train_rf import TrainRandomForestClassifier
 from simba.outlier_tools.outlier_corrector_location import \
@@ -121,6 +120,8 @@ from simba.ui.pop_ups.labelme_bbox_to_yolo_bbox_popup import \
 from simba.ui.pop_ups.labelme_to_df_popup import Labelme2DataFramePopUp
 from simba.ui.pop_ups.labelme_to_imgs_popup import Labelme2ImgsPopUp
 from simba.ui.pop_ups.make_path_plot_pop_up import MakePathPlotPopUp
+from simba.ui.pop_ups.merge_coco_keypoint_files_pop_up import \
+    MergeCOCOKeypointFilesPopUp
 from simba.ui.pop_ups.movement_analysis_pop_up import \
     MovementAnalysisPopUp  # ## LAZY
 from simba.ui.pop_ups.movement_analysis_time_bins_pop_up import \
