@@ -33,7 +33,7 @@ from simba.labelling.targeted_annotations_clips import \
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.model.grid_search_rf import GridSearchRandomForestClassifier
-from simba.model.inference_batch import InferenceBatch
+from simba.ui.pop_ups.merge_coco_keypoint_files_pop_up import MergeCOCOKeypointFilesPopUp
 from simba.model.inference_validation import InferenceValidation
 from simba.model.train_rf import TrainRandomForestClassifier
 from simba.outlier_tools.outlier_corrector_location import \
@@ -913,6 +913,7 @@ class App(object):
 
         convert_pose_file_format_menu = Menu(video_process_menu)
         convert_pose_file_format_menu.add_command(label="COCO key-points -> YOLO key-points", compound="left", image=self.menu_icons["coco_small"]["img"], command=COCOKeypoints2YOLOkeypointsPopUp, font=Formats.FONT_REGULAR.value)
+        convert_pose_file_format_menu.add_command(label="COCO key-point files -> COCO key-point file", compound="left", image=self.menu_icons["coco_small"]["img"], command=MergeCOCOKeypointFilesPopUp, font=Formats.FONT_REGULAR.value)
         convert_pose_file_format_menu.add_command(label="DLC annotations -> Labelme key-points", compound="left", image=self.menu_icons["dlc_2"]["img"], command=DLC2LabelmePopUp, font=Formats.FONT_REGULAR.value)
         convert_pose_file_format_menu.add_command(label="DLC annotations -> YOLO pose-estimation annotations", compound="left", image=self.menu_icons["dlc_2"]["img"], command=DLCYoloKeypointsPopUp, font=Formats.FONT_REGULAR.value)
         convert_pose_file_format_menu.add_command(label="DLC H5 inference -> YOLO pose-estimation annotations", compound="left", image=self.menu_icons["dlc_2"]["img"], command=DLCH5Inference2YoloPopUp, font=Formats.FONT_REGULAR.value)
@@ -924,6 +925,7 @@ class App(object):
         convert_pose_file_format_menu.add_command(label="Labelme key-points -> Images", compound="left", image=self.menu_icons["labelme"]["img"], command=Labelme2ImgsPopUp, font=Formats.FONT_REGULAR.value)
         convert_pose_file_format_menu.add_command(label="Labelme key-points -> CSV", compound="left", image=self.menu_icons["labelme"]["img"], command=Labelme2DataFramePopUp, font=Formats.FONT_REGULAR.value)
         convert_pose_file_format_menu.add_command(label="Labelme bounding-boxes -> YOLO bounding-box annotations", compound="left", image=self.menu_icons["labelme"]["img"], command=LabelmeBbox2YoloBboxPopUp, font=Formats.FONT_REGULAR.value)
+
         video_process_menu.add_cascade(label="Convert tracking data formats...", compound="left", image=self.menu_icons["pose"]["img"], menu=convert_pose_file_format_menu, font=Formats.FONT_REGULAR.value)
 
         convert_data_menu = Menu(video_process_menu)
