@@ -6,14 +6,17 @@ from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, FileSelect, SimbaButton, SimBALabel, SimBADropDown)
-from simba.utils.checks import (check_file_exist_and_readable, check_float, check_int)
-from simba.utils.enums import Formats, Keys, Links, ConfigKey, Dtypes
+from simba.model.inference_batch import InferenceBatch
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        FileSelect, SimbaButton, SimBADropDown,
+                                        SimBALabel)
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_int)
+from simba.utils.enums import ConfigKey, Dtypes, Formats, Keys, Links
 from simba.utils.errors import InvalidInputError, NoDataError
 from simba.utils.printing import stdout_success
+from simba.utils.read_write import find_core_cnt, read_config_entry
 from simba.utils.warnings import NoFileFoundWarning
-from simba.utils.read_write import read_config_entry, find_core_cnt
-from simba.model.inference_batch import InferenceBatch
 
 CORE_CNT_OPTIONS = list(range(1, find_core_cnt()[0]))
 MIN_BOUT, THRESHOLD, PATH = "min_bout", "threshold", "path"

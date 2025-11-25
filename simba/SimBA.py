@@ -67,7 +67,6 @@ from simba.ui.pop_ups.append_roi_features_bodypart_pop_up import \
 from simba.ui.pop_ups.archive_files_pop_up import ArchiveProcessedFilesPopUp
 from simba.ui.pop_ups.batch_preprocess_pop_up import BatchPreProcessPopUp
 from simba.ui.pop_ups.blob_visualizer_pop_up import BlobVisualizerPopUp
-from simba.ui.pop_ups.run_machine_models_popup import RunMachineModelsPopUp
 from simba.ui.pop_ups.boolean_conditional_slicer_pup_up import \
     BooleanConditionalSlicerPopUp
 from simba.ui.pop_ups.check_videos_seekable_pop_up import \
@@ -146,6 +145,7 @@ from simba.ui.pop_ups.roi_features_plot_pop_up import VisualizeROIFeaturesPopUp
 from simba.ui.pop_ups.roi_tracking_plot_pop_up import \
     VisualizeROITrackingPopUp  # ## LAZY
 from simba.ui.pop_ups.roi_video_table_pop_up import ROIVideoTable
+from simba.ui.pop_ups.run_machine_models_popup import RunMachineModelsPopUp
 from simba.ui.pop_ups.select_video_for_labelling_popup import \
     SelectLabellingVideoPupUp
 from simba.ui.pop_ups.select_video_for_pseudo_labelling_popup import \
