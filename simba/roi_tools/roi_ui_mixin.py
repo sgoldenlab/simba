@@ -628,21 +628,7 @@ class ROI_mixin(ConfigReader):
                              set_index: Optional[int] = 0,
                              set_str: Optional[str] = None):
 
-
         dropdown.change_options(values=new_options, set_index=set_index, set_str=set_str)
-        # dropdown.dropdown['values'] = new_options
-        # dropdown.dropdown_var.set('')
-        # if isinstance(set_index, int) and (0 <= set_index <= len(new_options) - 1):
-        #     dropdown.dropdown.set(new_options[set_index])
-        # elif (set_str is not None) and (set_str in new_options):
-        #     dropdown.dropdown.set(set_str)
-        # else:
-        #     dropdown.dropdown.set(new_options[0])
-        # dropdown.set_width(width=max(5, max(len(s) for s in new_options)))
-        # if dropdown.dropdown['values'] == ('',):
-        #     dropdown.disable()
-        # else:
-        #     dropdown.enable()
 
     def delete_named_shape(self, name: str):
         self.set_btn_clrs(btn=self.delete_selected_btn)

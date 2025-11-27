@@ -913,7 +913,7 @@ class App(object):
 
         convert_pose_file_format_menu = Menu(video_process_menu)
         convert_pose_file_format_menu.add_command(label="COCO key-points -> YOLO key-points", compound="left", image=self.menu_icons["coco_small"]["img"], command=COCOKeypoints2YOLOkeypointsPopUp, font=Formats.FONT_REGULAR.value)
-        convert_pose_file_format_menu.add_command(label="COCO key-point files -> COCO key-point file", compound="left", image=self.menu_icons["coco_small"]["img"], command=MergeCOCOKeypointFilesPopUp, font=Formats.FONT_REGULAR.value)
+        convert_pose_file_format_menu.add_command(label="COCO key-point files (multiple) -> COCO key-point file (single)", compound="left", image=self.menu_icons["coco_small"]["img"], command=MergeCOCOKeypointFilesPopUp, font=Formats.FONT_REGULAR.value)
         convert_pose_file_format_menu.add_command(label="DLC annotations -> Labelme key-points", compound="left", image=self.menu_icons["dlc_2"]["img"], command=DLC2LabelmePopUp, font=Formats.FONT_REGULAR.value)
         convert_pose_file_format_menu.add_command(label="DLC annotations -> YOLO pose-estimation annotations", compound="left", image=self.menu_icons["dlc_2"]["img"], command=DLCYoloKeypointsPopUp, font=Formats.FONT_REGULAR.value)
         convert_pose_file_format_menu.add_command(label="DLC H5 inference -> YOLO pose-estimation annotations", compound="left", image=self.menu_icons["dlc_2"]["img"], command=DLCH5Inference2YoloPopUp, font=Formats.FONT_REGULAR.value)

@@ -979,7 +979,8 @@ def find_files_of_filetypes_in_directory(directory: Union[str, os.PathLike],
                                          extensions: Union[List[str], Tuple[str], str],
                                          raise_warning: bool = True,
                                          as_dict: bool = False,
-                                         raise_error: bool = False) -> Union[List[str], Dict[str, str]]:
+                                         raise_error: bool = False,
+                                         sort_alphabetically: bool = False) -> Union[List[str], Dict[str, str]]:
     """
     Find all files in a directory of specified extensions/types.
 
@@ -1033,9 +1034,14 @@ def find_files_of_filetypes_in_directory(directory: Union[str, os.PathLike],
         for file_path in accepted_file_paths:
             _, file_name, _ = get_fn_ext(file_path)
             out[file_name] = file_path
+        if sort_alphabetically:
+            out = dict(sorted(out.items(), key=lambda x: [int(t) if t.isdigit() else t.lower() for t in re.split(r'(\d+)', x[0])]))
         return out
     else:
-        return accepted_file_paths
+        if sort_alphabetically:
+            return sorted(accepted_file_paths, key=lambda path: [int(part) if part.isdigit() else part.lower() for part in re.split(r"(\d+)", path)])
+        else:
+            return accepted_file_paths
 
 
 def convert_parquet_to_csv(directory: str) -> None:

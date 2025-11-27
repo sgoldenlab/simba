@@ -6,7 +6,8 @@ import threading
 import tkinter
 import tkinter as tk
 import webbrowser
-from copy import copy
+
+from copy import copy, deepcopy
 from tkinter import *
 from tkinter.filedialog import askdirectory, askopenfilename
 from tkinter.ttk import Combobox
@@ -117,6 +118,9 @@ def form_validator_is_numeric(inStr, acttyp):
 
 
 class DropDownMenu(Frame):
+    """
+    Legacy, use :func:`simba.ui.tkinter_functions.SimBADropDown`.
+    """
     def __init__(self,
                  parent=None,
                  dropdownLabel="",
@@ -162,6 +166,7 @@ class Entry_Box(Frame):
                  label_font: tuple = Formats.FONT_REGULAR.value,
                  entry_font: tuple = Formats.FONT_REGULAR.value,
                  justify: str = 'left',
+                 cmd: Optional[Callable] = None,
                  **kw):
 
         super(Entry_Box, self).__init__(master=parent)
@@ -179,6 +184,12 @@ class Entry_Box(Frame):
         self.entPath.grid(row=0, column=1)
         if value is not None:
             self.entry_set(val=value)
+        if cmd is not None:
+            self.bind_combobox_keys()
+            self.cmd = cmd
+
+    def bind_combobox_keys(self):
+        self.entPath.bind("<KeyRelease>", self.run_cmd)
 
     @property
     def entry_get(self):
@@ -196,6 +207,10 @@ class Entry_Box(Frame):
             self.entPath.destroy()
         except:
             pass
+
+    def run_cmd(self, x):
+        self.cmd(self.entry_get.strip())
+
 
 
 class FolderSelect(Frame):
@@ -367,15 +382,17 @@ class TwoOptionQuestionPopUp(object):
         self.main_frm = Toplevel()
         self.main_frm.geometry("600x200")
         self.main_frm.title(title)
+        menu_icons = get_menu_icons()
+        self.main_frm.iconphoto(False, menu_icons['question_mark']["img"])
+
+        #img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS['question_mark']["icon_path"]))
 
         question_frm = Frame(self.main_frm)
         question_frm.pack(expand=True, fill="both")
         Label(question_frm, text=question, font=Formats.LABELFRAME_HEADER_FORMAT.value).pack()
 
-        button_one = SimbaButton(parent=question_frm, txt=option_one, txt_clr="blue", bg_clr="lightgrey", img='check_blue', cmd=self.run, cmd_kwargs={'selected_option': lambda: option_one}, font=Formats.FONT_LARGE.value)
-        button_two = SimbaButton(parent=question_frm, txt=option_two, txt_clr="red", bg_clr="lightgrey", img='close', cmd=self.run, cmd_kwargs={'selected_option': lambda: option_two}, font=Formats.FONT_LARGE.value)
-        #button_one = Button(question_frm, text=option_one, fg="blue", command=lambda: self.run(option_one))
-        #button_two = Button(question_frm, text=option_two, fg="red", command=lambda: self.run(option_two))
+        button_one = SimbaButton(parent=question_frm, txt=option_one, txt_clr="blue", bg_clr="lightgrey", img='check_blue', cmd=self.run, cmd_kwargs={'selected_option': lambda: option_one}, font=Formats.FONT_LARGE.value, hover_font=Formats.FONT_LARGE_BOLD.value)
+        button_two = SimbaButton(parent=question_frm, txt=option_two, txt_clr="red", bg_clr="lightgrey", img='close', cmd=self.run, cmd_kwargs={'selected_option': lambda: option_two}, font=Formats.FONT_LARGE.value, hover_font=Formats.FONT_LARGE_BOLD.value)
         if link:
             link_lbl = Label(question_frm, text="Click here for more information.", cursor="hand2", fg="blue")
             link_lbl.bind("<Button-1>", lambda e: callback(link))
@@ -559,21 +576,25 @@ class SimBADropDown(Frame):
                 command: Callable = None,
                 value: Optional[Any] = None,
                 state: Optional[str] = None,
+                searchable: bool = False,
                 tooltip_txt: Optional[str] = None,
                 tooltip_key: Optional[str] = None):
+
 
         super().__init__(master=parent)
         self.dropdown_var = StringVar()
         self.dropdown_lbl = SimBALabel(parent=self, txt=label, txt_clr='black', bg_clr=label_bg_clr, font=label_font, width=label_width, anchor='w')
-        #self.dropdown_lbl = Label(self, text=label, width=label_width, anchor="w", font=label_font, bg=label_bg_clr)
         self.dropdown_lbl.grid(row=0, column=0)
         self.dropdown_options = dropdown_options
-        self.command = command
+        self.original_options = deepcopy(self.dropdown_options)
+        self.command, self.searchable = command, searchable
         if dropdown_font_size is None:
             drop_down_font = None
         else:
             drop_down_font = ("Poppins", dropdown_font_size)
-        self.dropdown = Combobox(self, textvariable=self.dropdown_var, font=drop_down_font, values=self.dropdown_options, state="readonly", width=dropdown_width, justify=justify)
+        self.combobox_state = 'normal' if searchable else "readonly"
+        self.dropdown = Combobox(self, textvariable=self.dropdown_var, font=drop_down_font, values=self.dropdown_options, state=self.combobox_state, width=dropdown_width, justify=justify)
+        if searchable: self.bind_combobox_keys()
         self.dropdown.grid(row=0, column=1, sticky="nw")
         if value is not None: self.set_value(value=value)
         if command is not None:
@@ -606,27 +627,61 @@ class SimBADropDown(Frame):
     def on_select(self, event):
         selected_value = self.dropdown_var.get()
         self.command(selected_value)
+        if self.searchable: self.dropdown['values'] = self.original_options
 
     def set_width(self, width: int):
         self.dropdown.configure(width=width)
 
-    def change_options(self, values, set_index, set_str):
+    def change_options(self, values: List[str], set_index: Optional[int] = None, set_str: Optional[str] = None, auto_change_width: Optional[bool] = True):
         self.dropdown_var.set('')
         self.dropdown['values'] = values
         if isinstance(set_index, int) and (0 <= set_index <= len(values) - 1):
             self.dropdown_var.set(values[set_index])
         elif (set_str is not None) and (set_str in values):
             self.dropdown_var.set(set_str)
+        elif self.searchable and (set_str is not None):
+            self.dropdown_var.set(set_str)
         else:
             self.dropdown_var.set(values[0])
-        self.set_width(width=max(5, max(len(s) for s in values)))
-        if self.dropdown['values'] == ('',) or len(values) == 0:
+        if auto_change_width: self.set_width(width=max(5, max(len(s) for s in values)))
+        if self.dropdown['values'] == ('',) or len(values) == 0 and not self.searchable:
             self.disable()
         else:
             self.enable()
 
+    def bind_combobox_keys(self):
+        self.dropdown.bind("<KeyRelease>", self._on_key_release)
+        if self.searchable:
+            self.dropdown.bind("<Button-1>", lambda e: self._reset_to_all_options())
+
+    def _on_key_release(self, event):
+        if event.keysym in ['Up', 'Down', 'Left', 'Right', 'Tab', 'Return']:
+            return
+        try:
+            cursor_pos = self.dropdown.index(INSERT)
+        except:
+            cursor_pos = len(self.dropdown_var.get())
+        current_text = self.dropdown_var.get()
+        filtered_options = [x for x in self.original_options if current_text.lower() in x.lower()]
+        if current_text != '':
+            self.dropdown['values'] = filtered_options
+            # Restore the text and cursor position
+            self.dropdown_var.set(current_text)
+            self.dropdown.icursor(cursor_pos)
+        else:
+            self.dropdown['values'] = self.original_options
+            self.dropdown_var.set('')
+            self.dropdown.icursor(0)
+
+    def _reset_to_all_options(self):
+        if self.searchable and self.dropdown_var.get() == '':
+            self.dropdown['values'] = self.original_options
 
 class DropDownMenu(Frame):
+
+    """
+    Legacy, use :func:`simba.ui.tkinter_functions.SimBADropDown`.
+    """
     def __init__(self,
                  parent=None,
                  dropdownLabel="",
