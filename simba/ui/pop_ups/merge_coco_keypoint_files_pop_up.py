@@ -1,11 +1,15 @@
 import os.path
 from datetime import datetime
+
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import CreateLabelFrameWithIcon, FolderSelect, Entry_Box, SimbaButton
+from simba.third_party_label_appenders.transform.utils import \
+    merge_coco_keypoints_files
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        FolderSelect, SimbaButton)
+from simba.utils.checks import check_if_dir_exists, check_int
 from simba.utils.enums import Keys
 from simba.utils.read_write import find_files_of_filetypes_in_directory
-from simba.utils.checks import check_if_dir_exists, check_int
-from simba.third_party_label_appenders.transform.utils import merge_coco_keypoints_files
+
 
 class MergeCOCOKeypointFilesPopUp(PopUpMixin):
 
