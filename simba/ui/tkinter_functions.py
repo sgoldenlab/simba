@@ -6,7 +6,6 @@ import threading
 import tkinter
 import tkinter as tk
 import webbrowser
-
 from copy import copy, deepcopy
 from tkinter import *
 from tkinter.filedialog import askdirectory, askopenfilename
