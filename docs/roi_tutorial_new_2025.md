@@ -482,13 +482,25 @@ To do this, click on [File] -> [Duplicate ROIs from source video to target video
 
 Once clicked, you should see the following pop-up:
 
-<img width="647" height="324" alt="image" src="https://github.com/user-attachments/assets/a07da2f3-171d-4a1e-a4d1-6b989006a161" />
+<img width="637" height="363" alt="image" src="https://github.com/user-attachments/assets/3c0593ba-19cb-4853-8ae8-c182aa081a89" />
 
 With the following options:
 
 - **ROI SOURCE VIDEO**: Dropdown menu listing all videos in the project that have ROI definitions. Select the video whose ROIs you want to copy to other videos.
 
+> [!NOTE]
+> The dropdown menu is filterable. To filter the ROI source videos, start typing in the ROI SOURCE VIDEO dropdown and the videos with the typed sub-string will show in teh dropdown.
+> To reset the filter, either select an option in the dropdown or remove typed text in the dropdown. 
+
+- **DESELECT ALL**: Click this button will bring up a pop-up asking you to confirm to remove any selected target videos.
+
+- **TARGET VIDEO NAME FILTER**: To filter the ROI TARGET VIDEO (see below), type a sub-string of the target videos you want to view in this entry-box. To remove the filter, remove all characters from the entry box.
+
 - **SELECT ROI TARGET VIDEO(S)**: A checkbox section displaying all videos in the project (except the selected source video). Check one or more target videos where you want to duplicate the ROI definitions. You must select at least one target video.
+
+> [!NOTE]
+> To select multiple checkboxes within a range at once, click the checkboxes while holding either the <kbd>control</kbd> OR <kbd>shift</kbd> key. 
+
 
 - **RUN**: Button that executes the ROI duplication process. Click after selecting a source video and at least one target video.
 
