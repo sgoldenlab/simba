@@ -155,10 +155,11 @@ class YOLOPoseInferencePopUP(PopUpMixin):
             if not recursive:
                 video_paths = find_files_of_filetypes_in_directory(directory=self.video_dir.folder_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True)
             else:
-                video_path = recursive_file_search(directory=self.video_dir.folder_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, as_dict=False)
+                video_paths = recursive_file_search(directory=self.video_dir.folder_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, as_dict=False)
         else:
             check_file_exist_and_readable(file_path=self.video_path.file_path, raise_error=True)
             video_paths = [self.video_path.file_path]
+
         for video_path in video_paths:
             _ = get_video_meta_data(video_path=video_path)
 

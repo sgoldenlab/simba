@@ -273,14 +273,14 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
         stdout_success(f'ROI statistics saved at {self.save_path}', elapsed_time=self.timer.elapsed_time_str)
 
 
-# analyzer = ROIAggregateStatisticsAnalyzer(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
-#                                           body_parts=['Center'],
+# analyzer = ROIAggregateStatisticsAnalyzer(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",
+#                                           body_parts=['resident_NOSE'],
 #                                           include_fps=False,
 #                                           threshold=0.5,
 #                                           calculate_distances=True,
 #                                           transpose=False,
 #                                           detailed_bout_data=True,
 #                                           outside_rois=True,
-#                                           verbose=False)
+#                                           verbose=True)
 # analyzer.run()
 # analyzer.save()

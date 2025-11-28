@@ -13,7 +13,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaButton,
                                         SimbaCheckbox, SimBADropDown,
                                         SimBALabel, TwoOptionQuestionPopUp, Entry_Box)
 from simba.utils.checks import check_file_exist_and_readable
-from simba.utils.enums import Formats, Keys, Links
+from simba.utils.enums import Formats, Keys, Links, TkBinds
 from simba.utils.errors import NoFilesFoundError
 from simba.utils.printing import stdout_success
 from simba.utils.read_write import find_all_videos_in_directory
@@ -62,22 +62,22 @@ class DuplicateROIsBySourceTarget(ConfigReader, PopUpMixin):
         self.status_bar.grid(row=6, column=0, sticky='we')
 
     def _bind_keys(self):
-        self.root.bind("<KeyPress-Control_L>", lambda e: self._ctrl_press())
-        self.root.bind("<KeyPress-Control_R>", lambda e: self._ctrl_press())
-        self.root.bind("<KeyRelease-Control_L>", lambda e: self._ctrl_release())
-        self.root.bind("<KeyRelease-Control_R>", lambda e: self._ctrl_release())
-        self.main_frm.bind("<KeyPress-Control_L>", lambda e: self._ctrl_press())
-        self.main_frm.bind("<KeyPress-Control_R>", lambda e: self._ctrl_press())
-        self.main_frm.bind("<KeyRelease-Control_L>", lambda e: self._ctrl_release())
-        self.main_frm.bind("<KeyRelease-Control_R>", lambda e: self._ctrl_release())
-        self.root.bind("<KeyPress-Shift_L>", lambda e: self._ctrl_press())
-        self.root.bind("<KeyPress-Shift_R>", lambda e: self._ctrl_press())
-        self.root.bind("<KeyRelease-Shift_L>", lambda e: self._ctrl_release())
-        self.root.bind("<KeyRelease-Shift_R>", lambda e: self._ctrl_release())
-        self.main_frm.bind("<KeyPress-Shift_L>", lambda e: self._ctrl_press())
-        self.main_frm.bind("<KeyPress-Shift_R>", lambda e: self._ctrl_press())
-        self.main_frm.bind("<KeyRelease-Shift_L>", lambda e: self._ctrl_release())
-        self.main_frm.bind("<KeyRelease-Shift_R>", lambda e: self._ctrl_release())
+        self.root.bind(TkBinds.CTRL_LEFT_PRESS.value, lambda e: self._ctrl_press())
+        self.root.bind(TkBinds.CTRL_RIGHT_PRESS.value, lambda e: self._ctrl_press())
+        self.root.bind(TkBinds.CTRL_LEFT_RELEASE.value, lambda e: self._ctrl_release())
+        self.root.bind(TkBinds.CTRL_RIGHT_RELEASE.value, lambda e: self._ctrl_release())
+        self.main_frm.bind(TkBinds.CTRL_LEFT_PRESS.value, lambda e: self._ctrl_press())
+        self.main_frm.bind(TkBinds.CTRL_RIGHT_PRESS.value, lambda e: self._ctrl_press())
+        self.main_frm.bind(TkBinds.CTRL_LEFT_RELEASE.value, lambda e: self._ctrl_release())
+        self.main_frm.bind(TkBinds.CTRL_RIGHT_RELEASE.value, lambda e: self._ctrl_release())
+        self.root.bind(TkBinds.SHIFT_LEFT_PRESS.value, lambda e: self._ctrl_press())
+        self.root.bind(TkBinds.SHIFT_RIGHT_PRESS.value, lambda e: self._ctrl_press())
+        self.root.bind(TkBinds.SHIFT_LEFT_RELEASE.value, lambda e: self._ctrl_release())
+        self.root.bind(TkBinds.SHIFT_RIGHT_RELEASE.value, lambda e: self._ctrl_release())
+        self.main_frm.bind(TkBinds.SHIFT_LEFT_PRESS.value, lambda e: self._ctrl_press())
+        self.main_frm.bind(TkBinds.SHIFT_RIGHT_PRESS.value, lambda e: self._ctrl_press())
+        self.main_frm.bind(TkBinds.SHIFT_LEFT_RELEASE.value, lambda e: self._ctrl_release())
+        self.main_frm.bind(TkBinds.SHIFT_RIGHT_RELEASE.value, lambda e: self._ctrl_release())
 
     def _unbind_keys(self):
         pass

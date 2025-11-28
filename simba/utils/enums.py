@@ -881,7 +881,14 @@ class TkBinds(Enum):
     B1_PRESS = "<ButtonPress-1>"
     B1_RELEASE = "<ButtonRelease-1>"
     B1_MOTION = "<B1-Motion>"
-
+    CTRL_LEFT_PRESS = '<KeyPress-Control_L>'
+    CTRL_RIGHT_PRESS = '<KeyPress-Control_R>'
+    CTRL_LEFT_RELEASE = '<KeyRelease-Control_L>'
+    CTRL_RIGHT_RELEASE = '<KeyPress-Control_R>'
+    SHIFT_LEFT_PRESS = '<KeyPress-Shift_L>'
+    SHIFT_RIGHT_PRESS = '<KeyPress-Shift_R>'
+    SHIFT_LEFT_RELEASE = '<KeyRelease-Shift_L>'
+    SHIFT_RIGHT_RELEASE = '<KeyRelease-Shift_R>'
 class ENV_VARS(Enum):
     PRINT_EMOJIS = 'PRINT_EMOJIS'
     UNSUPERVISED_INTERFACE = 'UNSUPERVISED_INTERFACE'

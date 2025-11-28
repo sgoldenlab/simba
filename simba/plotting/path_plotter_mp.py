@@ -302,7 +302,7 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
                 bad_cols = bad_cols[bad_cols].index.tolist()
                 if len (bad_cols) > 0:
                     raise InvalidInputError(msg=f'The columns {v} contains None, NaN, infinity, and/or negative values in file {file_path}', source=self.__class__.__name__)
-                line_data.append(self.data_df[[v['x'], v['y']]].values)
+                line_data.append(self.data_df[[v['x'], v['y']]].values.astype(np.int32))
 
             if self.last_frame:
                 last_frame_save_path = os.path.join(self.path_plot_dir, f"{self.video_name}_final_frame.png")

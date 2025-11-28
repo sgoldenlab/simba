@@ -1464,23 +1464,17 @@ class PlottingMixin(object):
             clr = colors[line_cnt]
             line_data = data[line_cnt]
             if max_lines is not None:
-                check_int(
-                    name=f"{PlottingMixin.make_path_plot.__name__} max_lines",
-                    value=max_lines,
-                    min_value=1,
-                )
+                check_int(name=f"{PlottingMixin.make_path_plot.__name__} max_lines", value=max_lines, min_value=1)
                 line_data = line_data[-max_lines:]
             for i in range(1, line_data.shape[0]):
-                cv2.line(
-                    img, tuple(line_data[i]), tuple(line_data[i - 1]), clr, line_width
-                )
+                cv2.line(img, tuple(int(x) for x in line_data[i]), tuple(int(x) for x in line_data[i - 1]), clr, line_width)
             if circle_size is not None:
-                cv2.circle(img, tuple(line_data[-1]), 0, clr, circle_size)
+                cv2.circle(img, tuple(int(x) for x in line_data[-1]),0, clr, circle_size)
             if animal_names is not None:
                 cv2.putText(
                     img,
                     animal_names[line_cnt],
-                    tuple(line_data[-1]),
+                    tuple(int(x) for x in line_data[-1]),
                     cv2.FONT_HERSHEY_COMPLEX,
                     font_size,
                     clr,

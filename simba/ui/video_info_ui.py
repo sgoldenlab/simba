@@ -165,7 +165,7 @@ class VideoInfoTable(ConfigReader, PopUpMixin):
 
     def _get_save_frm(self, index: int):
         self.save_frm = LabelFrame(self.main_frm, text="SAVE", font=Formats.FONT_HEADER.value)
-        self.save_data_btn = SimbaButton(parent=self.save_frm, txt="SAVE PIXEL PER MILLIMETER DATA", txt_clr='black', img='save_large', font=Formats.FONT_HEADER.value, cmd=self._save)
+        self.save_data_btn = SimbaButton(parent=self.save_frm, txt="SAVE PIXEL PER MILLIMETER DATA", txt_clr='black', img='save_large', font=Formats.FONT_HEADER.value, hover_font=Formats.FONT_HEADER.value, cmd=self._save)
         self.save_frm.grid(row=index, column=0, sticky=NW)
         self.save_data_btn.grid(row=0, column=0, sticky=NW)
 

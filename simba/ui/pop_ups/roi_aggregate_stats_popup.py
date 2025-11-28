@@ -6,10 +6,8 @@ from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.roi_tools.roi_aggregate_statistics_analyzer import \
-    ROIAggregateStatisticsAnalyzer
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box, SimbaButton, SimbaCheckbox)
+from simba.roi_tools.roi_aggregate_statistics_analyzer import ROIAggregateStatisticsAnalyzer
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, SimbaButton, SimbaCheckbox, SimBADropDown)
 from simba.utils.checks import check_float
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.errors import InvalidInputError, NoROIDataError
@@ -31,8 +29,8 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         PopUpMixin.__init__(self, title="ROI AGGREGATE STATISTICS ANALYSIS", icon='data_table')
         self.config_path = config_path
         self.animal_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMAL(S)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI_DATA_ANALYSIS.value)
-        self.animal_cnt_dropdown = DropDownMenu(self.animal_cnt_frm, "# OF ANIMALS", list(range(1, self.animal_cnt + 1)), labelwidth=20)
-        self.animal_cnt_dropdown.setChoices(1)
+
+        self.animal_cnt_dropdown = SimBADropDown(parent=self.animal_cnt_frm, label="# OF ANIMALS", dropdown_options=list(range(1, self.animal_cnt + 1)), label_width=20, value=1)
         self.animal_cnt_confirm_btn = SimbaButton(parent=self.animal_cnt_frm, txt="CONFIRM", img='tick', txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self._get_settings_frm)
         self.animal_cnt_frm.grid(row=0, column=0, sticky=NW)
         self.animal_cnt_dropdown.grid(row=0, column=0, sticky=NW)
@@ -50,16 +48,15 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
 
         self.probability_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT PROBABILITY THRESHOLD", icon_name='pose')
         self.probability_entry = Entry_Box(parent=self.probability_frm, fileDescription='PROBABILITY THRESHOLD (0.0-1.0):', labelwidth="30", value='0.0')
-        self.probability_frm.grid(row=self.frame_children(frame=self.main_frm), sticky=NW)
+        self.probability_frm.grid(row=self.frame_children(frame=self.main_frm), sticky=NW, pady=(5, 5))
         self.probability_entry.grid(row=0, column=0, sticky=NW)
 
         self.body_parts_dropdowns = {}
         self.body_part_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PART(S)", icon_name='pose')
-        self.body_part_frm.grid(row=self.frame_children(frame=self.main_frm), sticky=NW)
+        self.body_part_frm.grid(row=self.frame_children(frame=self.main_frm), sticky=NW, pady=(5, 5))
         for bp_cnt in range(int(self.animal_cnt_dropdown.getChoices())):
-            self.body_parts_dropdowns[bp_cnt] = DropDownMenu(self.body_part_frm, f"BODY-PART {str(bp_cnt + 1)}:", self.body_parts_lst, "20")
+            self.body_parts_dropdowns[bp_cnt] = SimBADropDown(parent=self.body_part_frm, label=f"BODY-PART {str(bp_cnt + 1)}:", dropdown_options=self.body_parts_lst, label_width=20, value=self.body_parts_lst[bp_cnt])
             self.body_parts_dropdowns[bp_cnt].grid(row=bp_cnt, column=0, sticky=NW)
-            self.body_parts_dropdowns[bp_cnt].setChoices(self.body_parts_lst[bp_cnt])
 
         self.data_options_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="DATA OPTIONS", icon_name='abacus')
         self.total_time_cb, self.total_time_var = SimbaCheckbox(parent=self.data_options_frm, txt='TOTAL ROI TIME (S)', val=True, txt_img='timer')
@@ -140,7 +137,7 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         analyzer.save()
 
 
-#_ = ROIAggregateDataAnalyzerPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+#_ = ROIAggregateDataAnalyzerPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
 
 #analyzer = ROIAggregateDataAnalyzerPopUp(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
 
