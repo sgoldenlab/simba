@@ -6,8 +6,11 @@ from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.roi_tools.roi_aggregate_statistics_analyzer import ROIAggregateStatisticsAnalyzer
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, SimbaButton, SimbaCheckbox, SimBADropDown)
+from simba.roi_tools.roi_aggregate_statistics_analyzer import \
+    ROIAggregateStatisticsAnalyzer
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        Entry_Box, SimbaButton, SimbaCheckbox,
+                                        SimBADropDown)
 from simba.utils.checks import check_float
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.errors import InvalidInputError, NoROIDataError
