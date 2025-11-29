@@ -321,8 +321,11 @@ def CreateLabelFrameWithIcon(parent: Union[Toplevel, LabelFrame, Canvas, Frame],
                              font: tuple = Formats.FONT_HEADER.value,
                              icon_link: Optional[Union[str, None]] = LabelFrame):
 
-    icon = PIL.Image.open(MENU_ICONS[icon_name]["icon_path"])
-    icon = ImageTk.PhotoImage(icon)
+    if icon_name in MENU_ICONS.keys():
+        icon = PIL.Image.open(MENU_ICONS[icon_name]["icon_path"])
+        icon = ImageTk.PhotoImage(icon)
+    else:
+        icon = None
 
     frm = Frame(parent, bg=bg)
     label_text = Label(frm, text=header, font=font, bg=bg)
@@ -562,6 +565,32 @@ def get_menu_icons():
 
 
 class SimBADropDown(Frame):
+    """
+    Create a dropdown menu widget with optional searchable functionality.
+
+    This class creates a ttk.Combobox dropdown menu with a label, supporting both readonly and searchable modes.
+    When searchable mode is enabled, users can type to filter the dropdown options.
+
+    :param parent (Frame | Canvas | LabelFrame | Toplevel | Tk): The parent widget container.
+    :param dropdown_options (Iterable[Any] | List[Any] | Tuple[Any]): List of options to display in the dropdown menu.
+    :param label (str, optional): Text label displayed next to the dropdown. Default: None.
+    :param label_width (int, optional): Width of the label in characters. Default: None.
+    :param label_font (tuple, optional): Font tuple for the label. Default: Formats.FONT_REGULAR.value.
+    :param label_bg_clr (str, optional): Background color for the label. Default: None.
+    :param dropdown_font_size (int, optional): Font size for the dropdown text. Default: None.
+    :param justify (str): Text justification in the dropdown ('left', 'center', 'right'). Default: 'center'.
+    :param dropdown_width (int, optional): Width of the dropdown widget in characters. Default: None.
+    :param command (Callable, optional): Callback function to execute when an option is selected. Default: None.
+    :param value (Any, optional): Initial selected value for the dropdown. Default: None.
+    :param state (str, optional): Initial state of the dropdown ('normal', 'disabled'). Default: None.
+    :param searchable (bool): If True, allows typing to filter dropdown options. Default: False.
+    :param tooltip_txt (str, optional): Tooltip text to display on hover. Default: None.
+    :param tooltip_key (str, optional): Key for tooltip lookup in TOOLTIPS dictionary. For dictionary, see `simba.assets.lookups.tooptips.json`. Default: None.
+
+    :example:
+    >>> dropdown = SimBADropDown(parent=parent_frm, dropdown_options=['Option 1', 'Option 2', 'Option 3'], label='Select option:', searchable=True)
+    >>> selected = dropdown.get_value()
+    """
     def __init__(self,
                 parent: Union[Frame, Canvas, LabelFrame, Toplevel, Tk],
                 dropdown_options: Union[Iterable[Any], List[Any], Tuple[Any]],

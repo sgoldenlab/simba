@@ -139,11 +139,14 @@ def _agg_roi_stats_helper(data_paths: list,
     return batch_id, results, detailed_dfs
 
 
-class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
+class ROIAggregateStatisticsAnalyzerMultiprocess(ConfigReader, FeatureExtractionMixin):
     """
     Analyzes region-of-interest (ROI) data from video tracking experiments.
 
     This class computes various statistics related to body-part movements inside defined ROIs, including entry counts, total time spent, and bout durations.
+
+    .. note::
+       For single core process, see :func:`simba.roi_tools.roi_aggregate_statistics_analyzer.ROIAggregateStatisticsAnalyzer`
 
     :param config_path (str | os.PathLike): Path to the configuration file.
     :param data_path (str | os.PathLike | List[str], optional): Path(s) to the data files.
@@ -162,7 +165,7 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
     :param save_path (str | os.PathLike, optional): Path to save summary statistics.
 
     :example:
-    >>> analyzer = ROIAggregateStatisticsAnalyzer(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", body_parts=['Center'], first_entry_time=True, threshold=0.0, calculate_distances=True, transpose=False, detailed_bout_data=True)
+    >>> analyzer = ROIAggregateStatisticsAnalyzerMultiprocess(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", body_parts=['Center'], first_entry_time=True, threshold=0.0, calculate_distances=True, transpose=False, detailed_bout_data=True)
     >>> analyzer.run()
     >>> analyzer.save()
     """
@@ -304,16 +307,16 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
         self.timer.stop_timer()
         stdout_success(f'ROI statistics saved at {self.save_path}', elapsed_time=self.timer.elapsed_time_str)
 
-if __name__ == "__main__":
-    analyzer = ROIAggregateStatisticsAnalyzer(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",
-                                              body_parts=['resident_NOSE'],
-                                              include_fps=False,
-                                              threshold=0.5,
-                                              calculate_distances=True,
-                                              transpose=True,
-                                              detailed_bout_data=True,
-                                              outside_rois=True,
-                                              verbose=True,
-                                              core_cnt=16)
-    analyzer.run()
-    analyzer.save()
+# if __name__ == "__main__":
+#     analyzer = ROIAggregateStatisticsAnalyzerMultiprocess(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",
+#                                               body_parts=['resident_NOSE'],
+#                                               include_fps=False,
+#                                               threshold=0.5,
+#                                               calculate_distances=True,
+#                                               transpose=True,
+#                                               detailed_bout_data=True,
+#                                               outside_rois=True,
+#                                               verbose=True,
+#                                               core_cnt=16)
+#     analyzer.run()
+#     analyzer.save()

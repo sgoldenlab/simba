@@ -7,10 +7,12 @@ from typing import Union
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.roi_aggregate_statistics_analyzer import ROIAggregateStatisticsAnalyzer
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, Entry_Box, SimbaButton, SimbaCheckbox, SimBADropDown)
+from simba.roi_tools.roi_aggregate_stats_mp import ROIAggregateStatisticsAnalyzerMultiprocess
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, SimbaCheckbox, SimBADropDown)
 from simba.utils.checks import check_float
-from simba.utils.enums import Formats, Keys, Links
+from simba.utils.enums import Keys, Links
 from simba.utils.errors import InvalidInputError, NoROIDataError
+from simba.utils.read_write import find_core_cnt
 
 OUTSIDE_ROI = 'OUTSIDE REGIONS OF INTEREST'
 
@@ -29,17 +31,18 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         PopUpMixin.__init__(self, title="ROI AGGREGATE STATISTICS ANALYSIS", icon='data_table')
         self.config_path = config_path
         self.animal_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMAL(S)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI_DATA_ANALYSIS.value)
-
-        self.animal_cnt_dropdown = SimBADropDown(parent=self.animal_cnt_frm, label="# OF ANIMALS", dropdown_options=list(range(1, self.animal_cnt + 1)), label_width=20, value=1)
-        self.animal_cnt_confirm_btn = SimbaButton(parent=self.animal_cnt_frm, txt="CONFIRM", img='tick', txt_clr="blue", font=Formats.FONT_REGULAR.value, cmd=self._get_settings_frm)
+        self.animal_cnt_dropdown = SimBADropDown(parent=self.animal_cnt_frm, label="# OF ANIMALS", dropdown_options=list(range(1, self.animal_cnt + 1)), label_width=30, dropdown_width=30, value=1, command= lambda x: self._get_settings_frm(x))
         self.animal_cnt_frm.grid(row=0, column=0, sticky=NW)
         self.animal_cnt_dropdown.grid(row=0, column=0, sticky=NW)
-        self.animal_cnt_confirm_btn.grid(row=0, column=1, sticky=NW)
-        self._get_settings_frm()
 
+        self.core_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CHOOSE PROCESSOR CPU COUNT", icon_name='cpu_small', icon_link=Links.ROI_DATA_ANALYSIS.value)
+        self.core_cnt_dropdown = SimBADropDown(parent=self.core_cnt_frm, label="# CPU CORES", dropdown_options=list(range(1, find_core_cnt()[0])), label_width=30, dropdown_width=30, value=1, tooltip_key='CPU_ROI_DESCRIPTIVE_ANALYSIS')
+        self.core_cnt_frm.grid(row=1, column=0, sticky=NW)
+        self.core_cnt_dropdown.grid(row=0, column=0, sticky=NW)
+        self._get_settings_frm(self.animal_cnt_dropdown.get_value())
         self.main_frm.mainloop()
 
-    def _get_settings_frm(self):
+    def _get_settings_frm(self, bp_cnt):
         if hasattr(self, "body_part_frm"):
             self.data_options_frm.destroy()
             self.body_part_frm.destroy()
@@ -47,7 +50,7 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
             self.format_frm.destroy()
 
         self.probability_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT PROBABILITY THRESHOLD", icon_name='pose')
-        self.probability_entry = Entry_Box(parent=self.probability_frm, fileDescription='PROBABILITY THRESHOLD (0.0-1.0):', labelwidth="30", value='0.0')
+        self.probability_entry = Entry_Box(parent=self.probability_frm, fileDescription='PROBABILITY THRESHOLD (0.0-1.0):', labelwidth=30, value=0.0, entry_box_width=30, justify='center')
         self.probability_frm.grid(row=self.frame_children(frame=self.main_frm), sticky=NW, pady=(5, 5))
         self.probability_entry.grid(row=0, column=0, sticky=NW)
 
@@ -55,7 +58,7 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         self.body_part_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PART(S)", icon_name='pose')
         self.body_part_frm.grid(row=self.frame_children(frame=self.main_frm), sticky=NW, pady=(5, 5))
         for bp_cnt in range(int(self.animal_cnt_dropdown.getChoices())):
-            self.body_parts_dropdowns[bp_cnt] = SimBADropDown(parent=self.body_part_frm, label=f"BODY-PART {str(bp_cnt + 1)}:", dropdown_options=self.body_parts_lst, label_width=20, value=self.body_parts_lst[bp_cnt])
+            self.body_parts_dropdowns[bp_cnt] = SimBADropDown(parent=self.body_part_frm, label=f"BODY-PART {str(bp_cnt + 1)}:", dropdown_options=self.body_parts_lst, label_width=30, value=self.body_parts_lst[bp_cnt], dropdown_width=30)
             self.body_parts_dropdowns[bp_cnt].grid(row=bp_cnt, column=0, sticky=NW)
 
         self.data_options_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="DATA OPTIONS", icon_name='abacus')
@@ -107,6 +110,7 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         video_length = self.video_length_var.get()
         px_per_mm = self.px_per_mm_var.get()
         outside_roi = self.outside_var.get()
+        core_cnt = int(self.core_cnt_dropdown.get_value())
 
         body_parts = []
         for k, v in self.body_parts_dropdowns.items(): body_parts.append(v.getChoices())
@@ -116,28 +120,48 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         if (len(selections) == 1) and (not selections[0]):
             raise InvalidInputError(msg=f'Please select at least one DATA OPTION.',source=self.__class__.__name__)
 
-        analyzer =  ROIAggregateStatisticsAnalyzer(config_path=self.config_path,
-                                                   data_path=None,
-                                                   threshold=float(probability),
-                                                   body_parts=body_parts,
-                                                   detailed_bout_data=detailed_table,
-                                                   calculate_distances=movement,
-                                                   total_time=total_time,
-                                                   entry_counts=entry_counts,
-                                                   first_entry_time=first_entry_time,
-                                                   last_entry_time=last_entry_time,
-                                                   mean_bout_time=mean_bout_time,
-                                                   transpose=transpose,
-                                                   include_fps=include_fps,
-                                                   include_video_length=video_length,
-                                                   include_px_per_mm=px_per_mm,
-                                                   outside_rois=outside_roi)
+        if core_cnt == 1:
+
+            analyzer =  ROIAggregateStatisticsAnalyzer(config_path=self.config_path,
+                                                       data_path=None,
+                                                       threshold=float(probability),
+                                                       body_parts=body_parts,
+                                                       detailed_bout_data=detailed_table,
+                                                       calculate_distances=movement,
+                                                       total_time=total_time,
+                                                       entry_counts=entry_counts,
+                                                       first_entry_time=first_entry_time,
+                                                       last_entry_time=last_entry_time,
+                                                       mean_bout_time=mean_bout_time,
+                                                       transpose=transpose,
+                                                       include_fps=include_fps,
+                                                       include_video_length=video_length,
+                                                       include_px_per_mm=px_per_mm,
+                                                       outside_rois=outside_roi)
+        else:
+
+            analyzer =  ROIAggregateStatisticsAnalyzerMultiprocess(config_path=self.config_path,
+                                                                   data_path=None,
+                                                                   threshold=float(probability),
+                                                                   body_parts=body_parts,
+                                                                   detailed_bout_data=detailed_table,
+                                                                   calculate_distances=movement,
+                                                                   total_time=total_time,
+                                                                   entry_counts=entry_counts,
+                                                                   first_entry_time=first_entry_time,
+                                                                   last_entry_time=last_entry_time,
+                                                                   mean_bout_time=mean_bout_time,
+                                                                   transpose=transpose,
+                                                                   include_fps=include_fps,
+                                                                   include_video_length=video_length,
+                                                                   include_px_per_mm=px_per_mm,
+                                                                   outside_rois=outside_roi,
+                                                                   core_cnt=core_cnt)
 
         analyzer.run()
         analyzer.save()
 
-
-#_ = ROIAggregateDataAnalyzerPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
+_ = ROIAggregateDataAnalyzerPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
 
 #analyzer = ROIAggregateDataAnalyzerPopUp(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
 

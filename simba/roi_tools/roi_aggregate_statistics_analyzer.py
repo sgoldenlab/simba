@@ -43,6 +43,9 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
 
     This class computes various statistics related to body-part movements inside defined ROIs, including entry counts, total time spent, and bout durations.
 
+    .. note::
+       For multicore process, see :func:`simba.roi_tools.roi_aggregate_stats_mp.ROIAggregateStatisticsAnalyzerMultiprocess`.
+
     :param config_path (str | os.PathLike): Path to the configuration file.
     :param data_path (str | os.PathLike | List[str], optional): Path(s) to the data files.
     :param threshold (float): Probability threshold for body-part inclusion.
@@ -56,6 +59,10 @@ class ROIAggregateStatisticsAnalyzer(ConfigReader, FeatureExtractionMixin):
     :param last_entry_time (bool): Whether to record the last entry time.
     :param mean_bout_time (bool): Whether to compute mean bout duration.
     :param transpose (bool): Whether to transpose the final results.
+    :param include_fps (bool): Whether to include video FPS in the results.
+    :param include_video_length (bool): Whether to include video length in the results.
+    :param include_px_per_mm (bool): Whether to include pixel-to-millimeter conversion factor in the results.
+    :param verbose (bool): Whether to print verbose output during processing.
     :param detailed_bout_data_save_path (str | os.PathLike, optional): Path to save detailed bout data.
     :param save_path (str | os.PathLike, optional): Path to save summary statistics.
 
