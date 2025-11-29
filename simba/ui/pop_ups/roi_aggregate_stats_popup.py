@@ -161,7 +161,7 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         analyzer.run()
         analyzer.save()
 
-_ = ROIAggregateDataAnalyzerPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
+#_ = ROIAggregateDataAnalyzerPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
 
 #analyzer = ROIAggregateDataAnalyzerPopUp(config_path=r"C:\troubleshooting\two_black_animals_14bp\project_folder\project_config.ini")
 
