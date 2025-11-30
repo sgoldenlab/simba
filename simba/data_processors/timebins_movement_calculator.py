@@ -26,10 +26,6 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
     """
     Computes aggregate movement statistics in user-defined time-bins.
 
-    :parameter str config_path: path to SimBA project config file in Configparser format
-    :parameter int bin_length: Integer representing the time bin size in seconds.
-    :parameter bool plots: If True, creates time-bin line plots representing the movement in each time-bin per video. Results are saved in the ``project_folder/logs/`` sub-directory.
-
     .. note::
         `Tutorial <https://github.com/sgoldenlab/simba/blob/master/docs/Scenario2.md#part-4--analyze-machine-results>`__.
 
@@ -37,8 +33,19 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
        :width: 500
        :align: center
 
+    .. seealso::
+       For CPU multicore process, see func:`simba.data_processors.timebins_movement_calculator_mp.TimeBinsMovementCalculator`.
+
+    :param config_path (str | os.PathLike): Path to SimBA project config file in Configparser format.
+    :param bin_length (int | float): Time bin size in seconds.
+    :param body_parts (List[str]): List of body parts to analyze for movement.
+    :param file_paths (List[str | os.PathLike], optional): Path(s) to data files to analyze. If None, uses all files in the outlier corrected directory.
+    :param plots (bool, optional): If True, creates time-bin line plots representing the movement in each time-bin per video. Results are saved in the ``project_folder/logs/`` sub-directory. Default: False.
+    :param verbose (bool): If True, prints progress messages during processing. Default: True.
+
+
     :example:
-    >>> calculator = TimeBinsMovementCalculator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', bin_length=0.04,plots=True, body_parts=['Nose_1', 'Nose_2'])
+    >>> calculator = TimeBinsMovementCalculator(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini', bin_length=0.04, plots=True, body_parts=['Nose_1', 'Nose_2'])
     >>> calculator.run()
     """
 

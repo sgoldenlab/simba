@@ -319,7 +319,8 @@ def CreateLabelFrameWithIcon(parent: Union[Toplevel, LabelFrame, Canvas, Frame],
                              width: Optional[int] = None,
                              bg: Optional[str] = None,
                              font: tuple = Formats.FONT_HEADER.value,
-                             icon_link: Optional[Union[str, None]] = LabelFrame):
+                             icon_link: Optional[Union[str, None]] = LabelFrame,
+                             tooltip_key: Optional[str] = None):
 
     if icon_name in MENU_ICONS.keys():
         icon = PIL.Image.open(MENU_ICONS[icon_name]["icon_path"])
@@ -338,6 +339,10 @@ def CreateLabelFrameWithIcon(parent: Union[Toplevel, LabelFrame, Canvas, Frame],
     label_image.grid(row=0, column=1)
 
     lbl_frm = LabelFrame(parent, labelwidget=frm, relief=relief, width=width, padx=padx or 0, pady=pady or 0)
+
+    if tooltip_key in TOOLTIPS.keys():
+        CreateToolTip(widget=label_text, text=TOOLTIPS[tooltip_key])
+
     if bg is not None:
         lbl_frm.configure(bg=bg)
     return lbl_frm
