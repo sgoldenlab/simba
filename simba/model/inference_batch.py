@@ -99,7 +99,7 @@ class InferenceBatch(TrainModelMixin, ConfigReader):
                     out_df = plug_holes_shortest_bout(data_df=out_df, clf_name=m_hyp[MODEL_NAME], fps=fps, shortest_bout=m_hyp[MINIMUM_BOUT_LENGTH])
             write_df(out_df, self.file_type, file_save_path)
             video_timer.stop_timer()
-            print(f"Predictions created for {file_name} (elapsed time: {video_timer.elapsed_time_str}) ...")
+            print(f"Predictions created for {file_name} (frame count: {len(in_df)}, elapsed time: {video_timer.elapsed_time_str}) ...")
         self.timer.stop_timer()
         stdout_success(msg=f"Machine predictions complete. Files saved in {self.save_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
 
