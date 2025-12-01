@@ -74,43 +74,59 @@ from simba.ui.pop_ups.clf_add_remove_print_pop_up import (
     AddClfPopUp, PrintModelInfoPopUp, RemoveAClassifierPopUp)
 from simba.ui.pop_ups.clf_annotation_counts_pop_up import \
     ClfAnnotationCountPopUp
-
 from simba.ui.pop_ups.clf_by_roi_pop_up import ClfByROIPopUp
 from simba.ui.pop_ups.clf_by_timebins_pop_up import TimeBinsClfPopUp
-from simba.ui.pop_ups.clf_descriptive_statistics_pop_up import ClfDescriptiveStatsPopUp
+from simba.ui.pop_ups.clf_descriptive_statistics_pop_up import \
+    ClfDescriptiveStatsPopUp
 from simba.ui.pop_ups.clf_plot_pop_up import SklearnVisualizationPopUp
-from simba.ui.pop_ups.clf_probability_plot_pop_up import VisualizeClassificationProbabilityPopUp
-from simba.ui.pop_ups.clf_validation_plot_pop_up import ClassifierValidationPopUp
-from simba.ui.pop_ups.coco_keypoints_to_yolo_popup import  COCOKeypoints2YOLOkeypointsPopUp
-from simba.ui.pop_ups.csv_2_parquet_pop_up import (Csv2ParquetPopUp, Parquet2CsvPopUp)
+from simba.ui.pop_ups.clf_probability_plot_pop_up import \
+    VisualizeClassificationProbabilityPopUp
+from simba.ui.pop_ups.clf_validation_plot_pop_up import \
+    ClassifierValidationPopUp
+from simba.ui.pop_ups.coco_keypoints_to_yolo_popup import \
+    COCOKeypoints2YOLOkeypointsPopUp
+from simba.ui.pop_ups.csv_2_parquet_pop_up import (Csv2ParquetPopUp,
+                                                   Parquet2CsvPopUp)
 from simba.ui.pop_ups.cue_light_main_popup import CueLightMainPopUp
 from simba.ui.pop_ups.data_plot_pop_up import DataPlotterPopUp
 from simba.ui.pop_ups.delete_all_rois_pop_up import delete_all_rois_pop_up
-from simba.ui.pop_ups.directing_animal_to_bodypart_plot_pop_up import DirectingAnimalToBodyPartVisualizerPopUp
-from simba.ui.pop_ups.directing_other_animals_plot_pop_up import DirectingOtherAnimalsVisualizerPopUp
-from simba.ui.pop_ups.direction_animal_to_bodypart_settings_pop_up import DirectionAnimalToBodyPartSettingsPopUp
+from simba.ui.pop_ups.directing_animal_to_bodypart_plot_pop_up import \
+    DirectingAnimalToBodyPartVisualizerPopUp
+from simba.ui.pop_ups.directing_other_animals_plot_pop_up import \
+    DirectingOtherAnimalsVisualizerPopUp
+from simba.ui.pop_ups.direction_animal_to_bodypart_settings_pop_up import \
+    DirectionAnimalToBodyPartSettingsPopUp
 from simba.ui.pop_ups.distance_plot_pop_up import DistancePlotterPopUp
-from simba.ui.pop_ups.dlc_annotations_to_labelme_popup import DLCAnnotations2LabelMePopUp
-from simba.ui.pop_ups.dlc_h5_inference_to_yolo_popup import  DLCH5Inference2YoloPopUp
+from simba.ui.pop_ups.dlc_annotations_to_labelme_popup import \
+    DLCAnnotations2LabelMePopUp
+from simba.ui.pop_ups.dlc_h5_inference_to_yolo_popup import \
+    DLCH5Inference2YoloPopUp
 from simba.ui.pop_ups.dlc_to_labelme_popup import DLC2LabelmePopUp
 from simba.ui.pop_ups.dlc_to_yolo_keypoints_popup import DLCYoloKeypointsPopUp
 from simba.ui.pop_ups.egocentric_alignment_pop_up import EgocentricAlignPopUp
-from simba.ui.pop_ups.extract_annotation_frames_pop_up import ExtractAnnotationFramesPopUp
+from simba.ui.pop_ups.extract_annotation_frames_pop_up import \
+    ExtractAnnotationFramesPopUp
 from simba.ui.pop_ups.fsttc_pop_up import FSTTCPopUp
 from simba.ui.pop_ups.gantt_pop_up import GanttPlotPopUp
 from simba.ui.pop_ups.heatmap_clf_pop_up import HeatmapClfPopUp
 from simba.ui.pop_ups.heatmap_location_pop_up import HeatmapLocationPopup
-from simba.ui.pop_ups.initialize_blob_tracking_pop_up import InitializeBlobTrackerPopUp
+from simba.ui.pop_ups.initialize_blob_tracking_pop_up import \
+    InitializeBlobTrackerPopUp
 from simba.ui.pop_ups.interpolate_pop_up import InterpolatePopUp
 from simba.ui.pop_ups.kleinberg_pop_up import KleinbergPopUp
-from simba.ui.pop_ups.labelme_bbox_to_yolo_bbox_popup import LabelmeBbox2YoloBboxPopUp
+from simba.ui.pop_ups.labelme_bbox_to_yolo_bbox_popup import \
+    LabelmeBbox2YoloBboxPopUp
 from simba.ui.pop_ups.labelme_to_df_popup import Labelme2DataFramePopUp
 from simba.ui.pop_ups.labelme_to_imgs_popup import Labelme2ImgsPopUp
 from simba.ui.pop_ups.make_path_plot_pop_up import MakePathPlotPopUp
-from simba.ui.pop_ups.merge_coco_keypoint_files_pop_up import MergeCOCOKeypointFilesPopUp
-from simba.ui.pop_ups.movement_analysis_pop_up import MovementAnalysisPopUp  # ## LAZY
-from simba.ui.pop_ups.movement_analysis_time_bins_pop_up import MovementAnalysisTimeBinsPopUp  # ## LAZY
-from simba.ui.pop_ups.multiple_videos_to_frames_popup import MultipleVideos2FramesPopUp
+from simba.ui.pop_ups.merge_coco_keypoint_files_pop_up import \
+    MergeCOCOKeypointFilesPopUp
+from simba.ui.pop_ups.movement_analysis_pop_up import \
+    MovementAnalysisPopUp  # ## LAZY
+from simba.ui.pop_ups.movement_analysis_time_bins_pop_up import \
+    MovementAnalysisTimeBinsPopUp  # ## LAZY
+from simba.ui.pop_ups.multiple_videos_to_frames_popup import \
+    MultipleVideos2FramesPopUp
 from simba.ui.pop_ups.mutual_exclusivity_pop_up import MutualExclusivityPupUp
 from simba.ui.pop_ups.outlier_settings_pop_up import OutlierSettingsPopUp
 from simba.ui.pop_ups.path_plot_pop_up import PathPlotPopUp
@@ -120,25 +136,38 @@ from simba.ui.pop_ups.print_video_meta_popup import PrintVideoMetaDataPopUp
 from simba.ui.pop_ups.pup_retrieval_pop_up import PupRetrievalPopUp  # LAZY
 from simba.ui.pop_ups.quick_path_plot_pop_up import QuickLineplotPopup
 from simba.ui.pop_ups.remove_roi_features_pop_up import RemoveROIFeaturesPopUp
-from simba.ui.pop_ups.roi_aggregate_stats_popup import ROIAggregateDataAnalyzerPopUp
-from simba.ui.pop_ups.roi_analysis_time_bins_pop_up import ROIAnalysisTimeBinsPopUp  # ## LAZY
+from simba.ui.pop_ups.roi_aggregate_stats_popup import \
+    ROIAggregateDataAnalyzerPopUp
+from simba.ui.pop_ups.roi_analysis_time_bins_pop_up import \
+    ROIAnalysisTimeBinsPopUp  # ## LAZY
 from simba.ui.pop_ups.roi_features_plot_pop_up import VisualizeROIFeaturesPopUp
-from simba.ui.pop_ups.roi_tracking_plot_pop_up import VisualizeROITrackingPopUp  # ## LAZY
+from simba.ui.pop_ups.roi_tracking_plot_pop_up import \
+    VisualizeROITrackingPopUp  # ## LAZY
 from simba.ui.pop_ups.roi_video_table_pop_up import ROIVideoTable
 from simba.ui.pop_ups.run_machine_models_popup import RunMachineModelsPopUp
-from simba.ui.pop_ups.select_video_for_labelling_popup import SelectLabellingVideoPupUp
-from simba.ui.pop_ups.select_video_for_pseudo_labelling_popup import SelectPseudoLabellingVideoPupUp
+from simba.ui.pop_ups.select_video_for_labelling_popup import \
+    SelectLabellingVideoPupUp
+from simba.ui.pop_ups.select_video_for_pseudo_labelling_popup import \
+    SelectPseudoLabellingVideoPupUp
 from simba.ui.pop_ups.severity_analysis_pop_up import AnalyzeSeverityPopUp
 from simba.ui.pop_ups.simba_rois_to_yolo_pop_up import SimBAROIs2YOLOPopUp
-from simba.ui.pop_ups.simba_to_yolo_keypoints_popup import SimBA2YoloKeypointsPopUp
-from simba.ui.pop_ups.single_video_to_frames_popup import SingleVideo2FramesPopUp
-from simba.ui.pop_ups.sleap_annotations_to_yolo_popup import SLEAPAnnotations2YoloPopUp
-from simba.ui.pop_ups.sleap_csv_predictions_to_yolo_popup import SLEAPcsvInference2Yolo
-from simba.ui.pop_ups.sleap_h5_inference_to_yolo_popup import SLEAPH5Inference2YoloPopUp
+from simba.ui.pop_ups.simba_to_yolo_keypoints_popup import \
+    SimBA2YoloKeypointsPopUp
+from simba.ui.pop_ups.single_video_to_frames_popup import \
+    SingleVideo2FramesPopUp
+from simba.ui.pop_ups.sleap_annotations_to_yolo_popup import \
+    SLEAPAnnotations2YoloPopUp
+from simba.ui.pop_ups.sleap_csv_predictions_to_yolo_popup import \
+    SLEAPcsvInference2Yolo
+from simba.ui.pop_ups.sleap_h5_inference_to_yolo_popup import \
+    SLEAPH5Inference2YoloPopUp
 from simba.ui.pop_ups.smoothing_popup import SmoothingPopUp
-from simba.ui.pop_ups.spontaneous_alternation_pop_up import SpontaneousAlternationPopUp  # ## LAZY
-from simba.ui.pop_ups.subset_feature_extractor_pop_up import FeatureSubsetExtractorPopUp
-from simba.ui.pop_ups.third_party_annotator_appender_pop_up import ThirdPartyAnnotatorAppenderPopUp
+from simba.ui.pop_ups.spontaneous_alternation_pop_up import \
+    SpontaneousAlternationPopUp  # ## LAZY
+from simba.ui.pop_ups.subset_feature_extractor_pop_up import \
+    FeatureSubsetExtractorPopUp
+from simba.ui.pop_ups.third_party_annotator_appender_pop_up import \
+    ThirdPartyAnnotatorAppenderPopUp
 from simba.ui.pop_ups.validation_plot_pop_up import ValidationVideoPopUp
 from simba.ui.pop_ups.video_processing_pop_up import (
     BackgroundRemoverDirectoryPopUp, BackgroundRemoverSingleVideoPopUp,
@@ -161,17 +190,24 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     SuperimposeTextPopUp, SuperimposeTimerPopUp, SuperimposeVideoNamesPopUp,
     SuperimposeVideoPopUp, SuperimposeWatermarkPopUp, UpsampleVideosPopUp,
     VideoRotatorPopUp, VideoTemporalJoinPopUp)
-from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import VisualizePoseInFolderPopUp
+from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
+    VisualizePoseInFolderPopUp
 from simba.ui.pop_ups.yolo_inference_popup import YOLOPoseInferencePopUP
 from simba.ui.pop_ups.yolo_plot_results import YoloPoseVisualizerPopUp
 from simba.ui.pop_ups.yolo_pose_train_popup import YOLOPoseTrainPopUP
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, FileSelect, SimbaButton, SimbaCheckbox, SimBALabel, hxtScrollbar)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        FileSelect, SimbaButton, SimbaCheckbox,
+                                        SimBALabel, hxtScrollbar)
 from simba.ui.video_info_ui import VideoInfoTable
-from simba.utils.checks import (check_ffmpeg_available, check_file_exist_and_readable, check_int)
+from simba.utils.checks import (check_ffmpeg_available,
+                                check_file_exist_and_readable, check_int)
 from simba.utils.custom_feature_extractor import CustomFeatureExtractor
-from simba.utils.enums import (ENV_VARS, OS, Defaults, Formats, Keys, Links, PackageNames, Paths, TagNames)
+from simba.utils.enums import (ENV_VARS, OS, Defaults, Formats, Keys, Links,
+                               PackageNames, Paths, TagNames)
 from simba.utils.errors import InvalidInputError
-from simba.utils.lookups import (get_bp_config_code_class_pairs, get_current_time, get_emojis, get_icons_paths, load_simba_fonts)
+from simba.utils.lookups import (get_bp_config_code_class_pairs,
+                                 get_current_time, get_emojis, get_icons_paths,
+                                 load_simba_fonts)
 from simba.utils.read_write import (fetch_pip_data, find_core_cnt,
                                     get_pkg_version, get_recent_projects_paths,
                                     get_video_meta_data, read_sys_env,
@@ -180,6 +216,7 @@ from simba.utils.warnings import (FFMpegNotFoundWarning, PythonVersionWarning,
                                   VersionWarning)
 from simba.video_processors.video_processing import \
     extract_frames_from_all_videos_in_directory
+
 sys.setrecursionlimit(10**6)
 currentPlatform = platform.system()
 ENV = read_sys_env()
