@@ -10,10 +10,11 @@ from sklearn.model_selection import train_test_split
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.train_model_mixin import TrainModelMixin
 from simba.utils.checks import check_if_filepath_list_is_empty, check_int
-from simba.utils.enums import (ConfigKey, Dtypes, Formats, Methods, MLParamKeys, Options, Links)
+from simba.utils.enums import (ConfigKey, Dtypes, Formats, Links, Methods,
+                               MLParamKeys, Options)
+from simba.utils.errors import ParametersFileError
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import read_config_entry, str_2_bool, write_df
-from simba.utils.errors import ParametersFileError
 
 
 class TrainRandomForestClassifier(ConfigReader, TrainModelMixin):

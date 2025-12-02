@@ -3,13 +3,17 @@ from tkinter import *
 from typing import Union
 
 from simba.data_processors.agg_clf_calculator import AggregateClfCalculator
-from simba.data_processors.agg_clf_counter_mp import AggregateClfCalculatorMultiprocess
+from simba.data_processors.agg_clf_counter_mp import \
+    AggregateClfCalculatorMultiprocess
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaButton, SimbaCheckbox, SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaButton,
+                                        SimbaCheckbox, SimBADropDown)
 from simba.utils.enums import Formats, Links
-from simba.utils.errors import (NoChoosenClassifierError, NoChoosenMeasurementError, NoDataError)
+from simba.utils.errors import (NoChoosenClassifierError,
+                                NoChoosenMeasurementError, NoDataError)
 from simba.utils.read_write import find_core_cnt
+
 
 class ClfDescriptiveStatsPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
