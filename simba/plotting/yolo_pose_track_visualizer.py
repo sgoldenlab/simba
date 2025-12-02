@@ -59,6 +59,7 @@ def _yolo_keypoint_track_visualizer(frm_ids: np.ndarray,
             frm_data = data.loc[data[FRAME] == current_frm]
             frm_data = frm_data[frm_data[CONFIDENCE] > threshold]
             for cnt, (row, row_data) in enumerate(frm_data.iterrows()):
+
                 clrs = np.array(palettes[int(row_data[TRACK])]).astype(np.int32)
                 bbox_cords = row_data[BOX_CORD_FIELDS].values.astype(np.int32).reshape(-1, 2)
                 kp_coords = row_data.drop(EXPECTED_COLS).values.astype(np.int32).reshape(-1, 3)[:, :-1]

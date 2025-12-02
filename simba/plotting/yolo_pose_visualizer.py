@@ -63,6 +63,10 @@ def _yolo_keypoint_visualizer(frm_ids: np.ndarray,
         frm_data = data.loc[data[FRAME] == current_frm]
         frm_data = frm_data[frm_data[CONFIDENCE] > threshold]
         for cnt, (row, row_data) in enumerate(frm_data.iterrows()):
+            #print(row_data)
+            #row_data = row_data.drop(["LEFT_SIDE_X", "LEFT_SIDE_Y", "LEFT_SIDE_P"], errors="ignore")
+            #row_data = row_data.drop(["RIGHT_SIDE_X", "RIGHT_SIDE_Y", "RIGHT_SIDE_P"], errors="ignore")
+            #row_data = row_data.drop(["CENTER_X", "CENTER_Y", "CENTER_P"], errors="ignore")
             clrs = np.array(palettes[int(row_data[CLASS_ID])]).astype(np.int32)
             bbox_cords = row_data[BOX_CORD_FIELDS].values.astype(np.int32).reshape(-1, 2)
             kp_coords = row_data.drop(EXPECTED_COLS).values.astype(np.int32).reshape(-1, 3)[:, :-1]
@@ -155,7 +159,6 @@ class YOLOPoseVisualizer():
                 check_int(name=f'{self.__class__.__name__} sample', min_value=1, raise_error=True, value=sample_n)
                 sample_n = min(sample_n, len(list(data_paths)))
                 data_paths = dict(random.sample(list(data_paths.items()), sample_n))
-
         elif os.path.isfile(data_path):
             check_file_exist_and_readable(file_path=data_path)
             data_paths = {get_fn_ext(filepath=data_path)[1]: data_path}
@@ -404,18 +407,18 @@ class YOLOPoseVisualizer():
 #     kp_vis.run()
 
 
-# if __name__ == "__main__":
-#     video_path = r"E:\netholabs_videos\3d_videos_batch_2\Cage_3_Simon_vid_examples_for_annotatino-20251019T183855Z-1-001\Cage_3_Simon_vid_examples_for_annotatino\rot\test_inference"
-#     data_path = r"E:\netholabs_videos\3d_videos_batch_2\Cage_3_Simon_vid_examples_for_annotatino-20251019T183855Z-1-001\Cage_3_Simon_vid_examples_for_annotatino\predictions"
-#     save_dir = r'E:\netholabs_videos\3d_videos_batch_2\Cage_3_Simon_vid_examples_for_annotatino-20251019T183855Z-1-001\Cage_3_Simon_vid_examples_for_annotatino\predictions\videos'
-#     kp_vis = YOLOPoseVisualizer(data_path=data_path,
-#                                 video_path=video_path,
-#                                 save_dir=save_dir,
-#                                 core_cnt=14,
-#                                 palettes=('tab20',),
-#                                 recursive=True,
-#                                 sample_n=None)
-#
-#
-#     kp_vis.run()
-#
+if __name__ == "__main__":
+    video_path = r"E:\netholabs_videos\primeintellect_100_videos\cage_1_date_2025_08_28_hour_20_minute_21.avi"
+    data_path = r"E:\netholabs_videos\primeintellect_100_largest\cage_1_date_2025_08_28_hour_20_minute_21.csv"
+    save_dir = r'E:\netholabs_videos\test_order'
+    kp_vis = YOLOPoseVisualizer(data_path=data_path,
+                                video_path=video_path,
+                                save_dir=save_dir,
+                                core_cnt=14,
+                                palettes=('tab20',),
+                                recursive=True,
+                                sample_n=None)
+
+
+    kp_vis.run()
+

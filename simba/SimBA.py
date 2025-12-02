@@ -278,12 +278,19 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
             self.btn_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname(__file__), self.btn_icons[k]["icon_path"])))
 
         simongui.iconphoto(False, self.btn_icons['SimBA_logo_3_small']["img"])
-
         tab_style = ttk.Style()
-        tab_style.configure(style='Custom.TNotebook.Tab', font=Formats.FONT_REGULAR.value)
-        tab_style.map('Custom.TNotebook.Tab', foreground=[('selected', 'navy')], font=[('selected', Formats.FONT_REGULAR_BOLD.value)])
+        tab_style.configure('Custom.TNotebook', background='#f0f0f0', borderwidth=0)
+        tab_style.configure('Custom.TNotebook.Tab', font=Formats.FONT_REGULAR.value, padding=[15, 8], borderwidth=1, relief='flat', background='#f0f0f0')
+        tab_style.map('Custom.TNotebook.Tab',
+                     background=[('selected', '#ffffff'), ('!selected', '#f0f0f0')],
+                     foreground=[('selected', 'navy'), ('!selected', '#333333')],
+                     font=[('selected', Formats.FONT_REGULAR_BOLD.value), ('!selected', Formats.FONT_REGULAR.value)],
+                     bordercolor=[('selected', '#0066cc'), ('!selected', '#e0e0e0')],
+                     lightcolor=[('selected', '#ffffff'), ('!selected', '#f5f5f5')],
+                     darkcolor=[('selected', '#e0e0e0'), ('!selected', '#e0e0e0')])
 
-        tab_parent = ttk.Notebook(hxtScrollbar(simongui), style='Custom.TNotebook')
+        scrollable_container = hxtScrollbar(simongui)
+        tab_parent = ttk.Notebook(scrollable_container, style='Custom.TNotebook')
         tab2 = ttk.Frame(tab_parent)
         tab3 = ttk.Frame(tab_parent)
         tab4 = ttk.Frame(tab_parent)
@@ -295,18 +302,18 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         tab10 = ttk.Frame(tab_parent)
         tab11 = ttk.Frame(tab_parent)
 
-        tab_parent.add(tab2, text=f"{'[ Further imports (data/video/frames) ]':20s}", compound="left", image=self.btn_icons["pose"]["img"])
-        tab_parent.add(tab3, text=f"{'[ Video parameters ]':15s}", compound="left", image=self.btn_icons["calipher"]["img"])
-        tab_parent.add(tab4, text=f"{'[ Outlier correction ]':15s}", compound="left", image=self.btn_icons["outlier"]["img"])
-        tab_parent.add(tab6, text=f"{'[ ROI ]':10s}", compound="left", image=self.btn_icons["roi"]["img"])
-        tab_parent.add(tab5, text=f"{'[ Extract features ]':15s}", compound="left", image=self.btn_icons["features"]["img"])
-        tab_parent.add(tab7, text=f"{'[ Label behavior] ':15s}", compound="left", image=self.btn_icons["label"]["img"])
-        tab_parent.add(tab8, text=f"{'[ Train machine model ]':15s}", compound="left", image=self.btn_icons["clf"]["img"])
-        tab_parent.add(tab9, text=f"{'[ Run machine model ]':15s}", compound="left", image=self.btn_icons["clf_2"]["img"])
-        tab_parent.add(tab10, text=f"{'[ Visualizations ]':10s}", compound="left", image=self.btn_icons["visualize"]["img"])
-        tab_parent.add(tab11, text=f"{'[ Add-ons ]':10s}", compound="left", image=self.btn_icons["add_on"]["img"])
+        tab_parent.add(tab2, text="Further imports", compound="left", image=self.btn_icons["pose"]["img"])
+        tab_parent.add(tab3, text="Video parameters", compound="left", image=self.btn_icons["calipher"]["img"])
+        tab_parent.add(tab4, text="Outlier correction", compound="left", image=self.btn_icons["outlier"]["img"])
+        tab_parent.add(tab6, text="ROI", compound="left", image=self.btn_icons["roi"]["img"])
+        tab_parent.add(tab5, text="Extract features", compound="left", image=self.btn_icons["features"]["img"])
+        tab_parent.add(tab7, text="Label behavior", compound="left", image=self.btn_icons["label"]["img"])
+        tab_parent.add(tab8, text="Train machine model", compound="left", image=self.btn_icons["clf"]["img"])
+        tab_parent.add(tab9, text="Run machine model", compound="left", image=self.btn_icons["clf_2"]["img"])
+        tab_parent.add(tab10, text="Visualizations", compound="left", image=self.btn_icons["visualize"]["img"])
+        tab_parent.add(tab11, text="Add-ons", compound="left", image=self.btn_icons["add_on"]["img"])
 
-        tab_parent.grid(row=0)
+        tab_parent.grid(row=0, sticky='ew')
         tab_parent.enable_traversal()
 
         import_frm = LabelFrame(tab2)
