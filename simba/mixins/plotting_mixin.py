@@ -1412,15 +1412,7 @@ class PlottingMixin(object):
                 source=PlottingMixin.make_path_plot.__name__,
                 accepted_ndims=(2,),
                 accepted_axis_1_shape=(2,),
-                accepted_dtypes=(
-                    int,
-                    float,
-                    np.int32,
-                    np.int64,
-                    np.float32,
-                    np.float64,
-                ),
-            )
+                accepted_dtypes=Formats.NUMERIC_DTYPES.value)
         check_valid_lst(
             data=colors,
             source=PlottingMixin.make_path_plot.__name__,
@@ -1459,7 +1451,7 @@ class PlottingMixin(object):
             img = np.zeros((bg_clr.shape[0], bg_clr.shape[1], 3))
         else:
             img = np.zeros((height, width, 3))
-            img[:] = bg_clr
+        img[:] = bg_clr
         for line_cnt in range(len(data)):
             clr = colors[line_cnt]
             line_data = data[line_cnt]

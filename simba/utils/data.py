@@ -1434,10 +1434,10 @@ def df_smoother(data: pd.DataFrame,
     :return pd.DataFrame:  The smoothed DataFrame.
     """
 
-    check_float(name='fps', value=fps, min_value=10e-16, raise_error=True)
-    check_int(name='time_window', value=time_window, min_value=1, raise_error=True)
-    check_int(name='std', value=std, min_value=1, raise_error=True)
-    check_str(name='method', value=method, options=('bartlett', 'blackman', 'boxcar', 'cosine', 'gaussian', 'hamming', 'exponential'), raise_error=True)
+    check_float(name=f'fps {source} {df_smoother.__name__}', value=fps, min_value=10e-16, raise_error=True)
+    check_int(name=f'time_window {source} {df_smoother.__name__}', value=time_window, min_value=1, raise_error=True)
+    check_int(name=f'time_window {source} {df_smoother.__name__}', value=std, min_value=1, raise_error=True)
+    check_str(name=f'time_window {source} {df_smoother.__name__}', value=method, options=('bartlett', 'blackman', 'boxcar', 'cosine', 'gaussian', 'hamming', 'exponential'), raise_error=True)
     check_valid_dataframe(df=data, valid_dtypes=Formats.NUMERIC_DTYPES.value, source=source)
     frms_in_smoothing_window = int(time_window / (1000 / fps))
     if frms_in_smoothing_window <= 1:

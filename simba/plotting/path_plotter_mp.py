@@ -476,32 +476,32 @@ class PathPlotterMulticore(ConfigReader, PlottingMixin):
 
 #
 
-#
+# #
 # #style_attr = None
-# style_attr = {'width': 1800,
-#               'height': 2200,
+# style_attr = {'width': None,
+#               'height': None,
 #               'line width': 5,
 #               'font size': 5,
 #               'font thickness': 2,
 #               'circle size': 5,
-#               'bg': (255, 255, 255),
-#               'bg_opacity': 1.0,
+#               'bg': (0, 0, 0),
+#               'bg_opacity': 0,
 #               'max lines': None}
 # animal_attr = {0: {'color': (255, 0, 0), 'body_part': 'Nose'}}
 # #clf_attr = {0: ['Freezing', 'Black', 'Size: 10'], 1: ['Normal Swimming', 'Red', 'Size: 10']}
 # #
 # # clf_attr = None
 #
-# if __name__ == "__main__":
-#     path_plotter = PathPlotterMulticore(config_path=r"D:\troubleshooting\path_plotx\project_folder\project_config.ini",
-#                                         frame_setting=False,
-#                                         video_setting=True,
-#                                         last_frame=True,
-#                                         clf_attr=None,
-#                                         style_attr=style_attr,
-#                                         animal_attr=animal_attr,
-#                                         print_animal_names=False,
-#                                         data_paths=[r"D:\troubleshooting\path_plotx\project_folder\csv\outlier_corrected_movement_location\Hyb_P2_VMHvl-Syn_B11_C2_B.csv"],
-#                                         core_cnt=8,
-#                                         verbose=True)
-#     path_plotter.run()
+# #if __name__ == "__main__":
+# path_plotter = PathPlotterMulticore(config_path=r"D:\troubleshooting\path_plotx\project_folder\project_config.ini",
+#                                     frame_setting=False,
+#                                     video_setting=False,
+#                                     last_frame=True,
+#                                     clf_attr=None,
+#                                     style_attr=style_attr,
+#                                     animal_attr=animal_attr,
+#                                     print_animal_names=False,
+#                                     data_paths=[r"D:\troubleshooting\path_plotx\project_folder\csv\outlier_corrected_movement_location\Hyb_P2_VMHvl-Syn_B11_C2_B.csv"],
+#                                     core_cnt=8,
+#                                     verbose=True)
+# path_plotter.run()
