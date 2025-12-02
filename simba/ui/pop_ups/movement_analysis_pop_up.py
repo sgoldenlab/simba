@@ -1,16 +1,17 @@
 import os
-from typing import Union
-
 from copy import deepcopy
 from tkinter import *
+from typing import Union
 
 from simba.data_processors.movement_calculator import MovementCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaCheckbox, Entry_Box, SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        SimbaCheckbox, SimBADropDown)
 from simba.utils.checks import check_float
 from simba.utils.enums import ConfigKey, Keys, Links
-from simba.utils.errors import NoDataError, InvalidInputError
+from simba.utils.errors import InvalidInputError, NoDataError
+
 
 class MovementAnalysisPopUp(ConfigReader, PopUpMixin):
     def __init__(self,
