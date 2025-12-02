@@ -123,7 +123,8 @@ from simba.ui.pop_ups.merge_coco_keypoint_files_pop_up import \
     MergeCOCOKeypointFilesPopUp
 from simba.ui.pop_ups.movement_analysis_pop_up import \
     MovementAnalysisPopUp  # ## LAZY
-from simba.ui.pop_ups.movement_analysis_time_bins_pop_up import MovementAnalysisTimeBinsPopUp
+from simba.ui.pop_ups.movement_analysis_time_bins_pop_up import \
+    MovementAnalysisTimeBinsPopUp
 from simba.ui.pop_ups.multiple_videos_to_frames_popup import \
     MultipleVideos2FramesPopUp
 from simba.ui.pop_ups.mutual_exclusivity_pop_up import MutualExclusivityPupUp
