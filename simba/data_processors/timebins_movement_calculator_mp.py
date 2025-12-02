@@ -19,12 +19,12 @@ from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log, check_float, check_int,
     check_that_column_exist, check_valid_boolean, check_valid_lst)
 from simba.utils.enums import TagNames
-from simba.utils.errors import FrameRangeError, NoDataError
+from simba.utils.errors import FrameRangeError, NoDataError, InvalidInputError
 from simba.utils.lookups import get_current_time
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
 from simba.utils.read_write import (create_directory, find_core_cnt,
                                     find_files_of_filetypes_in_directory,
-                                    get_fn_ext, read_df, read_video_info)
+                                    get_fn_ext, read_df, read_video_info, find_time_stamp_from_frame_numbers)
 
 
 def _time_bin_movement_helper(data: list,
@@ -32,7 +32,9 @@ def _time_bin_movement_helper(data: list,
                               verbose: bool,
                               video_info_df: pd.DataFrame,
                               bp_headers: list,
-                              bp_dict: dict):
+                              bp_dict: dict,
+                              distance: bool,
+                              velocity: bool):
 
     batch_id, file_paths = data
     video_dict, movement_dict, batch_results = {}, {}, []
@@ -58,9 +60,12 @@ def _time_bin_movement_helper(data: list,
             movement_dict[video_name] = movement_data
             movement_df_lists = [movement_data[i : i + bin_length_frames] for i in range(0, movement_data.shape[0], bin_length_frames)]
             for bin, movement_df in enumerate(movement_df_lists):
-                movement, velocity = (FeatureExtractionSupplemental.distance_and_velocity(x=movement_df["VALUE"].values, fps=fps, pixels_per_mm=px_per_mm, centimeters=False))
-                video_results.append({"VIDEO": video_name,"TIME BIN #": bin,"ANIMAL": name,"BODY-PART": bps[0][:-2],"MEASUREMENT": "Movement (cm)","VALUE": round(movement, 4)})
-                video_results.append({"VIDEO": video_name,"TIME BIN #": bin,"ANIMAL": name,"BODY-PART": bps[0][:-2],"MEASUREMENT": "Velocity (cm/s)","VALUE": round(velocity, 4)})
+                bin_times = find_time_stamp_from_frame_numbers(start_frame=int(bin_length_frames * bin), end_frame=min(int(bin_length_frames * (bin + 1)), len(data_df)), fps=fps)
+                movement_data, velocity_data = (FeatureExtractionSupplemental.distance_and_velocity(x=movement_df["VALUE"].values, fps=fps, pixels_per_mm=px_per_mm, centimeters=False))
+                if distance:
+                    video_results.append({"VIDEO": video_name,"TIME BIN #": bin, "START TIME": bin_times[0], "END TIME": bin_times[1], "ANIMAL": name,"BODY-PART": bps[0][:-2],"MEASUREMENT": "Movement (cm)","VALUE": round(movement_data, 4)})
+                if velocity:
+                    video_results.append({"VIDEO": video_name,"TIME BIN #": bin, "START TIME": bin_times[0], "END TIME": bin_times[1], "ANIMAL": name,"BODY-PART": bps[0][:-2],"MEASUREMENT": "Velocity (cm/s)","VALUE": round(velocity_data, 4)})
         results = pd.DataFrame(video_results).reset_index(drop=True)
         batch_results.append(results)
         video_timer.stop_timer()
@@ -90,7 +95,7 @@ class TimeBinsMovementCalculatorMultiprocess(ConfigReader, FeatureExtractionMixi
     :param Union[str, os.PathLike] config_path: Path to SimBA project config file in Configparser format.
     :param Union[int, float] bin_length: Time bin size in seconds. Must be greater than 0.
     :param List[str] body_parts: List of body part names to calculate movement for (e.g., ['Nose_1', 'Nose_2']). Body parts must exist in the project's body part configuration.
-    :param Optional[List[Union[str, os.PathLike]]] file_paths: Optional list of specific file paths to process. If None, processes all files in the project's outlier corrected directory. Can also be a single file path or a directory path containing CSV files.
+    :param Optional[List[Union[str, os.PathLike]]] data_path: Optional list of specific file paths to process. If None, processes all files in the project's outlier corrected directory. Can also be a single file path or a directory path containing CSV files.
     :param Optional[bool] plots: If True, creates time-bin line plots representing the movement in each time-bin per video. Results are saved in the ``project_folder/logs/`` sub-directory. Default: False.
     :param bool verbose: If True, prints progress information during processing. Default: True.
     :param int core_cnt: Number of CPU cores to use for multiprocessing. If -1, uses all available cores. If greater than available cores, uses all available cores. Must be greater than 0. Default: -1.
@@ -111,27 +116,39 @@ class TimeBinsMovementCalculatorMultiprocess(ConfigReader, FeatureExtractionMixi
                  config_path: Union[str, os.PathLike],
                  bin_length: Union[int, float],
                  body_parts: List[str],
-                 file_paths: Optional[List[Union[str, os.PathLike]]] = None,
-                 plots: Optional[bool] = False,
+                 data_path: Optional[Union[List[Union[str, os.PathLike]], str, os.PathLike]] = None,
+                 plots: bool = False,
                  verbose: bool = True,
-                 core_cnt: int = -1):
+                 core_cnt: int = -1,
+                 distance: bool = True,
+                 velocity: bool = True,
+                 transpose: bool = False,
+                 include_timestamp: bool = False):
 
         ConfigReader.__init__(self, config_path=config_path)
         log_event(logger_name=str(self.__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()),)
         check_float(name=f"{self.__class__.__name__} TIME BIN", value=bin_length, min_value=10e-6)
         check_valid_lst(data=body_parts, source=f'{self.__class__.__name__} file_paths', min_len=1, valid_dtypes=(str,), valid_values=self.body_parts_lst)
-        if file_paths is None:
+        if data_path is None:
             if len(self.outlier_corrected_paths) == 0: raise NoDataError(msg=f'No data files found in {self.outlier_corrected_dir}', source=self.__class__.__name__)
             self.file_paths = self.outlier_corrected_paths
-        elif os.path.isfile(file_paths):
-            self.file_paths = [file_paths]
-        else:
+        elif os.path.isfile(data_path):
+            self.file_paths = [data_path]
+        elif os.path.isdir(data_path):
             self.file_paths = find_files_of_filetypes_in_directory(directory=self.file_paths, extensions=('.csv',), raise_warning=False, raise_error=True, as_dict=False)
+        else:
+            self.file_paths = data_path
         check_valid_boolean(value=[plots], source=f'{self.__class__.__name__} plots', raise_error=True)
         check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose', raise_error=True)
+        check_valid_boolean(value=distance, source=f'{self.__class__.__name__} distance', raise_error=True)
+        check_valid_boolean(value=velocity, source=f'{self.__class__.__name__} velocity', raise_error=True)
+        check_valid_boolean(value=transpose, source=f'{self.__class__.__name__} transpose', raise_error=True)
+        check_valid_boolean(value=include_timestamp, source=f'{self.__class__.__name__} include_timestamp', raise_error=True)
         check_int(f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0], raise_error=True)
         self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
-        self.verbose = verbose
+        self.verbose, self.distance, self.velocity, self.transpose, self.include_timestamp = verbose, distance, velocity, transpose, include_timestamp
+        if not distance and not velocity:
+            raise InvalidInputError(msg='distance AND velocity are both False. To compute movement metrics, set at least one value to True.', source=self.__class__.__name__)
         self.col_headers, self.bp_dict = [], {}
         for bp_cnt, bp in enumerate(body_parts):
             self.col_headers.extend((f"{bp}_x", f"{bp}_y"))
@@ -178,7 +195,9 @@ class TimeBinsMovementCalculatorMultiprocess(ConfigReader, FeatureExtractionMixi
                                           verbose=self.verbose,
                                           video_info_df=self.video_info_df,
                                           bp_headers=self.col_headers,
-                                          bp_dict=self.bp_dict)
+                                          bp_dict=self.bp_dict,
+                                          distance=self.distance,
+                                          velocity=self.velocity)
             for cnt, result in enumerate(pool.imap(constants, split_data_paths, chunksize=self.multiprocess_chunksize)):
                 results_df, video_dict, movement_dict = result
                 self.out_df_lst.append(results_df)
@@ -187,20 +206,25 @@ class TimeBinsMovementCalculatorMultiprocess(ConfigReader, FeatureExtractionMixi
             self.out_df_lst = [item for sub in self.out_df_lst for item in sub]
 
     def save(self):
-        self.results = pd.concat(self.out_df_lst, axis=0).sort_values(by=["VIDEO", "TIME BIN #", "MEASUREMENT", "ANIMAL"])[["VIDEO", "TIME BIN #", "ANIMAL", "BODY-PART", "MEASUREMENT", "VALUE"]]
+        self.results = pd.concat(self.out_df_lst, axis=0).sort_values(by=["VIDEO", "TIME BIN #", "MEASUREMENT", "ANIMAL"])[["VIDEO", "TIME BIN #", "START TIME", "END TIME", "ANIMAL", "BODY-PART", "MEASUREMENT", "VALUE"]]
+        if not self.include_timestamp:
+            self.results = self.results.drop(["START TIME", "END TIME"], axis=1)
+        if self.plots: self.__create_plots()
+        if self.transpose:
+            self.results = self.results.pivot_table(index=["VIDEO", "ANIMAL", "BODY-PART", "MEASUREMENT"], columns="TIME BIN #", values="VALUE").reset_index()
         self.results.set_index("VIDEO").to_csv(self.save_path)
         self.timer.stop_timer()
         stdout_success(msg=f"Movement time-bins results for {len(self.file_paths)} videos ({self.bin_length}s bin size) saved at {self.save_path}", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
-        if self.plots: self.__create_plots()
 
 
-if __name__ == "__main__":
-    test = TimeBinsMovementCalculatorMultiprocess(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/mitra/project_folder/project_config.ini",
-                                                  body_parts=['Nose'], #['Simon CENTER OF GRAVITY', 'JJ CENTER OF GRAVITY', 'Animal_1 CENTER OF GRAVITY']
-                                                  bin_length=0.5,
-                                                  plots=True)
-    test.run()
-    test.save()
+
+# if __name__ == "__main__":
+#     test = TimeBinsMovementCalculatorMultiprocess(config_path=r"/Users/simon/Desktop/envs/simba/troubleshooting/mitra/project_folder/project_config.ini",
+#                                                   body_parts=['Nose'], #['Simon CENTER OF GRAVITY', 'JJ CENTER OF GRAVITY', 'Animal_1 CENTER OF GRAVITY']
+#                                                   bin_length=0.5,
+#                                                   plots=True)
+#     test.run()
+#     test.save()
 
 
 

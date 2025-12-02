@@ -90,7 +90,7 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
         check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose', raise_error=True)
         if not distance and not velocity:
             raise InvalidInputError(msg='distance AND velocity are both False. To compute movement metrics, set at least one value to True.', source=self.__class__.__name__)
-        self.distance, self.velocity = distance, velocity
+        self.distance, self.velocity, = distance, velocity
         check_valid_lst(data=body_parts, source=f'{self.__class__.__name__} file_paths', min_len=1, valid_dtypes=(str,), valid_values=self.body_parts_lst)
         self.body_parts, self.threshold, self.body_parts, self.transpose, self.verbose = file_paths, threshold, body_parts, transpose, verbose
 
@@ -106,7 +106,7 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
 
     def run(self):
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.file_paths)
-        self.results = pd.DataFrame(columns=["VIDEO", "ANIMAL", "BODY-PART", "MEASURE", "VALUE"])
+        self.results = pd.DataFrame(columns=["VIDEO", "ANIMAL", "BODY-PART", "MEASUREMENT", "VALUE"])
         for file_cnt, file_path in enumerate(self.file_paths):
             video_timer = SimbaTimer(start=True)
             self.__find_body_part_columns()
@@ -144,7 +144,7 @@ class MovementCalculator(ConfigReader, FeatureExtractionMixin):
 
     def save(self):
         if self.transpose:
-            self.results = (self.results.assign(col=lambda x: x["ANIMAL"] + "_" + x["BODY-PART"] + "_" + x["MEASURE"]).pivot(index="VIDEO", columns="col", values="VALUE").reset_index())
+            self.results = (self.results.assign(col=lambda x: x["ANIMAL"] + "_" + x["BODY-PART"] + "_" + x["MEASUREMENT"]).pivot(index="VIDEO", columns="col", values="VALUE").reset_index())
         self.results.set_index("VIDEO").to_csv(self.save_path)
         self.timer.stop_timer()
         if self.verbose: stdout_success(msg=f"Movement log saved in {self.save_path}", elapsed_time=self.timer.elapsed_time_str)

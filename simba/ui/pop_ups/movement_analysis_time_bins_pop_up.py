@@ -32,7 +32,7 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         if len(self.outlier_corrected_paths) == 0:
             raise NoDataError(msg=f'No data files found in {self.outlier_corrected_dir} directory, cannot compute time-bins movement statistics.', source=self.__class__.__name__)
-        PopUpMixin.__init__(self, title="TIME BINS: DISTANCE/VELOCITY", size=(400, 400), icon='run')
+        PopUpMixin.__init__(self, title="TIME BINS: DISTANCE/VELOCITY", size=(400, 600), icon='run')
         self.animal_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMALS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
         self.animal_cnt_dropdown = SimBADropDown(parent=self.animal_cnt_frm, label="# OF ANIMALS", label_width=30, dropdown_width=20, value=1, dropdown_options=list(range(1, self.animal_cnt + 1)), command=self.create_bp_frm)
         self.animal_cnt_frm.grid(row=0, column=0, sticky=NW, padx=5, pady=5)
@@ -44,7 +44,7 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         self.plots_cb.grid(row=0, column=0, sticky=NW)
 
         self.time_bin_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="TIME BIN", icon_name='timer_2', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
-        self.time_bin_entry = Entry_Box(parent=self.time_bin_frm, fileDescription='TIME BIN SIZE (S): ', labelwidth=30, entry_box_width=20)
+        self.time_bin_entry = Entry_Box(parent=self.time_bin_frm, fileDescription='TIME BIN SIZE (S): ', labelwidth=30, entry_box_width=20, justify='center')
         self.time_bin_frm.grid(row=2, column=0, sticky=NW, padx=5, pady=5)
         self.time_bin_entry.grid(row=0, column=0, sticky=NW)
 
@@ -52,6 +52,21 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         self.core_cnt_dropdown = SimBADropDown(parent=self.core_cnt_frm, label="CORE COUNT:", label_width=30, dropdown_width=20, value=1, dropdown_options=list(range(1, self.cpu_cnt+1)), tooltip_key='CPU_TIMEBINS_MOVEMENT')
         self.core_cnt_frm.grid(row=3, column=0, sticky=NW, padx=5, pady=5)
         self.core_cnt_dropdown.grid(row=0, column=0, sticky=NW)
+
+
+        self.measurments_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MEASUREMENTS", icon_name='ruler', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
+        distance_cb, self.distance_var = SimbaCheckbox(parent=self.measurments_frm, txt='DISTANCE (CM)', txt_img='distance', val=True)
+        velocity_cb, self.velocity_var = SimbaCheckbox(parent=self.measurments_frm, txt='VELOCITY (CM/S)', txt_img='run', val=True)
+        self.measurments_frm.grid(row=5, column=0, sticky=NW)
+        distance_cb.grid(row=0, column=0, sticky=NW)
+        velocity_cb.grid(row=1, column=0, sticky=NW)
+
+        self.output_format_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="OUTPUT FORMAT", icon_name='rotate', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
+        transpose_cb, self.transpose_var = SimbaCheckbox(parent=self.output_format_frm, txt='TRANSPOSE OUTPUT CSV', txt_img='rotate', val=False)
+        include_timestamps_cb, self.include_timestamps_var = SimbaCheckbox(parent=self.output_format_frm, txt='INCLUDE TIME-STAMPS', txt_img='timer', val=True)
+        self.output_format_frm.grid(row=6, column=0, sticky=NW, padx=5, pady=5)
+        transpose_cb.grid(row=0, column=0, sticky=NW)
+        include_timestamps_cb.grid(row=1, column=0, sticky=NW)
 
         self.create_bp_frm(animal_cnt=1)
         self.create_run_frm(run_function=self._run)
@@ -69,7 +84,7 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
         for cnt, i in enumerate(range(int(animal_cnt))):
             self.body_parts_dropdowns[cnt] = SimBADropDown(parent=self.bp_frm, label=f"Animal {cnt+1}", label_width=30, dropdown_width=20, value=self.body_parts_lst[cnt], dropdown_options=self.body_parts_lst)
             self.body_parts_dropdowns[cnt].grid(row=cnt, column=0, sticky=NW)
-        self.bp_frm.grid(row=4, column=0, sticky=NW, padx=10, pady=10)
+        self.bp_frm.grid(row=4, column=0, sticky=NW, padx=5, pady=5)
 
     def _run(self):
         check_float(name="Time bin", value=str(self.time_bin_entry.entry_get), min_value=10e-6)
@@ -80,19 +95,29 @@ class MovementAnalysisTimeBinsPopUp(ConfigReader, PopUpMixin):
             body_parts.append(dropdown.getChoices())
         self.update_config()
         core_cnt = int(self.core_cnt_dropdown.get_value())
+        velocity, distance, transpose = self.velocity_var.get(), self.distance_var.get(), self.transpose_var.get()
+        include_timestamps = self.include_timestamps_var.get()
         if core_cnt == 1:
-
             time_bin_movement_analyzer = TimeBinsMovementCalculator(config_path=self.config_path,
                                                                     bin_length=float(self.time_bin_entry.entry_get),
                                                                     plots=self.plots_var.get(),
-                                                                    body_parts=body_parts)
+                                                                    body_parts=body_parts,
+                                                                    verbose=True,
+                                                                    distance=distance,
+                                                                    velocity=velocity,
+                                                                    transpose=transpose,
+                                                                    include_timestamp=include_timestamps)
         else:
             time_bin_movement_analyzer = TimeBinsMovementCalculatorMultiprocess(config_path=self.config_path,
                                                                                 bin_length=float(self.time_bin_entry.entry_get),
                                                                                 body_parts=body_parts,
                                                                                 plots=self.plots_var.get(),
                                                                                 verbose=True,
-                                                                                core_cnt=core_cnt)
+                                                                                core_cnt=core_cnt,
+                                                                                distance=distance,
+                                                                                velocity=velocity,
+                                                                                transpose=transpose,
+                                                                                include_timestamp=include_timestamps)
 
         time_bin_movement_analyzer.run()
         time_bin_movement_analyzer.save()

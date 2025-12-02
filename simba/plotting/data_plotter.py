@@ -91,7 +91,7 @@ class DataPlotter(ConfigReader):
             os.makedirs(self.data_table_path)
         print(f"Processing {len(self.data_paths)} video(s)...")
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)
-        self.timebins_calculator = TimeBinsMovementCalculator(config_path=self.config_path, bin_length=1, file_paths=data_paths, plots=False, verbose=True, body_parts=self.bp_names)
+        self.timebins_calculator = TimeBinsMovementCalculator(config_path=self.config_path, bin_length=1, data_path=data_paths, plots=False, verbose=True, body_parts=self.bp_names)
         self.timebins_calculator.run()
         self.__compute_spacings()
 
