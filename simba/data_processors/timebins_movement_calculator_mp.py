@@ -19,12 +19,13 @@ from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log, check_float, check_int,
     check_that_column_exist, check_valid_boolean, check_valid_lst)
 from simba.utils.enums import TagNames
-from simba.utils.errors import FrameRangeError, NoDataError, InvalidInputError
+from simba.utils.errors import FrameRangeError, InvalidInputError, NoDataError
 from simba.utils.lookups import get_current_time
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
 from simba.utils.read_write import (create_directory, find_core_cnt,
                                     find_files_of_filetypes_in_directory,
-                                    get_fn_ext, read_df, read_video_info, find_time_stamp_from_frame_numbers)
+                                    find_time_stamp_from_frame_numbers,
+                                    get_fn_ext, read_df, read_video_info)
 
 
 def _time_bin_movement_helper(data: list,
