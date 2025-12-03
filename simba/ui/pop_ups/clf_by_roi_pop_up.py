@@ -1,23 +1,17 @@
 __author__ = "Simon Nilsson"
 
 import os
-from collections import defaultdict
 from tkinter import *
 from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.roi_tools.ROI_clf_calculator import ROIClfCalculator
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        SimbaButton, SimbaCheckbox)
-from simba.utils.enums import Formats, Keys, Links
-from simba.utils.errors import (NoChoosenClassifierError,
-                                NoChoosenMeasurementError, NoChoosenROIError,
-                                NoDataError, NoROIDataError,
-                                ROICoordinatesNotFoundError)
+from simba.roi_tools.roi_clf_calculator import ROIClfCalculator
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaCheckbox)
+from simba.utils.enums import Links
+from simba.utils.errors import (NoDataError, NoROIDataError, ROICoordinatesNotFoundError)
 
 MEASURES = ('TOTAL BEHAVIOR TIME IN ROI (S)', 'STARTED BEHAVIOR BOUTS IN ROI (COUNT)', 'ENDED BEHAVIOR BOUTS IN ROI (COUNT)')
-
 
 
 class ClfByROIPopUp(PopUpMixin, ConfigReader):
@@ -35,26 +29,26 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
             raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path, source=self.__class__.__name__)
         if len(self.machine_results_paths) == 0:
             raise NoDataError(f'Cannot compute ROI by classifier data: No data exist in {self.machine_results_dir} directory.', source=self.__class__.__name__)
-        PopUpMixin.__init__(self, title="CLASSIFICATIONS BY ROI", icon='shapes_small')
         self.read_roi_data()
+        PopUpMixin.__init__(self, title="CLASSIFICATIONS BY ROI", icon='shapes_small')
+
         roi_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT ROIs", icon_name='roi', padx=5, pady=5, relief='solid')
 
         self.roi_vars = {}
         for roi_cnt, roi_name in enumerate(self.roi_names):
             roi_cb, self.roi_vars[roi_name] = SimbaCheckbox(parent=roi_frm, txt=roi_name, val=True)
             roi_cb.grid(row=roi_cnt, sticky=NW)
-        roi_frm.grid(row=0, column=0, sticky=NW, padx=10, pady=10)
+        roi_frm.grid(row=0, column=0, sticky=NW)
 
-        clf_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT CLASSIFIERS", icon_name='forest', padx=5, pady=5, relief='solid')
+        clf_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT CLASSIFIERS", icon_name='forest', padx=2, pady=2, relief='solid')
         self.clf_vars = {}
         for clf_cnt, clf_name in enumerate(self.clf_names):
             clf_cb, self.clf_vars[clf_name] = SimbaCheckbox(parent=clf_frm, txt=clf_name, val=True)
             clf_cb.grid(row=clf_cnt, sticky=NW)
-        clf_frm.grid(row=1, column=0, sticky=NW, padx=10, pady=10)
+        clf_frm.grid(row=1, column=0, sticky=NW)
 
-
-        measurements_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT MEASUREMENTS", icon_name='ruler', padx=5, pady=5, relief='solid')
-        measurements_frm.grid(row=2, column=0, sticky=NW, padx=10, pady=10)
+        measurements_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT MEASUREMENTS", icon_name='ruler', padx=2, pady=2, relief='solid')
+        measurements_frm.grid(row=2, column=0, sticky=NW, padx=2, pady=2)
         self.total_time_cb, self.total_time_var = SimbaCheckbox(parent=measurements_frm, txt='TOTAL BEHAVIOR TIME IN ROI (S)', txt_img='timer_2', val=True)
         self.total_time_cb.grid(row=0, column=0, sticky=NW)
         self.start_bouts_cb, self.start_bouts_var = SimbaCheckbox(parent=measurements_frm, txt='STARTED BEHAVIOR BOUTS IN ROI (COUNT)', txt_img='abacus', val=True)
@@ -65,13 +59,18 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
         self.detailed_bouts_cb.grid(row=3, column=0, sticky=NW)
 
 
-        bp_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PARTS", icon_name='pose', icon_link=Links.ANALYZE_ML_RESULTS.value, padx=5, pady=5, relief='solid')
+        bp_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PARTS", icon_name='pose', icon_link=Links.ANALYZE_ML_RESULTS.value, padx=2, pady=2, relief='solid')
         self.bp_vars = {}
         for bp_cnt, bp_name in enumerate(self.body_parts_lst):
             bp_cb, self.bp_vars[bp_name] = SimbaCheckbox(parent=bp_frm, txt=bp_name)
             bp_cb.grid(row=bp_cnt, sticky=NW)
-        bp_frm.grid(row=3, column=0, sticky=NW, padx=10, pady=10)
-        self.create_run_frm(run_function=self.run)
+        bp_frm.grid(row=3, column=0, sticky=NW)
+
+        format_options_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="OUTPUT FORMAT OPTIONS", icon_name='settings', icon_link=Links.ANALYZE_ML_RESULTS.value, padx=2, pady=2, relief='solid')
+        self.transpose_cb, self.transpose_var = SimbaCheckbox(parent=format_options_frm, txt='TRANSPOSE OUTPUT (ONE ROW PER VIDEO)', txt_img='rotate', val=False)
+        format_options_frm.grid(row=4, column=0, sticky=NW)
+        self.transpose_cb.grid(row=0, column=0, sticky=NW)
+        self.create_run_frm(run_function=self.run, idx=5)
         #self.main_frm.mainloop()
 
     def run(self):
@@ -93,6 +92,7 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
         started_bouts = self.start_bouts_var.get()
         ended_bouts = self.end_bouts_var.get()
         detailed_bouts = self.detailed_bouts_var.get()
+        transpose = self.transpose_var.get()
 
         if not any([total_time, started_bouts, ended_bouts, detailed_bouts]):
             raise NoDataError(msg='Please check AT LEAST ONE MEASUREMENT,', source=self.__class__.__name__)
@@ -106,7 +106,8 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
                                     clf_time=total_time,
                                     started_bout_cnt=started_bouts,
                                     ended_bout_cnt=ended_bouts,
-                                    bout_table=detailed_bouts)
+                                    bout_table=detailed_bouts,
+                                    transpose=transpose)
         analyzer.run()
         analyzer.save()
 

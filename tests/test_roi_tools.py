@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 from simba.roi_tools.ROI_analyzer import ROIAnalyzer
-from simba.roi_tools.ROI_clf_calculator import ROIClfCalculator
+from simba.roi_tools.roi_clf_calculator import ROIClfCalculator
 from simba.roi_tools.ROI_directing_analyzer import DirectingROIAnalyzer
 from simba.roi_tools.ROI_feature_analyzer import ROIFeatureCreator
 #from simba.roi_tools.ROI_size_calculations import rectangle_size_calc, circle_size_calc, polygon_size_calc

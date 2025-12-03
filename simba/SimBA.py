@@ -208,10 +208,7 @@ from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_bp_config_code_class_pairs,
                                  get_current_time, get_emojis, get_icons_paths,
                                  load_simba_fonts)
-from simba.utils.read_write import (fetch_pip_data, find_core_cnt,
-                                    get_pkg_version, get_recent_projects_paths,
-                                    get_video_meta_data, read_sys_env,
-                                    write_to_recent_project_paths)
+from simba.utils.read_write import (fetch_pip_data, find_core_cnt, get_pkg_version, get_recent_projects_paths, get_video_meta_data, read_sys_env, write_to_recent_project_paths, remove_files)
 from simba.utils.warnings import (FFMpegNotFoundWarning, PythonVersionWarning,
                                   VersionWarning)
 from simba.video_processors.video_processing import \
@@ -829,22 +826,23 @@ class App(object):
 
         menu = Menu(self.root)
         self.root.config(menu=menu)
-        file_menu = Menu(menu)
-        menu.add_cascade(label="File", menu=file_menu)
-        file_menu.add_command(label="Create a new project", compound="left", image=self.menu_icons["create"]["img"], command=lambda: ProjectCreatorPopUp(), font=Formats.FONT_REGULAR.value)
-        file_menu.add_command(label="Load project", compound="left", image=self.menu_icons["load"]["img"], command=lambda: LoadProjectPopUp(), font=Formats.FONT_REGULAR.value)
-        file_menu.add_separator()
-        recent_projects_menu = Menu(menu)
+        self.file_menu = Menu(menu)
+        menu.add_cascade(label="File", menu=self.file_menu)
+        self.file_menu.add_command(label="Create a new project", compound="left", image=self.menu_icons["create"]["img"], command=lambda: ProjectCreatorPopUp(), font=Formats.FONT_REGULAR.value)
+        self.file_menu.add_command(label="Load project", compound="left", image=self.menu_icons["load"]["img"], command=lambda: LoadProjectPopUp(), font=Formats.FONT_REGULAR.value)
+        self.file_menu.add_separator()
+        self.recent_projects_menu = Menu(menu)
 
         for recent_project_path in recent_project_paths:
-            recent_projects_menu.add_command(label=recent_project_path,command=lambda p=recent_project_path: SimbaProjectPopUp(config_path=p), font=Formats.FONT_REGULAR.value)
+            self.recent_projects_menu.add_command(label=recent_project_path,command=lambda p=recent_project_path: SimbaProjectPopUp(config_path=p), font=Formats.FONT_REGULAR.value)
+        self.recent_projects_menu.add_command(label='Clear recent projects', command=lambda: self.clear_recent_projects(), font=Formats.FONT_REGULAR_ITALICS.value)
         recent_project_state = DISABLED if len(recent_project_paths) == 0 else NORMAL
-        file_menu.add_cascade(label="Open recent project...", compound="left", image=self.menu_icons["recent_files"]["img"], menu=recent_projects_menu, font=Formats.FONT_REGULAR.value, state=recent_project_state)
+        self.file_menu.add_cascade(label="Open recent project...", compound="left", image=self.menu_icons["recent_files"]["img"], menu=self.recent_projects_menu, font=Formats.FONT_REGULAR.value, state=recent_project_state)
 
-        file_menu.add_separator()
-        file_menu.add_command(label="Restart", compound="left", image=self.menu_icons["restart"]["img"], command=lambda: self.restart(), font=Formats.FONT_REGULAR.value)
-        file_menu.add_separator()
-        file_menu.add_command(label="Exit", compound="left", image=self.menu_icons["exit"]["img"], command=self.root.destroy, font=Formats.FONT_REGULAR.value)
+        self.file_menu.add_separator()
+        self.file_menu.add_command(label="Restart", compound="left", image=self.menu_icons["restart"]["img"], command=lambda: self.restart(), font=Formats.FONT_REGULAR.value)
+        self.file_menu.add_separator()
+        self.file_menu.add_command(label="Exit", compound="left", image=self.menu_icons["exit"]["img"], command=self.root.destroy, font=Formats.FONT_REGULAR.value)
 
         batch_process_menu = Menu(menu)
         menu.add_cascade(label="Process Videos", menu=batch_process_menu)
@@ -1066,6 +1064,14 @@ class App(object):
             if simba_pip_data[1] != OS.SIMBA_VERSION.value:
                 msg = f"A new version of SimBA is available: {simba_pip_data[1]} (you have version {OS.SIMBA_VERSION.value}). Consider upgrading using: pip install simba-uw-tf-dev --upgrade"
                 VersionWarning(msg=msg)
+
+    def clear_recent_projects(self):
+        file_path = os.path.join(os.path.dirname(__file__), Paths.RECENT_PROJECTS_PATHS.value)
+        remove_files(file_paths=[file_path], raise_error=False)
+        self.recent_projects_menu.delete(0, self.recent_projects_menu.index('end') - 1)
+        self.file_menu.entryconfig("Open recent project...", state=DISABLED)
+
+
 
     def restart(self):
         confirm_restart = askyesno(title="RESTART", message="Are you sure that you want restart SimBA?")

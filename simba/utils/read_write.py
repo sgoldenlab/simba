@@ -3390,10 +3390,10 @@ def read_sys_env():
     return env
 
 
-def get_recent_projects_paths(max: int = 10, sort_alphabetically: bool = True) -> List[str]:
+def get_recent_projects_paths(max: int = 15, sort_alphabetically: bool = True) -> List[str]:
     file_path = os.path.join(SIMBA_DIR, Paths.RECENT_PROJECTS_PATHS.value)
     if not os.path.isfile(file_path):
-        return []
+        Path(file_path).touch(); return []
     try:
         with open(file_path, "r") as file:
             project_paths = [line.strip() for line in file if line.strip()]
@@ -3406,9 +3406,13 @@ def get_recent_projects_paths(max: int = 10, sort_alphabetically: bool = True) -
         return []
 
 
+
+
+
 def write_to_recent_project_paths(config_path: Union[str, os.PathLike]):
     file_path = os.path.join(SIMBA_DIR, Paths.RECENT_PROJECTS_PATHS.value)
     existing_paths = get_recent_projects_paths()
+    print(existing_paths)
     if os.path.isfile(config_path) and (config_path not in existing_paths):
         try:
             with open(file_path, "r") as f:
