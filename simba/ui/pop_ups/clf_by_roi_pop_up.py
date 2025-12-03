@@ -7,9 +7,11 @@ from typing import Union
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.roi_clf_calculator import ROIClfCalculator
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaCheckbox)
+from simba.roi_tools.roi_clf_calculator_mp import ROIClfCalculatorMultiprocess
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaCheckbox, SimBADropDown)
 from simba.utils.enums import Links
 from simba.utils.errors import (NoDataError, NoROIDataError, ROICoordinatesNotFoundError)
+from simba.utils.read_write import find_core_cnt
 
 MEASURES = ('TOTAL BEHAVIOR TIME IN ROI (S)', 'STARTED BEHAVIOR BOUTS IN ROI (COUNT)', 'ENDED BEHAVIOR BOUTS IN ROI (COUNT)')
 
@@ -23,14 +25,13 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
 
     def __init__(self,
                  config_path: Union[str, os.PathLike]):
-
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         if not os.path.isfile(self.roi_coordinates_path):
             raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path, source=self.__class__.__name__)
         if len(self.machine_results_paths) == 0:
             raise NoDataError(f'Cannot compute ROI by classifier data: No data exist in {self.machine_results_dir} directory.', source=self.__class__.__name__)
         self.read_roi_data()
-        PopUpMixin.__init__(self, title="CLASSIFICATIONS BY ROI", icon='shapes_small')
+        PopUpMixin.__init__(self, title="CLASSIFICATIONS BY ROI", icon='shapes_small', size=(400, 800))
 
         roi_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT ROIs", icon_name='roi', padx=5, pady=5, relief='solid')
 
@@ -70,7 +71,12 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
         self.transpose_cb, self.transpose_var = SimbaCheckbox(parent=format_options_frm, txt='TRANSPOSE OUTPUT (ONE ROW PER VIDEO)', txt_img='rotate', val=False)
         format_options_frm.grid(row=4, column=0, sticky=NW)
         self.transpose_cb.grid(row=0, column=0, sticky=NW)
-        self.create_run_frm(run_function=self.run, idx=5)
+
+        runtime_option_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="RUNTIME OPTIONS", icon_name='settings', icon_link=Links.ANALYZE_ML_RESULTS.value, padx=2, pady=2, relief='solid', tooltip_key='CPU_ROI_DESCRIPTIVE_ANALYSIS')
+        self.cpu_cnt_dropdown = SimBADropDown(parent=runtime_option_frm, dropdown_options=list(range(1, find_core_cnt()[0]+1)), label='CPU CORE COUNT', value=1, tooltip_key='CPU_ROI_DESCRIPTIVE_ANALYSIS')
+        runtime_option_frm.grid(row=5, column=0, sticky=NW)
+        self.cpu_cnt_dropdown.grid(row=0, column=0, sticky=NW)
+        self.create_run_frm(run_function=self.run, idx=6, title=f'RUN ({len(self.machine_results_paths)} file(s))')
         #self.main_frm.mainloop()
 
     def run(self):
@@ -93,23 +99,38 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
         ended_bouts = self.end_bouts_var.get()
         detailed_bouts = self.detailed_bouts_var.get()
         transpose = self.transpose_var.get()
+        core_cnt = int(self.cpu_cnt_dropdown.get_value())
 
         if not any([total_time, started_bouts, ended_bouts, detailed_bouts]):
             raise NoDataError(msg='Please check AT LEAST ONE MEASUREMENT,', source=self.__class__.__name__)
+        if core_cnt == 1:
+            analyzer = ROIClfCalculator(config_path=self.config_path,
+                                        bp_names=self.selected_bps,
+                                        save_path=None,
+                                        data_paths=None,
+                                        clf_names=self.selected_clfs,
+                                        roi_names=self.selected_rois,
+                                        clf_time=total_time,
+                                        started_bout_cnt=started_bouts,
+                                        ended_bout_cnt=ended_bouts,
+                                        bout_table=detailed_bouts,
+                                        transpose=transpose)
+        else:
+            analyzer = ROIClfCalculatorMultiprocess(config_path=self.config_path,
+                                                    bp_names=self.selected_bps,
+                                                    save_path=None,
+                                                    data_paths=None,
+                                                    clf_names=self.selected_clfs,
+                                                    roi_names=self.selected_rois,
+                                                    clf_time=total_time,
+                                                    started_bout_cnt=started_bouts,
+                                                    ended_bout_cnt=ended_bouts,
+                                                    bout_table=detailed_bouts,
+                                                    transpose=transpose,
+                                                    core_cnt=core_cnt)
 
-        analyzer = ROIClfCalculator(config_path=self.config_path,
-                                    bp_names=self.selected_bps,
-                                    save_path=None,
-                                    data_paths=None,
-                                    clf_names=self.selected_clfs,
-                                    roi_names=self.selected_rois,
-                                    clf_time=total_time,
-                                    started_bout_cnt=started_bouts,
-                                    ended_bout_cnt=ended_bouts,
-                                    bout_table=detailed_bouts,
-                                    transpose=transpose)
         analyzer.run()
         analyzer.save()
 
-# x = ClfByROIPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+# x = ClfByROIPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
 # x.main_frm.mainloop()

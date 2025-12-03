@@ -45,6 +45,9 @@ class ROIClfCalculator(ConfigReader):
     Compute aggregate statistics of classification results within user-defined ROIs.
     Results are stored in `project_folder/logs` directory of the SimBA project.
 
+    .. seealso::
+       For multicore CPU process, see :func:`simba.roi_tools.roi_clf_calculator_mp.ROIClfCalculatorMultiprocess`
+
     :param Union[str, os.PathLike] config_path: path to SimBA project config file in Configparser format
     :param List[str] bp_names: List of body-parts to use as proxy for animal locations.
     :param Optional[Union[str, os.PathLike]] save_path: Optional location where to store the results in CSV format. If None, then results are stored in logs folder of SImBA project.
@@ -155,7 +158,6 @@ class ROIClfCalculator(ConfigReader):
                     elif roi_data[SHAPE_TYPE] == ROI_SETTINGS.CIRCLE.value:
                         circle_center = np.array([roi_data[CENTER_X], roi_data[CENTER_Y]]).astype(np.int32)
                         results[video_name][bp_name][roi_name] = FeatureExtractionMixin.is_inside_circle(bp=bp_arr, roi_center=circle_center, roi_radius=roi_data['radius'])
-                        pass
                     elif roi_data[SHAPE_TYPE] == ROI_SETTINGS.POLYGON.value:
                         vertices = roi_data[VERTICES].astype(np.int32)
                         results[video_name][bp_name][roi_name] = FeatureExtractionMixin.framewise_inside_polygon_roi(bp_location=bp_arr, roi_coords=vertices)
@@ -210,16 +212,17 @@ class ROIClfCalculator(ConfigReader):
             self.bouts_results.to_csv(self.bout_save_path)
             stdout_success(msg=f"Detailed classification by ROI bout data for saved in {self.bout_save_path}.", elapsed_time=self.timer.elapsed_time_str)
 
-# analyzer = ROIClfCalculator(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",
-#                             bp_names=['resident_NOSE'],
-#                             clf_names=['attack'],
-#                             clf_time=True,
-#                             started_bout_cnt=True,
-#                             ended_bout_cnt=False,
-#                             bout_table=True,
-#                             transpose=True)
-# analyzer.run()
-# analyzer.save()
+# if __name__ == "__main__":
+#     analyzer = ROIClfCalculator(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",
+#                                 bp_names=['resident_NOSE'],
+#                                 clf_names=['attack'],
+#                                 clf_time=True,
+#                                 started_bout_cnt=True,
+#                                 ended_bout_cnt=False,
+#                                 bout_table=True,
+#                                 transpose=True)
+#     analyzer.run()
+#     analyzer.save()
 
 # analyzer = ROIClfCalculator(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini", bp_names=['Nose'], clf_names=['straub_tail'], roi_names=['Cue_light_1'], bout_table=True)
 # analyzer.run()
