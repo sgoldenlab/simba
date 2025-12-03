@@ -8,9 +8,11 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.roi_clf_calculator import ROIClfCalculator
 from simba.roi_tools.roi_clf_calculator_mp import ROIClfCalculatorMultiprocess
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimbaCheckbox, SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
+                                        SimbaCheckbox, SimBADropDown)
 from simba.utils.enums import Links
-from simba.utils.errors import (NoDataError, NoROIDataError, ROICoordinatesNotFoundError)
+from simba.utils.errors import (NoDataError, NoROIDataError,
+                                ROICoordinatesNotFoundError)
 from simba.utils.read_write import find_core_cnt
 
 MEASURES = ('TOTAL BEHAVIOR TIME IN ROI (S)', 'STARTED BEHAVIOR BOUTS IN ROI (COUNT)', 'ENDED BEHAVIOR BOUTS IN ROI (COUNT)')
