@@ -48,11 +48,10 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         gpu_available = check_nvidea_gpu_available()
         self.clr_dict = get_color_dict()
         pose_palettes = Options.PALETTE_OPTIONS_CATEGORICAL.value + Options.PALETTE_OPTIONS.value
-
         PopUpMixin.__init__(self, title="VISUALIZE CLASSIFICATION (SKLEARN) RESULTS", icon='photos')
         bp_threshold_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BODY-PART VISUALIZATION THRESHOLD", icon_name='threshold', icon_link=Links.SKLEARN_PLOTS.value, padx=5, pady=5, relief='solid')
         self.bp_threshold_lbl = SimBALabel(parent=bp_threshold_frm, txt="Body-parts detected below the set threshold won't be shown in the output videos.", font=Formats.FONT_REGULAR_ITALICS.value)
-        self.bp_threshold_entry = Entry_Box(parent=bp_threshold_frm, fileDescription='BODY-PART PROBABILITY THRESHOLD: ', labelwidth=40, entry_box_width=15, value=0.00)
+        self.bp_threshold_entry = Entry_Box(parent=bp_threshold_frm, fileDescription='BODY-PART PROBABILITY THRESHOLD: ', labelwidth=40, entry_box_width=15, value=0.00, img='green_dice')
         self.get_bp_probability_threshold()
 
         bp_threshold_frm.grid(row=0, column=0, sticky=NW)
@@ -60,14 +59,14 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.bp_threshold_entry.grid(row=1, column=0, sticky=NW)
 
         self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='style', icon_link=Links.SKLEARN_PLOTS.value, padx=5, pady=5, relief='solid')
-        self.text_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=TEXT_SIZE_OPTIONS, label='TEXT SIZE: ', label_width=40, dropdown_width=15, value='AUTO')
-        self.text_spacing_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=TEXT_SIZE_OPTIONS, label='TEXT SPACING: ', label_width=40, dropdown_width=15, value='AUTO')
-        self.text_thickness_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=TEXT_SIZE_OPTIONS, label='TEXT THICKNESS: ', label_width=40, dropdown_width=15, value='AUTO')
-        self.circle_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=TEXT_SIZE_OPTIONS, label='CIRCLE SIZE: ', label_width=40, dropdown_width=15, value='AUTO')
-        self.text_opacity_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=OPACITY_OPTIONS, label='TEXT OPACITY: ', label_width=40, dropdown_width=15, value=0.8)
-        self.text_clr_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(self.clr_dict.keys()), label='TEXT COLOR: ', label_width=40, dropdown_width=15, value='White')
-        self.bg_clr_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(self.clr_dict.keys()), label='TEXT BACKGROUND COLOR: ', label_width=40, dropdown_width=15, value='Black')
-        self.tracking_clr_palette_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=pose_palettes, label='TRACKING COLOR PALETTE: ', label_width=40, dropdown_width=15, value='Set1')
+        self.text_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=TEXT_SIZE_OPTIONS, label='TEXT SIZE: ', label_width=40, dropdown_width=15, value='AUTO', img='text')
+        self.text_spacing_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=TEXT_SIZE_OPTIONS, label='TEXT SPACING: ', label_width=40, dropdown_width=15, value='AUTO', img='text_spacing')
+        self.text_thickness_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=TEXT_SIZE_OPTIONS, label='TEXT THICKNESS: ', label_width=40, dropdown_width=15, value='AUTO', img='bold')
+        self.circle_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=TEXT_SIZE_OPTIONS, label='CIRCLE SIZE: ', label_width=40, dropdown_width=15, value='AUTO', img='circle_small')
+        self.text_opacity_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=OPACITY_OPTIONS, label='TEXT OPACITY: ', label_width=40, dropdown_width=15, value=0.8, img='opacity')
+        self.text_clr_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(self.clr_dict.keys()), label='TEXT COLOR: ', label_width=40, dropdown_width=15, value='White', img='text_color')
+        self.bg_clr_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(self.clr_dict.keys()), label='TEXT BACKGROUND COLOR: ', label_width=40, dropdown_width=15, value='Black', img='fill')
+        self.tracking_clr_palette_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=pose_palettes, label='TRACKING COLOR PALETTE: ', label_width=40, dropdown_width=15, value='Set1', img='color_wheel')
 
         self.style_settings_frm.grid(row=1, column=0, sticky=NW)
         self.text_size_dropdown.grid(row=0, column=0, sticky=NW)
@@ -80,9 +79,9 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         self.tracking_clr_palette_dropdown.grid(row=7, column=0, sticky=NW)
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VISUALIZATION SETTINGS",  icon_name='eye', icon_link=Links.SKLEARN_PLOTS.value, padx=5,  pady=5, relief='solid')
-        self.multiprocess_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt+1)), label='CPU CORES: ', label_width=40, dropdown_width=30, value=int(self.cpu_cnt/2))
-        self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ', label_width=40, dropdown_width=30, value='FALSE', state=DISABLED if not gpu_available else NORMAL)
-        self.gantt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(GANTT_OPTIONS.keys()), label='SHOW GANTT PLOT:', label_width=40, dropdown_width=30, value=list(GANTT_OPTIONS.keys())[0])
+        self.multiprocess_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt+1)), label='CPU CORES: ', label_width=40, dropdown_width=30, value=int(self.cpu_cnt/2), img='cpu_small')
+        self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ', label_width=40, dropdown_width=30, value='FALSE', state=DISABLED if not gpu_available else NORMAL, img='gpu_3')
+        self.gantt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(GANTT_OPTIONS.keys()), label='SHOW GANTT PLOT:', label_width=40, dropdown_width=30, value=list(GANTT_OPTIONS.keys())[0], img='gantt_small')
 
         self.create_videos_cb, self.create_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEO', font=Formats.FONT_REGULAR.value, txt_img='video', val=True)
         self.create_frames_cb, self.create_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', font=Formats.FONT_REGULAR.value, txt_img='frames', val=False)
@@ -209,4 +208,5 @@ class SklearnVisualizationPopUp(PopUpMixin, ConfigReader):
         plotter.run()
 
 
+# _ = SklearnVisualizationPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
 #_ = SklearnVisualizationPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")

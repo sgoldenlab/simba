@@ -154,17 +154,18 @@ class DropDownMenu(Frame):
 
 class Entry_Box(Frame):
     def __init__(self,
-                 parent=None,
-                 fileDescription="",
-                 labelwidth="",
+                 parent: Union[Frame, Canvas, LabelFrame, Toplevel, Tk],
+                 fileDescription: Optional[str] = "",
+                 labelwidth: Union[int, str] = None,
                  label_bg_clr: Optional[str] = None,
-                 status=None,
-                 validation=None,
-                 entry_box_width=None,
+                 status: Literal["normal", "disabled", "readonly"] = 'normal',
+                 validation: Optional[Callable] = None,
+                 entry_box_width: Union[int, str] = None,
+                 img: Optional[str] = None,
                  value: Optional[Any] = None,
                  label_font: tuple = Formats.FONT_REGULAR.value,
                  entry_font: tuple = Formats.FONT_REGULAR.value,
-                 justify: str = 'left',
+                 justify: Literal["left", "center", "right"] = 'left',
                  cmd: Optional[Callable] = None,
                  **kw):
 
@@ -173,14 +174,22 @@ class Entry_Box(Frame):
         self.status = status if status is not None else NORMAL
         self.labelname = fileDescription
         Frame.__init__(self, master=parent, **kw)
+        self.columnconfigure(0, weight=0)
+        self.columnconfigure(1, weight=0)
+        if img is not None:
+            self.columnconfigure(2, weight=0)
+            self.entrybox_img_lbl = SimBALabel(parent=self, txt='', txt_clr='black', bg_clr=label_bg_clr, font=label_font, width=None, anchor='w', img=img, compound=None)
+            self.entrybox_img_lbl.grid(row=0, column=0, sticky="w")
+        else:
+            self.entrybox_img_lbl = None
         self.filePath = StringVar()
         self.lblName = Label(self, text=fileDescription, width=labelwidth, anchor=W, font=label_font, bg=label_bg_clr)
-        self.lblName.grid(row=0, column=0)
+        self.lblName.grid(row=0, column=1)
         if not entry_box_width:
             self.entPath = Entry(self, textvariable=self.filePath, state=self.status,  validate="key", validatecommand=self.validation_methods.get(validation, None), font=entry_font, justify=justify)
         else:
             self.entPath = Entry(self, textvariable=self.filePath, state=self.status, width=entry_box_width, validate="key", font=entry_font, justify=justify, validatecommand=self.validation_methods.get(validation, None))
-        self.entPath.grid(row=0, column=1)
+        self.entPath.grid(row=0, column=2)
         if value is not None:
             self.entry_set(val=value)
         if cmd is not None:
@@ -610,7 +619,6 @@ class SimBADropDown(Frame):
                 dropdown_font_size: Optional[int] = None,
                 justify: str = 'center',
                 img: Optional[str] = None,
-                compound: Optional[Literal['left', 'right', 'top', 'bottom']] = 'left',
                 dropdown_width: Optional[int] = None,
                 command: Callable = None,
                 value: Optional[Any] = None,
@@ -622,11 +630,18 @@ class SimBADropDown(Frame):
 
         super().__init__(master=parent)
         self.dropdown_var = StringVar()
+
+
         self.columnconfigure(0, weight=0)
         self.columnconfigure(1, weight=0)
-        if img is not None:self.columnconfigure(2, weight=0)
-        self.dropdown_lbl = SimBALabel(parent=self, txt=label, txt_clr='black', bg_clr=label_bg_clr, font=label_font, width=label_width, anchor='w', img=None, compound=None)
-        self.dropdown_lbl.grid(row=0, column=0, sticky=NW, padx=(0, 10))
+        if img is not None:
+            self.columnconfigure(2, weight=0)
+            self.dropdown_img_lbl = SimBALabel(parent=self, txt='', txt_clr='black', bg_clr=label_bg_clr, font=label_font, width=None, anchor='w', img=img, compound=None)
+            self.dropdown_img_lbl.grid(row=0, column=0, sticky="w")
+        else:
+            self.dropdown_img_lbl = None
+        self.dropdown_lbl = SimBALabel(parent=self, txt=label, txt_clr='black', bg_clr=label_bg_clr, font=label_font, width=label_width, anchor='w')
+        self.dropdown_lbl.grid(row=0, column=1, sticky=NW)
         self.dropdown_options = dropdown_options
         self.original_options = deepcopy(self.dropdown_options)
         self.command, self.searchable = command, searchable
@@ -637,12 +652,7 @@ class SimBADropDown(Frame):
         self.combobox_state = 'normal' if searchable else "readonly"
         self.dropdown = Combobox(self, textvariable=self.dropdown_var, font=drop_down_font, values=self.dropdown_options, state=self.combobox_state, width=dropdown_width, justify=justify)
         if searchable: self.bind_combobox_keys()
-        self.dropdown.grid(row=0, column=1, sticky="w")
-        if img is not None:
-            self.dropdown_img_lbl = SimBALabel(parent=self, txt='', txt_clr='black', bg_clr=label_bg_clr, font=label_font, width=None, anchor='w', img=img, compound=None)
-            self.dropdown_img_lbl.grid(row=0, column=2, sticky="w", padx=(5, 0))
-        else:
-            self.dropdown_img_lbl = None
+        self.dropdown.grid(row=0, column=2, sticky="w")
         if value is not None: self.set_value(value=value)
         if command is not None:
             self.command = command

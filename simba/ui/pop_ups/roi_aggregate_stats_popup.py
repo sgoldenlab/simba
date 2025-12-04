@@ -34,12 +34,12 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         PopUpMixin.__init__(self, title="ROI AGGREGATE STATISTICS ANALYSIS", icon='data_table')
         self.config_path = config_path
         self.animal_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMAL(S)", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI_DATA_ANALYSIS.value)
-        self.animal_cnt_dropdown = SimBADropDown(parent=self.animal_cnt_frm, label="# OF ANIMALS", dropdown_options=list(range(1, self.animal_cnt + 1)), label_width=30, dropdown_width=30, value=1, command= lambda x: self._get_settings_frm(x))
+        self.animal_cnt_dropdown = SimBADropDown(parent=self.animal_cnt_frm, label="# OF ANIMALS", dropdown_options=list(range(1, self.animal_cnt + 1)), label_width=30, dropdown_width=30, value=1, command= lambda x: self._get_settings_frm(x), img='abacus')
         self.animal_cnt_frm.grid(row=0, column=0, sticky=NW)
         self.animal_cnt_dropdown.grid(row=0, column=0, sticky=NW)
 
         self.core_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CHOOSE PROCESSOR CPU COUNT", icon_name='cpu_small', icon_link=Links.ROI_DATA_ANALYSIS.value)
-        self.core_cnt_dropdown = SimBADropDown(parent=self.core_cnt_frm, label="# CPU CORES", dropdown_options=list(range(1, find_core_cnt()[0])), label_width=30, dropdown_width=30, value=1, tooltip_key='CPU_ROI_DESCRIPTIVE_ANALYSIS')
+        self.core_cnt_dropdown = SimBADropDown(parent=self.core_cnt_frm, label="# CPU CORES", dropdown_options=list(range(1, find_core_cnt()[0])), label_width=30, dropdown_width=30, value=1, tooltip_key='CPU_ROI_DESCRIPTIVE_ANALYSIS', img='cpu_small')
         self.core_cnt_frm.grid(row=1, column=0, sticky=NW)
         self.core_cnt_dropdown.grid(row=0, column=0, sticky=NW)
         self._get_settings_frm(self.animal_cnt_dropdown.get_value())
@@ -53,7 +53,7 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
             self.format_frm.destroy()
 
         self.probability_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT PROBABILITY THRESHOLD", icon_name='pose')
-        self.probability_entry = Entry_Box(parent=self.probability_frm, fileDescription='PROBABILITY THRESHOLD (0.0-1.0):', labelwidth=30, value=0.0, entry_box_width=30, justify='center')
+        self.probability_entry = Entry_Box(parent=self.probability_frm, fileDescription='PROBABILITY THRESHOLD (0.0-1.0):', labelwidth=30, value=0.0, entry_box_width=30, justify='center', img='green_dice')
         self.probability_frm.grid(row=self.frame_children(frame=self.main_frm), sticky=NW, pady=(5, 5))
         self.probability_entry.grid(row=0, column=0, sticky=NW)
 
@@ -61,7 +61,7 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         self.body_part_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PART(S)", icon_name='pose')
         self.body_part_frm.grid(row=self.frame_children(frame=self.main_frm), sticky=NW, pady=(5, 5))
         for bp_cnt in range(int(self.animal_cnt_dropdown.getChoices())):
-            self.body_parts_dropdowns[bp_cnt] = SimBADropDown(parent=self.body_part_frm, label=f"BODY-PART {str(bp_cnt + 1)}:", dropdown_options=self.body_parts_lst, label_width=30, value=self.body_parts_lst[bp_cnt], dropdown_width=30)
+            self.body_parts_dropdowns[bp_cnt] = SimBADropDown(parent=self.body_part_frm, label=f"BODY-PART {str(bp_cnt + 1)}:", dropdown_options=self.body_parts_lst, label_width=30, value=self.body_parts_lst[bp_cnt], dropdown_width=30, img='mouse_small')
             self.body_parts_dropdowns[bp_cnt].grid(row=bp_cnt, column=0, sticky=NW)
 
         self.data_options_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="DATA OPTIONS", icon_name='abacus')

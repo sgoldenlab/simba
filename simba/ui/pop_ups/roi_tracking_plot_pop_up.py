@@ -57,14 +57,14 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
 
         PopUpMixin.__init__(self, title="VISUALIZE ROI TRACKING", size=(800, 500), icon='shapes_small')
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI_DATA_PLOT.value)
-        self.threshold_entry_box = Entry_Box(self.settings_frm, "BODY-PART PROBABILITY THRESHOLD:", labelwidth=35, value='0.0', justify='center', entry_box_width=20)
-        self.show_pose_estimation_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW POSE-ESTIMATED LOCATIONS:', label_width=35, value='TRUE', command=self._disable_clr)
-        self.show_animal_name_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL NAMES:', label_width=35, value='FALSE')
-        self.show_bbox_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL BOUNDING BOXES:', label_width=35, value='FALSE', tooltip_key='SHOW_ANIMAL_BBOX')
-        self.border_bg_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(self.bg_clr_options.keys()), dropdown_width=self.longest_animal_name_len, label='BORDER BACKGROUND COLOR:', label_width=35, value='Black', tooltip_key='BORDER_BG_COLOR')
-        self.outside_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='OUTSIDE ROI ZONES DATA:', label_width=35, value='FALSE', tooltip_txt=f'TREAT ALL NON-ROI REGIONS AS AN ROI REGION NAMED \n "{ROI_SETTINGS.OUTSIDE_ROI.value}"')
-        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt)), dropdown_width=self.longest_animal_name_len, label='NUMBER OF CPU CORES:', label_width=35, value=find_core_cnt()[1])
-        self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='USE GPU:', label_width=35, value='FALSE', state=gpu_state)
+        self.threshold_entry_box = Entry_Box(self.settings_frm, "BODY-PART PROBABILITY THRESHOLD:", labelwidth=35, value='0.0', justify='center', entry_box_width=20, img='green_dice')
+        self.show_pose_estimation_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW POSE-ESTIMATED LOCATIONS:', label_width=35, value='TRUE', command=self._disable_clr, img='pose')
+        self.show_animal_name_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL NAMES:', label_width=35, value='FALSE', img='label')
+        self.show_bbox_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL BOUNDING BOXES:', label_width=35, value='FALSE', tooltip_key='SHOW_ANIMAL_BBOX', img='rectangle_2')
+        self.border_bg_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(self.bg_clr_options.keys()), dropdown_width=self.longest_animal_name_len, label='BORDER BACKGROUND COLOR:', label_width=35, value='Black', tooltip_key='BORDER_BG_COLOR', img='fill')
+        self.outside_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='OUTSIDE ROI ZONES DATA:', label_width=35, value='FALSE', tooltip_txt=f'TREAT ALL NON-ROI REGIONS AS AN ROI REGION NAMED \n "{ROI_SETTINGS.OUTSIDE_ROI.value}"', img='outside')
+        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt)), dropdown_width=self.longest_animal_name_len, label='NUMBER OF CPU CORES:', label_width=35, value=find_core_cnt()[1], img='cpu_small')
+        self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='USE GPU:', label_width=35, value='FALSE', state=gpu_state, img='gpu_3')
 
         self.settings_frm.grid(row=0, column=0, sticky=NW)
         self.threshold_entry_box.grid(row=0, column=0, sticky=NW)
@@ -77,13 +77,15 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         #self.gpu_dropdown.grid(row=5, column=0, sticky=NW)
 
         self.body_parts_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMAL(S)", icon_name='pose', icon_link=Links.ROI_DATA_PLOT.value)
-        self.animal_cnt_dropdown = SimBADropDown(parent=self.body_parts_frm, dropdown_options=list(range(1, self.animal_cnt + 1)), dropdown_width=self.longest_animal_name_len, label="NUMBER OF ANIMALS:", label_width=35, value=1, command=self.__create_animal_bp_table)
+        self.animal_cnt_dropdown = SimBADropDown(parent=self.body_parts_frm, dropdown_options=list(range(1, self.animal_cnt + 1)), dropdown_width=self.longest_animal_name_len, label="NUMBER OF ANIMALS:", label_width=35, value=1, command=self.__create_animal_bp_table, img='abacus')
         self.__create_animal_bp_table(bp_cnt=1)
         self.body_parts_frm.grid(row=1, column=0, sticky=NW)
         self.animal_cnt_dropdown.grid(row=0, column=0, sticky=NW)
 
         self.single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name='video', icon_link=Links.ROI_DATA_PLOT.value)
         self.single_video_dropdown = DropDownMenu(self.single_video_frm, "SELECT VIDEO", self.videos_with_rois_and_data, "15", com=lambda x: self.update_file_select_box_from_dropdown(filename=x, fileselectbox=self.select_video_file_select))
+
+
         self.select_video_file_select = FileSelect(self.single_video_frm, "", lblwidth="1", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], dropdown=self.single_video_dropdown, initialdir=self.video_dir)
         self.select_video_file_select.filePath.set(self.videos_with_rois_and_data[0])
         self.single_video_dropdown.setChoices(self.videos_with_rois_and_data[0])

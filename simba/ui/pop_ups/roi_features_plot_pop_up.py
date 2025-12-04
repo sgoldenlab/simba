@@ -45,9 +45,9 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
         PopUpMixin.__init__(self, title="VISUALIZE ROI FEATURES", icon='shapes_small')
         FeatureExtractionMixin.__init__(self, config_path=self.config_path)
 
-        self.probability_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="PROBABILITY THRESHOLD", icon_name='probability', icon_link=Links.ROI_FEATURES_PLOT.value)
+        self.probability_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="PROBABILITY THRESHOLD", icon_name='green_dice', icon_link=Links.ROI_FEATURES_PLOT.value)
         threshold_label = SimBALabel(parent=self.probability_frm, txt="NOTE: body-part locations detected with probabilities \n below this threshold are filtered.", font=Formats.FONT_REGULAR_ITALICS.value)
-        self.threshold_entry_box = Entry_Box(self.probability_frm, "PROBABILITY THRESHOLD:", "25", value=0.0, entry_box_width=15)
+        self.threshold_entry_box = Entry_Box(self.probability_frm, "PROBABILITY THRESHOLD:", "25", value=0.0, entry_box_width=15, img='green_dice')
 
         self.probability_frm.grid(row=0, column=0, sticky=NW)
         threshold_label.grid(row=0, column=0, sticky=NW)
@@ -72,13 +72,13 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
         self.cpu_cnt_dropdown.grid(row=6, column=0, sticky=NW)
 
         self.body_parts_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PARTS", icon_name='pose', icon_link=Links.ROI_FEATURES_PLOT.value)
-        self.animal_cnt_dropdown = SimBADropDown(parent=self.body_parts_frm, dropdown_options=list(range(1, self.animal_cnt + 1)), label='NUMBER OF ANIMALS:', label_width=25, dropdown_width=15, value=1, command=self.__populate_bp_dropdown)
+        self.animal_cnt_dropdown = SimBADropDown(parent=self.body_parts_frm, dropdown_options=list(range(1, self.animal_cnt + 1)), label='NUMBER OF ANIMALS:', label_width=25, dropdown_width=15, value=1, command=self.__populate_bp_dropdown, img='abacus')
         self.__populate_bp_dropdown(bp_cnt=1)
         self.body_parts_frm.grid(row=2, column=0, sticky=NW)
         self.animal_cnt_dropdown.grid(row=0, column=0, sticky=NW)
 
         self.single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VISUALIZE SINGLE VIDEO", icon_name='video', icon_link=Links.ROI_FEATURES_PLOT.value)
-        self.single_video_dropdown = SimBADropDown(parent=self.single_video_frm, dropdown_options=self.video_list, label='SELECT VIDEO:', label_width=25, dropdown_width=self.max_video_name_len+10, value=self.video_list[0])
+        self.single_video_dropdown = SimBADropDown(parent=self.single_video_frm, dropdown_options=self.video_list, label='SELECT VIDEO:', label_width=25, dropdown_width=self.max_video_name_len+10, value=self.video_list[0], img='video')
         self.single_video_btn = SimbaButton(parent=self.single_video_frm, txt="VISUALIZE ROI FEATURES: SINGLE VIDEO", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'multiple': False}, width=240, txt_clr='blue')
 
         self.single_video_frm.grid(row=3, column=0, sticky=NW)
@@ -86,7 +86,7 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
         self.single_video_btn.grid(row=1, column=0, sticky=NW)
 
         self.all_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VISUALIZE ALL VIDEOS", icon_name='video', icon_link=Links.ROI_FEATURES_PLOT.value)
-        self.all_videos_btn = SimbaButton(parent=self.all_videos_frm, txt="VISUALIZE ROI FEATURES: ALL VIDEOS", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'multiple': True}, width=240, txt_clr='red')
+        self.all_videos_btn = SimbaButton(parent=self.all_videos_frm, txt=f"VISUALIZE ROI FEATURES: ALL {len(self.video_list)} VIDEO(S)", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run, cmd_kwargs={'multiple': True}, width=240, txt_clr='red')
 
         self.all_videos_frm.grid(row=4, column=0, sticky=NW)
         self.all_videos_btn.grid(row=0, column=0, sticky=NW)
@@ -101,7 +101,7 @@ class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin
 
         self.bp_dropdown_dict = {}
         for cnt in range(int(self.animal_cnt_dropdown.getChoices())):
-            self.bp_dropdown_dict[cnt] = SimBADropDown(parent=self.body_parts_frm, dropdown_options=self.body_parts_lst, label=self.multi_animal_id_list[cnt], label_width=25, dropdown_width=15, value=self.body_parts_lst[cnt])
+            self.bp_dropdown_dict[cnt] = SimBADropDown(parent=self.body_parts_frm, dropdown_options=self.body_parts_lst, label=self.multi_animal_id_list[cnt], label_width=25, dropdown_width=25, value=self.body_parts_lst[cnt])
             self.bp_dropdown_dict[cnt].grid(row=cnt + 1, column=0, sticky=NW)
 
     def run(self, multiple: bool):
