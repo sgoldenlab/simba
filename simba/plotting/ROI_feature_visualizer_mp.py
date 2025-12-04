@@ -4,9 +4,10 @@ import functools
 import itertools
 import multiprocessing
 import os
-from copy import deepcopy
 import platform
+from copy import deepcopy
 from typing import Dict, List, Optional, Tuple, Union
+
 try:
     from typing import Literal
 except:
@@ -20,9 +21,9 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.roi_tools.ROI_feature_analyzer import ROIFeatureCreator
 from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_valid_rgb_tuple, check_int,
+                                check_if_valid_rgb_tuple, check_int, check_str,
                                 check_valid_boolean, check_valid_lst,
-                                check_video_and_data_frm_count_align, check_str)
+                                check_video_and_data_frm_count_align)
 from simba.utils.data import slice_roi_dict_for_video
 from simba.utils.enums import Formats, TextOptions
 from simba.utils.errors import (BodypartColumnNotFoundError, NoFilesFoundError,

@@ -8,7 +8,8 @@ from typing import Union
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.feature_extraction_mixin import FeatureExtractionMixin
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.plotting.ROI_feature_visualizer_mp import ROIfeatureVisualizerMultiprocess
+from simba.plotting.ROI_feature_visualizer_mp import \
+    ROIfeatureVisualizerMultiprocess
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         SimbaButton, SimbaCheckbox,
                                         SimBADropDown, SimBALabel)
@@ -16,6 +17,7 @@ from simba.utils.checks import check_float, check_nvidea_gpu_available
 from simba.utils.enums import Formats, Links
 from simba.utils.errors import NoFilesFoundError, NoROIDataError
 from simba.utils.read_write import find_all_videos_in_directory, str_2_bool
+
 
 class VisualizeROIFeaturesPopUp(PopUpMixin, ConfigReader, FeatureExtractionMixin):
 
