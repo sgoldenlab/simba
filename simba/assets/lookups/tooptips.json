@@ -17,5 +17,7 @@
   "smoothing_dropdown": "Apply temporal smoothing over this many milliseconds to reduce jitter in keypoint trajectories.",
   "recursive_dropdown": "If False, only analyses videos in the immediate parent folder. If True, searches all sub-directories as well.",
   "CPU_ROI_DESCRIPTIVE_ANALYSIS": "If few videos (<1000), consider single CPU. If more videos (>1000), consider higher CPU count for acceptable speed.",
-  "CPU_TIMEBINS_MOVEMENT": "If the total number of time bins over all videos is expected to be many (1000+), consider higher CPU count (>1) for acceptable speed."
+  "CPU_TIMEBINS_MOVEMENT": "If the total number of time bins over all videos is expected to be many (1000+), consider higher CPU count (>1) for acceptable speed.",
+  "SHOW_ANIMAL_BBOX": "Display rectangle bounding boxes encompassing all animal keypoints",
+  "BORDER_BG_COLOR": "The color of the border image on which data is printed"
 }
