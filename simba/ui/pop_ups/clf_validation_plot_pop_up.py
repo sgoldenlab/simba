@@ -32,8 +32,6 @@ class ClassifierValidationPopUp(PopUpMixin, ConfigReader):
             raise NoDataError(msg=f'No data found in the {self.machine_results_dir} directory. This is required for creating validation clips.', source=self.__class__.__name__)
 
         self.machine_results_dict = {get_fn_ext(filepath=v)[1]:v for v in self.machine_results_paths}
-
-
         PopUpMixin.__init__(self, title="SIMBA CLASSIFIER VALIDATION CLIPS", icon='tick')
         color_names = list(self.colors_dict.keys())
 
