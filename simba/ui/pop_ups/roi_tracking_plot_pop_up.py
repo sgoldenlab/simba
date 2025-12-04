@@ -3,8 +3,8 @@ __author__ = "Simon Nilsson"
 import os
 import threading
 import time
-from tkinter import *
 from copy import deepcopy
+from tkinter import *
 from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
