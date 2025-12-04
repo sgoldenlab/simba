@@ -4,7 +4,7 @@ import os
 import threading
 import time
 from tkinter import *
-from tkinter.ttk import Combobox
+from copy import deepcopy
 from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
@@ -49,14 +49,19 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         if len(self.videos_with_rois_and_data) == 0:
             raise NoDataError(msg=f'No ROIs found for the videos represented in the {self.video_dir} and data represented in the {self.outlier_corrected_dir} directory. Draw ROIs for these videos before visualizing the data.')
         self.clr_dict = get_color_dict()
+        self.bg_clr_options = deepcopy(self.clr_dict)
+        self.bg_clr_options['Black'] = (0, 0, 0)
+
         self.longest_animal_name_len = len(max(self.multi_animal_id_list, key=len)) + 5
         gpu_state = NORMAL if self.gpu_available else DISABLED
 
         PopUpMixin.__init__(self, title="VISUALIZE ROI TRACKING", size=(800, 500), icon='shapes_small')
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.ROI_DATA_PLOT.value)
-        self.threshold_entry_box = Entry_Box(self.settings_frm, "BODY-PART PROBABILITY THRESHOLD:", "35", value='0.0', justify='center', entry_box_width=35)
+        self.threshold_entry_box = Entry_Box(self.settings_frm, "BODY-PART PROBABILITY THRESHOLD:", labelwidth=35, value='0.0', justify='center', entry_box_width=20)
         self.show_pose_estimation_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW POSE-ESTIMATED LOCATIONS:', label_width=35, value='TRUE', command=self._disable_clr)
         self.show_animal_name_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL NAMES:', label_width=35, value='FALSE')
+        self.show_bbox_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='SHOW ANIMAL BOUNDING BOXES:', label_width=35, value='FALSE')
+        self.border_bg_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(self.bg_clr_options.keys()), dropdown_width=self.longest_animal_name_len, label='BORDER BACKGROUND COLOR:', label_width=35, value='Black')
         self.outside_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='OUTSIDE ROI ZONES DATA:', label_width=35, value='FALSE', tooltip_txt=f'TREAT ALL NON-ROI REGIONS AS AN ROI REGION NAMED \n "{ROI_SETTINGS.OUTSIDE_ROI.value}"')
         self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt)), dropdown_width=self.longest_animal_name_len, label='NUMBER OF CPU CORES:', label_width=35, value=find_core_cnt()[1])
         self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], dropdown_width=self.longest_animal_name_len, label='USE GPU:', label_width=35, value='FALSE', state=gpu_state)
@@ -65,8 +70,10 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         self.threshold_entry_box.grid(row=0, column=0, sticky=NW)
         self.show_pose_estimation_dropdown.grid(row=2, column=0, sticky=NW)
         self.show_animal_name_dropdown.grid(row=3, column=0, sticky=NW)
-        self.outside_dropdown.grid(row=4, column=0, sticky=NW)
-        self.core_cnt_dropdown.grid(row=5, column=0, sticky=NW)
+        self.show_bbox_dropdown.grid(row=4, column=0, sticky=NW)
+        self.border_bg_dropdown.grid(row=5, column=0, sticky=NW)
+        self.outside_dropdown.grid(row=6, column=0, sticky=NW)
+        self.core_cnt_dropdown.grid(row=7, column=0, sticky=NW)
         #self.gpu_dropdown.grid(row=5, column=0, sticky=NW)
 
         self.body_parts_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMAL(S)", icon_name='pose', icon_link=Links.ROI_DATA_PLOT.value)
@@ -143,10 +150,11 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
         check_float(name="Body-part probability threshold", value=self.threshold_entry_box.entry_get, min_value=0.0, max_value=1.0)
         show_pose = str_2_bool(self.show_pose_estimation_dropdown.get_value())
         show_names = str_2_bool(self.show_animal_name_dropdown.get_value())
+        show_bbox = str_2_bool(self.show_bbox_dropdown.get_value())
         gpu = str_2_bool(self.gpu_dropdown.get_value())
         core_cnt = int(self.core_cnt_dropdown.get_value())
         outside_roi = str_2_bool(self.outside_dropdown.get_value())
-        style_attr = {"show_body_part": show_pose, "show_animal_name": show_names}
+        border_bg_clr = self.bg_clr_options[self.border_bg_dropdown.get_value()]
         body_parts = [v.get_value() for k, v in self.bp_dropdown_dict.items()]
         bp_clrs, bp_sizes = None, None
         if show_pose:
@@ -157,29 +165,37 @@ class VisualizeROITrackingPopUp(PopUpMixin, ConfigReader):
             if core_cnt == 1:
                 roi_plotter = ROIPlotter(config_path=self.config_path,
                                          video_path=video_path,
-                                         style_attr=style_attr,
+                                         show_animal_name=show_names,
+                                         show_body_part=show_pose,
                                          threshold=float(self.threshold_entry_box.entry_get),
                                          body_parts=body_parts,
                                          bp_colors=bp_clrs,
                                          bp_sizes=bp_sizes,
-                                         outside_roi=outside_roi)
+                                         outside_roi=outside_roi,
+                                         show_bbox=show_bbox,
+                                         border_bg_clr=border_bg_clr)
                 threading.Thread(target=roi_plotter.run()).start()
 
             else:
                 roi_plotter = ROIPlotMultiprocess(config_path=self.config_path,
                                                   video_path=video_path,
-                                                  style_attr=style_attr,
+                                                  show_animal_name=show_names,
+                                                  show_body_part=show_pose,
                                                   threshold=float(self.threshold_entry_box.entry_get),
                                                   body_parts=body_parts,
                                                   bp_colors=bp_clrs,
                                                   bp_sizes=bp_sizes,
                                                   core_cnt=core_cnt,
+                                                  show_bbox=show_bbox,
                                                   gpu=gpu,
-                                                  outside_roi=outside_roi)
+                                                  outside_roi=outside_roi,
+                                                  border_bg_clr=border_bg_clr)
                 roi_plotter.run()
                 time.sleep(3)
-        #
 
+
+
+#_ = VisualizeROITrackingPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
 
 #_ = VisualizeROITrackingPopUp(config_path=r"C:\troubleshooting\roi_entries\project_folder\project_config.ini")
 

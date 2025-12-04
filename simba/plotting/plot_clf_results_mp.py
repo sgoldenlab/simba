@@ -5,7 +5,7 @@ import multiprocessing
 import os
 import platform
 from copy import deepcopy
-from typing import Dict, List, Optional, Tuple, Union
+from typing import List, Optional, Tuple, Union
 
 import cv2
 import numpy as np
@@ -100,6 +100,7 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
                         bbox = GeometryMixin().keypoints_to_axis_aligned_bounding_box(keypoints=animal_cords.reshape(-1, len(animal_cords), 2).astype(np.int32))
                         img = cv2.polylines(img, [bbox], True, pose_clr_lst[animal_cnt], thickness=circle_size, lineType=cv2.LINE_AA)
                     except Exception as e:
+                        #print(e.args)
                         pass
             if rotate:
                 img = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)

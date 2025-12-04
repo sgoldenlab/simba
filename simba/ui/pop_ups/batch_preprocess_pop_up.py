@@ -18,7 +18,7 @@ class BatchPreProcessPopUp(PopUpMixin):
     """
 
     def __init__(self):
-        super().__init__(title="BATCH PROCESS VIDEO", size=(600, 400))
+        PopUpMixin.__init__(self, title="BATCH PROCESS VIDEO", size=(600, 400), icon='stack')
         selections_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECTIONS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.BATCH_PREPROCESS.value,)
         self.input_folder_select = FolderSelect(selections_frm, "INPUT VIDEO DIRECTORY:", title="Select Folder with Input Videos", lblwidth=30,)
         self.output_folder_select = FolderSelect(selections_frm, "OUTPUT VIDEO DIRECTORY:", title="Select Folder for Output videos", lblwidth=30)

@@ -14,15 +14,14 @@ import pandas as pd
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.roi_tools.roi_aggregate_statistics_analyzer import \
-    ROIAggregateStatisticsAnalyzer
+from simba.mixins.geometry_mixin import GeometryMixin
+from simba.roi_tools.roi_aggregate_statistics_analyzer import ROIAggregateStatisticsAnalyzer
 from simba.roi_tools.roi_utils import get_roi_dict_from_dfs
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists,
-                                check_if_keys_exist_in_dict,
                                 check_if_valid_rgb_tuple, check_int,
                                 check_nvidea_gpu_available,
-                                check_valid_boolean, check_valid_dict,
+                                check_valid_boolean,
                                 check_valid_lst,
                                 check_video_and_data_frm_count_align)
 from simba.utils.data import (create_color_palettes, detect_bouts,
@@ -40,12 +39,9 @@ from simba.utils.warnings import (DuplicateNamesWarning, FrameRangeWarning,
 
 pd.options.mode.chained_assignment = None
 
-SHOW_BODY_PARTS = 'show_body_part'
-SHOW_ANIMAL_NAMES = 'show_animal_name'
-STYLE_KEYS = [SHOW_BODY_PARTS, SHOW_ANIMAL_NAMES]
 
 
-def _roi_plotter_mp(data: Tuple[int, np.ndarray],
+def _roi_plotter_mp(data: Tuple[int, pd.DataFrame],
                     loc_dict: dict,
                     font_size: float,
                     circle_sizes: list,
@@ -56,11 +52,15 @@ def _roi_plotter_mp(data: Tuple[int, np.ndarray],
                     roi_dfs_dict: Dict[str, pd.DataFrame],
                     roi_dict: dict,
                     bp_colors: list,
-                    style_attr: dict,
+                    show_animal_name: bool,
+                    show_pose: bool,
                     animal_ids: list,
                     threshold: float,
                     outside_roi: bool,
-                    verbose: bool):
+                    verbose: bool,
+                    border_bg_clr: tuple,
+                    animal_bp_dict: dict,
+                    show_bbox: bool):
 
     def __insert_texts(roi_dict, img):
         for animal_name in animal_ids:
@@ -88,17 +88,27 @@ def _roi_plotter_mp(data: Tuple[int, np.ndarray],
     while current_frm <= end_frm:
         ret, img = cap.read()
         if ret:
-            img = cv2.copyMakeBorder(img, 0, 0, 0, int(video_meta_data["width"]), borderType=cv2.BORDER_CONSTANT,value=[0, 0, 0])
+            img = cv2.copyMakeBorder(img, 0, 0, 0, int(video_meta_data["width"]), borderType=cv2.BORDER_CONSTANT, value=border_bg_clr)
             img = __insert_texts(roi_dict, img)
             img = PlottingMixin.roi_dict_onto_img(img=img, roi_dict=roi_dfs_dict)
             for animal_cnt, animal_name in enumerate(animal_ids):
-                if style_attr[SHOW_BODY_PARTS] or style_attr[SHOW_ANIMAL_NAMES]:
+                if show_animal_name or show_pose:
                     x, y, p = (data_df.loc[current_frm, body_part_dict[animal_name]].fillna(0.0).values.astype(np.int32))
                     if threshold <= p:
-                        if style_attr[SHOW_BODY_PARTS]:
+                        if show_pose:
                             img = cv2.circle(img, (x, y), circle_sizes[animal_cnt], bp_colors[animal_cnt], -1)
-                        if style_attr[SHOW_ANIMAL_NAMES]:
+                        if show_animal_name:
                             img = cv2.putText(img, animal_name, (x, y), TextOptions.FONT.value, font_size, bp_colors[animal_cnt], TextOptions.TEXT_THICKNESS.value)
+                        if show_bbox:
+                            x_cols, y_cols = animal_bp_dict[animal_name]['X_bps'], animal_bp_dict[animal_name]['Y_bps']
+                            animal_cols = [x for pair in zip(x_cols, y_cols) for x in pair]
+                            animal_cords = data_df.loc[current_frm, animal_cols].fillna(0.0).values.astype(np.int32).reshape(-1, 2)
+                            try:
+                                bbox = GeometryMixin().keypoints_to_axis_aligned_bounding_box(keypoints=animal_cords.reshape(-1, len(animal_cords), 2).astype(np.int32))
+                                img = cv2.polylines(img, [bbox], True, bp_colors[animal_cnt], thickness=circle_sizes[animal_cnt], lineType=cv2.LINE_AA)
+                            except Exception as e:
+                                # print(e.args)
+                                pass
                 for shape_name in video_shape_names:
                     shape_color = TextOptions.WHITE.value if shape_name == ROI_SETTINGS.OUTSIDE_ROI.value else roi_dict[shape_name]["Color BGR"]
                     timer = round(data_df.loc[current_frm, f"{animal_name}_{shape_name}_cum_sum_time"], 2)
@@ -119,7 +129,7 @@ def _roi_plotter_mp(data: Tuple[int, np.ndarray],
 
 class ROIPlotMultiprocess(ConfigReader):
     """
-    Visualize the ROI data (number of entries/exits, time-spent-in ROIs).
+    Visualize the ROI data (number of entries/exits, time-spent in ROIs) using multiprocessing for improved performance.
 
     .. note::
        `ROI tutorials <https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md>`__.
@@ -141,23 +151,29 @@ class ROIPlotMultiprocess(ConfigReader):
        :autoplay:
        :loop:
 
-
-
-
-    :param Union[str, os.PathLike] config_path: Path to SimBA project config file in Configparser format
-    :param Union[str, os.PathLike] video_path: Name of video to create ROI visualizations for
-    :param Dict[str, bool] style_attr: User-defined visualization settings.
-    :param Optional[int] core_cnt: Number of cores to use. Default to -1 representing all available cores
-    :param Optional[bool]: If True, SimBA will treat all areas NOT covered by a ROI drawing as a single additional ROI visualize the stats for this, single, ROI.
+    :param Union[str, os.PathLike] config_path: Path to SimBA project config file in Configparser format.
+    :param Union[str, os.PathLike] video_path: Path to video file to create ROI visualizations for.
     :param List[str] body_parts: List of the body-parts to use as proxy for animal locations.
-    :param Optional[float] threshold: Float between 0 and 1. Body-part locations detected below this confidence threshold are filtered. Default: 0.0.
+    :param float threshold: Float between 0 and 1. Body-part locations detected below this confidence threshold are filtered. Default: 0.0.
+    :param int core_cnt: Number of cores to use for multiprocessing. Default: -1 (uses all available cores).
+    :param bool verbose: If True, print progress messages during video creation. Default: True.
+    :param bool outside_roi: If True, SimBA will treat all areas NOT covered by a ROI drawing as a single additional ROI and visualize the stats for this single ROI. Default: False.
+    :param bool show_body_part: If True, display body-part locations as circles on the video frames. Default: True.
+    :param bool show_animal_name: If True, display animal names on the video frames. Default: False.
+    :param Tuple[int, int, int] border_bg_clr: RGB tuple representing the background color of the border area where statistics are displayed. Default: (0, 0, 0).
+    :param Optional[Union[str, os.PathLike]] data_path: Optional path to the pose-estimation data. If None, then locates file in ``outlier_corrected_movement_location`` directory. Default: None.
+    :param Optional[Union[str, os.PathLike]] save_path: Optional path to where to save video. If None, then saves it in ``frames/output/roi_analysis`` directory of SimBA project. Default: None.
+    :param Optional[List[Tuple[int, int, int]]] bp_colors: Optional list of tuples of same length as body_parts representing the colors of the body-parts in RGB format. Defaults to None and colors are automatically chosen. Default: None.
+    :param Optional[List[Union[int]]] bp_sizes: Optional list of integers representing the sizes of the pose estimated body-part location circles. Defaults to None and size is automatically inferred. Default: None.
+    :param bool gpu: If True, use GPU acceleration for video concatenation. Default: False.
 
     :example:
     >>> test = ROIPlotMultiprocess(config_path=r'/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/project_config.ini',
     >>>                            video_path="/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT.mp4",
     >>>                            core_cnt=7,
-    >>>                            style_attr={'show_body_part': True, 'show_animal_name': False},
-    >>>                            body_parts=['Nose'])
+    >>>                            body_parts=['Nose'],
+    >>>                            show_body_part=True,
+    >>>                            show_animal_name=False)
     >>> test.run()
     """
 
@@ -165,11 +181,14 @@ class ROIPlotMultiprocess(ConfigReader):
                  config_path: Union[str, os.PathLike],
                  video_path: Union[str, os.PathLike],
                  body_parts: List[str],
-                 style_attr: Dict[str, bool],
                  threshold: Optional[float] = 0.0,
                  core_cnt: int = -1,
                  verbose: bool = True,
                  outside_roi: bool = False,
+                 show_body_part: bool = True,
+                 show_animal_name: bool = False,
+                 show_bbox: bool = False,
+                 border_bg_clr: Tuple[int, int, int] = (0, 0, 0),
                  data_path: Optional[Union[str, os.PathLike]] = None,
                  save_path: Optional[Union[str, os.PathLike]] = None,
                  bp_colors: Optional[List[Tuple[int, int, int]]] = None,
@@ -182,11 +201,13 @@ class ROIPlotMultiprocess(ConfigReader):
         self.video_name = self.video_meta_data['video_name']
         check_float(name=f'{self.__class__.__name__} threshold', value=threshold, min_value=0.0, max_value=1.0)
         check_int(name=f'{self.__class__.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0,])
-        check_if_keys_exist_in_dict(data=style_attr, key=STYLE_KEYS, name=f'{self.__class__.__name__} style_attr')
-        check_valid_dict(x=style_attr, required_keys=tuple(STYLE_KEYS,), valid_values_dtypes=(bool,))
+        check_if_valid_rgb_tuple(source=f'{self.__class__.__name__} border_bg_clr', data=border_bg_clr, raise_error=True)
         check_valid_boolean(value=[gpu], source=f'{self.__class__.__name__} gpu', raise_error=True)
         check_valid_boolean(value=[outside_roi], source=f'{self.__class__.__name__} outside_roi', raise_error=True)
         check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose', raise_error=True)
+        check_valid_boolean(value=show_body_part, source=f'{self.__class__.__name__} show_body_part', raise_error=True)
+        check_valid_boolean(value=show_animal_name, source=f'{self.__class__.__name__} show_animal_name', raise_error=True)
+        check_valid_boolean(value=show_bbox, source=f'{self.__class__.__name__} show_bbox', raise_error=True)
         if gpu and not check_nvidea_gpu_available():
             GPUToolsWarning(msg='GPU not detected but GPU set to True - skipping GPU use.')
             gpu = False
@@ -230,7 +251,7 @@ class ROIPlotMultiprocess(ConfigReader):
             self.detailed_roi_data = None
         self.bp_dict = self.roi_analyzer.bp_dict
         self.animal_names = [self.find_animal_name_from_body_part_name(bp_name=x, bp_dict=self.animal_bp_dict) for x in body_parts]
-        self.data_df = read_df(file_path=self.data_path, file_type=self.file_type, usecols=self.roi_analyzer.roi_headers).fillna(0.0).reset_index(drop=True)
+        self.data_df = read_df(file_path=self.data_path, file_type=self.file_type).fillna(0.0).reset_index(drop=True)
         self.shape_columns = []
         for x in itertools.product(self.animal_names, self.shape_names):
             self.data_df[f"{x[0]}_{x[1]}"] = 0; self.shape_columns.append(f"{x[0]}_{x[1]}")
@@ -238,7 +259,8 @@ class ROIPlotMultiprocess(ConfigReader):
         self.video_path = video_path
         check_video_and_data_frm_count_align(video=self.video_path, data=self.data_df, name=self.video_name, raise_error=False)
         self.cap = cv2.VideoCapture(self.video_path)
-        self.threshold, self.body_parts, self.style_attr, self.gpu, self.outside_roi, self.verbose = threshold, body_parts, style_attr, gpu, outside_roi, verbose
+        self.threshold, self.body_parts, self.show_animal_name, self.gpu, self.outside_roi, self.verbose, self.border_bg_clr = threshold, body_parts, show_animal_name, gpu, outside_roi, verbose, border_bg_clr
+        self.show_pose, self.show_bbox = show_body_part, show_bbox
         self.roi_dict_ = get_roi_dict_from_dfs(rectangle_df=self.sliced_roi_dict[Keys.ROI_RECTANGLES.value], circle_df=self.sliced_roi_dict[Keys.ROI_CIRCLES.value], polygon_df=self.sliced_roi_dict[Keys.ROI_POLYGONS.value])
         self.temp_folder = os.path.join(os.path.dirname(self.save_path), self.video_name, "temp")
         if os.path.exists(self.temp_folder): shutil.rmtree(self.temp_folder)
@@ -268,8 +290,7 @@ class ROIPlotMultiprocess(ConfigReader):
                 self.data_df[col_name][self.data_df.index.isin(entry_dict["frame_range"])] = 1
 
     def __get_text_locs(self) -> dict:
-         loc_dict = {}
-         txt_strs = []
+         loc_dict, txt_strs = {}, []
          for animal_cnt, animal_name in enumerate(self.animal_names):
              for shape in self.shape_names:
                  txt_strs.append(animal_name + ' ' + shape + ' entries')
@@ -355,11 +376,15 @@ class ROIPlotMultiprocess(ConfigReader):
                                           roi_dict = self.roi_dict_,
                                           video_shape_names=self.shape_names,
                                           bp_colors=self.color_lst,
-                                          style_attr=self.style_attr,
+                                          show_animal_name=self.show_animal_name,
+                                          show_pose=self.show_pose,
                                           animal_ids=self.animal_names,
                                           threshold=self.threshold,
                                           outside_roi=self.outside_roi,
-                                          verbose=self.verbose)
+                                          verbose=self.verbose,
+                                          border_bg_clr=self.border_bg_clr,
+                                          animal_bp_dict=self.animal_bp_dict,
+                                          show_bbox=self.show_bbox)
 
             for cnt, batch_cnt in enumerate(pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):
                 print(f'Image batch {batch_cnt+1} / {self.core_cnt} complete...')
@@ -373,12 +398,13 @@ class ROIPlotMultiprocess(ConfigReader):
 
 
 # if __name__ == "__main__":
-#     test = ROIPlotMultiprocess(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini",
-#                                video_path=r"C:\troubleshooting\mitra\project_folder\videos\501_MA142_Gi_Saline_0515.mp4",
-#                                body_parts=['Nose'],
-#                                style_attr={'show_body_part': True, 'show_animal_name': False},
-#                                outside_roi=False,
-#                                gpu=True)
+#     test = ROIPlotMultiprocess(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",
+#                                video_path=r"D:\troubleshooting\maplight_ri\project_folder\videos\Trial_10_C24_D1_1.mp4",
+#                                body_parts=['resident_NOSE'],
+#                                outside_roi=True,
+#                                gpu=True,
+#                                border_bg_clr=(255, 0, 0),
+#                                show_bbox=False)
 #     test.run()
 
 # if __name__ == "__main__":

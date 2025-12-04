@@ -95,7 +95,7 @@ class ROIAggregateDataAnalyzerPopUp(PopUpMixin, ConfigReader):
         self.fps_cb.grid(row=1, column=0, sticky=NW)
         self.video_length_cb.grid(row=2, column=0, sticky=NW)
         self.px_per_mm_cb.grid(row=3, column=0, sticky=NW)
-        self.create_run_frm(run_function=self.run)
+        self.create_run_frm(run_function=self.run, title=f'RUN ({len(self.outlier_corrected_paths)} file(s))')
 
         #self.main_frm.mainloop()
 

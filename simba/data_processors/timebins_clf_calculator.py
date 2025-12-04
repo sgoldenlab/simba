@@ -132,8 +132,6 @@ class TimeBinsClfCalculator(ConfigReader):
         else:
             self.out_df = self.out_df.set_index(VIDEO)
 
-
-
     def run(self):
         self.video_dict = {}
         check_all_file_names_are_represented_in_video_log(video_info_df=self.video_info_df, data_paths=self.data_paths)

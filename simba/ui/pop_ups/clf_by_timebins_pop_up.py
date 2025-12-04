@@ -62,7 +62,7 @@ class TimeBinsClfPopUp(PopUpMixin, ConfigReader):
         time_cb.grid(row=1, column=0, sticky=NW)
 
         run_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header=f"RUN {len(self.machine_results_paths)} video(s)", icon_name='run', icon_link=Links.ANALYZE_ML_RESULTS.value, padx=5, pady=5, relief='solid')
-        run_button = SimbaButton(parent=run_frm, txt="RUN", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self._run)
+        run_button = SimbaButton(parent=run_frm, txt=f"RUN ({len(self.machine_results_paths)} file(s))", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self._run)
 
         run_frm.grid(row=4, column=0, sticky=NW)
         run_button.grid(row=0, column=0, sticky=NW)
