@@ -4,8 +4,13 @@ import functools
 import itertools
 import multiprocessing
 import os
+from copy import deepcopy
 import platform
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 
 import cv2
 import numpy as np
@@ -15,9 +20,9 @@ from simba.mixins.config_reader import ConfigReader
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.roi_tools.ROI_feature_analyzer import ROIFeatureCreator
 from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_keys_exist_in_dict, check_int,
+                                check_if_valid_rgb_tuple, check_int,
                                 check_valid_boolean, check_valid_lst,
-                                check_video_and_data_frm_count_align)
+                                check_video_and_data_frm_count_align, check_str)
 from simba.utils.data import slice_roi_dict_for_video
 from simba.utils.enums import Formats, TextOptions
 from simba.utils.errors import (BodypartColumnNotFoundError, NoFilesFoundError,
@@ -29,15 +34,6 @@ from simba.utils.read_write import (concatenate_videos_in_folder,
                                     remove_a_folder)
 from simba.utils.warnings import DuplicateNamesWarning
 
-ROI_CENTERS = "roi_centers"
-ROI_EAR_TAGS = "roi_ear_tags"
-DIRECTIONALITY = "directionality"
-DIRECTIONALITY_STYLE = "directionality_style"
-BORDER_COLOR = "border_color"
-POSE = "pose_estimation"
-ANIMAL_NAMES = "animal_names"
-STYLE_KEYS = [ROI_CENTERS,ROI_EAR_TAGS,DIRECTIONALITY,BORDER_COLOR,POSE,DIRECTIONALITY_STYLE,ANIMAL_NAMES,]
-
 
 def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
                                data_df: pd.DataFrame,
@@ -48,7 +44,6 @@ def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
                                video_meta_data: dict,
                                shape_info: dict,
                                shape_names: list,
-                               style_attr: dict,
                                video_path: str,
                                animal_names: list,
                                roi_dict: dict,
@@ -56,7 +51,13 @@ def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
                                animal_bp_names: List[str],
                                animal_bp_dict: dict,
                                roi_features_df: pd.DataFrame,
-                               directing_data: Union[pd.DataFrame, None]):
+                               directing_data: Union[pd.DataFrame, None],
+                               border_bg_color: tuple,
+                               show_pose: bool,
+                               show_roi_ear_tags: bool,
+                               show_roi_centers: bool,
+                               show_animal_names: bool,
+                               direction: Union[None, str]):
     def __insert_texts(shape_info: dict, img: np.ndarray):
         for shape_name, shape_info in shape_info.items():
             shape_color = shape_info["Color BGR"]
@@ -65,7 +66,7 @@ def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
                 animal_name = f"{animal} {animal_bp}"
                 cv2.putText(img, text_locations[animal_name][shape_name]["in_zone_text"], text_locations[animal_name][shape_name]["in_zone_text_loc"], font, font_size, shape_color, 1)
                 cv2.putText(img, text_locations[animal_name][shape_name]["distance_text"], text_locations[animal_name][shape_name]["distance_text_loc"], font, font_size, shape_color, 1)
-                if directing_data is not None and style_attr[DIRECTIONALITY]:
+                if directing_data is not None and direction is not None:
                     cv2.putText(img, text_locations[animal][shape_name]["directing_text"], text_locations[animal][shape_name]["directing_text_loc"], font, font_size, shape_color, 1)
         return img
 
@@ -80,20 +81,20 @@ def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
     while current_frm <= end_frm:
         ret, img = cap.read()
         if ret:
-            img = cv2.copyMakeBorder(img, 0, 0, 0, int(video_meta_data["width"]), borderType=cv2.BORDER_CONSTANT, value=style_attr[BORDER_COLOR],)
+            img = cv2.copyMakeBorder(img, 0, 0, 0, int(video_meta_data["width"]), borderType=cv2.BORDER_CONSTANT, value=border_bg_color)
             img = __insert_texts(shape_info=shape_info, img=img)
-            if style_attr[POSE]:
+            if show_pose:
                 for animal_name, bp_data in animal_bp_dict.items():
                     for bp_cnt, bp in enumerate(zip(bp_data["X_bps"], bp_data["Y_bps"])):
                         bp_cords = data_df.loc[current_frm, list(bp)].values.astype(np.int64)
                         cv2.circle(img, (bp_cords[0], bp_cords[1]), 0, animal_bp_dict[animal_name]["colors"][bp_cnt], circle_size)
-            if style_attr[ANIMAL_NAMES]:
+            if show_animal_names:
                 for animal_name, bp_data in animal_bp_dict.items():
                     headers = [bp_data["X_bps"][-1], bp_data["Y_bps"][-1]]
                     bp_cords = data_df.loc[current_frm, headers].values.astype(np.int64)
                     cv2.putText(img, animal_name, (bp_cords[0], bp_cords[1]), font, font_size, animal_bp_dict[animal_name]["colors"][0], 1)
 
-            img = PlottingMixin.roi_dict_onto_img(img=img, roi_dict=roi_dict, circle_size=circle_size, show_tags=style_attr[ROI_EAR_TAGS], show_center=style_attr[ROI_CENTERS])
+            img = PlottingMixin.roi_dict_onto_img(img=img, roi_dict=roi_dict, circle_size=circle_size, show_tags=show_roi_ear_tags, show_center=show_roi_centers)
 
             for animal_name, shape_name in itertools.product(animal_bp_names, shape_names):
                 in_zone_col_name = f"{shape_name} {animal_name} in zone"
@@ -102,7 +103,7 @@ def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
                 distance_value = round(roi_features_df.loc[current_frm, distance_col_name], 2)
                 cv2.putText(img, in_zone_value, text_locations[animal_name][shape_name]["in_zone_data_loc"], font, font_size, shape_info[shape_name]["Color BGR"], 1)
                 cv2.putText(img, str(distance_value), text_locations[animal_name][shape_name]["distance_data_loc"], font, font_size, shape_info[shape_name]["Color BGR"], 1)
-            if (directing_data is not None) and (style_attr[DIRECTIONALITY]):
+            if (directing_data is not None) and direction is not None:
                 for animal_name, shape_name in itertools.product(animal_names, shape_names):
                     facing_col_name = f"{shape_name} {animal_name} facing"
                     facing_value = roi_features_df.loc[current_frm, facing_col_name]
@@ -115,7 +116,7 @@ def _roi_feature_visualizer_mp(frm_range: Tuple[int, np.ndarray],
                                                                   frame_id=current_frm,
                                                                   color=shape_info[shape_name]["Color BGR"],
                                                                   thickness=shape_info[shape_name]["Thickness"],
-                                                                  style=style_attr[DIRECTIONALITY_STYLE])
+                                                                  style=direction)
             writer.write(np.uint8(img))
             print(f"Multiprocessing frame: {current_frm} / {video_meta_data['frame_count']}  on core {group_cnt}...")
             current_frm += 1
@@ -164,31 +165,41 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
                  config_path: Union[str, os.PathLike],
                  video_path: Union[str, os.PathLike],
                  body_parts: List[str],
-                 style_attr: Dict[str, Any],
+                 show_roi_centers: bool = True,
+                 show_roi_eartags: bool = False,
+                 show_animal_names: bool = False,
+                 border_bg_clr: Tuple[int, int, int] = (0, 0, 0),
+                 direction: Optional[Literal['funnel', 'lines']] = None,
+                 roi_coordinates_path: Optional[Union[str, os.PathLike]] = None,
+                 show_pose: bool = True,
                  core_cnt: int = -1,
                  gpu: bool = False):
 
-        check_int(name=f"{self.__class__.__name__} core_cnt",value=core_cnt,min_value=-1,max_value=find_core_cnt()[0])
-        if core_cnt == -1:
-            core_cnt = find_core_cnt()[0]
+        check_int(name=f"{self.__class__.__name__} core_cnt", value=core_cnt, min_value=-1, unaccepted_vals=[0])
+        self.core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
         check_file_exist_and_readable(file_path=video_path)
         ConfigReader.__init__(self, config_path=config_path)
         PlottingMixin.__init__(self)
-        check_if_keys_exist_in_dict(data=style_attr,key=STYLE_KEYS,name=f"{self.__class__.__name__} style_attr")
-        check_valid_boolean(value=[gpu], source=f"{self.__class__.__name__} gpu", raise_error=True)
-        self.gpu = gpu
-        if not os.path.isfile(self.roi_coordinates_path):
-            raise ROICoordinatesNotFoundError(expected_file_path=self.roi_coordinates_path)
+        check_valid_boolean(value=gpu, source=f"{self.__class__.__name__} gpu", raise_error=True)
+        check_valid_boolean(value=show_roi_centers, source=f"{self.__class__.__name__} show_roi_centers", raise_error=True)
+        check_valid_boolean(value=show_roi_eartags, source=f"{self.__class__.__name__} show_roi_eartags", raise_error=True)
+        check_valid_boolean(value=show_animal_names, source=f"{self.__class__.__name__} show_animal_names", raise_error=True)
+        check_valid_boolean(value=show_pose, source=f"{self.__class__.__name__} show_pose", raise_error=True)
+        check_if_valid_rgb_tuple(data=border_bg_clr, source=f"{self.__class__.__name__} border_bg_clr", raise_error=True)
+        if direction is not None:
+            check_str(name=f"{self.__class__.__name__} show_direction", value=direction, options=['funnel', 'lines'], raise_error=True)
+        self.gpu, self.show_roi_centers, self.show_roi_eartags, self.show_animal_names = gpu, show_roi_centers, show_roi_eartags, show_animal_names
+        self.show_pose, self.border_bg_clr, self.direction = show_pose, border_bg_clr, direction
+        if roi_coordinates_path is not None:
+            check_file_exist_and_readable(file_path=roi_coordinates_path, raise_error=True)
+            self.roi_coordinates_path = deepcopy(roi_coordinates_path)
         self.read_roi_data()
         _, self.video_name, _ = get_fn_ext(video_path)
         self.roi_dict, self.shape_names = slice_roi_dict_for_video(data=self.roi_dict, video_name=self.video_name)
-        self.core_cnt, self.style_attr = core_cnt, style_attr
         self.save_path = os.path.join(self.roi_features_save_dir, f"{self.video_name}.mp4")
-        if not os.path.exists(self.roi_features_save_dir):
-            os.makedirs(self.roi_features_save_dir)
+        if not os.path.exists(self.roi_features_save_dir): os.makedirs(self.roi_features_save_dir)
         self.save_temp_dir = os.path.join(self.roi_features_save_dir, "temp")
-        if os.path.exists(self.save_temp_dir):
-            remove_a_folder(folder_dir=self.save_temp_dir)
+        if os.path.exists(self.save_temp_dir): remove_a_folder(folder_dir=self.save_temp_dir)
         os.makedirs(self.save_temp_dir)
         self.data_path = os.path.join(self.outlier_corrected_dir, f"{self.video_name}.{self.file_type}")
         if not os.path.isfile(self.data_path):
@@ -250,7 +261,7 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
                 self.loc_dict[animal_name][shape]["distance_text_loc"] = ((self.video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + 10) + y_spacer * add_spacer))
                 self.loc_dict[animal_name][shape]["distance_data_loc"] = (int(self.video_meta_data["width"] + x_spacer + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + 10) + y_spacer * add_spacer))
                 add_spacer += 1
-                if self.direct_viable and self.style_attr[DIRECTIONALITY]:
+                if self.direct_viable and self.direction is not None:
                     self.loc_dict[animal][shape] = {}
                     self.loc_dict[animal][shape]["directing_text"] = f"{shape} {animal} facing"
                     self.loc_dict[animal][shape]["directing_text_loc"] = ((self.video_meta_data["width"] + TextOptions.BORDER_BUFFER_X.value), (self.video_meta_data["height"] - (self.video_meta_data["height"] + 10) + y_spacer * add_spacer))
@@ -282,7 +293,6 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
                                           video_meta_data=self.video_meta_data,
                                           shape_info=self.shape_dicts,
                                           roi_dict=self.roi_dict,
-                                          style_attr=self.style_attr,
                                           save_temp_dir=self.save_temp_dir,
                                           directing_data=self.directing_df,
                                           shape_names=self.shape_names,
@@ -291,7 +301,13 @@ class ROIfeatureVisualizerMultiprocess(ConfigReader):
                                           animal_names=self.animal_names,
                                           animal_bp_dict=self.animal_bp_dict,
                                           bp_lk=self.bp_lk,
-                                          roi_features_df=self.roi_features_df.reset_index(drop=True))
+                                          roi_features_df=self.roi_features_df.reset_index(drop=True),
+                                          border_bg_color=self.border_bg_clr,
+                                          show_pose=self.show_pose,
+                                          show_roi_ear_tags=self.show_roi_eartags,
+                                          show_roi_centers=self.show_roi_centers,
+                                          show_animal_names=self.show_animal_names,
+                                          direction=self.direction)
 
             for cnt, result in enumerate(pool.imap(constants, frame_range, chunksize=self.multiprocess_chunksize)):
                print(f"Batch core {result+1}/{self.core_cnt} complete...")

@@ -530,7 +530,8 @@ def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                width: Optional[int] = None,
                cursor: Optional[str] = None,
                img: Optional[str] = None,
-               anchor: Optional[str] = None):
+               anchor: Optional[str] = None,
+               tooltip_key: Optional[str] = None):
 
 
     anchor = 'w' if anchor is None else anchor
@@ -558,6 +559,9 @@ def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
 
     if link is not None:
         lbl.bind("<Button-1>", lambda e: callback(link))
+
+    elif tooltip_key in TOOLTIPS.keys():
+        CreateToolTip(widget=lbl, text=TOOLTIPS[tooltip_key])
 
     return lbl
 
@@ -605,6 +609,8 @@ class SimBADropDown(Frame):
                 label_bg_clr: Optional[str] = None,
                 dropdown_font_size: Optional[int] = None,
                 justify: str = 'center',
+                img: Optional[str] = None,
+                compound: Optional[Literal['left', 'right', 'top', 'bottom']] = 'left',
                 dropdown_width: Optional[int] = None,
                 command: Callable = None,
                 value: Optional[Any] = None,
@@ -616,8 +622,11 @@ class SimBADropDown(Frame):
 
         super().__init__(master=parent)
         self.dropdown_var = StringVar()
-        self.dropdown_lbl = SimBALabel(parent=self, txt=label, txt_clr='black', bg_clr=label_bg_clr, font=label_font, width=label_width, anchor='w')
-        self.dropdown_lbl.grid(row=0, column=0)
+        self.columnconfigure(0, weight=0)
+        self.columnconfigure(1, weight=0)
+        if img is not None:self.columnconfigure(2, weight=0)
+        self.dropdown_lbl = SimBALabel(parent=self, txt=label, txt_clr='black', bg_clr=label_bg_clr, font=label_font, width=label_width, anchor='w', img=None, compound=None)
+        self.dropdown_lbl.grid(row=0, column=0, sticky=NW, padx=(0, 10))
         self.dropdown_options = dropdown_options
         self.original_options = deepcopy(self.dropdown_options)
         self.command, self.searchable = command, searchable
@@ -628,7 +637,12 @@ class SimBADropDown(Frame):
         self.combobox_state = 'normal' if searchable else "readonly"
         self.dropdown = Combobox(self, textvariable=self.dropdown_var, font=drop_down_font, values=self.dropdown_options, state=self.combobox_state, width=dropdown_width, justify=justify)
         if searchable: self.bind_combobox_keys()
-        self.dropdown.grid(row=0, column=1, sticky="nw")
+        self.dropdown.grid(row=0, column=1, sticky="w")
+        if img is not None:
+            self.dropdown_img_lbl = SimBALabel(parent=self, txt='', txt_clr='black', bg_clr=label_bg_clr, font=label_font, width=None, anchor='w', img=img, compound=None)
+            self.dropdown_img_lbl.grid(row=0, column=2, sticky="w", padx=(5, 0))
+        else:
+            self.dropdown_img_lbl = None
         if value is not None: self.set_value(value=value)
         if command is not None:
             self.command = command
@@ -639,6 +653,10 @@ class SimBADropDown(Frame):
             CreateToolTip(widget=self.dropdown_lbl, text=tooltip_txt)
         elif tooltip_key in TOOLTIPS.keys():
             CreateToolTip(widget=self.dropdown_lbl, text=TOOLTIPS[tooltip_key])
+            if img is not None:
+                CreateToolTip(widget=self.dropdown_img_lbl, text=TOOLTIPS[tooltip_key])
+
+
     def set_value(self, value: Any):
         self.dropdown_var.set(value)
 
