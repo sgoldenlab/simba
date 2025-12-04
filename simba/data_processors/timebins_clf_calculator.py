@@ -2,11 +2,11 @@ __author__ = "Simon Nilsson"
 
 import os
 from collections import defaultdict
-from typing import List, Union, Optional
+from copy import deepcopy
+from typing import List, Optional, Union
 
 import numpy as np
 import pandas as pd
-from copy import deepcopy
 
 try:
     from typing import Literal
@@ -16,13 +16,15 @@ except:
 from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log,
-    check_file_exist_and_readable, check_int,
-    check_that_column_exist, check_valid_boolean, check_valid_lst)
+    check_file_exist_and_readable, check_int, check_that_column_exist,
+    check_valid_boolean, check_valid_lst)
 from simba.utils.data import detect_bouts
 from simba.utils.errors import NoDataError
-from simba.utils.printing import stdout_success
-from simba.utils.read_write import get_fn_ext, read_df, find_files_of_filetypes_in_directory, find_time_stamp_from_frame_numbers
 from simba.utils.lookups import get_current_time
+from simba.utils.printing import stdout_success
+from simba.utils.read_write import (find_files_of_filetypes_in_directory,
+                                    find_time_stamp_from_frame_numbers,
+                                    get_fn_ext, read_df)
 
 FIRST_OCCURRENCE = "First occurrence (s)"
 EVENT_COUNT = "Event count"
