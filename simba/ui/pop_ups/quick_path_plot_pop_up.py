@@ -35,13 +35,13 @@ class QuickLineplotPopup(PopUpMixin, ConfigReader):
         video_names = list(self.video_filepaths.keys())
         video_name_max_len = max(len(s) for s in video_names)
 
-        self.video_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=video_names, label='VIDEO: ', label_width=25, dropdown_width=video_name_max_len, value=video_names[0])
-        self.bp_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=self.body_parts_lst, label='BODY-PART: ', label_width=25, dropdown_width=video_name_max_len, value=self.body_parts_lst[0])
-        self.background_color = SimBADropDown(parent=settings_frm, dropdown_options=color_lst, label="BACKGROUND COLOR: ", label_width=25, dropdown_width=video_name_max_len, value="White")
-        self.line_color = SimBADropDown(parent=settings_frm, dropdown_options=color_lst, label="LINE COLOR: ", label_width=25, dropdown_width=video_name_max_len, value="Red")
-        self.line_thickness = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 11)), label="LINE THICKNESS: ", label_width=25, dropdown_width=video_name_max_len, value=1)
-        self.circle_size = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 11)), label="CIRCLE SIZE: ", label_width=25, dropdown_width=video_name_max_len, value=5)
-        self.last_frm_only_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=["TRUE", "FALSE"], label="LAST FRAME ONLY: ", label_width=25, dropdown_width=video_name_max_len, value='FALSE')
+        self.video_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=video_names, label='VIDEO: ', label_width=25, dropdown_width=video_name_max_len, value=video_names[0], img='video_2')
+        self.bp_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=self.body_parts_lst, label='BODY-PART: ', label_width=25, dropdown_width=video_name_max_len, value=self.body_parts_lst[0], img='pose')
+        self.background_color = SimBADropDown(parent=settings_frm, dropdown_options=color_lst, label="BACKGROUND COLOR: ", label_width=25, dropdown_width=video_name_max_len, value="White", img='fill')
+        self.line_color = SimBADropDown(parent=settings_frm, dropdown_options=color_lst, label="LINE COLOR: ", label_width=25, dropdown_width=video_name_max_len, value="Red", img='line')
+        self.line_thickness = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 11)), label="LINE THICKNESS: ", label_width=25, dropdown_width=video_name_max_len, value=1, img='bold')
+        self.circle_size = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 11)), label="CIRCLE SIZE: ", label_width=25, dropdown_width=video_name_max_len, value=5, img='circle_2')
+        self.last_frm_only_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=["TRUE", "FALSE"], label="LAST FRAME ONLY: ", label_width=25, dropdown_width=video_name_max_len, value='FALSE', img='finish')
         self.inst_lbl = SimBALabel(parent=settings_frm, txt="NOTE: For more complex path plots, faster, \n see 'CREATE PATH PLOTS' under the [VISUALIZATIONS] tab", txt_clr='green')
 
         settings_frm.grid(row=0, sticky=W)
@@ -107,7 +107,7 @@ class QuickLineplotPopup(PopUpMixin, ConfigReader):
         threading.Thread(target=plotter.run).start()
 
 
-
+# _ = QuickLineplotPopup(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
 # _ = QuickLineplotPopup(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
 # _ = QuickLineplotPopup(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 # _ = QuickLineplotPopup(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

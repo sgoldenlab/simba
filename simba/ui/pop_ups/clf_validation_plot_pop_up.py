@@ -36,12 +36,12 @@ class ClassifierValidationPopUp(PopUpMixin, ConfigReader):
         color_names = list(self.colors_dict.keys())
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings',  icon_link=Links.CLF_VALIDATION.value, padx=5, pady=5, relief='solid')
-        self.seconds_entry = Entry_Box(self.settings_frm, "SECONDS PADDING: ", 40, validation="numeric", value=2, entry_box_width=30, justify='center')
+        self.seconds_entry = Entry_Box(self.settings_frm, "SECONDS PADDING: ", 40, validation="numeric", value=2, entry_box_width=30, justify='center', img='timer_2')
 
-        self.clf_dropdown = SimBADropDown(parent=self.settings_frm, label='CLASSIFIER: ', label_width=40, dropdown_width=30, dropdown_options=self.clf_names, value=self.clf_names[0])
-        self.clr_dropdown = SimBADropDown(parent=self.settings_frm, label="TEXT COLOR: ", label_width=40, dropdown_width=30, dropdown_options=color_names, value="Cyan")
-        self.highlight_clr_dropdown = SimBADropDown(parent=self.settings_frm, label="HIGHLIGHT TEXT COLOR: ", label_width=40, dropdown_width=30, dropdown_options=["None"] + color_names, value="None")
-        self.video_speed_dropdown = SimBADropDown(parent=self.settings_frm, label="VIDEO SPEED: ", label_width=40, dropdown_width=30, dropdown_options=Options.SPEED_OPTIONS.value, value=1.0)
+        self.clf_dropdown = SimBADropDown(parent=self.settings_frm, label='CLASSIFIER: ', label_width=40, dropdown_width=30, dropdown_options=self.clf_names, value=self.clf_names[0], img='forest')
+        self.clr_dropdown = SimBADropDown(parent=self.settings_frm, label="TEXT COLOR: ", label_width=40, dropdown_width=30, dropdown_options=color_names, value="Cyan", img='text_color_2')
+        self.highlight_clr_dropdown = SimBADropDown(parent=self.settings_frm, label="HIGHLIGHT TEXT COLOR: ", label_width=40, dropdown_width=30, dropdown_options=["None"] + color_names, value="None", img='text_color')
+        self.video_speed_dropdown = SimBADropDown(parent=self.settings_frm, label="VIDEO SPEED: ", label_width=40, dropdown_width=30, dropdown_options=Options.SPEED_OPTIONS.value, value=1.0, img='rocket')
 
         self.individual_bout_clips_cb, self.one_vid_per_bout_var = SimbaCheckbox(parent=self.settings_frm, txt="CREATE ONE CLIP PER BOUT", txt_img='segment', val=False)
         self.individual_clip_per_video_cb, self.one_vid_per_video_var = SimbaCheckbox(parent=self.settings_frm, txt="CREATE ONE CLIP PER BOUT", txt_img='video', val=True)

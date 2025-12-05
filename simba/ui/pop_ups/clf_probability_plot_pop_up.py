@@ -37,8 +37,6 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
     :example:
     >>> _ = VisualizeClassificationProbabilityPopUp(config_path=r'C:\troubleshooting\RAT_NOR\project_folder\project_config.ini')
     """
-
-
     def __init__(self, config_path: Union[str, os.PathLike]):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         color_names = list(get_color_dict().keys())
@@ -49,17 +47,17 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
         PopUpMixin.__init__(self, title="CREATE CLASSIFICATION PROBABILITY PLOTS", icon='probability')
 
         self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name='style', icon_link=Links.VISUALIZE_CLF_PROBABILITIES.value, pady=5, padx=5, relief='solid')
-        self.resolution_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.resolutions, label='RESOLUTION: ', label_width=25, dropdown_width=35, value=self.resolutions[1])
-        self.max_y_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=MAX_Y_OPTIONS, label='MAX Y-AXIS: ', label_width=25, dropdown_width=35, value=AUTO)
-        self.line_clr_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=color_names, label='LINE COLOR: ', label_width=25, dropdown_width=35, value='Red')
-        self.font_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(1, 26)), label='TEXT SIZE: ', label_width=25, dropdown_width=35, value=10)
-        self.line_width_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(1, 26)), label='LINE WIDTH: ', label_width=25, dropdown_width=35, value=2)
-        self.line_opacity_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=OPACITY_OPTIONS, label='LINE OPACITY: ', label_width=25, dropdown_width=35, value=1.0)
-        self.threshold_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW THRESHOLD LINES: ', label_width=25, dropdown_width=35, value='TRUE')
+        self.resolution_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.resolutions, label='RESOLUTION: ', label_width=25, dropdown_width=35, value=self.resolutions[1], img='monitor')
+        self.max_y_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=MAX_Y_OPTIONS, label='MAX Y-AXIS: ', label_width=25, dropdown_width=35, value=AUTO, img='y')
+        self.line_clr_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=color_names, label='LINE COLOR: ', label_width=25, dropdown_width=35, value='Red', img='color_wheel')
+        self.font_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(1, 26)), label='TEXT SIZE: ', label_width=25, dropdown_width=35, value=10, img='font_size')
+        self.line_width_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=list(range(1, 26)), label='LINE WIDTH: ', label_width=25, dropdown_width=35, value=2, img='line')
+        self.line_opacity_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=OPACITY_OPTIONS, label='LINE OPACITY: ', label_width=25, dropdown_width=35, value=1.0, img='opacity')
+        self.threshold_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW THRESHOLD LINES: ', label_width=25, dropdown_width=35, value='TRUE', img='threshold')
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VISUALIZATION SETTINGS", icon_name='eye', icon_link=Links.VISUALIZE_CLF_PROBABILITIES.value, pady=5, padx=5, relief='solid')
-        self.clf_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=self.clf_names, label='CLASSIFIER: ', label_width=25, dropdown_width=35, value=self.clf_names[0])
-        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt+1)), label='CPU CORE COUNT: ', label_width=25, dropdown_width=35, value=int(self.cpu_cnt/3))
+        self.clf_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=self.clf_names, label='CLASSIFIER: ', label_width=25, dropdown_width=35, value=self.clf_names[0], img='forest')
+        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt+1)), label='CPU CORE COUNT: ', label_width=25, dropdown_width=35, value=int(self.cpu_cnt/3), img='cpu_small')
 
         probability_frames_cb, self.probability_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', font=Formats.FONT_REGULAR.value, txt_img='frames', val=False)
         probability_videos_cb, self.probability_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', font=Formats.FONT_REGULAR.value, txt_img='video', val=False)
@@ -68,9 +66,9 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
 
         self.run_single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name='video', icon_link=Links.VISUALIZE_CLF_PROBABILITIES.value, pady=5, padx=5, relief='solid')
         self.run_single_video_btn = SimbaButton(parent=self.run_single_video_frm, txt="CREATE SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.__run, cmd_kwargs={'multiple': False})
-        self.single_video_dropdown = SimBADropDown(parent=self.run_single_video_frm, dropdown_options=list(self.files_found_dict.keys()), label='VIDEO: ', label_width=25, dropdown_width=max_file_name_len, value=list(self.files_found_dict.keys())[0])
+        self.single_video_dropdown = SimBADropDown(parent=self.run_single_video_frm, dropdown_options=list(self.files_found_dict.keys()), label='VIDEO: ', label_width=25, dropdown_width=max_file_name_len, value=list(self.files_found_dict.keys())[0], img='video')
 
-        self.run_multiple_videos = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEO", icon_name='video', icon_link=Links.VISUALIZE_CLF_PROBABILITIES.value, pady=5, padx=5, relief='solid')
+        self.run_multiple_videos = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEO", icon_name='stack', icon_link=Links.VISUALIZE_CLF_PROBABILITIES.value, pady=5, padx=5, relief='solid')
         self.run_multiple_video_btn = SimbaButton(parent=self.run_multiple_videos, txt=f"Create multiple videos ({len(list(self.files_found_dict.keys()))} video(s) found)", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.__run, cmd_kwargs={'multiple': True})
 
         self.style_settings_frm.grid(row=0, sticky=NW, padx=10, pady=10)
@@ -151,6 +149,6 @@ class VisualizeClassificationProbabilityPopUp(PopUpMixin, ConfigReader):
 
 
 
+#_ = VisualizeClassificationProbabilityPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
 
-#_ = VisualizeClassificationProbabilityPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
 # _ = VisualizeClassificationProbabilityPopUp(config_path=r"C:\troubleshooting\sleap_two_animals\project_folder\project_config.ini")

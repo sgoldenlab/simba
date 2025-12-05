@@ -44,7 +44,8 @@ BODY_PART = 'body_part'
 ANIMAL_NAME = 'animal_name'
 
 class PathPlotPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: Union[str, os.PathLike]):
+    def __init__(self,
+                 config_path: Union[str, os.PathLike]):
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
         self.machine_results_files = get_file_name_info_in_directory(directory=self.machine_results_dir, file_type=self.file_type)
         self.outlier_corrected_files = get_file_name_info_in_directory(directory=self.outlier_corrected_dir, file_type=self.file_type)
@@ -74,18 +75,18 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         self.custom_rgb_selections = {}
 
         self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name='style', icon_link=Links.PATH_PLOTS.value)
-        self.max_prior_lines_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.max_prior_lines_options, label='MAX PRIOR LINES (S): ', label_width=35, dropdown_width=30, value=ENTIRE_VIDEO)
-        self.resolution_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.resolution_options, label='RESOLUTION: ', label_width=35, dropdown_width=30, value=AUTO)
-        self.bg_clr_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.bg_clr_options, label='BACKGROUND: ', label_width=35, dropdown_width=30, value='White', command=self.__activate_settings)
-        self.line_width_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.line_width_options, label='LINE WIDTH: ', label_width=35, dropdown_width=30, value=AUTO)
-        self.font_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.font_size_options, label='FONT SIZE: ', label_width=35, dropdown_width=30, value=AUTO)
-        self.font_thickness_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.font_thickness_options, label='FONT THICKNESS: ', label_width=35, dropdown_width=30, value=AUTO)
-        self.bg_opacity_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.bg_opacity_options, label='BACKGROUND OPACITY (%): ', label_width=35, dropdown_width=30, value=100)
-        self.circle_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.circle_size_options, label='CIRCLE SIZE: ', label_width=35, dropdown_width=30, value=AUTO)
-        self.show_animal_names_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ANIMAL NAMES: ', label_width=35, dropdown_width=30, value='FALSE')
+        self.max_prior_lines_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.max_prior_lines_options, label='MAX PRIOR LINES (S): ', label_width=35, dropdown_width=30, value=ENTIRE_VIDEO, img='timer_2')
+        self.resolution_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.resolution_options, label='RESOLUTION: ', label_width=35, dropdown_width=30, value=AUTO, img='monitor')
+        self.bg_clr_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.bg_clr_options, label='BACKGROUND: ', label_width=35, dropdown_width=30, value='White', command=self.__activate_settings, img='fill')
+        self.line_width_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.line_width_options, label='LINE WIDTH: ', label_width=35, dropdown_width=30, value=AUTO, img='line')
+        self.font_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.font_size_options, label='FONT SIZE: ', label_width=35, dropdown_width=30, value=AUTO, img='font_size')
+        self.font_thickness_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.font_thickness_options, label='FONT THICKNESS: ', label_width=35, dropdown_width=30, value=AUTO, img='bold')
+        self.bg_opacity_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.bg_opacity_options, label='BACKGROUND OPACITY (%): ', label_width=35, dropdown_width=30, value=100,  img='opacity')
+        self.circle_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.circle_size_options, label='CIRCLE SIZE: ', label_width=35, dropdown_width=30, value=AUTO, img='circle_small')
+        self.show_animal_names_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=['TRUE', 'FALSE'], label='SHOW ANIMAL NAMES: ', label_width=35, dropdown_width=30, value='FALSE', img='label_yellow')
 
         self.body_parts_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CHOOSE BODY-PARTS", icon_name='pose', icon_link=Links.PATH_PLOTS.value)
-        self.number_of_animals_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.animal_cnt_options, label="# ANIMALS:", label_width=35, dropdown_width=30, value=self.animal_cnt_options[0], command=self.populate_body_parts_menu)
+        self.number_of_animals_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.animal_cnt_options, label="# ANIMALS:", label_width=35, dropdown_width=30, value=self.animal_cnt_options[0], command=self.populate_body_parts_menu, img='abacus')
 
         self.style_settings_frm.grid(row=0, sticky=NW)
         self.resolution_dropdown.grid(row=1, sticky=NW)
@@ -363,6 +364,8 @@ class PathPlotPopUp(PopUpMixin, ConfigReader):
         threading.Thread(target=path_plotter.run()).start()
 
 
+
+#_ = PathPlotPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
 
 #_ = PathPlotPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")
 

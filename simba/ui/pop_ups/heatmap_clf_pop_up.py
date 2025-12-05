@@ -39,15 +39,15 @@ class HeatmapClfPopUp(PopUpMixin, ConfigReader):
 
         self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name='style', icon_link=Links.HEATMAP_CLF.value)
 
-        self.palette_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.palette_options, label='PALETTE: ', label_width=30, dropdown_width=35, value=self.palette_options[0])
-        self.shading_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.shading_options, label='SHADING: ', label_width=30, dropdown_width=35, value=self.shading_options[0])
-        self.clf_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.clf_names, label='CLASSIFIER: ', label_width=30, dropdown_width=35, value=self.clf_names[0])
-        self.bp_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.body_parts_lst, label='BODY-PART: ', label_width=30, dropdown_width=35, value=self.body_parts_lst[0])
-        self.max_time_scale_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=max_scales_option, label='MAX TIME SCALE (S): ', label_width=30, dropdown_width=35, value=AUTO)
-        self.bin_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.heatmap_bin_size_options, label='BIN SIZE (MM): ', label_width=30, dropdown_width=35, value="80×80")
+        self.palette_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.palette_options, label='PALETTE: ', label_width=30, dropdown_width=35, value=self.palette_options[0], img='palette_small')
+        self.shading_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.shading_options, label='SHADING: ', label_width=30, dropdown_width=35, value=self.shading_options[0], img='shade')
+        self.clf_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.clf_names, label='CLASSIFIER: ', label_width=30, dropdown_width=35, value=self.clf_names[0], img='forest')
+        self.bp_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.body_parts_lst, label='BODY-PART: ', label_width=30, dropdown_width=35, value=self.body_parts_lst[0], img='pose')
+        self.max_time_scale_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=max_scales_option, label='MAX TIME SCALE (S): ', label_width=30, dropdown_width=35, value=AUTO, img='timer')
+        self.bin_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.heatmap_bin_size_options, label='BIN SIZE (MM): ', label_width=30, dropdown_width=35, value="80×80", img='size_black')
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VISUALIZATION SETTINGS", icon_name='eye', icon_link=Links.HEATMAP_CLF.value)
-        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt)), label='CPU CORE COUNT: ', label_width=30, dropdown_width=35, value=int(self.cpu_cnt/2))
+        self.core_cnt_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt)), label='CPU CORE COUNT: ', label_width=30, dropdown_width=35, value=int(self.cpu_cnt/2), img='cpu_small')
 
         heatmap_frames_cb, self.heatmap_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', txt_img='frames')
         heatmap_videos_cb, self.heatmap_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', txt_img='video')
@@ -132,5 +132,7 @@ class HeatmapClfPopUp(PopUpMixin, ConfigReader):
             heatmapper_clf.run()
 
 
+
+#_ = HeatmapClfPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
 
 #_ = HeatmapClfPopUp(config_path=r"C:\troubleshooting\RAT_NOR\project_folder\project_config.ini")

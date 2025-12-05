@@ -150,7 +150,7 @@ class ValidationVideoPopUp(PopUpMixin, ConfigReader):
 
 
 
-
+#_ = PathPlotPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
 
 # ValidationVideoPopUp(config_path=r"D:\troubleshooting\mitra\project_folder\project_config.ini",
 #                      feature_path=r"D:\troubleshooting\mitra\project_folder\csv\features_extracted\592_MA147_CNO1_0515.csv",

@@ -23,9 +23,6 @@ class MakePathPlotPopUp(PopUpMixin):
 
         self.background_color = DropDownMenu(settings_frm, "BACKGROUND COLOR: ", color_lst, "30")
         self.background_color.setChoices(choice="White")
-
-
-
         self.line_color = DropDownMenu(settings_frm, "LINE COLOR: ", color_lst, "30")
         self.line_color.setChoices(choice="Red")
         self.line_thickness = DropDownMenu(settings_frm, "LINE THICKNESS: ", list(range(1, 11)), "30")

@@ -336,16 +336,19 @@ def CreateLabelFrameWithIcon(parent: Union[Toplevel, LabelFrame, Canvas, Frame],
         icon = ImageTk.PhotoImage(icon)
     else:
         icon = None
-
     frm = Frame(parent, bg=bg)
-    label_text = Label(frm, text=header, font=font, bg=bg)
-    label_text.grid(row=0, column=0)
 
     label_image = Label(frm, image=icon, bg=bg)
     label_image.image = icon
     if icon_link:
         label_image.bind("<Button-1>", lambda e: callback(icon_link))
-    label_image.grid(row=0, column=1)
+    label_image.grid(row=0, column=0)
+
+
+    label_text = Label(frm, text=header, font=font, bg=bg)
+    label_text.grid(row=0, column=1)
+
+
 
     lbl_frm = LabelFrame(parent, labelwidget=frm, relief=relief, width=width, padx=padx or 0, pady=pady or 0)
 
@@ -448,6 +451,8 @@ def SimbaButton(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
     # if hover_font != font:
     #     hover_font = copy(font)
 
+
+
     if isinstance(img, str):
         img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS[img]["icon_path"]))
 
@@ -545,8 +550,10 @@ def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
 
     anchor = 'w' if anchor is None else anchor
 
-    if isinstance(img, str):
+    if isinstance(img, str) and img in MENU_ICONS.keys():
         img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS[img]["icon_path"]))
+    else:
+        img = None
 
     lbl = Label(parent,
                 text=txt,

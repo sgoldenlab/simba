@@ -6,8 +6,7 @@ from typing import Union
 from simba.data_processors.movement_calculator import MovementCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
-                                        SimbaCheckbox, SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, SimbaCheckbox, SimBADropDown)
 from simba.utils.checks import check_float
 from simba.utils.enums import ConfigKey, Keys, Links
 from simba.utils.errors import InvalidInputError, NoDataError
@@ -22,13 +21,13 @@ class MovementAnalysisPopUp(ConfigReader, PopUpMixin):
             raise NoDataError(msg=f'No data files found in {self.outlier_corrected_dir} directory, cannot compute movement statistics.', source=self.__class__.__name__)
         PopUpMixin.__init__(self, title="ANALYZE MOVEMENT", size=(500, 500), icon='run')
 
-        self.animal_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMALS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
-        self.animal_cnt_dropdown = SimBADropDown(parent=self.animal_cnt_frm, label="# OF ANIMALS", label_width=20, dropdown_width=20, value=1, dropdown_options=list(range(1, self.animal_cnt + 1)), command=self.create_settings_frm)
+        self.animal_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT NUMBER OF ANIMALS", icon_name='mouse_head', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
+        self.animal_cnt_dropdown = SimBADropDown(parent=self.animal_cnt_frm, label="# OF ANIMALS", label_width=20, dropdown_width=20, value=1, dropdown_options=list(range(1, self.animal_cnt + 1)), command=self.create_settings_frm, img='abacus')
         self.animal_cnt_frm.grid(row=0, column=0, sticky=NW)
         self.animal_cnt_dropdown.grid(row=0, column=0, sticky=NW)
 
-        self.choose_threshold_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PART THRESHOLD", icon_name='threshold', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
-        self.probability_entry = Entry_Box(parent=self.choose_threshold_frm, fileDescription='THRESHOLD: ', labelwidth=20, entry_box_width=20, value=0.0, justify='center')
+        self.choose_threshold_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PART THRESHOLD", icon_name='green_dice', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
+        self.probability_entry = Entry_Box(parent=self.choose_threshold_frm, fileDescription='THRESHOLD: ', labelwidth=20, entry_box_width=20, value=0.0, justify='center', img='green_dice')
         self.choose_threshold_frm.grid(row=1, column=0, sticky=NW)
         self.probability_entry.grid(row=0, column=0, sticky=NW)
 
@@ -60,7 +59,7 @@ class MovementAnalysisPopUp(ConfigReader, PopUpMixin):
         self.bp_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT BODY-PARTS", icon_name='pose', icon_link=Links.DATA_ANALYSIS.value, padx=5, pady=5, relief='solid')
         self.body_parts_dropdowns = {}
         for cnt, i in enumerate(range(int(animal_cnt))):
-            self.body_parts_dropdowns[cnt] = SimBADropDown(parent=self.bp_frm, label=f"Animal {cnt+1}", label_width=20, dropdown_width=20, value=self.body_part_options[cnt], dropdown_options=self.body_part_options)
+            self.body_parts_dropdowns[cnt] = SimBADropDown(parent=self.bp_frm, label=f"Animal {cnt+1}", label_width=20, dropdown_width=20, value=self.body_part_options[cnt], dropdown_options=self.body_part_options, img='circle_black')
             self.body_parts_dropdowns[cnt].grid(row=cnt, column=0, sticky=NW)
         self.bp_frm.grid(row=2, column=0, sticky=NW)
 
@@ -85,5 +84,6 @@ class MovementAnalysisPopUp(ConfigReader, PopUpMixin):
         movement_processor.save()
 
 
+#_ = MovementAnalysisPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
 # MovementAnalysisPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
 #_ = MovementAnalysisPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
