@@ -136,14 +136,18 @@ from simba.ui.pop_ups.print_video_meta_popup import PrintVideoMetaDataPopUp
 from simba.ui.pop_ups.pup_retrieval_pop_up import PupRetrievalPopUp
 from simba.ui.pop_ups.quick_path_plot_pop_up import QuickLineplotPopup
 from simba.ui.pop_ups.remove_roi_features_pop_up import RemoveROIFeaturesPopUp
-from simba.ui.pop_ups.roi_aggregate_stats_popup import ROIAggregateDataAnalyzerPopUp
-from simba.ui.pop_ups.roi_analysis_time_bins_pop_up import ROIAnalysisTimeBinsPopUp
+from simba.ui.pop_ups.roi_aggregate_stats_popup import \
+    ROIAggregateDataAnalyzerPopUp
+from simba.ui.pop_ups.roi_analysis_time_bins_pop_up import \
+    ROIAnalysisTimeBinsPopUp
 from simba.ui.pop_ups.roi_features_plot_pop_up import VisualizeROIFeaturesPopUp
 from simba.ui.pop_ups.roi_tracking_plot_pop_up import VisualizeROITrackingPopUp
 from simba.ui.pop_ups.roi_video_table_pop_up import ROIVideoTable
 from simba.ui.pop_ups.run_machine_models_popup import RunMachineModelsPopUp
-from simba.ui.pop_ups.select_video_for_labelling_popup import SelectLabellingVideoPupUp
-from simba.ui.pop_ups.select_video_for_pseudo_labelling_popup import SelectPseudoLabellingVideoPupUp
+from simba.ui.pop_ups.select_video_for_labelling_popup import \
+    SelectLabellingVideoPupUp
+from simba.ui.pop_ups.select_video_for_pseudo_labelling_popup import \
+    SelectPseudoLabellingVideoPupUp
 from simba.ui.pop_ups.severity_analysis_pop_up import AnalyzeSeverityPopUp
 from simba.ui.pop_ups.simba_rois_to_yolo_pop_up import SimBAROIs2YOLOPopUp
 from simba.ui.pop_ups.simba_to_yolo_keypoints_popup import \
