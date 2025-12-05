@@ -61,7 +61,8 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
                                 bouts_df: Optional[pd.DataFrame],
                                 final_gantt: Optional[np.ndarray],
                                 gantt_clrs: List[Tuple[float, float, float]],
-                                clf_names: List[str]):
+                                clf_names: List[str],
+                                verbose:bool):
 
     fourcc, font = cv2.VideoWriter_fourcc(*"mp4v"), cv2.FONT_HERSHEY_DUPLEX
     video_meta_data = get_video_meta_data(video_path=video_path)
@@ -146,7 +147,7 @@ def _multiprocess_sklearn_video(data: pd.DataFrame,
                 frame_save_name = os.path.join(frame_save_dir, f"{current_frm}.png")
                 cv2.imwrite(frame_save_name, img)
             current_frm += 1
-            print(f"Multi-processing video frame {current_frm} on core {batch}...")
+            if verbose: print(f"Multi-processing video frame {current_frm} on core {batch}...")
         else:
             FrameRangeWarning(msg=f'Could not read frame {current_frm} in video {video_path}. Stopping video creation.')
             break
@@ -242,6 +243,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
                  text_clr: Tuple[int, int, int] = (255, 255, 255),
                  text_bg_clr: Tuple[int, int, int] = (0, 0, 0),
                  gpu: bool = False,
+                 verbose: bool = True,
                  core_cnt: int = -1):
 
 
@@ -264,11 +266,12 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         self.clr_lst = create_color_palette(pallete_name=pose_palette, increments=len(self.body_parts_lst)+1)
         check_if_valid_rgb_tuple(data=text_clr, source=f'{self.__class__.__name__} text_clr')
         check_if_valid_rgb_tuple(data=text_bg_clr, source=f'{self.__class__.__name__} text_bg_clr')
+        check_valid_boolean(value=verbose, source=f'{self.__class__.__name__} verbose', raise_error=True)
         if show_gantt is not None:
             check_int(name=f"{self.__class__.__name__} show_gantt", value=show_gantt, max_value=2, min_value=1)
         self.video_setting, self.frame_setting, self.rotate, self.print_timers = video_setting, frame_setting, rotate, print_timers
         self.circle_size, self.font_size, self.animal_names, self.text_opacity = circle_size, font_size, animal_names, text_opacity
-        self.text_thickness, self.space_size, self.show_pose, self.pose_palette = text_thickness, space_size, show_pose, pose_palette
+        self.text_thickness, self.space_size, self.show_pose, self.pose_palette, self.verbose = text_thickness, space_size, show_pose, pose_palette, verbose
         self.text_color, self.text_bg_color, self.show_bbox, self.show_gantt, self.show_confidence = text_clr, text_bg_clr, show_bbox, show_gantt, show_confidence
         self.gpu = True if check_nvidea_gpu_available() and gpu else False
         self.pose_threshold = read_config_entry(self.config, ConfigKey.THRESHOLD_SETTINGS.value, ConfigKey.SKLEARN_BP_PROB_THRESH.value, Dtypes.FLOAT.value, 0.00)
@@ -304,10 +307,11 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         self.video_text_opacity = 0.8 if self.text_opacity is None else float(self.text_opacity)
 
     def run(self):
-        print(f'Creating {len(self.video_paths)} classification visualization(s) using {self.core_cnt} cores... ({get_current_time()})')
+        if self.verbose: print(f'Creating {len(self.video_paths)} classification visualization(s) using {self.core_cnt} cores... ({get_current_time()})')
         for video_cnt, video_path in enumerate(self.video_paths):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(video_path)
+            if self.verbose: print(f"Creating classification visualization for video {self.video_name}... ({get_current_time()})")
             self.data_path = os.path.join(self.machine_results_dir, f'{self.video_name}.{self.file_type}')
             self.data_df = read_df(self.data_path, self.file_type).reset_index(drop=True).fillna(0)
             if self.show_pose: check_that_column_exist(df=self.data_df, column_name=self.bp_col_names, file_name=self.data_path)
@@ -374,14 +378,15 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
                                               bouts_df=self.bouts_df,
                                               final_gantt=self.final_gantt_img,
                                               gantt_clrs=self.gantt_clrs,
-                                              clf_names=self.clf_names)
+                                              clf_names=self.clf_names,
+                                              verbose=self.verbose)
 
                 for cnt, result in enumerate(pool.imap(constants, data, chunksize=self.multiprocess_chunksize)):
-                    print(f"Image batch {result} complete, Video {(video_cnt + 1)}/{len(self.video_paths)}...")
+                    if self.verbose: print(f"Image batch {result} complete, Video {(video_cnt + 1)}/{len(self.video_paths)}...")
 
             if self.video_setting:
-                print(f"Joining {self.video_name} multiprocessed video...")
-                concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.video_save_path, gpu=self.gpu)
+                if self.verbose: print(f"Joining {self.video_name} multiprocessed video...")
+                concatenate_videos_in_folder(in_folder=self.video_temp_dir, save_path=self.video_save_path, gpu=self.gpu, verbose=self.verbose)
                 video_timer.stop_timer()
                 pool.terminate()
                 pool.join()
