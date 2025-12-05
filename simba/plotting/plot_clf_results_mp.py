@@ -266,12 +266,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         check_if_valid_rgb_tuple(data=text_bg_clr, source=f'{self.__class__.__name__} text_bg_clr')
         if show_gantt is not None:
             check_int(name=f"{self.__class__.__name__} show_gantt", value=show_gantt, max_value=2, min_value=1)
-        self.video_paths, self.print_timers = video_paths, print_timers
-        if self.video_paths is None:
-            self.video_paths = find_all_videos_in_project(videos_dir=self.video_dir)
-            if len(self.video_paths) == 0:
-                raise NoDataError(msg=f'Cannot create classification videos. No videos exist in {self.video_dir} directory', source=self.__class__.__name__)
-        self.video_setting, self.frame_setting, self.rotate = video_setting, frame_setting, rotate
+        self.video_setting, self.frame_setting, self.rotate, self.print_timers = video_setting, frame_setting, rotate, print_timers
         self.circle_size, self.font_size, self.animal_names, self.text_opacity = circle_size, font_size, animal_names, text_opacity
         self.text_thickness, self.space_size, self.show_pose, self.pose_palette = text_thickness, space_size, show_pose, pose_palette
         self.text_color, self.text_bg_color, self.show_bbox, self.show_gantt, self.show_confidence = text_clr, text_bg_clr, show_bbox, show_gantt, show_confidence
@@ -279,10 +274,15 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         self.pose_threshold = read_config_entry(self.config, ConfigKey.THRESHOLD_SETTINGS.value, ConfigKey.SKLEARN_BP_PROB_THRESH.value, Dtypes.FLOAT.value, 0.00)
         if not os.path.exists(self.sklearn_plot_dir):
             os.makedirs(self.sklearn_plot_dir)
-        if isinstance(self.video_paths, str): self.video_paths = [video_paths]
-        elif isinstance(self.video_paths, list): self.video_paths = video_paths
+        if isinstance(video_paths, str): self.video_paths = [video_paths]
+        elif isinstance(video_paths, list): self.video_paths = video_paths
+        elif video_paths is None:
+            self.video_paths = find_all_videos_in_project(videos_dir=self.video_dir)
+            if len(self.video_paths) == 0:
+                raise NoDataError(msg=f'Cannot create classification videos. No videos exist in {self.video_dir} directory', source=self.__class__.__name__)
         else:
             raise InvalidInputError(msg=f'video_paths has to be a path of a list of paths. Got {type(video_paths)}', source=self.__class__.__name__)
+
         for video_path in self.video_paths:
             video_name = get_fn_ext(filepath=video_path)[1]
             data_path = os.path.join(self.machine_results_dir, f'{video_name}.{self.file_type}')
@@ -304,7 +304,7 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
         self.video_text_opacity = 0.8 if self.text_opacity is None else float(self.text_opacity)
 
     def run(self):
-        print(f'Creating {len(self.video_paths)} classification visualizations using {self.core_cnt} cores... ({get_current_time()})')
+        print(f'Creating {len(self.video_paths)} classification visualization(s) using {self.core_cnt} cores... ({get_current_time()})')
         for video_cnt, video_path in enumerate(self.video_paths):
             video_timer = SimbaTimer(start=True)
             _, self.video_name, _ = get_fn_ext(video_path)
@@ -392,6 +392,22 @@ class PlotSklearnResultsMultiProcess(ConfigReader, TrainModelMixin, PlottingMixi
             stdout_success(msg=f"{len(self.video_paths)} video(s) saved in {self.sklearn_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
         if self.frame_setting:
             stdout_success(f"Frames for {len(self.video_paths)} videos saved in sub-folders within {self.sklearn_plot_dir} directory", elapsed_time=self.timer.elapsed_time_str, source=self.__class__.__name__)
+
+
+
+# if __name__ == "__main__":
+#     clf_plotter = PlotSklearnResultsMultiProcess(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini",
+#                                                 video_setting=True,
+#                                                 frame_setting=False,
+#                                                 video_paths=None,
+#                                                 print_timers=True,
+#                                                 rotate=False,
+#                                                 animal_names=False,
+#                                                 show_bbox=True,
+#                                                 show_gantt=None)
+#     clf_plotter.run()
+
+
 
 
 # if __name__ == "__main__":
