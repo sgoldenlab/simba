@@ -211,6 +211,8 @@ class Entry_Box(Frame):
 
     def destroy(self):
         try:
+            if self.entrybox_img_lbl is not None:
+                self.entrybox_img_lbl.destroy()
             self.lblName.destroy()
             self.entPath.destroy()
         except:
@@ -232,6 +234,7 @@ class FolderSelect(Frame):
                  lblwidth: Optional[int] = 0,
                  bg_clr: Optional[str] = 'white',
                  entry_width: Optional[int] = 20,
+                 lbl_icon: Optional[str] = None,
                  initialdir: Optional[Union[str, os.PathLike]] = None,
                  tooltip_txt: Optional[str] = None,
                  tooltip_key: Optional[str] = None,
@@ -243,15 +246,23 @@ class FolderSelect(Frame):
         self.parent = parent
         Frame.__init__(self, master=parent, **kw)
         browse_icon = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS["browse_small"]["icon_path"]))
+        self.columnconfigure(0, weight=0)
+        self.columnconfigure(1, weight=0)
+        self.columnconfigure(2, weight=0)
+        if lbl_icon is not None:
+            self.columnconfigure(3, weight=0)
+            self.lbl_icon = SimBALabel(parent=self, txt='', txt_clr='black', bg_clr=label_bg_clr, font=font, width=None, anchor='w', img=lbl_icon, compound=None)
+            self.lbl_icon.grid(row=0, column=0, sticky="w")
+        else:
+            self.lbl_icon = None
         self.folderPath = StringVar()
         self.lblName = Label(self, text=folderDescription, fg=str(self.color), width=str(self.lblwidth), anchor=W, font=font, bg=label_bg_clr)
-        self.lblName.grid(row=0, column=0, sticky=NW)
+        self.lblName.grid(row=0, column=1, sticky=NW)
         self.entPath = Label(self, textvariable=self.folderPath, relief=SUNKEN, font=font, bg=bg_clr, width=entry_width)
-        self.entPath.grid(row=0, column=1, sticky=NW)
+        self.entPath.grid(row=0, column=2, sticky=NW)
         self.btnFind = SimbaButton(parent=self, txt=Defaults.BROWSE_FOLDER_BTN_TEXT.value, font=font, cmd=self.setFolderPath, img=browse_icon)
-        #self.btnFind = Button(self, text=Defaults.BROWSE_FOLDER_BTN_TEXT.value, compound="left", image=browse_icon, relief=RAISED, font=font, command=self.setFolderPath)
         self.btnFind.image = browse_icon
-        self.btnFind.grid(row=0, column=2, sticky=NW)
+        self.btnFind.grid(row=0, column=3, sticky=NW)
         self.folderPath.set("No folder selected")
         if tooltip_txt is not None and isinstance(tooltip_txt, str):
             CreateToolTip(widget=self.lblName, text=tooltip_txt)
@@ -271,7 +282,6 @@ class FolderSelect(Frame):
         else:
             self.folderPath.set("No folder selected")
             self.entPath.configure(width=len("No folder selected")+10)
-
 
     @property
     def folder_path(self):

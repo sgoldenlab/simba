@@ -206,6 +206,6 @@ class YOLOPoseInferencePopUP(PopUpMixin):
 
 
 
-YOLOPoseInferencePopUP()
+#YOLOPoseInferencePopUP()
 
 

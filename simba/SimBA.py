@@ -97,8 +97,6 @@ from simba.ui.pop_ups.directing_other_animals_plot_pop_up import \
 from simba.ui.pop_ups.direction_animal_to_bodypart_settings_pop_up import \
     DirectionAnimalToBodyPartSettingsPopUp
 from simba.ui.pop_ups.distance_plot_pop_up import DistancePlotterPopUp
-from simba.ui.pop_ups.dlc_annotations_to_labelme_popup import \
-    DLCAnnotations2LabelMePopUp
 from simba.ui.pop_ups.dlc_h5_inference_to_yolo_popup import \
     DLCH5Inference2YoloPopUp
 from simba.ui.pop_ups.dlc_to_labelme_popup import DLC2LabelmePopUp

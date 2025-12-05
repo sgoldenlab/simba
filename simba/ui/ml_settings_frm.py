@@ -33,7 +33,7 @@ class GetMLSettingsFrame():
         self.fill_frm()
 
     def add_entry_box(self):
-        entry_box = Entry_Box(parent=self.ml_settings_frm, fileDescription=f'CLASSIFIER NAME {len(self.clf_entry_boxes) + 1}: ', labelwidth=self.lbl_width, entry_box_width=self.bx_width)
+        entry_box = Entry_Box(parent=self.ml_settings_frm, fileDescription=f'CLASSIFIER NAME {len(self.clf_entry_boxes) + 1}: ', labelwidth=self.lbl_width, entry_box_width=self.bx_width, img='circle_black')
         self.clf_entry_boxes.append(entry_box)
         self.fill_frm()
 
