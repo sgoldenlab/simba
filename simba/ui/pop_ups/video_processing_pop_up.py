@@ -23,7 +23,7 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
                                         CreateToolTip, DropDownMenu, Entry_Box,
                                         FileSelect, FolderSelect, SimbaButton,
                                         SimbaCheckbox, SimBADropDown,
-                                        SimBALabel, SimBARadioButton)
+                                        SimBALabel, SimBARadioButton, SimBAScaleBar)
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable,
                                 check_if_dir_exists,
@@ -136,24 +136,26 @@ class CLAHEPopUp(PopUpMixin):
 
 class CropVideoPopUp(PopUpMixin):
     def __init__(self):
-        super().__init__(title="CROP VIDEO(S)")
+        super().__init__(title="CROP VIDEO(S)", icon='crop')
         crop_video_lbl_frm = LabelFrame( self.main_frm, text="CROP SINGLE VIDEO", font=Formats.FONT_HEADER.value)
-        selected_video = FileSelect(crop_video_lbl_frm, "VIDEO PATH: ", title="Select a video file", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
-        use_gpu_cb_single, use_gpu_var_single = SimbaCheckbox(parent=crop_video_lbl_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
-        button_crop_video_single = SimbaButton(parent=crop_video_lbl_frm, txt="CROP SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=crop_single_video, cmd_kwargs={'file_path': lambda: selected_video.file_path, 'gpu': lambda: use_gpu_var_single.get()})
 
+        gpu_state = NORMAL if check_nvidea_gpu_available() else DISABLED
+        selected_video = FileSelect(crop_video_lbl_frm, "VIDEO PATH: ", title="Select a video file", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='browse')
+        self.single_video_gpu_dropdown = SimBADropDown(parent=crop_video_lbl_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ',label_width=20, dropdown_width=20, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
+        button_crop_video_single = SimbaButton(parent=crop_video_lbl_frm, txt="CROP SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=crop_single_video, cmd_kwargs={'file_path': lambda: selected_video.file_path, 'gpu': lambda: str_2_bool(self.single_video_gpu_dropdown.get_value())})
 
         crop_video_lbl_frm_multiple = LabelFrame(self.main_frm, text="CROP MULTIPLE VIDEOS", font=Formats.FONT_HEADER.value, padx=5, pady=5)
-        instructions_1 = Label(crop_video_lbl_frm_multiple, text="The crop coordinates you draw in the first video,\n will be applied on all videos in directory.", font=Formats.FONT_REGULAR.value)
-        instructions_2 = Label(crop_video_lbl_frm_multiple, text="To draw crop coordinates on each individual video,\n instead use SimBA batch processing.", font=Formats.FONT_REGULAR.value)
-        input_folder = FolderSelect(crop_video_lbl_frm_multiple, "VIDEO DIRECTORY:", title="Select Folder with videos", lblwidth=20)
-        output_folder = FolderSelect(crop_video_lbl_frm_multiple,"OUTPUT DIRECTORY:",title="Select a folder for your output videos",lblwidth=20)
-        use_gpu_cb_multiple, use_gpu_var_multiple = SimbaCheckbox(parent=crop_video_lbl_frm_multiple, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
-        button_crop_video_multiple = SimbaButton(parent=crop_video_lbl_frm_multiple, txt="CROP VIDEO DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=crop_multiple_videos, cmd_kwargs={'directory_path': lambda:input_folder.folder_path, 'output_path': lambda:output_folder.folder_path,  'gpu': use_gpu_var_multiple.get()})
+        instructions_1 = SimBALabel(parent=crop_video_lbl_frm_multiple, txt="The crop coordinates you draw in the first video,\n will be applied on all videos in directory.", font=Formats.FONT_REGULAR_ITALICS.value)
+        instructions_2 = SimBALabel(parent=crop_video_lbl_frm_multiple, txt="To draw crop coordinates on each individual video,\n instead use SimBA batch processing.", font=Formats.FONT_REGULAR_ITALICS.value)
+        input_folder = FolderSelect(crop_video_lbl_frm_multiple, "VIDEO DIRECTORY:", title="Select Folder with videos", lblwidth=20, lbl_icon='browse')
+        output_folder = FolderSelect(crop_video_lbl_frm_multiple,"OUTPUT DIRECTORY:",title="Select a folder for your output videos",lblwidth=20, lbl_icon='browse')
+        self.multiple_video_gpu_dropdown = SimBADropDown(parent=crop_video_lbl_frm_multiple, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ',label_width=20, dropdown_width=20, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
+
+        button_crop_video_multiple = SimbaButton(parent=crop_video_lbl_frm_multiple, txt="CROP VIDEO DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=crop_multiple_videos, cmd_kwargs={'directory_path': lambda:input_folder.folder_path, 'output_path': lambda:output_folder.folder_path,  'gpu': str_2_bool(self.multiple_video_gpu_dropdown.get_value())})
 
         crop_video_lbl_frm.grid(row=0, sticky=NW)
         selected_video.grid(row=0, sticky=NW)
-        use_gpu_cb_single.grid(row=1, column=0, sticky=NW)
+        self.single_video_gpu_dropdown.grid(row=1, column=0, sticky=NW)
         button_crop_video_single.grid(row=2, sticky=NW)
 
         crop_video_lbl_frm_multiple.grid(row=1, sticky=NW)
@@ -161,7 +163,7 @@ class CropVideoPopUp(PopUpMixin):
         instructions_2.grid(row=1, sticky=NW)
         input_folder.grid(row=2, sticky=NW)
         output_folder.grid(row=3, sticky=NW)
-        use_gpu_cb_multiple.grid(row=4, sticky=NW)
+        self.multiple_video_gpu_dropdown.grid(row=4, sticky=NW)
         button_crop_video_multiple.grid(row=5, sticky=NW)
         self.main_frm.mainloop()
 
@@ -173,20 +175,22 @@ class ClipVideoPopUp(PopUpMixin):
         selected_video_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="Video path", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         selected_video = FileSelect(selected_video_frm, "FILE PATH: ", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         selected_video.grid(row=0, column=0, sticky="NW")
-        use_gpu_frm = LabelFrame(self.main_frm, text="GPU", font=Formats.FONT_HEADER.value, padx=5, pady=5)
+        use_gpu_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GPU", icon_name='gpu_3', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5)
         gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
-        self.use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=use_gpu_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2', state=gpu_available)
-        self.use_gpu_cb.grid(row=0, column=0, sticky=NW)
-        method_1_frm = LabelFrame(self.main_frm, text="Method 1", font=Formats.FONT_HEADER.value, padx=5, pady=5)
-        label_set_time_1 = Label(method_1_frm, text="Please enter the time frame in HH:MM:SS format", font=Formats.FONT_REGULAR.value)
-        start_time = Entry_Box(method_1_frm, "Start at (HH:MM:SS):", "22")
-        end_time = Entry_Box(method_1_frm, "End at (HH:MM:SS):", "22")
+        self.gpu_dropdown = SimBADropDown(parent=use_gpu_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ',label_width=20, dropdown_width=20, value='FALSE', img='gpu_3', state=gpu_available, tooltip_key='USE_GPU')
+        self.gpu_dropdown.grid(row=0, column=0, sticky=NW)
+
+        method_1_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="METHOD 1", icon_name='circle_black', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5)
+        label_set_time_1 = SimBALabel(parent=method_1_frm, txt="Please enter the time frame in HH:MM:SS format", font=Formats.FONT_REGULAR_ITALICS.value)
+        start_time = Entry_Box(method_1_frm,  fileDescription="Start at (HH:MM:SS):", labelwidth=22, img='play')
+        end_time = Entry_Box(method_1_frm, fileDescription="End at (HH:MM:SS):", labelwidth=22, img='stop')
         CreateToolTip(method_1_frm, "Method 1 will retrieve the specified time input. (eg: input of Start at: 00:00:00, End at: 00:01:00, will create a new video from the chosen video from the very start till it reaches the first minute of the video)")
-        method_2_frm = LabelFrame(self.main_frm, text="Method 2", font=Formats.FONT_HEADER.value, padx=5, pady=5)
-        method_2_time = Entry_Box(method_2_frm, "Seconds:", "22", validation="numeric")
-        label_method_2 = Label(method_2_frm, text="Method 2 will retrieve from the end of the video (e.g.,: an input of 3 seconds will get rid of the first 3 seconds of the video).", font=Formats.FONT_REGULAR.value)
-        button_cutvideo_method_1 = SimbaButton(parent=method_1_frm, txt="CUT VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=clip_video_in_range, cmd_kwargs={'file_path': lambda: selected_video.file_path, 'start_time': lambda:start_time.entry_get, 'end_time': lambda:end_time.entry_get, 'gpu': lambda: self.use_gpu_var.get()})
-        button_cutvideo_method_2 = SimbaButton(parent=method_2_frm, txt="CUT VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=remove_beginning_of_video, cmd_kwargs={'file_path': lambda:selected_video.file_path, 'time': lambda:method_2_time.entry_get, 'gpu': lambda:self.use_gpu_var.get()})
+
+        method_2_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="METHOD 2", icon_name='circle_black', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5)
+        method_2_time = Entry_Box(method_2_frm, "Seconds:", "22", validation="numeric", img='timer')
+        label_method_2 = SimBALabel(parent=method_2_frm, txt="Method 2 will retrieve from the end of the video (e.g.,: an input of 3 seconds will get rid of the first 3 seconds of the video).", font=Formats.FONT_REGULAR_ITALICS.value)
+        button_cutvideo_method_1 = SimbaButton(parent=method_1_frm, txt="CUT VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=clip_video_in_range, cmd_kwargs={'file_path': lambda: selected_video.file_path, 'start_time': lambda:start_time.entry_get, 'end_time': lambda:end_time.entry_get, 'gpu': lambda: str_2_bool(self.gpu_dropdown.get_value())})
+        button_cutvideo_method_2 = SimbaButton(parent=method_2_frm, txt="CUT VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=remove_beginning_of_video, cmd_kwargs={'file_path': lambda:selected_video.file_path, 'time': lambda:method_2_time.entry_get, 'gpu': lambda: str_2_bool(self.gpu_dropdown.get_value())})
         selected_video_frm.grid(row=0, sticky=NW)
         use_gpu_frm.grid(row=1, column=0, sticky=NW)
         method_1_frm.grid(row=2, sticky=NW, pady=5)
@@ -199,40 +203,45 @@ class ClipVideoPopUp(PopUpMixin):
         method_2_time.grid(row=2, sticky=NW)
         button_cutvideo_method_2.grid(row=3, sticky=NW)
 
-#ClipVideoPopUp()
+#_ = ClipVideoPopUp()
 
 class GreyscaleSingleVideoPopUp(PopUpMixin):
     def __init__(self):
-        super().__init__(title="GREYSCALE VIDEO")
+        super().__init__(title="GREYSCALE VIDEO", icon='grey')
         video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GREYSCALE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect( video_frm, "VIDEO FILE PATH", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
-        self.use_gpu_var_video = BooleanVar(value=False)
-        use_gpu_video_cb, self.use_gpu_var_video = SimbaCheckbox(parent=video_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+        self.selected_video = FileSelect( video_frm, "VIDEO FILE PATH", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='browse')
+        gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
+        self.gpu_dropdown = SimBADropDown(parent=video_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ',label_width=25, dropdown_width=20, value='FALSE', img='gpu_3', state=gpu_available, tooltip_key='USE_GPU')
         run_video_btn = SimbaButton(parent=video_frm, txt="RUN ON SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_video)
         dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GREYSCALE VIDEO DIRECTORY", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.dir_selected = FolderSelect(dir_frm, "VIDEO DIRECTORY PATH", title="Select folder with videos", lblwidth=25)
+        self.dir_selected = FolderSelect(dir_frm, "VIDEO DIRECTORY PATH", title="Select folder with videos", lblwidth=25, lbl_icon='browse')
 
-        use_gpu_dir_cb, self.use_gpu_var_dir = SimbaCheckbox(parent=dir_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+
+        self.gpu_dropdown_multiple = SimBADropDown(parent=dir_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ',label_width=25, dropdown_width=20, value='FALSE', img='gpu_3', state=gpu_available, tooltip_key='USE_GPU')
         run_dir_btn = SimbaButton(parent=dir_frm, txt="RUN ON DIRECTORY OF VIDEOS", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run_dir)
 
         video_frm.grid(row=0, column=0, sticky="NW")
         self.selected_video.grid(row=0, column=0, sticky="NW")
-        use_gpu_video_cb.grid(row=1, column=0, sticky="NW")
+        self.gpu_dropdown.grid(row=1, column=0, sticky="NW")
         run_video_btn.grid(row=2, column=0, sticky="NW")
 
         dir_frm.grid(row=1, column=0, sticky="NW")
         self.dir_selected.grid(row=0, column=0, sticky="NW")
-        use_gpu_dir_cb.grid(row=1, column=0, sticky="NW")
+        self.gpu_dropdown_multiple.grid(row=1, column=0, sticky="NW")
         run_dir_btn.grid(row=2, column=0, sticky="NW")
 
 
     def run_video(self):
         check_file_exist_and_readable(file_path=self.selected_video.file_path)
-        video_to_greyscale(file_path=self.selected_video.file_path, gpu=self.use_gpu_var_video.get())
+        video_to_greyscale(file_path=self.selected_video.file_path, gpu=str_2_bool(self.gpu_dropdown.get_value()))
 
     def run_dir(self):
         check_if_dir_exists(in_dir=self.dir_selected.folder_path)
-        batch_video_to_greyscale(path=self.dir_selected.folder_path, gpu=self.use_gpu_var_dir.get())
+        batch_video_to_greyscale(path=self.dir_selected.folder_path, gpu=str_2_bool(self.gpu_dropdown_multiple.get_value()))
+
+
+#_ = GreyscaleSingleVideoPopUp()
+
 
 class SuperImposeFrameCountPopUp(PopUpMixin):
     def __init__(self):
@@ -242,19 +251,18 @@ class SuperImposeFrameCountPopUp(PopUpMixin):
         font_dict = get_fonts()
 
         gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
-        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=settings_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2', state=gpu_available)
-
-        self.font_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=list(range(1, 101, 2)), label="FONT SIZE:", label_width=25, value=20)
-        self.font_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=color_dict, label="FONT COLOR:", label_width=25, value='Black')
-        self.font_bg_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=color_dict, label="FONT BACKGROUND COLOR:", label_width=25, value='White')
-        self.font_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=list(font_dict.keys()), label="FONT:", label_width=25, value='Arial')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ',label_width=25, dropdown_width=35, value='FALSE', img='gpu_3', state=gpu_available, tooltip_key='USE_GPU')
+        self.font_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=list(range(1, 101, 2)), label="FONT SIZE:", label_width=25, value=20, img='font_size')
+        self.font_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=color_dict, label="FONT COLOR:", label_width=25, value='Black', img='text_color')
+        self.font_bg_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=color_dict, label="FONT BACKGROUND COLOR:", label_width=25, value='White', img='fill')
+        self.font_dropdown = SimBADropDown(parent=settings_frm, dropdown_width=35, dropdown_options=list(font_dict.keys()), label="FONT:", label_width=25, value='Arial', img='font')
 
         settings_frm.grid(row=0, column=0, sticky="NW")
         self.font_size_dropdown.grid(row=0, column=0, sticky="NW")
         self.font_color_dropdown.grid(row=1, column=0, sticky="NW")
         self.font_bg_color_dropdown.grid(row=2, column=0, sticky="NW")
         self.font_dropdown.grid(row=3, column=0, sticky="NW")
-        use_gpu_cb.grid(row=4, column=0, sticky="NW")
+        self.gpu_dropdown.grid(row=4, column=0, sticky="NW")
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE FRAME COUNT", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
@@ -289,7 +297,7 @@ class SuperImposeFrameCountPopUp(PopUpMixin):
     def apply(self):
         check_ffmpeg_available(raise_error=True)
         timer = SimbaTimer(start=True)
-        use_gpu = self.use_gpu_var.get()
+        use_gpu = str_2_bool(self.gpu_dropdown.get_value())
         font = self.font_dropdown.getChoices()
         font_clr = self.font_color_dropdown.getChoices()
         font_bg_clr = self.font_bg_color_dropdown.getChoices()
@@ -305,7 +313,7 @@ class SuperImposeFrameCountPopUp(PopUpMixin):
         timer.stop_timer()
         stdout_success(msg=f'Frame counts superimposed on {len(self.video_paths)} video(s)', elapsed_time=timer.elapsed_time_str)
 
-#SuperImposeFrameCountPopUp()
+#_ = SuperImposeFrameCountPopUp()
 
 class MultiShortenPopUp(PopUpMixin):
     def __init__(self):
@@ -461,6 +469,8 @@ class ChangeImageFormatPopUp(PopUpMixin):
             file_type_out=self.out_file_type.get(),
         )
 
+
+#_ = ChangeImageFormatPopUp()
 
 class ConvertVideoPopUp(PopUpMixin):
     def __init__(self):
@@ -645,7 +655,7 @@ class ExtractAllFramesPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="EXTRACT ALL FRAMES", icon='frames')
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm,header="SINGLE VIDEO",icon_name=Keys.DOCUMENTATION.value,icon_link=Links.VIDEO_TOOLS.value)
-        video_path = FileSelect( single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        video_path = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         single_video_btn = SimbaButton(parent=single_video_frm, txt="Extract Frames (Single video)", img='rocket', font=Formats.FONT_REGULAR.value, cmd=extract_frames_single_video, cmd_kwargs={'file_path': lambda:video_path.file_path, 'save_dir': None})
         multiple_videos_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="MULTIPLE VIDEOS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
 
@@ -663,21 +673,24 @@ class MultiCropPopUp(PopUpMixin):
     def __init__(self):
 
         PopUpMixin.__init__(self, title="MULTI-CROP", size=(500, 300), icon='crop')
-        self.input_folder = FolderSelect(self.main_frm, "INPUT VIDEO FOLDER: ", lblwidth=25)
-        self.output_folder = FolderSelect(self.main_frm, "OUTPUT FOLDER: ", lblwidth=25)
+        self.input_folder = FolderSelect(self.main_frm, "INPUT VIDEO FOLDER: ", lblwidth=25, lbl_icon='browse')
+        self.output_folder = FolderSelect(self.main_frm, "OUTPUT FOLDER: ", lblwidth=25, lbl_icon='browse')
         video_options = Options.ALL_VIDEO_FORMAT_OPTIONS_2.value
-        self.video_type_dropdown = SimBADropDown(parent=self.main_frm, dropdown_options=video_options, label="INPUT VIDEO FORMAT: ", label_width=25, dropdown_width=25, value='mp4')
-        self.crop_cnt_dropdown = SimBADropDown(parent=self.main_frm, dropdown_options=list(range(2, 31)), label="CROPS PER VIDEO: ", label_width=25, dropdown_width=25, value=2)
+        self.video_type_dropdown = SimBADropDown(parent=self.main_frm, dropdown_options=video_options, label="INPUT VIDEO FORMAT: ", label_width=25, dropdown_width=25, value='mp4', img='file_type')
+        self.crop_cnt_dropdown = SimBADropDown(parent=self.main_frm, dropdown_options=list(range(2, 31)), label="CROPS PER VIDEO: ", label_width=25, dropdown_width=25, value=2, img='abacus')
         quality_options = list(percent_to_crf_lookup().keys())
-        self.quality_dropdown = SimBADropDown(parent=self.main_frm, dropdown_options=quality_options, label="CROP OUTPUT QUALITY: ", label_width=25, dropdown_width=25, value=60)
-        self.use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=self.main_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+        self.quality_dropdown = SimBADropDown(parent=self.main_frm, dropdown_options=quality_options, label="CROP OUTPUT QUALITY: ", label_width=25, dropdown_width=25, value=60, img='pct')
+        gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
+
+        self.gpu_dropdown = SimBADropDown(parent=self.main_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ',label_width=25, dropdown_width=25, value='FALSE', img='gpu_3', state=gpu_available, tooltip_key='USE_GPU')
+
         self.create_run_frm(run_function=self.run)
         self.input_folder.grid(row=0, sticky=NW)
         self.output_folder.grid(row=1, sticky=NW)
         self.video_type_dropdown.grid(row=2, sticky=NW)
         self.crop_cnt_dropdown.grid(row=3, sticky=NW)
         self.quality_dropdown.grid(row=4, sticky=NW)
-        self.use_gpu_cb.grid(row=5, sticky=NW)
+        self.gpu_dropdown.grid(row=5, sticky=NW)
         self.create_run_frm(run_function=self.run)
 
     def run(self):
@@ -688,23 +701,24 @@ class MultiCropPopUp(PopUpMixin):
                                input_folder=self.input_folder.folder_path,
                                output_folder=self.output_folder.folder_path,
                                crop_cnt=int(self.crop_cnt_dropdown.getChoices()),
-                               gpu=self.use_gpu_var.get(),
+                               gpu=str_2_bool(self.gpu_dropdown.get_value()),
                                quality=int(self.quality_dropdown.getChoices()))
         cropper.run()
 
-
+#_ = MultiCropPopUp()
 
 class ChangeFpsSingleVideoPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="CHANGE FRAME RATE: SINGLE VIDEO", size=(500, 300), icon='fps')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header='SETTINGS', icon_name='settings')
-        self.video_path = FileSelect(settings_frm, "VIDEO PATH:", title="Select a video file", lblwidth=15, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
-        self.new_fps_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 101, 1)), label='NEW FPS: ', label_width=15, dropdown_width=20, value=15)
-        gpu_cb, self.gpu_var = SimbaCheckbox(parent=settings_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+        gpu_state = DISABLED if not check_nvidea_gpu_available() else NORMAL
+        self.video_path = FileSelect(settings_frm, "VIDEO PATH:", title="Select a video file", lblwidth=15, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='browse')
+        self.new_fps_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 101, 1)), label='NEW FPS: ', label_width=15, dropdown_width=20, value=15, img='fps')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ', label_width=15, dropdown_width=20, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.video_path.grid(row=0, sticky=NW)
         self.new_fps_dropdown.grid(row=1, sticky=NW)
-        gpu_cb.grid(row=2, sticky=NW)
+        self.gpu_dropdown.grid(row=2, sticky=NW)
         self.create_run_frm(run_function=self.run)
 
     def run(self):
@@ -712,23 +726,25 @@ class ChangeFpsSingleVideoPopUp(PopUpMixin):
         video_meta_data = get_video_meta_data(video_path=video_path)
         _, video_name, _ = get_fn_ext(filepath=video_path)
         new_fps = int(self.new_fps_dropdown.getChoices())
-        gpu = self.gpu_var.get()
+        gpu = str_2_bool(self.gpu_dropdown.get_value())
         if video_meta_data['fps'] <= new_fps:
             FrameRangeWarning(msg=f'For video {video_name}, the new FPS ({new_fps}) is higher or the same as the original FPS ({video_meta_data["fps"]})', source=self.__class__.__name__)
         threading.Thread(change_single_video_fps(file_path=video_path, fps=new_fps, gpu=gpu)).start()
+
+#_ = ChangeFpsSingleVideoPopUp()
 
 class ChangeFpsMultipleVideosPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="CHANGE FRAME RATE: MULTIPLE VIDEO", size=(500, 300), icon='fps')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header='SETTINGS', icon_name='settings')
-        self.directory_path = FolderSelect(settings_frm, "VIDEO DIRECTORY PATH:", title="Select folder with videos: ", lblwidth="25")
-
-        self.new_fps_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 101, 1)), label='NEW FPS: ', label_width=25, dropdown_width=20, value=15)
-        gpu_cb, self.gpu_var = SimbaCheckbox(parent=settings_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+        gpu_state = DISABLED if not check_nvidea_gpu_available() else NORMAL
+        self.directory_path = FolderSelect(settings_frm, "VIDEO DIRECTORY PATH:", title="Select folder with videos: ", lblwidth=25, lbl_icon='browse')
+        self.new_fps_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 101, 1)), label='NEW FPS: ', label_width=25, dropdown_width=20, value=15, img='fps')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ', label_width=25, dropdown_width=20, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.directory_path.grid(row=0, sticky=NW)
         self.new_fps_dropdown.grid(row=1, sticky=NW)
-        gpu_cb.grid(row=2, sticky=NW)
+        self.gpu_dropdown.grid(row=2, sticky=NW)
         self.create_run_frm(run_function=self.run)
         self.main_frm.mainloop()
 
@@ -737,8 +753,11 @@ class ChangeFpsMultipleVideosPopUp(PopUpMixin):
         check_if_dir_exists(in_dir=video_dir)
         _ = find_all_videos_in_directory(directory=video_dir, raise_error=True)
         new_fps = int(self.new_fps_dropdown.getChoices())
-        gpu = self.gpu_var.get()
+        gpu = str_2_bool(self.gpu_dropdown.get_value())
         threading.Thread(change_fps_of_multiple_videos(path=video_dir, fps=new_fps, gpu=gpu)).start()
+
+#_ = ChangeFpsMultipleVideosPopUp()
+
 
 class ExtractSEQFramesPopUp(PopUpMixin):
     def __init__(self):
@@ -866,16 +885,17 @@ class CalculatePixelsPerMMInVideoPopUp(PopUpMixin):
        :autoplay:
        :loop:
     """
+
     def __init__(self):
         PopUpMixin.__init__(self, title="CALCULATE PIXELS PER MILLIMETER IN VIDEO", size=(550, 550), icon='distance')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.video_path = FileSelect(settings_frm, "Select a video file: ",  title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=30)
-        self.known_distance = Entry_Box(settings_frm, "Known real-life metric distance (mm): ", "30", validation="numeric")
+        self.video_path = FileSelect(settings_frm, "SELECT VIDEO FILE: ",  title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=40, lbl_icon='browse')
+        self.known_distance = Entry_Box(settings_frm, "KNOWN REAL LIFE METRIC DISTANCE (mm): ", labelwidth=40, validation="numeric", img='distance')
         run_btn = SimbaButton(parent=settings_frm, txt="GET PIXELS PER MILLIMETER", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run)
-        settings_frm.grid(row=0, column=0, pady=10, sticky=NW)
-        self.video_path.grid(row=0, column=0, pady=10, sticky=NW)
-        self.known_distance.grid(row=1, column=0, pady=10, sticky=NW)
-        run_btn.grid(row=2, column=0, pady=10, sticky=NW)
+        settings_frm.grid(row=0, column=0, sticky=NW)
+        self.video_path.grid(row=0, column=0, sticky=NW)
+        self.known_distance.grid(row=1, column=0, sticky=NW)
+        run_btn.grid(row=2, column=0, sticky=NW)
         self.main_frm.mainloop()
 
     def run(self):
@@ -886,23 +906,22 @@ class CalculatePixelsPerMMInVideoPopUp(PopUpMixin):
         px_per_mm_interface.run()
         print(f"ONE (1) PIXEL REPRESENTS {round(px_per_mm_interface.ppm, 4)} MILLIMETERS IN VIDEO {os.path.basename(self.video_path.file_path)}.")
 
+
+#_ = CalculatePixelsPerMMInVideoPopUp()
+
 class ConcatenatingVideosPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="CONCATENATE TWO VIDEOS", size=(600, 300), icon='concat_videos')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.video_path_1 = FileSelect(settings_frm, "FIRST VIDEO PATH: ", title="Select a video file", lblwidth=35, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
-        self.video_path_2 = FileSelect(settings_frm, "SECOND VIDEO PATH: ", title="Select a video file", lblwidth=35, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
+        self.video_path_1 = FileSelect(settings_frm, "FIRST VIDEO PATH: ", title="Select a video file", lblwidth=35, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='one')
+        self.video_path_2 = FileSelect(settings_frm, "SECOND VIDEO PATH: ", title="Select a video file", lblwidth=35, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='two')
         resolutions = ["VIDEO 1", "VIDEO 2", 240, 320, 480, 640, 720, 800, 960, 1120, 1080, 1980]
-
-
-        self.resolution_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=resolutions, label="RESOLUTION (ASPECT RATIO RETAINED):", label_width=35, dropdown_width=35, value=resolutions[0])
-        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU (REDUCED RUN-TIME):", label_width=35, dropdown_width=35, value='FALSE')
-
+        self.resolution_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=resolutions, label="RESOLUTION (ASPECT RATIO RETAINED):", label_width=35, dropdown_width=35, value=resolutions[0], img='monitor')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU (REDUCED RUN-TIME):", label_width=35, dropdown_width=35, value='FALSE', img='gpu_3', state=self.gpu_available)
         self.horizontal = BooleanVar(value=False)
         horizontal_radio_btn = SimBARadioButton(parent=settings_frm, txt="HORIZONTAL concatenation", variable=self.horizontal, img='horizontal', value=True, compound='left')
         vertical_radio_btn = SimBARadioButton(parent=settings_frm, txt="VERTICAL concatenation", variable=self.horizontal, img='vertical', value=False, compound='left')
-
-
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.video_path_1.grid(row=0, column=0, sticky=NW)
         self.video_path_2.grid(row=1, column=0, sticky=NW)
@@ -945,6 +964,8 @@ class ConcatenatingVideosPopUp(PopUpMixin):
                 #raise ResolutionError(f'For VERTICAL concatenation, the videos has to be the same width. Got Video 1 width: {video_1_meta["width"]}, Video 2 width: {video_2_meta["width"]}. Select a specific resolution or convert the video resolution widths of the two videos first to be the same.', source=self.__class__.__name__)
         threading.Thread(video_concatenator(video_one_path=video_1_path, video_two_path=video_2_path, resolution=resolution, horizontal=horizontal_bool, gpu=gpu_bool)).start()
 
+#_ = ConcatenatingVideosPopUp()
+
 class ConcatenatorPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Optional[Union[str, os.PathLike]] = None):
         self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
@@ -982,11 +1003,11 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
             self.icons_dict[file_name]["btn"].grid(row=0, column=file_cnt, sticky=NW)
         self.join_type_var.set(value="mosaic")
         self.resolution_frm = LabelFrame(self.main_frm, text="RESOLUTION", pady=5, padx=5, font=Formats.FONT_HEADER.value, fg="black")
-        self.resolution_width = SimBADropDown(parent=self.resolution_frm, dropdown_options=["480", "640", "1280", "1920", "2560"], label='WIDTH:', label_width=15, dropdown_width=30, value="480")
-        self.resolution_height = SimBADropDown(parent=self.resolution_frm, dropdown_options=["480", "640", "1280", "1920", "2560"], label='HEIGHT:', label_width=15, dropdown_width=30, value="640")
+        self.resolution_width = SimBADropDown(parent=self.resolution_frm, dropdown_options=["480", "640", "1280", "1920", "2560"], label='WIDTH:', label_width=15, dropdown_width=30, value="480", img='width')
+        self.resolution_height = SimBADropDown(parent=self.resolution_frm, dropdown_options=["480", "640", "1280", "1920", "2560"], label='HEIGHT:', label_width=15, dropdown_width=30, value="640", img='height')
         self.gpu_frm = LabelFrame(self.main_frm, text="GPU", pady=5, padx=5, font=Formats.FONT_HEADER.value, fg="black")
-        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=self.gpu_frm, txt="USE (reduced runtime)", txt_img='gpu_2', state=self.gpu_available)
-        use_gpu_cb.grid(row=0, column=0, sticky="NW")
+        self.gpu_dropdown = SimBADropDown(parent=self.gpu_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU (REDUCED RUN-TIME):", label_width=35, dropdown_width=35, value='FALSE', img='gpu_3', state=self.gpu_available)
+        self.gpu_dropdown.grid(row=0, column=0, sticky="NW")
         self.resolution_frm.grid(row=3, column=0, sticky=NW)
         self.gpu_frm.grid(row=4, column=0, sticky="NW")
         self.resolution_width.grid(row=0, column=0, sticky=NW)
@@ -1004,17 +1025,18 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
             raise MixedMosaicError(msg="If using the mixed mosaic join type, please tick check-boxes for at least three video types.", source=self.__class__.__name__ )
         if (len(file_paths) < 3) & (self.join_type_var.get() == "mosaic"):
             self.join_type_var.set(value="vertical")
+        gpu = str_2_bool(self.gpu_dropdown.get_value())
 
         video_merger = FrameMergererFFmpeg(config_path=self.config_path,
                                            video_paths=file_paths,
                                            video_height=int(self.resolution_height.getChoices()),
                                            video_width=int(self.resolution_width.getChoices()),
                                            concat_type=self.join_type_var.get(),
-                                           gpu=self.use_gpu_var.get())
+                                           gpu=gpu)
 
         threading.Thread(target=video_merger.run())
 
-
+#_ = ConcatenatorPopUp()
 #ConcatenatorPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 #ConcatenatorPopUp(config_path=None)
 
@@ -1022,16 +1044,15 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
 
 class VideoRotatorPopUp(PopUpMixin):
     def __init__(self):
-        super().__init__(title="ROTATE VIDEOS")
+        super().__init__(title="ROTATE VIDEOS", icon='rotate')
         self.save_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SAVE LOCATION", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.save_dir = FolderSelect(self.save_dir_frm, "Save directory:", lblwidth=20)
-
         self.setting_frm = LabelFrame(self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value)
-
-        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=self.setting_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
-        use_ffmpeg_cb, self.use_ffmpeg_var = SimbaCheckbox(parent=self.setting_frm, txt="Use GPU (reduced runtime)")
-        use_gpu_cb.grid(row=0, column=0, sticky=NW)
-        use_ffmpeg_cb.grid(row=1, column=0, sticky=NW)
+        self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
+        self.gpu_dropdown = SimBADropDown(parent=self.setting_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU (REDUCED RUN-TIME):", label_width=35, dropdown_width=35, value='FALSE', img='gpu_3', state=self.gpu_available)
+        self.ffmpeg_dropdown = SimBADropDown(parent=self.setting_frm, dropdown_options=['TRUE', 'FALSE'], label="USE FFMPEG:", label_width=35, dropdown_width=35, value='FALSE', img='ffmpeg')
+        self.gpu_dropdown.grid(row=0, column=0, sticky=NW)
+        self.ffmpeg_dropdown.grid(row=1, column=0, sticky=NW)
 
         self.rotate_dir_frm = LabelFrame(self.main_frm, text="ROTATE VIDEOS IN DIRECTORY", font=Formats.FONT_HEADER.value)
         self.input_dir = FolderSelect(self.rotate_dir_frm, "Video directory:", lblwidth=20)
@@ -1056,41 +1077,40 @@ class VideoRotatorPopUp(PopUpMixin):
         self.input_file.grid(row=0, column=0, sticky=NW)
         self.run_file.grid(row=1, column=0, sticky=NW)
 
+        self.main_frm.mainloop()
+
     def run(self, input_path: str, output_path: str):
         check_if_dir_exists(in_dir=output_path)
-        rotator = VideoRotator(
-            input_path=input_path,
-            output_dir=output_path,
-            ffmpeg=self.use_ffmpeg_var.get(),
-            gpu=self.use_gpu_var.get(),
-        )
+        ffmpeg = str_2_bool(self.ffmpeg_dropdown.get_value())
+        gpu = str_2_bool(self.gpu_dropdown.get_value())
+        rotator = VideoRotator(input_path=input_path, output_dir=output_path, ffmpeg=ffmpeg, gpu=gpu)
         rotator.run()
 
+
+#_ = VideoRotatorPopUp()
 
 class VideoTemporalJoinPopUp(PopUpMixin):
 
     def __init__(self):
-        super().__init__(title="TEMPORAL JOIN VIDEOS")
-        self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm,
-                                                     header="SETTINGS",
-                                                     icon_name=Keys.DOCUMENTATION.value,
-                                                     icon_link=Links.VIDEO_TOOLS.value)
+        super().__init__(title="TEMPORAL JOIN VIDEOS", icon='time')
+        self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
 
         FPS_OPTIONS = list(range(2, 102, 2))
         FPS_OPTIONS.insert(0, 'SAME AS THE FIRST INPUT VIDEO IN INPUT DIRECTORY')
         FPS_OPTIONS.insert(0, 'KEEP INPUT VIDEO FPS')
+        self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
 
-        self.input_dir = FolderSelect( self.settings_frm, "INPUT DIRECTORY:", lblwidth=30)
-        self.file_format = DropDownMenu(self.settings_frm, "INPUT VIDEO FORMAT:", Options.VIDEO_FORMAT_OPTIONS.value, "30")
-        self.out_fps = DropDownMenu(self.settings_frm, "OUTPUT FPS:", FPS_OPTIONS, "30")
-        self.out_fps.setChoices('SAME AS INPUT VIDEOS')
-        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=self.settings_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
-        self.file_format.setChoices(Options.VIDEO_FORMAT_OPTIONS.value[0])
+
+        self.input_dir = FolderSelect( self.settings_frm, "INPUT DIRECTORY:", lblwidth=30, lbl_icon='browse')
+
+        self.file_format = SimBADropDown(parent=self.settings_frm, label="INPUT VIDEO FORMAT:", dropdown_options=Options.VIDEO_FORMAT_OPTIONS.value, label_width=30, dropdown_width=30, value=Options.VIDEO_FORMAT_OPTIONS.value[0], img='file_type')
+        self.out_fps = SimBADropDown(parent=self.settings_frm, label="OUTPUT FPS:", dropdown_options=FPS_OPTIONS, label_width=30, dropdown_width=30, value='SAME AS INPUT VIDEOS', img='fps')
+        self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU (REDUCED RUN-TIME):", label_width=30, dropdown_width=30, value='FALSE', img='gpu_3', state=self.gpu_available)
         self.settings_frm.grid(row=0, column=0, sticky=NW)
         self.input_dir.grid(row=0, column=0, sticky=NW)
         self.file_format.grid(row=1, column=0, sticky=NW)
         self.out_fps.grid(row=2, column=0, sticky=NW)
-        use_gpu_cb.grid(row=3, column=0, sticky="NW")
+        self.gpu_dropdown.grid(row=3, column=0, sticky="NW")
         self.create_run_frm(run_function=self.run)
         self.main_frm.mainloop()
 
@@ -1105,6 +1125,8 @@ class VideoTemporalJoinPopUp(PopUpMixin):
         else:
             fps = int(fps_setting)
 
+        gpu = str_2_bool(self.gpu_dropdown.get_value())
+
         print(f"Concatenating videos in {self.input_dir.folder_path} directory...")
         save_path = os.path.join(self.input_dir.folder_path, f"concatenated.mp4")
         concatenate_videos_in_folder(in_folder=self.input_dir.folder_path,
@@ -1112,7 +1134,10 @@ class VideoTemporalJoinPopUp(PopUpMixin):
                                      remove_splits=False,
                                      fps=fps,
                                      video_format=self.file_format.getChoices(),
-                                     gpu=self.use_gpu_var.get())
+                                     gpu=gpu)
+
+#VideoTemporalJoinPopUp()
+
 
 class ImportFrameDirectoryPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: str):
@@ -1157,17 +1182,18 @@ class ExtractAnnotationFramesPopUp(PopUpMixin, ConfigReader):
         self.create_clf_checkboxes(main_frm=self.clf_frame, clfs=self.clf_names)
         self.choose_video_frm = LabelFrame(self.main_frm, text="CHOOSE VIDEOS", font=Formats.FONT_HEADER.value, pady=5, padx=5)
         video_options = ["ALL"] + list(self.video_dict.keys())
-        self.video_dropdown = DropDownMenu(self.choose_video_frm, "Video:", video_options, "25")
-        self.video_dropdown.setChoices('ALL')
+
+        self.video_dropdown = SimBADropDown(parent=self.choose_video_frm, dropdown_options=video_options, label='VIDEO', label_width=25, value='ALL', img='video')
+        self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", font=Formats.FONT_HEADER.value, pady=5, padx=5, icon_name='style')
+
         self.settings_frm = LabelFrame(self.main_frm, text="STYLE SETTINGS", font=Formats.FONT_HEADER.value, pady=5, padx=5)
         down_sample_resolution_options = ["None", "2x", "3x", "4x", "5x"]
         img_format_options = ['png', 'jpg', 'webp']
-        self.resolution_downsample_dropdown = DropDownMenu(self.settings_frm, "Down-sample images:", down_sample_resolution_options, "25")
-        self.resolution_downsample_dropdown.setChoices(down_sample_resolution_options[0])
-        self.img_format_dropdown = DropDownMenu(self.settings_frm, "Image format:", img_format_options, "25")
-        self.img_format_dropdown.setChoices(img_format_options[0])
-        self.greyscale_dropdown = DropDownMenu(self.settings_frm, "Image grayscale:", ['TRUE', 'FALSE'], "25")
-        self.greyscale_dropdown.setChoices('FALSE')
+
+        self.resolution_downsample_dropdown = SimBADropDown(parent=self.settings_frm, label="Down-sample images:", label_width=25, dropdown_width=25, value=down_sample_resolution_options[0], img='monitor', dropdown_options=down_sample_resolution_options)
+
+        self.img_format_dropdown = SimBADropDown(parent=self.settings_frm, label="Image format:", label_width=25, dropdown_width=25, value=img_format_options[0], img='file_type', dropdown_options=img_format_options)
+        self.greyscale_dropdown = SimBADropDown(parent=self.settings_frm, label="Image grayscale:", label_width=25, dropdown_width=25, value='FALSE', img='grey', dropdown_options=['TRUE', 'FALSE'])
 
         self.choose_video_frm.grid(row=self.children_cnt_main()+2, column=0, sticky=NW)
         self.video_dropdown.grid(row=0, column=0, sticky=NW)
@@ -1175,9 +1201,6 @@ class ExtractAnnotationFramesPopUp(PopUpMixin, ConfigReader):
         self.resolution_downsample_dropdown.grid(row=0, column=0, sticky=NW)
         self.img_format_dropdown.grid(row=1, column=0, sticky=NW)
         self.greyscale_dropdown.grid(row=2, column=0, sticky=NW)
-
-
-
         self.run_btn = SimbaButton(parent=self.main_frm, txt="RUN", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.run)
         self.run_btn.grid(row=self.children_cnt_main()+3, column=0, sticky=NW)
         self.main_frm.mainloop()
@@ -1211,71 +1234,37 @@ class ExtractAnnotationFramesPopUp(PopUpMixin, ConfigReader):
                                                    data_paths=data_paths)
         frame_extractor.run()
 
+
+#ExtractAnnotationFramesPopUp(config_path=r"C:\troubleshooting\sleap_two_animals_open_field\project_folder\project_config.ini")
+
 class DownsampleVideoPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="DOWN-SAMPLE VIDEO RESOLUTION")
-        instructions = Label(
-            self.main_frm,
-            text="Choose only one of the following method (Custom or Default)", font=Formats.FONT_REGULAR.value
-        )
-        choose_video_frm = CreateLabelFrameWithIcon(
-            parent=self.main_frm,
-            header="SELECT VIDEO",
-            icon_name=Keys.DOCUMENTATION.value,
-            icon_link=Links.DOWNSAMPLE.value,
-        )
-        self.video_path_selected = FileSelect(
-            choose_video_frm,
-            "Video path",
-            title="Select a video file",
-            file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)],
-        )
-        gpu_frm = LabelFrame(
-            self.main_frm,
-            text="GPU",
-            font=Formats.FONT_HEADER.value,
-            fg="black",
-            padx=5,
-            pady=5,
-        )
-        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=gpu_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
-        use_gpu_cb.grid(row=0, column=0, sticky="NW")
-        custom_frm = LabelFrame(
-            self.main_frm,
-            text="Custom resolution",
-            font=Formats.FONT_HEADER.value,
-            fg="black",
-            padx=5,
-            pady=5,
-        )
-        self.entry_width = Entry_Box(custom_frm, "Width", "10", validation="numeric")
-        self.entry_height = Entry_Box(custom_frm, "Height", "10", validation="numeric")
+        choose_video_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="SELECT VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DOWNSAMPLE.value)
+        self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
+        self.video_path_selected = FileSelect(choose_video_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='browse')
 
+        gpu_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GPU", icon_name='gpu_3', icon_link=Links.DOWNSAMPLE.value, padx=5, pady=5)
+        self.gpu_dropdown = SimBADropDown(parent=gpu_frm, label="Use GPU (reduced runtime)", img='gpu_3', dropdown_options=['TRUE', 'FALSE'], dropdown_width=30, label_width=30, value='FALSE', state=self.gpu_available)
+        self.gpu_dropdown.grid(row=0, column=0, sticky="NW")
 
-
+        custom_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="CUSTOM RESOLUTION", icon_name='monitor', icon_link=Links.DOWNSAMPLE.value, padx=5, pady=5)
+        self.entry_width = Entry_Box(custom_frm, "Width", "10", validation="numeric", img='width')
+        self.entry_height = Entry_Box(custom_frm, "Height", "10", validation="numeric", img='height')
 
         self.custom_downsample_btn = SimbaButton(parent=custom_frm, txt="Downsample to custom resolution", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.custom_downsample)
 
-        default_frm = LabelFrame(
-            self.main_frm, text="Default resolution", font=Formats.FONT_HEADER.value, padx=5, pady=5
-        )
+
+        default_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="DEFAULT RESOLUTION", icon_name='monitor', icon_link=Links.DOWNSAMPLE.value, padx=5, pady=5)
+
         self.radio_btns = {}
         self.var = StringVar()
+
         for custom_cnt, resolution_radiobtn in enumerate(self.resolutions):
-            self.radio_btns[resolution_radiobtn] = Radiobutton(
-                default_frm,
-                text=resolution_radiobtn,
-                variable=self.var,
-                value=resolution_radiobtn,
-                font=Formats.FONT_REGULAR.value,
-            )
+            self.radio_btns[resolution_radiobtn] = SimBARadioButton(parent=default_frm, txt=resolution_radiobtn, variable=self.var, font=Formats.FONT_REGULAR.value, value=resolution_radiobtn)
             self.radio_btns[resolution_radiobtn].grid(row=custom_cnt, sticky=NW)
 
         self.default_downsample_btn = SimbaButton(parent=default_frm, txt="Downsample to default resolution", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.default_downsample)
-
-
-
-        instructions.grid(row=0, sticky=NW, pady=10)
         choose_video_frm.grid(row=1, column=0, sticky=NW)
         gpu_frm.grid(row=2, column=0, sticky=NW)
         self.video_path_selected.grid(row=0, column=0, sticky=NW)
@@ -1284,9 +1273,8 @@ class DownsampleVideoPopUp(PopUpMixin):
         self.entry_height.grid(row=1, column=0, sticky=NW)
         self.custom_downsample_btn.grid(row=3, column=0, sticky=NW)
         default_frm.grid(row=5, column=0, sticky=NW)
-        self.default_downsample_btn.grid(
-            row=len(self.resolutions) + 1, column=0, sticky=NW
-        )
+        self.default_downsample_btn.grid(row=len(self.resolutions) + 1, column=0, sticky=NW)
+        self.main_frm.mainloop()
 
     def custom_downsample(self):
         width = self.entry_width.entry_get
@@ -1298,7 +1286,7 @@ class DownsampleVideoPopUp(PopUpMixin):
             file_path=self.video_path_selected.file_path,
             video_width=int(width),
             video_height=int(height),
-            gpu=self.use_gpu_var.get(),
+            gpu=str_2_bool(self.gpu_dropdown.get_value()),
         )
 
     def default_downsample(self):
@@ -1315,13 +1303,15 @@ class DownsampleVideoPopUp(PopUpMixin):
             gpu=self.use_gpu_var.get(),
         )
 
+#DownsampleVideoPopUp()
+
 
 class ConvertROIDefinitionsPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CONVERT ROI DEFINITIONS", icon='roi')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header='SETTINGS', icon_name='settings', font=Formats.FONT_HEADER.value)
-        self.roi_definitions_file_select = FileSelect(settings_frm, "ROI DEFINITIONS PATH (H5)", title="SELECT H5 FILE", lblwidth=30, file_types=[("H5 FILE", (".h5", ".H5"))])
-        self.save_dir = FolderSelect(settings_frm, "SAVE DIRECTORY", title="SELECT H5 FILE", lblwidth=30)
+        self.roi_definitions_file_select = FileSelect(settings_frm, "ROI DEFINITIONS PATH (H5)", title="SELECT H5 FILE", lblwidth=30, file_types=[("H5 FILE", (".h5", ".H5"))], lbl_icon='roi')
+        self.save_dir = FolderSelect(settings_frm, "SAVE DIRECTORY", title="SELECT H5 FILE", lblwidth=30, lbl_icon='browse')
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.roi_definitions_file_select.grid(row=0, column=0, sticky=NW)
         self.save_dir.grid(row=1, column=0, sticky=NW)
@@ -1332,6 +1322,9 @@ class ConvertROIDefinitionsPopUp(PopUpMixin):
         check_if_dir_exists(in_dir=self.save_dir.folder_path)
         convert_roi_definitions(roi_definitions_path=self.roi_definitions_file_select.file_path, save_dir=self.save_dir.folder_path)
 
+
+
+#ConvertROIDefinitionsPopUp()
 
 class CropVideoCirclesPopUp(PopUpMixin):
     def __init__(self):
@@ -1350,9 +1343,10 @@ class CropVideoCirclesPopUp(PopUpMixin):
         input_folder.grid(row=0, sticky=NW)
         output_folder.grid(row=1, sticky=NW)
         button_crop_video_multiple.grid(row=3, sticky=NW)
+        self.main_frm.mainloop()
 
 
-# _ = CropVideoCirclesPopUp()
+#_ = CropVideoCirclesPopUp()
 
 
 class CropVideoPolygonsPopUp(PopUpMixin):
@@ -1444,30 +1438,37 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
         check_if_dir_exists(in_dir=data_dir, source=self.__class__.__name__, create_if_not_exist=False )
         check_if_dir_exists(in_dir=save_dir, source=self.__class__.__name__, create_if_not_exist=True)
         self.video_paths = find_all_videos_in_directory(directory=data_dir, as_dict=True, raise_error=True)
+        print(self.video_paths)
         self.video_meta_data = [get_video_meta_data(video_path=x)["frame_count"]for x in list(self.video_paths.values())]
         max_video_name_len = len(max(list(self.video_paths.keys())))
         super().__init__(title="CLIP MULTIPLE VIDEOS BY FRAME NUMBERS")
         self.save_dir = save_dir
         data_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         data_frm.grid(row=0, column=0, sticky=NW)
-        Label(data_frm, text="VIDEO NAME", width=max_video_name_len, font=Formats.FONT_REGULAR.value).grid(row=0, column=0, sticky=NW)
-        Label(data_frm, text="START FRAME", font=Formats.FONT_REGULAR.value, width=10).grid(row=0, column=2)
-        Label(data_frm, text="END FRAME", font=Formats.FONT_REGULAR.value, width=10).grid(row=0, column=3)
+        self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
+
+
+
+        SimBALabel(parent=data_frm, width=max_video_name_len+20, font=Formats.FONT_REGULAR.value, txt="VIDEO NAME", justify='center').grid(row=0, column=0)
+        SimBALabel(parent=data_frm, width=max_video_name_len+20, font=Formats.FONT_REGULAR.value, txt="START FRAME", justify='center').grid(row=0, column=2)
+        SimBALabel(parent=data_frm, width=max_video_name_len+20, font=Formats.FONT_REGULAR.value, txt="END FRAME", justify='center').grid(row=0, column=3)
+
         self.entry_boxes = {}
         for cnt, video_name in enumerate(self.video_paths.keys()):
             self.entry_boxes[video_name] = {}
-            Label(data_frm, text=video_name, width=max_video_name_len, font=Formats.FONT_REGULAR.value).grid(row=cnt + 1, column=0, sticky=NW)
-            Label(data_frm, text=self.video_meta_data[cnt], width=max_video_name_len).grid(row=cnt + 1, column=1, sticky=NW)
-            self.entry_boxes[video_name]["start"] = Entry_Box(data_frm, "", 5, validation="numeric")
-            self.entry_boxes[video_name]["end"] = Entry_Box(data_frm, "", 5, validation="numeric")
+            SimBALabel(parent=data_frm, width=max_video_name_len + 20, font=Formats.FONT_REGULAR.value, txt=video_name + ' ' + f'({ self.video_meta_data[cnt]})', justify='center').grid(row=cnt + 1, column=0)
+            self.entry_boxes[video_name]["start"] = Entry_Box(data_frm, "", 0, validation="numeric")
+            self.entry_boxes[video_name]["end"] = Entry_Box(data_frm, "", 0, validation="numeric")
             self.entry_boxes[video_name]["start"].grid(row=cnt + 1, column=2, sticky=NW)
             self.entry_boxes[video_name]["end"].grid(row=cnt + 1, column=3, sticky=NW)
 
-        settings_frm = LabelFrame(self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value, fg="black", padx=5, pady=5)
-        gpu_cb, self.gpu_var = SimbaCheckbox(parent=settings_frm, txt='USE GPU (REDUCED RUNTIME)', txt_img='gpu_2')
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, label='USE GPU (REDUCED RUNTIME)', img='gpu_3', dropdown_options=['TRUE', 'FALSE'], value='FALSE', state=self.gpu_available)
         settings_frm.grid(row=1, column=0, sticky=NW)
-        gpu_cb.grid(row=0, column=0, sticky=NW)
+        self.gpu_dropdown.grid(row=0, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run, btn_txt_clr="blue")
+
+        #self.main_frm.mainloop()
 
     def run(self):
         video_paths, frame_ids = [], []
@@ -1501,10 +1502,13 @@ class ClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
                 )
             frame_ids.append([start, end])
 
-        if self.gpu_var.get() and not check_nvidea_gpu_available():
+        gpu = str_2_bool(self.gpu_dropdown.get_value())
+        if gpu and not check_nvidea_gpu_available():
             raise FFMPEGCodecGPUError('No GPU detected on machine. Try unchecking the GPU checkbox', source=self.__class__.__name__)
-        _ = clip_videos_by_frame_ids(file_paths=video_paths, frm_ids=frame_ids, save_dir=self.save_dir, gpu=self.gpu_var.get())
+        _ = clip_videos_by_frame_ids(file_paths=video_paths, frm_ids=frame_ids, save_dir=self.save_dir, gpu=gpu)
 
+
+#ClipMultipleVideosByFrameNumbersPopUp(data_dir=r'E:\netholabs_videos\terry\mp4s\4_02_001_exp_2025_12_02_15_22_00\videos\Camera2', save_dir=r'E:\netholabs_videos\terry\mp4s\4_02_001_exp_2025_12_02_15_22_00\videos\Camera2\test')
 
 class InitiateClipMultipleVideosByFrameNumbersPopUp(PopUpMixin):
     def __init__(self):
@@ -1562,13 +1566,13 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         check_if_dir_exists(in_dir=save_dir, source=self.__class__.__name__, create_if_not_exist=True)
         self.video_paths = find_all_videos_in_directory(directory=data_dir, as_dict=True, raise_error=True)
         self.video_meta_data = [get_video_meta_data(video_path=x) for x in list(self.video_paths.values())]
-        max_video_name_len = len(max(list(self.video_paths.keys()))) + 5
-        super().__init__(title="CLIP MULTIPLE VIDEOS BY TIME-STAMPS")
+        max_video_name_len = len(max(list(self.video_paths.keys()))) + 25
+        super().__init__(title="CLIP MULTIPLE VIDEOS BY TIME-STAMPS", icon='clip')
         self.save_dir = save_dir
         batch_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="BATCH SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        batch_start_entry = Entry_Box(parent=batch_settings_frm, fileDescription='START TIME:', labelwidth=10, entry_box_width=12)
+        batch_start_entry = Entry_Box(parent=batch_settings_frm, fileDescription='START TIME (HH:MM:SS):', labelwidth=25, entry_box_width=12, img='play')
         batch_start_btn = SimbaButton(parent=batch_settings_frm, txt='SET', img='tick', cmd=self._batch_set_val, cmd_kwargs={'text': lambda: batch_start_entry.entry_get.strip(), 'box_type': lambda: 'start'})
-        batch_end_entry = Entry_Box(parent=batch_settings_frm, fileDescription='END TIME:', labelwidth=10, entry_box_width=12)
+        batch_end_entry = Entry_Box(parent=batch_settings_frm, fileDescription='END TIME (HH:MM:SS):', labelwidth=25, entry_box_width=12, img='stop')
         batch_end_btn = SimbaButton(parent=batch_settings_frm, txt='SET', img='tick', cmd=self._batch_set_val, cmd_kwargs={'text': lambda: batch_end_entry.entry_get.strip(), 'box_type': lambda: 'end'})
         batch_settings_frm.grid(row=0, column=0, sticky=NW)
         batch_start_entry.grid(row=0, column=0, sticky=NW)
@@ -1576,7 +1580,7 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         batch_end_entry.grid(row=1, column=0, sticky=NW)
         batch_end_btn.grid(row=1, column=1, sticky=NW)
         self.save_dir = save_dir
-        data_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        data_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO SETTINGS", icon_name='video', icon_link=Links.VIDEO_TOOLS.value)
         data_frm.grid(row=1, column=0, sticky=NW)
         Label(data_frm, text="VIDEO NAME", width=max_video_name_len).grid(row=0, column=0, sticky=NW)
         Label(data_frm, text="VIDEO LENGTH", width=12).grid(row=0, column=1)
@@ -1586,7 +1590,7 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         self.entry_boxes = {}
         for cnt, video_name in enumerate(self.video_paths.keys()):
             self.entry_boxes[video_name] = {}
-            Label(data_frm, text=video_name, width=max_video_name_len).grid(row=cnt + 1, column=0, sticky=NW)
+            SimBALabel(parent=data_frm, txt=video_name, width=max_video_name_len, justify='center').grid(row=cnt + 1, column=0, sticky=NW)
             video_length = self.video_meta_data[cnt]["video_length_s"]
             video_length_hhmmss = seconds_to_timestamp(seconds=video_length)
             Label(data_frm, text=video_length_hhmmss, width=max_video_name_len).grid(row=cnt + 1, column=1, sticky=NW)
@@ -1623,8 +1627,7 @@ class ClipMultipleVideosByTimestamps(PopUpMixin):
         timer.stop_timer()
         stdout_success(msg=f"{len(self.entry_boxes)} videos clipped by time-stamps and saved in {self.save_dir}", elapsed_time=timer.elapsed_time_str,)
 
-
-
+#ClipMultipleVideosByTimestamps(data_dir=r"C:\troubleshooting\mitra\project_folder\videos", save_dir=r"C:\troubleshooting\mitra\project_folder\videos\temp_3")
 
 
 class InitiateClipMultipleVideosByTimestampsPopUp(PopUpMixin):
@@ -1680,8 +1683,8 @@ class BrightnessContrastPopUp(PopUpMixin):
         super().__init__(title="CHANGE BRIGHTNESS / CONTRAST")
         self.datetime = datetime.now().strftime("%Y%m%d%H%M%S")
         setting_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.gpu_dropdown = DropDownMenu(setting_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=20)
-        self.gpu_dropdown.setChoices('FALSE')
+        gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
+        self.gpu_dropdown = SimBADropDown(parent=setting_frm, label="USE GPU:", dropdown_options=['TRUE', 'FALSE'], dropdown_width=20, value='FALSE', state=gpu_available, img='gpu_3')
         setting_frm.grid(row=0, column=0, sticky="NW")
         self.gpu_dropdown.grid(row=0, column=0, sticky="NW")
 
@@ -1738,6 +1741,8 @@ class BrightnessContrastPopUp(PopUpMixin):
         timer.stop_timer()
         stdout_success(f'{len(self.video_paths)} video(s) converted.', elapsed_time=timer.elapsed_time_str)
 
+
+#BrightnessContrastPopUp()
 
 class InteractiveClahePopUp(PopUpMixin):
     """
@@ -1821,29 +1826,27 @@ class DownsampleSingleVideoPopUp(PopUpMixin):
         choose_video_frm.grid(row=0, column=0, sticky=NW)
         self.video_path_selected.grid(row=0, column=0, sticky=NW)
 
-        gpu_frm = LabelFrame(self.main_frm, text="GPU (REDUCED RUNTIMES)", font=Formats.FONT_HEADER.value, fg="black", padx=5, pady=5)
-        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=gpu_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+
+        gpu_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GPU (REDUCED RUNTIMES)", icon_name='gpu_3', icon_link=Links.DOWNSAMPLE.value)
+        gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
+        self.gpu_dropdown = SimBADropDown(parent=gpu_frm, label="USE GPU:", dropdown_options=['TRUE', 'FALSE'], label_width=20, dropdown_width=20, value='FALSE', state=gpu_available, img='gpu_3')
 
         gpu_frm.grid(row=1, column=0, sticky=NW)
-        use_gpu_cb.grid(row=0, column=0, sticky=NW)
+        self.gpu_dropdown.grid(row=0, column=0, sticky=NW)
 
-        custom_size_frm = LabelFrame(self.main_frm, text="CUSTOM RESOLUTION",font=Formats.FONT_HEADER.value,fg="black",padx=5,pady=5)
-        self.entry_width = Entry_Box(custom_size_frm, "Width", "10", validation="numeric")
-        self.entry_height = Entry_Box(custom_size_frm, "Height", "10", validation="numeric")
+        custom_size_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CUSTOM RESOLUTION", icon_name='monitor', icon_link=Links.DOWNSAMPLE.value,padx=5,pady=5)
+        self.entry_width = Entry_Box(custom_size_frm, "WIDTH:", 20, validation="numeric", img='width')
+        self.entry_height = Entry_Box(custom_size_frm, "HEIGHT", 20, validation="numeric", img='height')
         self.custom_downsample_btn = SimbaButton(parent=custom_size_frm, txt="DOWN-SAMPLE USING CUSTOM RESOLUTION", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.downsample_custom)
-
 
         custom_size_frm.grid(row=2, column=0, sticky=NW)
         self.entry_width.grid(row=0, column=0, sticky=NW)
         self.entry_height.grid(row=1, column=0, sticky=NW)
         self.custom_downsample_btn.grid(row=2, column=0, sticky=NW)
 
-        default_size_frm = LabelFrame(self.main_frm, text="DEFAULT RESOLUTION",font=Formats.FONT_HEADER.value,fg="black",padx=5,pady=5)
-        self.width_dropdown = DropDownMenu(default_size_frm, "WIDTH:", Options.RESOLUTION_OPTIONS_2.value, labelwidth=20)
-        self.height_dropdown = DropDownMenu(default_size_frm, "HEIGHT:", Options.RESOLUTION_OPTIONS_2.value, labelwidth=20)
-        self.width_dropdown.setChoices(640)
-        self.height_dropdown.setChoices("AUTO")
-
+        default_size_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="DEFAULT RESOLUTION", icon_name='monitor', icon_link=Links.DOWNSAMPLE.value,padx=5,pady=5)
+        self.width_dropdown = SimBADropDown(parent=default_size_frm, label="WIDTH:", dropdown_options=Options.RESOLUTION_OPTIONS_2.value, label_width=20, dropdown_width=20, value=640, img='width')
+        self.height_dropdown = SimBADropDown(parent=default_size_frm, label="HEIGHT:", dropdown_options=Options.RESOLUTION_OPTIONS_2.value, label_width=20, dropdown_width=20, value="AUTO", img='height')
         self.default_downsample_btn = SimbaButton(parent=default_size_frm, txt="DOWN-SAMPLE USING DEFAULT RESOLUTION", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.downsample_default)
 
         default_size_frm.grid(row=3, column=0, sticky=NW)
@@ -1853,9 +1856,7 @@ class DownsampleSingleVideoPopUp(PopUpMixin):
 
     def _checks(self):
         check_ffmpeg_available(raise_error=True)
-        self.gpu = self.use_gpu_var.get()
-        if self.gpu:
-            check_nvidea_gpu_available()
+        self.gpu = str_2_bool(self.gpu_dropdown.get_value())
         self.file_path = self.video_path_selected.file_path
         check_file_exist_and_readable(file_path=self.file_path)
         _ = get_video_meta_data(video_path=self.file_path)
@@ -1881,23 +1882,23 @@ class DownsampleSingleVideoPopUp(PopUpMixin):
 
 class DownsampleMultipleVideosPopUp(PopUpMixin):
     def __init__(self):
+
         PopUpMixin.__init__(self,title="DOWN-SAMPLE MULTIPLE VIDEO RESOLUTION", icon='minus')
         choose_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECT VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DOWNSAMPLE.value)
-
         self.video_dir_selected = FolderSelect(choose_video_frm, "VIDEO DIRECTORY:",title="Select Folder with videos", lblwidth=20)
         choose_video_frm.grid(row=0, column=0, sticky=NW)
         self.video_dir_selected.grid(row=0, column=0, sticky=NW)
 
-        gpu_frm = LabelFrame(self.main_frm, text="GPU (REDUCED RUNTIMES)", font=Formats.FONT_HEADER.value, fg="black", padx=5, pady=5)
-        use_gpu_cb, self.use_gpu_var = SimbaCheckbox(parent=gpu_frm, txt="Use GPU (reduced runtime)", txt_img='gpu_2')
+        gpu_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GPU (REDUCED RUNTIMES)", icon_name='gpu_3', icon_link=Links.DOWNSAMPLE.value)
+        gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
+        self.gpu_dropdown = SimBADropDown(parent=gpu_frm, label="USE GPU:", dropdown_options=['TRUE', 'FALSE'], dropdown_width=20, value='FALSE', state=gpu_available, img='gpu_3')
 
         gpu_frm.grid(row=1, column=0, sticky=NW)
-        use_gpu_cb.grid(row=0, column=0, sticky=NW)
+        self.gpu_dropdown.grid(row=0, column=0, sticky=NW)
 
-        custom_size_frm = LabelFrame(self.main_frm, text="CUSTOM RESOLUTION",font=Formats.FONT_HEADER.value,fg="black",padx=5,pady=5)
-        self.entry_width = Entry_Box(custom_size_frm, "Width", "10", validation="numeric")
-        self.entry_height = Entry_Box(custom_size_frm, "Height", "10", validation="numeric")
-
+        custom_size_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CUSTOM RESOLUTION", icon_name='monitor', icon_link=Links.DOWNSAMPLE.value,padx=5,pady=5)
+        self.entry_width = Entry_Box(custom_size_frm, "WIDTH:", 20, validation="numeric", img='width')
+        self.entry_height = Entry_Box(custom_size_frm, "HEIGHT", 20, validation="numeric", img='height')
         self.custom_downsample_btn = SimbaButton(parent=custom_size_frm, txt="DOWN-SAMPLE USING CUSTOM RESOLUTION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.downsample_custom)
 
         custom_size_frm.grid(row=2, column=0, sticky=NW)
@@ -1905,12 +1906,9 @@ class DownsampleMultipleVideosPopUp(PopUpMixin):
         self.entry_height.grid(row=1, column=0, sticky=NW)
         self.custom_downsample_btn.grid(row=2, column=0, sticky=NW)
 
-        default_size_frm = LabelFrame(self.main_frm, text="DEFAULT RESOLUTION",font=Formats.FONT_HEADER.value,fg="black",padx=5,pady=5)
-        self.width_dropdown = DropDownMenu(default_size_frm, "WIDTH:", Options.RESOLUTION_OPTIONS_2.value, labelwidth=20)
-        self.height_dropdown = DropDownMenu(default_size_frm, "HEIGHT:", Options.RESOLUTION_OPTIONS_2.value, labelwidth=20)
-        self.width_dropdown.setChoices(640)
-        self.height_dropdown.setChoices("AUTO")
-
+        default_size_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="DEFAULT RESOLUTION", icon_name='monitor', icon_link=Links.DOWNSAMPLE.value,padx=5,pady=5)
+        self.width_dropdown = SimBADropDown(parent=default_size_frm, label="WIDTH:", dropdown_options=Options.RESOLUTION_OPTIONS_2.value, label_width=20, dropdown_width=20, value=640, img='width')
+        self.height_dropdown = SimBADropDown(parent=default_size_frm, label="HEIGHT:", dropdown_options=Options.RESOLUTION_OPTIONS_2.value, label_width=20, dropdown_width=20, value="AUTO", img='height')
         self.default_downsample_btn = SimbaButton(parent=default_size_frm, txt="DOWN-SAMPLE USING DEFAULT RESOLUTION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.downsample_default)
 
         default_size_frm.grid(row=3, column=0, sticky=NW)
@@ -1920,9 +1918,7 @@ class DownsampleMultipleVideosPopUp(PopUpMixin):
 
     def _checks(self):
         check_ffmpeg_available(raise_error=True)
-        self.gpu = self.use_gpu_var.get()
-        if self.gpu:
-            check_nvidea_gpu_available()
+        self.gpu = str_2_bool(self.gpu_dropdown.get_value())
         self.video_directory = self.video_dir_selected.folder_path
         check_if_dir_exists(in_dir=self.video_directory)
         self.video_paths = find_all_videos_in_directory(directory=self.video_directory, raise_error=True, as_dict=True)
@@ -1947,6 +1943,9 @@ class DownsampleMultipleVideosPopUp(PopUpMixin):
         else:
             for file_path in self.video_paths.values():
                 threading.Thread(target=downsample_video(file_path=file_path, video_height=height, video_width=width, gpu=self.gpu)).start()
+
+
+#DownsampleMultipleVideosPopUp()
 
 class Convert2jpegPopUp(PopUpMixin):
     def __init__(self):
@@ -2017,16 +2016,14 @@ class Convert2bmpPopUp(PopUpMixin):
 
 class Convert2WEBPPopUp(PopUpMixin):
     def __init__(self):
-        super().__init__(title="CONVERT IMAGES TO WEBP")
+        super().__init__(title="CONVERT IMAGES TO WEBP", icon='webp')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.quality_lbl = Label(settings_frm, text="WEBP OUTPUT QUALITY: ")
-        self.quality_scale = Scale(settings_frm, from_=1, to=100, orient=HORIZONTAL, length=200, label='WEBP QUALITY', fg='blue', font=Formats.FONT_REGULAR.value,)
-        self.quality_scale.set(95)
+        self.quality_scale = SimBAScaleBar(parent=settings_frm, from_=0, to=100, length=200, label='WEBP QUALITY: ', label_clr='black', lbl_font=Formats.FONT_REGULAR.value, value=95, tickinterval=25, sliderrelief='raised', showvalue=True, lbl_img='pct')
         settings_frm.grid(row=0, column=0, sticky="NW")
         self.quality_scale.grid(row=0, column=0, sticky="NW")
 
         convert_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE DIRECTORY TO WEBP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_frame_dir = FolderSelect(convert_dir_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
+        self.selected_frame_dir = FolderSelect(convert_dir_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25, lbl_icon='browse')
 
         run_btn_dir = SimbaButton(parent=convert_dir_frm, txt="RUN IMAGE DIRECTORY WEBP CONVERSION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.run_dir)
 
@@ -2035,8 +2032,7 @@ class Convert2WEBPPopUp(PopUpMixin):
         run_btn_dir.grid(row=1, column=0, sticky="NW")
 
         convert_img_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE FILE TO WEBP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_file = FileSelect(convert_img_frm, "IMAGE PATH:", title="Select an image file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_IMAGE_FORMAT_OPTIONS.value)])
-
+        self.selected_file = FileSelect(convert_img_frm, "IMAGE PATH:", title="Select an image file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_IMAGE_FORMAT_OPTIONS.value)], lbl_icon='file_type')
 
         run_btn_frm = SimbaButton(parent=convert_img_frm, txt="RUN IMAGE WEBP CONVERSION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=self.run_img)
         convert_img_frm.grid(row=2, column=0, sticky="NW")
@@ -2048,12 +2044,17 @@ class Convert2WEBPPopUp(PopUpMixin):
     def run_dir(self):
         folder_path = self.selected_frame_dir.folder_path
         check_if_dir_exists(in_dir=folder_path)
-        _ = convert_to_webp(path=folder_path, quality=int(self.quality_scale.get()), verbose=True)
+        quality = int(self.quality_scale.get_value())
+        _ = convert_to_webp(path=folder_path, quality=quality, verbose=True)
 
     def run_img(self):
         file_path = self.selected_file.file_path
         check_file_exist_and_readable(file_path)
-        _ = convert_to_webp(path=file_path, quality=int(self.quality_scale.get()), verbose=True)
+        quality = int(self.quality_scale.get_value())
+        _ = convert_to_webp(path=file_path, quality=quality, verbose=True)
+
+
+#Convert2WEBPPopUp()
 
 class Convert2TIFFPopUp(PopUpMixin):
     def __init__(self):
@@ -2120,9 +2121,9 @@ class Convert2MP4PopUp(PopUpMixin):
         super().__init__(title="CONVERT VIDEOS TO MP4", icon='mp4')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5, relief='solid')
 
-        self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=self.cpu_codec_qualities, label="OUTPUT VIDEO QUALITY:", label_width=30, dropdown_width=40, value=60)
-        self.codec_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.MP4_CODEC_LK.keys()), label="COMPRESSION CODEC:", label_width=30, dropdown_width=40, value='H.264 (AVC)', command=self.update_quality_dropdown)
-        self.keep_audio_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['FALSE', 'TRUE'], label="KEEP AUDIO (IF EXIST):", label_width=30, dropdown_width=40, value='FALSE')
+        self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=self.cpu_codec_qualities, label="OUTPUT VIDEO QUALITY:", label_width=30, dropdown_width=40, value=60, img='pct')
+        self.codec_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.MP4_CODEC_LK.keys()), label="COMPRESSION CODEC:", label_width=30, dropdown_width=40, value='H.264 (AVC)', command=self.update_quality_dropdown, img='file_type')
+        self.keep_audio_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['FALSE', 'TRUE'], label="KEEP AUDIO (IF EXIST):", label_width=30, dropdown_width=40, value='FALSE', img='audio')
 
         settings_frm.grid(row=0, column=0, sticky=NW, padx=10, pady=10)
         self.quality_dropdown.grid(row=0, column=0, sticky=NW)
@@ -2130,7 +2131,7 @@ class Convert2MP4PopUp(PopUpMixin):
         self.keep_audio_dropdown.grid(row=2, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name='video', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5, relief='solid')
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=30, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=30, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
 
         single_video_run = SimbaButton(parent=single_video_frm, txt="RUN - SINGLE VIDEO", img='rocket', cmd=self.run, cmd_kwargs={'multiple': False})
 
@@ -2139,7 +2140,7 @@ class Convert2MP4PopUp(PopUpMixin):
         single_video_run.grid(row=1, column=0, sticky=NW)
 
         multiple_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO DIRECTORY", icon_name='stack', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5, relief='solid')
-        self.selected_video_dir = FolderSelect(multiple_video_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=30)
+        self.selected_video_dir = FolderSelect(multiple_video_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=30, lbl_icon='browse')
 
         multiple_video_run = SimbaButton(parent=multiple_video_frm, txt="RUN - VIDEO DIRECTORY", img='rocket', cmd=self.run, cmd_kwargs={'multiple': True})
         multiple_video_frm.grid(row=2, column=0, sticky=NW, padx=10, pady=10)
@@ -2166,7 +2167,7 @@ class Convert2MP4PopUp(PopUpMixin):
         threading.Thread(target=convert_to_mp4(path=video_path, codec=codec, quality=quality, keep_audio=audio))
 
 
-
+#Convert2MP4PopUp()
 
 
 
@@ -2177,25 +2178,23 @@ class Convert2AVIPopUp(PopUpMixin):
     """
 
     def __init__(self):
-        super().__init__(title="CONVERT VIDEOS TO AVI")
+        super().__init__(title="CONVERT VIDEOS TO AVI", icon='avi')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.AVI_CODEC_LK = {'XviD': 'xvid', 'DivX': 'divx', 'MJPEG': 'mjpeg'}
-        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
-        self.quality_dropdown.setChoices(60)
-        self.codec_dropdown = DropDownMenu(settings_frm, "COMPRESSION CODEC:", list(self.AVI_CODEC_LK.keys()), labelwidth=25)
-        self.codec_dropdown.setChoices('DivX')
+        self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label="OUTPUT VIDEO QUALITY:", label_width=25, dropdown_width=30, value=60, img='pct')
+        self.codec_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.AVI_CODEC_LK.keys()), label="COMPRESSION CODEC:", label_width=25, dropdown_width=30, value='DivX', img='file_type')
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.quality_dropdown.grid(row=0, column=0, sticky=NW)
         self.codec_dropdown.grid(row=1, column=0, sticky=NW)
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
         single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=False))
         single_video_frm.grid(row=1, column=0, sticky=NW)
         self.selected_video.grid(row=0, column=0, sticky=NW)
         single_video_run.grid(row=1, column=0, sticky=NW)
 
         multiple_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO DIRECTORY", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video_dir = FolderSelect(multiple_video_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        self.selected_video_dir = FolderSelect(multiple_video_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25, lbl_icon='browse')
         multiple_video_run = Button(multiple_video_frm, text="RUN - VIDEO DIRECTORY", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=True))
         multiple_video_frm.grid(row=2, column=0, sticky=NW)
         self.selected_video_dir.grid(row=0, column=0, sticky=NW)

@@ -152,6 +152,63 @@ class DropDownMenu(Frame):
         self.popupMenu.configure(state="disable")
 
 
+class SimBAScaleBar(Frame):
+    def __init__(self,
+                 parent: Union[Frame, Canvas, LabelFrame, Toplevel, Tk],
+                 label: Optional[str] = None,
+                 orient: Literal['horizontal', 'vertical'] = HORIZONTAL,
+                 length: int = 200,
+                 value: Optional[int] = 95,
+                 showvalue: bool = True,
+                 label_clr: str = 'black',
+                 lbl_font: tuple = Formats.FONT_REGULAR.value,
+                 scale_font: tuple = Formats.FONT_REGULAR_ITALICS.value,
+                 lbl_img: Optional[str] = None,
+                 from_: int = -1,
+                 resolution: int = 1,
+                 to: int = 100,
+                 tickinterval: Optional[int] = None,
+                 troughcolor: Optional[str] = None,
+                 sliderrelief: Literal["raised", "sunken", "flat", "ridge", "solid", "groove"] = 'flat'):
+
+        super().__init__(master=parent)
+        self.columnconfigure(0, weight=0)
+        self.columnconfigure(1, weight=0)
+        if lbl_img is not None:
+            self.columnconfigure(2, weight=0)
+            self.lbl_lbl = SimBALabel(parent=self, txt='', txt_clr='black', bg_clr=None, font=lbl_font, width=None, anchor='w', img=lbl_img, compound=None)
+            self.lbl_lbl.grid(row=0, column=0, sticky=SW)
+        else:
+            self.lbl_lbl = None
+
+        self.scale = Scale(self,
+                           from_=from_,
+                           to=to,
+                           orient=orient,
+                           length=length,
+                           font=scale_font,
+                           sliderrelief=sliderrelief,
+                           troughcolor=troughcolor,
+                           tickinterval=tickinterval,
+                           resolution=resolution,
+                           showvalue=showvalue)
+
+        if label is not None:
+            self.lbl = SimBALabel(parent=self, txt=label, font=lbl_font, txt_clr=label_clr)
+            self.lbl.grid(row=0, column=1, sticky=SW)
+
+        self.scale.grid(row=0, column=2, sticky=NW)
+        if value is not None:
+            self.set_value(value=value)
+
+    def set_value(self, value: int):
+        self.scale.set(value)
+
+    def get_value(self) -> Union[int, float]:
+        return self.scale.get()
+
+
+
 class Entry_Box(Frame):
     def __init__(self,
                  parent: Union[Frame, Canvas, LabelFrame, Toplevel, Tk],
@@ -159,7 +216,7 @@ class Entry_Box(Frame):
                  labelwidth: Union[int, str] = None,
                  label_bg_clr: Optional[str] = None,
                  status: Literal["normal", "disabled", "readonly"] = 'normal',
-                 validation: Optional[Callable] = None,
+                 validation: Optional[Union[Callable, str]] = None,
                  entry_box_width: Union[int, str] = None,
                  img: Optional[str] = None,
                  value: Optional[Any] = None,
@@ -800,6 +857,7 @@ class FileSelect(Frame):
                  dropdown: Union[DropDownMenu, SimBADropDown] = None,
                  entry_width: Optional[int] = 20,
                  status: Optional[str] = None,
+                 lbl_icon: Optional[str] = None,
                  font: Tuple = Formats.FONT_REGULAR.value,
                  initialdir: Optional[Union[str, os.PathLike]] = None,
                  initial_path: Optional[Union[str, os.PathLike]] = None,
@@ -814,13 +872,22 @@ class FileSelect(Frame):
         self.parent = parent
         Frame.__init__(self, master=parent, **kw)
         browse_icon = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS["browse"]["icon_path"]))
+        self.columnconfigure(0, weight=0)
+        self.columnconfigure(1, weight=0)
+        self.columnconfigure(2, weight=0)
+        if lbl_icon is not None:
+            self.columnconfigure(3, weight=0)
+            self.lbl_icon = SimBALabel(parent=self, txt='', txt_clr='black', font=font, width=None, anchor='w', img=lbl_icon, compound=None)
+            self.lbl_icon.grid(row=0, column=0, sticky="w")
+        else:
+            self.lbl_icon = None
         self.filePath = StringVar()
         self.lblName = Label(self, text=fileDescription, fg=str(self.color), width=str(self.lblwidth), anchor=W, font=Formats.FONT_REGULAR.value)
-        self.lblName.grid(row=0, column=0, sticky=W)
+        self.lblName.grid(row=0, column=1, sticky=W)
         self.entPath = Label(self, textvariable=self.filePath, relief=SUNKEN, font=Formats.FONT_REGULAR.value, bg=bg_clr, width=entry_width)
-        self.entPath.grid(row=0, column=1)
+        self.entPath.grid(row=0, column=2)
         self.btnFind = SimbaButton(parent=self, txt=Defaults.BROWSE_FILE_BTN_TEXT.value, font=font, cmd=self.setFilePath, img=browse_icon)
-        self.btnFind.grid(row=0, column=2)
+        self.btnFind.grid(row=0, column=3)
         self.filePath.set(Defaults.NO_FILE_SELECTED_TEXT.value)
         if initial_path is not None:
             self.filePath.set(initial_path)
