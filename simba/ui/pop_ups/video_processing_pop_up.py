@@ -23,7 +23,8 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon,
                                         CreateToolTip, DropDownMenu, Entry_Box,
                                         FileSelect, FolderSelect, SimbaButton,
                                         SimbaCheckbox, SimBADropDown,
-                                        SimBALabel, SimBARadioButton, SimBAScaleBar)
+                                        SimBALabel, SimBARadioButton,
+                                        SimBAScaleBar)
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable,
                                 check_if_dir_exists,
