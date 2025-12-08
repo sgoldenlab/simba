@@ -2219,25 +2219,24 @@ class Convert2WEBMPopUp(PopUpMixin):
     """
 
     def __init__(self):
-        super().__init__(title="CONVERT VIDEOS TO WEBM")
+        super().__init__(title="CONVERT VIDEOS TO WEBM", icon='webm')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.WEBM_CODEC_LK = {'VP8': 'vp8', 'VP9': 'vp9'}
-        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
-        self.quality_dropdown.setChoices(60)
-        self.codec_dropdown = DropDownMenu(settings_frm, "COMPRESSION CODEC:", list(self.WEBM_CODEC_LK.keys()), labelwidth=25)
-        self.codec_dropdown.setChoices('VP9')
+
+        self.quality_dropdown = SimBADropDown(parent=settings_frm, label="OUTPUT VIDEO QUALITY:", dropdown_options=list(range(10, 110, 10)), label_width=25, value=60, img='pct', dropdown_width=30)
+        self.codec_dropdown = SimBADropDown(parent=settings_frm, label="COMPRESSION CODEC:", dropdown_options=list(self.WEBM_CODEC_LK.keys()), label_width=25, value='VP9', img='file_type', dropdown_width=30)
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.quality_dropdown.grid(row=0, column=0, sticky=NW)
         self.codec_dropdown.grid(row=1, column=0, sticky=NW)
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
         single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=False))
         single_video_frm.grid(row=1, column=0, sticky=NW)
         self.selected_video.grid(row=0, column=0, sticky=NW)
         single_video_run.grid(row=1, column=0, sticky=NW)
 
         multiple_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO DIRECTORY", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video_dir = FolderSelect(multiple_video_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        self.selected_video_dir = FolderSelect(multiple_video_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25,  lbl_icon='browse')
         multiple_video_run = Button(multiple_video_frm, text="RUN - VIDEO DIRECTORY", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=True))
         multiple_video_frm.grid(row=2, column=0, sticky=NW)
         self.selected_video_dir.grid(row=0, column=0, sticky=NW)
@@ -2254,6 +2253,9 @@ class Convert2WEBMPopUp(PopUpMixin):
         codec = self.WEBM_CODEC_LK[self.codec_dropdown.getChoices()]
         quality = int(self.quality_dropdown.getChoices())
         threading.Thread(target=convert_to_webm(path=video_path, codec=codec, quality=quality))
+
+
+Convert2WEBMPopUp()
 
 class Convert2MOVPopUp(PopUpMixin):
     """
