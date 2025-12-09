@@ -3,34 +3,29 @@ from tkinter import *
 
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.plotting.ez_path_plot import EzPathPlot
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box, FileSelect)
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_valid_rgb_tuple, check_int, check_str)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, FileSelect, SimBADropDown)
+from simba.utils.checks import (check_file_exist_and_readable, check_if_valid_rgb_tuple, check_int, check_str)
 from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.lookups import get_color_dict
+from simba.utils.read_write import str_2_bool
+
 
 
 class MakePathPlotPopUp(PopUpMixin):
     def __init__(self):
-        PopUpMixin.__init__(self, title="CREATE SIMPLE PATH PLOT", size=(500, 300), icon='path_2')
+        PopUpMixin.__init__(self, title="CREATE SIMPLE PATH PLOT", size=(600, 300), icon='path_2')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.video_path = FileSelect(settings_frm, "VIDEO PATH: ", lblwidth="30", file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
-        self.body_part = Entry_Box(settings_frm, "BODY PART: ", "30")
-        self.data_path = FileSelect(settings_frm, "DATA PATH (e.g., H5 or CSV file): ", lblwidth="30")
+        self.video_path = FileSelect(settings_frm, "VIDEO PATH: ", lblwidth=30, entry_width=30, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='video_2')
+        self.body_part = Entry_Box(settings_frm, fileDescription= "BODY PART: ", labelwidth=30, entry_box_width=30, img='nose', justify='center')
+        self.data_path = FileSelect(settings_frm, fileDescription="DATA PATH (e.g., H5 or CSV file): ", lblwidth=30, entry_width=30, lbl_icon='file')
         color_lst = list(get_color_dict().keys())
 
+        self.background_color = SimBADropDown(parent=settings_frm, label="BACKGROUND COLOR: ", dropdown_options=color_lst, label_width=30, dropdown_width=30, img='fill', value="White")
+        self.line_color = SimBADropDown(parent=settings_frm, label="LINE COLOR: ", dropdown_options=color_lst, label_width=30, dropdown_width=30, img='line', value="Red")
+        self.line_thickness = SimBADropDown(parent=settings_frm, label="LINE THICKNESS: ", dropdown_options=list(range(1, 11)), label_width=30, dropdown_width=30, img='bold', value=1)
+        self.circle_size = SimBADropDown(parent=settings_frm, label="CIRCLE SIZE: ", dropdown_options=list(range(1, 11)), label_width=30, dropdown_width=30, img='circle_small', value=5)
+        self.last_frm_only_dropdown = SimBADropDown(parent=settings_frm, label="LAST FRAME ONLY: ", dropdown_options=["TRUE", "FALSE"], label_width=30, dropdown_width=30, img='finish', value='FALSE')
 
-        self.background_color = DropDownMenu(settings_frm, "BACKGROUND COLOR: ", color_lst, "30")
-        self.background_color.setChoices(choice="White")
-        self.line_color = DropDownMenu(settings_frm, "LINE COLOR: ", color_lst, "30")
-        self.line_color.setChoices(choice="Red")
-        self.line_thickness = DropDownMenu(settings_frm, "LINE THICKNESS: ", list(range(1, 11)), "30")
-        self.line_thickness.setChoices(choice=1)
-        self.circle_size = DropDownMenu(settings_frm, "CIRCLE SIZE: ", list(range(1, 11)), "30")
-        self.last_frm_only_dropdown = DropDownMenu(settings_frm, "LAST FRAME ONLY: ", ["TRUE", "FALSE"], "30")
-        self.last_frm_only_dropdown.setChoices("FALSE")
-        self.circle_size.setChoices(choice=5)
         settings_frm.grid(row=0, sticky=W)
         self.video_path.grid(row=0, sticky=W)
         self.data_path.grid(row=1, sticky=W)
@@ -66,11 +61,7 @@ class MakePathPlotPopUp(PopUpMixin):
         check_if_valid_rgb_tuple(data=background_color)
         check_if_valid_rgb_tuple(data=line_color)
         check_str(name=f"{self.__class__.__name__} body-part", value=bp)
-        last_frm = self.last_frm_only_dropdown.getChoices()
-        if last_frm == "TRUE":
-            last_frm = True
-        else:
-            last_frm = False
+        last_frm = str_2_bool(self.last_frm_only_dropdown.getChoices())
         plotter = EzPathPlot(
             data_path=data_path,
             video_path=video_path,

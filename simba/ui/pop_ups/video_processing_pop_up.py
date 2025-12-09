@@ -2256,7 +2256,7 @@ class Convert2WEBMPopUp(PopUpMixin):
         threading.Thread(target=convert_to_webm(path=video_path, codec=codec, quality=quality))
 
 
-Convert2WEBMPopUp()
+#Convert2WEBMPopUp()
 
 class Convert2MOVPopUp(PopUpMixin):
     """
@@ -2309,16 +2309,14 @@ class SuperimposeWatermarkPopUp(PopUpMixin):
         self.LOCATIONS = {'TOP LEFT': 'top_left', 'TOP RIGHT': 'top_right', 'BOTTOM LEFT': 'bottom_left', 'BOTTOM RIGHT': 'bottom_right', 'CENTER': 'center'}
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         opacities = [round(x, 1) for x in list(np.arange(0.1, 1.1, 0.1))]
-        self.selected_img = FileSelect(settings_frm, "WATERMARK IMAGE PATH:", title="Select an image file", file_types=[("VIDEO", Options.ALL_IMAGE_FORMAT_OPTIONS.value)], lblwidth=25)
-        self.location_dropdown = DropDownMenu(settings_frm, "WATERMARK LOCATION:", list(self.LOCATIONS.keys()), labelwidth=25)
-        self.opacity_dropdown = DropDownMenu(settings_frm, "WATERMARK OPACITY:", opacities, labelwidth=25)
-        self.size_dropdown = DropDownMenu(settings_frm, "WATERMARK SCALE %:", list(range(5, 100, 5)), labelwidth=25)
-        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU", ['TRUE', 'FALSE'], labelwidth=25)
+        self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
+        self.selected_img = FileSelect(settings_frm, "WATERMARK IMAGE PATH:", title="Select an image file", file_types=[("VIDEO", Options.ALL_IMAGE_FORMAT_OPTIONS.value)], lblwidth=25, lbl_icon='frames')
 
-        self.location_dropdown.setChoices('TOP LEFT')
-        self.opacity_dropdown.setChoices(0.5)
-        self.size_dropdown.setChoices(5)
-        self.gpu_dropdown.setChoices('FALSE')
+
+        self.location_dropdown = SimBADropDown(parent=settings_frm, label="WATERMARK LOCATION:", dropdown_options=list(self.LOCATIONS.keys()), label_width=25, dropdown_width=30, img='location', value='TOP LEFT')
+        self.opacity_dropdown = SimBADropDown(parent=settings_frm, label="WATERMARK OPACITY:", dropdown_options=opacities, label_width=25, dropdown_width=30, img='opacity', value=0.5)
+        self.size_dropdown = SimBADropDown(parent=settings_frm, label="WATERMARK SCALE %:", dropdown_options=list(range(5, 100, 5)), label_width=25, dropdown_width=30, img='size_black', value=5)
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, label="USE GPU", dropdown_options=['TRUE', 'FALSE'], label_width=25, dropdown_width=30, img='gpu_3', value='FALSE', state=self.gpu_available)
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.selected_img.grid(row=0, column=0, sticky=NW)
@@ -2328,7 +2326,7 @@ class SuperimposeWatermarkPopUp(PopUpMixin):
         self.gpu_dropdown.grid(row=4, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE WATERMARK", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
         single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=False))
 
         single_video_frm.grid(row=1, column=0, sticky="NW")
@@ -2336,7 +2334,7 @@ class SuperimposeWatermarkPopUp(PopUpMixin):
         single_video_run.grid(row=1, column=0, sticky="NW")
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - SUPERIMPOSE WATERMARK", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25, lbl_icon='folder')
         multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
@@ -2377,14 +2375,14 @@ class SuperimposeTimerPopUp(PopUpMixin):
         self.font_dict = get_fonts()
         gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
 
-        self.location_dropdown = SimBADropDown(parent=settings_frm, label="TIMER LOCATION:", dropdown_options=list(self.LOCATIONS.keys()), label_width=30, dropdown_width=35, value='TOP LEFT')
-        self.font_dropdown = SimBADropDown(parent=settings_frm, label="TIMER FONT:", dropdown_options=list(self.font_dict.keys()), label_width=30, dropdown_width=35, value='Arial')
-        self.font_size_dropdown = SimBADropDown(parent=settings_frm, label="FONT SIZE:", dropdown_options=list(range(20, 100, 5)), label_width=30, dropdown_width=35, value=20)
-        self.font_color_dropdown = SimBADropDown(parent=settings_frm, label="FONT COLOR:", dropdown_options=list(self.color_dict.keys()), label_width=30, dropdown_width=35, value='White')
-        self.font_border_dropdown = SimBADropDown(parent=settings_frm, label="FONT BORDER COLOR:", dropdown_options=list(self.color_dict.keys()), label_width=30, dropdown_width=35, value='Black')
-        self.font_border_width_dropdown = SimBADropDown(parent=settings_frm, label="FONT BORDER WIDTH:", dropdown_options=list(range(2, 52, 2)), label_width=30, dropdown_width=35, value=2)
-        self.timer_format_dropdown = SimBADropDown(parent=settings_frm, label="TIME FORMAT:", dropdown_options=['MM:SS', 'HH:MM:SS', 'SS.MMMMMM', 'HH:MM:SS.MMMM'], label_width=30, dropdown_width=35, value='HH:MM:SS.MMMM')
-        self.gpu_dropdown = SimBADropDown(parent=settings_frm, label="USE GPU:", dropdown_options=['TRUE', 'FALSE'], label_width=30, dropdown_width=35, value='FALSE', state=gpu_available)
+        self.location_dropdown = SimBADropDown(parent=settings_frm, label="TIMER LOCATION:", dropdown_options=list(self.LOCATIONS.keys()), label_width=30, dropdown_width=35, value='TOP LEFT', img='location')
+        self.font_dropdown = SimBADropDown(parent=settings_frm, label="TIMER FONT:", dropdown_options=list(self.font_dict.keys()), label_width=30, dropdown_width=35, value='Arial', img='font')
+        self.font_size_dropdown = SimBADropDown(parent=settings_frm, label="FONT SIZE:", dropdown_options=list(range(20, 100, 5)), label_width=30, dropdown_width=35, value=20, img='font_size')
+        self.font_color_dropdown = SimBADropDown(parent=settings_frm, label="FONT COLOR:", dropdown_options=list(self.color_dict.keys()), label_width=30, dropdown_width=35, value='White', img='font_size')
+        self.font_border_dropdown = SimBADropDown(parent=settings_frm, label="FONT BORDER COLOR:", dropdown_options=list(self.color_dict.keys()), label_width=30, dropdown_width=35, value='Black', img='text_color')
+        self.font_border_width_dropdown = SimBADropDown(parent=settings_frm, label="FONT BORDER WIDTH:", dropdown_options=list(range(2, 52, 2)), label_width=30, dropdown_width=35, value=2, img='text_black')
+        self.timer_format_dropdown = SimBADropDown(parent=settings_frm, label="TIME FORMAT:", dropdown_options=['MM:SS', 'HH:MM:SS', 'SS.MMMMMM', 'HH:MM:SS.MMMM'], label_width=30, dropdown_width=35, value='HH:MM:SS.MMMM', img='clock')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, label="USE GPU:", dropdown_options=['TRUE', 'FALSE'], label_width=30, dropdown_width=35, value='FALSE', state=gpu_available, img='gpu_3')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.location_dropdown.grid(row=0, column=0, sticky=NW)
@@ -2397,7 +2395,7 @@ class SuperimposeTimerPopUp(PopUpMixin):
         self.gpu_dropdown.grid(row=7, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE TIMER", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
         single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=False))
 
         single_video_frm.grid(row=1, column=0, sticky="NW")
@@ -2405,7 +2403,7 @@ class SuperimposeTimerPopUp(PopUpMixin):
         single_video_run.grid(row=1, column=0, sticky="NW")
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - SUPERIMPOSE TIMER", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25, lbl_icon='folder')
         multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
@@ -2440,10 +2438,6 @@ class SuperimposeTimerPopUp(PopUpMixin):
                                             position=loc,
                                             gpu=gpu)
 
-
-#SuperimposeTimerPopUp()
-
-
 class SuperimposeProgressBarPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="SUPER-IMPOSE PROGRESS BAR ON VIDEOS", icon='superimpose')
@@ -2452,16 +2446,13 @@ class SuperimposeProgressBarPopUp(PopUpMixin):
         self.color_dict = get_color_dict()
         size_lst = list(range(0, 110, 5))
         size_lst[0] = 1
-        self.bar_loc_dropdown = DropDownMenu(settings_frm, "PROGRESS BAR LOCATION:", list(self.LOCATIONS.keys()), labelwidth=25)
-        self.bar_color_dropdown = DropDownMenu(settings_frm, "PROGRESS BAR COLOR:", list(self.color_dict.keys()), labelwidth=25)
-        self.bar_size_dropdown = DropDownMenu(settings_frm, "PROGRESS BAR HEIGHT (%):", size_lst, labelwidth=25)
-        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
+        self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
 
-        self.bar_color_dropdown.setChoices('Red')
-        self.bar_size_dropdown.setChoices(10)
-        self.bar_loc_dropdown.setChoices('BOTTOM')
-        self.gpu_dropdown.setChoices('FALSE')
 
+        self.bar_loc_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.LOCATIONS.keys()), label_width=25, value='BOTTOM', label="PROGRESS BAR LOCATION:", img='location')
+        self.bar_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.color_dict.keys()), label_width=25, value='Red', label="PROGRESS BAR COLOR:", img='color_wheel')
+        self.bar_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=size_lst, label_width=25, value=10, label="PROGRESS BAR HEIGHT (%):", img='height')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label_width=25, value='FALSE', label="USE GPU:", img='gpu_3', state=self.gpu_available)
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.bar_loc_dropdown.grid(row=0, column=0, sticky=NW)
         self.bar_color_dropdown.grid(row=1, column=0, sticky=NW)
@@ -2469,7 +2460,7 @@ class SuperimposeProgressBarPopUp(PopUpMixin):
         self.gpu_dropdown.grid(row=3, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE PROGRESS BAR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
         single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=False))
 
         single_video_frm.grid(row=1, column=0, sticky="NW")
@@ -2477,7 +2468,7 @@ class SuperimposeProgressBarPopUp(PopUpMixin):
         single_video_run.grid(row=1, column=0, sticky="NW")
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - SUPERIMPOSE PROGRESS BAR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25, lbl_icon='folder')
         multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
@@ -2503,6 +2494,10 @@ class SuperimposeProgressBarPopUp(PopUpMixin):
                                                               color=bar_clr,
                                                               position=loc,
                                                               gpu=gpu)).start()
+
+
+
+#SuperimposeProgressBarPopUp()
 
 class SuperimposeVideoPopUp(PopUpMixin):
     def __init__(self):
@@ -2557,24 +2552,18 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.color_dict = get_color_dict()
         self.font_dict = get_fonts()
+        self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
 
-        self.location_dropdown = DropDownMenu(settings_frm, "VIDEO NAME TEXT LOCATION:", list(self.LOCATIONS.keys()), labelwidth=25)
-        self.font_dropdown = DropDownMenu(settings_frm, "FONT:", list(self.font_dict.keys()), labelwidth=25)
-        self.font_size_dropdown = DropDownMenu(settings_frm, "FONT SIZE:", list(range(5, 105, 5)), labelwidth=25)
-        self.font_color_dropdown = DropDownMenu(settings_frm, "FONT COLOR:", list(self.color_dict.keys()), labelwidth=25)
-        self.font_border_dropdown = DropDownMenu(settings_frm, "FONT BORDER COLOR:", list(self.color_dict.keys()), labelwidth=25)
-        self.font_border_width_dropdown = DropDownMenu(settings_frm, "FONT BORDER WIDTH:", list(range(2, 52, 2)), labelwidth=25)
-        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
+        self.location_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.LOCATIONS.keys()), label_width=25, value='TOP LEFT', label="VIDEO NAME TEXT LOCATION:", img='location')
+        self.font_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.font_dict.keys()), label_width=25, value='Arial', label="FONT:", img='font')
 
+        self.font_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(5, 105, 5)), label_width=25, value=20, label="FONT SIZE:", img='font_size')
+        self.font_color_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.color_dict.keys()), label_width=25, value='White', label="FONT COLOR:", img='color_wheel')
 
+        self.font_border_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.color_dict.keys()), label_width=25, value='Black', label="FONT BORDER COLOR:", img='text')
+        self.font_border_width_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(2, 52, 2)), label_width=25, value=2, label="FONT BORDER WIDTH:", img='width')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label_width=25, value='FALSE', label="USE GPU:", img='gpu_3', state=self.gpu_available)
 
-        self.location_dropdown.setChoices('TOP LEFT')
-        self.font_size_dropdown.setChoices(20)
-        self.font_dropdown.setChoices('Arial')
-        self.font_color_dropdown.setChoices('White')
-        self.font_border_dropdown.setChoices('Black')
-        self.font_border_width_dropdown.setChoices(2)
-        self.gpu_dropdown.setChoices('FALSE')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.location_dropdown.grid(row=0, column=0, sticky=NW)
@@ -2586,7 +2575,7 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
         self.gpu_dropdown.grid(row=6, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE VIDEO NAME", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
         single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=False))
 
         single_video_frm.grid(row=1, column=0, sticky="NW")
@@ -2594,7 +2583,7 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
         single_video_run.grid(row=1, column=0, sticky="NW")
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - SUPERIMPOSE VIDEO NAME", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25, lbl_icon='folder')
         multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
@@ -2627,6 +2616,9 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
                                                         position=loc,
                                                         gpu=gpu)).start()
 
+
+#SuperimposeVideoNamesPopUp()
+
 class SuperimposeTextPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="SUPER-IMPOSE TEXT ON VIDEOS", icon='superimpose')
@@ -2634,25 +2626,16 @@ class SuperimposeTextPopUp(PopUpMixin):
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.color_dict = get_color_dict()
         self.font_dict = get_fonts()
+        self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
 
-        self.location_dropdown = DropDownMenu(settings_frm, "TEXT LOCATION:", list(self.LOCATIONS.keys()), labelwidth=25)
-        self.text_eb = Entry_Box(parent=settings_frm, labelwidth=25, entry_box_width=50, fileDescription='TEXT:')
-        self.font_dropdown = DropDownMenu(settings_frm, "FONT:", list(self.font_dict.keys()), labelwidth=25)
-        self.font_size_dropdown = DropDownMenu(settings_frm, "FONT SIZE:", list(range(5, 105, 5)), labelwidth=25)
-        self.font_color_dropdown = DropDownMenu(settings_frm, "FONT COLOR:", list(self.color_dict.keys()), labelwidth=25)
-        self.font_border_dropdown = DropDownMenu(settings_frm, "FONT BORDER COLOR:", list(self.color_dict.keys()), labelwidth=25)
-        self.font_border_width_dropdown = DropDownMenu(settings_frm, "FONT BORDER WIDTH:", list(range(2, 52, 2)), labelwidth=25)
-        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
-
-
-
-        self.location_dropdown.setChoices('TOP LEFT')
-        self.font_size_dropdown.setChoices(20)
-        self.font_dropdown.setChoices('Arial')
-        self.font_color_dropdown.setChoices('White')
-        self.font_border_dropdown.setChoices('Black')
-        self.font_border_width_dropdown.setChoices(2)
-        self.gpu_dropdown.setChoices('FALSE')
+        self.location_dropdown = SimBADropDown(parent=settings_frm, label="TEXT LOCATION:", dropdown_options=list(self.LOCATIONS.keys()), label_width=25, value='TOP LEFT', img='location')
+        self.text_eb = Entry_Box(parent=settings_frm, labelwidth=25, entry_box_width=50, fileDescription='TEXT:', img='text')
+        self.font_dropdown = SimBADropDown(parent=settings_frm, label="FONT:", dropdown_options=list(self.font_dict.keys()), label_width=25, value='Arial', img='font')
+        self.font_size_dropdown = SimBADropDown(parent=settings_frm, label="FONT SIZE:", dropdown_options=list(range(5, 105, 5)), label_width=25, value=20, img='font_size')
+        self.font_color_dropdown = SimBADropDown(parent=settings_frm, label="FONT COLOR:", dropdown_options=list(self.color_dict.keys()), label_width=25, value='White', img='text_color')
+        self.font_border_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.color_dict.keys()), label_width=25, value='Black', label="FONT BORDER COLOR:", img='line')
+        self.font_border_width_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(2, 52, 2)), label_width=25, value=2, label="FONT BORDER WIDTH:", img='width')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label_width=25, value='FALSE', label="USE GPU:", img='gpu_3', state=self.gpu_available)
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.location_dropdown.grid(row=0, column=0, sticky=NW)
@@ -2665,7 +2648,7 @@ class SuperimposeTextPopUp(PopUpMixin):
         self.gpu_dropdown.grid(row=7, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE TEXT", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
         single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=False))
 
         single_video_frm.grid(row=1, column=0, sticky="NW")
@@ -2673,7 +2656,7 @@ class SuperimposeTextPopUp(PopUpMixin):
         single_video_run.grid(row=1, column=0, sticky="NW")
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - SUPERIMPOSE TEXT", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25, lbl_icon='folder')
         multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", font=Formats.FONT_REGULAR.value,  command=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
@@ -2710,22 +2693,24 @@ class SuperimposeTextPopUp(PopUpMixin):
                                                      gpu=gpu)).start()
 
 
+#SuperimposeTextPopUp()
+
+
 class BoxBlurPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="BOX BLUR VIDEOS", icon='smooth')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         blur_lvl = [round(x, 2) for x in list(np.arange(0.05, 1.0, 0.05))]
-        self.blur_lvl_dropdown = DropDownMenu(settings_frm, "BLUR LEVEL:", blur_lvl, labelwidth=25)
-        self.invert_dropdown = DropDownMenu(settings_frm, "INVERT BLUR REGION:", ['TRUE', 'FALSE'], labelwidth=25)
 
-        self.blur_lvl_dropdown.setChoices(0.02)
-        self.invert_dropdown.setChoices('FALSE')
+
+        self.blur_lvl_dropdown = SimBADropDown(parent=settings_frm, label="BLUR LEVEL:", dropdown_options=blur_lvl, label_width=25, dropdown_width=30, value=0.02, img='smooth')
+        self.invert_dropdown = SimBADropDown(parent=settings_frm, label="INVERT BLUR REGION:", dropdown_options=['TRUE', 'FALSE'], label_width=25, dropdown_width=30, value='FALSE', img='invert')
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.blur_lvl_dropdown.grid(row=0, column=0, sticky=NW)
         self.invert_dropdown.grid(row=1, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="APPLY BOX-BLUR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
         single_video_run = Button(single_video_frm, text="RUN", font=Formats.FONT_REGULAR.value, command=lambda: self.run())
 
         single_video_frm.grid(row=1, column=0, sticky="NW")
@@ -2742,6 +2727,7 @@ class BoxBlurPopUp(PopUpMixin):
         threading.Thread(target=roi_blurbox(video_path=video_path, blur_level=blur_lvl, invert=invert)).start()
 
 
+
 class BackgroundRemoverSingleVideoPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="REMOVE BACKGROUND IN A VIDEO", icon='black_and_white')
@@ -2749,26 +2735,19 @@ class BackgroundRemoverSingleVideoPopUp(PopUpMixin):
         self.foreground_clr_options = list(self.clr_dict.keys())
         self.foreground_clr_options.append('Original')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.video_path = FileSelect(settings_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=45)
-        self.bg_video_path = FileSelect(settings_frm, "BACKGROUND REFERENCE VIDEO PATH (OPTIONAL):", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=45)
-        self.bg_clr_dropdown = DropDownMenu(settings_frm, "BACKGROUND COLOR:", list(self.clr_dict.keys()), labelwidth=45)
-        self.fg_clr_dropdown = DropDownMenu(settings_frm, "FOREGROUND COLOR:", self.foreground_clr_options, labelwidth=45)
-        self.bg_threshold_dropdown = DropDownMenu(settings_frm, "BACKGROUND THRESHOLD:", list(range(1, 100)), labelwidth=45)
-        self.bg_start_eb = Entry_Box(parent=settings_frm, labelwidth=45, entry_box_width=15, fileDescription='BACKGROUND VIDEO START (FRAME # OR TIME):')
-        self.bg_end_eb = Entry_Box(parent=settings_frm, labelwidth=45, entry_box_width=15, fileDescription='BACKGROUND VIDEO END (FRAME # OR TIME):')
-        self.bg_start_eb.set_state(DISABLED)
-        self.bg_end_eb.set_state(DISABLED)
-        self.entire_video_as_bg_var = BooleanVar(value=True)
-        self.entire_video_as_bg_cb = Checkbutton(settings_frm, text="COMPUTE BACKGROUND FROM ENTIRE VIDEO", font=Formats.FONT_REGULAR.value, variable=self.entire_video_as_bg_var, command=lambda: self.enable_entrybox_from_checkbox(check_box_var=self.entire_video_as_bg_var, entry_boxes=[self.bg_start_eb, self.bg_end_eb], reverse=True))
-        self.multiprocessing_var = BooleanVar(value=True)
-        self.multiprocess_cb = Checkbutton(settings_frm, text="MULTIPROCESS VIDEO (FASTER)", font=Formats.FONT_REGULAR.value, variable=self.multiprocessing_var, command=lambda: self.enable_dropdown_from_checkbox(check_box_var=self.multiprocessing_var, dropdown_menus=[self.multiprocess_dropdown]))
-        self.multiprocess_dropdown = DropDownMenu(settings_frm, "CPU cores:", list(range(2, self.cpu_cnt)), "12")
-        self.multiprocess_dropdown.setChoices(self.cpu_cnt)
-        self.bg_clr_dropdown.setChoices('White')
-        self.fg_clr_dropdown.setChoices('Original')
-        self.bg_start_eb.entry_set('00:00:00')
-        self.bg_end_eb.entry_set('00:00:20')
-        self.bg_threshold_dropdown.setChoices('30')
+        self.video_path = FileSelect(settings_frm, "VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=45, lbl_icon='video_2')
+        self.bg_video_path = FileSelect(settings_frm, "BACKGROUND REFERENCE VIDEO PATH (OPTIONAL):", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=45, lbl_icon='video_2')
+
+        self.bg_clr_dropdown = SimBADropDown(parent=settings_frm, label="BACKGROUND COLOR:", dropdown_options=list(self.clr_dict.keys()), label_width=45, value='White', img='fill')
+        self.fg_clr_dropdown = SimBADropDown(parent=settings_frm, label="FOREGROUND COLOR:", dropdown_options=self.foreground_clr_options, label_width=45, value='Original', img='mouse_head')
+        self.bg_threshold_dropdown = SimBADropDown(parent=settings_frm, label="BACKGROUND THRESHOLD:", dropdown_options=list(range(1, 100)), label_width=45, value=30, img='threshold')
+        self.bg_start_eb = Entry_Box(parent=settings_frm, labelwidth=45, entry_box_width=15, fileDescription='BACKGROUND VIDEO START (FRAME # OR TIME):', img='play', value='00:00:00', status=DISABLED)
+        self.bg_end_eb = Entry_Box(parent=settings_frm, labelwidth=45, entry_box_width=15, fileDescription='BACKGROUND VIDEO END (FRAME # OR TIME):', img='stop', value='00:00:20', status=DISABLED)
+
+
+        self.multiprocess_dropdown = SimBADropDown(parent=settings_frm, label="CPU CORE COUNT:", dropdown_options=list(range(1, find_core_cnt()[0]+1)), label_width=45, value=int(find_core_cnt()[0]/2), img='cpu_small')
+        self.entire_video_as_bg_cb, self.entire_video_as_bg_var = SimbaCheckbox(parent=settings_frm, txt="COMPUTE BACKGROUND FROM ENTIRE VIDEO", font=Formats.FONT_REGULAR.value, val=True, cmd=lambda: self.enable_entrybox_from_checkbox(check_box_var=self.entire_video_as_bg_var, entry_boxes=[self.bg_start_eb, self.bg_end_eb], reverse=True))
+
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.video_path.grid(row=0, column=0, sticky=NW)
@@ -2776,11 +2755,10 @@ class BackgroundRemoverSingleVideoPopUp(PopUpMixin):
         self.bg_clr_dropdown.grid(row=2, column=0, sticky=NW)
         self.fg_clr_dropdown.grid(row=3, column=0, sticky=NW)
         self.bg_threshold_dropdown.grid(row=4, column=0, sticky=NW)
-        self.entire_video_as_bg_cb.grid(row=5, column=0, sticky=NW)
-        self.bg_start_eb.grid(row=6, column=0, sticky=NW)
-        self.bg_end_eb.grid(row=7, column=0, sticky=NW)
-        self.multiprocess_cb.grid(row=8, column=0, sticky=NW)
-        self.multiprocess_dropdown.grid(row=9, column=1, sticky=NW)
+        self.multiprocess_dropdown.grid(row=5, column=0, sticky=NW)
+        self.entire_video_as_bg_cb.grid(row=6, column=0, sticky=NW)
+        self.bg_start_eb.grid(row=7, column=0, sticky=NW)
+        self.bg_end_eb.grid(row=8, column=0, sticky=NW)
 
         self.create_run_frm(run_function=self.run)
         self.main_frm.mainloop()
@@ -2793,6 +2771,7 @@ class BackgroundRemoverSingleVideoPopUp(PopUpMixin):
         bg_threshold = int((bg_threshold/100) * 255)
         bg_clr = self.colors_dict[self.bg_clr_dropdown.getChoices()]
         fg_clr = self.fg_clr_dropdown.getChoices()
+        core_cnt = int(self.multiprocess_dropdown.get_value())
         if fg_clr != 'Original':
             fg_clr = self.colors_dict[self.fg_clr_dropdown.getChoices()]
         else:
@@ -2825,7 +2804,7 @@ class BackgroundRemoverSingleVideoPopUp(PopUpMixin):
 
 
         print(f'Running background subtraction for video {video_meta_data["video_name"]}...')
-        if not self.multiprocessing_var.get():
+        if core_cnt == 1:
             video_bg_subtraction(video_path=video_path,
                                  bg_video_path=bg_video,
                                  bg_start_frm=bg_start_frm,
@@ -2849,6 +2828,8 @@ class BackgroundRemoverSingleVideoPopUp(PopUpMixin):
                                     threshold=bg_threshold)
 
 
+#BackgroundRemoverSingleVideoPopUp()
+
 class BackgroundRemoverDirectoryPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="REMOVE BACKGROUNDS IN MULTIPLE VIDEOS", icon='black_and_white')
@@ -2856,26 +2837,18 @@ class BackgroundRemoverDirectoryPopUp(PopUpMixin):
         self.foreground_clr_options = list(self.clr_dict.keys())
         self.foreground_clr_options.append('Original')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.dir_path = FolderSelect(settings_frm, "VIDEO DIRECTORY:", lblwidth=45)
-        self.bg_dir_path = FolderSelect(settings_frm, "BACKGROUND VIDEO DIRECTORY (OPTIONAL):", lblwidth=45)
-        self.bg_clr_dropdown = DropDownMenu(settings_frm, "BACKGROUND COLOR:", list(self.clr_dict.keys()), labelwidth=45)
-        self.fg_clr_dropdown = DropDownMenu(settings_frm, "FOREGROUND COLOR:", self.foreground_clr_options, labelwidth=45)
-        self.bg_threshold_dropdown = DropDownMenu(settings_frm, "BACKGROUND THRESHOLD:", list(range(1, 100)), labelwidth=45)
-        self.bg_start_eb = Entry_Box(parent=settings_frm, labelwidth=45, entry_box_width=15, fileDescription='BACKGROUND VIDEO START (FRAME # OR TIME):')
-        self.bg_end_eb = Entry_Box(parent=settings_frm, labelwidth=45, entry_box_width=15, fileDescription='BACKGROUND VIDEO END (FRAME # OR TIME):')
-        self.bg_start_eb.set_state(DISABLED)
-        self.bg_end_eb.set_state(DISABLED)
-        self.entire_video_as_bg_var = BooleanVar(value=True)
-        self.entire_video_as_bg_cb = Checkbutton(settings_frm, text="COMPUTE BACKGROUND FROM ENTIRE VIDEO", font=Formats.FONT_REGULAR.value, variable=self.entire_video_as_bg_var, command=lambda: self.enable_entrybox_from_checkbox(check_box_var=self.entire_video_as_bg_var, entry_boxes=[self.bg_start_eb, self.bg_end_eb], reverse=True))
-        self.multiprocessing_var = BooleanVar(value=True)
-        self.multiprocess_cb = Checkbutton(settings_frm, text="MULTIPROCESS VIDEO (FASTER)", font=Formats.FONT_REGULAR.value, variable=self.multiprocessing_var, command=lambda: self.enable_dropdown_from_checkbox(check_box_var=self.multiprocessing_var, dropdown_menus=[self.multiprocess_dropdown]))
-        self.multiprocess_dropdown = DropDownMenu(settings_frm, "CPU cores:", list(range(2, self.cpu_cnt)), "12")
-        self.multiprocess_dropdown.setChoices(self.cpu_cnt)
-        self.bg_clr_dropdown.setChoices('White')
-        self.fg_clr_dropdown.setChoices('Original')
-        self.bg_start_eb.entry_set('00:00:00')
-        self.bg_end_eb.entry_set('00:00:20')
-        self.bg_threshold_dropdown.setChoices('30')
+        self.dir_path = FolderSelect(settings_frm, "VIDEO DIRECTORY:", lblwidth=45, lbl_icon='video_2')
+        self.bg_dir_path = FolderSelect(settings_frm, "BACKGROUND VIDEO DIRECTORY (OPTIONAL):", lblwidth=45, lbl_icon='video_2')
+
+        self.bg_clr_dropdown = SimBADropDown(parent=settings_frm, label="BACKGROUND COLOR:", dropdown_options=list(self.clr_dict.keys()), label_width=45, value='White', img='fill')
+        self.fg_clr_dropdown = SimBADropDown(parent=settings_frm, label="FOREGROUND COLOR:", dropdown_options=self.foreground_clr_options, label_width=45, value='Original', img='mouse_head')
+        self.bg_threshold_dropdown = SimBADropDown(parent=settings_frm, label="BACKGROUND THRESHOLD:", dropdown_options=list(range(1, 100)), label_width=45, value=30, img='threshold')
+        self.bg_start_eb = Entry_Box(parent=settings_frm, labelwidth=45, entry_box_width=15, fileDescription='BACKGROUND VIDEO START (FRAME # OR TIME):', img='play', status=DISABLED, value='00:00:00')
+        self.bg_end_eb = Entry_Box(parent=settings_frm, labelwidth=45, entry_box_width=15, fileDescription='BACKGROUND VIDEO END (FRAME # OR TIME):', img='stop', status=DISABLED, value='00:00:20')
+
+
+        self.multiprocess_dropdown = SimBADropDown(parent=settings_frm, label="CPU CORE COUNT:", dropdown_options=list(range(1, find_core_cnt()[0]+1)), label_width=45, value=int(find_core_cnt()[0]/2), img='cpu_small')
+        self.entire_video_as_bg_cb, self.entire_video_as_bg_var = SimbaCheckbox(parent=settings_frm, txt="COMPUTE BACKGROUND FROM ENTIRE VIDEO", font=Formats.FONT_REGULAR.value, val=True, cmd=lambda: self.enable_entrybox_from_checkbox(check_box_var=self.entire_video_as_bg_var, entry_boxes=[self.bg_start_eb, self.bg_end_eb], reverse=True))
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.dir_path.grid(row=0, column=0, sticky=NW)
@@ -2886,8 +2859,7 @@ class BackgroundRemoverDirectoryPopUp(PopUpMixin):
         self.entire_video_as_bg_cb.grid(row=5, column=0, sticky=NW)
         self.bg_start_eb.grid(row=6, column=0, sticky=NW)
         self.bg_end_eb.grid(row=7, column=0, sticky=NW)
-        self.multiprocess_cb.grid(row=8, column=0, sticky=NW)
-        self.multiprocess_dropdown.grid(row=9, column=1, sticky=NW)
+        self.multiprocess_dropdown.grid(row=9, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
         #self.main_frm.mainloop()
 
@@ -2933,12 +2905,13 @@ class BackgroundRemoverDirectoryPopUp(PopUpMixin):
         for cnt, (video_name, video_path) in enumerate(video_paths.items()):
             print(f'Running background subtraction for video {video_name}... (Video {cnt+1}/{len(list(video_paths.keys()))})')
             bg_video_path = bg_video_paths[video_name]
+            core_cnt = int(self.multiprocess_dropdown.get_value())
             if self.entire_video_as_bg_var.get():
                 bg_video_meta_data = get_video_meta_data(video_path=bg_video_path)
                 bg_start_frm, bg_end_frm = 0, bg_video_meta_data['frame_count']
                 bg_start_time, bg_end_time = None, None
 
-            if not self.multiprocessing_var.get():
+            if core_cnt == 1:
                 video_bg_subtraction(video_path=video_path,
                                      bg_video_path=bg_video_path,
                                      bg_start_frm=bg_start_frm,
@@ -2962,6 +2935,7 @@ class BackgroundRemoverDirectoryPopUp(PopUpMixin):
                                         threshold=bg_threshold)
 
 
+#BackgroundRemoverDirectoryPopUp()
 
 class RotateVideoSetDegreesPopUp(PopUpMixin):
     def __init__(self):
@@ -3218,11 +3192,9 @@ class CreateAverageFramePopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="CREATE AVERAGE VIDEO FRAME", icon='average')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.save_dir = FolderSelect(settings_frm, "AVERAGE FRAME SAVE DIRECTORY:", title="Select a video directory", lblwidth=25)
-        self.section_start_time_eb = Entry_Box(settings_frm, "SAMPLE START TIME:", "25")
-        self.section_end_time_eb = Entry_Box(settings_frm, "SAMPLE END TIME:", "25")
-        self.section_start_time_eb.entry_set('00:00:00')
-        self.section_end_time_eb.entry_set('00:00:00')
+        self.save_dir = FolderSelect(settings_frm, "AVERAGE FRAME SAVE DIRECTORY:", title="Select a video directory", lblwidth=35, lbl_icon='folder')
+        self.section_start_time_eb = Entry_Box(settings_frm, fileDescription="SAMPLE START TIME:", labelwidth=35, value='00:00:00', img='play')
+        self.section_end_time_eb = Entry_Box(settings_frm, fileDescription="SAMPLE END TIME:", labelwidth=35, value='00:00:00', img='stop')
 
         settings_frm.grid(row=0, column=0, sticky=NW, pady=10)
         self.save_dir.grid(row=0, column=0, sticky=NW)
@@ -3230,7 +3202,7 @@ class CreateAverageFramePopUp(PopUpMixin):
         self.section_end_time_eb.grid(row=2, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - CREATE AVERAGE FRAME", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
         single_video_run = Button(single_video_frm, text="RUN - SINGLE VIDEO", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=False))
 
         single_video_frm.grid(row=1, column=0, sticky="NW")
@@ -3238,7 +3210,7 @@ class CreateAverageFramePopUp(PopUpMixin):
         single_video_run.grid(row=1, column=0, sticky="NW")
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - CREATE AVERAGE FRAMES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25, lbl_icon='folder')
         multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
@@ -3282,28 +3254,28 @@ class CreateAverageFramePopUp(PopUpMixin):
                                                        save_path=save_path,
                                                        verbose=True)).start()
 
+#CreateAverageFramePopUp()
+
+
 class ManualTemporalJoinPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="MANUAL TEMPORAL JOIN VIDEOS", icon='join_purple')
         video_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="NUMBER OF VIDEOS TO JOIN", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.video_cnt_dropdown = DropDownMenu(video_cnt_frm, "NUMBER OF VIDEOS:", list(range(2, 101, 1)), labelwidth=25)
-        self.select_video_cnt_btn = SimbaButton(parent=video_cnt_frm, txt='SELECT', img='tick', cmd=self.select)
-        self.quality_dropdown = DropDownMenu(video_cnt_frm, "OUTPUT VIDEO QUALITY %:", list(range(10, 110, 10)), labelwidth=25)
-        self.quality_dropdown.setChoices(60)
-        self.out_format_dropdown = DropDownMenu(video_cnt_frm, "OUTPUT VIDEO FORMAT:", Options.ALL_VIDEO_FORMAT_OPTIONS.value, labelwidth=25)
-        self.gpu_dropdown = DropDownMenu(video_cnt_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
-        self.gpu_dropdown.setChoices('FALSE')
-        self.out_format_dropdown.setChoices('.mp4')
-        self.video_cnt_dropdown.setChoices(2)
+        self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
+
+        self.video_cnt_dropdown = SimBADropDown(parent=video_cnt_frm, label="NUMBER OF VIDEOS:", dropdown_options=list(range(2, 101, 1)), label_width=25, dropdown_width=30, img='abacus_2', value=2, command= lambda x: self.select(x))
+        self.quality_dropdown = SimBADropDown(parent=video_cnt_frm, label="OUTPUT VIDEO QUALITY %:", dropdown_options=list(range(10, 110, 10)), label_width=25, dropdown_width=30, img='pct', value=60)
+        self.out_format_dropdown = SimBADropDown(parent=video_cnt_frm, label="OUTPUT VIDEO FORMAT:", dropdown_options=Options.ALL_VIDEO_FORMAT_OPTIONS.value, label_width=25, dropdown_width=30, img='file_type', value='.mp4')
+        self.gpu_dropdown = SimBADropDown(parent=video_cnt_frm, label="USE GPU:", dropdown_options=['TRUE', 'FALSE'], label_width=25, dropdown_width=30, img='gpu_3', value='FALSE', state=self.gpu_available)
         video_cnt_frm.grid(row=0, column=0, sticky=NW)
         self.video_cnt_dropdown.grid(row=0, column=0, sticky=NW)
-        self.select_video_cnt_btn.grid(row=0, column=1, sticky=NW)
         self.quality_dropdown.grid(row=1, column=0, sticky=NW)
         self.out_format_dropdown.grid(row=2, column=0, sticky=NW)
         self.gpu_dropdown.grid(row=3, column=0, sticky=NW)
+        self.select(x=2)
         self.main_frm.mainloop()
 
-    def select(self):
+    def select(self, x):
         video_cnt = int(self.video_cnt_dropdown.getChoices())
         if hasattr(self, 'video_paths_frm'):
             self.video_paths_frm.destroy()
@@ -3312,7 +3284,7 @@ class ManualTemporalJoinPopUp(PopUpMixin):
         self.video_paths_frm.grid(row=1, column=0, sticky=NW)
         self.video_paths = {}
         for video_cnt in range(video_cnt):
-            self.video_paths[video_cnt] = FileSelect(self.video_paths_frm, f"VIDEO PATH {video_cnt+1}:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+            self.video_paths[video_cnt] = FileSelect(self.video_paths_frm, f"VIDEO PATH {video_cnt+1}:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
             self.video_paths[video_cnt].grid(row=video_cnt, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
 
@@ -3345,19 +3317,14 @@ class CrossfadeVideosPopUp(PopUpMixin):
         PopUpMixin.__init__(self, title="CROSS-FADE VIDEOS", icon='crossfade')
         crossfade_methods = get_ffmpeg_crossfade_methods()
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="NUMBER OF VIDEOS TO JOIN", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.video_path_1 = FileSelect(settings_frm, f"VIDEO PATH 1:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
-        self.video_path_2 = FileSelect(settings_frm, f"VIDEO PATH 2:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
-        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
-        self.out_format_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO FORMAT:", ['mp4', 'avi', 'webm'], labelwidth=25)
-        self.fade_method_dropdown = DropDownMenu(settings_frm, "CROSS-FADE METHOD:", crossfade_methods, labelwidth=25)
-        self.duration_dropdown = DropDownMenu(settings_frm, "CROSS-FADE DURATION:", list(range(2, 22, 2)), labelwidth=25)
-        self.offset_eb = Entry_Box(settings_frm, "CROSS-FADE OFFSET:", "25")
+        self.video_path_1 = FileSelect(settings_frm, f"VIDEO PATH 1:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
+        self.video_path_2 = FileSelect(settings_frm, f"VIDEO PATH 2:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
+        self.quality_dropdown = SimBADropDown(parent=settings_frm, label="OUTPUT VIDEO QUALITY:", dropdown_options=list(range(10, 110, 10)), label_width=25, img='pct', dropdown_width=35, value=60)
+        self.out_format_dropdown = SimBADropDown(parent=settings_frm, label="OUTPUT VIDEO FORMAT:", dropdown_options=['mp4', 'avi', 'webm'], label_width=25, img='file_type', dropdown_width=35, value='mp4')
+        self.fade_method_dropdown = SimBADropDown(parent=settings_frm, label="CROSS-FADE METHOD:", dropdown_options=crossfade_methods, label_width=25, img='crossfade', dropdown_width=35, value='fade')
+        self.duration_dropdown = SimBADropDown(parent=settings_frm, label="CROSS-FADE DURATION:", dropdown_options=list(range(2, 22, 2)), label_width=25, img='timer', dropdown_width=35, value=6)
+        self.offset_eb = Entry_Box(settings_frm, fileDescription="CROSS-FADE OFFSET:", labelwidth=25, value='00:00:00', img='timer_2', entry_box_width=35, justify='center')
 
-        self.offset_eb.entry_set('00:00:00')
-        self.quality_dropdown.setChoices(60)
-        self.out_format_dropdown.setChoices('mp4')
-        self.fade_method_dropdown.setChoices('fade')
-        self.duration_dropdown.setChoices(6)
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.video_path_1.grid(row=0, column=0, sticky=NW)
         self.video_path_2.grid(row=1, column=0, sticky=NW)
@@ -3394,6 +3361,9 @@ class CrossfadeVideosPopUp(PopUpMixin):
                                               crossfade_offset=offset,
                                               out_format=format,
                                               quality=quality)).start()
+
+
+
 
 #CrossfadeVideosPopUp()
 #_ = BrightnessContrastPopUp()

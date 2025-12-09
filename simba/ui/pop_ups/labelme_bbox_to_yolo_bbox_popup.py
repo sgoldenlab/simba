@@ -24,13 +24,13 @@ class LabelmeBbox2YoloBboxPopUp(PopUpMixin):
         PopUpMixin.__init__(self, title="LABELME BOUNDING BOXES -> YOLO BOUNDING BOXES ", icon='dlc_1')
 
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
-        self.labelme_dir = FolderSelect(settings_frm, folderDescription="LABELME DIRECTORY:", lblwidth=35)
-        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35)
-        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE:", label_width=35, dropdown_width=40, value='TRUE')
-        self.obb_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="OBB:", label_width=35, dropdown_width=40, value='TRUE')
-        self.clahe_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="CLAHE:", label_width=35, dropdown_width=40, value='FALSE')
-        self.greyscale_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE:", label_width=35, dropdown_width=40, value='FALSE')
-        self.train_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=TRAIN_SIZE_OPTIONS, label="TRAIN SIZE (%): ", label_width=35, dropdown_width=40, value=70)
+        self.labelme_dir = FolderSelect(settings_frm, folderDescription="LABELME DIRECTORY:", lblwidth=35, lbl_icon='folder')
+        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, lbl_icon='folder')
+        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE:", label_width=35, dropdown_width=40, value='TRUE', img='verbose')
+        self.obb_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="OBB:", label_width=35, dropdown_width=40, value='TRUE', img='obb')
+        self.clahe_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="CLAHE:", label_width=35, dropdown_width=40, value='FALSE', img='clahe')
+        self.greyscale_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE:", label_width=35, dropdown_width=40, value='FALSE', img='grey')
+        self.train_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=TRAIN_SIZE_OPTIONS, label="TRAIN SIZE (%): ", label_width=35, dropdown_width=40, value=70, img='pct_2')
 
 
         settings_frm.grid(row=0, column=0, sticky=NW)

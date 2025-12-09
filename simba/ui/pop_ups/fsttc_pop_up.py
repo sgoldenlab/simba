@@ -59,4 +59,6 @@ class FSTTCPopUp(PopUpMixin, ConfigReader):
         fsttc_calculator.run()
 
 
-# _ = FSTTCPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
+#ExtractAnnotationFramesPopUp(config_path=)
+
+#_ = FSTTCPopUp(config_path=r"C:\troubleshooting\multi_animal_dlc_two_c57\project_folder\project_config.ini")

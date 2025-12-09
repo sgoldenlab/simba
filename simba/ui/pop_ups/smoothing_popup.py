@@ -35,9 +35,9 @@ class SmoothingPopUp(PopUpMixin, ConfigReader):
 
         self.settings_frm= CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
         instruction_lbl = SimBALabel(parent=self.settings_frm, txt=INSTRUCTIONS_LBL_1, font=Formats.FONT_REGULAR_ITALICS.value)
-        self.time_window = Entry_Box(self.settings_frm, "TIME WINDOW (MILLISECONDS):", "35", validation="numeric", entry_box_width=35, value=100, justify='center')
-        self.method_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=Options.SMOOTHING_OPTIONS.value, label="SMOOTHING METHOD:", label_width=35, dropdown_width=35, value=Options.SMOOTHING_OPTIONS.value[0])
-        self.save_originals_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="SAVE ORIGINALS:", label_width=35, dropdown_width=35, value='TRUE')
+        self.time_window = Entry_Box(self.settings_frm, "TIME WINDOW (MILLISECONDS):", "35", validation="numeric", entry_box_width=35, value=100, justify='center', img='timer')
+        self.method_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=Options.SMOOTHING_OPTIONS.value, label="SMOOTHING METHOD:", label_width=35, dropdown_width=35, value=Options.SMOOTHING_OPTIONS.value[0], img='equation_small')
+        self.save_originals_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="SAVE ORIGINALS:", label_width=35, dropdown_width=35, value='TRUE', img='save')
 
         self.settings_frm.grid(row=0, column=0, sticky=NW)
         instruction_lbl.grid(row=0, column=0, sticky=NW)

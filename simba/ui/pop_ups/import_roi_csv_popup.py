@@ -26,11 +26,11 @@ class ROIDefinitionsCSVImporterPopUp(ConfigReader, PopUpMixin):
         self.config_path = config_path
         self.paths_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header=f"FILE PATHS", icon_name='csv_black', icon_link=Links.ROI.value)
         instruct_lbl = SimBALabel(parent=self.paths_frm, txt='Import previously exported SimBA ROI data in CSV format to \n SimBA ROI H5 format', txt_clr='black', bg_clr=None, font=Formats.FONT_REGULAR_ITALICS.value)
-        self.rectangle_file_select = FileSelect(self.paths_frm, "RECTANGLE CSV PATH", title="SELECT CSV FILE", lblwidth=35, file_types=[("CSV FILE", (".csv", ".CSV"))])
-        self.circle_file_select = FileSelect(self.paths_frm, "CIRCLE CSV PATH", title="SELECT CSV FILE", lblwidth=35, file_types=[("CSV FILE", (".csv", ".CSV"))])
-        self.polygon_file_select = FileSelect(self.paths_frm, "POLYGON CSV PATH", title="SELECT CSV FILE", lblwidth=35, file_types=[("CSV FILE", (".csv", ".CSV"))])
+        self.rectangle_file_select = FileSelect(self.paths_frm, "RECTANGLE CSV PATH", title="SELECT CSV FILE", lblwidth=35, file_types=[("CSV FILE", (".csv", ".CSV"))], lbl_icon='rectangle')
+        self.circle_file_select = FileSelect(self.paths_frm, "CIRCLE CSV PATH", title="SELECT CSV FILE", lblwidth=35, file_types=[("CSV FILE", (".csv", ".CSV"))], lbl_icon='circle_small')
+        self.polygon_file_select = FileSelect(self.paths_frm, "POLYGON CSV PATH", title="SELECT CSV FILE", lblwidth=35, file_types=[("CSV FILE", (".csv", ".CSV"))], lbl_icon='polygon_2')
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header=f"SETTINGS", icon_name='settings', icon_link=Links.ROI.value, pady=10)
-        self.append_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='APPEND TO EXISTING ROI DATA: ', label_width=35, dropdown_width=30, value='FALSE', state=self.append_activated)
+        self.append_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label='APPEND TO EXISTING ROI DATA: ', label_width=35, dropdown_width=30, value='FALSE', state=self.append_activated, img='plus_green_3')
         self.roi_table_frm = roi_table_frm if roi_table_frm is not None and hasattr(roi_table_frm, 'refresh_window') else None
         self.run_btn = SimbaButton(parent=self.main_frm, txt='RUN', img='rocket', txt_clr='blue', font=Formats.FONT_LARGE.value, hover_font=Formats.FONT_LARGE_BOLD.value, cmd=self.run)
         self.paths_frm.grid(row=0, column=0, sticky='NW')

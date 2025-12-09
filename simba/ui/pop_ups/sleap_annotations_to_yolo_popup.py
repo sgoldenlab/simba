@@ -37,16 +37,15 @@ class SLEAPAnnotations2YoloPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="SLEAP ANNOTATIONS TO YOLO POSE ESTIMATION ANNOTATIONS", icon='sleap_small')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
-        self.sleap_dir = FolderSelect(settings_frm, folderDescription="SLEAP DATA DIRECTORY (.SLP):", lblwidth=35, entry_width=40, initialdir=r"D:\troubleshooting\two_animals_sleap\import_data")
-        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, entry_width=40, initialdir=r"D:\troubleshooting\two_animals_sleap\yolo_kpts_2")
+        self.sleap_dir = FolderSelect(settings_frm, folderDescription="SLEAP DATA DIRECTORY (.SLP):", lblwidth=35, entry_width=40, initialdir=r"D:\troubleshooting\two_animals_sleap\import_data", lbl_icon='folder')
+        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, entry_width=40, initialdir=r"D:\troubleshooting\two_animals_sleap\yolo_kpts_2", lbl_icon='folder')
 
-        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE: ", label_width=35, dropdown_width=40, value='TRUE')
-        self.train_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=TRAIN_SIZE_OPTIONS, label="TRAIN SIZE (%): ", label_width=35, dropdown_width=40, value=70)
-        self.grey_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE: ", label_width=35, dropdown_width=40, value='FALSE')
-        self.padding_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=PADDING_OPTIONS, label="PADDING: ", label_width=35, dropdown_width=40, value='None')
-        self.clahe_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="CLAHE: ", label_width=35, dropdown_width=40, value='FALSE')
-        single_id_cb, self.single_id_var = SimbaCheckbox(parent=settings_frm, txt="REMOVE ANIMAL ID'S", val=False)
-
+        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE: ", label_width=35, dropdown_width=40, value='TRUE', img='verbose')
+        self.train_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=TRAIN_SIZE_OPTIONS, label="TRAIN SIZE (%): ", label_width=35, dropdown_width=40, value=70, img='pct_2')
+        self.grey_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE: ", label_width=35, dropdown_width=40, value='FALSE', img='grey')
+        self.padding_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=PADDING_OPTIONS, label="PADDING: ", label_width=35, dropdown_width=40, value='None', img='size_black')
+        self.clahe_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="CLAHE: ", label_width=35, dropdown_width=40, value='FALSE', img='clahe')
+        self.single_id_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="REMOVE ANIMAL ID'S", label_width=35, dropdown_width=40, value='FALSE', img='mouse_head')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.sleap_dir .grid(row=0, column=0, sticky=NW)
@@ -57,7 +56,7 @@ class SLEAPAnnotations2YoloPopUp(PopUpMixin):
         self.grey_dropdown.grid(row=4, column=0, sticky=NW)
         self.clahe_dropdown.grid(row=5, column=0, sticky=NW)
         self.padding_dropdown.grid(row=6, column=0, sticky=NW)
-        single_id_cb.grid(row=7, column=0, sticky=NW)
+        self.single_id_dropdown.grid(row=7, column=0, sticky=NW)
 
         self.create_run_frm(run_function=self.run)
         self.main_frm.mainloop()
@@ -76,7 +75,7 @@ class SLEAPAnnotations2YoloPopUp(PopUpMixin):
         verbose = str_2_bool(self.verbose_dropdown.get_value())
         clahe = str_2_bool(self.clahe_dropdown.get_value())
         padding = float(self.padding_dropdown.get_value()) if self.padding_dropdown.get_value() != 'None' else 0.0
-        single_id = 'animal_1' if self.single_id_var.get() else None
+        single_id = 'animal_1' if str_2_bool(self.single_id_dropdown.get_value()) else None
 
         runner = SleapAnnotations2Yolo(sleap_dir=sleap_dir, save_dir=save_dir, padding=padding, train_size=train_size, verbose=verbose, greyscale=grey, clahe=clahe, single_id=single_id)
         runner.run()

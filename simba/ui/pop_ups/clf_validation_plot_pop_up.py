@@ -94,4 +94,6 @@ class ClassifierValidationPopUp(PopUpMixin, ConfigReader):
 
 
 
+#_ = ClassifierValidationPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
+
 #_ = ClassifierValidationPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")

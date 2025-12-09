@@ -18,12 +18,12 @@ class Labelme2ImgsPopUp(PopUpMixin):
     >>> Labelme2ImgsPopUp()
     """
     def __init__(self):
-        super().__init__(title="LABELME TO IMAGES")
+        super().__init__(title="LABELME TO IMAGES", icon='labelme')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
-        self.labelme_dir = FolderSelect(settings_frm, folderDescription="LABELME DIRECTORY:", lblwidth=35, width=40)
-        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, width=40)
-        self.img_format_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=IMG_FORMATS, label="IMAGE FORMAT: ", label_width=35, dropdown_width=40, value=IMG_FORMATS[0])
-        self.grey_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE: ", label_width=35, dropdown_width=40, value='FALSE')
+        self.labelme_dir = FolderSelect(settings_frm, folderDescription="LABELME DIRECTORY:", lblwidth=35, width=40, lbl_icon='labelme_2')
+        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, width=40, lbl_icon='folder')
+        self.img_format_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=IMG_FORMATS, label="IMAGE FORMAT: ", label_width=35, dropdown_width=40, value=IMG_FORMATS[0], img='frames')
+        self.grey_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE: ", label_width=35, dropdown_width=40, value='FALSE', img='grey')
 
 
         settings_frm.grid(row=0, column=0, sticky=NW)
@@ -41,3 +41,6 @@ class Labelme2ImgsPopUp(PopUpMixin):
         grey = str_2_bool(self.grey_dropdown.get_value())
         thread = threading.Thread(target=labelme_to_img_dir, kwargs={'labelme_dir': labelme_dir, 'img_dir': save_dir, 'img_format': img_format, 'greyscale': grey})
         thread.start()
+
+
+#Labelme2ImgsPopUp()

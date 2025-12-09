@@ -107,7 +107,7 @@ class QuickLineplotPopup(PopUpMixin, ConfigReader):
         threading.Thread(target=plotter.run).start()
 
 
-# _ = QuickLineplotPopup(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
+#_ = QuickLineplotPopup(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
 # _ = QuickLineplotPopup(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
 # _ = QuickLineplotPopup(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')
 # _ = QuickLineplotPopup(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

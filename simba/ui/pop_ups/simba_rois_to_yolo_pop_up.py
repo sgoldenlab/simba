@@ -25,18 +25,18 @@ class SimBAROIs2YOLOPopUp(PopUpMixin):
     >>> SimBAROIs2YOLOPopUp()
     """
     def __init__(self):
-        PopUpMixin.__init__(self, title="DLC MULTI-ANIMAL H5 PREDICTIONS TO YOLO", icon='SimBA_logo_3_small')
+        PopUpMixin.__init__(self, title="SIMBA ROI data to YOLO train set", icon='SimBA_logo_3_small')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
 
-        self.simba_config_path = FileSelect(parent=settings_frm, fileDescription='SIMBA CONFIG PATH: ', lblwidth=35, file_types=[("SIMBA PROJECT CONFIG", (".ini",))], entry_width=40)
-        self.video_dir = FolderSelect(settings_frm, folderDescription="VIDEO DIRECTORY:", lblwidth=35, width=40)
-        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, width=40)
-        self.greyscale_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE: ", label_width=35, dropdown_width=40, value='FALSE')
-        self.clahe_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="CLAHE: ", label_width=35, dropdown_width=40, value='FALSE')
-        self.obb_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="OBB: ", label_width=35, dropdown_width=40, value='TRUE')
-        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE: ", label_width=35, dropdown_width=40, value='TRUE')
-        self.frm_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(50, 650, 50)), label="FRAM COUNT (PER VIDEO): ", label_width=35, dropdown_width=40, value=100)
-        self.train_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label="TRAIN SIZE (%): ", label_width=35, dropdown_width=40, value=70)
+        self.simba_config_path = FileSelect(parent=settings_frm, fileDescription='SIMBA CONFIG PATH: ', lblwidth=35, file_types=[("SIMBA PROJECT CONFIG", (".ini",))], entry_width=40, lbl_icon='ini')
+        self.video_dir = FolderSelect(settings_frm, folderDescription="VIDEO DIRECTORY:", lblwidth=35, width=40, lbl_icon='folder')
+        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, width=40, lbl_icon='folder')
+        self.greyscale_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE: ", label_width=35, dropdown_width=40, value='FALSE', img='grey')
+        self.clahe_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="CLAHE: ", label_width=35, dropdown_width=40, value='FALSE', img='clahe')
+        self.obb_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="OBB: ", label_width=35, dropdown_width=40, value='TRUE', img='obb')
+        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE: ", label_width=35, dropdown_width=40, value='TRUE', img='verbose')
+        self.frm_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(50, 650, 50)), label="FRAM COUNT (PER VIDEO): ", label_width=35, dropdown_width=40, value=100, img='frames')
+        self.train_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label="TRAIN SIZE (%): ", label_width=35, dropdown_width=40, value=70, img='pct_2')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.simba_config_path.grid(row=0, column=0, sticky=NW)

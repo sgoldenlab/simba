@@ -40,11 +40,11 @@ class DataPlotterPopUp(PopUpMixin, ConfigReader):
         self.color_lst = list(self.colors_dict.keys())
 
         self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.DATA_TABLES.value, pady=5, padx=5, relief='solid')
-        self.resolution_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.resolutions, label='RESOLUTION:', label_width=30, dropdown_width=20, value=self.resolutions[1])
-        self.rounding_decimals_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=DECIMALS_OPTIONS, label='DECIMAL ACCURACY:', label_width=30, dropdown_width=20, value=2)
-        self.background_color_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.color_lst, label='BACKGROUND COLOR:', label_width=30, dropdown_width=20, value="White")
-        self.header_color_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.color_lst, label='HEADER COLOR:', label_width=30, dropdown_width=20, value="Black")
-        self.font_thickness_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=THICKNESS_OPTIONS, label='FONT THICKNESS: ', label_width=30, dropdown_width=20, value=1)
+        self.resolution_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.resolutions, label='RESOLUTION:', label_width=30, dropdown_width=20, value=self.resolutions[1], img='monitor')
+        self.rounding_decimals_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=DECIMALS_OPTIONS, label='DECIMAL ACCURACY:', label_width=30, dropdown_width=20, value=2, img='rounding')
+        self.background_color_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.color_lst, label='BACKGROUND COLOR:', label_width=30, dropdown_width=20, value="White", img='fill')
+        self.header_color_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.color_lst, label='HEADER COLOR:', label_width=30, dropdown_width=20, value="Black", img='text_color')
+        self.font_thickness_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=THICKNESS_OPTIONS, label='FONT THICKNESS: ', label_width=30, dropdown_width=20, value=1, img='bold')
         self.style_settings_frm.grid(row=0, sticky=NW, pady=10, padx=10)
         self.resolution_dropdown.grid(row=0, sticky=NW)
         self.rounding_decimals_dropdown.grid(row=1, sticky=NW)
@@ -81,7 +81,7 @@ class DataPlotterPopUp(PopUpMixin, ConfigReader):
         self.run_multiple_videos.grid(row=4, column=0, sticky=NW, pady=10, padx=10)
         self.run_multiple_video_btn.grid(row=0, column=0, sticky=NW)
 
-        #self.main_frm.mainloop()
+        self.main_frm.mainloop()
 
     def _create_bp_menu(self, x):
         if hasattr(self, "bp_dropdowns"):
@@ -140,5 +140,5 @@ class DataPlotterPopUp(PopUpMixin, ConfigReader):
 
         _ = data_plotter.run()
 
-#_ = DataPlotterPopUp(config_path=r"C:\troubleshooting\SDS_pre_post\project_folder\project_config.ini")
+# _ = DataPlotterPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
 # _ = DataPlotterPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/two_black_animals_14bp/project_folder/project_config.ini')

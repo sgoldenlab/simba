@@ -18,15 +18,15 @@ class LabelmeDirectory2CSVPopUp(PopUpMixin):
     >>> LabelmeDirectory2CSVPopUp()
     """
     def __init__(self):
-        super().__init__(title="LABELME DIRECTORY TO CSV")
+        super().__init__(title="LABELME DIRECTORY TO CSV", icon='labelme')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
-        self.labelme_dir = FolderSelect(settings_frm, folderDescription="LABELME DIRECTORY:", lblwidth=35)
-        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35)
-        self.greyscale_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE: ", label_width=35, dropdown_width=40, value='FALSE')
-        self.pad_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="PAD IMAGES: ", label_width=35, dropdown_width=40, value='FALSE')
-        self.size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['FALSE', 'MINIMUM', 'MAXIMUM'], label="RESIZE IMAGES: ", label_width=35, dropdown_width=40, value='FALSE')
-        self.normalize_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'],  label="NORMALIZE IMAGES: ", label_width=35, dropdown_width=40, value='FALSE')
-        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'],  label="VERBOSE: ", label_width=35, dropdown_width=40, value='TRUE')
+        self.labelme_dir = FolderSelect(settings_frm, folderDescription="LABELME DIRECTORY:", lblwidth=35, lbl_icon='labelme_2')
+        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, lbl_icon='folder')
+        self.greyscale_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE: ", label_width=35, dropdown_width=40, value='FALSE', img='grey')
+        self.pad_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="PAD IMAGES: ", label_width=35, dropdown_width=40, value='FALSE', img='size_black')
+        self.size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['FALSE', 'MINIMUM', 'MAXIMUM'], label="RESIZE IMAGES: ", label_width=35, dropdown_width=40, value='FALSE', img='resize')
+        self.normalize_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'],  label="NORMALIZE IMAGES: ", label_width=35, dropdown_width=40, value='FALSE', img='equation_small')
+        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'],  label="VERBOSE: ", label_width=35, dropdown_width=40, value='TRUE', img='verbose')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.labelme_dir.grid(row=0, column=0, sticky=NW)
@@ -53,3 +53,6 @@ class LabelmeDirectory2CSVPopUp(PopUpMixin):
         check_if_dir_exists(in_dir=labelme_dir, source=f'{self.__class__.__name__} SAVE DIRECTORY')
         thread = threading.Thread(target=labelme_to_df, kwargs={'labelme_dir': labelme_dir, 'save_path': save_path, 'greyscale': greyscale, 'pad': pad, 'normalize': normalize, 'size': size, 'verbose': verbose})
         thread.start()
+
+
+#LabelmeDirectory2CSVPopUp()

@@ -134,5 +134,5 @@ class ClfByROIPopUp(PopUpMixin, ConfigReader):
         analyzer.run()
         analyzer.save()
 
-# x = ClfByROIPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
-# x.main_frm.mainloop()
+#x = ClfByROIPopUp(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")
+#x.main_frm.mainloop()

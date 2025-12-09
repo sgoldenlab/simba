@@ -5,15 +5,12 @@ from typing import Union
 from simba.data_processors.egocentric_aligner import EgocentricalAligner
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        FolderSelect, SimbaCheckbox)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, FolderSelect, SimbaCheckbox, SimBADropDown)
 from simba.utils.checks import check_if_dir_exists, check_nvidea_gpu_available
 from simba.utils.enums import Keys, Links
 from simba.utils.errors import InvalidInputError, NoDataError, SimBAGPUError
 from simba.utils.lookups import get_color_dict
-from simba.utils.read_write import (find_all_videos_in_directory,
-                                    find_files_of_filetypes_in_directory,
-                                    get_fn_ext)
+from simba.utils.read_write import (find_all_videos_in_directory, find_files_of_filetypes_in_directory, get_fn_ext, str_2_bool)
 
 
 class EgocentricAlignPopUp(ConfigReader, PopUpMixin):
@@ -29,22 +26,20 @@ class EgocentricAlignPopUp(ConfigReader, PopUpMixin):
         PopUpMixin.__init__(self, title="EGOCENTRIC ALIGN VIDEO AND POSE", icon='egocentric')
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False, create_logger=False)
         self.clr_dict = get_color_dict()
-        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.data_dir = FolderSelect(settings_frm, "DATA DIRECTORY:", lblwidth=45, initialdir=self.outlier_corrected_dir)
-        self.videos_dir = FolderSelect(settings_frm, "VIDEO DIRECTORY:", lblwidth=45, initialdir=self.video_dir)
-        self.save_dir = FolderSelect(settings_frm, "SAVE DIRECTORY:", lblwidth=45, initialdir=self.video_dir)
-        self.center_anchor_dropdown = DropDownMenu(settings_frm, "CENTER ANCHOR:", self.body_parts_lst, labelwidth=45)
-        self.direction_anchor_dropdown = DropDownMenu(settings_frm, "DIRECTION ANCHOR:", self.body_parts_lst, labelwidth=45)
-        self.direction_dropdown = DropDownMenu(settings_frm, "DIRECTION:", list(range(0, 361)), labelwidth=45)
-        self.fill_clr_dropdown = DropDownMenu(settings_frm, "ROTATION COLOR:", list(self.clr_dict.keys()), labelwidth=45)
-        self.core_cnt_dropdown = DropDownMenu(settings_frm, "CPU COUNT:", list(range(1, self.cpu_cnt + 1)), labelwidth=45)
-        self.gpu_cb, self.gpu_var = SimbaCheckbox(parent=settings_frm, txt='USE GPU')
+        gpu_status = NORMAL if check_nvidea_gpu_available() else DISABLED
 
-        self.center_anchor_dropdown.setChoices(self.body_parts_lst[0])
-        self.direction_anchor_dropdown.setChoices(self.body_parts_lst[1])
-        self.direction_dropdown.setChoices(0)
-        self.fill_clr_dropdown.setChoices('Black')
-        self.core_cnt_dropdown.setChoices(self.cpu_cnt)
+
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
+        self.data_dir = FolderSelect(settings_frm, "DATA DIRECTORY:", lblwidth=45, initialdir=self.outlier_corrected_dir, lbl_icon='folder')
+        self.videos_dir = FolderSelect(settings_frm, "VIDEO DIRECTORY:", lblwidth=45, initialdir=self.video_dir, lbl_icon='folder')
+        self.save_dir = FolderSelect(settings_frm, "SAVE DIRECTORY:", lblwidth=45, initialdir=self.video_dir, lbl_icon='folder')
+
+        self.center_anchor_dropdown = SimBADropDown(parent=settings_frm, label="CENTER ANCHOR:", dropdown_options=self.body_parts_lst, label_width=45, dropdown_width=45, img='center', value=self.body_parts_lst[0])
+        self.direction_anchor_dropdown = SimBADropDown(parent=settings_frm, label="DIRECTION ANCHOR:", dropdown_options=self.body_parts_lst, label_width=45, dropdown_width=45, img='direction', value=self.body_parts_lst[1])
+        self.direction_dropdown = SimBADropDown(parent=settings_frm, label="DIRECTION:", dropdown_options=list(range(0, 361)), label_width=45, dropdown_width=45, img='direction_2', value=0)
+        self.fill_clr_dropdown = SimBADropDown(parent=settings_frm, label="ROTATION COLOR:", dropdown_options=list(self.clr_dict.keys()), label_width=45, dropdown_width=45, img='fill', value='Black')
+        self.core_cnt_dropdown = SimBADropDown(parent=settings_frm, label="CPU COUNT:", dropdown_options=list(range(1, self.cpu_cnt + 1)), label_width=45, dropdown_width=45, img='cpu_small', value=self.cpu_cnt)
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, label='USE GPU:', dropdown_options=['TRUE', 'FALSE'], label_width=45, dropdown_width=45, img='gpu_3', value='FALSE', state=gpu_status)
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.data_dir.grid(row=0, column=0, sticky=NW)
@@ -55,21 +50,21 @@ class EgocentricAlignPopUp(ConfigReader, PopUpMixin):
         self.direction_dropdown.grid(row=5, column=0, sticky=NW)
         self.fill_clr_dropdown.grid(row=6, column=0, sticky=NW)
         self.core_cnt_dropdown.grid(row=7, column=0, sticky=NW)
-        self.gpu_cb.grid(row=8, column=0, sticky=NW)
+        self.gpu_dropdown.grid(row=8, column=0, sticky=NW)
         self.create_run_frm(run_function=self.run)
-        #self.main_frm.mainloop()
+        self.main_frm.mainloop()
 
     def run(self):
         data_dir, video_dir = self.data_dir.folder_path, self.videos_dir.folder_path
         save_dir = self.save_dir.folder_path
+        gpu = str_2_bool(self.gpu_dropdown.get_value())
         check_if_dir_exists(in_dir=data_dir);
         check_if_dir_exists(in_dir=video_dir);
         check_if_dir_exists(in_dir=save_dir)
         if (save_dir == data_dir) or (save_dir == video_dir):
-            raise InvalidInputError(msg='The save directory cannot be the same as the data/video directories',
-                                    source=self.__class__.__name__)
+            raise InvalidInputError(msg='The save directory cannot be the same as the data/video directories',source=self.__class__.__name__)
         center_anchor, direction_anchor = self.center_anchor_dropdown.getChoices(), self.direction_anchor_dropdown.getChoices()
-        fill_clr, core_cnt, gpu = self.fill_clr_dropdown.getChoices(), self.core_cnt_dropdown.getChoices(), self.gpu_var.get()
+        fill_clr, core_cnt = self.fill_clr_dropdown.getChoices(), self.core_cnt_dropdown.getChoices()
         direction = int(self.direction_dropdown.getChoices())
         if gpu and not check_nvidea_gpu_available():
             raise SimBAGPUError(msg='No NVIDEA GPU detected.', source=self.__class__.__name__)
@@ -96,3 +91,6 @@ class EgocentricAlignPopUp(ConfigReader, PopUpMixin):
                                       videos_dir=video_dir)
 
         aligner.run()
+
+
+#_ = EgocentricAlignPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")

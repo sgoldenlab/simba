@@ -81,6 +81,7 @@ from simba.ui.pop_ups.clf_descriptive_statistics_pop_up import \
 from simba.ui.pop_ups.clf_plot_pop_up import SklearnVisualizationPopUp
 from simba.ui.pop_ups.clf_probability_plot_pop_up import \
     VisualizeClassificationProbabilityPopUp
+from simba.ui.pop_ups.splash_popup import SplashMovie
 from simba.ui.pop_ups.clf_validation_plot_pop_up import \
     ClassifierValidationPopUp
 from simba.ui.pop_ups.coco_keypoints_to_yolo_popup import \
@@ -1135,74 +1136,9 @@ class StdRedirector(object):
     def flush(self):
         pass
 
-
-class SplashStatic:
-    def __init__(self, parent):
-        self.parent = parent
-        self.load_splash_img()
-        self.display_splash()
-
-    def load_splash_img(self):
-        splash_path_win = os.path.join(
-            os.path.dirname(__file__), Paths.SPLASH_PATH_WINDOWS.value
-        )
-        splash_path_linux = os.path.join(
-            os.path.dirname(__file__), Paths.SPLASH_PATH_LINUX.value
-        )
-        if currentPlatform == OS.WINDOWS.value:
-            self.splash_img = PIL.Image.open(splash_path_win)
-        else:
-            if os.path.isfile(splash_path_linux):
-                self.splash_img = PIL.Image.open(splash_path_linux)
-            else:
-                self.splash_img = PIL.Image.open(splash_path_win)
-        self.splash_img_tk = ImageTk.PhotoImage(self.splash_img)
-
-    def display_splash(self):
-        width, height = self.splash_img.size
-        half_width = int((self.parent.winfo_screenwidth() - width) // 2)
-        half_height = int((self.parent.winfo_screenheight() - height) // 2)
-        self.parent.geometry("%ix%i+%i+%i" % (width, height, half_width, half_height))
-        Label(self.parent, image=self.splash_img_tk).pack()
-
-
-class SplashMovie:
-    def __init__(self):
-        self.parent, self.img_cnt = Tk(), 0
-        self.parent.overrideredirect(True)
-        self.parent.configure(bg="white")
-        splash_path = os.path.join(
-            os.path.dirname(__file__), Paths.SPLASH_PATH_MOVIE.value
-        )
-        self.meta_ = get_video_meta_data(splash_path)
-        self.cap = cv2.VideoCapture(splash_path)
-        width, height = self.meta_["width"], self.meta_["height"]
-        half_width = int((self.parent.winfo_screenwidth() - width) // 2)
-        half_height = int((self.parent.winfo_screenheight() - height) // 2)
-        self.parent.geometry("%ix%i+%i+%i" % (width, height, half_width, half_height))
-        self.img_lbl = Label(self.parent, bg="white", image="")
-        self.img_lbl.pack()
-        self.show_animation()
-
-    def show_animation(self):
-        for frm_cnt in range(self.meta_["frame_count"] - 1):
-            self.cap.set(1, frm_cnt)
-            ret, frame = self.cap.read()
-            if not ret:
-                break
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
-            frame = ImageTk.PhotoImage(image=PIL.Image.fromarray(frame))
-            self.img_lbl.configure(image=frame)
-            self.img_lbl.imgtk = frame
-            self.parent.update()
-            cv2.waitKey(max(33, int(self.meta_["fps"] / 1000)))
-        self.parent.destroy()
-
-
 def terminate_children(children):
     for process in children:
         process.terminate()
-
 
 def main():
     if currentPlatform == OS.WINDOWS.value:

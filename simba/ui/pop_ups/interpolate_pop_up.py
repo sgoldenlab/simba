@@ -38,9 +38,9 @@ class InterpolatePopUp(PopUpMixin, ConfigReader):
 
         #self.settings_frm = LabelFrame(self.main_frm, text="SETTINGS", font=Formats.FONT_HEADER.value)
         instruction_lbl_1 = SimBALabel(parent=self.settings_frm, txt=INSTRUCTIONS_LBL_1, font=Formats.FONT_REGULAR_ITALICS.value, justify='center')
-        self.type_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['MISSING BODY-PARTS', 'MISSING ANIMALS'], label="INTERPOLATION TYPE:", label_width=35, value='MISSING BODY-PARTS', dropdown_width=35)
-        self.method_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['NEAREST', 'LINEAR', 'QUADRATIC'], label="INTERPOLATION METHOD:", label_width=35, value='NEAREST', dropdown_width=35)
-        self.save_originals_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="SAVE ORIGINALS:", label_width=35, value='TRUE', dropdown_width=35)
+        self.type_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['MISSING BODY-PARTS', 'MISSING ANIMALS'], label="INTERPOLATION TYPE:", label_width=35, value='MISSING BODY-PARTS', dropdown_width=35, img='file_type')
+        self.method_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['NEAREST', 'LINEAR', 'QUADRATIC'], label="INTERPOLATION METHOD:", label_width=35, value='NEAREST', dropdown_width=35, img='equation_small')
+        self.save_originals_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="SAVE ORIGINALS:", label_width=35, value='TRUE', dropdown_width=35, img='save_blue')
 
         self.settings_frm.grid(row=0, column=0, sticky=NW)
         instruction_lbl_1.grid(row=0, column=0, sticky=NW)
@@ -91,6 +91,5 @@ class InterpolatePopUp(PopUpMixin, ConfigReader):
                                    copy_originals=copy_originals,
                                    multi_index_df_headers=multi_index_df_headers)
         interpolator.run()
-
 
 #InterpolatePopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")

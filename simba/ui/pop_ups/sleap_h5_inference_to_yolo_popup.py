@@ -33,19 +33,19 @@ class SLEAPH5Inference2YoloPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="SLEAP H5 PREDICTIONS TO YOLO POSE ESTIMATION", icon='sleap_small')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
-        self.sleap_dir = FolderSelect(settings_frm, folderDescription="SLEAP DATA DIRECTORY (H5):", lblwidth=35, entry_width=40, initialdir=r"D:\ares\data\termite_2")
-        self.video_dir = FolderSelect(settings_frm, folderDescription="VIDEO DIRECTORY:", lblwidth=35, entry_width=40, initialdir=r"D:\ares\data\termite_2")
-        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, entry_width=40, initialdir=r"D:\ares\data\termite_2\yolo")
+        self.sleap_dir = FolderSelect(settings_frm, folderDescription="SLEAP DATA DIRECTORY (H5):", lblwidth=35, entry_width=40, initialdir=r"D:\ares\data\termite_2", lbl_icon='sleap_small')
+        self.video_dir = FolderSelect(settings_frm, folderDescription="VIDEO DIRECTORY:", lblwidth=35, entry_width=40, initialdir=r"D:\ares\data\termite_2", lbl_icon='folder')
+        self.save_dir = FolderSelect(settings_frm, folderDescription="SAVE DIRECTORY:", lblwidth=35, entry_width=40, initialdir=r"D:\ares\data\termite_2\yolo", lbl_icon='folder')
 
-        self.frm_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=SAMPLE_SIZE_OPTIONS, label="FRAMES (PER VIDEO): ", label_width=35, dropdown_width=40, value=100)
-        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE: ", label_width=35, dropdown_width=40, value='TRUE')
-        self.threshold_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=THRESHOLD_OPTION, label="THRESHOLD (%): ", label_width=35, dropdown_width=40, value=90)
-        self.train_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=TRAIN_SIZE_OPTIONS, label="TRAIN SIZE (%): ", label_width=35, dropdown_width=40, value=70)
-        self.grey_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE: ", label_width=35, dropdown_width=40, value='FALSE')
-        self.clahe_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="CLAHE: ", label_width=35, dropdown_width=40, value='FALSE')
-        self.padding_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=PADDING_OPTIONS, label="PADDING: ", label_width=35, dropdown_width=40, value='None')
-        self.animal_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 10, 1)), label="ANIMAL COUNT: ", label_width=35, dropdown_width=40, value=2)
-        single_id_cb, self.single_id_var = SimbaCheckbox(parent=settings_frm, txt="REMOVE ANIMAL ID'S", val=False)
+        self.frm_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=SAMPLE_SIZE_OPTIONS, label="FRAMES (PER VIDEO): ", label_width=35, dropdown_width=40, value=100, img='frames')
+        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE: ", label_width=35, dropdown_width=40, value='TRUE', img='verbose')
+        self.threshold_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=THRESHOLD_OPTION, label="THRESHOLD (%): ", label_width=35, dropdown_width=40, value=90, img='threshold')
+        self.train_size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=TRAIN_SIZE_OPTIONS, label="TRAIN SIZE (%): ", label_width=35, dropdown_width=40, value=70, img='pct_2')
+        self.grey_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE: ", label_width=35, dropdown_width=40, value='FALSE', img='grey')
+        self.clahe_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="CLAHE: ", label_width=35, dropdown_width=40, value='FALSE', img='clahe')
+        self.padding_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=PADDING_OPTIONS, label="PADDING: ", label_width=35, dropdown_width=40, value='None', img='resize')
+        self.animal_cnt_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 10, 1)), label="ANIMAL COUNT: ", label_width=35, dropdown_width=40, value=2, img='abacus')
+        self.single_id_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="REMOVE ANIMAL ID'S", label_width=35, dropdown_width=40, value='FALSE', img='mouse_head')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.sleap_dir .grid(row=0, column=0, sticky=NW)
@@ -60,7 +60,7 @@ class SLEAPH5Inference2YoloPopUp(PopUpMixin):
         self.clahe_dropdown.grid(row=7, column=0, sticky=NW)
         self.padding_dropdown.grid(row=8, column=0, sticky=NW)
         self.animal_cnt_dropdown.grid(row=9, column=0, sticky=NW)
-        single_id_cb.grid(row=10, column=0, sticky=NW)
+        self.single_id_dropdown.grid(row=10, column=0, sticky=NW)
 
         self.create_run_frm(run_function=self.run)
         self.main_frm.mainloop()
@@ -86,7 +86,7 @@ class SLEAPH5Inference2YoloPopUp(PopUpMixin):
         frm_cnt = int(self.frm_cnt_dropdown.get_value())
         padding = float(self.padding_dropdown.get_value()) if self.padding_dropdown.get_value() != 'None' else 0.0
         threshold = float(self.threshold_dropdown.get_value()) / 100
-        single_id = 'animal_1' if self.single_id_var.get() else None
+        single_id = 'animal_1' if str_2_bool(self.single_id_dropdown.get_value()) else None
         animal_cnt = int(self.animal_cnt_dropdown.get_value())
 
 

@@ -17,11 +17,11 @@ class MergeCOCOKeypointFilesPopUp(PopUpMixin):
 
         PopUpMixin.__init__(self, title="MERGE COCO KEYPOINT FILES", icon='coco_small')
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value)
-        self.json_folder = FolderSelect(parent=self.settings_frm, folderDescription='COCO JSON DIRECTORY:', lblwidth=30, entry_width=30, tooltip_txt='FOLDER CONTAINING JSONS COCO KEYPOINT FILES')
-        self.save_folder = FolderSelect(parent=self.settings_frm, folderDescription='SAVE_DIRECTORY:', lblwidth=30, entry_width=30, tooltip_txt='FOLDER WHERE TO SAVE THE MERGED JSON FILE')
+        self.json_folder = FolderSelect(parent=self.settings_frm, folderDescription='COCO JSON DIRECTORY:', lblwidth=30, entry_width=30, tooltip_txt='FOLDER CONTAINING JSONS COCO KEYPOINT FILES', lbl_icon='json')
+        self.save_folder = FolderSelect(parent=self.settings_frm, folderDescription='SAVE_DIRECTORY:', lblwidth=30, entry_width=30, tooltip_txt='FOLDER WHERE TO SAVE THE MERGED JSON FILE', lbl_icon='folder')
 
-        self.max_x_entry = Entry_Box(parent=self.settings_frm, fileDescription='MAX KEYPOINT X LOCATION:', labelwidth=30, entry_box_width=30, value='None', justify='center')
-        self.max_y_entry = Entry_Box(parent=self.settings_frm, fileDescription='MAX KEYPOINT Y LOCATION:', labelwidth=30, entry_box_width=30, value='None', justify='center')
+        self.max_x_entry = Entry_Box(parent=self.settings_frm, fileDescription='MAX KEYPOINT X LOCATION:', labelwidth=30, entry_box_width=30, value='None', justify='center', img='x')
+        self.max_y_entry = Entry_Box(parent=self.settings_frm, fileDescription='MAX KEYPOINT Y LOCATION:', labelwidth=30, entry_box_width=30, value='None', justify='center', img='y')
 
         self.settings_frm.grid(row=0, column=0, sticky='NW')
         self.json_folder.grid(row=0, column=0, sticky='NW')

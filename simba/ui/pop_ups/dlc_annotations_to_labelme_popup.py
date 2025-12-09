@@ -20,9 +20,9 @@ class DLCAnnotations2LabelMePopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="DLC ANNOTATIONS TO LABELME")
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings')
-        self.dlc_dir = FolderSelect(settings_frm, folderDescription="DLC ANNOTATIONS DIRECTORY:", lblwidth=35)
-        self.labelme_dir = FolderSelect(settings_frm, folderDescription="LABELME SAVE DIR:", lblwidth=35)
-        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE:", label_width=35, dropdown_width=40, value='TRUE')
+        self.dlc_dir = FolderSelect(settings_frm, folderDescription="DLC ANNOTATIONS DIRECTORY:", lblwidth=35, lbl_icon='folder')
+        self.labelme_dir = FolderSelect(settings_frm, folderDescription="LABELME SAVE DIR:", lblwidth=35, lbl_icon='folder')
+        self.verbose_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="VERBOSE:", label_width=35, dropdown_width=40, value='TRUE', img='verbose')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.dlc_dir.grid(row=0, column=0, sticky=NW)
@@ -44,3 +44,4 @@ class DLCAnnotations2LabelMePopUp(PopUpMixin):
         thread.start()
 
 
+#DLCAnnotations2LabelMePopUp()

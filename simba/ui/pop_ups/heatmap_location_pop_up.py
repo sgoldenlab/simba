@@ -40,14 +40,14 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
         max_scales.insert(0, "Auto-compute")
         self.style_settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.HEATMAP_LOCATION.value)
 
-        self.palette_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.palette_options, label='PALETTE: ', label_width=25, dropdown_width=30, value=self.palette_options[0])
-        self.shading_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.shading_options, label='SHADING: ', label_width=25, dropdown_width=30, value=self.shading_options[0])
-        self.bp_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.body_parts_lst, label='BODY-PART: ', label_width=25, dropdown_width=30, value=self.body_parts_lst[0])
-        self.max_time_scale_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=max_scales, label='MAX TIME SCALE (S): ', label_width=25, dropdown_width=30, value=max_scales[0])
-        self.bin_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.heatmap_bin_size_options, label='BIN SIZE (MM): ', label_width=25, dropdown_width=30, value="80×80")
+        self.palette_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.palette_options, label='PALETTE: ', label_width=25, dropdown_width=30, value=self.palette_options[0], img='color_wheel')
+        self.shading_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.shading_options, label='SHADING: ', label_width=25, dropdown_width=30, value=self.shading_options[0], img='shade')
+        self.bp_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.body_parts_lst, label='BODY-PART: ', label_width=25, dropdown_width=30, value=self.body_parts_lst[0],img='pose')
+        self.max_time_scale_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=max_scales, label='MAX TIME SCALE (S): ', label_width=25, dropdown_width=30, value=max_scales[0], img='timer_2')
+        self.bin_size_dropdown = SimBADropDown(parent=self.style_settings_frm, dropdown_options=self.heatmap_bin_size_options, label='BIN SIZE (MM): ', label_width=25, dropdown_width=30, value="80×80", img='rectangle_red')
 
         self.settings_frm = LabelFrame(self.main_frm, text="VISUALIZATION SETTINGS", font=Formats.FONT_HEADER.value, pady=5, padx=5)
-        self.multiprocess_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt)), label='CPU CORES: ', label_width=25, dropdown_width=30, value=int(self.cpu_cnt/2))
+        self.multiprocess_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(1, self.cpu_cnt)), label='CPU CORES: ', label_width=25, dropdown_width=30, value=int(self.cpu_cnt/2), img='cpu_small')
         heatmap_frames_cb, self.heatmap_frames_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE FRAMES', txt_img='frames')
         heatmap_videos_cb, self.heatmap_videos_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE VIDEOS', txt_img='video')
         heatmap_last_frm_cb, self.heatmap_last_frm_var = SimbaCheckbox(parent=self.settings_frm, txt='CREATE LAST FRAME', txt_img='finish')
@@ -124,3 +124,7 @@ class HeatmapLocationPopup(PopUpMixin, ConfigReader):
                                                             core_cnt=int(self.multiprocess_dropdown.getChoices()))
 
             heatmapper_clf.run()
+
+
+
+#_ = HeatmapLocationPopup(config_path=r"D:\troubleshooting\maplight_ri\project_folder\project_config.ini")

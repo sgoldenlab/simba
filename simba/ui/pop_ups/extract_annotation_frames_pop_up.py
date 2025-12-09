@@ -48,9 +48,9 @@ class ExtractAnnotationFramesPopUp(PopUpMixin, ConfigReader):
             self.classifiers_cbs[clf_name][0].grid(row=clf_cnt, column=0, sticky=NW)
 
         self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="STYLE SETTINGS", icon_name='style')
-        self.resolution_downsample_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=DOWNSAMPLE_OPTION, label="DOWN-SAMPLE IMAGES:", label_width=35, dropdown_width=25, value=DOWNSAMPLE_OPTION[0])
-        self.img_format_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=IMG_FORMAT_OPTIONS, label="IMAGE FORMAT:", label_width=35, dropdown_width=25, value=IMG_FORMAT_OPTIONS[0])
-        self.greyscale_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE IMAGES:", label_width=35, dropdown_width=25, value='FALSE')
+        self.resolution_downsample_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=DOWNSAMPLE_OPTION, label="DOWN-SAMPLE IMAGES:", label_width=35, dropdown_width=25, value=DOWNSAMPLE_OPTION[0], img='minus')
+        self.img_format_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=IMG_FORMAT_OPTIONS, label="IMAGE FORMAT:", label_width=35, dropdown_width=25, value=IMG_FORMAT_OPTIONS[0], img='file_type')
+        self.greyscale_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="GREYSCALE IMAGES:", label_width=35, dropdown_width=25, value='FALSE', img='grey')
 
         self.settings_frm.grid(row=1, column=0, sticky=NW)
         self.resolution_downsample_dropdown.grid(row=0, column=0, sticky=NW)
@@ -58,7 +58,7 @@ class ExtractAnnotationFramesPopUp(PopUpMixin, ConfigReader):
         self.greyscale_dropdown.grid(row=2, column=0, sticky=NW)
 
         self.choose_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CHOOSE VIDEOS", icon_name='video')
-        self.video_dropdown = SimBADropDown(parent=self.choose_video_frm, dropdown_options=video_options, label="VIDEO:", label_width=35, dropdown_width=25, value=ALL_VIDEOS)
+        self.video_dropdown = SimBADropDown(parent=self.choose_video_frm, dropdown_options=video_options, label="VIDEO:", label_width=35, dropdown_width=25, value=ALL_VIDEOS, img='video_2')
 
         self.choose_video_frm.grid(row=2, column=0, sticky=NW)
         self.video_dropdown.grid(row=0, column=0, sticky=NW)
