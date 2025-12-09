@@ -1,13 +1,17 @@
-from typing import Tuple, Optional, Union
 import os
-import cv2
-from simba.utils.enums import Paths, Defaults, FontPaths
-from simba.utils.read_write import get_video_meta_data
-from simba.utils.checks import check_if_valid_rgb_tuple, check_file_exist_and_readable,check_float
 from tkinter import *
-from PIL import ImageTk, ImageDraw, ImageFont
+from typing import Optional, Tuple, Union
+
+import cv2
 import PIL.Image
+from PIL import ImageDraw, ImageFont, ImageTk
+
 import simba
+from simba.utils.checks import (check_file_exist_and_readable, check_float,
+                                check_if_valid_rgb_tuple)
+from simba.utils.enums import Defaults, FontPaths, Paths
+from simba.utils.read_write import get_video_meta_data
+
 
 class SplashMovie:
     def __init__(self,
