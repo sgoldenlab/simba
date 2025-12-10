@@ -7,7 +7,8 @@ from typing import Union
 from simba.feature_extractors.feature_subsets import FeatureSubsetsCalculator
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FolderSelect, SimbaCheckbox)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FolderSelect,
+                                        SimbaCheckbox)
 from simba.utils.enums import Formats, Links
 from simba.utils.errors import InvalidInputError, NoDataError
 

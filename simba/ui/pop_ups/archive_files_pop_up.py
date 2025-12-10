@@ -1,12 +1,13 @@
 __author__ = "Simon Nilsson"
 
-from typing import Union
 import os
 from tkinter import *
+from typing import Union
 
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, SimbaButton)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        SimbaButton)
 from simba.utils.checks import check_str
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.read_write import archive_processed_files

@@ -81,7 +81,6 @@ from simba.ui.pop_ups.clf_descriptive_statistics_pop_up import \
 from simba.ui.pop_ups.clf_plot_pop_up import SklearnVisualizationPopUp
 from simba.ui.pop_ups.clf_probability_plot_pop_up import \
     VisualizeClassificationProbabilityPopUp
-from simba.ui.pop_ups.splash_popup import SplashMovie
 from simba.ui.pop_ups.clf_validation_plot_pop_up import \
     ClassifierValidationPopUp
 from simba.ui.pop_ups.coco_keypoints_to_yolo_popup import \
@@ -160,6 +159,7 @@ from simba.ui.pop_ups.sleap_csv_predictions_to_yolo_popup import \
 from simba.ui.pop_ups.sleap_h5_inference_to_yolo_popup import \
     SLEAPH5Inference2YoloPopUp
 from simba.ui.pop_ups.smoothing_popup import SmoothingPopUp
+from simba.ui.pop_ups.splash_popup import SplashMovie
 from simba.ui.pop_ups.spontaneous_alternation_pop_up import \
     SpontaneousAlternationPopUp  # ## LAZY
 from simba.ui.pop_ups.subset_feature_extractor_pop_up import \
