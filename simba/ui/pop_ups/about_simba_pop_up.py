@@ -1,15 +1,16 @@
-from typing import Union
-import webbrowser
 import os
+import webbrowser
 from tkinter import *
-import cv2
+from typing import Union
 
-from PIL import Image, ImageTk, ImageDraw, ImageFilter
-from simba.utils.read_write import get_video_meta_data
-from simba.ui.tkinter_functions import SimBALabel
-from simba.utils.enums import Formats, OS, Links, Paths
-from simba.utils.lookups import rgb_to_hex
+import cv2
+from PIL import Image, ImageDraw, ImageFilter, ImageTk
+
 import simba
+from simba.ui.tkinter_functions import SimBALabel
+from simba.utils.enums import OS, Formats, Links, Paths
+from simba.utils.lookups import rgb_to_hex
+from simba.utils.read_write import get_video_meta_data
 
 LINKS = [
          ("GitHub", "https://github.com/sgoldenlab/simba", "github_2"),
