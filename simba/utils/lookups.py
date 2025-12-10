@@ -31,8 +31,9 @@ from tabulate import tabulate
 import simba
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_float,
-                                check_if_dir_exists, check_instance, check_int,
-                                check_str, check_valid_dict, check_valid_tuple, check_if_valid_rgb_tuple)
+                                check_if_dir_exists, check_if_valid_rgb_tuple,
+                                check_instance, check_int, check_str,
+                                check_valid_dict, check_valid_tuple)
 from simba.utils.enums import (OS, UML, Defaults, FontPaths, Formats, Keys,
                                Methods, Options, Paths)
 from simba.utils.errors import (FFMPEGNotFoundError, InvalidInputError,
