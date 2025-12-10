@@ -13,16 +13,16 @@ import simba
 
 LINKS = [
          ("GitHub", "https://github.com/sgoldenlab/simba", "github_2"),
-         ("API", "https://github.com/sgoldenlab/simba/blob/master/docs/API.md", "documentation_large"),
-         ("Gitter", "https://gitter.im/sgoldenlab/simba", "gitter_large"),
+         ("API", "https://simba-uw-tf-dev.readthedocs.io/en/latest/api.html", "documentation_large"),
+         ("Gitter", "https://app.gitter.im/#/room/#sgoldenlab_simba:gitter.im", "gitter_large"),
          ("bioRxiv", "https://www.biorxiv.org/content/10.1101/2020.04.19.049452v1", "documentation_large"),
-         ("Nature Neuroscience", "https://www.nature.com/articles/s41593-020-00729-8", "pdf_large"),
-         ("OSF data buckets", "https://osf.io/deposit/?q=simba", "osf_large"),
-         ("PyPI", "https://pypi.org/project/simba-uw-tf/", "rocket")
+         ("Nature Neuroscience", "https://www.nature.com/articles/s41593-024-01649-9", "pdf_large"),
+         ("OSF data buckets", "https://osf.io/user/mutws", "osf_large"),
+         ("PyPI", "https://pypi.org/project/simba-uw-tf-dev/", "rocket")
          ]
 
 DEVELOPER_URL = Links.SIMON_WEBSITE.value
-DEVELOPER_IMG = r"C:\projects\simba\simba\simba\assets\img\simon_n.webp"
+DEVELOPER_IMG = os.path.join(os.path.dirname(simba.__file__), Paths.SIMON_SMALL_IMG.value)
 VERSION_TXT = f"SimBA v{OS.SIMBA_VERSION.value}" if OS.SIMBA_VERSION.value else "SimBA"
 LANDING_MOVIE_PATH = os.path.join(os.path.dirname(simba.__file__), Paths.LANDING_MOVIE.value)
 

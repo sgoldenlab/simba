@@ -32,6 +32,47 @@ RIGHT_Y = 'right_y'
 BP_COLS = [NOSE_X, NOSE_Y, TAIL_X, TAIL_Y, LEFT_X, LEFT_Y, RIGHT_X, RIGHT_Y]
 
 class BlobVisualizer():
+    """
+    Visualize blob tracking data by overlaying geometric shapes and body part markers on video frames.
+
+    Processes blob tracking CSV data files and corresponding videos to create annotated output videos.
+    It can visualize multiple body parts including convex hulls, anterior (nose), posterior (tail), center points,
+    and left/right body parts. The visualizations are rendered with customizable colors, opacity, and circle sizes.
+
+    .. video:: _static/img/BlobVisualizer.webm
+       :width: 800
+       :autoplay:
+       :loop:
+
+    ..seealso::
+       To create blob data, see :func:`simba.video_processors.blob_tracking_executor.BlobTrackingExecutor`
+       To import blob data into SimBA project, see :func:`simba.pose_importers.simba_blob_importer.SimBABlobImporter`
+
+    :param data_path: Path to a single CSV file or directory containing blob tracking CSV data files. CSV files must contain columns: 'nose_x', 'nose_y', 'tail_x', 'tail_y', 'center_x', 'center_y', 'left_x', 'left_y', 'right_x', 'right_y', and optionally 'vertice_*' columns for hull visualization.
+    :param video_path: Path to a single video file or directory containing video files. Video filenames must match the corresponding CSV data filenames (without extension).
+    :param save_dir: Directory path where annotated output videos will be saved. Directory will be created if it doesn't exist.
+    :param core_cnt: Number of CPU cores to use for video processing. Default: -1 (auto-detect). Set to -1 to use all available cores, or specify a positive integer.
+    :param shape_opacity: Opacity of the drawn shapes (0.1-1.0). Default: 0.5. Lower values make shapes more transparent.
+    :param bg_opacity: Opacity of the background video frames (0.1-1.0). Default: 1.0. Lower values make background more transparent.
+    :param circle_size: Size of circles drawn for point markers (anterior, posterior, center, left, right). Default: None (uses default size). Set to None to use default, or specify a positive integer.
+    :param hull: RGB color tuple (R, G, B) for convex hull visualization. Default: (178, 102, 255). Set to None to disable hull visualization.
+    :param anterior: RGB color tuple (R, G, B) for anterior (nose) point visualization. Default: (0, 0, 255). Set to None to disable anterior visualization.
+    :param posterior: RGB color tuple (R, G, B) for posterior (tail) point visualization. Default: (0, 128, 0). Set to None to disable posterior visualization.
+    :param center: RGB color tuple (R, G, B) for center point visualization. Default: (0, 165, 255). Set to None to disable center visualization.
+    :param left: RGB color tuple (R, G, B) for left body part point visualization. Default: (255, 51, 153). Set to None to disable left visualization.
+    :param right: RGB color tuple (R, G, B) for right body part point visualization. Default: (255, 255, 102). Set to None to disable right visualization.
+
+    :example:
+    >>> visualizer = BlobVisualizer(data_path=r'/path/to/blob_data.csv',
+    ...                             video_path=r'/path/to/video.mp4',
+    ...                             save_dir=r'/path/to/output',
+    ...                             core_cnt=4,
+    ...                             shape_opacity=0.6,
+    ...                             posterior=None,
+    ...                             left=None,
+    ...                             right=None)
+    >>> visualizer.run()
+    """
     def __init__(self,
                  data_path: Union[str, os.PathLike],
                  video_path: Union[str, os.PathLike],
