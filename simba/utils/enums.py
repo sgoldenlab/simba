@@ -110,6 +110,7 @@ class Paths(Enum):
     SPLASH_PATH_WINDOWS = Path("assets/img/splash.png")
     SPLASH_PATH_LINUX = Path("assets/img/splash.PNG")
     SPLASH_PATH_MOVIE = Path("assets/img/splash_2024.mp4")
+    LANDING_MOVIE = Path("assets/img/landing.mp4")
     BG_IMG_PATH = Path("assets/img/bg_2024.png")
     LOGO_ICON_WINDOWS_PATH = Path("assets/icons/SimBA_logo_3.ico")
     LOGO_ICON_DARWIN_PATH = Path("assets/icons/SimBA_logo_3.png")
@@ -682,6 +683,7 @@ class Links(Enum):
     GITHUB_REPO = "https://github.com/sgoldenlab/simba"
     OSF_REPO = "https://osf.io/tmu6y/"
     GITTER = "https://gitter.im/SimBA-Resource/community"
+    SIMON_WEBSITE = "https://sronilsson.netlify.app/"
     COUNT_ANNOTATIONS_IN_PROJECT = "https://github.com/sgoldenlab/simba/blob/master/docs/label_behavior.md#count-annotations-in-simba-project"
     COUNT_ANNOTATIONS_OUTSIDE_PROJECT = "https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#extract-project-annotation-counts"
     CIRCLE_CROP = "https://github.com/sgoldenlab/simba/blob/master/docs/Tutorial_tools.md#circle-crop"
@@ -871,6 +873,8 @@ class ROI_SETTINGS(Enum):
 
 class PackageNames(Enum):
     ULTRALYTICS = 'ultralytics'
+
+
 
 
 class TkBinds(Enum):

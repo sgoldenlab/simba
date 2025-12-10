@@ -32,7 +32,7 @@ import simba
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_instance, check_int,
-                                check_str, check_valid_dict, check_valid_tuple)
+                                check_str, check_valid_dict, check_valid_tuple, check_if_valid_rgb_tuple)
 from simba.utils.enums import (OS, UML, Defaults, FontPaths, Formats, Keys,
                                Methods, Options, Paths)
 from simba.utils.errors import (FFMPEGNotFoundError, InvalidInputError,
@@ -150,6 +150,12 @@ def get_bp_config_code_class_pairs() -> Dict[str, object]:
         "AMBER": AmberFeatureExtractor,
     }
 
+
+
+def rgb_to_hex(color: Tuple[int, int, int]) -> str:
+    check_if_valid_rgb_tuple(data=color, raise_error=True, source=rgb_to_hex.__name__)
+    r, g, b = color
+    return rgb2hex((r/255, g/255, b/255), keep_alpha=False)
 
 def get_icons_paths() -> Dict[str, Union[str, os.PathLike]]:
     """

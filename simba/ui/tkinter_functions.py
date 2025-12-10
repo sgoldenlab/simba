@@ -603,7 +603,9 @@ def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                txt: str,
                txt_clr: str = 'black',
                bg_clr: Optional[str] = None,
+               hover_fg_clr: Optional[str] = None,
                font: tuple = Formats.FONT_REGULAR.value,
+               hover_font: Optional[Tuple] = Formats.FONT_REGULAR.value,
                relief: str = FLAT,
                compound: Optional[Literal['left', 'right', 'top', 'bottom', 'center']] = 'left',
                justify: Optional[str] = None,
@@ -615,12 +617,19 @@ def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                tooltip_key: Optional[str] = None):
 
 
-    anchor = 'w' if anchor is None else anchor
+    def on_enter(e):
+        e.widget.config(fg=hover_fg_clr, font=hover_font)
 
+    def on_leave(e):
+        e.widget.config(fg=txt_clr, bg=bg_clr, font=font)
+
+    anchor = 'w' if anchor is None else anchor
     if isinstance(img, str) and img in MENU_ICONS.keys():
         img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS[img]["icon_path"]))
     else:
         img = None
+    if img is not None and compound is None:
+        compound = 'left'
 
     lbl = Label(parent,
                 text=txt,
@@ -645,6 +654,10 @@ def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
 
     elif tooltip_key in TOOLTIPS.keys():
         CreateToolTip(widget=lbl, text=TOOLTIPS[tooltip_key])
+
+    if hover_font is not None or hover_fg_clr is not None:
+        lbl.bind("<Enter>", on_enter)
+        lbl.bind("<Leave>", on_leave)
 
     return lbl
 
@@ -710,7 +723,7 @@ class SimBADropDown(Frame):
         self.columnconfigure(1, weight=0)
         if img is not None:
             self.columnconfigure(2, weight=0)
-            self.dropdown_img_lbl = SimBALabel(parent=self, txt='', txt_clr='black', bg_clr=label_bg_clr, font=label_font, width=None, anchor='w', img=img, compound=None)
+            self.dropdown_img_lbl = SimBALabel(parent=self, txt='', txt_clr='black', bg_clr=label_bg_clr, font=label_font, width=None, anchor='w', img=img, compound='left')
             self.dropdown_img_lbl.grid(row=0, column=0, sticky="w")
         else:
             self.dropdown_img_lbl = None
