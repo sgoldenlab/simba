@@ -4,23 +4,32 @@ import json
 import os
 from tkinter import *
 from typing import Union
+
+import cv2
 import PIL
 from PIL import ImageTk
-import cv2
 
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, SimBASeperator,
-                                        SimbaButton, SimbaCheckbox, Entry_Box, SimBADropDown, SimBALabel)
-from simba.utils.checks import (check_file_exist_and_readable, check_float,
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        SimbaButton, SimbaCheckbox,
+                                        SimBADropDown, SimBALabel,
+                                        SimBASeperator)
+from simba.utils.checks import (check_ffmpeg_available,
+                                check_file_exist_and_readable, check_float,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_int, check_nvidea_gpu_available,
-                                check_that_hhmmss_start_is_before_end, check_ffmpeg_available)
+                                check_that_hhmmss_start_is_before_end)
 from simba.utils.enums import Formats, Keys, Links, Options
-from simba.utils.errors import FFMPEGCodecGPUError, NoFilesFoundError, FFMPEGNotFoundError
-from simba.utils.lookups import (percent_to_crf_lookup, video_quality_to_preset_lookup, get_icons_paths)
+from simba.utils.errors import (FFMPEGCodecGPUError, FFMPEGNotFoundError,
+                                NoFilesFoundError)
+from simba.utils.lookups import (get_icons_paths, percent_to_crf_lookup,
+                                 video_quality_to_preset_lookup)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext, get_video_meta_data, str_2_bool)
-from simba.video_processors.batch_process_create_ffmpeg_commands import FFMPEGCommandCreator
+from simba.utils.read_write import (
+    check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
+    get_video_meta_data, str_2_bool)
+from simba.video_processors.batch_process_create_ffmpeg_commands import \
+    FFMPEGCommandCreator
 from simba.video_processors.roi_selector import ROISelector
 
 MENU_ICONS = get_icons_paths()
