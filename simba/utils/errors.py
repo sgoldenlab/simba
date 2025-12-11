@@ -426,6 +426,12 @@ class SimBAPAckageVersionError(SimbaError):
         msg = f"SIMBA PACKAGE VERSION ERROR: {msg}"
         super().__init__(msg=msg, source=source, show_window=show_window)
 
+
+class CropError(SimbaError):
+    def __init__(self, msg: str, source: str = "", show_window: bool = False):
+        msg = f"SIMBA CROP ERROR: {msg}"
+        super().__init__(msg=msg, source=source, show_window=show_window)
+
 # test = NoSpecifiedOutputError(msg='test', source='test.method')
 # test = FFMPEGNotFoundError(msg='323')
 

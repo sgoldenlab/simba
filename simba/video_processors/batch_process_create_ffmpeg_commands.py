@@ -1,23 +1,14 @@
-import datetime
 import glob
 import json
 import os
-import pathlib
 import shutil
-import subprocess
 
-import cv2
-
-import simba
-from simba.utils.checks import check_file_exist_and_readable
+from simba.utils.checks import check_file_exist_and_readable, check_ffmpeg_available
 from simba.utils.enums import Formats
-from simba.utils.errors import PermissionError
-from simba.utils.lookups import (get_ffmpeg_encoders, get_fonts,
-                                 gpu_quality_to_cpu_quality_lk)
-from simba.utils.read_write import get_video_meta_data
+from simba.utils.errors import PermissionError, CropError, FFMPEGNotFoundError
+from simba.utils.lookups import (get_ffmpeg_encoders, gpu_quality_to_cpu_quality_lk, get_current_time)
 from simba.utils.warnings import CropWarning
-
-
+from simba.video_processors.video_processing import superimpose_frame_count, video_to_greyscale, change_single_video_fps, clip_video_in_range, downsample_video, clahe_enhance_video, crop_video
 class FFMPEGCommandCreator(object):
     """
     Execute FFmpeg commands from instructions stored in json format.
@@ -47,6 +38,10 @@ class FFMPEGCommandCreator(object):
 
     def __init__(self, json_path: str):
 
+        if not check_ffmpeg_available(raise_error=False):
+            raise FFMPEGNotFoundError(msg='Cannot perform batch video processing: FFMPEG not found', source=self.__class__.__name__)
+
+
         check_file_exist_and_readable(json_path)
         with open(json_path, "r") as fp:
             self.video_dict = json.load(fp)
@@ -62,7 +57,7 @@ class FFMPEGCommandCreator(object):
         self.gpu_to_cpu_quality_lk = gpu_quality_to_cpu_quality_lk()
         self.time_format = "%H:%M:%S"
         if os.path.exists(self.temp_dir):
-            shutil.rmtree(self.temp_dir)
+            shutil.rmtree(self.temp_dir, ignore_errors=True)
         os.makedirs(self.temp_dir)
         self.copy_videos_to_temp_dir()
         self.batch_codec = Formats.BATCH_CODEC.value if Formats.BATCH_CODEC.value in get_ffmpeg_encoders() else 'mpeg4'
@@ -109,207 +104,107 @@ class FFMPEGCommandCreator(object):
     def downsample_videos(self):
         self.videos_to_downsample = self.find_relevant_videos(variable="downsample")
         self.create_process_dir()
-        for video, video_data in self.videos_to_downsample.items():
-            print(f"Down-sampling {video}...")
+        for cnt, (video, video_data) in enumerate(self.videos_to_downsample.items()):
+            print(f"Down-sampling {video} to {video_data['settings']['width']}x{video_data['settings']['height']} ({cnt+1}/{len(list(self.videos_to_downsample.keys()))})... ({get_current_time()})")
             if video_data["last_operation"] == "downsample":
                 self.quality = video_data["output_quality"]
-            in_path, out_path = video_data["path"], os.path.join(
-                self.process_dir, os.path.basename(video_data["path"])
-            )
-            width, height = str(video_data["settings"]["width"]), str(
-                video_data["settings"]["height"]
-            )
-            if self.gpu:
-                command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "scale=w={width}:h={height}" -c:v h264_nvenc -preset {self.quality} -hide_banner -loglevel error -stats "{out_path}"'
-            else:
-                command = f'ffmpeg -i "{in_path}" -vf scale={width}:{height} "{out_path}" -c:v {self.batch_codec} -crf {self.quality} -hide_banner -loglevel error -stats -y'
-            subprocess.call(command, shell=True, stdout=subprocess.PIPE)
+            in_path, out_path = video_data["path"], os.path.join(self.process_dir, os.path.basename(video_data["path"]))
+            downsample_video(file_path=in_path, save_path=out_path, gpu=self.gpu, quality=self.quality, verbose=False, codec=self.batch_codec, video_width=int(video_data["settings"]["width"]), video_height=int(video_data["settings"]["height"]))
         self.replace_files_in_temp()
-        print("Downsampling complete...")
+        print(f"Downsampling complete... ({get_current_time()})")
 
     def clip_videos(self):
         self.videos_to_clip = self.find_relevant_videos(variable="clip")
         self.create_process_dir()
-
-        for video, video_data in self.videos_to_clip.items():
-            print(f"Clipping {video}...")
+        for cnt, (video, video_data) in enumerate(self.videos_to_clip.items()):
             if video_data["last_operation"] == "clip":
                 self.quality = video_data["output_quality"]
-            in_path, out_path = video_data["path"], os.path.join(
-                self.process_dir, os.path.basename(video_data["path"])
-            )
-            start_time, end_time = str(video_data["settings"]["start"]).replace(
-                " ", ""
-            ), str(video_data["settings"]["stop"]).replace(" ", "")
-            start_time_shift, end_time = datetime.datetime.strptime(
-                start_time, self.time_format
-            ), datetime.datetime.strptime(end_time, self.time_format)
-            time_difference = str(end_time - start_time_shift)
-            if self.gpu:
-                command = f'ffmpeg -hwaccel auto -i "{in_path}" -ss {start_time} -t {time_difference} -c:v h264_nvenc -async 1 "{out_path}" -preset {self.quality} -hide_banner -loglevel error -stats -y'
-            else:
-                command = f'ffmpeg -i "{in_path}" -ss {start_time} -t {time_difference} -c:v {self.batch_codec} -async 1 -crf {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
-            subprocess.call(command, shell=True, stdout=subprocess.PIPE)
+            in_path, out_path = video_data["path"], os.path.join(self.process_dir, os.path.basename(video_data["path"]))
+            start_time, end_time = str(video_data["settings"]["start"]).replace(" ", ""), str(video_data["settings"]["stop"]).replace(" ", "")
+            print(f"Clipping {video} between {start_time} and {end_time} ({cnt+1}/{len(list(self.videos_to_clip.keys()))})...  ({get_current_time()})")
+            clip_video_in_range(file_path=in_path, start_time=start_time, end_time=end_time, out_dir=None, overwrite=True, include_clip_time_in_filename=False, gpu=self.gpu, save_path=out_path, verbose=False)
         self.replace_files_in_temp()
-        print("Clipping complete...")
+        print(f"Clipping complete... ({get_current_time()})")
 
     def apply_fps(self):
         self.videos_to_change_fps = self.find_relevant_videos(variable="fps")
         self.create_process_dir()
-        for video, video_data in self.videos_to_change_fps.items():
-            print(f"Changing FPS {video}...")
+        for cnt, (video, video_data) in enumerate(self.videos_to_change_fps.items()):
+            print(f"Changing FPS of {video} to {video_data['settings']['fps']} ({cnt+1}/{len(list(self.videos_to_change_fps.keys()))})... ({get_current_time()})")
             if video_data["last_operation"] == "fps":
                 self.quality = video_data["output_quality"]
-            in_path, out_path = video_data["path"], os.path.join(
-                self.process_dir, os.path.basename(video_data["path"])
-            )
-            fps = str(video_data["settings"]["fps"])
-            if self.gpu:
-                command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "fps={fps}" -c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
-            else:
-                command = f'ffmpeg -i "{in_path}" -c:v {self.batch_codec} -crf {self.quality} -filter:v fps=fps={fps} "{out_path}"'
-            subprocess.call(command, shell=True, stdout=subprocess.PIPE)
+            in_path, out_path = video_data["path"], os.path.join(self.process_dir, os.path.basename(video_data["path"]))
+            change_single_video_fps(file_path=in_path, fps=video_data["settings"]["fps"], gpu=self.gpu, quality=self.quality, verbose=False, save_path=out_path)
         self.replace_files_in_temp()
-        print("FPS conversion complete...")
+        print(f"FPS conversion complete... ({get_current_time()})")
 
     def apply_grayscale(self):
         self.videos_to_greyscale = self.find_relevant_videos(variable="grayscale")
         self.create_process_dir()
-        for video, video_data in self.videos_to_greyscale.items():
-            print(f"Applying grayscale {video}...")
+        for cnt, (video, video_data) in enumerate(self.videos_to_greyscale.items()):
+            print(f"Applying grayscale {video} ({cnt+1}/{len(list(self.videos_to_greyscale.keys()))})... ({get_current_time()})")
             if video_data["last_operation"] == "grayscale":
                 self.quality = video_data["output_quality"]
             in_path, out_path = video_data["path"], os.path.join(self.process_dir, os.path.basename(video_data["path"]))
-            if self.gpu:
-                command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "hwupload_cuda,hwdownload,format=nv12,format=gray" -c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
-            else:
-                command = f'ffmpeg -i "{in_path}" -c:v {self.batch_codec} -crf {self.quality} -vf hue=s=0 "{out_path}" -hide_banner -loglevel error -stats -y'
-            subprocess.call(command, shell=True, stdout=subprocess.PIPE)
+            video_to_greyscale(file_path=in_path, gpu=self.gpu, codec=self.batch_codec, verbose=False, quality=self.quality, save_path=out_path)
         self.replace_files_in_temp()
-        print("Grayscale complete...")
+        print(f"Grayscale complete... ({get_current_time()})")
 
     def apply_frame_count(self):
         self.videos_to_frm_cnt = self.find_relevant_videos(variable="frame_cnt")
         self.create_process_dir()
-        font_path = get_fonts()['Arial']
-        font_path = font_path.replace("\\", "/")
-        for video, video_data in self.videos_to_frm_cnt.items():
-            print(f"Applying frame count print {video}...")
+        for cnt, (video, video_data) in enumerate(self.videos_to_frm_cnt.items()):
+            print(f"Applying frame count print {video} ({cnt+1}/{len(list(self.videos_to_frm_cnt.keys()))})... ({get_current_time()})")
             if video_data["last_operation"] == "frame_cnt":
                 self.quality = video_data["output_quality"]
-            in_path, out_path = video_data["path"], os.path.join(
-                self.process_dir, os.path.basename(video_data["path"])
-            )
-            try:
-                if self.gpu:
-                    command = (
-                        f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" '
-                        f'-vf "drawtext=fontfile=\'{font_path}\':text=\'%%{{n}}\':x=(w-tw)/2:y=h-th-10:fontcolor=white:box=1:boxcolor=white@0.5" '
-                        f'-c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -y -hide_banner -loglevel error -stats -y'
-                    )
-                else:
-                    command = [
-                        "ffmpeg",
-                        "-i", in_path,
-                        "-c:v", self.batch_codec,
-                        "-crf", str(self.quality),
-                        "-vf",
-                        f"drawtext=fontfile='{font_path}':text='%%{{frame_num}}':start_number=1:x=(w-tw)/2:y=h-(2*lh):fontcolor=black:fontsize=20:box=1:boxcolor=white:boxborderw=5",
-                        "-c:a", "copy",
-                        "-y",
-                        out_path,
-                        "-hide_banner",
-                        "-loglevel", "error", "-stats"
-                    ]
-                    subprocess.check_output(command, shell=True)
-                subprocess.call(command, shell=True, stdout=subprocess.PIPE)
-            except:
-                simba_cw = os.path.dirname(simba.__file__)
-                simba_font_path = pathlib.Path(
-                    simba_cw, "assets", "UbuntuMono-Regular.ttf"
-                )
-                if self.gpu:
-                    command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "drawtext=fontsize=24:fontfile={simba_font_path}:text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor=white:box=1:boxcolor=white@0.5" -c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -y -hide_banner -loglevel error -stats -y'
-                else:
-                    command = f'ffmpeg -i "{in_path}" -vf "drawtext=fontfile={simba_font_path}:text=\'%{{frame_num}}\':start_number=1:x=(w-tw)/2:y=h-(2*lh):fontcolor=black:fontsize=20:box=1:boxcolor=white:boxborderw=5" -c:v {self.batch_codec} -crf {self.quality} -c:a copy -y "{out_path}" -hide_banner -loglevel error -stats -y'
-                subprocess.call(command, shell=True, stdout=subprocess.PIPE)
+            in_path, out_path = video_data["path"], os.path.join(self.process_dir, os.path.basename(video_data["path"]))
+            superimpose_frame_count(file_path=in_path, gpu=self.gpu, font='Arial', save_path=out_path, loc='bottom_middle', fontsize=25, codec=self.batch_codec, quality=self.quality, verbose=False)
         self.replace_files_in_temp()
-        print("Applying frame count complete...")
+        print(f"Applying frame count complete... ({get_current_time()})")
 
     def apply_clahe(self):
         self.videos_to_frm_cnt = self.find_relevant_videos(variable="clahe")
         self.create_process_dir()
-        for video, video_data in self.videos_to_frm_cnt.items():
-            clahe_filter = cv2.createCLAHE(clipLimit=2, tileGridSize=(16, 16))
-            print(
-                f"Applying CLAHE {video}... (note: process can be slow for long videos)"
-            )
-            in_path, out_path = video_data["path"], os.path.join(
-                self.process_dir, os.path.basename(video_data["path"])
-            )
-            video_info = get_video_meta_data(in_path)
-            cap = cv2.VideoCapture(in_path)
-            fps, width, height = (
-                video_info["fps"],
-                video_info["width"],
-                video_info["height"],
-            )
-            writer = cv2.VideoWriter(
-                out_path, cv2.VideoWriter_fourcc(*"MP4V"), fps, (width, height), 0
-            )
-            while True:
-                ret, image = cap.read()
-                if ret == True:
-                    img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-                    clahe_img = clahe_filter.apply(img)
-                    writer.write(clahe_img)
-                else:
-                    break
-            cap.release()
-            writer.release()
+        for cnt, (video, video_data) in enumerate(self.videos_to_frm_cnt.items()):
+            print(f"Applying CLAHE {video} ({cnt+1}/{len(list(self.videos_to_frm_cnt.keys()))})... (note: process can be slow for long videos) ({get_current_time()})")
+            in_path, out_path = video_data["path"], os.path.join(self.process_dir, os.path.basename(video_data["path"]))
+            clahe_enhance_video(file_path=in_path, clip_limit=2, tile_grid_size=(16, 16), out_path=out_path, verbose=False)
         self.replace_files_in_temp()
-        print("Applying CLAHE complete...")
+        print(f"Applying CLAHE complete... ({get_current_time()})")
 
     def crop_videos(self):
         self.videos_to_crop = self.find_relevant_videos(variable="crop")
         self.create_process_dir()
-        for video, video_data in self.videos_to_crop.items():
-            print(f"Applying crop {video}...")
+        for cnt, (video, video_data) in enumerate(self.videos_to_crop.items()):
+            print(f"Applying crop {video} ({cnt+1}/{len(list(self.videos_to_crop.keys()))})... ({get_current_time()})")
             if video_data["last_operation"] == "crop":
                 self.quality = video_data["output_quality"]
             in_path, out_path = video_data["path"], os.path.join(self.process_dir, os.path.basename(video_data["path"]))
             crop_settings = self.video_dict["video_data"][video]["crop_settings"]
-            width, height = str(crop_settings["width"]), str(crop_settings["height"])
-            top_left_x, top_left_y = str(crop_settings["top_left_x"]), str(crop_settings["top_left_y"])
-            gpu_cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{in_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}, format=yuv420p" -c:v h264_nvenc -preset {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
-            if self.gpu:
-                try:
-                    subprocess.run(gpu_cmd, check=True, shell=True)
-                except subprocess.CalledProcessError as e:
+            width, height = int(crop_settings["width"]), int(crop_settings["height"])
+            top_left_x, top_left_y = int(crop_settings["top_left_x"]), int(crop_settings["top_left_y"])
+            try:
+                crop_video(video_path=in_path, save_path=out_path, size=(width, height), top_left=(top_left_x, top_left_y), gpu=self.gpu, verbose=False, quality=self.quality, codec=self.batch_codec)
+            except Exception as e:
+                if self.gpu:
                     CropWarning(msg=f'GPU crop for video {video} failed, reverting to CPU crop.', source=self.__class__.__name__)
-                    cpu_cmd = f'ffmpeg -i "{in_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}" -c:v {self.batch_codec} -crf {self.gpu_to_cpu_quality_lk[self.quality]} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
-                    subprocess.call(cpu_cmd, shell=True)
-            else:
-                cpu_cmd = f'ffmpeg -i "{in_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}" -c:v {self.batch_codec} -crf {self.quality} -c:a copy "{out_path}" -hide_banner -loglevel error -stats -y'
-                subprocess.call(cpu_cmd, shell=True)
+                    crop_video(video_path=in_path, save_path=out_path, size=(width, height), top_left=(top_left_x, top_left_y), gpu=False, verbose=False, quality=self.quality, codec=self.batch_codec)
+                else:
+                    raise CropError(msg=f'Could not crop video {video} at width: {width}, height: {height} top_left_x: {top_left_x}, top_left_y: {top_left_y}', source=self.__class__.__name__)
         self.replace_files_in_temp()
-        print("Applying crop complete...")
+        print(f"Applying crop complete... ({get_current_time()})")
 
     def copy_videos_to_temp_dir(self):
         for video, video_data in self.video_dict["video_data"].items():
             source = video_data["video_info"]["file_path"]
-            print(f"Making a copy of {os.path.basename(source)} ...")
+            print(f"Making a copy of {os.path.basename(source)} ... ({get_current_time()})")
             destination = os.path.join(self.temp_dir, os.path.basename(source))
             shutil.copyfile(source, destination)
 
     def move_all_processed_files_to_output_folder(self):
-        final_videos_path_lst = [
-            f for f in glob.glob(self.temp_dir + "/*") if os.path.isfile(f)
-        ]
+        final_videos_path_lst = [f for f in glob.glob(self.temp_dir + "/*") if os.path.isfile(f)]
         for file_path in final_videos_path_lst:
-            shutil.copy(
-                file_path, os.path.join(self.out_dir, os.path.basename(file_path))
-            )
+            shutil.copy(file_path, os.path.join(self.out_dir, os.path.basename(file_path)))
         if os.path.exists(self.temp_dir):
             shutil.rmtree(self.temp_dir)
         if os.path.exists(self.process_dir):

@@ -218,6 +218,7 @@ class Entry_Box(Frame):
                  status: Literal["normal", "disabled", "readonly"] = 'normal',
                  validation: Optional[Union[Callable, str]] = None,
                  entry_box_width: Union[int, str] = None,
+                 entry_box_clr: Optional[str] = None,
                  img: Optional[str] = None,
                  value: Optional[Any] = None,
                  label_font: tuple = Formats.FONT_REGULAR.value,
@@ -243,9 +244,9 @@ class Entry_Box(Frame):
         self.lblName = Label(self, text=fileDescription, width=labelwidth, anchor=W, font=label_font, bg=label_bg_clr)
         self.lblName.grid(row=0, column=1)
         if not entry_box_width:
-            self.entPath = Entry(self, textvariable=self.filePath, state=self.status,  validate="key", validatecommand=self.validation_methods.get(validation, None), font=entry_font, justify=justify)
+            self.entPath = Entry(self, textvariable=self.filePath, state=self.status,  validate="key", validatecommand=self.validation_methods.get(validation, None), font=entry_font, justify=justify, bg=entry_box_clr)
         else:
-            self.entPath = Entry(self, textvariable=self.filePath, state=self.status, width=entry_box_width, validate="key", font=entry_font, justify=justify, validatecommand=self.validation_methods.get(validation, None))
+            self.entPath = Entry(self, textvariable=self.filePath, state=self.status, width=entry_box_width, validate="key", font=entry_font, justify=justify, validatecommand=self.validation_methods.get(validation, None), bg=entry_box_clr)
         self.entPath.grid(row=0, column=2)
         if value is not None:
             self.entry_set(val=value)
@@ -573,11 +574,13 @@ def SimbaButton(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
 def SimbaCheckbox(parent: Union[Frame, Toplevel, LabelFrame, Canvas],
                   txt: str,
                   txt_clr: Optional[str] = 'black',
+                  bg_clr: Optional[str] = None,
                   txt_img: Optional[str] = None,
                   txt_img_location: Literal['left', 'right', 'top', 'bottom'] = RIGHT,
                   font: Optional[Tuple[str, str, int]] = Formats.FONT_REGULAR.value,
                   val: Optional[bool] = False,
                   state: Literal["disabled", 'normal'] = NORMAL,
+                  indicatoron: bool = True,
                   cmd: Optional[Callable] = None,
                   tooltip_txt: Optional[str] = None):
 
@@ -586,9 +589,9 @@ def SimbaCheckbox(parent: Union[Frame, Toplevel, LabelFrame, Canvas],
     if isinstance(txt_img, str):
         txt_img = ImageTk.PhotoImage(image=PIL.Image.open(MENU_ICONS[txt_img]["icon_path"]))
     if cmd is None:
-        cb = Checkbutton(master=parent, font=font, fg=txt_clr, image=txt_img, text=txt, compound=txt_img_location, variable=var)
+        cb = Checkbutton(master=parent, font=font, fg=txt_clr, image=txt_img, text=txt, compound=txt_img_location, variable=var, indicatoron=indicatoron, bg=bg_clr)
     else:
-        cb = Checkbutton(master=parent, font=font, fg=txt_clr, image=txt_img, text=txt, compound=txt_img_location, variable=var, command=cmd)
+        cb = Checkbutton(master=parent, font=font, fg=txt_clr, image=txt_img, text=txt, compound=txt_img_location, variable=var, command=cmd, indicatoron=indicatoron, bg=bg_clr)
     if txt_img is not None:
         cb.image = txt_img
     if state == DISABLED:
@@ -611,6 +614,8 @@ def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                justify: Optional[str] = None,
                link: Optional[str] = None,
                width: Optional[int] = None,
+               padx: Optional[int] = None,
+               pady: Optional[int] = None,
                cursor: Optional[str] = None,
                img: Optional[str] = None,
                anchor: Optional[str] = None,
@@ -641,7 +646,9 @@ def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
                 cursor=cursor,
                 anchor=anchor,
                 image=img,
-                compound=compound)
+                compound=compound,
+                padx=padx,
+                pady=pady)
 
     if img is not None:
         lbl.image = img
@@ -667,6 +674,38 @@ def get_menu_icons():
     for k in menu_icons.keys():
         menu_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname(__file__), menu_icons[k]["icon_path"])))
     return menu_icons
+
+
+
+class SimBASeperator(Frame):
+
+    def __init__(self,
+                 parent: Union[Frame, Canvas, LabelFrame, Toplevel, Tk],
+                 color: Optional[str] = None,
+                 orient: Literal['horizontal', 'vertical'] = 'horizontal',
+                 cursor: Optional[str] = None,
+                 borderwidth: Optional[int] = None,
+                 takefocus: Optional[int] = 0,
+                 height: int = 1,
+                 relief: Literal["raised", "sunken", "flat", "ridge", "solid", "groove"] = "flat"):
+
+        super().__init__(master=parent, height=height, bg=color if color is not None else "black", relief=relief, bd=borderwidth if borderwidth is not None else None)
+        style = tk.ttk.Style()
+        style_name = "SimBA.TSeparator"
+
+        style.configure(style_name,
+                        background=color if color is not None else "black")
+
+        seperator = tk.ttk.Separator(self,
+                                     orient=orient,
+                                     style=style_name,
+                                     cursor=cursor,
+                                     takefocus=takefocus)
+
+        if orient == "horizontal":
+            seperator.pack(fill="x", expand=True)
+        else:
+            seperator.pack(fill="y", expand=True)
 
 
 class SimBADropDown(Frame):
@@ -717,8 +756,6 @@ class SimBADropDown(Frame):
 
         super().__init__(master=parent)
         self.dropdown_var = StringVar()
-
-
         self.columnconfigure(0, weight=0)
         self.columnconfigure(1, weight=0)
         if img is not None:
@@ -796,6 +833,7 @@ class SimBADropDown(Frame):
             self.disable()
         else:
             self.enable()
+        self.dropdown.configure(state='normal' if self.searchable else "readonly")
 
     def bind_combobox_keys(self):
         self.dropdown.bind("<KeyRelease>", self._on_key_release)

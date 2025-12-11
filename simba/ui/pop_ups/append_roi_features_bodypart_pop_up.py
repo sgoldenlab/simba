@@ -33,6 +33,10 @@ class AppendROIFeaturesByBodyPartPopUp(PopUpMixin, ConfigReader):
         self.root.destroy()
 
 
+
+
+#_ = AppendROIFeaturesByBodyPartPopUp(config_path=r"C:\troubleshooting\mitra\project_folder\project_config.ini")
+
 # _ = AppendROIFeaturesByBodyPartPopUp(config_path='/Users/simon/Desktop/envs/simba/troubleshooting/open_field_below/project_folder/project_config.ini')
 
 

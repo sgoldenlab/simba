@@ -398,9 +398,10 @@ def convert_to_webp(path: Union[str, os.PathLike],
     stdout_success(msg=f"SIMBA COMPLETE: {len(file_paths)} image file(s) in {directory} directory converted to WEBP and stored in {save_dir} directory", source=convert_to_webp.__name__, elapsed_time=timer.elapsed_time_str)
 
 def clahe_enhance_video(file_path: Union[str, os.PathLike],
-                         clip_limit: Optional[int] = 2,
-                         tile_grid_size: Optional[Tuple[int, int]] = (16, 16),
-                         out_path: Optional[Union[str, os.PathLike]] = None) -> None:
+                        clip_limit: Optional[int] = 2,
+                        tile_grid_size: Optional[Tuple[int, int]] = (16, 16),
+                        out_path: Optional[Union[str, os.PathLike]] = None,
+                        verbose: bool = True) -> None:
 
     """
     Convert a single video file to clahe-enhanced greyscale .avi file.
@@ -437,7 +438,7 @@ def clahe_enhance_video(file_path: Union[str, os.PathLike],
         check_if_dir_exists(in_dir=os.path.dirname(out_path), source=f'{clahe_enhance_video.__name__} out_path')
         save_path = out_path
     fourcc = cv2.VideoWriter_fourcc(*Formats.AVI_CODEC.value)
-    print(f"Applying CLAHE on video {file_name}, this might take awhile...")
+    if verbose: print(f"Applying CLAHE on video {file_name}, this might take awhile...")
     cap = cv2.VideoCapture(file_path)
     writer = cv2.VideoWriter( save_path, fourcc, video_meta_data["fps"], (video_meta_data["width"], video_meta_data["height"]), 0)
     clahe_filter = cv2.createCLAHE(clipLimit=int(clip_limit), tileGridSize=tile_grid_size)
@@ -450,18 +451,18 @@ def clahe_enhance_video(file_path: Union[str, os.PathLike],
                 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 clahe_frm = clahe_filter.apply(img)
                 writer.write(clahe_frm)
-                print(f"CLAHE converted frame {frm_cnt}/{video_meta_data['frame_count']} ({file_name})...")
+                if verbose: print(f"CLAHE converted frame {frm_cnt}/{video_meta_data['frame_count']} ({file_name})...")
             else:
                 break
         cap.release()
         writer.release()
-        print(f"CLAHE video created: {save_path}.")
+        if verbose: print(f"CLAHE video created: {save_path}.")
     except Exception as se:
-        print(se.args)
-        print(f"CLAHE conversion failed for video {file_name}.")
+        if verbose: print(se.args)
+        if verbose: print(f"CLAHE conversion failed for video {file_name}.")
         cap.release()
         writer.release()
-        raise InvalidVideoFileError(msg=f"Could not convert file {file_path} to CLAHE enhanced video", source=clahe_enhance_video.__name__,)
+        raise InvalidVideoFileError(msg=f"Could not convert file {file_path} to CLAHE enhanced video: {se.args}", source=clahe_enhance_video.__name__,)
 
 
 def _clahe_enhance_video_mp_helper(data: tuple,
@@ -640,12 +641,16 @@ def extract_frame_range(file_path: Union[str, os.PathLike],
 
 
 def change_single_video_fps(file_path: Union[str, os.PathLike],
-                            fps: int,
-                            gpu: Optional[bool] = False) -> None:
+                            fps: Union[int, float],
+                            gpu: bool = False,
+                            codec: Optional[str] = None,
+                            save_path: Optional[Union[str, os.PathLike]] = None,
+                            quality: Optional[int] = 23,
+                            verbose: bool = True) -> None:
 
     """
     Change the fps of a single video file. Results are stored in the same directory as in the input file with
-    the suffix ``_fps_new_fps``.
+    the suffix ``_fps_new_fps`` if save_path is not passed.
 
     .. note::
        To change the FPS of all videos in a directory, use ``simba.video_processors.video_processing.change_fps_of_multiple_videos``.
@@ -667,28 +672,33 @@ def change_single_video_fps(file_path: Union[str, os.PathLike],
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)", source=change_single_video_fps.__name__)
     check_file_exist_and_readable(file_path=file_path)
-    check_int(name="New fps", value=fps)
+    check_float(name=f'{change_single_video_fps} fps', value=fps, raise_error=True)
     video_meta_data = get_video_meta_data(video_path=file_path)
     dir_name, file_name, ext = get_fn_ext(filepath=file_path)
-    if int(fps) == int(video_meta_data["fps"]):
+    if float(fps) == float(video_meta_data["fps"]):
         SameInputAndOutputWarning(msg=f"The new fps is the same as the input fps for video {file_name} ({str(fps)})", source=change_single_video_fps.__name__)
-    save_path = os.path.join(dir_name, file_name + f"_fps_{fps}{ext}")
-    print(f"Converting the FPS to {fps} for video {file_name} ...")
-    if ext.lower() == '.webm':
-        codec = 'libvpx-vp9'
-    elif ext.lower() == '.avi':
-        codec = 'mpeg4'
+    if save_path is None:
+        save_path = os.path.join(dir_name, file_name + f"_fps_{fps}{ext}")
     else:
-        codec = 'libx264'
+        check_if_dir_exists(in_dir=os.path.dirname(save_path), raise_error=True)
+    quality = 23 if not check_int(name='quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
+    if verbose: print(f"Converting the FPS to {fps} for video {file_name} ...")
+    if codec is None:
+        if ext.lower() == '.webm':
+            codec = 'libvpx-vp9'
+        elif ext.lower() == '.avi':
+            codec = 'mpeg4'
+        else:
+            codec = 'libx264'
     if os.path.isfile(save_path):
         FileExistWarning(msg=f"Overwriting existing file at {save_path}...", source=change_single_video_fps.__name__,)
     if gpu:
-        command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -c:a copy "{save_path}" -y'
+        cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
     else:
-        command = f'ffmpeg -i "{file_path}" -filter:v fps=fps={fps} -c:v {codec} -c:a aac "{save_path}" -loglevel error -stats -hide_banner -y'
-    subprocess.call(command, shell=True)
+        cmd = f'ffmpeg -i "{file_path}" -filter:v fps=fps={fps} -c:v {codec} -c:a aac "{save_path}" -crf {quality} -loglevel error -stats -hide_banner -y'
+    subprocess.call(cmd, shell=True)
     timer.stop_timer()
-    stdout_success(msg=f'SIMBA COMPLETE: FPS of video {file_name} changed from {str(video_meta_data["fps"])} to {str(fps)} and saved in directory {save_path}', elapsed_time=timer.elapsed_time_str, source=change_single_video_fps.__name__)
+    if verbose: stdout_success(msg=f'SIMBA COMPLETE: FPS of video {file_name} changed from {str(video_meta_data["fps"])} to {str(fps)} and saved in directory {save_path}', elapsed_time=timer.elapsed_time_str, source=change_single_video_fps.__name__)
 
 
 def change_fps_of_multiple_videos(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]],
@@ -794,7 +804,12 @@ def convert_video_powerpoint_compatible_format(file_path: Union[str, os.PathLike
 
 
 
-def video_to_greyscale(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
+def video_to_greyscale(file_path: Union[str, os.PathLike],
+                       gpu: Optional[bool] = False,
+                       codec: str = 'libx264',
+                       verbose: bool = True,
+                       quality: int = 23,
+                       save_path: Optional[Union[str, os.PathLike]] = None) -> None:
     """
     Convert a video file to greyscale mp4 format.
 
@@ -819,31 +834,27 @@ def video_to_greyscale(file_path: Union[str, os.PathLike], gpu: Optional[bool] =
     """
     check_ffmpeg_available(raise_error=True)
     if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(
-            msg="No GPU found (as evaluated by nvidea-smi returning None)",
-            source=video_to_greyscale.__name__,
-        )
+        raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)", source=video_to_greyscale.__name__)
     timer = SimbaTimer(start=True)
     check_file_exist_and_readable(file_path=file_path)
     dir, file_name, ext = get_fn_ext(filepath=file_path)
-    save_name = os.path.join(dir, file_name + "_grayscale.mp4")
-    if os.path.isfile(save_name):
-        raise FileExistError(
-            msg="SIMBA ERROR: The outfile file already exist: {}.".format(save_name),
-            source=video_to_greyscale.__name__,
-        )
-    if gpu:
-        command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "hwupload_cuda,hwdownload,format=nv12,format=gray" -c:v h264_nvenc -c:a copy "{save_name}"'
+    if save_path is None:
+        save_name = os.path.join(dir, file_name + "_grayscale.mp4")
+        if os.path.isfile(save_name):
+            raise FileExistError(msg="SIMBA ERROR: The outfile file already exist: {}.".format(save_name), source=video_to_greyscale.__name__)
     else:
-        command = f'ffmpeg -i "{file_path}" -vf format=gray -c:v libx264 "{save_name}"'
-    print(f"Converting {file_name} to greyscale... ")
-    subprocess.call(command, shell=True, stdout=subprocess.PIPE)
+        check_if_dir_exists(in_dir=os.path.dirname(save_path))
+        save_name = deepcopy(save_path)
+    quality = 23 if not check_int(name='quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
+    if gpu:
+        cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "hwupload_cuda, hwdownload, format=nv12, format=gray" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy "{save_name}" -loglevel error -stats -hide_banner -y'
+    else:
+        cmd = f'ffmpeg -i "{file_path}" -vf format=gray -c:v {codec} -crf {quality} "{save_name}" -loglevel error -stats -hide_banner -y'
+
+    if verbose: print(f"Converting {file_name} to greyscale... ")
+    subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
-    stdout_success(
-        msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!",
-        elapsed_time=timer.elapsed_time_str,
-        source=video_to_greyscale.__name__,
-    )
+    if verbose: stdout_success(msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str, source=video_to_greyscale.__name__)
 
 
 def batch_video_to_greyscale(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]],
@@ -913,6 +924,9 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
                             font: Optional[str] = 'Arial',
                             font_color: Optional[str] = 'black',
                             bg_color: Optional[str] = 'white',
+                            codec: Optional[str] = 'libx264',
+                            quality: Optional[int] = None,
+                            verbose: bool = True,
                             save_path: Optional[Union[str, os.PathLike]] = None,
                             loc: Optional[Literal['top_left', 'top_middle', 'top_right', 'bottom_left', 'bottom_middle', 'bottom_right']] = 'bottom_middle',
                             fontsize: Optional[int] = 20) -> None:
@@ -933,15 +947,15 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
        :height: 480
        :align: center
 
-    :parameter Union[str, os.PathLike] file_path: Path to video file or directory containing video files.
-    :parameter Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
-    :parameter Optional[bool] recursive: If True, processes all video files in ``file_path`` directory found recursively. If False, then grabs just the video in the parent.
-    :parameter Optional[int] fontsize: The size of the font represetnting the current frame. Default: 20.
-    :parameter Optional[Union[str, os.PathLike]] save_path: Optional save path or save directory for the video with frame numbers. If None, then the new video is saved in the same directory as the input video with the ``_frame_no`` suffix.
-    :parameter Optional[str] font_color: The color of frame number text. Default: 'Black'.
-    :parameter Optional[str] loc: The location of the font number text. Options: 'top_left', 'top_middle', 'top_right', 'bottom_left', 'bottom_middle', 'bottom_right'. Default: Bottom middle.
-    :parameter Optional[str] bg_color: The color of the box which the frame number is printed in. Default: 'White'.
-    :parameter Optional[str] font: The font to use for the frame number. Default Arial.
+    :param Union[str, os.PathLike] file_path: Path to video file or directory containing video files.
+    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param Optional[bool] recursive: If True, processes all video files in ``file_path`` directory found recursively. If False, then grabs just the video in the parent.
+    :param Optional[int] fontsize: The size of the font represetnting the current frame. Default: 20.
+    :param Optional[Union[str, os.PathLike]] save_path: Optional save path or save directory for the video with frame numbers. If None, then the new video is saved in the same directory as the input video with the ``_frame_no`` suffix.
+    :param Optional[str] font_color: The color of frame number text. Default: 'Black'.
+    :param Optional[str] loc: The location of the font number text. Options: 'top_left', 'top_middle', 'top_right', 'bottom_left', 'bottom_middle', 'bottom_right'. Default: Bottom middle.
+    :param Optional[str] bg_color: The color of the box which the frame number is printed in. Default: 'White'.
+    :param Optional[str] font: The font to use for the frame number. Default Arial.
     :returns: None. The result is stored in the same directory as the input file with the ``_frame_no.mp4`` suffix if ``save_path`` is None.
 
     :example:
@@ -972,45 +986,46 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
             file_paths = recursive_file_search(directory=file_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_error=True, as_dict=False)
             print(len(file_paths), file_path)
     else:
-        raise InvalidInputError(msg='{} is not a valid file path or file directory.', source=superimpose_frame_count.__name__)
+        raise InvalidInputError(msg=f'{file_path} is not a valid file path or file directory.', source=superimpose_frame_count.__name__)
 
+    quality = 23 if not check_int(name='quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
     for video_cnt, file_path in enumerate(file_paths):
         dir, file_name, ext = get_fn_ext(filepath=file_path)
-        print(f'Superimposing frame count video {video_cnt+1}/{len(file_paths)}...')
+        if verbose: print(f'Superimposing frame count video {video_cnt+1}/{len(file_paths)}...')
         if save_path is None:
             save_name = os.path.join(dir, f"{file_name}_frame_no.mp4")
         elif os.path.isdir(save_path):
             save_name = os.path.join(save_path, f"{file_name}_frame_no.mp4")
         else:
-            check_if_dir_exists(in_dir=os.path.isdir(os.path.dirname(save_path)), source=f'{superimpose_frame_count.__name__} save_path', create_if_not_exist=True)
+            check_if_dir_exists(in_dir=os.path.dirname(save_path), source=f'{superimpose_frame_count.__name__} save_path', create_if_not_exist=True)
             save_name = save_path
         if gpu:
             if loc == 'top_left':
-                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=10:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=10:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'top_center':
-                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=(w-tw)/2:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=(w-tw)/2:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'top_right':
-                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=w-tw-10:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=w-tw-10:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'bottom_left':
-                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=10:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=10:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'bottom_right':
-                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=w-tw-10:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=w-tw-10:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
             else:
-                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=(w-tw)/2:y=h-th-10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
         else:
             if loc == 'top_left':
-                cmd = f'''ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=10: y=10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=10: y=10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'top_middle':
-                cmd = f'''ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=(w-tw)/2: y=10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=(w-tw)/2: y=10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'bottom_left':
-                cmd = f'''ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=10: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=10: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'bottom_right':
-                cmd = f'''ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=w-tw-10: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=w-tw-10: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
             else:
-                cmd = f'''ffmpeg -y -i "{file_path}" -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=(w-tw)/2: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
+                cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=(w-tw)/2: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         timer.stop_timer()
-        stdout_success(msg=f"Superimposed video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str)
+        if verbose: stdout_success(msg=f"Superimposed video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str)
 
 def remove_beginning_of_video(file_path: Union[str, os.PathLike],
                               time: int,
@@ -1061,6 +1076,10 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
                         start_time: str,
                         end_time: str,
                         out_dir: Optional[Union[str, os.PathLike]] = None,
+                        save_path: Optional[Union[str, os.PathLike]] = None,
+                        codec: str = 'libvpx-vp9',
+                        quality: int = 23,
+                        verbose: bool = True,
                         overwrite: Optional[bool] = False,
                         include_clip_time_in_filename: Optional[bool] = False,
                         gpu: Optional[bool] = False) -> None:
@@ -1099,29 +1118,30 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
         save_name = os.path.join(dir, file_name + "_clipped.mp4")
     else:
         save_name = os.path.join(dir, file_name + f'_{start_time.replace(":", "-")}_{end_time.replace(":", "-")}.mp4')
+    if save_path is not None:
+        check_if_dir_exists(in_dir=os.path.dirname(save_path), raise_error=True)
+        save_name = deepcopy(save_path)
     if os.path.isfile(save_name) and (not overwrite):
-        raise FileExistError(
-            msg=f"SIMBA ERROR: The outfile file already exist: {save_name}.",
-            source=clip_video_in_range.__name__,
-        )
+        raise FileExistError(msg=f"SIMBA ERROR: The outfile file already exist: {save_name}.", source=clip_video_in_range.__name__)
+    quality = 23 if not check_int(name='quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
     if gpu:
-        command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -ss {start_time} -to {end_time} -async 1 "{save_name}" -loglevel error -stats -hide_banner -y'
+        cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -ss {start_time} -to {end_time} -async 1 "{save_name}" -rc vbr -cq {quality} -loglevel error -stats -hide_banner -y'
     else:
-        command = f'ffmpeg -i "{file_path}" -ss {start_time} -to {end_time} -async 1 -c:v libvpx-vp9 "{save_name}" -loglevel error -stats -hide_banner -y'
-    print(f"Clipping video {file_name} between {start_time} and {end_time}... ")
-    subprocess.call(command, shell=True, stdout=subprocess.PIPE)
+        cmd = f'ffmpeg -i "{file_path}" -ss {start_time} -to {end_time} -async 1 -c:v {codec} "{save_name}" -crf {quality} -loglevel error -stats -hide_banner -y'
+    if verbose: print(f"Clipping video {file_name} between {start_time} and {end_time}... ")
+    subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
-    stdout_success(
-        msg=f"Video converted! {save_name} generated!",
-        elapsed_time=timer.elapsed_time_str,
-        source=clip_video_in_range.__name__,
-    )
+    if verbose: stdout_success(msg=f"Video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str, source=clip_video_in_range.__name__)
 
 
 def downsample_video(file_path: Union[str, os.PathLike],
                      video_height: int,
                      video_width: int,
-                     gpu: Optional[bool] = False) -> None:
+                     gpu: Optional[bool] = False,
+                     codec: str = 'libx264',
+                     quality: int = 23,
+                     save_path: Optional[Union[str, os.PathLike]] = None,
+                     verbose: bool = True) -> None:
     """
     Down-sample a video file.
 
@@ -1148,21 +1168,23 @@ def downsample_video(file_path: Union[str, os.PathLike],
         video_height += 1
     check_file_exist_and_readable(file_path=file_path)
     dir, file_name, ext = get_fn_ext(filepath=file_path)
-    save_name = os.path.join(dir, file_name + "_downsampled.mp4")
-    if os.path.isfile(save_name):
-        raise FileExistError("SIMBA ERROR: The outfile file already exist: {}.".format(save_name), source=downsample_video.__name__,)
-    if gpu:
-        command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "scale_cuda=w={video_width}:h={video_height}:force_original_aspect_ratio=decrease:flags=bicubic" -c:v h264_nvenc "{save_name}"'
+    if save_path is None:
+        save_name = os.path.join(dir, file_name + "_downsampled.mp4")
     else:
-        command = f'ffmpeg -i "{file_path}" -vf scale={video_width}:{video_height} -c:v libx264 "{save_name}" -loglevel error -stats -hide_banner'
-    print("Down-sampling video... ")
+        check_if_dir_exists(in_dir=os.path.dirname(save_path), raise_error=True)
+        save_name = deepcopy(save_path)
+    if os.path.isfile(save_name):
+        raise FileExistError("SIMBA ERROR: The outfile file already exist: {}.".format(save_name), source=downsample_video.__name__)
+    quality = 23 if not check_int(name=f'{downsample_video.__name__} quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
+    if gpu:
+        command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "scale=w={video_width}:h={video_height}" -c:v h264_nvenc -rc vbr -cq {quality} -hide_banner -loglevel error -stats "{save_name}" -loglevel error -stats -hide_banner -y'
+        #command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "scale_cuda=w={video_width}:h={video_height}:force_original_aspect_ratio=decrease:flags=bicubic" -c:v h264_nvenc -rc vbr -cq {quality} "{save_name}" -loglevel error -stats -hide_banner -y'
+    else:
+        command = f'ffmpeg -i "{file_path}" -vf scale={video_width}:{video_height} -c:v {codec} -crf {quality} "{save_name}" -loglevel error -stats -hide_banner -y'
+    if verbose: print("Down-sampling video... ")
     subprocess.call(command, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
-    stdout_success(
-        msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!",
-        elapsed_time=timer.elapsed_time_str,
-        source=downsample_video.__name__,
-    )
+    if verbose: stdout_success(msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str, source=downsample_video.__name__)
 
 
 
@@ -4874,8 +4896,9 @@ def crop_video(video_path: Union[str, os.PathLike],
                size: Tuple[int, int],
                top_left: Tuple[int, int],
                gpu: bool = False,
+               codec: str = Formats.BATCH_CODEC.value,
                verbose: bool = True,
-               quality: int = 60):
+               quality: int = 23):
     """
     Crops a video from the given file at `video_path` and saves the result to `save_path`.
     Optionally uses GPU acceleration for faster processing, falling back to CPU if GPU fails.
@@ -4915,8 +4938,8 @@ def crop_video(video_path: Union[str, os.PathLike],
     width, height = int(bottom_right[0] - top_left[0]), (bottom_right[1] - top_left[1])
     width, height = (width + 1) // 2 * 2, (height + 1) // 2 * 2
     top_left_x, top_left_y = top_left[0], top_left[1]
-    gpu_cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{video_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}, format=yuv420p" -c:v h264_nvenc -cq {quality_code} -c:a copy "{save_path}" -hide_banner -loglevel error -stats -y'
-    cpu_cmd = f'ffmpeg -i "{video_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}" -c:v {Formats.BATCH_CODEC.value} -crf {quality_code} -c:a copy "{save_path}" -hide_banner -loglevel error -stats -y'
+    gpu_cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{video_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}, format=yuv420p" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy "{save_path}" -hide_banner -loglevel error -stats -y'
+    cpu_cmd = f'ffmpeg -i "{video_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}" -c:v {codec} -crf {quality_code} -c:a copy "{save_path}" -hide_banner -loglevel error -stats -y'
     if gpu:
         try:
             subprocess.run(gpu_cmd, check=True, shell=True)

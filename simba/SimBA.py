@@ -398,7 +398,7 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
 
         extract_features_frm = CreateLabelFrameWithIcon(parent=tab5, header="EXTRACT FEATURES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.EXTRACT_FEATURES.value, relief='solid')
         userscript, self.user_defined_var = SimbaCheckbox(parent=extract_features_frm, txt="APPLY USER DEFINED FEATURE EXTRACTION SCRIPT", font=Formats.FONT_REGULAR.value, val=False, state=NORMAL, cmd= activate)
-        self.scriptfile = FileSelect(extract_features_frm, "SCRIPT PATH:", file_types=[("Python .py file", "*.py")], lblwidth=25, status=DISABLED)
+        self.scriptfile = FileSelect(extract_features_frm, "SCRIPT PATH (.PY):", file_types=[("Python .py file", "*.py")], lblwidth=25, status=DISABLED, lbl_icon='python')
         button_extractfeatures = SimbaButton(parent=extract_features_frm, txt="EXTRACT FEATURES", width=Formats.BUTTON_WIDTH_XL.value, txt_clr='blue', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run_feature_extraction, thread=False)
 
         extract_features_frm.grid(row=0, column=0, sticky=NSEW, padx=10, pady=10)
