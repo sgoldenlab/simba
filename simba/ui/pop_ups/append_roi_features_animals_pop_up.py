@@ -8,7 +8,8 @@ from typing import Union
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.roi_tools.ROI_feature_analyzer import ROIFeatureCreator
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu, SimbaButton, SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
+                                        SimbaButton, SimBADropDown)
 from simba.utils.enums import Formats, Keys, Links
 from simba.utils.warnings import ROIWarning
 
