@@ -20,8 +20,8 @@ class BatchPreProcessPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="BATCH PROCESS VIDEO", size=(600, 400), icon='stack')
         selections_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SELECTIONS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.BATCH_PREPROCESS.value,)
-        self.input_folder_select = FolderSelect(selections_frm, "INPUT VIDEO DIRECTORY:", title="Select Folder with Input Videos", lblwidth=30,)
-        self.output_folder_select = FolderSelect(selections_frm, "OUTPUT VIDEO DIRECTORY:", title="Select Folder for Output videos", lblwidth=30)
+        self.input_folder_select = FolderSelect(selections_frm, "INPUT VIDEO DIRECTORY:", title="Select Folder with Input Videos", lblwidth=30, lbl_icon='folder')
+        self.output_folder_select = FolderSelect(selections_frm, "OUTPUT VIDEO DIRECTORY:", title="Select Folder for Output videos", lblwidth=30, lbl_icon='folder')
 
         confirm_btn = SimbaButton(parent=selections_frm, txt="CONFIRM", img='tick', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=self.run)
         selections_frm.grid(row=0, column=0, sticky=NW)
@@ -38,10 +38,7 @@ class BatchPreProcessPopUp(PopUpMixin):
         if (self.output_folder_select.folder_path == self.input_folder_select.folder_path):
             raise DuplicationError(msg="The INPUT directory and OUTPUT directory CANNOT be the same folder", source=self.__class__.__name__,)
         else:
-            batch_preprocessor = BatchProcessFrame(
-                input_dir=self.input_folder_select.folder_path,
-                output_dir=self.output_folder_select.folder_path,
-            )
+            batch_preprocessor = BatchProcessFrame(input_dir=self.input_folder_select.folder_path, output_dir=self.output_folder_select.folder_path)
             batch_preprocessor.create_main_window()
             batch_preprocessor.create_video_table_headings()
             batch_preprocessor.create_video_rows()
@@ -49,4 +46,4 @@ class BatchPreProcessPopUp(PopUpMixin):
             batch_preprocessor.main_frm.mainloop()
 
 
-#BatchPreProcessPopUp()
+BatchPreProcessPopUp()

@@ -230,7 +230,7 @@ class BatchProcessFrame(PopUpMixin):
         seperator.grid(row=1, column=0, columnspan=15, rowspan=1, sticky="ew")
 
         seperator = SimBASeperator(parent=self.videos_frm, orient='vertical', borderwidth=1)
-        seperator.grid(row=0, column=1, rowspan=len(self.videos_in_dir_dict.keys()) + 10, sticky="ns")
+        seperator.grid(row=0, column=1, rowspan=len(self.videos_in_dir_dict.keys()) + 400, sticky="ns")
 
     def create_video_rows(self):
         self.videos = {}
