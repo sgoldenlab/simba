@@ -46,4 +46,4 @@ class BatchPreProcessPopUp(PopUpMixin):
             batch_preprocessor.main_frm.mainloop()
 
 
-BatchPreProcessPopUp()
+#BatchPreProcessPopUp()
