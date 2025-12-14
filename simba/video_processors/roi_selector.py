@@ -4,12 +4,10 @@ from typing import Optional, Tuple, Union
 import cv2
 import numpy as np
 
-from simba.utils.checks import (check_file_exist_and_readable,
-                                check_if_valid_img, check_if_valid_rgb_tuple,
-                                check_int, check_str)
+from simba.utils.checks import (check_file_exist_and_readable, check_if_valid_img, check_if_valid_rgb_tuple, check_int, check_str, check_valid_boolean)
 from simba.utils.enums import Options
 from simba.utils.errors import InvalidFileTypeError
-from simba.utils.read_write import get_fn_ext, get_video_meta_data
+from simba.utils.read_write import get_fn_ext, get_video_meta_data, read_img, read_frm_of_video
 from simba.utils.warnings import CropWarning
 
 
@@ -38,12 +36,17 @@ class ROISelector(object):
                  thickness: int = 10,
                  clr: Tuple[int, int, int] = (147, 20, 255),
                  title: Optional[str] = None,
-                 destroy: bool = True) -> None:
+                 destroy: bool = True,
+                 greyscale: bool = False,
+                 clahe: bool = False) -> None:
 
         check_if_valid_rgb_tuple(data=clr)
         check_int(name="Thickness", value=thickness, min_value=1, raise_error=True)
-        if title is not None:
-            check_str(name="ROI title window", value=title)
+        if title is not None: check_str(name=f"{self.__class__.__name__} title", value=title)
+        check_valid_boolean(value=destroy, source=f'{self.__class__.__name__} destroy', raise_error=True)
+        check_valid_boolean(value=greyscale, source=f'{self.__class__.__name__} greyscale', raise_error=True)
+        check_valid_boolean(value=clahe, source=f'{self.__class__.__name__} clahe', raise_error=True)
+
         self.roi_start = None
         self.roi_end = None
         self.selecting_roi = False
@@ -60,13 +63,11 @@ class ROISelector(object):
             check_file_exist_and_readable(file_path=path)
             _, filename, ext = get_fn_ext(filepath=path)
             if ext in Options.ALL_VIDEO_FORMAT_OPTIONS.value:
-                _ = get_video_meta_data(video_path=path)
-                cap = cv2.VideoCapture(path)
-                cap.set(1, 0)
-                _, self.image = cap.read()
+                self.image = read_frm_of_video(video_path=path, frame_index=0, greyscale=greyscale, clahe=clahe, use_ffmpeg=False, raise_error=True)
 
             elif ext in Options.ALL_IMAGE_FORMAT_OPTIONS.value:
-                self.image = cv2.imread(path).astype(np.uint8)
+                self.image = read_img(img_path=path, greyscale=greyscale, clahe=clahe)
+                #self.image = cv2.imread(path).astype(np.uint8)
 
             else:
                 raise InvalidFileTypeError(msg=f"Cannot crop a {ext} file.", source=self.__class__.__name__)
@@ -75,7 +76,6 @@ class ROISelector(object):
 
         self.img_cpy = self.image.copy()
         self.w, self.h = self.image.shape[1], self.image.shape[0]
-
         if title is None:
             self.title = "Draw ROI - Press ESC when drawn"
         else:
@@ -98,6 +98,7 @@ class ROISelector(object):
 
     def run(self):
         cv2.namedWindow(self.title, cv2.WINDOW_NORMAL)
+        cv2.resizeWindow(self.title, self.w, self.h)
         cv2.setMouseCallback(self.title, self.mouse_callback)
         while not self.terminate:
             if self.selecting_roi or self.img_cpy is None:

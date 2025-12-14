@@ -61,7 +61,7 @@ from simba.utils.read_write import (
     find_all_videos_in_directory, find_core_cnt,
     find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data,
     read_config_entry, read_config_file, read_frm_of_video,
-    read_img_batch_from_video_gpu, recursive_file_search)
+    read_img_batch_from_video_gpu, recursive_file_search, read_img)
 from simba.utils.warnings import (CropWarning, FFMpegCodecWarning,
                                   FileExistWarning, FrameRangeWarning,
                                   GPUToolsWarning, InValidUserInputWarning,
@@ -3902,6 +3902,7 @@ def create_average_frm(video_path: Union[str, os.PathLike],
 
     .. seealso:
        See :func:`simba.data_processors.cuda.image.create_average_frm_cupy`, :func:`simba.data_processors.cuda.image.create_average_frm_cuda` for GPU acceleration.
+       This one appears quicker than the GPU implementations...
 
     :param Union[str, os.PathLike] video_path: The path to the video to create the average frame from. Default: None.
     :param Optional[int] start_frm: The first frame in the segment to create the average frame from. Default: None.
@@ -3921,6 +3922,7 @@ def create_average_frm(video_path: Union[str, os.PathLike],
     check_file_exist_and_readable(file_path=video_path)
     video_meta_data = get_video_meta_data(video_path=video_path)
     cap = cv2.VideoCapture(video_path)
+    timer = SimbaTimer(start=True)
     if verbose:
         print(f'Getting average frame from {video_path}...')
     if (start_frm is not None) and (end_frm is not None):
@@ -3941,7 +3943,7 @@ def create_average_frm(video_path: Union[str, os.PathLike],
     bg_sum, frm_cnt, frm_len = None, 0, len(frame_ids)
     while frm_cnt < frm_len:
         if verbose:
-            print(f'Reading frame {frm_cnt} / {frm_len} ({video_path})...')
+            print(f'Reading frame {frm_cnt} / {frm_len-1} ({video_path})...')
         ret, frm = cap.read()
         if ret:
             if bg_sum is None:
@@ -3953,12 +3955,14 @@ def create_average_frm(video_path: Union[str, os.PathLike],
             break
     img = cv2.convertScaleAbs(bg_sum / frm_len)
     cap.release()
+    timer.stop_timer()
     if save_path is not None:
         check_if_dir_exists(in_dir=os.path.dirname(save_path), source=create_average_frm.__name__)
         cv2.imwrite(save_path, img)
         if verbose:
-            stdout_success(msg=f'Saved average frame at {save_path}', source=create_average_frm.__name__)
+            stdout_success(msg=f'Saved average frame at {save_path}', source=create_average_frm.__name__, elapsed_time=timer.elapsed_time_str)
     else:
+        if verbose: stdout_success(msg=f'Average frame computed.', source=create_average_frm.__name__,  elapsed_time=timer.elapsed_time_str)
         return img
 
 
@@ -4056,7 +4060,7 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
         avg_frm = create_average_frm(video_path=bg_video_path, start_frm=bg_start_frm, end_frm=bg_end_frm, start_time=bg_start_time, end_time=bg_end_time)
         avg_frm = cv2.resize(avg_frm, (video_meta_data['width'], video_meta_data['height']))
     else:
-        check_if_valid_img(data=avg_frm, source=f'{video_bg_subtraction_mp.__name__} avg_frm')
+        check_if_valid_img(data=avg_frm, source=f'{video_bg_subtraction.__name__} avg_frm')
         avg_frm = cv2.resize(avg_frm, (video_meta_data['width'], video_meta_data['height']))
     cap = cv2.VideoCapture(video_path)
     frm_cnt = 0
@@ -4128,27 +4132,22 @@ def _bg_remover_mp(frm_range: Tuple[int, np.ndarray],
     cap = cv2.VideoCapture(video_path)
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
     save_path = os.path.join(temp_dir, f"{batch}.mp4")
-    cap.set(1, start_frm)
     writer = cv2.VideoWriter(save_path, fourcc, video_meta_data['fps'], (video_meta_data['width'], video_meta_data['height']))
     dir, video_name, ext = get_fn_ext(filepath=video_path)
+    cap.set(1, int(start_frm))
     while current_frm <= end_frm:
         ret, frm = cap.read()
         if not ret:
             FrameRangeWarning(msg=f'Could nor read frame {current_frm} in video {video_meta_data["video_name"]}', source=_bg_remover_mp.__name__)
             break
         out_frm = deepcopy(frm)
-        if method == 'absolute':
-            diff = cv2.absdiff(frm, bg_frm)
-        elif method == 'light':
-            diff = np.abs(frm.astype(np.int16) - bg_frm.astype(np.int16)).astype(np.uint8)
-        elif method == 'dark':
-            diff = np.abs(bg_frm.astype(np.int16) - frm.astype(np.int16)).astype(np.uint8)
-        else:
-            diff = cv2.absdiff(frm, bg_frm)
+        if method == 'absolute': diff = cv2.absdiff(frm, bg_frm)
+        elif method == 'light': diff = np.abs(frm.astype(np.int16) - bg_frm.astype(np.int16)).astype(np.uint8)
+        elif method == 'dark': diff = np.abs(bg_frm.astype(np.int16) - frm.astype(np.int16)).astype(np.uint8)
+        else: diff = cv2.absdiff(frm, bg_frm)
         if len(diff.shape) != 2:
             gray_diff = (0.07 * diff[:, :, 2] + 0.72 * diff[:, :, 1] + 0.21 * diff[:, :, 0]).astype(np.uint8)
-        else:
-            gray_diff = diff
+        else: gray_diff = diff
         mask = np.where(gray_diff > threshold, 1, 0).astype(np.uint8)
         out_frm[mask == 0] = bg_clr
         if fg_clr is not None:
@@ -4171,7 +4170,7 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
                             bg_end_frm: Optional[int] = None,
                             bg_start_time: Optional[str] = None,
                             bg_end_time: Optional[str] = None,
-                            avg_frm: Optional[np.ndarray] = None,
+                            avg_frm: Optional[Union[np.ndarray, str, os.PathLike]] = None,
                             bg_color: Tuple[int, int, int] = (0, 0, 0),
                             fg_color: Optional[Tuple[int, int, int]] = None,
                             save_path: Optional[Union[str, os.PathLike]] = None,
@@ -4262,17 +4261,17 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
         opening_kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, opening_kernel_size)
     if avg_frm is None:
         bg_frm = create_average_frm(video_path=bg_video_path, start_frm=bg_start_frm, end_frm=bg_end_frm, start_time=bg_start_time, end_time=bg_end_time)
-        #bg_frm = bg_frm[:, :, ::-1]
     else:
+        if isinstance(avg_frm, (str, os.PathLike)):
+            check_file_exist_and_readable(file_path=avg_frm, raise_error=True)
+            avg_frm = read_img(img_path=avg_frm, greyscale=False, clahe=False)
         check_if_valid_img(data=avg_frm, source=f'{video_bg_subtraction_mp.__name__} avg_frm')
         bg_frm = np.copy(avg_frm)
     bg_frm = cv2.resize(bg_frm, (video_meta_data['width'], video_meta_data['height']))
     frm_list = np.array_split(list(range(0, video_meta_data['frame_count'])), core_cnt)
     frm_data = []
-
     if platform.system() == "Darwin":
         multiprocessing.set_start_method("spawn", force=True)
-
     for c, i in enumerate(frm_list):
         frm_data.append((c, i))
     with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
@@ -4999,6 +4998,23 @@ def get_async_frame_batch(batch_reader: AsyncVideoFrameReader, timeout: int = 10
     else:
         return x
 
+
+#if __name__ == "__main__":
+# VIDEO_PATH = r"D:\troubleshooting\maplight_ri\project_folder\blob\videos\111.mp4"
+# AVG_FRM   = r"D:\troubleshooting\maplight_ri\project_folder\blob\Trial_1_C24_D1_1_bg_removed.png"
+# SAVE_PATH = r"D:\troubleshooting\maplight_ri\project_folder\blob\Trial_1_C24_D1_1_bg_removed.mp4"
+#
+# video_bg_subtraction_mp(video_path=VIDEO_PATH, avg_frm=AVG_FRM, save_path=SAVE_PATH, core_cnt=28, verbose=True, gpu=True, threshold=175)
+
+
+# VIDEO_PATH = "/mnt/d/troubleshooting/maplight_ri/project_folder/blob/videos/Trial_1_C24_D1_1.mp4"
+# SAVE_PATH  = "/mnt/d/troubleshooting/maplight_ri/project_folder/blob/Trial_1_C24_D1_1_bg_removed.png"
+# VIDEO_PATH = "/mnt/d/troubleshooting/maplight_ri/project_folder/blob/videos/111.mp4"
+#
+#
+#
+# create_average_frm(video_path=VIDEO_PATH, start_frm=0, end_frm=8992, save_path=SAVE_PATH, verbose=True)
+#
 
 
 

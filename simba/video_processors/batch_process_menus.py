@@ -81,7 +81,7 @@ class BatchProcessFrame(PopUpMixin):
         self.max_char_vid_name = len(max(list(self.videos_in_dir_dict.keys()), key=len))
         self.root.lift()
         self.root.attributes("-topmost", True)
-        self.root.after(100, lambda: self.root.attributes("-topmost", False))
+        self.root.after(50, lambda: self.root.attributes("-topmost", False))
 
     def get_input_files(self):
         for file_path in glob.glob(self.input_dir + "/*"):
@@ -266,24 +266,24 @@ class BatchProcessFrame(PopUpMixin):
             self.videos[name]["apply_clahe_cbox"], self.videos[name]["apply_clahe_cb_var"] = SimbaCheckbox(parent=self.videos_frm, txt='', cmd=None)
             self.videos[name]["video_quality_dropdown"] = SimBADropDown(parent=self.videos_frm, label="", dropdown_options=self.cpu_video_quality, value=60, dropdown_width=10)
 
-            self.videos[name]["video_name_lbl"].grid(row=row, column=0, sticky=W)
-            self.videos[name]["crop_btn"].grid(row=row, column=2)
-            self.videos[name]["start_entry"].grid(row=row, column=3, sticky=NW)
-            self.videos[name]["end_entry"].grid(row=row, column=4, padx=5)
-            self.videos[name]["clip_cb"].grid(row=row, column=5, sticky=W, padx=5)
-            self.videos[name]["width_entry"].grid(row=row, column=6, padx=5)
-            self.videos[name]["height_entry"].grid(row=row, column=7, padx=5)
-            self.videos[name]["downsample_cb"].grid(row=row, column=8, sticky=W, padx=5)
-            self.videos[name]["fps_entry"].grid(row=row, column=9, padx=5)
-            self.videos[name]["fps_cb"].grid(row=row, column=10, sticky=W, padx=5)
-            self.videos[name]["grayscale_cbox"].grid(row=row, column=11, sticky=W, padx=5)
-            self.videos[name]["frame_cnt_cbox"].grid(row=row, column=12, sticky=W, padx=5)
-            self.videos[name]["apply_clahe_cbox"].grid(row=row, column=13, sticky=W, padx=5)
+            self.videos[name]["video_name_lbl"].grid(row=row, column=0, sticky=W, pady=(3, 3))
+            self.videos[name]["crop_btn"].grid(row=row, column=2, pady=(3, 3))
+            self.videos[name]["start_entry"].grid(row=row, column=3, sticky=W, pady=(3, 3))
+            self.videos[name]["end_entry"].grid(row=row, column=4, padx=5, pady=(3, 3))
+            self.videos[name]["clip_cb"].grid(row=row, column=5, sticky=W, padx=5, pady=(3, 3))
+            self.videos[name]["width_entry"].grid(row=row, column=6, padx=5, pady=(3, 3))
+            self.videos[name]["height_entry"].grid(row=row, column=7, padx=5, pady=(3, 3))
+            self.videos[name]["downsample_cb"].grid(row=row, column=8, sticky=W, padx=5, pady=(3, 3))
+            self.videos[name]["fps_entry"].grid(row=row, column=9, padx=5, pady=(3, 3))
+            self.videos[name]["fps_cb"].grid(row=row, column=10, sticky=W, padx=5, pady=(3, 3))
+            self.videos[name]["grayscale_cbox"].grid(row=row, column=11, sticky=W, padx=5, pady=(3, 3))
+            self.videos[name]["frame_cnt_cbox"].grid(row=row, column=12, sticky=W, padx=5, pady=(3, 3))
+            self.videos[name]["apply_clahe_cbox"].grid(row=row, column=13, sticky=W, padx=5, pady=(3, 3))
             try:
-                self.videos[name]["video_quality_dropdown"].grid_remove(row=row, column=14, sticky=NW)
+                self.videos[name]["video_quality_dropdown"].grid_remove(row=row, column=14, sticky=W)
             except:
                 pass
-            self.videos[name]["video_quality_dropdown"].grid(row=row, column=14, sticky=NW)
+            self.videos[name]["video_quality_dropdown"].grid(row=row, column=14, sticky=W)
             if video_cnt != len(self.videos_in_dir_dict.keys()) -1:
                 sep = SimBASeperator(parent=self.videos_frm, orient='horizontal', height=1, color="#ccc")
                 sep.grid(row=row + 1, column=0, columnspan=15, sticky="ew")

@@ -6,7 +6,7 @@ import math
 import os
 import time
 from typing import Optional, Tuple, Union
-
+import multiprocessing as mp
 try:
     from typing import Literal
 except:
@@ -26,8 +26,7 @@ import numpy as np
 from numba import cuda
 from numba.core.errors import NumbaPerformanceWarning
 
-from simba.data_processors.cuda.utils import (_cuda_luminance_pixel_to_grey,
-                                              _cuda_mse, _is_cuda_available)
+from simba.data_processors.cuda.utils import (_cuda_luminance_pixel_to_grey, _cuda_mse, _is_cuda_available)
 from simba.mixins.image_mixin import ImageMixin
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
@@ -41,7 +40,7 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 is_video_color)
 from simba.utils.data import (create_color_palette,
                               find_frame_numbers_from_time_stamp)
-from simba.utils.enums import Formats
+from simba.utils.enums import Formats, OS
 from simba.utils.errors import (FFMPEGCodecGPUError, FrameRangeError,
                                 InvalidInputError, SimBAGPUError)
 from simba.utils.printing import SimbaTimer, stdout_success
@@ -49,9 +48,11 @@ from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
     concatenate_videos_in_folder, create_directory, get_fn_ext,
     get_memory_usage_array, get_video_meta_data, read_df,
-    read_img_batch_from_video, read_img_batch_from_video_gpu)
-from simba.video_processors.async_frame_reader import (AsyncVideoFrameReader,
-                                                       get_async_frame_batch)
+    read_img_batch_from_video, read_img_batch_from_video_gpu, read_img)
+from simba.video_processors.async_frame_reader import (AsyncVideoFrameReader, get_async_frame_batch)
+from simba.utils.lookups import get_current_time
+import platform
+
 
 warnings.simplefilter('ignore', category=NumbaPerformanceWarning)
 
@@ -59,6 +60,7 @@ warnings.simplefilter('ignore', category=NumbaPerformanceWarning)
 PHOTOMETRIC = 'photometric'
 DIGITAL = 'digital'
 THREADS_PER_BLOCK = 2024
+if platform.system() != OS.WINDOWS.value: mp.set_start_method("spawn", force=True)
 
 def create_average_frm_cupy(video_path: Union[str, os.PathLike],
                             start_frm: Optional[int] = None,
@@ -67,11 +69,12 @@ def create_average_frm_cupy(video_path: Union[str, os.PathLike],
                             end_time: Optional[str] = None,
                             save_path: Optional[Union[str, os.PathLike]] = None,
                             batch_size: Optional[int] = 3000,
-                            verbose: Optional[bool] = False) -> Union[None, np.ndarray]:
+                            verbose: Optional[bool] = False,
+                            async_frame_read: bool = False) -> Union[None, np.ndarray]:
 
     """
     Computes the average frame using GPU acceleration from a specified range of frames or time interval in a video file.
-    This average frame typically used for background substraction.
+    This average frame is typically used for background subtraction.
 
     The function reads frames from the video, calculates their average, and optionally saves the result
     to a specified file. If `save_path` is provided, the average frame is saved as an image file;
@@ -81,18 +84,29 @@ def create_average_frm_cupy(video_path: Union[str, os.PathLike],
        For CPU function see :func:`~simba.video_processors.video_processing.create_average_frm`.
        For CUDA function see :func:`~simba.data_processors.cuda.image.create_average_frm_cuda`
 
-    :param Union[str, os.PathLike] video_path:  The path to the video file from which to extract frames.
-    :param Optional[int] start_frm: The starting frame number (inclusive). Either `start_frm`/`end_frm` or `start_time`/`end_time` must be provided, but not both.
-    :param Optional[int] end_frm:  The ending frame number (exclusive).
-    :param Optional[str] start_time: The start time in the format 'HH:MM:SS' from which to begin extracting frames.
-    :param Optional[str] end_time: The end time in the format 'HH:MM:SS' up to which frames should be extracted.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/create_average_frm_cupy.csv
+       :widths: 10, 45, 45
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
+    :param Union[str, os.PathLike] video_path: The path to the video file from which to extract frames.
+    :param Optional[int] start_frm: The starting frame number (inclusive). Either `start_frm`/`end_frm` or `start_time`/`end_time` must be provided, but not both. If both `start_frm` and `end_frm` are `None`, processes all frames in the video.
+    :param Optional[int] end_frm: The ending frame number (exclusive). Either `start_frm`/`end_frm` or `start_time`/`end_time` must be provided, but not both.
+    :param Optional[str] start_time: The start time in the format 'HH:MM:SS' from which to begin extracting frames. Either `start_frm`/`end_frm` or `start_time`/`end_time` must be provided, but not both.
+    :param Optional[str] end_time: The end time in the format 'HH:MM:SS' up to which frames should be extracted. Either `start_frm`/`end_frm` or `start_time`/`end_time` must be provided, but not both.
     :param Optional[Union[str, os.PathLike]] save_path: The path where the average frame image will be saved. If `None`, the average frame is returned as a NumPy array.
     :param Optional[int] batch_size: The number of frames to process in each batch. Default is 3000. Increase if your RAM allows it.
-    :param Optional[bool] verbose:  If `True`, prints progress and informational messages during execution.
+    :param Optional[bool] verbose: If `True`, prints progress and informational messages during execution. Default: False.
+    :param bool async_frame_read: If `True`, uses asynchronous frame reading for improved performance. Default: False.
     :return: Returns `None` if the result is saved to `save_path`. Otherwise, returns the average frame as a NumPy array.
 
     :example:
     >>> create_average_frm_cupy(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled.mp4", verbose=True, start_frm=0, end_frm=9000)
+    >>> create_average_frm_cupy(video_path=r"C:\videos\my_video.mp4", start_time="00:00:00", end_time="00:01:00", async_frame_read=True, save_path=r"C:\output\avg_frame.png")
 
     """
 
@@ -105,7 +119,7 @@ def create_average_frm_cupy(video_path: Union[str, os.PathLike],
     if not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)", source=create_average_frm_cupy.__name__)
 
-
+    timer = SimbaTimer(start=True)
     if ((start_frm is not None) or (end_frm is not None)) and ((start_time is not None) or (end_time is not None)):
         raise InvalidInputError(msg=f'Pass start_frm and end_frm OR start_time and end_time', source=create_average_frm_cupy.__name__)
     elif type(start_frm) != type(end_frm):
@@ -124,30 +138,41 @@ def create_average_frm_cupy(video_path: Union[str, os.PathLike],
         check_int(name='end_frm', value=end_frm, min_value=0, max_value=video_meta_data['frame_count'])
         if start_frm > end_frm:
             raise InvalidInputError(msg=f'Start frame ({start_frm}) has to be before end frame ({end_frm}).', source=create_average_frm_cupy.__name__)
-        frame_ids = list(range(start_frm, end_frm))
+        frame_ids_lst = list(range(start_frm, end_frm))
     elif (start_time is not None) and (end_time is not None):
         check_if_string_value_is_valid_video_timestamp(value=start_time, name=create_average_frm_cupy.__name__)
         check_if_string_value_is_valid_video_timestamp(value=end_time, name=create_average_frm_cupy.__name__)
         check_that_hhmmss_start_is_before_end(start_time=start_time, end_time=end_time, name=create_average_frm_cupy.__name__)
         check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=start_time, video_path=video_path)
-        frame_ids = find_frame_numbers_from_time_stamp(start_time=start_time, end_time=end_time, fps=video_meta_data['fps'])
+        frame_ids_lst = find_frame_numbers_from_time_stamp(start_time=start_time, end_time=end_time, fps=video_meta_data['fps'])
     else:
-        frame_ids = list(range(0, video_meta_data['frame_count']))
-    frame_ids = [frame_ids[i:i+batch_size] for i in range(0,len(frame_ids),batch_size)]
+        frame_ids_lst = list(range(0, video_meta_data['frame_count']))
+    frame_ids = [frame_ids_lst[i:i+batch_size] for i in range(0,len(frame_ids_lst),batch_size)]
     avg_imgs = []
+    if async_frame_read:
+        async_frm_reader = AsyncVideoFrameReader(video_path=video_path, batch_size=batch_size, max_que_size=5, start_idx=int(min(frame_ids_lst)), end_idx=int(max(frame_ids_lst))+1, verbose=True, gpu=True)
+        async_frm_reader.start()
+    else:
+        async_frm_reader = None
     for batch_cnt in range(len(frame_ids)):
         start_idx, end_idx = frame_ids[batch_cnt][0], frame_ids[batch_cnt][-1]
         if start_idx == end_idx:
             continue
-        imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=start_idx, end_frm=end_idx, verbose=verbose)
-        imgs = np.stack(list(imgs.values()), axis=0)
+        if not async_frm_reader:
+            imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=start_idx, end_frm=end_idx, verbose=verbose)
+            imgs = np.stack(list(imgs.values()), axis=0)
+        else:
+            imgs = get_async_frame_batch(batch_reader=async_frm_reader, timeout=15)[2]
         avg_imgs.append(average_3d_stack(image_stack=imgs))
     avg_img = average_3d_stack(image_stack=np.stack(avg_imgs, axis=0))
+    timer.stop_timer()
+    if async_frm_reader is not None: async_frm_reader.kill()
     if save_path is not None:
         cv2.imwrite(save_path, avg_img)
         if verbose:
-            stdout_success(msg=f'Saved average frame at {save_path}', source=create_average_frm_cupy.__name__)
+            stdout_success(msg=f'Saved average frame at {save_path}', source=create_average_frm_cupy.__name__, elapsed_time=timer.elapsed_time_str)
     else:
+        if verbose: stdout_success(msg=f'Average frame compute complete', source=create_average_frm_cupy.__name__, elapsed_time=timer.elapsed_time_str)
         return avg_img
 
 def average_3d_stack_cupy(image_stack: np.ndarray) -> np.ndarray:
@@ -195,7 +220,8 @@ def create_average_frm_cuda(video_path: Union[str, os.PathLike],
                             end_time: Optional[str] = None,
                             save_path: Optional[Union[str, os.PathLike]] = None,
                             batch_size: Optional[int] = 6000,
-                            verbose: Optional[bool] = False) -> Union[None, np.ndarray]:
+                            verbose: Optional[bool] = False,
+                            async_frame_read: bool = False) -> Union[None, np.ndarray]:
     """
     Computes the average frame using GPU acceleration from a specified range of frames or time interval in a video file.
     This average frame typically used for background substraction.
@@ -225,12 +251,10 @@ def create_average_frm_cuda(video_path: Union[str, os.PathLike],
     """
 
     if not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)",
-                                  source=create_average_frm_cuda.__name__)
+        raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)", source=create_average_frm_cuda.__name__)
 
     if ((start_frm is not None) or (end_frm is not None)) and ((start_time is not None) or (end_time is not None)):
-        raise InvalidInputError(msg=f'Pass start_frm and end_frm OR start_time and end_time',
-                                source=create_average_frm_cuda.__name__)
+        raise InvalidInputError(msg=f'Pass start_frm and end_frm OR start_time and end_time', source=create_average_frm_cuda.__name__)
     elif type(start_frm) != type(end_frm):
         raise InvalidInputError(msg=f'Pass start frame and end frame', source=create_average_frm_cuda.__name__)
     elif type(start_time) != type(end_time):
@@ -247,23 +271,32 @@ def create_average_frm_cuda(video_path: Union[str, os.PathLike],
         check_int(name='end_frm', value=end_frm, min_value=0, max_value=video_meta_data['frame_count'])
         if start_frm > end_frm:
             raise InvalidInputError(msg=f'Start frame ({start_frm}) has to be before end frame ({end_frm}).', source=create_average_frm_cuda.__name__)
-        frame_ids = list(range(start_frm, end_frm))
+        frame_ids_lst = list(range(start_frm, end_frm))
     elif (start_time is not None) and (end_time is not None):
         check_if_string_value_is_valid_video_timestamp(value=start_time, name=create_average_frm_cuda.__name__)
         check_if_string_value_is_valid_video_timestamp(value=end_time, name=create_average_frm_cuda.__name__)
         check_that_hhmmss_start_is_before_end(start_time=start_time, end_time=end_time, name=create_average_frm_cuda.__name__)
         check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=start_time, video_path=video_path)
-        frame_ids = find_frame_numbers_from_time_stamp(start_time=start_time, end_time=end_time, fps=video_meta_data['fps'])
+        frame_ids_lst = find_frame_numbers_from_time_stamp(start_time=start_time, end_time=end_time, fps=video_meta_data['fps'])
     else:
-        frame_ids = list(range(0, video_meta_data['frame_count']))
-    frame_ids = [frame_ids[i:i + batch_size] for i in range(0, len(frame_ids), batch_size)]
+        frame_ids_lst = list(range(0, video_meta_data['frame_count']))
+    frame_ids = [frame_ids_lst[i:i + batch_size] for i in range(0, len(frame_ids_lst), batch_size)]
     avg_imgs = []
+    if async_frame_read:
+        async_frm_reader = AsyncVideoFrameReader(video_path=video_path, batch_size=batch_size, max_que_size=5, start_idx=int(min(frame_ids_lst)), end_idx=int(max(frame_ids_lst))+1, verbose=True, gpu=True)
+        async_frm_reader.start()
+    else:
+        async_frm_reader = None
     for batch_cnt in range(len(frame_ids)):
         start_idx, end_idx = frame_ids[batch_cnt][0], frame_ids[batch_cnt][-1]
         if start_idx == end_idx:
             continue
-        imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=start_idx, end_frm=end_idx, verbose=verbose)
-        avg_imgs.append(_average_3d_stack_cuda(image_stack=np.stack(list(imgs.values()), axis=0)))
+        if not async_frm_reader:
+            imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=start_idx, end_frm=end_idx, verbose=verbose)
+            avg_imgs.append(_average_3d_stack_cuda(image_stack=np.stack(list(imgs.values()), axis=0)))
+        else:
+            imgs = get_async_frame_batch(batch_reader=async_frm_reader, timeout=15)[2]
+            avg_imgs.append(_average_3d_stack_cuda(image_stack=imgs))
     avg_img = average_3d_stack_cupy(image_stack=np.stack(avg_imgs, axis=0))
     if save_path is not None:
         cv2.imwrite(save_path, avg_img)
@@ -1243,12 +1276,14 @@ def bg_subtraction_cuda(video_path: Union[str, os.PathLike],
 
 
 def bg_subtraction_cupy(video_path: Union[str, os.PathLike],
-                        avg_frm: np.ndarray,
+                        avg_frm: Union[np.ndarray, str, os.PathLike],
                         save_path: Optional[Union[str, os.PathLike]] = None,
                         bg_clr: Optional[Tuple[int, int, int]] = (0, 0, 0),
                         fg_clr: Optional[Tuple[int, int, int]] = None,
                         batch_size: Optional[int] = 500,
-                        threshold: Optional[int] = 50):
+                        threshold: Optional[int] = 50,
+                        verbose: bool = True,
+                        async_frame_read: bool = True):
     """
     Remove background from videos using GPU acceleration through CuPY.
 
@@ -1274,22 +1309,29 @@ def bg_subtraction_cupy(video_path: Union[str, os.PathLike],
 
     if not _is_cuda_available()[0]:
         raise SimBAGPUError('NP GPU detected using numba.cuda', source=bg_subtraction_cupy.__name__)
+    if isinstance(avg_frm, (str, os.PathLike)):
+        check_file_exist_and_readable(file_path=avg_frm, raise_error=True)
+        avg_frm = read_img(img_path=avg_frm, greyscale=False, clahe=False)
     check_if_valid_img(data=avg_frm, source=f'{bg_subtraction_cupy}')
-    avg_frm = cp.array(avg_frm)
     check_if_valid_rgb_tuple(data=bg_clr)
     check_int(name=f'{bg_subtraction_cupy.__name__} batch_size', value=batch_size, min_value=1)
     check_int(name=f'{bg_subtraction_cupy.__name__} threshold', value=threshold, min_value=0, max_value=255)
     timer = SimbaTimer(start=True)
     video_meta = get_video_meta_data(video_path=video_path)
-    #print(avg_frm, avg_frm.shape, video_meta['width'], video_meta['height'])
-    #avg_frm = cv2.resize(avg_frm, (video_meta['width'], video_meta['height'], 3))
+    n, w, h = video_meta['frame_count'], video_meta['width'], video_meta['height']
+    is_video_color_bool = is_video_color(video_path)
+    is_avg_frm_color = avg_frm.ndim == 3 and avg_frm.shape[2] == 3
+    if avg_frm.shape[0] != h or avg_frm.shape[1] != w:
+        raise InvalidInputError(msg=f'The avg_frm and video must have the same resolution: avg_frm is {avg_frm.shape[1]}x{avg_frm.shape[0]}, video is {w}x{h}', source=bg_subtraction_cupy.__name__)
+    if is_video_color_bool != is_avg_frm_color:
+        video_type = 'color' if is_video_color_bool else 'grayscale'
+        avg_frm_type = 'color' if is_avg_frm_color else 'grayscale'
+        raise InvalidInputError(msg=f'Color/grayscale mismatch: video is {video_type} but avg_frm is {avg_frm_type}', source=bg_subtraction_cupy.__name__)
+
+    avg_frm = cp.array(avg_frm)
+    is_color = is_video_color_bool
     batch_cnt = int(max(1, np.ceil(video_meta['frame_count'] / batch_size)))
     frm_batches = np.array_split(np.arange(0, video_meta['frame_count']), batch_cnt)
-    n, w, h = video_meta['frame_count'], video_meta['width'], video_meta['height']
-    if is_video_color(video_path):
-        is_color = np.array([1])
-    else:
-        is_color = np.array([0])
     fourcc = cv2.VideoWriter_fourcc(*Formats.MP4_CODEC.value)
     if save_path is None:
         in_dir, video_name, _ = get_fn_ext(filepath=video_path)
@@ -1299,21 +1341,40 @@ def bg_subtraction_cupy(video_path: Union[str, os.PathLike],
         fg_clr = np.array(fg_clr)
     else:
         fg_clr = np.array([-1])
-    writer = cv2.VideoWriter(save_path, fourcc, video_meta['fps'], (w, h))
+    writer = cv2.VideoWriter(save_path, fourcc, video_meta['fps'], (w, h), isColor=is_color)
+    if async_frame_read:
+        async_frm_reader = AsyncVideoFrameReader(video_path=video_path, batch_size=batch_size, max_que_size=3, verbose=True, gpu=True)
+        async_frm_reader.start()
+    else:
+        async_frm_reader = None
     for frm_batch_cnt, frm_batch in enumerate(frm_batches):
-        print(f'Processing frame batch {frm_batch_cnt + 1} / {len(frm_batches)} (complete: {round((frm_batch_cnt / len(frm_batches)) * 100, 2)}%)')
-        batch_imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=frm_batch[0], end_frm=frm_batch[-1])
-        batch_imgs = cp.array(np.stack(list(batch_imgs.values()), axis=0).astype(np.float32))
+        if verbose: print(f'Processing frame batch {frm_batch_cnt + 1} / {len(frm_batches)} (complete: {round((frm_batch_cnt / len(frm_batches)) * 100, 2)}%, {get_current_time()})')
+        if not async_frame_read:
+            batch_imgs = read_img_batch_from_video_gpu(video_path=video_path, start_frm=frm_batch[0], end_frm=frm_batch[-1], verbose=verbose)
+            batch_imgs = cp.array(np.stack(list(batch_imgs.values()), axis=0).astype(np.float32))
+        else:
+            batch_imgs = cp.array(get_async_frame_batch(batch_reader=async_frm_reader, timeout=15)[2])
         img_diff = cp.abs(batch_imgs - avg_frm)
         if is_color:
             img_diff = img_stack_to_grayscale_cupy(imgs=img_diff, batch_size=img_diff.shape[0])
-            mask = cp.where(img_diff > threshold, 1, 0).astype(cp.uint8)
+        threshold_cp = cp.array([threshold], dtype=cp.float32)
+        mask = cp.where(img_diff > threshold_cp, 1, 0).astype(cp.uint8)
+        if is_color:
             batch_imgs[mask == 0] = bg_clr
             if fg_clr[0] != -1:
                 batch_imgs[mask == 1] = fg_clr
+        else:
+            bg_clr_gray = int(0.07 * bg_clr[2] + 0.72 * bg_clr[1] + 0.21 * bg_clr[0])
+            batch_imgs[mask == 0] = bg_clr_gray
+            if fg_clr[0] != -1:
+                fg_clr_gray = int(0.07 * fg_clr[2] + 0.72 * fg_clr[1] + 0.21 * fg_clr[0])
+                batch_imgs[mask == 1] = fg_clr_gray
         batch_imgs = batch_imgs.astype(cp.uint8).get()
         for img_cnt, img in enumerate(batch_imgs):
             writer.write(img)
+    if async_frm_reader is not None:
+        async_frm_reader.kill()
+
     writer.release()
     timer.stop_timer()
     stdout_success(msg=f'Video saved at {save_path}', elapsed_time=timer.elapsed_time_str)
@@ -1439,7 +1500,23 @@ def pose_plotter(data: Union[str, os.PathLike, np.ndarray],
         stdout_success(msg=f'Pose-estimation video saved at {save_path}.', elapsed_time=total_timer.elapsed_time_str)
 
 
+# VIDEO_PATH = "/mnt/d/troubleshooting/maplight_ri/project_folder/blob/videos/Trial_1_C24_D1_1.mp4"
+# #
+#
+#
+#
+# avg_frm = create_average_frm_cuda(video_path=VIDEO_PATH, verbose=True, batch_size=100, start_frm=0, end_frm=100, async_frame_read=True, save_path=SAVE_PATH)
+# if _
+# VIDEO_PATH = r"D:\troubleshooting\maplight_ri\project_folder\blob\videos\111.mp4"
+# AVG_FRM   = r"D:\troubleshooting\maplight_ri\project_folder\blob\Trial_1_C24_D1_1_bg_removed.png"
+# SAVE_PATH = r"D:\troubleshooting\maplight_ri\project_folder\blob\Trial_1_C24_D1_1_bg_removed.mp4"
+#
 
+
+# VIDEO_PATH = "/mnt/d/troubleshooting/maplight_ri/project_folder/blob/videos/111.mp4"
+# AVG_FRM = "/mnt/d/troubleshooting/maplight_ri/project_folder/blob/Trial_1_C24_D1_1_bg_removed.png"
+# SAVE_PATH  = "/mnt/d/troubleshooting/maplight_ri/project_folder/blob/Trial_1_C24_D1_1_bg_removed.mp4"
+# bg_subtraction_cupy(video_path=VIDEO_PATH, avg_frm=AVG_FRM, save_path=SAVE_PATH, batch_size=100, verbose=True, async_frame_read=True, threshold=240, fg_clr=(255, 0,0), bg_clr=(0, 0, 255))
 
 
 

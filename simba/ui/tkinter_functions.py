@@ -681,7 +681,7 @@ class SimBASeperator(Frame):
 
     def __init__(self,
                  parent: Union[Frame, Canvas, LabelFrame, Toplevel, Tk],
-                 color: Optional[str] = None,
+                 color: Optional[str] = 'black',
                  orient: Literal['horizontal', 'vertical'] = 'horizontal',
                  cursor: Optional[str] = None,
                  borderwidth: Optional[int] = None,
@@ -743,7 +743,7 @@ class SimBADropDown(Frame):
                 label_font: tuple = Formats.FONT_REGULAR.value,
                 label_bg_clr: Optional[str] = None,
                 dropdown_font_size: Optional[int] = None,
-                justify: str = 'center',
+                justify: Literal['left', 'right', 'center'] = 'center',
                 img: Optional[str] = None,
                 dropdown_width: Optional[int] = None,
                 command: Callable = None,

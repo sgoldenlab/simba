@@ -477,7 +477,6 @@ def get_video_meta_data(video_path: Union[str, os.PathLike, cv2.VideoCapture],
         if not valid_file:
             return None
         cap = cv2.VideoCapture(video_path)
-        cap = cv2.VideoCapture(video_path)
         _, video_data["video_name"], _ = get_fn_ext(video_path)
     elif isinstance(video_path, cv2.VideoCapture):
         cap = video_path

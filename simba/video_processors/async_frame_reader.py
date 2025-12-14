@@ -13,6 +13,7 @@ from simba.utils.printing import SimbaTimer
 from simba.utils.read_write import (get_video_meta_data,
                                     read_img_batch_from_video,
                                     read_img_batch_from_video_gpu)
+from simba.utils.lookups import get_current_time
 
 
 class AsyncVideoFrameReader:
@@ -80,17 +81,17 @@ class AsyncVideoFrameReader:
                 if self._stop:
                     break
                 if self.gpu:
-                    imgs = read_img_batch_from_video_gpu(video_path=self.video_path, start_frm=batch_start_idx, end_frm=batch_end_idx-1, greyscale=self.greyscale, black_and_white=self.black_and_white)
+                    imgs = read_img_batch_from_video_gpu(video_path=self.video_path, start_frm=batch_start_idx, end_frm=batch_end_idx-1, greyscale=self.greyscale, black_and_white=self.black_and_white, verbose=False)
                 else:
-                    imgs = read_img_batch_from_video(video_path=self.video_path, start_frm=batch_start_idx, end_frm=batch_end_idx-1, greyscale=self.greyscale, black_and_white=self.black_and_white, clahe=self.clahe)
+                    imgs = read_img_batch_from_video(video_path=self.video_path, start_frm=batch_start_idx, end_frm=batch_end_idx-1, greyscale=self.greyscale, black_and_white=self.black_and_white, clahe=self.clahe, verbose=False)
                 imgs = np.stack(list(imgs.values()), axis=0)
                 self.frame_queue.put((batch_start_idx, batch_end_idx-1, imgs))
                 batch_timer.stop_timer()
                 if self.verbose:
-                    print(f'[{self.__class__.__name__}] ({self.video_meta_data["video_name"]}) frames queued {batch_start_idx}-{batch_end_idx-1} (elapsed time: {batch_timer.elapsed_time_str}s).')
+                    print(f'{get_current_time()} [{self.__class__.__name__}] ({self.video_meta_data["video_name"]}) frames queued {batch_start_idx}-{batch_end_idx-1} (of: {self.video_meta_data["frame_count"]}, elapsed time: {batch_timer.elapsed_time_str}s).')
         except Exception as e:
             if self.verbose:
-                print(f"[{self.__class__.__name__}] ERROR: {e.args}")
+                print(f"{get_current_time()} [{self.__class__.__name__}] ERROR: {e.args}")
             self.frame_queue.put(e)
         finally:
             self.frame_queue.put(None)
@@ -113,7 +114,7 @@ class AsyncVideoFrameReader:
         self.frame_queue, self.batch_end_idxs, self.video_meta_data  = None, None, None
         self.video_path, self._stop = None, None
         if self.verbose:
-            print(f"[{self.__class__.__name__}] Reader thread killed and state cleared.")
+            print(f"{get_current_time()} [{self.__class__.__name__}] Reader thread killed and state cleared.")
 
     def is_running(self) -> bool:
         return self._thread is not None and self._thread.is_alive() and not self._stop
