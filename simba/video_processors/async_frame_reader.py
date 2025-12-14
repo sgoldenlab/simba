@@ -9,11 +9,11 @@ from simba.utils.checks import (check_instance, check_int,
                                 check_nvidea_gpu_available,
                                 check_valid_boolean)
 from simba.utils.errors import SimBAGPUError
+from simba.utils.lookups import get_current_time
 from simba.utils.printing import SimbaTimer
 from simba.utils.read_write import (get_video_meta_data,
                                     read_img_batch_from_video,
                                     read_img_batch_from_video_gpu)
-from simba.utils.lookups import get_current_time
 
 
 class AsyncVideoFrameReader:
