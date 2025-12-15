@@ -178,7 +178,7 @@ from simba.ui.pop_ups.video_processing_pop_up import (
     ConvertROIDefinitionsPopUp, CreateAverageFramePopUp, CreateGIFPopUP,
     CropVideoCirclesPopUp, CropVideoPolygonsPopUp, CropVideoPopUp,
     CrossfadeVideosPopUp, DownsampleMultipleVideosPopUp,
-    DownsampleSingleVideoPopUp, ExtractAllFramesPopUp, ExtractSEQFramesPopUp,
+    DownsampleSingleVideoPopUp, ExtractSEQFramesPopUp,
     ExtractSpecificFramesPopUp, FlipVideosPopUp, GreyscaleSingleVideoPopUp,
     ImportFrameDirectoryPopUp, InitiateClipMultipleVideosByFrameNumbersPopUp,
     InitiateClipMultipleVideosByTimestampsPopUp, InteractiveClahePopUp,

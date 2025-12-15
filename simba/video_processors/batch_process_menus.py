@@ -360,7 +360,7 @@ class BatchProcessFrame(PopUpMixin):
         codecs = get_ffmpeg_encoders(alphabetically_sorted=True)
         fonts = list(get_fonts().keys())
         pref_frm = CreateLabelFrameWithIcon(parent=self.preferences_frm, header='SETTINGS', icon_name='settings')
-        self.codec_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=codecs, label='CODEC:', label_width=25, value=self.settings['codec'], dropdown_width=30)
+        self.codec_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=codecs, label='CODEC:', label_width=25, value=self.settings['codec'], dropdown_width=30, searchable=True)
         self.font_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=fonts, label='FONT:', label_width=25, value=self.settings['font'], dropdown_width=30)
         self.font_size_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=list(range(1, 61)), label='FONT SIZE:', label_width=25, value=self.settings['font_size'], dropdown_width=30)
         self.text_loc_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=Formats.TXT_LOCATIONS.value, label='TEXT LOCATION:', label_width=25, value=self.settings['txt_loc'], dropdown_width=30)
@@ -506,7 +506,7 @@ class BatchProcessFrame(PopUpMixin):
             if video_data["fps"]:
                 check_float(value=video_data["fps_settings"]["fps"], min_value=0, name=f"FPS settings for video {video_name}")
 
-        ffmpeg_runner = FFMPEGCommandCreator(json_path=self.save_path)
+        ffmpeg_runner = FFMPEGCommandCreator(json_path=self.save_path, codec=self.settings['codec'])
         ffmpeg_runner.crop_videos()
         ffmpeg_runner.clip_videos()
         ffmpeg_runner.downsample_videos()

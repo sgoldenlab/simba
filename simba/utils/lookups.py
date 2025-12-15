@@ -1163,54 +1163,9 @@ def intermittent_palette(n: int = 10,
 
 
 
-#
-# display_resolution = get_display_resolution()
-# img_size = (3000, 600)
-# _get_img_resize_info(img_size=img_size, display_resolution=display_resolution)
-#
 
-#
-# def rao_spacing_critical_values():
-#     {4.0: 186.45,
-#      5.0: 183.44,
-#      6.0: 180.65,
-#      7.0: 177.83,
-#      8.0: 175.68,
-#      9.0: 173.68,
-#      10.0: 171.98,
-#      11.0: 170.45,
-#      12.0: 169.09,
-#      13.0: 167.87,
-#      14.0: 166.76,
-#      15.0: 165.75,
-#      16.0: 164.83,
-#      17.0: 163.98,
-#      18.0: 163.2,
-#      19.0: 162.47,
-#      20.0: 161.79,
-#      21.0: 161.16,
-#      22.0: 160.56,
-#      23.0: 160.01,
-#      24.0: 159.48,
-#      25.0: 158.99,
-#      26.0: 158.52,
-#      27.0: 158.07,
-#      28.0: 157.65,
-#      29.0: 157.25,
-#      30.0: 156.87,
-#      35.0: 155.19,
-#      40.0: 153.82,
-#      45.0: 152.68,
-#      50.0: 151.7,
-#      75.0: 148.34,
-#      100.0: 146.29,
-#      150.0: 143.83,
-#      200.0: 142.35,
-#      300.0: 140.57,
-#      400.0: 139.5,
-#      500.0: 138.77,
-#      600.0: 138.23,
-#      700.0: 137.8,
-#      800.0: 137.46,
-#      900.0: 137.18,
-#      1000.0: 136.94}
+def quality_pct_to_crf(pct: int) -> int:
+    check_int(name=f'{quality_pct_to_crf.__name__} pct', min_value=1, max_value=100, raise_error=True, value=pct)
+    quality_lk = {int(k):v for k, v in percent_to_crf_lookup().items()}
+    closest_key = min(quality_lk, key=lambda k: abs(k - pct))
+    return quality_lk[closest_key]

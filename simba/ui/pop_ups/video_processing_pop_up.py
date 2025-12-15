@@ -139,11 +139,11 @@ class CropVideoPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CROP VIDEO(S)", icon='crop')
         crop_video_lbl_frm = LabelFrame( self.main_frm, text="CROP SINGLE VIDEO", font=Formats.FONT_HEADER.value)
-
         gpu_state = NORMAL if check_nvidea_gpu_available() else DISABLED
         selected_video = FileSelect(crop_video_lbl_frm, "VIDEO PATH: ", title="Select a video file", lblwidth=20, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='browse')
         self.single_video_gpu_dropdown = SimBADropDown(parent=crop_video_lbl_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ',label_width=20, dropdown_width=20, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
-        button_crop_video_single = SimbaButton(parent=crop_video_lbl_frm, txt="CROP SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=crop_single_video, cmd_kwargs={'file_path': lambda: selected_video.file_path, 'gpu': lambda: str_2_bool(self.single_video_gpu_dropdown.get_value())})
+        self.single_quality_dropdown = SimBADropDown(parent=crop_video_lbl_frm, dropdown_options=list(range(1, 101, 1)), label='OUTPUT VIDEO QUALITY: ',label_width=20, dropdown_width=20, value=60, img='pct_2', tooltip_key="OUPUT_VIDEO_QUALITY")
+        button_crop_video_single = SimbaButton(parent=crop_video_lbl_frm, txt="CROP SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=crop_single_video, cmd_kwargs={'file_path': lambda: selected_video.file_path, 'gpu': lambda: str_2_bool(self.single_video_gpu_dropdown.get_value()), 'quality': lambda: int(self.single_quality_dropdown.get_value())})
 
         crop_video_lbl_frm_multiple = LabelFrame(self.main_frm, text="CROP MULTIPLE VIDEOS", font=Formats.FONT_HEADER.value, padx=5, pady=5)
         instructions_1 = SimBALabel(parent=crop_video_lbl_frm_multiple, txt="The crop coordinates you draw in the first video,\n will be applied on all videos in directory.", font=Formats.FONT_REGULAR_ITALICS.value)
@@ -151,13 +151,15 @@ class CropVideoPopUp(PopUpMixin):
         input_folder = FolderSelect(crop_video_lbl_frm_multiple, "VIDEO DIRECTORY:", title="Select Folder with videos", lblwidth=20, lbl_icon='browse')
         output_folder = FolderSelect(crop_video_lbl_frm_multiple,"OUTPUT DIRECTORY:",title="Select a folder for your output videos",lblwidth=20, lbl_icon='browse')
         self.multiple_video_gpu_dropdown = SimBADropDown(parent=crop_video_lbl_frm_multiple, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ',label_width=20, dropdown_width=20, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
+        self.multiple_quality_dropdown = SimBADropDown(parent=crop_video_lbl_frm_multiple, dropdown_options=list(range(1, 101, 1)), label='OUTPUT VIDEO QUALITY: ',label_width=20, dropdown_width=20, value=60, img='pct_2', tooltip_key="OUPUT_VIDEO_QUALITY")
 
-        button_crop_video_multiple = SimbaButton(parent=crop_video_lbl_frm_multiple, txt="CROP VIDEO DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=crop_multiple_videos, cmd_kwargs={'directory_path': lambda:input_folder.folder_path, 'output_path': lambda:output_folder.folder_path,  'gpu': str_2_bool(self.multiple_video_gpu_dropdown.get_value())})
+        button_crop_video_multiple = SimbaButton(parent=crop_video_lbl_frm_multiple, txt="CROP VIDEO DIRECTORY", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=crop_multiple_videos, cmd_kwargs={'directory_path': lambda:input_folder.folder_path, 'output_path': lambda:output_folder.folder_path, 'quality': lambda: int(self.multiple_quality_dropdown.get_value()), 'gpu': str_2_bool(self.multiple_video_gpu_dropdown.get_value())})
 
         crop_video_lbl_frm.grid(row=0, sticky=NW)
         selected_video.grid(row=0, sticky=NW)
         self.single_video_gpu_dropdown.grid(row=1, column=0, sticky=NW)
-        button_crop_video_single.grid(row=2, sticky=NW)
+        self.single_quality_dropdown.grid(row=2, column=0, sticky=NW)
+        button_crop_video_single.grid(row=3, sticky=NW)
 
         crop_video_lbl_frm_multiple.grid(row=1, sticky=NW)
         instructions_1.grid(row=0, sticky=NW)
@@ -165,7 +167,8 @@ class CropVideoPopUp(PopUpMixin):
         input_folder.grid(row=2, sticky=NW)
         output_folder.grid(row=3, sticky=NW)
         self.multiple_video_gpu_dropdown.grid(row=4, sticky=NW)
-        button_crop_video_multiple.grid(row=5, sticky=NW)
+        self.multiple_quality_dropdown.grid(row=5, column=0, sticky=NW)
+        button_crop_video_multiple.grid(row=6, sticky=NW)
         self.main_frm.mainloop()
 
 #_ = CropVideoPopUp()
@@ -176,24 +179,28 @@ class ClipVideoPopUp(PopUpMixin):
         selected_video_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="Video path", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         selected_video = FileSelect(selected_video_frm, "FILE PATH: ", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
         selected_video.grid(row=0, column=0, sticky="NW")
-        use_gpu_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GPU", icon_name='gpu_3', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5)
+
+
+        settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GPU", icon_name='gpu_3', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5)
         gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
-        self.gpu_dropdown = SimBADropDown(parent=use_gpu_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ',label_width=20, dropdown_width=20, value='FALSE', img='gpu_3', state=gpu_available, tooltip_key='USE_GPU')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ',label_width=35, dropdown_width=20, value='FALSE', img='gpu_3', state=gpu_available, tooltip_key='USE_GPU')
+        self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 101, 1)), label='OUTPUT VIDEO QUALITY: ', label_width=35, dropdown_width=20, value=60, img='pct_2', tooltip_key='OUPUT_VIDEO_QUALITY')
         self.gpu_dropdown.grid(row=0, column=0, sticky=NW)
+        self.quality_dropdown.grid(row=1, column=0, sticky=NW)
 
         method_1_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="METHOD 1", icon_name='circle_black', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5)
         label_set_time_1 = SimBALabel(parent=method_1_frm, txt="Please enter the time frame in HH:MM:SS format", font=Formats.FONT_REGULAR_ITALICS.value)
-        start_time = Entry_Box(method_1_frm,  fileDescription="Start at (HH:MM:SS):", labelwidth=22, img='play')
-        end_time = Entry_Box(method_1_frm, fileDescription="End at (HH:MM:SS):", labelwidth=22, img='stop')
+        start_time = Entry_Box(method_1_frm,  fileDescription="Start at (HH:MM:SS):", labelwidth=22, img='play', justify='center')
+        end_time = Entry_Box(method_1_frm, fileDescription="End at (HH:MM:SS):", labelwidth=22, img='stop', justify='center')
         CreateToolTip(method_1_frm, "Method 1 will retrieve the specified time input. (eg: input of Start at: 00:00:00, End at: 00:01:00, will create a new video from the chosen video from the very start till it reaches the first minute of the video)")
 
         method_2_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="METHOD 2", icon_name='circle_black', icon_link=Links.VIDEO_TOOLS.value, padx=5, pady=5)
-        method_2_time = Entry_Box(method_2_frm, "Seconds:", "22", validation="numeric", img='timer')
+        method_2_time = Entry_Box(method_2_frm, "Seconds:", "22", validation="numeric", img='timer', justify='center')
         label_method_2 = SimBALabel(parent=method_2_frm, txt="Method 2 will retrieve from the end of the video (e.g.,: an input of 3 seconds will get rid of the first 3 seconds of the video).", font=Formats.FONT_REGULAR_ITALICS.value)
-        button_cutvideo_method_1 = SimbaButton(parent=method_1_frm, txt="CUT VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=clip_video_in_range, cmd_kwargs={'file_path': lambda: selected_video.file_path, 'start_time': lambda:start_time.entry_get, 'end_time': lambda:end_time.entry_get, 'gpu': lambda: str_2_bool(self.gpu_dropdown.get_value())})
-        button_cutvideo_method_2 = SimbaButton(parent=method_2_frm, txt="CUT VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=remove_beginning_of_video, cmd_kwargs={'file_path': lambda:selected_video.file_path, 'time': lambda:method_2_time.entry_get, 'gpu': lambda: str_2_bool(self.gpu_dropdown.get_value())})
+        button_cutvideo_method_1 = SimbaButton(parent=method_1_frm, txt="CUT VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=clip_video_in_range, cmd_kwargs={'file_path': lambda: selected_video.file_path, 'quality': lambda: self.quality_dropdown.get_value(), 'start_time': lambda:start_time.entry_get.strip(), 'end_time': lambda:end_time.entry_get.strip(), 'gpu': lambda: str_2_bool(self.gpu_dropdown.get_value())})
+        button_cutvideo_method_2 = SimbaButton(parent=method_2_frm, txt="CUT VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=remove_beginning_of_video, cmd_kwargs={'file_path': lambda:selected_video.file_path, 'time': lambda:method_2_time.entry_get, 'gpu': lambda: str_2_bool(self.gpu_dropdown.get_value()), 'quality': lambda: self.quality_dropdown.get_value()})
         selected_video_frm.grid(row=0, sticky=NW)
-        use_gpu_frm.grid(row=1, column=0, sticky=NW)
+        settings_frm.grid(row=1, column=0, sticky=NW)
         method_1_frm.grid(row=2, sticky=NW, pady=5)
         label_set_time_1.grid(row=0, sticky=NW)
         start_time.grid(row=1, sticky=NW)

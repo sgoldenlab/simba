@@ -20,5 +20,6 @@
   "CPU_TIMEBINS_MOVEMENT": "If the total number of time bins over all videos is expected to be many (1000+), consider higher CPU count (>1) for acceptable speed.",
   "SHOW_ANIMAL_BBOX": "Display rectangle bounding boxes encompassing all animal keypoints",
   "BORDER_BG_COLOR": "The color of the border image on which data is printed",
-  "USE_GPU": "If GPU available and selected, then potentially faster processing times."
+  "USE_GPU": "If GPU available and selected, then potentially faster processing times.",
+  "OUPUT_VIDEO_QUALITY": "Higher values produce larger, higher quality, videos. Lower values produce smaller, lower quality videos. \nScale not linear. Avoid values above 80 if possible. 60 generally works well."
 }

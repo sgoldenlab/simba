@@ -53,7 +53,7 @@ from simba.utils.errors import (CountError, DirectoryExistError,
 from simba.utils.lookups import (get_ffmpeg_crossfade_methods, get_fonts,
                                  get_named_colors, percent_to_crf_lookup,
                                  percent_to_qv_lk,
-                                 video_quality_to_preset_lookup)
+                                 video_quality_to_preset_lookup, quality_pct_to_crf)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
@@ -695,7 +695,7 @@ def change_single_video_fps(file_path: Union[str, os.PathLike],
     if gpu:
         cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
     else:
-        cmd = f'ffmpeg -i "{file_path}" -filter:v fps=fps={fps} -c:v {codec} -c:a aac "{save_path}" -crf {quality} -loglevel error -stats -hide_banner -y'
+        cmd = f'ffmpeg -i "{file_path}" -filter:v fps=fps={fps} -c:v {codec} -crf {quality} -c:a aac "{save_path}" -loglevel error -stats -hide_banner -y'
     subprocess.call(cmd, shell=True)
     timer.stop_timer()
     if verbose: stdout_success(msg=f'SIMBA COMPLETE: FPS of video {file_name} changed from {str(video_meta_data["fps"])} to {str(fps)} and saved in directory {save_path}', elapsed_time=timer.elapsed_time_str, source=change_single_video_fps.__name__)
@@ -1031,6 +1031,7 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
 
 def remove_beginning_of_video(file_path: Union[str, os.PathLike],
                               time: int,
+                              quality: int = 60,
                               save_path: Optional[Union[str, os.PathLike]] = None,
                               gpu: Optional[bool] = False) -> None:
 
@@ -1055,6 +1056,8 @@ def remove_beginning_of_video(file_path: Union[str, os.PathLike],
     check_file_exist_and_readable(file_path=file_path)
     video_meta_data = get_video_meta_data(video_path=file_path)
     check_int(name="Cut time", value=time, min_value=1)
+    check_int(name=f'{remove_beginning_of_video.__name__} quality', value=quality, min_value=1, max_value=100, raise_error=True)
+    quality_crf = quality_pct_to_crf(pct=int(quality))
     time = int(time)
     dir, file_name, ext = get_fn_ext(filepath=file_path)
     if video_meta_data['video_length_s'] <= time:
@@ -1065,9 +1068,9 @@ def remove_beginning_of_video(file_path: Union[str, os.PathLike],
         check_if_dir_exists(in_dir=os.path.isdir(os.path.dirname(save_path)), source=f'{remove_beginning_of_video.__name__} save_path', create_if_not_exist=True)
         save_name = save_path
     if gpu:
-        cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -ss {time} -i "{file_path}" -c:v h264_nvenc -c:a aac "{save_name}"'
+        cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -ss {time} -i "{file_path}" -rc vbr -cq {quality_crf} -c:v h264_nvenc -c:a aac "{save_name}" -loglevel error -stats -hide_banner -y'
     else:
-        cmd = f'ffmpeg -ss {time} -i "{file_path}" -c:v libx264 -c:a aac "{save_name}" -loglevel error -stats -hide_banner -y'
+        cmd = f'ffmpeg -ss {time} -i "{file_path}" -c:v libx264 -crf {quality_crf} -c:a aac "{save_name}" -loglevel error -stats -hide_banner -y'
     print(f"Removing initial {time}s from {file_name}... ")
     subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
@@ -1080,7 +1083,7 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
                         out_dir: Optional[Union[str, os.PathLike]] = None,
                         save_path: Optional[Union[str, os.PathLike]] = None,
                         codec: str = 'libvpx-vp9',
-                        quality: int = 23,
+                        quality: int = 60,
                         verbose: bool = True,
                         overwrite: Optional[bool] = False,
                         include_clip_time_in_filename: Optional[bool] = False,
@@ -1116,6 +1119,9 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
     check_that_hhmmss_start_is_before_end(start_time=start_time, end_time=end_time, name=f"{file_name} timestamps")
     check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=start_time, video_path=file_path)
     check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=end_time, video_path=file_path)
+    print(quality)
+    quality = 60 if not check_int(name='quality', value=quality, min_value=0, max_value=100, raise_error=False)[0] else int(quality)
+    quality_crf = quality_pct_to_crf(pct=quality)
     if not include_clip_time_in_filename:
         save_name = os.path.join(dir, file_name + "_clipped.mp4")
     else:
@@ -1125,11 +1131,11 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
         save_name = deepcopy(save_path)
     if os.path.isfile(save_name) and (not overwrite):
         raise FileExistError(msg=f"SIMBA ERROR: The outfile file already exist: {save_name}.", source=clip_video_in_range.__name__)
-    quality = 23 if not check_int(name='quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
+
     if gpu:
-        cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -ss {start_time} -to {end_time} -async 1 "{save_name}" -rc vbr -cq {quality} -loglevel error -stats -hide_banner -y'
+        cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -ss {start_time} -to {end_time} -async 1 -rc vbr -cq {quality_crf} "{save_name}" -loglevel error -stats -hide_banner -y'
     else:
-        cmd = f'ffmpeg -i "{file_path}" -ss {start_time} -to {end_time} -async 1 -c:v {codec} "{save_name}" -crf {quality} -loglevel error -stats -hide_banner -y'
+        cmd = f'ffmpeg -i "{file_path}" -ss {start_time} -to {end_time} -async 1 -c:v {codec} -crf {quality_crf} "{save_name}" -loglevel error -stats -hide_banner -y'
     if verbose: print(f"Clipping video {file_name} between {start_time} and {end_time}... ")
     subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
@@ -1506,7 +1512,9 @@ def multi_split_video(file_path: Union[str, os.PathLike],
 # multi_split_video(file_path=r'/Users/simon/Desktop/time_s_converted.mp4', start_times=['00:00:01', '00:00:02'], end_times=['00:00:04', '00:00:05'], gpu=False)
 
 
-def crop_single_video(file_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
+def crop_single_video(file_path: Union[str, os.PathLike],
+                      gpu: Optional[bool] = False,
+                      quality: int = 60) -> None:
     """
     Crop a single video using :func:`~simba.video_processors.roi_selector.ROISelector` interface.
 
@@ -1531,6 +1539,7 @@ def crop_single_video(file_path: Union[str, os.PathLike], gpu: Optional[bool] = 
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None", source=crop_single_video.__name__)
     check_file_exist_and_readable(file_path=file_path)
+    check_int(name=f'{crop_single_video.__name__} quality', value=quality, min_value=1, max_value=100, raise_error=True)
     _ = get_video_meta_data(video_path=file_path)
     dir_name, file_name, ext = get_fn_ext(filepath=file_path)
     roi_selector = ROISelector(path=file_path)
@@ -1541,7 +1550,7 @@ def crop_single_video(file_path: Union[str, os.PathLike], gpu: Optional[bool] = 
     if os.path.isfile(save_path):
         raise FileExistError(msg=f"SIMBA ERROR: The out file  already exist: {save_path}.", source=crop_single_video.__name__)
     timer = SimbaTimer(start=True)
-    crop_video(video_path=file_path, save_path=save_path, size=(roi_selector.width, roi_selector.height), top_left=(roi_selector.top_left[0], roi_selector.top_left[1]), gpu=gpu, verbose=False)
+    crop_video(video_path=file_path, save_path=save_path, size=(roi_selector.width, roi_selector.height), top_left=(roi_selector.top_left[0], roi_selector.top_left[1]), gpu=gpu, verbose=False, quality=quality)
     timer.stop_timer()
     stdout_success(msg=f"Video {file_name} cropped and saved at {save_path}", elapsed_time=timer.elapsed_time_str, source=crop_single_video.__name__)
 
@@ -1551,7 +1560,10 @@ def crop_single_video(file_path: Union[str, os.PathLike], gpu: Optional[bool] = 
 # crop_single_video(file_path=r'C:\Users\Nape_Computer_2\Desktop\test_videos\Box1_PM2_day_5_20211104T171021.mp4', gpu=False)
 
 
-def crop_multiple_videos(directory_path: Union[str, os.PathLike], output_path: Union[str, os.PathLike], gpu: Optional[bool] = False) -> None:
+def crop_multiple_videos(directory_path: Union[str, os.PathLike],
+                         output_path: Union[str, os.PathLike],
+                         gpu: Optional[bool] = False,
+                         quality: int = 60) -> None:
     """
     Crop multiple videos in a folder according to crop-coordinates defined in the **first** video.
 
@@ -1576,6 +1588,7 @@ def crop_multiple_videos(directory_path: Union[str, os.PathLike], output_path: U
         raise FFMPEGCodecGPUError(msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None", source=crop_multiple_videos.__name__)
     check_if_dir_exists(in_dir=directory_path)
     check_if_dir_exists(in_dir=output_path)
+    check_int(name=f'{crop_multiple_videos.__name__} quality', value=quality, min_value=1, max_value=52, raise_error=True)
     check_valid_boolean(value=[gpu], source=crop_multiple_videos.__name__)
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(msg='Cannot crop using GPU. No GPU detected through FFMPEG', source=crop_multiple_videos.__name__)
@@ -1596,7 +1609,7 @@ def crop_multiple_videos(directory_path: Union[str, os.PathLike], output_path: U
         if (roi_selector.bottom_right[0] > video_meta_data["width"]) or (roi_selector.bottom_right[1] > video_meta_data["height"]):
             raise InvalidInputError(msg=f'Cannot crop video {file_name} of size {video_meta_data["resolution_str"]} at location top left: {roi_selector.top_left}, bottom right: {roi_selector.bottom_right}', source=crop_multiple_videos.__name__)
         save_path = os.path.join(output_path, f"{file_name}_cropped.mp4")
-        crop_video(video_path=file_path, save_path=save_path, size=(roi_selector.width, roi_selector.height), top_left=(roi_selector.top_left[0], roi_selector.top_left[1]), gpu=gpu, verbose=False)
+        crop_video(video_path=file_path, save_path=save_path, size=(roi_selector.width, roi_selector.height), top_left=(roi_selector.top_left[0], roi_selector.top_left[1]), gpu=gpu, verbose=False, quality=quality)
         video_timer.stop_timer()
         print(f"Video {file_name} cropped (Video {file_cnt+1}/{len(video_paths)}, elapsed time: {video_timer.elapsed_time_str})")
     timer.stop_timer()
@@ -4899,7 +4912,7 @@ def crop_video(video_path: Union[str, os.PathLike],
                gpu: bool = False,
                codec: str = Formats.BATCH_CODEC.value,
                verbose: bool = True,
-               quality: int = 23):
+               quality: int = 60):
     """
     Crops a video from the given file at `video_path` and saves the result to `save_path`.
     Optionally uses GPU acceleration for faster processing, falling back to CPU if GPU fails.
@@ -4923,9 +4936,7 @@ def crop_video(video_path: Union[str, os.PathLike],
         raise FFMPEGCodecGPUError(msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None. Try without GPU selection", source=crop_video.__name__)
     video_meta_data = get_video_meta_data(video_path=video_path)
     check_int(name=f'{crop_video.__name__} quality', value=quality, min_value=1, max_value=100)
-    quality_lk = {int(k):v for k, v in percent_to_crf_lookup().items()}
-    closest_key = min(quality_lk, key=lambda k: abs(k - quality))
-    quality_code = quality_lk[closest_key]
+    quality_code = quality_pct_to_crf(pct=quality)
     check_if_dir_exists(in_dir=os.path.dirname(save_path))
     check_valid_tuple(x=size, source=f'{crop_video.__name__} size', accepted_lengths=(2,), valid_dtypes=(int,), min_integer=1)
     check_valid_tuple(x=top_left, source=f'{crop_video.__name__} top_left', accepted_lengths=(2,), valid_dtypes=(int,), min_integer=0)
@@ -4939,7 +4950,7 @@ def crop_video(video_path: Union[str, os.PathLike],
     width, height = int(bottom_right[0] - top_left[0]), (bottom_right[1] - top_left[1])
     width, height = (width + 1) // 2 * 2, (height + 1) // 2 * 2
     top_left_x, top_left_y = top_left[0], top_left[1]
-    gpu_cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{video_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}, format=yuv420p" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy "{save_path}" -hide_banner -loglevel error -stats -y'
+    gpu_cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{video_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}, format=yuv420p" -c:v h264_nvenc -rc vbr -cq {quality_code} -c:a copy "{save_path}" -hide_banner -loglevel error -stats -y'
     cpu_cmd = f'ffmpeg -i "{video_path}" -vf "crop={width}:{height}:{top_left_x}:{top_left_y}" -c:v {codec} -crf {quality_code} -c:a copy "{save_path}" -hide_banner -loglevel error -stats -y'
     if gpu:
         try:
