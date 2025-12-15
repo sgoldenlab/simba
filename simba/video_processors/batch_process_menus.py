@@ -23,7 +23,7 @@ from simba.utils.enums import Formats, Keys, Links, Options
 from simba.utils.errors import (FFMPEGCodecGPUError, FFMPEGNotFoundError,
                                 NoFilesFoundError)
 from simba.utils.lookups import (get_icons_paths, percent_to_crf_lookup,
-                                 video_quality_to_preset_lookup)
+                                 video_quality_to_preset_lookup, get_ffmpeg_encoders, get_fonts, get_color_dict)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
@@ -75,6 +75,7 @@ class BatchProcessFrame(PopUpMixin):
         self.cpu_video_quality = list(range(10, 110, 10))
         self.cpu_video_quality = [str(x) for x in self.cpu_video_quality]
         self.video_quality_to_preset_lookup = video_quality_to_preset_lookup()
+        self.clrs = list(get_color_dict().keys())
         self.gpu_available_state = NORMAL if check_nvidea_gpu_available() else DISABLED
         if len(list(self.videos_in_dir_dict.keys())) == 0:
             raise NoFilesFoundError(msg=f"The input directory {self.input_dir} contains ZERO video files in either .avi, .mp4, .mov, .flv, or m4v format", source=self.__class__.__name__)
@@ -241,6 +242,15 @@ class BatchProcessFrame(PopUpMixin):
         seperator = SimBASeperator(parent=self.videos_frm, orient='vertical', borderwidth=1)
         seperator.grid(row=0, column=1, rowspan=len(self.videos_in_dir_dict.keys()) + 400, sticky="ns")
 
+
+    def get_file_menu(self):
+        menu = Menu(self.root)
+        file_menu = Menu(menu)
+        menu.add_cascade(label="File", menu=file_menu, compound="left")
+        file_menu.add_command(label="Preferences...", compound="left", image=self.menu_icons["settings"]["img"], command=lambda: self.preferences_pop_up())
+        self.root.config(menu=menu)
+
+
     def create_video_rows(self):
         self.videos = {}
         for w in self.videos_frm.grid_slaves():
@@ -299,6 +309,7 @@ class BatchProcessFrame(PopUpMixin):
         self.reset_all_btn.grid(row=0, column=0, sticky=W, padx=5)
         self.reset_crop_btn.grid(row=0, column=1, sticky=W, padx=5)
         self.execute_btn.grid(row=0, column=2, sticky=W, padx=5)
+        self.get_file_menu()
 
     def reset_crop(self):
         self.crop_dict = {}
@@ -322,6 +333,29 @@ class BatchProcessFrame(PopUpMixin):
         cv2.destroyAllWindows()
         self.videos[video_name]["crop_btn"].configure(fg="red", font=('Arial', 14, 'bold'))
         self.videos[video_name]["crop_btn"].configure(image=self.red_drop_img, compound='left')
+
+    def preferences_pop_up(self):
+        if hasattr(self, 'preferences_frm'):
+            self.preferences_frm.destroy()
+
+        self.preferences_frm = Toplevel()
+        self.preferences_frm.minsize(400, 300)
+        self.preferences_frm.wm_title("PREFERENCES")
+        self.preferences_frm.iconphoto(False, self.menu_icons['settings']["img"])
+
+        codecs = get_ffmpeg_encoders(alphabetically_sorted=True)
+        fonts = list(get_fonts().keys())
+        pref_frm = CreateLabelFrameWithIcon(parent=self.preferences_frm, header='SETTINGS', icon_name='settings')
+        self.codec_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=codecs, label='CODEC:', label_width=25, value=Formats.BATCH_CODEC.value, dropdown_width=30)
+        self.font_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=fonts, label='FONT:', label_width=25, value='Arial', dropdown_width=30)
+        self.crop_thickness_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=list(range(1, 31)), label='CROP THICKNESS:', label_width=25, value=10, dropdown_width=30)
+        self.crop_color_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=self.clrs, label='CROP COLOR:', label_width=25, value=10, dropdown_width=30)
+
+        pref_frm.grid(row=0, column=0, sticky=NW)
+        self.codec_dropdown.grid(row=0, column=0, sticky=NW)
+        self.font_dropdown.grid(row=1, column=0, sticky=NW)
+        self.crop_thickness_dropdown.grid(row=2, column=0, sticky=NW)
+        self.crop_color_dropdown.grid(row=3, column=0, sticky=NW)
 
     def execute(self):
         out_video_dict = {}

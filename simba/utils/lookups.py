@@ -690,13 +690,15 @@ def get_labelling_video_kbd_bindings() -> dict:
     return cleaned_bindings
 
 
-def get_fonts():
+def get_fonts(sort_alphabetically: bool = False):
     """ Returns a dictionary with all fonts available in OS, with the font name as key and font path as value"""
     font_dict = {f.name: f.fname for f in matplotlib.font_manager.fontManager.ttflist if not f.name.startswith('.')}
     if len(font_dict) == 0:
         NoDataFoundWarning(msg='No fonts found on disk using matplotlib.font_manager', source=get_fonts.__name__)
     if platform.system() == OS.WINDOWS.value:
         font_dict = {key: str(Path(value.replace('C:', '')).as_posix()) for key, value in font_dict.items()}
+    if sort_alphabetically:
+        font_dict = dict(sorted(font_dict.items(), key=lambda x: [int(t) if t.isdigit() else t.lower() for t in re.split(r'(\d+)', x[0])]))
     return font_dict
 
 def get_log_config():
@@ -897,7 +899,7 @@ def print_video_meta_data(data_path: Union[str, os.PathLike]) -> None:
         print(f"{table} {Defaults.STR_SPLIT_DELIMITER.value}TABLE")
 
 
-def get_ffmpeg_encoders(raise_error: bool = True) -> List[str]:
+def get_ffmpeg_encoders(raise_error: bool = True, alphabetically_sorted: bool = False) -> List[str]:
     """
     Get a list of all available FFmpeg encoders.
 
@@ -930,7 +932,8 @@ def get_ffmpeg_encoders(raise_error: bool = True) -> List[str]:
             if len(parts) >= 2:
                 encoder_name = parts[1]
                 encoders.append(encoder_name)
-    return encoders
+
+    return sorted(encoders) if alphabetically_sorted else encoders
 
 
 def find_closest_string(target: str,
