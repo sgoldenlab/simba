@@ -3,10 +3,11 @@ __email__ = "sronilsson@gmail.com"
 
 
 import math
+import multiprocessing as mp
 import os
 import time
 from typing import Optional, Tuple, Union
-import multiprocessing as mp
+
 try:
     from typing import Literal
 except:
@@ -18,6 +19,7 @@ except:
     import numpy as cp
     from scipy.ndimage import rotate
 
+import platform
 import warnings
 from copy import deepcopy
 
@@ -26,7 +28,8 @@ import numpy as np
 from numba import cuda
 from numba.core.errors import NumbaPerformanceWarning
 
-from simba.data_processors.cuda.utils import (_cuda_luminance_pixel_to_grey, _cuda_mse, _is_cuda_available)
+from simba.data_processors.cuda.utils import (_cuda_luminance_pixel_to_grey,
+                                              _cuda_mse, _is_cuda_available)
 from simba.mixins.image_mixin import ImageMixin
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
@@ -40,19 +43,18 @@ from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 is_video_color)
 from simba.utils.data import (create_color_palette,
                               find_frame_numbers_from_time_stamp)
-from simba.utils.enums import Formats, OS
+from simba.utils.enums import OS, Formats
 from simba.utils.errors import (FFMPEGCodecGPUError, FrameRangeError,
                                 InvalidInputError, SimBAGPUError)
+from simba.utils.lookups import get_current_time
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
     concatenate_videos_in_folder, create_directory, get_fn_ext,
-    get_memory_usage_array, get_video_meta_data, read_df,
-    read_img_batch_from_video, read_img_batch_from_video_gpu, read_img)
-from simba.video_processors.async_frame_reader import (AsyncVideoFrameReader, get_async_frame_batch)
-from simba.utils.lookups import get_current_time
-import platform
-
+    get_memory_usage_array, get_video_meta_data, read_df, read_img,
+    read_img_batch_from_video, read_img_batch_from_video_gpu)
+from simba.video_processors.async_frame_reader import (AsyncVideoFrameReader,
+                                                       get_async_frame_batch)
 
 warnings.simplefilter('ignore', category=NumbaPerformanceWarning)
 

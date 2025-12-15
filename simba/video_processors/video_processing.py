@@ -60,8 +60,8 @@ from simba.utils.read_write import (
     concatenate_videos_in_folder, create_directory,
     find_all_videos_in_directory, find_core_cnt,
     find_files_of_filetypes_in_directory, get_fn_ext, get_video_meta_data,
-    read_config_entry, read_config_file, read_frm_of_video,
-    read_img_batch_from_video_gpu, recursive_file_search, read_img)
+    read_config_entry, read_config_file, read_frm_of_video, read_img,
+    read_img_batch_from_video_gpu, recursive_file_search)
 from simba.utils.warnings import (CropWarning, FFMpegCodecWarning,
                                   FileExistWarning, FrameRangeWarning,
                                   GPUToolsWarning, InValidUserInputWarning,

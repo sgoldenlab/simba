@@ -4,10 +4,13 @@ from typing import Optional, Tuple, Union
 import cv2
 import numpy as np
 
-from simba.utils.checks import (check_file_exist_and_readable, check_if_valid_img, check_if_valid_rgb_tuple, check_int, check_str, check_valid_boolean)
+from simba.utils.checks import (check_file_exist_and_readable,
+                                check_if_valid_img, check_if_valid_rgb_tuple,
+                                check_int, check_str, check_valid_boolean)
 from simba.utils.enums import Options
 from simba.utils.errors import InvalidFileTypeError
-from simba.utils.read_write import get_fn_ext, get_video_meta_data, read_img, read_frm_of_video
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
+                                    read_frm_of_video, read_img)
 from simba.utils.warnings import CropWarning
 
 

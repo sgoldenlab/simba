@@ -15,7 +15,8 @@ from simba.roi_tools.roi_utils import get_roi_data, multiply_ROIs
 from simba.ui.blob_quick_check_interface import BlobQuickChecker
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
                                         FolderSelect, SimbaButton,
-                                        SimBADropDown, SimBALabel, SimBASeperator)
+                                        SimBADropDown, SimBALabel,
+                                        SimBASeperator)
 from simba.utils.checks import (check_if_dir_exists, check_int,
                                 check_nvidea_gpu_available, check_str)
 from simba.utils.enums import Formats, Paths
