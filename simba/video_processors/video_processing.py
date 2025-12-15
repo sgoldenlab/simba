@@ -1002,7 +1002,7 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
         if gpu:
             if loc == 'top_left':
                 cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=10:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
-            elif loc == 'top_center':
+            elif loc == 'top_middle':
                 cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=(w-tw)/2:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'top_right':
                 cmd = f'''ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "drawtext=fontfile='{font_path}':text=%{{n}}:x=w-tw-10:y=10:fontcolor={font_color}:fontsize={fontsize}:box=1:boxcolor={bg_color}@0.5" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy -loglevel error -stats "{save_name}" -y'''
@@ -1017,6 +1017,8 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
                 cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=10: y=10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'top_middle':
                 cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=(w-tw)/2: y=10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
+            elif loc == 'top_right':
+                cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=w-tw-10: y=10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'bottom_left':
                 cmd = f'''ffmpeg -y -i "{file_path}" -c:v {codec} -crf {quality} -vf "drawtext=fontfile='{font_path}': text='%{{frame_num}}': start_number=0: x=10: y=h-th-10: fontcolor={font_color}: fontsize={fontsize}: box=1: boxcolor={bg_color}: boxborderw=5" -c:a copy -loglevel error -stats "{save_name}" -y'''
             elif loc == 'bottom_right':

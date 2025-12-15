@@ -1,14 +1,17 @@
+from typing import Optional, Tuple, Union
+try:
+    from typing import Literal
+except:
+    from typing_extensions import Literal
 import glob
 import json
 import os
 import shutil
 
-from simba.utils.checks import (check_ffmpeg_available,
-                                check_file_exist_and_readable)
+from simba.utils.checks import (check_ffmpeg_available, check_file_exist_and_readable, check_str)
 from simba.utils.enums import Formats
 from simba.utils.errors import CropError, FFMPEGNotFoundError, PermissionError
-from simba.utils.lookups import (get_current_time, get_ffmpeg_encoders,
-                                 gpu_quality_to_cpu_quality_lk)
+from simba.utils.lookups import (get_current_time, get_ffmpeg_encoders, gpu_quality_to_cpu_quality_lk)
 from simba.utils.warnings import CropWarning
 from simba.video_processors.video_processing import (change_single_video_fps,
                                                      clahe_enhance_video,
@@ -46,11 +49,12 @@ class FFMPEGCommandCreator(object):
     >>> ffmpeg_executor.move_all_processed_files_to_output_folder()
     """
 
-    def __init__(self, json_path: str):
+    def __init__(self,
+                 json_path: Union[str, os.PathLike],
+                 codec: str = 'libx264'):
 
         if not check_ffmpeg_available(raise_error=False):
             raise FFMPEGNotFoundError(msg='Cannot perform batch video processing: FFMPEG not found', source=self.__class__.__name__)
-
 
         check_file_exist_and_readable(json_path)
         with open(json_path, "r") as fp:
@@ -59,10 +63,9 @@ class FFMPEGCommandCreator(object):
         self.out_dir = self.video_dict["meta_data"]["out_dir"]
         if "gpu" in list(self.video_dict["meta_data"].keys()):
             self.gpu = self.video_dict["meta_data"]["gpu"]
-            self.quality = "medium"
         else:
             self.gpu = False
-            self.quality = 23
+        self.quality = 23
         self.temp_dir = os.path.join(self.out_dir, "temp")
         self.gpu_to_cpu_quality_lk = gpu_quality_to_cpu_quality_lk()
         self.time_format = "%H:%M:%S"
@@ -70,7 +73,8 @@ class FFMPEGCommandCreator(object):
             shutil.rmtree(self.temp_dir, ignore_errors=True)
         os.makedirs(self.temp_dir)
         self.copy_videos_to_temp_dir()
-        self.batch_codec = Formats.BATCH_CODEC.value if Formats.BATCH_CODEC.value in get_ffmpeg_encoders() else 'mpeg4'
+        check_str(name=f'{self.__class__.__name__} codec', value=codec, allow_blank=False)
+        self.batch_codec = codec if codec in get_ffmpeg_encoders() else 'mpeg4'
 
     def replace_files_in_temp(self):
         processed_files = glob.glob(self.process_dir + "/*")
@@ -160,7 +164,7 @@ class FFMPEGCommandCreator(object):
         self.replace_files_in_temp()
         print(f"Grayscale complete... ({get_current_time()})")
 
-    def apply_frame_count(self):
+    def apply_frame_count(self, font_size: int = 25, font: str = 'Arial', loc: Literal['top_left', 'top_middle', 'top_right', 'bottom_left', 'bottom_middle', 'bottom_right'] = 'bottom_middle'):
         self.videos_to_frm_cnt = self.find_relevant_videos(variable="frame_cnt")
         self.create_process_dir()
         for cnt, (video, video_data) in enumerate(self.videos_to_frm_cnt.items()):
@@ -168,17 +172,17 @@ class FFMPEGCommandCreator(object):
             if video_data["last_operation"] == "frame_cnt":
                 self.quality = video_data["output_quality"]
             in_path, out_path = video_data["path"], os.path.join(self.process_dir, os.path.basename(video_data["path"]))
-            superimpose_frame_count(file_path=in_path, gpu=self.gpu, font='Arial', save_path=out_path, loc='bottom_middle', fontsize=25, codec=self.batch_codec, quality=self.quality, verbose=False)
+            superimpose_frame_count(file_path=in_path, gpu=self.gpu, font=font, save_path=out_path, loc=loc, fontsize=font_size, codec=self.batch_codec, quality=self.quality, verbose=False)
         self.replace_files_in_temp()
         print(f"Applying frame count complete... ({get_current_time()})")
 
-    def apply_clahe(self):
+    def apply_clahe(self, tile_size: Tuple[int, int] = (16, 16), clip_limit: int = 2):
         self.videos_to_frm_cnt = self.find_relevant_videos(variable="clahe")
         self.create_process_dir()
         for cnt, (video, video_data) in enumerate(self.videos_to_frm_cnt.items()):
             print(f"Applying CLAHE {video} ({cnt+1}/{len(list(self.videos_to_frm_cnt.keys()))})... (note: process can be slow for long videos) ({get_current_time()})")
             in_path, out_path = video_data["path"], os.path.join(self.process_dir, os.path.basename(video_data["path"]))
-            clahe_enhance_video(file_path=in_path, clip_limit=2, tile_grid_size=(16, 16), out_path=out_path, verbose=False)
+            clahe_enhance_video(file_path=in_path, clip_limit=clip_limit, tile_grid_size=tile_size, out_path=out_path, verbose=False)
         self.replace_files_in_temp()
         print(f"Applying CLAHE complete... ({get_current_time()})")
 

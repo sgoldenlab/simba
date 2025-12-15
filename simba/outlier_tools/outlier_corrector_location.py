@@ -56,7 +56,7 @@ class OutlierCorrecterLocation(ConfigReader, FeatureExtractionMixin):
             self.criterion = read_config_entry(self.config, ConfigKey.OUTLIER_SETTINGS.value, ConfigKey.LOCATION_CRITERION.value, Dtypes.FLOAT.value)
         else:
             check_float(name=f'{criterion} criterion', value=criterion, min_value=10e-10)
-            self.criterion = criterion
+            self.criterion = float(criterion)
         if data_dir is not None:
             check_if_dir_exists(in_dir=data_dir, source=self.__class__.__name__)
             self.data_dir = data_dir

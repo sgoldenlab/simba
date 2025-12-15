@@ -425,7 +425,7 @@ class BlobTrackingUI(PopUpMixin):
 
 #_ = BlobTrackingUI(input_dir=r'C:\troubleshooting\blob_track_tester\videos', output_dir=r'C:\troubleshooting\blob_track_tester\results')
 
-#_ = BlobTrackingUI(input_dir=r'D:\troubleshooting\maplight_ri\project_folder\blob\videos', output_dir=r'D:\troubleshooting\maplight_ri\project_folder\blob\data')
+#_ = BlobTrackingUI(input_dir=r'D:\troubleshooting\maplight_ri\project_folder\blob\videos', output_dir=r'D:\troubleshooting\maplight_ri\project_folder\blob\batch_out_7')
 
 
 #_ = BlobTrackingUI(input_dir=r'D:\water_maze', output_dir=r'D:\water_maze\data')

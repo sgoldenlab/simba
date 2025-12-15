@@ -4,6 +4,7 @@ import json
 import os
 from tkinter import *
 from typing import Union
+from copy import deepcopy
 
 import cv2
 import PIL
@@ -19,7 +20,7 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_if_string_value_is_valid_video_timestamp,
                                 check_int, check_nvidea_gpu_available,
                                 check_that_hhmmss_start_is_before_end)
-from simba.utils.enums import Formats, Keys, Links, Options
+from simba.utils.enums import Formats, Keys, Links, Options, TextOptions
 from simba.utils.errors import (FFMPEGCodecGPUError, FFMPEGNotFoundError,
                                 NoFilesFoundError)
 from simba.utils.lookups import (get_icons_paths, percent_to_crf_lookup,
@@ -33,6 +34,16 @@ from simba.video_processors.batch_process_create_ffmpeg_commands import \
 from simba.video_processors.roi_selector import ROISelector
 
 MENU_ICONS = get_icons_paths()
+
+
+SETTINGS = {'codec': Formats.BATCH_CODEC.value,
+            'crop_color': 'Pink',
+            'font': 'Arial',
+            'crop_thickness': 10,
+            'txt_loc': 'bottom_middle',
+            'font_size': 25,
+            'clahe_clip_limit': 2,
+            'clahe_tile_size': 16}
 
 class BatchProcessFrame(PopUpMixin):
     """
@@ -74,8 +85,9 @@ class BatchProcessFrame(PopUpMixin):
         self.percent_to_crf_lookup = percent_to_crf_lookup()
         self.cpu_video_quality = list(range(10, 110, 10))
         self.cpu_video_quality = [str(x) for x in self.cpu_video_quality]
+        self.settings = deepcopy(SETTINGS)
         self.video_quality_to_preset_lookup = video_quality_to_preset_lookup()
-        self.clrs = list(get_color_dict().keys())
+        self.clrs = get_color_dict()
         self.gpu_available_state = NORMAL if check_nvidea_gpu_available() else DISABLED
         if len(list(self.videos_in_dir_dict.keys())) == 0:
             raise NoFilesFoundError(msg=f"The input directory {self.input_dir} contains ZERO video files in either .avi, .mp4, .mov, .flv, or m4v format", source=self.__class__.__name__)
@@ -246,7 +258,7 @@ class BatchProcessFrame(PopUpMixin):
     def get_file_menu(self):
         menu = Menu(self.root)
         file_menu = Menu(menu)
-        menu.add_cascade(label="File", menu=file_menu, compound="left")
+        menu.add_cascade(label="File...", menu=file_menu, compound="left")
         file_menu.add_command(label="Preferences...", compound="left", image=self.menu_icons["settings"]["img"], command=lambda: self.preferences_pop_up())
         self.root.config(menu=menu)
 
@@ -320,7 +332,7 @@ class BatchProcessFrame(PopUpMixin):
 
     def batch_process_crop_function(self, video_name):
         check_file_exist_and_readable(self.videos_in_dir_dict[video_name]["file_path"])
-        roi_selector = ROISelector(path=self.videos_in_dir_dict[video_name]["file_path"], title=f"CROP {video_name} - Press ESC when ROI drawn")
+        roi_selector = ROISelector(path=self.videos_in_dir_dict[video_name]["file_path"], title=f"CROP {video_name} - Press ESC when ROI drawn", clr=self.clrs[self.settings['crop_color']], thickness=self.settings['crop_thickness'])
         roi_selector.run()
         self.crop_dict[video_name] = {}
         self.crop_dict[video_name]["top_left_x"] = roi_selector.top_left[0]
@@ -346,16 +358,38 @@ class BatchProcessFrame(PopUpMixin):
         codecs = get_ffmpeg_encoders(alphabetically_sorted=True)
         fonts = list(get_fonts().keys())
         pref_frm = CreateLabelFrameWithIcon(parent=self.preferences_frm, header='SETTINGS', icon_name='settings')
-        self.codec_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=codecs, label='CODEC:', label_width=25, value=Formats.BATCH_CODEC.value, dropdown_width=30)
-        self.font_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=fonts, label='FONT:', label_width=25, value='Arial', dropdown_width=30)
-        self.crop_thickness_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=list(range(1, 31)), label='CROP THICKNESS:', label_width=25, value=10, dropdown_width=30)
-        self.crop_color_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=self.clrs, label='CROP COLOR:', label_width=25, value=10, dropdown_width=30)
+        self.codec_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=codecs, label='CODEC:', label_width=25, value=self.settings['codec'], dropdown_width=30)
+        self.font_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=fonts, label='FONT:', label_width=25, value=self.settings['font'], dropdown_width=30)
+        self.font_size_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=list(range(1, 61)), label='FONT SIZE:', label_width=25, value=self.settings['font_size'], dropdown_width=30)
+        self.text_loc_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=Formats.TXT_LOCATIONS.value, label='TEXT LOCATION:', label_width=25, value=self.settings['txt_loc'], dropdown_width=30)
+        self.crop_thickness_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=list(range(1, 31)), label='CROP THICKNESS:', label_width=25, value=self.settings['crop_thickness'], dropdown_width=30)
+        self.crop_color_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=list(self.clrs.keys()), label='CROP COLOR:', label_width=25, value=self.settings['crop_color'], dropdown_width=30)
+        self.clahe_clip_limit_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=list(range(1, 31)), label='CLAHE CLIP LIMIT:', label_width=25, value=self.settings['clahe_clip_limit'], dropdown_width=30)
+        self.clahe_tile_size_dropdown = SimBADropDown(parent=pref_frm, dropdown_options=list(range(1, 31)), label='CLAHE TILE SIZE:', label_width=25, value=self.settings['clahe_tile_size'], dropdown_width=30)
+        self.save_pref_btn = SimbaButton(parent=pref_frm, txt='SAVE', img='rocket', cmd=lambda: self._save_preferences())
 
         pref_frm.grid(row=0, column=0, sticky=NW)
         self.codec_dropdown.grid(row=0, column=0, sticky=NW)
         self.font_dropdown.grid(row=1, column=0, sticky=NW)
-        self.crop_thickness_dropdown.grid(row=2, column=0, sticky=NW)
-        self.crop_color_dropdown.grid(row=3, column=0, sticky=NW)
+        self.font_size_dropdown.grid(row=2, column=0, sticky=NW)
+        self.text_loc_dropdown.grid(row=3, column=0, sticky=NW)
+        self.crop_thickness_dropdown.grid(row=4, column=0, sticky=NW)
+        self.crop_color_dropdown.grid(row=5, column=0, sticky=NW)
+        self.clahe_clip_limit_dropdown.grid(row=6, column=0, sticky=NW)
+        self.clahe_tile_size_dropdown.grid(row=7, column=0, sticky=NW)
+        self.save_pref_btn.grid(row=8, column=0, sticky=NW)
+
+
+    def _save_preferences(self):
+        self.settings['codec'] = self.codec_dropdown.get_value()
+        self.settings['crop_color'] = self.crop_color_dropdown.get_value()
+        self.settings['font'] = self.font_dropdown.get_value()
+        self.settings['crop_thickness'] = int(self.crop_thickness_dropdown.get_value())
+        self.settings['font_size'] = int(self.font_size_dropdown.get_value())
+        self.settings['txt_loc'] = self.text_loc_dropdown.get_value()
+        stdout_success(msg='Preference settings updated.', source=self.__class__.__name__)
+
+
 
     def execute(self):
         out_video_dict = {}
@@ -468,11 +502,7 @@ class BatchProcessFrame(PopUpMixin):
                     name=f"Downsample height for video {video_name}",
                 )
             if video_data["fps"]:
-                check_float(
-                    value=video_data["fps_settings"]["fps"],
-                    min_value=0,
-                    name=f"FPS settings for video {video_name}",
-                )
+                check_float(value=video_data["fps_settings"]["fps"], min_value=0, name=f"FPS settings for video {video_name}")
 
         ffmpeg_runner = FFMPEGCommandCreator(json_path=self.save_path)
         ffmpeg_runner.crop_videos()
@@ -480,8 +510,8 @@ class BatchProcessFrame(PopUpMixin):
         ffmpeg_runner.downsample_videos()
         ffmpeg_runner.apply_fps()
         ffmpeg_runner.apply_grayscale()
-        ffmpeg_runner.apply_frame_count()
-        ffmpeg_runner.apply_clahe()
+        ffmpeg_runner.apply_frame_count(font_size=int(self.settings['font_size']), font=self.settings['font'], loc=self.settings['txt_loc'])
+        ffmpeg_runner.apply_clahe(clip_limit=int(self.settings['clahe_clip_limit']), tile_size=(int(self.settings['clahe_tile_size']), int(self.settings['clahe_tile_size'])))
         ffmpeg_runner.move_all_processed_files_to_output_folder()
         timer.stop_timer()
         stdout_success(msg=f"SimBA batch pre-process JSON saved at {self.save_path}", source=self.__class__.__name__)
