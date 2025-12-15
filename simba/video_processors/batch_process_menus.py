@@ -2,9 +2,9 @@ import datetime
 import glob
 import json
 import os
+from copy import deepcopy
 from tkinter import *
 from typing import Union
-from copy import deepcopy
 
 import cv2
 import PIL
