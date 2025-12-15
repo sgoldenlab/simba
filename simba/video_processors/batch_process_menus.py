@@ -23,8 +23,10 @@ from simba.utils.checks import (check_ffmpeg_available,
 from simba.utils.enums import Formats, Keys, Links, Options, TextOptions
 from simba.utils.errors import (FFMPEGCodecGPUError, FFMPEGNotFoundError,
                                 NoFilesFoundError)
-from simba.utils.lookups import (get_icons_paths, percent_to_crf_lookup,
-                                 video_quality_to_preset_lookup, get_ffmpeg_encoders, get_fonts, get_color_dict)
+from simba.utils.lookups import (get_color_dict, get_ffmpeg_encoders,
+                                 get_fonts, get_icons_paths,
+                                 percent_to_crf_lookup,
+                                 video_quality_to_preset_lookup)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video, get_fn_ext,
