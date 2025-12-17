@@ -23,6 +23,8 @@ import numpy as np
 import pandas as pd
 import trafaret as t
 from shapely.geometry import Polygon
+from multiprocessing import Pool
+import multiprocessing
 
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.enums import Formats, Keys, Options, UMAPParam
@@ -649,7 +651,6 @@ def check_ffmpeg_available(raise_error: Optional[bool] = False) -> Union[bool, N
             )
         else:
             return False
-
 
 def check_if_valid_rgb_str(
     input: str,
@@ -2246,3 +2247,88 @@ def is_lxc_container() -> bool:
     except Exception:
         pass
     return False
+
+
+
+def check_valid_cpu_pool(value: Any,
+                         source: str = '',
+                         max_cores: Optional[int] = None,
+                         min_cores: Optional[int] = None,
+                         accepted_cores: Optional[Union[List[int], Tuple[int, ...], int]] = None,
+                         raise_error: bool = True) -> bool:
+
+    """
+    Validates that a value is a valid multiprocessing.Pool instance and optionally checks core count constraints.
+
+    :param Any value: The value to validate. Must be an instance of multiprocessing.pool.Pool.
+    :param str source: Optional source identifier for error messages. Default is empty string.
+    :param Optional[int] max_cores: Optional maximum number of processes allowed in the pool. If provided, validates that pool._processes <= max_cores.
+    :param Optional[int] min_cores: Optional minimum number of processes required in the pool. If provided, validates that pool._processes >= min_cores.
+    :param Optional[Union[List[int], Tuple[int, ...], int]] accepted_cores: Optional exact or list of acceptable process counts. If an int, validates that pool._processes == accepted_cores. If a list/tuple of ints, validates that pool._processes is in accepted_cores. All values must be positive integers.
+    :param bool raise_error: If True, raises InvalidInputError on validation failure. If False, returns False on failure. Default is True.
+    :return bool: True if validation passes, False if validation fails and raise_error is False.
+    :raises InvalidInputError: If value is not a valid Pool instance, if core count constraints are violated, if accepted_cores contains invalid types, or if raise_error is True.
+
+    :example:
+    >>> import multiprocessing
+    >>> pool = multiprocessing.Pool(processes=4)
+    >>> check_valid_cpu_pool(value=pool, source='test', max_cores=8, min_cores=2)
+    >>> True
+    >>> check_valid_cpu_pool(value=pool, source='test', accepted_cores=[4, 8, 16])
+    >>> True
+    >>> check_valid_cpu_pool(value=pool, source='test', accepted_cores=4)
+    >>> True
+    """
+
+    if not isinstance(value, (multiprocessing.pool.Pool,)):
+        if raise_error:
+            raise InvalidInputError(msg=f'Not a valid CPU pool. Expected {multiprocessing.pool.Pool}, got {type(value)}.', source=source)
+        else:
+            return False
+    if max_cores is not None:
+        check_int(name=f'{source} max_cores', value=max_cores, min_value=1)
+        if value._processes > max_cores:
+            if raise_error: raise InvalidInputError(msg=f'CPU pool has too many processes. Got {value._processes}, max {max_cores}', source=source)
+            else: return False
+    if min_cores is not None:
+        check_int(name=f'{source} min_cores', value=min_cores, min_value=1)
+        if value._processes < min_cores:
+            if raise_error:
+                raise InvalidInputError(msg=f'CPU pool has too few processes. Got {value._processes}, min {min_cores}',source=source)
+            else:
+                return False
+    if accepted_cores is not None:
+        if isinstance(accepted_cores, int):
+            is_valid, _ = check_int(name=f'{source} accepted_cores', value=accepted_cores, min_value=1, raise_error=raise_error)
+            if not is_valid:
+                return False
+            if value._processes != accepted_cores:
+                if raise_error:
+                    raise InvalidInputError(msg=f'CPU pool has an unacceptable number of cores. Got {value._processes}, accepted {accepted_cores}', source=source)
+                else:
+                    return False
+        elif isinstance(accepted_cores, (tuple, list)):
+            is_valid = check_valid_lst(data=list(accepted_cores), source=f'{source} accepted_cores', valid_dtypes=(int,), min_len=1, min_value=1, raise_error=raise_error)
+            if not is_valid:
+                return False
+            if value._processes not in accepted_cores:
+                if raise_error:
+                    raise InvalidInputError(msg=f'CPU pool has an unacceptable number of cores. Got {value._processes}, accepted {accepted_cores}', source=source)
+                else:
+                    return False
+            if min_cores is not None:
+                if min(accepted_cores) < min_cores:
+                    if raise_error:
+                        raise InvalidInputError(msg=f'accepted_cores contains values below min_cores. min_cores={min_cores}, accepted_cores={accepted_cores}', source=source)
+                    else:
+                        return False
+            if max_cores is not None:
+                if max(accepted_cores) > max_cores:
+                    if raise_error:
+                        raise InvalidInputError(msg=f'accepted_cores contains values above max_cores. max_cores={max_cores}, accepted_cores={accepted_cores}', source=source)
+                    else:
+                        return False
+        else:
+            raise InvalidInputError(msg=f'accepted_cores has to be an int, list of ints, or tuple of ints. Got {type(accepted_cores)}', source=source)
+
+    return True
