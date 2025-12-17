@@ -18,13 +18,14 @@ try:
 except ModuleNotFoundError:
     import numpy as cp
 
+import multiprocessing
+from multiprocessing import Pool
+
 import cv2
 import numpy as np
 import pandas as pd
 import trafaret as t
 from shapely.geometry import Polygon
-from multiprocessing import Pool
-import multiprocessing
 
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.enums import Formats, Keys, Options, UMAPParam
