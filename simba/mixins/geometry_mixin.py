@@ -7,7 +7,6 @@ import platform
 from copy import deepcopy
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
-
 import cv2
 import imutils
 import numpy as np
@@ -15,7 +14,8 @@ import pandas as pd
 from numba import jit, njit, prange, typed, types
 from scipy.interpolate import splev, splprep
 from scipy.spatial.qhull import QhullError
-from shapely.geometry import (GeometryCollection, LineString, MultiLineString, MultiPoint, MultiPolygon, Point, Polygon)
+from shapely.geometry import (GeometryCollection, LineString, MultiLineString,
+                              MultiPoint, MultiPolygon, Point, Polygon)
 from shapely.ops import linemerge, split, triangulate, unary_union
 
 try:
@@ -36,9 +36,10 @@ from simba.utils.checks import (check_float,
                                 check_instance, check_int,
                                 check_iterable_length, check_str,
                                 check_valid_array, check_valid_boolean,
-                                check_valid_cpu_pool, check_valid_dict, check_valid_lst,
-                                check_valid_tuple)
-from simba.utils.data import create_color_palette, create_color_palettes, terminate_cpu_pool
+                                check_valid_cpu_pool, check_valid_dict,
+                                check_valid_lst, check_valid_tuple)
+from simba.utils.data import (create_color_palette, create_color_palettes,
+                              terminate_cpu_pool)
 from simba.utils.enums import Defaults, Formats, GeometryEnum, Options
 from simba.utils.errors import CountError, InvalidInputError
 from simba.utils.read_write import (SimbaTimer, find_core_cnt,
