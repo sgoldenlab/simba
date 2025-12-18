@@ -16,15 +16,22 @@ from simba.utils.checks import (check_if_valid_img, check_instance, check_int,
                                 check_str, check_valid_tuple)
 from simba.utils.enums import Formats
 from simba.utils.errors import FrameRangeError, InvalidVideoFileError
+from simba.utils.lookups import get_icons_paths
 from simba.utils.printing import SimbaTimer
 from simba.utils.read_write import get_video_meta_data, read_frm_of_video
 from simba.video_processors.video_processing import create_average_frm
 
 FRAME_NAME = 'QUICK CHECK'
+MENU_ICONS = get_icons_paths()
 
 class BlobQuickChecker():
     """
      Interactive tool for visual comparisons using threshold-based difference detection with support for inclusion zones and interactive frame navigation.
+
+    .. video:: _static/img/blob_quick_check.webm
+       :width: 800
+       :autoplay:
+       :loop:
 
     :param Union[str, os.PathLike] video_path: Path to the video file being analyzed.
     :param Union[str, os.PathLike] bg_video_path: Path to the background reference video.
@@ -77,6 +84,10 @@ class BlobQuickChecker():
         self.img_idx = 0
         self.img_window = Toplevel()
         self.img_window.title(FRAME_NAME)
+
+        for k in MENU_ICONS.keys(): MENU_ICONS[k]["img"] = ImageTk.PhotoImage(image=Image.open(MENU_ICONS[k]["icon_path"]))
+        try: self.img_window.iconphoto(False, MENU_ICONS['magnifying']["img"]) if 'magnifying' in list(MENU_ICONS.keys()) else None
+        except: pass
         self.img_lbl = Label(self.img_window, name='img_lbl')
         self.img_lbl.grid(row=0, column=0, sticky=NW)
         self.inclusion_zones = inclusion_zones
@@ -164,6 +175,15 @@ class BlobQuickChecker():
             self.img_window.quit()
         except:
             pass
+
+
+
+# quick_checker = BlobQuickChecker(video_path=r"E:\open_video\barnes_maze\Run 33 - ID 231 - Barnes Maze Test (04-24-23).mp4",
+#                                  bg_video_path=r"E:\open_video\barnes_maze\Run 33 - ID 231 - Barnes Maze Test (04-24-23).mp4",
+#                                  close_kernel_size=(5, 5),
+#                                  open_kernel_size=(7,7),
+#                                  open_kernel_iterations=3,
+#                                  close_kernel_iterations=7)
 
 
 # quick_checker = BlobQuickChecker(video_path=r"D:\EPM\sample_2\2025-02-24 08-25-56.mp4",
