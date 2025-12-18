@@ -4219,9 +4219,14 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
        :loop:
 
     .. note::
-       If  ``bg_video_path`` is passed, that video will be used to parse the background. If None, ``video_path`` will be use to parse background.
-       Either pass ``start_frm`` and ``end_frm`` OR ``start_time`` and ``end_time`` OR pass all four arguments as None.
-       Those two arguments will be used to slice the background video, and the sliced part is used to parse the background.
+       If ``avg_frm`` is passed, that img will be used to parse the background.
+
+       If ``avg_frm`` is NOT passed and ``bg_video_path`` IS passed, the ``bg_video_path`` will be used to parse the background.
+
+       If ``avg_frm`` is NOT passed and ``bg_video_path`` is NOT passed, the ``video_path`` will be used to parse the background.
+
+       If ``avg_frm`` is NOT passed, pass consider passing ``start_frm`` and ``end_frm`` OR ``start_time`` and ``end_time``.
+       Those arguments will be used to slice the background video, and the sliced part is used to parse the background.
 
        For example, in the scenario where there is **no** animal in the ``video_path`` video for the first 20s, then the first 20s can be used to parse the background.
        In this scenario, ``bg_video_path`` can be passed as ``None`` and bg_start_time and bg_end_time can be ``00:00:00`` and ``00:00:20``, repectively.
