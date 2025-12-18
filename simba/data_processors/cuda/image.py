@@ -1196,6 +1196,11 @@ def bg_subtraction_cuda(video_path: Union[str, os.PathLike],
     """
     Remove background from videos using GPU acceleration.
 
+    .. video:: _static/img/video_bg_subtraction.webm
+       :width: 800
+       :autoplay:
+       :loop:
+
     .. note::
        To create an `avg_frm`, use :func:`simba.video_processors.video_processing.create_average_frm`, :func:`simba.data_processors.cuda.image.create_average_frm_cupy`, or :func:`~simba.data_processors.cuda.image.create_average_frm_cuda`
 
@@ -1288,6 +1293,11 @@ def bg_subtraction_cupy(video_path: Union[str, os.PathLike],
                         async_frame_read: bool = True):
     """
     Remove background from videos using GPU acceleration through CuPY.
+
+    .. video:: _static/img/bg_remover_example_1.webm
+       :width: 800
+       :autoplay:
+       :loop:
 
     .. seealso::
        For CPU-based alternative, see :func:`simba.video_processors.video_processing.video_bg_subtraction` or :func:`~simba.video_processors.video_processing.video_bg_subtraction_mp`
