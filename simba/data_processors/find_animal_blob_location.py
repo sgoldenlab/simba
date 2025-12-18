@@ -90,6 +90,35 @@ def get_nose_tail_from_vertices(vertices: np.ndarray,
                                 fps: float = 10,
                                 smooth_factor = 0.5,
                                 jump_threshold = 0.75):
+    """
+    Identify the anterior (nose/head) and posterior (tail) points of an animal from its body shape vertices.
+
+    Determines the nose and tail positions by finding the two farthest points in each frame and using motion
+    vectors and bearing calculations to consistently label which point is anterior vs posterior across frames.
+    Includes smoothing and jump detection to maintain temporal consistency.
+
+    .. note::
+       The function identifies the two farthest points in each frame, then uses the cumulative motion vector
+       and bearing calculations to determine which point is the nose (anterior) and which is the tail (posterior).
+       Jump detection prevents sudden swaps when the animal changes direction.
+
+    .. seealso::
+       For computing left and right points using the nose and tail, see :func:`~simba.data_processors.find_animal_blob_location.get_left_right_points`.
+       For blob tracking that uses this function, see :func:`~simba.video_processors.blob_tracking_executor.BlobTrackingExecutor`.
+
+    :param np.ndarray vertices: Array of shape (n_frames, n_points, 2) containing the x,y coordinates of body shape vertices for each frame.
+    :param float fps: Frames per second of the video. Used to calculate smoothing window size. Default: 10.
+    :param float smooth_factor: Factor (in seconds) to determine smoothing window size. Window size is calculated as ``max(2, int(fps * smooth_factor))``. Default: 0.5.
+    :param float jump_threshold: Threshold multiplier for detecting sudden jumps in nose/tail positions. If the distance between candidate and previous positions exceeds ``jump_threshold * mean_distance``, the labels are swapped. Default: 0.75.
+    :return: Tuple containing two arrays:
+        - anterior: Array of shape (n_frames, 2) with x,y coordinates of the anterior (nose/head) point for each frame.
+        - posterior: Array of shape (n_frames, 2) with x,y coordinates of the posterior (tail) point for each frame.
+    :rtype: Tuple[np.ndarray, np.ndarray]
+
+    :example:
+    >>> vertices = np.random.randint(0, 100, (100, 50, 2)).astype(np.float32)
+    >>> nose, tail = get_nose_tail_from_vertices(vertices=vertices, fps=30, smooth_factor=0.5, jump_threshold=0.75)
+    """
 
     def calculate_bearing(head, tail):
         delta_y = tail[1] - head[1]
@@ -157,6 +186,38 @@ def get_left_right_points(hull_vertices: np.ndarray,
                            anterior: np.ndarray,
                            center: np.ndarray,
                            posterior: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Identify the leftmost and rightmost points on an animal's body shape relative to its anterior-posterior axis.
+
+    Computes the mediolateral (left-right) extents of an animal's body by projecting all hull vertices onto a
+    perpendicular vector to the anterior-posterior direction. The leftmost and rightmost points are identified
+    as the vertices closest to the center on each side of the perpendicular axis.
+
+    .. note::
+       The function determines left and right based on a perpendicular vector to the anterior-posterior axis.
+       The perpendicular vector is computed as (-dy, dx) where (dx, dy) is the direction from anterior to posterior.
+
+    .. seealso::
+       For computing anterior and posterior points, see :func:`~simba.data_processors.find_animal_blob_location.get_nose_tail_from_vertices`.
+       For blob tracking that uses this function, see :func:`~simba.video_processors.blob_tracking_executor.BlobTrackingExecutor`.
+
+    :param np.ndarray hull_vertices: Array of shape (n_frames, n_points, 2) containing the x,y coordinates of hull vertices for each frame.
+    :param np.ndarray anterior: Array of shape (n_frames, 2) containing the x,y coordinates of the anterior (nose/head) point for each frame.
+    :param np.ndarray center: Array of shape (n_frames, 2) containing the x,y coordinates of the center point for each frame.
+    :param np.ndarray posterior: Array of shape (n_frames, 2) containing the x,y coordinates of the posterior (tail) point for each frame.
+    :return: Tuple containing two arrays:
+        - left_points: Array of shape (n_frames, 2) with x,y coordinates of the leftmost point for each frame.
+        - right_points: Array of shape (n_frames, 2) with x,y coordinates of the rightmost point for each frame.
+    :rtype: Tuple[np.ndarray, np.ndarray]
+
+    :example:
+    >>> vertices = np.random.randint(0, 100, (100, 50, 2)).astype(np.float32)
+    >>> anterior = np.random.randint(0, 100, (100, 2)).astype(np.float32)
+    >>> center = np.mean(vertices, axis=1)
+    >>> posterior = np.random.randint(0, 100, (100, 2)).astype(np.float32)
+    >>> left, right = get_left_right_points(hull_vertices=vertices, anterior=anterior, center=center, posterior=posterior)
+    """
+
     # Ensure inputs are 3D for consistency (n_images, n_points, 2)
     if hull_vertices.ndim != 3 or anterior.ndim != 2 or center.ndim != 2 or posterior.ndim != 2:
         raise ValueError("hull_vertices must be 3D, while anterior, center, and posterior must be 2D.")
