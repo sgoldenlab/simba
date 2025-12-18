@@ -19,9 +19,10 @@ from shapely.geometry import MultiPolygon, Polygon
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.utils.checks import (check_float, check_instance, check_int,
                                 check_nvidea_gpu_available,
-                                check_valid_boolean, is_img_bw, check_valid_cpu_pool)
+                                check_valid_boolean, check_valid_cpu_pool,
+                                is_img_bw)
 from simba.utils.data import resample_geometry_vertices, terminate_cpu_pool
-from simba.utils.enums import Defaults, OS
+from simba.utils.enums import OS, Defaults
 from simba.utils.errors import FFMPEGCodecGPUError, SimBAGPUError
 from simba.utils.lookups import get_available_ram
 from simba.utils.read_write import (find_core_cnt, get_fn_ext,

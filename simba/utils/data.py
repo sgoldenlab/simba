@@ -2,9 +2,9 @@ __author__ = "Simon Nilsson"
 
 import ast
 import configparser
+import gc
 import io
 import os
-import gc
 import subprocess
 from copy import deepcopy
 from datetime import datetime
