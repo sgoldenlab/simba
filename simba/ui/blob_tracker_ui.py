@@ -47,6 +47,10 @@ class BlobTrackingUI(PopUpMixin):
     """
     GUI interface for configuring and executing blob tracking on videos using background subtraction.
 
+    .. image:: _static/img/BlobTrackingUI.webm
+       :width: 800
+       :align: center
+
     This class provides a graphical user interface for setting up blob tracking parameters for multiple videos,
     including background reference videos, thresholds, inclusion zones, smoothing, and morphological operations.
     The interface allows batch processing of videos with per-video settings and generates a configuration file
@@ -443,7 +447,7 @@ class BlobTrackingUI(PopUpMixin):
 
 #_ = BlobTrackingUI(input_dir=r'C:\troubleshooting\blob_track_tester\videos', output_dir=r'C:\troubleshooting\blob_track_tester\results')
 
-#_ = BlobTrackingUI(input_dir=r'D:\troubleshooting\maplight_ri\project_folder\blob\videos_2', output_dir=r'D:\troubleshooting\maplight_ri\project_folder\blob\batch_out_7')
+#_ = BlobTrackingUI(input_dir=r'D:\troubleshooting\maplight_ri\project_folder\blob\videos', output_dir=r'D:\troubleshooting\maplight_ri\project_folder\blob\batch_out_7')
 
 
 #_ = BlobTrackingUI(input_dir=r'D:\water_maze', output_dir=r'D:\water_maze\data')
