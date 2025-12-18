@@ -4234,7 +4234,7 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
 
     .. csv-table::
        :header: EXPECTED RUNTIMES
-       :file: ../../../docs/tables/video_bg_subtraction_mp.csv
+       :file: ../../docs/tables/video_bg_subtraction_mp.csv
        :widths: 10, 45, 45
        :align: center
        :class: simba-table
