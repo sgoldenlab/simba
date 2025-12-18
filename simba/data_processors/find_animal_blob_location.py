@@ -17,12 +17,11 @@ from shapely.affinity import scale
 from shapely.geometry import MultiPolygon, Polygon
 
 from simba.mixins.geometry_mixin import GeometryMixin
-from simba.mixins.image_mixin import ImageMixin
 from simba.utils.checks import (check_float, check_instance, check_int,
                                 check_nvidea_gpu_available,
-                                check_valid_boolean, is_img_bw)
-from simba.utils.data import resample_geometry_vertices
-from simba.utils.enums import Defaults
+                                check_valid_boolean, is_img_bw, check_valid_cpu_pool)
+from simba.utils.data import resample_geometry_vertices, terminate_cpu_pool
+from simba.utils.enums import Defaults, OS
 from simba.utils.errors import FFMPEGCodecGPUError, SimBAGPUError
 from simba.utils.lookups import get_available_ram
 from simba.utils.read_write import (find_core_cnt, get_fn_ext,
@@ -221,7 +220,7 @@ def get_blob_vertices_from_imgs(frm_idxs: Tuple[int, List[int]],
     if window_size is not None:
         check_float(name='window_size', value=window_size, min_value=1.0, raise_error=True)
     check_int(name=f'{get_blob_vertices_from_imgs.__name__} vertice_cnt', value=vertice_cnt, min_value=3, raise_error=True)
-    video_meta_data = get_video_meta_data(video_path=video_path)
+    _ = get_video_meta_data(video_path=video_path)
     results, prior_window = {}, None
     for frm_idx in frm_idxs[1]:
         if verbose:
@@ -261,6 +260,7 @@ def get_blob_vertices_from_imgs(frm_idxs: Tuple[int, List[int]],
     return results
 
 def get_blob_vertices_from_video(video_path: Union[str, os.PathLike],
+                                 pool: Optional[multiprocessing.Pool] = None,
                                  gpu: bool = False,
                                  core_cnt: int = -1,
                                  verbose: bool = True,
@@ -271,24 +271,27 @@ def get_blob_vertices_from_video(video_path: Union[str, os.PathLike],
                                  vertice_cnt: int = 50) -> np.ndarray:
 
     """
-    Detects the location of the largest blob in each frame of a video. Processes frames in batches and optionally uses GPU for acceleration. Results can be saved to a specified path or returned as a NumPy array.
+    Detects the location of the largest blob in each frame of a video. Processes frames in batches and optionally uses GPU for acceleration. Returns a NumPy array with blob vertices.
 
     .. seealso::
        For visualization of results, see :func:`simba.plotting.blob_plotter.BlobPlotter` and :func:`simba.mixins.plotting_mixin.PlottingMixin._plot_blobs`
        Background subtraction can be performed using :func:`~simba.video_processors.video_processing.video_bg_subtraction_mp` or :func:`~simba.video_processors.video_processing.video_bg_subtraction`.
 
     .. note::
-       In ``inclusion_zones`` is not None, then the largest blob will be searches for **inside** the passed vertices.
+       If ``inclusion_zone`` is not None, then the largest blob will be searched for **inside** the passed vertices.
 
     :param Union[str, os.PathLike] video_path: Path to the video file from which to extract frames. Often, a background subtracted video, which can be created with e.g., :func:`simba.video_processors.video_processing.video_bg_subtraction_mp`.
-    :param Optional[int] batch_size: Number of frames to process in each batch. Default is 3k.
-    :param Optional[bool] gpu: Whether to use GPU acceleration for processing. Default is False.
-    :param Optional[bool] verbose: Whether to print progress and status messages. Default is True.
-    :param Optional[Union[Polygon, MultiPolygon]] inclusion_zones: Optional shapely polygon, or multipolygon, restricting where to search for the largest blob. Default: None.
-    :param Optional[int] window_size: If not None, then integer representing the size multiplier of the animal geometry in previous frame. If not None, the animal geometry will only be searched for within this geometry.
-    :param bool convex_hull:  If True, creates the convex hull of the shape, which is the smallest convex polygon that encloses the shape. Default True.
-    :return: A dataframe shape (N, 4) where N is the number of frames, containing the X and Y coordinates of the centroid of the largest blob in each frame and the vertices representing the hull. If `save_path` is provided, returns None.
-    :rtype: Union[None, pd.DataFrame]
+    :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool for parallel processing. If None, a new pool is created and terminated after processing. Default: None.
+    :param bool gpu: Whether to use GPU acceleration for processing. Default: False.
+    :param int core_cnt: Number of CPU cores to use for parallel processing. Default is -1, which uses all available cores.
+    :param bool verbose: Whether to print progress and status messages. Default: True.
+    :param Optional[Union[Polygon, MultiPolygon]] inclusion_zone: Optional shapely polygon, or multipolygon, restricting where to search for the largest blob. Default: None.
+    :param Optional[float] window_size: If not None, then float representing the size multiplier of the animal geometry in previous frame. If not None, the animal geometry will only be searched for within this geometry. Default: None.
+    :param Optional[int] batch_size: Number of frames to process in each batch. If None, automatically calculated based on available RAM. Default: None.
+    :param bool convex_hull: If True, creates the convex hull of the shape, which is the smallest convex polygon that encloses the shape. Default: False.
+    :param int vertice_cnt: Number of vertices to use when resampling the blob shape. Default: 50.
+    :return: NumPy array of shape (N, vertice_cnt*2) where N is the number of frames, containing the X and Y coordinates of the vertices representing the blob shape in each frame.
+    :rtype: np.ndarray
 
     :example:
     >>> x = get_blob_vertices_from_video(video_path=r"/mnt/c/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4_downsampled_bg_subtracted.mp4", gpu=True)
@@ -311,7 +314,12 @@ def get_blob_vertices_from_video(video_path: Union[str, os.PathLike],
     check_valid_boolean(value=verbose, source=f'{get_blob_vertices_from_video.__name__} verbose')
     check_int(name=f'{get_blob_vertices_from_video.__name__} core_cnt', value=core_cnt, min_value=-1, unaccepted_vals=[0], raise_error=True)
     check_int(name=f'{get_blob_vertices_from_video.__name__} vertice_cnt', value=vertice_cnt, min_value=3, raise_error=True)
-    core_cnt = find_core_cnt()[0] if core_cnt == -1 else core_cnt
+    core_cnt = find_core_cnt()[0] if core_cnt == -1 or core_cnt > find_core_cnt()[0] else core_cnt
+    pool_terminate_flag = False if pool is not None else True
+    if pool is not None:
+        check_valid_cpu_pool(value=pool, source=f'{get_blob_vertices_from_video.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+    else:
+        pool = multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value)
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(msg='No GPU detected, try to set GPU to False', source=get_blob_vertices_from_video.__name__)
     if inclusion_zone is not None:
@@ -319,24 +327,19 @@ def get_blob_vertices_from_video(video_path: Union[str, os.PathLike],
     if window_size is not None:
         check_float(name='window_size', value=window_size, min_value=1.0, raise_error=True)
     if gpu and not check_nvidea_gpu_available():
-        raise SimBAGPUError(msg='GPU is set to True, but SImBA could not find a GPU on the machine', source=get_blob_vertices_from_video.__name__)
+        raise SimBAGPUError(msg='GPU is set to True, but SimBA could not find a GPU on the machine', source=get_blob_vertices_from_video.__name__)
     frame_ids = list(range(0, video_meta['frame_count']))
     frame_ids = [frame_ids[i:i + batch_size] for i in range(0, len(frame_ids), batch_size)]
     results = {}
     frame_ids = [(i, j) for i, j in enumerate(frame_ids)]
     if verbose:
         print(f'Starting animal location detection for video {video_meta["video_name"]}...')
-    if platform.system() == "Darwin":
-        multiprocessing.set_start_method("spawn", force=True)
-    with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.LARGE_MAX_TASK_PER_CHILD.value) as pool:
-        constants = functools.partial(get_blob_vertices_from_imgs, verbose=verbose, video_name=video_name, inclusion_zone=inclusion_zone, convex_hull=convex_hull, vertice_cnt=vertice_cnt, video_path=video_path)
-        for cnt, result in enumerate(pool.map(constants, frame_ids, chunksize=1)):
-            results.update(result)
-    pool.join()
-    pool.terminate()
-    gc.collect()
+    if platform.system() == OS.MAC.value: multiprocessing.set_start_method("spawn", force=True)
+    constants = functools.partial(get_blob_vertices_from_imgs, verbose=verbose, video_name=video_name, inclusion_zone=inclusion_zone, convex_hull=convex_hull, vertice_cnt=vertice_cnt, video_path=video_path)
+    for cnt, result in enumerate(pool.map(constants, frame_ids, chunksize=1)):
+        results.update(result)
+    if pool_terminate_flag: terminate_cpu_pool(pool=pool)
     results = dict(sorted(results.items()))
-
     return np.stack(list(results.values()), axis=0).astype(np.int32)
 
 

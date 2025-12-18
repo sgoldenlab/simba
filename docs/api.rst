@@ -118,6 +118,17 @@ Visualize behavioral data and pose-tracking outputs.
    simba.plotting
 
 
+|:mag:| **Blob tracking tools**
+--------------------------------------------------
+
+Track animals in videos using background subtraction and blob detection. Extract geometric features (center, nose, tail, left/right points) from detected blob shapes without requiring pose-estimation data.
+
+.. toctree::
+   :maxdepth: 5
+
+   simba.blob
+
+
 |:warning:| **Outlier correction**
 --------------------------------------------------
 

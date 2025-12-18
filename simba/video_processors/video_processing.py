@@ -2,7 +2,6 @@ __author__ = "Simon Nilsson"
 
 
 import functools
-import gc
 import glob
 import multiprocessing
 import os
@@ -40,9 +39,10 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_nvidea_gpu_available, check_str,
                                 check_that_hhmmss_start_is_before_end,
                                 check_valid_boolean, check_valid_lst,
-                                check_valid_tuple)
-from simba.utils.data import find_frame_numbers_from_time_stamp
-from simba.utils.enums import ConfigKey, Defaults, Formats, Options, Paths
+                                check_valid_tuple,
+                                check_valid_cpu_pool)
+from simba.utils.data import find_frame_numbers_from_time_stamp, terminate_cpu_pool
+from simba.utils.enums import ConfigKey, Defaults, Formats, Options, Paths, OS
 from simba.utils.errors import (CountError, DirectoryExistError,
                                 FFMPEGCodecGPUError, FFMPEGNotFoundError,
                                 FileExistError, FrameRangeError,
@@ -4180,6 +4180,7 @@ def _bg_remover_mp(frm_range: Tuple[int, np.ndarray],
     return batch
 
 def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
+                            pool: Optional[multiprocessing.Pool] = None,
                             bg_video_path: Union[str, os.PathLike] = None,
                             bg_start_frm: Optional[int] = None,
                             bg_end_frm: Optional[int] = None,
@@ -4231,19 +4232,35 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
         For single core alternative, see :func:`~simba.video_processors.video_processing.video_bg_subtraction`.
         For GPU based alternative, see :func:`~simba.data_processors.cuda.image.bg_subtraction_cuda` or :func:`~simba.data_processors.cuda.image.bg_subtraction_cupy`.
 
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../../docs/tables/video_bg_subtraction_mp.csv
+       :widths: 10, 45, 45
+       :align: center
+       :class: simba-table
+       :header-rows: 1
+
     :param Union[str, os.PathLike] video_path: The path to the video to remove the background from.
-    :param Optional[np.ndarray] avg_frm: The average frame to use to compute the background. If None is passed, then the average frame will be computed.
-    :param Optional[Union[str, os.PathLike]] bg_video_path: Path to the video which contains a segment with the background only. If None, then ``video_path`` will be used.
+    :param Optional[multiprocessing.Pool] pool: Optional multiprocessing pool for parallel processing. If None, a new pool is created and terminated after processing. Default: None.
+    :param Optional[Union[str, os.PathLike]] bg_video_path: Path to the video which contains a segment with the background only. If None, then ``video_path`` will be used. Default: None.
     :param Optional[int] bg_start_frm: The first frame in the background video to use when creating a representative background image. Default: None.
     :param Optional[int] bg_end_frm: The last frame in the background video to use when creating a representative background image. Default: None.
     :param Optional[str] bg_start_time: The start timestamp in `HH:MM:SS` format in the background video to use to create a representative background image. Default: None.
     :param Optional[str] bg_end_time: The end timestamp in `HH:MM:SS` format in the background video to use to create a representative background image. Default: None.
-    :param Optional[str] bg_end_time: The end timestamp in `HH:MM:SS` format in the background video to use to create a representative background image. Default: None.
-    :param Optional[Tuple[int, int, int]] bg_color: The RGB color of the moving objects in the output video. Defaults to None, which represents the original colors of the moving objects.
-    :param Optional[Union[str, os.PathLike]] save_path: The patch to where to save the output video where the background is removed. If None, saves the output video in the same directory as the input video with the ``_bg_subtracted`` suffix. Default: None.
-    :param Optional[int] core_cnt: The number of cores to use. Defaults to -1 representing all available cores.
-    :param Optional[int] threshold: Value between 0-255 representing the difference threshold between the average frame subtracted from each frame. Higher values and more pixels will be considered background. Default: 50.
-    :return: None.
+    :param Optional[Union[np.ndarray, str, os.PathLike]] avg_frm: The average frame to use to compute the background. Can be a NumPy array, or a path to an image file. If None is passed, then the average frame will be computed from the background video. Default: None.
+    :param Tuple[int, int, int] bg_color: The RGB color to use for background pixels in the output video. Default: (0, 0, 0).
+    :param Optional[Tuple[int, int, int]] fg_color: The RGB color to use for foreground (moving object) pixels in the output video. If None, original colors are preserved. Default: None.
+    :param Optional[Union[str, os.PathLike]] save_path: The path to where to save the output video where the background is removed. If None, saves the output video in the same directory as the input video with the ``_bg_subtracted`` suffix. Default: None.
+    :param int core_cnt: The number of cores to use. Defaults to -1 representing all available cores.
+    :param bool verbose: Whether to print progress messages. Default: True.
+    :param bool gpu: Whether to use GPU acceleration for video concatenation. Default: False.
+    :param Optional[int] threshold: Value between 1-255 representing the difference threshold between the average frame subtracted from each frame. Higher values mean more pixels will be considered background. Default: 50.
+    :param str method: Method for background subtraction. Options: 'absolute', 'light', 'dark'. Default: 'absolute'.
+    :param Optional[Tuple[int, int]] closing_kernel_size: Size of the morphological closing kernel (width, height). If None, closing is not applied. Default: None.
+    :param int closing_iterations: Number of iterations for morphological closing operation. Default: 3.
+    :param Optional[Tuple[int, int]] opening_kernel_size: Size of the morphological opening kernel (width, height). If None, opening is not applied. Default: None.
+    :param int opening_iterations: Number of iterations for morphological opening operation. Default: 3.
+    :returns: None.
 
     :example:
     >>> video_bg_subtraction_mp(video_path='/Users/simon/Downloads/1_LH.mp4', bg_start_time='00:00:00', bg_end_time='00:00:10', bg_color=(0, 0, 0), fg_color=(255, 255, 255))
@@ -4285,35 +4302,40 @@ def video_bg_subtraction_mp(video_path: Union[str, os.PathLike],
     bg_frm = cv2.resize(bg_frm, (video_meta_data['width'], video_meta_data['height']))
     frm_list = np.array_split(list(range(0, video_meta_data['frame_count'])), core_cnt)
     frm_data = []
-    if platform.system() == "Darwin":
-        multiprocessing.set_start_method("spawn", force=True)
+    if platform.system() == OS.MAC.value: multiprocessing.set_start_method(OS.SPAWN.value, force=True)
     for c, i in enumerate(frm_list):
         frm_data.append((c, i))
-    with multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) as pool:
-        constants = functools.partial(_bg_remover_mp,
-                                      video_path=video_path,
-                                      bg_frm=bg_frm,
-                                      bg_clr=bg_color,
-                                      fg_clr=fg_color,
-                                      video_meta_data=video_meta_data,
-                                      temp_dir=temp_dir,
-                                      verbose=verbose,
-                                      threshold=threshold,
-                                      method=method,
-                                      closing_kernel=closing_kernel,
-                                      closing_iterations=closing_iterations,
-                                      opening_kernel=opening_kernel,
-                                      opening_iterations=opening_iterations)
-        for cnt, result in enumerate(pool.imap(constants, frm_data, chunksize=1)):
-            print(f'Frame batch {result+1} completed...')
-    pool.terminate()
-    pool.join()
-    gc.collect()
+    pool_terminate_flag = False if pool is not None else True
+    start = time.time()
+    if pool is not None:
+        check_valid_cpu_pool(value=pool, source=f'{video_bg_subtraction_mp.__name__} pool', raise_error=True, accepted_cores=core_cnt)
+    else:
+        pool = multiprocessing.Pool(core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value)
+    constants = functools.partial(_bg_remover_mp,
+                                  video_path=video_path,
+                                  bg_frm=bg_frm,
+                                  bg_clr=bg_color,
+                                  fg_clr=fg_color,
+                                  video_meta_data=video_meta_data,
+                                  temp_dir=temp_dir,
+                                  verbose=verbose,
+                                  threshold=threshold,
+                                  method=method,
+                                  closing_kernel=closing_kernel,
+                                  closing_iterations=closing_iterations,
+                                  opening_kernel=opening_kernel,
+                                  opening_iterations=opening_iterations)
+    for cnt, result in enumerate(pool.imap(constants, frm_data, chunksize=1)):
+        print(f'Frame batch {result+1} completed...')
+    if pool_terminate_flag: terminate_cpu_pool(pool=pool)
     print(f"Joining {video_name} multi-processed video...")
+    elapsed = time.time() - start
+    print(elapsed)
     concatenate_videos_in_folder(in_folder=temp_dir, save_path=save_path, video_format=ext[1:], remove_splits=True, gpu=gpu, fps=video_meta_data['fps'])
     #reencode_mp4_video(save_path, 'libx264', 23)
     timer.stop_timer()
     stdout_success(msg=f'Video saved at {save_path}', elapsed_time=timer.elapsed_time_str)
+
 
 def superimpose_video_names(video_path: Union[str, os.PathLike],
                             font: Optional[str] = 'Arial',
@@ -4435,7 +4457,6 @@ def superimpose_freetext(video_path: Union[str, os.PathLike],
     :param Optional[Literal['top_left', 'top_right', 'bottom_left', 'bottom_right', 'top_middle', 'bottom_middle']] position: Position where the text will be superimposed. Default ``top_left``.
     :param Optional[Union[str, os.PathLike]] save_dir: Directory where the modified video(s) will be saved. If not provided, the directory of the input video(s) will be used.
     :param Optional[bool] gpu: If True, uses GPU codecs with potentially faster runtimes. Default: False.
-
     :return: None
     """
 
@@ -5010,6 +5031,47 @@ def get_async_frame_batch(batch_reader: AsyncVideoFrameReader, timeout: int = 10
         raise x
     else:
         return x
+
+
+def change_playback_speed(video_path: Union[str, os.PathLike],
+                          speed: float,
+                          save_path: Optional[Union[str, os.PathLike]] = None,
+                          quality: int = 60,
+                          codec: str = 'libx264'):
+    """
+    Change the playback speed of a video file. Speed > 1.0 makes the video faster, speed < 1.0 makes it slower.
+
+    .. note::
+       The output video will have no audio track.
+       The function uses FFmpeg's setpts filter to adjust playback speed. The video duration will change
+       proportionally to the speed factor (e.g., speed=2.0 halves the duration).
+
+    :param Union[str, os.PathLike] video_path: Path to the input video file.
+    :param float speed: Playback speed multiplier. Must be between 0.001 and 100. Values > 1.0 increase speed, values < 1.0 decrease speed.
+    :param Optional[Union[str, os.PathLike]] save_path: Path where the output video will be saved. If None, saves in the same directory as input with ``_playback_speed`` suffix.
+    :param int quality: Video quality as percentage (1-100). Higher values indicate better quality. Default: 60. Converted to CRF internally.
+    :param str codec: Video codec to use. Default: 'libx264'.
+    :returns: None
+
+    :example:
+    >>> change_playback_speed(video_path=r"project_folder/videos/Video_1.mp4", speed=1.5)
+    >>> change_playback_speed(video_path=r"project_folder/videos/Video_1.mp4", speed=0.5, quality=80)
+    """
+
+    check_ffmpeg_available(raise_error=True)
+    check_float(name=f'{change_playback_speed.__name__} speed', value=speed, min_value=0.001, max_value=100, raise_error=True)
+    check_int(name=f'{change_playback_speed.__name__} quality', value=quality, min_value=1, max_value=100, raise_error=True)
+    _ = get_video_meta_data(video_path=video_path)
+    quality_code = quality_pct_to_crf(pct=quality)
+    if save_path is not None:
+        check_if_dir_exists(in_dir=os.path.dirname(save_path), source=f'{change_playback_speed.__name__} save_path')
+    else:
+        dir, video_name, ext = get_fn_ext(filepath=video_path)
+        save_path = os.path.join(dir, f'{video_name}_playback_speed{ext}')
+
+    video_pts = 1.0 / speed
+    cmd = f'ffmpeg -i "{video_path}" -vf "setpts={video_pts:.6f}*PTS" -an -c:v {codec} -crf {quality_code} "{save_path}" -hide_banner -loglevel error -stats -y'
+    subprocess.call(cmd, shell=True)
 
 
 #if __name__ == "__main__":

@@ -1204,7 +1204,7 @@ def bg_subtraction_cuda(video_path: Union[str, os.PathLike],
        For GPU-based alternative, see :func:`~simba.data_processors.cuda.image.bg_subtraction_cupy`. Needs work, CPU/multicore appears faster.
 
     .. seealso::
-       To create average frame on the CPU, see :func:`simba.video_processors.video_processing.create_average_frm`.
+       To create average frame on the CPU, see :func:`simba.video_processors.video_processing.create_average_frm`. CPU/multicore appears faster.
 
     .. csv-table::
        :header: EXPECTED RUNTIMES

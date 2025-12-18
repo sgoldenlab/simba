@@ -45,6 +45,24 @@ BLOB_EXECUTOR_PATH = os.path.join(SIMBA_DIR, Paths.BLOB_EXECUTOR_PATH.value)
 
 class BlobTrackingUI(PopUpMixin):
     """
+    GUI interface for configuring and executing blob tracking on videos using background subtraction.
+
+    This class provides a graphical user interface for setting up blob tracking parameters for multiple videos,
+    including background reference videos, thresholds, inclusion zones, smoothing, and morphological operations.
+    The interface allows batch processing of videos with per-video settings and generates a configuration file
+    that is used by :func:`simba.video_processors.blob_tracking_executor.BlobTrackingExecutor` to perform the actual tracking.
+
+    .. note::
+       The output directory must be empty when initializing the class. All configuration data is saved to a pickle file
+       in the output directory, which is then used by the blob tracking executor.
+
+    .. seealso::
+       To execute blob tracking, see :func:`simba.video_processors.blob_tracking_executor.BlobTrackingExecutor`.
+       For quick checking of blob detection settings, see :func:`simba.ui.blob_quick_check_interface.BlobQuickChecker`.
+
+    :param Union[str, os.PathLike] input_dir: Directory containing input video files to be tracked.
+    :param Union[str, os.PathLike] output_dir: Directory where blob tracking results and configuration files will be saved. Must be empty. Will be created if it doesn't exist.
+
     :example:
     >>> _ = BlobTrackingUI(input_dir=r'D:\open_field_3\sample', output_dir=r"D:\open_field_3\sample\blob_data")
     """
@@ -425,7 +443,7 @@ class BlobTrackingUI(PopUpMixin):
 
 #_ = BlobTrackingUI(input_dir=r'C:\troubleshooting\blob_track_tester\videos', output_dir=r'C:\troubleshooting\blob_track_tester\results')
 
-#_ = BlobTrackingUI(input_dir=r'D:\troubleshooting\maplight_ri\project_folder\blob\videos', output_dir=r'D:\troubleshooting\maplight_ri\project_folder\blob\batch_out_7')
+#_ = BlobTrackingUI(input_dir=r'D:\troubleshooting\maplight_ri\project_folder\blob\videos_2', output_dir=r'D:\troubleshooting\maplight_ri\project_folder\blob\batch_out_7')
 
 
 #_ = BlobTrackingUI(input_dir=r'D:\water_maze', output_dir=r'D:\water_maze\data')

@@ -1,24 +1,22 @@
 import argparse
 import os
 import sys
-from typing import Union
+from typing import Union, Optional
 
 import numpy as np
 import pandas as pd
+import multiprocessing
 
-from simba.data_processors.find_animal_blob_location import (
-    get_blob_vertices_from_video, get_left_right_points,
-    get_nose_tail_from_vertices, stabilize_body_parts)
+from simba.data_processors.find_animal_blob_location import (get_blob_vertices_from_video, get_left_right_points, get_nose_tail_from_vertices, stabilize_body_parts)
 from simba.mixins.geometry_mixin import GeometryMixin
-from simba.utils.checks import (check_if_dir_exists, check_instance, check_int,
-                                check_nvidea_gpu_available, check_valid_dict)
-from simba.utils.data import resample_geometry_vertices, savgol_smoother
+from simba.utils.checks import (check_if_dir_exists, check_instance, check_int, check_nvidea_gpu_available, check_valid_dict)
+from simba.utils.data import resample_geometry_vertices, savgol_smoother, terminate_cpu_pool
 from simba.utils.errors import SimBAGPUError
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_core_cnt, get_video_meta_data,
-                                    read_pickle, remove_files, write_df)
-from simba.video_processors.video_processing import (video_bg_subtraction,
-                                                     video_bg_subtraction_mp)
+from simba.utils.lookups import get_current_time
+from simba.utils.read_write import (find_core_cnt, get_video_meta_data, read_pickle, remove_files, write_df)
+from simba.video_processors.video_processing import (video_bg_subtraction, video_bg_subtraction_mp)
+from simba.utils.enums import Defaults
 
 CENTER_X = 'center_x'
 CENTER_Y = 'center_y'
@@ -44,11 +42,12 @@ OPENING_ITS = 'open_iterations'
 OPENING_KERNEL = 'open_kernel'
 SAVE_BG_VIDEOS = 'save_bg_videos'
 GPU = 'gpu'
+METHOD = 'method'
+THRESHOLD = 'threshold'
 
 REQUIRED_KEYS = (IN_DIR, OUT_DIR, GPU, CORE_CNT, VIDEO_DATA, VERTICE_CNT, SAVE_BG_VIDEOS, CLOSING_ITS, OPENING_ITS)
 
-METHOD = 'method'
-THRESHOLD = 'threshold'
+
 
 
 class BlobTrackingExecutor():
@@ -58,19 +57,40 @@ class BlobTrackingExecutor():
     and geometry-based processing. The class handles the processing of video frames in parallel, tracks blob locations
     across frames, and saves the results to CSV files.
 
-    :param Union[dict, str, os.PathLike] data: Path to a configuration file or a dictionary containing the necessary parameters for blob tracking. The configuration should include keys for the video data, input/output directories, and other processing settings.
-    :param int vertice_cnt: The number of vertices to use when sampling the blob geometry. Default: 10.
-    :param int batch_size: The batch size for blob location detection. Default: 4k.
+    The ``data`` parameter should be a dictionary or path to a pickle file containing a dictionary with the following required keys:
+    - ``input_dir``: Input directory containing videos
+    - ``output_dir``: Output directory for results
+    - ``gpu``: Boolean indicating whether to use GPU acceleration
+    - ``core_cnt``: Number of CPU cores to use
+    - ``video_data``: Dictionary mapping video names to their configuration (threshold, reference video, etc.)
+    - ``vertice_cnt``: Number of vertices to use when sampling blob geometry
+    - ``save_bg_videos``: Boolean indicating whether to save background-subtracted videos
+    - ``close_iterations``: Number of iterations for morphological closing
+    - ``open_iterations``: Number of iterations for morphological opening
+
+    .. seealso::
+       For GUI used to create ``data``, see :func:`simba.video_processors.batch_process_menus.BatchProcessFrame`.
+       This is a wrapper for calling background subtraction through :func:`simba.video_processors.video_processing.video_bg_subtraction_mp` or :func:`~simba.video_processors.video_processing.video_bg_subtraction`.
+       For finding the animal, this class wraps :func:`simba.data_processors.find_animal_blob_location.get_blob_vertices_from_video`.
+       For GPU based bg subtraction methods, see :func:`~simba.data_processors.cuda.image.bg_subtraction_cuda` or :func:`~simba.data_processors.cuda.image.bg_subtraction_cupy`.
+
+    :param Union[dict, str, os.PathLike] data: Path to a pickle file or a dictionary containing the necessary parameters for blob tracking. The configuration should include keys for the video data, input/output directories, and other processing settings.
+    :param Optional[int] batch_size: The batch size for blob location detection. If None, automatically calculated based on available RAM. Default: None.
+    :param bool rostrocaudal: If True, compute nose and tail coordinates. Default: True.
+    :param bool mediolateral: If True, compute left and right point coordinates. Default: True.
+    :param bool center: If True, compute center coordinates. Default: True.
 
     :example:
-    >>> tracker = BlobTrackingExecutor(data=r"C:\troubleshooting\mitra\test\.temp\blob_definitions.h5", vertice_cnt=10)
+    >>> tracker = BlobTrackingExecutor(data=r"C:\troubleshooting\mitra\test\.temp\blob_definitions.pickle")
+    >>> tracker.run()
+    >>> tracker = BlobTrackingExecutor(data=r"C:\troubleshooting\mitra\test\.temp\blob_definitions.pickle", batch_size=5000)
     >>> tracker.run()
     """
 
 
     def __init__(self,
                  data: Union[dict, str, os.PathLike],
-                 batch_size: int = 5000,
+                 batch_size: Optional[int] = None,
                  rostrocaudal : bool = True,
                  mediolateral: bool = True,
                  center: bool = True):
@@ -83,7 +103,7 @@ class BlobTrackingExecutor():
         check_if_dir_exists(in_dir=data[IN_DIR], source=self.__class__.__name__, raise_error=True)
         check_if_dir_exists(in_dir=data[OUT_DIR], source=self.__class__.__name__, raise_error=True)
         check_int(name=f'{self.__class__.__name__} core_cnt', value=data[CORE_CNT], min_value=1, max_value=find_core_cnt()[0], raise_error=True)
-        check_int(name=f'{self.__class__.__name__} batch_size', value=batch_size, min_value=1, raise_error=True)
+        if batch_size is not None: check_int(name=f'{self.__class__.__name__} batch_size', value=batch_size, min_value=1, raise_error=True)
         self.data, self.gpu, self.core_cnt, self.batch_size, self.vertice_cnt, self.closing_iterations = data, data[GPU], data[CORE_CNT], batch_size, data[VERTICE_CNT], data[CLOSING_ITS]
         self.save_bg_videos, self.save_dir, self.opening_iterations = data[SAVE_BG_VIDEOS], data[OUT_DIR], data[OPENING_ITS]
         self.rostrocaudal, self.mediolateral, self.center = rostrocaudal, mediolateral, center
@@ -95,9 +115,11 @@ class BlobTrackingExecutor():
             self.vertice_col_names.append(f"vertice_{i}_x"); self.vertice_col_names.append(f"vertice_{i}_y")
 
     def run(self):
+        self.pool = multiprocessing.Pool(self.core_cnt, maxtasksperchild=Defaults.MAXIMUM_MAX_TASK_PER_CHILD.value) if self.core_cnt > 1 else None
         self._remove_bgs()
         self._find_blobs()
         self.timer.stop_timer()
+        if self.pool is not None: terminate_cpu_pool(pool=self.pool)
         stdout_success(msg=f'Animal tracking complete. Results save din directory {self.data[OUT_DIR]}', elapsed_time=self.timer.elapsed_time_str)
 
     def _interpolate_vertices(self, arr: np.ndarray) -> np.ndarray:
@@ -123,7 +145,7 @@ class BlobTrackingExecutor():
             self.bg_video_paths.append(bg_video_path)
             close_kernel_size = None if video_data[CLOSING_KERNEL] is None else tuple(video_data[CLOSING_KERNEL])
             opening_kernel_size = None if video_data[OPENING_KERNEL] is None else tuple(video_data[OPENING_KERNEL])
-            print(f'Starting background subtraction on video {video_name} (video {video_cnt+1}/{self.video_cnt}, frame count: {video_meta["frame_count"]}, cores: {self.core_cnt}, gpu: {self.gpu})')
+            print(f'Starting background subtraction on video {video_name} (video {video_cnt+1}/{self.video_cnt}, frame count: {video_meta["frame_count"]}, cores: {self.core_cnt}, gpu: {self.gpu}, {get_current_time()})')
             if (self.core_cnt == 1):
                 video_bg_subtraction(video_path=video_data['video_path'],
                                      bg_video_path=video_data[REFERENCE],
@@ -147,11 +169,10 @@ class BlobTrackingExecutor():
                                         closing_kernel_size=close_kernel_size,
                                         closing_iterations=self.closing_iterations,
                                         opening_kernel_size=opening_kernel_size,
-                                        opening_iterations=self.opening_iterations)
-
+                                        opening_iterations=self.opening_iterations,
+                                        pool=self.pool)
         bg_timer.stop_timer()
-        print(f'Background subtraction COMPLETE: videos saved at {self.save_dir}, (elapsed time: {bg_timer.elapsed_time_str}s)')
-
+        print(f'Background subtraction COMPLETE: videos saved at {self.save_dir}, (elapsed time: {bg_timer.elapsed_time_str}s), {get_current_time()}')
 
 
     def _find_blobs(self):
@@ -164,15 +185,15 @@ class BlobTrackingExecutor():
             inclusion_zone = None if 'inclusion_zones' not in video_data.keys() else video_data['inclusion_zones']
             window_size = None if 'window_size' not in video_data.keys() else video_data['window_size']
             vertices = get_blob_vertices_from_video(video_path=temp_video_path,
+                                                    pool=self.pool,
                                                     gpu=self.gpu,
                                                     verbose=True,
                                                     core_cnt=self.core_cnt,
-                                                    batch_size=None,
+                                                    batch_size=self.batch_size,
                                                     inclusion_zone=inclusion_zone,
                                                     window_size=window_size,
                                                     convex_hull=False,
                                                     vertice_cnt=self.vertice_cnt)
-
             vertices = self._interpolate_vertices(arr=vertices)
             results = pd.DataFrame()
             if video_data['buffer_size'] is not None:
@@ -206,15 +227,15 @@ class BlobTrackingExecutor():
             remove_files(file_paths=self.bg_video_paths, raise_error=False)
         print(f'Blob tracking COMPLETE: data saved at {self.save_dir}, (elapsed time: {blob_timer.elapsed_time_str}s')
 
-if __name__ == "__main__" and not hasattr(sys, 'ps1'):
-    parser = argparse.ArgumentParser(description="Execute Blob tracking in SimBA.")
-    parser.add_argument('--data', type=str, required=True, help='Path to the pickle holding the parameters for performing blob tracking')
-    args = parser.parse_args()
-    tracker = BlobTrackingExecutor(data=args.data)
-    tracker.run()
+# if __name__ == "__main__" and not hasattr(sys, 'ps1'):
+#     parser = argparse.ArgumentParser(description="Execute Blob tracking in SimBA.")
+#     parser.add_argument('--data', type=str, required=True, help='Path to the pickle holding the parameters for performing blob tracking')
+#     args = parser.parse_args()
+#     tracker = BlobTrackingExecutor(data=args.data)
+#     tracker.run()
 
 
-# DATA_PATH = r"C:\troubleshooting\blob_track_tester\results\blob_definitions.pickle"
+# DATA_PATH = r"D:\troubleshooting\maplight_ri\project_folder\blob\data\blob_definitions.pickle"
 # tracker = BlobTrackingExecutor(data=DATA_PATH)
 # tracker.run()
 
@@ -262,7 +283,7 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 
 
 
-# data = read_pickle(data_path=r"C:\troubleshooting\mitra\blob_data.pickle")
+#data = read_pickle(data_path=r"D:\troubleshooting\maplight_ri\project_folder\blob\batch_out_6")
 # # data['gpu'] = True
 # # data['core_cnt'] = 16
 # tracker = BlobTrackingExecutor(data=data)

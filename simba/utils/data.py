@@ -4,6 +4,7 @@ import ast
 import configparser
 import io
 import os
+import gc
 import subprocess
 from copy import deepcopy
 from datetime import datetime
@@ -1834,6 +1835,7 @@ def terminate_cpu_pool(pool: Optional[multiprocessing.pool.Pool],
         pool.terminate()
     except (ValueError, AssertionError, AttributeError):
         pass
+    gc.collect()
 
 
 # run_user_defined_feature_extraction_class(config_path='/Users/simon/Desktop/envs/troubleshooting/circular_features_zebrafish/project_folder/project_config.ini', file_path='/Users/simon/Desktop/fish_feature_extractor_2023_version_5.py')
