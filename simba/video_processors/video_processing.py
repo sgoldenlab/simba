@@ -1145,7 +1145,7 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
 def downsample_video(file_path: Union[str, os.PathLike],
                      video_height: int,
                      video_width: int,
-                     gpu: Optional[bool] = False,
+                     gpu: bool = False,
                      codec: str = 'libx264',
                      quality: int = 23,
                      save_path: Optional[Union[str, os.PathLike]] = None,
@@ -1166,18 +1166,16 @@ def downsample_video(file_path: Union[str, os.PathLike],
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError( msg="No GPU found (as evaluated by nvidea-smi returning None)", source=downsample_video.__name__)
     timer = SimbaTimer(start=True)
-    check_int(name="Video height", value=video_height)
-    check_int(name="Video width", value=video_width)
-    video_height = int(video_height)
-    video_width = int(video_width)
-    if video_width % 2 != 0:
-        video_width += 1
-    if video_height % 2 != 0:
-        video_height += 1
+    check_int(name=f'{downsample_video.__name__} video_height', value=video_height, min_value=1)
+    check_int(name=f'{downsample_video.__name__} video_width', value=video_width, min_value=1)
+    check_int(name=f'{downsample_video.__name__} quality', value=quality, min_value=1, max_value=100)
+    video_height, video_width = int(video_height), int(video_width)
+    if video_width % 2 != 0: video_width += 1
+    if video_height % 2 != 0: video_height += 1
     check_file_exist_and_readable(file_path=file_path)
     dir, file_name, ext = get_fn_ext(filepath=file_path)
     if save_path is None:
-        save_name = os.path.join(dir, file_name + "_downsampled.mp4")
+        save_name = os.path.join(dir, f"{file_name}_downsampled.mp4")
     else:
         check_if_dir_exists(in_dir=os.path.dirname(save_path), raise_error=True)
         save_name = deepcopy(save_path)
@@ -1189,7 +1187,7 @@ def downsample_video(file_path: Union[str, os.PathLike],
         #command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "scale_cuda=w={video_width}:h={video_height}:force_original_aspect_ratio=decrease:flags=bicubic" -c:v h264_nvenc -rc vbr -cq {quality} "{save_name}" -loglevel error -stats -hide_banner -y'
     else:
         command = f'ffmpeg -i "{file_path}" -vf scale={video_width}:{video_height} -c:v {codec} -crf {quality} "{save_name}" -loglevel error -stats -hide_banner -y'
-    if verbose: print("Down-sampling video... ")
+    if verbose: print(f"Down-sampling video {file_name}... ")
     subprocess.call(command, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     if verbose: stdout_success(msg=f"SIMBA COMPLETE: Video converted! {save_name} generated!", elapsed_time=timer.elapsed_time_str, source=downsample_video.__name__)
@@ -5042,6 +5040,8 @@ def change_playback_speed(video_path: Union[str, os.PathLike],
                           speed: float,
                           save_path: Optional[Union[str, os.PathLike]] = None,
                           quality: int = 60,
+                          gpu: bool = False,
+                          verbose: bool = True,
                           codec: str = 'libx264'):
     """
     Change the playback speed of a video file. Speed > 1.0 makes the video faster, speed < 1.0 makes it slower.
@@ -5061,22 +5061,41 @@ def change_playback_speed(video_path: Union[str, os.PathLike],
     :example:
     >>> change_playback_speed(video_path=r"project_folder/videos/Video_1.mp4", speed=1.5)
     >>> change_playback_speed(video_path=r"project_folder/videos/Video_1.mp4", speed=0.5, quality=80)
+    >>> change_playback_speed(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\03152021_NOB_IOT_8.mp4", speed=2.0, gpu=False)
     """
 
+    timer = SimbaTimer(start=True)
     check_ffmpeg_available(raise_error=True)
+    check_valid_boolean(value=gpu, source=f'{change_playback_speed.__name__} gpu', raise_error=True)
+    check_valid_boolean(value=verbose, source=f'{change_playback_speed.__name__} verbose', raise_error=True)
+    if gpu: check_nvidea_gpu_available(raise_error=True)
     check_float(name=f'{change_playback_speed.__name__} speed', value=speed, min_value=0.001, max_value=100, raise_error=True)
     check_int(name=f'{change_playback_speed.__name__} quality', value=quality, min_value=1, max_value=100, raise_error=True)
     _ = get_video_meta_data(video_path=video_path)
     quality_code = quality_pct_to_crf(pct=quality)
+    dir, video_name, ext = get_fn_ext(filepath=video_path)
     if save_path is not None:
         check_if_dir_exists(in_dir=os.path.dirname(save_path), source=f'{change_playback_speed.__name__} save_path')
     else:
-        dir, video_name, ext = get_fn_ext(filepath=video_path)
         save_path = os.path.join(dir, f'{video_name}_playback_speed{ext}')
-
     video_pts = 1.0 / speed
-    cmd = f'ffmpeg -i "{video_path}" -vf "setpts={video_pts:.6f}*PTS" -an -c:v {codec} -crf {quality_code} "{save_path}" -hide_banner -loglevel error -stats -y'
+    if gpu:
+        cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{video_path}" -vf "setpts={video_pts:.6f}*PTS" -an -c:v h264_nvenc -rc vbr -cq {quality_code} "{save_path}" -hide_banner -loglevel error -stats -y'
+    else:
+        cmd = f'ffmpeg -i "{video_path}" -vf "setpts={video_pts:.6f}*PTS" -an -c:v {codec} -crf {quality_code} "{save_path}" -hide_banner -loglevel error -stats -y'
     subprocess.call(cmd, shell=True)
+    timer.stop_timer()
+    if verbose:
+        stdout_success(msg=f'Video {video_name} playbackspeed multiplied by {speed} and saved at {save_path}', elapsed_time=timer.elapsed_time_str, source=change_playback_speed.__name__)
+
+
+
+
+#change_playback_speed(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\03152021_NOB_IOT_8.mp4", speed=2.0, gpu=False)
+
+
+
+
 
 
 #if __name__ == "__main__":

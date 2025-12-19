@@ -619,7 +619,7 @@ def check_that_hhmmss_start_is_before_end(
         )
 
 
-def check_nvidea_gpu_available() -> bool:
+def check_nvidea_gpu_available(raise_error: bool = False) -> bool:
     """
     Helper to check of NVIDEA GPU is available via ``nvidia-smi``.
     returns bool: True if nvidia-smi returns not None. Else False.
@@ -628,6 +628,8 @@ def check_nvidea_gpu_available() -> bool:
         subprocess.check_output("nvidia-smi")
         return True
     except Exception:
+        if raise_error:
+            raise SimBAGPUError(msg='No NVIDIA GPU detected on machine (checked by calling "nvidia-smi")', source=check_nvidea_gpu_available.__name__)
         return False
 
 
