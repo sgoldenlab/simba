@@ -101,8 +101,10 @@ Before using the training popup, ensure you have:
    - Training labels (`.txt` files) in a corresponding directory
    - Validation images in a separate directory
    - Validation labels (`.txt` files) in a corresponding directory
+   
+   > **Note**: If your annotations are in a different format (DLC, SimBA, SLEAP, COCO, etc.), you'll need to convert them to YOLO format first. See the [Converting Other Data Formats to YOLO Format](#converting-other-data-formats-to-yolo-format) section for available conversion tools.
 
-2. **YOLO Map File (YAML)**: Create a YAML file that describes your dataset structure. See example files in the SimBA repository for the required format.
+2. **YOLO Map File (YAML)**: Create a YAML file that describes your dataset structure. See example files in the SimBA repository for the required format. If you used one of SimBA's conversion tools, a YAML map file (`map.yaml`) will be automatically generated in the output directory.
 
 3. **Initial Weights**: Download a pre-trained YOLO pose estimation model from [HuggingFace](https://huggingface.co/Ultralytics).
 
