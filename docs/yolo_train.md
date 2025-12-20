@@ -4,7 +4,19 @@ SimBA has a graphical user interface (GUI) for training YOLO-based pose estimati
 
 <img width="756" height="201" alt="image" src="https://github.com/user-attachments/assets/0659b291-7742-4422-8670-a08450c6353a" />
 
+## Table of Contents
 
+- [Prerequisites](#prerequisites)
+- [Accessing the YOLO Pose Training Popup](#accessing-the-yolo-pose-training-popup)
+- [Interface Overview](#interface-overview)
+- [Usage Instructions](#usage-instructions)
+- [Output](#output)
+- [Important Notes](#important-notes)
+- [Troubleshooting](#troubleshooting)
+- [Converting Other Data Formats to YOLO Format](#converting-other-data-formats-to-yolo-format)
+- [Related Documentation](#related-documentation)
+
+<a id="prerequisites"></a>
 ## Prerequisites
 
 Before using the YOLO Pose Training popup, ensure that:
@@ -15,13 +27,16 @@ Before using the YOLO Pose Training popup, ensure that:
 4. **Initial Weights File**: You need a pre-trained YOLO pose estimation model weights file (typically a `.pt` file) to use as a starting point. Pre-trained weights can be downloaded from [HuggingFace](https://huggingface.co/Ultralytics) (e.g., `yolo11n-pose.pt`, `yolo11s-pose.pt`, `yolo11m-pose.pt`, `yolo11l-pose.pt`, `yolo11x-pose.pt`).
 5. **Annotated Dataset**: You need a properly formatted YOLO dataset with images and corresponding label files. The dataset should be organized with separate directories for training and validation images and labels.
 
+<a id="accessing-the-yolo-pose-training-popup"></a>
 ## Accessing the YOLO Pose Training Popup
 
 The YOLO training menu can be accessed in the SimBA main interface. The popup window is titled **"TRAIN YOLO POSE ESTIMATION MODEL"** and provides an interface for configuring and running YOLO pose estimation model training.
 
+<a id="interface-overview"></a>
 ## Interface Overview
 
 <img width="885" height="397" alt="image" src="https://github.com/user-attachments/assets/bd5ce66e-0131-4e25-a0b0-18713064dd8f" />
+
 
 The popup window is organized into a single **SETTINGS** section that contains all configuration options:
 
@@ -74,6 +89,7 @@ This section contains all the parameters needed to configure YOLO model training
 - **DEVICE**: Select the device for training. Options include "CPU" or specific GPU devices (e.g., "0 : NVIDIA GeForce RTX 3090"). The default is typically the first available GPU.
   - **Effect**: GPU training (default) is essential for practical training times - training on CPU can take days or weeks for even small datasets. Use a specific GPU number if you have multiple GPUs and want to use a particular one. **Recommendation**: Always use GPU unless you have no other option. If you have multiple GPUs, select the one with the most memory or the one not being used by other processes.
 
+<a id="usage-instructions"></a>
 ## Usage Instructions
 
 ### Step 1: Prepare Your Dataset
@@ -125,6 +141,7 @@ During training, monitor:
   - Precision and recall metrics
   - Any signs of overfitting (validation loss increasing while training loss decreases)
 
+<a id="output"></a>
 ## Output
 
 Training outputs are saved in the specified **SAVE DIRECTORY** and include:
@@ -137,6 +154,7 @@ Training outputs are saved in the specified **SAVE DIRECTORY** and include:
 
 The `best.pt` file is typically the model you want to use for inference, as it represents the best performance on the validation set.
 
+<a id="important-notes"></a>
 ## Important Notes
 
 1. **GPU Requirement**: While not strictly enforced, GPU training is essential for practical training times. CPU training is extremely slow and not recommended.
@@ -169,6 +187,7 @@ The `best.pt` file is typically the model you want to use for inference, as it r
 
 7. **Model Selection**: After training, use `best.pt` (not `last.pt`) for inference, as it represents the best validation performance.
 
+<a id="troubleshooting"></a>
 ## Troubleshooting
 
 - **"No GPU detected"**: While training may proceed on CPU, it will be extremely slow. Ensure you have an NVIDIA GPU with CUDA drivers installed. Check GPU availability using `nvidia-smi` in your terminal.
@@ -207,6 +226,7 @@ The `best.pt` file is typically the model you want to use for inference, as it r
   - Use a smaller model
   - Check training plots to identify when overfitting begins
 
+<a id="converting-other-data-formats-to-yolo-format"></a>
 ## Converting Other Data Formats to YOLO Format
 
 Before training a YOLO pose estimation model, you need to convert your annotations to YOLO format. SimBA provides several conversion tools accessible through the main interface under the **Convert pose file format** menu. These tools convert various annotation formats into YOLO keypoint format, which can then be used for training.
@@ -311,6 +331,7 @@ The following conversion tools are available in SimBA for converting pose estima
   - Flip indices for data augmentation
   - Class names mapping
 
+<a id="related-documentation"></a>
 ## Related Documentation
 
 - For running inference with trained YOLO pose estimation models, see the [YOLO pose inference documentation](https://github.com/sgoldenlab/simba/blob/master/docs/yolo_pose_inference_popup.md).
