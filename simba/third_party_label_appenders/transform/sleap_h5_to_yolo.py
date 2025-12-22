@@ -46,9 +46,9 @@ class SleapH52Yolo:
 
 
     :example:
-    >>>DATA_DIR = r'D:\ares\data\termite_1\data'
-    >>>VIDEO_DIR = r'D:\ares\data\termite_1\video'
-    >>>SAVE_DIR = r"D:\imgs\sleap_h5"
+    >>>DATA_DIR = r'D:/ares/data/termite_1/data'
+    >>>VIDEO_DIR = r'D:/ares/data/termite_1/video'
+    >>>SAVE_DIR = r"D:/imgs/sleap_h5"
     >>>runner = SleapH52Yolo(data_dir=DATA_DIR, video_dir=VIDEO_DIR, save_dir=SAVE_DIR, threshold=0.9, frms_cnt=50, single_id='termite')
     >>>runner.run()
     """

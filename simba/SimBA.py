@@ -192,6 +192,7 @@ from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.pop_ups.yolo_inference_popup import YOLOPoseInferencePopUP
 from simba.ui.pop_ups.yolo_plot_results import YoloPoseVisualizerPopUp
+from simba.ui.pop_ups.change_speed_popup import ChangeSpeedPopup
 from simba.ui.pop_ups.yolo_pose_train_popup import YOLOPoseTrainPopUP
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         FileSelect, SimbaButton, SimbaCheckbox,
@@ -891,6 +892,8 @@ class App(object):
         img_format_menu = Menu(format_menu)
         video_format_menu = Menu(format_menu)
 
+
+
         img_format_menu.add_command(label="Convert images to PNG", compound="left",  image=self.menu_icons["png"]["img"], command=Convert2PNGPopUp, font=Formats.FONT_REGULAR.value)
         img_format_menu.add_command(label="Convert images  to JPEG", compound="left", image=self.menu_icons["jpeg"]["img"], command=Convert2jpegPopUp, font=Formats.FONT_REGULAR.value)
         img_format_menu.add_command(label="Convert images to BMP", compound="left",  image=self.menu_icons["bmp"]["img"], command=Convert2bmpPopUp, font=Formats.FONT_REGULAR.value)
@@ -957,6 +960,7 @@ class App(object):
         video_process_menu.add_command(label="Get metric conversion factor (pixels/millimeter)", compound="left", image=self.menu_icons["calipher"]["img"], command=CalculatePixelsPerMMInVideoPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Change video brightness / contrast", compound="left", image=self.menu_icons["brightness"]["img"], command=BrightnessContrastPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Merge frames to video", compound="left", image=self.menu_icons["merge"]["img"], command=MergeFrames2VideoPopUp, font=Formats.FONT_REGULAR.value)
+        video_process_menu.add_command(label="Change video playback speed", compound="left", image=self.menu_icons["run"]["img"], command=ChangeSpeedPopup, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Print classifier info", compound="left", image=self.menu_icons["print"]["img"], command=PrintModelInfoPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_command(label="Show video file(s) meta data", compound="left", image=self.menu_icons["print"]["img"], command=PrintVideoMetaDataPopUp, font=Formats.FONT_REGULAR.value)
 

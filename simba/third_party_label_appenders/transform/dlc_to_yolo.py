@@ -47,8 +47,8 @@ class DLC2Yolo:
     :return: None. Results saved in ``save_dir``.
 
     :example:
-    >>> DLC_DIR = r'D:\rat_resident_intruder\dlc_data'
-    >>> SAVE_DIR = r'D:\rat_resident_intruder\yolo_3'
+    >>> DLC_DIR = r'D:/rat_resident_intruder/dlc_data'
+    >>> SAVE_DIR = r'D:/rat_resident_intruder/yolo_3'
     >>> runner = DLC2Yolo(dlc_dir=DLC_DIR, save_dir=SAVE_DIR, verbose=True, clahe=True, names=('resident', 'intruder'))
     >>> runner.run()
     """

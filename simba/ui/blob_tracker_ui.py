@@ -68,7 +68,7 @@ class BlobTrackingUI(PopUpMixin):
     :param Union[str, os.PathLike] output_dir: Directory where blob tracking results and configuration files will be saved. Must be empty. Will be created if it doesn't exist.
 
     :example:
-    >>> _ = BlobTrackingUI(input_dir=r'D:\open_field_3\sample', output_dir=r"D:\open_field_3\sample\blob_data")
+    >>> _ = BlobTrackingUI(input_dir=r'D:/open_field_3/sample', output_dir=r"D:/open_field_3/sample/blob_data")
     """
 
     def __init__(self,

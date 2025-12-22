@@ -102,11 +102,17 @@ class YOLOPoseVisualizer():
     .. seealso::
        To create YOLO pose data, see :func:`~simba.bounding_box_tools.yolo.yolo_pose_inference.YOLOPoseInference`
        To fit YOLO model, see :func:`~simba.bounding_box_tools.yolo.yolo_fit.FitYolo`
+       For instructions, see `YOLO Pose Estimation Visualization Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/yolo_pose_plot.md>`_.
 
     .. video:: _static/img/YOLOPoseVisualizer.webm
        :width: 900
        :loop:
        :autoplay:
+
+    .. video:: _static/img/T1.webm
+       :width: 1000
+       :autoplay:
+       :loop:
 
     :param Union[str, os.PathLike] data_path: Path to the CSV file containing keypoint data, or folder containing keypoint data (output from YOLO pose inference).
     :param Union[str, os.PathLike] video_path: Path to the original input video, or folder containing original videos, to overlay keypoints on.
@@ -407,18 +413,18 @@ class YOLOPoseVisualizer():
 #     kp_vis.run()
 
 
-if __name__ == "__main__":
-    video_path = r"E:\netholabs_videos\primeintellect_100_videos\cage_1_date_2025_08_28_hour_20_minute_21.avi"
-    data_path = r"E:\netholabs_videos\primeintellect_100_largest\cage_1_date_2025_08_28_hour_20_minute_21.csv"
-    save_dir = r'E:\netholabs_videos\test_order'
-    kp_vis = YOLOPoseVisualizer(data_path=data_path,
-                                video_path=video_path,
-                                save_dir=save_dir,
-                                core_cnt=14,
-                                palettes=('tab20',),
-                                recursive=True,
-                                sample_n=None)
-
-
-    kp_vis.run()
+# if __name__ == "__main__":
+#     video_path = r"E:\netholabs_videos\primeintellect_100_videos\cage_1_date_2025_08_28_hour_20_minute_21.avi"
+#     data_path = r"E:\netholabs_videos\primeintellect_100_largest\cage_1_date_2025_08_28_hour_20_minute_21.csv"
+#     save_dir = r'E:\netholabs_videos\test_order'
+#     kp_vis = YOLOPoseVisualizer(data_path=data_path,
+#                                 video_path=video_path,
+#                                 save_dir=save_dir,
+#                                 core_cnt=14,
+#                                 palettes=('tab20',),
+#                                 recursive=True,
+#                                 sample_n=None)
+#
+#
+#     kp_vis.run()
 

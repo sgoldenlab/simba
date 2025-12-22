@@ -38,6 +38,7 @@ class FitYolo():
     .. seealso::
        :func:`simba.bounding_box_tools.yolo.utils.fit_yolo` for the functional API.
        :func:`simba.bounding_box_tools.yolo.utils.load_yolo_model` to load trained weights.
+       For  instructions, see `YOLO Pose Estimation Training Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/yolo_train.md>`_.
 
     :param Union[str, os.PathLike] weights_path: Path to base weights (e.g., ``yolo11n.pt`` or ``.onnx`` export).
     :param Union[str, os.PathLike] model_yaml: Dataset configuration YAML describing dataset folders and class labels.

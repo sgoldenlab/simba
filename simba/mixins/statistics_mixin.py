@@ -1364,7 +1364,42 @@ class Statistics(FeatureExtractionMixin):
     @dynamic_numba_decorator(dtypes="(float32[:], float64[:], float64)", cache=True, fastmath=False)
 
     def rolling_barletts_test(data: np.ndarray, time_windows: np.ndarray, fps: float) -> np.ndarray:
+        """
+        Compute rolling Bartlett's test statistic comparing variances between consecutive time windows.
 
+        Bartlett's test is used to test the null hypothesis that the variances of two or more groups are equal.
+        This function splits the data into consecutive time windows and compares the variance of each window
+        to the variance of the preceding window. The test statistic follows a chi-square distribution under
+        the null hypothesis of equal variances.
+
+        .. note::
+           The first time window (where there is no preceding window) will have fill value ``0.0``.
+           The test assumes that the data within each window is approximately normally distributed.
+
+        The Bartlett's test statistic (:math:`u`) is calculated as:
+
+        .. math::
+           u = \\frac{(N - 2) \\cdot (\\ln(\\sigma_1^2) + \\ln(\\sigma_2^2))}{\\frac{1}{n_1 - 1} + \\frac{1}{n_2 - 1}}
+
+        where:
+
+        - :math:`N = n_1 + n_2` is the total number of observations
+        - :math:`n_1` and :math:`n_2` are the sample sizes of the two consecutive windows
+        - :math:`\\sigma_1^2` and :math:`\\sigma_2^2` are the sample variances of the two windows
+
+        .. seealso::
+           For Levene's test (more robust to non-normality), see :func:`simba.mixins.statistics_mixin.Statistics.rolling_levenes`.
+
+        :param np.ndarray data: 1D array of feature values to test.
+        :param np.ndarray time_windows: Array of time window sizes in seconds. E.g., np.array([1.0, 2.0]) for 1s and 2s windows.
+        :param float fps: Frames per second of the recorded video.
+        :returns: 2D array of size len(data) x len(time_windows) containing Bartlett's test statistics. Contains 0.0 for the first window of each time window size.
+        :rtype: np.ndarray
+
+        :example:
+        >>> data = np.random.normal(loc=0, scale=1, size=(100,)).astype(np.float32)
+        >>> Statistics().rolling_barletts_test(data=data, time_windows=np.array([1.0, 2.0]), fps=10.0)
+        """
         results = np.full((data.shape[0], time_windows.shape[0]), 0.0)
         for i in prange(time_windows.shape[0]):
             window_size = int(time_windows[i] * fps)
@@ -5177,12 +5212,12 @@ class Statistics(FeatureExtractionMixin):
     @staticmethod
     def symmetry_index(x: np.ndarray, y: np.ndarray, agg_type: Literal['mean', 'median'] = 'mean') -> float:
 
-        """
+        r"""
         Calculate the Symmetry Index (SI) between two arrays of measurements, `x` and `y`, over a given time series.
         The Symmetry Index quantifies the relative difference between two measurements at each time point, expressed as a percentage.
         The function returns either the mean or median Symmetry Index over the entire series, based on the specified aggregation type.
 
-        Zero indicates perfect symmetry. Positive values pepresent increasing asymmetry between the two measurements.
+        Zero indicates perfect symmetry. Positive values represent increasing asymmetry between the two measurements.
 
         The Symmetry Index (SI) is calculated as:
 

@@ -55,9 +55,17 @@ class YOLOPoseInference():
     batch or stream-based inference, result interpolation, and saving results to disk. The model returns detected
     keypoints and their confidence scores for each frame, and optionally tracks poses over time.
 
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../docs/tables/YOLOPoseInference.csv
+       :widths: 10, 10, 40, 40
+       :align: center
+       :header-rows: 1
+
     .. seealso::
        For bounding box inference only (no pose), see :func:`~simba.bounding_box_tools.yolo.yolo_inference.YoloInference`.
        For segmentation inference, see :func:`~simba.bounding_box_tools.yolo.yolo_seg_inference.YOLOSegmentationInference`.
+       For detailed instructions, see `YOLO Pose Estimation Inference Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/yolo_inference.md>`_.
 
     :param Union[str, os.PathLike] weights: Path to the trained YOLO model weights (e.g., 'best.pt').
     :param Union[str, os.PathLike] or List[Union[str, os.PathLike]] video_path: Path to a single video, list of videos, or directory containing video files.
@@ -121,7 +129,7 @@ class YOLOPoseInference():
             video_path = [video_path]
         elif os.path.isdir(video_path):
             if not recursive:
-                video_path = find_files_of_filetypes_in_directory(directory=video_path, extensions=list(Options.ALL_VIDEO_FORMAT_OPTIONS.value), as_dict=False)
+                video_path = find_files_of_filetypes_in_directory(directory=video_path, extensions=list(Options.ALL_VIDEO_FORMAT_OPTIONS.value), as_dict=False, sort_alphabetically=True)
             else:
                 video_path = recursive_file_search(directory=video_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, as_dict=False)
         for i in video_path:
@@ -317,26 +325,26 @@ if __name__ == "__main__" and not hasattr(sys, 'ps1'):
 # WEIGHTS_PATH = r"E:\netholabs_videos\mosaics\yolo_mdl_wo_tail\mdl\train2\weights\best.pt"
 # SAVE_DIR = r"E:\netholabs_videos\mosaics\yolo_mdl_wo_tail\results_csv"
 #
-# # VIDEO_DIR = r"E:\maplight_videos"
-# # SAVE_DIR = r"E:\maplight_videos\yolo_mdl\mdl\results"
-# # WEIGHTS_PATH = r"E:\maplight_videos\yolo_mdl\mdl\train\weights\best.pt"
+# VIDEO_DIR = r"E:\maplight_videos\yolo_runtime_test\videos"
+# SAVE_DIR = r"E:\maplight_videos\yolo_runtime_test\results"
+# WEIGHTS_PATH = r"E:\maplight_videos\yolo_mdl\mdl\train\weights\best.pt"
 #
 # KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base',)
-# #
+#
 # i = YOLOPoseInference(weights=WEIGHTS_PATH,
 #                         video_path=VIDEO_DIR,
 #                         save_dir=SAVE_DIR,
 #                         verbose=True,
 #                         device=0,
 #                         format=None,
-#                         stream=True,
+#                         stream=False,
 #                         keypoint_names=KEYPOINT_NAMES,
-#                         batch_size=250,
-#                         imgsz=640,
+#                         batch_size=500,
+#                         imgsz=288,
 #                         interpolate=False,
 #                         box_threshold=0.5,
-#                         max_tracks=3,
-#                         max_per_class=None,
+#                         max_tracks=100,
+#                         max_per_class=1,
 #                         overwrite=True,
 #                         randomize_order=True,
 #                         raise_error=False,

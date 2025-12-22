@@ -32,6 +32,9 @@ class ROITimebinCalculator(ConfigReader):
     :param float threshold: Filter pose-estimation data detected below defined threshold.
     :param Optional[bool] movement: If True, compute the distances and velocities within time-bins. Default False.
 
+    .. important::
+       Legacy. Use :func:`simba.roi_tools.roi_time_bins_analyzer.ROITimebinAnalyzer`.
+
     .. note::
        `Example anticipated ROI time-bins entry results <https://github.com/sgoldenlab/simba/blob/master/misc/ROI_time_bins_5.2s_entry_data_20240331125343.csv>`__.
        `Example anticipated ROI time-bins latency results <https://github.com/sgoldenlab/simba/blob/master/misc/ROI_time_bins_5.2s_time_data_20240331125343.csv>`__.

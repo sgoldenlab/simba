@@ -21,5 +21,7 @@
   "SHOW_ANIMAL_BBOX": "Display rectangle bounding boxes encompassing all animal keypoints",
   "BORDER_BG_COLOR": "The color of the border image on which data is printed",
   "USE_GPU": "If GPU available and selected, then potentially faster processing times.",
-  "OUPUT_VIDEO_QUALITY": "Higher values produce larger, higher quality, videos. Lower values produce smaller, lower quality videos. \nScale not linear. Avoid values above 80 if possible. 60 generally works well."
+  "OUPUT_VIDEO_QUALITY": "Higher values produce larger, higher quality, videos. Lower values produce smaller, lower quality videos. \nScale not linear. Avoid values above 80 if possible. 60 generally works well.",
+  "VIDEO_SPEED": "2 doubles the speed, while 0.5 halves the speed.",
+  "VIDEO_CODEC": "Video codec to use for encoding. Common options include libx264 (CPU, widely compatible), h264_nvenc (NVIDIA GPU), libx265 (CPU, better compression), and libvpx-vp9 (CPU, web optimized). Codec availability depends on your FFmpeg installation."
 }

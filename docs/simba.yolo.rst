@@ -7,7 +7,7 @@ converting behavioral neuroscience specific datasets to YOLO datasets.
 Utilities
 -----------------------------------------------------------------------
 
-.. automodule:: simba.bounding_box_tools.yolo.utils
+.. automodule:: simba.utils.yolo
    :members:
    :show-inheritance:
 

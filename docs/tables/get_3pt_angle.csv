@@ -1,8 +1,8 @@
 FRAMES,TIME (S)
-**4 million**,0.020
-**8 million**,0.040
+**4 million**,0.02
+**8 million**,0.04
 **16 million**,0.159
-**32 million**,0.290
+**32 million**,0.29
 **64 million** ,0.335
 **128 million**,0.792
-256 million**,1.371
+**256 million**,1.371

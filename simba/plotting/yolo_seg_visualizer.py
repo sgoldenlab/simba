@@ -71,7 +71,7 @@ class YOLOSegmentationVisualizer():
        To **create** YOLO segmentation dataset for fitting, use :func:`simba.third_party_label_appenders.transform.labelme_to_yolo_seg.LabelmeKeypoints2YoloSeg`.
        To fit YOLO model, see `:func:~simba.bounding_box_tools.yolo.yolo_fit.FitYolo`
 
-    :param Union[str, os.PathLike] data_path (): Path to the CSV file with YOLO segmentation output. Must include columns "FRAME", "ID", and at least six "VERTICE" columns.
+    :param Union[str, os.PathLike] data_path: Path to the CSV file with YOLO segmentation output. Must include columns "FRAME", "ID", and at least six "VERTICE" columns.
     :param Union[str, os.PathLike] video_path: Path to the source video file.
     :param Union[str, os.PathLike] save_dir: Directory where output videos (temp and final) are saved.
     :param Tuple[int, int, int] color: RGB color for drawing polygons. Defaults to (255, 255, 0).
@@ -81,7 +81,7 @@ class YOLOSegmentationVisualizer():
     :param float shape_opacity: Alpha blending factor for filled polygon overlay (range 0.0–1.0). If `None`, solid fill is used. Defaults to 0.5.
 
     :example:
-    runner = YOLOSegmentationVisualizer(data_path=r"D:\platea\platea_videos\videos\yolo_results\10B_Mouse_5-choice_MustTouchTrainingNEWFINAL_a7.csv", video_path=r"D:\platea\platea_videos\videos\clipped\10B_Mouse_5-choice_MustTouchTrainingNEWFINAL_a7.mp4", save_dir=r'D:\platea\platea_videos\videos\yolo_seg_videos', verbose=True)
+    runner = YOLOSegmentationVisualizer(data_path=r"D:/platea/platea_videos/videos/yolo_results/10B_Mouse_5-choice_MustTouchTrainingNEWFINAL_a7.csv", video_path=r"D:/platea/platea_videos/videos/clipped/10B_Mouse_5-choice_MustTouchTrainingNEWFINAL_a7.mp4", save_dir=r'D:/platea/platea_videos/videos/yolo_seg_videos', verbose=True)
     runner.run()
     """
 

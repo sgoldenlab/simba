@@ -107,8 +107,8 @@ def create_average_frm_cupy(video_path: Union[str, os.PathLike],
     :return: Returns `None` if the result is saved to `save_path`. Otherwise, returns the average frame as a NumPy array.
 
     :example:
-    >>> create_average_frm_cupy(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled.mp4", verbose=True, start_frm=0, end_frm=9000)
-    >>> create_average_frm_cupy(video_path=r"C:\videos\my_video.mp4", start_time="00:00:00", end_time="00:01:00", async_frame_read=True, save_path=r"C:\output\avg_frame.png")
+    >>> create_average_frm_cupy(video_path=r"C:/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4_downsampled.mp4", verbose=True, start_frm=0, end_frm=9000)
+    >>> create_average_frm_cupy(video_path=r"C:/videos/my_video.mp4", start_time="00:00:00", end_time="00:01:00", async_frame_read=True, save_path=r"C:/output/avg_frame.png")
 
     """
 
@@ -248,7 +248,7 @@ def create_average_frm_cuda(video_path: Union[str, os.PathLike],
     :return: Returns `None` if the result is saved to `save_path`. Otherwise, returns the average frame as a NumPy array.
 
     :example:
-    >>> create_average_frm_cuda(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\2022-06-20_NOB_DOT_4_downsampled.mp4", verbose=True, start_frm=0, end_frm=9000)
+    >>> create_average_frm_cuda(video_path=r"C:/troubleshooting/RAT_NOR/project_folder/videos/2022-06-20_NOB_DOT_4_downsampled.mp4", verbose=True, start_frm=0, end_frm=9000)
 
     """
 
@@ -440,7 +440,7 @@ def _rgb_mse(data, ref_img, stride, batch_cnt, mse_arr):
 def stack_sliding_mse(x: np.ndarray,
                       stride: Optional[int] = 1,
                       batch_size: Optional[int] = 1000) -> np.ndarray:
-    """
+    r"""
     Computes the Mean Squared Error (MSE) between each image in a stack and a reference image,
     where the reference image is determined by a sliding window approach with a specified stride.
     The function is optimized for large image stacks by processing them in batches.
@@ -450,6 +450,7 @@ def stack_sliding_mse(x: np.ndarray,
        :func:`~simba.mixins.image_mixin.ImageMixin.img_sliding_mse`.
 
     .. math::
+
        \text{MSE} = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
 
     :param np.ndarray x: Input array of images, where the first dimension corresponds to the stack of images. The array should be either 3D (height, width, channels) or 4D (batch, height, width, channels).
@@ -1029,7 +1030,7 @@ def _sliding_psnr(data, stride, results):
 def sliding_psnr(data: np.ndarray,
                  stride_s: int,
                  sample_rate: float) -> np.ndarray:
-    """
+    r"""
     Computes the Peak Signal-to-Noise Ratio (PSNR) between pairs of images in a stack using a sliding window approach.
 
     This function calculates PSNR for each image in a stack compared to another image in the stack that is separated by a specified stride.

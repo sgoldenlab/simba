@@ -152,6 +152,23 @@ class ImageMixin(object):
         absolute: Optional[bool] = True,
     ):
         """
+        Compare histograms of two images using OpenCV's histogram comparison methods.
+
+        Computes a similarity metric between the histograms of two images. The method determines how the comparison
+        is performed (e.g., correlation, chi-square, Bhattacharyya distance). Lower values typically indicate
+        greater similarity for correlation and intersection methods, while higher values indicate similarity for
+        chi-square methods.
+
+        .. seealso::
+           For histogram comparison within specific geometries, see :func:`simba.mixins.geometry_mixin.GeometryMixin.geometry_histocomparison`.
+
+        :param np.ndarray img_1: First input image as a numpy array.
+        :param np.ndarray img_2: Second input image as a numpy array.
+        :param Optional[Literal['chi_square', 'correlation', 'intersection', 'bhattacharyya', 'hellinger', 'chi_square_alternative', 'kl_divergence']] method: Histogram comparison method. Default: 'correlation'.
+        :param Optional[bool] absolute: If True, returns the absolute value of the comparison result. Default: True.
+        :return: Histogram comparison score between the two images.
+        :rtype: float
+
         :example:
         >>> img_1 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/khan/project_folder/videos/stitched_frames/0.png').astype(np.uint8)
         >>> img_2 = cv2.imread('/Users/simon/Desktop/envs/troubleshooting/khan/project_folder/videos/stitched_frames/3.png').astype(np.uint8)
@@ -1188,9 +1205,9 @@ class ImageMixin(object):
         :return: A binary image (NumPy array) where pixel values are either 255 (significant difference) or 0 (insignificant difference).
         :rtype: np.ndarray
 
-        :references:
+        References
         ----------
-           .. [1] Pennington et al,. “eztrack: An open-source video analysis pipeline for the investigation of animal behavior”. Scientific Reports (2019) 9:19979 | https://doi.org/10.1038/s41598-019-56408-9
+        .. [1] Pennington et al. "eztrack: An open-source video analysis pipeline for the investigation of animal behavior". Scientific Reports (2019) 9:19979 | https://doi.org/10.1038/s41598-019-56408-9
 
         :example:
         >>> img1 = np.random.randint(0, 255, (100, 100, 3), dtype=np.uint8)

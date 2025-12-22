@@ -19,7 +19,7 @@ import numpy as np
 import pandas as pd
 from PIL import Image, ImageTk
 from shapely.affinity import scale
-from shapely.geometry import MultiPolygon, Polygon
+from shapely.geometry import Polygon
 from skimage.color import label2rgb
 from skimage.segmentation import slic
 
@@ -39,7 +39,8 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_nvidea_gpu_available, check_str,
                                 check_that_hhmmss_start_is_before_end,
                                 check_valid_boolean, check_valid_cpu_pool,
-                                check_valid_lst, check_valid_tuple)
+                                check_valid_lst, check_valid_tuple,
+                                check_valid_codec)
 from simba.utils.data import (find_frame_numbers_from_time_stamp,
                               terminate_cpu_pool)
 from simba.utils.enums import OS, ConfigKey, Defaults, Formats, Options, Paths
@@ -49,7 +50,7 @@ from simba.utils.errors import (CountError, DirectoryExistError,
                                 InvalidFileTypeError, InvalidInputError,
                                 InvalidVideoFileError, NoDataError,
                                 NoFilesFoundError, NotDirectoryError,
-                                ResolutionError, SimBAGPUError)
+                                ResolutionError, SimBAGPUError,DuplicationError)
 from simba.utils.lookups import (get_ffmpeg_crossfade_methods, get_fonts,
                                  get_named_colors, percent_to_crf_lookup,
                                  percent_to_qv_lk, quality_pct_to_crf,
@@ -1578,7 +1579,7 @@ def crop_multiple_videos(directory_path: Union[str, os.PathLike],
 
     :example:
     >>> _ = crop_multiple_videos(directory_path='project_folder/videos', output_path='project_folder/videos/my_new_folder')
-    >>> _ = crop_multiple_videos(directory_path=r'C:\troubleshooting\mitra\test', output_path=r'C:\troubleshooting\mitra\test\cropped', gpu=True)
+    >>> _ = crop_multiple_videos(directory_path=r'C:/troubleshooting/mitra/test', output_path=r'C:/troubleshooting/mitra/test/cropped', gpu=True)
     """
 
     check_ffmpeg_available(raise_error=True)
@@ -2425,8 +2426,8 @@ def resize_videos_by_width(video_paths: List[Union[str, os.PathLike]],
     :example:
     >>> video_paths= ['/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat7_8(2).mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/08102021_DOT_Rat11_12.mp4']
     >>> _ = resize_videos_by_width(video_paths=video_paths, width=300, overwrite=False, save_dir='/Users/simon/Desktop/envs/simba/troubleshooting/RAT_NOR/project_folder/videos/test/new')
-    >>> video_paths= [r"D:\videos\4A_Mouse_5-choice_MustTouchTrainingNEWFINAL_a8_grayscale.mp4"]
-    >>> resize_videos_by_width(video_paths=video_paths, width=301, overwrite=False, save_dir=r"D:\videos\test", gpu=True)
+    >>> video_paths= [r"D:/videos/4A_Mouse_5-choice_MustTouchTrainingNEWFINAL_a8_grayscale.mp4"]
+    >>> resize_videos_by_width(video_paths=video_paths, width=301, overwrite=False, save_dir=r"D:/videos/test", gpu=True)
     """
 
     timer = SimbaTimer(start=True)
@@ -4113,7 +4114,32 @@ def video_bg_subtraction(video_path: Union[str, os.PathLike],
     if verbose:
         stdout_success(msg=f'Background subtracted from {video_name} and saved at {save_path}', elapsed_time=timer.elapsed_time)
 
-def reencode_mp4_video(file_path, codec, quality):
+def reencode_mp4_video(file_path: Union[str, os.PathLike],
+                      codec: str,
+                      quality: int) -> None:
+    """
+    Re-encode an MP4 video file in-place with a new codec and quality setting.
+
+    This function re-encodes the video track of an MP4 file using FFmpeg while preserving
+    the audio track unchanged. The original file is replaced with the re-encoded version.
+    A temporary file is used during encoding to ensure the original is only replaced if
+    encoding succeeds.
+
+    .. note::
+       The function modifies the file in-place. The original file will be replaced with
+       the re-encoded version upon successful completion. The audio track is copied as-is
+       without re-encoding (`-c:a copy`).
+       FFmpeg must be installed and available in the system PATH.
+
+    :param Union[str, os.PathLike] file_path: Path to the MP4 video file to re-encode.
+    :param str codec: Video codec to use for encoding (e.g., 'libx264', 'libx265', 'h264_nvenc').
+    :param int quality: CRF (Constant Rate Factor) value for quality control. Lower values indicate higher quality. Typical range: 18-28 (18 = high quality, 28 = lower quality/file size).
+    :returns: None. The original file is replaced with the re-encoded version.
+
+    :example:
+    >>> reencode_mp4_video(file_path=r'project_folder/videos/Video_1.mp4', codec='libx264', quality=23)
+    >>> reencode_mp4_video(file_path=r'C:/videos/my_video.mp4', codec='libx265', quality=20)
+    """
     tmp_path = f"{file_path}.tmp"
     cmd = f'ffmpeg -i "{file_path}" -c:v {codec} -crf {quality} -c:a copy "{tmp_path}" -loglevel error -stats -hide_banner -y'
     try:
@@ -4532,8 +4558,8 @@ def rotate_video(video_path: Union[str, os.PathLike],
 
     :example:
     >>> rotate_video(video_path='/Users/simon/Desktop/envs/simba/troubleshooting/reptile/rot_test.mp4', degrees=180)
-    >>> rotate_video(video_path=r"C:\troubleshooting\mitra\project_folder\videos\clipped\501_MA142_Gi_CNO_0514_clipped.mp4", degrees=65)
-    >>> rotate_video(video_path=r"C:\troubleshooting\mitra\project_folder\videos\clipped\501_MA142_Gi_CNO_0514_clipped.mp4", degrees=10, fill_color='deeppink', gpu=True)
+    >>> rotate_video(video_path=r"C:/troubleshooting/mitra/project_folder/videos/clipped/501_MA142_Gi_CNO_0514_clipped.mp4", degrees=65)
+    >>> rotate_video(video_path=r"C:/troubleshooting/mitra/project_folder/videos/clipped/501_MA142_Gi_CNO_0514_clipped.mp4", degrees=10, fill_color='deeppink', gpu=True)
 
     """
 
@@ -4756,7 +4782,7 @@ def get_img_slic(img: np.ndarray,
     :rtype: np.ndarray
 
     :example:
-    >>> img = read_frm_of_video(video_path=r"C:\troubleshooting\mitra\project_folder\videos\FRR_gq_Saline_0626.mp4", frame_index=0)
+    >>> img = read_frm_of_video(video_path=r"C:/troubleshooting/mitra/project_folder/videos/FRR_gq_Saline_0626.mp4", frame_index=0)
     >>> sliced_img = get_img_slic(img=img)
     """
 
@@ -5051,6 +5077,11 @@ def change_playback_speed(video_path: Union[str, os.PathLike],
        The function uses FFmpeg's setpts filter to adjust playback speed. The video duration will change
        proportionally to the speed factor (e.g., speed=2.0 halves the duration).
 
+    .. video:: _static/img/playback_speed.webm
+       :width: 800
+       :autoplay:
+       :loop:
+
     :param Union[str, os.PathLike] video_path: Path to the input video file.
     :param float speed: Playback speed multiplier. Must be between 0.001 and 100. Values > 1.0 increase speed, values < 1.0 decrease speed.
     :param Optional[Union[str, os.PathLike]] save_path: Path where the output video will be saved. If None, saves in the same directory as input with ``_playback_speed`` suffix.
@@ -5061,7 +5092,7 @@ def change_playback_speed(video_path: Union[str, os.PathLike],
     :example:
     >>> change_playback_speed(video_path=r"project_folder/videos/Video_1.mp4", speed=1.5)
     >>> change_playback_speed(video_path=r"project_folder/videos/Video_1.mp4", speed=0.5, quality=80)
-    >>> change_playback_speed(video_path=r"C:\troubleshooting\RAT_NOR\project_folder\videos\03152021_NOB_IOT_8.mp4", speed=2.0, gpu=False)
+    >>> change_playback_speed(video_path=r"C:/troubleshooting/RAT_NOR/project_folder/videos/03152021_NOB_IOT_8.mp4", speed=2.0, gpu=False)
     """
 
     timer = SimbaTimer(start=True)
@@ -5069,15 +5100,16 @@ def change_playback_speed(video_path: Union[str, os.PathLike],
     check_valid_boolean(value=gpu, source=f'{change_playback_speed.__name__} gpu', raise_error=True)
     check_valid_boolean(value=verbose, source=f'{change_playback_speed.__name__} verbose', raise_error=True)
     if gpu: check_nvidea_gpu_available(raise_error=True)
-    check_float(name=f'{change_playback_speed.__name__} speed', value=speed, min_value=0.001, max_value=100, raise_error=True)
+    check_float(name=f'{change_playback_speed.__name__} speed', value=speed, min_value=0.000001, max_value=100, raise_error=True)
     check_int(name=f'{change_playback_speed.__name__} quality', value=quality, min_value=1, max_value=100, raise_error=True)
     _ = get_video_meta_data(video_path=video_path)
     quality_code = quality_pct_to_crf(pct=quality)
     dir, video_name, ext = get_fn_ext(filepath=video_path)
+    if verbose: print(f'Changing playback speed for video {video_name} ({speed}x)... ')
     if save_path is not None:
         check_if_dir_exists(in_dir=os.path.dirname(save_path), source=f'{change_playback_speed.__name__} save_path')
     else:
-        save_path = os.path.join(dir, f'{video_name}_playback_speed{ext}')
+        save_path = os.path.join(dir, f'{video_name}_playback_speed_{speed}{ext}')
     video_pts = 1.0 / speed
     if gpu:
         cmd = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{video_path}" -vf "setpts={video_pts:.6f}*PTS" -an -c:v h264_nvenc -rc vbr -cq {quality_code} "{save_path}" -hide_banner -loglevel error -stats -y'
@@ -5086,7 +5118,74 @@ def change_playback_speed(video_path: Union[str, os.PathLike],
     subprocess.call(cmd, shell=True)
     timer.stop_timer()
     if verbose:
-        stdout_success(msg=f'Video {video_name} playbackspeed multiplied by {speed} and saved at {save_path}', elapsed_time=timer.elapsed_time_str, source=change_playback_speed.__name__)
+        stdout_success(msg=f'Video {video_name} playback speed multiplied by {speed} and saved at {save_path}', elapsed_time=timer.elapsed_time_str, source=change_playback_speed.__name__)
+
+
+
+def change_playback_speed_dir(data_dir: Union[str, os.PathLike],
+                              speed: float,
+                              save_dir: Optional[Union[str, os.PathLike]] = None,
+                              quality: int = 60,
+                              gpu: bool = False,
+                              verbose: bool = True,
+                              codec: str = 'libx264'):
+    """
+    Change the playback speed of all video files in a directory. Speed > 1.0 makes videos faster, speed < 1.0 makes them slower.
+
+    .. note::
+       The output videos will have no audio track.
+       The function uses FFmpeg's setpts filter to adjust playback speed. The video duration will change proportionally to the speed factor (e.g., speed=2.0 halves the duration).
+       If ``save_dir`` is None, creates a new directory named ``playback_speed_{speed}x`` in the input directory.
+
+    .. seealso::
+       For processing a single video file, see :func:`~simba.video_processors.video_processing.change_playback_speed`.
+
+    :param Union[str, os.PathLike] data_dir: Path to the directory containing video files to process.
+    :param float speed: Playback speed multiplier. Must be between 0.000001 and 100. Values > 1.0 increase speed, values < 1.0 decrease speed.
+    :param Optional[Union[str, os.PathLike]] save_dir: Path where the output videos will be saved. If None, creates a new directory named ``playback_speed_{speed}x`` in the input directory.
+    :param int quality: Video quality as percentage (1-100). Higher values indicate better quality. Default: 60. Converted to CRF internally.
+    :param bool gpu: If True, use NVIDIA GPU codecs for encoding. Requires NVIDIA GPU and appropriate drivers. Default: False.
+    :param bool verbose: If True, prints progress messages. Default: True.
+    :param str codec: Video codec to use. Default: 'libx264'.
+    :returns: None
+
+    :example:
+    >>> change_playback_speed_dir(data_dir=r'E:/open_video/barnes_maze/test', speed=5)
+    >>> change_playback_speed_dir(data_dir=r'project_folder/videos', speed=2.0, quality=80, gpu=True)
+    """
+
+    timer = SimbaTimer(start=True)
+    check_ffmpeg_available(raise_error=True)
+    check_valid_boolean(value=gpu, source=f'{change_playback_speed.__name__} gpu', raise_error=True)
+    check_valid_boolean(value=verbose, source=f'{change_playback_speed.__name__} verbose', raise_error=True)
+    if gpu: check_nvidea_gpu_available(raise_error=True)
+    check_float(name=f'{change_playback_speed.__name__} speed', value=speed, min_value=0.000001, max_value=100, raise_error=True)
+    check_int(name=f'{change_playback_speed.__name__} quality', value=quality, min_value=1, max_value=100, raise_error=True)
+    check_if_dir_exists(in_dir=data_dir, source=f'{change_playback_speed.__name__} data_dir')
+    check_valid_codec(codec=codec, raise_error=True, source=change_playback_speed_dir.__name__)
+    video_dict = find_all_videos_in_directory(directory=data_dir, as_dict=True, raise_error=True, sort_alphabetically=True)
+    total_video_cnt = len(list(video_dict.keys()))
+    if save_dir is not None:
+        check_if_dir_exists(in_dir=save_dir, source=f'{change_playback_speed.__name__} save_path')
+    else:
+        save_dir = os.path.join(data_dir, f'playback_speed_{speed}x')
+        if not os.path.isdir(save_dir): create_directory(paths=save_dir, overwrite=True)
+    if save_dir == data_dir:
+        raise DuplicationError(msg=f'The video directory and the save directory cannot be the same folder: {save_dir}', source=change_playback_speed_dir.__name__)
+    for video_cnt, (video_name, video_path) in enumerate(video_dict.items()):
+        _, _, ext = get_fn_ext(filepath=video_path)
+        save_path = os.path.join(save_dir, f'{video_name}{ext}')
+        if verbose: print(f'Changing video speed for video {video_name} ({video_cnt+1}/{total_video_cnt})...')
+        change_playback_speed(video_path=video_path, speed=speed, save_path=save_path, quality=quality, codec=codec, verbose=False)
+
+    timer.stop_timer()
+    if verbose:
+        stdout_success(msg=f'Changed video speed for {total_video_cnt} video(s) ({speed}x). Videos saved in {save_dir}.', elapsed_time=timer.elapsed_time_str, source=change_playback_speed_dir.__name__)
+
+
+
+
+#change_playback_speed_dir(data_dir=r'E:\open_video\barnes_maze\test', speed=5)
 
 
 

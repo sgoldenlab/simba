@@ -9,12 +9,13 @@ except:
     from typing_extensions import Literal
 try:
     from ultralytics import YOLO
+    import torch
 except ModuleNotFoundError:
     YOLO = None
+    torch = None
 
 import numpy as np
 import pandas as pd
-import torch
 
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.third_party_label_appenders.converters import \

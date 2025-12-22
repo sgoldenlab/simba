@@ -424,10 +424,9 @@ class CircularStatisticsMixin(object):
           :width: 600
           :align: center
 
-        .. seealso:
-           :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.direction_two_bps`
-           :func:`simba.data_processors.cuda.circular_statistics.direction_from_two_bps`
-           :func:`simba.data_processors.cuda.circular_statistics.direction_from_three_bps`
+        .. seealso::
+           For two-point direction calculation, see :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.direction_two_bps`.
+           For GPU-accelerated implementations, see :func:`simba.data_processors.cuda.circular_statistics.direction_from_two_bps` and :func:`simba.data_processors.cuda.circular_statistics.direction_from_three_bps`.
 
         :param ndarray nose_loc: 2D array of size len(frames)x2 representing nose coordinates
         :param ndarray left_ear_loc: 2D array of size len(frames)x2 representing left ear coordinates
@@ -595,14 +594,14 @@ class CircularStatisticsMixin(object):
         The Rayleigh Z score is calculated as follows:
 
         .. math::
-           Z = nR^2
+           Z = n R^2
 
         where :math:`n` is the sample size and :math:`R` is the mean resultant length.
 
         The associated p-value is calculated as follows:
 
         .. math::
-           p = e^{\\sqrt{1 + 4n + 4(n^2 - R^2)} - (1 + 2n)}
+           p = \\exp\\left(\\sqrt{1 + 4n + 4(n^2 - R^2)} - (1 + 2n)\\right)
 
         .. seealso::
            :func:`simba.data_processors.cuda.circular_statistics.sliding_rayleigh_z`,
@@ -672,10 +671,7 @@ class CircularStatisticsMixin(object):
         The circular correlation coefficient is calculated as:
 
         .. math::
-           R = \\frac{\\sum \\sin(\\theta_1 - \\bar{\\theta}_1) \\sin(\\theta_2 - \\bar{\\theta}_2)}
-           {\\sqrt{\\sum \\sin^2(\\theta_1 - \\bar{\\theta}_1) \\sum \\sin^2(\\theta_2 - \\bar{\\theta}_2)}}
-
-           R = \frac{\sum \sin(\theta_1 - \bar{\theta}_1) \sin(\theta_2 - \bar{\theta}_2)}{\sqrt{\sum \sin^2(\theta_1 - \bar{\theta}_1) \sum \sin^2(\theta_2 - \bar{\theta}_2)}}
+           R = \\frac{\\sum \\sin(\\theta_1 - \\bar{\\theta}_1) \\sin(\\theta_2 - \\bar{\\theta}_2)}{\\sqrt{\\sum \\sin^2(\\theta_1 - \\bar{\\theta}_1) \\sum \\sin^2(\\theta_2 - \\bar{\\theta}_2)}}
 
         Where:
 
@@ -1056,7 +1052,41 @@ class CircularStatisticsMixin(object):
 
     @staticmethod
     def sliding_hodges_ajne(data: np.ndarray, time_window: float, fps: int) -> np.ndarray:
+        """
+        Compute the Hodges-Ajne test statistic for uniformity of circular data within sliding time windows.
 
+        The Hodges-Ajne test is a non-parametric test used to assess whether circular data is uniformly distributed.
+        The test statistic measures the concentration of data points around the circle. Lower values indicate
+        more uniform distribution, while higher values suggest clustering or non-uniformity.
+
+        .. attention::
+           The returned values represent the Hodges-Ajne statistic in the time-window ``[(current_frame-time_window)->current_frame]``.
+           `-1.0` is returned where ``current_frame-time_window`` is less than 0 (i.e., before the first complete window).
+
+        The Hodges-Ajne statistic (:math:`H`) is calculated as:
+
+        .. math::
+           H = n \\cdot (1 - v)
+
+        where:
+
+        - :math:`n` is the number of data points in the sliding window
+        - :math:`v = 1 - |\\text{mean}(\\exp(j \\cdot \\theta))|` is a measure of dispersion
+        - :math:`\\theta` are the angles in radians within the window
+
+        .. seealso::
+           For computing the Hodges-Ajne statistic on a single sample, see :func:`simba.mixins.circular_statistics.CircularStatisticsMixin.hodges_ajne`.
+
+        :param np.ndarray data: 1D array of size len(frames) representing angles in degrees.
+        :param float time_window: Size of the sliding time window in seconds.
+        :param int fps: Frames per second of the recorded video.
+        :returns: 1D array of size len(data) containing Hodges-Ajne test statistics for each sliding window. Contains -1.0 for frames before the first complete window.
+        :rtype: np.ndarray
+
+        :example:
+        >>> data = np.random.randint(low=0, high=361, size=(100,)).astype(np.float32)
+        >>> CircularStatisticsMixin().sliding_hodges_ajne(data=data, time_window=1.0, fps=10)
+        """
         data = np.deg2rad(data)
         results, window_size = np.full((data.shape[0]), -1.0), int(time_window * fps)
         for i in range(window_size, data.shape[0]):

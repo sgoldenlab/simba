@@ -71,3 +71,6 @@ intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
     'shapely': ('https://shapely.readthedocs.io/en/stable/', None),
 }
+
+# Mock imports for modules that may not be available during documentation build
+autodoc_mock_imports = ['torch', 'ultralytics', 'cupy']

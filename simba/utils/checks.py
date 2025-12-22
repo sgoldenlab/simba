@@ -19,14 +19,11 @@ except ModuleNotFoundError:
     import numpy as cp
 
 import multiprocessing
-from multiprocessing import Pool
-
 import cv2
 import numpy as np
 import pandas as pd
 import trafaret as t
 from shapely.geometry import Polygon
-
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.enums import Formats, Keys, Options, UMAPParam
 from simba.utils.errors import (ArrayError, ColumnNotFoundError,
@@ -40,6 +37,7 @@ from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 SimBAGPUError, StringError)
 from simba.utils.warnings import (CorruptedFileWarning, FrameRangeWarning,
                                   InvalidValueWarning, NoDataFoundWarning)
+
 
 
 def check_file_exist_and_readable(file_path: Union[str, os.PathLike], raise_error: bool = True) -> bool:
@@ -2335,3 +2333,43 @@ def check_valid_cpu_pool(value: Any,
             raise InvalidInputError(msg=f'accepted_cores has to be an int, list of ints, or tuple of ints. Got {type(accepted_cores)}', source=source)
 
     return True
+
+
+def check_valid_codec(codec: str, raise_error: bool = True, source: str = ''):
+    """
+    Validate that a codec string is available in the current FFmpeg installation.
+
+    Checks if the provided codec name exists in the list of available FFmpeg encoders
+    by querying FFmpeg directly. This ensures the codec can be used for video encoding/decoding.
+
+    .. note::
+       This function requires FFmpeg to be installed and available in the system PATH.
+       The function queries FFmpeg for available encoders at runtime, so it will reflect
+       the actual encoders available in your FFmpeg installation.
+
+    .. seealso::
+       To get a list of all available encoders, see :func:`~simba.utils.lookups.get_ffmpeg_encoders`.
+       To check if FFmpeg is available, see :func:`~simba.utils.checks.check_ffmpeg_available`.
+
+    :param str codec: The codec name to validate (e.g., 'libx264', 'h264_nvenc', 'libvpx-vp9').
+    :param bool raise_error: If True, raises ``InvalidInputError`` when codec is invalid. If False, returns False. Default: True.
+    :param str source: Source identifier for error messages. Used when raising exceptions. Default: ''.
+    :return: True if codec is valid, False if invalid and ``raise_error=False``.
+    :rtype: bool
+    :raises InvalidInputError: If codec is not valid and ``raise_error=True``.
+
+    :example:
+    >>> check_valid_codec(codec='libx264')
+    >>> check_valid_codec(codec='h264_nvenc', source='my_function')
+    >>> is_valid = check_valid_codec(codec='invalid_codec', raise_error=False)
+    """
+    from simba.utils.lookups import get_ffmpeg_encoders; encoders = get_ffmpeg_encoders()
+    valid_codec = check_str(name=f'{check_valid_codec.__name__} codec', value=codec, options=encoders, allow_blank=False, raise_error=False)[0]
+    if not valid_codec:
+        if raise_error:
+            raise InvalidInputError(msg=f'The codec {codec} is not a valid codec in the current FFMPEG installation', source=source)
+        else:
+            return False
+    return True
+
+

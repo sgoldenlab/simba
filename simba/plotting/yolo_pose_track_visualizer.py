@@ -110,8 +110,6 @@ class YOLOPoseTrackVisualizer():
     >>> kp_vis.run()
     """
 
-
-
     def __init__(self,
                  data_path: Union[str, os.PathLike],
                  video_path: Union[str, os.PathLike],

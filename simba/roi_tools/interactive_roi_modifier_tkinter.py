@@ -67,6 +67,91 @@ def _plot_roi(roi_dict: dict,
 
 
 class InteractiveROIModifier():
+    """
+    Interactive Tkinter-based GUI tool for modifying ROI (Region of Interest) shapes by clicking, dragging, and keyboard controls.
+
+    This class provides an interactive Tkinter interface for modifying existing ROI shapes (rectangles, circles, and polygons)
+    through mouse and keyboard interactions. Users can resize, reposition, and reshape ROIs by clicking and dragging control
+    points (tags/vertices), or by using arrow keys for fine-grained adjustments. The tool supports optional grid overlays
+    for alignment assistance and updates the ROI dictionary in-place during interactions.
+
+    .. note::
+       - The `img_window` must contain a Tkinter `Label` widget with the name 'img_lbl' that displays the image.
+       - For rectangles: Click and drag corner tags, edge tags (top, bottom, left, right), or center tag to modify the shape.
+       - For circles: Click and drag the center tag to move the circle, or the border tag to resize the radius.
+       - For polygons: Click and drag individual vertex tags to reshape the polygon, or the center tag to move the entire polygon.
+       - After selecting a tag, arrow keys can be used for pixel-precise adjustments (sensitivity controlled by settings).
+       - All modifications are constrained to stay within the image boundaries.
+       - The modified ROI dictionary is updated in-place during interactions.
+
+    .. seealso::
+       For an OpenCV-based version, see :class:`simba.roi_tools.interactive_modifier_ui.InteractiveROIModifier`.
+       For creating new ROIs from scratch, see :func:`simba.roi_tools.roi_selector_polygon_tkinter.ROISelectorPolygonTkinter`
+       and :func:`simba.roi_tools.roi_selector_circle_tkinter.ROISelectorCircleTkinter`.
+
+    :param Toplevel img_window: Tkinter Toplevel window containing a Label widget named 'img_lbl' that displays the image with ROIs.
+    :param np.ndarray original_img: NumPy array representing the original, unmodified image without ROIs. Used as base for redrawing.
+                                    Shape should be (height, width, channels) in BGR format.
+    :param dict roi_dict: Dictionary containing ROI definitions. Each key is an ROI name, and each value is a dictionary
+                         with shape-specific keys (e.g., 'Shape_type', 'Name', 'Tags', 'Color BGR', 'Thickness', etc.).
+                         Must include 'Tags' dictionary with control point coordinates for each ROI.
+    :param Optional[dict] settings: Optional dictionary of ROI display settings. If None, uses default settings from `ROI_SETTINGS`.
+                                    Can include keys like 'ROI_SELECT_CLR', 'LINE_TYPE', 'KEYBOARD_SENSITIVITY', 'OVERLAY_GRID_COLOR'.
+    :param Optional[List[Polygon]] hex_grid: Optional list of Shapely Polygon objects representing a hexagonal grid overlay.
+                                             Gridlines will be drawn on the image for alignment assistance.
+    :param Optional[List[Polygon]] rectangle_grid: Optional list of Shapely Polygon objects representing a rectangular grid overlay.
+                                                    Gridlines will be drawn on the image for alignment assistance.
+
+    :example:
+    >>> from tkinter import Toplevel, Label
+    >>> import cv2
+    >>> import numpy as np
+    >>> from simba.roi_tools.interactive_roi_modifier_tkinter import InteractiveROIModifier
+    >>> from simba.utils.enums import ROI_SETTINGS
+    >>> from PIL import Image, ImageTk
+    >>> # Load an image
+    >>> original_img = cv2.imread('path/to/image.jpg')
+    >>> img = original_img.copy()
+    >>> # Define a rectangle ROI
+    >>> rectangle_roi = {
+    ...     'Shape_type': ROI_SETTINGS.RECTANGLE.value,
+    ...     'Name': 'My_rectangle',
+    ...     'Color BGR': (0, 0, 255),
+    ...     'Thickness': 7,
+    ...     'topLeftX': 100,
+    ...     'topLeftY': 100,
+    ...     'Bottom_right_X': 250,
+    ...     'Bottom_right_Y': 250,
+    ...     'Tags': {
+    ...         'Top left tag': (100, 100),
+    ...         'Bottom right tag': (250, 250),
+    ...         'Center tag': (175, 175)
+    ...     },
+    ...     'Ear_tag_size': 15
+    ... }
+    >>> roi_dict = {'My_rectangle': rectangle_roi}
+    >>> # Draw ROIs on image (using PlottingMixin or similar)
+    >>> # ... (drawing code here) ...
+    >>> # Create Tkinter window with image label
+    >>> root = Toplevel()
+    >>> root.title('DEFINE SHAPE')
+    >>> img_lbl = Label(root, name='img_lbl')
+    >>> img_lbl.pack()
+    >>> # Convert and display image
+    >>> img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    >>> pil_image = Image.fromarray(img_rgb)
+    >>> tk_image = ImageTk.PhotoImage(pil_image)
+    >>> img_lbl.configure(image=tk_image)
+    >>> img_lbl.image = tk_image
+    >>> # Create and initialize the interactive modifier
+    >>> modifier = InteractiveROIModifier(
+    ...     img_window=root,
+    ...     original_img=original_img,
+    ...     roi_dict=roi_dict
+    ... )
+    >>> root.mainloop()
+    >>> # After closing the window, roi_dict will contain the modified ROI coordinates
+    """
 
     def __init__(self,
                  img_window: Toplevel,

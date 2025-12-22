@@ -49,8 +49,11 @@ class YOLOPoseTrackInference():
     keypoint trajectories.
 
     .. note::
-       Requires GPU with CUDA support. The class will raise an error if no GPU is detected.
-       The ultralytics package must be installed.
+       Requires GPU with CUDA support. The class will raise an error if no GPU is detected. The ultralytics package must be installed.
+
+    .. seealso::
+       For pose inference without tracks, see :func:`simba.model.yolo_pose_inference.YOLOPoseInference`.
+       For visualizing pose tracks, see :func:`simba.plotting.yolo_pose_track_visualizer.YOLOPoseTrackVisualizer`.
 
     :param Union[str, os.PathLike] weights_path: Path to the YOLO pose model weights file (e.g., .pt file). Must be a valid YOLO pose model, not a detection or segmentation model.
     :param Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]] video_path: Path(s) to video file(s) or directory containing videos. Can be a single video path, a list of video paths, or a directory path. If a directory is provided, all video files in the directory will be processed.

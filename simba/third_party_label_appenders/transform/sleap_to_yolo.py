@@ -37,7 +37,7 @@ class SleapAnnotations2Yolo():
     :param Optional[str] single_id: Optional custom ID to assign all annotations the same class (used in single-animal datasets).
 
     :example:
-    >>> runner = SleapAnnotations2Yolo(sleap_dir=r'D:\cvat_annotations\frames\slp_to_yolo', save_dir=r'D:\cvat_annotations\frames\slp_to_yolo\yolo')
+    >>> runner = SleapAnnotations2Yolo(sleap_dir=r'D:/cvat_annotations/frames/slp_to_yolo', save_dir=r'D:/cvat_annotations/frames/slp_to_yolo/yolo')
     >>> runner.run()
     """
 

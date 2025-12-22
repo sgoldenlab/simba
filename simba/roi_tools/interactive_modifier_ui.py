@@ -61,6 +61,78 @@ def _plot_roi(roi_dict: dict,
 
 
 class InteractiveROIModifier():
+    """
+    Interactive GUI tool for modifying ROI (Region of Interest) shapes by clicking and dragging.
+
+    This class provides an interactive interface for modifying existing ROI shapes (rectangles, circles, and polygons)
+    by clicking and dragging control points (tags/vertices). Users can resize, reposition, and reshape ROIs through
+    mouse interactions. The tool supports both OpenCV windows and Tkinter windows, and can display optional grid overlays
+    for alignment assistance.
+
+    .. note::
+       - For rectangles: Click and drag corner tags, edge tags (top, bottom, left, right), or center tag to modify the shape.
+       - For circles: Click and drag the center tag to move the circle, or the border tag to resize the radius.
+       - For polygons: Click and drag individual vertex tags to reshape the polygon, or the center tag to move the entire polygon.
+       - All modifications are constrained to stay within the image boundaries.
+       - The modified ROI dictionary is updated in-place during interactions.
+
+    .. seealso::
+       For creating new ROIs from scratch, see :func:`simba.roi_tools.roi_selector_polygon_tkinter.ROISelectorPolygonTkinter`
+       and :func:`simba.roi_tools.roi_selector_circle_tkinter.ROISelectorCircleTkinter`.
+
+    :param str window_name: Name of the OpenCV window to display the interactive ROI editor.
+    :param dict roi_dict: Dictionary containing ROI definitions. Each key is an ROI name, and each value is a dictionary
+                         with shape-specific keys (e.g., 'Shape_type', 'Name', 'Tags', 'Color BGR', 'Thickness', etc.).
+                         Must include 'Tags' dictionary with control point coordinates for each ROI.
+    :param np.ndarray img: NumPy array representing the image with ROIs already drawn. Shape should be (height, width, channels).
+    :param np.ndarray orginal_img: NumPy array representing the original, unmodified image without ROIs. Used as base for redrawing.
+                                   Shape should match `img`.
+    :param Optional[dict] settings: Optional dictionary of ROI display settings. If None, uses default settings from `ROI_SETTINGS`.
+    :param bool tkinter_window: If True, displays the interface in a Tkinter window. If False, uses OpenCV window. Default: True.
+    :param Optional[List[Polygon]] hex_grid: Optional list of Shapely Polygon objects representing a hexagonal grid overlay.
+                                             Gridlines will be drawn on the image for alignment assistance.
+    :param Optional[List[Polygon]] rectangle_grid: Optional list of Shapely Polygon objects representing a rectangular grid overlay.
+                                                    Gridlines will be drawn on the image for alignment assistance.
+
+    :example:
+    >>> import cv2
+    >>> import numpy as np
+    >>> from simba.roi_tools.interactive_modifier_ui import InteractiveROIModifier
+    >>> from simba.utils.enums import ROI_SETTINGS
+    >>> # Load an image
+    >>> img = cv2.imread('path/to/image.jpg')
+    >>> original_img = img.copy()
+    >>> # Define a rectangle ROI
+    >>> rectangle_roi = {
+    ...     'Shape_type': ROI_SETTINGS.RECTANGLE.value,
+    ...     'Name': 'My_rectangle',
+    ...     'Color BGR': (0, 0, 255),
+    ...     'Thickness': 7,
+    ...     'topLeftX': 100,
+    ...     'topLeftY': 100,
+    ...     'Bottom_right_X': 250,
+    ...     'Bottom_right_Y': 250,
+    ...     'Tags': {
+    ...         'Top left tag': (100, 100),
+    ...         'Bottom right tag': (250, 250),
+    ...         'Center tag': (175, 175)
+    ...     },
+    ...     'Ear_tag_size': 15
+    ... }
+    >>> roi_dict = {'My_rectangle': rectangle_roi}
+    >>> # Draw ROIs on image
+    >>> # ... (drawing code here) ...
+    >>> # Create and run the interactive modifier
+    >>> modifier = InteractiveROIModifier(
+    ...     window_name='DEFINE SHAPE',
+    ...     roi_dict=roi_dict,
+    ...     img=img,
+    ...     orginal_img=original_img,
+    ...     tkinter_window=False
+    ... )
+    >>> modifier.run()
+    >>> # After closing the window, roi_dict will contain the modified ROI coordinates
+    """
 
     def __init__(self,
                  window_name: DRAW_FRAME_NAME,

@@ -83,7 +83,7 @@ class LightDarkBoxPlotter():
        For light/dark box data analysis, see :func:`simba.data_processors.light_dark_box_analyzer.LightDarkBoxAnalyzer`.
 
     .. video:: _static/img/LightDarkBoxPlotter.webm
-       :width: 800
+       :width: 400
        :autoplay:
        :loop:
 
