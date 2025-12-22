@@ -8,8 +8,8 @@ try:
 except:
     from typing_extensions import Literal
 try:
-    from ultralytics import YOLO
     import torch
+    from ultralytics import YOLO
 except ModuleNotFoundError:
     YOLO = None
     torch = None

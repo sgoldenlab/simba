@@ -68,6 +68,7 @@ from simba.ui.pop_ups.batch_preprocess_pop_up import BatchPreProcessPopUp
 from simba.ui.pop_ups.blob_visualizer_pop_up import BlobVisualizerPopUp
 from simba.ui.pop_ups.boolean_conditional_slicer_pup_up import \
     BooleanConditionalSlicerPopUp
+from simba.ui.pop_ups.change_speed_popup import ChangeSpeedPopup
 from simba.ui.pop_ups.check_videos_seekable_pop_up import \
     CheckVideoSeekablePopUp
 from simba.ui.pop_ups.clf_add_remove_print_pop_up import (
@@ -192,7 +193,6 @@ from simba.ui.pop_ups.visualize_pose_in_dir_pop_up import \
     VisualizePoseInFolderPopUp
 from simba.ui.pop_ups.yolo_inference_popup import YOLOPoseInferencePopUP
 from simba.ui.pop_ups.yolo_plot_results import YoloPoseVisualizerPopUp
-from simba.ui.pop_ups.change_speed_popup import ChangeSpeedPopup
 from simba.ui.pop_ups.yolo_pose_train_popup import YOLOPoseTrainPopUP
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         FileSelect, SimbaButton, SimbaCheckbox,

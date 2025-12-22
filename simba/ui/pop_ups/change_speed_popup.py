@@ -2,15 +2,24 @@ __author__ = "Simon Nilsson"
 
 import os
 from tkinter import *
+
 import numpy as np
+
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect, FolderSelect, SimbaButton, SimBADropDown, SimBALabel)
-from simba.utils.checks import (check_file_exist_and_readable, check_if_dir_exists, check_ffmpeg_available, check_nvidea_gpu_available)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
+                                        FolderSelect, SimbaButton,
+                                        SimBADropDown, SimBALabel)
+from simba.utils.checks import (check_ffmpeg_available,
+                                check_file_exist_and_readable,
+                                check_if_dir_exists,
+                                check_nvidea_gpu_available)
 from simba.utils.enums import Options
-from simba.utils.read_write import str_2_bool, find_all_videos_in_directory, get_fn_ext
-from simba.utils.lookups import get_ffmpeg_encoders
-from simba.video_processors.video_processing import change_playback_speed_dir, change_playback_speed
 from simba.utils.errors import DuplicationError
+from simba.utils.lookups import get_ffmpeg_encoders
+from simba.utils.read_write import (find_all_videos_in_directory, get_fn_ext,
+                                    str_2_bool)
+from simba.video_processors.video_processing import (change_playback_speed,
+                                                     change_playback_speed_dir)
 
 SPEED_OPTIONS = [round(x, 2) for x in np.arange(0.1, 10.1, 0.1)]
 QUALITY_OPTIONS = list(range(10, 110, 10))

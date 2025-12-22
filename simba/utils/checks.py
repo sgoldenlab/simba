@@ -19,11 +19,13 @@ except ModuleNotFoundError:
     import numpy as cp
 
 import multiprocessing
+
 import cv2
 import numpy as np
 import pandas as pd
 import trafaret as t
 from shapely.geometry import Polygon
+
 from simba.data_processors.cuda.utils import _is_cuda_available
 from simba.utils.enums import Formats, Keys, Options, UMAPParam
 from simba.utils.errors import (ArrayError, ColumnNotFoundError,
@@ -37,7 +39,6 @@ from simba.utils.errors import (ArrayError, ColumnNotFoundError,
                                 SimBAGPUError, StringError)
 from simba.utils.warnings import (CorruptedFileWarning, FrameRangeWarning,
                                   InvalidValueWarning, NoDataFoundWarning)
-
 
 
 def check_file_exist_and_readable(file_path: Union[str, os.PathLike], raise_error: bool = True) -> bool:
