@@ -51,8 +51,8 @@ class YOLOSegmentationInference():
 
     .. note::
        To **create** YOLO segmentation dataset for fitting, use :func:`simba.third_party_label_appenders.transform.labelme_to_yolo_seg.LabelmeKeypoints2YoloSeg`.
-       To fit YOLO model, see `:func:~simba.bounding_box_tools.yolo.yolo_fit.FitYolo`.
-       To visualize the segmentation results, see :func:`simba.bounding_box_tools.yolo.yolo_seg_visualizer.YOLOSegmentationVisualizer`
+       To fit YOLO model, see `:func:`simba.model.yolo_fit.FitYolo`.
+       To visualize the segmentation results, see :func:`simba.plotting.yolo_seg_visualizer.YOLOSegmentationVisualizer`
 
     :example:
     >>> weights_path = r"D:\platea\yolo_071525\mdl\train3\weights\best.pt"

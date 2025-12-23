@@ -21,7 +21,6 @@ from tkinter.filedialog import askdirectory
 from tkinter.messagebox import askyesno
 from typing import Union
 
-import cv2
 import PIL.Image
 from PIL import ImageTk
 
@@ -202,16 +201,16 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_int)
 from simba.utils.custom_feature_extractor import CustomFeatureExtractor
 from simba.utils.enums import (ENV_VARS, OS, Defaults, Formats, Keys, Links,
-                               PackageNames, Paths, TagNames)
+                               PackageNames, Paths, TagNames, ConfigKey, Dtypes)
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_bp_config_code_class_pairs,
                                  get_current_time, get_emojis, get_icons_paths,
                                  load_simba_fonts)
 from simba.utils.read_write import (fetch_pip_data, find_core_cnt,
                                     get_pkg_version, get_recent_projects_paths,
-                                    get_video_meta_data, read_sys_env,
+                                    read_config_entry, read_sys_env,
                                     remove_files,
-                                    write_to_recent_project_paths)
+                                    write_to_recent_project_paths, read_config_file)
 from simba.utils.warnings import (FFMpegNotFoundWarning, PythonVersionWarning,
                                   VersionWarning)
 from simba.video_processors.video_processing import \
@@ -269,7 +268,13 @@ class SimbaProjectPopUp(ConfigReader, PopUpMixin):
         simongui.attributes("-topmost", True)
         simongui.after(150, lambda: simongui.attributes("-topmost", False))
         simongui.minsize(1300, 800)
-        simongui.wm_title("LOAD PROJECT")
+        try:
+            config = read_config_file(config_path=config_path)
+            project_name = read_config_entry(config=config, section=ConfigKey.GENERAL_SETTINGS.value, option=ConfigKey.PROJECT_NAME.value, default_value="LOAD PROJECT", data_type=Dtypes.STR.value)
+            project_name = f'{project_name} ({config_path})'
+        except:
+            project_name = "LOAD PROJECT"
+        simongui.wm_title(project_name)
         simongui.columnconfigure(0, weight=1)
         simongui.rowconfigure(0, weight=1)
         self.core_cnt = find_core_cnt()[0]

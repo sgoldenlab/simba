@@ -63,8 +63,9 @@ class YOLOPoseInference():
        :header-rows: 1
 
     .. seealso::
-       For bounding box inference only (no pose), see :func:`~simba.bounding_box_tools.yolo.yolo_inference.YoloInference`.
-       For segmentation inference, see :func:`~simba.bounding_box_tools.yolo.yolo_seg_inference.YOLOSegmentationInference`.
+       For bounding box inference only (no pose), see :func:`simba.model.yolo_inference.YoloInference`.
+       For segmentation inference, see :func:`simba.model.yolo_seg_inference.YOLOSegmentationInference`.
+       To fit YOLO model, see `:func:`simba.model.yolo_fit.FitYolo`.
        For detailed instructions, see `YOLO Pose Estimation Inference Documentation <https://github.com/sgoldenlab/simba/blob/master/docs/yolo_inference.md>`_.
 
     :param Union[str, os.PathLike] weights: Path to the trained YOLO model weights (e.g., 'best.pt').

@@ -67,9 +67,8 @@ class YOLOSegmentationVisualizer():
     Visualizes polygon-based YOLO segmentation results overlaid on video frames.
 
     .. seealso::
-       To run segmentation inference, see :func:`simba.bounding_box_tools.yolo.yolo_seg_inference.YOLOSegmentationInference`
-       To **create** YOLO segmentation dataset for fitting, use :func:`simba.third_party_label_appenders.transform.labelme_to_yolo_seg.LabelmeKeypoints2YoloSeg`.
-       To fit YOLO model, see `:func:~simba.bounding_box_tools.yolo.yolo_fit.FitYolo`
+       To run segmentation inference, see :func:`simba.model.yolo_seg_inference.YOLOSegmentationInference`
+       To fit YOLO model, see :func:`simba.model.yolo_fit.FitYolo`
 
     :param Union[str, os.PathLike] data_path: Path to the CSV file with YOLO segmentation output. Must include columns "FRAME", "ID", and at least six "VERTICE" columns.
     :param Union[str, os.PathLike] video_path: Path to the source video file.

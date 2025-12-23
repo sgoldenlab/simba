@@ -695,6 +695,7 @@ class Links(Enum):
                        'yolo11m-pose': "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11s-pose.pt",
                        'yolo11l-pose': "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11l-pose.pt",
                        'yolo11x-pose': "https://github.com/ultralytics/assets/releases/download/v8.3.0/yolo11x-pose.pt"}
+    BLOB_TRACKING = "https://github.com/sgoldenlab/simba/blob/master/docs/blob_track.md"
 
 class Labelling(Enum):
     PADDING = 5
