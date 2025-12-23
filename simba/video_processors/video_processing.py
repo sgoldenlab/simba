@@ -38,19 +38,20 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 check_if_valid_img, check_instance, check_int,
                                 check_nvidea_gpu_available, check_str,
                                 check_that_hhmmss_start_is_before_end,
-                                check_valid_boolean, check_valid_cpu_pool,
-                                check_valid_lst, check_valid_tuple,
-                                check_valid_codec)
+                                check_valid_boolean, check_valid_codec,
+                                check_valid_cpu_pool, check_valid_lst,
+                                check_valid_tuple)
 from simba.utils.data import (find_frame_numbers_from_time_stamp,
                               terminate_cpu_pool)
 from simba.utils.enums import OS, ConfigKey, Defaults, Formats, Options, Paths
 from simba.utils.errors import (CountError, DirectoryExistError,
-                                FFMPEGCodecGPUError, FFMPEGNotFoundError,
-                                FileExistError, FrameRangeError,
-                                InvalidFileTypeError, InvalidInputError,
-                                InvalidVideoFileError, NoDataError,
-                                NoFilesFoundError, NotDirectoryError,
-                                ResolutionError, SimBAGPUError,DuplicationError)
+                                DuplicationError, FFMPEGCodecGPUError,
+                                FFMPEGNotFoundError, FileExistError,
+                                FrameRangeError, InvalidFileTypeError,
+                                InvalidInputError, InvalidVideoFileError,
+                                NoDataError, NoFilesFoundError,
+                                NotDirectoryError, ResolutionError,
+                                SimBAGPUError)
 from simba.utils.lookups import (get_ffmpeg_crossfade_methods, get_fonts,
                                  get_named_colors, percent_to_crf_lookup,
                                  percent_to_qv_lk, quality_pct_to_crf,
