@@ -19,13 +19,14 @@ from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FileSelect,
                                         SimBASeperator)
 from simba.utils.checks import (check_if_dir_exists, check_int,
                                 check_nvidea_gpu_available, check_str)
-from simba.utils.enums import Formats, Paths, Links
+from simba.utils.enums import Formats, Links, Paths
 from simba.utils.errors import (InvalidInputError, InvalidVideoFileError,
                                 NoDataError)
 from simba.utils.read_write import (find_all_videos_in_directory,
                                     find_core_cnt,
                                     find_files_of_filetypes_in_directory,
-                                    get_video_meta_data, remove_files, str_2_bool, write_pickle)
+                                    get_video_meta_data, remove_files,
+                                    str_2_bool, write_pickle)
 from simba.video_processors.blob_tracking_executor import BlobTrackingExecutor
 
 ABSOLUTE = 'absolute'

@@ -200,17 +200,18 @@ from simba.ui.video_info_ui import VideoInfoTable
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_int)
 from simba.utils.custom_feature_extractor import CustomFeatureExtractor
-from simba.utils.enums import (ENV_VARS, OS, Defaults, Formats, Keys, Links,
-                               PackageNames, Paths, TagNames, ConfigKey, Dtypes)
+from simba.utils.enums import (ENV_VARS, OS, ConfigKey, Defaults, Dtypes,
+                               Formats, Keys, Links, PackageNames, Paths,
+                               TagNames)
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_bp_config_code_class_pairs,
                                  get_current_time, get_emojis, get_icons_paths,
                                  load_simba_fonts)
 from simba.utils.read_write import (fetch_pip_data, find_core_cnt,
                                     get_pkg_version, get_recent_projects_paths,
-                                    read_config_entry, read_sys_env,
-                                    remove_files,
-                                    write_to_recent_project_paths, read_config_file)
+                                    read_config_entry, read_config_file,
+                                    read_sys_env, remove_files,
+                                    write_to_recent_project_paths)
 from simba.utils.warnings import (FFMpegNotFoundWarning, PythonVersionWarning,
                                   VersionWarning)
 from simba.video_processors.video_processing import \
