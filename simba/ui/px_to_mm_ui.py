@@ -8,9 +8,9 @@ import numpy as np
 
 from simba.mixins.image_mixin import ImageMixin
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.checks import (check_file_exist_and_readable, check_float)
+from simba.utils.checks import check_file_exist_and_readable, check_float
 from simba.utils.enums import TextOptions
-from simba.utils.read_write import (get_fn_ext, get_video_meta_data)
+from simba.utils.read_write import get_fn_ext, get_video_meta_data
 
 PIXEL_SENSITIVITY = 20
 DRAW_COLOR = (144, 0, 255)

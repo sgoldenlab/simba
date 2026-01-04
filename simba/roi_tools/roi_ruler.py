@@ -1,16 +1,18 @@
+import math
 from tkinter import *
-from typing import Tuple, Optional
+from typing import Optional, Tuple
 
 import cv2
-import math
 import numpy as np
 from PIL import Image, ImageTk
 
-from simba.roi_tools.roi_utils import get_image_from_label
-from simba.utils.checks import (check_if_valid_rgb_tuple, check_instance, check_int, check_float)
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.utils.enums import TkBinds, TextOptions
+from simba.roi_tools.roi_utils import get_image_from_label
 from simba.ui.tkinter_functions import SimBALabel
+from simba.utils.checks import (check_float, check_if_valid_rgb_tuple,
+                                check_instance, check_int)
+from simba.utils.enums import TextOptions, TkBinds
+
 DRAW_FRAME_NAME = "DEFINE SHAPE"
 
 class ROIRuler(object):
