@@ -41,7 +41,7 @@ from simba.utils.errors import (CountError, DuplicationError,
                                 NoFilesFoundError, NotDirectoryError,
                                 ResolutionError)
 from simba.utils.lookups import (get_color_dict, get_ffmpeg_crossfade_methods,
-                                 get_fonts, percent_to_crf_lookup)
+                                 get_fonts, percent_to_crf_lookup, quality_pct_to_crf)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.read_write import (
     check_if_hhmmss_timestamp_is_valid_part_of_video,
@@ -720,13 +720,16 @@ class ChangeFpsSingleVideoPopUp(PopUpMixin):
         PopUpMixin.__init__(self, title="CHANGE FRAME RATE: SINGLE VIDEO", size=(500, 300), icon='fps')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header='SETTINGS', icon_name='settings')
         gpu_state = DISABLED if not check_nvidea_gpu_available() else NORMAL
-        self.video_path = FileSelect(settings_frm, "VIDEO PATH:", title="Select a video file", lblwidth=15, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='browse')
-        self.new_fps_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 101, 1)), label='NEW FPS: ', label_width=15, dropdown_width=20, value=15, img='fps')
-        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ', label_width=15, dropdown_width=20, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
+        self.video_path = FileSelect(settings_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='browse')
+        self.new_fps_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 101, 1)), label='NEW FPS: ', label_width=25, dropdown_width=20, value=15, img='fps')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ', label_width=25, dropdown_width=20, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
+        self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label='OUTPUT VIDEO QUALITY: ', label_width=25, dropdown_width=20, value=60, img='pct_2', tooltip_key='OUPUT_VIDEO_QUALITY')
+
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.video_path.grid(row=0, sticky=NW)
         self.new_fps_dropdown.grid(row=1, sticky=NW)
-        self.gpu_dropdown.grid(row=2, sticky=NW)
+        self.quality_dropdown.grid(row=2, sticky=NW)
+        self.gpu_dropdown.grid(row=3, sticky=NW)
         self.create_run_frm(run_function=self.run)
 
     def run(self):
@@ -737,7 +740,8 @@ class ChangeFpsSingleVideoPopUp(PopUpMixin):
         gpu = str_2_bool(self.gpu_dropdown.get_value())
         if video_meta_data['fps'] <= new_fps:
             FrameRangeWarning(msg=f'For video {video_name}, the new FPS ({new_fps}) is higher or the same as the original FPS ({video_meta_data["fps"]})', source=self.__class__.__name__)
-        threading.Thread(change_single_video_fps(file_path=video_path, fps=new_fps, gpu=gpu)).start()
+        quality = quality_pct_to_crf(pct=int(self.quality_dropdown.get_value()))
+        threading.Thread(change_single_video_fps(file_path=video_path, fps=new_fps, gpu=gpu, quality=quality)).start()
 
 #_ = ChangeFpsSingleVideoPopUp()
 
@@ -749,10 +753,13 @@ class ChangeFpsMultipleVideosPopUp(PopUpMixin):
         self.directory_path = FolderSelect(settings_frm, "VIDEO DIRECTORY PATH:", title="Select folder with videos: ", lblwidth=25, lbl_icon='browse')
         self.new_fps_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 101, 1)), label='NEW FPS: ', label_width=25, dropdown_width=20, value=15, img='fps')
         self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label='USE GPU: ', label_width=25, dropdown_width=20, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
+        self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label='OUTPUT VIDEO QUALITY: ', label_width=25, dropdown_width=20, value=60, img='pct_2', tooltip_key='OUPUT_VIDEO_QUALITY')
+
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.directory_path.grid(row=0, sticky=NW)
         self.new_fps_dropdown.grid(row=1, sticky=NW)
-        self.gpu_dropdown.grid(row=2, sticky=NW)
+        self.quality_dropdown.grid(row=2, sticky=NW)
+        self.gpu_dropdown.grid(row=3, sticky=NW)
         self.create_run_frm(run_function=self.run)
         self.main_frm.mainloop()
 
@@ -762,7 +769,8 @@ class ChangeFpsMultipleVideosPopUp(PopUpMixin):
         _ = find_all_videos_in_directory(directory=video_dir, raise_error=True)
         new_fps = int(self.new_fps_dropdown.getChoices())
         gpu = str_2_bool(self.gpu_dropdown.get_value())
-        threading.Thread(change_fps_of_multiple_videos(path=video_dir, fps=new_fps, gpu=gpu)).start()
+        quality = quality_pct_to_crf(pct=int(self.quality_dropdown.get_value()))
+        threading.Thread(change_fps_of_multiple_videos(path=video_dir, fps=new_fps, gpu=gpu, quality=quality)).start()
 
 #_ = ChangeFpsMultipleVideosPopUp()
 

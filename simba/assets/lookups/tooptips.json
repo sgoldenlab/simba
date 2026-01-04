@@ -23,17 +23,5 @@
   "USE_GPU": "If GPU available and selected, then potentially faster processing times.",
   "OUPUT_VIDEO_QUALITY": "Higher values produce larger, higher quality, videos. Lower values produce smaller, lower quality videos. \nScale not linear. Avoid values above 80 if possible. 60 generally works well.",
   "VIDEO_SPEED": "2 doubles the speed, while 0.5 halves the speed.",
-  "VIDEO_CODEC": "Video codec to use for encoding. Common options include libx264 (CPU, widely compatible), h264_nvenc (NVIDIA GPU), libx265 (CPU, better compression), and libvpx-vp9 (CPU, web optimized). Codec availability depends on your FFmpeg installation.",
-  "BLOB_TRACK_THRESHOLD": "Foreground threshold (1-100). Higher values are stricter and may reduce noise but risk missing faint blobs; lower values detect more but can increase noise. Applied to all videos via quick settings.",
-  "BLOB_SMOOTHING_TIME": "Temporal smoothing window in seconds applied to all videos via quick settings. 'None' keeps per-video values; higher values smooth jitter but can blur brief movement details.",
-  "BLOB_BUFFER_PIXELS": "Optional pixel buffer applied in quick settings. Expands the area considered around detections/ROIs. 'None' leaves per-video values unchanged.",
-  "BLOB_CLOSE_KERNEL": "Gap-fill filter size (% of max frame dimension). Larger values close larger holes between foreground pixels. Set to 'None' to skip closing.",
-  "BLOB_OPEN_KERNEL": "Noise removal (morphological opening) filter size expressed as percent of the maximum frame dimension. Larger values remove more small speckles. 'None' disables opening.",
-  "BLOB_BG_DIR": "Folder with background reference videos matching each input video name and resolution. Required for background subtraction.",
-  "BLOB_CORE_COUNT": "CPU cores to use for blob tracking. Higher values speed up processing but increase CPU/RAM memory load.",
-  "BLOB_VERTICE_COUNT": "Number of vertices (points) to detect around animal outer bounds. Higher values give finer detail but may slow processing.",
-  "BLOB_SAVE_BG_VIDEOS": "Save generated background videos alongside results. Disable to save disk space.",
-  "BLOB_CLOSE_ITERATIONS": "Number of iterations for morphological closing (gap filling). Higher values close larger gaps.",
-  "BLOB_OPEN_ITERATIONS": "Number of iterations for morphological opening (noise removal). Higher values remove more small speckles.",
-  "BLOB_DUPLICATE_INCLUSION": "Copy inclusion zones defined for one video to all other videos. Requires existing inclusion zone definitions."
+  "VIDEO_CODEC": "Video codec to use for encoding. Common options include libx264 (CPU, widely compatible), h264_nvenc (NVIDIA GPU), libx265 (CPU, better compression), and libvpx-vp9 (CPU, web optimized). Codec availability depends on your FFmpeg installation."
 }

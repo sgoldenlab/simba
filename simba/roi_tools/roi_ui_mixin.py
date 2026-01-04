@@ -4,7 +4,7 @@ import os
 import platform
 from copy import copy, deepcopy
 from tkinter import *
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import cv2
 import numpy as np
@@ -38,19 +38,19 @@ from simba.roi_tools.roi_utils import (change_roi_dict_video_name,
                                        get_triangle_vertices,
                                        get_vertices_hexagon,
                                        insert_gridlines_on_roi_img)
+from simba.roi_tools.roi_ruler import ROIRuler
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
                                         Entry_Box, SimbaButton, SimBADropDown,
                                         SimBALabel, get_menu_icons)
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_int, check_str, check_valid_array)
-from simba.utils.enums import OS, ROI_SETTINGS, Formats, Keys
+from simba.utils.enums import OS, ROI_SETTINGS, Formats, Keys, TkBinds
 from simba.utils.errors import (FrameRangeError, InvalidInputError,
                                 NoROIDataError)
 from simba.utils.lookups import (create_color_palettes, get_color_dict,
                                  get_img_resize_info, get_monitor_info)
 from simba.utils.printing import stdout_information, stdout_success
-from simba.utils.read_write import (get_fn_ext, get_video_meta_data,
-                                    read_frm_of_video)
+from simba.utils.read_write import (get_fn_ext, get_video_meta_data, read_frm_of_video)
 from simba.utils.warnings import DuplicateNamesWarning
 
 WINDOW_SIZE_OPTIONS = [round(x * 0.05, 2) for x in range(21)]
@@ -406,9 +406,11 @@ class ROI_mixin(ConfigReader):
         self.interact_panel = CreateLabelFrameWithIcon(parent=parent_frame, header="SHAPE INTERACTION", font=Formats.FONT_HEADER.value, padx=5, pady=5, icon_name='interaction_large', relief='solid')
         self.move_shape_btn = SimbaButton(parent=self.interact_panel, txt="MOVE SHAPE", img='move_large', txt_clr='black', cmd=self.move_shapes, cmd_kwargs={'parent_frame': lambda : top_level})
         self.shape_info_btn = SimbaButton(parent=self.interact_panel, txt="SHOW SHAPE INFO", img='info_large', txt_clr='black', enabled=True, cmd=self.show_shape_info)
+        self.ruler_btn = SimbaButton(parent=self.interact_panel, txt="RULER", img='ruler_large', txt_clr='black', enabled=True, cmd=self.get_ruler, cmd_kwargs={'parent_frame': lambda : top_level})
         self.interact_panel.grid(row=row_idx, sticky=W, pady=10)
         self.move_shape_btn.grid(row=0, column=0, sticky=W, pady=10, padx=(0, 10))
         self.shape_info_btn.grid(row=0, column=1, sticky=W, pady=10, padx=(0, 10))
+        self.ruler_btn.grid(row=0, column=2, sticky=W, pady=10, padx=(0, 10))
 
     def get_status_bar_panel(self,
                              parent_frame: Union[Frame, Canvas, LabelFrame, Toplevel],
@@ -465,7 +467,7 @@ class ROI_mixin(ConfigReader):
         def on_click(event):
             self.click_event.set(True)
             self.got_attributes = self.selector.get_attributes()
-            self.root.unbind("<Button-1>"); self.root.unbind("<Escape>"); self.img_window.unbind("<Escape>");
+            self.root.unbind(TkBinds.B1_PRESS.value); self.root.unbind(TkBinds.ESCAPE.value); self.img_window.unbind(TkBinds.ESCAPE.value);
             self.set_btn_clrs()
 
         self.shape_info_btn.configure(text="SHOW SHAPE INFO")
@@ -493,7 +495,7 @@ class ROI_mixin(ConfigReader):
             self.selector = ROISelectorCircle(img_window=self.img_window, thickness=int(self.thickness_dropdown.getChoices()), clr=self.color_option_dict[self.color_dropdown.getChoices()])
         elif self.selected_shape_type == POLYGON:
             self.selector = ROISelectorPolygon(img_window=self.img_window, thickness=int(self.thickness_dropdown.getChoices()), clr=self.color_option_dict[self.color_dropdown.getChoices()], vertice_size=int(self.ear_tag_size_dropdown.getChoices()), tolerance=int(self.settings[POLYGON_TOLERANCE]))
-        self.root.bind("<Button-1>", on_click); self.root.bind("<Escape>", on_click); self.img_window.bind("<Escape>", on_click)
+        self.root.bind(TkBinds.B1_PRESS.value, on_click); self.root.bind(TkBinds.ESCAPE.value, on_click); self.img_window.bind(TkBinds.ESCAPE.value, on_click)
         self.root.wait_variable(self.click_event)
         if self.got_attributes:
             if self.selected_shape_type == RECTANGLE:
@@ -513,10 +515,9 @@ class ROI_mixin(ConfigReader):
     def set_btn_clrs(self, btn: Optional[SimbaButton] = None):
         if btn is not None:
             btn.configure(fg=ROI_SETTINGS.SELECT_COLOR.value)
-        for other_btns in [self.delete_all_btn, self.draw_btn, self.chg_attr_btn, self.delete_selected_btn, self.duplicate_selected_btn, self.move_shape_btn, self.shape_info_btn, self.save_data_btn, self.apply_other_video_btn]:
+        for other_btns in [self.delete_all_btn, self.draw_btn, self.chg_attr_btn, self.delete_selected_btn, self.duplicate_selected_btn, self.move_shape_btn, self.shape_info_btn, self.save_data_btn, self.apply_other_video_btn, self.ruler_btn]:
             if btn != other_btns:
                 other_btns.configure(fg=ROI_SETTINGS.UNSELECT_COLOR.value)
-
 
     def move_shapes(self, parent_frame):
         if len(list(self.roi_dict.keys())) == 0:
@@ -526,19 +527,18 @@ class ROI_mixin(ConfigReader):
 
         def on_click(event):
             self.click_event.set(True)
-            self.root.unbind("<Button-1>"); self.root.unbind("<Escape>"); self.img_window.unbind("<Escape>");
+            self.root.unbind(TkBinds.B1_PRESS.value); self.root.unbind(TkBinds.ESCAPE.value); self.img_window.unbind(TkBinds.ESCAPE.value)
             self.interactive_modifier.unbind_keys()
             self.set_btn_clrs()
             self.set_status_bar_panel(text="ROI MOVE MODE EXITED", fg="blue")
 
         self.set_btn_clrs(btn=self.move_shape_btn)
-
         self.overlay_rois_on_image(show_ear_tags=True, show_roi_info=False)
         self.set_status_bar_panel(text="IN ROI MOVE MODE. MODIFY ROI'S BY DRAGGING EAR TAGS. CLICK ESC OCH CLICK SETTINGS WINDOW TO EXIT MOVE MODE", fg="darkred")
         self.click_event, self.got_attributes = BooleanVar(value=False), False
         self.root = parent_frame
         self.interactive_modifier = InteractiveROIModifier(img_window=self.img_window, original_img=self.read_img(frame_idx=self.img_idx), roi_dict=deepcopy(self.roi_dict), settings=self.settings, rectangle_grid=self.grid, hex_grid=self.hexagon_grid)
-        self.root.bind("<Button-1>", on_click); self.root.bind("<Escape>", on_click); self.img_window.bind("<Escape>", on_click)
+        self.root.bind(TkBinds.B1_PRESS.value, on_click); self.root.bind(TkBinds.ESCAPE.value, on_click); self.img_window.bind(TkBinds.ESCAPE.value, on_click)
         self.root.wait_variable(self.click_event)
 
         self.img_window = self.interactive_modifier.img_window
@@ -546,6 +546,26 @@ class ROI_mixin(ConfigReader):
         self.rectangles_df, self.circles_df, self.polygon_df = get_roi_df_from_dict(roi_dict=self.roi_dict)
         del self.interactive_modifier; del self.root
         self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
+
+
+    def get_ruler(self, parent_frame):
+        def exit_click(event):
+            self.click_event.set(True)
+            self.root.unbind(TkBinds.B1_PRESS.value); self.root.unbind(TkBinds.ESCAPE.value); self.img_window.unbind(TkBinds.ESCAPE.value)
+            self.set_btn_clrs()
+            self.set_status_bar_panel(text="RULER MODE EXITED", fg="blue")
+
+        self.set_btn_clrs(btn=self.ruler_btn)
+        self.root = parent_frame
+        self.set_status_bar_panel(text="RULER MODE ENTERED", fg="blue")
+        self.click_event = BooleanVar(value=False)
+        self.ruler = ROIRuler(img_window=self.img_window, thickness=int(self.thickness_dropdown.getChoices()), clr=self.color_option_dict[self.color_dropdown.getChoices()], second_clr=(0, 0, 0), tolerance=int(self.settings[KEYBOARD_SENSITIVITY] * 2), px_per_mm=self.px_per_mm, info_label=self.status_bar)
+        self.root.bind(TkBinds.B1_PRESS.value, exit_click); self.root.bind(TkBinds.ESCAPE.value, exit_click); self.img_window.bind(TkBinds.ESCAPE.value, exit_click)
+        self.root.wait_variable(self.click_event)
+        del self.ruler; del self.root
+        self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
+
+
 
 
     def change_img(self, stride: Union[int, str]):
@@ -837,6 +857,7 @@ class ROI_mixin(ConfigReader):
         self.settings['ROI_SELECT_CLR'] = self.color_option_dict[self.roi_select_clr_dropdown.get_value()]
         self.settings['DUPLICATION_JUMP_SIZE'] = int(self.duplication_jump_dropdown.get_value())
         self.settings[KEYBOARD_SENSITIVITY] = int(self.keyboard_sensitivity_dropdown.get_value())
+        self.settings[POLYGON_TOLERANCE] = int(self.polygon_tolerance_dropdown.get_value())
         self.settings[ROI_TRACKING_STYLE] = self.show_tracking_dropdown.get_value()
         self.settings[SHOW_GRID_OVERLAY] = self.show_grid_overlay_dropdown.get_value()
         self.settings[SHOW_HEXAGON_OVERLAY] = self.show_hexagon_overlay_dropdown.get_value()

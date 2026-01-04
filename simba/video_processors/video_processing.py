@@ -661,8 +661,12 @@ def change_single_video_fps(file_path: Union[str, os.PathLike],
        :loop:
 
     :param Union[str, os.PathLike] file_path: Path to video file
-    :param int fps: FPS of the new video file.
-    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param Union[int, float] fps: FPS of the new video file.
+    :param bool gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param Optional[str] codec: Video codec to use. If None, automatically selects based on file extension (libvpx-vp9 for .webm, mpeg4 for .avi, libx264 for others). Default None.
+    :param Optional[Union[str, os.PathLike]] save_path: Path where to save the converted video. If None, saves in the same directory as input file with ``_fps_{fps}`` suffix. Default None.
+    :param Optional[int] quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
+    :param bool verbose: If True, prints conversion progress. Default True.
     :returns: None
 
     :example:
@@ -705,15 +709,17 @@ def change_single_video_fps(file_path: Union[str, os.PathLike],
 
 def change_fps_of_multiple_videos(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]],
                                   fps: int,
+                                  quality: int = 23,
                                   save_dir: Optional[Union[str, os.PathLike]] = None,
                                   gpu: Optional[bool] = False) -> None:
     """
     Change the fps of all video files in a folder. Results are stored in the same directory as in the input files with
     the suffix ``_fps_new_fps``.
 
-    :param Union[str, os.PathLike] path: Path to video file directory, or a list of video file paths.
-    :param int fps: Fps of the new video files.
-    :param Optional[bool] save_dir: If not None, then the directory where to store converted videos. If None, then stores the new videos in the same directory as the input video with the ``_new_fps.file_extension`` suffix.
+    :param Union[str, os.PathLike, List[Union[str, os.PathLike]]] path: Path to video file directory, or a list of video file paths.
+    :param int fps: FPS of the new video files.
+    :param int quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
+    :param Optional[Union[str, os.PathLike]] save_dir: If not None, then the directory where to store converted videos. If None, then stores the new videos in the same directory as the input video with the ``_fps_{fps}.file_extension`` suffix.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :returns: None.
 
@@ -737,6 +743,7 @@ def change_fps_of_multiple_videos(path: Union[str, os.PathLike, List[Union[str, 
         raise InvalidInputError(msg=f'{path} is not a valid file path or directory path or list of file paths', source=change_fps_of_multiple_videos.__name__)
     if save_dir is not None:
         check_if_dir_exists(in_dir=save_dir, source=f'{change_fps_of_multiple_videos.__name__} save_dir', create_if_not_exist=True)
+    quality = 23 if not check_int(name='quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
     for file_cnt, file_path in enumerate(video_paths):
         video_timer = SimbaTimer(start=True)
         dir_name, file_name, ext = get_fn_ext(filepath=file_path)
@@ -752,9 +759,9 @@ def change_fps_of_multiple_videos(path: Union[str, os.PathLike, List[Union[str, 
         elif ext.lower() == '.avi': codec = 'mpeg4'
         else: codec = 'libx264'
         if gpu:
-            command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -c:a copy "{save_path}" -y'
+            command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "fps={fps}" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
         else:
-            command = f'ffmpeg -i "{file_path}" -filter:v fps=fps={fps} -c:v {codec} "{save_path}" -loglevel error -stats -hide_banner -y'
+            command = f'ffmpeg -i "{file_path}" -filter:v fps=fps={fps} -c:v {codec} -crf {quality} -c:a aac "{save_path}" -loglevel error -stats -hide_banner -y'
         subprocess.call(command, shell=True)
         video_timer.stop_timer()
         print(f"Video {file_name} complete (saved at {save_path})... (elapsed time: {video_timer.elapsed_time_str}s)")
@@ -821,15 +828,19 @@ def video_to_greyscale(file_path: Union[str, os.PathLike],
 
     .. seealso::
        For GPU CuPY acceleration, see :func:`~simba.data_processors.cuda.image.img_stack_to_grayscale_cupy`
-       For GPU numba\ CUDA acceleration, see :func:`~simba.data_processors.cuda.image.img_stack_to_grayscale_cuda`,
+       For GPU numba \ CUDA acceleration, see :func:`~simba.data_processors.cuda.image.img_stack_to_grayscale_cuda`,
        For multicore CPU solutions, see :func:`~simba.mixins.image_mixin.ImageMixin.img_stack_to_greyscale` or :func:`~simba.video_processors.video_processing.batch_video_to_greyscale`
        For single-core multivideo solution, see :func:`~simba.video_processors.video_processing.batch_video_to_greyscale`
 
     :param Union[str, os.PathLike] file_path: Path to video file.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
-    :returns: The result is stored in the same directory as the input file with the ``_grayscale.mp4`` suffix.
+    :param str codec: Video codec to use for CPU encoding. Default 'libx264'. Ignored if gpu=True.
+    :param bool verbose: If True, prints conversion progress. Default True.
+    :param int quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
+    :param Optional[Union[str, os.PathLike]] save_path: Path where to save the converted video. If None, saves in the same directory as input file with ``_grayscale.mp4`` suffix. Default None.
+    :returns: None. The result is stored in the same directory as the input file with the ``_grayscale.mp4`` suffix if save_path is not provided.
     :raise FFMPEGCodecGPUError: If no GPU is found and ``gpu == True``.
-    :raise FileExistError: If video name with ``_grayscale`` suffix already exist.
+    :raise FileExistError: If video name with ``_grayscale`` suffix already exist and save_path is None.
 
     :example:
     >>> _ = video_to_greyscale(file_path='project_folder/videos/Video_1.avi')
@@ -952,12 +963,15 @@ def superimpose_frame_count(file_path: Union[str, os.PathLike],
     :param Union[str, os.PathLike] file_path: Path to video file or directory containing video files.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :param Optional[bool] recursive: If True, processes all video files in ``file_path`` directory found recursively. If False, then grabs just the video in the parent.
-    :param Optional[int] fontsize: The size of the font represetnting the current frame. Default: 20.
+    :param Optional[str] font: The font to use for the frame number. Default 'Arial'.
+    :param Optional[str] font_color: The color of frame number text. Default 'black'.
+    :param Optional[str] bg_color: The color of the box which the frame number is printed in. Default 'white'.
+    :param Optional[str] codec: Video codec to use for CPU encoding. Default 'libx264'. Ignored if gpu=True.
+    :param Optional[int] quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. If None, defaults to 23. Default None.
+    :param bool verbose: If True, prints conversion progress. Default True.
     :param Optional[Union[str, os.PathLike]] save_path: Optional save path or save directory for the video with frame numbers. If None, then the new video is saved in the same directory as the input video with the ``_frame_no`` suffix.
-    :param Optional[str] font_color: The color of frame number text. Default: 'Black'.
-    :param Optional[str] loc: The location of the font number text. Options: 'top_left', 'top_middle', 'top_right', 'bottom_left', 'bottom_middle', 'bottom_right'. Default: Bottom middle.
-    :param Optional[str] bg_color: The color of the box which the frame number is printed in. Default: 'White'.
-    :param Optional[str] font: The font to use for the frame number. Default Arial.
+    :param Optional[Literal['top_left', 'top_middle', 'top_right', 'bottom_left', 'bottom_middle', 'bottom_right']] loc: The location of the font number text. Options: 'top_left', 'top_middle', 'top_right', 'bottom_left', 'bottom_middle', 'bottom_right'. Default 'bottom_middle'.
+    :param Optional[int] fontsize: The size of the font representing the current frame. Default 20.
     :returns: None. The result is stored in the same directory as the input file with the ``_frame_no.mp4`` suffix if ``save_path`` is None.
 
     :example:
@@ -1042,6 +1056,7 @@ def remove_beginning_of_video(file_path: Union[str, os.PathLike],
 
     :param Union[str, os.PathLike] file_path: Path to video file
     :param int time: Number of seconds to remove from the beginning of the video.
+    :param int quality: Video quality percentage (1-100). Higher values = higher quality. Default 60.
     :param Optional[Union[str, os.PathLike]] save_path: Optional save location for the shortened video. If None, then the new video is saved in the same directory as the input video with the ``_shortened`` suffix.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :returns: None. If save_path is not passed, the result is stored in the same directory as the input file with the ``_shorten.mp4`` suffix.
@@ -1097,10 +1112,14 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
     :param str start_time: Start time in HH:MM:SS format.
     :param str end_time: End time in HH:MM:SS format.
     :param Optional[Union[str, os.PathLike]] out_dir: If None, then the clip will be stored in the same dir as the input video. If directory, then the location of the output files.
-    :param Optional[bool] include_clip_time_in_filename: If True, include the clip start and end in HH-MM-SS format as suffix in the filename. If False, then use integer suffic representing the count.
-    :param Optional[bool] overwrite: If True, the overwrite output file if path already exist. If False, then raise FileExistError.
+    :param Optional[Union[str, os.PathLike]] save_path: Optional save path for the clipped video. If provided, overrides out_dir and filename generation. Default None.
+    :param str codec: Video codec to use for CPU encoding. Default 'libvpx-vp9'. Ignored if gpu=True.
+    :param int quality: Video quality percentage (0-100). Higher values = higher quality. Default 60.
+    :param bool verbose: If True, prints conversion progress. Default True.
+    :param Optional[bool] overwrite: If True, overwrite output file if path already exists. If False, then raise FileExistError. Default False.
+    :param Optional[bool] include_clip_time_in_filename: If True, include the clip start and end in HH-MM-SS format as suffix in the filename. If False, then use ``_clipped`` suffix. Default False.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
-    :returns: If None, then the clip will be stored in the same dir as the input video with the ``_clipped.mp4`` suffix. If directory, then the location of the output files.
+    :returns: None. The clip is stored in the same directory as the input video with the ``_clipped.mp4`` suffix if save_path and out_dir are None.
 
     :example:
     >>> _ = clip_video_in_range(file_path='project_folder/videos/Video_1.avi', start_time='00:00:05', end_time='00:00:10')
@@ -1121,7 +1140,6 @@ def clip_video_in_range(file_path: Union[str, os.PathLike],
     check_that_hhmmss_start_is_before_end(start_time=start_time, end_time=end_time, name=f"{file_name} timestamps")
     check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=start_time, video_path=file_path)
     check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=end_time, video_path=file_path)
-    print(quality)
     quality = 60 if not check_int(name='quality', value=quality, min_value=0, max_value=100, raise_error=False)[0] else int(quality)
     quality_crf = quality_pct_to_crf(pct=quality)
     if not include_clip_time_in_filename:
@@ -1156,10 +1174,14 @@ def downsample_video(file_path: Union[str, os.PathLike],
     Down-sample a video file.
 
     :param Union[str, os.PathLike] file_path: Path to video file.
-    :param int video_height: height of new video.
-    :param int video_width: width of new video.
-    :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
-    :returns: None. The result is stored in the same directory as the input file with the ``_downsampled.mp4`` suffix.
+    :param int video_height: Height of new video.
+    :param int video_width: Width of new video.
+    :param bool gpu: If True, use NVIDEA GPU codecs. Default False.
+    :param str codec: Video codec to use for CPU encoding. Default 'libx264'. Ignored if gpu=True.
+    :param int quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
+    :param Optional[Union[str, os.PathLike]] save_path: Optional save path for the downsampled video. If None, saves in the same directory as input file with ``_downsampled.mp4`` suffix. Default None.
+    :param bool verbose: If True, prints conversion progress. Default True.
+    :returns: None. The result is stored in the same directory as the input file with the ``_downsampled.mp4`` suffix if save_path is None.
 
     :example:
     >>> _ = downsample_video(file_path='project_folder/videos/Video_1.avi', video_height=600, video_width=400)
@@ -1518,7 +1540,7 @@ def crop_single_video(file_path: Union[str, os.PathLike],
     """
     Crop a single video using :func:`~simba.video_processors.roi_selector.ROISelector` interface.
 
-    Results is saved in the same directory as input video with the ``_cropped.mp4`` suffix`.
+    Results is saved in the same directory as input video with the ``_cropped.mp4`` suffix.
 
     .. image:: _static/img/crop_single_video.gif
        :width: 700
@@ -1527,9 +1549,10 @@ def crop_single_video(file_path: Union[str, os.PathLike],
     .. seealso::
        To crop multiple videos, see :func:`~simba.video_processors.video_processing.crop_multiple_videos`
 
-    :param str file_path: Path to video file.
+    :param Union[str, os.PathLike] file_path: Path to video file.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
-    :returns: None. Results is saved in the same directory as input video with the ``_cropped.mp4`` suffix`.
+    :param int quality: Video quality percentage (1-100). Higher values = higher quality. Default 60.
+    :returns: None. Results is saved in the same directory as input video with the ``_cropped.mp4`` suffix.
 
     :example:
     >>> _ = crop_single_video(file_path='project_folder/videos/Video_1.mp4')

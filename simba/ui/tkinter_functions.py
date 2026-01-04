@@ -20,7 +20,7 @@ except:
 import PIL.Image
 from PIL import ImageTk
 
-from simba.utils.enums import Defaults, Formats
+from simba.utils.enums import Defaults, Formats, TkBinds
 from simba.utils.lookups import get_icons_paths, get_tooltips
 from simba.utils.read_write import get_fn_ext
 
@@ -663,8 +663,8 @@ def SimBALabel(parent: Union[Frame, Canvas, LabelFrame, Toplevel],
         CreateToolTip(widget=lbl, text=TOOLTIPS[tooltip_key])
 
     if hover_font is not None or hover_fg_clr is not None:
-        lbl.bind("<Enter>", on_enter)
-        lbl.bind("<Leave>", on_leave)
+        lbl.bind(TkBinds.ENTER.value, on_enter)
+        lbl.bind(TkBinds.LEAVE.value, on_leave)
 
     return lbl
 

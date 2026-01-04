@@ -896,6 +896,9 @@ class TkBinds(Enum):
     SHIFT_RIGHT_PRESS = '<KeyPress-Shift_R>'
     SHIFT_LEFT_RELEASE = '<KeyRelease-Shift_L>'
     SHIFT_RIGHT_RELEASE = '<KeyRelease-Shift_R>'
+    ESCAPE = "<Escape>"
+    ENTER = "<Enter>"
+    LEAVE = "<Leave>"
 class ENV_VARS(Enum):
     PRINT_EMOJIS = 'PRINT_EMOJIS'
     UNSUPERVISED_INTERFACE = 'UNSUPERVISED_INTERFACE'

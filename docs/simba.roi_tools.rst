@@ -112,6 +112,13 @@ ROI GUI Mixin
    :members:
    :show-inheritance:
 
+ROI Ruler
+-------
+
+.. autoclass:: simba.roi_tools.roi_ruler.ROIRuler
+   :members:
+   :show-inheritance:
+
 ROI GUI Utils
 -------------
 

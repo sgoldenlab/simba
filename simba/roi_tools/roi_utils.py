@@ -540,7 +540,7 @@ def reset_video_ROIs(config_path: Union[str, os.PathLike],
     store.close()
     stdout_trash(msg=f"Deleted ROI records for video {video_name}. Deleted rectangle count: {len(video_rectangle_roi_records)}, circles: {len(video_circle_roi_records)}, polygons: {len(video_polygon_roi_records)}.")
 
-def get_image_from_label(tk_lbl: Label):
+def get_image_from_label(tk_lbl: Label) -> np.ndarray:
     """ Given a tkinter label with an image, retrieve image in array format"""
 
     if not hasattr(tk_lbl, 'image'):
