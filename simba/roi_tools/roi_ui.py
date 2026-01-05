@@ -98,11 +98,11 @@ class ROI_ui(ROI_mixin, ConfigReader):
 #        video_path=r"C:\troubleshooting\SDS_pre_post\project_folder\videos\SDI100 x ALR2 pre_d7.mp4")
 #
 
-
+#
 # ROI_ui(config_path=r"C:\troubleshooting\open_field_below\project_folder\project_config.ini",
 #        video_path=r"C:\troubleshooting\open_field_below\project_folder\videos\raw_clip1.mp4")
-
-
+#
+#
 
 
 

@@ -16,6 +16,7 @@ from scipy.interpolate import splev, splprep
 from scipy.spatial.qhull import QhullError
 from shapely.geometry import (GeometryCollection, LineString, MultiLineString,
                               MultiPoint, MultiPolygon, Point, Polygon)
+from shapely.geometry import JOIN_STYLE
 from shapely.ops import linemerge, split, triangulate, unary_union
 
 try:
@@ -167,24 +168,11 @@ class GeometryMixin(object):
         >>> GeometryMixin().bodyparts_to_points(data=data)
         """
 
-        check_valid_array(
-            source=f"{GeometryMixin.bodyparts_to_points} data",
-            data=data,
-            accepted_dtypes=Formats.NUMERIC_DTYPES.value,
-            accepted_ndims=(2,),
-        )
+        check_valid_array(source=f"{GeometryMixin.bodyparts_to_points} data", data=data, accepted_dtypes=Formats.NUMERIC_DTYPES.value, accepted_ndims=(2,))
         area = None
         if buffer is not None:
-            check_float(
-                name=f"{GeometryMixin.bodyparts_to_points} buffer",
-                value=buffer,
-                min_value=1,
-            )
-            check_float(
-                name=f"{GeometryMixin.bodyparts_to_points} px_per_mm",
-                value=px_per_mm,
-                min_value=1,
-            )
+            check_float(name=f"{GeometryMixin.bodyparts_to_points} buffer", value=buffer, allow_negative=False, allow_zero=False)
+            check_float(name=f"{GeometryMixin.bodyparts_to_points} px_per_mm", value=px_per_mm, allow_negative=False, allow_zero=False)
             area = buffer / px_per_mm
         results = []
         for i in range(data.shape[0]):
@@ -305,9 +293,83 @@ class GeometryMixin(object):
         return shape_skeleton
 
     @staticmethod
+    def parallel_offset_polygon(polygon: Polygon, size_mm: Union[int, float], pixels_per_mm: float) -> Polygon:
+        """
+        Offset polygon by scaling from centroid while preserving the exact vertex count.
+        
+        This is a simple method that moves each vertex along the line from the centroid,
+        preserving the vertex count and shape proportions.
+        
+        :param Polygon polygon: The input polygon to offset.
+        :param Union[int, float] size_mm: The offset distance in millimeters. Positive for outward, negative for inward.
+        :param float pixels_per_mm: The conversion factor from millimeters to pixels.
+        :return: The offset polygon with the same vertex count.
+        :rtype: Polygon
+        
+        :example:
+        >>> polygon = Polygon([(0, 0), (10, 0), (10, 10), (0, 10)])
+        >>> offset = GeometryMixin().parallel_offset_polygon(polygon=polygon, size_mm=2.0, pixels_per_mm=1.0)
+        """
+        if not isinstance(polygon, Polygon):
+            raise InvalidInputError(msg=f'polygon must be a Polygon, got: {type(polygon)}', source=GeometryMixin.parallel_offset_polygon.__name__)
+        check_float(name="PARALLEL OFFSET size_mm", value=size_mm, allow_negative=True, allow_zero=False)
+        check_float(name="PARALLEL OFFSET pixels_per_mm", value=pixels_per_mm, allow_negative=False, allow_zero=False)
+        
+        distance = float(size_mm / pixels_per_mm)
+        if abs(distance) < 1e-10:
+            return polygon
+        
+        # Check if polygon is valid
+        if not polygon.is_valid:
+            polygon = polygon.buffer(0)
+            if not isinstance(polygon, Polygon):
+                return polygon
+        
+        coords = np.array(polygon.exterior.coords[:-1])  # Remove duplicate last point
+        n = len(coords)
+        
+        if n < 3:
+            return polygon
+        
+        # Get centroid
+        centroid = np.array(polygon.centroid.coords[0])
+        
+        # Calculate average distance from centroid to vertices (for scaling factor)
+        distances_to_centroid = np.array([np.linalg.norm(coord - centroid) for coord in coords])
+        avg_distance = np.mean(distances_to_centroid)
+        
+        if avg_distance < 1e-10:
+            # Degenerate polygon (all vertices at centroid)
+            return polygon
+        
+        # Calculate scale factor: new_distance = old_distance + offset_distance
+        # scale_factor = (avg_distance + distance) / avg_distance
+        scale_factor = 1.0 + (distance / avg_distance)
+        
+        # Apply scaling from centroid to each vertex
+        offset_coords = np.zeros_like(coords, dtype=np.float64)
+        for i in range(n):
+            vec_to_vertex = coords[i] - centroid
+            offset_coords[i] = centroid + vec_to_vertex * scale_factor
+        
+        # Create new polygon (close it by adding first point at end)
+        offset_coords_closed = np.vstack([offset_coords, offset_coords[0]])
+        
+        try:
+            result = Polygon(offset_coords_closed)
+            if not result.is_valid:
+                result = result.buffer(0)
+                if isinstance(result, MultiPolygon):
+                    result = max(result.geoms, key=lambda p: p.area)
+            return result
+        except Exception:
+            return polygon
+
+    @staticmethod
     def buffer_shape(shape: Union[Polygon, LineString, List[Union[Polygon, LineString]]],
                      size_mm: int,
                      pixels_per_mm: float,
+                     resolution: int = 16,
                      cap_style: Literal["round", "square", "flat"] = "round") -> Union[Polygon, List[Polygon]]:
         """
         Create a buffered shape by applying a buffer operation to the input polygon or linestring.
@@ -331,18 +393,20 @@ class GeometryMixin(object):
         if isinstance(shape, (Polygon, LineString)):
             shape = [shape]
         if isinstance(shape, list):
-            check_valid_lst(data=shape, source=f'{GeometryMixin.buffer_shape.__name__} shape',
-                            valid_dtypes=(Polygon, LineString,), min_len=1, raise_error=True)
+            check_valid_lst(data=shape, source=f'{GeometryMixin.buffer_shape.__name__} shape', valid_dtypes=(Polygon, LineString,), min_len=1, raise_error=True)
         else:
-            raise InvalidInputError(
-                msg=f'shape is not a valid dtype. accepted: {Polygon, LineString}, got: {type(shape)}',
-                source=GeometryMixin.buffer_shape.__name__)
-        check_int(name="BUFFER SHAPE size_mm", value=size_mm)
-        check_float(name="BUFFER SHAPE pixels_per_mm", value=pixels_per_mm, min_value=1)
-        results = []
+            raise InvalidInputError(msg=f'shape is not a valid dtype. accepted: {Polygon, LineString}, got: {type(shape)}', source=GeometryMixin.buffer_shape.__name__)
+        check_int(name="BUFFER SHAPE size_mm", value=size_mm, allow_negative=True, allow_zero=False)
+        check_int(name="resolution", value=resolution, min_value=1, max_value=52, raise_error=True)
+        check_float(name="BUFFER SHAPE pixels_per_mm", value=pixels_per_mm, allow_negative=False, allow_zero=False)
+        results, distance_px = [], int(size_mm / pixels_per_mm)
         for i in shape:
-            results.append(
-                i.buffer(distance=int(size_mm / pixels_per_mm), cap_style=GeometryEnum.CAP_STYLE_MAP.value[cap_style]))
+            buffered = i.buffer(distance=distance_px, cap_style=GeometryEnum.CAP_STYLE_MAP.value[cap_style], resolution=resolution)
+            if isinstance(buffered, MultiPolygon):
+                buffered = unary_union(buffered)
+            if isinstance(buffered, MultiPolygon):
+                return max(buffered.geoms, key=lambda p: p.area)
+            results.append(buffered)
         if len(results) == 1:
             return results[0]
         else:

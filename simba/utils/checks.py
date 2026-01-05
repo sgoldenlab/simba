@@ -75,22 +75,34 @@ def check_int(name: str,
               min_value: Optional[int] = None,
               unaccepted_vals: Optional[List[int]] = None,
               accepted_vals: Optional[List[int]] = None,
+              allow_negative: bool = True,
+              allow_zero: bool = True,
               raise_error: Optional[bool] = True) -> Tuple[bool, str]:
     """
     Check if variable is a valid integer.
 
-    :param str name: Name of variable
-    :param Any value: Value of variable
-    :param Optional[int] max_value: Maximum allowed value of the variable. If None, then no maximum. Default: None.
-    :param Optional[int]: Minimum allowed value of the variable. If None, then no minimum. Default: None.
-    :param Optional[List[int]] unaccepted_vals: Optional list of values that are not accepted. Default: None.
-    :param Optional[List[int]] accepted_vals: Optional list of values that are accepted. Default: None.
-    :param Optional[bool] raise_error: If True, then raise error if invalid integer. Default: True.
-    :return: If `raise_error` is False, then returns size-2 tuple, with first value being a bool representing if valid integer, and second value a string representing error (if valid is False, else empty string)
-    :rtype: Tuple[bool, str]
+    Validates that a value is an integer and optionally checks it against constraints such as
+    minimum/maximum values, accepted/unaccepted value lists, and negative/zero number restrictions.
 
-    :examples:
-    >>> check_int(name='My_fps', input=25, min_value=1)
+    :param str name: Name of the variable being checked (used in error messages).
+    :param Any value: The value to validate as an integer.
+    :param Optional[int] max_value: Maximum allowed value. If None, no maximum constraint. Default None.
+    :param Optional[int] min_value: Minimum allowed value. If None, no minimum constraint. Default None.
+    :param Optional[List[int]] unaccepted_vals: List of integer values that are not accepted. If value is in this list, validation fails. Default None.
+    :param Optional[List[int]] accepted_vals: List of integer values that are accepted. If value is not in this list, validation fails. Default None.
+    :param bool allow_negative: If False, negative values will cause validation to fail. Default True.
+    :param bool allow_zero: If False, zero values will cause validation to fail. Default True.
+    :param Optional[bool] raise_error: If True, raises IntegerError when validation fails. If False, returns (False, error_message) tuple. Default True.
+    :return: If `raise_error` is False, returns a tuple (bool, str) where bool indicates if value is valid, and str contains error message (empty string if valid). If `raise_error` is True and validation passes, returns (True, ""). If `raise_error` is True and validation fails, raises IntegerError.
+    :rtype: Tuple[bool, str]
+    :raises IntegerError: If validation fails and `raise_error` is True.
+
+    :example:
+    >>> check_int(name='My_fps', value=25, min_value=1)
+    >>> check_int(name='Quality', value=50, min_value=0, max_value=100, raise_error=False)
+    >>> check_int(name='Mode', value=2, accepted_vals=[1, 2, 3])
+    >>> check_int(name='Count', value=-5, allow_negative=False)
+    >>> check_int(name='Divisor', value=0, allow_zero=False)
     """
     msg = ""
     try:
@@ -132,6 +144,19 @@ def check_int(name: str,
             else:
                 return False, msg
 
+    if not allow_negative and int(value) < 0:
+        msg = f"{name} is negative and negative is not accepted. Got: {value}."
+        if raise_error:
+            raise IntegerError(msg=msg, source=check_int.__name__)
+        else:
+            return False, msg
+
+    if not allow_zero and int(value) == 0:
+        msg = f"{name} is zero and zero is not accepted. Got: {value}."
+        if raise_error:
+            raise IntegerError(msg=msg, source=check_int.__name__)
+        else:
+            return False, msg
 
     return True, msg
 

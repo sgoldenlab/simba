@@ -50,7 +50,7 @@ class ROIRuler(object):
         check_int(name=f'{self.__class__.__name__} tolerance', value=tolerance, min_value=1)
         #if info_label is not None: check_instance(source=f'{self.__class__.__name__} info_label', instance=info_label, accepted_types=type(SimBALabel), raise_error=True, warning=False)
         if clr is not None: check_if_valid_rgb_tuple(data=clr, raise_error=True, source=f'{self.__class__.__name__} clr')
-        else: clr = TextOptions.COLOR.value
+        else: clr = (0, 255, 255)
         if second_clr is not None: check_if_valid_rgb_tuple(data=second_clr, raise_error=True, source=f'{self.__class__.__name__} second_clr')
         self.thickness, self.clr, self.img_window = thickness, clr, img_window
         self.drawing, self.clr, self.thickness, self.second_thickness, self.tolerance = False, clr, thickness, second_thickness, tolerance
@@ -63,9 +63,17 @@ class ROIRuler(object):
         if second_thickness is None: self.second_thickness = int(self.thickness * 2.0)
         self.img_cpy, self.got_attributes = self.img.copy(), False
         self.w, self.h, self.drawing = self.img.shape[1], self.img.shape[0], False
+        self._bind_mouse()
+
+    def _bind_mouse(self):
         self.img_window.bind(TkBinds.B1_PRESS.value, self._mouse_press)
         self.img_window.bind(TkBinds.B1_MOTION.value, self._mouse_move)
         self.img_window.bind(TkBinds.B1_RELEASE.value, self._mouse_release)
+
+    def unbind_mouse(self):
+        self.img_window.unbind(TkBinds.B1_PRESS.value)
+        self.img_window.unbind(TkBinds.B1_MOTION.value)
+        self.img_window.unbind(TkBinds.B1_RELEASE.value)
 
     def _find_proximal_tag(self, click_coordinate: Tuple[int, int]):
         proximal_loc, proximal_name = None, None
@@ -144,7 +152,7 @@ class ROIRuler(object):
         else: self.length_mm = None
         self.got_attributes = True
         if self.info_lbl is not None:
-            self.info_lbl.configure(text=f'RULER LENGTH: {self.length_mm} mm, {self.length_px} pixels', fg='blue')
+            self.info_lbl.configure(text=f'RULER LENGTH: {self.length_mm} mm, {self.length_px} pixels (Convertion factor: {self.px_per_mm})', fg='blue')
             self.info_lbl.update_idletasks()
 
 

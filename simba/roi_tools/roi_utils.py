@@ -3,7 +3,10 @@ import os
 import warnings
 from copy import copy, deepcopy
 from tkinter import *
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from simba.roi_tools.interactive_roi_bufferer import InteractiveROIBufferer
 
 import cv2
 import numpy as np
@@ -34,7 +37,15 @@ warnings.simplefilter(action='ignore', category=pd.errors.PerformanceWarning)
 
 DRAW_FRAME_NAME = "DEFINE SHAPE"
 
-def create_rectangle_entry(rectangle_selector: ROISelector, video_name: str, shape_name: str, clr_name: str, clr_bgr: Tuple[int, int, int], thickness: int, ear_tag_size: int, px_conversion_factor: float):
+def create_rectangle_entry(rectangle_selector: Union[ROISelector, "InteractiveROIBufferer"],
+                           video_name: str,
+                           shape_name: str,
+                           clr_name: str,
+                           clr_bgr: Tuple[int, int, int],
+                           thickness: int,
+                           ear_tag_size: int,
+                           px_conversion_factor: float):
+
     return {'Video':             video_name,
             'Shape_type':        ROI_SETTINGS.RECTANGLE.value,
             'Name':              shape_name,
@@ -63,16 +74,24 @@ def create_rectangle_entry(rectangle_selector: ROISelector, video_name: str, sha
                                  "Bottom tag": rectangle_selector.bottom_tag},
             'Ear_tag_size':      ear_tag_size}
 
-def create_circle_entry(circle_selector: ROISelectorCircle,  video_name: str, shape_name: str, clr_name: str, clr_bgr: Tuple[int, int, int], thickness: int, ear_tag_size: int, px_conversion_factor: float):
+def create_circle_entry(circle_selector: Union[ROISelectorCircle, "InteractiveROIBufferer"],
+                        video_name: str,
+                        shape_name: str,
+                        clr_name: str,
+                        clr_bgr: Tuple[int, int, int],
+                        thickness: int,
+                        ear_tag_size: int,
+                        px_conversion_factor: float):
+
     return {'Video':             video_name,
             'Shape_type':        ROI_SETTINGS.CIRCLE.value,
             'Name':              shape_name,
             'Color name':        clr_name,
             'Color BGR':         clr_bgr,
             'Thickness':         thickness,
-            'centerX':           circle_selector.circle_center[0],
-            'centerY':           circle_selector.circle_center[1],
-            'radius':            circle_selector.circle_radius,
+            'centerX':           int(circle_selector.circle_center[0]),
+            'centerY':           int(circle_selector.circle_center[1]),
+            'radius':            int(circle_selector.circle_radius),
             'radius_cm':         round((circle_selector.circle_radius / px_conversion_factor) / 10, 2),
             'area_cm':           round(math.pi * (round((circle_selector.circle_radius / px_conversion_factor) / 10, 2) **2), 2),
             "Tags":             {"Center tag": circle_selector.circle_center,
@@ -80,15 +99,23 @@ def create_circle_entry(circle_selector: ROISelectorCircle,  video_name: str, sh
             'Ear_tag_size':      ear_tag_size}
 
 
-def create_polygon_entry(polygon_selector: ROISelectorPolygon, video_name: str, shape_name: str, clr_name: str, clr_bgr: Tuple[int, int, int], thickness: int, ear_tag_size: int, px_conversion_factor: float) -> dict:
+def create_polygon_entry(polygon_selector: Union[ROISelectorPolygon, "InteractiveROIBufferer"],
+                         video_name: str,
+                         shape_name: str,
+                         clr_name: str,
+                         clr_bgr: Tuple[int, int, int],
+                         thickness: int,
+                         ear_tag_size: int,
+                         px_conversion_factor: float) -> dict:
+
     return {'Video':                video_name,
             'Shape_type':           ROI_SETTINGS.POLYGON.value,
             'Name':                 shape_name,
             'Color name':           clr_name,
             'Color BGR':            clr_bgr,
             'Thickness':            thickness,
-            'Center_X':             polygon_selector.polygon_centroid[0],
-            'Center_Y':             polygon_selector.polygon_centroid[1],
+            'Center_X':             int(polygon_selector.polygon_centroid[0]),
+            'Center_Y':             int(polygon_selector.polygon_centroid[1]),
             'vertices':             polygon_selector.polygon_arr,
             'center':               tuple(polygon_selector.polygon_centroid),
             'area':                 polygon_selector.polygon_area,

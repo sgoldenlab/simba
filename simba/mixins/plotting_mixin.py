@@ -1554,7 +1554,10 @@ class PlottingMixin(object):
             if isinstance(row["Color BGR"], str): row["Color BGR"] = ast.literal_eval(row["Color BGR"])
             img = cv2.circle(img, (int(row["centerX"]), int(row["centerY"])), row["radius"], row["Color BGR"], int(row["Thickness"]), lineType=circle_line_type)
             if show_center:
-                img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), tag_size, row["Color BGR"], -1, lineType=circle_line_type)
+                try:
+                    img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), tag_size, row["Color BGR"], -1, lineType=circle_line_type)
+                except KeyError:
+                    img = cv2.circle(img, (int(row["centerX"]), int(row["centerY"])), tag_size, row["Color BGR"], -1, lineType=circle_line_type)
             if show_tags:
                 for tag_data in row["Tags"].values():
                     img = cv2.circle(img, tuple(tag_data), tag_size, row["Color BGR"], -1, lineType=circle_line_type)

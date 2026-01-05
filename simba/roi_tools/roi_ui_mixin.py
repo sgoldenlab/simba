@@ -16,8 +16,8 @@ from shapely.geometry import Polygon
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.plotting_mixin import PlottingMixin
-from simba.roi_tools.interactive_roi_modifier_tkinter import \
-    InteractiveROIModifier
+from simba.roi_tools.interactive_roi_modifier_tkinter import InteractiveROIModifier
+from simba.roi_tools.interactive_roi_bufferer import InteractiveROIBufferer
 from simba.roi_tools.roi_selector_circle_tkinter import ROISelectorCircle
 from simba.roi_tools.roi_selector_polygon_tkinter import ROISelectorPolygon
 from simba.roi_tools.roi_selector_rectangle_tkinter import ROISelector
@@ -279,12 +279,13 @@ class ROI_mixin(ConfigReader):
 
     def overlay_rois_on_image(self,
                               show_ear_tags: bool = False,
-                              show_roi_info: bool = False):
+                              show_roi_info: bool = False,
+                              show_center: bool = False):
 
         self.set_img(frame_idx=self.img_idx)
-        self.img = PlottingMixin.rectangles_onto_image(img=self.img, rectangles=self.rectangles_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'])
-        self.img = PlottingMixin.circles_onto_image(img=self.img, circles=self.circles_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'])
-        self.img = PlottingMixin.polygons_onto_image(img=self.img, polygons=self.polygon_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'])
+        self.img = PlottingMixin.rectangles_onto_image(img=self.img, rectangles=self.rectangles_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'], show_center=show_center)
+        self.img = PlottingMixin.circles_onto_image(img=self.img, circles=self.circles_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'], show_center=show_center)
+        self.img = PlottingMixin.polygons_onto_image(img=self.img, polygons=self.polygon_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'], show_center=show_center)
         if self.pose_data is not None:
             self.img = self.insert_pose(img=self.img, pose_img_data=self.get_frm_pose(frame_idx=self.img_idx))
         if self.grid is not None:
@@ -312,6 +313,7 @@ class ROI_mixin(ConfigReader):
         self.video_frame_id_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'DISPLAY FRAME #: {self.img_idx}')
         self.video_frame_time_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'DISPLAY FRAME (S): {(round((self.img_idx / self.video_meta["fps"]), 2))}')
         self.display_size = SimBALabel(parent=self.change_attr_panel, txt=f'PRIMARY MONITOR (WxH): {self.display_w, self.display_h}')
+        self.ppm_lbl = SimBALabel(parent=self.change_attr_panel, txt=f'PIXEL PER MM: {self.px_per_mm}')
         self.change_attr_panel.grid(row=row_idx, sticky=W)
         self.video_name_lbl.grid(row=0, column=0, sticky=NW)
         self.video_fps_lbl.grid(row=0, column=1, sticky=NW)
@@ -319,6 +321,7 @@ class ROI_mixin(ConfigReader):
         self.video_frame_id_lbl.grid(row=0, column=3, sticky=NW)
         self.video_frame_time_lbl.grid(row=0, column=4, sticky=NW)
         self.display_size.grid(row=1, column=0, sticky=NW)
+        self.ppm_lbl.grid(row=1, column=1, sticky=NW)
 
     def get_file_menu(self,
                       root: Toplevel):
@@ -328,6 +331,7 @@ class ROI_mixin(ConfigReader):
         menu.add_cascade(label="File (ROI)", menu=file_menu)
         file_menu.add_command(label="Preferences...", compound="left", image=self.menu_icons["settings"]["img"], command=lambda: self.preferences_pop_up())
         file_menu.add_command(label="Draw ROIs of pre-defined sizes...", compound="left", image=self.menu_icons["size_black"]["img"], command=lambda: self.fixed_roi_pop_up())
+        file_menu.add_command(label="Buffer ROIs...", compound="left", image=self.menu_icons["resize"]["img"], command=lambda: self.buffer_rois_popup(), state="disabled")
         root.config(menu=menu)
 
     def get_select_img_panel(self,
@@ -525,7 +529,7 @@ class ROI_mixin(ConfigReader):
             self.set_status_bar_panel(text=msg, fg="red")
             raise NoROIDataError(msg, source=self.__class__.__name__)
 
-        def on_click(event):
+        def exit_click(event):
             self.click_event.set(True)
             self.root.unbind(TkBinds.B1_PRESS.value); self.root.unbind(TkBinds.ESCAPE.value); self.img_window.unbind(TkBinds.ESCAPE.value)
             self.interactive_modifier.unbind_keys()
@@ -538,7 +542,7 @@ class ROI_mixin(ConfigReader):
         self.click_event, self.got_attributes = BooleanVar(value=False), False
         self.root = parent_frame
         self.interactive_modifier = InteractiveROIModifier(img_window=self.img_window, original_img=self.read_img(frame_idx=self.img_idx), roi_dict=deepcopy(self.roi_dict), settings=self.settings, rectangle_grid=self.grid, hex_grid=self.hexagon_grid)
-        self.root.bind(TkBinds.B1_PRESS.value, on_click); self.root.bind(TkBinds.ESCAPE.value, on_click); self.img_window.bind(TkBinds.ESCAPE.value, on_click)
+        self.root.bind(TkBinds.B1_PRESS.value, exit_click); self.root.bind(TkBinds.ESCAPE.value, exit_click); self.img_window.bind(TkBinds.ESCAPE.value, exit_click)
         self.root.wait_variable(self.click_event)
 
         self.img_window = self.interactive_modifier.img_window
@@ -562,6 +566,7 @@ class ROI_mixin(ConfigReader):
         self.ruler = ROIRuler(img_window=self.img_window, thickness=int(self.thickness_dropdown.getChoices()), clr=self.color_option_dict[self.color_dropdown.getChoices()], second_clr=(0, 0, 0), tolerance=int(self.settings[KEYBOARD_SENSITIVITY] * 2), px_per_mm=self.px_per_mm, info_label=self.status_bar)
         self.root.bind(TkBinds.B1_PRESS.value, exit_click); self.root.bind(TkBinds.ESCAPE.value, exit_click); self.img_window.bind(TkBinds.ESCAPE.value, exit_click)
         self.root.wait_variable(self.click_event)
+        self.ruler.unbind_mouse()
         del self.ruler; del self.root
         self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
 
@@ -826,7 +831,7 @@ class ROI_mixin(ConfigReader):
         self.preferences_frm = Toplevel()
         self.preferences_frm.minsize(400, 300)
         self.preferences_frm.wm_title("PREFERENCES")
-
+        self.preferences_frm.iconphoto(False, self.menu_icons['settings']["img"])
 
         pref_frm_panel = CreateLabelFrameWithIcon(parent=self.preferences_frm, header="PREFERENCES", icon_name='settings', padx=5, pady=5)
         self.line_type_dropdown = SimBADropDown(parent=pref_frm_panel, dropdown_options=ROI_SETTINGS.LINE_TYPE_OPTIONS.value, label="LINE TYPE: ", label_width=35, dropdown_width=35, value=self.settings['LINE_TYPE'])
@@ -886,18 +891,6 @@ class ROI_mixin(ConfigReader):
             self.hexagon_grid = list(GeometryMixin().bucket_img_into_grid_hexagon(img_size=(self.display_img_width, self.display_img_height), bucket_size_mm=bucket_grid_size_mm, px_per_mm=self.px_per_mm, verbose=False)[0].values())
         else:
             self.hexagon_grid = None
-
-
-
-
-        # max_width = float(self.max_width_ratio_dropdown.get_value())
-        # max_height = float(self.max_height_ratio_dropdown.get_value())
-        # min_width = float(self.min_width_ratio_dropdown.get_value())
-        # min_height = float(self.min_height_ratio_dropdown.get_value())
-        #
-        # if (max_width, max_height) != MAX_DRAW_UI_DISPLAY_RATIO or (min_width, min_height) != MIN_DRAW_UI_DISPLAY_RATIO:
-        #     self.set_screen_display(max_width=max_width, max_height=max_height, min_width=min_width, min_height=min_height)
-
         self.overlay_rois_on_image()
 
 
@@ -993,6 +986,7 @@ class ROI_mixin(ConfigReader):
         self.clr_name = self.fixed_roi_clr_drpdwn.getChoices()
         self.clr_bgr = self.color_option_dict[self.clr_name]
         self.thickness = int(self.fixed_roi_thickness_drpdwn.getChoices())
+        self.ear_tag_size = int(self.fixed_roi_eartag_size_drpdwn.getChoices())
         self.ear_tag_size = int(self.fixed_roi_eartag_size_drpdwn.getChoices())
         self.shape_cnt = len(list(self.roi_dict.keys()))
         self.shape_center = (round(self.img_center[0] + (self.settings['DUPLICATION_JUMP_SIZE'] * self.shape_cnt)), round(self.img_center[1] + (self.settings['DUPLICATION_JUMP_SIZE'] * self.shape_cnt)))
@@ -1146,12 +1140,14 @@ class ROI_mixin(ConfigReader):
         try:
             self.img_window.destroy()
             self.preferences_frm.destroy()
+            self.fixed_roi_frm.destroy()
         except:
             pass
         try:
             self.main_frm.destroy()
             self.main_frm.quit()
             self.preferences_frm.quit()
+            self.fixed_roi_frm.quit()
         except:
             pass
 
@@ -1179,9 +1175,62 @@ class ROI_mixin(ConfigReader):
                 self.pose_data = self.pose_data * self.downscale_factor
                 self.pose_data_cpy = deepcopy(self.pose_data)
 
-            #self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
+    def buffer_rois_popup(self):
+        if len(self.roi_names) == 0:
+            error_msg = f'Cannot buffer ROIs: The video {self.video_meta["video_name"]} has no ROIs drawn.'
+            self.set_status_bar_panel(text=error_msg, fg='red')
+            raise InvalidInputError(error_msg, source=self.__class__.__name__)
+        if hasattr(self, 'buffer_roi_frm'):
+            self.buffer_roi_frm.destroy()
+
+        self.buffer_roi_frm = Toplevel()
+        self.buffer_roi_frm.minsize(400, 300)
+        self.buffer_roi_frm.wm_title("BUFFER ROIs")
+        self.buffer_roi_frm.iconphoto(False, self.menu_icons['resize']["img"])
+        buffer_roi_settings_frm = CreateLabelFrameWithIcon(parent=self.buffer_roi_frm, header="BUFFER ROI SETTINGS", icon_name='resize', padx=5, pady=5)
+        self.buffer_size_eb = Entry_Box(parent=buffer_roi_settings_frm, fileDescription='BUFFER SIZE (MM):', validation='numeric', labelwidth=35, entry_box_width=10, justify='center', value=20)
+        self.px_per_mm_eb = Entry_Box(parent=buffer_roi_settings_frm, fileDescription='PIXEL PER MM CONVERTION FACTOR:', labelwidth=35, entry_box_width=10, justify='center', value=self.px_per_mm)
+
+        buffer_roi_settings_frm.grid(row=0, column=0, sticky=NW)
+        self.buffer_size_eb.grid(row=0, column=0, sticky=NW, pady=5)
+        self.px_per_mm_eb.grid(row=1, column=0, sticky=NW, pady=5)
+        run_btn = SimbaButton(parent=self.buffer_roi_frm, txt="RUN", img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.run_buffer)
+        run_btn.grid(row=1, column=0, sticky=NW, pady=5)
 
 
+
+    def run_buffer(self):
+        buffer_mm = self.buffer_size_eb.entry_get
+        px_per_mm = self.px_per_mm_eb.entry_get
+        valid_buffer, error_msg_buffer = check_int(name='BUFFER SIZE (MM)', value=buffer_mm, allow_zero=False, allow_negative=False, raise_error=False)
+        valid_px_per_mm, error_msg_px_per_mm = check_float(name='PIXEL PER MM CONVERTION FACTOR', value=px_per_mm, allow_zero=False, allow_negative=False, raise_error=False)
+        if not valid_buffer:
+            self.set_status_bar_panel(text=error_msg_buffer, fg='red')
+            raise InvalidInputError(error_msg_buffer, source=self.__class__.__name__)
+        if not valid_px_per_mm:
+            self.set_status_bar_panel(text=error_msg_px_per_mm, fg='red')
+            raise InvalidInputError(error_msg_px_per_mm, source=self.__class__.__name__)
+
+        def exit_click(event):
+            self.click_event.set(True)
+            if hasattr(self, 'roi_bufferer'):
+                self.img_window.unbind(TkBinds.B1_PRESS.value)
+            self.main_frm.unbind(TkBinds.B1_PRESS.value); self.main_frm.unbind(TkBinds.ESCAPE.value); self.img_window.unbind(TkBinds.ESCAPE.value)
+            self.set_btn_clrs()
+            self.set_status_bar_panel(text="BUFFER MODE EXITED", fg="blue")
+
+        self.set_status_bar_panel(text="BUFFER MODE ENTERED", fg="darkred")
+        self.click_event = BooleanVar(value=False)
+        self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False, show_center=True)
+        self.roi_bufferer = InteractiveROIBufferer(img_window=self.img_window, original_img=self.read_img(frame_idx=self.img_idx), roi_dict=deepcopy(self.roi_dict), settings=self.settings, rectangle_grid=self.grid, hex_grid=self.hexagon_grid, buffer_mm=int(buffer_mm), px_per_mm=float(px_per_mm))
+        self.main_frm.bind(TkBinds.B1_PRESS.value, exit_click); self.main_frm.bind(TkBinds.ESCAPE.value, exit_click); self.img_window.bind(TkBinds.ESCAPE.value, exit_click)
+        self.main_frm.wait_variable(self.click_event)
+        self.roi_bufferer.unbind_mouse()
+        self.img_window = self.roi_bufferer.img_window
+        self.roi_dict = self.roi_bufferer.roi_dict
+        self.rectangles_df, self.circles_df, self.polygon_df = get_roi_df_from_dict(roi_dict=self.roi_dict)
+        del self.roi_bufferer
+        self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False)
 
 
 
