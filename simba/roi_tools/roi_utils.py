@@ -3,7 +3,7 @@ import os
 import warnings
 from copy import copy, deepcopy
 from tkinter import *
-from typing import Dict, List, Optional, Tuple, Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Dict, List, Optional, Tuple, Union
 
 if TYPE_CHECKING:
     from simba.roi_tools.interactive_roi_bufferer import InteractiveROIBufferer

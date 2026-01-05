@@ -1,19 +1,26 @@
-from typing import Optional, List, Tuple
-from tkinter import Toplevel, Event
-import numpy as np
-import cv2
-from PIL import Image, ImageTk
-import pandas as pd
-from copy import deepcopy
-from scipy.spatial.distance import cdist
 import math
-from shapely.geometry import Polygon, Point
-from simba.utils.checks import check_instance
-from simba.utils.enums import ROI_SETTINGS, TkBinds, Keys
-from simba.roi_tools.roi_utils import get_image_from_label, create_rectangle_entry, create_circle_entry, create_polygon_entry, get_circle_df_headers, get_rectangle_df_headers, get_polygon_df_headers
+from copy import deepcopy
+from tkinter import Event, Toplevel
+from typing import List, Optional, Tuple
+
+import cv2
+import numpy as np
+import pandas as pd
+from PIL import Image, ImageTk
+from scipy.spatial.distance import cdist
+from shapely.geometry import Point, Polygon
+
 from simba.mixins.geometry_mixin import GeometryMixin
 from simba.mixins.plotting_mixin import PlottingMixin
-
+from simba.roi_tools.roi_utils import (create_circle_entry,
+                                       create_polygon_entry,
+                                       create_rectangle_entry,
+                                       get_circle_df_headers,
+                                       get_image_from_label,
+                                       get_polygon_df_headers,
+                                       get_rectangle_df_headers)
+from simba.utils.checks import check_instance
+from simba.utils.enums import ROI_SETTINGS, Keys, TkBinds
 
 TAGS, SHAPE_TYPE = 'Tags', 'Shape_type'
 
