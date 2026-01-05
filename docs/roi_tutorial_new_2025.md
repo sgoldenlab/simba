@@ -39,6 +39,7 @@ Moreover, the ROI data can  be used to build potentially valuable, additional, f
  * [CHANGING ROI SHAPES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#changing-roi-shapes)
  * [CHANGE ROI ATTRIBUTES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#change-roi-attributes)
  * [SHOW SHAPE SIZE INFORMATION](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#show-shape-size-information)
+ * [MEASURE DISTANCES WITH THE RULER TOOL](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#measure-distances-with-the-ruler-tool)
  * [DRAW SHAPES OF USER-DEFINED METRIC SIZES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-shapes-of-user-defined-metric-sizes)
  * [DRAW A RECTANGLE OF METRIC WIDTH & HEIGHT](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-a-rectangle-of-metric-width--height)
  * [DRAW A CIRCLE OF METRIC RADIUS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-a-circle-of-metric-radius)
@@ -298,6 +299,23 @@ Sometimes we need some metrics representing the sizes of the ROIs we have drawn.
 
 [show_shape_size.webm](https://github.com/user-attachments/assets/6fdb61c1-7110-46dc-8845-cd6c47c10cef)
 
+
+## MEASURE DISTANCES WITH THE RULER TOOL
+
+SimBA includes a ruler tool that allows you to measure distances between two points on the video frame. This is useful for verifying pixel-to-millimeter conversion factors, measuring distances between ROIs, or checking the dimensions of objects in your video.
+
+1. To activate the ruler tool, click the <kbd>RULER</kbd> button in the `SHAPE INTERACTION` submenu. The button is located alongside the `MOVE SHAPE` and `SHOW SHAPE INFO` buttons.
+
+2. Once activated, you can draw a measurement line by **clicking and holding the left mouse button** at the starting point, then **dragging the mouse** to the end point. The ruler displays a line with arrows on both ends to indicate the measurement direction.
+
+3. After releasing the mouse button, the line length is calculated and displayed in the **status bar** at the bottom of the **REGION OF INTEREST (ROI) SETTINGS** window. If a pixel-per-millimeter conversion factor is available (from your `project_folder/logs/video_info.csv`), the measurement will be shown in both **millimeters** and **pixels** (e.g., "RULER LENGTH: 25.5 mm, 127.5 pixels"). Otherwise, only the pixel distance is displayed.
+
+4. To adjust the measurement, **click and hold the left mouse button** near either endpoint of the line (within the tolerance distance). The endpoint will be highlighted, and you can **drag it to a new position** to update the measurement.
+
+5. To exit the ruler tool, press the **keyboard `ESCAPE` key** or click the left mouse button anywhere in the ROI SETTINGS window.
+
+> [!NOTE]
+> The ruler tool uses arrowed lines to make the measurement direction clear. The line thickness and color are controlled by the `Shape thickness` and `Shape color` dropdown menus in the `SHAPE ATTRIBUTES` section. Adjust these settings before activating the ruler tool to customize the appearance of your measurement lines. The minimum line length is determined by the tolerance setting (default: 10 pixels) to prevent accidental measurements from small mouse movements.
 
 ## DRAW SHAPES OF USER-DEFINED METRIC SIZES
 
