@@ -299,10 +299,11 @@ Sometimes we need some metrics representing the sizes of the ROIs we have drawn.
 
 [show_shape_size.webm](https://github.com/user-attachments/assets/6fdb61c1-7110-46dc-8845-cd6c47c10cef)
 
-
 ## MEASURE DISTANCES WITH THE RULER TOOL
 
 SimBA includes a ruler tool that allows you to measure distances between two points on the video frame. This is useful for verifying pixel-to-millimeter conversion factors, measuring distances between ROIs, or checking the dimensions of objects in your video.
+
+[ROI_ruler_2.webm](https://github.com/user-attachments/assets/edff3c5e-2894-43b7-b44d-7559b4bdb5ed)
 
 1. To activate the ruler tool, click the <kbd>RULER</kbd> button in the `SHAPE INTERACTION` submenu. The button is located alongside the `MOVE SHAPE` and `SHOW SHAPE INFO` buttons.
 
@@ -313,6 +314,8 @@ SimBA includes a ruler tool that allows you to measure distances between two poi
 4. To adjust the measurement, **click and hold the left mouse button** near either endpoint of the line (within the tolerance distance). The endpoint will be highlighted, and you can **drag it to a new position** to update the measurement.
 
 5. To exit the ruler tool, press the **keyboard `ESCAPE` key** or click the left mouse button anywhere in the ROI SETTINGS window.
+
+https://github.com/user-attachments/assets/2838106a-3452-4ed0-bce6-0140a539d5da
 
 > [!NOTE]
 > The ruler tool uses arrowed lines to make the measurement direction clear. The line thickness and color are controlled by the `Shape thickness` and `Shape color` dropdown menus in the `SHAPE ATTRIBUTES` section. Adjust these settings before activating the ruler tool to customize the appearance of your measurement lines. The minimum line length is determined by the tolerance setting (default: 10 pixels) to prevent accidental measurements from small mouse movements.
