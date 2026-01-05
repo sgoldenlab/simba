@@ -7,7 +7,8 @@ import pandas as pd
 from copy import deepcopy
 from scipy.spatial.distance import cdist
 import math
-from shapely.geometry import Polygon, Point
+from shapely.geometry import Polygon, Point, MultiPolygon
+from shapely.ops import unary_union
 from simba.utils.checks import check_instance
 from simba.utils.enums import ROI_SETTINGS, TkBinds, Keys
 from simba.roi_tools.roi_utils import get_image_from_label, create_rectangle_entry, create_circle_entry, create_polygon_entry, get_circle_df_headers, get_rectangle_df_headers, get_polygon_df_headers
@@ -81,36 +82,77 @@ class InteractiveROIBufferer():
     def left_mouse_down(self, event: Event):
         self.click_loc = (event.x, event.y)
         self.clicked_roi, self.clicked_tag = self._find_closest_tag(roi_dict=self.roi_dict, click_coordinate=self.click_loc)
-        if self.clicked_roi is not None:
-            if self.clicked_roi[SHAPE_TYPE] != ROI_SETTINGS.CIRCLE.value:
-                roi_data_tags = list(self.clicked_roi[TAGS].values())
-                roi_geometry = Polygon(np.array(roi_data_tags).reshape(-1, 2).astype(np.int32))
-            else:
-                center, radius = self.clicked_roi[TAGS]['Center tag'], self.clicked_roi['radius']
+        if self.clicked_roi is not None and self.clicked_roi[SHAPE_TYPE] != ROI_SETTINGS.POLYGON.value:
+            original_tags = self.clicked_roi[TAGS]
+            buffer_px = int(self.buffer_mm / self.px_per_mm)
+            if self.clicked_roi[SHAPE_TYPE] == ROI_SETTINGS.CIRCLE.value:
+                center, radius = original_tags['Center tag'], self.clicked_roi['radius']
                 roi_geometry = Point(center).buffer(distance=radius)
-            if self.clicked_roi[SHAPE_TYPE] != ROI_SETTINGS.POLYGON.value:
                 new_geometry = GeometryMixin().buffer_shape(shape=roi_geometry, size_mm=self.buffer_mm, pixels_per_mm=self.px_per_mm, resolution=1)
-            else:
-                new_geometry = GeometryMixin().parallel_offset_polygon(polygon=roi_geometry, size_mm=self.buffer_mm, pixels_per_mm=self.px_per_mm)
-            minx, miny, maxx, maxy = new_geometry.bounds
-            center_x, center_y = (minx + maxx) / 2, (miny + maxy) / 2
-            self.width, self.height, self.center = maxx - minx, maxy - miny, (int(center_x), int(center_y))
-            self.top_left, self.bottom_right = (int(minx), int(miny)), (int(maxx), int(maxy))
-            self.top_right_tag, self.bottom_left_tag = (int(maxx), int(miny)), (int(minx), int(maxy))
-            self.left_tag, self.right_tag = (int(minx), int(center_y)), (int(maxx), int(center_y))
-            self.bottom_tag, self.top_tag = (int(center_x), int(maxy)), (int(center_x), int(miny))
-            self.circle_radius, self.left_border_tag = int(self.width/2), self.left_tag
-            self.polygon_vertices, self.circle_center = np.array(new_geometry.exterior.coords), (int(center_x), int(center_y))
-            self.polygon_centroid, self.polygon_area = self.circle_center, new_geometry.area
-            self.max_vertice_distance = np.max(cdist(self.polygon_vertices, self.polygon_vertices).astype(np.int32))
-            self.polygon_arr = self.polygon_vertices.astype(np.int32)[1:]
-            self.tags = {f'Tag_{cnt}': tuple(y) for cnt, y in enumerate(self.polygon_arr)}
-            if self.clicked_roi[SHAPE_TYPE] == ROI_SETTINGS.RECTANGLE.value:
-                new_roi = create_rectangle_entry(rectangle_selector=self, video_name=self.clicked_roi['Video'], shape_name=self.clicked_roi['Name'], clr_name=self.clicked_roi['Color name'], clr_bgr=self.clicked_roi['Color BGR'], thickness=self.clicked_roi['Thickness'], ear_tag_size=int(self.clicked_roi['Ear_tag_size']), px_conversion_factor=self.px_per_mm)
-            elif self.clicked_roi[SHAPE_TYPE] == ROI_SETTINGS.CIRCLE.value:
+
+                if isinstance(new_geometry, MultiPolygon):
+                    new_geometry = unary_union(new_geometry)
+                    if isinstance(new_geometry, MultiPolygon):
+                        new_geometry = max(new_geometry.geoms, key=lambda p: p.area)
+
+                minx, miny, maxx, maxy = new_geometry.bounds
+                center_x, center_y = (minx + maxx) / 2, (miny + maxy) / 2
+                new_center = (int(center_x), int(center_y))
+                new_radius = int((maxx - minx) / 2)
+
+                self.circle_center, self.circle_radius = new_center, new_radius
+                self.width, self.height, self.center = new_radius * 2, new_radius * 2, new_center
+                self.top_left = (new_center[0] - new_radius, new_center[1] - new_radius)
+                self.bottom_right = (new_center[0] + new_radius, new_center[1] + new_radius)
+                self.left_border_tag = (new_center[0] - new_radius, new_center[1])
+                
                 new_roi = create_circle_entry(circle_selector=self, video_name=self.clicked_roi['Video'], shape_name=self.clicked_roi['Name'], clr_name=self.clicked_roi['Color name'], clr_bgr=self.clicked_roi['Color BGR'], thickness=self.clicked_roi['Thickness'], ear_tag_size=int(self.clicked_roi['Ear_tag_size']), px_conversion_factor=self.px_per_mm)
+                
             else:
-                new_roi = create_polygon_entry(polygon_selector=self, video_name=self.clicked_roi['Video'], shape_name=self.clicked_roi['Name'], clr_name=self.clicked_roi['Color name'], clr_bgr=self.clicked_roi['Color BGR'], thickness=self.clicked_roi['Thickness'], ear_tag_size=int(self.clicked_roi['Ear_tag_size']), px_conversion_factor=self.px_per_mm)
+                center_tag_names = ['Center tag', 'Center_tag']
+                corner_tags = {k: v for k, v in original_tags.items() if k not in center_tag_names}
+                if len(corner_tags) > 0:
+                    tag_coords = np.array(list(corner_tags.values()))
+                    centroid = np.mean(tag_coords, axis=0)
+                    
+                    buffered_tags = {}
+                    for tag_name, tag_coord in corner_tags.items():
+                        tag_coord_np = np.array(tag_coord)
+                        vec_to_tag = tag_coord_np - centroid
+                        vec_length = np.linalg.norm(vec_to_tag)
+                        
+                        if vec_length > 1e-10:
+                            vec_normalized = vec_to_tag / vec_length
+                            new_coord = tag_coord_np + vec_normalized * buffer_px
+                            new_coord[0] = max(0, min(new_coord[0], self.img_w - 1))
+                            new_coord[1] = max(0, min(new_coord[1], self.img_h - 1))
+                            buffered_tags[tag_name] = tuple(new_coord.astype(int))
+                        else:
+                            buffered_tags[tag_name] = tag_coord
+
+                    buffered_coords = np.array(list(buffered_tags.values()))
+                    new_center = tuple(np.mean(buffered_coords, axis=0).astype(int))
+                    if 'Center tag' in original_tags: buffered_tags['Center tag'] = new_center
+                    elif 'Center_tag' in original_tags: buffered_tags['Center_tag'] = new_center
+                else:
+                    buffered_tags = original_tags.copy()
+
+                self.top_left = buffered_tags.get('Top left tag', buffered_tags.get('Tag_0', (0, 0)))
+                self.bottom_right = buffered_tags.get('Bottom right tag', buffered_tags.get('Tag_2', (0, 0)))
+                self.top_right_tag = buffered_tags.get('Top right tag', buffered_tags.get('Tag_1', (0, 0)))
+                self.bottom_left_tag = buffered_tags.get('Bottom left tag', buffered_tags.get('Tag_3', (0, 0)))
+                self.center = buffered_tags.get('Center tag', buffered_tags.get('Center_tag', (0, 0)))
+                self.left_tag = buffered_tags.get('Left tag', (self.top_left[0], (self.top_left[1] + self.bottom_right[1]) // 2))
+                self.right_tag = buffered_tags.get('Right tag', (self.bottom_right[0], (self.top_left[1] + self.bottom_right[1]) // 2))
+                self.top_tag = buffered_tags.get('Top tag', ((self.top_left[0] + self.bottom_right[0]) // 2, self.top_left[1]))
+                self.bottom_tag = buffered_tags.get('Bottom tag', ((self.top_left[0] + self.bottom_right[0]) // 2, self.bottom_right[1]))
+                self.width = abs(self.bottom_right[0] - self.top_left[0])
+                self.height = abs(self.bottom_right[1] - self.top_left[1])
+                self.circle_radius = int(self.width / 2)
+                self.left_border_tag = self.left_tag
+                
+                new_roi = create_rectangle_entry(rectangle_selector=self, video_name=self.clicked_roi['Video'], shape_name=self.clicked_roi['Name'], clr_name=self.clicked_roi['Color name'], clr_bgr=self.clicked_roi['Color BGR'], thickness=self.clicked_roi['Thickness'], ear_tag_size=int(self.clicked_roi['Ear_tag_size']), px_conversion_factor=self.px_per_mm)
+            
             self.roi_dict[self.clicked_roi['Name']] = new_roi
             self.temp_img = _plot_roi(roi_dict=self.roi_dict, img=self.original_img.copy())
             self.__update_image(img=self.temp_img)

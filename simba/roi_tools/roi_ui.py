@@ -102,7 +102,7 @@ class ROI_ui(ROI_mixin, ConfigReader):
 # ROI_ui(config_path=r"C:\troubleshooting\open_field_below\project_folder\project_config.ini",
 #        video_path=r"C:\troubleshooting\open_field_below\project_folder\videos\raw_clip1.mp4")
 #
-#
+
 
 
 

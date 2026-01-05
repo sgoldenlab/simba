@@ -370,6 +370,7 @@ class GeometryMixin(object):
                      size_mm: int,
                      pixels_per_mm: float,
                      resolution: int = 16,
+                     join_style:  int = JOIN_STYLE.round,
                      cap_style: Literal["round", "square", "flat"] = "round") -> Union[Polygon, List[Polygon]]:
         """
         Create a buffered shape by applying a buffer operation to the input polygon or linestring.
@@ -401,11 +402,11 @@ class GeometryMixin(object):
         check_float(name="BUFFER SHAPE pixels_per_mm", value=pixels_per_mm, allow_negative=False, allow_zero=False)
         results, distance_px = [], int(size_mm / pixels_per_mm)
         for i in shape:
-            buffered = i.buffer(distance=distance_px, cap_style=GeometryEnum.CAP_STYLE_MAP.value[cap_style], resolution=resolution)
+            buffered = i.buffer(distance=distance_px, cap_style=GeometryEnum.CAP_STYLE_MAP.value[cap_style], resolution=resolution, join_style=join_style)
             if isinstance(buffered, MultiPolygon):
                 buffered = unary_union(buffered)
-            if isinstance(buffered, MultiPolygon):
-                return max(buffered.geoms, key=lambda p: p.area)
+                if isinstance(buffered, MultiPolygon):
+                    buffered = max(buffered.geoms, key=lambda p: p.area)
             results.append(buffered)
         if len(results) == 1:
             return results[0]

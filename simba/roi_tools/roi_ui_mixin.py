@@ -331,7 +331,7 @@ class ROI_mixin(ConfigReader):
         menu.add_cascade(label="File (ROI)", menu=file_menu)
         file_menu.add_command(label="Preferences...", compound="left", image=self.menu_icons["settings"]["img"], command=lambda: self.preferences_pop_up())
         file_menu.add_command(label="Draw ROIs of pre-defined sizes...", compound="left", image=self.menu_icons["size_black"]["img"], command=lambda: self.fixed_roi_pop_up())
-        file_menu.add_command(label="Buffer ROIs...", compound="left", image=self.menu_icons["resize"]["img"], command=lambda: self.buffer_rois_popup(), state="disabled")
+        file_menu.add_command(label="Buffer ROIs...", compound="left", image=self.menu_icons["resize"]["img"], command=lambda: self.buffer_rois_popup(), state='disabled')
         root.config(menu=menu)
 
     def get_select_img_panel(self,
@@ -1188,7 +1188,7 @@ class ROI_mixin(ConfigReader):
         self.buffer_roi_frm.wm_title("BUFFER ROIs")
         self.buffer_roi_frm.iconphoto(False, self.menu_icons['resize']["img"])
         buffer_roi_settings_frm = CreateLabelFrameWithIcon(parent=self.buffer_roi_frm, header="BUFFER ROI SETTINGS", icon_name='resize', padx=5, pady=5)
-        self.buffer_size_eb = Entry_Box(parent=buffer_roi_settings_frm, fileDescription='BUFFER SIZE (MM):', validation='numeric', labelwidth=35, entry_box_width=10, justify='center', value=20)
+        self.buffer_size_eb = Entry_Box(parent=buffer_roi_settings_frm, fileDescription='BUFFER SIZE (MM):', labelwidth=35, entry_box_width=10, justify='center', value=20) #validation='numeric')
         self.px_per_mm_eb = Entry_Box(parent=buffer_roi_settings_frm, fileDescription='PIXEL PER MM CONVERTION FACTOR:', labelwidth=35, entry_box_width=10, justify='center', value=self.px_per_mm)
 
         buffer_roi_settings_frm.grid(row=0, column=0, sticky=NW)
@@ -1202,7 +1202,7 @@ class ROI_mixin(ConfigReader):
     def run_buffer(self):
         buffer_mm = self.buffer_size_eb.entry_get
         px_per_mm = self.px_per_mm_eb.entry_get
-        valid_buffer, error_msg_buffer = check_int(name='BUFFER SIZE (MM)', value=buffer_mm, allow_zero=False, allow_negative=False, raise_error=False)
+        valid_buffer, error_msg_buffer = check_int(name='BUFFER SIZE (MM)', value=buffer_mm, allow_zero=False, allow_negative=True, raise_error=False)
         valid_px_per_mm, error_msg_px_per_mm = check_float(name='PIXEL PER MM CONVERTION FACTOR', value=px_per_mm, allow_zero=False, allow_negative=False, raise_error=False)
         if not valid_buffer:
             self.set_status_bar_panel(text=error_msg_buffer, fg='red')
