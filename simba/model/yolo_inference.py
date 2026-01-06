@@ -1,5 +1,6 @@
-import os
+__author__ = "Simon Nilsson"
 
+import os
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 from typing import Dict, List, Optional, Union
 
@@ -18,22 +19,17 @@ import numpy as np
 import pandas as pd
 
 from simba.data_processors.cuda.utils import _is_cuda_available
-from simba.third_party_label_appenders.converters import \
-    yolo_obb_data_to_bounding_box
+from simba.third_party_label_appenders.converters import yolo_obb_data_to_bounding_box
 from simba.utils.checks import (check_file_exist_and_readable, check_float,
                                 check_if_dir_exists, check_instance, check_int,
                                 check_str, check_valid_boolean,
                                 check_valid_lst, get_fn_ext)
 from simba.utils.data import df_smoother, savgol_smoother
 from simba.utils.enums import Options
-from simba.utils.errors import (InvalidVideoFileError, SimBAGPUError,
-                                SimBAPAckageVersionError)
+from simba.utils.errors import (InvalidVideoFileError, SimBAGPUError, SimBAPAckageVersionError)
 from simba.utils.printing import SimbaTimer, stdout_success
-from simba.utils.read_write import (find_core_cnt,
-                                    find_files_of_filetypes_in_directory,
-                                    get_video_meta_data)
-from simba.utils.yolo import (_get_undetected_obs, check_valid_device,
-                              load_yolo_model, yolo_predict)
+from simba.utils.read_write import (find_core_cnt, find_files_of_filetypes_in_directory, get_video_meta_data)
+from simba.utils.yolo import (_get_undetected_obs, check_valid_device, load_yolo_model, yolo_predict)
 
 COORD_COLS = ['X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
 OUT_COLS = ['FRAME', 'CLASS_ID', 'CLASS_NAME', 'CONFIDENCE', 'X1', 'Y1', 'X2', 'Y2', 'X3', 'Y3', 'X4', 'Y4']
@@ -44,12 +40,20 @@ class YoloInference():
     """
     Performs object detection inference on a video using a YOLO model.
 
-    This class performs YOLO-based object detection on one or more video files. It supports GPU acceleration,
+    YOLO-based object detection (bounding-box) on one or more video files. It supports GPU acceleration,
     batch processing, streaming, and optional result saving. The model returns bounding box coordinates and
     class confidence scores for each frame. Results can be smoothed or interpolated to handle detection gaps.
 
     .. seealso::
-       To perform bounding box and keypoint (pose) detection, see :func:`~simba.bounding_box_tools.yolo.yolo_pose_inference.YOLOPoseInference`
+       To perform bounding box and **keypoint (pose) detection**, see :func:`~simba.bounding_box_tools.yolo.yolo_pose_inference.YOLOPoseInference`.
+       To perform keypoint (pose) detection with tracking, see :func:`~simba.model.yolo_pose_track_inference.YOLOPoseTrackInference`
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../docs/tables/YoloInference.csv
+       :widths: 10, 10, 40, 40
+       :align: center
+       :header-rows: 1
 
     :param Union[str, os.PathLike] weights: Path to the YOLO model weights file or a loaded YOLO model object.
     :param Union[str, os.PathLike] or List[Union[str, os.PathLike]] video_path: Path(s) to the input video file(s) for performing inference, or path to a directory containing video files.
@@ -81,14 +85,14 @@ class YoloInference():
                  save_dir: Optional[Union[str, os.PathLike]] = None,
                  half_precision: Optional[bool] = True,
                  device: Union[Literal['cpu'], int] = 0,
-                 batch_size: Optional[int] = 4,
+                 batch_size: Optional[int] = 400,
                  core_cnt: int = 8,
                  threshold: float = 0.25,
                  max_detections: int = 300,
                  smoothing_method: Optional[Literal['savitzky-golay', 'bartlett', 'blackman', 'boxcar', 'cosine', 'gaussian', 'hamming', 'exponential']] = None,
                  smoothing_time_window: Optional[int] = None,
                  interpolate: bool = False,
-                 imgsz: int = 640,
+                 imgsz: int = 320,
                  stream: Optional[bool] = True) -> Union[None, Dict[str, pd.DataFrame]]:
 
         if not _is_cuda_available()[0]:
@@ -100,7 +104,7 @@ class YoloInference():
         elif os.path.isfile(video_path):
             check_file_exist_and_readable(file_path=video_path)
             video_path = [video_path]
-        elif os.path.isfile(video_path):
+        elif os.path.isdir(video_path):
             video_path = find_files_of_filetypes_in_directory(directory=video_path, extensions=Options.ALL_VIDEO_FORMAT_OPTIONS.value, raise_warning=False, raise_error=True, as_dict=False)
         else:
             raise InvalidVideoFileError(msg=f'{video_path} is not a valid video path or directory path', source=self.__class__.__name__)
@@ -179,7 +183,7 @@ class YoloInference():
 
 # video_path = r"/mnt/c/troubleshooting/mitra/project_folder/videos/501_MA142_Gi_CNO_0521.mp4"
 # video_path = "/mnt/d/netholabs/yolo_videos/input/mp4_20250606083508/2025-05-28_19-50-23.mp4"
-# video_path = r"E:\maplight_videos\Day 1\Trial_1_C24_D1_1.mp4"
+# video_path = r"E:\maplight_videos\yolo_runtime_test\videos"
 # weights_path = r"E:\maplight_videos\yolo_mdl\mdl\train\weights\best.pt"
 # save_dir = r"E:\maplight_videos\yolo_mdl\mdl\results"
 # i = YoloInference(weights=weights_path,
@@ -187,5 +191,7 @@ class YoloInference():
 #                   save_dir=save_dir,
 #                   stream=True,
 #                   verbose=True,
-#                   batch_size=100)
+#                   core_cnt=18,
+#                   imgsz=256,
+#                   batch_size=500)
 # i.run()

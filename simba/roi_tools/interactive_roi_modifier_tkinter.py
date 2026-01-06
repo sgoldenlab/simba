@@ -76,6 +76,11 @@ class InteractiveROIModifier():
     points (tags/vertices), or by using arrow keys for fine-grained adjustments. The tool supports optional grid overlays
     for alignment assistance and updates the ROI dictionary in-place during interactions.
 
+    .. video:: _static/img/InteractiveROIModifier.webm
+       :width: 800
+       :autoplay:
+       :loop:
+
     .. note::
        - The `img_window` must contain a Tkinter `Label` widget with the name 'img_lbl' that displays the image.
        - For rectangles: Click and drag corner tags, edge tags (top, bottom, left, right), or center tag to modify the shape.
@@ -91,17 +96,11 @@ class InteractiveROIModifier():
        and :func:`simba.roi_tools.roi_selector_circle_tkinter.ROISelectorCircleTkinter`.
 
     :param Toplevel img_window: Tkinter Toplevel window containing a Label widget named 'img_lbl' that displays the image with ROIs.
-    :param np.ndarray original_img: NumPy array representing the original, unmodified image without ROIs. Used as base for redrawing.
-                                    Shape should be (height, width, channels) in BGR format.
-    :param dict roi_dict: Dictionary containing ROI definitions. Each key is an ROI name, and each value is a dictionary
-                         with shape-specific keys (e.g., 'Shape_type', 'Name', 'Tags', 'Color BGR', 'Thickness', etc.).
-                         Must include 'Tags' dictionary with control point coordinates for each ROI.
-    :param Optional[dict] settings: Optional dictionary of ROI display settings. If None, uses default settings from `ROI_SETTINGS`.
-                                    Can include keys like 'ROI_SELECT_CLR', 'LINE_TYPE', 'KEYBOARD_SENSITIVITY', 'OVERLAY_GRID_COLOR'.
-    :param Optional[List[Polygon]] hex_grid: Optional list of Shapely Polygon objects representing a hexagonal grid overlay.
-                                             Gridlines will be drawn on the image for alignment assistance.
-    :param Optional[List[Polygon]] rectangle_grid: Optional list of Shapely Polygon objects representing a rectangular grid overlay.
-                                                    Gridlines will be drawn on the image for alignment assistance.
+    :param np.ndarray original_img: NumPy array representing the original, unmodified image without ROIs. Used as base for redrawing. Shape should be (height, width, channels) in BGR format.
+    :param dict roi_dict: Dictionary containing ROI definitions. Each key is an ROI name, and each value is a dictionary  with shape-specific keys (e.g., 'Shape_type', 'Name', 'Tags', 'Color BGR', 'Thickness', etc.). Must include 'Tags' dictionary with control point coordinates for each ROI.
+    :param Optional[dict] settings: Optional dictionary of ROI display settings. If None, uses default settings from `ROI_SETTINGS`. Can include keys like 'ROI_SELECT_CLR', 'LINE_TYPE', 'KEYBOARD_SENSITIVITY', 'OVERLAY_GRID_COLOR'.
+    :param Optional[List[Polygon]] hex_grid: Optional list of Shapely Polygon objects representing a hexagonal grid overlay. Gridlines will be drawn on the image for alignment assistance.
+    :param Optional[List[Polygon]] rectangle_grid: Optional list of Shapely Polygon objects representing a rectangular grid overlay. Gridlines will be drawn on the image for alignment assistance.
 
     :example:
     >>> from tkinter import Toplevel, Label
