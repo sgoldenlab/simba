@@ -4,7 +4,7 @@ import os
 import platform
 from copy import copy, deepcopy
 from tkinter import *
-from typing import Optional, Union
+from typing import Optional, Union, List
 
 import cv2
 import numpy as np
@@ -282,12 +282,13 @@ class ROI_mixin(ConfigReader):
     def overlay_rois_on_image(self,
                               show_ear_tags: bool = False,
                               show_roi_info: bool = False,
-                              show_center: bool = False):
+                              show_center: bool = False,
+                              omitted_centers: Optional[List[str]] = None):
 
         self.set_img(frame_idx=self.img_idx)
-        self.img = PlottingMixin.rectangles_onto_image(img=self.img, rectangles=self.rectangles_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'], show_center=show_center)
-        self.img = PlottingMixin.circles_onto_image(img=self.img, circles=self.circles_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'], show_center=show_center)
-        self.img = PlottingMixin.polygons_onto_image(img=self.img, polygons=self.polygon_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'], show_center=show_center)
+        self.img = PlottingMixin.rectangles_onto_image(img=self.img, rectangles=self.rectangles_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'], show_center=show_center, omitted_centers=omitted_centers)
+        self.img = PlottingMixin.circles_onto_image(img=self.img, circles=self.circles_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'], show_center=show_center, omitted_centers=omitted_centers)
+        self.img = PlottingMixin.polygons_onto_image(img=self.img, polygons=self.polygon_df, show_tags=show_ear_tags, circle_size=None, print_metrics=show_roi_info, line_type=self.settings['LINE_TYPE'], show_center=show_center, omitted_centers=omitted_centers)
         if self.pose_data is not None:
             self.img = self.insert_pose(img=self.img, pose_img_data=self.get_frm_pose(frame_idx=self.img_idx))
         if self.grid is not None:
@@ -333,7 +334,7 @@ class ROI_mixin(ConfigReader):
         menu.add_cascade(label="File (ROI)", menu=file_menu)
         file_menu.add_command(label="Preferences...", compound="left", image=self.menu_icons["settings"]["img"], command=lambda: self.preferences_pop_up())
         file_menu.add_command(label="Draw ROIs of pre-defined sizes...", compound="left", image=self.menu_icons["size_black"]["img"], command=lambda: self.fixed_roi_pop_up())
-        file_menu.add_command(label="Buffer ROIs...", compound="left", image=self.menu_icons["resize"]["img"], command=lambda: self.buffer_rois_popup(), state='disabled')
+        file_menu.add_command(label="Buffer ROIs...", compound="left", image=self.menu_icons["resize"]["img"], command=lambda: self.buffer_rois_popup()) #state='disabled'
         root.config(menu=menu)
 
     def get_select_img_panel(self,
@@ -1223,7 +1224,8 @@ class ROI_mixin(ConfigReader):
 
         self.set_status_bar_panel(text="BUFFER MODE ENTERED", fg="darkred")
         self.click_event = BooleanVar(value=False)
-        self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False, show_center=True)
+        polygon_names = [v['Name'] for k, v in self.roi_dict.items() if v['Shape_type'] == ROI_SETTINGS.POLYGON.value]
+        self.overlay_rois_on_image(show_ear_tags=False, show_roi_info=False, show_center=True, omitted_centers=polygon_names)
         self.roi_bufferer = InteractiveROIBufferer(img_window=self.img_window, original_img=self.read_img(frame_idx=self.img_idx), roi_dict=deepcopy(self.roi_dict), settings=self.settings, rectangle_grid=self.grid, hex_grid=self.hexagon_grid, buffer_mm=int(buffer_mm), px_per_mm=float(px_per_mm))
         self.main_frm.bind(TkBinds.B1_PRESS.value, exit_click); self.main_frm.bind(TkBinds.ESCAPE.value, exit_click); self.img_window.bind(TkBinds.ESCAPE.value, exit_click)
         self.main_frm.wait_variable(self.click_event)

@@ -51,6 +51,7 @@ def _plot_roi(roi_dict: dict,
               img: np.ndarray,
               show_tags: bool = False,
               omitted_roi: Optional[str] = None):
+
     rectangles_df, circles_df, polygon_df = pd.DataFrame(columns=get_rectangle_df_headers()), pd.DataFrame(
         columns=get_circle_df_headers()), pd.DataFrame(columns=get_polygon_df_headers())
     for roi_name, roi_data in roi_dict.items():

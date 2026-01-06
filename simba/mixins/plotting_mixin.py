@@ -1509,18 +1509,23 @@ class PlottingMixin(object):
                               circle_size: Optional[int] = 2,
                               line_type: int = -1,
                               print_metrics: bool = False,
+                              omitted_rois: Optional[List[str]] = None,
+                              omitted_centers: Optional[List[str]] = None,
                               txt_size: Optional[Union[float, int]] = None) -> np.ndarray:
 
         check_valid_array(data=img, source=PlottingMixin.rectangles_onto_image.__name__)
-        check_valid_dataframe(df=rectangles, source=PlottingMixin.rectangles_onto_image.__name__, required_fields=["topLeftX", "topLeftY", "Bottom_right_X", "Bottom_right_Y", "Color BGR", "Thickness", "Center_X", "Center_Y", "Tags", "Ear_tag_size", 'width', 'height'])
+        check_valid_dataframe(df=rectangles, source=PlottingMixin.rectangles_onto_image.__name__, required_fields=["topLeftX", "topLeftY", "Bottom_right_X", "Bottom_right_Y", "Color BGR", "Thickness", "Center_X", "Center_Y", "Tags", "Ear_tag_size", 'width', 'height', 'Name'])
         check_int(name='line_type', value=line_type, accepted_vals=[4, 8, 16, -1], raise_error=True)
         if circle_size is not None: check_int(name=PlottingMixin.rectangles_onto_image.__name__, value=circle_size, min_value=1)
         for _, row in rectangles.iterrows():
+            if omitted_rois is not None and row['Name'] in omitted_rois:
+                continue
             rectangle_line_type = [4 if row['Thickness'] == 1 else line_type][0]
             tag_size = [row['Ear_tag_size'] if circle_size is None else circle_size][0]
             if isinstance(row["Color BGR"], str): row["Color BGR"] = ast.literal_eval(row["Color BGR"])
             img = cv2.rectangle(img, (int(row["topLeftX"]), int(row["topLeftY"])), (int(row["Bottom_right_X"]), int(row["Bottom_right_Y"])), row["Color BGR"], int(row["Thickness"]), lineType=rectangle_line_type)
             if show_center:
+                if omitted_centers is not None and row['Name'] in omitted_centers: continue
                 img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), tag_size, row["Color BGR"], -1)
             if show_tags:
                 for tag_name, tag_data in row["Tags"].items():
@@ -1542,18 +1547,23 @@ class PlottingMixin(object):
                            circle_size: Optional[int] = 2,
                            line_type: Optional[int] = -1,
                            print_metrics: bool = False,
+                           omitted_rois: Optional[List[str]] = None,
+                           omitted_centers: Optional[List[str]] = None,
                            txt_size: Optional[Union[float, int]] = None) -> np.ndarray:
 
         check_valid_array(data=img, source=PlottingMixin.circles_onto_image.__name__)
-        check_valid_dataframe(df=circles, source=PlottingMixin.circles_onto_image.__name__, required_fields=["centerX", "centerY", "radius", "Color BGR", "Thickness", "Tags", "Ear_tag_size"])
+        check_valid_dataframe(df=circles, source=PlottingMixin.circles_onto_image.__name__, required_fields=["centerX", "centerY", "radius", "Color BGR", "Thickness", "Tags", "Ear_tag_size", "Name"])
         if circle_size is not None:  check_int(name=PlottingMixin.circles_onto_image.__name__, value=circle_size, min_value=1)
         check_int(name='line_type', value=line_type, accepted_vals=[4, 8, 16, -1], raise_error=True)
         for _, row in circles.iterrows():
+            if omitted_rois is not None and row['Name'] in omitted_rois:
+                continue
             circle_line_type = [4 if row['Thickness'] == 1 else line_type][0]
             tag_size = [row['Ear_tag_size'] if circle_size is None else circle_size][0]
             if isinstance(row["Color BGR"], str): row["Color BGR"] = ast.literal_eval(row["Color BGR"])
             img = cv2.circle(img, (int(row["centerX"]), int(row["centerY"])), row["radius"], row["Color BGR"], int(row["Thickness"]), lineType=circle_line_type)
             if show_center:
+                if omitted_centers is not None and row['Name'] in omitted_centers: continue
                 try:
                     img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), tag_size, row["Color BGR"], -1, lineType=circle_line_type)
                 except KeyError:
@@ -1578,18 +1588,24 @@ class PlottingMixin(object):
                             circle_size: Optional[int] = 2,
                             line_type: Optional[int] = -1,
                             print_metrics: bool = False,
+                            omitted_rois: Optional[List[str]] = None,
+                            omitted_centers: Optional[List[str]] = None,
                             txt_size: Optional[Union[float, int]] = None) -> np.ndarray:
 
         check_valid_array(data=img, source=f"{PlottingMixin.polygons_onto_image.__name__} img")
-        check_valid_dataframe(df=polygons, source=f"{PlottingMixin.polygons_onto_image.__name__} polygons", required_fields=["vertices", "Color BGR", "Thickness", "Tags"])
+        check_valid_dataframe(df=polygons, source=f"{PlottingMixin.polygons_onto_image.__name__} polygons", required_fields=["vertices", "Color BGR", "Thickness", "Tags", "Name"])
         check_int(name='line_type', value=line_type, accepted_vals=[4, 8, 16, -1], raise_error=True)
         if circle_size is not None: check_int(name=PlottingMixin.polygons_onto_image.__name__, value=circle_size, min_value=1)
         for _, row in polygons.iterrows():
+            if omitted_rois is not None and row['Name'] in omitted_rois:
+                continue
             polygon_line_type = [4 if row['Thickness'] == 1 else line_type][0]
             tag_size = [row['Ear_tag_size'] if circle_size is None else circle_size][0]
             if isinstance(row["Color BGR"], str): row["Color BGR"] = ast.literal_eval(row["Color BGR"])
             img = cv2.polylines( img, [row["vertices"].astype(np.int32)], True, row["Color BGR"], thickness=int(row["Thickness"]), lineType=polygon_line_type)
             if show_center:
+                print(row['Name'], omitted_centers)
+                if omitted_centers is not None and row['Name'] in omitted_centers: continue
                 img = cv2.circle(img, (int(row["Center_X"]), int(row["Center_Y"])), tag_size, row["Color BGR"], polygon_line_type)
             if show_tags:
                 for tag_name, tag_data in row["Tags"].items():
@@ -1608,13 +1624,14 @@ class PlottingMixin(object):
                           roi_dict: Dict[str, pd.DataFrame],
                           circle_size: Optional[int] = None,
                           show_center: Optional[bool] = False,
+                          omitted_centers: Optional[List[str]] = None,
                           show_tags: Optional[bool] = False) -> np.ndarray:
 
         check_valid_array(data=img, source=f"{PlottingMixin.roi_dict_onto_img.__name__} img")
         check_if_keys_exist_in_dict(data=roi_dict, key=[Keys.ROI_POLYGONS.value, Keys.ROI_CIRCLES.value, Keys.ROI_RECTANGLES.value], name=PlottingMixin.roi_dict_onto_img.__name__)
-        img = PlottingMixin.rectangles_onto_image(img=img, rectangles=roi_dict[Keys.ROI_RECTANGLES.value], circle_size=circle_size, show_center=show_center, show_tags=show_tags)
-        img = PlottingMixin.circles_onto_image(img=img, circles=roi_dict[Keys.ROI_CIRCLES.value], circle_size=circle_size, show_center=show_center, show_tags=show_tags)
-        img = PlottingMixin.polygons_onto_image(img=img, polygons=roi_dict[Keys.ROI_POLYGONS.value], circle_size=circle_size, show_center=show_center, show_tags=show_tags)
+        img = PlottingMixin.rectangles_onto_image(img=img, rectangles=roi_dict[Keys.ROI_RECTANGLES.value], circle_size=circle_size, show_center=show_center, show_tags=show_tags, omitted_centers=omitted_centers)
+        img = PlottingMixin.circles_onto_image(img=img, circles=roi_dict[Keys.ROI_CIRCLES.value], circle_size=circle_size, show_center=show_center, show_tags=show_tags, omitted_centers=omitted_centers)
+        img = PlottingMixin.polygons_onto_image(img=img, polygons=roi_dict[Keys.ROI_POLYGONS.value], circle_size=circle_size, show_center=show_center, show_tags=show_tags, omitted_centers=omitted_centers)
         return img
 
     @staticmethod

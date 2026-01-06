@@ -30,10 +30,22 @@ def _plot_roi(roi_dict: dict,
         elif roi_data['Shape_type'].lower() == ROI_SETTINGS.POLYGON.value:
             polygon_df = pd.concat([polygon_df, pd.DataFrame([roi_data])], ignore_index=True)
     roi_dict = {Keys.ROI_RECTANGLES.value: rectangles_df, Keys.ROI_CIRCLES.value: circles_df, Keys.ROI_POLYGONS.value: polygon_df}
-    img = PlottingMixin.roi_dict_onto_img(img=img, roi_dict=roi_dict, circle_size=None, show_tags=False, show_center=True)
+    img = PlottingMixin.roi_dict_onto_img(img=img, roi_dict=roi_dict, circle_size=None, show_tags=False, show_center=True, omitted_centers=list(polygon_df['Name'].unique()))
     return img
 
 class InteractiveROIBufferer():
+    """
+    Interactive Tkinter-based tool for buffering (expanding or shrinking) ROI shapes by specified metric millimeter by clicking on their tags.
+
+    :param Toplevel img_window: Tkinter Toplevel window containing an image label named 'img_lbl' displaying the ROI image.
+    :param np.ndarray original_img: Original image as a numpy array in BGR format. Used as the base for redrawing ROIs.
+    :param dict roi_dict: Dictionary containing ROI definitions. Keys are ROI names (str), values are dictionaries with ROI properties including 'Shape_type', 'Tags', 'Color BGR', 'Thickness', 'Ear_tag_size', etc. Expected shape types: 'Rectangle', 'Circle', or 'Polygon'.
+    :param int buffer_mm: Buffer distance in millimeters. Positive values expand the shape, negative values shrink it.
+    :param float px_per_mm: Pixels per millimeter conversion factor. Used to convert buffer_mm to pixels. Must be > 0.
+    :param Optional[dict] settings: Optional dictionary of ROI settings. If None, uses default ROI_SETTINGS values. Default None.
+    :param Optional[List[Polygon]] hex_grid: Optional list of Shapely Polygon objects representing a hexagon grid overlay. Default None.
+    :param Optional[List[Polygon]] rectangle_grid: Optional list of Shapely Polygon objects representing a rectangle grid overlay. Default None.
+    """
 
     def __init__(self,
                  img_window: Toplevel,
@@ -51,6 +63,7 @@ class InteractiveROIBufferer():
         self.img_lbl = img_window.nametowidget("img_lbl")
         self.img = get_image_from_label(self.img_lbl)
         self.original_img, self.roi_dict = deepcopy(original_img), deepcopy(roi_dict)
+        _plot_roi(roi_dict=self.roi_dict, img=self.original_img.copy())
         self.img_w, self.img_h = self.img.shape[1], self.img.shape[0]
         self.img_window, self.settings, self.buffer_mm, self.px_per_mm = img_window, settings, buffer_mm, px_per_mm
         self.bind_mouse()
