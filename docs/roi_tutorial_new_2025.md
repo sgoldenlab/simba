@@ -40,6 +40,7 @@ Moreover, the ROI data can  be used to build potentially valuable, additional, f
  * [CHANGE ROI ATTRIBUTES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#change-roi-attributes)
  * [SHOW SHAPE SIZE INFORMATION](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#show-shape-size-information)
  * [MEASURE DISTANCES WITH THE RULER TOOL](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#measure-distances-with-the-ruler-tool)
+ * [BUFFERING ROI SHAPES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#buffering-roi-shapes)
  * [DRAW SHAPES OF USER-DEFINED METRIC SIZES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-shapes-of-user-defined-metric-sizes)
  * [DRAW A RECTANGLE OF METRIC WIDTH & HEIGHT](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-a-rectangle-of-metric-width--height)
  * [DRAW A CIRCLE OF METRIC RADIUS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-a-circle-of-metric-radius)
@@ -206,6 +207,8 @@ SimBA allows several forms of shape manipulations that are described in detail b
 
 * [Change the shape of ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#changing-the-shape-of-the-roi) - allows you to change the width and/or hight of a rectangle, radius of a circle, or the locations of the outer bounds of a polygon.
 
+* [Buffering ROI shapes](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#buffering-roi-shapes) - allows you to expand or shrink ROI shapes by a specified metric distance by clicking on their tags.
+
 * [Drawing shapes of fixed metric sizes](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#change-roi-attributes) - allows you to change the name, color or other attributes of an already created ROI.
   
 ### DELETING ROIs
@@ -269,6 +272,30 @@ SimBA allows several forms of shape manipulations that are described in detail b
 
 [change_shapes.webm](https://github.com/user-attachments/assets/3f4ebcf6-b343-4c52-9779-42d84e11bee5)
 
+
+
+### BUFFERING ROI SHAPES
+
+The buffer tool allows you to expand or shrink ROI shapes by a specified distance in millimeters by clicking on their center tags. This is useful for creating buffer zones around existing ROIs or adjusting ROI sizes while maintaining their general shape.
+
+1. To activate the buffer tool, navigate to the `File (ROI)` dropdown menu at the top of the **REGION OF INTEREST (ROI) SETTINGS** window and click on `Buffer ROIs...`. A pop-up window will appear:
+
+2. In the pop-up window, enter the following:
+   - **Buffer size (mm)**: Enter the buffer distance in millimeters. Positive values expand the shape outward, negative values shrink it inward.
+   - **Pixels per mm**: Enter the pixel-to-millimeter conversion factor for your video. This value is typically found in your `project_folder/logs/video_info.csv` file and has been pre-filled with this value.
+
+3. Click the <kbd>RUN</kbd> button to activate the buffer tool. The drawing window will enter **BUFFER MODE**, and the ear tags of all ROI shapes will be displayed.
+
+4. **Click on center tag** of a rectangle or circle ROI to buffer it by the specified distance. The shape will immediately expand or shrink based on the buffer value you entered.
+
+   > [!NOTE]
+   > The buffer tool currently supports **rectangles** and **circles** only. **Polygons** are excluded from interactive buffering.
+   
+5. When finished, remember to exit **BUFFER MODE**, by pressing the **keyboard `ESCAPE` key** or click the left mouse button anywhere in the ROI SETTINGS window.
+
+> [!NOTE]
+> The buffer tool modifies ROI shapes in real-time. Make sure to **save your ROIs** after buffering by clicking the <kbd>SAVE</kbd> button in the **REGION OF INTEREST (ROI) SETTINGS** window.
+
    
 ### CHANGE ROI ATTRIBUTES
 
@@ -299,10 +326,11 @@ Sometimes we need some metrics representing the sizes of the ROIs we have drawn.
 
 [show_shape_size.webm](https://github.com/user-attachments/assets/6fdb61c1-7110-46dc-8845-cd6c47c10cef)
 
-
 ## MEASURE DISTANCES WITH THE RULER TOOL
 
 SimBA includes a ruler tool that allows you to measure distances between two points on the video frame. This is useful for verifying pixel-to-millimeter conversion factors, measuring distances between ROIs, or checking the dimensions of objects in your video.
+
+[ROI_ruler_2.webm](https://github.com/user-attachments/assets/edff3c5e-2894-43b7-b44d-7559b4bdb5ed)
 
 1. To activate the ruler tool, click the <kbd>RULER</kbd> button in the `SHAPE INTERACTION` submenu. The button is located alongside the `MOVE SHAPE` and `SHOW SHAPE INFO` buttons.
 
@@ -313,6 +341,8 @@ SimBA includes a ruler tool that allows you to measure distances between two poi
 4. To adjust the measurement, **click and hold the left mouse button** near either endpoint of the line (within the tolerance distance). The endpoint will be highlighted, and you can **drag it to a new position** to update the measurement.
 
 5. To exit the ruler tool, press the **keyboard `ESCAPE` key** or click the left mouse button anywhere in the ROI SETTINGS window.
+
+https://github.com/user-attachments/assets/2838106a-3452-4ed0-bce6-0140a539d5da
 
 > [!NOTE]
 > The ruler tool uses arrowed lines to make the measurement direction clear. The line thickness and color are controlled by the `Shape thickness` and `Shape color` dropdown menus in the `SHAPE ATTRIBUTES` section. Adjust these settings before activating the ruler tool to customize the appearance of your measurement lines. The minimum line length is determined by the tolerance setting (default: 10 pixels) to prevent accidental measurements from small mouse movements.
