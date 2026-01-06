@@ -40,6 +40,7 @@ Moreover, the ROI data can  be used to build potentially valuable, additional, f
  * [CHANGE ROI ATTRIBUTES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#change-roi-attributes)
  * [SHOW SHAPE SIZE INFORMATION](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#show-shape-size-information)
  * [MEASURE DISTANCES WITH THE RULER TOOL](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#measure-distances-with-the-ruler-tool)
+ * [BUFFERING ROI SHAPES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#buffering-roi-shapes)
  * [DRAW SHAPES OF USER-DEFINED METRIC SIZES](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-shapes-of-user-defined-metric-sizes)
  * [DRAW A RECTANGLE OF METRIC WIDTH & HEIGHT](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-a-rectangle-of-metric-width--height)
  * [DRAW A CIRCLE OF METRIC RADIUS](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#draw-a-circle-of-metric-radius)
@@ -206,6 +207,8 @@ SimBA allows several forms of shape manipulations that are described in detail b
 
 * [Change the shape of ROIs](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#changing-the-shape-of-the-roi) - allows you to change the width and/or hight of a rectangle, radius of a circle, or the locations of the outer bounds of a polygon.
 
+* [Buffering ROI shapes](https://github.com/sgoldenlab/simba/blob/master/docs/roi_tutorial_new_2025.md#buffering-roi-shapes) - allows you to expand or shrink ROI shapes by a specified metric distance by clicking on their tags.
+
 * [Drawing shapes of fixed metric sizes](https://github.com/sgoldenlab/simba/blob/master/docs/ROI_tutorial_new.md#change-roi-attributes) - allows you to change the name, color or other attributes of an already created ROI.
   
 ### DELETING ROIs
@@ -268,6 +271,30 @@ SimBA allows several forms of shape manipulations that are described in detail b
 4. Finally, once the ROIs have been moved into their correct location. We need to exit the **MOVE MODE**. Select the `DEFINE SHAPE` window (e.g., by clicking the top bar), and hit the **keyboard `ESCAPE` key**.
 
 [change_shapes.webm](https://github.com/user-attachments/assets/3f4ebcf6-b343-4c52-9779-42d84e11bee5)
+
+
+
+### BUFFERING ROI SHAPES
+
+The buffer tool allows you to expand or shrink ROI shapes by a specified distance in millimeters by clicking on their center tags. This is useful for creating buffer zones around existing ROIs or adjusting ROI sizes while maintaining their general shape.
+
+1. To activate the buffer tool, navigate to the `File (ROI)` dropdown menu at the top of the **REGION OF INTEREST (ROI) SETTINGS** window and click on `Buffer ROIs...`. A pop-up window will appear:
+
+2. In the pop-up window, enter the following:
+   - **Buffer size (mm)**: Enter the buffer distance in millimeters. Positive values expand the shape outward, negative values shrink it inward.
+   - **Pixels per mm**: Enter the pixel-to-millimeter conversion factor for your video. This value is typically found in your `project_folder/logs/video_info.csv` file and has been pre-filled with this value.
+
+3. Click the <kbd>RUN</kbd> button to activate the buffer tool. The drawing window will enter **BUFFER MODE**, and the ear tags of all ROI shapes will be displayed.
+
+4. **Click on center tag** of a rectangle or circle ROI to buffer it by the specified distance. The shape will immediately expand or shrink based on the buffer value you entered.
+
+   > [!NOTE]
+   > The buffer tool currently supports **rectangles** and **circles** only. **Polygons** are excluded from interactive buffering.
+   
+5. When finished, remember to exit **BUFFER MODE**, by pressing the **keyboard `ESCAPE` key** or click the left mouse button anywhere in the ROI SETTINGS window.
+
+> [!NOTE]
+> The buffer tool modifies ROI shapes in real-time. Make sure to **save your ROIs** after buffering by clicking the <kbd>SAVE</kbd> button in the **REGION OF INTEREST (ROI) SETTINGS** window.
 
    
 ### CHANGE ROI ATTRIBUTES
