@@ -272,11 +272,11 @@ SimBA allows several forms of shape manipulations that are described in detail b
 
 [change_shapes.webm](https://github.com/user-attachments/assets/3f4ebcf6-b343-4c52-9779-42d84e11bee5)
 
-
-
 ### BUFFERING ROI SHAPES
 
 The buffer tool allows you to expand or shrink ROI shapes by a specified distance in millimeters by clicking on their center tags. This is useful for creating buffer zones around existing ROIs or adjusting ROI sizes while maintaining their general shape.
+
+[buffering_roi_shapes.webm](https://github.com/user-attachments/assets/11e93b0f-aed1-4451-b54c-123533dff69b)
 
 1. To activate the buffer tool, navigate to the `File (ROI)` dropdown menu at the top of the **REGION OF INTEREST (ROI) SETTINGS** window and click on `Buffer ROIs...`. A pop-up window will appear:
 

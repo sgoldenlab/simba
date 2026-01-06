@@ -4,7 +4,7 @@ import os
 import platform
 from copy import copy, deepcopy
 from tkinter import *
-from typing import Optional, Union, List
+from typing import List, Optional, Union
 
 import cv2
 import numpy as np
