@@ -1,3 +1,5 @@
+__author__ = "Simon Nilsson; sronilsson@gmail.com"
+
 import functools
 import itertools
 import math

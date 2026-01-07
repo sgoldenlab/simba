@@ -1,3 +1,5 @@
+__author__ = "Simon Nilsson; sronilsson@gmail.com"
+
 import itertools
 import os
 from typing import List, Optional, Union

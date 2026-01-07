@@ -1,10 +1,13 @@
-import os
-import sys
+"""
+SimBA (Simple Behavioral Analysis)
+Toolkit for computer classification and analysis of behaviors in experimental animals
+"""
 
-from dotenv import load_dotenv
-
-from simba.utils.enums import Paths
-
-script_dir = os.path.dirname(sys.argv[0]) or os.getcwd()
-env_path = os.path.join(script_dir, Paths.ENV_PATH.value)
-load_dotenv(env_path)
+__author__ = "Simon Nilsson"
+__author_email__ = "sronilsson@gmail.com"
+__maintainer__ = "Simon Nilsson"
+__maintainer_email__ = "sronilsson@gmail.com"
+__copyright__ = "Copyright 2024, Simon Nilsson"
+__license__ = "Modified BSD 3-Clause License"
+__url__ = "https://github.com/sgoldenlab/simba"
+__description__ = "Toolkit for computer classification and analysis of behaviors in experimental animals"

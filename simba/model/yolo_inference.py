@@ -1,4 +1,4 @@
-__author__ = "Simon Nilsson"
+__author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"

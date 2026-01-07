@@ -1,3 +1,5 @@
+__author__ = "Simon Nilsson; sronilsson@gmail.com"
+
 import platform
 from typing import Dict, List, Optional, Tuple, Union
 

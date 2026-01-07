@@ -1,3 +1,5 @@
+__author__ = "Simon Nilsson; sronilsson@gmail.com"
+
 import os
 import warnings
 from typing import Any, Optional, Union

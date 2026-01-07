@@ -1,4 +1,4 @@
-__author__ = "Simon Nilsson"
+__author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 from simba.utils.printing import SimbaTimer, stdout_success, stdout_warning
 

@@ -1,3 +1,5 @@
+__author__ = "Simon Nilsson; sronilsson@gmail.com"
+
 import math
 from copy import deepcopy
 from tkinter import Event, Toplevel

@@ -1,3 +1,5 @@
+__author__ = "Simon Nilsson; sronilsson@gmail.com"
+
 import math
 from tkinter import *
 from typing import Optional, Tuple

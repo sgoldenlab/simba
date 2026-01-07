@@ -1,5 +1,4 @@
-__author__ = "Simon Nilsson"
-__email__ = "sronilsson@gmail.com"
+__author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 import os
 from typing import List, Optional, Tuple, Union

@@ -1,4 +1,4 @@
-__author__ = "Simon Nilsson"
+__author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 import os.path
 from typing import Dict, List, Optional, Union

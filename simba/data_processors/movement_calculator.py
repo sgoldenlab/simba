@@ -1,4 +1,4 @@
-__author__ = "Simon Nilsson"
+__author__ = "Simon Nilsson; sronilsson@gmail.com"
 import argparse
 import os
 import sys

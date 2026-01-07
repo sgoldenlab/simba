@@ -1,4 +1,4 @@
-__author__ = "Simon Nilsson"
+__author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 from itertools import combinations, permutations
 from typing import List, Optional, Tuple, Union

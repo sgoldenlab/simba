@@ -1,4 +1,4 @@
-__author__ = "Simon Nilsson"
+__author__ = "Simon Nilsson; sronilsson@gmail.com"
 
 
 # MODIFIED FROM https://gist.github.com/HaydenFaulkner/54318fd3e9b9bdb66c5440c44e4e08b8
