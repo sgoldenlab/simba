@@ -69,7 +69,7 @@ from simba.utils.errors import (DataHeaderError, DuplicationError,
                                 MissingProjectConfigEntryError, NoDataError,
                                 NoFilesFoundError, NotDirectoryError,
                                 ParametersFileError, PermissionError,
-                                SimBAPAckageVersionError)
+                                SimBAPAckageVersionError, CorruptedFileError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.warnings import (
     FileExistWarning, FrameRangeWarning, GPUToolsWarning, InvalidValueWarning,
@@ -3347,12 +3347,15 @@ def read_sleap_h5(file_path: Union[str, os.PathLike]) -> pd.DataFrame:
 
     EXPECTED_KEYS = ["tracks", "point_scores", "node_names", "track_names"]
     check_file_exist_and_readable(file_path=file_path)
-    with h5py.File(file_path, "r") as f:
-        missing_keys = [x for x in EXPECTED_KEYS if not x in list(f.keys())]
-        if missing_keys:
-            raise InvalidFileTypeError(msg=f'{file_path} is not a valid SLEAP H5 file. Missing expected keys: {missing_keys}')
-        tracks = f["tracks"][:].T
-        point_scores = f["point_scores"][:].T
+    try:
+        with h5py.File(file_path, "r") as f:
+            missing_keys = [x for x in EXPECTED_KEYS if not x in list(f.keys())]
+            if missing_keys:
+                raise InvalidFileTypeError(msg=f'{file_path} is not a valid SLEAP H5 file. Missing expected keys: {missing_keys}')
+            tracks = f["tracks"][:].T
+            point_scores = f["point_scores"][:].T
+    except (OSError,) as e:
+        raise CorruptedFileError(msg=f'Could not read SLEAP file {file_path}. The file appears corrupted, or unable to read in the current python/h5py,hdf environment. Try recreating the file, or reach out on for help ({e.args})', source=read_sleap_h5.__name__)
 
     csv_rows = []
     n_frames, n_nodes, _, n_tracks = tracks.shape

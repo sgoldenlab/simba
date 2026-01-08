@@ -20,7 +20,7 @@ from simba.utils.printing import (SimbaTimer, log_event, stdout_success,
                                   stdout_warning)
 from simba.utils.read_write import (clean_sleap_file_name,
                                     find_all_videos_in_project, get_fn_ext,
-                                    get_video_meta_data, write_df)
+                                    get_video_meta_data, write_df, read_sleap_h5)
 
 
 class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
@@ -92,31 +92,7 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
             print(f"Importing {self.output_filename}...")
             video_timer = SimbaTimer(start=True)
             self.video_name = self.output_filename
-            with h5py.File(video_data["DATA"], "r") as f:
-                missing_keys = [x for x in ["tracks", "point_scores", "node_names", "track_names"] if not x in list(f.keys())]
-                if missing_keys:
-                    stdout_warning(msg=f'{video_data["DATA"]} is not a valid SLEAP H5 file. Missing keys {missing_keys} Skipping {self.output_filename}...')
-                    continue
-                tracks = f["tracks"][:].T
-                point_scores = f["point_scores"][:].T
-
-
-            csv_rows = []
-            n_frames, n_nodes, _, n_tracks = tracks.shape
-            for frame_ind in range(n_frames):
-                csv_row = []
-                for track_ind in range(n_tracks):
-                    for node_ind in range(n_nodes):
-                        for xyp in range(3):
-                            if xyp == 0 or xyp == 1:
-                                data = tracks[frame_ind, node_ind, xyp, track_ind]
-                            else:
-                                data = point_scores[frame_ind, node_ind, track_ind]
-                            csv_row.append(f"{data:.3f}")
-                csv_rows.append(" ".join(csv_row))
-            csv_rows = "\n".join(csv_rows)
-            self.data_df = pd.read_csv(io.StringIO(csv_rows), delim_whitespace=True, header=None).fillna(0)
-
+            self.data_df = read_sleap_h5(file_path=video_data["DATA"])
             if len(self.data_df.columns) != len(self.bp_headers):
                 raise BodypartColumnNotFoundError(
                     msg=f'The number of body-parts in data file {video_data["DATA"]} do not match the number of body-parts in your SimBA project. '
@@ -147,7 +123,7 @@ class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
 
 
 # test = SLEAPImporterH5(config_path=r"C:\troubleshooting\sleap_two_animals_open_field\project_folder\project_config.ini",
-#                         data_folder=r"C:\Users\sroni\Downloads\slape_data_fodler_2",
+#                         data_folder=r"C:\troubleshooting\sleap_two_animals_open_field\h5",
 #                         id_lst=['Jarryd', 'Nilsson'],
 #                         interpolation_settings=None,
 #                         smoothing_settings = None)

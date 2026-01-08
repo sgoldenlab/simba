@@ -14,7 +14,7 @@ from simba.mixins.feature_extraction_supplement_mixin import \
 from simba.mixins.plotting_mixin import PlottingMixin
 from simba.utils.checks import (
     check_all_file_names_are_represented_in_video_log, check_float,
-    check_that_column_exist, check_valid_boolean, check_valid_lst)
+    check_that_column_exist, check_valid_boolean, check_valid_lst, check_file_exist_and_readable)
 from simba.utils.enums import TagNames
 from simba.utils.errors import FrameRangeError, InvalidInputError, NoDataError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
@@ -56,7 +56,7 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
                  config_path: Union[str, os.PathLike],
                  bin_length: Union[int, float],
                  body_parts: List[str],
-                 data_path: Optional[List[Union[str, os.PathLike]]] = None,
+                 data_path: Optional[Union[List[Union[str, os.PathLike]], Union[str, os.PathLike]]] = None,
                  plots: bool = False,
                  verbose: bool = True,
                  distance: bool = True,
@@ -71,12 +71,14 @@ class TimeBinsMovementCalculator(ConfigReader, FeatureExtractionMixin):
         if data_path is None:
             if len(self.outlier_corrected_paths) == 0: raise NoDataError(msg=f'No data files found in {self.outlier_corrected_dir}', source=self.__class__.__name__)
             self.file_paths = self.outlier_corrected_paths
-        elif os.path.isfile(data_path):
-            self.file_paths = [data_path]
+        elif isinstance(data_path, list):
+            _ = [check_file_exist_and_readable(file_path=x, raise_error=True) for x in data_path]
+            self.file_paths = data_path
         elif os.path.isdir(data_path):
             self.file_paths = find_files_of_filetypes_in_directory(directory=self.file_paths, extensions=('.csv',), raise_warning=False, raise_error=True, as_dict=False)
-        else:
-            self.file_paths = data_path
+        elif isinstance(data_path, str):
+            check_file_exist_and_readable(file_path=data_path, raise_error=True)
+            self.file_paths = [data_path]
         check_valid_boolean(value=[plots], source=f'{self.__class__.__name__} plots', raise_error=True)
         check_valid_boolean(value=[verbose], source=f'{self.__class__.__name__} verbose', raise_error=True)
         check_valid_boolean(value=distance, source=f'{self.__class__.__name__} distance', raise_error=True)

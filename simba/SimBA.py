@@ -234,8 +234,6 @@ class LoadProjectPopUp(object):
         self.load_project_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="LOAD SIMBA PROJECT_CONFIG.INI", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.LOAD_PROJECT.value)
         self.selected_file = FileSelect(self.load_project_frm, "SIMBA CONFIG FILE: ", title="Select project_config.ini file", file_types=[("SimBA Project .ini", "*.ini")], lblwidth=30, lbl_icon='file_type')
         load_project_btn = SimbaButton(parent=self.load_project_frm, txt="LOAD PROJECT PATH", txt_clr='blue', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.launch_project, cmd_kwargs={'project_path': lambda: self.selected_file.file_path})
-
-
         #load_project_btn = SimbaButton(parent=self.load_project_frm, txt="LOAD PROJECT PATH", txt_clr='blue', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.launch_project, cmd_kwargs={'project_path': self.selected_file.file_path})
         self.load_project_frm.grid(row=0, sticky=NW, pady=(0, 10))
         self.selected_file.grid(row=0, sticky=NW)
