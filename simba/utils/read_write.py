@@ -61,15 +61,16 @@ from simba.utils.checks import (check_ffmpeg_available,
                                 is_video_color)
 from simba.utils.enums import (ENV_VARS, OS, ConfigKey, Defaults, Dtypes,
                                Formats, Keys, Links, Options, Paths)
-from simba.utils.errors import (DataHeaderError, DuplicationError,
-                                FFMPEGCodecGPUError, FFMPEGNotFoundError,
-                                FileExistError, FrameRangeError, IntegerError,
+from simba.utils.errors import (CorruptedFileError, DataHeaderError,
+                                DuplicationError, FFMPEGCodecGPUError,
+                                FFMPEGNotFoundError, FileExistError,
+                                FrameRangeError, IntegerError,
                                 InvalidFilepathError, InvalidFileTypeError,
                                 InvalidInputError, InvalidVideoFileError,
                                 MissingProjectConfigEntryError, NoDataError,
                                 NoFilesFoundError, NotDirectoryError,
                                 ParametersFileError, PermissionError,
-                                SimBAPAckageVersionError, CorruptedFileError)
+                                SimBAPAckageVersionError)
 from simba.utils.printing import SimbaTimer, stdout_success
 from simba.utils.warnings import (
     FileExistWarning, FrameRangeWarning, GPUToolsWarning, InvalidValueWarning,

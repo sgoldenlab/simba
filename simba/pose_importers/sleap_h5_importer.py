@@ -20,7 +20,8 @@ from simba.utils.printing import (SimbaTimer, log_event, stdout_success,
                                   stdout_warning)
 from simba.utils.read_write import (clean_sleap_file_name,
                                     find_all_videos_in_project, get_fn_ext,
-                                    get_video_meta_data, write_df, read_sleap_h5)
+                                    get_video_meta_data, read_sleap_h5,
+                                    write_df)
 
 
 class SLEAPImporterH5(ConfigReader, PoseImporterMixin):
