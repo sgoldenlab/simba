@@ -1,4 +1,4 @@
-__author__ = "Simon Nilsson; sronilsson@gmail.com"
+__author__ = "Simon Nilsson"
 
 
 import functools
@@ -872,7 +872,6 @@ def video_to_greyscale(file_path: Union[str, os.PathLike],
 
 def batch_video_to_greyscale(path: Union[str, os.PathLike, List[Union[str, os.PathLike]]],
                              save_dir: Optional[Union[str, os.PathLike]] = None,
-                             quality: int = 23,
                              gpu: Optional[bool] = False) -> None:
     """
     Convert a directory of video file to greyscale mp4 format.
@@ -890,7 +889,6 @@ def batch_video_to_greyscale(path: Union[str, os.PathLike, List[Union[str, os.Pa
     :param Union[str, os.PathLike] path: Path to directory holding video files in color, or a list of file paths to videos in color.
     :param Optional[bool] save_dir: If not None, then the directory where to store converted videos. If None, then stores the new videos in the same directory as the input video with the ``_grayscale`` suffix.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
-    :param int quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
     :raise FFMPEGCodecGPUError: If no GPU is found and ``gpu == True``.
     :returns: None.
 
@@ -902,8 +900,6 @@ def batch_video_to_greyscale(path: Union[str, os.PathLike, List[Union[str, os.Pa
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError(msg="No GPU found (as evaluated by nvidea-smi returning None)", source=batch_video_to_greyscale.__name__)
     timer = SimbaTimer(start=True)
-    quality = 23 if not check_int(name='quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
-
     if isinstance(path, list):
         check_valid_lst(data=path, source=f'{batch_video_to_greyscale.__name__} path', valid_dtypes=(str,), min_len=1)
         for i in path: check_file_exist_and_readable(file_path=i)
@@ -924,9 +920,9 @@ def batch_video_to_greyscale(path: Union[str, os.PathLike, List[Union[str, os.Pa
         else:
             save_name = os.path.join(save_dir, f'{file_name}{file_ext}')
         if gpu:
-            command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "hwupload_cuda,hwdownload,format=nv12,format=gray" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy "{save_name}" -hide_banner -loglevel error -y'
+            command = f'ffmpeg -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "hwupload_cuda,hwdownload,format=nv12,format=gray" -c:v h264_nvenc -c:a copy "{save_name}" -y'
         else:
-            command = f'ffmpeg -i "{file_path}" -vf format=gray -c:v libx264 -crf {quality} "{save_name}" -hide_banner -loglevel error -y'
+            command = f'ffmpeg -i "{file_path}" -vf format=gray -c:v libx264 "{save_name}" -hide_banner -loglevel error -y'
         print(f"Converting {file_name} to greyscale (Video {file_cnt+1}/{len(video_paths)})... ")
         subprocess.call(command, shell=True, stdout=subprocess.PIPE)
         video_timer.stop_timer()
@@ -1211,7 +1207,7 @@ def downsample_video(file_path: Union[str, os.PathLike],
         raise FileExistError("SIMBA ERROR: The outfile file already exist: {}.".format(save_name), source=downsample_video.__name__)
     quality = 23 if not check_int(name=f'{downsample_video.__name__} quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
     if gpu:
-        command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "scale=w={video_width}:h={video_height}" -c:v h264_nvenc -rc vbr -cq {quality} "{save_name}" -loglevel error -stats -hide_banner -y'
+        command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "scale=w={video_width}:h={video_height}" -c:v h264_nvenc -rc vbr -cq {quality} -hide_banner -loglevel error -stats "{save_name}" -loglevel error -stats -hide_banner -y'
         #command = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{file_path}" -vf "scale_cuda=w={video_width}:h={video_height}:force_original_aspect_ratio=decrease:flags=bicubic" -c:v h264_nvenc -rc vbr -cq {quality} "{save_name}" -loglevel error -stats -hide_banner -y'
     else:
         command = f'ffmpeg -i "{file_path}" -vf scale={video_width}:{video_height} -c:v {codec} -crf {quality} "{save_name}" -loglevel error -stats -hide_banner -y'
@@ -1456,7 +1452,6 @@ def multi_split_video(file_path: Union[str, os.PathLike],
                       start_times: List[str],
                       end_times: List[str],
                       out_dir: Optional[Union[str, os.PathLike]] = None,
-                      quality: int = 23,
                       include_clip_time_in_filename: Optional[bool] = False,
                       gpu: Optional[bool] = False) -> None:
     """
@@ -1465,7 +1460,6 @@ def multi_split_video(file_path: Union[str, os.PathLike],
     :param str file_path: Path to input video file.
     :param List[str] start_times: Start times in HH:MM:SS format.
     :param List[str] end_times: End times in HH:MM:SS format.
-    :param int quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
     :param Optional[Union[str, os.PathLike]] out_dir: If None, then the clips will be stored in the same dir as the input video. If directory, then the location of the output files.
     :param Optional[bool] include_clip_time_in_filename: If True, include the clip start and end in HH-MM-SS format as suffix in the filename. If False, then use integer suffic representing the count.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
@@ -1479,40 +1473,65 @@ def multi_split_video(file_path: Union[str, os.PathLike],
     timer = SimbaTimer(start=True)
     check_file_exist_and_readable(file_path=file_path)
     dir_name, file_name, ext = get_fn_ext(filepath=file_path)
-    quality = 23 if not check_int(name=f'{downsample_video.__name__} quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
     if out_dir is not None:
-        if not os.path.isdir(out_dir): os.makedirs(out_dir)
+        if not os.path.isdir(out_dir):
+            os.makedirs(out_dir)
         dir_name = out_dir
     for start_time_cnt, start_time in enumerate(start_times):
-        check_if_string_value_is_valid_video_timestamp(value=start_time, name=f"Start time for clip {start_time_cnt+1}")
+        check_if_string_value_is_valid_video_timestamp(
+            value=start_time, name=f"Start time for clip {start_time_cnt+1}"
+        )
     for end_time_cnt, end_time in enumerate(end_times):
-        check_if_string_value_is_valid_video_timestamp(value=end_time, name=f"End time for clip {end_time_cnt+1}")
+        check_if_string_value_is_valid_video_timestamp(
+            value=end_time, name=f"End time for clip {end_time_cnt+1}"
+        )
     for clip_cnt, (start_time, end_time) in enumerate(zip(start_times, end_times)):
-        clip_timer = SimbaTimer(start=True)
-        check_that_hhmmss_start_is_before_end(start_time=start_time, end_time=end_time, name=f"Clip {str(clip_cnt+1)}")
-        check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=start_time, video_path=file_path)
-        check_if_hhmmss_timestamp_is_valid_part_of_video(timestamp=end_time, video_path=file_path)
+        check_that_hhmmss_start_is_before_end(
+            start_time=start_time, end_time=end_time, name=f"Clip {str(clip_cnt+1)}"
+        )
+        check_if_hhmmss_timestamp_is_valid_part_of_video(
+            timestamp=start_time, video_path=file_path
+        )
+        check_if_hhmmss_timestamp_is_valid_part_of_video(
+            timestamp=end_time, video_path=file_path
+        )
         if not include_clip_time_in_filename:
-            save_path = os.path.join(dir_name, f'{file_name}_{clip_cnt + 1}.mp4')
+            save_path = os.path.join(
+                dir_name, file_name + "_{}".format(str(clip_cnt + 1)) + ".mp4"
+            )
         else:
-            save_path = os.path.join(dir_name, file_name+ f'_{start_time.replace(":", "-")}_{end_time.replace(":", "-")}.mp4')
+            save_path = os.path.join(
+                dir_name,
+                file_name
+                + f'_{start_time.replace(":", "-")}_{end_time.replace(":", "-")}.mp4',
+            )
         if os.path.isfile(save_path):
-            raise FileExistError(msg=f"The outfile file already exist: {save_path}.", source=multi_split_video.__name__)
+            raise FileExistError(
+                msg=f"The outfile file already exist: {save_path}.",
+                source=multi_split_video.__name__,
+            )
         if gpu:
             if not check_nvidea_gpu_available():
-                raise FFMPEGCodecGPUError(msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None", source=multi_split_video.__name__)
-            #command = f'ffmpeg -hwaccel auto -i "{file_path}" -ss {start_time} -to {end_time} -c:v h264_nvenc -rc vbr -cq {quality} -async 1 "{save_path}" -loglevel error -stats -hide_banner -y'
-            command = f'ffmpeg -hwaccel cuda -hwaccel_output_format cuda -i "{file_path}" -ss {start_time} -to {end_time} -c:v h264_nvenc -rc vbr -cq {quality} "{save_path}" -hide_banner -loglevel error -stats -y'
+                raise FFMPEGCodecGPUError(
+                    msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None",
+                    source=multi_split_video.__name__,
+                )
+            command = 'ffmpeg -hwaccel auto -i "{}" -ss {} -to {} -c:v h264_nvenc -async 1 "{}"'.format(
+                file_path, start_time, end_time, save_path
+            )
         else:
-            command = f'ffmpeg -i "{file_path}" -ss {start_time} -to {end_time} -async 1 -crf {quality} "{save_path}" -loglevel error -stats -hide_banner -y'
-        clip_timer.stop_timer()
+            command = f'ffmpeg -i "{file_path}" -ss {start_time} -to {end_time} -async 1 "{save_path}"'
+        print("Processing video clip {}...".format(str(clip_cnt + 1)))
         subprocess.call(command, shell=True, stdout=subprocess.PIPE)
-        print(f"Video clip {clip_cnt + 1} / {len(start_times)} complete (elapsed time: {clip_timer.elapsed_time_str}s)...")
     timer.stop_timer()
-    stdout_success(msg=f"Video {file_name} converted into {str(len(start_times))} clips in directory {dir_name}!", elapsed_time=timer.elapsed_time_str, source=multi_split_video.__name__)
+    stdout_success(
+        msg=f"Video {file_name} converted into {str(len(start_times))} clips in directory {dir_name}!",
+        elapsed_time=timer.elapsed_time_str,
+        source=multi_split_video.__name__,
+    )
 
 
-#multi_split_video(file_path=r'/Users/simon/Desktop/time_s_converted.mp4', start_times=['00:00:01', '00:00:02'], end_times=['00:00:04', '00:00:05'], gpu=False)
+# multi_split_video(file_path=r'/Users/simon/Desktop/time_s_converted.mp4', start_times=['00:00:01', '00:00:02'], end_times=['00:00:04', '00:00:05'], gpu=False)
 
 
 def crop_single_video(file_path: Union[str, os.PathLike],
@@ -1699,7 +1718,6 @@ def video_concatenator(video_one_path: Union[str, os.PathLike],
                        video_two_path: Union[str, os.PathLike],
                        resolution: Optional[Union[int, str]] = 'video 1',
                        horizontal: Optional[bool] = True,
-                       quality: int = 60,
                        gpu: Optional[bool] = False) -> None:
     """
     Concatenate two videos to a single video either horizontally or vertically
@@ -1717,7 +1735,6 @@ def video_concatenator(video_one_path: Union[str, os.PathLike],
     :param str video_two_path: Path to the second video in the concatenated video
     :param int or str resolution: If str, then the name of the video which resolution you want to retain. E.g., `Video_1`. Else int, representing the video width (if vertical concat) or height (if horizontal concat). Aspect raio will be retained.
     :param horizontal: If true, then horizontal concatenation. Else vertical concatenation.
-    :param quality: Integer (1–100) representing output video quality. Higher = better quality + bigger size.
     :param Optional[bool] gpu: If True, use NVIDEA GPU codecs. Default False.
     :returns: None. The video is stored in the same directory as the ``video_one_path`` using the video names concatenated as filename.
 
@@ -1751,20 +1768,18 @@ def video_concatenator(video_one_path: Union[str, os.PathLike],
     _, file_name_2, _ = get_fn_ext(video_two_path)
     print(f"Concatenating videos {file_name_1} and {file_name_2}...")
     save_path = os.path.join(dir, f"{file_name_1}_{file_name_2}_concat.mp4")
-    quality = 60 if not check_int(name='quality', value=quality, min_value=0, max_value=100, raise_error=False)[0] else int(quality)
-    quality_crf = quality_pct_to_crf(pct=quality)
     if horizontal:
         cpu_cmd = (f'ffmpeg -y -i "{video_one_path}" -i "{video_two_path}" '
                    f'-filter_complex "[0:v]scale=ceil(iw/2)*2:{video_meta_data["height"]}[v0];'
                    f'[1:v]scale=ceil(iw/2)*2:{video_meta_data["height"]}[v1];'
-                   f'[v0][v1]hstack=inputs=2" -crf {quality_crf} "{save_path}" -hide_banner -loglevel error -stats -y')
-        gpu_cmd = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{video_one_path}" -hwaccel auto -c:v h264_cuvid -i "{video_two_path}" -filter_complex "[0:v]scale=-1:{video_meta_data["height"]}[v0];[v0][1:v]hstack=inputs=2" -c:v h264_nvenc -rc vbr -cq {quality_crf} "{save_path}" -hide_banner -loglevel debug -stats -y'
+                   f'[v0][v1]hstack=inputs=2" "{save_path}" -hide_banner -loglevel error -stats -y')
+        gpu_cmd = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{video_one_path}" -hwaccel auto -c:v h264_cuvid -i "{video_two_path}" -filter_complex "[0:v]scale=-1:{video_meta_data["height"]}[v0];[v0][1:v]hstack=inputs=2" -c:v h264_nvenc "{save_path}" -hide_banner -loglevel debug -stats -y'
     else:
         cpu_cmd = (f'ffmpeg -y -i "{video_one_path}" -i "{video_two_path}" '
                    f'-filter_complex "[0:v]scale={video_meta_data["width"]}:-1[v0];'
                    f'[1:v]scale={video_meta_data["width"]}:-1[v1];'
-                   f'[v0][v1]vstack=inputs=2" -crf {quality_crf} "{save_path}" -hide_banner -loglevel error -stats -y')
-        gpu_cmd = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{video_one_path}" -hwaccel auto -c:v h264_cuvid -i "{video_two_path}" -filter_complex "[0:v]scale={video_meta_data["width"]}:-1[v0];[v0][1:v]vstack=inputs=2" -c:v h264_nvenc -rc vbr -cq {quality_crf} "{save_path}" -hide_banner -loglevel error -stats -y'
+                   f'[v0][v1]vstack=inputs=2" "{save_path}" -hide_banner -loglevel error -stats -y')
+        gpu_cmd = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{video_one_path}" -hwaccel auto -c:v h264_cuvid -i "{video_two_path}" -filter_complex "[0:v]scale={video_meta_data["width"]}:-1[v0];[v0][1:v]vstack=inputs=2" -c:v h264_nvenc "{save_path}" -hide_banner -loglevel error -stats -y'
     if gpu:
         try:
             subprocess.run(gpu_cmd, check=True, shell=True)
@@ -2342,7 +2357,6 @@ def resize_videos_by_height(video_paths: List[Union[str, os.PathLike]],
                             overwrite: Optional[bool] = False,
                             save_dir: Optional[Union[str, os.PathLike]] = None,
                             gpu: Optional[bool] = False,
-                            quality: int = 23,
                             suffix: Optional[str] = None,
                             verbose: Optional[bool] = True) -> Union[None, List[Union[None, str, os.PathLike]]]:
     """
@@ -2353,7 +2367,6 @@ def resize_videos_by_height(video_paths: List[Union[str, os.PathLike]],
     :param Optional[bool] overwrite: If True, then overwrites the original videos. Default False.
     :param Optional[Union[str, os.PathLike]] save_dir: If not None, then the directory where to store the re-sized videos.
     :param Optional[bool] gpu: If True, then use FFmpeg GPU codecs. Default False.
-    :param int quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
     :param Optional[bool] suffix: If not None, then stores the resized videos in the same directory as the input videos with the provided suffix.
     :param Optional[bool] verbose: If True, prints progress. Default True.
     :return Union[None, List[Union[str, os.PathLike]]]: If save_dir is not None, returns the paths of the re-sized videos. Else returns empty list.
@@ -2379,7 +2392,6 @@ def resize_videos_by_height(video_paths: List[Union[str, os.PathLike]],
     )
     _ = [check_file_exist_and_readable(x) for x in video_paths]
     new_video_paths = []
-    quality = 23 if not check_int(name=f'{downsample_video.__name__} quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
     if isinstance(height, str):
         check_int(name=f"{resize_videos_by_height.__name__} height",value=height,min_value=0,max_value=len(video_paths))
         video_heights = []
@@ -2401,9 +2413,9 @@ def resize_videos_by_height(video_paths: List[Union[str, os.PathLike]],
             save_path = os.path.join(dir_name, f"{video_name}_{suffix}.mp4")
             new_video_paths.append(save_path)
         if gpu:
-            cmd = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{video_path}" -vf scale_npp=-2:{height} -c:v h264_nvenc -rc vbr -cq {quality} "{save_path}" -hide_banner -loglevel error -y'
+            cmd = f'ffmpeg -y -hwaccel auto -c:v h264_cuvid -i "{video_path}" -vf scale_npp=-2:{height} -c:v h264_nvenc "{save_path}" -hide_banner -loglevel error -y'
         else:
-            cmd = f'ffmpeg -y -i "{video_path}" -vf scale=-2:{height} -crf {quality} "{save_path}" -hide_banner -loglevel error -stats -y'
+            cmd = f'ffmpeg -y -i "{video_path}" -vf scale=-2:{height} "{save_path}" -hide_banner -loglevel error -stats -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         if overwrite:
             shutil.copy(save_path, video_path)
@@ -2421,7 +2433,6 @@ def resize_videos_by_width(video_paths: List[Union[str, os.PathLike]],
                            overwrite: Optional[bool] = False,
                            save_dir: Optional[Union[str, os.PathLike]] = None,
                            gpu: Optional[bool] = False,
-                           quality: int = 23,
                            suffix: Optional[str] = None,
                            verbose: Optional[bool] = True) -> Union[None, List[Union[None, str, os.PathLike]]]:
     """
@@ -2432,7 +2443,6 @@ def resize_videos_by_width(video_paths: List[Union[str, os.PathLike]],
     :param Optional[bool] overwrite: If True, then overwrites the original videos. Default False.
     :param Optional[Union[str, os.PathLike]] save_dir: If not None, then the directory where to store the re-sized videos.
     :param Optional[bool] gpu: If True, then use FFmpeg GPU codecs. Default False.
-    :param int quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
     :param Optional[bool] suffix: If not None, then stores the resized videos in the same directory as the input videos with the provided suffix.
     :param Optional[bool] verbose: If True, prints progress. Default True.
     :return Union[None, List[Union[str, os.PathLike]]]: If save_dir is not None, returns the paths of the re-sized videos. Else returns empty list.
@@ -2459,7 +2469,6 @@ def resize_videos_by_width(video_paths: List[Union[str, os.PathLike]],
     check_valid_lst(data=video_paths, source=resize_videos_by_width.__name__, min_len=1)
     _ = [check_file_exist_and_readable(x) for x in video_paths]
     new_video_paths = []
-    quality = 23 if not check_int(name=f'{downsample_video.__name__} quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
     if isinstance(width, str):
         check_int(
             name=f"{resize_videos_by_width.__name__} height",
@@ -2488,9 +2497,9 @@ def resize_videos_by_width(video_paths: List[Union[str, os.PathLike]],
             save_path = os.path.join(dir_name, f"{video_name}_{suffix}.mp4")
             new_video_paths.append(save_path)
         if gpu:
-            cmd = f'ffmpeg -y -hwaccel auto -i "{video_path}" -vf "scale={width}:-2" -c:v h264_nvenc -rc vbr -cq {quality} "{save_path}" -hide_banner -loglevel error -stats -y'
+            cmd = f'ffmpeg -y -hwaccel auto -i "{video_path}" -vf "scale={width}:-2" -c:v h264_nvenc "{save_path}" -hide_banner -loglevel error -stats -y'
         else:
-            cmd = f'ffmpeg -y -i "{video_path}" -vf scale={width}:-2 -crf {quality} "{save_path}" -hide_banner -loglevel error -stats -y'
+            cmd = f'ffmpeg -y -i "{video_path}" -vf scale={width}:-2 "{save_path}" -hide_banner -loglevel error -stats -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         if overwrite:
             shutil.copy(save_path, video_path)
@@ -3012,15 +3021,13 @@ def mixed_mosaic_concatenator(
 def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]],
                              frm_ids: List[List[int]],
                              save_dir: Optional[Union[str, os.PathLike]] = None,
-                             gpu: Optional[bool] = False,
-                             quality: int = 23):
+                             gpu: Optional[bool] = False):
 
     """
     Clip videos specified by frame IDs (numbers).
 
     :param List[Union[str, os.PathLike]] file_paths: List of paths to input video files.
     :param List[List[int]] frm_ids: List of lists containing start and end frame IDs for each video.
-    :param int quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
     :param Optional[Union[str, os.PathLike]] save_dir:  Directory to save the clipped videos. If None, videos will be saved in the same directory as the input videos with frame numbers as suffix.
     :param Optional[bool] gpu: If True, uses FFMpeg GPU acceleration.
     :return: None.
@@ -3036,7 +3043,6 @@ def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]],
     check_valid_lst(data=file_paths,source=clip_videos_by_frame_ids.__name__,valid_dtypes=(str,),min_len=1)
     check_valid_lst(data=frm_ids,source=clip_videos_by_frame_ids.__name__,valid_dtypes=(list,), exact_len=len(file_paths))
     check_valid_boolean(value=gpu, source=f'{clip_videos_by_frame_ids} gpu')
-    quality = 23 if not check_int(name=f'{downsample_video.__name__} quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
     if gpu and not check_nvidea_gpu_available():
         raise FFMPEGCodecGPUError('GPU is passed but no GPU was found on the machine.', source=clip_videos_by_frame_ids.__name__)
     for cnt, i in enumerate(frm_ids):
@@ -3055,15 +3061,15 @@ def clip_videos_by_frame_ids(file_paths: List[Union[str, os.PathLike]],
         video_timer = SimbaTimer(start=True)
         dir, video_name, ext = get_fn_ext(filepath=file_path)
         s_f, e_f = frm_ids[cnt][0], frm_ids[cnt][1]
-        print(f"Trimming {video_name} from frame {s_f} to frame {e_f} (Video {cnt+1}/{len(file_paths)})...")
+        print(f"Trimming {video_name} from frame {s_f} to frame {e_f}...")
         if save_dir is not None:
             out_path = os.path.join(save_dir, os.path.basename(file_path))
         else:
             out_path = os.path.join(dir, f"{video_name}_{s_f}_{e_f}{ext}")
         if not gpu:
-            cmd = f'ffmpeg -i "{file_path}" -vf trim=start_frame={s_f}:end_frame={e_f} -an -crf {quality} "{out_path}" -loglevel error -stats -y'
+            cmd = f'ffmpeg -i "{file_path}" -vf trim=start_frame={s_f}:end_frame={e_f} -an "{out_path}" -loglevel error -stats -y'
         else:
-            cmd = f'ffmpeg -hwaccel auto -i "{file_path}" -vf trim=start_frame={s_f}:end_frame={e_f} -c:v h264_nvenc -rc vbr -cq {quality} -an "{out_path}" -loglevel error -stats -y'
+            cmd = f'ffmpeg -hwaccel auto -i "{file_path}" -vf trim=start_frame={s_f}:end_frame={e_f} -c:v h264_nvenc -an "{out_path}" -loglevel error -stats -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
         video_timer.stop_timer()
         print(f"Video {video_name} complete (elapsed time {video_timer.elapsed_time_str}s)")
@@ -3682,7 +3688,6 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
                              font_border_color: Optional[str] = 'black',
                              time_format: Optional[Literal['MM:SS', 'HH:MM:SS', 'SS.MMMMMM', 'HH:MM:SS.MMMM']] = 'HH:MM:SS.MMMM',
                              font_border_width: Optional[int] = 2,
-                             quality: int = 23,
                              position: Optional[Literal['top_left', 'top_right', 'bottom_left', 'bottom_right', 'top_middle', 'bottom_middle']] = 'top_left',
                              save_dir: Optional[Union[str, os.PathLike]] = None,
                              gpu: Optional[bool] = False) -> None:
@@ -3697,7 +3702,6 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
     :param Optional[int] font_size: Font size for the elapsed time text. Default 30.
     :param Optional[str] font_color:  Font color for the elapsed time text. Default white
     :param Optional[str] font_border_color: Font border color for the elapsed time text. Default black.
-    :param int quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
     :param Optional[int] font_border_width: Font border width for the elapsed time text in pixels. Default 2.
     :param Optional[Literal['top_left', 'top_right', 'bottom_left', 'bottom_right', 'middle_top', 'middle_bottom']] position: Position where the elapsed time text will be superimposed. Default ``top_left``.
     :param Optional[Union[str, os.PathLike]] save_dir: Directory where the modified video(s) will be saved. If not provided, the directory of the input video(s) will be used.
@@ -3718,7 +3722,6 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
     check_str(name=f'{superimpose_elapsed_time.__name__} time_format', value=time_format, options=['MM:SS', 'HH:MM:SS', 'SS.MMMMMM', 'HH:MM:SS.MMMM'])
     check_int(name=f'{superimpose_elapsed_time.__name__} font_size', value=font_size, min_value=1)
     check_int(name=f'{superimpose_elapsed_time.__name__} font_border_width', value=font_border_width, min_value=1)
-    quality = 23 if not check_int(name=f'{downsample_video.__name__} quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
     font_color = ''.join(filter(str.isalnum, font_color)).lower()
     font_border_color = ''.join(filter(str.isalnum, font_border_color)).lower()
     font_dict = get_fonts()
@@ -3765,12 +3768,13 @@ def superimpose_elapsed_time(video_path: Union[str, os.PathLike],
 
         # Escape Windows path for FFmpeg compatibility
         font_path_escaped = font_path.replace('\\', '/') if os.name == 'nt' else font_path
+
         vf_filter = f"drawtext=fontfile={font_path_escaped}:text='{time_text}':{pos}:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}"
 
         if not gpu:
-            cmd = f'ffmpeg -i "{video_path}" -vf "{vf_filter}" -c:a copy -crf {quality} "{save_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -i "{video_path}" -vf "{vf_filter}" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
         else:
-            cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -vf "{vf_filter}" -c:v h264_nvenc -rc vbr -cq {quality} -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -vf "{vf_filter}" -c:v h264_nvenc -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
 
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
@@ -4392,7 +4396,6 @@ def superimpose_video_names(video_path: Union[str, os.PathLike],
                             font_color: Optional[str] = 'white',
                             font_border_color: Optional[str] = 'black',
                             font_border_width: Optional[int] = 2,
-                            quality: int = 23,
                             position: Optional[Literal['top_left', 'top_right', 'bottom_left', 'bottom_right', 'middle_top', 'middle_bottom']] = 'top_left',
                             save_dir: Optional[Union[str, os.PathLike]] = None,
                             gpu: Optional[bool] = False) -> None:
@@ -4408,7 +4411,6 @@ def superimpose_video_names(video_path: Union[str, os.PathLike],
     :param Optional[str] font_color:  Font color for the video name text. Default white
     :param Optional[str] font_border_color: Font border color for the video name text. Default black.
     :param Optional[int] font_border_width: Font border width for the video name text in pixels. Default 2.
-    :param int quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
     :param Optional[Literal['top_left', 'top_right', 'bottom_left', 'bottom_right', 'top_middle', 'bottom_middle']] position: Position where the video name will be superimposed. Default ``top_left``.
     :param Optional[Union[str, os.PathLike]] save_dir: Directory where the modified video(s) will be saved. If not provided, the directory of the input video(s) will be used.
     :param Optional[bool] gpu: If True, uses GPU codecs with potentially faster runtimes. Default: False.
@@ -4432,7 +4434,6 @@ def superimpose_video_names(video_path: Union[str, os.PathLike],
     font_path = font_dict[font]
     font_color = ''.join(filter(str.isalnum, font_color)).lower()
     font_border_color = ''.join(filter(str.isalnum, font_border_color)).lower()
-    quality = 23 if not check_int(name=f'{downsample_video.__name__} quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
     if os.path.isfile(video_path):
         video_paths = [video_path]
     elif os.path.isdir(video_path):
@@ -4449,34 +4450,34 @@ def superimpose_video_names(video_path: Union[str, os.PathLike],
         save_path = os.path.join(save_dir, f'{video_name}_video_name_superimposed{ext}')
         if position == POSITIONS[0]:
             if not gpu:
-                cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=5:y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -crf {quality} -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+                cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=5:y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
             else:
                 cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=5:y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:v h264_nvenc -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
         elif position == POSITIONS[1]:
             if not gpu:
-                cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw-5):y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -crf {quality} -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+                cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw-5):y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
             else:
                 cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw-5):y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:v h264_nvenc -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
         elif position == POSITIONS[2]:
             if not gpu:
-                cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=5:y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -crf {quality} -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+                cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=5:y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
             else:
                 cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=5:y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
         elif position == POSITIONS[3]:
             if not gpu:
-                cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw-5):y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -crf {quality}  -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+                cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw-5):y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
             else:
-                cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw-5):y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -crf {quality}-c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+                cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw-5):y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
 
         elif position == POSITIONS[4]:
             if not gpu:
-                cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw)/2:y=10:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -crf {quality}  -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+                cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw)/2:y=10:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
             else:
                 cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw)/2:y=10:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
 
         else:
             if not gpu:
-                cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw)/2:y=(h-th-10):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -crf {quality}  -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
+                cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw)/2:y=(h-th-10):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
             else:
                 cmd = f'ffmpeg -hwaccel auto -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={video_name}:x=(w-tw)/2:y=(h-th-10):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
@@ -4490,7 +4491,6 @@ def superimpose_freetext(video_path: Union[str, os.PathLike],
                          font_color: Optional[str] = 'white',
                          font_border_color: Optional[str] = 'black',
                          font_border_width: Optional[int] = 2,
-                         quality: int = 23,
                          position: Optional[Literal['top_left', 'top_right', 'bottom_left', 'bottom_right', 'middle_top', 'middle_bottom']] = 'top_left',
                          save_dir: Optional[Union[str, os.PathLike]] = None,
                          gpu: Optional[bool] = False) -> None:
@@ -4507,7 +4507,6 @@ def superimpose_freetext(video_path: Union[str, os.PathLike],
     :param Optional[str] font_color:  Font color for text. Default white
     :param Optional[str] font_border_color: Font border color for the text. Default black.
     :param Optional[int] font_border_width: Font border width for the text in pixels. Default 2.
-    :param int quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
     :param Optional[Literal['top_left', 'top_right', 'bottom_left', 'bottom_right', 'top_middle', 'bottom_middle']] position: Position where the text will be superimposed. Default ``top_left``.
     :param Optional[Union[str, os.PathLike]] save_dir: Directory where the modified video(s) will be saved. If not provided, the directory of the input video(s) will be used.
     :param Optional[bool] gpu: If True, uses GPU codecs with potentially faster runtimes. Default: False.
@@ -4528,7 +4527,6 @@ def superimpose_freetext(video_path: Union[str, os.PathLike],
     font_path = font_dict[font]
     font_color = ''.join(filter(str.isalnum, font_color)).lower()
     font_border_color = ''.join(filter(str.isalnum, font_border_color)).lower()
-    quality = 23 if not check_int(name=f'{downsample_video.__name__} quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
     if os.path.isfile(video_path):
         video_paths = [video_path]
     elif os.path.isdir(video_path):
@@ -4544,17 +4542,17 @@ def superimpose_freetext(video_path: Union[str, os.PathLike],
         print(f'Superimposing video name on {video_name} (Video {file_cnt + 1}/{len(video_paths)})...')
         save_path = os.path.join(save_dir, f'{video_name}_text_superimposed{ext}')
         if position == POSITIONS[0]:
-            cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={text}:x=5:y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy -crf {quality} "{save_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={text}:x=5:y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
         elif position == POSITIONS[1]:
-            cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={text}:x=(w-tw-5):y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy -crf {quality} "{save_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={text}:x=(w-tw-5):y=5:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
         elif position == POSITIONS[2]:
-            cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={text}:x=5:y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy -crf {quality} "{save_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={text}:x=5:y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
         elif position == POSITIONS[3]:
-            cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={text}:x=(w-tw-5):y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy -crf {quality} "{save_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={text}:x=(w-tw-5):y=(h-th-5):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
         elif position == POSITIONS[4]:
-            cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={text}:x=(w-tw)/2:y=10:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy -crf {quality} "{save_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={text}:x=(w-tw)/2:y=10:fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
         else:
-            cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={text}:x=(w-tw)/2:y=(h-th-10):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy -crf {quality} "{save_path}" -loglevel error -stats -hide_banner -y'
+            cmd = f'ffmpeg -i "{video_path}" -vf \"drawtext=fontfile={font_path}:text={text}:x=(w-tw)/2:y=(h-th-10):fontsize={font_size}:fontcolor={font_color}:borderw={font_border_width}:bordercolor={font_border_color}\" -c:a copy "{save_path}" -loglevel error -stats -hide_banner -y'
         subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     stdout_success(msg=f'Super-imposed free-text on {len(video_paths)} video(s), saved in {save_dir}', elapsed_time=timer.elapsed_time_str)

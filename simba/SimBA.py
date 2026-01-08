@@ -195,7 +195,7 @@ from simba.ui.pop_ups.yolo_plot_results import YoloPoseVisualizerPopUp
 from simba.ui.pop_ups.yolo_pose_train_popup import YOLOPoseTrainPopUP
 from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
                                         FileSelect, SimbaButton, SimbaCheckbox,
-                                        SimBALabel, hxtScrollbar)
+                                        SimBALabel, hxtScrollbar, SimBADropDown)
 from simba.ui.video_info_ui import VideoInfoTable
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_int)
@@ -229,20 +229,30 @@ class LoadProjectPopUp(object):
         self.main_frm.minsize(300, 200)
         self.main_frm.wm_title("Load SimBA project (project_config.ini file)")
         self.btn_icons = get_icons_paths()
-        for k in self.btn_icons.keys():
-            self.btn_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname(__file__), self.btn_icons[k]["icon_path"])))
+        for k in self.btn_icons.keys(): self.btn_icons[k]["img"] = ImageTk.PhotoImage(image=PIL.Image.open(os.path.join(os.path.dirname(__file__), self.btn_icons[k]["icon_path"])))
         self.main_frm.iconphoto(False, self.btn_icons['browse']["img"])
         self.load_project_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="LOAD SIMBA PROJECT_CONFIG.INI", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.LOAD_PROJECT.value)
-        self.selected_file = FileSelect(self.load_project_frm, "SELECT SIMBA CONFIG FILE: ", title="Select project_config.ini file", file_types=[("SimBA Project .ini", "*.ini")], lblwidth=30)
+        self.selected_file = FileSelect(self.load_project_frm, "SIMBA CONFIG FILE: ", title="Select project_config.ini file", file_types=[("SimBA Project .ini", "*.ini")], lblwidth=30, lbl_icon='file_type')
+        load_project_btn = SimbaButton(parent=self.load_project_frm, txt="LOAD PROJECT PATH", txt_clr='blue', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.launch_project, cmd_kwargs={'project_path': lambda: self.selected_file.file_path})
 
-        load_project_btn = SimbaButton(parent=self.load_project_frm, txt="LOAD PROJECT", txt_clr='blue', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.launch_project)
-        self.load_project_frm.grid(row=0, sticky=NW)
+
+        #load_project_btn = SimbaButton(parent=self.load_project_frm, txt="LOAD PROJECT PATH", txt_clr='blue', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.launch_project, cmd_kwargs={'project_path': self.selected_file.file_path})
+        self.load_project_frm.grid(row=0, sticky=NW, pady=(0, 10))
         self.selected_file.grid(row=0, sticky=NW)
-        load_project_btn.grid(row=1, pady=10, sticky=NW)
+        load_project_btn.grid(row=1, pady=(3, 0), sticky=NW)
+        recent_project_paths = get_recent_projects_paths()
+        if len(recent_project_paths) > 0:
+            max_len = max(len(s) for s in recent_project_paths)
+            self.load_recent_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="LOAD RECENT PROJECT", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.LOAD_PROJECT.value)
+            self.recent_project_dropdown = SimBADropDown(parent=self.load_recent_frm, dropdown_options=recent_project_paths, label='RECENT CONFIG FILE PATH:', label_width=30, value=recent_project_paths[0], dropdown_width=max_len)
+            self.load_recent_project_btn = SimbaButton(parent=self.load_recent_frm, txt="LOAD RECENT PROJECT", txt_clr='darkgreen', img='rocket', font=Formats.FONT_REGULAR.value, cmd=self.launch_project, cmd_kwargs={'project_path': lambda: self.recent_project_dropdown.get_value()})
+            self.load_recent_frm.grid(row=1, sticky=NW)
+            self.recent_project_dropdown.grid(row=0, sticky=NW)
+            self.load_recent_project_btn.grid(row=1, pady=(5, 0), sticky=NW)
 
-    def launch_project(self):
-        check_file_exist_and_readable(file_path=self.selected_file.file_path)
-        _ = SimbaProjectPopUp(config_path=self.selected_file.file_path)
+    def launch_project(self, project_path: str):
+        check_file_exist_and_readable(file_path=project_path)
+        _ = SimbaProjectPopUp(config_path=project_path)
         self.load_project_frm.destroy()
         self.main_frm.destroy()
 
@@ -985,7 +995,7 @@ class App(object):
         superimpose_menu.add_command(label="Superimpose watermark", compound="left", image=self.menu_icons["watermark_green"]["img"], command=SuperimposeWatermarkPopUp, font=Formats.FONT_REGULAR.value)
         superimpose_menu.add_command(label="Superimpose timer", compound="left", image=self.menu_icons["timer"]["img"], command=SuperimposeTimerPopUp, font=Formats.FONT_REGULAR.value)
         superimpose_menu.add_command(label="Superimpose progress-bar", compound="left", image=self.menu_icons["progressbar_black"]["img"], command=SuperimposeProgressBarPopUp, font=Formats.FONT_REGULAR.value)
-        superimpose_menu.add_command(label="Superimpose video on video", compound="left", image=self.menu_icons["video"]["img"], command=SuperimposeVideoPopUp, font=Formats.FONT_REGULAR.value)
+        superimpose_menu.add_command(label="Superimpose video on video", compound="left", image=self.menu_icons["video_2"]["img"], command=SuperimposeVideoPopUp, font=Formats.FONT_REGULAR.value)
         superimpose_menu.add_command(label="Superimpose video names", compound="left", image=self.menu_icons["id_card"]["img"], command=SuperimposeVideoNamesPopUp, font=Formats.FONT_REGULAR.value)
         superimpose_menu.add_command(label="Superimpose free-text", compound="left", image=self.menu_icons["text_black"]["img"], command=SuperimposeTextPopUp, font=Formats.FONT_REGULAR.value)
         video_process_menu.add_cascade(label="Superimpose on videos...", compound="left", image=self.menu_icons["superimpose"]["img"], menu=superimpose_menu, font=Formats.FONT_REGULAR.value)
