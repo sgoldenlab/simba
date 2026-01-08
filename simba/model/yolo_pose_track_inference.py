@@ -43,8 +43,7 @@ class YOLOPoseTrackInference():
     """
     Perform YOLO-based pose estimation and object tracking inference on single or multiple videos.
 
-    This class uses YOLOv8/YOLO pose models to detect and track objects with keypoint localization
-    across video frames. It supports GPU acceleration, multi-object tracking with configurable trackers
+    Uses YOLO pose model to detect and track objects with keypoint localization across video frames. It supports GPU acceleration, multi-object tracking with configurable trackers
     (e.g., BoTSORT, ByteTrack), and post-processing options including interpolation and smoothing of
     keypoint trajectories.
 
@@ -54,6 +53,14 @@ class YOLOPoseTrackInference():
     .. seealso::
        For pose inference without tracks, see :func:`simba.model.yolo_pose_inference.YOLOPoseInference`.
        For visualizing pose tracks, see :func:`simba.plotting.yolo_pose_track_visualizer.YOLOPoseTrackVisualizer`.
+       If you do not need tracks (have individually idenitifiable individuals) use :func:`simba.plotting.yolo_pose_track_visualizer.YOLOPoseTrackVisualizer` for better runtimes.
+
+    .. csv-table::
+       :header: EXPECTED RUNTIMES
+       :file: ../../docs/tables/YOLOPoseTrackInference.csv
+       :widths: 10, 10, 40, 40
+       :align: center
+       :header-rows: 1
 
     :param Union[str, os.PathLike] weights_path: Path to the YOLO pose model weights file (e.g., .pt file). Must be a valid YOLO pose model, not a detection or segmentation model.
     :param Union[Union[str, os.PathLike], List[Union[str, os.PathLike]]] video_path: Path(s) to video file(s) or directory containing videos. Can be a single video path, a list of video paths, or a directory path. If a directory is provided, all video files in the directory will be processed.
@@ -269,19 +276,19 @@ class YOLOPoseTrackInference():
         timer.stop_timer()
         if not self.save_dir:
             if self.verbose:
-                print(f'YOLO results created for {len(self.video_path)} videos', timer.elapsed_time_str)
+                print(f'YOLO results created for {len(self.video_path)} videos (elapsed time: {timer.elapsed_time_str}s).')
             return self.results
         else:
             if self.verbose:
-                print(f'YOLO results for {len(self.video_path)} videos saved in {self.save_dir} directory', timer.elapsed_time_str)
+                print(f'YOLO results for {len(self.video_path)} videos saved in {self.save_dir} directory (elapsed time: {timer.elapsed_time_str}s).')
             return None
 
-#
+# #
 #
 # VIDEO_PATH = r"E:\netholabs_videos\two_tracks\videos"
 # WEIGHTS_PASS = r"D:\netholabs\yolo_mosaic_data_102315\mdl\train\weights\best.pt"
-# SAVE_DIR = r"E:\netholabs_videos\two_tracks\tow_yaml"
-# BOTSORT_PATH = r"C:\projects\simba\simba\simba\assets\tow_bytetrack.yaml"
+# SAVE_DIR = r"E:\netholabs_videos\two_tracks\videos\results"
+# BOTSORT_PATH = r"C:\projects\simba\simba\simba\assets\tracker_yml\tow_bytetrack.yaml"
 #
 # KEYPOINT_NAMES = ('Nose', 'Left_ear', 'Right_ear', 'Left_side', 'Center', 'Right_side', 'Tail_base', 'Tail_mid', 'Tail_end')
 #
@@ -296,9 +303,10 @@ class YOLOPoseTrackInference():
 #                            threshold=0.25,
 #                            config_path=BOTSORT_PATH,
 #                            interpolate=False,
-#                            imgsz=640,
+#                            imgsz=268,
 #                            max_tracks=3,
 #                            stream=True,
+#                            torch_threads=16,
 #                            iou=0.2)
 # i.run()
 

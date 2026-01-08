@@ -878,11 +878,11 @@ class App(object):
         video_process_menu.add_cascade(label="Change FPS...", compound="left", image=self.menu_icons["fps"]["img"], menu=fps_menu, font=Formats.FONT_REGULAR.value)
 
         clip_video_menu = Menu(menu)
-        clip_video_menu.add_command(label="Clip single video", command=ClipVideoPopUp, font=Formats.FONT_REGULAR.value, image=self.menu_icons["video"]["img"],  compound="left",)
+        clip_video_menu.add_command(label="Clip single video", command=ClipVideoPopUp, font=Formats.FONT_REGULAR.value, image=self.menu_icons["video_2"]["img"],  compound="left",)
         clip_video_menu.add_command(label="Clip multiple videos", command=InitiateClipMultipleVideosByTimestampsPopUp, font=Formats.FONT_REGULAR.value, image=self.menu_icons["stack"]["img"],  compound="left",)
 
         clip_video_menu.add_command(label="Clip video into multiple videos", command=MultiShortenPopUp, font=Formats.FONT_REGULAR.value, image=self.menu_icons["one_to_many"]["img"],  compound="left",)
-        clip_video_menu.add_command(label="Clip single video by frame numbers", command=ClipSingleVideoByFrameNumbers, font=Formats.FONT_REGULAR.value, image=self.menu_icons["video"]["img"],  compound="left",)
+        clip_video_menu.add_command(label="Clip single video by frame numbers", command=ClipSingleVideoByFrameNumbers, font=Formats.FONT_REGULAR.value, image=self.menu_icons["video_2"]["img"],  compound="left",)
         clip_video_menu.add_command(label="Clip multiple videos by frame numbers", command=InitiateClipMultipleVideosByFrameNumbersPopUp, font=Formats.FONT_REGULAR.value, image=self.menu_icons["stack"]["img"],  compound="left",)
 
         video_process_menu.add_cascade(label="Clip videos...", compound="left", image=self.menu_icons["clip"]["img"], menu=clip_video_menu, font=Formats.FONT_REGULAR.value)

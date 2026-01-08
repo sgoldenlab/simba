@@ -28,6 +28,9 @@ class ROIAnalyzer(ConfigReader, FeatureExtractionMixin):
     Analyze movements, entries, exits, and time-spent-in user-defined ROIs. Results are stored in the
     'project_folder/logs' directory of the SimBA project.
 
+    .. note::
+       Legacy, use :func:`simba.roi_tools.roi_aggregate_statistics_analyzer.ROIAggregateStatisticsAnalyzer` or :func:`simba.roi_tools.roi_clf_calculator_mp.ROIClfCalculatorMultiprocess`.
+
     :param str config_path: Path to SimBA project config file in Configparser format.
     :param Optional[str] data_path: Path to folder or file holding the data used to calculate ROI aggregate statistics. If None, then defaults to the `project_folder/csv/outlier_corrected_movement_location` directory of the SimBA project. Default: None.
     :param Optional[bool] calculate_distances: If True, then calculate movements aggregate statistics (distances and velocities) inside ROIs. Results are saved in ``project_folder/logs/`` directory. Default: False.
