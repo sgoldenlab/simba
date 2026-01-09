@@ -11,8 +11,6 @@ from simba.utils.read_write import (find_all_videos_in_directory,
                                     find_files_of_filetypes_in_directory)
 
 
-
-
 class InitializeBlobTrackerPopUp(PopUpMixin):
     """
     :example:
