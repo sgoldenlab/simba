@@ -2399,7 +2399,7 @@ class SuperimposeWatermarkPopUp(PopUpMixin):
         self.location_dropdown = SimBADropDown(parent=settings_frm, label="WATERMARK LOCATION:", dropdown_options=list(self.LOCATIONS.keys()), label_width=25, dropdown_width=30, img='location', value='TOP LEFT')
         self.opacity_dropdown = SimBADropDown(parent=settings_frm, label="WATERMARK OPACITY:", dropdown_options=opacities, label_width=25, dropdown_width=30, img='opacity', value=0.5)
         self.size_dropdown = SimBADropDown(parent=settings_frm, label="WATERMARK SCALE %:", dropdown_options=list(range(5, 100, 5)), label_width=25, dropdown_width=30, img='size_black', value=5)
-        self.gpu_dropdown = SimBADropDown(parent=settings_frm, label="USE GPU", dropdown_options=['TRUE', 'FALSE'], label_width=25, dropdown_width=30, img='gpu_3', value='FALSE', state=self.gpu_available)
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, label="USE GPU:", dropdown_options=['TRUE', 'FALSE'], label_width=25, dropdown_width=30, img='gpu_3', value='FALSE', state=self.gpu_available, tooltip_key='USE_GPU')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.selected_img.grid(row=0, column=0, sticky=NW)
@@ -2418,7 +2418,7 @@ class SuperimposeWatermarkPopUp(PopUpMixin):
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - SUPERIMPOSE WATERMARK", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25, lbl_icon='folder')
-        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=True))
+        multiple_videos_run = SimbaButton(parent=multiple_videos_frm, txt="RUN - MULTIPLE VIDEOS", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
         self.selected_video_dir.grid(row=0, column=0, sticky="NW")
@@ -2426,12 +2426,12 @@ class SuperimposeWatermarkPopUp(PopUpMixin):
         #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
-        gpu = str_2_bool(self.gpu_dropdown.getChoices())
+        gpu = str_2_bool(self.gpu_dropdown.get_value())
         img_path = self.selected_img.file_path
-        loc = self.location_dropdown.getChoices()
+        loc = self.location_dropdown.get_value()
         loc = self.LOCATIONS[loc]
-        opacity = float(self.opacity_dropdown.getChoices())
-        size = float(int(self.size_dropdown.getChoices()) / 100)
+        opacity = float(self.opacity_dropdown.get_value())
+        size = float(int(self.size_dropdown.get_value()) / 100)
         if size == 1.0: size = size - 0.001
         check_file_exist_and_readable(file_path=img_path)
         if not multiple:
@@ -2465,7 +2465,8 @@ class SuperimposeTimerPopUp(PopUpMixin):
         self.font_border_dropdown = SimBADropDown(parent=settings_frm, label="FONT BORDER COLOR:", dropdown_options=list(self.color_dict.keys()), label_width=30, dropdown_width=35, value='Black', img='text_color')
         self.font_border_width_dropdown = SimBADropDown(parent=settings_frm, label="FONT BORDER WIDTH:", dropdown_options=list(range(2, 52, 2)), label_width=30, dropdown_width=35, value=2, img='text_black')
         self.timer_format_dropdown = SimBADropDown(parent=settings_frm, label="TIME FORMAT:", dropdown_options=['MM:SS', 'HH:MM:SS', 'SS.MMMMMM', 'HH:MM:SS.MMMM'], label_width=30, dropdown_width=35, value='HH:MM:SS.MMMM', img='clock')
-        self.gpu_dropdown = SimBADropDown(parent=settings_frm, label="USE GPU:", dropdown_options=['TRUE', 'FALSE'], label_width=30, dropdown_width=35, value='FALSE', state=gpu_available, img='gpu_3')
+        self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label="OUTPUT VIDEO QUALITY:", label_width=30, dropdown_width=35, value=60, img='pct_2', tooltip_key='OUTPUT_VIDEO_QUALITY')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, label="USE GPU:", dropdown_options=['TRUE', 'FALSE'], label_width=30, dropdown_width=35, value='FALSE', state=gpu_available, img='gpu_3', tooltip_key='USE_GPU')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.location_dropdown.grid(row=0, column=0, sticky=NW)
@@ -2475,7 +2476,8 @@ class SuperimposeTimerPopUp(PopUpMixin):
         self.font_border_dropdown.grid(row=4, column=0, sticky=NW)
         self.font_border_width_dropdown.grid(row=5, column=0, sticky=NW)
         self.timer_format_dropdown.grid(row=6, column=0, sticky=NW)
-        self.gpu_dropdown.grid(row=7, column=0, sticky=NW)
+        self.quality_dropdown.grid(row=7, column=0, sticky=NW)
+        self.gpu_dropdown.grid(row=8, column=0, sticky=NW)
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - SUPERIMPOSE TIMER", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
@@ -2487,7 +2489,7 @@ class SuperimposeTimerPopUp(PopUpMixin):
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - SUPERIMPOSE TIMER", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25, lbl_icon='folder')
-        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=True))
+        multiple_videos_run = SimbaButton(parent=multiple_videos_frm, txt="RUN - MULTIPLE VIDEOS", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
         self.selected_video_dir.grid(row=0, column=0, sticky="NW")
@@ -2495,15 +2497,17 @@ class SuperimposeTimerPopUp(PopUpMixin):
         #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
-        gpu = str_2_bool(self.gpu_dropdown.getChoices())
-        loc = self.location_dropdown.getChoices()
+        gpu = str_2_bool(self.gpu_dropdown.get_value())
+        loc = self.location_dropdown.get_value()
         loc = self.LOCATIONS[loc]
-        font_size = int(self.font_size_dropdown.getChoices())
-        font = self.font_dropdown.getChoices()
-        font_clr = self.font_color_dropdown.getChoices()
-        font_border_clr = self.font_border_dropdown.getChoices()
-        font_border_width = int(self.font_border_width_dropdown.getChoices())
-        timer_format = self.timer_format_dropdown.getChoices()
+        font_size = int(self.font_size_dropdown.get_value())
+        font = self.font_dropdown.get_value()
+        font_clr = self.font_color_dropdown.get_value()
+        font_border_clr = self.font_border_dropdown.get_value()
+        font_border_width = int(self.font_border_width_dropdown.get_value())
+        timer_format = self.timer_format_dropdown.get_value()
+        quality_pct = int(self.quality_dropdown.get_value())
+        quality_crf = quality_pct_to_crf(pct=quality_pct)
         if not multiple:
             data_path = self.selected_video.file_path
             check_file_exist_and_readable(file_path=data_path)
@@ -2511,7 +2515,7 @@ class SuperimposeTimerPopUp(PopUpMixin):
             data_path = self.selected_video_dir.folder_path
             check_if_dir_exists(in_dir=data_path)
 
-        superimpose_elapsed_time(video_path=data_path,
+        threading.Thread(target=superimpose_elapsed_time(video_path=data_path,
                                             font=font,
                                             font_size=font_size,
                                             font_color=font_clr,
@@ -2519,7 +2523,8 @@ class SuperimposeTimerPopUp(PopUpMixin):
                                             font_border_width=font_border_width,
                                             time_format=timer_format,
                                             position=loc,
-                                            gpu=gpu)
+                                            quality=quality_crf,
+                                            gpu=gpu)).start()
 
 class SuperimposeProgressBarPopUp(PopUpMixin):
     def __init__(self):
@@ -2552,7 +2557,7 @@ class SuperimposeProgressBarPopUp(PopUpMixin):
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - SUPERIMPOSE PROGRESS BAR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25, lbl_icon='folder')
-        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=True))
+        multiple_videos_run = SimbaButton(parent=multiple_videos_frm, txt="RUN - MULTIPLE VIDEOS", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
         self.selected_video_dir.grid(row=0, column=0, sticky="NW")
@@ -2560,11 +2565,11 @@ class SuperimposeProgressBarPopUp(PopUpMixin):
         #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
-        gpu = str_2_bool(self.gpu_dropdown.getChoices())
-        loc = self.bar_loc_dropdown.getChoices()
+        gpu = str_2_bool(self.gpu_dropdown.get_value())
+        loc = self.bar_loc_dropdown.get_value()
         loc = self.LOCATIONS[loc]
-        bar_clr = self.bar_color_dropdown.getChoices()
-        bar_size = int(self.bar_size_dropdown.getChoices())
+        bar_clr = self.bar_color_dropdown.get_value()
+        bar_size = int(self.bar_size_dropdown.get_value())
         if not multiple:
             data_path = self.selected_video.file_path
             check_file_exist_and_readable(file_path=data_path)
@@ -2589,17 +2594,13 @@ class SuperimposeVideoPopUp(PopUpMixin):
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         opacities = [round(x, 1) for x in list(np.arange(0.1, 1.1, 0.1))]
         scales = [round(x, 2) for x in list(np.arange(0.05, 1.0, 0.05))]
-        self.main_video_path = FileSelect(settings_frm, "MAIN VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=25)
-        self.overlay_video_path = FileSelect(settings_frm, "OVERLAY VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=25)
-        self.location_dropdown = DropDownMenu(settings_frm, "OVERLAY VIDEO LOCATION:", list(self.LOCATIONS.keys()), labelwidth=25)
-        self.opacity_dropdown = DropDownMenu(settings_frm, "OVERLAY VIDEO OPACITY:", opacities, labelwidth=25)
-        self.size_dropdown = DropDownMenu(settings_frm, "OVERLAY VIDEO SCALE (%):", scales, labelwidth=25)
-        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
-
-        self.location_dropdown.setChoices('TOP LEFT')
-        self.opacity_dropdown.setChoices(0.5)
-        self.size_dropdown.setChoices(0.05)
-        self.gpu_dropdown.setChoices('FALSE')
+        self.main_video_path = FileSelect(settings_frm, "MAIN VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=25, lbl_icon='video_2')
+        self.overlay_video_path = FileSelect(settings_frm, "OVERLAY VIDEO PATH:", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_OPTIONS.value)], lblwidth=25, lbl_icon='video_2')
+        gpu_state = NORMAL if check_nvidea_gpu_available(raise_error=False) else DISABLED
+        self.location_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.LOCATIONS.keys()), label="OVERLAY VIDEO LOCATION:", label_width=25, dropdown_width=30, value='TOP LEFT', img='location')
+        self.opacity_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=opacities, label="OVERLAY VIDEO OPACITY:", label_width=25, dropdown_width=30, value=0.5, img='opacity')
+        self.size_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=scales, label="OVERLAY VIDEO SCALE (%):", label_width=25, dropdown_width=30, value=0.05, img='size_black')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU:", label_width=25, dropdown_width=30, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.main_video_path.grid(row=0, column=0, sticky=NW)
@@ -2612,11 +2613,11 @@ class SuperimposeVideoPopUp(PopUpMixin):
         #self.main_frm.mainloop()
 
     def run(self):
-        loc = self.location_dropdown.getChoices()
+        loc = self.location_dropdown.get_value()
         loc = self.LOCATIONS[loc]
-        gpu = str_2_bool(self.gpu_dropdown.getChoices())
-        opacity = float(self.opacity_dropdown.getChoices())
-        size = float(self.size_dropdown.getChoices())
+        gpu = str_2_bool(self.gpu_dropdown.get_value())
+        opacity = float(self.opacity_dropdown.get_value())
+        size = float(self.size_dropdown.get_value())
         video_path = self.main_video_path.file_path
         overlay_path = self.overlay_video_path.file_path
         check_file_exist_and_readable(file_path=video_path)
@@ -2669,7 +2670,7 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - SUPERIMPOSE VIDEO NAME", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25, lbl_icon='folder')
-        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=True))
+        multiple_videos_run = SimbaButton(parent=multiple_videos_frm, txt="RUN - MULTIPLE VIDEOS", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
         self.selected_video_dir.grid(row=0, column=0, sticky="NW")
@@ -3152,7 +3153,7 @@ class UpsampleVideosPopUp(PopUpMixin):
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS -  UP-SAMPLE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
-        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=True))
+        multiple_videos_run = SimbaButton(parent=multiple_videos_frm, txt="RUN - MULTIPLE VIDEOS", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
         self.selected_video_dir.grid(row=0, column=0, sticky="NW")
@@ -3202,7 +3203,7 @@ class ReverseVideoPopUp(PopUpMixin):
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - REVERSE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
-        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=True))
+        multiple_videos_run = SimbaButton(parent=multiple_videos_frm, txt="RUN - MULTIPLE VIDEOS", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
         self.selected_video_dir.grid(row=0, column=0, sticky="NW")
@@ -3249,7 +3250,7 @@ class Convert2BlackWhitePopUp(PopUpMixin):
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - CONVERT TO BLACK & WHITE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
-        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=True))
+        multiple_videos_run = SimbaButton(parent=multiple_videos_frm, txt="RUN - MULTIPLE VIDEOS", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
         self.selected_video_dir.grid(row=0, column=0, sticky="NW")
@@ -3294,7 +3295,7 @@ class CreateAverageFramePopUp(PopUpMixin):
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - CREATE AVERAGE FRAMES", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25, lbl_icon='folder')
-        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", font=Formats.FONT_REGULAR.value, command=lambda: self.run(multiple=True))
+        multiple_videos_run = SimbaButton(parent=multiple_videos_frm, txt="RUN - MULTIPLE VIDEOS", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
         self.selected_video_dir.grid(row=0, column=0, sticky="NW")
