@@ -205,9 +205,10 @@ from simba.utils.enums import (ENV_VARS, OS, ConfigKey, Defaults, Dtypes,
                                Formats, Keys, Links, PackageNames, Paths,
                                TagNames)
 from simba.utils.errors import InvalidInputError
-from simba.utils.lookups import (get_bp_config_code_class_pairs,
+from simba.utils.lookups import (check_for_updates,
+                                 get_bp_config_code_class_pairs,
                                  get_current_time, get_emojis, get_icons_paths,
-                                 load_simba_fonts, check_for_updates)
+                                 load_simba_fonts)
 from simba.utils.read_write import (fetch_pip_data, find_core_cnt,
                                     get_pkg_version, get_recent_projects_paths,
                                     read_config_entry, read_config_file,
