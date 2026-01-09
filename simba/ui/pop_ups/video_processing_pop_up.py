@@ -1342,7 +1342,7 @@ class DownsampleVideoPopUp(PopUpMixin):
             file_path=self.video_path_selected.file_path,
             video_width=int(width),
             video_height=int(height),
-            gpu=self.use_gpu_var.get(),
+            gpu=str_2_bool(self.gpu_dropdown.get_value()),
             quality=quality_crf,
         )
 
@@ -1796,7 +1796,7 @@ class BrightnessContrastPopUp(PopUpMixin):
 
     def apply(self):
         timer = SimbaTimer(start=True)
-        gpu = str_2_bool(self.gpu_dropdown.getChoices())
+        gpu = str_2_bool(self.gpu_dropdown.get_value())
         for file_cnt, file_path in enumerate(self.video_paths):
             video_timer = SimbaTimer(start=True)
             dir, video_name, ext = get_fn_ext(filepath=file_path)
@@ -2083,7 +2083,7 @@ class Convert2bmpPopUp(PopUpMixin):
 
         img_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE TO BMP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_file = FileSelect(img_frm, "IMAGE PATH:", title="Select an image file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_IMAGE_FORMAT_OPTIONS.value)])
-        run_btn_img = Button(img_frm, text="RUN IMAGE BMP CONVERSION", font=Formats.FONT_REGULAR.value, command=lambda: self.run_img())
+        run_btn_img = SimbaButton(parent=img_frm, txt="RUN IMAGE BMP CONVERSION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run_img())
 
         img_frm.grid(row=1, column=0, sticky="NW")
         self.selected_file.grid(row=0, column=0, sticky="NW")
@@ -2146,11 +2146,9 @@ class Convert2TIFFPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CONVERT IMAGE DIRECTORY TO TIFF")
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_frame_dir = FolderSelect(settings_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
-        self.compression_dropdown = DropDownMenu(settings_frm, "COMPRESSION:", ['raw', 'tiff_deflate', 'tiff_lzw'], labelwidth=25)
-        self.compression_dropdown.setChoices('raw')
-        self.stack_dropdown = DropDownMenu(settings_frm, "STACK:", ['FALSE', 'TRUE'], labelwidth=25)
-        self.stack_dropdown.setChoices('FALSE')
+        self.selected_frame_dir = FolderSelect(settings_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25, lbl_icon='browse')
+        self.compression_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['raw', 'tiff_deflate', 'tiff_lzw'], label="COMPRESSION:", label_width=25, dropdown_width=25, value='raw', img='file_type')
+        self.stack_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['FALSE', 'TRUE'], label="STACK:", label_width=25, dropdown_width=25, value='FALSE', img='stack')
         self.create_run_frm(run_function=self.run, title='RUN TIFF CONVERSION')
 
         settings_frm.grid(row=0, column=0, sticky="NW")
@@ -2162,23 +2160,23 @@ class Convert2TIFFPopUp(PopUpMixin):
     def run(self):
         folder_path = self.selected_frame_dir.folder_path
         check_if_dir_exists(in_dir=folder_path)
-        stack = str_2_bool(self.stack_dropdown.getChoices())
-        convert_to_tiff(directory=folder_path, compression=self.compression_dropdown.getChoices(), verbose=True, stack=stack)
+        stack = str_2_bool(self.stack_dropdown.get_value())
+        convert_to_tiff(directory=folder_path, compression=self.compression_dropdown.get_value(), verbose=True, stack=stack)
 
 class Convert2PNGPopUp(PopUpMixin):
     def __init__(self):
         super().__init__(title="CONVERT IMAGE TO PNG")
         img_dir_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE DIRECTORY TO PNG", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_frame_dir = FolderSelect(img_dir_frm, "IMAGE DIRECTORY PATH:", title="Select a image directory", lblwidth=25)
-        run_btn_dir = Button(img_dir_frm, text="RUN DIRECTORY PNG CONVERSION", font=Formats.FONT_REGULAR.value, command=lambda: self.run_dir())
+        run_btn_dir = SimbaButton(parent=img_dir_frm, txt="RUN DIRECTORY PNG CONVERSION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run_dir())
 
         img_dir_frm.grid(row=0, column=0, sticky="NW")
         self.selected_frame_dir.grid(row=0, column=0, sticky="NW")
         run_btn_dir.grid(row=1, column=0, sticky="NW")
 
         img_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="CONVERT IMAGE TO PNG", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_file_dir = FileSelect(img_frm, "IMAGE PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_IMAGE_FORMAT_OPTIONS.value)])
-        run_btn_img = Button(img_frm, text="RUN PNG CONVERSION", font=Formats.FONT_REGULAR.value, command=lambda: self.run_img())
+        self.selected_file_dir = FileSelect(img_frm, "IMAGE PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_IMAGE_FORMAT_OPTIONS.value)], lbl_icon='file_type')
+        run_btn_img = SimbaButton(parent=img_frm, txt="RUN PNG CONVERSION", img='rocket', txt_clr='black', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run_img())
 
         img_frm.grid(row=1, column=0, sticky="NW")
         self.selected_file_dir.grid(row=0, column=0, sticky="NW")
@@ -2647,7 +2645,7 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
         self.font_border_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.color_dict.keys()), label_width=25, value='Black', label="FONT BORDER COLOR:", img='text')
         self.font_border_width_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(2, 52, 2)), label_width=25, value=2, label="FONT BORDER WIDTH:", img='width')
         self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label="OUTPUT VIDEO QUALITY: ", label_width=25, dropdown_width=30, value=60, img='pct_2', tooltip_key='OUTPUT_VIDEO_QUALITY')
-        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label_width=25, value='FALSE', label="USE GPU:", img='gpu_3', state=self.gpu_available)
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label_width=25, value='FALSE', label="USE GPU:", img='gpu_3', state=self.gpu_available, tooltip_key='USE_GPU')
 
 
         settings_frm.grid(row=0, column=0, sticky=NW)
@@ -2678,14 +2676,14 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
         #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
-        loc = self.location_dropdown.getChoices()
+        loc = self.location_dropdown.get_value()
         loc = self.LOCATIONS[loc]
-        gpu = str_2_bool(self.gpu_dropdown.getChoices())
-        font_size = int(self.font_size_dropdown.getChoices())
-        font = self.font_dropdown.getChoices()
-        font_clr = self.font_color_dropdown.getChoices()
-        font_border_clr = self.font_border_dropdown.getChoices()
-        font_border_width = int(self.font_border_width_dropdown.getChoices())
+        gpu = str_2_bool(self.gpu_dropdown.get_value())
+        font_size = int(self.font_size_dropdown.get_value())
+        font = self.font_dropdown.get_value()
+        font_clr = self.font_color_dropdown.get_value()
+        font_border_clr = self.font_border_dropdown.get_value()
+        font_border_width = int(self.font_border_width_dropdown.get_value())
         if not multiple:
             data_path = self.selected_video.file_path
             check_file_exist_and_readable(file_path=data_path)
@@ -2693,7 +2691,7 @@ class SuperimposeVideoNamesPopUp(PopUpMixin):
             data_path = self.selected_video_dir.folder_path
             check_if_dir_exists(in_dir=data_path)
 
-        quality = int(self.quality_dropdown.getChoices())
+        quality = int(self.quality_dropdown.get_value())
         threading.Thread(target=superimpose_video_names(video_path=data_path,
                                                         font=font,
                                                         font_size=font_size,
@@ -2724,7 +2722,7 @@ class SuperimposeTextPopUp(PopUpMixin):
         self.font_border_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.color_dict.keys()), label_width=25, value='Black', label="FONT BORDER COLOR:", img='line')
         self.font_border_width_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(2, 52, 2)), label_width=25, value=2, label="FONT BORDER WIDTH:", img='width')
         self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label="OUTPUT VIDEO QUALITY: ", label_width=25, dropdown_width=30, value=60, img='pct_2', tooltip_key='OUTPUT_VIDEO_QUALITY')
-        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label_width=25, value='FALSE', label="USE GPU:", img='gpu_3', state=self.gpu_available)
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label_width=25, value='FALSE', label="USE GPU:", img='gpu_3', state=self.gpu_available, tooltip_key='USE_GPU')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.location_dropdown.grid(row=0, column=0, sticky=NW)
@@ -2747,7 +2745,7 @@ class SuperimposeTextPopUp(PopUpMixin):
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - SUPERIMPOSE TEXT", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25, lbl_icon='folder')
-        multiple_videos_run = Button(multiple_videos_frm, text="RUN - MULTIPLE VIDEOS", font=Formats.FONT_REGULAR.value,  command=lambda: self.run(multiple=True))
+        multiple_videos_run = SimbaButton(parent=multiple_videos_frm, txt="RUN - MULTIPLE VIDEOS", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
         self.selected_video_dir.grid(row=0, column=0, sticky="NW")
@@ -2755,16 +2753,16 @@ class SuperimposeTextPopUp(PopUpMixin):
         #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
-        loc = self.location_dropdown.getChoices()
+        loc = self.location_dropdown.get_value()
         loc = self.LOCATIONS[loc]
         text = self.text_eb.entry_get
-        gpu = str_2_bool(self.gpu_dropdown.getChoices())
+        gpu = str_2_bool(self.gpu_dropdown.get_value())
         check_str(name='text', value=text)
-        font = self.font_dropdown.getChoices()
-        font_size = int(self.font_size_dropdown.getChoices())
-        font_clr = self.font_color_dropdown.getChoices()
-        font_border_clr = self.font_border_dropdown.getChoices()
-        font_border_width = int(self.font_border_width_dropdown.getChoices())
+        font = self.font_dropdown.get_value()
+        font_size = int(self.font_size_dropdown.get_value())
+        font_clr = self.font_color_dropdown.get_value()
+        font_border_clr = self.font_border_dropdown.get_value()
+        font_border_width = int(self.font_border_width_dropdown.get_value())
         if not multiple:
             data_path = self.selected_video.file_path
             check_file_exist_and_readable(file_path=data_path)
@@ -2772,7 +2770,7 @@ class SuperimposeTextPopUp(PopUpMixin):
             data_path = self.selected_video_dir.folder_path
             check_if_dir_exists(in_dir=data_path)
 
-        quality = int(self.quality_dropdown.getChoices())
+        quality = int(self.quality_dropdown.get_value())
         threading.Thread(target=superimpose_freetext(video_path=data_path,
                                                      text=text,
                                                      font=font,
@@ -2803,7 +2801,7 @@ class BoxBlurPopUp(PopUpMixin):
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="APPLY BOX-BLUR", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='file')
-        single_video_run = Button(single_video_frm, text="RUN", font=Formats.FONT_REGULAR.value, command=lambda: self.run())
+        single_video_run = SimbaButton(parent=single_video_frm, txt="RUN", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run())
 
         single_video_frm.grid(row=1, column=0, sticky="NW")
         self.selected_video.grid(row=0, column=0, sticky="NW")
@@ -2814,8 +2812,8 @@ class BoxBlurPopUp(PopUpMixin):
     def run(self):
         video_path = self.selected_video.file_path
         check_file_exist_and_readable(file_path=video_path)
-        blur_lvl = float(self.blur_lvl_dropdown.getChoices())
-        invert = str_2_bool(self.invert_dropdown.getChoices())
+        blur_lvl = float(self.blur_lvl_dropdown.get_value())
+        invert = str_2_bool(self.invert_dropdown.get_value())
         threading.Thread(target=roi_blurbox(video_path=video_path, blur_level=blur_lvl, invert=invert)).start()
 
 
@@ -3044,7 +3042,7 @@ class RotateVideoSetDegreesPopUp(PopUpMixin):
         self.gpu_dropdown.grid(row=2, column=0, sticky="NW")
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - ROTATE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='video_2')
         single_video_run = SimbaButton(parent=single_video_frm, txt="RUN - SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run(multiple=False))
 
         single_video_frm.grid(row=1, column=0, sticky="NW")
@@ -3052,7 +3050,7 @@ class RotateVideoSetDegreesPopUp(PopUpMixin):
         single_video_run.grid(row=1, column=0, sticky="NW")
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - ROTATE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25, lbl_icon='folder')
         multiple_videos_run = SimbaButton(parent=multiple_videos_frm, txt="RUN - MULTIPLE VIDEOS", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
@@ -3094,7 +3092,7 @@ class FlipVideosPopUp(PopUpMixin):
         self.gpu_dropdown.grid(row=3, column=0, sticky="NW")
 
         single_video_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SINGLE VIDEO - FLIP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+        self.selected_video = FileSelect(single_video_frm, "VIDEO PATH:", title="Select a video file", lblwidth=25, file_types=[("VIDEO FILE", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lbl_icon='video_2')
         single_video_run = SimbaButton(parent=single_video_frm, txt="RUN - SINGLE VIDEO", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run(multiple=False))
 
         single_video_frm.grid(row=1, column=0, sticky="NW")
@@ -3102,7 +3100,7 @@ class FlipVideosPopUp(PopUpMixin):
         single_video_run.grid(row=1, column=0, sticky="NW")
 
         multiple_videos_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="MULTIPLE VIDEOS - FLIP", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25)
+        self.selected_video_dir = FolderSelect(multiple_videos_frm, "VIDEO DIRECTORY PATH:", title="Select a video directory", lblwidth=25, lbl_icon='folder')
         multiple_videos_run = SimbaButton(parent=multiple_videos_frm, txt="RUN - MULTIPLE VIDEOS", img='rocket', txt_clr='blue', font=Formats.FONT_REGULAR.value, cmd=lambda: self.run(multiple=True))
 
         multiple_videos_frm.grid(row=2, column=0, sticky="NW")
@@ -3134,11 +3132,8 @@ class UpsampleVideosPopUp(PopUpMixin):
     def __init__(self):
         PopUpMixin.__init__(self, title="UPSAMPLE VIDEOS USING INTERPOLATION (WARNING: LONG RUN-TIMES)", icon='sample')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
-        self.fps_dropdown = DropDownMenu(settings_frm, "NEW FRAME-RATE (FPS):", list(range(1, 500)), labelwidth=25)
-        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY (%):", list(range(10, 110, 10)), labelwidth=25)
-
-        self.fps_dropdown.setChoices(60)
-        self.quality_dropdown.setChoices(60)
+        self.fps_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(1, 500)), label="NEW FRAME-RATE (FPS):", label_width=25, dropdown_width=25, value=60, img='fps')
+        self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label="OUTPUT VIDEO QUALITY (%):", label_width=25, dropdown_width=25, value=60, img='pct_2', tooltip_key='OUTPUT_VIDEO_QUALITY')
         settings_frm.grid(row=0, column=0, sticky="NW")
         self.fps_dropdown.grid(row=0, column=0, sticky="NW")
         self.quality_dropdown.grid(row=1, column=0, sticky="NW")
@@ -3161,8 +3156,8 @@ class UpsampleVideosPopUp(PopUpMixin):
         self.main_frm.mainloop()
 
     def run(self, multiple: bool):
-        target_fps = int(self.fps_dropdown.getChoices())
-        target_quality = int(self.quality_dropdown.getChoices())
+        target_fps = int(self.fps_dropdown.get_value())
+        target_quality = int(self.quality_dropdown.get_value())
         if not multiple:
             data_path = self.selected_video.file_path
             check_file_exist_and_readable(file_path=data_path)
@@ -3181,12 +3176,10 @@ class ReverseVideoPopUp(PopUpMixin):
         PopUpMixin.__init__(self, title="REVERSE VIDEOS", icon='reverse_blue')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         self.MP4_CODEC_LK = {'HEVC (H.265)': 'libx265', 'H.264 (AVC)': 'libx264', 'VP9': 'vp9'}
-        self.quality_dropdown = DropDownMenu(settings_frm, "OUTPUT VIDEO QUALITY:", list(range(10, 110, 10)), labelwidth=25)
-        self.quality_dropdown.setChoices(60)
-        self.codec_dropdown = DropDownMenu(settings_frm, "COMPRESSION CODEC:", list(self.MP4_CODEC_LK.keys()), labelwidth=25)
-        self.codec_dropdown.setChoices('HEVC (H.265)')
-        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
-        self.gpu_dropdown.setChoices('FALSE')
+        gpu_state = NORMAL if check_nvidea_gpu_available(raise_error=False) else DISABLED
+        self.quality_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(range(10, 110, 10)), label="OUTPUT VIDEO QUALITY:", label_width=25, dropdown_width=25, value=60, img='pct_2', tooltip_key='OUTPUT_VIDEO_QUALITY')
+        self.codec_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=list(self.MP4_CODEC_LK.keys()), label="COMPRESSION CODEC:", label_width=25, dropdown_width=25, value='HEVC (H.265)', img='file_type')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU:", label_width=25, dropdown_width=25, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
 
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.quality_dropdown.grid(row=0, column=0, sticky=NW)
@@ -3211,9 +3204,9 @@ class ReverseVideoPopUp(PopUpMixin):
         #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
-        target_quality = int(self.quality_dropdown.getChoices())
-        codec = self.MP4_CODEC_LK[self.codec_dropdown.getChoices()]
-        gpu = str_2_bool(self.gpu_dropdown.getChoices())
+        target_quality = int(self.quality_dropdown.get_value())
+        codec = self.MP4_CODEC_LK[self.codec_dropdown.get_value()]
+        gpu = str_2_bool(self.gpu_dropdown.get_value())
         if not multiple:
             data_path = self.selected_video.file_path
             check_file_exist_and_readable(file_path=data_path)
@@ -3231,11 +3224,9 @@ class Convert2BlackWhitePopUp(PopUpMixin):
         PopUpMixin.__init__(self, title="CONVERT VIDEOS TO BLACK AND WHITE (NOTE: NOT GRAYSCALE)", icon='black_and_white')
         settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.VIDEO_TOOLS.value)
         threshold = [round(x, 2) for x in list(np.arange(0.01, 1.01, 0.01))]
-        self.threshold_dropdown = DropDownMenu(settings_frm, "BLACK THRESHOLD:", threshold, labelwidth=25)
-        self.gpu_dropdown = DropDownMenu(settings_frm, "USE GPU:", ['TRUE', 'FALSE'], labelwidth=25)
-
-        self.threshold_dropdown.setChoices(0.5)
-        self.gpu_dropdown.setChoices('FALSE')
+        gpu_state = NORMAL if check_nvidea_gpu_available(raise_error=False) else DISABLED
+        self.threshold_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=threshold, label="BLACK THRESHOLD:", label_width=25, dropdown_width=25, value=0.5, img='threshold')
+        self.gpu_dropdown = SimBADropDown(parent=settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU:", label_width=25, dropdown_width=25, value='FALSE', img='gpu_3', state=gpu_state, tooltip_key='USE_GPU')
         settings_frm.grid(row=0, column=0, sticky=NW)
         self.threshold_dropdown.grid(row=0, column=0, sticky=NW)
         self.gpu_dropdown.grid(row=1, column=0, sticky=NW)
@@ -3258,8 +3249,8 @@ class Convert2BlackWhitePopUp(PopUpMixin):
         #self.main_frm.mainloop()
 
     def run(self, multiple: bool):
-        threshold = float(self.threshold_dropdown.getChoices())
-        gpu = str_2_bool(self.gpu_dropdown.getChoices())
+        threshold = float(self.threshold_dropdown.get_value())
+        gpu = str_2_bool(self.gpu_dropdown.get_value())
         if not multiple:
             data_path = self.selected_video.file_path
             check_file_exist_and_readable(file_path=data_path)
@@ -3384,7 +3375,7 @@ class ManualTemporalJoinPopUp(PopUpMixin):
         unique_fps, unique_res = list(set(fps)), list(set(resolutions))
         format = self.out_format_dropdown.getChoices()
         quality = self.quality_dropdown.getChoices()
-        gpu = str_2_bool(self.gpu_dropdown.getChoices())
+        gpu = str_2_bool(self.gpu_dropdown.get_value())
         if len(unique_fps) > 1: raise FrameRangeError(msg=f'The selected videos contain more than one unique FPS: {unique_fps}', source=self.__class__.__name__)
         if len(unique_res) > 1: raise ResolutionError(msg=f'The selected videos contain more than one unique resolutions: {unique_res}', source=self.__class__.__name__)
         threading.Thread(temporal_concatenation(video_paths=video_file_paths,
