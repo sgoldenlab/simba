@@ -204,7 +204,7 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
                 FrameRangeWarning(msg=f"Geometry {i+1} contains {len(geometries[i])} shapes but video has {self.video_meta_data[FRAME_COUNT]} frames")
         self.geometries, self.video_name, self.thickness = geometries, video_name, thickness
         if config_path is None:
-            check_if_dir_exists(in_dir=save_dir)
+            check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir')
             self.save_dir = save_dir
         else:
             self.save_dir = os.path.join(self.frames_output_dir, "geometry_visualization")
@@ -246,6 +246,10 @@ class GeometryPlotter(ConfigReader, PlottingMixin):
         concatenate_videos_in_folder(in_folder=self.temp_dir, save_path=self.save_path, remove_splits=True)
         video_timer.stop_timer()
         stdout_success(msg=f"Geometry video {self.save_path} complete!", elapsed_time=video_timer.elapsed_time_str, source=self.__class__.__name__)
+
+
+
+
 
 
 

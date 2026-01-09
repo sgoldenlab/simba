@@ -104,6 +104,7 @@ class YOLOSegmentationInference():
         if save_dir is not None:
             check_if_dir_exists(in_dir=save_dir, source=f'{self.__class__.__name__} save_dir')
         torch.set_num_threads(torch_threads)
+        print(weights_path)
         self.model = load_yolo_model(weights_path=weights_path, device=device, format=format)
         self.half_precision, self.stream, self.video_path, self.retina_msk = half_precision, stream, video_path, retina_msk
         self.device, self.batch_size, self.threshold, self.max_tracks, self.iou = device, batch_size, threshold, max_tracks, iou

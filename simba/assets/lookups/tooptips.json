@@ -27,5 +27,7 @@
   "VIDEO_CODEC": "Video codec to use for encoding. Common options include libx264 (CPU, widely compatible), h264_nvenc (NVIDIA GPU), libx265 (CPU, better compression), and libvpx-vp9 (CPU, web optimized). Codec availability depends on your FFmpeg installation.",
   "RESOLUTION_CONCAT": "If the two videos have different resolutions, which resolution should be retained in each video of the concatenated results?",
   "LOCATION_FRAME_COUNT": "The location in the video where the \n frame count is positioned.",
-  "ROTATE_FILL_COLOR": "When video is rotated, there may be empty space not \n covered by the video. What color should this space have?"
+  "ROTATE_FILL_COLOR": "When video is rotated, there may be empty space not \n covered by the video. What color should this space have?",
+  "VIDEO_DIR": "Directory containing videos.",
+  "SAVE_DIR": "Directory where to save results."
 }
