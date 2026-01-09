@@ -207,7 +207,7 @@ from simba.utils.enums import (ENV_VARS, OS, ConfigKey, Defaults, Dtypes,
 from simba.utils.errors import InvalidInputError
 from simba.utils.lookups import (get_bp_config_code_class_pairs,
                                  get_current_time, get_emojis, get_icons_paths,
-                                 load_simba_fonts)
+                                 load_simba_fonts, check_for_updates)
 from simba.utils.read_write import (fetch_pip_data, find_core_cnt,
                                     get_pkg_version, get_recent_projects_paths,
                                     read_config_entry, read_config_file,
@@ -1035,6 +1035,7 @@ class App(object):
         links_menu.add_command(label="SimBA developer contact", compound="left", image=self.menu_icons["developer"]["img"], command=lambda: webbrowser.open_new(str(r"https://sronilsson.netlify.app/")), font=Formats.FONT_REGULAR.value)
 
         help_menu.add_cascade(label="Links", menu=links_menu, compound="left", image=self.menu_icons["link"]["img"], font=Formats.FONT_REGULAR.value)
+        help_menu.add_command(label="Check for updates", compound="left", image=self.menu_icons["download"]["img"], command=check_for_updates, font=Formats.FONT_REGULAR.value)
         help_menu.add_command(label="About", compound="left", image=self.menu_icons["about"]["img"], command=AboutSimBAPopUp, font=Formats.FONT_REGULAR.value)
 
         self.frame = Frame(background, bd=2, relief=SUNKEN, width=750, height=300)

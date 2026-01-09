@@ -37,10 +37,11 @@ from simba.utils.checks import (check_ffmpeg_available,
 from simba.utils.enums import (OS, UML, Defaults, FontPaths, Formats, Keys,
                                Methods, Options, Paths)
 from simba.utils.errors import (FFMPEGNotFoundError, InvalidInputError,
-                                NoFilesFoundError)
+                                NoFilesFoundError, SimBAPAckageVersionError)
 from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext, get_video_meta_data, read_json)
+                                    get_fn_ext, get_video_meta_data, read_json, fetch_pip_data)
 from simba.utils.warnings import NoDataFoundWarning
+from simba.utils.printing import stdout_information
 
 if platform.system() == OS.WINDOWS.value:
     from pyglet.libs.win32 import constants
@@ -1161,11 +1162,42 @@ def intermittent_palette(n: int = 10,
     else:
         return [rgb2hex(colour) for colour in colours]
 
-
-
-
 def quality_pct_to_crf(pct: int) -> int:
     check_int(name=f'{quality_pct_to_crf.__name__} pct', min_value=1, max_value=100, raise_error=True, value=pct)
     quality_lk = {int(k):v for k, v in percent_to_crf_lookup().items()}
     closest_key = min(quality_lk, key=lambda k: abs(k - pct))
     return quality_lk[closest_key]
+
+
+def check_for_updates(time_out: int = 2):
+    """
+    Check for SimBA package updates by querying PyPI and comparing with the installed version.
+
+    Fetches the latest SimBA version from PyPI and compares it with the currently installed
+    version. Prints an informational message indicating whether an update is available or if
+    the installation is up-to-date. Requires an active internet connection to query PyPI.
+
+    :parameter int time_out: Timeout in seconds for the PyPI API request. Default is 2 seconds.
+        Must be at least 1 second.
+    :returns: None. Prints update information to stdout via stdout_information.
+    :raises SimBAPAckageVersionError: If the latest version cannot be fetched from PyPI, or if
+        the local SimBA version cannot be determined.
+
+    :example:
+    >>> check_for_updates()
+    >>> # Prints: "UP-TO-DATE. You have the latest SimBA version (1.0.0)."
+    >>> # or: "NEW SimBA VERSION AVAILABLE. You have SimBA version 1.0.0. The latest version is 1.1.0..."
+    """
+    check_int(name=f'{fetch_pip_data.__name__} time_out', value=time_out, min_value=1)
+    _, latest_simba_version = fetch_pip_data(pip_url=r'https://pypi.org/pypi/simba-uw-tf-dev/json', time_out=time_out)
+    env_simba_version = OS.SIMBA_VERSION.value
+    if latest_simba_version is None:
+        raise SimBAPAckageVersionError(msg='Could not fetch latest SimBA version.', source=check_for_updates.__name__)
+    elif env_simba_version is None:
+        raise SimBAPAckageVersionError(msg='Could not get local SimBA version.', source=check_for_updates.__name__)
+    if latest_simba_version == env_simba_version:
+        msg = f'UP-TO-DATE. \nYou have the latest SimBA version ({env_simba_version}).'
+    else:
+        msg = (f'NEW SimBA VERSION AVAILABLE. \nYou have SimBA version {env_simba_version}. \nThe latest version is {latest_simba_version}. '
+               f'\nYou can update using "pip install simba-uw-tf-dev --upgrade"')
+    stdout_information(msg=msg, source=check_for_updates.__name__)

@@ -1864,6 +1864,25 @@ def clean_superanimal_topview_filename(file_name: str):
 
 
 def read_dlc_superanimal_h5(path: Union[str, os.PathLike], col_names: List[str]) -> pd.DataFrame:
+    """
+    Read and parse DeepLabCut SuperAnimal-TopView pose estimation data from H5 format.
+
+    Reads pose estimation data from a SuperAnimal-TopView DLC H5 file, validates the file structure,
+    extracts the pose data table, and returns it as a pandas DataFrame with the specified column names.
+    The function expects the H5 file to contain a 'df_with_missing' group with nested 'table' data.
+
+    :parameter Union[str, os.PathLike] path: Path to the SuperAnimal DLC H5 file.
+    :parameter List[str] col_names: List of column names to assign to the DataFrame. Must match the expected
+        number of columns based on the SimBA project configuration (typically body-part coordinates: x, y, p).
+    :returns: DataFrame containing pose estimation data with columns named according to col_names parameter.
+    :rtype: pd.DataFrame
+    :raises InvalidInputError: If the file cannot be read as H5, if expected keys are missing, or if the
+        number of columns in the file is less than the number of expected column names.
+
+    :example:
+    >>> col_names = ['Animal_1_Nose_x', 'Animal_1_Nose_y', 'Animal_1_Nose_p', 'Animal_1_Ear_left_x', ...]
+    >>> df = read_dlc_superanimal_h5(path='project_folder/videos/Video_1.h5', col_names=col_names)
+    """
     EXPECTED_KEYS = ['df_with_missing']
     DF_W_MISSING = 'df_with_missing'
     NESTED_EXPECTED_KEYS = ['_i_table', 'table']
@@ -1981,6 +2000,7 @@ def remove_multiple_folders(folders: List[Union[os.PathLike, str]], raise_error:
 
     """
     Helper to remove multiple directories.
+
     :param folders List[os.PathLike]: List of directory paths.
     :param bool raise_error: If True, raise ``NotDirectoryError`` error of folder does not exist. if False, then pass. Default False.
     :raises NotDirectoryError: If ``raise_error`` and directory does not exist.
@@ -2058,12 +2078,29 @@ def get_pkg_version(pkg: str, raise_error: Optional[bool] = False):
         else:
             return None
 
-def fetch_pip_data(pip_url: str = Links.SIMBA_PIP_URL.value) -> Union[Tuple[Dict[str, Any], str], Tuple[None, None]]:
-    """ Helper to fetch the pypi data associated with a package """
+def fetch_pip_data(pip_url: str = Links.SIMBA_PIP_URL.value,
+                   time_out: int = 2) -> Union[Tuple[Dict[str, Any], str], Tuple[None, None]]:
+    """
+    Fetch PyPI package metadata from a PyPI JSON API URL.
+
+    Retrieves package information from the PyPI JSON API endpoint and extracts the latest version.
+    Used primarily for checking if newer versions of SimBA are available. Returns the full JSON
+    response data and the latest version string, or (None, None) if the request fails.
+
+    :parameter str pip_url: URL to the PyPI JSON API endpoint for the package. Defaults to SimBA's PyPI URL.
+    :returns: Tuple containing (JSON data dictionary, latest version string) on success, or (None, None) on failure.
+    :rtype: Union[Tuple[Dict[str, Any], str], Tuple[None, None]]
+
+    :example:
+    >>> json_data, version = fetch_pip_data()
+    >>> if version:
+    >>>     print(f"Latest version: {version}")
+    """
+    check_int(name=f'{fetch_pip_data.__name__} time_out', value=time_out, min_value=1)
     if check_valid_url(url=pip_url):
         try:
             opener = request.build_opener(request.HTTPHandler(), request.HTTPSHandler())
-            with opener.open(pip_url, timeout=2) as response:
+            with opener.open(pip_url, timeout=time_out) as response:
                 if response.status == 200:
                     encoding = response.info().get_content_charset("utf-8")
                     data = response.read().decode(encoding)
@@ -3355,7 +3392,7 @@ def read_sleap_h5(file_path: Union[str, os.PathLike]) -> pd.DataFrame:
             tracks = f["tracks"][:].T
             point_scores = f["point_scores"][:].T
     except (OSError,) as e:
-        raise CorruptedFileError(msg=f'Could not read SLEAP file {file_path}. The file appears corrupted, or unable to read in the current python/h5py,hdf environment. Try recreating the file, or reach out on for help ({e.args})', source=read_sleap_h5.__name__)
+        raise CorruptedFileError(msg=f'Could not read SLEAP file {file_path}. The file appears corrupted, or unable to read in the current python/h5py,hdf environment. Try recreating the file using the SLEAP GUI, or reach out on for help ({e.args})', source=read_sleap_h5.__name__)
 
     csv_rows = []
     n_frames, n_nodes, _, n_tracks = tracks.shape
