@@ -38,10 +38,11 @@ from simba.utils.enums import (OS, UML, Defaults, FontPaths, Formats, Keys,
                                Methods, Options, Paths)
 from simba.utils.errors import (FFMPEGNotFoundError, InvalidInputError,
                                 NoFilesFoundError, SimBAPAckageVersionError)
-from simba.utils.read_write import (find_files_of_filetypes_in_directory,
-                                    get_fn_ext, get_video_meta_data, read_json, fetch_pip_data)
-from simba.utils.warnings import NoDataFoundWarning
 from simba.utils.printing import stdout_information
+from simba.utils.read_write import (fetch_pip_data,
+                                    find_files_of_filetypes_in_directory,
+                                    get_fn_ext, get_video_meta_data, read_json)
+from simba.utils.warnings import NoDataFoundWarning
 
 if platform.system() == OS.WINDOWS.value:
     from pyglet.libs.win32 import constants
