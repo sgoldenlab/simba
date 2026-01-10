@@ -14,7 +14,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_int,
                                 check_nvidea_gpu_available, check_str,
-                                check_valid_lst)
+                                check_valid_lst, check_valid_boolean)
 from simba.utils.enums import Paths, TagNames
 from simba.utils.errors import FFMPEGCodecGPUError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
@@ -44,6 +44,7 @@ class FrameMergererFFmpeg(ConfigReader):
     :parameter str config_path: Optional path to SimBA project config file in Configparser format.
     :parameter Literal["horizontal", "vertical", "mosaic", "mixed_mosaic"] concat_type: Type of concatenation. OPTIONS: 'horizontal', 'vertical', 'mosaic', 'mixed_mosaic'.
     :parameter List[Union[str, os.PathLike]] video_paths: List with videos to concatenate.
+    :param int quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
     :parameter Optional[int] video_height: Optional height of the canatenated videos. Required if concat concat_type is not mixed_mosaic.
     :parameter int video_width: Optional wisth of the canatenated videos. Required if concat concat_type is not mixed_mosaic.
     :parameter Optional[bool] gpu: If True, use NVIDEA FFMpeg GPU codecs. Default False.
@@ -54,113 +55,53 @@ class FrameMergererFFmpeg(ConfigReader):
     >>> merger.run()
     """
 
-    def __init__(
-        self,
-        concat_type: Literal["horizontal", "vertical", "mosaic", "mixed_mosaic"],
-        video_paths: List[Union[str, os.PathLike]],
-        video_height: Optional[int] = None,
-        video_width: Optional[int] = None,
-        config_path: Optional[str] = None,
-        gpu: Optional[bool] = False,
-    ):
+    def __init__( self,
+                 concat_type: Literal["horizontal", "vertical", "mosaic", "mixed_mosaic"],
+                 video_paths: List[Union[str, os.PathLike]],
+                 video_height: Optional[int] = None,
+                 video_width: Optional[int] = None,
+                 config_path: Optional[str] = None,
+                 quality: int = 23,
+                 gpu: bool = False):
 
         if gpu and not check_nvidea_gpu_available():
-            raise FFMPEGCodecGPUError(
-                msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None",
-                source=self.__class__.__name__,
-            )
+            raise FFMPEGCodecGPUError(msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None", source=self.__class__.__name__)
         check_ffmpeg_available()
-        check_str(
-            name=f"{FrameMergererFFmpeg.__name__} concat_type",
-            value=concat_type,
-            options=ACCEPTED_TYPES,
-        )
-        check_valid_lst(
-            data=video_paths,
-            source=f"{self.__class__.__name__} video_paths",
-            valid_dtypes=(str,),
-            min_len=2,
-        )
+        check_str(name=f"{FrameMergererFFmpeg.__name__} concat_type", value=concat_type, options=ACCEPTED_TYPES)
+        check_valid_lst(data=video_paths, source=f"{self.__class__.__name__} video_paths", valid_dtypes=(str,), min_len=2)
+        check_valid_boolean(value=gpu, source=f'{self.__class__.__name__} gpu', raise_error=True)
+        self.quality = 23 if not check_int(name='quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
         for i in video_paths:
             check_file_exist_and_readable(file_path=i)
         if concat_type != MIXED_MOSAIC:
-            check_int(
-                name=f"{FrameMergererFFmpeg.__name__} video_height",
-                value=video_height,
-                min_value=0,
-            )
-            check_int(
-                name=f"{FrameMergererFFmpeg.__name__} video_width",
-                value=video_height,
-                min_value=0,
-            )
+            check_int(name=f"{FrameMergererFFmpeg.__name__} video_height", value=video_height, min_value=0)
+            check_int(name=f"{FrameMergererFFmpeg.__name__} video_width", value=video_height, min_value=0)
         if config_path is not None:
             ConfigReader.__init__(self, config_path=config_path)
-            log_event(
-                logger_name=str(__class__.__name__),
-                log_type=TagNames.CLASS_INIT.value,
-                msg=self.create_log_msg_from_init_args(locals=locals()),
-            )
-            self.output_dir = os.path.join(
-                self.project_path, Paths.CONCAT_VIDEOS_DIR.value
-            )
-            self.output_path = os.path.join(
-                self.project_path,
-                Paths.CONCAT_VIDEOS_DIR.value,
-                f"merged_video_{self.datetime}.mp4",
-            )
+            log_event(logger_name=str(__class__.__name__), log_type=TagNames.CLASS_INIT.value, msg=self.create_log_msg_from_init_args(locals=locals()))
+            self.output_dir = os.path.join(self.project_path, Paths.CONCAT_VIDEOS_DIR.value)
+            self.output_path = os.path.join(self.project_path, Paths.CONCAT_VIDEOS_DIR.value, f"merged_video_{self.datetime}.mp4")
         else:
             self.timer = SimbaTimer(start=True)
             self.datetime = datetime.now().strftime("%Y%m%d%H%M%S")
             self.output_dir, _, _ = get_fn_ext(filepath=video_paths[0])
-            self.output_path = os.path.join(
-                self.output_dir, f"merged_video_{self.datetime}.mp4"
-            )
+            self.output_path = os.path.join(self.output_dir, f"merged_video_{self.datetime}.mp4")
 
         self.video_height, self.video_width, self.gpu = video_height, video_width, gpu
         self.video_paths, self.concat_type = video_paths, concat_type
-        if not os.path.exists(self.output_dir):
-            os.makedirs(self.output_dir)
+        if not os.path.exists(self.output_dir): os.makedirs(self.output_dir)
 
     def run(self):
         if self.concat_type == HORIZONTAL:
-            _ = horizontal_video_concatenator(
-                video_paths=self.video_paths,
-                save_path=self.output_path,
-                height_px=self.video_height,
-                gpu=self.gpu,
-                verbose=True,
-            )
+            _ = horizontal_video_concatenator(video_paths=self.video_paths, save_path=self.output_path, height_px=self.video_height, gpu=self.gpu, quality=self.quality, verbose=True)
         elif self.concat_type == VERTICAL:
-            _ = vertical_video_concatenator(
-                video_paths=self.video_paths,
-                save_path=self.output_path,
-                width_px=self.video_width,
-                gpu=self.gpu,
-                verbose=True,
-            )
+            _ = vertical_video_concatenator(video_paths=self.video_paths, save_path=self.output_path, width_px=self.video_width, gpu=self.gpu, quality=self.quality, verbose=True)
         elif self.concat_type == MOSAIC:
-            _ = mosaic_concatenator(
-                video_paths=self.video_paths,
-                save_path=self.output_path,
-                width_px=self.video_width,
-                height_px=self.video_height,
-                gpu=self.gpu,
-                verbose=True,
-            )
+            _ = mosaic_concatenator(video_paths=self.video_paths, save_path=self.output_path, width_px=self.video_width, height_px=self.video_height, gpu=self.gpu, quality=self.quality, verbose=True)
         else:
-            _ = mixed_mosaic_concatenator(
-                video_paths=self.video_paths,
-                save_path=self.output_path,
-                gpu=self.gpu,
-                verbose=True,
-            )
+            _ = mixed_mosaic_concatenator(video_paths=self.video_paths, save_path=self.output_path, gpu=self.gpu, verbose=True)
         self.timer.stop_timer()
-        stdout_success(
-            msg=f"Merged video saved at {self.output_path}",
-            source=self.__class__.__name__,
-            elapsed_time=self.timer.elapsed_time_str,
-        )
+        stdout_success(msg=f"Merged video saved at {self.output_path}", source=self.__class__.__name__, elapsed_time=self.timer.elapsed_time_str)
 
 
 # videos = ['/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_downsampled.mp4', '/Users/simon/Desktop/envs/simba/troubleshooting/mouse_open_field/project_folder/videos/SI_DAY3_308_CD1_PRESENT_downsampled.mp4']

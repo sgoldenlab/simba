@@ -29,5 +29,14 @@
   "LOCATION_FRAME_COUNT": "The location in the video where the \n frame count is positioned.",
   "ROTATE_FILL_COLOR": "When video is rotated, there may be empty space not \n covered by the video. What color should this space have?",
   "VIDEO_DIR": "Directory containing videos.",
-  "SAVE_DIR": "Directory where to save results."
+  "SAVE_DIR": "Directory where to save results.",
+  "CONCAT_HEIGHT": "If join involves aligning videos horizontally, this values \nwill be used to ensure videos have the same height. ",
+  "CONCAT_WIDTH": "If join involves aligning videos vertically, this values \nwill be used to ensure videos have the same width. ",
+  "CONCAT_RES_HEADER": "When stacking videos horizontally and/or vertically, \n the videos need to be same height and/or width. Here, \n select what resolution to use.",
+  "EGOCENTRIC_DATA_DIR": "Folder containing pose-estimation CSV data.\n Can be sub-directory in 'project_folder/csv' folder.\n Should contain same file names as the VIDEO files",
+  "EGOCENTRIC_VIDEO_DIR": "Folder containing videos.\n Should contain same file names as the DATA files.",
+  "EGOCENTRIC_ANCHOR": "This body-part will be placed in the center of the video",
+  "EGOCENTRIC_DIRECTION_ANCHOR": "This body-part will be placed at N degrees relative to the anchor",
+  "EGOCENTRIC_DIRECTION": "The anchor body-part will always be placed at these degrees relative to the center anchor",
+  "CORE_COUNT": "Higher core counts speeds up processing but may require more RAM memory"
 }

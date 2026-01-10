@@ -1000,26 +1000,31 @@ class ConcatenatingVideosPopUp(PopUpMixin):
 
 class ConcatenatorPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Optional[Union[str, os.PathLike]] = None):
+
+        self.RESOLUTIONS = ["480", "640", "1280", "1920", "2560"]
+        self.CONCAT_TYPES_1 = {'HORIZONTAL': 'horizontal', 'MIXED MOSAIC': 'mixed_mosaic', 'MOSAIC': 'mosaic', 'VERTICAL': 'vertical'}
+        self.CONCAT_TYPES_2 = {'horizontal': 'HORIZONTAL', 'mixed_mosaic': 'MIXED MOSAIC', 'mosaic': 'MOSAIC', 'vertical': 'VERTICAL'}
         self.gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
         PopUpMixin.__init__(self, title="MERGE (CONCATENATE) VIDEOS", icon='concat_videos')
         self.config_path = config_path
         self.select_video_cnt_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="NUMBER OF VIDEOS TO CONCATENATE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.CONCAT_VIDEOS.value)
-        self.select_video_cnt_dropdown = SimBADropDown(parent=self.select_video_cnt_frm, dropdown_options=list(range(2, 21)), label="VIDEOS #", label_width=15, dropdown_width=25, value=2, command=lambda value: self.populate_table(int(value)))
+        self.select_video_cnt_dropdown = SimBADropDown(parent=self.select_video_cnt_frm, dropdown_options=list(range(2, 21)), label="VIDEOS #", label_width=30, dropdown_width=25, value=2, command=lambda value: self.populate_table(int(value)), img='stack')
         self.select_video_cnt_frm.grid(row=0, column=0, sticky=NW)
         self.select_video_cnt_dropdown.grid(row=0, column=0, sticky=NW)
         self.populate_table(video_cnt=int(self.select_video_cnt_dropdown.get_value()))
-        self.main_frm.mainloop()
+       # self.main_frm.mainloop()
 
     def populate_table(self, video_cnt):
         if hasattr(self, "video_table_frm"): self.video_table_frm.destroy()
         if hasattr(self, "join_type_frm"): self.join_type_frm.destroy()
-        self.video_table_frm = LabelFrame(self.main_frm, text="VIDEO PATHS", pady=5, padx=5, font=Formats.FONT_HEADER.value, fg="black")
+        self.video_table_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="VIDEO PATHS", icon_name='video_2', icon_link=Links.CONCAT_VIDEOS.value, pady=5, padx=5)
         self.video_table_frm.grid(row=1, sticky=NW)
         self.videos_dict = {}
         for cnt in range(int(video_cnt)):
-            self.videos_dict[cnt] = FileSelect(self.video_table_frm, f"VIDEO {cnt+1}: ", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)])
+            self.videos_dict[cnt] = FileSelect(self.video_table_frm, f"VIDEO {cnt+1}: ", title="Select a video file", file_types=[("VIDEO", Options.ALL_VIDEO_FORMAT_STR_OPTIONS.value)], lblwidth=30, lbl_icon='video_2')
             self.videos_dict[cnt].grid(row=cnt, column=0, sticky=NW)
-        self.join_type_frm = LabelFrame(self.main_frm, text="JOIN TYPE", pady=5, padx=5, font=Formats.FONT_HEADER.value, fg="black")
+
+        self.join_type_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="JOIN TYPE", icon_name='category', icon_link=Links.CONCAT_VIDEOS.value, pady=5, padx=5)
         self.join_type_frm.grid(row=2, sticky=NW)
         self.join_type_var = StringVar()
         self.icons_dict = {}
@@ -1030,22 +1035,24 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
             _, file_name, _ = get_fn_ext(file_path)
             self.icons_dict[file_name] = {}
             self.icons_dict[file_name]["img"] = ImageTk.PhotoImage(Image.open(file_path))
-
-            self.icons_dict[file_name]["btn"] = SimBARadioButton(parent=self.join_type_frm, txt=file_name, variable=self.join_type_var, img=self.icons_dict[file_name]["img"], value=file_name)
+            self.icons_dict[file_name]["btn"] = SimBARadioButton(parent=self.join_type_frm, txt=self.CONCAT_TYPES_2[file_name], variable=self.join_type_var, img=self.icons_dict[file_name]["img"], value=self.CONCAT_TYPES_2[file_name], compound='bottom', font=Formats.FONT_REGULAR_BOLD.value)
             self.icons_dict[file_name]["btn"].grid(row=0, column=file_cnt, sticky=NW)
         self.join_type_var.set(value="mosaic")
-        self.resolution_frm = LabelFrame(self.main_frm, text="RESOLUTION", pady=5, padx=5, font=Formats.FONT_HEADER.value, fg="black")
-        self.resolution_width = SimBADropDown(parent=self.resolution_frm, dropdown_options=["480", "640", "1280", "1920", "2560"], label='WIDTH:', label_width=15, dropdown_width=30, value="480", img='width')
-        self.resolution_height = SimBADropDown(parent=self.resolution_frm, dropdown_options=["480", "640", "1280", "1920", "2560"], label='HEIGHT:', label_width=15, dropdown_width=30, value="640", img='height')
-        self.gpu_frm = LabelFrame(self.main_frm, text="GPU", pady=5, padx=5, font=Formats.FONT_HEADER.value, fg="black")
-        self.gpu_dropdown = SimBADropDown(parent=self.gpu_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU (REDUCED RUN-TIME):", label_width=35, dropdown_width=35, value='FALSE', img='gpu_3', state=self.gpu_available)
+        self.resolution_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="RESOLUTION", icon_name='monitor', icon_link=Links.CONCAT_VIDEOS.value, pady=5, padx=5, tooltip_key='CONCAT_RES_HEADER')
+        self.resolution_width = SimBADropDown(parent=self.resolution_frm, dropdown_options=self.RESOLUTIONS, label='WIDTH:', label_width=30, dropdown_width=25, value="480", img='width', tooltip_key="CONCAT_WIDTH")
+        self.resolution_height = SimBADropDown(parent=self.resolution_frm, dropdown_options=self.RESOLUTIONS, label='HEIGHT:', label_width=30, dropdown_width=25, value="640", img='height', tooltip_key="CONCAT_HEIGHT")
+        self.settings_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="SETTINGS", icon_name='settings', icon_link=Links.CONCAT_VIDEOS.value, pady=5, padx=5)
+        self.gpu_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=['TRUE', 'FALSE'], label="USE GPU:", label_width=30, dropdown_width=25, value='FALSE', img='gpu_3', state=self.gpu_available, tooltip_key='USE_GPU')
+        self.quality_dropdown = SimBADropDown(parent=self.settings_frm, dropdown_options=list(range(10, 110, 10)), label="OUT VIDEO QUALITY:", label_width=30, dropdown_width=25, value=60, img='pct_2', state=self.gpu_available, tooltip_key='OUTPUT_VIDEO_QUALITY')
+
         self.gpu_dropdown.grid(row=0, column=0, sticky="NW")
+        self.quality_dropdown.grid(row=1, column=0, sticky="NW")
         self.resolution_frm.grid(row=3, column=0, sticky=NW)
-        self.gpu_frm.grid(row=4, column=0, sticky="NW")
+        self.settings_frm.grid(row=4, column=0, sticky="NW")
         self.resolution_width.grid(row=0, column=0, sticky=NW)
         self.resolution_height.grid(row=1, column=0, sticky=NW)
 
-        run_btn = Button(self.main_frm, text="RUN", command=lambda: self.run())
+        run_btn = SimbaButton(parent=self.main_frm, txt='RUN', img='rocket', cmd=self.run)
         run_btn.grid(row=5, column=0, sticky=NW)
 
     def run(self):
@@ -1054,17 +1061,23 @@ class ConcatenatorPopUp(PopUpMixin, ConfigReader):
             _ = get_video_meta_data(video_path=video_data.file_path)
             file_paths.append(video_data.file_path)
         if (len(file_paths) < 3) & (self.join_type_var.get() == "mixed_mosaic"):
-            raise MixedMosaicError(msg="If using the mixed mosaic join type, please tick check-boxes for at least three video types.", source=self.__class__.__name__ )
+            raise MixedMosaicError(msg="If using the mixed mosaic join type, please use at least 3 videos.", source=self.__class__.__name__ )
         if (len(file_paths) < 3) & (self.join_type_var.get() == "mosaic"):
             self.join_type_var.set(value="vertical")
         gpu = str_2_bool(self.gpu_dropdown.get_value())
+        quality = int(self.quality_dropdown.get_value())
+        quality_crf = quality_pct_to_crf(pct=quality)
+
+        join_type = self.CONCAT_TYPES_1[self.join_type_var.get()]
+
 
         video_merger = FrameMergererFFmpeg(config_path=self.config_path,
                                            video_paths=file_paths,
                                            video_height=int(self.resolution_height.getChoices()),
                                            video_width=int(self.resolution_width.getChoices()),
-                                           concat_type=self.join_type_var.get(),
-                                           gpu=gpu)
+                                           concat_type=join_type,
+                                           gpu=gpu,
+                                           quality=quality_crf)
 
         threading.Thread(target=video_merger.run())
 
@@ -1907,7 +1920,7 @@ class DownsampleSingleVideoPopUp(PopUpMixin):
         self.gpu_dropdown.grid(row=0, column=0, sticky=NW)
 
         quality_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="OUTPUT QUALITY", icon_name='pct_2', icon_link=Links.DOWNSAMPLE.value)
-        self.quality_dropdown = SimBADropDown(parent=quality_frm, dropdown_options=list(range(10, 110, 10)), label="OUTPUT VIDEO QUALITY:", label_width=35, dropdown_width=35, value=60, img='pct_2', tooltip_key='OUPUT_VIDEO_QUALITY')
+        self.quality_dropdown = SimBADropDown(parent=quality_frm, dropdown_options=list(range(10, 110, 10)), label="OUTPUT VIDEO QUALITY:", label_width=20, dropdown_width=35, value=60, img='pct_2', tooltip_key='OUPUT_VIDEO_QUALITY')
         quality_frm.grid(row=2, column=0, sticky=NW)
         self.quality_dropdown.grid(row=0, column=0, sticky=NW)
 
@@ -1970,13 +1983,13 @@ class DownsampleMultipleVideosPopUp(PopUpMixin):
 
         gpu_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="GPU (REDUCED RUNTIMES)", icon_name='gpu_3', icon_link=Links.DOWNSAMPLE.value)
         gpu_available = NORMAL if check_nvidea_gpu_available() else DISABLED
-        self.gpu_dropdown = SimBADropDown(parent=gpu_frm, label="USE GPU:", dropdown_options=['TRUE', 'FALSE'], dropdown_width=20, value='FALSE', state=gpu_available, img='gpu_3')
+        self.gpu_dropdown = SimBADropDown(parent=gpu_frm, label="USE GPU:", dropdown_options=['TRUE', 'FALSE'], dropdown_width=20, value='FALSE', state=gpu_available, img='gpu_3', label_width=20)
 
         gpu_frm.grid(row=1, column=0, sticky=NW)
         self.gpu_dropdown.grid(row=0, column=0, sticky=NW)
 
         quality_frm = CreateLabelFrameWithIcon(parent=self.main_frm, header="OUTPUT QUALITY", icon_name='pct_2', icon_link=Links.DOWNSAMPLE.value)
-        self.quality_dropdown = SimBADropDown(parent=quality_frm, dropdown_options=list(range(10, 110, 10)), label="OUTPUT VIDEO QUALITY:", label_width=35, dropdown_width=35, value=60, img='pct_2', tooltip_key='OUPUT_VIDEO_QUALITY')
+        self.quality_dropdown = SimBADropDown(parent=quality_frm, dropdown_options=list(range(10, 110, 10)), label="OUTPUT VIDEO QUALITY:", label_width=20, dropdown_width=35, value=60, img='pct_2', tooltip_key='OUPUT_VIDEO_QUALITY')
         quality_frm.grid(row=2, column=0, sticky=NW)
         self.quality_dropdown.grid(row=0, column=0, sticky=NW)
 

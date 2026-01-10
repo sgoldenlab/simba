@@ -57,7 +57,7 @@ def egocentric_video_aligner(frm_range: np.ndarray,
                 final_frame = cv2.warpAffine(rotated_frame, m_translations[img_counter],(video_meta['width'], video_meta['height']), borderValue=fill_clr)
                 writer.write(final_frame)
                 if verbose:
-                    print(f'Creating frame {frame_id} ({video_name}, CPU core: {batch + 1}).')
+                    print(f'Creating frame {frame_id}/{video_meta["frame_count"]} ({video_name}, CPU core: {batch + 1}).')
                 img_counter+=1
     else:
         cap = cv2.VideoCapture(video_path)
@@ -67,7 +67,7 @@ def egocentric_video_aligner(frm_range: np.ndarray,
             final_frame = cv2.warpAffine(rotated_frame, m_translations[frm_idx], (video_meta['width'], video_meta['height']), borderValue=fill_clr)
             writer.write(final_frame)
             if verbose:
-                print(f'Creating frame {frm_id} ({video_name}, CPU core: {batch + 1}).')
+                print(f'Creating frame {frm_id}/{video_meta["frame_count"]} ({video_name}, CPU core: {batch + 1}).')
     writer.release()
     return batch + 1
 

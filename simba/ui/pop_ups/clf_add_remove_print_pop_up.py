@@ -7,21 +7,20 @@ from typing import Union
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.pose_processors.pose_reset import PoseResetter
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, DropDownMenu,
-                                        Entry_Box, FileSelect, SimbaButton,
-                                        TwoOptionQuestionPopUp)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, FileSelect, SimbaButton, TwoOptionQuestionPopUp, SimBADropDown)
 from simba.utils.checks import check_str
 from simba.utils.enums import ConfigKey, Keys, Links
-from simba.utils.errors import DuplicationError
+from simba.utils.errors import DuplicationError, NoDataError
 from simba.utils.printing import stdout_success, stdout_trash
 from simba.utils.read_write import tabulate_clf_info
 
 
 class AddClfPopUp(PopUpMixin, ConfigReader):
-    def __init__(self, config_path: Union[str, os.PathLike]):
-        PopUpMixin.__init__(self, config_path=config_path, title="ADD CLASSIFIER")
+    def __init__(self,
+                 config_path: Union[str, os.PathLike]):
+        PopUpMixin.__init__(self, config_path=config_path, title="ADD CLASSIFIER", icon='plus')
         ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
-        self.clf_eb = Entry_Box(self.main_frm, "CLASSIFIER NAME:", "15")
+        self.clf_eb = Entry_Box(parent=self.main_frm, fileDescription="CLASSIFIER NAME:", labelwidth=25, entry_box_width=30, justify='center', img='decision_tree_small')
         add_btn = SimbaButton(parent=self.main_frm, txt="ADD CLASSIFIER", cmd=self.run, img='rocket')
         self.clf_eb.grid(row=0, column=0, sticky=NW)
         add_btn.grid(row=1, column=0, sticky=NW)
@@ -43,36 +42,42 @@ class AddClfPopUp(PopUpMixin, ConfigReader):
 
 class RemoveAClassifierPopUp(PopUpMixin, ConfigReader):
     def __init__(self, config_path: Union[str, os.PathLike]):
-        PopUpMixin.__init__(self, title="Warning: Remove classifier(s) settings")
-        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
-        self.remove_clf_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="SELECT A CLASSIFIER TO REMOVE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.REMOVE_CLF.value)
-        self.clf_dropdown = DropDownMenu(self.remove_clf_frm, "Classifier", self.clf_names, "12")
-        self.clf_dropdown.setChoices(self.clf_names[0])
 
+        ConfigReader.__init__(self, config_path=config_path, read_video_info=False)
+        if not isinstance(self.clf_names, (list, tuple)) or len(self.clf_names) < 1:
+            raise NoDataError(msg='The SimBA project has no classifiers: Cannot remove a classifier.', source=self.__class__.__name__)
+        PopUpMixin.__init__(self, title="WARNING: REMOVE CLASSIFIER", icon='trash_red')
+        self.remove_clf_frm = CreateLabelFrameWithIcon( parent=self.main_frm, header="SELECT A CLASSIFIER TO REMOVE", icon_name=Keys.DOCUMENTATION.value, icon_link=Links.REMOVE_CLF.value)
+        self.clf_dropdown = SimBADropDown(parent=self.remove_clf_frm, dropdown_options=self.clf_names, label_width=20, dropdown_width=40, label='CLASSIFIER:', value=self.clf_names[0])
         run_btn = SimbaButton(parent=self.main_frm, txt="REMOVE CLASSIFIER", cmd=self.run, img='trash')
-        self.remove_clf_frm.grid(row=0, sticky=W)
-        self.clf_dropdown.grid(row=0, sticky=W)
+        self.remove_clf_frm.grid(row=0, column=0, sticky=W)
+        self.clf_dropdown.grid(row=0, column=0, sticky=W)
         run_btn.grid(row=1, pady=10)
 
     def run(self):
-        for i in range(len(self.clf_names)):
-            self.config.remove_option("SML settings", f"model_path_{i+1}")
-            self.config.remove_option("SML settings", f"target_name_{i+1}")
-            self.config.remove_option("threshold_settings", f"threshold_{i+1}")
-            self.config.remove_option("Minimum_bout_lengths", f"min_bout_{i+1}")
-        self.clf_names.remove(self.clf_dropdown.getChoices())
-        self.config.set("SML settings", "no_targets", str(len(self.clf_names)))
+        clf_to_remove = self.clf_dropdown.get_value()
+        question = TwoOptionQuestionPopUp(title="WARNING!", question=f"Do you want to remove the {clf_to_remove} \nclassifier from the SimBA project?", option_one="YES", option_two="NO")
+        if question.selected_option == "YES":
+            for i in range(len(self.clf_names)):
+                self.config.remove_option("SML settings", f"model_path_{i+1}")
+                self.config.remove_option("SML settings", f"target_name_{i+1}")
+                self.config.remove_option("threshold_settings", f"threshold_{i+1}")
+                self.config.remove_option("Minimum_bout_lengths", f"min_bout_{i+1}")
+            self.clf_names.remove(self.clf_dropdown.getChoices())
+            self.config.set("SML settings", "no_targets", str(len(self.clf_names)))
 
-        for clf_cnt, clf_name in enumerate(self.clf_names):
-            self.config.set("SML settings", f"model_path_{clf_cnt + 1}", "")
-            self.config.set("SML settings", f"target_name_{clf_cnt + 1}", clf_name)
-            self.config.set("threshold_settings", f"threshold_{clf_cnt + 1}", "None")
-            self.config.set("Minimum_bout_lengths", f"min_bout_{clf_cnt + 1}", "None")
+            for clf_cnt, clf_name in enumerate(self.clf_names):
+                self.config.set("SML settings", f"model_path_{clf_cnt + 1}", "")
+                self.config.set("SML settings", f"target_name_{clf_cnt + 1}", clf_name)
+                self.config.set("threshold_settings", f"threshold_{clf_cnt + 1}", "None")
+                self.config.set("Minimum_bout_lengths", f"min_bout_{clf_cnt + 1}", "None")
 
-        with open(self.config_path, "w") as f:
-            self.config.write(f)
+            with open(self.config_path, "w") as f:
+                self.config.write(f)
 
-        stdout_trash(msg=f"{self.clf_dropdown.getChoices()} classifier removed from SimBA project.", source=self.__class__.__name__)
+            stdout_trash(msg=f"{self.clf_dropdown.getChoices()} classifier removed from SimBA project.", source=self.__class__.__name__)
+        else:
+            pass
 
 
 # _ = RemoveAClassifierPopUp(config_path='/Users/simon/Desktop/envs/troubleshooting/Two_animals_16bps/project_folder/project_config.ini')

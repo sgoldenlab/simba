@@ -2578,14 +2578,13 @@ def create_blank_video(path: Union[str, os.PathLike],
         )
 
 
-def horizontal_video_concatenator(
-    video_paths: List[Union[str, os.PathLike]],
-    save_path: Union[str, os.PathLike],
-    height_px: Optional[Union[int, str]] = None,
-    height_idx: Optional[Union[int, str]] = None,
-    gpu: Optional[bool] = False,
-    verbose: Optional[bool] = True,
-) -> None:
+def horizontal_video_concatenator(video_paths: List[Union[str, os.PathLike]],
+                                  save_path: Union[str, os.PathLike],
+                                  height_px: Optional[Union[int, str]] = None,
+                                  height_idx: Optional[Union[int, str]] = None,
+                                  gpu: bool = False,
+                                  quality: int = 23,
+                                  verbose: Optional[bool] = True) -> None:
     """
     Concatenates multiple videos horizontally.
 
@@ -2596,10 +2595,14 @@ def horizontal_video_concatenator(
     .. seealso::
        :func:`simba.video_processors.video_processing.vertical_video_concatenator`
 
+    .. note::
+       Set the height of each video in the moseic by passing **EITHER** ``height_px`` or ``height_idx``.
+
     :param List[Union[str, os.PathLike]] video_paths: List of input video file paths.
     :param Union[str, os.PathLike] save_path: File path to save the concatenated video.
     :param Optional[int] height_px: Height of the output video in pixels.
     :param Optional[int] height_idx: Index of the video to use for determining Height.
+    :param int quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
     :param Optional[bool] gpu: Whether to use GPU-accelerated codec (default: False).
     :param Optional[bool] verbose:Whether to print progress messages (default: True).
 
@@ -2609,69 +2612,41 @@ def horizontal_video_concatenator(
     """
     check_ffmpeg_available()
     if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(
-            msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None)",
-            source=horizontal_video_concatenator.__name__,
-        )
+        raise FFMPEGCodecGPUError(msg="NVIDEA GPU not available (as evaluated by nvidea-smi returning None)", source=horizontal_video_concatenator.__name__)
     timer = SimbaTimer(start=True)
-    check_valid_lst(
-        data=video_paths, source=horizontal_video_concatenator.__name__, min_len=2
-    )
-    check_if_dir_exists(
-        in_dir=os.path.dirname(save_path), source=horizontal_video_concatenator.__name__
-    )
-    video_meta_data = [
-        get_video_meta_data(video_path=video_path) for video_path in video_paths
-    ]
-    if ((height_px is None) and (height_idx is None)) or (
-        (height_px is not None) and (height_idx is not None)
-    ):
-        raise InvalidInputError(
-            msg="Provide a height_px OR height_idx",
-            source=horizontal_video_concatenator.__name__,
-        )
+    check_valid_lst(data=video_paths, source=horizontal_video_concatenator.__name__, min_len=2)
+    check_if_dir_exists(in_dir=os.path.dirname(save_path), source=horizontal_video_concatenator.__name__)
+    video_meta_data = [get_video_meta_data(video_path=video_path) for video_path in video_paths]
+    if ((height_px is None) and (height_idx is None)) or ((height_px is not None) and (height_idx is not None)):
+        raise InvalidInputError(msg="Provide a height_px OR height_idx",source=horizontal_video_concatenator.__name__)
     if height_idx is not None:
-        check_int(
-            name=f"{horizontal_video_concatenator.__name__} height",
-            value=height_idx,
-            min_value=0,
-            max_value=len(video_paths) - 1,
-        )
+        check_int(name=f"{horizontal_video_concatenator.__name__} height", value=height_idx, min_value=0, max_value=len(video_paths) - 1)
         height = int(video_meta_data[height_idx]["height"])
     else:
-        check_int(
-            name=f"{horizontal_video_concatenator.__name__} height",
-            value=height_px,
-            min_value=1,
-        )
+        check_int(name=f"{horizontal_video_concatenator.__name__} height", value=height_px,min_value=1)
         height = int(height_px)
     video_path_str = " ".join([f'-i "{path}"' for path in video_paths])
+    quality = 23 if not check_int(name='quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
+    quality_cmd = f'-crf {quality}' if not gpu else f'-rc vbr -cq {quality}'
     codec = "h264_nvenc" if gpu else "libvpx-vp9"
-    filter_complex = ";".join(
-        [f"[{idx}:v]scale=-1:{height}[v{idx}]" for idx in range(len(video_paths))]
-    )
+    filter_complex = ";".join([f"[{idx}:v]scale=-1:{height}[v{idx}]" for idx in range(len(video_paths))])
     filter_complex += f";{''.join([f'[v{idx}]' for idx in range(len(video_paths))])}hstack=inputs={len(video_paths)}[v]"
     if verbose:
-        print(
-            f"Concatenating {len(video_paths)} videos horizontally with a {height} pixel height... "
-        )
-    cmd = f'ffmpeg {video_path_str} -filter_complex "{filter_complex}" -map "[v]" -c:v {codec} -loglevel error -stats "{save_path}" -y'
+        print(f"Concatenating {len(video_paths)} videos horizontally with a {height} pixel height... ")
+    cmd = f'ffmpeg {video_path_str} -filter_complex "{filter_complex}" -map "[v]" -c:v {codec} {quality_cmd} -loglevel error -stats "{save_path}" -y'
     subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     if verbose:
-        print(
-            f"Horizontal concatenation complete, saved at {save_path} (elapsed time: {timer.elapsed_time_str}s.)"
-        )
+        print(f"Horizontal concatenation complete, saved at {save_path} (elapsed time: {timer.elapsed_time_str}s.)")
 
 
-def vertical_video_concatenator(
-    video_paths: List[Union[str, os.PathLike]],
-    save_path: Union[str, os.PathLike],
-    width_px: Optional[int] = None,
-    width_idx: Optional[int] = None,
-    gpu: Optional[bool] = False,
-    verbose: Optional[bool] = True,
-) -> None:
+def vertical_video_concatenator(video_paths: List[Union[str, os.PathLike]],
+                                save_path: Union[str, os.PathLike],
+                                width_px: Optional[int] = None,
+                                width_idx: Optional[int] = None,
+                                gpu: bool = False,
+                                quality: int = 23,
+                                verbose: bool = True) -> None:
     """
     Concatenates multiple videos vertically.
 
@@ -2738,22 +2713,18 @@ def vertical_video_concatenator(
         width = int(width_px)
     video_path_str = " ".join([f'-i "{path}"' for path in video_paths])
     codec = "h264_nvenc" if gpu else "libvpx-vp9"
-    filter_complex = ";".join(
-        [f"[{idx}:v]scale={width}:-1[v{idx}]" for idx in range(len(video_paths))]
-    )
+    quality = 23 if not check_int(name='quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
+    quality_cmd = f'-crf {quality}' if not gpu else f'-rc vbr -cq {quality}'
+    filter_complex = ";".join([f"[{idx}:v]scale={width}:-1[v{idx}]" for idx in range(len(video_paths))])
     filter_complex += f";{''.join([f'[v{idx}]' for idx in range(len(video_paths))])}"
     filter_complex += f"vstack=inputs={len(video_paths)}[v]"
     if verbose:
-        print(
-            f"Concatenating {len(video_paths)} videos vertically with a {width} pixel width..."
-        )
-    cmd = f'ffmpeg {video_path_str} -filter_complex "{filter_complex}" -map "[v]" -c:v {codec} -loglevel error -stats "{save_path}" -y'
+        print(f"Concatenating {len(video_paths)} videos vertically with a {width} pixel width...")
+    cmd = f'ffmpeg {video_path_str} -filter_complex "{filter_complex}" -map "[v]" -c:v {codec} {quality_cmd} "{save_path}" -loglevel error -stats -y'
     subprocess.call(cmd, shell=True, stdout=subprocess.PIPE)
     timer.stop_timer()
     if verbose:
-        print(
-            f"Vertical concatenation complete. Saved at {save_path} (Elapsed time: {timer.elapsed_time_str}s.)"
-        )
+        print(f"Vertical concatenation complete. Saved at {save_path} (Elapsed time: {timer.elapsed_time_str}s.)")
 
 
 def mosaic_concatenator(
@@ -2763,8 +2734,9 @@ def mosaic_concatenator(
     width_px: Optional[Union[int, str]] = None,
     height_idx: Optional[Union[int, str]] = None,
     height_px: Optional[Union[int, str]] = None,
-    gpu: Optional[bool] = False,
-    verbose: Optional[bool] = True,
+    gpu: bool = False,
+    quality: int = 23,
+    verbose: bool = True,
     uneven_fill_color: Optional[str] = "black",
 ) -> None:
     """
@@ -2789,6 +2761,7 @@ def mosaic_concatenator(
     :param Optional[int] height_px: Height of the output video panels in pixels.
     :param Optional[int] height_idx: Height of the video to use for determining width.
     :param Optional[bool] gpu: Whether to use GPU-accelerated codec (default: False).
+    :param int quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
     :param Optional[bool] verbose: Whether to print progress messages (default: True).
 
     :example:
@@ -2799,49 +2772,24 @@ def mosaic_concatenator(
 
     check_ffmpeg_available()
     if gpu and not check_nvidea_gpu_available():
-        raise FFMPEGCodecGPUError(
-            msg="NVIDIA GPU not available", source=mosaic_concatenator.__name__
-        )
+        raise FFMPEGCodecGPUError(msg="NVIDIA GPU not available", source=mosaic_concatenator.__name__)
     timer = SimbaTimer(start=True)
     dt = datetime.now().strftime("%Y%m%d%H%M%S")
-    check_valid_lst(
-        data=video_paths,
-        source=f"{mosaic_concatenator.__name__} video_paths",
-        min_len=3,
-    )
-    video_meta_data = [
-        get_video_meta_data(video_path=video_path) for video_path in video_paths
-    ]
+    check_valid_lst(data=video_paths, source=f"{mosaic_concatenator.__name__} video_paths", min_len=3)
+    video_meta_data = [get_video_meta_data(video_path=video_path) for video_path in video_paths]
     max_video_length = max([x["video_length_s"] for x in video_meta_data])
-    if ((width_px is None) and (width_idx is None)) or (
-        (width_px is not None) and (width_idx is not None)
-    ):
-        raise InvalidInputError(
-            msg="Provide a width_px OR width_idx", source=mosaic_concatenator.__name__
-        )
-    if ((height_px is None) and (height_idx is None)) or (
-        (height_px is not None) and (height_idx is not None)
-    ):
-        raise InvalidInputError(
-            msg="Provide a height_px OR height_idx", source=mosaic_concatenator.__name__
-        )
+    quality = 23 if not check_int(name='quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
+    if ((width_px is None) and (width_idx is None)) or ((width_px is not None) and (width_idx is not None)):
+        raise InvalidInputError(msg="Provide a width_px OR width_idx", source=mosaic_concatenator.__name__)
+    if ((height_px is None) and (height_idx is None)) or ((height_px is not None) and (height_idx is not None)):
+        raise InvalidInputError(msg="Provide a height_px OR height_idx", source=mosaic_concatenator.__name__)
     if width_idx is not None:
-        check_int(
-            name=f"{vertical_video_concatenator.__name__} width index",
-            value=width_idx,
-            min_value=1,
-            max_value=len(video_paths) - 1,
-        )
+        check_int(name=f"{vertical_video_concatenator.__name__} width index", value=width_idx, min_value=1, max_value=len(video_paths) - 1)
         width = int(video_meta_data[width_idx]["width"])
     else:
         width = width_px
     if height_idx is not None:
-        check_int(
-            name=f"{vertical_video_concatenator.__name__} height index",
-            value=width_idx,
-            min_value=1,
-            max_value=len(video_paths) - 1,
-        )
+        check_int(name=f"{vertical_video_concatenator.__name__} height index", value=width_idx, min_value=1, max_value=len(video_paths) - 1)
         height = int(video_meta_data[width_idx]["height"])
     else:
         height = height_px
@@ -2851,73 +2799,40 @@ def mosaic_concatenator(
     os.makedirs(temp_dir)
     if not (len(video_paths) % 2) == 0:
         blank_path = os.path.join(temp_dir, f"{dt}.mp4")
-        create_blank_video(
-            path=blank_path,
-            length=max_video_length,
-            width=width,
-            height=height,
-            gpu=gpu,
-            verbose=verbose,
-            color=uneven_fill_color,
-        )
+        create_blank_video(path=blank_path, length=max_video_length, width=width, height=height, gpu=gpu, verbose=verbose, color=uneven_fill_color)
         video_paths.append(blank_path)
-    upper_videos, lower_videos = (
-        video_paths[: len(video_paths) // 2],
-        video_paths[len(video_paths) // 2 :],
-    )
+    upper_videos, lower_videos = (video_paths[: len(video_paths) // 2], video_paths[len(video_paths) // 2 :])
     if verbose:
         print("Creating upper mosaic... (Step 1/3)")
     if len(upper_videos) > 1:
         upper_path = os.path.join(temp_dir, "upper.mp4")
-        horizontal_video_concatenator(
-            video_paths=upper_videos,
-            save_path=upper_path,
-            gpu=gpu,
-            height_px=height,
-            verbose=verbose,
-        )
+        horizontal_video_concatenator(video_paths=upper_videos, save_path=upper_path, gpu=gpu, quality=quality, height_px=height, verbose=verbose)
     else:
         upper_path = upper_videos[0]
     if verbose:
         print("Creating lower mosaic... (Step 2/3)")
     if len(lower_videos) > 1:
         lower_path = os.path.join(temp_dir, "lower.mp4")
-        horizontal_video_concatenator(
-            video_paths=lower_videos,
-            save_path=lower_path,
-            gpu=gpu,
-            height_px=height,
-            verbose=verbose,
-        )
+        horizontal_video_concatenator(video_paths=lower_videos, save_path=lower_path, gpu=gpu, quality=quality, height_px=height, verbose=verbose)
     else:
         lower_path = lower_videos[0]
-    panels_meta = [
-        get_video_meta_data(video_path=video_path)
-        for video_path in [lower_path, upper_path]
-    ]
+    panels_meta = [get_video_meta_data(video_path=video_path) for video_path in [lower_path, upper_path]]
     if verbose:
-        print("Joining upper and lower mosaic... (Step 2/3)")
-    vertical_video_concatenator(
-        video_paths=[upper_path, lower_path],
-        save_path=save_path,
-        verbose=verbose,
-        gpu=gpu,
-        width_px=max([x["width"] for x in panels_meta]),
-    )
+        print("Joining upper and lower mosaic... (Step 3/3)")
+    vertical_video_concatenator(video_paths=[upper_path, lower_path], save_path=save_path, verbose=verbose, gpu=gpu, quality=quality, width_px=max([x["width"] for x in panels_meta]))
     timer.stop_timer()
     shutil.rmtree(temp_dir)
     if verbose:
-        print(
-            f"Mosaic concatenation complete. Saved at {save_path} (Elapsed time: {timer.elapsed_time_str}s.)"
-        )
+        print(f"Mosaic concatenation complete. Saved at {save_path} (Elapsed time: {timer.elapsed_time_str}s.)")
 
 
 def mixed_mosaic_concatenator(
     video_paths: List[Union[str, os.PathLike]],
     save_path: Union[str, os.PathLike],
-    gpu: Optional[bool] = False,
-    verbose: Optional[bool] = True,
-    uneven_fill_color: Optional[str] = "black",
+    gpu: bool = False,
+    quality: int = 23,
+    verbose: bool = True,
+    uneven_fill_color: str = "black",
 ) -> None:
     """
     Create a mixed mosaic video by concatenating multiple input videos in a mosaic layout of various sizes.
@@ -2939,6 +2854,7 @@ def mixed_mosaic_concatenator(
     :param List[Union[str, os.PathLike]] video_paths: List of input video file paths.
     :param Union[str, os.PathLike] save_path: File path to save the concatenated video.
     :param Optional[bool] gpu: Whether to use GPU-accelerated codec (default: False).
+    :param int quality: Video quality (CRF value). Lower values = higher quality. Range 0-52. Default 23.
     :param Optional[bool] verbose: Whether to print progress messages (default: True).
 
     :example:
@@ -2962,6 +2878,8 @@ def mixed_mosaic_concatenator(
         print("Creating mixed mosaic video... ")
     temp_dir = os.path.join(os.path.dirname(large_mosaic_path), f"temp_{dt}")
     os.makedirs(temp_dir)
+    quality = 23 if not check_int(name='quality', value=quality, min_value=0, max_value=52, raise_error=False)[0] else int(quality)
+
     if not (len(video_paths) % 2) == 0:
         blank_path = os.path.join(temp_dir, f"{dt}.mp4")
         create_blank_video(
@@ -2986,6 +2904,7 @@ def mixed_mosaic_concatenator(
             video_paths=upper_videos,
             save_path=upper_path,
             gpu=gpu,
+            quality=quality,
             height_px=mosaic_height,
             verbose=verbose,
         )
@@ -2999,6 +2918,7 @@ def mixed_mosaic_concatenator(
             video_paths=lower_videos,
             save_path=lower_path,
             gpu=gpu,
+            quality=quality,
             verbose=verbose,
             height_px=mosaic_height,
         )
@@ -3016,6 +2936,7 @@ def mixed_mosaic_concatenator(
         width_px=max([x["width"] for x in panels_meta]),
         save_path=mosaic_path,
         gpu=gpu,
+        quality=quality,
         verbose=verbose,
     )
     if verbose:
@@ -3025,6 +2946,7 @@ def mixed_mosaic_concatenator(
         height_idx=0,
         save_path=save_path,
         gpu=gpu,
+        quality=quality,
     )
     timer.stop_timer()
     shutil.rmtree(temp_dir)
