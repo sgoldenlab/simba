@@ -14,7 +14,7 @@ from simba.mixins.config_reader import ConfigReader
 from simba.utils.checks import (check_ffmpeg_available,
                                 check_file_exist_and_readable, check_int,
                                 check_nvidea_gpu_available, check_str,
-                                check_valid_lst, check_valid_boolean)
+                                check_valid_boolean, check_valid_lst)
 from simba.utils.enums import Paths, TagNames
 from simba.utils.errors import FFMPEGCodecGPUError
 from simba.utils.printing import SimbaTimer, log_event, stdout_success

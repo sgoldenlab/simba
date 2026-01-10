@@ -7,7 +7,9 @@ from typing import Union
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
 from simba.pose_processors.pose_reset import PoseResetter
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box, FileSelect, SimbaButton, TwoOptionQuestionPopUp, SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, Entry_Box,
+                                        FileSelect, SimbaButton, SimBADropDown,
+                                        TwoOptionQuestionPopUp)
 from simba.utils.checks import check_str
 from simba.utils.enums import ConfigKey, Keys, Links
 from simba.utils.errors import DuplicationError, NoDataError
