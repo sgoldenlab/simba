@@ -5,12 +5,15 @@ from typing import Union
 from simba.data_processors.egocentric_aligner import EgocentricalAligner
 from simba.mixins.config_reader import ConfigReader
 from simba.mixins.pop_up_mixin import PopUpMixin
-from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FolderSelect, SimBADropDown)
+from simba.ui.tkinter_functions import (CreateLabelFrameWithIcon, FolderSelect,
+                                        SimBADropDown)
 from simba.utils.checks import check_if_dir_exists, check_nvidea_gpu_available
 from simba.utils.enums import Keys, Links
 from simba.utils.errors import InvalidInputError, NoDataError, SimBAGPUError
-from simba.utils.lookups import get_color_dict, find_closest_string
-from simba.utils.read_write import (find_all_videos_in_directory, find_files_of_filetypes_in_directory,  get_fn_ext, str_2_bool)
+from simba.utils.lookups import find_closest_string, get_color_dict
+from simba.utils.read_write import (find_all_videos_in_directory,
+                                    find_files_of_filetypes_in_directory,
+                                    get_fn_ext, str_2_bool)
 
 
 class EgocentricAlignPopUp(ConfigReader, PopUpMixin):
