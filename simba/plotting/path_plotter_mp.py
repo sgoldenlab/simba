@@ -18,11 +18,16 @@ from simba.utils.checks import (
     check_that_hhmmss_start_is_before_end, check_valid_boolean,
     check_valid_dataframe, check_valid_lst,
     check_video_and_data_frm_count_align)
-from simba.utils.data import (find_frame_numbers_from_time_stamp, slice_roi_dict_for_video, terminate_cpu_pool, get_cpu_pool)
+from simba.utils.data import (find_frame_numbers_from_time_stamp, get_cpu_pool,
+                              slice_roi_dict_for_video, terminate_cpu_pool)
 from simba.utils.enums import Formats, TagNames
-from simba.utils.errors import (FrameRangeError, InvalidInputError, InvalidVideoFileError, NoSpecifiedOutputError)
+from simba.utils.errors import (FrameRangeError, InvalidInputError,
+                                InvalidVideoFileError, NoSpecifiedOutputError)
 from simba.utils.printing import SimbaTimer, log_event, stdout_success
-from simba.utils.read_write import (concatenate_videos_in_folder, create_directory, find_core_cnt, find_video_of_file, get_fn_ext, read_df, read_frm_of_video, get_current_time)
+from simba.utils.read_write import (concatenate_videos_in_folder,
+                                    create_directory, find_core_cnt,
+                                    find_video_of_file, get_current_time,
+                                    get_fn_ext, read_df, read_frm_of_video)
 from simba.utils.warnings import ROIWarning
 
 STYLE_WIDTH = "width"
